@@ -45,7 +45,7 @@ function mkColumnDefs() {
             field: "surveyRun.status",
             name: "Status",
             cellFilter: "toDisplayName:'surveyRunStatus'",
-            width: "5%"
+            width: "7%"
         },
         {
             field: "completionRateStats",
@@ -70,29 +70,49 @@ function mkColumnDefs() {
                                 </uib-bar>
                             </uib-progress>
                         </div>`,
-            width: "10%"
+            width: "15%"
         },
         {
             field: "surveyRun.contactEmail",
             name: "Contact",
+            width: "20%"
         },
         {
             field: "surveyRun.issuedOn",
             name: "Issued",
             cellTemplate: "<div class=\"ui-grid-cell-contents\"><waltz-from-now timestamp=\"COL_FIELD\" days-only=\"true\"></waltz-from-now></div>",
-            width: "10%"
+            width: "8%"
         },
         {
             field: "surveyRun.dueDate",
             name: "Due",
             cellTemplate: "<div class=\"ui-grid-cell-contents\"><waltz-from-now timestamp=\"COL_FIELD\" days-only=\"true\"></waltz-from-now></div>",
-            width: "10%"
+            width: "7%"
         },
         {
             field: "owner.displayName",
             name: "Owner",
+            width: "10%",
             cellTemplate: "<div class=\"ui-grid-cell-contents\"><span ng-bind=\"COL_FIELD\"></span></div>",
         },
+        {
+            field: "",
+            name: "Actions",
+            width: "8%",
+            cellTemplate:
+                `
+                <div class="ui-grid-cell-contents">
+                    <a ng-click="grid.appScope.deleteRun(row.entity.surveyRun)"
+                       ng-if="row.entity.isRunOwnedByLoggedInUser"
+                       uib-popover="Delete this Survey Run"
+                       popover-placement="left"
+                       popover-trigger="mouseenter" 
+                       class="btn btn-xs btn-danger waltz-visibility-child-30">
+                        <waltz-icon name="trash-o"></waltz-icon>
+                    </a>
+                </div>
+                `
+        }
     ];
 }
 
@@ -114,8 +134,7 @@ function controller($q,
 
     const templateId = $stateParams.id;
 
-    vm.people = {};
-
+    // template
     serviceBroker
         .loadViewData(CORE_API.SurveyTemplateStore.getById, [ templateId ])
         .then(r => {
@@ -128,25 +147,41 @@ function controller($q,
             }
         });
 
-    serviceBroker
-        .loadViewData(CORE_API.SurveyRunStore.findByTemplateId, [ templateId ])
-        .then(r => {
-            [vm.issuedAndCompleted, vm.draft] = _
-                .chain(r.data)
-                .map(d => {
-                    const stats = d.completionRateStats;
-                    stats.popoverText = computePopoverTextForStats(d.surveyRun, stats);
-                    return d;
-                })
-                .partition(d => d.surveyRun.status !== "DRAFT")
-                .value();
-        });
+    // runs
+    const loadRuns = () => {
+        let userPromise = serviceBroker
+            .loadAppData(CORE_API.UserStore.whoami)
+            .then(r => r.data);
 
+        let runsPromise = serviceBroker
+            .loadViewData(CORE_API.SurveyRunStore.findByTemplateId, [templateId], { force: true })
+            .then(r => r.data);
+
+        $q.all([userPromise, runsPromise])
+            .then(([user, runsData]) => {
+                [vm.issuedAndCompleted, vm.draft] = _
+                    .chain(runsData)
+                    .map(d => {
+                        const stats = d.completionRateStats;
+                        stats.popoverText = computePopoverTextForStats(d.surveyRun, stats);
+                        d.isRunOwnedByLoggedInUser = d.owner
+                            ? (_.toLower(d.owner.email) === _.toLower(user.userName))
+                            : false;
+                        return d;
+                    })
+                    .partition(d => d.surveyRun.status !== "DRAFT")
+                    .value();
+            });
+    };
+
+    loadRuns();
+
+    // questions
     serviceBroker
         .loadViewData(CORE_API.SurveyQuestionStore.findForTemplate, [templateId])
         .then(r => vm.questionInfos = r.data);
 
-    function updateTemplateStatus(newStatus, successMessage) {
+    const updateTemplateStatus = (newStatus, successMessage) => {
         serviceBroker
             .execute(
                 CORE_API.SurveyTemplateStore.updateStatus,
@@ -158,7 +193,7 @@ function controller($q,
             .catch(e => {
                 displayError(notification, `Could not update status to ${newStatus}`, e);
             });
-    }
+    };
 
     vm.markTemplateAsActive = () => {
         updateTemplateStatus("ACTIVE", "Survey template successfully marked as Active");
@@ -186,6 +221,22 @@ function controller($q,
                 .then(r => {
                     notification.success("Survey template cloned successfully");
                     $state.go("main.survey.template.view", {id: r.data});
+                });
+        }
+    };
+
+    vm.deleteRun = (surveyRun) => {
+        if (confirm(`Are you sure you want to delete this survey run: ${surveyRun.name}? Any responses collected so far will also be deleted.`)) {
+            serviceBroker
+                .execute(
+                    CORE_API.SurveyRunStore.deleteById,
+                    [ surveyRun.id ])
+                .then(() => {
+                    notification.warning("Survey run deleted");
+                    loadRuns();
+                })
+                .catch(e => {
+                    displayError(notification, "Survey run could not be deleted", e);
                 });
         }
     };

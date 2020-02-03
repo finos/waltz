@@ -68,6 +68,7 @@ public class SurveyRunEndpoint implements Endpoint {
         String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String surveyRunListForUserPath = mkPath(BASE_URL, "user");
         String surveyRunUpdatePath = mkPath(BASE_URL, ":id");
+        String surveyRunDeletePath = mkPath(BASE_URL, ":id");
         String generateSurveyRunRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
         String createSurveyRunInstancesAndRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
         String createSurveyInstancesPath = mkPath(BASE_URL, ":id", "create-instances");
@@ -93,6 +94,9 @@ public class SurveyRunEndpoint implements Endpoint {
             return surveyRunService
                     .createSurveyRun(getUsername(req), surveyRunChangeCommand);
         };
+
+        DatumRoute<Boolean> surveyRunDeleteRoute = (req, res) ->
+                surveyRunService.deleteSurveyRun(getUsername(req), getId(req));
 
         DatumRoute<Integer> surveyRunUpdateRoute = (req, res) -> {
             ensureUserHasAdminRights(req);
@@ -154,6 +158,7 @@ public class SurveyRunEndpoint implements Endpoint {
         getForList(generateSurveyRunRecipientsPath, generateSurveyRunRecipientsRoute);
         getForList(surveyRunListForUserPath, surveyRunListForUserRoute);
         postForDatum(BASE_URL, surveyRunCreateRoute);
+        deleteForDatum(surveyRunDeletePath, surveyRunDeleteRoute);
         putForDatum(surveyRunUpdatePath, surveyRunUpdateRoute);
         postForDatum(createSurveyRunInstancesAndRecipientsPath, createSurveyRunInstancesAndRecipientsRoute);
         postForDatum(createSurveyInstancesPath, createSurveyInstancesRoute);

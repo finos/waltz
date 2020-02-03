@@ -46,6 +46,12 @@ function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const deleteById = (id) => {
+        return $http
+            .delete(`${base}/${id}`)
+            .then(r => r.data);
+    };
+
     const getById = (id) => {
         return $http
             .get(`${base}/id/${id}`)
@@ -114,6 +120,7 @@ function store($http, baseApiUrl) {
 
     return {
         create,
+        deleteById,
         getById,
         findByTemplateId,
         findByEntityReference,
@@ -143,6 +150,11 @@ export const SurveyRunStore_API = {
         serviceName,
         serviceFnName: 'create',
         description: 'create survey run'
+    },
+    deleteById: {
+        serviceName,
+        serviceFnName: 'deleteById',
+        description: 'delete survey run for a given id'
     },
     getById: {
         serviceName,

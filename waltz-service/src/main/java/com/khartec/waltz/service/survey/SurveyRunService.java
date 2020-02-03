@@ -24,10 +24,7 @@ import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.involvement.InvolvementDao;
 import com.khartec.waltz.data.person.PersonDao;
-import com.khartec.waltz.data.survey.SurveyInstanceDao;
-import com.khartec.waltz.data.survey.SurveyInstanceRecipientDao;
-import com.khartec.waltz.data.survey.SurveyRunDao;
-import com.khartec.waltz.data.survey.SurveyTemplateDao;
+import com.khartec.waltz.data.survey.*;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.person.Person;
@@ -39,7 +36,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
@@ -59,6 +59,7 @@ public class SurveyRunService {
     private final SurveyInstanceRecipientDao surveyInstanceRecipientDao;
     private final SurveyRunDao surveyRunDao;
     private final SurveyTemplateDao surveyTemplateDao;
+    private final SurveyQuestionResponseDao surveyQuestionResponseDao;
 
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
     private final SurveyInstanceIdSelectorFactory surveyInstanceIdSelectorFactory = new SurveyInstanceIdSelectorFactory();
@@ -71,7 +72,8 @@ public class SurveyRunService {
                             SurveyInstanceDao surveyInstanceDao,
                             SurveyInstanceRecipientDao surveyInstanceRecipientDao,
                             SurveyRunDao surveyRunDao,
-                            SurveyTemplateDao surveyTemplateDao) {
+                            SurveyTemplateDao surveyTemplateDao,
+                            SurveyQuestionResponseDao surveyQuestionResponseDao) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(involvementDao, "involvementDao cannot be null");
         checkNotNull(personDao, "personDao cannot be null");
@@ -79,6 +81,7 @@ public class SurveyRunService {
         checkNotNull(surveyInstanceRecipientDao, "surveyInstanceRecipientDao cannot be null");
         checkNotNull(surveyRunDao, "surveyRunDao cannot be null");
         checkNotNull(surveyTemplateDao, "surveyTemplateDao cannot be null");
+        checkNotNull(surveyQuestionResponseDao, "surveyQuestionResponseDao cannot be null");
 
         this.changeLogService = changeLogService;
         this.involvementDao = involvementDao;
@@ -87,6 +90,7 @@ public class SurveyRunService {
         this.surveyInstanceRecipientDao = surveyInstanceRecipientDao;
         this.surveyRunDao = surveyRunDao;
         this.surveyTemplateDao = surveyTemplateDao;
+        this.surveyQuestionResponseDao = surveyQuestionResponseDao;
     }
 
 
@@ -114,6 +118,18 @@ public class SurveyRunService {
 
         long surveyRunId = surveyRunDao.create(owner.id().get(), command);
 
+        // log against template
+        changeLogService.write(
+                ImmutableChangeLog.builder()
+                        .operation(Operation.ADD)
+                        .userId(userName)
+                        .parentReference(EntityReference.mkRef(EntityKind.SURVEY_TEMPLATE, command.surveyTemplateId()))
+                        .childKind(EntityKind.SURVEY_RUN)
+                        .message("Survey Run: " + command.name() + " (ID: " + surveyRunId + ") added")
+                        .build());
+
+
+        // log against run
         changeLogService.write(
                 ImmutableChangeLog.builder()
                         .operation(Operation.ADD)
@@ -125,6 +141,45 @@ public class SurveyRunService {
         return ImmutableIdCommandResponse.builder()
                 .id(surveyRunId)
                 .build();
+    }
+
+
+    public boolean deleteSurveyRun(String userName, long surveyRunId) {
+        checkNotNull(userName, "userName cannot be null");
+
+        validateSurveyRunDelete(userName, surveyRunId);
+
+        SurveyRun surveyRun = surveyRunDao.getById(surveyRunId);
+
+        // delete question responses
+        surveyQuestionResponseDao.deleteForSurveyRun(surveyRunId);
+        // delete instance recipients
+        surveyInstanceRecipientDao.deleteForSurveyRun(surveyRunId);
+        // delete instances
+        surveyInstanceDao.deleteForSurveyRun(surveyRunId);
+        // delete run
+        boolean deleteSuccessful = surveyRunDao.delete(surveyRunId) == 1;
+
+        // log against template
+        changeLogService.write(
+                ImmutableChangeLog.builder()
+                        .operation(Operation.REMOVE)
+                        .userId(userName)
+                        .parentReference(EntityReference.mkRef(EntityKind.SURVEY_TEMPLATE, surveyRun.surveyTemplateId()))
+                        .childKind(EntityKind.SURVEY_RUN)
+                        .message("Survey Run: " + surveyRun.name() + " (ID: " + surveyRunId + ") removed")
+                        .build());
+
+        // log against run (for completeness)
+        changeLogService.write(
+                ImmutableChangeLog.builder()
+                        .operation(Operation.REMOVE)
+                        .userId(userName)
+                        .parentReference(EntityReference.mkRef(EntityKind.SURVEY_RUN, surveyRunId))
+                        .message("Survey Run: " + surveyRun.name() + " removed")
+                        .build());
+
+        return deleteSuccessful;
     }
 
 
@@ -279,15 +334,36 @@ public class SurveyRunService {
 
 
     private void validateSurveyRunUpdate(String userName, long surveyRunId) {
-        Person owner = personDao.getActiveByUserEmail(userName);
-        checkNotNull(owner, "userName " + userName + " cannot be resolved");
-
-        SurveyRun surveyRun = surveyRunDao.getById(surveyRunId);
-        checkNotNull(surveyRun, "surveyRun " + surveyRunId + " not found");
+        Person owner = validateUser(userName);
+        SurveyRun surveyRun = validateSurveyRun(surveyRunId);
 
         checkTrue(Objects.equals(surveyRun.ownerId(), owner.id().get()), "Permission denied");
 
         checkTrue(surveyRun.status() == SurveyRunStatus.DRAFT, "survey run can only be updated when it's still in DRAFT mode");
+    }
+
+
+    private void validateSurveyRunDelete(String userName, long surveyRunId) {
+        Person owner = validateUser(userName);
+        SurveyRun surveyRun = validateSurveyRun(surveyRunId);
+
+        checkTrue(Objects.equals(surveyRun.ownerId(), owner.id().get()), "Permission denied");
+    }
+
+
+    private Person validateUser(String userName) {
+        Person owner = personDao.getActiveByUserEmail(userName);
+        checkNotNull(owner, "userName " + userName + " cannot be resolved");
+
+        return owner;
+    }
+
+
+    private SurveyRun validateSurveyRun(long surveyRunId) {
+        SurveyRun surveyRun = surveyRunDao.getById(surveyRunId);
+        checkNotNull(surveyRun, "surveyRun " + surveyRunId + " not found");
+
+        return surveyRun;
     }
 
 
