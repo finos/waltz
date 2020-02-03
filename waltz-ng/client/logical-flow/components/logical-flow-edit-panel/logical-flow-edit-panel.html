@@ -23,8 +23,8 @@
             <!-- SLOPE DIAGRAM -->
             <waltz-source-and-target-graph ng-if="$ctrl.parentEntityRef"
                                            entity-ref="$ctrl.parentEntityRef"
-                                           logical-flows="$ctrl.logicalFlows"
-                                           decorators="$ctrl.logicalFlowDecorators"
+                                           logical-flows="$ctrl.filteredFlowData.flows"
+                                           decorators="$ctrl.filteredFlowData.decorators"
                                            tweakers="$ctrl.flowTweakers">
             </waltz-source-and-target-graph>
         </div>
