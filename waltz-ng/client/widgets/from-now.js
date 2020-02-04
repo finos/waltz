@@ -47,16 +47,20 @@ function controller($scope) {
 
         const m = moment.utc(nv, formats.parse );
 
-        const hoverFormat = vm.daysOnly
-            ? formats.daysOnly
-            : formats.daysAndMinutes;
+        let hoverFormat = null;
+        let current = null;
 
-        const current = vm.daysOnly ? moment().startOf('day') : moment();
-
-        vm.hoverValue = m.local().format(hoverFormat);
-        vm.fromNow = !vm.daysOnly
-            ? m.fromNow()
-            : Math.round(current.diff(m, 'days', true)) !== 0 ? m.from(current) : 'today';
+        if(vm.daysOnly) {
+            hoverFormat = formats.daysOnly;
+            current = moment().utc().startOf('day');
+            vm.hoverValue = m.format(hoverFormat);
+            vm.fromNow = Math.round(current.diff(m, 'days', true)) !== 0 ? m.from(current) : 'today';
+        } else {
+            hoverFormat = formats.daysAndMinutes;
+            current = moment();
+            vm.hoverValue = m.local().format(hoverFormat);
+            vm.fromNow = m.fromNow();
+        }
     });
 }
 
