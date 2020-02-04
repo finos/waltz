@@ -24,6 +24,7 @@ import {mkTweakers} from "../source-and-target-graph/source-and-target-utilities
 import template from "./logical-flow-edit-panel.html";
 import {displayError} from "../../../common/error-utils";
 import {sameRef} from "../../../common/entity-utils";
+import {event} from "d3-selection";
 
 
 const bindings = {
@@ -81,11 +82,64 @@ function vetoMove(isDirty) {
 }
 
 
-function controller($q,
+
+function scrollIntoView(element, $window) {
+    element.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+    });
+    $window.scrollBy(0, -90);
+}
+
+
+
+function filterByType(typeId, flows = [], decorators = []) {
+    if (typeId === 0) {
+        return {
+            selectedTypeId: 0,
+            decorators,
+            flows
+        };
+    }
+
+    const ds = _.filter(decorators, d => d.decoratorEntity.id === typeId);
+    const dataFlowIds = _.map(ds, "dataFlowId");
+    const fs = _.filter(flows, f => _.includes(dataFlowIds, f.id));
+
+    return {
+        filterApplied: true,
+        decorators: ds,
+        flows: fs
+    };
+}
+
+
+function controller($element,
+                    $q,
                     $scope,
+                    $window,
                     notification,
                     serviceBroker) {
     const vm = initialiseData(this, initialState);
+
+    function applyFilter() {
+        $scope.$applyAsync(() => {
+            const filterFunction = vm.activeFilter || resetFilter;
+            vm.filteredFlowData = filterFunction();
+            scrollIntoView($element[0], $window);
+        });
+    }
+
+    function resetFilter() {
+        return {
+            filterApplied: false,
+            flows: vm.logicalFlows,
+            decorators: vm.logicalFlowDecorators
+        };
+    }
+
+    vm.showAll = () => vm.filteredFlowData = resetFilter();
+
 
     vm.$onChanges = (changes) => {
         if(vm.parentEntityRef) {
@@ -94,13 +148,34 @@ function controller($q,
                     const baseTweakers = {
                         source: {onSelect: a => $scope.$applyAsync(() => selectSource(a))},
                         target: {onSelect: a => $scope.$applyAsync(() => selectTarget(a))},
-                        type: {onSelect: a => $scope.$applyAsync(() => selectType(a))}
+                        type: {
+                            onSelect: d => {
+                                event.stopPropagation();
+                                $scope.$applyAsync(() => selectType(d));
+                                vm.activeFilter = () => filterByType(
+                                    d.id,
+                                    vm.logicalFlows,
+                                    vm.logicalFlowDecorators);
+                                applyFilter();
+                            }
+                        },
+                        typeBlock: {
+                            onSelect: () => {
+                                event.stopPropagation();
+                                if (vm.filteredFlowData.filterApplied) {
+                                    vm.activeFilter = resetFilter;
+                                    applyFilter();
+                                }
+                            }
+                        }
                     };
 
                     vm.flowTweakers = mkTweakers(
                         baseTweakers,
                         vm.physicalFlows,
                         vm.logicalFlows);
+
+                    vm.showAll();
                 });
 
             serviceBroker
@@ -171,12 +246,14 @@ function controller($q,
 
     const reload = () => {
         vm.cancel();
-        return $q.all([
-            loadLogicalFlows(),
-            loadLogicalFlowDecorators(),
-            loadDataTypeUsages(),
-            loadPhysicalFlows()
-        ]);
+        return $q
+            .all([
+                loadLogicalFlows(),
+                loadLogicalFlowDecorators(),
+                loadDataTypeUsages(),
+                loadPhysicalFlows()
+            ])
+            .then(applyFilter);
     };
 
     const selectSource = (selection) => {
@@ -324,8 +401,10 @@ function controller($q,
 
 
 controller.$inject = [
+    "$element",
     "$q",
     "$scope",
+    "$window",
     "Notification",
     "ServiceBroker"
 ];
