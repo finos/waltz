@@ -92,9 +92,11 @@ const entityLoaders = {
                 value: "-"
             };
 
-            serviceBroker
-                .loadViewData(CORE_API.OrgUnitStore.getById, [ person.organisationalUnitId ])
-                .then(r => orgUnitName.value = r.data.name);
+            if (person.organisationalUnitId) {
+                serviceBroker
+                    .loadViewData(CORE_API.OrgUnitStore.getById, [ person.organisationalUnitId ])
+                    .then(r => orgUnitName.value = r.data.name);
+            }
 
             return [
                 {
