@@ -720,4 +720,28 @@
                                  onDelete="CASCADE"/>
     </changeSet>
 
+    <changeSet id="20200124-4626-3"
+               author="kearash1">
+        <comment>4626: involvement: add read-only flag</comment>
+        <dropDefaultValue tableName="involvement"
+                          columnName="is_readonly"/>
+    </changeSet>
+
+    <changeSet id="20200124-4626-4"
+               author="kearash1">
+        <comment>4626: involvement: add read-only flag</comment>
+        <addDefaultValue tableName="involvement"
+                         columnName="is_readonly"
+                         defaultValueBoolean="true"/>
+    </changeSet>
+
+    <changeSet id="20200124-4626-5"
+               author="kearash1">
+        <sql>
+            UPDATE involvement
+            SET is_readonly = CASE WHEN provenance = 'waltz' THEN 0 ELSE 1
+            END
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
