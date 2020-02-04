@@ -41,10 +41,11 @@ const columnDefs = [
                             ng-switch="row.entity['management']">
                          <span ng-switch-when="End User"
                                ng-bind="COL_FIELD"></span>
-                         <a ng-switch-default
-                            ui-sref="main.app.view ({ id: row.entity['id'] })"
-                            ng-bind="COL_FIELD">
-                         </a>
+                         <span ng-switch-default>
+                            <waltz-entity-link tooltip-placement="right"
+                                               entity-ref="row.entity">
+                            </waltz-entity-link>
+                         </span>
                        </div>`
     },
     { field: "assetCode"},

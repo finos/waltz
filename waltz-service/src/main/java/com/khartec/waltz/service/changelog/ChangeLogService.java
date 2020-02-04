@@ -19,27 +19,39 @@
 package com.khartec.waltz.service.changelog;
 
 import com.khartec.waltz.common.CollectionUtilities;
+import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.data.changelog.ChangeLogDao;
+import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowDao;
+import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.Operation;
+import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ChangeLog;
+import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.physical_flow.PhysicalFlow;
+import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import org.jooq.lambda.Unchecked;
+import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.Future;
 
 import static com.khartec.waltz.common.Checks.*;
+import static com.khartec.waltz.common.SetUtilities.asSet;
+import static com.khartec.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
+import static com.khartec.waltz.model.EntityKind.PHYSICAL_FLOW;
 import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.model.EntityReferenceUtilities.safeName;
+import static java.lang.String.format;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
 @Service
@@ -49,19 +61,27 @@ public class ChangeLogService {
     private final ChangeLogDao changeLogDao;
     private final DBExecutorPoolInterface dbExecutorPool;
     private final PhysicalFlowDao physicalFlowDao;
+    private final LogicalFlowDao logicalFlowDao;
+    private final PhysicalSpecificationDao physicalSpecificationDao;
 
 
     @Autowired
     public ChangeLogService(ChangeLogDao changeLogDao,
                             DBExecutorPoolInterface dbExecutorPool,
-                            PhysicalFlowDao physicalFlowDao) {
+                            PhysicalFlowDao physicalFlowDao,
+                            PhysicalSpecificationDao physicalSpecificationDao,
+                            LogicalFlowDao logicalFlowDao) {
         checkNotNull(changeLogDao, "changeLogDao must not be null");
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
         checkNotNull(physicalFlowDao, "physicalFlowDao cannot be null");
+        checkNotNull(physicalSpecificationDao, "physicalSpecificationDao cannot be null");
+        checkNotNull(logicalFlowDao, "logicalFlowDao cannot be null");
 
         this.changeLogDao = changeLogDao;
         this.dbExecutorPool = dbExecutorPool;
         this.physicalFlowDao = physicalFlowDao;
+        this.physicalSpecificationDao = physicalSpecificationDao;
+        this.logicalFlowDao = logicalFlowDao;
     }
 
 
@@ -94,7 +114,7 @@ public class ChangeLogService {
     }
 
 
-    public int[] write(List<ChangeLog> changeLogs) {
+    public int[] write(Collection<ChangeLog> changeLogs) {
         return changeLogDao.write(changeLogs);
     }
 
@@ -109,6 +129,40 @@ public class ChangeLogService {
      */
     public List<ChangeLog> findUnattestedChanges(EntityReference ref) {
         return changeLogDao.findUnattestedChanges(ref);
+    }
+
+
+    public void writeChangeLogEntries(EntityReference ref, String userId, String postamble, Operation operation) {
+        switch (ref.kind()) {
+            case PHYSICAL_FLOW:
+                PhysicalFlow physicalFlow = physicalFlowDao.getById(ref.id());
+                writeChangeLogEntries(physicalFlow, userId, postamble, operation);
+                break;
+            case LOGICAL_DATA_FLOW:
+                LogicalFlow logicalFlow = logicalFlowDao.getByFlowId(ref.id());
+                writeChangeLogEntries(logicalFlow, userId, postamble, operation);
+            default:
+                // nop
+        }
+    }
+
+    public void writeChangeLogEntries(LogicalFlow logicalFlow,
+                                      String userId,
+                                      String postamble,
+                                      Operation operation) {
+        Tuple2<String, Set<EntityReference>> t = preparePreambleAndEntitiesForChangeLogs(logicalFlow);
+        String message = format("%s: %s", t.v1, postamble);
+        writeChangeLogEntries(t.v2, message, operation, LOGICAL_DATA_FLOW, userId);
+    }
+
+
+    public void writeChangeLogEntries(PhysicalFlow physicalFlow,
+                                      String userId,
+                                      String postamble,
+                                      Operation operation) {
+        Tuple2<String, Set<EntityReference>> t = preparePreambleAndEntitiesForChangeLogs(physicalFlow);
+        String message = format("%s: %s", t.v1, postamble);
+        writeChangeLogEntries(t.v2, message, operation, PHYSICAL_FLOW, userId);
     }
 
 
@@ -135,5 +189,64 @@ public class ChangeLogService {
             return (List<ChangeLog>) CollectionUtilities.sort(all, Comparator.comparing(ChangeLog::createdAt).reversed());
         }).get();
     }
+
+
+    private void writeChangeLogEntries(Set<EntityReference> refs,
+                                       String message,
+                                       Operation operation,
+                                       EntityKind childKind,
+                                       String userId) {
+        Set<ChangeLog> changeLogEntries = SetUtilities.map(
+                refs,
+                r -> (ChangeLog) ImmutableChangeLog
+                        .builder()
+                        .parentReference(r)
+                        .message(message)
+                        .severity(Severity.INFORMATION)
+                        .userId(userId)
+                        .childKind(childKind)
+                        .operation(operation)
+                        .build());
+
+        write(changeLogEntries);
+    }
+
+
+    private Tuple2<String, Set<EntityReference>> preparePreambleAndEntitiesForChangeLogs(PhysicalFlow physicalFlow) {
+        LogicalFlow logicalFlow = logicalFlowDao.getByFlowId(physicalFlow.logicalFlowId());
+        PhysicalSpecification specification = physicalSpecificationDao.getById(physicalFlow.specificationId());
+
+        String messagePreamble = format(
+                "Physical flow: %s, from: %s, to: %s",
+                specification.name(),
+                safeName(logicalFlow.source()),
+                safeName(logicalFlow.target()));
+
+        return tuple(
+                messagePreamble,
+                asSet(
+                        physicalFlow.entityReference(),
+                        logicalFlow.entityReference(),
+                        logicalFlow.source(),
+                        logicalFlow.target()));
+
+    }
+
+
+    private Tuple2<String, Set<EntityReference>> preparePreambleAndEntitiesForChangeLogs(LogicalFlow logicalFlow) {
+        String messagePreamble = format(
+                "Logical flow from: %s, to: %s",
+                safeName(logicalFlow.source()),
+                safeName(logicalFlow.target()));
+
+
+        return tuple(
+                messagePreamble,
+                asSet(
+                        logicalFlow.entityReference(),
+                        logicalFlow.source(),
+                        logicalFlow.target()));
+    }
+
 
 }
