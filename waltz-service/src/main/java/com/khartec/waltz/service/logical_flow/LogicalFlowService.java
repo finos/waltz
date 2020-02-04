@@ -159,13 +159,6 @@ public class LogicalFlowService {
     public LogicalFlow addFlow(AddLogicalFlowCommand addCmd, String username) {
         rejectIfSelfLoop(addCmd);
 
-        auditFlowChange(
-                "added",
-                addCmd.source(),
-                addCmd.target(),
-                username,
-                Operation.ADD);
-
         LocalDateTime now = nowUtc();
         LogicalFlow flowToAdd = ImmutableLogicalFlow.builder()
                 .source(addCmd.source())
@@ -178,27 +171,11 @@ public class LogicalFlowService {
         LogicalFlow logicalFlow = logicalFlowDao.addFlow(flowToAdd);
         attemptToAddUnknownDecoration(logicalFlow, username);
 
+        changeLogService.writeChangeLogEntries(logicalFlow, username, "Added", Operation.ADD);
+
         return logicalFlow;
     }
 
-
-    private void attemptToAddUnknownDecoration(LogicalFlow logicalFlow, String username) {
-        dataTypeService
-                .getUnknownDataType()
-                .flatMap(IdProvider::id)
-                .flatMap(unknownDataTypeId -> logicalFlow.id()
-                        .map(flowId -> tuple(
-                                mkRef(DATA_TYPE, unknownDataTypeId),
-                                flowId)))
-                .map(t -> ImmutableLogicalFlowDecorator
-                        .builder()
-                        .decoratorEntity(t.v1)
-                        .dataFlowId(t.v2)
-                        .lastUpdatedBy(username)
-                        .rating(AuthoritativenessRating.DISCOURAGED)
-                        .build())
-                .map(decoration -> logicalFlowDecoratorDao.addDecorators(newArrayList(decoration)));
-    }
 
 
     public List<LogicalFlow> addFlows(List<AddLogicalFlowCommand> addCmds, String username) {
@@ -270,14 +247,10 @@ public class LogicalFlowService {
 
         Set<EntityReference> affectedEntityRefs = SetUtilities.fromArray(logicalFlow.source(), logicalFlow.target());
 
-        auditFlowChange(
-                "removed",
-                logicalFlow.source(),
-                logicalFlow.target(),
-                username,
-                Operation.REMOVE);
 
         dataTypeUsageService.recalculateForApplications(affectedEntityRefs);
+
+        changeLogService.writeChangeLogEntries(logicalFlow, username, "Removed", Operation.REMOVE);
 
         return deleted;
     }
@@ -330,27 +303,12 @@ public class LogicalFlowService {
     }
 
 
-    private void auditFlowChange(String verb, EntityReference source, EntityReference target, String username, Operation operation) {
-        ImmutableChangeLog logEntry = ImmutableChangeLog.builder()
-                .parentReference(source)
-                .severity(Severity.INFORMATION)
-                .userId(username)
-                .message(String.format(
-                        "Flow %s between: %s and %s",
-                        verb,
-                        source.name().orElse(Long.toString(source.id())),
-                        target.name().orElse(Long.toString(target.id()))))
-                .childKind(LOGICAL_DATA_FLOW)
-                .operation(operation)
-                .build();
-
-        changeLogService.write(logEntry);
-        changeLogService.write(logEntry.withParentReference(target));
-    }
-
-
     public boolean restoreFlow(long logicalFlowId, String username) {
-        return logicalFlowDao.restoreFlow(logicalFlowId, username);
+        boolean result = logicalFlowDao.restoreFlow(logicalFlowId, username);
+        if (result) {
+            changeLogService.writeChangeLogEntries(mkRef(LOGICAL_DATA_FLOW, logicalFlowId), username, "Restored", Operation.ADD);
+        }
+        return result;
     }
 
 
@@ -373,4 +331,22 @@ public class LogicalFlowService {
     }
 
 
+
+    private void attemptToAddUnknownDecoration(LogicalFlow logicalFlow, String username) {
+        dataTypeService
+                .getUnknownDataType()
+                .flatMap(IdProvider::id)
+                .flatMap(unknownDataTypeId -> logicalFlow.id()
+                        .map(flowId -> tuple(
+                                mkRef(DATA_TYPE, unknownDataTypeId),
+                                flowId)))
+                .map(t -> ImmutableLogicalFlowDecorator
+                        .builder()
+                        .decoratorEntity(t.v1)
+                        .dataFlowId(t.v2)
+                        .lastUpdatedBy(username)
+                        .rating(AuthoritativenessRating.DISCOURAGED)
+                        .build())
+                .map(decoration -> logicalFlowDecoratorDao.addDecorators(newArrayList(decoration)));
+    }
 }

@@ -32,6 +32,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -194,7 +195,7 @@ public class ChangeLogDao {
     }
 
 
-    public int[] write(List<ChangeLog> changeLogs) {
+    public int[] write(Collection<ChangeLog> changeLogs) {
         checkNotNull(changeLogs, "changeLogs must not be null");
 
         Query[] queries = changeLogs
