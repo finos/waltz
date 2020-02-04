@@ -136,7 +136,7 @@ public class InvolvementService {
                                            EntityReference entityReference,
                                            EntityInvolvementChangeCommand command) {
         Involvement involvement = mkInvolvement(entityReference, command);
-        boolean result = involvementDao.remove(involvement) == 1;
+        boolean result = involvementDao.remove(involvement) > 0;
         if (result) {
             logChange(entityReference, userId, command);
         }
@@ -169,7 +169,8 @@ public class InvolvementService {
                 entityReference,
                 person.employeeId(),
                 command.involvementKindId(),
-                "waltz");
+                "waltz",
+                false);
     }
 
 
