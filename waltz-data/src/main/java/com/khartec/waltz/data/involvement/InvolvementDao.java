@@ -261,7 +261,7 @@ public class InvolvementDao {
                 .and(INVOLVEMENT.ENTITY_ID.eq(involvement.entityReference().id()))
                 .and(INVOLVEMENT.EMPLOYEE_ID.eq(involvement.employeeId()))
                 .and(INVOLVEMENT.KIND_ID.eq(involvement.kindId()))
-                .and(INVOLVEMENT.PROVENANCE.eq(involvement.provenance()));
+                .and(INVOLVEMENT.IS_READONLY.eq(false));
         return condition;
     }
 

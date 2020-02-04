@@ -45,13 +45,15 @@ public abstract class Involvement implements ProvenanceProvider {
             EntityReference entityRef,
             String employeeId,
             int involvementKindId,
-            String provenance) {
+            String provenance,
+            boolean isReadOnly) {
 
         return ImmutableInvolvement.builder()
                 .entityReference(entityRef)
                 .employeeId(employeeId)
                 .kindId(involvementKindId)
                 .provenance(provenance)
+                .isReadOnly(isReadOnly)
                 .build();
     }
 }

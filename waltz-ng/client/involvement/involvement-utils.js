@@ -27,7 +27,8 @@ export function aggregatePeopleInvolvements(involvements = [], people = []) {
             .chain(xs)
             .map(x => ({
                 kindId: x.kindId,
-                provenance: x.provenance
+                provenance: x.provenance,
+                isReadOnly: x.isReadOnly
             }))
             .uniqBy(d => d.kindId)
             .value()
