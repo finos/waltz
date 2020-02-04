@@ -121,7 +121,7 @@ function mkCurrentInvolvements(involvements = []) {
             return _.map(i.involvements, inv => ({
                 entity: personEntityRef,
                 involvement: +inv.kindId,
-                isReadOnly: inv.provenance !== "waltz"
+                isReadOnly: inv.isReadOnly
             }));
         });
 }
