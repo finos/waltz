@@ -32,7 +32,7 @@
             <li style="margin: 4px"
                 class="no-overflow"
                 ng-repeat="item in ctrl.history">
-                <a ui-sref="{{ ::item.state }} ({{ ::item.stateParams | json}})">
+                <a ui-sref="{{ ::item.state }} (::item.stateParams)">
                     <waltz-icon class='text-muted small'
                                 fixed-width="true"
                                 name="{{ item.kind | toIconName:'entity' }}"></waltz-icon>

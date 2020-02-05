@@ -26,7 +26,7 @@
           popover-placement="top">
 
         <!-- link -->
-        <a ui-sref="{{ action.state }} ({{ action.stateParams | json }})"
+        <a ui-sref="{{ ::action.state }} (::action.stateParams)"
            ng-switch-when="link"
            class="clickable">
             <waltz-icon ng-if="action.name"
