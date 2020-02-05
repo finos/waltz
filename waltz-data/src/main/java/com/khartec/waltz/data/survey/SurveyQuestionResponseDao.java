@@ -148,6 +148,17 @@ public class SurveyQuestionResponseDao {
     }
 
 
+    public int deleteForSurveyRun(long surveyRunId) {
+        Select<Record1<Long>> surveyInstanceIdSelector = dsl.select(SURVEY_INSTANCE.ID)
+                .from(SURVEY_INSTANCE)
+                .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId));
+
+        return dsl.delete(SURVEY_QUESTION_RESPONSE)
+                .where(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.in(surveyInstanceIdSelector))
+                .execute();
+    }
+
+
     private SurveyQuestionResponseRecord mkRecord(SurveyInstanceQuestionResponse response) {
         SurveyQuestionResponse questionResponse = response.questionResponse();
         Optional<EntityReference> entityResponse = questionResponse.entityResponse();

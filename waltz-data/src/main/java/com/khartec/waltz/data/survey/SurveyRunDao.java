@@ -125,6 +125,13 @@ public class SurveyRunDao {
     }
 
 
+    public int delete(long surveyRunId) {
+        return dsl.delete(SURVEY_RUN)
+                .where(SURVEY_RUN.ID.eq(surveyRunId))
+                .execute();
+    }
+
+
     public int update(long surveyRunId, SurveyRunChangeCommand command) {
         checkNotNull(command, "command cannot be null");
 
