@@ -130,11 +130,12 @@ public class EndUserAppService {
 
         List<Involvement> appInvolvements = map(eudaInvolvements,
                 r -> ImmutableInvolvement.builder()
-                    .entityReference(mkRef(APPLICATION, appRegistrationResponse.id().get()))
-                    .kindId(r.kindId())
-                    .employeeId(r.employeeId())
-                    .provenance(r.provenance())
-                    .build());
+                        .entityReference(mkRef(APPLICATION, appRegistrationResponse.id().get()))
+                        .kindId(r.kindId())
+                        .employeeId(r.employeeId())
+                        .provenance(r.provenance())
+                        .isReadOnly(false)
+                        .build());
 
         appInvolvements.forEach(involvementDao::save);
     }
