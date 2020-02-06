@@ -27,8 +27,10 @@ import com.khartec.waltz.model.survey.ImmutableSurveyInstanceQuestionResponse;
 import com.khartec.waltz.model.survey.ImmutableSurveyQuestionResponse;
 import com.khartec.waltz.model.survey.SurveyInstanceQuestionResponse;
 import com.khartec.waltz.model.survey.SurveyQuestionResponse;
+import com.khartec.waltz.schema.tables.records.SurveyQuestionListResponseRecord;
 import com.khartec.waltz.schema.tables.records.SurveyQuestionResponseRecord;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -36,13 +38,20 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.StringUtilities.ifEmpty;
+import static com.khartec.waltz.common.StringUtilities.join;
 import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
+import static com.khartec.waltz.schema.Tables.SURVEY_QUESTION_LIST_RESPONSE;
 import static com.khartec.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
+import static java.util.Comparator.comparingInt;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 import static org.jooq.impl.DSL.*;
 
 @Repository
@@ -93,22 +102,41 @@ public class SurveyQuestionResponseDao {
 
 
     public List<SurveyInstanceQuestionResponse> findForInstance(long surveyInstanceId) {
-        return dsl.select(SURVEY_QUESTION_RESPONSE.fields())
+        // fetch list responses
+        Map<Long, List<SurveyQuestionListResponseRecord>> questionIdToListResponses =
+                dsl.selectFrom(SURVEY_QUESTION_LIST_RESPONSE)
+                .where(SURVEY_QUESTION_LIST_RESPONSE.SURVEY_INSTANCE_ID.eq(surveyInstanceId))
+                .fetch()
+                .stream()
+                .collect(groupingBy(r -> r.getQuestionId(), toList()));
+
+        // fetch responses
+        List<SurveyInstanceQuestionResponse> responses = dsl.select(SURVEY_QUESTION_RESPONSE.fields())
                 .select(entityNameField)
                 .from(SURVEY_QUESTION_RESPONSE)
                 .where(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.eq(surveyInstanceId))
                 .fetch(TO_DOMAIN_MAPPER);
-    }
 
+        // plug list responses into responses
+        return responses.stream()
+                .map(r -> {
+                    if (questionIdToListResponses.containsKey(r.questionResponse().questionId())) {
+                        List<String> listResponse = questionIdToListResponses.get(r.questionResponse().questionId())
+                                .stream()
+                                .sorted(comparingInt(lr -> lr.getPosition()))
+                                .map(lr -> lr.getResponse())
+                                .collect(toList());
 
-    public List<SurveyInstanceQuestionResponse> findForSurveyRun(long surveyRunId) {
-        return dsl.select(SURVEY_QUESTION_RESPONSE.fields())
-                .select(entityNameField)
-                .from(SURVEY_QUESTION_RESPONSE)
-                .innerJoin(SURVEY_INSTANCE)
-                .on(SURVEY_INSTANCE.ID.eq(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID))
-                .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
-                .fetch(TO_DOMAIN_MAPPER);
+                        return ImmutableSurveyInstanceQuestionResponse
+                                .copyOf(r)
+                                .withQuestionResponse(ImmutableSurveyQuestionResponse
+                                                        .copyOf(r.questionResponse())
+                                                        .withListResponse(listResponse));
+                    } else {
+                        return r;
+                    }
+                })
+                .collect(toList());
     }
 
 
@@ -122,29 +150,80 @@ public class SurveyQuestionResponseDao {
                 .where(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.eq(response.surveyInstanceId())
                         .and(SURVEY_QUESTION_RESPONSE.QUESTION_ID.eq(response.questionResponse().questionId()))));
 
-        Boolean responseExists = dsl.select(when(responseExistsCondition, true).otherwise(false))
+        // save survey_question_response record
+        Boolean responseExists = dsl
+                .select(when(responseExistsCondition, true)
+                        .otherwise(false))
                 .fetchOne(Record1::value1);
 
-        if (responseExists) {
-            dsl.executeUpdate(record);
-        } else {
-            dsl.executeInsert(record);
-        }
+        dsl.transaction(configuration -> {
+            DSLContext txDsl = DSL.using(configuration);
+
+            if (responseExists) {
+                txDsl.executeUpdate(record);
+            } else {
+                txDsl.executeInsert(record);
+            }
+
+            // save survey_question_list_response records
+            response.questionResponse().listResponse().ifPresent(lrs -> {
+                txDsl.deleteFrom(SURVEY_QUESTION_LIST_RESPONSE)
+                        .where(SURVEY_QUESTION_LIST_RESPONSE.SURVEY_INSTANCE_ID.eq(response.surveyInstanceId()))
+                        .and(SURVEY_QUESTION_LIST_RESPONSE.QUESTION_ID.eq(response.questionResponse().questionId()))
+                        .execute();
+
+                if (! lrs.isEmpty()) {
+                    List<SurveyQuestionListResponseRecord> listResponses =
+                            IntStream.range(0, lrs.size())
+                            .mapToObj(i -> {
+                                SurveyQuestionListResponseRecord rec = new SurveyQuestionListResponseRecord();
+                                rec.setSurveyInstanceId(response.surveyInstanceId());
+                                rec.setQuestionId(response.questionResponse().questionId());
+                                rec.setResponse(lrs.get(i));
+                                rec.setPosition(i + 1);
+
+                                return rec;
+                            })
+                            .collect(toList());
+
+                    txDsl.batchInsert(listResponses)
+                            .execute();
+                }
+            });
+        });
     }
 
 
-    public int[] cloneResponses(long sourceSurveyInstanceId, long targetSurveyInstanceId) {
-        Result<SurveyQuestionResponseRecord> records = dsl.select(SURVEY_QUESTION_RESPONSE.fields())
+    public void cloneResponses(long sourceSurveyInstanceId, long targetSurveyInstanceId) {
+        List<SurveyQuestionResponseRecord> responseRecords = dsl
+                .select(SURVEY_QUESTION_RESPONSE.fields())
                 .select(entityNameField)
                 .from(SURVEY_QUESTION_RESPONSE)
                 .where(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.eq(sourceSurveyInstanceId))
-                .fetchInto(SURVEY_QUESTION_RESPONSE);
+                .fetchInto(SURVEY_QUESTION_RESPONSE)
+                .stream()
+                .peek(r -> r.setSurveyInstanceId(targetSurveyInstanceId))
+                .peek(r -> r.changed(true))
+                .collect(toList());
 
-        records.stream()
-                .forEach(r -> r.setSurveyInstanceId(targetSurveyInstanceId));
+        List<SurveyQuestionListResponseRecord> listResponseRecords = dsl
+                .selectFrom(SURVEY_QUESTION_LIST_RESPONSE)
+                .where(SURVEY_QUESTION_LIST_RESPONSE.SURVEY_INSTANCE_ID.eq(sourceSurveyInstanceId))
+                .fetchInto(SURVEY_QUESTION_LIST_RESPONSE)
+                .stream()
+                .peek(r -> r.setSurveyInstanceId(targetSurveyInstanceId))
+                .peek(r -> r.changed(true))
+                .collect(toList());
 
-        return dsl.batchInsert(records)
-                .execute();
+        dsl.transaction(configuration -> {
+            DSLContext txDsl = DSL.using(configuration);
+
+            txDsl.batchInsert(responseRecords)
+                    .execute();
+
+            txDsl.batchInsert(listResponseRecords)
+                    .execute();
+        });
     }
 
 
@@ -153,6 +232,7 @@ public class SurveyQuestionResponseDao {
                 .from(SURVEY_INSTANCE)
                 .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId));
 
+        // this will also auto delete any survey_question_list_response records (fk delete cascade)
         return dsl.delete(SURVEY_QUESTION_RESPONSE)
                 .where(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.in(surveyInstanceIdSelector))
                 .execute();
@@ -183,6 +263,10 @@ public class SurveyQuestionResponseDao {
                                     .orElse(null));
         record.setEntityResponseKind(entityResponse.map(er -> er.kind().name()).orElse(null));
         record.setEntityResponseId(entityResponse.map(er -> er.id()).orElse(null));
+        record.setListResponseConcat(questionResponse.listResponse()
+                                        .filter(l -> ! l.isEmpty())
+                                        .map(l -> join(l, ";;"))
+                                        .orElse(null));
 
         return record;
     }

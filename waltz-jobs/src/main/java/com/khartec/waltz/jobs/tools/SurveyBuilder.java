@@ -108,7 +108,7 @@ public class SurveyBuilder {
             tuple(
                 ImmutableSurveyQuestion.builder()
                         .position(positionCounter.getAndAdd(10))
-                        .fieldType(SurveyQuestionFieldType.DROPDOWN)
+                        .fieldType(SurveyQuestionFieldType.DROPDOWN_MULTI_SELECT)
                         .questionText("What happens to the data once it is consumed?")
                         .isMandatory(false)
                         .allowComment(true)

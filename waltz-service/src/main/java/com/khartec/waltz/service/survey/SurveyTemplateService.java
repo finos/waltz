@@ -177,7 +177,8 @@ public class SurveyTemplateService {
 
                     long id = surveyQuestionDao.create(clonedQuestion);
 
-                    if(sq.fieldType() == SurveyQuestionFieldType.DROPDOWN) {
+                    if(sq.fieldType() == SurveyQuestionFieldType.DROPDOWN
+                            || sq.fieldType() == SurveyQuestionFieldType.DROPDOWN_MULTI_SELECT) {
                         //clone the entries too
                         List<SurveyQuestionDropdownEntry> existingEntries = surveyQuestionDropdownEntryDao.findForQuestion(sq.id().get());
                         List<SurveyQuestionDropdownEntry> clonedEntries = map(

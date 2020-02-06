@@ -32,7 +32,11 @@ const initialState = {
 function extractAnswer(response = {}) {
     return !_.isNil(response.booleanResponse)
             ? response.booleanResponse
-            : (response.stringResponse || response.numberResponse || response.dateResponse || response.entityResponse)
+            : (response.stringResponse
+                || response.numberResponse
+                || response.dateResponse
+                || response.entityResponse
+                || response.listResponse)
 }
 
 

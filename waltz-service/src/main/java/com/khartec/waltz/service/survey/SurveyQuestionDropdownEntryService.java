@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static java.util.stream.Collectors.toList;
@@ -51,9 +52,10 @@ public class SurveyQuestionDropdownEntryService {
     public boolean saveEntries(long questionId, List<SurveyQuestionDropdownEntry> entries) {
         checkNotNull(entries, "entries cannot be null");
 
-        List<SurveyQuestionDropdownEntry> sanitisedEntries = entries.stream()
-                .map(e -> ImmutableSurveyQuestionDropdownEntry.copyOf(e)
-                        .withQuestionId(questionId))
+        List<SurveyQuestionDropdownEntry> sanitisedEntries = IntStream.range(0, entries.size())
+                .mapToObj(i -> ImmutableSurveyQuestionDropdownEntry.copyOf(entries.get(i))
+                        .withQuestionId(questionId)
+                        .withPosition(i + 1))
                 .collect(toList());
 
         surveyQuestionDropdownEntryDao.saveEntries(questionId, sanitisedEntries);
