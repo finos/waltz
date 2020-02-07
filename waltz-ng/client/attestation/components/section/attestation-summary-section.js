@@ -20,24 +20,25 @@ import template from "./attestation-summary-section.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {determineDownwardsScopeForKind, mkSelectionOptions} from "../../../common/selector-utils";
-import {
-    attestationPieConfig,
-    prepareSummaryData
-} from "../../attestation-pie-utils";
+import {attestationPieConfig, prepareSummaryData} from "../../attestation-pie-utils";
 import {entity} from "../../../common/services/enums/entity";
 import {attestationSummaryColumnDefs, mkAttestationSummaryDataForApps} from "../../attestation-utils";
+import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
+import * as _ from "lodash";
 
 
 const initialState = {
     columnDefs: attestationSummaryColumnDefs,
     visibility : {
         tableView: false
-    }
+    },
+    selectedFlowType: null
 };
 
 
 const bindings = {
-    parentEntityRef: "<"
+    parentEntityRef: "<",
+    filters: "<"
 };
 
 
@@ -46,26 +47,26 @@ function controller($q,
                     displayNameService) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onInit = () => {
-        vm.config =  {
-            logical: Object.assign({}, attestationPieConfig, { onSelect: vm.onSelectLogicalFlow }),
-            physical: Object.assign({}, attestationPieConfig, { onSelect: vm.onSelectPhysicalFlow }),
-        };
+    const loadData = () => {
 
-        const selectionOptions = mkSelectionOptions(
+        vm.selectionOptions = mkSelectionOptions(
             vm.parentEntityRef,
-            determineDownwardsScopeForKind(vm.parentEntityRef.kind));
+            determineDownwardsScopeForKind(vm.parentEntityRef.kind),
+            [entityLifecycleStatus.ACTIVE.key],
+            vm.filters);
+
+        console.log(vm.selectionOptions);
 
         const attestationInstancePromise = serviceBroker
             .loadViewData(
                 CORE_API.AttestationInstanceStore.findBySelector,
-                [selectionOptions])
+                [vm.selectionOptions])
             .then(r => r.data);
 
         const appPromise = serviceBroker
             .loadViewData(
                 CORE_API.ApplicationStore.findBySelector,
-                [selectionOptions])
+                [vm.selectionOptions])
             .then(r => r.data);
 
         $q.all([attestationInstancePromise, appPromise])
@@ -82,8 +83,18 @@ function controller($q,
             });
     };
 
+    vm.$onInit = () => {
+        vm.config =  {
+            logical: Object.assign({}, attestationPieConfig, { onSelect: vm.onSelectLogicalFlow }),
+            physical: Object.assign({}, attestationPieConfig, { onSelect: vm.onSelectPhysicalFlow }),
+        };
+
+        loadData();
+    };
+
     const gridSelected = (d, grid) => {
         vm.selectedApps = _.filter(grid, app => app.isAttested === d.key);
+        vm.exportFlowType = _.find(grid, r => !_.isUndefined(r.attestation)).attestation.attestedEntityKind;
         vm.visibility.tableView = true;
     };
 
@@ -97,6 +108,11 @@ function controller($q,
         gridSelected(d, vm.gridDataByPhysicalFlow)
     };
 
+    vm.$onChanges = (changes) => {
+        if(changes.filters) {
+            loadData();
+        }
+    };
 
 
 }
