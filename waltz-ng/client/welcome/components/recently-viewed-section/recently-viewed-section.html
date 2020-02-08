@@ -21,7 +21,7 @@
                name="Recently Viewed">
     <ul class="list-unstyled">
         <li ng-repeat="item in $ctrl.history">
-            <a ui-sref="{{ ::item.state }} ({{ ::item.stateParams }})">
+            <a ui-sref="{{ ::item.state }} (::item.stateParams)">
                 <waltz-icon class='text-muted'
                             fixed-width="true"
                             name="{{ item.kind | toIconName:'entity' }}"></waltz-icon>
