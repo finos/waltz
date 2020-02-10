@@ -57,7 +57,7 @@ public class MeasurableRatingPlannedDecommissionDao {
     }
 
 
-    public List<MeasurableRatingPlannedDecommission> fetchByEntity(EntityReference ref){
+    public List<MeasurableRatingPlannedDecommission> fetchByEntityRef(EntityReference ref){
         return dsl
                 .selectFrom(MEASURABLE_RATING_PLANNED_DECOMMISSION)
                 .where(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_ID.eq(ref.id())
