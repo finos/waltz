@@ -24,6 +24,7 @@ import {mkTabs} from "../../measurable-rating-utils";
 import {indexRatingSchemes, mkRatingsKeyHandler} from "../../../ratings/rating-utils";
 
 import template from "./measurable-rating-edit-panel.html";
+import {displayError} from "../../../common/error-utils";
 
 
 const bindings = {
@@ -32,13 +33,6 @@ const bindings = {
     parentEntityRef: "<",
     startingCategoryId: "<?"
 };
-
-
-function determineSaveFn(selected, store) {
-    return _.isEmpty(selected.rating)
-        ? store.create
-        : store.update;
-}
 
 
 const initialState = {
@@ -66,7 +60,6 @@ const initialState = {
 
 function controller($q,
                     $state,
-                    measurableRatingStore,
                     notification,
                     serviceBroker) {
     const vm = initialiseData(this, initialState);
@@ -99,11 +92,11 @@ function controller($q,
             .then(() => {
                 recalcTabs();
                 if (vm.startingCategoryId) {
-                    vm.onTabChange(vm.startingCategoryId);
-                } else if (!vm.visibility.tab) {
-                    const startingTab = _.get(vm.tabs, [0, "category", "id"], null);
-                    if (startingTab) { vm.onTabChange(startingTab); }
+                    vm.activeTab = _.find(vm.tabs, t => t.category.id === vm.startingCategoryId)
+                } else if (!vm.activeTab) {
+                    vm.activeTab = vm.tabs[0];
                 }
+                vm.onTabChange();
             });
 
     };
@@ -116,9 +109,14 @@ function controller($q,
             vm.ratingSchemesById,
             vm.measurables,
             vm.ratings,
+            vm.allocationSchemes,
+            vm.allocations,
             showAllCategories);
 
         vm.hasHiddenTabs = vm.categories.length !== vm.tabs.length;
+        if (vm.activeTab) {
+            vm.activeTab = _.find(vm.tabs, t => t.category.id == vm.activeTab.category.id);
+        }
     };
 
 
@@ -133,22 +131,19 @@ function controller($q,
 
 
     const doSave = (rating, description) => {
-        const saveFn = determineSaveFn(vm.selected, measurableRatingStore);
 
-        const savePromise = saveFn(
-            vm.parentEntityRef,
-            vm.selected.measurable.id,
-            rating,
-            description);
-
-        return savePromise
-            .then(rs => vm.ratings = rs)
+        return serviceBroker
+            .execute(
+                CORE_API.MeasurableRatingStore.save,
+                [vm.parentEntityRef, vm.selected.measurable.id, rating, description])
+            .then(r => { vm.ratings = r.data })
             .then(() => recalcTabs())
             .then(() => {
                 vm.saveInProgress = false;
                 const newRating = { rating, description };
                 vm.selected = Object.assign({}, vm.selected, { rating: newRating });
-            });
+            })
+            .catch(e => displayError(notification, "Could not save rating", e))
     };
 
 
@@ -158,13 +153,15 @@ function controller($q,
 
         vm.saveInProgress = true;
 
-        return measurableRatingStore
-            .remove(vm.parentEntityRef, vm.selected.measurable.id)
-            .then(rs => {
+        return serviceBroker
+            .execute(
+                CORE_API.MeasurableRatingStore.remove,
+                [vm.parentEntityRef, vm.selected.measurable.id])
+            .then(r => {
                 vm.saveInProgress = false;
-                vm.ratings = rs;
-                vm.tabs = mkTabs(vm.categories, vm.ratingSchemesById, vm.measurables, vm.ratings);
+                vm.ratings = r.data;
                 vm.selected.rating = null;
+                recalcTabs();
             });
     };
 
@@ -176,16 +173,13 @@ function controller($q,
     };
 
 
-    const selectMeasurable = (measurable, rating) => {
+    const selectMeasurable = (node) => {
+        const { measurable, rating, allocations } = node;
         const category = _.find(vm.categories, ({ id: measurable.categoryId }));
-        const allocations = _.chain(vm.allocationsByMeasurableId)
-            .get(measurable.id, [])
-            .map(a => Object.assign({}, a, { scheme: vm.allocationSchemesById[a.schemeId] }))
-            .value();
-
+        const ratingScheme = vm.ratingSchemesById[category.ratingSchemeId];
         const hasWarnings = !_.isEmpty(allocations);
 
-        vm.selected = Object.assign({}, vm.selected, { rating, measurable, category, allocations, hasWarnings });
+        vm.selected = Object.assign({}, node, { category, hasWarnings, ratingScheme });
         vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: false, ratingPicker: true});
     };
 
@@ -207,8 +201,8 @@ function controller($q,
 
     // -- INTERACT ---
 
-    vm.onMeasurableSelect = (measurable, rating) => {
-        selectMeasurable(measurable, rating);
+    vm.onMeasurableSelect = (node) => {
+        selectMeasurable(node);
     };
 
     vm.onRatingSelect = r => {
@@ -218,14 +212,14 @@ function controller($q,
 
         return r === "X"
             ? doRemove()
-                .then(() => notification.success("Removed"))
+                .then(() => notification.success(`Removed: ${vm.selected.measurable.name}`))
             : doSave(r, getDescription())
-                .then(() => notification.success("Saved"));
+                .then(() => notification.success(`Saved: ${vm.selected.measurable.name}`));
     };
 
     vm.onSaveComment = (comment) => {
         return doSave(getRating(), comment)
-            .then(() => notification.success("Saved Comment"))
+            .then(() => notification.success(`Saved Comment for: ${vm.selected.measurable.name}`))
     };
 
     vm.doCancel = () => {
@@ -251,18 +245,10 @@ function controller($q,
         }
     };
 
-    vm.onTabChange = (categoryId) => {
+    vm.onTabChange = () => {
         deselectMeasurable();
-        vm.visibility.tab = categoryId;
-
-        const category = vm.categoriesById[categoryId];
-        const ratingScheme = vm.ratingSchemesById[category.ratingSchemeId];
-        vm.selected = {
-            category,
-            ratingScheme,
-        };
         vm.onKeypress = mkRatingsKeyHandler(
-            ratingScheme.ratings,
+            vm.activeTab.ratingScheme.ratings,
             vm.onRatingSelect,
             vm.doCancel);
     };
@@ -278,7 +264,6 @@ function controller($q,
 controller.$inject = [
     "$q",
     "$state",
-    "MeasurableRatingStore",
     "Notification",
     "ServiceBroker"
 ];

@@ -69,17 +69,10 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
-    const create = (ref, measurableId, rating = "Z", description = "") => {
+    const save = (ref, measurableId, rating = "Z", description = "") => {
         checkIsEntityRef(ref);
         return $http
-            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/measurable/${measurableId}`, { rating, description})
-            .then(d => d.data);
-    };
-
-    const update = (ref, measurableId, rating = "Z", description = "") => {
-        checkIsEntityRef(ref);
-        return $http
-            .put(`${baseUrl}/entity/${ref.kind}/${ref.id}/measurable/${measurableId}`, { rating, description })
+            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/measurable/${measurableId}`, { rating, description })
             .then(d => d.data);
     };
 
@@ -105,8 +98,7 @@ function store($http, baseApiUrl) {
         countByMeasurableCategory,
         statsByAppSelector,
         statsForRelatedMeasurables,
-        create,
-        update,
+        save,
         remove,
         removeByCategory
     };
@@ -155,25 +147,20 @@ export const MeasurableRatingStore_API = {
         serviceFnName: "statsForRelatedMeasurables",
         description: "return stats for related measurables"
     },
-    create: {
+    save: {
         serviceName,
-        serviceFnName: "create",
-        description: "create a measurable"
-    },
-    update: {
-        serviceName,
-        serviceFnName: "update",
-        description: "update a measurable"
+        serviceFnName: "save",
+        description: "saves a measurable rating (either creating it or updating it as appropriate)"
     },
     remove: {
         serviceName,
         serviceFnName: "remove",
-        description: "remove a measurable"
+        description: "remove a measurable rating"
     },
     removeByCategory: {
         serviceName,
         serviceFnName: "removeByCategory",
-        description: "remove a measurable"
+        description: "remove all measurable ratings for an entity in a given category [entityRef, categoryId]"
     }
 };
 
