@@ -62,14 +62,14 @@ function controller($scope,
     };
 
     const loadAll = () => {
-        const selectorOptions = mkSelectionOptions(
+        vm.selectorOptions = mkSelectionOptions(
             vm.parentEntityRef,
             undefined,
             [entityLifecycleStatus.ACTIVE.key],
             vm.filters);
 
         serviceBroker
-            .loadViewData(CORE_API.ApplicationStore.findBySelector, [selectorOptions])
+            .loadViewData(CORE_API.ApplicationStore.findBySelector, [vm.selectorOptions])
             .then(r => r.data)
             .then(apps => vm.apps = _.map(
                 apps,
@@ -78,7 +78,7 @@ function controller($scope,
 
         if (vm.parentEntityRef.kind === "ORG_UNIT") {
             serviceBroker
-                .loadViewData(CORE_API.EndUserAppStore.findBySelector, [selectorOptions])
+                .loadViewData(CORE_API.EndUserAppStore.findBySelector, [vm.selectorOptions])
                 .then(r => r.data)
                 .then(endUserApps => vm.endUserApps = _.map(
                     endUserApps,
@@ -103,10 +103,6 @@ function controller($scope,
         if (tabName === "DETAIL") {
             vm.combinedApps = combine(vm.apps, vm.endUserApps);
         }
-    };
-
-    vm.onInitialise = (cfg) => {
-        vm.export = () => cfg.exportFn("apps.csv");
     };
 }
 
