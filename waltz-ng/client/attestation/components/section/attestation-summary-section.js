@@ -55,8 +55,6 @@ function controller($q,
             [entityLifecycleStatus.ACTIVE.key],
             vm.filters);
 
-        console.log(vm.selectionOptions);
-
         const attestationInstancePromise = serviceBroker
             .loadViewData(
                 CORE_API.AttestationInstanceStore.findBySelector,

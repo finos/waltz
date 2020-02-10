@@ -68,8 +68,8 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
             Select<Record1<Long>> appIds = applicationIdSelectorFactory.apply(idSelectionOptions);
             EntityKind kind = getKind(request);
 
-            AttestationInstance attestationInstance = ATTESTATION_INSTANCE.as("attestationInstance");
-            AttestationInstance attestationInstance2 = ATTESTATION_INSTANCE.as("attestationInstance2");
+            AttestationInstance latestAttestationInstance = ATTESTATION_INSTANCE.as("latestAttestationInstance");
+            AttestationInstance attestationInstanceForPerson= ATTESTATION_INSTANCE.as("attestationInstanceForPerson");
 
             String fileName = String.format("attestations-for-%s-%s-%s",
                     idSelectionOptions.entityReference().kind().name().toLowerCase(),
@@ -77,21 +77,21 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
                     kind.name().toLowerCase());
 
             SelectHavingStep<Record2<Long, Timestamp>> latestAttestation = dsl
-                    .selectDistinct(attestationInstance.PARENT_ENTITY_ID.as("parent_id"),
-                            DSL.max(attestationInstance.ATTESTED_AT).as("latest_attested_at"))
-                    .from(attestationInstance)
-                    .innerJoin(ATTESTATION_RUN).on(attestationInstance.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID))
-                    .where(attestationInstance.PARENT_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                    .selectDistinct(latestAttestationInstance.PARENT_ENTITY_ID.as("parent_id"),
+                            DSL.max(latestAttestationInstance.ATTESTED_AT).as("latest_attested_at"))
+                    .from(latestAttestationInstance)
+                    .innerJoin(ATTESTATION_RUN).on(latestAttestationInstance.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID))
+                    .where(latestAttestationInstance.PARENT_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
                     .and(ATTESTATION_RUN.ATTESTED_ENTITY_KIND.eq(kind.name())))
-                    .groupBy(attestationInstance.PARENT_ENTITY_ID);
+                    .groupBy(latestAttestationInstance.PARENT_ENTITY_ID);
 
             SelectOnConditionStep<Record3<String, Timestamp, Long>> peopleToAttest = dsl
-                    .select(attestationInstance2.ATTESTED_BY,
-                            attestationInstance2.ATTESTED_AT,
-                            attestationInstance2.PARENT_ENTITY_ID)
-                    .from(attestationInstance2)
-                    .innerJoin(latestAttestation).on(attestationInstance2.PARENT_ENTITY_ID.eq(latestAttestation.field("parent_id").coerce(attestationInstance2.PARENT_ENTITY_ID)))
-                    .and(attestationInstance2.ATTESTED_AT.eq(latestAttestation.field("latest_attested_at").coerce(attestationInstance2.ATTESTED_AT)));
+                    .select(attestationInstanceForPerson.ATTESTED_BY,
+                            attestationInstanceForPerson.ATTESTED_AT,
+                            attestationInstanceForPerson.PARENT_ENTITY_ID)
+                    .from(attestationInstanceForPerson)
+                    .innerJoin(latestAttestation).on(attestationInstanceForPerson.PARENT_ENTITY_ID.eq(latestAttestation.field("parent_id").coerce(attestationInstanceForPerson.PARENT_ENTITY_ID)))
+                    .and(attestationInstanceForPerson.ATTESTED_AT.eq(latestAttestation.field("latest_attested_at").coerce(attestationInstanceForPerson.ATTESTED_AT)));
 
             SelectConditionStep<Record> qry = dsl
                     .select(APPLICATION.NAME.as("Name"),
@@ -99,10 +99,10 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
                             APPLICATION.KIND.as("Kind"),
                             APPLICATION.BUSINESS_CRITICALITY.as("Business Criticality"),
                             APPLICATION.LIFECYCLE_PHASE.as("Lifecycle Phase"))
-                    .select(peopleToAttest.field(attestationInstance2.ATTESTED_BY).as("Last Attested By"),
-                            peopleToAttest.field(attestationInstance2.ATTESTED_AT).as("Last Attested At"))
+                    .select(peopleToAttest.field(attestationInstanceForPerson.ATTESTED_BY).as("Last Attested By"),
+                            peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT).as("Last Attested At"))
                     .from(APPLICATION)
-                    .leftJoin(peopleToAttest).on(APPLICATION.ID.eq(peopleToAttest.field(attestationInstance2.PARENT_ENTITY_ID)))
+                    .leftJoin(peopleToAttest).on(APPLICATION.ID.eq(peopleToAttest.field(attestationInstanceForPerson.PARENT_ENTITY_ID)))
                     .where(APPLICATION.ID.in(appIds));
 
             return writeExtract(
