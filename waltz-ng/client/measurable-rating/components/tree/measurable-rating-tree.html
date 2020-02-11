@@ -47,12 +47,12 @@
                  tree-model="$ctrl.hierarchy"
                  expanded-nodes="$ctrl.expandedNodes"
                  options="$ctrl.treeOptions"
-                 on-selection="$ctrl.onSelect(node, $ctrl.ratingsByMeasurable[node.id])"
-                 order-by="'-name'">
+                 on-selection="$ctrl.onSelect(node)"
+                 order-by="'-measurable.name'">
 
         <span class="waltz-visibility-parent wmrt-node">
-            <span ng-style="{ opacity: node.concrete ? 1 : 0.5 }">
-                <waltz-rating-indicator-cell rating="$ctrl.ratingsByCode[$ctrl.ratingsByMeasurable[node.id].rating]"
+            <span ng-style="{ opacity: node.measurable.concrete ? 1 : 0.5 }">
+                <waltz-rating-indicator-cell rating="node.ratingSchemeItem"
                                              show-name="false">
                 </waltz-rating-indicator-cell>
             </span>
@@ -62,22 +62,23 @@
                   popover-append-to-body="true"
                   popover-delay="300"
                   popover-placement="right"
-                  ng-class="{ 'text-muted': $ctrl.ratingsByMeasurable[node.id].rating == null }"
+                  ng-class="{
+                        'text-muted': node.rating === null,
+                        'italics' : ! node.measurable.concrete,
+                        'waltz-inactive' : node.measurable.entityLifecycleStatus === 'REMOVED'
+                  }"
                   class="no-overflow wmrt-label">
-                <span ng-bind="node.displayName"
-                      ng-class="{
-                        'italics' : ! node.concrete,
-                        'waltz-inactive' : node.entityLifecycleStatus === 'REMOVED'
-                      }">
+                <span ng-bind="::node.displayName">
                 </span>
                 <span class="small"
-                       ng-if="$ctrl.ratingsByMeasurable[node.id].description.length > 0">
+                      ng-if="node.rating.description.length > 0">
                      <waltz-icon name="sticky-note-o"></waltz-icon>
                 </span>
                 <waltz-icon name="pie-chart"
                             class="waltz-visibility-child-30"
-                            ng-if="$ctrl.allocationsByMeasurable[node.id]">
+                            ng-if="node.allocations">
                 </waltz-icon>
+
             </span>
         </span>
 
@@ -90,22 +91,22 @@
 <script type="text/ng-template"
         id="wmrt-popover.html">
     <div class="small">
-        <span ng-if="node.entityLifecycleStatus !== 'REMOVED'">
-            <strong ng-bind="node.name"></strong>
+        <span ng-if="node.measurable.entityLifecycleStatus !== 'REMOVED'">
+            <strong ng-bind="node.measurable.name"></strong>
         </span>
-        <span ng-if="node.entityLifecycleStatus === 'REMOVED'">
-            <del><strong ng-bind="node.name"></strong></del>
+        <span ng-if="node.measurable.entityLifecycleStatus === 'REMOVED'">
+            <del><strong ng-bind="node.measurable.name"></strong></del>
             <span class="text-muted">Inactive</span>
         </span>
 
         <hr>
-        <waltz-markdown text="node.description"></waltz-markdown>
-        <div ng-if="$ctrl.ratingsByMeasurable[node.id].description.length > 0">
+        <waltz-markdown text="node.measurable.description"></waltz-markdown>
+        <div ng-if="node.rating.description.length > 0">
             <hr>
-            <waltz-markdown text="$ctrl.ratingsByMeasurable[node.id].description"></waltz-markdown>
+            <waltz-markdown text="node.rating.description"></waltz-markdown>
         </div>
 
-        <div ng-if="$ctrl.allocationsByMeasurable[node.id]"
+        <div ng-if="node.allocations"
              class="text-muted">
             <hr>
             <waltz-icon name="pie-chart">

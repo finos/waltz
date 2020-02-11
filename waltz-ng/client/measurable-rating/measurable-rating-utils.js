@@ -23,6 +23,7 @@ export function mkTabs(categories = [],
                        measurables = [],
                        ratings = [],
                        allocationSchemes = [],
+                       allocations = [],
                        includeEmpty = true) {
 
     const measurablesByCategory = _.groupBy(measurables, d => d.categoryId);
@@ -41,7 +42,8 @@ export function mkTabs(categories = [],
                 ratingScheme,
                 measurables: measurablesForCategory,
                 ratings: ratingsForCategory,
-                allocationSchemes: allocationSchemesByCategory[category.id] || []
+                allocationSchemes: allocationSchemesByCategory[category.id] || [],
+                allocations
             };
         })
         .filter(t => t.ratings.length > 0 || includeEmpty)

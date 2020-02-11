@@ -25,8 +25,8 @@ import template from "./rating-picker.html";
 const bindings = {
     selected: "<",
     editDisabled: "<",
-    onSelect: "<",
-    onKeypress: "<",
+    onSelect: "<?",
+    onKeypress: "<?",
     schemeId: "<",
 };
 
@@ -53,11 +53,12 @@ function controller(serviceBroker) {
                     .orderBy(d => d.position)
                     .value());
         }
-        if (c.disabled) {
-            vm.pickerStyle = vm.disabled
+        if (c.editDisabled) {
+            vm.pickerStyle = vm.editDisabled
                 ? { opacity: 0.4 }
                 : [];
         }
+
     }
 
 }

@@ -62,7 +62,6 @@ function controller($q, serviceBroker) {
         $q.all([measurablesPromise, ratingSchemesPromise, ratingsPromise, categoriesPromise])
             .then(() => {
                 vm.ratingScheme = vm.ratingSchemesById[vm.measurableCategory.ratingSchemeId];
-                console.log("got data: ", {parentRef: vm.parentEntityRef, cat: vm.measurableCategory, vm} );
             });
     };
 
