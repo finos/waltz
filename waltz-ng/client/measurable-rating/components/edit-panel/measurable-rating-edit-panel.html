@@ -54,11 +54,11 @@
         id="wmrep-main-tabs">
     <div class="waltz-tabs">
         <!-- TAB HEADERS -->
-        <input type="radio"
-               ng-change="$ctrl.onTabChange(tab.category.id)"
-               ng-repeat-start="tab in $ctrl.tabs track by tab.category.id"
-               ng-model="$ctrl.visibility.tab"
-               ng-value="tab.category.id"
+        <input ng-repeat-start="tab in $ctrl.tabs track by tab.category.id"
+               type="radio"
+               ng-change="$ctrl.onTabChange()"
+               ng-model="$ctrl.activeTab"
+               ng-value="tab"
                ng-disabled="! tab.measurables"
                name="measurable_rating_edit"
                id="{{ tab.category.id + '_' + $id }}">
@@ -75,25 +75,21 @@
         </label>
 
         <!-- SHOW ALL CATEGORIES -->
-        <span ng-if="$ctrl.hasHiddenTabs"
+        <label ng-if="$ctrl.hasHiddenTabs"
               ng-click="$ctrl.onShowAllTabs()"
               uib-popover="Unused categories (those with no mappings to this entity) are hidden by default.  Click here to show them."
               popover-append-to-body="true"
               popover-popup-delay="300"
-              popover-trigger="mouseenter"
-              style="padding: 5px 10px;
-                     display: block;
-                     float: left;
-                     cursor: pointer;">
-            <waltz-icon name="plus"></waltz-icon>
+              popover-trigger="mouseenter">
+            <waltz-icon name="plus-circle"></waltz-icon>
             Show all categories
-        </span>
+        </label>
 
-        <!-- TAB CONTENT -->
-        <div ng-repeat="tab in $ctrl.tabs track by tab.category.id"
-             ng-class="{ 'wt-active': tab.category.id == $ctrl.visibility.tab }"
-             class="wt-tab">
-            <div ng-include="'wmrep-tab-content'"></div>
+
+        <div class="wt-tab wt-active"
+             ng-if="$ctrl.activeTab">
+            <div ng-include="'wmrep-tab-content'">
+            </div>
         </div>
 
     </div>
@@ -104,9 +100,10 @@
 <script type="text/ng-template"
         id="wmrep-tab-content">
     <div style="padding-top: 6px">
-        <waltz-measurable-rating-tree ratings="tab.ratings"
-                                      rating-scheme="tab.ratingScheme"
-                                      measurables="tab.measurables"
+        <waltz-measurable-rating-tree ratings="$ctrl.activeTab.ratings"
+                                      allocations="$ctrl.activeTab.allocations"
+                                      rating-scheme="$ctrl.activeTab.ratingScheme"
+                                      measurables="$ctrl.activeTab.measurables"
                                       on-keypress="$ctrl.onKeypress"
                                       scroll-height="600"
                                       on-select="$ctrl.onMeasurableSelect">
@@ -115,18 +112,18 @@
 
     <br>
     <p class="text-muted small"
-       ng-bind="tab.category.description">
+       ng-bind="$ctrl.activeTab.category.description">
     </p>
 
 
-    <div ng-if="tab.ratings.length > 0">
-        <a ng-click="$ctrl.onRemoveAll(tab.category.id)"
+    <div ng-if="$ctrl.activeTab.ratings.length > 0">
+        <a ng-click="$ctrl.onRemoveAll($ctrl.activeTab.category.id)"
            class="clickable text-danger">
             <waltz-icon name="trash"></waltz-icon>
             Remove all mappings
         </a>
         for this category
-        (<span ng-bind="tab.category.name"></span>)
+        (<span ng-bind="$ctrl.activeTab.category.name"></span>)
     </div>
 </script>
 
@@ -134,27 +131,62 @@
 <!-- PICKER -->
 <script type="text/ng-template"
         id="wmrep-rating-picker">
-    <hr>
+
+
     <b style="font-weight: bolder"
        ng-bind="$ctrl.selected.measurable.name">
     </b>
-    <div ng-class="{ 'waltz-scroll-region-100' : $ctrl.selected.measurable.description.length > 300 }">
+
+    <!-- ABSTRACT -->
+    <div ng-if="! $ctrl.selected.measurable.concrete">
+        <br>
+        <waltz-warning>
+            <message>
+                This node is abstract and cannot be given a direct rating
+            </message>
+            <content>
+                Abstract nodes cannot be used in mappings as they are not specific
+                enough.
+            </content>
+        </waltz-warning>
+    </div>
+
+    <!-- WARNINGS -->
+    <div ng-if="$ctrl.selected.hasWarnings">
+        <br>
+        <waltz-warning ng-if="$ctrl.selected.allocations.length > 0">
+            <message>
+                This item is used in allocations
+            </message>
+            <content>
+                This item is used in allocations. Namely:
+                <table class="table table-condensed small">
+                    <thead>
+                    <tr>
+                        <th>Allocation Scheme</th>
+                        <th>Percentage</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="allocation in $ctrl.selected.allocations">
+                        <td><span ng-bind="$ctrl.allocationSchemesById[allocation.schemeId].name"></span></td>
+                        <td><span ng-bind="allocation.percentage"></span>%</td>
+                    </tr>
+                    </tbody>
+                </table>
+                Removing this item will cause it's allocation to be deleted and the percentage would be
+                returned to the unallocated pool.
+            </content>
+        </waltz-warning>
+    </div>
+
+    <div ng-class="{ 'waltz-scroll-region-100' : $ctrl.selected.measurable.description.length > 400 }" style="margin-top: 15px">
         <div class="text-muted">
             <waltz-markdown text="$ctrl.selected.measurable.description"></waltz-markdown>
         </div>
     </div>
 
     <br>
-
-    <!-- ABSTRACT -->
-    <div ng-if="! $ctrl.selected.measurable.concrete">
-        <br>
-        <div class="alert alert-warning">
-            <waltz-icon name="info-circle"></waltz-icon>
-            This node is abstract and cannot be given a direct
-            rating.
-        </div>
-    </div>
 
     <!-- CONCRETE -->
     <div ng-if="$ctrl.selected.measurable.concrete">
@@ -173,7 +205,7 @@
                 Rating:
             </div>
             <div class="col-sm-9">
-                <waltz-rating-picker selected="$ctrl.selected.rating.rating"
+                <waltz-rating-picker selected="$ctrl.selected.ratingSchemeItem.rating"
                                      scheme-id="$ctrl.selected.ratingScheme.id"
                                      edit-disabled="$ctrl.saveInProgress"
                                      on-select="$ctrl.onRatingSelect"
@@ -196,43 +228,17 @@
                 </waltz-inline-edit-area>
             </div>
         </div>
+    </div>
 
-        <!-- WARNINGS -->
-        <div ng-if="$ctrl.selected.hasWarnings"
-             class="alert alert-warning">
-            <div ng-if="$ctrl.selected.allocations.length > 0">
-                <waltz-icon name="warning"></waltz-icon>
-                This item is used in allocations. Namely:
-                <table class="table table-condensed small">
-                    <thead>
-                    <tr>
-                        <th>Allocation Scheme</th>
-                        <th>Percentage</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="allocation in $ctrl.selected.allocations">
-                        <td><span ng-bind="allocation.scheme.name"></span></td>
-                        <td><span ng-bind="allocation.percentage"></span>%</td>
-                    </tr>
-                    </tbody>
-                </table>
-                Removing this item will cause it's allocation to be deleted and the percentage would be
-                returned to the unallocated pool.
-            </div>
+
+    <!-- CANCEL -->
+    <div class="row">
+        <div class="col-sm-12">
+            <br>
+            <a class="clickable" ng-click="$ctrl.doCancel()">
+                &laquo; Back
+            </a>
         </div>
-
-
-        <!-- CANCEL -->
-        <div class="row">
-            <div class="col-sm-12">
-                <br>
-                <a class="clickable" ng-click="$ctrl.doCancel()">
-                    &laquo; Back
-                </a>
-            </div>
-        </div>
-
     </div>
 </script>
 

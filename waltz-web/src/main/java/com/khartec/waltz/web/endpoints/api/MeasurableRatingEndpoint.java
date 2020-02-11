@@ -102,8 +102,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
         postForList(findByMeasurableSelectorPath, findByMeasurableSelectorRoute);
         postForList(findByAppSelectorPath, findByAppSelectorRoute);
         getForList(findByCategoryPath, findByCategoryRoute);
-        postForList(modifyMeasurableForEntityPath, this::createRoute);
-        putForList(modifyMeasurableForEntityPath, this::updateRoute);
+        postForList(modifyMeasurableForEntityPath, this::saveRoute);
         deleteForList(modifyMeasurableForEntityPath, this::removeRoute);
         deleteForList(modifyCategoryForEntityPath, this::removeCategoryRoute);
         getForList(countByMeasurableCategoryPath, countByMeasurableCategoryRoute);
@@ -121,10 +120,10 @@ public class MeasurableRatingEndpoint implements Endpoint {
     }
 
 
-    private Collection<MeasurableRating> updateRoute(Request request, Response z) throws IOException {
+    private Collection<MeasurableRating> saveRoute(Request request, Response z) throws IOException {
         requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
         SaveMeasurableRatingCommand command = mkCommand(request);
-        return measurableRatingService.update(command);
+        return measurableRatingService.save(command);
     }
 
 
@@ -140,11 +139,6 @@ public class MeasurableRatingEndpoint implements Endpoint {
     }
 
 
-    private Collection<MeasurableRating> createRoute(Request request, Response z) throws IOException {
-        requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
-        SaveMeasurableRatingCommand command = mkCommand(request);
-        return measurableRatingService.create(command);
-    }
 
 
     private SaveMeasurableRatingCommand mkCommand(Request request) throws IOException {

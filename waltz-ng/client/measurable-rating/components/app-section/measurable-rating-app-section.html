@@ -142,8 +142,8 @@
                    uib-popover-template="'wmras-tab-popover.html'"
                    popover-trigger="mouseenter"
                    popover-append-to-body="true"
-                   popover-placement="top"
-                   popover-popup-delay="200"
+                   popover-placement="bottom"
+                   popover-popup-delay="300"
                    ng-repeat-end
                    ng-bind="tab.category.name">
             </label>
@@ -165,9 +165,7 @@
     <!-- RATING TREE -->
     <div class="row">
         <div class="col-sm-12">
-            <waltz-measurable-rating-panel category="tab.category"
-                                           entity-reference="$ctrl.parentEntityRef"
-                                           measurables="tab.measurables"
+            <waltz-measurable-rating-panel measurables="tab.measurables"
                                            ratings="tab.ratings"
                                            rating-scheme="tab.ratingScheme"
                                            allocations="$ctrl.allocations"

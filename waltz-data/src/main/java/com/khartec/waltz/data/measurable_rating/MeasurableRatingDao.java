@@ -18,10 +18,9 @@
 
 package com.khartec.waltz.data.measurable_rating;
 
-import com.khartec.waltz.common.EnumUtilities;
+import com.khartec.waltz.common.exception.NotFoundException;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.application.ApplicationKind;
 import com.khartec.waltz.model.measurable_rating.ImmutableMeasurableRating;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
 import com.khartec.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
@@ -39,7 +38,6 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -52,6 +50,7 @@ import static com.khartec.waltz.data.SelectorUtilities.mkApplicationConditions;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
+import static java.lang.String.format;
 
 @Repository
 public class MeasurableRatingDao {
@@ -128,17 +127,32 @@ public class MeasurableRatingDao {
         this.dsl = dsl;
     }
 
-    // --- update
+    // --- save
 
-    public boolean create(SaveMeasurableRatingCommand command) {
+    public Operation save(SaveMeasurableRatingCommand command) {
         MeasurableRatingRecord record = TO_RECORD_MAPPER.apply(command);
-        return dsl.executeInsert(record) == 1;
-    }
 
+        boolean exists = dsl.fetchExists(DSL
+                .selectFrom(MEASURABLE_RATING)
+                .where(MEASURABLE_RATING.MEASURABLE_ID.eq(command.measurableId()))
+                .and(MEASURABLE_RATING.ENTITY_ID.eq(command.entityReference().id()))
+                .and(MEASURABLE_RATING.ENTITY_KIND.eq(command.entityReference().kind().name())));
 
-    public boolean update(SaveMeasurableRatingCommand command) {
-        MeasurableRatingRecord record = TO_RECORD_MAPPER.apply(command);
-        return dsl.executeUpdate(record) == 1;
+        if (exists) {
+            if (dsl.executeUpdate(record) == 0) {
+                throw new NotFoundException(
+                        "MR_SAVE_UPDATE_FAILED",
+                        format("Could find associated record to update for rating: %s", command));
+            };
+            return Operation.UPDATE;
+        } else {
+            if (dsl.executeInsert(record) != 1) {
+                throw new NotFoundException(
+                        "MR_SAVE_INSERT_FAILED",
+                        format("Creation of record failed: %s", command));
+            };
+            return Operation.ADD;
+        }
     }
 
 
