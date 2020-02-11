@@ -18,28 +18,33 @@
 
 package com.khartec.waltz.web.endpoints.extracts;
 
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.SelectConditionStep;
+import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.schema.tables.AttestationInstance;
+import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
 import static com.khartec.waltz.schema.tables.AttestationInstanceRecipient.ATTESTATION_INSTANCE_RECIPIENT;
 import static com.khartec.waltz.schema.tables.AttestationRun.ATTESTATION_RUN;
-import static com.khartec.waltz.web.WebUtilities.getId;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static spark.Spark.get;
+import static spark.Spark.post;
 
 
 @Service
 public class AttestationExtractor extends DirectQueryBasedDataExtractor {
 
     private static final Logger LOG = LoggerFactory.getLogger(AttestationExtractor.class);
+    private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
 
     public AttestationExtractor(DSLContext dsl) {
         super(dsl);
@@ -48,7 +53,81 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
 
     @Override
     public void register() {
-        String path = mkPath("data-extract", "attestation", ":id");
+
+        registerExtractForRun(mkPath("data-extract", "attestation", ":id"));
+        registerExtractForAttestedEntityKindAndSelector(mkPath("data-extract", "attestations", ":kind"));
+
+    }
+
+
+    private void registerExtractForAttestedEntityKindAndSelector(String path) {
+
+        post(path, (request, response) -> {
+
+            IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
+            Select<Record1<Long>> appIds = applicationIdSelectorFactory.apply(idSelectionOptions);
+            EntityKind kind = getKind(request);
+
+            String fileName = String.format("attestations-for-%s-%s-%s",
+                    idSelectionOptions.entityReference().kind().name().toLowerCase(),
+                    idSelectionOptions.entityReference().id(),
+                    kind.name().toLowerCase());
+
+            SelectConditionStep<Record> qry = mkQueryForReportingAttestationsByKindAndSelector(appIds, kind);
+
+            return writeExtract(
+                    fileName,
+                    qry,
+                    request,
+                    response);
+        });
+
+    }
+
+    private SelectConditionStep<Record> mkQueryForReportingAttestationsByKindAndSelector(Select<Record1<Long>> appIds, EntityKind kind) {
+
+        AttestationInstance latestAttestationInstance = ATTESTATION_INSTANCE.as("latestAttestationInstance");
+        AttestationInstance attestationInstanceForPerson= ATTESTATION_INSTANCE.as("attestationInstanceForPerson");
+
+        Field<Long> latestAttestationParentId = latestAttestationInstance.PARENT_ENTITY_ID.as("parent_id");
+        Field<Timestamp> latestAttestationAt = DSL.max(latestAttestationInstance.ATTESTED_AT).as("latest_attested_at");
+
+        SelectHavingStep<Record2<Long, Timestamp>> latestAttestation = dsl
+                .selectDistinct(
+                        latestAttestationParentId,
+                        latestAttestationAt)
+                .from(latestAttestationInstance)
+                .innerJoin(ATTESTATION_RUN).on(latestAttestationInstance.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID))
+                .where(latestAttestationInstance.PARENT_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                .and(ATTESTATION_RUN.ATTESTED_ENTITY_KIND.eq(kind.name())))
+                .groupBy(latestAttestationInstance.PARENT_ENTITY_ID);
+
+        Field<Long> entityPersonIsAttesting = attestationInstanceForPerson.PARENT_ENTITY_ID.as("entityPersonIsAttesting");
+
+        SelectOnConditionStep<Record3<String, Timestamp, Long>> peopleToAttest = dsl
+                .select(attestationInstanceForPerson.ATTESTED_BY,
+                        attestationInstanceForPerson.ATTESTED_AT,
+                        entityPersonIsAttesting)
+                .from(attestationInstanceForPerson)
+                .innerJoin(latestAttestation).on(attestationInstanceForPerson.PARENT_ENTITY_ID.eq(latestAttestationParentId))
+                .and(attestationInstanceForPerson.ATTESTED_AT.eq(latestAttestationAt));
+
+        return dsl
+                .select(APPLICATION.NAME.as("Name"),
+                        APPLICATION.ASSET_CODE.as("Asset Code"),
+                        APPLICATION.KIND.as("Kind"),
+                        APPLICATION.BUSINESS_CRITICALITY.as("Business Criticality"),
+                        APPLICATION.LIFECYCLE_PHASE.as("Lifecycle Phase"))
+                .select(peopleToAttest.field(attestationInstanceForPerson.ATTESTED_BY).as("Last Attested By"),
+                        peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT).as("Last Attested At"))
+                .from(APPLICATION)
+                .leftJoin(peopleToAttest).on(APPLICATION.ID.eq(entityPersonIsAttesting))
+                .where(APPLICATION.ID.in(appIds));
+    }
+
+
+    private void registerExtractForRun(String path) {
+
         get(path, (request, response) -> {
             long runId = getId(request);
 
@@ -92,7 +171,5 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
                     .on(APPLICATION.ID.eq(ATTESTATION_INSTANCE.PARENT_ENTITY_ID))
                 .where(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(runId))
                     .and(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
-
-
     }
 }
