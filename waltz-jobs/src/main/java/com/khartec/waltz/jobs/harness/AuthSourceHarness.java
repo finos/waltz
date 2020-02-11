@@ -18,22 +18,15 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.common.SetUtilities;
+import com.khartec.waltz.common.FunctionUtilities;
+import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
 import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorDao;
-import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.authoritative_source.AuthSourceRatingCalculator;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService;
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorRatingsCalculator;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
-
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.common.SetUtilities.fromCollection;
 
 
 public class AuthSourceHarness {
@@ -46,9 +39,14 @@ public class AuthSourceHarness {
         AuthSourceRatingCalculator authSourceRatingCalculatorCalculator = ctx.getBean(AuthSourceRatingCalculator.class);
         LogicalFlowDecoratorRatingsCalculator flowCalculator = ctx.getBean(LogicalFlowDecoratorRatingsCalculator.class);
         LogicalFlowDecoratorDao decoratorDao = ctx.getBean(LogicalFlowDecoratorDao.class);
+        AuthoritativeSourceDao authoritativeSourceDao = ctx.getBean(AuthoritativeSourceDao.class);
 
 
-        List<LogicalFlowDecorator> preDecorators = decoratorDao.findByFlowIds(newArrayList(24938L));
+        FunctionUtilities.time("Flow ratings", () -> svc.recalculateAllFlowRatings());
+
+        /*
+        List<AuthoritativeRatingVantagePoint> authoritativeRatingVantagePoints = authoritativeSourceDao.findAuthoritativeRatingVantagePoints(SetUtilities.asSet(6645L));
+        List<LogicalFlowDecorator> preDecorators = decoratorDao.findByFlowIds(newArrayList(39835L));
         preDecorators.forEach(System.out::println);
 
         Collection<LogicalFlowDecorator> postDecorators = flowCalculator.calculate(preDecorators);
@@ -61,7 +59,7 @@ public class AuthSourceHarness {
 
         System.out.println("---- mod ----");
         modifiedDecorators.forEach(System.out::println);
-
+        */
 
         System.exit(-1);
     }

@@ -64,8 +64,9 @@ public class AuthoritativeSourceResolverTest {
         List<AuthoritativeRatingVantagePoint> vantagePoints = new ArrayList<>();
         vantagePoints.add(ImmutableAuthoritativeRatingVantagePoint.builder()
                 .vantagePoint(vantagePoint)
-                .rank(1)
+                .vantagePointRank(1)
                 .dataTypeCode("TRADE_DATA")
+                .dataTypeRank(1)
                 .applicationId(200L)
                 .rating(AuthoritativenessRating.SECONDARY)
                 .build());
@@ -85,8 +86,9 @@ public class AuthoritativeSourceResolverTest {
         List<AuthoritativeRatingVantagePoint> vantagePoints = new ArrayList<>();
         vantagePoints.add(ImmutableAuthoritativeRatingVantagePoint.builder()
                 .vantagePoint(vantagePoint)
-                .rank(1)
+                .vantagePointRank(1)
                 .dataTypeCode("REF_DATA")
+                .dataTypeRank(1)
                 .applicationId(205L)
                 .rating(AuthoritativenessRating.PRIMARY)
                 .build());
@@ -106,8 +108,9 @@ public class AuthoritativeSourceResolverTest {
         List<AuthoritativeRatingVantagePoint> vantagePoints = new ArrayList<>();
         vantagePoints.add(ImmutableAuthoritativeRatingVantagePoint.builder()
                 .vantagePoint(vantagePoint)
-                .rank(1)
+                .vantagePointRank(1)
                 .dataTypeCode("REF_DATA")
+                .dataTypeRank(2)
                 .applicationId(205L)
                 .rating(AuthoritativenessRating.PRIMARY)
                 .build());
@@ -115,8 +118,9 @@ public class AuthoritativeSourceResolverTest {
 
         vantagePoints.add(ImmutableAuthoritativeRatingVantagePoint.builder()
                 .vantagePoint(vantagePoint)
-                .rank(2)
+                .vantagePointRank(2)
                 .dataTypeCode("REF_DATA")
+                .dataTypeRank(3)
                 .applicationId(200L)
                 .rating(AuthoritativenessRating.SECONDARY)
                 .build());
@@ -133,23 +137,28 @@ public class AuthoritativeSourceResolverTest {
     @Test
     public void getBestRankedIsCorrect() {
 
-        ImmutableAuthoritativeRatingVantagePoint rank1 = ImmutableAuthoritativeRatingVantagePoint.builder()
+        ImmutableAuthoritativeRatingVantagePoint rank12 = ImmutableAuthoritativeRatingVantagePoint.builder()
                 .vantagePoint(vantagePoint)
-                .rank(1)
+                .vantagePointRank(1)
                 .dataTypeCode("REF_DATA")
+                .dataTypeRank(2)
                 .applicationId(205L)
                 .rating(AuthoritativenessRating.PRIMARY)
                 .build();
 
 
-        ImmutableAuthoritativeRatingVantagePoint rank2 = rank1.withRank(2);
+        ImmutableAuthoritativeRatingVantagePoint rank22 = rank12.withVantagePointRank(2);
+        ImmutableAuthoritativeRatingVantagePoint rank11 = rank12.withDataTypeRank(1);
 
 
-        Optional<AuthoritativeRatingVantagePoint> bestRanked = AuthoritativeSourceResolver.getBestRanked(ListUtilities.newArrayList(rank1, rank2));
+        Optional<AuthoritativeRatingVantagePoint> bestRankedOrgUnit = AuthoritativeSourceResolver.getMostSpecificRanked(ListUtilities.newArrayList(rank12, rank22));
+        Optional<AuthoritativeRatingVantagePoint> bestRankedDataType = AuthoritativeSourceResolver.getMostSpecificRanked(ListUtilities.newArrayList(rank12, rank11));
 
+        Assert.assertTrue(bestRankedOrgUnit.isPresent());
+        Assert.assertEquals(rank22, bestRankedOrgUnit.get());
 
-        Assert.assertTrue(bestRanked.isPresent());
-        Assert.assertEquals(rank2, bestRanked.get());
+        Assert.assertTrue(bestRankedDataType.isPresent());
+        Assert.assertEquals(rank12, bestRankedDataType.get());
     }
 
 
@@ -157,7 +166,7 @@ public class AuthoritativeSourceResolverTest {
     @Test
     public void getBestRankedWorksWithEmpty() {
 
-        Optional<AuthoritativeRatingVantagePoint> bestRanked = AuthoritativeSourceResolver.getBestRanked(ListUtilities.newArrayList());
+        Optional<AuthoritativeRatingVantagePoint> bestRanked = AuthoritativeSourceResolver.getMostSpecificRanked(ListUtilities.newArrayList());
 
 
         Assert.assertFalse(bestRanked.isPresent());
