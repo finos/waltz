@@ -25,8 +25,8 @@ import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.authoritativesource.*;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.schema.tables.Application;
+import com.khartec.waltz.schema.tables.EntityHierarchy;
 import com.khartec.waltz.schema.tables.records.AuthoritativeSourceRecord;
-import com.khartec.waltz.schema.tables.records.EntityHierarchyRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,6 +59,17 @@ public class AuthoritativeSourceDao {
     public final static Application CONSUMER_APP = APPLICATION.as("consumer");
     public final static Application SUPPLIER_APP = APPLICATION.as("supplier");
     private final static AggregateFunction<Integer> COUNT_FIELD = DSL.count(LOGICAL_FLOW);
+
+    private final static EntityHierarchy ehOrgUnit = ENTITY_HIERARCHY.as("ehOrgUnit");
+    private final static EntityHierarchy ehDataType = ENTITY_HIERARCHY.as("ehDataType");
+    private final static com.khartec.waltz.schema.tables.DataType declaredDataType = DATA_TYPE.as("declaredDataType");
+    private final static com.khartec.waltz.schema.tables.DataType impliedDataType = DATA_TYPE.as("impliedDataType");
+
+    private final static Field<Long> targetOrgUnitId = ehOrgUnit.ID.as("targetOrgUnitId");
+    private final static Field<Integer> declaredOrgUnitLevel = ehOrgUnit.LEVEL.as("declaredOrgUnitLevel");
+    private final static Field<String> declaredDataTypeCode = AUTHORITATIVE_SOURCE.DATA_TYPE.as("declaredDataTypeCode");
+    private final static Field<Integer> declaredDataTypeLevel = ehDataType.LEVEL.as("declaredDataTypeLevel");
+    private final static Field<String> targetDataTypeCode = impliedDataType.CODE.as("targetDataTypeCode");
 
 
     private final DSLContext dsl;
@@ -98,17 +109,16 @@ public class AuthoritativeSourceDao {
 
     private static final RecordMapper<Record, AuthoritativeRatingVantagePoint> TO_VANTAGE_MAPPER = r -> {
         AuthoritativeSourceRecord authRecord = r.into(AuthoritativeSourceRecord.class);
-        EntityHierarchyRecord entityHierarchyRecord = r.into(EntityHierarchyRecord.class);
-
         return ImmutableAuthoritativeRatingVantagePoint.builder()
                 .vantagePoint(ImmutableEntityReference.builder()
                         .kind(EntityKind.ORG_UNIT)
-                        .id(entityHierarchyRecord.getId())
+                        .id(r.get(targetOrgUnitId))
                         .build())
-                .rank(entityHierarchyRecord.getLevel())
+                .vantagePointRank(r.get(declaredOrgUnitLevel))
                 .applicationId(authRecord.getApplicationId())
                 .rating(AuthoritativenessRating.valueOf(authRecord.getRating()))
-                .dataTypeCode(authRecord.getDataType())
+                .dataTypeCode(r.get(targetDataTypeCode))
+                .dataTypeRank(r.get(declaredDataTypeLevel))
                 .build();
     };
 
@@ -198,19 +208,27 @@ public class AuthoritativeSourceDao {
 
 
     public List<AuthoritativeRatingVantagePoint> findAuthoritativeRatingVantagePoints(Set<Long> orgIds) {
-        return dsl.select(
-                    ENTITY_HIERARCHY.ID,
-                    ENTITY_HIERARCHY.LEVEL,
-                    AUTHORITATIVE_SOURCE.DATA_TYPE,
-                    AUTHORITATIVE_SOURCE.APPLICATION_ID,
-                    AUTHORITATIVE_SOURCE.RATING)
-                .from(ENTITY_HIERARCHY)
-                .join(AUTHORITATIVE_SOURCE)
-                .on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(AUTHORITATIVE_SOURCE.PARENT_ID))
-                .where(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name())
-                        .and(ENTITY_HIERARCHY.ID.in(orgIds)))
-                .orderBy(ENTITY_HIERARCHY.ID, ENTITY_HIERARCHY.LEVEL)
-                .fetch(TO_VANTAGE_MAPPER);
+        SelectSeekStep3<Record7<Long, Integer, String, Integer, String, Long, String>, Integer, Integer, Long> record7s = dsl.select(
+                targetOrgUnitId,
+                declaredOrgUnitLevel,
+                declaredDataTypeCode,
+                declaredDataTypeLevel,
+                targetDataTypeCode,
+                AUTHORITATIVE_SOURCE.APPLICATION_ID,
+                AUTHORITATIVE_SOURCE.RATING)
+                .from(ehOrgUnit)
+                .innerJoin(AUTHORITATIVE_SOURCE)
+                    .on(ehOrgUnit.ANCESTOR_ID.eq(AUTHORITATIVE_SOURCE.PARENT_ID).and(ehOrgUnit.KIND.eq(EntityKind.ORG_UNIT.name())))
+                .innerJoin(declaredDataType)
+                    .on(declaredDataType.CODE.eq(AUTHORITATIVE_SOURCE.DATA_TYPE))
+                .innerJoin(ehDataType)
+                    .on(ehDataType.ANCESTOR_ID.eq(declaredDataType.ID).and(ehDataType.KIND.eq(EntityKind.DATA_TYPE.name())))
+                .innerJoin(impliedDataType)
+                    .on(impliedDataType.ID.eq(ehDataType.ID).and(ehDataType.KIND.eq(EntityKind.DATA_TYPE.name())))
+                .where(ehOrgUnit.ID.in(orgIds))
+                .orderBy(ehOrgUnit.LEVEL.desc(), ehDataType.LEVEL.desc(), ehOrgUnit.ID);
+
+        return record7s.fetch(TO_VANTAGE_MAPPER);
     }
 
 
