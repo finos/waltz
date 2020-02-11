@@ -12,7 +12,7 @@ import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
@@ -57,11 +57,11 @@ public class MeasurableRatingPlannedDecommissionDao {
     }
 
 
-    public List<MeasurableRatingPlannedDecommission> fetchByEntityRef(EntityReference ref){
+    public Set<MeasurableRatingPlannedDecommission> fetchByEntityRef(EntityReference ref){
         return dsl
                 .selectFrom(MEASURABLE_RATING_PLANNED_DECOMMISSION)
                 .where(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_ID.eq(ref.id())
                         .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_KIND.eq(ref.kind().name())))
-                .fetch(TO_DOMAIN_MAPPER);
+                .fetchSet(TO_DOMAIN_MAPPER);
     }
 }

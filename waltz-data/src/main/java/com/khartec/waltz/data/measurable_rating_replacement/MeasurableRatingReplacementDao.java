@@ -11,7 +11,7 @@ import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
@@ -58,21 +58,22 @@ public class MeasurableRatingReplacementDao {
     }
 
 
-    public MeasurableRatingReplacement getByDecommissionId(Long decommissionId){
+    public Set<MeasurableRatingReplacement> fetchByDecommissionId(Long decommissionId){
         return dsl
                 .selectFrom(MEASURABLE_RATING_REPLACEMENT)
                 .where(MEASURABLE_RATING_REPLACEMENT.DECOMMISSION_ID.eq(decommissionId))
-                .fetchOne(TO_DOMAIN_MAPPER);
+                .fetchSet(TO_DOMAIN_MAPPER);
     }
 
-    public List<MeasurableRatingReplacement> fetchByEntityRef(EntityReference ref){
+
+    public Set<MeasurableRatingReplacement> fetchByEntityRef(EntityReference ref){
         return dsl
                 .select()
                 .from(MEASURABLE_RATING_REPLACEMENT)
                 .innerJoin(MEASURABLE_RATING_PLANNED_DECOMMISSION).on(MEASURABLE_RATING_PLANNED_DECOMMISSION.ID.eq(MEASURABLE_RATING_REPLACEMENT.DECOMMISSION_ID))
                 .where(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_ID.eq(ref.id())
                         .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_KIND.eq(ref.kind().name())))
-                .fetch(TO_DOMAIN_MAPPER);
+                .fetchSet(TO_DOMAIN_MAPPER);
     }
 
 }
