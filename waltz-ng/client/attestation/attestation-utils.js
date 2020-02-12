@@ -22,7 +22,6 @@ import {mkDateGridCell, mkEntityLinkGridCell} from "../common/grid-utils";
 import {mapToDisplayNames} from "../applications/application-utils";
 
 
-
 function mkAttestationCommand(attestedEntityRef, attestationKind){
     return {
         entityReference: attestedEntityRef,
@@ -161,8 +160,8 @@ export const attestationSummaryColumnDefs = [
     mkEntityLinkGridCell("Name", "application", "left", "right"),
     {field: "application.assetCode", name: "Asset Code"},
     {field: "application.kindDisplay", name: "Kind"},
-    {field: "businessCriticalityDisplay", name: "Business Criticality"},
+    {field: "application.businessCriticalityDisplay", name: "Business Criticality"},
     {field: "application.lifecyclePhaseDisplay", name: "Lifecycle Phase"},
     {field: "attestation.attestedBy", name: "Last Attested By"},
-    mkDateGridCell("Last Attested at", "attestation.attestedAt")
+    mkDateGridCell("Last Attested At", "attestation.attestedAt")
 ];

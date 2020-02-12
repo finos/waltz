@@ -21,6 +21,7 @@ package com.khartec.waltz.web;
 import com.khartec.waltz.common.LoggingUtilities;
 import com.khartec.waltz.common.exception.DuplicateKeyException;
 import com.khartec.waltz.common.exception.InsufficientPrivelegeException;
+import com.khartec.waltz.common.exception.NotFoundException;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.settings.SettingsService;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -126,6 +127,17 @@ public class Main {
 
 
     private void registerExceptionHandlers() {
+
+        exception(NotFoundException.class, (e, req, res) -> {
+            LOG.error(e.getMessage());
+            reportException(
+                    404,
+                    e.getCode(),
+                    e.getMessage(),
+                    res,
+                    LOG);
+        });
+
         exception(WebException.class, (e, req, res) -> {
             LOG.error(e.getMessage());
             reportException(

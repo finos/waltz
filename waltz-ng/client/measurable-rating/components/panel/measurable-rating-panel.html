@@ -50,15 +50,16 @@
                     <br>
                 </div>
 
-                <hr>
 
-                <div class="waltz-visibility-parent">
+                <div class="waltz-visibility-parent"
+                     ng-if="$ctrl.selected.rating">
+                    <hr>
                     <div class="row">
                         <div class="col-sm-2 waltz-display-field-label">
                             Rating:
                         </div>
                         <div class="col-sm-10">
-                            <waltz-rating-indicator-cell rating="$ctrl.ratingsByCode[$ctrl.selected.rating.rating]"
+                            <waltz-rating-indicator-cell rating="$ctrl.selected.ratingSchemeItem"
                                                          show-description-popup="true"
                                                          show-name="true">
                             </waltz-rating-indicator-cell>

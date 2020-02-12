@@ -42,7 +42,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
@@ -99,21 +98,23 @@ public class MeasurableRatingService {
 
     // -- WRITE
 
-    public Collection<MeasurableRating> update(SaveMeasurableRatingCommand command) {
-        return save(
-                command,
-                measurableRatingDao::update,
-                "Updated: %s with a rating of: %s",
-                Operation.UPDATE);
-    }
+    public Collection<MeasurableRating> save(SaveMeasurableRatingCommand command) {
+        checkNotNull(command, "command cannot be null");
 
+        Measurable measurable = measurableDao.getById(command.measurableId());
+        checkNotNull(measurable, format("Unknown measurable with id: %d", command.measurableId()));
+        checkTrue(measurable.concrete(), "Cannot rate against an abstract measurable");
 
-    public Collection<MeasurableRating> create(SaveMeasurableRatingCommand command) {
-        return save(
+        Operation operationThatWasPerformed = measurableRatingDao.save(command);
+
+        writeChangeLogEntry(
                 command,
-                measurableRatingDao::create,
-                "Added: %s with a rating of: %s",
-                Operation.ADD);
+                format("Saved: %s with a rating of: %s",
+                        measurable.name(),
+                        command.rating()),
+                operationThatWasPerformed);
+
+        return findForEntity(command.entityReference());
     }
 
 
@@ -184,30 +185,6 @@ public class MeasurableRatingService {
 
 
     // -- HELPERS --
-
-    private Collection<MeasurableRating> save(SaveMeasurableRatingCommand command,
-                                              Function<SaveMeasurableRatingCommand, Boolean> action,
-                                              String messageTemplate,
-                                              Operation operation) {
-        checkNotNull(command, "command cannot be null");
-
-        Measurable measurable = measurableDao.getById(command.measurableId());
-        checkNotNull(measurable, format("Unknown measurable with id: %d", command.measurableId()));
-        checkTrue(measurable.concrete(), "Cannot rate against an abstract measurable");
-
-        boolean success = action.apply(command);
-
-        if (success) {
-            writeChangeLogEntry(
-                    command,
-                    format(messageTemplate,
-                            measurable.name(),
-                            command.rating()),
-                    operation);
-        }
-
-        return findForEntity(command.entityReference());
-    }
 
 
     private void writeChangeLogEntry(MeasurableRatingCommand command, String message, Operation operation) {

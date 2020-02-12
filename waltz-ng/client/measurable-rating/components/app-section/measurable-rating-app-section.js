@@ -63,7 +63,7 @@ function controller($q, serviceBroker) {
                 { force: true})
             .then(r => vm.allocations = r.data);
 
-        allocationsPromise
+        return allocationsPromise
             .then(() => vm.allocationTotalsByScheme = _
                 .chain(vm.allocations)
                 .groupBy(d => d.schemeId)
@@ -98,9 +98,14 @@ function controller($q, serviceBroker) {
             .loadViewData(CORE_API.AllocationSchemeStore.findAll)
             .then(r => vm.allocationSchemes = r.data);
 
-        loadAllocations();
+        const allocationsPromise = loadAllocations();
 
-        $q.all([measurablesPromise, ratingSchemesPromise, ratingsPromise, categoriesPromise, allocationSchemesPromise])
+        $q.all([measurablesPromise,
+                ratingSchemesPromise,
+                ratingsPromise,
+                categoriesPromise,
+                allocationsPromise,
+                allocationSchemesPromise])
             .then(() => {
                 vm.tabs = mkTabs(
                     vm.categories,
@@ -108,6 +113,7 @@ function controller($q, serviceBroker) {
                     vm.measurables,
                     vm.ratings,
                     vm.allocationSchemes,
+                    vm.allocations,
                     false /*include empty */);
                 const firstNonEmptyTab = determineStartingTab(vm.tabs);
                 vm.visibility.tab = firstNonEmptyTab ? firstNonEmptyTab.category.id : null;

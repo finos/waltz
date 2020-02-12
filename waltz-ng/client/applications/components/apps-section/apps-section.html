@@ -19,13 +19,13 @@
 <div>
 
     <waltz-section-actions>
-        <button class="btn btn-xs btn-primary"
-                ng-if="$ctrl.visibility.tab == 'DETAIL'"
-                ng-click="$ctrl.export()">
-            <waltz-icon name="cloud-download"></waltz-icon>
-            Export
-        </button>
-
+        <waltz-data-extract-link name="Export"
+                                 styling="button"
+                                 extract="application/by-selector"
+                                 method="POST"
+                                 request-body="$ctrl.selectorOptions"
+                                 ng-if="$ctrl.visibility.tab == 'DETAIL'">
+        </waltz-data-extract-link>
         <button class="btn btn-xs waltz-btn-transparent"
                 ng-click="$ctrl.visibility.appOverlay = ! $ctrl.visibility.appOverlay">
             <waltz-icon name="map-signs"></waltz-icon>
@@ -48,8 +48,7 @@
                  heading="Applications">
             <br>
             <div ng-if="$ctrl.visibility.tab == 'DETAIL'">
-                <waltz-app-table applications="$ctrl.combinedApps"
-                                 on-initialise="$ctrl.onInitialise">
+                <waltz-app-table applications="$ctrl.combinedApps">
                 </waltz-app-table>
             </div>
         </uib-tab>

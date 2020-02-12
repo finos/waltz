@@ -31,8 +31,9 @@ import org.immutables.value.Value;
 public abstract class AuthoritativeRatingVantagePoint {
 
     public abstract EntityReference vantagePoint();
-    public abstract int rank();
+    public abstract int vantagePointRank();
     public abstract String dataTypeCode();
+    public abstract int dataTypeRank();
     public abstract Long applicationId();
     public abstract AuthoritativenessRating rating();
 

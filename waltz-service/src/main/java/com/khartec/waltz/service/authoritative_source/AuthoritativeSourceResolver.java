@@ -22,10 +22,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.head;
@@ -54,7 +51,7 @@ public class AuthoritativeSourceResolver {
                             byOu -> byOu.dataTypeCode(),
                             byDts -> groupAndThen(
                                     dt -> dt.applicationId(),
-                                    a -> getBestRanked(a),
+                                    a -> getMostSpecificRanked(a),
                                     byDts),
                             byOus),
                     authoritativeRatingVantagePoints);
@@ -95,11 +92,14 @@ public class AuthoritativeSourceResolver {
      * @param vantagePoints
      * @return
      */
-    static Optional<AuthoritativeRatingVantagePoint> getBestRanked(Collection<AuthoritativeRatingVantagePoint> vantagePoints) {
+    static Optional<AuthoritativeRatingVantagePoint> getMostSpecificRanked(Collection<AuthoritativeRatingVantagePoint> vantagePoints) {
+        Comparator<AuthoritativeRatingVantagePoint> comparator = Comparator
+                .comparingInt(AuthoritativeRatingVantagePoint::vantagePointRank)
+                .thenComparingInt(AuthoritativeRatingVantagePoint::dataTypeRank);
         return head(
                 sort(
                     vantagePoints,
-                    (x, y) -> Integer.compare(y.rank(), x.rank())));
+                    (x, y) -> comparator.compare(y, x))); //note the reversal of parameters because we want descending order
     }
 
 }

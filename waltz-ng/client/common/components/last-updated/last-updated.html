@@ -22,7 +22,7 @@
 </span>
 <span ng-if="$ctrl.entity.lastUpdatedBy">
     <span ng-if="$ctrl.entity.lastUpdatedBy">
-        <span ng-bind="$ctrl.entity.lastUpdatedBy"></span>,
+        <waltz-person-link user-id="$ctrl.entity.lastUpdatedBy"></waltz-person-link>
     </span>
     <waltz-from-now class='text-muted'
                     timestamp="$ctrl.entity.lastUpdatedAt">
@@ -30,7 +30,7 @@
 </span>
 <span ng-if="$ctrl.entity.lastUpdated">
     <span ng-if="$ctrl.entity.lastUpdated.by">
-        <span ng-bind="$ctrl.entity.lastUpdated.by"></span>,
+        <waltz-person-link user-id="$ctrl.entity.lastUpdated.by"></waltz-person-link>
     </span>
     <waltz-from-now class='text-muted'
                     timestamp="$ctrl.entity.lastUpdated.at">
