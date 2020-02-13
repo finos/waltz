@@ -40,7 +40,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.IntStream;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
@@ -173,14 +173,15 @@ public class SurveyQuestionResponseDao {
                         .execute();
 
                 if (! lrs.isEmpty()) {
+                    AtomicInteger counter = new AtomicInteger(0);
                     List<SurveyQuestionListResponseRecord> listResponses =
-                            IntStream.range(0, lrs.size())
-                            .mapToObj(i -> {
+                            lrs.stream()
+                            .map(lr -> {
                                 SurveyQuestionListResponseRecord rec = new SurveyQuestionListResponseRecord();
                                 rec.setSurveyInstanceId(response.surveyInstanceId());
                                 rec.setQuestionId(response.questionResponse().questionId());
-                                rec.setResponse(lrs.get(i));
-                                rec.setPosition(i + 1);
+                                rec.setResponse(lr);
+                                rec.setPosition(counter.incrementAndGet());
 
                                 return rec;
                             })
@@ -202,8 +203,11 @@ public class SurveyQuestionResponseDao {
                 .where(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.eq(sourceSurveyInstanceId))
                 .fetchInto(SURVEY_QUESTION_RESPONSE)
                 .stream()
-                .peek(r -> r.setSurveyInstanceId(targetSurveyInstanceId))
-                .peek(r -> r.changed(true))
+                .map(r -> {
+                    r.setSurveyInstanceId(targetSurveyInstanceId);
+                    r.changed(true);
+                    return r;
+                })
                 .collect(toList());
 
         List<SurveyQuestionListResponseRecord> listResponseRecords = dsl
@@ -211,8 +215,11 @@ public class SurveyQuestionResponseDao {
                 .where(SURVEY_QUESTION_LIST_RESPONSE.SURVEY_INSTANCE_ID.eq(sourceSurveyInstanceId))
                 .fetchInto(SURVEY_QUESTION_LIST_RESPONSE)
                 .stream()
-                .peek(r -> r.setSurveyInstanceId(targetSurveyInstanceId))
-                .peek(r -> r.changed(true))
+                .map(r -> {
+                    r.setSurveyInstanceId(targetSurveyInstanceId);
+                    r.changed(true);
+                    return r;
+                })
                 .collect(toList());
 
         dsl.transaction(configuration -> {

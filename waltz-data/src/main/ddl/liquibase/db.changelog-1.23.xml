@@ -35,7 +35,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="response"
-                    type="nvarchar(max)">
+                    type="${maxvarchar.type}">
                 <constraints nullable="false"/>
             </column>
             <column name="position"
@@ -62,7 +62,7 @@
         <comment>3192: survey question response list_response_concat column</comment>
         <addColumn tableName="survey_question_response">
             <column name="list_response_concat"
-                    type="nvarchar(max)">
+                    type="${maxvarchar.type}">
                 <constraints nullable="true"/>
             </column>
         </addColumn>
