@@ -26,7 +26,7 @@
         <button class="btn btn-xs btn-primary clickable"
                 ng-if="$ctrl.visibility.picker"
                 ng-click="$ctrl.onShowPicker()">
-            View
+            Viewrelated
         </button>
     </waltz-section-actions>
 
@@ -34,9 +34,17 @@
     <!-- VIEW -->
     <div class="row"
          ng-if="!$ctrl.visibility.picker">
-        <div class="col-md-12">
+        <div class="col-md-12" ng-if="$ctrl.relatedDataTypes.length > 0">
             <waltz-data-type-usage-tree used="$ctrl.relatedDataTypes">
             </waltz-data-type-usage-tree>
+        </div>
+        <div class="col-md-12" ng-if="$ctrl.relatedDataTypes.length === 0">
+            <waltz-no-data>
+                <message>
+                    <strong>No Data Types</strong>
+                    have been related
+                </message>
+            </waltz-no-data>
         </div>
     </div>
 
