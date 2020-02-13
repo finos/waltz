@@ -48,7 +48,7 @@ import {EntityNamedNoteTypeStore_API as EntityNamedNoteTypeStore} from "../../en
 import {EntityRelationshipStore_API as EntityRelationshipStore} from "../../entity-relationship/services/entity-relationship-store";
 import {EntitySearchStore_API as EntitySearchStore} from "../../entity/services/entity-search-store";
 import {EntityStatisticStore_API as EntityStatisticStore} from "../../entity-statistics/services/entity-statistic-store";
-import { TagStore_API as TagStore } from "../../tag/services/tag-store";
+import {TagStore_API as TagStore} from "../../tag/services/tag-store";
 import {EnumValueStore_API as EnumValueStore} from "../../enum-value/services/enum-value-store";
 import {EntitySvgDiagramStore_API as EntitySvgDiagramStore} from "../../entity-svg-diagram/services/entity-svg-diagram-store";
 import {ExternalIdentifierStore_API as ExternalIdentifierStore} from "../../external-identifier/services/external-identifier-store"
@@ -64,6 +64,8 @@ import {LogicalFlowStore_API as LogicalFlowStore} from "../../logical-flow/servi
 import {LogicalFlowDecoratorStore_API as LogicalFlowDecoratorStore} from "../../logical-flow-decorator/services/logical-flow-decorator-store";
 import {MeasurableCategoryStore_API as MeasurableCategoryStore} from "../../measurable-category/services/measurable-category-store";
 import {MeasurableRatingStore_API as MeasurableRatingStore} from "../../measurable-rating/services/measurable-rating-store";
+import {MeasurableRatingPlannedDecommissionStore_API as MeasurableRatingPlannedDecommissionStore} from "../../measurable-rating-planned-decommission/services/measurable-rating-planned-decommission-store";
+import {MeasurableRatingReplacementStore_API as MeasurableRatingReplacementStore} from "../../measurable-rating-replacement/services/measurable-rating-replacement-store";
 import {MeasurableRelationshipStore_API as MeasurableRelationshipStore} from "../../measurable-relationship/services/measurable-relationship-store";
 import {MeasurableStore_API as MeasurableStore} from "../../measurable/services/measurable-store";
 import {NotificationStore_API as NotificationStore} from "../../notification/services/notification-store";
@@ -147,6 +149,8 @@ export const CORE_API = {
     LogicalFlowDecoratorStore,
     MeasurableCategoryStore,
     MeasurableRatingStore,
+    MeasurableRatingPlannedDecommissionStore,
+    MeasurableRatingReplacementStore,
     MeasurableRelationshipStore,
     MeasurableStore,
     NotificationStore,
