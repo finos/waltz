@@ -19,6 +19,8 @@ import angular from "angular";
 import {registerComponents, registerStores} from "../common/module-utils";
 
 import MeasurableRatingStore from "./services/measurable-rating-store";
+import MeasurableRatingReplacementAppsStore from "./services/measurable-rating-replacement-store"
+import MeasurableRatingPlannedDecommissionStore from "./services/measurable-rating-planned-decommission-store"
 import MeasurableRatingsBrowserSection from "./components/browser-section/measurable-ratings-browser-section";
 import MeasurableRatingsBrowserTreePanel from "./components/browser-tree-panel/measurable-ratings-browser-tree-panel";
 import MeasurableRatingEditPanel from "./components/edit-panel/measurable-rating-edit-panel";
@@ -28,6 +30,7 @@ import MeasurableRatingPanel from "./components/panel/measurable-rating-panel";
 import MeasurableRatingTree from "./components/tree/measurable-rating-tree";
 import MeasurableRatingsBrowser from "./components/browser/measurable-ratings-browser";
 import RelatedMeasurablesSection from "./components/related-measurables-section/related-measurables-section";
+import MeasurableRatingPlannedDecommissionInfo from "./components/planned-decommission-info/planned-decommission-info"
 import Routes from "./routes";
 
 
@@ -37,7 +40,10 @@ export default () => {
     module
         .config(Routes);
 
-    registerStores(module, [MeasurableRatingStore]);
+    registerStores(module, [
+        MeasurableRatingStore,
+        MeasurableRatingReplacementAppsStore,
+        MeasurableRatingPlannedDecommissionStore]);
 
     registerComponents(module, [
         MeasurableRatingAppSection,
@@ -48,7 +54,8 @@ export default () => {
         MeasurableRatingsBrowser,
         MeasurableRatingsBrowserSection,
         MeasurableRatingsBrowserTreePanel,
-        RelatedMeasurablesSection
+        RelatedMeasurablesSection,
+        MeasurableRatingPlannedDecommissionInfo
     ]);
 
     return module.name;

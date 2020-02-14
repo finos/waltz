@@ -88,8 +88,6 @@ import LogicalFlowDecorator from "./logical-flow-decorator";
 import Measurable from "./measurable";
 import MeasurableCategory from "./measurable-category";
 import MeasurableRating from "./measurable-rating";
-import MeasurableRatingPlannedDecommission from "./measurable-rating-planned-decommission";
-import MeasurableRatingReplacement from "./measurable-rating-replacement";
 import MeasurableRelationship from "./measurable-relationship";
 import Navbar from "./navbar";
 import Notification from "./notification";
@@ -197,8 +195,6 @@ const dependencies = [
     Measurable(),
     MeasurableCategory(),
     MeasurableRating(),
-    MeasurableRatingPlannedDecommission(),
-    MeasurableRatingReplacement(),
     MeasurableRelationship(),
     Navbar(),
     Notification(),

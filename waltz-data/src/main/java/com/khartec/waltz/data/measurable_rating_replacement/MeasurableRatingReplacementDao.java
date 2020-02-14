@@ -16,6 +16,7 @@ import java.util.Set;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.schema.Tables.APPLICATION;
 import static com.khartec.waltz.schema.tables.MeasurableRatingPlannedDecommission.MEASURABLE_RATING_PLANNED_DECOMMISSION;
 import static com.khartec.waltz.schema.tables.MeasurableRatingReplacement.MEASURABLE_RATING_REPLACEMENT;
 
@@ -35,18 +36,30 @@ public class MeasurableRatingReplacementDao {
 
     public static final RecordMapper<? super Record, MeasurableRatingReplacement> TO_DOMAIN_MAPPER =  record -> {
 
+        boolean isApplication = record.get(MEASURABLE_RATING_REPLACEMENT.ENTITY_KIND).equalsIgnoreCase(EntityKind.APPLICATION.name());
+
+        String name = null;
+
+        if (isApplication) {
+            name = record.get(APPLICATION.NAME);
+        }
+
         MeasurableRatingReplacementRecord r = record.into(MEASURABLE_RATING_REPLACEMENT);
 
-            return ImmutableMeasurableRatingReplacement.builder()
-                    .id(r.getId())
-                    .entityReference(mkRef(EntityKind.valueOf(r.getEntityKind()), r.getEntityId()))
-                    .decommissionId(r.getDecommissionId())
-                    .plannedCommissionDate(toLocalDateTime(r.getPlannedCommissionDate()))
-                    .createdAt(toLocalDateTime(r.getCreatedAt()))
-                    .createdBy(r.getCreatedBy())
-                    .lastUpdatedAt(toLocalDateTime(r.getUpdatedAt()))
-                    .lastUpdatedBy(r.getUpdatedBy())
-                    .build();
+        EntityReference entityReference = isApplication
+                ? mkRef(EntityKind.valueOf(r.getEntityKind()), r.getEntityId(), name)
+                : mkRef(EntityKind.valueOf(r.getEntityKind()), r.getEntityId());
+
+        return ImmutableMeasurableRatingReplacement.builder()
+                .id(r.getId())
+                .entityReference(entityReference)
+                .decommissionId(r.getDecommissionId())
+                .plannedCommissionDate(toLocalDateTime(r.getPlannedCommissionDate()))
+                .createdAt(toLocalDateTime(r.getCreatedAt()))
+                .createdBy(r.getCreatedBy())
+                .lastUpdatedAt(toLocalDateTime(r.getUpdatedAt()))
+                .lastUpdatedBy(r.getUpdatedBy())
+                .build();
     };
 
 
@@ -71,6 +84,8 @@ public class MeasurableRatingReplacementDao {
                 .select()
                 .from(MEASURABLE_RATING_REPLACEMENT)
                 .innerJoin(MEASURABLE_RATING_PLANNED_DECOMMISSION).on(MEASURABLE_RATING_PLANNED_DECOMMISSION.ID.eq(MEASURABLE_RATING_REPLACEMENT.DECOMMISSION_ID))
+                .leftJoin(APPLICATION).on(MEASURABLE_RATING_REPLACEMENT.ENTITY_ID.eq(APPLICATION.ID)
+                        .and(MEASURABLE_RATING_REPLACEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .where(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_ID.eq(ref.id())
                         .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_KIND.eq(ref.kind().name())))
                 .fetchSet(TO_DOMAIN_MAPPER);

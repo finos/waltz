@@ -64,8 +64,8 @@ import {LogicalFlowStore_API as LogicalFlowStore} from "../../logical-flow/servi
 import {LogicalFlowDecoratorStore_API as LogicalFlowDecoratorStore} from "../../logical-flow-decorator/services/logical-flow-decorator-store";
 import {MeasurableCategoryStore_API as MeasurableCategoryStore} from "../../measurable-category/services/measurable-category-store";
 import {MeasurableRatingStore_API as MeasurableRatingStore} from "../../measurable-rating/services/measurable-rating-store";
-import {MeasurableRatingPlannedDecommissionStore_API as MeasurableRatingPlannedDecommissionStore} from "../../measurable-rating-planned-decommission/services/measurable-rating-planned-decommission-store";
-import {MeasurableRatingReplacementStore_API as MeasurableRatingReplacementStore} from "../../measurable-rating-replacement/services/measurable-rating-replacement-store";
+import {MeasurableRatingPlannedDecommissionStore_API as MeasurableRatingPlannedDecommissionStore} from "../../measurable-rating/services/measurable-rating-planned-decommission-store";
+import {MeasurableRatingReplacementStore_API as MeasurableRatingReplacementStore} from "../../measurable-rating/services/measurable-rating-replacement-store";
 import {MeasurableRelationshipStore_API as MeasurableRelationshipStore} from "../../measurable-relationship/services/measurable-relationship-store";
 import {MeasurableStore_API as MeasurableStore} from "../../measurable/services/measurable-store";
 import {NotificationStore_API as NotificationStore} from "../../notification/services/notification-store";

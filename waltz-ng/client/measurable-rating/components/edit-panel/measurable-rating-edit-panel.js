@@ -31,7 +31,9 @@ const bindings = {
     allocations: "<",
     allocationSchemes: "<",
     parentEntityRef: "<",
-    startingCategoryId: "<?"
+    startingCategoryId: "<?",
+    plannedDecommissions: "<?",
+    replacementApps: "<?"
 };
 
 
@@ -54,7 +56,9 @@ const initialState = {
         schemeOverview: false,
         showAllCategories: false,
         tab: null
-    }
+    },
+    plannedDecommissions: [],
+    replacementApps: []
 };
 
 
