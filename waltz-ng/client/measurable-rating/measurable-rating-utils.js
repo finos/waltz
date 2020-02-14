@@ -16,6 +16,86 @@
  *
  */
 import _ from "lodash";
+import {CORE_API} from "../common/services/core-api-utils";
+
+
+export function loadAllData(
+    $q,
+    serviceBroker,
+    vm,
+    allMeasurables = false,
+    force = false) {
+
+    serviceBroker
+        .loadViewData(
+            CORE_API.RoadmapStore.findRoadmapsAndScenariosByRatedEntity,
+            [ vm.parentEntityRef ])
+        .then(r => vm.roadmapReferences = r.data);
+
+    const ratingsPromise = serviceBroker
+        .loadViewData(CORE_API.MeasurableRatingStore.findForEntityReference, [ vm.parentEntityRef ], { force })
+        .then(r => vm.ratings = r.data);
+
+    const ratingSchemesPromise = serviceBroker
+        .loadAppData(CORE_API.RatingSchemeStore.findAll)
+        .then(r => vm.ratingSchemesById = _.keyBy(r.data, "id"));
+
+    const categoriesPromise = serviceBroker
+        .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
+        .then(r => vm.categories = r.data);
+
+    const measurablesPromise = serviceBroker
+        .loadViewData(
+            allMeasurables
+                ? CORE_API.MeasurableStore.findAll
+                : CORE_API.MeasurableStore.findMeasurablesRelatedToPath,
+            [vm.parentEntityRef],
+            { force })
+        .then(r => vm.measurables = r.data);
+
+    const allocationSchemesPromise = serviceBroker
+        .loadViewData(CORE_API.AllocationSchemeStore.findAll)
+        .then(r => vm.allocationSchemes = r.data);
+
+    const allocationsPromise = serviceBroker
+        .loadViewData(
+            CORE_API.AllocationStore.findByEntity,
+            [vm.parentEntityRef],
+            { force: true})
+        .then(r => vm.allocations = r.data)
+        .then(() => vm.allocationTotalsByScheme = _
+            .chain(vm.allocations)
+            .groupBy(d => d.schemeId)
+            .mapValues(xs => _.sumBy(xs, x => x.percentage))
+            .value());
+
+    const replacementAppPromise = serviceBroker
+        .loadViewData(CORE_API.MeasurableRatingReplacementStore.findForEntityRef, [vm.parentEntityRef])
+        .then(r => vm.replacementApps = r.data);
+
+    const decommissionDatePromise = serviceBroker
+        .loadViewData(CORE_API.MeasurableRatingPlannedDecommissionStore.findForEntityRef, [vm.parentEntityRef])
+        .then(r => vm.plannedDecommissions = r.data);
+
+    return $q
+        .all([
+            measurablesPromise,
+            ratingSchemesPromise,
+            ratingsPromise,
+            categoriesPromise,
+            allocationsPromise,
+            allocationSchemesPromise])
+        .then(() => {
+            vm.tabs = mkTabs(
+                vm.categories,
+                vm.ratingSchemesById,
+                vm.measurables,
+                vm.ratings,
+                vm.allocationSchemes,
+                vm.allocations,
+                false /*include empty */);
+        });
+}
 
 
 export function mkTabs(categories = [],
