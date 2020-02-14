@@ -48,13 +48,24 @@
 <script type="text/ng-template"
         id="weil-popover-basic">
     <div>
-        <waltz-markdown text="$ctrl.entityRef.description"></waltz-markdown>
+        <div class="weil-description">
+            <div class="weil-description-fade">
+            </div>
+            <waltz-markdown text="$ctrl.entityRef.description"></waltz-markdown>
+        </div>
         <div ng-if="$ctrl.entityRef.entityLifecycleStatus"
-             class="small">
-            <hr>
-            <strong>Status:</strong>
-            <span ng-bind="$ctrl.entityRef.entityLifecycleStatus | toDisplayName:'entityLifecycleStatus'">
-            </span>
+             class="small"
+        style="padding-top: 12px">
+            <table class="table table-condensed">
+                <tr>
+                    <td><span class="text-muted">Status</span></td>
+                    <td><span ng-bind="$ctrl.entityRef.entityLifecycleStatus | toDisplayName:'entityLifecycleStatus'"></span></td>
+                </tr>
+                <tr ng-repeat="item in $ctrl.additionalDisplayData">
+                    <td><span class="text-muted" ng-bind="item.name"></span></td>
+                    <td><span ng-bind="item.value"></span></td>
+                </tr>
+            </table>
         </div>
     </div>
 </script>
@@ -90,6 +101,10 @@
                     <span ng-bind="prop.value">
                     </span>
                     </td>
+                </tr>
+                <tr ng-repeat="item in $ctrl.additionalDisplayData">
+                    <td><span class="text-muted" ng-bind="item.name"></span></td>
+                    <td><span ng-bind="item.value"></span></td>
                 </tr>
             </table>
 

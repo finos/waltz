@@ -28,6 +28,7 @@ import {genericAvatarDataUrl} from "../../../person/person-utils";
 const bindings = {
     entityRef: "<",
     iconPlacement: "@?",
+    additionalDisplayData: "<?",
     tooltipPlacement: "@?"
 };
 
@@ -37,6 +38,7 @@ const initialState = {
     tooltipPlacement: "top", // left, top-left, top-right; refer to: (https://github.com/angular-ui/bootstrap/tree/master/src/tooltip)
     trigger: "none",
     ready: false,
+    additionalDisplayData: [],
     genericAvatarDataUrl
 };
 
