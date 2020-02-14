@@ -162,7 +162,8 @@
                                 ng-model="ctrl.selectedQuestionInfo.question.fieldType">
                         </select>
                     </div>
-                    <div ng-if="ctrl.selectedQuestionInfo.question.fieldType === 'DROPDOWN'"
+                    <div ng-if="ctrl.selectedQuestionInfo.question.fieldType === 'DROPDOWN'
+                                || ctrl.selectedQuestionInfo.question.fieldType === 'DROPDOWN_MULTI_SELECT'"
                          class="col-sm-7 col-sm-offset-3"
                          style="background-color: #F8F9F9; margin-top:10px;">
                         <waltz-survey-dropdown-editor entries="ctrl.selectedQuestionInfo.dropdownEntries"

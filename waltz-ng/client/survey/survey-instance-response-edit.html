@@ -145,7 +145,7 @@
                                                       on-change="ctrl.saveDateResponse"
                                                       ng-required="qi.question.isMandatory">
                         </waltz-date-picker-form-input>
-                        <!-- dropdown -->
+                        <!-- dropdown (single value) -->
                         <select ng-switch-when="DROPDOWN"
                                 id="{{ qi.question.id }}"
                                 ng-model="ctrl.surveyResponses[qi.question.id].stringResponse"
@@ -154,6 +154,25 @@
                                 ng-options="entry.value as entry.value for entry in qi.dropdownEntries | orderBy:'position'"
                                 class="form-control">
                         </select>
+                        <!-- dropdown (multi-select) -->
+                        <div ng-switch-when="DROPDOWN_MULTI_SELECT">
+                            <ui-select input-id="{{ qi.question.id }}"
+                                       multiple="true"
+                                       theme="bootstrap"
+                                       close-on-select="false"
+                                       ng-model="ctrl.surveyResponses[qi.question.id].listResponse"
+                                       ng-required="qi.question.isMandatory"
+                                       on-select="ctrl.saveResponse(qi.question.id)"
+                                       on-remove="ctrl.saveResponse(qi.question.id)"
+                                       class="form-control waltz-survey-form-control">
+                                <ui-select-match placeholder="Select values...">
+                                    <span ng-bind="$item.value"></span>
+                                </ui-select-match>
+                                <ui-select-choices repeat="entry.value as entry in qi.dropdownEntries | orderBy:'position' | filter: { value: $select.search }">
+                                    <span ng-bind-html="entry.value | highlight: $select.search"></span>
+                                </ui-select-choices>
+                            </ui-select>
+                        </div>
                         <!-- application -->
                         <waltz-entity-selector ng-switch-when="APPLICATION"
                                                item-id="qi.question.id"

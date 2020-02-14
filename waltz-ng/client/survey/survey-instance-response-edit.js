@@ -62,6 +62,7 @@ function indexResponses(responses = []) {
 function controller($location,
                     $state,
                     $stateParams,
+                    $timeout,
                     notification,
                     serviceBroker,
                     surveyInstanceStore,
@@ -156,24 +157,28 @@ function controller($location,
     };
 
     vm.saveForLater = () => {
-        notification.success("Survey response saved successfully");
-        $state.go("main.survey.instance.user");
+        $timeout(() => {
+            notification.success("Survey response saved successfully");
+            $state.go("main.survey.instance.user");
+        }, 200); // allow blur events to fire
     };
 
     vm.submit = () => {
-        if (confirm(
-            `The survey cannot be edited once submitted.\nPlease ensure you have saved any comments you may have entered (by clicking 'Save' on each comment field).
+        $timeout(() => {
+            if (confirm(
+                `The survey cannot be edited once submitted.\nPlease ensure you have saved any comments you may have entered (by clicking 'Save' on each comment field).
             \nAre you sure you want to submit your responses?`)) {
-            surveyInstanceStore.updateStatus(
-                vm.surveyInstance.id,
-                {newStatus: "COMPLETED"}
-            )
-            .then(() => {
-                notification.success("Survey response submitted successfully");
-                serviceBroker.loadAppData(CORE_API.NotificationStore.findAll, [], { force: true });
-                $state.go("main.survey.instance.response.view", {id: id});
-            });
-        }
+                surveyInstanceStore.updateStatus(
+                    vm.surveyInstance.id,
+                    {newStatus: "COMPLETED"}
+                )
+                    .then(() => {
+                        notification.success("Survey response submitted successfully");
+                        serviceBroker.loadAppData(CORE_API.NotificationStore.findAll, [], {force: true});
+                        $state.go("main.survey.instance.response.view", {id: id});
+                    });
+            }
+        }, 200); // allow blur events to fire, because 'confirm' blocks events
     };
 
 }
@@ -182,6 +187,7 @@ controller.$inject = [
     "$location",
     "$state",
     "$stateParams",
+    "$timeout",
     "Notification",
     "ServiceBroker",
     "SurveyInstanceStore",

@@ -349,7 +349,7 @@ public class SurveyInstanceExtractor implements DataExtractor {
                 .select(subjectNameField, subjectExtIdField)
                 .select(si.ID, si.STATUS, si.APPROVED_AT, si.APPROVED_BY, si.SUBMITTED_AT, si.SUBMITTED_BY)
                 .select(sqr.QUESTION_ID, sqr.COMMENT)
-                .select(sqr.STRING_RESPONSE, sqr.NUMBER_RESPONSE, sqr.DATE_RESPONSE, sqr.BOOLEAN_RESPONSE)
+                .select(sqr.STRING_RESPONSE, sqr.NUMBER_RESPONSE, sqr.DATE_RESPONSE, sqr.BOOLEAN_RESPONSE, sqr.LIST_RESPONSE_CONCAT)
                 .select(responseNameField, responseExtIdField)
                 .from(st)
                 .innerJoin(sr).on(sr.SURVEY_TEMPLATE_ID.eq(st.ID))
@@ -409,6 +409,8 @@ public class SurveyInstanceExtractor implements DataExtractor {
                 return r.get(sqr.BOOLEAN_RESPONSE);
             case DATE:
                 return r.get(sqr.DATE_RESPONSE);
+            case DROPDOWN_MULTI_SELECT:
+                return r.get(sqr.LIST_RESPONSE_CONCAT);
             case APPLICATION:
             case PERSON:
                 return ofNullable(r.get(responseNameField))

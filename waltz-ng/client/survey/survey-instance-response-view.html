@@ -122,6 +122,14 @@
                                     <waltz-markdown text="ctrl.answers[qi.question.id].answer">
                                     </waltz-markdown>
                                 </div>
+                                <div ng-switch-when="DROPDOWN_MULTI_SELECT">
+                                    <ul class="list-unstyled">
+                                        <li ng-repeat="response in ctrl.answers[qi.question.id].answer">
+                                            <span ng-bind="response">
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
                                 <div ng-switch-default>
                                     <span ng-bind="ctrl.answers[qi.question.id].answer">
                                     </span>

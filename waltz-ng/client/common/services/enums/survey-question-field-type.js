@@ -45,6 +45,13 @@ export const surveyQuestionFieldType = {
         description: null,
         position: 30
     },
+    DROPDOWN_MULTI_SELECT: {
+        key: 'DROPDOWN_MULTI_SELECT',
+        name: 'Dropdown (Multi-Select)',
+        icon: null,
+        description: null,
+        position: 30
+    },
     NUMBER: {
         key: 'NUMBER',
         name: 'Number',

@@ -36,7 +36,8 @@ $invalid-color: #f0ad4e;
         border-color: $invalid-color;
     }
 
-    .ui-select-container.ng-invalid .ui-select-match {
+    .ui-select-container.ng-invalid:not(.ui-select-multiple) .ui-select-match,
+    .ui-select-multiple.ui-select-container.ng-invalid {
         border: 1px solid $invalid-color;
     }
 

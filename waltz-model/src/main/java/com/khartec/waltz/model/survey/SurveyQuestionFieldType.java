@@ -24,6 +24,7 @@ public enum SurveyQuestionFieldType {
     BOOLEAN,
     DATE,
     DROPDOWN,
+    DROPDOWN_MULTI_SELECT,
     NUMBER,
     PERSON,
     TEXT,
