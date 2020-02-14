@@ -100,6 +100,14 @@ function controller($q, serviceBroker) {
 
         const allocationsPromise = loadAllocations();
 
+        const replacementAppPromise = serviceBroker
+            .loadViewData(CORE_API.MeasurableRatingReplacementStore.findForEntityRef, [vm.parentEntityRef])
+            .then(r => vm.replacementApps = r.data);
+
+        const decommissionDatePromise = serviceBroker
+            .loadViewData(CORE_API.MeasurableRatingPlannedDecommissionStore.findForEntityRef, [vm.parentEntityRef])
+            .then(r => vm.plannedDecommissions = r.data);
+
         $q.all([measurablesPromise,
                 ratingSchemesPromise,
                 ratingsPromise,
