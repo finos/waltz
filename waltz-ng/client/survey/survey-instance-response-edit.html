@@ -73,14 +73,6 @@
                          class="col-sm-7"
                          ng-class="{'col-md-3': qi.question.fieldType === 'DATE'}">
                         <!-- input control -->
-                        <!-- text -->
-                        <input ng-switch-when="TEXT"
-                               type="text"
-                               id="{{ qi.question.id }}"
-                               ng-model="ctrl.surveyResponses[qi.question.id].stringResponse"
-                               ng-required="qi.question.isMandatory"
-                               ng-blur="ctrl.saveResponse(qi.question.id)"
-                               class="form-control"/>
                         <!-- number -->
                         <input ng-switch-when="NUMBER"
                                type="number"
@@ -125,6 +117,15 @@
                                 N/a
                             </label>
                         </div>
+                        <!-- text -->
+                        <textarea ng-switch-when="TEXT"
+                                  id="{{ qi.question.id }}"
+                                  ng-model="ctrl.surveyResponses[qi.question.id].stringResponse"
+                                  ng-required="qi.question.isMandatory"
+                                  ng-blur="ctrl.saveResponse(qi.question.id)"
+                                  rows="1"
+                                  class="form-control">
+                        </textarea>
                         <!-- textarea -->
                         <textarea ng-switch-when="TEXTAREA"
                                   id="{{ qi.question.id }}"
