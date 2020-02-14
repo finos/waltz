@@ -108,7 +108,9 @@ function controller($q, serviceBroker) {
             .loadViewData(CORE_API.MeasurableRatingPlannedDecommissionStore.findForEntityRef, [vm.parentEntityRef])
             .then(r => vm.plannedDecommissions = r.data);
 
-        $q.all([measurablesPromise,
+        return $q
+            .all([
+                measurablesPromise,
                 ratingSchemesPromise,
                 ratingsPromise,
                 categoriesPromise,

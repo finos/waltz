@@ -104,7 +104,6 @@ function controller($q,
                 }
                 vm.onTabChange();
             });
-
     };
 
     const recalcTabs = function () {
@@ -125,19 +124,15 @@ function controller($q,
         }
     };
 
-
     const getDescription = () => _.get(
         vm.selected,
         ["rating", "description"]);
-
 
     const getRating = () => _.get(
         vm.selected,
         ["rating", "rating"]);
 
-
     const doRatingSave = (rating, description) => {
-
         return serviceBroker
             .execute(
                 CORE_API.MeasurableRatingStore.save,
@@ -152,9 +147,7 @@ function controller($q,
             .catch(e => displayError(notification, "Could not save rating", e))
     };
 
-
     const doRemove = () => {
-
         if (! vm.selected.rating) return $q.reject();
 
         vm.saveInProgress = true;
@@ -171,13 +164,11 @@ function controller($q,
             });
     };
 
-
     const deselectMeasurable = () => {
         vm.saveInProgress = false;
         vm.selected = Object.assign({}, vm.selected, { measurable: null });
         vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: true, ratingPicker: false});
     };
-
 
     const selectMeasurable = (node) => {
         const { measurable, rating, allocations } = node;
@@ -237,7 +228,8 @@ function controller($q,
             return;
         }
         serviceBroker
-            .execute(CORE_API.MeasurableRatingPlannedDecommissionStore.remove,
+            .execute(
+                CORE_API.MeasurableRatingPlannedDecommissionStore.remove,
                 [vm.selected.decommission.id])
             .then(() => {
                 vm.selected = Object.assign({}, vm.selected, { decommission: null, replacementApps: [] });
@@ -285,7 +277,6 @@ function controller($q,
                 })
                 .catch(e => {
                     const message = "Error removing all ratings for category: " + e.message;
-                    console.log(message, { e });
                     notification.error(message);
                 });
         }

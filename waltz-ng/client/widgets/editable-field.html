@@ -51,14 +51,18 @@
         <a ng-click="$ctrl.edit()"
            ng-if="$ctrl.editRole"
            waltz-has-role="{{ $ctrl.editRole }}"
+           style="position: relative; top: -1px"
            class="btn btn-xs waltz-visibility-child-30">
-            <waltz-icon name="pencil"></waltz-icon>
+            <waltz-icon name="pencil">
+            </waltz-icon>
             <span ng-bind="$ctrl.buttonLabel"></span>
         </a>
         <a ng-click="$ctrl.edit()"
            ng-if="! $ctrl.editRole"
-                class="btn btn-xs waltz-visibility-child-30">
-            <waltz-icon name="pencil"></waltz-icon>
+           style="position: relative; top: -1px"
+           class="btn btn-xs waltz-visibility-child-30">
+            <waltz-icon name="pencil">
+            </waltz-icon>
             <span ng-bind="$ctrl.buttonLabel"></span>
         </a>
     </div>
