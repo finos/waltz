@@ -38,27 +38,29 @@ const bindings = {
 
 
 const initialState = {
-    selected: null,
+    activeTab: null,
     allocations: [],
     allocationSchemes: [],
-    measurables: [],
     categories: [],
+    measurables: [],
+    plannedDecommissions: [],
     ratings: [],
     ratingSchemesById: {},
     ratingItemsBySchemeIdByCode: {},
-    tabs: [],
+    replacementApps: [],
     saveInProgress: false,
+    selected: null,
     startingCategoryId: null,
+    tabs: [],
     unusedCategories: [],
     visibility: {
         ratingPicker: false,
+        showDescriptionInPicker: false,
         instructions: true,
         schemeOverview: false,
         showAllCategories: false,
         tab: null
-    },
-    plannedDecommissions: [],
-    replacementApps: []
+    }
 };
 
 
@@ -119,7 +121,7 @@ function controller($q,
 
         vm.hasHiddenTabs = vm.categories.length !== vm.tabs.length;
         if (vm.activeTab) {
-            vm.activeTab = _.find(vm.tabs, t => t.category.id == vm.activeTab.category.id);
+            vm.activeTab = _.find(vm.tabs, t => t.category.id === vm.activeTab.category.id);
         }
     };
 
@@ -134,7 +136,7 @@ function controller($q,
         ["rating", "rating"]);
 
 
-    const doSave = (rating, description) => {
+    const doRatingSave = (rating, description) => {
 
         return serviceBroker
             .execute(
@@ -203,7 +205,47 @@ function controller($q,
     };
 
 
+    const reloadDecommData = () => {
+        return serviceBroker
+            .loadViewData(
+                CORE_API.MeasurableRatingPlannedDecommissionStore.findForEntityRef,
+                [vm.parentEntityRef], { force: true})
+            .then(r => {
+                vm.plannedDecommissions = r.data;
+                recalcTabs();
+            });
+    };
+
     // -- INTERACT ---
+
+    vm.onSaveDecommissionDate = (dateChange) => {
+        serviceBroker
+            .execute(
+                CORE_API.MeasurableRatingPlannedDecommissionStore.save,
+                [vm.parentEntityRef, vm.selected.measurable.id, dateChange])
+            .then(r => {
+                vm.selected = Object.assign({}, vm.selected, { decommission: r.data });
+                notification.success(`Saved decommission date for ${vm.selected.measurable.name}`);
+            })
+            .catch(e => displayError(notification, "Could not save decommission date", e))
+            .finally(reloadDecommData);
+    };
+
+    vm.onRemoveDecommission = () => {
+        if (!confirm("Are you sure you want to remove this decommission and any replacement apps?")) {
+            notification.info("Revocation of decommission cancelled");
+            return;
+        }
+        serviceBroker
+            .execute(CORE_API.MeasurableRatingPlannedDecommissionStore.remove,
+                [vm.selected.decommission.id])
+            .then(() => {
+                vm.selected = Object.assign({}, vm.selected, { decommission: null, replacementApps: [] });
+                notification.success(`Removed decommission date and replacement applications for: ${vm.selected.measurable.name}`);
+            })
+            .catch(e => displayError(notification, "Could not remove decommission date", e))
+            .finally(reloadDecommData);
+    };
 
     vm.onMeasurableSelect = (node) => {
         selectMeasurable(node);
@@ -217,12 +259,12 @@ function controller($q,
         return r === "X"
             ? doRemove()
                 .then(() => notification.success(`Removed: ${vm.selected.measurable.name}`))
-            : doSave(r, getDescription())
+            : doRatingSave(r, getDescription())
                 .then(() => notification.success(`Saved: ${vm.selected.measurable.name}`));
     };
 
     vm.onSaveComment = (comment) => {
-        return doSave(getRating(), comment)
+        return doRatingSave(getRating(), comment)
             .then(() => notification.success(`Saved Comment for: ${vm.selected.measurable.name}`))
     };
 
