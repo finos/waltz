@@ -76,7 +76,15 @@
                 </span>
                 <waltz-icon name="pie-chart"
                             class="waltz-visibility-child-30"
-                            ng-if="node.allocations">
+                            ng-if="node.allocations.length > 0">
+                </waltz-icon>
+                <waltz-icon name="hand-paper-o"
+                            class="waltz-visibility-child-30"
+                            ng-if="node.decommission && node.replacementApps.length === 0">
+                </waltz-icon>
+                <waltz-icon name="handshake-o"
+                            class="waltz-visibility-child-30"
+                            ng-if="node.decommission && node.replacementApps.length > 0">
                 </waltz-icon>
 
             </span>
@@ -106,12 +114,29 @@
             <waltz-markdown text="node.rating.description"></waltz-markdown>
         </div>
 
-        <div ng-if="node.allocations"
+        <div ng-if="node.allocations.length > 0"
              class="text-muted">
             <hr>
             <waltz-icon name="pie-chart">
             </waltz-icon>
             This item has <i>allocations</i>, select it for more information
         </div>
+
+        <div ng-if="node.decommission && node.replacementApps.length === 0"
+             class="text-muted">
+            <hr>
+            <waltz-icon name="hand-paper-o">
+            </waltz-icon>
+            This item will be decommissioned without a replacement application, select it for more information
+        </div>
+
+        <div ng-if="node.decommission && node.replacementApps.length > 0"
+             class="text-muted">
+            <hr>
+            <waltz-icon name="handshake-o">
+            </waltz-icon>
+            This item will be decommissioned having replacement application/s, select it for more information
+        </div>
+
     </div>
 </script>

@@ -36,12 +36,16 @@ const bindings = {
     allocationSchemes: "<",
     measurables: "<",
     ratings: "<",
-    ratingScheme: "<"
+    ratingScheme: "<",
+    plannedDecommissions: "<?",
+    replacementApps: "<?"
 };
 
 
 const initialState = {
-    selected: null
+    selected: null,
+    plannedDecommissions: [],
+    replacementApps: []
 };
 
 
