@@ -135,9 +135,17 @@
         id="wmrep-rating-picker">
 
 
-    <b style="font-weight: bolder"
-       ng-bind="$ctrl.selected.measurable.name">
-    </b>
+    <div>
+        <b style="font-weight: bolder"
+           ng-bind="$ctrl.selected.measurable.name">
+        </b>
+        <a ng-if="$ctrl.selected.measurable.description"
+           ng-click="$ctrl.visibility.showDescriptionInPicker = ! $ctrl.visibility.showDescriptionInPicker"
+           class="clickable">
+            <span ng-if="!$ctrl.visibility.showDescriptionInPicker">(show description)</span>
+            <span ng-if="$ctrl.visibility.showDescriptionInPicker">(hide description)</span>
+        </a>
+    </div>
 
     <!-- ABSTRACT -->
     <div ng-if="! $ctrl.selected.measurable.concrete">
@@ -182,7 +190,8 @@
         </waltz-warning>
     </div>
 
-    <div ng-class="{ 'waltz-scroll-region-100' : $ctrl.selected.measurable.description.length > 400 }" style="margin-top: 15px">
+    <div style="margin-top: 15px"
+         ng-if="$ctrl.visibility.showDescriptionInPicker">
         <div class="text-muted">
             <waltz-markdown text="$ctrl.selected.measurable.description"></waltz-markdown>
         </div>
@@ -192,14 +201,6 @@
 
     <!-- CONCRETE -->
     <div ng-if="$ctrl.selected.measurable.concrete">
-
-        <!-- NEW -->
-        <div ng-if="! $ctrl.selected.rating">
-            This entity does not currently exhibit this characteristic.
-            To add it, choose a rating and, optionally, provide a comment.
-        </div>
-
-        <br>
 
         <!-- RATING -->
         <div class="row">
@@ -216,21 +217,58 @@
             </div>
         </div>
 
-        <!-- COMMENT -->
-        <div class="row"
-             style="padding-top: 8px;"
-             ng-if="$ctrl.selected.rating">
-            <div class="col-sm-3">
-                Comments:
+        <div ng-if="$ctrl.selected.rating">
+            <!-- DECOMMISSION -->
+            <div class="row"
+                 style="padding-top: 8px;">
+                <div>
+                    <div class="col-sm-3">
+                        Decommission:
+                    </div>
+                    <div class="col-sm-9">
+                        <waltz-editable-field field-type="date"
+                                              initial-val="$ctrl.selected.decommission.plannedDecommissionDate"
+                                              on-save="$ctrl.onSaveDecommissionDate"
+                                              date-format="yyyy-MM-dd"
+                                              empty-label="No planned decommission date">
+                        </waltz-editable-field>
+
+                        <small class="form-text text-muted"
+                               ng-if="! $ctrl.selected.decommission">
+                            There is no planned decommission date set for this
+                            <i ng-bind="$ctrl.activeTab.category.name"></i>
+                        </small>
+
+                        <small class="form-text text-muted"
+                               ng-if="$ctrl.selected.decommission">
+                            This <i ng-bind="$ctrl.activeTab.category.name"></i>
+                            is due to be decommissioned.
+                            <br>
+                            <a class="clickable"
+                               ng-click="$ctrl.onRemoveDecommission()">
+                                <waltz-icon name="trash"></waltz-icon>
+                                Revoke
+                            </a>
+                            this decommission.
+                        </small>
+                    </div>
+                </div>
             </div>
-            <div class="col-sm-9">
-                <waltz-inline-edit-area placeholder='None'
-                                        on-save="$ctrl.onSaveComment"
-                                        value="$ctrl.selected.rating.description">
-                </waltz-inline-edit-area>
+
+            <!-- COMMENT -->
+            <div class="row"
+                 style="padding-top: 8px;">
+                <div class="col-sm-3">
+                    Comments:
+                </div>
+                <div class="col-sm-9">
+                    <waltz-inline-edit-area placeholder='None'
+                                            on-save="$ctrl.onSaveComment"
+                                            value="$ctrl.selected.rating.description">
+                    </waltz-inline-edit-area>
+                </div>
             </div>
         </div>
-    </div>
 
 
     <!-- CANCEL -->

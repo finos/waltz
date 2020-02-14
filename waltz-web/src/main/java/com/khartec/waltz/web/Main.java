@@ -22,6 +22,7 @@ import com.khartec.waltz.common.LoggingUtilities;
 import com.khartec.waltz.common.exception.DuplicateKeyException;
 import com.khartec.waltz.common.exception.InsufficientPrivelegeException;
 import com.khartec.waltz.common.exception.NotFoundException;
+import com.khartec.waltz.common.exception.UpdateFailedException;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.settings.SettingsService;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -132,6 +133,16 @@ public class Main {
             LOG.error(e.getMessage());
             reportException(
                     404,
+                    e.getCode(),
+                    e.getMessage(),
+                    res,
+                    LOG);
+        });
+
+        exception(UpdateFailedException.class, (e, req, res) -> {
+            LOG.error(e.getMessage());
+            reportException(
+                    500,
                     e.getCode(),
                     e.getMessage(),
                     res,

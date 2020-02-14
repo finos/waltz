@@ -18,17 +18,20 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.command.DateFieldChange;
 import com.khartec.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
 import com.khartec.waltz.service.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionService;
+import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.web.WebUtilities.getEntityReference;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.deleteForDatum;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
 
 @Service
 public class MeasurableRatingPlannedDecommissionEndpoint implements Endpoint {
@@ -51,11 +54,24 @@ public class MeasurableRatingPlannedDecommissionEndpoint implements Endpoint {
     public void register() {
 
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
+        String savePath = mkPath(BASE_URL, "entity", ":kind", ":id", "MEASURABLE", ":measurableId");
+        String removePath = mkPath(BASE_URL, "id", ":id");
 
         ListRoute<MeasurableRatingPlannedDecommission> findForEntityRoute = (request, response)
                 -> measurableRatingPlannedDecommissionService.findForEntityRef(getEntityReference(request));
 
+        DatumRoute<MeasurableRatingPlannedDecommission> saveRoute = (request, response)
+                -> measurableRatingPlannedDecommissionService.save(
+                        getEntityReference(request),
+                        getLong(request, "measurableId"),
+                        readBody(request, DateFieldChange.class),
+                        getUsername(request));
+
+        DatumRoute<Boolean> removeRoute = (request, response) -> measurableRatingPlannedDecommissionService.remove(getId(request));
+
         getForList(findForEntityPath, findForEntityRoute);
+        postForDatum(savePath, saveRoute);
+        deleteForDatum(removePath, removeRoute);
 
     }
 }
