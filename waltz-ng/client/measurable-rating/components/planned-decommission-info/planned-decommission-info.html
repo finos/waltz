@@ -1,0 +1,41 @@
+<div class="waltz-replacement-apps">
+    <div class="col-sm-12 ">
+        <hr>
+        This item is being retired for this application. The planned decommission date is:
+        <span ng-bind="$ctrl.plannedDecommission.plannedDecommissionDate | date:'yyyy-MM-dd'"></span>
+        <div ng-if="$ctrl.replacementApps.length > 0">
+            <br>
+            The replacement application/s for this item are:
+            <br>
+            <br>
+            <table class="table table-condensed table-hover small">
+                <colgroup>
+                    <col width="33%">
+                    <col width="33%">
+                    <col width="33%">
+                </colgroup>
+                <thead>
+                    <th>Name</th>
+                    <th>Commission Date</th>
+                    <th>Last Updated By</th>
+                </thead>
+                <tbody>
+                <tr ng-repeat="item in $ctrl.replacementApps">
+                    <td>
+                        <waltz-entity-link entity-ref="item.entityReference">
+                        </waltz-entity-link>
+                    </td>
+                    <td>
+                        <span ng-bind="item.plannedCommissionDate | date:'yyyy-MM-dd'">
+                        </span>
+                    </td>
+                    <td>
+                        <waltz-last-updated entity="item">
+                        </waltz-last-updated>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
