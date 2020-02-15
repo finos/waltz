@@ -56,8 +56,10 @@ function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const loadData = (force = false) => {
-        return loadAllData($q, serviceBroker, vm, false, force)
-            .then(() => {
+        return loadAllData($q, serviceBroker, vm.parentEntityRef, false, force)
+            .then((r) => {
+                Object.assign(vm, r);
+                vm.tabs = mkTabs(vm);
                 const firstNonEmptyTab = determineStartingTab(vm.tabs);
                 vm.visibility.tab = firstNonEmptyTab ? firstNonEmptyTab.category.id : null;
             });
@@ -88,8 +90,12 @@ function controller($q, serviceBroker) {
                 CORE_API.AllocationStore.updateAllocations,
                 [vm.parentEntityRef, vm.activeAllocationScheme.id, changes])
             .then(r => {
-                loadAllData($q, serviceBroker, vm, false, true);
-                return r;
+                loadAllData($q, serviceBroker, vm.parentEntityRef, false, true)
+                    .then(r => {
+                        Object.assign(vm, r);
+                        mkTabs(vm);
+                    });
+                return r.data;
             });
     };
 

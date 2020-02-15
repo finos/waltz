@@ -72,8 +72,9 @@ function controller($q,
 
 
     const loadData = (force) => {
-        return loadAllData($q, serviceBroker, vm, true, force)
-            .then(() => {
+        return loadAllData($q, serviceBroker, vm.parentEntityRef, true, force)
+            .then((r) => {
+                Object.assign(vm, r);
                 recalcTabs();
                 vm.categoriesById = _.keyBy(vm.categories, "id");
                 vm.ratingItemsBySchemeIdByCode = indexRatingSchemes(_.values(vm.ratingSchemesById) || []);
@@ -89,14 +90,7 @@ function controller($q,
     const recalcTabs = function () {
         const hasNoRatings = vm.ratings.length === 0;
         const showAllCategories = hasNoRatings || vm.visibility.showAllCategories;
-        vm.tabs = mkTabs(
-            vm.categories,
-            vm.ratingSchemesById,
-            vm.measurables,
-            vm.ratings,
-            vm.allocationSchemes,
-            vm.allocations,
-            showAllCategories);
+        vm.tabs = mkTabs(vm, showAllCategories);
 
         vm.hasHiddenTabs = vm.categories.length !== vm.tabs.length;
         if (vm.activeTab) {
