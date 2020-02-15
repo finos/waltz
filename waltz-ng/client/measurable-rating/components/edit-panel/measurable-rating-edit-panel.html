@@ -18,8 +18,15 @@
 
 <div class="row">
 
+
+    <!-- TABS & TREES -->
+    <div class="col-sm-7">
+        <div ng-include="'wmrep-main-tabs'">
+        </div>
+    </div>
+
     <!-- INSTRUCTIONS / PICKER -->
-    <div class="col-sm-4">
+    <div class="col-sm-5" style="padding-top: 40px">
         <!-- SCHEME OVERVIEW -->
         <div ng-if="$ctrl.visibility.schemeOverview"
              ng-include="'wmrep-rating-scheme-overview'">
@@ -36,12 +43,6 @@
              ng-include="'wmrep-instructions'">
         </div>
 
-    </div>
-
-    <!-- TABS & TREES -->
-    <div class="col-sm-8">
-         <div ng-include="'wmrep-main-tabs'">
-         </div>
     </div>
 
 </div>
@@ -147,6 +148,15 @@
         </a>
     </div>
 
+
+    <div style="margin-top: 15px"
+         ng-if="$ctrl.visibility.showDescriptionInPicker">
+        <div class="text-muted">
+            <waltz-markdown text="$ctrl.selected.measurable.description"></waltz-markdown>
+        </div>
+    </div>
+
+
     <!-- ABSTRACT -->
     <div ng-if="! $ctrl.selected.measurable.concrete">
         <br>
@@ -190,12 +200,6 @@
         </waltz-warning>
     </div>
 
-    <div style="margin-top: 15px"
-         ng-if="$ctrl.visibility.showDescriptionInPicker">
-        <div class="text-muted">
-            <waltz-markdown text="$ctrl.selected.measurable.description"></waltz-markdown>
-        </div>
-    </div>
 
     <br>
 
