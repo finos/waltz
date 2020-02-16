@@ -33,8 +33,8 @@
         </div>
 
         <!-- EDIT SECTION -->
-        <div ng-if="$ctrl.visibility.ratingPicker"
-             ng-include="'wmrep-rating-picker'">
+        <div ng-if="$ctrl.visibility.ratingEditor"
+             ng-include="'wmrep-rating-editor'">
         </div>
 
         <!-- INSTRUCTIONS -->
@@ -133,7 +133,7 @@
 
 <!-- PICKER -->
 <script type="text/ng-template"
-        id="wmrep-rating-picker">
+        id="wmrep-rating-editor">
 
 
     <div>
@@ -148,14 +148,13 @@
         </a>
     </div>
 
-
+    <!-- DESCRIPTION -->
     <div style="margin-top: 15px"
          ng-if="$ctrl.visibility.showDescriptionInPicker">
         <div class="text-muted">
             <waltz-markdown text="$ctrl.selected.measurable.description"></waltz-markdown>
         </div>
     </div>
-
 
     <!-- ABSTRACT -->
     <div ng-if="! $ctrl.selected.measurable.concrete">

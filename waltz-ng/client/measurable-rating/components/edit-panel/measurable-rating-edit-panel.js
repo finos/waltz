@@ -54,7 +54,7 @@ const initialState = {
     tabs: [],
     unusedCategories: [],
     visibility: {
-        ratingPicker: false,
+        ratingEditor: false,
         showDescriptionInPicker: false,
         instructions: true,
         schemeOverview: false,
@@ -141,7 +141,7 @@ function controller($q,
     const deselectMeasurable = () => {
         vm.saveInProgress = false;
         vm.selected = Object.assign({}, vm.selected, { measurable: null });
-        vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: true, ratingPicker: false});
+        vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: true, ratingEditor: false});
     };
 
     const selectMeasurable = (node) => {
@@ -151,7 +151,7 @@ function controller($q,
         const hasWarnings = !_.isEmpty(allocations);
 
         vm.selected = Object.assign({}, node, { category, hasWarnings, ratingScheme });
-        vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: false, ratingPicker: true});
+        vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: false, ratingEditor: true});
     };
 
     const reloadDecommData = () => {
