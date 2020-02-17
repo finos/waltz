@@ -20,7 +20,7 @@ import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 import {kindToViewState} from "../../../common/link-utils";
-import {loadAllData, mkTabs} from "../../measurable-rating-utils";
+import {loadAllData, loadDecommData, mkTabs} from "../../measurable-rating-utils";
 import {indexRatingSchemes, mkRatingsKeyHandler} from "../../../ratings/rating-utils";
 
 import template from "./measurable-rating-edit-panel.html";
@@ -154,15 +154,10 @@ function controller($q,
         vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: false, ratingEditor: true});
     };
 
+
     const reloadDecommData = () => {
-        return serviceBroker
-            .loadViewData(
-                CORE_API.MeasurableRatingPlannedDecommissionStore.findForEntityRef,
-                [vm.parentEntityRef], { force: true})
-            .then(r => {
-                vm.plannedDecommissions = r.data;
-                recalcTabs();
-            });
+        return loadDecommData($q, serviceBroker, vm.parentEntityRef, true)
+            .then(r => Object.assign(vm, r));
     };
 
     // -- BOOT --
@@ -181,6 +176,32 @@ function controller($q,
 
 
     // -- INTERACT ---
+
+    vm.onRemoveReplacementApp = (replacement) => {
+        return serviceBroker
+            .execute(
+                CORE_API.MeasurableRatingReplacementStore.remove,
+                [replacement.decommissionId, replacement.id])
+            .then(r => {
+                vm.selected = Object.assign({}, vm.selected, { replacementApps: r.data });
+                notification.success("Replacement app removed")
+            })
+            .catch(e  => displayError(notification, "Could not remove replacement app", e))
+            .finally(reloadDecommData);
+    };
+
+    vm.onAddReplacementApp = (replacement) => {
+        return serviceBroker
+            .execute(
+                CORE_API.MeasurableRatingReplacementStore.save,
+                [replacement.decommissionId, replacement])
+            .then(r => {
+                vm.selected = Object.assign({}, vm.selected, { replacementApps: r.data });
+                notification.success("Successfully added replacement app")
+            })
+            .catch(e  => displayError(notification, "Could not add replacement app", e))
+            .finally(reloadDecommData);
+    };
 
     vm.onSaveDecommissionDate = (dateChange) => {
         serviceBroker

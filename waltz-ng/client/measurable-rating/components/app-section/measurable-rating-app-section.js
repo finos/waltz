@@ -43,7 +43,7 @@ const initialState = {
     ratings: [],
     measurables: [],
     visibility: {
-        editor: false, // TODO set back to `false`
+        editor: false,
         overlay: false,
         tab: null
     },

@@ -26,11 +26,11 @@ const bindings = {
     currentSelection: "<",
     entityKinds: "<",
     entityLifecycleStatuses: "<?",
-    itemId: "<",
+    itemId: "<?", // ctx
     limit: "<?",
     onSelect: "<",
-    required: "<",
-    selectionFilter: "<"
+    required: "<?",
+    selectionFilter: "<?"
 };
 
 

@@ -17,8 +17,16 @@
  */
 
 import template from "./planned-decommission-editor.html";
-import {initialiseData} from "../../../common";
+import {initialiseData, invokeFunction} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
+
+const modes= {
+    VIEW: "VIEW",
+    SELECT_APP: "SELECT_APP",
+    SELECT_COMM_DATE: "SELECT_COMM_DATE",
+    CONFIRM_ADDITION: "CONFIRM_ADDITION",
+    CONFIRM_REMOVAL: "CONFIRM_REMOVAL"
+};
 
 
 const bindings = {
@@ -26,45 +34,85 @@ const bindings = {
     replacementApps: "<?",
     onSaveDecommissionDate: "<",
     onRemoveDecommission: "<",
+    onAddReplacementApp: "<",
+    onRemoveReplacementApp: "<",
+    category: "<"
 };
 
 
 const initialState = {
+    candidateApp: null,
+    candidateRemoval: null,
+    candidateCommissionDate: null,
     plannedDecommission: null,
     replacementApps: [],
-    visibility: {
-        replacementAppSelector: false
-    }
+    mode: modes.VIEW
 };
 
 
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges = () => {
-        serviceBroker
-            .loadViewData(
-                CORE_API.MeasurableRatingReplacementStore.findForEntityRef,
-                [ vm.plannedDecommission.entityReference ],
-                { force: true })
-            .then(r => {
-                const existingReplacementApps = _.map(vm.replacementApps, d => d.entityReference.id);
-                vm.suggestedReplacements = _.reject(
-                    r.data,
-                    d => _.includes(existingReplacementApps, d.entityReference.id));
-
-                console.log({ sr: vm.suggestedReplacements })
-            });
+    vm.$onChanges = (c) => {
+        if (c.plannedDecommission) {
+            vm.mode = modes.VIEW;
+        }
     };
 
     vm.onShowAdd = () => {
-        vm.visibility = Object.assign({}, vm.visibility, {replacementAppSelector: true});
+        vm.mode = modes.SELECT_APP;
     };
 
-    vm.onHideAdd = () => {
-        vm.visibility = Object.assign({}, vm.visibility, {replacementAppSelector: false});
+    vm.onCancelAdd = () => {
+
+        if (vm.mode === modes.SELECT_APP) {
+            vm.mode = modes.VIEW;
+        } else if (vm.mode === modes.SELECT_COMM_DATE) {
+            vm.mode = modes.SELECT_APP;
+        } else {
+            vm.mode = modes.VIEW;
+        }
     };
 
+    vm.selectionFilter = (candidate) => {
+        const isSelf = candidate.id === vm.plannedDecommission.entityReference.id;
+        if (isSelf) {
+            return false;
+        } else {
+            const existingReplacementApps = _.map(vm.replacementApps, d => d.entityReference.id);
+            return !_.includes(existingReplacementApps, candidate.id);
+        }
+    };
+
+    vm.onSelectReplacementCandidate = (d) => {
+        vm.mode = modes.SELECT_COMM_DATE;
+        vm.candidateApp = d;
+    };
+
+    vm.onSetCommissionDate = (c) => {
+        vm.mode = modes.CONFIRM_ADDITION;
+        vm.candidateCommissionDate = c.newVal;
+    };
+
+    vm.onAddReplacement = () => {
+        const replacement = {
+            decommissionId: vm.plannedDecommission.id,
+            replacementApp: vm.candidateApp,
+            commissionDate: vm.candidateCommissionDate
+        };
+        invokeFunction(vm.onAddReplacementApp, replacement);
+        vm.mode = modes.VIEW;
+    };
+
+    vm.onSelectCandidateForRemoval = (replacement) => {
+        vm.candidateRemoval = replacement;
+        vm.mode = modes.CONFIRM_REMOVAL;
+    };
+
+    vm.onRemoveReplacement = () => {
+        invokeFunction(vm.onRemoveReplacementApp, vm.candidateRemoval)
+            .then(() => vm.mode = modes.VIEW)
+    };
 }
 
 

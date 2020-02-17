@@ -81,7 +81,7 @@
                     <waltz-icon name="hand-paper-o"
                                 ng-if="node.decommission && node.replacementApps.length === 0">
                     </waltz-icon>
-                    <waltz-icon name="handshake-o"
+                    <waltz-icon name="hand-o-right"
                                 ng-if="node.decommission && node.replacementApps.length > 0">
                     </waltz-icon>
                 </span>
@@ -135,7 +135,7 @@
         <div ng-if="node.decommission && node.replacementApps.length > 0"
              style="border-top: 1px solid #eee; margin-top: 12px; padding-top: 4px"
              class="text-muted">
-            <waltz-icon name="handshake-o">
+            <waltz-icon name="hand-o-right">
             </waltz-icon>
             This item will be decommissioned having replacement application/s, select it for more information
         </div>

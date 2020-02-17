@@ -15,7 +15,7 @@
  * See the License for the specific
  *
  */
-import {initialiseData} from "../common";
+import {initialiseData, invokeFunction} from "../common";
 
 import template from "./editable-field.html";
 
@@ -29,7 +29,9 @@ const bindings = {
     buttonLabel: "@",
     saveLabel: "@?",
     editRole: "@",
-    emptyLabel: "@?"
+    emptyLabel: "@?",
+    startInEditMode: "<?",
+    onCancel: "<?"
 };
 
 
@@ -44,6 +46,8 @@ const initialState = {
     fieldType: "text",
     buttonLabel: "Edit",
     saveLabel:  "Save",
+    startInEditMode: false,
+    onCancel: null,
     onSave: () => console.log("WEF: No on-save method provided")
 };
 
@@ -57,6 +61,12 @@ function mkNewVal(initialVal, fieldType) {
 
 function controller() {
     const vm = initialiseData(this, initialState);
+
+    vm.$onInit = () => {
+        if (vm.startInEditMode) {
+            vm.editing = true;
+        }
+    };
 
     vm.$onChanges = (c) => {
         if (c.initialVal) {
@@ -87,8 +97,9 @@ function controller() {
         const promise = vm.onSave(data, vm.ctx);
 
         if (promise) {
-            promise.then(saveComplete, saveFailed)
-                   .then(() => vm.initialVal = data.newVal);
+            promise
+                .then(saveComplete, saveFailed)
+                .then(() => vm.initialVal = data.newVal);
         } else {
             saveComplete();
         }
@@ -103,6 +114,7 @@ function controller() {
         vm.editing = false;
         vm.saving = false;
         vm.errorMessage = "";
+        invokeFunction(vm.onCancel);
     };
 
     vm.entitySelect = (entity) => {

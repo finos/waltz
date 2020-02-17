@@ -19,6 +19,32 @@ import _ from "lodash";
 import {CORE_API} from "../common/services/core-api-utils";
 
 
+export function loadDecommData(
+    $q,
+    serviceBroker,
+    parentEntityRef,
+    force = false) {
+
+    const replacementAppPromise = serviceBroker
+        .loadViewData(
+            CORE_API.MeasurableRatingReplacementStore.findForEntityRef,
+            [parentEntityRef],
+            {force})
+        .then(r => ({replacementApps: r.data}));
+
+    const decommissionDatePromise = serviceBroker
+        .loadViewData(
+            CORE_API.MeasurableRatingPlannedDecommissionStore.findForEntityRef,
+            [parentEntityRef],
+            {force})
+        .then(r => ({plannedDecommissions: r.data}));
+
+    return $q
+        .all([replacementAppPromise, decommissionDatePromise])
+        .then(responses => Object.assign({}, ...responses));
+
+}
+
 export function loadAllData(
     $q,
     serviceBroker,
@@ -72,19 +98,7 @@ export function loadAllData(
                 .mapValues(xs => _.sumBy(xs, x => x.percentage))
                 .value()}));
 
-    const replacementAppPromise = serviceBroker
-        .loadViewData(
-            CORE_API.MeasurableRatingReplacementStore.findForEntityRef,
-            [parentEntityRef],
-            {force})
-        .then(r => ({replacementApps: r.data}));
-
-    const decommissionDatePromise = serviceBroker
-        .loadViewData(
-            CORE_API.MeasurableRatingPlannedDecommissionStore.findForEntityRef,
-            [parentEntityRef],
-            {force})
-        .then(r => ({plannedDecommissions: r.data}));
+    const decommPromise = loadDecommData($q, serviceBroker, parentEntityRef, force);
 
     return $q
         .all([
@@ -94,8 +108,7 @@ export function loadAllData(
             categoriesPromise,
             allocationsPromise,
             allocationSchemesPromise,
-            replacementAppPromise,
-            decommissionDatePromise,
+            decommPromise,
             roadmapsPromise])
         .then(results => Object.assign({}, ...results));
 }
@@ -112,7 +125,8 @@ export function mkTabs(ctx, includeEmpty = true) {
     const measurablesByCategory = _.groupBy(ctx.measurables, d => d.categoryId);
     const allocationSchemesByCategory = _.groupBy(ctx.allocationSchemes, d => d.measurableCategoryId);
 
-    return _.chain(ctx.categories)
+    return _
+        .chain(ctx.categories)
         .map(category => {
             const measurablesForCategory = measurablesByCategory[category.id] || [];
             const measurableIds = _.map(measurablesForCategory, d => d.id);
