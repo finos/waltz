@@ -17,6 +17,7 @@
  */
 import _ from "lodash";
 import {CORE_API} from "../common/services/core-api-utils";
+import {mkSelectionOptions} from "../common/selector-utils";
 
 
 export function loadDecommData(
@@ -73,7 +74,10 @@ export function loadAllData(
     // if we are in edit mode we will be loading all measurables, otherwise just the needed measurables
     const measurablesCall = allMeasurables
         ? serviceBroker.loadAppData(CORE_API.MeasurableStore.findAll)
-        : serviceBroker.loadViewData(CORE_API.MeasurableStore.findMeasurablesRelatedToPath, [parentEntityRef], { force });
+        : serviceBroker.loadViewData(
+            CORE_API.MeasurableStore.findMeasurablesBySelector,
+            [mkSelectionOptions(parentEntityRef)],
+            { force });
 
     const measurablesPromise = measurablesCall
         .then(r => ({measurables: r.data}));

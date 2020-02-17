@@ -49,7 +49,6 @@ public class MeasurableEndpoint implements Endpoint {
 
         String findAllPath = mkPath(BASE_URL, "all");
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
-        String findMeasurablesRelatedToPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findByMeasurableIdSelectorPath = mkPath(BASE_URL, "measurable-selector");
         String findByExternalIdPath = mkPath(BASE_URL, "external-id", ":extId");
         String searchPath = mkPath(BASE_URL, "search", ":query");
@@ -59,9 +58,6 @@ public class MeasurableEndpoint implements Endpoint {
 
         DatumRoute<Measurable> getByIdRoute = (request, response)
                 -> measurableService.getById(getId(request));
-
-        ListRoute<Measurable> findMeasurablesRelatedToEntityRoute = (request, response)
-                -> measurableService.findMeasurablesRelatedToEntity(getEntityReference(request));
 
         ListRoute<Measurable> findByMeasurableIdSelectorRoute = (request, response)
                 -> measurableService.findByMeasurableIdSelector(readIdSelectionOptionsFromBody(request));
@@ -73,7 +69,6 @@ public class MeasurableEndpoint implements Endpoint {
                 -> measurableService.findByExternalId(request.params("extId"));
 
         getForList(findAllPath, findAllRoute);
-        getForList(findMeasurablesRelatedToPath, findMeasurablesRelatedToEntityRoute);
         getForList(findByExternalIdPath, findByExternalIdRoute);
         postForList(findByMeasurableIdSelectorPath, findByMeasurableIdSelectorRoute);
         getForDatum(getByIdPath, getByIdRoute);
