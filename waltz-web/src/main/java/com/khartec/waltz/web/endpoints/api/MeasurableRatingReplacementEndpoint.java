@@ -20,7 +20,9 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.measurable_rating_replacement.MeasurableRatingReplacement;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.measurable_rating_replacement.MeasurableRatingReplacementService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,13 +41,17 @@ public class MeasurableRatingReplacementEndpoint implements Endpoint {
 
 
     private final MeasurableRatingReplacementService measurableRatingReplacementService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public MeasurableRatingReplacementEndpoint(MeasurableRatingReplacementService measurableRatingReplacementService) {
+    public MeasurableRatingReplacementEndpoint(MeasurableRatingReplacementService measurableRatingReplacementService,
+                                               UserRoleService userRoleService) {
         checkNotNull(measurableRatingReplacementService, "measurableRatingReplacementService cannot be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.measurableRatingReplacementService = measurableRatingReplacementService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -60,6 +66,7 @@ public class MeasurableRatingReplacementEndpoint implements Endpoint {
                 -> measurableRatingReplacementService.findForEntityRef(getEntityReference(request));
 
         ListRoute<MeasurableRatingReplacement> saveRoute = (request, response) -> {
+            requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
             String username = getUsername(request);
             EntityReference entityReference = getEntityReference(request);
             long decommId = getLong(request, "decommId");
@@ -69,6 +76,7 @@ public class MeasurableRatingReplacementEndpoint implements Endpoint {
 
 
         ListRoute<MeasurableRatingReplacement> removeRoute = (request, response) -> {
+            requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
             String username = getUsername(request);
             long decommId = getLong(request, "decommId");
             long replacementId = getLong(request, "replacementId");

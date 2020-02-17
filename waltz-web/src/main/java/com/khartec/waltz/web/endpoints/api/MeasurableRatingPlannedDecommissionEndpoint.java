@@ -20,7 +20,9 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.command.DateFieldChange;
 import com.khartec.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -40,13 +42,17 @@ public class MeasurableRatingPlannedDecommissionEndpoint implements Endpoint {
 
 
     private final MeasurableRatingPlannedDecommissionService measurableRatingPlannedDecommissionService;
+    private final UserRoleService userRoleService;
 
 
     @Autowired
-    public MeasurableRatingPlannedDecommissionEndpoint(MeasurableRatingPlannedDecommissionService measurableRatingPlannedDecommissionService) {
+    public MeasurableRatingPlannedDecommissionEndpoint(MeasurableRatingPlannedDecommissionService measurableRatingPlannedDecommissionService,
+                                                       UserRoleService userRoleService) {
         checkNotNull(measurableRatingPlannedDecommissionService, "measurableRatingPlannedDecommissionService cannot be null");
+        checkNotNull(userRoleService, "userRoleService cannot be null");
 
         this.measurableRatingPlannedDecommissionService = measurableRatingPlannedDecommissionService;
+        this.userRoleService = userRoleService;
     }
 
 
@@ -60,14 +66,19 @@ public class MeasurableRatingPlannedDecommissionEndpoint implements Endpoint {
         ListRoute<MeasurableRatingPlannedDecommission> findForEntityRoute = (request, response)
                 -> measurableRatingPlannedDecommissionService.findForEntityRef(getEntityReference(request));
 
-        DatumRoute<MeasurableRatingPlannedDecommission> saveRoute = (request, response)
-                -> measurableRatingPlannedDecommissionService.save(
-                        getEntityReference(request),
-                        getLong(request, "measurableId"),
-                        readBody(request, DateFieldChange.class),
-                        getUsername(request));
+        DatumRoute<MeasurableRatingPlannedDecommission> saveRoute = (request, response) -> {
+            requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
+            return measurableRatingPlannedDecommissionService.save(
+                    getEntityReference(request),
+                    getLong(request, "measurableId"),
+                    readBody(request, DateFieldChange.class),
+                    getUsername(request));
+        };
 
-        DatumRoute<Boolean> removeRoute = (request, response) -> measurableRatingPlannedDecommissionService.remove(getId(request));
+        DatumRoute<Boolean> removeRoute = (request, response) -> {
+            requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
+            return measurableRatingPlannedDecommissionService.remove(getId(request));
+        };
 
         getForList(findForEntityPath, findForEntityRoute);
         postForDatum(savePath, saveRoute);
