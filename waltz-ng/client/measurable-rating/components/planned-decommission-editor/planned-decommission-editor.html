@@ -21,7 +21,7 @@
     <div class="row"
          style="padding-top: 8px;">
         <div class="col-sm-3">
-            Decommission:
+            Decommission date:
         </div>
         <div class="col-sm-9">
             <!-- EDITOR -->
@@ -46,53 +46,173 @@
                 <a class="clickable"
                    ng-click="$ctrl.onRemoveDecommission()">
                     <waltz-icon name="trash"></waltz-icon>
-                    Revoke this
-                    <i ng-bind="$ctrl.category.name"></i>
+                    Revoke the decommissioning
                 </a>
-                decommission.
+                    of this <i ng-bind="$ctrl.category.name"></i>
             </small>
         </div>
     </div>
 
     <!-- REPLACEMENT APPS -->
-    <div ng-if="$ctrl.decommission !== null"
-         style="padding-top: 6px;"
+    <div ng-if="$ctrl.plannedDecommission !== null"
+         style="padding-top: 12px;"
          class="row">
         <div class="col-sm-3">
-            Replacement Apps:
+            Replacement apps:
         </div>
         <div class="col-sm-9">
 
-            <!-- VIEW: APP LIST -->
-            <div ng-if="!$ctrl.visibility.replacementAppSelector">
-                <ul class="list-unstyled">
-                    <li ng-if="$ctrl.replacementApps.length === 0">
+            <div ng-switch="$ctrl.mode">
+
+                <!-- VIEW: APP LIST -->
+                <div ng-switch-when="VIEW">
+                    <p ng-if="$ctrl.replacementApps.length === 0">
                         No replacement applications have been declared.
-                    </li>
-                    <li ng-repeat="replacement in $ctrl.replacementApps">
-                        <waltz-entity-icon-label entity-ref="replacement.entityReference">
-                        </waltz-entity-icon-label>
-                        <span class="text-muted">
-                            ( <span ng-bind="replacement.plannedCommissionDate | date:'yyyy-MM-dd'"></span> )
-                        </span>
-                    </li>
-                    <li>
-                        <a class="clickable small" ng-click="$ctrl.onShowAdd()">
-                            <waltz-icon name="plus"></waltz-icon>
-                            Add
+                    </p>
+
+                    <table style="width: 100%">
+                        <colgroup>
+                            <col width="50%">
+                            <col width="30%">
+                            <col width="20%">
+                        </colgroup>
+                        <tbody>
+                        <tr ng-repeat="replacement in $ctrl.replacementApps">
+                            <td>
+                                <waltz-entity-icon-label entity-ref="replacement.entityReference">
+                                </waltz-entity-icon-label>
+                            </td>
+                            <td>
+                                <span uib-popover="This date represents when the application will take over this {{$ctrl.category.name}}."
+                                      popover-trigger="mouseenter"
+                                      popover-delay="300"
+                                      popover-append-to-body="true"
+                                      ng-bind="replacement.plannedCommissionDate | date:'yyyy-MM-dd'">
+                                </span>
+                            </td>
+                            <td>
+                                <span class="display: inline-block"
+                                      uib-popover="Remove this replacement application"
+                                      popover-trigger="mouseenter"
+                                      popover-delay="300"
+                                      popover-placement="left"
+                                      popover-append-to-body="true">
+                                    <a class="clickable"
+                                       ng-click="$ctrl.onSelectCandidateForRemoval(replacement)">
+                                        <waltz-icon name="trash"></waltz-icon>
+                                    </a>
+                                </span>
+                            </td>
+                        </tr>
+                        </tbody>
+                        <tbody>
+                        <tr>
+                            <td colspan="3">
+                                &nbsp;
+                                <a class="clickable" ng-click="$ctrl.onShowAdd()">
+                                    <waltz-icon name="plus"></waltz-icon>
+                                    Add
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+                <!-- EDIT: APP SELECT -->
+                <div ng-switch-when="SELECT_APP">
+                    <waltz-entity-selector clearable="false"
+                                           selection-filter="$ctrl.selectionFilter"
+                                           on-select="$ctrl.onSelectReplacementCandidate"
+                                           entity-kinds="['APPLICATION']" >
+                    </waltz-entity-selector>
+
+
+                    <div ng-if="$ctrl.existing"></div>
+                    <p class="help-block small">
+                        First select a replacement app that will pick up this
+                        <i ng-bind="$ctrl.category.name"></i>.
+                        <br>
+                        <a class="clickable"
+                           ng-click="$ctrl.onCancelAdd()">
+                            Cancel
                         </a>
-                    </li>
-                </ul>
+
+                    </p>
+                </div>
+
+
+                <!-- EDIT: APP SELECT_COMM_DATE -->
+                <div ng-switch-when="SELECT_COMM_DATE">
+                    <waltz-entity-icon-label entity-ref="$ctrl.candidateApp"></waltz-entity-icon-label>
+
+                    <waltz-editable-field field-type="date"
+                                          initial-val="$ctrl.plannedDecommission.plannedDecommissionDate"
+                                          on-save="$ctrl.onSetCommissionDate"
+                                          date-format="yyyy-MM-dd"
+                                          button-label="Set"
+                                          start-in-edit-mode="true"
+                                          on-cancel="$ctrl.onCancelAdd"
+                                          empty-label="No planned commission date">
+                    </waltz-editable-field>
+                    <p class="help-block small">
+                        Now select the date this application will take over this
+                        <i ng-bind="$ctrl.category.name"></i>.
+                        <br>
+                        <a class="clickable"
+                           ng-click="$ctrl.onCancelAdd()">
+                            Cancel
+                        </a>
+                    </p>
+                </div>
+
+
+                <!-- EDIT: APP SELECT_COMM_DATE -->
+                <div ng-switch-when="CONFIRM_ADDITION">
+                    Are you sure you want to set
+                    <b>
+                        <waltz-entity-icon-label entity-ref="$ctrl.candidateApp"></waltz-entity-icon-label>
+                    </b>
+                    as a replacement for this <i ng-bind="$ctrl.category.name"></i> commencing on
+                    <b>
+                        <span ng-bind="$ctrl.candidateCommissionDate | date:'yyyy-MM-dd'"></span>
+                    </b>
+                    ?
+
+                    <div style="padding-top: 6px">
+                        <button class="btn btn-success btn-xs"
+                                ng-click="$ctrl.onAddReplacement()">
+                            Confirm
+                        </button>
+                        <a class="clickable"
+                           ng-click="$ctrl.onCancelAdd()">
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+
+                <div ng-switch-when="CONFIRM_REMOVAL">
+                    Are you sure you want to remove
+                    <b>
+                        <waltz-entity-icon-label entity-ref="$ctrl.candidateRemoval.entityReference"></waltz-entity-icon-label>
+                    </b>
+                    as a replacement for this <i ng-bind="$ctrl.category.name"></i> ?
+
+                    <div style="padding-top: 6px">
+                        <button class="btn btn-warning btn-xs"
+                                ng-click="$ctrl.onRemoveReplacement()">
+                            Confirm
+                        </button>
+                        <a class="clickable"
+                           ng-click="$ctrl.onCancelAdd()">
+                            Cancel
+                        </a>
+                    </div>
+                </div>
+
             </div>
 
-            <!-- EDIT: APP SELECT -->
-            <div ng-if="$ctrl.visibility.replacementAppSelector">
-                <div ng-if="$ctrl.existing"></div>
-                <a class="clickable"
-                   ng-click="$ctrl.onHideAdd()">
-                    Cancel
-                </a>
-            </div>
         </div>
 
     </div>
