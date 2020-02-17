@@ -131,11 +131,11 @@
 </script>
 
 
-<!-- PICKER -->
+<!-- EDITOR -->
 <script type="text/ng-template"
         id="wmrep-rating-editor">
 
-
+    <!-- TITLE -->
     <div>
         <b style="font-weight: bolder"
            ng-bind="$ctrl.selected.measurable.name">
@@ -199,7 +199,6 @@
         </waltz-warning>
     </div>
 
-
     <br>
 
     <!-- CONCRETE -->
@@ -220,58 +219,29 @@
             </div>
         </div>
 
+        <!-- COMMENT -->
+        <div class="row"
+             style="padding-top: 8px;">
+            <div class="col-sm-3">
+                Comments:
+            </div>
+            <div class="col-sm-9">
+                <waltz-inline-edit-area placeholder='None'
+                                        on-save="$ctrl.onSaveComment"
+                                        value="$ctrl.selected.rating.description">
+                </waltz-inline-edit-area>
+            </div>
+        </div>
+
+        <!-- DECOMMISSION -->
         <div ng-if="$ctrl.selected.rating">
-            <!-- DECOMMISSION -->
-            <div class="row"
-                 style="padding-top: 8px;">
-                <div>
-                    <div class="col-sm-3">
-                        Decommission:
-                    </div>
-                    <div class="col-sm-9">
-                        <waltz-editable-field field-type="date"
-                                              initial-val="$ctrl.selected.decommission.plannedDecommissionDate"
-                                              on-save="$ctrl.onSaveDecommissionDate"
-                                              date-format="yyyy-MM-dd"
-                                              button-label="Set decommission date"
-                                              empty-label="No planned decommission date">
-                        </waltz-editable-field>
+            <waltz-planned-decommission-editor planned-decommission="$ctrl.selected.decommission"
+                                               replacement-apps="$ctrl.selected.replacementApps"
+                                               on-save-decommission-date="$ctrl.onSaveDecommissionDate"
+                                               on-remove-decommission="$ctrl.onRemoveDecommission"
+                                               category="$ctrl.activeTab.category">
 
-                        <small class="form-text text-muted"
-                               ng-if="! $ctrl.selected.decommission">
-                            There is no planned decommission date set for this
-                            <i ng-bind="$ctrl.activeTab.category.name"></i>
-                        </small>
-
-                        <small class="form-text text-muted"
-                               ng-if="$ctrl.selected.decommission">
-                            This <i ng-bind="$ctrl.activeTab.category.name"></i>
-                            is due to be decommissioned.
-                            <br>
-                            <a class="clickable"
-                               ng-click="$ctrl.onRemoveDecommission()">
-                                <waltz-icon name="trash"></waltz-icon>
-                                Revoke
-                            </a>
-                            this decommission.
-                        </small>
-                    </div>
-                </div>
-            </div>
-
-            <!-- COMMENT -->
-            <div class="row"
-                 style="padding-top: 8px;">
-                <div class="col-sm-3">
-                    Comments:
-                </div>
-                <div class="col-sm-9">
-                    <waltz-inline-edit-area placeholder='None'
-                                            on-save="$ctrl.onSaveComment"
-                                            value="$ctrl.selected.rating.description">
-                    </waltz-inline-edit-area>
-                </div>
-            </div>
+            </waltz-planned-decommission-editor>
         </div>
 
 
