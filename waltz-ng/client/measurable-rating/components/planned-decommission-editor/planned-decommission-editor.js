@@ -18,6 +18,7 @@
 
 import template from "./planned-decommission-editor.html";
 import {initialiseData} from "../../../common";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
@@ -39,6 +40,22 @@ const initialState = {
 
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
+
+    vm.$onChanges = () => {
+        serviceBroker
+            .loadViewData(
+                CORE_API.MeasurableRatingReplacementStore.findForEntityRef,
+                [ vm.plannedDecommission.entityReference ],
+                { force: true })
+            .then(r => {
+                const existingReplacementApps = _.map(vm.replacementApps, d => d.entityReference.id);
+                vm.suggestedReplacements = _.reject(
+                    r.data,
+                    d => _.includes(existingReplacementApps, d.entityReference.id));
+
+                console.log({ sr: vm.suggestedReplacements })
+            });
+    };
 
     vm.onShowAdd = () => {
         vm.visibility = Object.assign({}, vm.visibility, {replacementAppSelector: true});
