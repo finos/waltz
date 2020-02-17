@@ -26,6 +26,7 @@
 
         <waltz-entity-icon-label entity-ref="$ctrl.entityRef"
                                  icon-placement="{{$ctrl.iconPlacement}}"
+                                 additional-display-data="$ctrl.additionalDisplayData"
                                  tooltip-placement="{{$ctrl.tooltipPlacement}}">
         </waltz-entity-icon-label>
         <waltz-icon ng-if='$ctrl.target === "_blank"'
@@ -37,6 +38,7 @@
     <waltz-entity-icon-label entity-ref="$ctrl.entityRef"
                              icon-placement="{{$ctrl.iconPlacement}}"
                              tooltip-placement="{{$ctrl.tooltipPlacement}}"
+                             additional-display-data="$ctrl.additionalDisplayData"
                              ng-if="!$ctrl.viewUrl">
     </waltz-entity-icon-label>
 </span>
