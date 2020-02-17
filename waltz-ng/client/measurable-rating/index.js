@@ -30,7 +30,8 @@ import MeasurableRatingPanel from "./components/panel/measurable-rating-panel";
 import MeasurableRatingTree from "./components/tree/measurable-rating-tree";
 import MeasurableRatingsBrowser from "./components/browser/measurable-ratings-browser";
 import RelatedMeasurablesSection from "./components/related-measurables-section/related-measurables-section";
-import MeasurableRatingPlannedDecommissionInfo from "./components/planned-decommission-info/planned-decommission-info"
+import PlannedDecommissionInfo from "./components/planned-decommission-info/planned-decommission-info"
+import PlannedDecommissionEditor from "./components/planned-decommission-editor/planned-decommission-editor"
 import Routes from "./routes";
 
 
@@ -55,7 +56,8 @@ export default () => {
         MeasurableRatingsBrowserSection,
         MeasurableRatingsBrowserTreePanel,
         RelatedMeasurablesSection,
-        MeasurableRatingPlannedDecommissionInfo
+        PlannedDecommissionInfo,
+        PlannedDecommissionEditor
     ]);
 
     return module.name;

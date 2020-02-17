@@ -1,0 +1,99 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<div class="waltz-planned-decommission-editor">
+    <!-- DECOMMISSION DATE -->
+    <div class="row"
+         style="padding-top: 8px;">
+        <div class="col-sm-3">
+            Decommission:
+        </div>
+        <div class="col-sm-9">
+            <!-- EDITOR -->
+            <waltz-editable-field field-type="date"
+                                  initial-val="$ctrl.plannedDecommission.plannedDecommissionDate"
+                                  on-save="$ctrl.onSaveDecommissionDate"
+                                  date-format="yyyy-MM-dd"
+                                  button-label="Set"
+                                  empty-label="No planned decommission date">
+            </waltz-editable-field>
+
+            <!-- BLURB -->
+            <small class="form-text text-muted"
+                   ng-if="! $ctrl.plannedDecommission">
+                There is no planned decommission date set for this
+                <i ng-bind="$ctrl.category.name"></i>
+            </small>
+
+            <!-- REVOKE -->
+            <small class="form-text text-muted"
+                   ng-if="$ctrl.plannedDecommission">
+                <a class="clickable"
+                   ng-click="$ctrl.onRemoveDecommission()">
+                    <waltz-icon name="trash"></waltz-icon>
+                    Revoke this
+                    <i ng-bind="$ctrl.category.name"></i>
+                </a>
+                decommission.
+            </small>
+        </div>
+    </div>
+
+    <!-- REPLACEMENT APPS -->
+    <div ng-if="$ctrl.decommission !== null"
+         style="padding-top: 6px;"
+         class="row">
+        <div class="col-sm-3">
+            Replacement Apps:
+        </div>
+        <div class="col-sm-9">
+
+            <!-- VIEW: APP LIST -->
+            <div ng-if="!$ctrl.visibility.replacementAppSelector">
+                <ul class="list-unstyled">
+                    <li ng-if="$ctrl.replacementApps.length === 0">
+                        No replacement applications have been declared.
+                    </li>
+                    <li ng-repeat="replacement in $ctrl.replacementApps">
+                        <waltz-entity-icon-label entity-ref="replacement.entityReference">
+                        </waltz-entity-icon-label>
+                        <span class="text-muted">
+                            ( <span ng-bind="replacement.plannedCommissionDate | date:'yyyy-MM-dd'"></span> )
+                        </span>
+                    </li>
+                    <li>
+                        <a class="clickable small" ng-click="$ctrl.onShowAdd()">
+                            <waltz-icon name="plus"></waltz-icon>
+                            Add
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- EDIT: APP SELECT -->
+            <div ng-if="$ctrl.visibility.replacementAppSelector">
+                <div ng-if="$ctrl.existing"></div>
+                <a class="clickable"
+                   ng-click="$ctrl.onHideAdd()">
+                    Cancel
+                </a>
+            </div>
+        </div>
+
+    </div>
+</div>

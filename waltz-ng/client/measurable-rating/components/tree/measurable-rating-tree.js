@@ -38,7 +38,7 @@ const bindings = {
     measurables: "<",
     onKeypress: "<",
     onSelect: "<",
-    scrollHeight: "@" // should correspond to numeric values in `waltz-scroll-region` classes
+    scrollHeight: "@?" // should correspond to numeric values in `waltz-scroll-region` classes
 };
 
 

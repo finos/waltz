@@ -20,7 +20,7 @@ import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 import {kindToViewState} from "../../../common/link-utils";
-import {mkTabs} from "../../measurable-rating-utils";
+import {loadAllData, mkTabs} from "../../measurable-rating-utils";
 import {indexRatingSchemes, mkRatingsKeyHandler} from "../../../ratings/rating-utils";
 
 import template from "./measurable-rating-edit-panel.html";
@@ -54,7 +54,7 @@ const initialState = {
     tabs: [],
     unusedCategories: [],
     visibility: {
-        ratingPicker: false,
+        ratingEditor: false,
         showDescriptionInPicker: false,
         instructions: true,
         schemeOverview: false,
@@ -72,52 +72,25 @@ function controller($q,
 
 
     const loadData = (force) => {
-        const ratingSchemePromise = serviceBroker
-            .loadAppData(CORE_API.RatingSchemeStore.findAll)
-            .then(r => {
-                vm.ratingSchemesById = _.keyBy(r.data, "id");
-                vm.ratingItemsBySchemeIdByCode = indexRatingSchemes(r.data || []);
-            });
-
-        const categoryPromise = serviceBroker
-            .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
-            .then(r => {
-                vm.categories = r.data;
-                vm.categoriesById = _.keyBy(r.data, "id");
-            });
-
-        const measurablesPromise = serviceBroker
-            .loadAppData(CORE_API.MeasurableStore.findAll)
-            .then(r => vm.measurables = r.data);
-
-        const ratingsPromise = serviceBroker
-            .loadViewData(CORE_API.MeasurableRatingStore.findForEntityReference, [ vm.parentEntityRef ], { force })
-            .then(r => vm.ratings = r.data);
-
-        $q.all([ratingsPromise, measurablesPromise, categoryPromise, ratingSchemePromise])
-            .then(() => {
+        return loadAllData($q, serviceBroker, vm.parentEntityRef, true, force)
+            .then((r) => {
+                Object.assign(vm, r);
                 recalcTabs();
+                vm.categoriesById = _.keyBy(vm.categories, "id");
+                vm.ratingItemsBySchemeIdByCode = indexRatingSchemes(_.values(vm.ratingSchemesById) || []);
                 if (vm.startingCategoryId) {
                     vm.activeTab = _.find(vm.tabs, t => t.category.id === vm.startingCategoryId)
                 } else if (!vm.activeTab) {
                     vm.activeTab = vm.tabs[0];
                 }
                 vm.onTabChange();
-            });
-
+            })
     };
 
     const recalcTabs = function () {
         const hasNoRatings = vm.ratings.length === 0;
         const showAllCategories = hasNoRatings || vm.visibility.showAllCategories;
-        vm.tabs = mkTabs(
-            vm.categories,
-            vm.ratingSchemesById,
-            vm.measurables,
-            vm.ratings,
-            vm.allocationSchemes,
-            vm.allocations,
-            showAllCategories);
+        vm.tabs = mkTabs(vm, showAllCategories);
 
         vm.hasHiddenTabs = vm.categories.length !== vm.tabs.length;
         if (vm.activeTab) {
@@ -125,19 +98,15 @@ function controller($q,
         }
     };
 
-
     const getDescription = () => _.get(
         vm.selected,
         ["rating", "description"]);
-
 
     const getRating = () => _.get(
         vm.selected,
         ["rating", "rating"]);
 
-
     const doRatingSave = (rating, description) => {
-
         return serviceBroker
             .execute(
                 CORE_API.MeasurableRatingStore.save,
@@ -152,9 +121,7 @@ function controller($q,
             .catch(e => displayError(notification, "Could not save rating", e))
     };
 
-
     const doRemove = () => {
-
         if (! vm.selected.rating) return $q.reject();
 
         vm.saveInProgress = true;
@@ -171,13 +138,11 @@ function controller($q,
             });
     };
 
-
     const deselectMeasurable = () => {
         vm.saveInProgress = false;
         vm.selected = Object.assign({}, vm.selected, { measurable: null });
-        vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: true, ratingPicker: false});
+        vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: true, ratingEditor: false});
     };
-
 
     const selectMeasurable = (node) => {
         const { measurable, rating, allocations } = node;
@@ -186,9 +151,19 @@ function controller($q,
         const hasWarnings = !_.isEmpty(allocations);
 
         vm.selected = Object.assign({}, node, { category, hasWarnings, ratingScheme });
-        vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: false, ratingPicker: true});
+        vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: false, ratingEditor: true});
     };
 
+    const reloadDecommData = () => {
+        return serviceBroker
+            .loadViewData(
+                CORE_API.MeasurableRatingPlannedDecommissionStore.findForEntityRef,
+                [vm.parentEntityRef], { force: true})
+            .then(r => {
+                vm.plannedDecommissions = r.data;
+                recalcTabs();
+            });
+    };
 
     // -- BOOT --
 
@@ -204,17 +179,6 @@ function controller($q,
         vm.allocationSchemesById = _.keyBy(vm.allocationSchemes, s => s.id);
     };
 
-
-    const reloadDecommData = () => {
-        return serviceBroker
-            .loadViewData(
-                CORE_API.MeasurableRatingPlannedDecommissionStore.findForEntityRef,
-                [vm.parentEntityRef], { force: true})
-            .then(r => {
-                vm.plannedDecommissions = r.data;
-                recalcTabs();
-            });
-    };
 
     // -- INTERACT ---
 
@@ -237,7 +201,8 @@ function controller($q,
             return;
         }
         serviceBroker
-            .execute(CORE_API.MeasurableRatingPlannedDecommissionStore.remove,
+            .execute(
+                CORE_API.MeasurableRatingPlannedDecommissionStore.remove,
                 [vm.selected.decommission.id])
             .then(() => {
                 vm.selected = Object.assign({}, vm.selected, { decommission: null, replacementApps: [] });
@@ -285,7 +250,6 @@ function controller($q,
                 })
                 .catch(e => {
                     const message = "Error removing all ratings for category: " + e.message;
-                    console.log(message, { e });
                     notification.error(message);
                 });
         }
