@@ -66,7 +66,14 @@
                                 <waltz-entity-hierarchy-navigator model="$ctrl.hierarchy"
                                                                   selected-node="$ctrl.measurable"
                                                                   on-select="$ctrl.onSelectNavItem">
+                                    <node-template>
+                                        <waltz-entity-icon-label entity-ref="node"
+                                                                 icon-placement="none"
+                                                                 tooltip-placement="right">
+                                        </waltz-entity-icon-label>
+                                    </node-template>
                                 </waltz-entity-hierarchy-navigator>
+
                             </div>
                         </div>
                     </content>
