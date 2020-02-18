@@ -33,7 +33,8 @@ const bindings = {
     parentEntityRef: "<",
     startingCategoryId: "<?",
     plannedDecommissions: "<?",
-    replacementApps: "<?"
+    replacementApps: "<?",
+    replacingDecommissions: "<?"
 };
 
 
@@ -48,6 +49,7 @@ const initialState = {
     ratingSchemesById: {},
     ratingItemsBySchemeIdByCode: {},
     replacementApps: [],
+    replacingDecommissions: [],
     saveInProgress: false,
     selected: null,
     startingCategoryId: null,

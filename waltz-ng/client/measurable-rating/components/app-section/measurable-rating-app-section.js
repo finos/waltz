@@ -59,7 +59,7 @@ function controller($q, serviceBroker) {
         return loadAllData($q, serviceBroker, vm.parentEntityRef, false, force)
             .then((r) => {
                 Object.assign(vm, r);
-                vm.tabs = mkTabs(vm);
+                vm.tabs = mkTabs(vm, false);
                 const firstNonEmptyTab = determineStartingTab(vm.tabs);
                 vm.visibility.tab = firstNonEmptyTab ? firstNonEmptyTab.category.id : null;
             });

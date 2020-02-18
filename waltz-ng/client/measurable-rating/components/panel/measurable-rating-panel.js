@@ -38,6 +38,7 @@ const bindings = {
     ratings: "<",
     ratingScheme: "<",
     plannedDecommissions: "<?",
+    replacingDecommissions: "<?",
     replacementApps: "<?"
 };
 
@@ -45,6 +46,7 @@ const bindings = {
 const initialState = {
     selected: null,
     plannedDecommissions: [],
+    replacingDecommissions: [],
     replacementApps: []
 };
 

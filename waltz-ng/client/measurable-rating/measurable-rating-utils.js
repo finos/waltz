@@ -40,8 +40,14 @@ export function loadDecommData(
             {force})
         .then(r => ({plannedDecommissions: r.data}));
 
+    const replacingDecomms = serviceBroker
+        .loadViewData(
+            CORE_API.MeasurableRatingPlannedDecommissionStore.findForReplacingEntityRef,
+            [parentEntityRef])
+        .then(r => ({replacingDecommissions: r.data}));
+
     return $q
-        .all([replacementAppPromise, decommissionDatePromise])
+        .all([replacementAppPromise, decommissionDatePromise, replacingDecomms])
         .then(responses => Object.assign({}, ...responses));
 
 }
@@ -102,7 +108,11 @@ export function loadAllData(
                 .mapValues(xs => _.sumBy(xs, x => x.percentage))
                 .value()}));
 
-    const decommPromise = loadDecommData($q, serviceBroker, parentEntityRef, force);
+    const decommPromise = loadDecommData(
+        $q,
+        serviceBroker,
+        parentEntityRef,
+        force);
 
     return $q
         .all([
@@ -147,7 +157,7 @@ export function mkTabs(ctx, includeEmpty = true) {
                 allocations: ctx.allocations
             };
         })
-        .filter(t => t.ratings.length > 0 || includeEmpty)
+        .filter(t => t.measurables.length > 0 || includeEmpty)
         .sortBy(tab => tab.category.name)
         .value();
 }
