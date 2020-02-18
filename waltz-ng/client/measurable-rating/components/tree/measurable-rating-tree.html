@@ -124,7 +124,7 @@
              class="text-muted">
             <waltz-icon name="pie-chart">
             </waltz-icon>
-            This item has <i>allocations</i>, select it for more information
+            This feature has allocations recorded against it
         </div>
 
         <div ng-if="node.decommission && node.replacementApps.length === 0"
@@ -132,7 +132,7 @@
              class="text-muted">
             <waltz-icon name="hand-paper-o">
             </waltz-icon>
-            This item will be decommissioned without a replacement application, select it for more information
+            This feature will be decommissioned without a replacement application
         </div>
 
         <div ng-if="node.decommission && node.replacementApps.length > 0"
@@ -140,7 +140,7 @@
              class="text-muted">
             <waltz-icon name="hand-o-right">
             </waltz-icon>
-            This item will be decommissioned having replacement application/s, select it for more information
+            This feature is scheduled to be moved to other application/s
         </div>
 
         <div ng-if="node.replacingDecommissions.length > 0"
