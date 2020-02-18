@@ -32,6 +32,7 @@ import {truncateMiddle} from "../../../common/string-utils";
 const bindings = {
     allocations: "<?",
     plannedDecommissions: "<?",
+    replacingDecommissions: "<?",
     replacementApps: "<?",
     ratings: "<",
     ratingScheme: "<",
@@ -45,6 +46,7 @@ const bindings = {
 const initialState = {
     allocations: [],
     plannedDecommissions: [],
+    replacingDecommissions: [],
     replacementApps: [],
     containerClass: "",
     hierarchy: [],
@@ -108,6 +110,7 @@ function controller() {
         const allocationsByMeasurable = _.groupBy(vm.allocations, d => d.measurableId);
         const decommissionDatesByMeasurable = _.keyBy(vm.plannedDecommissions, d => d.measurableId);
         const replacementAppsByDecommissionId = _.groupBy(vm.replacementApps, d => d.decommissionId);
+        const replacingDecommissionsByMeasurable = _.groupBy(vm.replacingDecommissions, d => d.measurableId);
 
         const nodes = _.map(vm.measurables, m => {
             const rating = ratingsByMeasurable[m.id];
@@ -120,7 +123,8 @@ function controller() {
                 ratingSchemeItem: rating ? ratingSchemeItemsByCode[rating.rating] : null,
                 allocations: allocationsByMeasurable[m.id],
                 decommission: _.get(decommissionDatesByMeasurable, [m.id], null),
-                replacementApps: _.get(replacementAppsByDecommissionId, _.get(decommissionDatesByMeasurable, [m.id, "id"]), [])
+                replacementApps: _.get(replacementAppsByDecommissionId, _.get(decommissionDatesByMeasurable, [m.id, "id"]), []),
+                replacingDecommissions: _.get(replacingDecommissionsByMeasurable, [m.id], [])
             };
         });
 

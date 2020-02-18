@@ -17,6 +17,7 @@
  */
 import _ from "lodash";
 import {CORE_API} from "../common/services/core-api-utils";
+import {mkSelectionOptions} from "../common/selector-utils";
 
 
 export function loadDecommData(
@@ -39,8 +40,14 @@ export function loadDecommData(
             {force})
         .then(r => ({plannedDecommissions: r.data}));
 
+    const replacingDecomms = serviceBroker
+        .loadViewData(
+            CORE_API.MeasurableRatingPlannedDecommissionStore.findForReplacingEntityRef,
+            [parentEntityRef])
+        .then(r => ({replacingDecommissions: r.data}));
+
     return $q
-        .all([replacementAppPromise, decommissionDatePromise])
+        .all([replacementAppPromise, decommissionDatePromise, replacingDecomms])
         .then(responses => Object.assign({}, ...responses));
 
 }
@@ -73,7 +80,10 @@ export function loadAllData(
     // if we are in edit mode we will be loading all measurables, otherwise just the needed measurables
     const measurablesCall = allMeasurables
         ? serviceBroker.loadAppData(CORE_API.MeasurableStore.findAll)
-        : serviceBroker.loadViewData(CORE_API.MeasurableStore.findMeasurablesRelatedToPath, [parentEntityRef], { force });
+        : serviceBroker.loadViewData(
+            CORE_API.MeasurableStore.findMeasurablesBySelector,
+            [mkSelectionOptions(parentEntityRef)],
+            { force });
 
     const measurablesPromise = measurablesCall
         .then(r => ({measurables: r.data}));
@@ -98,7 +108,11 @@ export function loadAllData(
                 .mapValues(xs => _.sumBy(xs, x => x.percentage))
                 .value()}));
 
-    const decommPromise = loadDecommData($q, serviceBroker, parentEntityRef, force);
+    const decommPromise = loadDecommData(
+        $q,
+        serviceBroker,
+        parentEntityRef,
+        force);
 
     return $q
         .all([
@@ -143,7 +157,7 @@ export function mkTabs(ctx, includeEmpty = true) {
                 allocations: ctx.allocations
             };
         })
-        .filter(t => t.ratings.length > 0 || includeEmpty)
+        .filter(t => t.measurables.length > 0 || includeEmpty)
         .sortBy(tab => tab.category.name)
         .value();
 }

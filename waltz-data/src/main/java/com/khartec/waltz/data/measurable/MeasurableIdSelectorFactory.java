@@ -154,11 +154,38 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
     }
 
 
-    private Select<Record1<Long>> mkForDirectEntityKind(IdSelectionOptions options) {
+    private Select<Record1<Long>> mkForDirectEntityKindOld(IdSelectionOptions options) {
         checkTrue(options.scope() == HierarchyQueryScope.EXACT, "Can only calculate application based selectors with exact scopes");
         return mkBaseRatingBasedSelector()
                 .where(MEASURABLE_RATING.ENTITY_ID.in(options.entityReference().id()))
                 .and(MEASURABLE_RATING.ENTITY_KIND.eq(options.entityReference().kind().name()));
+    }
+
+
+    private Select<Record1<Long>> mkForDirectEntityKind(IdSelectionOptions options) {
+        checkTrue(options.scope() == HierarchyQueryScope.EXACT, "Can only calculate application based selectors with exact scopes");
+
+        SelectConditionStep<Record1<Long>> measurablesViaReplacements = DSL
+                .select(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_ID)
+                .from(MEASURABLE_RATING_PLANNED_DECOMMISSION)
+                .innerJoin(MEASURABLE_RATING_REPLACEMENT)
+                .on(MEASURABLE_RATING_PLANNED_DECOMMISSION.ID.eq(MEASURABLE_RATING_REPLACEMENT.DECOMMISSION_ID))
+                .where(MEASURABLE_RATING_REPLACEMENT.ENTITY_ID.eq(options.entityReference().id())
+                        .and(MEASURABLE_RATING_REPLACEMENT.ENTITY_KIND.eq(options.entityReference().kind().name())));
+
+        SelectConditionStep<Record1<Long>> measurablesViaRatings = DSL
+                .select(MEASURABLE_RATING.MEASURABLE_ID)
+                .from(MEASURABLE_RATING)
+                .where(MEASURABLE_RATING.ENTITY_ID.eq(options.entityReference().id())
+                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(options.entityReference().kind().name())));
+
+        return DSL
+                .selectDistinct(MEASURABLE.ID)
+                .from(MEASURABLE)
+                .innerJoin(ENTITY_HIERARCHY)
+                .on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(MEASURABLE.ID)
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name())))
+                .where(ENTITY_HIERARCHY.ID.in(measurablesViaRatings.union(measurablesViaReplacements)));
     }
 
 
@@ -178,8 +205,8 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                 .and(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId));
 
         return DSL.selectFrom(viaAppRatings.union(viaDirectRelationship).asTable());
-
     }
+
 
 
     /**

@@ -60,11 +60,15 @@ public class MeasurableRatingPlannedDecommissionEndpoint implements Endpoint {
     public void register() {
 
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
+        String findForReplacingEntityPath = mkPath(BASE_URL, "replacing-entity", ":kind", ":id");
         String savePath = mkPath(BASE_URL, "entity", ":kind", ":id", "MEASURABLE", ":measurableId");
         String removePath = mkPath(BASE_URL, "id", ":id");
 
         ListRoute<MeasurableRatingPlannedDecommission> findForEntityRoute = (request, response)
                 -> measurableRatingPlannedDecommissionService.findForEntityRef(getEntityReference(request));
+
+        ListRoute<MeasurableRatingPlannedDecommission> findForReplacingEntityRoute = (request, response)
+                -> measurableRatingPlannedDecommissionService.findForReplacingEntityRef(getEntityReference(request));
 
         DatumRoute<MeasurableRatingPlannedDecommission> saveRoute = (request, response) -> {
             requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
@@ -81,6 +85,7 @@ public class MeasurableRatingPlannedDecommissionEndpoint implements Endpoint {
         };
 
         getForList(findForEntityPath, findForEntityRoute);
+        getForList(findForReplacingEntityPath, findForReplacingEntityRoute);
         postForDatum(savePath, saveRoute);
         deleteForDatum(removePath, removeRoute);
 

@@ -16,11 +16,10 @@
  *
  */
 
-import _ from "lodash";
-import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 
 import template from "./inline-measurable-rating-panel.html";
+import {loadAllData} from "../../../measurable-rating/measurable-rating-utils";
 
 
 const bindings = {
@@ -42,27 +41,8 @@ function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const loadData = (force = false) => {
-
-        const ratingsPromise = serviceBroker
-            .loadViewData(CORE_API.MeasurableRatingStore.findForEntityReference, [ vm.parentEntityRef ], { force })
-            .then(r => vm.ratings = r.data);
-
-        const ratingSchemesPromise = serviceBroker
-            .loadAppData(CORE_API.RatingSchemeStore.findAll)
-            .then(r => vm.ratingSchemesById = _.keyBy(r.data, "id"));
-
-        const categoriesPromise = serviceBroker
-            .loadAppData(CORE_API.MeasurableCategoryStore.getById, [vm.measurableCategoryRef.id])
-            .then(r => vm.measurableCategory = r.data);
-
-        const measurablesPromise = serviceBroker
-            .loadViewData(CORE_API.MeasurableStore.findMeasurablesRelatedToPath, [vm.parentEntityRef], { force })
-            .then(r => vm.measurables = _.filter(r.data, m => m.categoryId === vm.measurableCategoryRef.id));
-
-        $q.all([measurablesPromise, ratingSchemesPromise, ratingsPromise, categoriesPromise])
-            .then(() => {
-                vm.ratingScheme = vm.ratingSchemesById[vm.measurableCategory.ratingSchemeId];
-            });
+        return loadAllData($q, serviceBroker, vm.parentEntityRef, false, true)
+            .then(results => Object.assign(vm, ...results));
     };
 
     vm.$onInit = () => loadData();

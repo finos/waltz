@@ -75,17 +75,6 @@ public class MeasurableService {
     }
 
 
-    /**
-     * Includes parents, this should probably be deprecated and rolled into findByMeasureableIdSelector
-     * @param ref Entity reference of item to search against
-     * @return List of measurable related to the given entity `ref`
-     */
-    public List<Measurable> findMeasurablesRelatedToEntity(EntityReference ref) {
-        checkNotNull(ref, "ref cannot be null");
-        return measurableDao.findMeasuresRelatedToEntity(ref);
-    }
-
-
     public List<Measurable> findByMeasurableIdSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = measurableIdSelectorFactory.apply(options);
