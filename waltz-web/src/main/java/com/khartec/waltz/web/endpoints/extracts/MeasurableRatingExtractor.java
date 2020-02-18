@@ -19,6 +19,7 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
 
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
@@ -29,6 +30,7 @@ import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
@@ -45,8 +47,13 @@ public class MeasurableRatingExtractor extends DirectQueryBasedDataExtractor {
     private final Application app = APPLICATION.as("app");
     private final MeasurableCategory mc = Tables.MEASURABLE_CATEGORY.as("mc");
     private final MeasurableRating mr = MEASURABLE_RATING.as("mr");
+    private final MeasurableRatingPlannedDecommission mrd = MEASURABLE_RATING_PLANNED_DECOMMISSION.as("mrd");
+    private final MeasurableRatingReplacement mrr = MEASURABLE_RATING_REPLACEMENT.as("mrr");
     private final RatingScheme rs = RATING_SCHEME.as("rs");
     private final RatingSchemeItem rsi = RATING_SCHEME_ITEM.as("rsi");
+    private final Field<String> replacementAppName = InlineSelectFieldFactory.mkNameField(mrr.ENTITY_ID, mrr.ENTITY_KIND, asSet(EntityKind.APPLICATION));
+    private final Field<String> replacementAppExtId = InlineSelectFieldFactory.mkExternalIdField(mrr.ENTITY_ID, mrr.ENTITY_KIND, asSet(EntityKind.APPLICATION));
+
 
 
     @Autowired
@@ -83,7 +90,11 @@ public class MeasurableRatingExtractor extends DirectQueryBasedDataExtractor {
                             rsi.CODE.as("Rating Code"))
                     .select(mr.DESCRIPTION.as("Rating Description"),
                             mr.LAST_UPDATED_AT.as("Last Updated Time"),
-                            mr.LAST_UPDATED_BY.as("Last Updated By"));
+                            mr.LAST_UPDATED_BY.as("Last Updated By"))
+                    .select(mrd.PLANNED_DECOMMISSION_DATE.as("Planned Decommission Date"))
+                    .select(replacementAppName.as("Replacement App Name"),
+                            replacementAppExtId.as("Replacement External Id"),
+                            mrr.PLANNED_COMMISSION_DATE.as("Replacement Commission Date"));
 
             Condition reportConditions = app.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name())
                     .and(m.MEASURABLE_CATEGORY_ID.eq(categoryId))
@@ -99,6 +110,11 @@ public class MeasurableRatingExtractor extends DirectQueryBasedDataExtractor {
                     .innerJoin(mc).on(mc.ID.eq(m.MEASURABLE_CATEGORY_ID))
                     .innerJoin(rs).on(rs.ID.eq(mc.RATING_SCHEME_ID))
                     .innerJoin(rsi).on(rsi.SCHEME_ID.eq(rs.ID))
+                    .leftJoin(mrd)
+                        .on(mrd.MEASURABLE_ID.eq(mr.MEASURABLE_ID)
+                                .and(mrd.ENTITY_ID.eq(mr.ENTITY_ID))
+                                .and(mrd.ENTITY_KIND.eq(mr.ENTITY_KIND)))
+                    .leftJoin(mrr).on(mrr.DECOMMISSION_ID.eq(mrd.ID))
                     .where(reportConditions);
 
             String categoryName = dsl.select(mc.NAME).from(mc).where(mc.ID.eq(categoryId)).fetchOne(mc.NAME);

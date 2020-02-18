@@ -22,7 +22,10 @@
                                       rating-scheme="$ctrl.ratingScheme"
                                       on-select="$ctrl.onSelect"
                                       allocations="$ctrl.allocations"
-                                      measurables="$ctrl.measurables">
+                                      measurables="$ctrl.measurables"
+                                      planned-decommissions="$ctrl.plannedDecommissions"
+                                      replacing-decommissions="$ctrl.replacingDecommissions"
+                                      replacement-apps="$ctrl.replacementApps">
         </waltz-measurable-rating-tree>
     </div>
     <div class="col-sm-6"
@@ -107,6 +110,13 @@
                             </div>
                         </div>
                     </div>
+                </div>
+
+                <div class="row" ng-if="$ctrl.selected.decommission || $ctrl.selected.replacingDecommissions">
+                    <waltz-planned-decommission-info planned-decommission="$ctrl.selected.decommission"
+                                                     replacing-decommissions="$ctrl.selected.replacingDecommissions"
+                                                     replacement-apps="$ctrl.selected.replacementApps">
+                    </waltz-planned-decommission-info>
                 </div>
 
             </div>

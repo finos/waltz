@@ -20,7 +20,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 
 import template from "./measurable-rating-app-section.html";
-import {determineStartingTab, mkTabs} from "../../measurable-rating-utils";
+import {determineStartingTab, loadAllData, mkTabs} from "../../measurable-rating-utils";
 
 
 /**
@@ -55,66 +55,11 @@ const initialState = {
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    function loadAllocations() {
-        const allocationsPromise = serviceBroker
-            .loadViewData(
-                CORE_API.AllocationStore.findByEntity,
-                [vm.parentEntityRef],
-                { force: true})
-            .then(r => vm.allocations = r.data);
-
-        return allocationsPromise
-            .then(() => vm.allocationTotalsByScheme = _
-                .chain(vm.allocations)
-                .groupBy(d => d.schemeId)
-                .mapValues(xs => _.sumBy(xs, x => x.percentage))
-                .value());
-    }
-
     const loadData = (force = false) => {
-        serviceBroker
-            .loadViewData(
-                CORE_API.RoadmapStore.findRoadmapsAndScenariosByRatedEntity,
-                [ vm.parentEntityRef ])
-            .then(r => vm.roadmapReferences = r.data);
-
-        const ratingsPromise = serviceBroker
-            .loadViewData(CORE_API.MeasurableRatingStore.findForEntityReference, [ vm.parentEntityRef ], { force })
-            .then(r => vm.ratings = r.data);
-
-        const ratingSchemesPromise = serviceBroker
-            .loadAppData(CORE_API.RatingSchemeStore.findAll)
-            .then(r => vm.ratingSchemesById = _.keyBy(r.data, "id"));
-
-        const categoriesPromise = serviceBroker
-            .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
-            .then(r => vm.categories = r.data);
-
-        const measurablesPromise = serviceBroker
-            .loadViewData(CORE_API.MeasurableStore.findMeasurablesRelatedToPath, [vm.parentEntityRef], { force })
-            .then(r => vm.measurables = r.data);
-
-        const allocationSchemesPromise = serviceBroker
-            .loadViewData(CORE_API.AllocationSchemeStore.findAll)
-            .then(r => vm.allocationSchemes = r.data);
-
-        const allocationsPromise = loadAllocations();
-
-        $q.all([measurablesPromise,
-                ratingSchemesPromise,
-                ratingsPromise,
-                categoriesPromise,
-                allocationsPromise,
-                allocationSchemesPromise])
-            .then(() => {
-                vm.tabs = mkTabs(
-                    vm.categories,
-                    vm.ratingSchemesById,
-                    vm.measurables,
-                    vm.ratings,
-                    vm.allocationSchemes,
-                    vm.allocations,
-                    false /*include empty */);
+        return loadAllData($q, serviceBroker, vm.parentEntityRef, false, force)
+            .then((r) => {
+                Object.assign(vm, r);
+                vm.tabs = mkTabs(vm, false);
                 const firstNonEmptyTab = determineStartingTab(vm.tabs);
                 vm.visibility.tab = firstNonEmptyTab ? firstNonEmptyTab.category.id : null;
             });
@@ -144,7 +89,14 @@ function controller($q, serviceBroker) {
             .execute(
                 CORE_API.AllocationStore.updateAllocations,
                 [vm.parentEntityRef, vm.activeAllocationScheme.id, changes])
-            .then(r => { loadAllocations(); return r; });
+            .then(r => {
+                loadAllData($q, serviceBroker, vm.parentEntityRef, false, true)
+                    .then(r => {
+                        Object.assign(vm, r);
+                        mkTabs(vm);
+                    });
+                return r.data;
+            });
     };
 
     vm.onViewRatings = () => {

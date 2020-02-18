@@ -26,8 +26,8 @@ import _ from "lodash";
 
 const bindings = {
     userId: "<",
-    iconPlacement: "@",
-    tooltipPlacement: "@"
+    iconPlacement: "@?",
+    tooltipPlacement: "@?"
 };
 
 

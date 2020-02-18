@@ -16,7 +16,7 @@
  *
  */
 
-import { registerComponents } from "../common/module-utils";
+import {registerComponents} from "../common/module-utils";
 
 import routes from "./routes";
 import services from "./services";
@@ -25,6 +25,7 @@ import AppCostsSection from "./components/app-costs-section/app-costs-section";
 import AppOverview from "./components/overview/app-overview";
 import AppsSection from "./components/apps-section/apps-section";
 import BulkApplicationSelector from "./components/bulk-application-selector/bulk-application-selector";
+import RelatedAppsSection from "./components/related-apps-section/related-apps-section";
 import AppSelector from "./directives/app-selector";
 import AssetCodeExplorer from "./directives/asset-code-explorer";
 import BasicAppSelector from "./components/basic-app-selector/basic-app-selector";
@@ -59,7 +60,8 @@ export default () => {
         AppOverview,
         AppsSection,
         BasicAppSelector,
-        BulkApplicationSelector
+        BulkApplicationSelector,
+        RelatedAppsSection
     ]);
 
     return module.name;

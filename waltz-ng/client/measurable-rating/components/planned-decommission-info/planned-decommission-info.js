@@ -16,39 +16,26 @@
  *
  */
 
+import template from "./planned-decommission-info.html";
 import {initialiseData} from "../../../common";
-
-import template from "./inline-measurable-rating-panel.html";
-import {loadAllData} from "../../../measurable-rating/measurable-rating-utils";
 
 
 const bindings = {
-    parentEntityRef: "<",
-    measurableCategoryRef: "<",
+    plannedDecommission: "<",
+    replacementApps: "<?",
+    replacingDecommissions: "<?"
 };
 
 
 const initialState = {
-    categories: [],
-    measurableCategory: {},
-    ratings: [],
-    ratingSchemesById: {},
-    measurables: []
+    replacementApps: [],
+    replacingDecommissions: []
 };
 
 
 function controller($q, serviceBroker) {
+
     const vm = initialiseData(this, initialState);
-
-    const loadData = (force = false) => {
-        return loadAllData($q, serviceBroker, vm.parentEntityRef, false, true)
-            .then(results => Object.assign(vm, ...results));
-    };
-
-    vm.$onInit = () => loadData();
-
-    vm.$onChanges = (changes) => {
-    };
 }
 
 
@@ -67,5 +54,5 @@ const component = {
 
 export default {
     component,
-    id: "waltzInlineMeasurableRatingPanel"
+    id: "waltzPlannedDecommissionInfo"
 };

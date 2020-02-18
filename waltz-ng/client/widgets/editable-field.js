@@ -15,31 +15,39 @@
  * See the License for the specific
  *
  */
-import {initialiseData} from "../common";
+import {initialiseData, invokeFunction} from "../common";
 
 import template from "./editable-field.html";
 
 
 const bindings = {
-    initialVal: "<",
+    initialVal: "<?",
     onSave: "<",  // e.g.: (d, ctx) => console.log(d.newVal, d.oldVal, ctx)
     fieldType: "@",  // logical-data-element | person | text | textarea | boolean | date | markdown | number
-    dateFormat: "@",
-    ctx: "<",
+    dateFormat: "@?",
+    ctx: "<?",
     buttonLabel: "@",
     saveLabel: "@?",
     editRole: "@",
-    emptyLabel: "@"
+    emptyLabel: "@?",
+    startInEditMode: "<?",
+    onCancel: "<?"
 };
 
 
 const initialState = {
+    initialVal: null,
+    dateFormat: "yyyy-MM-dd",
+    ctx: null,
     errorMessage: "",
+    emptyLabel: null,
     editing: false,
     saving: false,
     fieldType: "text",
     buttonLabel: "Edit",
     saveLabel:  "Save",
+    startInEditMode: false,
+    onCancel: null,
     onSave: () => console.log("WEF: No on-save method provided")
 };
 
@@ -54,8 +62,14 @@ function mkNewVal(initialVal, fieldType) {
 function controller() {
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges = () => {
-        if (vm.initialVal) {
+    vm.$onInit = () => {
+        if (vm.startInEditMode) {
+            vm.editing = true;
+        }
+    };
+
+    vm.$onChanges = (c) => {
+        if (c.initialVal) {
             vm.newVal = mkNewVal(vm.initialVal, vm.fieldType);
         }
     };
@@ -83,8 +97,9 @@ function controller() {
         const promise = vm.onSave(data, vm.ctx);
 
         if (promise) {
-            promise.then(saveComplete, saveFailed)
-                   .then(() => vm.initialVal = data.newVal);
+            promise
+                .then(saveComplete, saveFailed)
+                .then(() => vm.initialVal = data.newVal);
         } else {
             saveComplete();
         }
@@ -99,6 +114,7 @@ function controller() {
         vm.editing = false;
         vm.saving = false;
         vm.errorMessage = "";
+        invokeFunction(vm.onCancel);
     };
 
     vm.entitySelect = (entity) => {

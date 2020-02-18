@@ -231,10 +231,9 @@ function controller($q, notification, serviceBroker) {
             }))
             .value();
 
-
         vm.onSave(changes)
             .then(r => {
-                if (r.data === true) {
+                if (r === true) {
                     notification.success("Updated allocations");
                 } else {
                     notification.warning("Could not update allocations");
