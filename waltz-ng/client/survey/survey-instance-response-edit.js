@@ -78,7 +78,7 @@ function controller($location,
         kind: "SURVEY_INSTANCE"
     };
 
-    const instancePromise  = surveyInstanceStore
+    surveyInstanceStore
         .getById(id)
         .then(r => {
             vm.instanceCanBeEdited = (r.status === "NOT_STARTED" || r.status === "IN_PROGRESS" || r.status === "REJECTED");
@@ -94,7 +94,8 @@ function controller($location,
         .all([userService.whoami(), surveyInstanceStore.findRecipients(id)])
         .then(([user = {}, recipients = []]) => {
             vm.user = user;
-            const [currentRecipients = [], otherRecipients = []] = _.partition(recipients,
+            const [currentRecipients = [], otherRecipients = []] = _.partition(
+                recipients,
                 r => _.toLower(r.person.email) === _.toLower(user.userName));
 
             vm.isUserInstanceRecipient = currentRecipients.length > 0;
@@ -119,8 +120,8 @@ function controller($location,
                 questionResponse,
                 {
                     dateResponse : questionResponse && questionResponse.dateResponse
-                                    ? moment(questionResponse.dateResponse).format(formats.parseDateOnly)
-                                    : null
+                        ? moment(questionResponse.dateResponse).format(formats.parseDateOnly)
+                        : null
                 })
         );
     };

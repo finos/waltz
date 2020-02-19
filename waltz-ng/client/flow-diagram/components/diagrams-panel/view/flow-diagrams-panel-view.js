@@ -29,9 +29,9 @@ import {pageHeaderDefaultOffset} from "../../../../widgets/page-header/page-head
 import {displayError} from "../../../../common/error-utils";
 
 const bindings = {
-    parentEntityRef: '<',
-    onEditDiagram: '<',
-    onDismissDiagram: '<'
+    parentEntityRef: "<",
+    onEditDiagram: "<",
+    onDismissDiagram: "<"
 };
 
 
@@ -66,8 +66,8 @@ function determinePopupTopPosition(evt, scrollOffset, elementHeight) {
 
 function determinePopupPosition(evt, $window, $element) {
     //get the width and height of the element
-    const elementWidth = _.get($element, '[0].parentElement.clientWidth');
-    const elementHeight = _.get($element, '[0].parentElement.clientHeight');
+    const elementWidth = _.get($element, "[0].parentElement.clientWidth");
+    const elementHeight = _.get($element, "[0].parentElement.clientHeight");
     const scrollOffset = $window.pageYOffset;
     const halfWidth = elementWidth / 2;
 
@@ -158,7 +158,7 @@ function controller($element,
     vm.toggleLayer = (layer) => {
         const currentlyVisible = flowDiagramStateService.getState().visibility.layers[layer];
         const cmd = {
-            command: currentlyVisible ? 'HIDE_LAYER' : 'SHOW_LAYER',
+            command: currentlyVisible ? "HIDE_LAYER" : "SHOW_LAYER",
             payload: layer
         };
         flowDiagramStateService.processCommands([cmd]);
@@ -171,7 +171,7 @@ function controller($element,
         vm.contextPopup.styling = determinePopupPosition(event, $window, $element);
 
         const nodeRef = n.data;
-        if (nodeRef.kind === 'APPLICATION') {
+        if (nodeRef.kind === "APPLICATION") {
             serviceBroker
                 .loadViewData(CORE_API.ApplicationStore.getById, [ nodeRef.id ])
                 .then(r => {
@@ -189,12 +189,12 @@ function controller($element,
         vm.contextPopup.styling = determinePopupPosition(event, $window, $element);
 
         const state = flowDiagramStateService.getState();
-        const physFlowsPath = ['model', 'decorations', logicalFlow.id];
+        const physFlowsPath = ["model", "decorations", logicalFlow.id];
         const physicalFlowIds = _
             .chain(state)
             .get(physFlowsPath)
-            .map('data')
-            .map('id')
+            .map("data")
+            .map("id")
             .value();
 
         const diagramSelector = mkSelectionOptions(vm.parentEntityRef, "EXACT", allEntityLifecycleStatuses);
@@ -219,8 +219,8 @@ function controller($element,
 
         $q.all([flowPromise, specPromise, changeUnitPromise])
             .then(([flows, specs, changeUnits]) => {
-                const flowsById = _.keyBy(flows, 'id');
-                const specsById = _.keyBy(specs, 'id');
+                const flowsById = _.keyBy(flows, "id");
+                const specsById = _.keyBy(specs, "id");
 
                 vm.changeUnits = changeUnits;
                 const changeUnitsByPhysicalFlowId = _.chain(vm.changeUnits)
@@ -260,13 +260,13 @@ function controller($element,
 
 
 controller.$inject = [
-    '$element',
-    '$q',
-    '$window',
-    '$timeout',
-    'FlowDiagramStateService',
-    'ServiceBroker',
-    'Notification'
+    "$element",
+    "$q",
+    "$window",
+    "$timeout",
+    "FlowDiagramStateService",
+    "ServiceBroker",
+    "Notification"
 ];
 
 
@@ -279,5 +279,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzFlowDiagramsPanelView'
+    id: "waltzFlowDiagramsPanelView"
 };

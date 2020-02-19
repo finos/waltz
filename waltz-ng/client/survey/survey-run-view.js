@@ -19,7 +19,7 @@
 import template from "./survey-run-view.html";
 import {timeFormat} from "d3-time-format";
 import {initialiseData} from "../common";
-import {mkEntityLabelGridCell, mkEntityLinkGridCell} from "../common/grid-utils";
+import {mkEntityLabelGridCell} from "../common/grid-utils";
 
 const columnDefs = [
     mkEntityLabelGridCell("Entity", "surveyEntity", "left", "right"),

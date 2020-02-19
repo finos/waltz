@@ -18,12 +18,12 @@
 import _ from "lodash";
 import { entityLifecycleStatuses, resetData } from "../common";
 import { mkSelectionOptions } from "../common/selector-utils";
-import { hasRelatedDefinitions, navigateToStatistic, updateUrlWithoutReload } from "./utilities";
-import { dynamicSections } from '../dynamic-section/dynamic-section-definitions';
-import { CORE_API } from '../common/services/core-api-utils';
+import { hasRelatedDefinitions, navigateToStatistic } from "./utilities";
+import { dynamicSections } from "../dynamic-section/dynamic-section-definitions";
+import { CORE_API } from "../common/services/core-api-utils";
 
 
-import template from './person-entity-statistic-view.html';
+import template from "./person-entity-statistic-view.html";
 
 
 const initData = {
@@ -39,7 +39,7 @@ const initData = {
     relatedDefinitions: null,
     summaries: [],
     directs: [],
-    duration: 'MONTH',
+    duration: "MONTH",
     managers: [],
     peers: [],
     person: null,
@@ -85,7 +85,7 @@ function controller($q,
 
     vm.statRef = {
         id: statId,
-        kind: 'ENTITY_STATISTIC'
+        kind: "ENTITY_STATISTIC"
     };
 
     const definitionPromise = serviceBroker
@@ -119,7 +119,7 @@ function controller($q,
     }
 
     function loadHistory() {
-        const selector = mkStatisticSelector(vm.parentRef, 'CHILDREN');
+        const selector = mkStatisticSelector(vm.parentRef, "CHILDREN");
 
         serviceBroker
             .loadViewData(
@@ -136,11 +136,11 @@ function controller($q,
 
         const entityReference = {
             id: person.id,
-            kind: 'PERSON'
+            kind: "PERSON"
         };
         vm.parentRef = entityReference;
 
-        const selector = mkStatisticSelector(entityReference, 'CHILDREN');
+        const selector = mkStatisticSelector(entityReference, "CHILDREN");
 
         serviceBroker
             .loadViewData(
@@ -155,7 +155,7 @@ function controller($q,
 
                 const relatedIds = _.chain(related)
                     .filter(s => s !== null)
-                    .map('id')
+                    .map("id")
                     .value();
 
                 return serviceBroker
@@ -207,17 +207,17 @@ function controller($q,
 
 
 controller.$inject = [
-    '$q',
-    '$state',
-    '$stateParams',
-    'ServiceBroker'
+    "$q",
+    "$state",
+    "$stateParams",
+    "ServiceBroker"
 ];
 
 
 const page = {
     controller,
     template,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };
 
 

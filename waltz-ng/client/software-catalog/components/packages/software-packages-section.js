@@ -22,10 +22,9 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 import {mkEntityLinkGridCell, mkLinkGridCell} from "../../../common/grid-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
-import {countByVersionId, groupByVersionId} from "../../software-catalog-utilities";
+import {countByVersionId} from "../../software-catalog-utilities";
 
 import template from "./software-packages-section.html";
-import {withWidth} from "../../../physical-flow/physical-flow-table-utilities";
 
 
 const bindings = {
@@ -62,8 +61,8 @@ function mkColumnDefs() {
             field: "usageCount",
             name: "# Applications",
             cellTemplate: `<div class="ui-grid-cell-contents">
-                               <a class="clickable" 
-                                  ng-bind="COL_FIELD" 
+                               <a class="clickable"
+                                  ng-bind="COL_FIELD"
                                   ng-click="grid.appScope.onSelectVersion(row.entity)">
                                </a>
                            </div>`

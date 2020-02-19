@@ -147,7 +147,7 @@ function controller($q,
     };
 
     const selectMeasurable = (node) => {
-        const { measurable, rating, allocations } = node;
+        const { measurable, allocations } = node;
         const category = _.find(vm.categories, ({ id: measurable.categoryId }));
         const ratingScheme = vm.ratingSchemesById[category.ratingSchemeId];
         const hasWarnings = !_.isEmpty(allocations);

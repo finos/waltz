@@ -18,7 +18,6 @@
 
 import template from "./planned-decommission-editor.html";
 import {initialiseData, invokeFunction} from "../../../common";
-import {CORE_API} from "../../../common/services/core-api-utils";
 
 const modes= {
     VIEW: "VIEW",
@@ -50,7 +49,7 @@ const initialState = {
 };
 
 
-function controller($q, serviceBroker) {
+function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = (c) => {
@@ -64,7 +63,6 @@ function controller($q, serviceBroker) {
     };
 
     vm.onCancelAdd = () => {
-
         if (vm.mode === modes.SELECT_APP) {
             vm.mode = modes.VIEW;
         } else if (vm.mode === modes.SELECT_COMM_DATE) {
@@ -117,8 +115,6 @@ function controller($q, serviceBroker) {
 
 
 controller.$inject = [
-    "$q",
-    "ServiceBroker"
 ];
 
 

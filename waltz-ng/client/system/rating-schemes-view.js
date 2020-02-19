@@ -15,13 +15,11 @@
  * See the License for the specific
  *
  */
-import template from './rating-schemes-view.html';
+import template from "./rating-schemes-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
 import {initialiseData} from "../common";
 import * as _ from "lodash";
 
-
-const bindings = {};
 
 const initialState = {
     ratingSchemes: [],
@@ -38,10 +36,9 @@ function controller(serviceBroker, $q) {
         .loadViewData(
             CORE_API.RatingSchemeStore.findAll)
         .then(r => vm.ratingSchemes =
-            _.forEach( r.data,
-                d => _.forEach(
-                    d.ratings,
-                        rating => rating.name = rating.name + " (" + rating.rating + ")")));
+            _.forEach( r.data, d => _.forEach(
+                d.ratings,
+                rating => rating.name = rating.name + " (" + rating.rating + ")")));
 
     const assessmentDefinitionPromise = serviceBroker
         .loadViewData(

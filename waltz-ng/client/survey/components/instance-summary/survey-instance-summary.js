@@ -21,7 +21,7 @@ import template from "./survey-instance-summary.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import {timeFormat} from "d3-time-format";
-import {loadEntity, mkRef, sameRef} from "../../../common/entity-utils";
+import {loadEntity, sameRef} from "../../../common/entity-utils";
 import {displayError} from "../../../common/error-utils";
 import roles from "../../../user/system-roles";
 
@@ -162,10 +162,10 @@ function controller($state, serviceBroker, userService, notification) {
     function determineAvailableStatusActions() {
         vm.availableStatusActions = _.filter(
             statusActions,
-                act => act.predicate(
-                    vm.surveyInstance,
-                    vm.permissions,
-                    vm.currentResponseVersion.isLatest));
+            act => act.predicate(
+                vm.surveyInstance,
+                vm.permissions,
+                vm.currentResponseVersion.isLatest));
     }
 
     function loadUser() {
@@ -314,9 +314,7 @@ function controller($state, serviceBroker, userService, notification) {
             .execute(
                 CORE_API.SurveyInstanceStore.updateRecipient,
                 [vm.surveyInstance.id, cmd])
-            .then(r => {
-                notification.success("Updated survey recipient");
-            })
+            .then(() => notification.success("Updated survey recipient"))
             .catch(e => displayError(notification, "Failed to update recipient", e))
             .finally(() => loadRecipients(true));
     };
@@ -333,7 +331,7 @@ function controller($state, serviceBroker, userService, notification) {
                     notification.success("Survey instance due date updated successfully");
                     loadInstanceAndRun(true);
                 })
-                .catch(r => notification.error("Failed to update survey instance due date"));
+                .catch(e => displayError(notification, "Failed to update survey instance due date", e));
         }
     };
 
