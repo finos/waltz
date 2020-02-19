@@ -33,9 +33,8 @@ const initialState = {
 };
 
 
-function controller($q, serviceBroker) {
-
-    const vm = initialiseData(this, initialState);
+function controller() {
+    initialiseData(this, initialState);
 }
 
 

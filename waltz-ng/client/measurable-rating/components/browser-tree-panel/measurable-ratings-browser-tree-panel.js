@@ -140,9 +140,9 @@ function prepareTableData(measurable,
 
 
 function prepareUnmappedTableData(applications = [],
-                                ratings = [],
-                                measurables = [],
-                                categoryId) {
+                                  ratings = [],
+                                  measurables = [],
+                                  categoryId) {
 
     const measurableIdsOfACategory =
         _.chain(measurables)
@@ -221,7 +221,8 @@ function controller($q, serviceBroker) {
     };
 
     const loadBaseData = () => {
-        vm.selector = mkSelectionOptions(vm.parentEntityRef,
+        vm.selector = mkSelectionOptions(
+            vm.parentEntityRef,
             undefined,
             undefined,
             vm.filters);
@@ -239,7 +240,8 @@ function controller($q, serviceBroker) {
     const loadRatings = () => {
         clearDetail();
 
-        vm.selector = mkSelectionOptions(vm.parentEntityRef,
+        vm.selector = mkSelectionOptions(
+            vm.parentEntityRef,
             undefined,
             undefined,
             vm.filters);
@@ -280,8 +282,10 @@ function controller($q, serviceBroker) {
     };
 
     vm.onSelectUnmapped = (categoryId) => {
-        vm.selectedMeasurable = { name: "Unmapped Applications",
-            description: "Display applications which do not have any associated measurable rating for this category."};
+        vm.selectedMeasurable = {
+            name: "Unmapped Applications",
+            description: "Display applications which do not have any associated measurable rating for this category."
+        };
         loadUnmappedApplications(vm.measurables, categoryId);
     };
 
@@ -337,7 +341,7 @@ function controller($q, serviceBroker) {
         vm.onMeasurableCategorySelect(c);
     };
 
-    vm.toggleShow = () => vm.showMore = !vm.showMore
+    vm.toggleShow = () => vm.showMore = !vm.showMore;
 }
 
 

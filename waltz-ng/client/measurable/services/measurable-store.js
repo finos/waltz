@@ -15,7 +15,7 @@
  * See the License for the specific
  *
  */
-import {checkIsEntityRef, checkIsIdSelector} from "../../common/checks"
+import {checkIsIdSelector} from "../../common/checks"
 
 
 function store($http, baseApiUrl) {

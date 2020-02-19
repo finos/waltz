@@ -19,10 +19,8 @@
 import _ from "lodash";
 import { initialiseData, invokeFunction } from "../../../common";
 import { isDescendant } from "../../../common/browser-utils";
-import { entity } from "../../../common/services/enums/entity";
 import { FILTER_CHANGED_EVENT } from "../../../common/constants";
 import { CORE_API } from "../../../common/services/core-api-utils";
-import { hierarchyQueryScope } from "../../../common/services/enums/hierarchy-query-scope";
 import { mkSelectionOptions } from "../../../common/selector-utils";
 import { viewStateToKind } from "../../../common/link-utils";
 import { mkRef } from "../../../common/entity-utils";
@@ -112,7 +110,7 @@ function controller($element,
 
 
     const setupTransitionHandler = () => {
-        $transitions.onSuccess({ }, (transition) => {
+        $transitions.onSuccess({ }, () => {
             const name = $state.current.name;
             const id = _.parseInt($stateParams.id);
             loadFacets(name, id)

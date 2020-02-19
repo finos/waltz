@@ -21,8 +21,6 @@ import {initialiseData} from "../common";
 import * as _ from "lodash";
 
 
-const bindings = {};
-
 const initialState = {
     selectedEuda: null,
     recentlyPromoted: []

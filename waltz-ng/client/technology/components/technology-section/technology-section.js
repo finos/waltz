@@ -17,7 +17,7 @@
  */
 
 import _ from "lodash";
-import {perhaps, termSearch} from "../../../common";
+import {initialiseData, perhaps, termSearch} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkEntityLinkGridCell, mkLinkGridCell} from "../../../common/grid-utils";
 
@@ -50,12 +50,6 @@ function mkEndOfLifeCell(title, dateField, flagField) {
             </div>`
     };
 }
-
-
-const MATURITY_STATUS_TEMPLATE = `
-    <div class="ui-grid-cell-contents">
-        <waltz-maturity-status ng-if="COL_FIELD" status="COL_FIELD"></waltz-maturity-status>
-    </div>`;
 
 
 function mkBooleanColumnFilter(uiGridConstants) {
@@ -208,7 +202,7 @@ function combineServersAndUsage(servers = [], serverUsage = []) {
 
 function controller($q, $animate, uiGridConstants, serviceBroker) {
 
-    const vm = this;
+    const vm = initialiseData(this, initialState);
 
 
     function refresh(qry) {

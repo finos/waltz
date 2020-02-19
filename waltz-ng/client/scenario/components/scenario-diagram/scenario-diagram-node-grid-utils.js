@@ -18,7 +18,6 @@
 
 import _ from "lodash";
 import {drawUnit, NODE_STYLES, updateUnit} from "./scenario-diagram-static-node-utils";
-import {checkTrue} from "../../../common/checks";
 import {CELL_DIMENSIONS} from "./scenario-diagram-dimensions";
 import {defaultOptions} from "./scenario-diagram-utils";
 import {d3ContextMenu} from "../../../common/d3-context-menu";

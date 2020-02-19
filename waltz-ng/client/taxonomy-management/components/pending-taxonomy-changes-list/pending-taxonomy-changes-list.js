@@ -22,7 +22,7 @@ import {initialiseData} from "../../../common";
 
 const bindings = {
     pendingChanges: "<",
-    onSelect: "<"
+    onSelect: "<?"
 };
 
 
@@ -32,7 +32,7 @@ const initialState = {
 
 
 function controller() {
-    const vm = initialiseData(this, initialState);
+    initialiseData(this, initialState);
 }
 
 
