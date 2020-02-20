@@ -1,3 +1,5 @@
+
+
 <!--
   ~ Waltz - Enterprise Architecture
   ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
@@ -16,16 +18,11 @@
   ~
   -->
 
-<span uib-popover-template="'wric-rating-popup.html'"
-      popover-popup-delay="300"
-      popover-enable="$ctrl.showDescriptionPopup && $ctrl.rating.description"
-      popover-trigger="mouseenter"
-      popover-append-to-body="true">
-    <span class="wric-cell"
-          ng-style="{ 'background-color': $ctrl.rating.color }">
-    </span>
-    <span ng-if="$ctrl.showName"
-          class="wric-name"
-          ng-bind="$ctrl.rating.name">
-    </span>
-</span>
+<!-- DESCRIPTION POPUP -->
+<script type="text/ng-template"
+        id="wric-rating-popup.html">
+    <div class="small">
+        <waltz-markdown text="$ctrl.rating.description">
+        </waltz-markdown>
+    </div>
+</script>

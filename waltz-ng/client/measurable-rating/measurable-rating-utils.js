@@ -69,7 +69,10 @@ export function loadAllData(
 
     const categoriesPromise = serviceBroker
         .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
-        .then(r => ({categories: r.data}));
+        .then(r => ({
+            categories: r.data,
+            categoriesById: _.keyBy(r.data, d => d.id)
+        }));
 
     const roadmapsPromise = serviceBroker
         .loadViewData(
