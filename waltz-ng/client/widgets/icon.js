@@ -43,8 +43,8 @@ function controller() {
             vm.fixedWidth ? "fa-fw" : "",
             vm.inverse ? "fa-inverse" : "",
             vm.spin ? "fa-spin" : ""
-        ].join(" ");
-    }
+        ];
+    };
 }
 
 
