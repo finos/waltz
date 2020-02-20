@@ -24,6 +24,7 @@ import com.khartec.waltz.model.entity_hierarchy.EntityHierarchyItem;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.EntityHierarchy;
 import com.khartec.waltz.schema.tables.records.EntityHierarchyRecord;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -63,7 +64,7 @@ public class EntityHierarchyDao {
     }
 
 
-    public int replaceHierarchy(EntityKind kind, List<EntityHierarchyItem> hierarchyItems) {
+    public int replaceHierarchy(EntityKind kind, List<EntityHierarchyItem> hierarchyItems, Condition deleteFilter) {
         checkNotNull(kind, "kind cannot be null");
         checkNotNull(hierarchyItems, "hierarchyItems cannot be null");
 
@@ -74,6 +75,7 @@ public class EntityHierarchyDao {
             DSLContext txDsl = DSL.using(configuration);
             txDsl.deleteFrom(ENTITY_HIERARCHY)
                     .where(ENTITY_HIERARCHY.KIND.eq(kind.name()))
+                    .and(deleteFilter)
                     .execute();
             txDsl.batchInsert(records)
                     .execute();

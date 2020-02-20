@@ -74,6 +74,11 @@ function controller($q,
         vm.selectedChange = null;
     };
 
+    const reloadMeasurables = () => {
+        serviceBroker
+            .loadAppData(CORE_API.MeasurableStore.findAll, [], { force: true })
+            .then(r => vm.measurables = _.filter(r.data, m => m.categoryId === categoryId));
+    };
 
     // -- boot
 
@@ -124,6 +129,7 @@ function controller($q,
                 [ change.id ])
             .then(() => {
                 notification.info("Change applied");
+                reloadMeasurables();
                 reloadPending();
                 return true;
             })
