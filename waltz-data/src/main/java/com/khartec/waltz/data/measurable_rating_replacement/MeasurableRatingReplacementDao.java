@@ -22,11 +22,13 @@ import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.measurable_rating_replacement.ImmutableMeasurableRatingReplacement;
 import com.khartec.waltz.model.measurable_rating_replacement.MeasurableRatingReplacement;
 import com.khartec.waltz.schema.tables.records.MeasurableRatingReplacementRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -40,6 +42,7 @@ import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.MeasurableRatingPlannedDecommission.MEASURABLE_RATING_PLANNED_DECOMMISSION;
 import static com.khartec.waltz.schema.tables.MeasurableRatingReplacement.MEASURABLE_RATING_REPLACEMENT;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
 public class MeasurableRatingReplacementDao {
@@ -100,6 +103,18 @@ public class MeasurableRatingReplacementDao {
     }
 
 
+    public MeasurableRatingReplacement fetchByDecommissionIdAndEntityRef(Long decommissionId, EntityReference ref){
+        return dsl
+                .select(MEASURABLE_RATING_REPLACEMENT.fields())
+                .select(NAME_FIELD)
+                .from(MEASURABLE_RATING_REPLACEMENT)
+                .where(MEASURABLE_RATING_REPLACEMENT.DECOMMISSION_ID.eq(decommissionId)
+                        .and(MEASURABLE_RATING_REPLACEMENT.ENTITY_KIND.eq(ref.kind().name())
+                                .and(MEASURABLE_RATING_REPLACEMENT.ENTITY_ID.eq(ref.id()))))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
+
     public Set<MeasurableRatingReplacement> fetchByEntityRef(EntityReference ref){
         return dsl
                 .select(MEASURABLE_RATING_REPLACEMENT.fields())
@@ -113,7 +128,7 @@ public class MeasurableRatingReplacementDao {
     }
 
 
-    public Boolean save(long decommId, EntityReference entityReference, LocalDate commissionDate, String username) {
+    public Tuple2<Operation, Boolean> save(long decommId, EntityReference entityReference, LocalDate commissionDate, String username) {
 
         Condition condition = MEASURABLE_RATING_REPLACEMENT.DECOMMISSION_ID.eq(decommId)
                 .and(MEASURABLE_RATING_REPLACEMENT.ENTITY_ID.eq(entityReference.id())
@@ -124,12 +139,15 @@ public class MeasurableRatingReplacementDao {
                 .where(condition));
 
         if (isUpdate) {
-            return dsl
+            boolean recordsUpdated = dsl
                     .update(MEASURABLE_RATING_REPLACEMENT)
-                    .set(MEASURABLE_RATING_REPLACEMENT.PLANNED_COMMISSION_DATE, DateTimeUtilities.toSqlDate(commissionDate))
+                    .set(MEASURABLE_RATING_REPLACEMENT.PLANNED_COMMISSION_DATE, toSqlDate(commissionDate))
                     .set(MEASURABLE_RATING_REPLACEMENT.UPDATED_BY, username)
                     .set(MEASURABLE_RATING_REPLACEMENT.UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
                     .execute() == 1;
+
+            return tuple(Operation.UPDATE, recordsUpdated);
+
         } else {
             MeasurableRatingReplacementRecord replacementRecord = dsl.newRecord(MEASURABLE_RATING_REPLACEMENT);
 
@@ -142,7 +160,9 @@ public class MeasurableRatingReplacementDao {
             replacementRecord.setUpdatedBy(username);
             replacementRecord.setPlannedCommissionDate(toSqlDate(commissionDate));
 
-            return replacementRecord.insert() == 1;
+            boolean recordsInserted = replacementRecord.insert() == 1;
+
+            return tuple(Operation.ADD, recordsInserted);
         }
     }
 

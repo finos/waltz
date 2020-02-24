@@ -19,18 +19,17 @@
 package com.khartec.waltz.service.measurable_rating_replacement;
 
 
-import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.common.exception.UpdateFailedException;
 import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionDao;
 import com.khartec.waltz.data.measurable_rating_replacement.MeasurableRatingReplacementDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.Severity;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
 import com.khartec.waltz.model.measurable_rating_replacement.MeasurableRatingReplacement;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -76,28 +75,25 @@ public class MeasurableRatingReplacementService {
                         LocalDate commissionDate,
                         String username) {
 
-        measurableRatingReplacementDao.save(decommId, entityReference, commissionDate, username);
+        Tuple2<Operation, Boolean> operation = measurableRatingReplacementDao.save(decommId, entityReference, commissionDate, username);
 
+        MeasurableRatingReplacement measurableRatingReplacement = measurableRatingReplacementDao.fetchByDecommissionIdAndEntityRef(decommId, entityReference);
         MeasurableRatingPlannedDecommission plannedDecomm = measurableRatingPlannedDecommissionDao.getById(decommId);
 
-        mkChangeLogEntry(entityReference,
-                format("Added as a replacement application for measurable: %s [%d] from %s [%d] on %s",
-                        resolveMeasurableName(plannedDecomm.id()),
-                        plannedDecomm.measurableId(),
-                        resolveApplicationName(entityReference.id()),
-                        entityReference.id(),
-                        commissionDate),
-                username,
-                Operation.ADD);
-        mkChangeLogEntry(plannedDecomm.entityReference(),
-                format("Added replacement application %s [%d] for measurable: %s [%d] with planned commission date: %s",
-                        resolveApplicationName(entityReference.id()),
-                        entityReference.id(),
-                        resolveMeasurableName(plannedDecomm.measurableId()),
-                        plannedDecomm.measurableId(),
-                        commissionDate),
-                username,
-                Operation.ADD);
+        if(!operation.v2){
+            throw new UpdateFailedException(
+                    "REPLACEMENT_SAVE_FAILED",
+                    format("Failed to store replacement app change for entity %s:%d and measurable %d",
+                            plannedDecomm.entityReference().kind(),
+                            plannedDecomm.entityReference().id(),
+                            plannedDecomm.measurableId()));
+        } else {
+            changeLogService.writeChangeLogEntries(
+                    measurableRatingReplacement,
+                    username,
+                    format("%s with planned commission date: %s", (operation.v1.equals(Operation.ADD) ? "Added" : "Updated"), commissionDate),
+                    operation.v1);
+        }
 
         return measurableRatingReplacementDao.fetchByDecommissionId(decommId);
     }
@@ -105,56 +101,16 @@ public class MeasurableRatingReplacementService {
 
     public Collection<MeasurableRatingReplacement> remove(long decommId, long replacementId, String username) {
 
-        MeasurableRatingReplacement replacementRemoved = measurableRatingReplacementDao.getById(replacementId);
-        MeasurableRatingPlannedDecommission plannedDecomm = measurableRatingPlannedDecommissionDao.getById(decommId);
+        boolean isRemoved = measurableRatingReplacementDao.remove(decommId, replacementId);
 
-        measurableRatingReplacementDao.remove(decommId, replacementId);
+        if (isRemoved) {
+            changeLogService.writeChangeLogEntries(
+                    mkRef(EntityKind.MEASURABLE_RATING_REPLACEMENT, replacementId),
+                    username,
+                    "Removed",
+                    Operation.REMOVE);
+        }
 
-        mkChangeLogEntry(plannedDecomm.entityReference(),
-                format("Removed replacement application %s [%d] from measurable: %s [%d]",
-                        resolveApplicationName(replacementRemoved.entityReference().id()),
-                        replacementRemoved.entityReference().id(),
-                        resolveMeasurableName(plannedDecomm.measurableId()),
-                        plannedDecomm.measurableId()),
-                username,
-                Operation.REMOVE);
-        mkChangeLogEntry(replacementRemoved.entityReference(),
-                format("Removed this application as a replacement for measurable: %s [%d] from %s [%d]",
-                        resolveMeasurableName(plannedDecomm.measurableId()),
-                        plannedDecomm.measurableId(),
-                        resolveApplicationName(plannedDecomm.entityReference().id()),
-                        plannedDecomm.entityReference().id()),
-                username,
-                Operation.REMOVE);
         return measurableRatingReplacementDao.fetchByDecommissionId(decommId);
-    }
-
-
-    private void mkChangeLogEntry(EntityReference entityReference, String message, String userName, Operation operation) {
-        changeLogService.write(ImmutableChangeLog.builder()
-                .message(message)
-                .parentReference(entityReference)
-                .userId(userName)
-                .createdAt(DateTimeUtilities.nowUtc())
-                .severity(Severity.INFORMATION)
-                .childKind(EntityKind.MEASURABLE_RATING)
-                .operation(operation)
-                .build());
-    }
-
-
-    private String resolveMeasurableName(long id) {
-        return nameResolver
-                .resolve(mkRef(EntityKind.MEASURABLE, id))
-                .flatMap(EntityReference::name)
-                .orElse("UNKNOWN");
-    }
-
-
-    private String resolveApplicationName(long id) {
-        return nameResolver
-                .resolve(mkRef(EntityKind.APPLICATION, id))
-                .flatMap(EntityReference::name)
-                .orElse("UNKNOWN");
     }
 }
