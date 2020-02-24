@@ -108,16 +108,12 @@ public class MeasurableRatingPlannedDecommissionService {
                 format("Removed planned decommission date and the associated replacement application/s: %s", replacementApps)
                 : "Removed planned decommission date";
 
-        boolean isRemoved = measurableRatingPlannedDecommissionDao.remove(id);
+        changeLogService.writeChangeLogEntries(
+                mkRef(EntityKind.MEASURABLE_RATING_PLANNED_DECOMMISSION, id),
+                username,
+                msg,
+                Operation.REMOVE);
 
-        if(isRemoved){
-            changeLogService.writeChangeLogEntries(
-                    mkRef(EntityKind.MEASURABLE_RATING_PLANNED_DECOMMISSION, id),
-                    username,
-                    msg,
-                    Operation.REMOVE);
-        }
-
-        return isRemoved;
+        return measurableRatingPlannedDecommissionDao.remove(id);
     }
 }

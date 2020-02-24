@@ -83,33 +83,34 @@ public class MeasurableRatingReplacementService {
         if(!operation.v2){
             throw new UpdateFailedException(
                     "REPLACEMENT_SAVE_FAILED",
-                    format("Failed to store replacement app change for entity %s:%d and measurable %d",
+                    format("Failed to store measurable rating replacement %s:%d for entity %s:%d and measurable %d",
+                            measurableRatingReplacement.entityReference().kind(),
+                            measurableRatingReplacement.entityReference().id(),
                             plannedDecomm.entityReference().kind(),
                             plannedDecomm.entityReference().id(),
                             plannedDecomm.measurableId()));
         } else {
+
             changeLogService.writeChangeLogEntries(
                     measurableRatingReplacement,
                     username,
                     format("%s with planned commission date: %s", (operation.v1.equals(Operation.ADD) ? "Added" : "Updated"), commissionDate),
                     operation.v1);
-        }
 
-        return measurableRatingReplacementDao.fetchByDecommissionId(decommId);
+            return measurableRatingReplacementDao.fetchByDecommissionId(decommId);
+        }
     }
 
 
     public Collection<MeasurableRatingReplacement> remove(long decommId, long replacementId, String username) {
 
-        boolean isRemoved = measurableRatingReplacementDao.remove(decommId, replacementId);
+        changeLogService.writeChangeLogEntries(
+                mkRef(EntityKind.MEASURABLE_RATING_REPLACEMENT, replacementId),
+                username,
+                "Removed",
+                Operation.REMOVE);
 
-        if (isRemoved) {
-            changeLogService.writeChangeLogEntries(
-                    mkRef(EntityKind.MEASURABLE_RATING_REPLACEMENT, replacementId),
-                    username,
-                    "Removed",
-                    Operation.REMOVE);
-        }
+        boolean isRemoved = measurableRatingReplacementDao.remove(decommId, replacementId);
 
         return measurableRatingReplacementDao.fetchByDecommissionId(decommId);
     }
