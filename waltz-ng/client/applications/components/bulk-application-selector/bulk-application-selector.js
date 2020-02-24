@@ -127,16 +127,16 @@ function controller(serviceBroker) {
                 vm.visibility.loading = false;
                 vm.searchSummary = mkSummary(vm.searchResults);
 
-                const resultsById = _.keyBy(results, 'entityRef.id');
+                const resultsById = _.keyBy(results, "entityRef.id");
                 vm.removedResults = _.chain(vm.existingRefs)
                     .filter(r => !resultsById[r.id])
-                    .map(entityRef => ({entityRef, action: 'REMOVE'}))
+                    .map(entityRef => ({entityRef, action: "REMOVE"}))
                     .value();
             });
     };
 
     vm.save = () => {
-        vm.selectionResults = _.filter(vm.searchResults, r => r.action !== 'NO_CHANGE');
+        vm.selectionResults = _.filter(vm.searchResults, r => r.action !== "NO_CHANGE");
         if(vm.mode === MODES.REPLACE) {
             vm.selectionResults = _.concat(vm.selectionResults, vm.removedResults);
         }

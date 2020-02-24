@@ -260,7 +260,7 @@ function controller($q,
                     [id, Object.assign({}, {applicationIds: appIdsToAdd, unknownIdentifiers: unknownIdentifiers})])
                 .then(r => r.data)
                 .then(apps => vm.applications = apps, e => handleError(e))
-                .then(() => notification.success(`Added ${appIdsToAdd.length} applications`))
+                .then(() => notification.success(`Added ${appIdsToAdd.length} applications`));
         }
 
         if (appIdsToRemove.length > 0) {
@@ -272,7 +272,7 @@ function controller($q,
         }
 
         if (appIdsToRemove.length === 0 && appIdsToAdd.length === 0){
-            notification.info("There are no applications to be added or removed")
+            notification.info("There are no applications to be added or removed");
         }
     };
 
