@@ -134,6 +134,7 @@ public class MeasurableRatingPlannedDecommissionDao {
         if (existingRecord != null) {
             updateDecommDateOnRecord(existingRecord, dateChange, userName);
             boolean updatedRecord = existingRecord.update() == 1;
+
             return Tuple.tuple(Operation.UPDATE, updatedRecord);
         } else {
             MeasurableRatingPlannedDecommissionRecord record = dsl.newRecord(MEASURABLE_RATING_PLANNED_DECOMMISSION);
@@ -143,8 +144,9 @@ public class MeasurableRatingPlannedDecommissionDao {
             record.setEntityId(entityReference.id());
             record.setEntityKind(entityReference.kind().name());
             record.setMeasurableId(measurableId);
-            boolean inserted = record.insert() == 1;
-            return Tuple.tuple(Operation.ADD, inserted);
+            boolean recordsInserted = record.insert() == 1;
+
+            return Tuple.tuple(Operation.ADD, recordsInserted);
         }
     }
 
