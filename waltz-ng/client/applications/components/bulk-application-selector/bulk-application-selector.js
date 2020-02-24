@@ -122,7 +122,7 @@ function controller(serviceBroker) {
 
         return searchRefs(identifiers)
             .then(results => {
-                vm.searchResults = results
+                vm.searchResults = results;
                 vm.filteredSearchResults = filterResults();
                 vm.visibility.loading = false;
                 vm.searchSummary = mkSummary(vm.searchResults);
@@ -136,11 +136,14 @@ function controller(serviceBroker) {
     };
 
     vm.save = () => {
-        let selectionResults = _.filter(vm.searchResults, r => r.action === 'ADD');
+        vm.selectionResults = _.filter(vm.searchResults, r => r.action !== 'NO_CHANGE');
         if(vm.mode === MODES.REPLACE) {
-            selectionResults = _.concat(selectionResults, vm.removedResults);
+            vm.selectionResults = _.concat(vm.selectionResults, vm.removedResults);
         }
-        invokeFunction(vm.onSave, selectionResults);
+
+        if (!vm.searchSummary.notFound || confirm(`There are {${vm.searchSummary.notFound}} unresolved applications, do you want to proceed?`)){
+            invokeFunction(vm.onSave, vm.selectionResults);
+        }
     };
 
     vm.toggleNotFound = () => {

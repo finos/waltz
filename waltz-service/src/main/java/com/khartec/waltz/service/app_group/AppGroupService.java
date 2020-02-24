@@ -50,9 +50,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.append;
 import static com.khartec.waltz.common.MapUtilities.indexBy;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
+import static java.lang.String.format;
 
 @Service
 public class AppGroupService {
@@ -170,7 +172,7 @@ public class AppGroupService {
         verifyUserCanUpdateGroup(userId, groupId);
         appGroupDao.deleteGroup(groupId);
         entityRelationshipDao.removeAnyInvolving(mkRef(EntityKind.APP_GROUP, groupId));
-        audit(groupId, userId, String.format("Removed group %d", groupId), null, Operation.REMOVE);
+        audit(groupId, userId, format("Removed group %d", groupId), null, Operation.REMOVE);
         return findGroupSubscriptionsForUser(userId);
     }
 
@@ -182,29 +184,46 @@ public class AppGroupService {
         Application app = applicationDao.getById(applicationId);
         if (app != null) {
             appGroupEntryDao.addApplication(groupId, applicationId);
-            audit(groupId, userId, String.format("Added application %s to group", app.name()), EntityKind.APPLICATION, Operation.ADD);
+            audit(groupId, userId, format("Added application %s to group", app.name()), EntityKind.APPLICATION, Operation.ADD);
         }
 
         return appGroupEntryDao.getEntriesForGroup(groupId);
     }
 
 
-    public List<EntityReference> addApplications(String userId, long groupId, List<Long> applicationIds) throws InsufficientPrivelegeException {
+    public List<EntityReference> addApplications(String userId,
+                                                 long groupId,
+                                                 List<Long> applicationIds,
+                                                 List<String> unknownIdentifiers) throws InsufficientPrivelegeException {
         verifyUserCanUpdateGroup(userId, groupId);
 
         appGroupEntryDao.addApplications(groupId, applicationIds);
 
+        EntityReference entityReference = mkRef(EntityKind.APP_GROUP, groupId);
         List<Application> apps = applicationDao.findByIds(applicationIds);
-        List<ChangeLog> changeLogs = apps
+
+        List<ChangeLog> addedApplicationChangeLogs = apps
                 .stream()
                 .map(app -> ImmutableChangeLog.builder()
-                        .message(String.format("Added application %s to group", app.name()))
-                        .userId(userId)
-                        .parentReference(ImmutableEntityReference.builder().id(groupId).kind(EntityKind.APP_GROUP).build())
-                        .childKind(EntityKind.APPLICATION)
-                        .operation(Operation.ADD)
-                        .build())
+                            .message(format("Added application %s to group", app.name()))
+                            .userId(userId)
+                            .parentReference(entityReference)
+                            .childKind(EntityKind.APPLICATION)
+                            .operation(Operation.ADD)
+                            .build())
                 .collect(Collectors.toList());
+
+        List<ChangeLog> changeLogs = (unknownIdentifiers.size() == 0)
+                ? addedApplicationChangeLogs
+                : append(addedApplicationChangeLogs,
+                        ImmutableChangeLog.builder()
+                                .message(format("The following {%d} identifiers could not be found and were not added to this group: %s", unknownIdentifiers.size(), unknownIdentifiers))
+                                .userId(userId)
+                                .parentReference(entityReference)
+                                .childKind(EntityKind.APPLICATION)
+                                .operation(Operation.UNKNOWN)
+                                .build());
+
         changeLogService.write(changeLogs);
 
         return appGroupEntryDao.getEntriesForGroup(groupId);
@@ -215,7 +234,7 @@ public class AppGroupService {
         verifyUserCanUpdateGroup(userId, groupId);
         appGroupEntryDao.removeApplication(groupId, applicationId);
         Application app = applicationDao.getById(applicationId);
-        audit(groupId, userId, String.format(
+        audit(groupId, userId, format(
                     "Removed application %s from group",
                     app != null
                         ? app.name()
@@ -231,7 +250,7 @@ public class AppGroupService {
         OrganisationalUnit orgUnit = organisationalUnitDao.getById(orgUnitId);
         if (orgUnit != null) {
             appGroupOrganisationalUnitDao.addOrgUnit(groupId, orgUnitId);
-            audit(groupId, userId, String.format("Added application %s to group", orgUnit.name()), EntityKind.ORG_UNIT, Operation.ADD);
+            audit(groupId, userId, format("Added application %s to group", orgUnit.name()), EntityKind.ORG_UNIT, Operation.ADD);
         }
         return appGroupOrganisationalUnitDao.getEntriesForGroup(groupId);
     }
@@ -240,7 +259,7 @@ public class AppGroupService {
         verifyUserCanUpdateGroup(userId, groupId);
         appGroupOrganisationalUnitDao.removeOrgUnit(groupId, orgUnitId);
         OrganisationalUnit ou = organisationalUnitDao.getById(orgUnitId);
-        audit(groupId, userId, String.format("Removed application %s from group", ou != null ? ou.name() : orgUnitId), EntityKind.ORG_UNIT, Operation.REMOVE);
+        audit(groupId, userId, format("Removed application %s from group", ou != null ? ou.name() : orgUnitId), EntityKind.ORG_UNIT, Operation.REMOVE);
         return appGroupOrganisationalUnitDao.getEntriesForGroup(groupId);
     }
     public List<EntityReference> removeApplications(String userId, long groupId, List<Long> applicationIds) throws InsufficientPrivelegeException {
@@ -252,7 +271,7 @@ public class AppGroupService {
         List<ChangeLog> changeLogs = apps
                 .stream()
                 .map(app -> ImmutableChangeLog.builder()
-                        .message(String.format("Removed application %s from group", app.name()))
+                        .message(format("Removed application %s from group", app.name()))
                         .userId(userId)
                         .parentReference(ImmutableEntityReference.builder().id(groupId).kind(EntityKind.APP_GROUP).build())
                         .childKind(EntityKind.APPLICATION)
@@ -267,7 +286,7 @@ public class AppGroupService {
 
     public int addOwner(String userId, long groupId, String ownerId) throws InsufficientPrivelegeException {
         verifyUserCanUpdateGroup(userId, groupId);
-        audit(groupId, userId, String.format("Added owner %s to group %d", ownerId, groupId), EntityKind.PERSON, Operation.ADD);
+        audit(groupId, userId, format("Added owner %s to group %d", ownerId, groupId), EntityKind.PERSON, Operation.ADD);
         return appGroupMemberDao.register(groupId, ownerId, AppGroupMemberRole.OWNER);
     }
 
@@ -276,7 +295,7 @@ public class AppGroupService {
         verifyUserCanUpdateGroup(userId, groupId);
         boolean result = appGroupMemberDao.unregister(groupId, ownerToRemoveId);
         subscribe(ownerToRemoveId, groupId);
-        audit(groupId, userId, String.format("Removed owner %s from group %d", ownerToRemoveId, groupId), EntityKind.PERSON, Operation.REMOVE);
+        audit(groupId, userId, format("Removed owner %s from group %d", ownerToRemoveId, groupId), EntityKind.PERSON, Operation.REMOVE);
         return result;
     }
 
@@ -328,7 +347,7 @@ public class AppGroupService {
 
         audit(groupId,
                 username,
-                String.format("Associated change initiative: %d", changeInitiativeId),
+                format("Associated change initiative: %d", changeInitiativeId),
                 EntityKind.CHANGE_INITIATIVE,
                 Operation.ADD);
 
@@ -349,7 +368,7 @@ public class AppGroupService {
 
         audit(groupId,
                 username,
-                String.format("Removed associated change initiative: %d", changeInitiativeId),
+                format("Removed associated change initiative: %d", changeInitiativeId),
                 EntityKind.CHANGE_INITIATIVE,
                 Operation.REMOVE);
 
