@@ -115,8 +115,7 @@ public class AuthSourceRatingCalculator {
                 .stream()
                 .map(d -> d.id().get())
                 .collect(Collectors.toSet());
-        // dataTypeDescendents.contains(decorator.decoratorEntity().id())
-        // decorator.decoratorEntity().id() == dataType.id().get()
+
         Collection<LogicalFlowDecorator> impactedDecorators = logicalFlowDecoratorDao
                 .findByEntityIdSelectorAndKind(
                         EntityKind.APPLICATION,

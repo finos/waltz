@@ -243,9 +243,6 @@ public class AuthoritativeSourceDao {
                 AUTHORITATIVE_SOURCE.APPLICATION_ID,
                 AUTHORITATIVE_SOURCE.RATING)
                 .from(AUTHORITATIVE_SOURCE)
-//                .innerJoin(ORGANISATIONAL_UNIT)
-//                .on(ORGANISATIONAL_UNIT.ID.eq(AUTHORITATIVE_SOURCE.PARENT_ID)
-//                        .and(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(EntityKind.ORG_UNIT.name())))
                 .innerJoin(ehOrgUnit)
                 .on(ehOrgUnit.ANCESTOR_ID.eq(AUTHORITATIVE_SOURCE.PARENT_ID)
                         .and(ehOrgUnit.KIND.eq(EntityKind.ORG_UNIT.name()))
