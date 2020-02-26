@@ -122,7 +122,8 @@ public class SurveyQuestionEndpoint implements Endpoint {
     private SurveyQuestionInfo mkQuestionInfo(SurveyQuestion question) {
         ImmutableSurveyQuestionInfo.Builder builder = ImmutableSurveyQuestionInfo.builder();
 
-        if (question.fieldType() == SurveyQuestionFieldType.DROPDOWN) {
+        if (question.fieldType() == SurveyQuestionFieldType.DROPDOWN
+                || question.fieldType() == SurveyQuestionFieldType.DROPDOWN_MULTI_SELECT) {
             builder.dropdownEntries(surveyQuestionDropdownEntryService.findForQuestion(question.id().get()));
         }
         return builder
@@ -134,7 +135,8 @@ public class SurveyQuestionEndpoint implements Endpoint {
     private boolean mayBeSaveDropdownEntries(long questionId, SurveyQuestionInfo questionInfo) {
         checkNotNull(questionInfo.question(), "questionInfo.question() cannot be null");
 
-        if (questionInfo.question().fieldType() == SurveyQuestionFieldType.DROPDOWN) {
+        if (questionInfo.question().fieldType() == SurveyQuestionFieldType.DROPDOWN
+                || questionInfo.question().fieldType() == SurveyQuestionFieldType.DROPDOWN_MULTI_SELECT) {
             return surveyQuestionDropdownEntryService.saveEntries(
                     questionId,
                     questionInfo.dropdownEntries());

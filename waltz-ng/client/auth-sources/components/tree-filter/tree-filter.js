@@ -61,9 +61,11 @@ function controller() {
         const matchingNodes = doSearch(termStr, vm.searchNodes);
         vm.hierarchy = prepareTree(matchingNodes);
     };
+
     vm.toggleTreeSelector = () => {
         vm.editMode = !vm.editMode;
     };
+
     const sortByName = (items = []) => items.sort((a, b) => {
         if (a.name < b.name) {
             return -1;
@@ -92,13 +94,15 @@ function controller() {
         const expandedSelection = _.chain(selectedItems).flatMap(d => findChildren(d)).map(d => d.id).uniq().value();
         vm.onFilterChange(expandedSelection);
     };
+
     vm.removeSelected = (id) => {
         vm.selectedItems = vm.selectedItems.filter(e => e.id !== id);
         notifyListeners(vm.selectedItems);
     };
+
     vm.isSelected = (n) => {
         return vm.selectedItems.map(e => e.id).includes(n.id)
-    }
+    };
 }
 
 

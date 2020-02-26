@@ -24,7 +24,6 @@ function setup($stateProvider) {
         .state('main.measurable-rating', baseState);
 }
 
-
 setup.$inject = ['$stateProvider'];
 
 

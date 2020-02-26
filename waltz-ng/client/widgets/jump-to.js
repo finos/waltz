@@ -20,11 +20,6 @@ import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 import {dynamicSectionNavigationDefaultOffset} from "../dynamic-section/components/dynamic-section-navigation/dynamic-section-navigation";
 import * as _ from "lodash";
 
-/**
- * Additional scroll amount to compensate for navbar etc.
-*/
-const OFFSET = 160;
-
 
 /**
  * An attribute directive which allows
@@ -37,12 +32,12 @@ const OFFSET = 160;
 const directive = function($window,
                            dynamicSectionManager) {
     return {
-        restrict: 'A',
+        restrict: "A",
         link: (scope, elem, attrs) => {
             // NOTE:  if you change the name of the directive
             // then the attr name will also change
             const target = attrs.waltzJumpTo;
-            elem.on('click', () => {
+            elem.on("click", () => {
                 const section = _.find(dynamicSections, section => section.componentId === target);
                 if(section != null) {
                     scope.$apply(() => (dynamicSectionManager.activate(section)));
@@ -57,8 +52,8 @@ const directive = function($window,
 
 
 directive.$inject=[
-    '$window',
-    'DynamicSectionManager'
+    "$window",
+    "DynamicSectionManager"
 ];
 
 

@@ -18,16 +18,23 @@
 
 <div class="row">
 
+
+    <!-- TABS & TREES -->
+    <div class="col-sm-7">
+        <div ng-include="'wmrep-main-tabs'">
+        </div>
+    </div>
+
     <!-- INSTRUCTIONS / PICKER -->
-    <div class="col-sm-4">
+    <div class="col-sm-5" style="padding-top: 40px">
         <!-- SCHEME OVERVIEW -->
         <div ng-if="$ctrl.visibility.schemeOverview"
              ng-include="'wmrep-rating-scheme-overview'">
         </div>
 
         <!-- EDIT SECTION -->
-        <div ng-if="$ctrl.visibility.ratingPicker"
-             ng-include="'wmrep-rating-picker'">
+        <div ng-if="$ctrl.visibility.ratingEditor"
+             ng-include="'wmrep-rating-editor'">
         </div>
 
         <!-- INSTRUCTIONS -->
@@ -36,12 +43,6 @@
              ng-include="'wmrep-instructions'">
         </div>
 
-    </div>
-
-    <!-- TABS & TREES -->
-    <div class="col-sm-8">
-         <div ng-include="'wmrep-main-tabs'">
-         </div>
     </div>
 
 </div>
@@ -106,7 +107,10 @@
                                       measurables="$ctrl.activeTab.measurables"
                                       on-keypress="$ctrl.onKeypress"
                                       scroll-height="600"
-                                      on-select="$ctrl.onMeasurableSelect">
+                                      on-select="$ctrl.onMeasurableSelect"
+                                      planned-decommissions="$ctrl.plannedDecommissions"
+                                      replacing-decommissions="$ctrl.replacingDecommissions"
+                                      replacement-apps="$ctrl.replacementApps">
         </waltz-measurable-rating-tree>
     </div>
 
@@ -128,14 +132,30 @@
 </script>
 
 
-<!-- PICKER -->
+<!-- EDITOR -->
 <script type="text/ng-template"
-        id="wmrep-rating-picker">
+        id="wmrep-rating-editor">
 
+    <!-- TITLE -->
+    <div>
+        <b style="font-weight: bolder"
+           ng-bind="$ctrl.selected.measurable.name">
+        </b>
+        <a ng-if="$ctrl.selected.measurable.description"
+           ng-click="$ctrl.visibility.showDescriptionInPicker = ! $ctrl.visibility.showDescriptionInPicker"
+           class="clickable">
+            <span ng-if="!$ctrl.visibility.showDescriptionInPicker">(show description)</span>
+            <span ng-if="$ctrl.visibility.showDescriptionInPicker">(hide description)</span>
+        </a>
+    </div>
 
-    <b style="font-weight: bolder"
-       ng-bind="$ctrl.selected.measurable.name">
-    </b>
+    <!-- DESCRIPTION -->
+    <div style="margin-top: 15px"
+         ng-if="$ctrl.visibility.showDescriptionInPicker">
+        <div class="text-muted">
+            <waltz-markdown text="$ctrl.selected.measurable.description"></waltz-markdown>
+        </div>
+    </div>
 
     <!-- ABSTRACT -->
     <div ng-if="! $ctrl.selected.measurable.concrete">
@@ -180,24 +200,10 @@
         </waltz-warning>
     </div>
 
-    <div ng-class="{ 'waltz-scroll-region-100' : $ctrl.selected.measurable.description.length > 400 }" style="margin-top: 15px">
-        <div class="text-muted">
-            <waltz-markdown text="$ctrl.selected.measurable.description"></waltz-markdown>
-        </div>
-    </div>
-
     <br>
 
     <!-- CONCRETE -->
     <div ng-if="$ctrl.selected.measurable.concrete">
-
-        <!-- NEW -->
-        <div ng-if="! $ctrl.selected.rating">
-            This entity does not currently exhibit this characteristic.
-            To add it, choose a rating and, optionally, provide a comment.
-        </div>
-
-        <br>
 
         <!-- RATING -->
         <div class="row">
@@ -216,8 +222,7 @@
 
         <!-- COMMENT -->
         <div class="row"
-             style="padding-top: 8px;"
-             ng-if="$ctrl.selected.rating">
+             style="padding-top: 8px;">
             <div class="col-sm-3">
                 Comments:
             </div>
@@ -227,6 +232,19 @@
                                         value="$ctrl.selected.rating.description">
                 </waltz-inline-edit-area>
             </div>
+        </div>
+
+        <!-- DECOMMISSION -->
+        <div ng-if="$ctrl.selected.rating">
+            <waltz-planned-decommission-editor planned-decommission="$ctrl.selected.decommission"
+                                               replacement-apps="$ctrl.selected.replacementApps"
+                                               on-save-decommission-date="$ctrl.onSaveDecommissionDate"
+                                               on-remove-decommission="$ctrl.onRemoveDecommission"
+                                               on-add-replacement-app="$ctrl.onAddReplacementApp"
+                                               on-remove-replacement-app="$ctrl.onRemoveReplacementApp"
+                                               category="$ctrl.activeTab.category">
+
+            </waltz-planned-decommission-editor>
         </div>
     </div>
 

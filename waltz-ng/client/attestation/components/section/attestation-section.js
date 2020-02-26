@@ -150,7 +150,7 @@ function controller($q,
                     notification.success("Attested successfully");
                     loadAttestationData(vm.parentEntityRef);
                     vm.onCancelAttestation();
-                })
+                });
         }
     };
 
@@ -180,7 +180,7 @@ function controller($q,
         } else {
             return "This attestation has not been completed"
         }
-    }
+    };
 
 }
 

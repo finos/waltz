@@ -18,7 +18,6 @@
 
 import _ from "lodash";
 import { CORE_API } from "../../../common/services/core-api-utils";
-import { mkEntityLinkGridCell } from "../../../common/grid-utils";
 import { initialiseData } from "../../../common";
 
 import template from "./physical-flow-participants-section.html";

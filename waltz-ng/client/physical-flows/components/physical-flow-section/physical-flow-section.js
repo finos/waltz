@@ -25,18 +25,9 @@ const bindings = {
 };
 
 
-function controller() {
-    const vm = this;
-}
-
-
-controller.$inject = [];
-
-
 const component = {
     template,
     bindings,
-    controller
 };
 
 

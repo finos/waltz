@@ -25,6 +25,7 @@ import com.khartec.waltz.model.EntityReference;
 import org.immutables.value.Value;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Value.Immutable
@@ -39,4 +40,5 @@ public abstract class SurveyQuestionResponse {
     public abstract Optional<Boolean> booleanResponse();
     public abstract Optional<LocalDate> dateResponse();
     public abstract Optional<EntityReference> entityResponse();
+    public abstract Optional<List<String>> listResponse();
 }

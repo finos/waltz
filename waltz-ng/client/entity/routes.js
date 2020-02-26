@@ -17,7 +17,7 @@
  */
 
 import {kindToViewState} from "../common/link-utils";
-import {loadByExtId, toEntityRef} from "../common/entity-utils";
+import {loadByExtId} from "../common/entity-utils";
 import picker from "./pages/picker";
 
 
@@ -69,7 +69,7 @@ const byExtIdState = {
 
 
 function extIdBouncer($q, $state, $stateParams, serviceBroker) {
-    const {kind, id} = $stateParams;
+    const {kind} = $stateParams;
     const targetState = kindToViewState(kind);
 
     if (!targetState) {

@@ -62,6 +62,7 @@ function indexResponses(responses = []) {
 function controller($location,
                     $state,
                     $stateParams,
+                    $timeout,
                     notification,
                     serviceBroker,
                     surveyInstanceStore,
@@ -77,7 +78,7 @@ function controller($location,
         kind: "SURVEY_INSTANCE"
     };
 
-    const instancePromise  = surveyInstanceStore
+    surveyInstanceStore
         .getById(id)
         .then(r => {
             vm.instanceCanBeEdited = (r.status === "NOT_STARTED" || r.status === "IN_PROGRESS" || r.status === "REJECTED");
@@ -93,7 +94,8 @@ function controller($location,
         .all([userService.whoami(), surveyInstanceStore.findRecipients(id)])
         .then(([user = {}, recipients = []]) => {
             vm.user = user;
-            const [currentRecipients = [], otherRecipients = []] = _.partition(recipients,
+            const [currentRecipients = [], otherRecipients = []] = _.partition(
+                recipients,
                 r => _.toLower(r.person.email) === _.toLower(user.userName));
 
             vm.isUserInstanceRecipient = currentRecipients.length > 0;
@@ -118,8 +120,8 @@ function controller($location,
                 questionResponse,
                 {
                     dateResponse : questionResponse && questionResponse.dateResponse
-                                    ? moment(questionResponse.dateResponse).format(formats.parseDateOnly)
-                                    : null
+                        ? moment(questionResponse.dateResponse).format(formats.parseDateOnly)
+                        : null
                 })
         );
     };
@@ -156,24 +158,28 @@ function controller($location,
     };
 
     vm.saveForLater = () => {
-        notification.success("Survey response saved successfully");
-        $state.go("main.survey.instance.user");
+        $timeout(() => {
+            notification.success("Survey response saved successfully");
+            $state.go("main.survey.instance.user");
+        }, 200); // allow blur events to fire
     };
 
     vm.submit = () => {
-        if (confirm(
-            `The survey cannot be edited once submitted.\nPlease ensure you have saved any comments you may have entered (by clicking 'Save' on each comment field).
+        $timeout(() => {
+            if (confirm(
+                `The survey cannot be edited once submitted.\nPlease ensure you have saved any comments you may have entered (by clicking 'Save' on each comment field).
             \nAre you sure you want to submit your responses?`)) {
-            surveyInstanceStore.updateStatus(
-                vm.surveyInstance.id,
-                {newStatus: "COMPLETED"}
-            )
-            .then(() => {
-                notification.success("Survey response submitted successfully");
-                serviceBroker.loadAppData(CORE_API.NotificationStore.findAll, [], { force: true });
-                $state.go("main.survey.instance.response.view", {id: id});
-            });
-        }
+                surveyInstanceStore.updateStatus(
+                    vm.surveyInstance.id,
+                    {newStatus: "COMPLETED"}
+                )
+                    .then(() => {
+                        notification.success("Survey response submitted successfully");
+                        serviceBroker.loadAppData(CORE_API.NotificationStore.findAll, [], {force: true});
+                        $state.go("main.survey.instance.response.view", {id: id});
+                    });
+            }
+        }, 200); // allow blur events to fire, because 'confirm' blocks events
     };
 
 }
@@ -182,6 +188,7 @@ controller.$inject = [
     "$location",
     "$state",
     "$stateParams",
+    "$timeout",
     "Notification",
     "ServiceBroker",
     "SurveyInstanceStore",

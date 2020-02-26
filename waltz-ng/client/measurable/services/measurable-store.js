@@ -15,7 +15,7 @@
  * See the License for the specific
  *
  */
-import {checkIsEntityRef, checkIsIdSelector} from "../../common/checks"
+import {checkIsIdSelector} from "../../common/checks"
 
 
 function store($http, baseApiUrl) {
@@ -28,13 +28,6 @@ function store($http, baseApiUrl) {
     const getById = (id) => $http
         .get(`${baseUrl}/id/${id}`)
         .then(d => d.data);
-
-    const findMeasurablesRelatedToPath = (ref) => {
-        checkIsEntityRef(ref);
-        return $http
-            .get(`${baseUrl}/entity/${ref.kind}/${ref.id}`)
-            .then(d => d.data);
-    };
 
     const findByExternalId = (extId) => $http
         .get(`${baseUrl}/external-id/${extId}`)
@@ -54,7 +47,6 @@ function store($http, baseApiUrl) {
     return {
         findAll,
         findByExternalId,
-        findMeasurablesRelatedToPath,
         findMeasurablesBySelector,
         getById,
         search
@@ -95,11 +87,6 @@ export const MeasurableStore_API = {
         serviceName,
         serviceFnName: "search",
         description: "executes search"
-    },
-    findMeasurablesRelatedToPath: {
-        serviceName,
-        serviceFnName: "findMeasurablesRelatedToPath",
-        description: "executes findMeasurablesRelatedToPath"
     },
     findMeasurablesBySelector: {
         serviceName,

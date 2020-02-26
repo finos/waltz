@@ -1,0 +1,71 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.23.xml">
+
+    <!-- 3192: survey_question_list_response -->
+    <changeSet id="20200205-3192-1"
+               author="rovats">
+        <comment>3192: survey question multi-select response table</comment>
+        <createTable tableName="survey_question_list_response">
+            <column name="survey_instance_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="question_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="response"
+                    type="${maxvarchar.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="position"
+                    type="${int.type}"
+                    defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20200205-3192-2"
+               author="rovats">
+        <comment>3192: survey question multi-select response table fk</comment>
+        <addForeignKeyConstraint baseTableName="survey_question_list_response"
+                                 baseColumnNames="survey_instance_id,question_id"
+                                 constraintName="survey_q_list_resp_survey_q_resp_fk"
+                                 referencedTableName="survey_question_response"
+                                 referencedColumnNames="survey_instance_id,question_id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20200205-3192-3"
+               author="rovats">
+        <comment>3192: survey question response list_response_concat column</comment>
+        <addColumn tableName="survey_question_response">
+            <column name="list_response_concat"
+                    type="${maxvarchar.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>

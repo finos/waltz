@@ -31,17 +31,23 @@ import {truncateMiddle} from "../../../common/string-utils";
  */
 const bindings = {
     allocations: "<?",
+    plannedDecommissions: "<?",
+    replacingDecommissions: "<?",
+    replacementApps: "<?",
     ratings: "<",
     ratingScheme: "<",
     measurables: "<",
     onKeypress: "<",
     onSelect: "<",
-    scrollHeight: "@" // should correspond to numeric values in `waltz-scroll-region` classes
+    scrollHeight: "@?" // should correspond to numeric values in `waltz-scroll-region` classes
 };
 
 
 const initialState = {
     allocations: [],
+    plannedDecommissions: [],
+    replacingDecommissions: [],
+    replacementApps: [],
     containerClass: "",
     hierarchy: [],
     measurables: [],
@@ -102,6 +108,9 @@ function controller() {
         const ratingsByMeasurable = _.keyBy(vm.ratings || [], "measurableId");
         const ratingSchemeItemsByCode = _.keyBy(_.get(vm.ratingScheme, "ratings", []), "rating");
         const allocationsByMeasurable = _.groupBy(vm.allocations, d => d.measurableId);
+        const decommissionDatesByMeasurable = _.keyBy(vm.plannedDecommissions, d => d.measurableId);
+        const replacementAppsByDecommissionId = _.groupBy(vm.replacementApps, d => d.decommissionId);
+        const replacingDecommissionsByMeasurable = _.groupBy(vm.replacingDecommissions, d => d.measurableId);
 
         const nodes = _.map(vm.measurables, m => {
             const rating = ratingsByMeasurable[m.id];
@@ -112,7 +121,10 @@ function controller() {
                 measurable: m,
                 rating,
                 ratingSchemeItem: rating ? ratingSchemeItemsByCode[rating.rating] : null,
-                allocations: allocationsByMeasurable[m.id]
+                allocations: allocationsByMeasurable[m.id],
+                decommission: _.get(decommissionDatesByMeasurable, [m.id], null),
+                replacementApps: _.get(replacementAppsByDecommissionId, _.get(decommissionDatesByMeasurable, [m.id, "id"]), []),
+                replacingDecommissions: _.get(replacingDecommissionsByMeasurable, [m.id], [])
             };
         });
 

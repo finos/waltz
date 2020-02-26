@@ -76,10 +76,6 @@ function mkTreeData(changeInitiatives = [], parentEntityRef, displayRetired = tr
 }
 
 
-function expandNodes(hierarchy, initiatives, parentEntityRef) {
-}
-
-
 function controller($state, serviceBroker) {
     const vm = initialiseData(this, initialState);
 

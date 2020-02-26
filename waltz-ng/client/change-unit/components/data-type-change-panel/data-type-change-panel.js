@@ -16,8 +16,6 @@
  *
  */
 
-import { initialiseData } from "../../../common";
-
 import template from "./data-type-change-panel.html";
 
 
@@ -26,23 +24,9 @@ const bindings = {
 };
 
 
-const initialState = {
-};
-
-
-function controller() {
-    const vm = initialiseData(this, initialState);
-}
-
-
-controller.$inject = [
-];
-
-
 const component = {
     template,
-    bindings,
-    controller
+    bindings
 };
 
 

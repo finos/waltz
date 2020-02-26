@@ -26,8 +26,8 @@ import _ from "lodash";
 
 const bindings = {
     userId: "<",
-    iconPlacement: "@",
-    tooltipPlacement: "@"
+    iconPlacement: "@?",
+    tooltipPlacement: "@?"
 };
 
 
@@ -60,7 +60,7 @@ function controller(serviceBroker, settingsService) {
             .then(r => {
                 vm.person = r.data;
                 vm.ready = true;
-                vm.imageUrl =  vm.imageUrl = avatarUrlTemplate(vm.person);
+                vm.imageUrl = avatarUrlTemplate(vm.person);
             });
     };
 }

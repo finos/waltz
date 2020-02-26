@@ -21,6 +21,7 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.app_group.AppGroup;
+import com.khartec.waltz.model.app_group.AppGroupBulkAddRequest;
 import com.khartec.waltz.model.app_group.AppGroupDetail;
 import com.khartec.waltz.model.app_group.AppGroupMember;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
@@ -167,10 +168,14 @@ public class AppGroupEndpoint implements Endpoint {
 
         ListRoute<EntityReference> addApplicationListRoute = (request, response) -> {
             long groupId = getId(request);
-            List<Long> applicationIds = readIdsFromBody(request);
-            LOG.info("Adding applications: {}, to group: {} ", applicationIds,  groupId);
+            AppGroupBulkAddRequest appGroupBulkAddRequest = readBody(request, AppGroupBulkAddRequest.class);
+            LOG.info("Adding applications: {}, to group: {} ", appGroupBulkAddRequest.applicationIds(),  groupId);
             String userId = getUsername(request);
-            return appGroupService.addApplications(userId, groupId, applicationIds);
+            return appGroupService.addApplications(
+                    userId,
+                    groupId,
+                    appGroupBulkAddRequest.applicationIds(),
+                    appGroupBulkAddRequest.unknownIdentifiers());
         };
 
         ListRoute<EntityReference> removeApplicationRoute = (request, response) -> {

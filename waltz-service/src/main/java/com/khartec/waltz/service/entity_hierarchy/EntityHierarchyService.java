@@ -39,6 +39,7 @@ import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.service.person_hierarchy.PersonHierarchyService;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +50,9 @@ import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityKind.PERSON;
+import static com.khartec.waltz.schema.Tables.ENTITY_HIERARCHY;
+import static com.khartec.waltz.schema.Tables.MEASURABLE;
+import static org.jooq.impl.DSL.select;
 
 @Service
 public class EntityHierarchyService {
@@ -141,20 +145,33 @@ public class EntityHierarchyService {
             return rc.length;
         } else {
             Table table = determineTableToRebuild(kind);
-            return buildFor(table, kind);
+            return buildFor(table, kind, DSL.trueCondition(), DSL.trueCondition());
         }
     }
 
 
-    private int buildFor(Table table, EntityKind kind) {
-        Collection<FlatNode<Long, Long>> flatNodes = fetchFlatNodes(table);
-        List<EntityHierarchyItem> hierarchyItems = convertFlatNodesToHierarchyItems(kind, flatNodes);
-
-        return entityHierarchyDao.replaceHierarchy(kind, hierarchyItems);
+    public int buildForMeasurableByCategory(long categoryId) {
+        return buildFor(MEASURABLE,
+                        EntityKind.MEASURABLE,
+                        MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId),
+                        ENTITY_HIERARCHY.ID.in(select(MEASURABLE.ID)
+                                                .from(MEASURABLE)
+                                                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId))));
     }
 
 
-    private List<FlatNode<Long, Long>> fetchFlatNodes(Table table) {
+    private int buildFor(Table table,
+                         EntityKind kind,
+                         Condition selectFilter,
+                         Condition deleteFilter) {
+        Collection<FlatNode<Long, Long>> flatNodes = fetchFlatNodes(table, selectFilter);
+        List<EntityHierarchyItem> hierarchyItems = convertFlatNodesToHierarchyItems(kind, flatNodes);
+
+        return entityHierarchyDao.replaceHierarchy(kind, hierarchyItems, deleteFilter);
+    }
+
+
+    private List<FlatNode<Long, Long>> fetchFlatNodes(Table table, Condition selectFilter) {
         Field<Long> idField = table.field("id", Long.class);
         Field<Long> parentIdField = table.field("parent_id", Long.class);
 
@@ -163,6 +180,7 @@ public class EntityHierarchyService {
 
         return dsl.select(idField, parentIdField)
                 .from(table)
+                .where(selectFilter)
                 .fetch(r -> new FlatNode<>(
                         r.value1(),
                         Optional.ofNullable(r.value2()),
@@ -224,7 +242,7 @@ public class EntityHierarchyService {
             case ENTITY_STATISTIC:
                 return Tables.ENTITY_STATISTIC_DEFINITION;
             case MEASURABLE:
-                return Tables.MEASURABLE;
+                return MEASURABLE;
             case ORG_UNIT:
                 return Tables.ORGANISATIONAL_UNIT;
             default:

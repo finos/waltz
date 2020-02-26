@@ -82,6 +82,11 @@
     <property name="longvarchar.type" value="varchar(4000)" dbms="postgresql"></property>
     <property name="longvarchar.type" value="LONGVARCHAR" dbms="h2"></property>
 
+    <property name="maxvarchar.type" value="nvarchar(max)" dbms="mssql"></property>
+    <property name="maxvarchar.type" value="LONGVARCHAR" dbms="mysql"></property>
+    <property name="maxvarchar.type" value="varchar" dbms="postgresql"></property>
+    <property name="maxvarchar.type" value="LONGVARCHAR" dbms="h2"></property>
+
     <property name="true.value" value="1" dbms="mssql"/>
     <property name="true.value" value="1" dbms="mysql"/>
     <property name="true.value" value="true" dbms="postgresql"/>

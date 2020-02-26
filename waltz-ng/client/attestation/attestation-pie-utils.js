@@ -17,11 +17,8 @@
  */
 
 import { attestationStatusColorScale } from "../common/colors";
-import _ from "lodash";
 import { toKeyCounts } from "../common";
-import { keys } from "d3-collection";
-import { mapToDisplayNames } from "../applications/application-utils";
-import { mkDateGridCell, mkEntityLinkGridCell } from "../common/grid-utils";
+
 
 const attestationStatus = {
     ATTESTED: {

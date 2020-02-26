@@ -43,12 +43,6 @@ function controller() {
 
     const vm = initialiseData(this, initialState);
 
-    const defaultOnSelect = (d) => {
-        vm.selectedSegmentKey = d
-            ? d.key
-            : null;
-    };
-
     const dataChanged = (data = []) => {
         const segmentedData = toSegments(data);
         vm.summarizedSegments = _.chain(segmentedData.primary).concat([segmentedData.overspillSummary]).compact().value();

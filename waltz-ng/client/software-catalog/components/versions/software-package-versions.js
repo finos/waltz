@@ -19,7 +19,7 @@
 import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
-import {countByVersionId, groupByVersionId} from "../../software-catalog-utilities";
+import {countByVersionId} from "../../software-catalog-utilities";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 
 import template from "./software-package-versions.html";
@@ -66,8 +66,8 @@ function mkColumnDefs() {
             field: "usageCount",
             name: "# Applications",
             cellTemplate: `<div class="ui-grid-cell-contents">
-                               <a class="clickable" 
-                                  ng-bind="COL_FIELD" 
+                               <a class="clickable"
+                                  ng-bind="COL_FIELD"
                                   ng-click="grid.appScope.onSelectVersion(row.entity)">
                                </a>
                            </div>`

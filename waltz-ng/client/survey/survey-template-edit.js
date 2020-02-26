@@ -42,6 +42,9 @@ const initialState = {
         name: "Dropdown",
         value: "DROPDOWN"
     },{
+        name: "Dropdown (Multi-Select)",
+        value: "DROPDOWN_MULTI_SELECT"
+    },{
         name: "Application",
         value: "APPLICATION"
     },{
