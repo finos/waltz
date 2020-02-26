@@ -109,7 +109,7 @@ public class ScheduledJobService {
                 (jk) -> complexityRatingService.rebuild());
 
         runIfNeeded(JobKey.AUTH_SOURCE_RECALC_FLOW_RATINGS,
-                (jk) -> authoritativeSourceService.recalculateAllFlowRatings());
+                (jk) -> authoritativeSourceService.fastRecalculateAllFlowRatings());
 
         runIfNeeded(JobKey.LOGICAL_FLOW_CLEANUP_ORPHANS,
                 (jk) -> logicalFlowService.cleanupOrphans());

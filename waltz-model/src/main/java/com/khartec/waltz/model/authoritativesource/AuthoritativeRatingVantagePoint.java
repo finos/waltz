@@ -32,6 +32,7 @@ public abstract class AuthoritativeRatingVantagePoint {
 
     public abstract EntityReference vantagePoint();
     public abstract int vantagePointRank();
+    public abstract EntityReference dataType();
     public abstract String dataTypeCode();
     public abstract int dataTypeRank();
     public abstract Long applicationId();

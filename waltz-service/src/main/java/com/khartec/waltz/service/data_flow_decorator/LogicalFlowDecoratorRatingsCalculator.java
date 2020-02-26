@@ -142,7 +142,7 @@ public class LogicalFlowDecoratorRatingsCalculator {
         Set<Long> orgIds = map(targetApps, app -> app.organisationalUnitId());
 
         List<AuthoritativeRatingVantagePoint> authoritativeRatingVantagePoints =
-                authoritativeSourceDao.findAuthoritativeRatingVantagePoints(orgIds);
+                authoritativeSourceDao.findExpandedAuthoritativeRatingVantagePoints(orgIds);
 
         AuthoritativeSourceResolver resolver = new AuthoritativeSourceResolver(authoritativeRatingVantagePoints);
         return resolver;

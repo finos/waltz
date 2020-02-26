@@ -23,12 +23,14 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.FlowDirection;
 import com.khartec.waltz.model.ImmutableEntityReference;
+import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
 import com.khartec.waltz.model.data_flow_decorator.*;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.schema.tables.LogicalFlow;
 import com.khartec.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.function.Function2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -43,6 +45,8 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static java.util.stream.Collectors.toList;
@@ -53,10 +57,12 @@ import static org.jooq.impl.DSL.when;
 @Repository
 public class LogicalFlowDecoratorDao {
 
+
     private static final RecordMapper<Record, LogicalFlowDecorator> TO_DECORATOR_MAPPER = r -> {
         LogicalFlowDecoratorRecord record = r.into(LOGICAL_FLOW_DECORATOR);
 
         return ImmutableLogicalFlowDecorator.builder()
+                .id(record.getId())
                 .dataFlowId(record.getLogicalFlowId())
                 .decoratorEntity(ImmutableEntityReference.builder()
                         .id(record.getDecoratorEntityId())
@@ -71,6 +77,8 @@ public class LogicalFlowDecoratorDao {
 
     private static final Function<LogicalFlowDecorator, LogicalFlowDecoratorRecord> TO_RECORD = d -> {
         LogicalFlowDecoratorRecord r = new LogicalFlowDecoratorRecord();
+        r.setId(d.id().orElse(null));
+        r.changed(LOGICAL_FLOW_DECORATOR.ID, false);
         r.setDecoratorEntityKind(d.decoratorEntity().kind().name());
         r.setDecoratorEntityId(d.decoratorEntity().id());
         r.setLogicalFlowId(d.dataFlowId());
@@ -272,6 +280,53 @@ public class LogicalFlowDecoratorDao {
         return dsl.batchUpdate(records).execute();
     }
 
+
+    public int updateDecoratorsForAuthSource(AuthoritativeRatingVantagePoint ratingVantagePoint) {
+        com.khartec.waltz.schema.tables.LogicalFlowDecorator lfd = LOGICAL_FLOW_DECORATOR.as("lfd");
+
+        EntityReference vantagePoint = ratingVantagePoint.vantagePoint();
+        Long appId = ratingVantagePoint.applicationId();
+        EntityReference dataType = ratingVantagePoint.dataType();
+        AuthoritativenessRating rating = ratingVantagePoint.rating();
+
+        SelectConditionStep<Record1<Long>> orgUnitSubselect = DSL.select(ENTITY_HIERARCHY.ID)
+                .from(ENTITY_HIERARCHY)
+                .where(ENTITY_HIERARCHY.KIND.eq(vantagePoint.kind().name()))
+                .and(ENTITY_HIERARCHY.ANCESTOR_ID.eq(vantagePoint.id()));
+
+        SelectConditionStep<Record1<Long>> dataTypeSubselect = DSL.select(ENTITY_HIERARCHY.ID)
+                .from(ENTITY_HIERARCHY)
+                .where(ENTITY_HIERARCHY.KIND.eq(EntityKind.DATA_TYPE.name()))
+                .and(ENTITY_HIERARCHY.ANCESTOR_ID.eq(dataType.id()));
+
+        Condition usingAuthSource = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(appId);
+        Condition notUsingAuthSource = LOGICAL_FLOW.SOURCE_ENTITY_ID.ne(appId);
+
+        Function2<Condition, String, Update<LogicalFlowDecoratorRecord>> mkQuery = (appScopingCondition, ratingName) -> dsl
+                .update(LOGICAL_FLOW_DECORATOR)
+                .set(LOGICAL_FLOW_DECORATOR.RATING, ratingName)
+                .where(LOGICAL_FLOW_DECORATOR.ID.in(
+                        DSL.select(lfd.ID)
+                                .from(lfd)
+                                .innerJoin(LOGICAL_FLOW).on(LOGICAL_FLOW.ID.eq(lfd.LOGICAL_FLOW_ID))
+                                .innerJoin(APPLICATION)
+                                .on(APPLICATION.ID.eq(LOGICAL_FLOW.TARGET_ENTITY_ID)
+                                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                                .where(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                                        .and(appScopingCondition)
+                                        .and(APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitSubselect))
+                                        .and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
+                                        .and(lfd.DECORATOR_ENTITY_ID.in(dataTypeSubselect)))
+                                .and(lfd.RATING.in(AuthoritativenessRating.NO_OPINION.name(), AuthoritativenessRating.DISCOURAGED.name()))
+
+                ));
+
+        Update<LogicalFlowDecoratorRecord> updateAuthSources = mkQuery.apply(usingAuthSource, rating.name());
+        Update<LogicalFlowDecoratorRecord> updateNonAuthSources = mkQuery.apply(notUsingAuthSource, AuthoritativenessRating.DISCOURAGED.name());
+        int authSourceUpdateCount = updateAuthSources.execute();
+        int nonAuthSourceUpdateCount = updateNonAuthSources.execute();
+        return authSourceUpdateCount + nonAuthSourceUpdateCount;
+    }
 
     // --- HELPERS ---
 
