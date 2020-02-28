@@ -54,6 +54,7 @@
                 <label>Search by name, role etc</label>
 
                 <waltz-entity-selector on-select="ctrl.goToPerson"
+                                       entity-lifecycle-statuses="['ACTIVE']"
                                        entity-kinds="['PERSON']">
                 </waltz-entity-selector>
             </div>
