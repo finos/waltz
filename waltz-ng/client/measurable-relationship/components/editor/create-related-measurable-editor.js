@@ -248,7 +248,7 @@ function controller(notification, serviceBroker) {
             .then(() => {
                 notification.success("Relationship saved");
                 vm.onRefresh();
-            })
+            });
     };
 
 }

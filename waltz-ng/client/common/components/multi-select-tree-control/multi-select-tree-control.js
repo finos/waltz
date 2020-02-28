@@ -25,7 +25,7 @@ import template from "./multi-select-tree-control.html";
 
 const bindings = {
     items: "<",
-    onClick: "<",
+    onClick: "<?",
     onCheck: "<",
     onUncheck: "<",
     checkedItemIds: "<",
