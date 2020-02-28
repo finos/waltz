@@ -82,7 +82,7 @@
                author="alimuza">
         <comment>4719: Change string note text column to nvarchar(max) to allow string larger than 4000 characters</comment>
         <modifyDataType columnName="note_text"
-                        newDataType="nvarchar(max)"
+                        newDataType="${maxvarchar.type}"
                         tableName="entity_named_note"/>
     </changeSet>
 </databaseChangeLog>
