@@ -32,12 +32,20 @@ const initialState = {
 };
 
 
-
 function mkColumnDefs() {
     return [
         mkLinkGridCell("Name", "name", "id", "main.licence.view"),
         { field: "externalId", displayName: "External Id" },
-        { field: "approvalStatus", displayName: "Approval Status", cellFilter: "toDisplayName:'ApprovalStatus'"},
+        {
+            field: "assessments",
+            displayName: "Assessments",
+            width: "7%",
+            cellTemplate: `
+                <div style="text-align: center">
+                    <waltz-assessment-rating-traffic-lights assessments="COL_FIELD">
+                    </waltz-assessment-rating-traffic-lights>
+                </div>`
+        }
     ];
 }
 

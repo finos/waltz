@@ -22,6 +22,7 @@ import AssessmentEditor from "./components/editor/assessment-editor";
 import AssessmentRatingList from "./components/list/assessment-rating-list";
 import AssessmentRatingSubSection from "./components/sub-section/assessment-rating-sub-section";
 import AssessmentRatingSummaryPies from "./components/summary-pies/assessment-rating-summary-pies";
+import AssessmentRatingTrafficLights from "./components/traffic-lights/assessment-rating-traffic-lights";
 
 export default () => {
 
@@ -33,7 +34,8 @@ export default () => {
         AssessmentEditor,
         AssessmentRatingList,
         AssessmentRatingSubSection,
-        AssessmentRatingSummaryPies
+        AssessmentRatingSummaryPies,
+        AssessmentRatingTrafficLights
     ]);
 
     return module.name;

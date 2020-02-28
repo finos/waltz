@@ -17,25 +17,67 @@
  */
 import {initialiseData} from "../../common/index";
 import template from "./playpen4.html";
+import {CORE_API} from "../../common/services/core-api-utils";
+import {resolveResponses} from "../../common/promise-utils";
+import {mkEnrichedAssessmentDefinitions} from "../../assessments/assessment-utils";
 
 const initialState = {
-    parentEntityRef: { kind: "ORG_UNIT", id: 6018 },
-    foo: "baa"
+    parentEntityRef: { kind: "LICENCE", id: 179 },
 };
 
 
 
-function controller() {
+function controller($q, serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
-    vm.$onInit = () => {
+    const loadAll = () => {
+        const definitionsPromise = serviceBroker
+            .loadViewData(
+                CORE_API.AssessmentDefinitionStore.findByKind,
+                [vm.parentEntityRef.kind]);
+
+        const ratingsPromise = serviceBroker
+            .loadViewData(
+                CORE_API.AssessmentRatingStore.findForEntityReference,
+                [vm.parentEntityRef],
+                {force: true});
+
+        const ratingSchemePromise = serviceBroker
+            .loadViewData(
+                CORE_API.RatingSchemeStore.findAll);
+
+        return $q
+            .all([definitionsPromise, ratingsPromise, ratingSchemePromise])
+            .then(responses => {
+                [vm.assessmentDefinitions, vm.assessmentRatings, vm.ratingSchemes] = resolveResponses(responses);
+
+                vm.assessments = mkEnrichedAssessmentDefinitions(
+                    vm.assessmentDefinitions,
+                    vm.ratingSchemes,
+                    vm.assessmentRatings);
+                console.log('ratings: ', vm.assessmentRatings)
+                console.log('combined: ', vm.assessments)
+
+                if (vm.selectedAssessment) {
+                    // re-find the selected assessment
+                    vm.selectedAssessment = _.find(
+                        vm.assessments,
+                        a => a.definition.id === vm.selectedAssessment.definition.id);
+                }
+            });
     };
 
+
+    vm.$onInit = () => {
+        loadAll();
+    };
 }
 
 
 controller.$inject = [
+    "$q",
+    "ServiceBroker"
 ];
 
 

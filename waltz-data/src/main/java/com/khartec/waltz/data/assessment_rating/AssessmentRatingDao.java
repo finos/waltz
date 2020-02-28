@@ -22,6 +22,7 @@ package com.khartec.waltz.data.assessment_rating;
 import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.assessment_definition.AssessmentVisibility;
 import com.khartec.waltz.model.assessment_rating.AssessmentRating;
 import com.khartec.waltz.model.assessment_rating.ImmutableAssessmentRating;
 import com.khartec.waltz.model.assessment_rating.RemoveAssessmentRatingCommand;
@@ -94,6 +95,29 @@ public class AssessmentRatingDao {
     }
 
 
+    public List<AssessmentRating> findByEntityKind(EntityKind kind, List<AssessmentVisibility> visibilities) {
+        return dsl.select(ASSESSMENT_RATING.fields())
+                .from(ASSESSMENT_RATING)
+                .innerJoin(ASSESSMENT_DEFINITION).on(ASSESSMENT_DEFINITION.ID.eq(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID))
+                .where(ASSESSMENT_RATING.ENTITY_KIND.eq(kind.name()))
+                .and(ASSESSMENT_DEFINITION.VISIBILITY.in(visibilities))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<AssessmentRating> findByGenericSelector(GenericSelector genericSelector) {
+        return dsl
+                .select()
+                .from(ASSESSMENT_RATING)
+                .innerJoin(ASSESSMENT_DEFINITION)
+                .on(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID.eq(ASSESSMENT_DEFINITION.ID)
+                        .and(ASSESSMENT_DEFINITION.ENTITY_KIND.eq(genericSelector.kind().name())))
+                .where(ASSESSMENT_RATING.ENTITY_KIND.eq(genericSelector.kind().name()))
+                .and(ASSESSMENT_RATING.ENTITY_ID.in(genericSelector.selector()))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
     public boolean store(SaveAssessmentRatingCommand command) {
         checkNotNull(command, "command cannot be null");
         AssessmentRatingRecord record = TO_RECORD_MAPPER.apply(command);
@@ -116,18 +140,5 @@ public class AssessmentRatingDao {
                 .and(ASSESSMENT_RATING.ENTITY_ID.eq(rating.entityReference().id()))
                 .and(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID.eq(rating.assessmentDefinitionId()))
                 .execute() == 1;
-    }
-
-
-    public List<AssessmentRating> findByGenericSelector(GenericSelector genericSelector) {
-        return dsl
-                .select()
-                .from(ASSESSMENT_RATING)
-                .innerJoin(ASSESSMENT_DEFINITION)
-                .on(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID.eq(ASSESSMENT_DEFINITION.ID)
-                        .and(ASSESSMENT_DEFINITION.ENTITY_KIND.eq(genericSelector.kind().name())))
-                .where(ASSESSMENT_RATING.ENTITY_KIND.eq(genericSelector.kind().name()))
-                .and(ASSESSMENT_RATING.ENTITY_ID.in(genericSelector.selector()))
-                .fetch(TO_DOMAIN_MAPPER);
     }
 }

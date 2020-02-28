@@ -20,12 +20,13 @@ import _ from "lodash";
 import {initialiseData, perhaps, termSearch} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkEntityLinkGridCell, mkLinkGridCell} from "../../../common/grid-utils";
-
 import {mkSelectionOptions} from "../../../common/selector-utils";
 import {withWidth} from "../../../physical-flow/physical-flow-table-utilities";
+import {countByVersionsByPackageId} from "../../../software-catalog/software-catalog-utilities";
+import {loadAssessments} from "../../../assessments/assessment-utils";
 
 import template from "./technology-section.html";
-import {countByVersionsByPackageId} from "../../../software-catalog/software-catalog-utilities";
+
 
 const bindings = {
     parentEntityRef: "<"
@@ -153,7 +154,16 @@ function prepareLicenceGridOptions($animate, uiGridConstants) {
     const columnDefs = [
         mkLinkGridCell("Name", "name", "id", "main.licence.view"),
         { field: "externalId", displayName: "External Id" },
-        { field: "approvalStatus", displayName: "Approval Status", cellFilter: "toDisplayName:'ApprovalStatus'"},
+        {
+            field: "assessments",
+            displayName: "Assessments",
+            width: "7%",
+            cellTemplate: `
+                <div style="text-align: center">
+                    <waltz-assessment-rating-traffic-lights assessments="COL_FIELD">
+                    </waltz-assessment-rating-traffic-lights>
+                </div>`
+        },
     ];
 
     const baseTable = createDefaultTableOptions($animate, uiGridConstants, "licences.csv");
@@ -200,10 +210,10 @@ function combineServersAndUsage(servers = [], serverUsage = []) {
     return _.map(serverUsage, su => Object.assign({}, serversById[su.serverId], su));
 }
 
+
 function controller($q, $animate, uiGridConstants, serviceBroker) {
 
     const vm = initialiseData(this, initialState);
-
 
     function refresh(qry) {
         if (qry) {
@@ -254,17 +264,23 @@ function controller($q, $animate, uiGridConstants, serviceBroker) {
             .then(() => refresh(vm.qry));
 
         // licences
-        serviceBroker
+        const licencePromise = serviceBroker
             .loadViewData(
                 CORE_API.LicenceStore.findBySelector,
                 [mkSelectionOptions(vm.parentEntityRef)]
             )
-            .then(r => {
-                vm.licences = r.data;
-                vm.licenceGridOptions.data = vm.licences;
-                return vm.licences;
+            .then(r => r.data);
+
+        $q.all([licencePromise, loadAssessments($q, serviceBroker)])
+            .then(([licences, assessmentsByLicenceId]) => {
+                vm.licences = licences;
+                const licenceWithAssessments =_.map(
+                    vm.licences,
+                    l => Object.assign({}, l, {assessments: _.get(assessmentsByLicenceId, l.id, [])}));
+                vm.licenceGridOptions.data = licenceWithAssessments;
             })
             .then(() => refresh(vm.qry));
+
 
         // software catalog
         serviceBroker

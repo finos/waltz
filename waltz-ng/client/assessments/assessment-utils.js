@@ -20,6 +20,8 @@ import { indexRatingSchemes } from "../ratings/rating-utils";
 import { nest } from "d3-collection";
 import { grey } from "../common/colors";
 import { refToString } from "../common/entity-utils";
+import {CORE_API} from "../common/services/core-api-utils";
+import {resolveResponses} from "../common/promise-utils";
 
 /**
  * Creates an enriched assessment definition which adds fields for
@@ -135,4 +137,35 @@ export function filterByAssessmentRating(entities = [],
             }
         })
         .value();
+}
+
+
+export function loadAssessments($q, serviceBroker) {
+    const definitionsPromise = serviceBroker
+        .loadViewData(
+            CORE_API.AssessmentDefinitionStore.findByKind,
+            ["LICENCE"]);
+
+    const ratingsPromise = serviceBroker
+        .loadViewData(
+            CORE_API.AssessmentRatingStore.findByEntityKind,
+            ["LICENCE"],
+            {force: true});
+
+    const ratingSchemePromise = serviceBroker
+        .loadViewData(
+            CORE_API.RatingSchemeStore.findAll);
+
+    return $q
+        .all([definitionsPromise, ratingsPromise, ratingSchemePromise])
+        .then(responses => {
+            const [assessmentDefinitions, assessmentRatings, ratingSchemes] = resolveResponses(responses);
+            const ratingsByEntityId = _.groupBy(assessmentRatings, "entityReference.id");
+            const primaryDefinitions = _.filter(assessmentDefinitions, d => d.visibility === "PRIMARY");
+            const enrichedByLicenceId = _.mapValues(ratingsByEntityId, (v, k) => mkEnrichedAssessmentDefinitions(
+                primaryDefinitions,
+                ratingSchemes,
+                v));
+            return enrichedByLicenceId;
+        });
 }
