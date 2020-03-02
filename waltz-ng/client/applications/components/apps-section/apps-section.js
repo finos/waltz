@@ -53,8 +53,7 @@ function combine(apps = [], endUserApps = []) {
 }
 
 
-function controller($scope,
-                    serviceBroker) {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const refresh = () => {
@@ -108,7 +107,6 @@ function controller($scope,
 
 
 controller.$inject = [
-    "$scope",
     "ServiceBroker"
 ];
 
