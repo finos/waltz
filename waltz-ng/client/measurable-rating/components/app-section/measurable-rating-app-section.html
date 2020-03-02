@@ -141,7 +141,8 @@
                    ng-change="$ctrl.onTabChange(tab)"
                    name="measurable_rating"
                    id="{{ tab.category.id + '_' +$id}}">
-            <label for="{{ tab.category.id + '_' +$id}}"
+            <label class="wt-label"
+                   for="{{ tab.category.id + '_' +$id}}"
                    uib-popover-template="'wmras-tab-popover.html'"
                    popover-trigger="mouseenter"
                    popover-append-to-body="true"
