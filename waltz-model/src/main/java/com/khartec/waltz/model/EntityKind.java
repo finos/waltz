@@ -41,7 +41,7 @@ public enum EntityKind {
     ENTITY_NAMED_NOTE_TYPE("Entity named note type"),
     ENTITY_STATISTIC("Entity statistic"),
     FLOW_DIAGRAM("Flow diagram"),
-    FLOW_ANNOTATION("Flow animation"),
+    FLOW_ANNOTATION("Flow annotation"),
     INVOLVEMENT("Involvement"),
     INVOLVEMENT_KIND("Involvement kind"),
     LICENCE("Licence"),
