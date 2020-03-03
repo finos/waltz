@@ -30,7 +30,8 @@ const bindings = {
     parentEntityRef: "<",
     type: "<",
     onCancel: "<",
-    onRefresh: "<"
+    onRefresh: "<",
+    onRemove: "<"
 };
 
 
@@ -47,14 +48,13 @@ const initialState = {
     relationshipKindsKey: "",
     onCancel: () => console.log("wcrme: onCancel - default impl"),
     onRefresh: () => console.log("wcrme: onRefresh - default impl"),
-    treeOptions: {
-        isSelectable: node => node.concrete
-    },
+    onRemove: () => console.log("wcrme: onRemove - default impl"),
     visibility: {
         appGroupSelector: false,
         changeInitiativeSelector: false,
         measurableSelector: false
-    }
+    },
+    checkedItemIds: [],
 };
 
 
@@ -72,15 +72,32 @@ function prepareTree(nodes = []) {
 function controller(notification, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    const loadRelationships = () => {
+    const loadRelationships = (autoExpand = false) => {
+
         return serviceBroker
-            .loadViewData(CORE_API.MeasurableRelationshipStore.findByEntityReference, [vm.parentEntityRef], { force: true })
+            .loadViewData(
+                CORE_API.MeasurableRelationshipStore.findByEntityReference,
+                [vm.parentEntityRef],
+                { force: true })
             .then(r => {
                 vm.relationships = r.data;
                 vm.relatedEntityMap = _.chain(r.data)
                     .flatMap((rel) => [rel.a, rel.b])
                     .keyBy(ref => refToString(ref))
                     .value();
+                vm.checkedItemIds = _
+                    .chain(vm.relationships)
+                    .flatMap(rel => {
+                        const ids = [];
+                        if (rel.a.kind === "MEASURABLE") ids.push(rel.a.id);
+                        if (rel.b.kind === "MEASURABLE") ids.push(rel.b.id);
+                        return ids;
+                    })
+                    .uniq()
+                    .value();
+            })
+            .then(() => {
+                if (autoExpand) vm.expandedItemIds = _.clone(vm.checkedItemIds);
             });
     };
 
@@ -90,39 +107,21 @@ function controller(notification, serviceBroker) {
         serviceBroker
             .loadAppData(CORE_API.MeasurableStore.findAll)
             .then(r => {
-                vm.measurables = _.filter(r.data, { categoryId });
+                vm.measurables = _
+                    .chain(r.data)
+                    .filter(m => m.categoryId === categoryId)
+                    .map(d => Object.assign({}, d, {disable: !d.concrete}))
+                    .value();
+                vm.measurablesById = _.keyBy(vm.measurables, d => d.id);
                 vm.searchNodes = prepareSearchNodes(vm.measurables);
                 vm.nodes = prepareTree(vm.measurables);
             });
 
-
-        // load existing relationships
-        serviceBroker
-            .loadViewData(
-                CORE_API.MeasurableRelationshipStore.findByEntityReference,
-                [vm.parentEntityRef],
-                { force: true })
-            .then(r => {
-                const usedIds = _
-                    .chain(r.data)
-                    .flatMap(rel => {
-                        const ids = [];
-                        if (rel.a.kind === "MEASURABLE") ids.push(rel.a.id);
-                        if (rel.b.kind === "MEASURABLE") ids.push(rel.b.id);
-                        return ids;
-                    })
-                    .uniq()
-                    .value();
-
-                vm.treeOptions.isSelectable = (node) => {
-                    return node.concrete && ! _.includes(usedIds, node.id);
-                };
-            });
     };
 
 
     vm.$onInit = () => {
-        loadRelationships();
+        loadRelationships(true);
 
         const isMeasurable = _.startsWith(vm.type.id, "MEASURABLE");
 
@@ -181,8 +180,31 @@ function controller(notification, serviceBroker) {
         vm.form.counterpart = changeInitiative;
     };
 
-    vm.onMeasurableSelection = (node) => {
-        vm.form.counterpart = toEntityRef(node, "MEASURABLE");
+    vm.onItemCheck = (node) => {
+
+        const selected = vm.measurablesById[node];
+        vm.form.counterpart = toEntityRef(selected, "MEASURABLE");
+
+        save(vm.form)
+            .then(loadRelationships)
+            .catch(e => displayError(notification, "Could not save because: ", e));
+    };
+
+    vm.onItemUncheck = (node) => {
+
+        const relationshipToRemove = _.find(vm.relationships, d =>
+            (d.a.id === vm.parentEntityRef.id && d.b.id === node)
+            || (d.a.id === node && d.b.id === vm.parentEntityRef.id));
+
+        vm.onRemove(relationshipToRemove)
+            .then(r => notification.warning("Relationship Removed"))
+            .then(() => {
+                loadRelationships();
+                vm.onRefresh();
+            })
+            .catch(e => {
+                displayError(notification, "Could not remove relationship because: ", e);
+            });
     };
 
     vm.onMeasurableCategorySelection = (category) => {
@@ -198,22 +220,9 @@ function controller(notification, serviceBroker) {
 
     vm.submit = () => {
         if (vm.isFormValid()) {
-            const form = vm.form;
-            const submission = {
-                a: vm.parentEntityRef,
-                b: form.counterpart,
-                relationshipKind: form.relationshipKind,
-                description: form.description
-            };
-
-            save(submission)
-                .then(() => {
-                    notification.success("Relationship saved");
-                    vm.onRefresh();
-                })
-                .catch(e => {
-                    displayError(notification, "Could not save because: ", e);
-                });
+            save(vm.form)
+                .catch(e => displayError(notification, "Could not save because: ", e))
+                .finally(() =>  vm.onCancel());
         }
     };
 
@@ -225,8 +234,21 @@ function controller(notification, serviceBroker) {
     // -- API ---
 
     const save = d => {
+
+        const form = d;
+
+        const submission = {
+            a: vm.parentEntityRef,
+            b: form.counterpart,
+            relationshipKind: form.relationshipKind,
+            description: form.description
+        };
         return serviceBroker
-            .execute(CORE_API.MeasurableRelationshipStore.create, [d]);
+            .execute(CORE_API.MeasurableRelationshipStore.create, [submission])
+            .then(() => {
+                notification.success("Relationship saved");
+                vm.onRefresh();
+            });
     };
 
 }

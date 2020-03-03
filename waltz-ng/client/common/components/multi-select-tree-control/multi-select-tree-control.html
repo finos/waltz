@@ -50,15 +50,21 @@
                  options="$ctrl.treeOptions">
 
             <span>
-                    <input
-                        type="checkbox"
-                        data-ux="tree-node-{{node.id}}"
-                        ng-checked="$ctrl.checkedMap[node.id]"
-                        ng-disabled="node.disable">
+                <span style="font-size: x-large">
+                    <waltz-toggle state="$ctrl.checkedMap[node.id]"
+                                  read-only="node.disable"
+                                  icon-on="check-square-o"
+                                  icon-off="square-o"
+                                  on-toggle="$ctrl.onToggleCheck(node)">
+                    </waltz-toggle>
+                </span>
 
-                <ng-transclude>
-                    <span ng-bind="node.name"></span>
-                </ng-transclude>
+                <label>
+                    <ng-transclude>
+                        <span ng-bind="node.name"></span>
+                    </ng-transclude>
+                </label>
+
             </span>
     </treecontrol>
 </div>
