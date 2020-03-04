@@ -71,18 +71,10 @@
         id="sil-table.html">
     <table class="table table-condensed table-striped small"
            ng-if="surveys.length > 0">
-        <colgroup>
-            <col width="34%">
-            <col width="10%">
-            <col width="8%">
-            <col width="16%">
-            <col width="8%">
-            <col width="16%">
-            <col width="8%">
-        </colgroup>
         <thead>
         <tr>
             <th>Title</th>
+            <th ng-if="$ctrl.visibility.showSurveySubject">Subject</th>
             <th>Status</th>
             <th>Issued On</th>
             <th>Submitted By</th>
@@ -102,6 +94,10 @@
                    ng-bind="row.surveyRun.name"
                    class="clickable"
                    ui-sref="main.survey.instance.response.edit ({id: row.surveyInstance.id })"></a>
+            </td>
+            <td ng-if="$ctrl.visibility.showSurveySubject">
+                <waltz-entity-link entity-ref="row.surveyInstance.surveyEntity">
+                </waltz-entity-link>
             </td>
             <td ng-bind="row.surveyInstance.status | toDisplayName:'surveyInstanceStatus'">
             </td>
