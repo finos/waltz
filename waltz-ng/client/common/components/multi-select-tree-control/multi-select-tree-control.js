@@ -25,7 +25,7 @@ import template from "./multi-select-tree-control.html";
 
 const bindings = {
     items: "<",
-    onClick: "<",
+    onClick: "<?",
     onCheck: "<",
     onUncheck: "<",
     checkedItemIds: "<",
@@ -95,17 +95,15 @@ function controller() {
     };
 
     vm.onNodeClick = (node) => {
-        if (vm.hasAnyChild(node)) {
-            const idx = _.findIndex(vm.expandedNodes, n => n.id === node.id);
-            if (idx === -1) {
-                // add
-                vm.expandedNodes.push(node);
-            } else {
-                // remove
-                vm.expandedNodes.splice(idx, 1);
-            }
-        }
         invokeFunction(vm.onClick, node.id);
+    };
+
+    vm.onToggleCheck = (node) => {
+        if (_.includes(vm.checkedItemIds, node.id)) {
+            vm.onNodeUncheck(node.id)
+        } else {
+            vm.onNodeCheck(node.id)
+        }
     };
 
     vm.onNodeCheck = (id) => {
@@ -124,12 +122,13 @@ function controller() {
     };
 
     vm.$onChanges = changes => {
-        if(changes) {
+        if(changes.items) {
             vm.hierarchy = buildHierarchies(vm.items, false);
             vm.searchNodes = prepareSearchNodes(vm.items);
+            vm.expandedNodes = expandSelectedNodes(vm.items, vm.expandedItemIds);
         }
 
-        if(changes.items && changes.expandedItemIds) {
+        if(changes.expandedItemIds) {
             vm.expandedNodes = expandSelectedNodes(vm.items, vm.expandedItemIds);
         }
 

@@ -125,7 +125,8 @@
                     <waltz-entity-selector clearable="false"
                                            selection-filter="$ctrl.selectionFilter"
                                            on-select="$ctrl.onSelectReplacementCandidate"
-                                           entity-kinds="['APPLICATION']" >
+                                           entity-kinds="['APPLICATION']"
+                                           entity-lifecycle-statuses="['ACTIVE', 'PENDING']">
                     </waltz-entity-selector>
 
 
@@ -138,7 +139,6 @@
                            ng-click="$ctrl.onCancelAdd()">
                             Cancel
                         </a>
-
                     </p>
                 </div>
 
