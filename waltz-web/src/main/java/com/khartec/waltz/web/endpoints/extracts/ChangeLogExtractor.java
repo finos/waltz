@@ -34,11 +34,6 @@ import static spark.Spark.post;
 @Service
 public class ChangeLogExtractor extends DirectQueryBasedDataExtractor {
 
-
-    static {
-    }
-
-
     @Autowired
     public ChangeLogExtractor(DSLContext dsl) {
         super(dsl);
@@ -46,22 +41,23 @@ public class ChangeLogExtractor extends DirectQueryBasedDataExtractor {
 
     @Override
     public void register() {
-    registerExtractForApp( mkPath("data-extract", "change-log", ":kind", ":id"));
-}
+        registerExtractForApp( mkPath("data-extract", "change-log", ":kind", ":id"));
+    }
 
-    private void registerExtractForApp(String path) {
-        post(path, (request, response) -> {
+    private void registerExtractForApp(String path) { post(path, (request, response) -> {
 
             EntityReference entityRef = getEntityReference(request);
             Condition condition = CHANGE_LOG.PARENT_ID.eq(entityRef.id())
                     .and(CHANGE_LOG.PARENT_KIND.eq(entityRef.kind().name()));
 
-            SelectSeekStep1<Record4<String, String, String, Timestamp>, Timestamp> qry = dsl.select(
+            SelectSeekStep1<Record4<String, String, String, Timestamp>, Timestamp> qry = dsl
+                    .select(
                     CHANGE_LOG.SEVERITY.as("Severity"),
                     CHANGE_LOG.MESSAGE.as("Message"),
                     CHANGE_LOG.USER_ID.as("User"),
                     CHANGE_LOG.CREATED_AT.as("Timestamp")
-            ).from(CHANGE_LOG)
+                    )
+                    .from(CHANGE_LOG)
                     .where(condition)
                     .orderBy(CHANGE_LOG.CREATED_AT.desc());
 
