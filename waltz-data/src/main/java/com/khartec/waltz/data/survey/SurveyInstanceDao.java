@@ -140,7 +140,7 @@ public class SurveyInstanceDao {
         record.setEntityId(command.entityReference().id());
         record.setStatus(command.status().name());
         record.setDueDate(command.dueDate().map(Date::valueOf).orElse(null));
-        record.setOwnerId(null);
+        record.setOwnerId(command.ownerId());
         record.setOwningRole(command.owningRole());
 
         record.store();
@@ -211,7 +211,6 @@ public class SurveyInstanceDao {
         return dsl.update(SURVEY_INSTANCE)
                 .set(SURVEY_INSTANCE.OWNING_ROLE, role)
                 .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
-                .and(IS_ORIGINAL_INSTANCE_CONDITION)
                 .execute();
     }
 

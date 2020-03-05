@@ -123,9 +123,9 @@ function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
-    const createSurveyInstances = (surveyRunId, personIds = [], owningRole) => {
+    const createSurveyInstances = (surveyRunId, peopleAndRoles) => {
         return $http
-            .post(`${base}/${surveyRunId}/create-instances`, { personIds: personIds, owningRole: owningRole } )
+            .post(`${base}/${surveyRunId}/create-instances`, peopleAndRoles )
             .then(result => result.data);
     };
 

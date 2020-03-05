@@ -129,7 +129,7 @@ function controller(notification, serviceBroker, userService) {
             .execute(CORE_API.SurveyRunStore.create, [command])
             .then(r => r.data.id)
             .then(runId => serviceBroker
-                .execute(CORE_API.SurveyRunStore.createSurveyInstances, [ runId, recipientIds, vm.surveyRunForm.owningRole ])
+                .execute(CORE_API.SurveyRunStore.createSurveyInstances, [ runId, { personIds: recipientIds, owningRole: vm.surveyRunForm.owningRole }])
                 .then(() => runId))
             .then(runId => serviceBroker
                 .execute(CORE_API.SurveyRunStore.updateStatus, [runId, {newStatus: "ISSUED"}]))
