@@ -447,6 +447,7 @@ public class SurveyRunService {
                 .surveyRunId(run.id().get())
                 .status(SurveyInstanceStatus.NOT_STARTED)
                 .owningRole(owningRole)
+                .ownerId(run.ownerId())
                 .build();
         long instanceId = surveyInstanceDao.create(instanceCreateCommand);
         return surveyInstanceDao.createInstanceRecipients(
