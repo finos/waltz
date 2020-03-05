@@ -107,7 +107,7 @@ public class AssessmentRatingDao {
 
     public List<AssessmentRating> findByGenericSelector(GenericSelector genericSelector) {
         return dsl
-                .select()
+                .select(ASSESSMENT_RATING.fields())
                 .from(ASSESSMENT_RATING)
                 .innerJoin(ASSESSMENT_DEFINITION)
                 .on(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID.eq(ASSESSMENT_DEFINITION.ID)
