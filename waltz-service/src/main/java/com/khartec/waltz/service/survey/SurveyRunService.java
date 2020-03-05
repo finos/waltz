@@ -435,6 +435,7 @@ public class SurveyRunService {
         }
     }
 
+
     private int[] mkSurveyInstance(EntityReference entityRef,
                                    SurveyRun run,
                                    List<Long> personIds,
@@ -451,6 +452,14 @@ public class SurveyRunService {
         return surveyInstanceDao.createInstanceRecipients(
                 instanceId,
                 personIds);
+    }
+
+
+    public int updateSurveyInstanceOwningRoles(String username,
+                                               long id,
+                                               SurveyInstanceOwningRoleSaveCommand owningRoleSaveCommand) {
+
+        return surveyInstanceDao.updateOwningRoleForSurveyRun(id, owningRoleSaveCommand.owningRole());
     }
 }
 

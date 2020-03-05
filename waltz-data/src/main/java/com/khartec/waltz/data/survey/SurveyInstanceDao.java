@@ -207,6 +207,15 @@ public class SurveyInstanceDao {
     }
 
 
+    public int updateOwningRoleForSurveyRun(long surveyRunId, String role) {
+        return dsl.update(SURVEY_INSTANCE)
+                .set(SURVEY_INSTANCE.OWNING_ROLE, role)
+                .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
+                .and(IS_ORIGINAL_INSTANCE_CONDITION)
+                .execute();
+    }
+
+
     public int updateSubmitted(long instanceId, String userName) {
         checkNotNull(userName, "userName cannot be null");
 

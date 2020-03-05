@@ -101,6 +101,12 @@ function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const updateOwningRole = (id, command) => {
+        return $http
+            .put(`${base}/${id}/role`, command)
+            .then(r => r.data);
+    };
+
     const generateSurveyRunRecipients = (id) => {
         return $http
             .get(`${base}/${id}/recipients`)
@@ -138,7 +144,8 @@ function store($http, baseApiUrl) {
         generateSurveyRunRecipients,
         createSurveyRunInstancesAndRecipients,
         getCompletionRate,
-        createSurveyInstances
+        createSurveyInstances,
+        updateOwningRole
     };
 }
 
@@ -202,6 +209,11 @@ export const SurveyRunStore_API = {
         serviceName,
         serviceFnName: 'updateDueDate',
         description: `update a survey run's due date`
+    },
+    updateOwningRole: {
+        serviceName,
+        serviceFnName: 'updateOwningRole',
+        description: `update the owning role for all instances in a run`
     },
     generateSurveyRunRecipients: {
         serviceName,
