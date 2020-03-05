@@ -109,6 +109,13 @@ public class SurveyRunService {
     }
 
 
+    public List<SurveyRun> findForRecipient(Long personId) {
+        checkNotNull(personId, "personId cannot be null");
+
+        return surveyRunDao.findForRecipient(personId);
+    }
+
+
     public IdCommandResponse createSurveyRun(String userName, SurveyRunCreateCommand command) {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(command, "create command cannot be null");
