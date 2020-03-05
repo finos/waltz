@@ -32,7 +32,8 @@ const initialState = {
         dueDate: null,
         contactEmail: null,
         issuanceKind: "GROUP",
-        recipients: []
+        recipients: [],
+        owningRole: null
     }
 };
 
@@ -90,6 +91,9 @@ function controller(notification, serviceBroker, userService) {
     };
 
     vm.$onInit = () => {
+        serviceBroker.loadViewData(CORE_API.RoleStore.findAllRoles)
+            .then(r => vm.customRoles = _.filter(r.data, d => d.isCustom === true));
+
         userService
             .whoami()
             .then(me => vm.surveyRunForm.contactEmail = me.userName);
@@ -121,7 +125,7 @@ function controller(notification, serviceBroker, userService) {
             .execute(CORE_API.SurveyRunStore.create, [command])
             .then(r => r.data.id)
             .then(runId => serviceBroker
-                .execute(CORE_API.SurveyRunStore.createSurveyInstances, [ runId, recipientIds ])
+                .execute(CORE_API.SurveyRunStore.createSurveyInstances, [ runId, recipientIds, vm.surveyRunForm.owningRole ])
                 .then(() => runId))
             .then(runId => serviceBroker
                 .execute(CORE_API.SurveyRunStore.updateStatus, [runId, {newStatus: "ISSUED"}]))

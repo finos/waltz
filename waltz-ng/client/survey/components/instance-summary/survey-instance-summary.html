@@ -63,6 +63,11 @@
         <div ng-include="'wsis-submitted-date'"></div>
     </div>
 
+    <!-- OWNER / OWNING ROLE -->
+    <div class="row waltz-survey-summary-row">
+        <div ng-include="'wsis-owning-role'"></div>
+    </div>
+
     <!-- RECIPIENTS -->
     <div class="row">
         <div class="col-sm-2 waltz-display-field-label">
@@ -287,5 +292,20 @@
         <span ng-if="! $ctrl.surveyInstance.approvedAt">
             -
         </span>
+    </div>
+</script>
+
+
+<!-- OWNING ROLE -->
+<script type="text/ng-template"
+        id="wsis-owning-role">
+    <div class="col-sm-2 waltz-display-field-label">
+        Owning Role
+    </div>
+    <div class="col-sm-4">
+        <span ng-if="$ctrl.surveyInstance.owningRole"
+              ng-bind="$ctrl.owningRole.name">
+        </span>
+        <span ng-if="!$ctrl.surveyInstance.owningRole">-</span>
     </div>
 </script>

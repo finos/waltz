@@ -284,7 +284,6 @@ public class SurveyRunService {
                         toList()
                 ));
 
-
         // delete existing instances and recipients
         deleteSurveyInstancesAndRecipients(surveyRunId);
 
@@ -405,7 +404,7 @@ public class SurveyRunService {
     }
 
 
-    public boolean createDirectSurveyInstances(long runId, List<Long> personIds) {
+    public boolean createDirectSurveyInstances(long runId, List<Long> personIds, String owningRole) {
         SurveyRun run = getById(runId);
         EntityReference subjectRef = run.selectionOptions().entityReference();
 
@@ -414,13 +413,15 @@ public class SurveyRunService {
                 map(personIds, p -> mkSurveyInstance(
                         subjectRef,
                         run,
-                        ListUtilities.newArrayList(p)));
+                        ListUtilities.newArrayList(p),
+                        owningRole));
                 return true;
             case GROUP:
                 mkSurveyInstance(
                         subjectRef,
                         run,
-                        personIds);
+                        personIds,
+                        owningRole);
                 return true;
             default:
                 return false;
@@ -429,13 +430,15 @@ public class SurveyRunService {
 
     private int[] mkSurveyInstance(EntityReference entityRef,
                                    SurveyRun run,
-                                   List<Long> personIds) {
+                                   List<Long> personIds,
+                                   String owningRole) {
         SurveyInstanceCreateCommand instanceCreateCommand = ImmutableSurveyInstanceCreateCommand
                 .builder()
                 .dueDate(run.dueDate())
                 .entityReference(entityRef)
                 .surveyRunId(run.id().get())
                 .status(SurveyInstanceStatus.NOT_STARTED)
+                .owningRole(owningRole)
                 .build();
         long instanceId = surveyInstanceDao.create(instanceCreateCommand);
         return surveyInstanceDao.createInstanceRecipients(

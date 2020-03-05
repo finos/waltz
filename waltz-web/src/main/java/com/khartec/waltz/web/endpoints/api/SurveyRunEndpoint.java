@@ -31,8 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
-import java.util.List;
-
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
@@ -143,10 +141,13 @@ public class SurveyRunEndpoint implements Endpoint {
 
         DatumRoute<Boolean> createSurveyInstancesRoute = (request, response) -> {
             long runId = getId(request);
-            List<Long> personIds = readIdsFromBody(request);
+
+            SurveyInstanceRecipientsAndOwners recipientsAndOwners = readBody(request, SurveyInstanceRecipientsAndOwners.class);
+
             return surveyRunService.createDirectSurveyInstances(
                     runId,
-                    personIds);
+                    recipientsAndOwners.personIds(),
+                    recipientsAndOwners.owningRole());
         };
 
         DatumRoute<SurveyRunCompletionRate> getSurveyRunCompletionRateRoute = (request, response)

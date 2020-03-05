@@ -53,7 +53,6 @@ public class SurveyInstanceService {
     private final SurveyInstanceDao surveyInstanceDao;
     private final SurveyInstanceRecipientDao surveyInstanceRecipientDao;
     private final SurveyQuestionResponseDao surveyQuestionResponseDao;
-
     private final SurveyInstanceIdSelectorFactory surveyInstanceIdSelectorFactory = new SurveyInstanceIdSelectorFactory();
     private SurveyRunDao surveyRunDao;
     private UserRoleService userRoleService;
@@ -145,7 +144,7 @@ public class SurveyInstanceService {
     public Person checkPersonIsOwnerOrAdmin(String userName, long instanceId) {
         Person person = getPersonByUsername(userName);
         checkTrue(
-                isAdmin(userName) || isOwner(instanceId, person),
+                isAdmin(userName) || isOwner(instanceId, person) || hasOwningRole(instanceId, person),
                 "Permission denied");
         return person;
     }
@@ -325,6 +324,7 @@ public class SurveyInstanceService {
         return person;
     }
 
+
     private Person getPersonById(Long id) {
         Person person = personDao.getById(id);
         checkNotNull(person, "Person with id %d cannot be resolved", id);
@@ -344,6 +344,11 @@ public class SurveyInstanceService {
         return userRoleService.hasRole(userName, SystemRole.SURVEY_ADMIN);
     }
 
+
+    private boolean hasOwningRole(long instanceId, Person person) {
+        SurveyInstance instance = surveyInstanceDao.getById(instanceId);
+        return userRoleService.hasRole(person.email(), instance.owningRole());
+    }
 
 
     private void logRecipientChange(String username, long instanceId, long personId, Operation op, String msg) {

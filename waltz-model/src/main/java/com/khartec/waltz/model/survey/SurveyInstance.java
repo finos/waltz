@@ -56,4 +56,10 @@ public abstract class SurveyInstance implements IdProvider {
 
     @Nullable
     public abstract Long originalInstanceId();
+
+    @Nullable
+    public abstract Long ownerId();
+
+    @Nullable
+    public abstract String owningRole();
 }

@@ -149,10 +149,20 @@ function findMatchingRecipient(recipients = [], person) {
 function controller($state, serviceBroker, userService, notification) {
     const vm = initialiseData(this, initialState);
 
+
+    function loadRoles() {
+        serviceBroker.loadViewData(CORE_API.RoleStore.findAllRoles)
+            .then(r => {
+                const rolesByKey = _.keyBy(r.data, d => d.key);
+                vm.owningRole = rolesByKey[vm.surveyInstance.owningRole];
+            })
+    }
+
     function reload(force = false) {
         loadInstanceAndRun(force)
             .then(loadSubject)
             .then(loadOwner)
+            .then(loadRoles)
             .then(() => loadRecipients(force))
             .then(() => loadPreviousVersions(force))
             .then(loadUser)
@@ -174,10 +184,11 @@ function controller($state, serviceBroker, userService, notification) {
             .then(u => {
                 const isOwner = vm.owner.userId === u.userName;
                 const isParticipant = _.some(vm.people, p => p.userId === u.userName);
+                const hasOwningRole = _.includes(u.roles, vm.surveyInstance.owningRole);
                 const isAdmin = userService.hasRole(u, roles.SURVEY_ADMIN);
                 vm.permissions = {
                     admin: isAdmin,
-                    owner: isOwner,
+                    owner: isOwner || hasOwningRole,
                     participant: isParticipant,
                     metaEdit: vm.currentResponseVersion.isLatest && (isOwner || isAdmin)
                 };
