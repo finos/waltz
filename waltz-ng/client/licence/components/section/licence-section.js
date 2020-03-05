@@ -45,10 +45,16 @@ function controller($q, serviceBroker) {
                 .then(r => r.data);
 
             $q.all([licencePromise, loadAssessments($q, serviceBroker)])
-                .then(([licences, assessmentsByLicenceId]) => {
+                .then(([licences, assessments]) => {
+                    vm.assessmentDefinitions = assessments.definitions;
+                    const assessmentsByLicenceId = assessments.assessmentsByLicenceId;
+
                     vm.licences =_.map(
                         licences,
-                        l => Object.assign({}, l, {assessments: _.get(assessmentsByLicenceId, l.id, [])}));
+                        l => {
+                            const assessmentsByDefinitionExtId = _.get(assessmentsByLicenceId, l.id, []);
+                            return Object.assign({}, l, assessmentsByDefinitionExtId)
+                        });
                 });
         }
     };

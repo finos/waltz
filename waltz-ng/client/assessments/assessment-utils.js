@@ -162,10 +162,17 @@ export function loadAssessments($q, serviceBroker) {
             const [assessmentDefinitions, assessmentRatings, ratingSchemes] = resolveResponses(responses);
             const ratingsByEntityId = _.groupBy(assessmentRatings, "entityReference.id");
             const primaryDefinitions = _.filter(assessmentDefinitions, d => d.visibility === "PRIMARY");
-            const enrichedByLicenceId = _.mapValues(ratingsByEntityId, (v, k) => mkEnrichedAssessmentDefinitions(
-                primaryDefinitions,
-                ratingSchemes,
-                v));
-            return enrichedByLicenceId;
+            const enrichedByLicenceId = _.mapValues(ratingsByEntityId, (v, k) => {
+                const enriched = mkEnrichedAssessmentDefinitions(
+                    primaryDefinitions,
+                    ratingSchemes,
+                    v);
+                return _.keyBy(enriched, e => e.definition.externalId);
+            });
+
+            return {
+                definitions: primaryDefinitions,
+                assessmentsByLicenceId: enrichedByLicenceId
+            };
         });
 }

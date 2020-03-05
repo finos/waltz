@@ -149,22 +149,21 @@ function prepareDatabaseGridOptions($animate, uiGridConstants) {
 }
 
 
-function prepareLicenceGridOptions($animate, uiGridConstants) {
+function prepareLicenceGridOptions($animate, uiGridConstants, assessmentDefs) {
+    const assessmentFields = _.map(assessmentDefs, d => {
+        return {
+            field: `${d.externalId}.ratingItem.name`,
+            displayName: d.name
+        };
+    });
 
-    const columnDefs = [
-        mkLinkGridCell("Name", "name", "id", "main.licence.view"),
-        { field: "externalId", displayName: "External Id" },
-        {
-            field: "assessments",
-            displayName: "Assessments",
-            width: "7%",
-            cellTemplate: `
-                <div style="text-align: center">
-                    <waltz-assessment-rating-traffic-lights assessments="COL_FIELD">
-                    </waltz-assessment-rating-traffic-lights>
-                </div>`
-        },
-    ];
+    const columnDefs = _.union(
+        [
+            mkLinkGridCell("Name", "name", "id", "main.licence.view"),
+            { field: "externalId", displayName: "External Id" },
+        ],
+        assessmentFields
+    );
 
     const baseTable = createDefaultTableOptions($animate, uiGridConstants, "licences.csv");
     return _.extend(baseTable, {
@@ -272,11 +271,19 @@ function controller($q, $animate, uiGridConstants, serviceBroker) {
             .then(r => r.data);
 
         $q.all([licencePromise, loadAssessments($q, serviceBroker)])
-            .then(([licences, assessmentsByLicenceId]) => {
+            .then(([licences, assessments]) => {
+                const definitions = assessments.definitions;
+                const assessmentsByLicenceId = assessments.assessmentsByLicenceId;
+
                 vm.licences = licences;
                 const licenceWithAssessments =_.map(
                     vm.licences,
-                    l => Object.assign({}, l, {assessments: _.get(assessmentsByLicenceId, l.id, [])}));
+                    l => {
+                        const assessmentsByDefinitionExtId = _.get(assessmentsByLicenceId, l.id, []);
+                        return Object.assign({}, l, assessmentsByDefinitionExtId)
+                    });
+
+                vm.licenceGridOptions = prepareLicenceGridOptions($animate, uiGridConstants, definitions);
                 vm.licenceGridOptions.data = licenceWithAssessments;
             })
             .then(() => refresh(vm.qry));
@@ -315,7 +322,6 @@ function controller($q, $animate, uiGridConstants, serviceBroker) {
                         { version: versionsById[u.softwareVersionId] }
                     ))
                     .value();
-
                 vm.softwareCatalogGridOptions.data = gridData;
             })
             .then(() => refresh(vm.qry));
@@ -323,7 +329,6 @@ function controller($q, $animate, uiGridConstants, serviceBroker) {
 
     vm.serverGridOptions = prepareServerGridOptions($animate, uiGridConstants);
     vm.databaseGridOptions = prepareDatabaseGridOptions($animate, uiGridConstants);
-    vm.licenceGridOptions = prepareLicenceGridOptions($animate, uiGridConstants);
     vm.softwareCatalogGridOptions = prepareSoftwareCatalogGridOptions($animate, uiGridConstants);
 
     vm.doSearch = () => refresh(vm.qry);

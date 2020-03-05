@@ -20,33 +20,36 @@ import { initialiseData } from "../../../common";
 import { mkLinkGridCell } from "../../../common/grid-utils";
 
 import template from "./licence-panel.html";
+import _ from "lodash";
 
 const bindings = {
+    assessmentDefinitions: "<",
     licences: "<"
 };
 
 
 const initialState = {
+    assessmentDefinitions: [],
     columnDefs: [],
     csvName: "licences.csv"
 };
 
 
-function mkColumnDefs() {
-    return [
-        mkLinkGridCell("Name", "name", "id", "main.licence.view"),
-        { field: "externalId", displayName: "External Id" },
-        {
-            field: "assessments",
-            displayName: "Assessments",
-            width: "7%",
-            cellTemplate: `
-                <div style="text-align: center">
-                    <waltz-assessment-rating-traffic-lights assessments="COL_FIELD">
-                    </waltz-assessment-rating-traffic-lights>
-                </div>`
-        }
-    ];
+function mkColumnDefs(assessmentDefs) {
+    const assessmentFields = _.map(assessmentDefs, d => {
+        return {
+            field: `${d.externalId}.ratingItem.name`,
+            displayName: d.name
+        };
+    });
+
+    return _.union(
+        [
+            mkLinkGridCell("Name", "name", "id", "main.licence.view"),
+            { field: "externalId", displayName: "External Id" },
+        ],
+        assessmentFields
+    );
 }
 
 
@@ -55,7 +58,7 @@ function controller() {
 
     vm.$onChanges = (changes) => {
         if(changes.licences) {
-            vm.columnDefs = mkColumnDefs();
+            vm.columnDefs = mkColumnDefs(vm.assessmentDefinitions);
         }
     };
 
