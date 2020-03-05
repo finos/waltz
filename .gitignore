@@ -8,3 +8,7 @@ dist
 *.ids
 npm-debug.log
 *.log
+.settings
+*/.classpath
+*/.factorypath
+**/.project

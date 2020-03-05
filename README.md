@@ -35,7 +35,7 @@ NatWest Markets | [press release](https://www.nwm.com/about-us/media/articles/na
 - Spark framework
 - JDBC via JOOQ
 
-See [pom.xml](https://github.com/khartec/waltz/blob/master/pom.xml) for a full list of Java dependencies.
+See [pom.xml](https://github.com/finos/waltz/blob/master/pom.xml) for a full list of Java dependencies.
 
 
 ### Supported Databases
@@ -54,12 +54,24 @@ See [pom.xml](https://github.com/khartec/waltz/blob/master/pom.xml) for a full l
 - Bootstrap 3
 - D3 
 
-See [package.json](https://github.com/khartec/waltz/blob/master/waltz-ng/package.json) for full list of javascript dependencies.
+See [package.json](https://github.com/finos/waltz/blob/master/waltz-ng/package.json) for full list of javascript dependencies.
 
-## Contact
+## Roadmap
 
-- email: [mailto:dwatkins@khartec.com]
+Checkout [the project milestones](https://github.com/finos/waltz/milestones) and browse through the Todo, work in progress and done issues.
 
+## Contributing
+
+1. Fork it (<https://github.com/finos/waltz/fork>)
+2. Create your feature branch (`git checkout -b feature/fooBar`)
+3. Read our [contribution guidelines](.github/CONTRIBUTING.md) and [Community Code of Conduct](https://www.finos.org/code-of-conduct)
+4. Commit your changes (`git commit -am 'Add some fooBar'`)
+5. Push to the branch (`git push origin feature/fooBar`)
+6. Create a new Pull Request
+
+_NOTE:_ Commits and pull requests to FINOS repositories will only be accepted from those contributors with an active, executed Individual Contributor License Agreement (ICLA) with FINOS OR who are covered under an existing and active Corporate Contribution License Agreement (CCLA) executed with FINOS. Commits from individuals not covered under an ICLA or CCLA will be flagged and blocked by the FINOS Clabot tool. Please note that some CCLAs require individuals/employees to be explicitly named on the CCLA.
+
+*Need an ICLA? Unsure if you are covered under an existing CCLA? Email [help@finos.org](mailto:help@finos.org)*
 
 ## Contributors
 
@@ -70,3 +82,11 @@ Individual and organisational contributors are listed in [the contributors file]
 ## External Resources
 
 [Using ArchUnit to formalize architecture rules in the Waltz codebase](https://medium.com/@davidwatkins73/using-archunit-to-formalize-architecture-rules-in-the-waltz-code-base-5fd3e092fc22)
+
+## License
+
+Copyright (C) 2019 Waltz open source project
+
+Distributed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
+
+SPDX-License-Identifier: [Apache-2.0](https://spdx.org/licenses/Apache-2.0)

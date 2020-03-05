@@ -41,7 +41,7 @@
     <url>http://khartec.com</url>
 
     <issueManagement>
-        <url>https://github.com/khartec/waltz/issues</url>
+        <url>https://github.com/finos/waltz/issues</url>
         <system>GitHub Issues</system>
     </issueManagement>
 
@@ -55,8 +55,8 @@
     </licenses>
 
     <scm>
-        <url>https://github.com/khartec/waltz</url>
-        <connection>scm:git:git://github.com/khartec/waltz.git</connection>
+        <url>https://github.com/finos/waltz</url>
+        <connection>scm:git:git://github.com/finos/waltz.git</connection>
         <developerConnection>scm:git:git@github.com:davidwatkins73/waltz.git</developerConnection>
     </scm>
 

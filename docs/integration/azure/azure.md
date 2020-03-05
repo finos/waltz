@@ -47,7 +47,7 @@ This may be obtained from the SQL Server options menu, (`Settings > Connection S
 ### Setting up the schema
 
 If you wish to setup the schema you will need to run liquibase as described in the 
-document: [Liquibase setup](https://github.com/khartec/waltz/blob/master/waltz-data/src/main/ddl/liquibase/README.md)
+document: [Liquibase setup](https://github.com/finos/waltz/blob/master/waltz-data/src/main/ddl/liquibase/README.md)
 
 ### Data
 
