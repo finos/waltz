@@ -21,11 +21,13 @@ import {CORE_API} from "../../common/services/core-api-utils";
 import template from "./survey-section.html";
 import {timeFormat} from "d3-time-format";
 import {displayError} from "../../common/error-utils";
+import {isSurveyTargetKind} from "../survey-utils";
 
 
 const initialState = {
     visibility: {
-        mode: "list" // list | issue
+        mode: "list", // list | issue,
+        showIssueSurveyBtn: false
     },
     selectedTemplate: null,
     surveyRunForm: {
@@ -97,6 +99,8 @@ function controller(notification, serviceBroker, userService) {
         userService
             .whoami()
             .then(me => vm.surveyRunForm.contactEmail = me.userName);
+
+        vm.visibility.showIssueSurveyBtn = isSurveyTargetKind(vm.parentEntityRef.kind);
     };
 
     function save () {

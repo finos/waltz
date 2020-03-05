@@ -22,7 +22,7 @@
     <waltz-section-actions>
         <span>
             <a class="btn btn-xs btn-primary"
-               ng-if="$ctrl.visibility.mode == 'list'"
+               ng-if="$ctrl.visibility.showIssueSurveyBtn && $ctrl.visibility.mode == 'list'"
                ng-click="$ctrl.onShowCreateForm()">
                 Issue new survey
             </a>

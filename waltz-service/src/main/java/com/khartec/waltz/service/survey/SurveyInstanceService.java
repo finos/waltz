@@ -98,6 +98,13 @@ public class SurveyInstanceService {
     }
 
 
+    public List<SurveyInstance> findForRecipient(Long personId) {
+        checkNotNull(personId, "personId cannot be null");
+
+        return surveyInstanceDao.findForRecipient(personId);
+    }
+
+
     public List<SurveyInstance> findForSurveyRun(long surveyRunId) {
         return surveyInstanceDao.findForSurveyRun(surveyRunId);
     }
