@@ -17,16 +17,6 @@
   -->
 
 <div>
-    <waltz-section-actions>
-        <div class="waltz-sub-section-controls">
-                    <waltz-data-extract-link name="Export"
-                                                 styling="link"
-                                                 extract="change-log/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
-                                                 method="POST">
-                    </waltz-data-extract-link>
-        </div>
-
-    </waltz-section-actions>
 
     <div ng-if="$ctrl.entries.length > 0">
         <waltz-change-log-table entries="$ctrl.entries"
@@ -46,6 +36,12 @@
                ng-click="$ctrl.refresh()">
                 Refresh now
             </a>
+            |
+            <waltz-data-extract-link name="Export"
+                                     styling="link"
+                                     extract="change-log/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
+                                     method="POST">
+            </waltz-data-extract-link>
         </div>
 
     </div>
