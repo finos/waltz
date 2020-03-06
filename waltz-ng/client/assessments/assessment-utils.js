@@ -139,17 +139,29 @@ export function filterByAssessmentRating(entities = [],
         .value();
 }
 
-
-export function loadAssessments($q, serviceBroker) {
+/**
+ * Loads all assessments for an entity kind, returning the definitions and ratings that for that entity kind.
+ * Returns an object as follows
+ * {
+ *     definitions,
+ *     assessmentsByEntityId //<entity id -> assessment def external id -> assessment>
+ * }
+ * @param $q
+ * @param serviceBroker
+ * @param kind
+ * @param primaryOnly
+ * @returns {*}
+ */
+export function loadAssessments($q, serviceBroker, kind, primaryOnly = true) {
     const definitionsPromise = serviceBroker
         .loadViewData(
             CORE_API.AssessmentDefinitionStore.findByKind,
-            ["LICENCE"]);
+            [kind]);
 
     const ratingsPromise = serviceBroker
         .loadViewData(
             CORE_API.AssessmentRatingStore.findByEntityKind,
-            ["LICENCE"],
+            [kind],
             {force: true});
 
     const ratingSchemePromise = serviceBroker
@@ -161,18 +173,19 @@ export function loadAssessments($q, serviceBroker) {
         .then(responses => {
             const [assessmentDefinitions, assessmentRatings, ratingSchemes] = resolveResponses(responses);
             const ratingsByEntityId = _.groupBy(assessmentRatings, "entityReference.id");
-            const primaryDefinitions = _.filter(assessmentDefinitions, d => d.visibility === "PRIMARY");
-            const enrichedByLicenceId = _.mapValues(ratingsByEntityId, (v, k) => {
+            const filteredDefinitions = _.filter(assessmentDefinitions, primaryOnly ? d => d.visibility === "PRIMARY" : true);
+            const enrichedByEntityId = _.mapValues(ratingsByEntityId, (v, k) => {
                 const enriched = mkEnrichedAssessmentDefinitions(
-                    primaryDefinitions,
+                    filteredDefinitions,
                     ratingSchemes,
                     v);
                 return _.keyBy(enriched, e => e.definition.externalId);
             });
 
+
             return {
-                definitions: primaryDefinitions,
-                assessmentsByLicenceId: enrichedByLicenceId
+                definitions: filteredDefinitions,
+                assessmentsByEntityId: enrichedByEntityId // assessmentsByEntityId: entity id -> assessment def external id -> assessment
             };
         });
 }

@@ -270,10 +270,10 @@ function controller($q, $animate, uiGridConstants, serviceBroker) {
             )
             .then(r => r.data);
 
-        $q.all([licencePromise, loadAssessments($q, serviceBroker)])
+        $q.all([licencePromise, loadAssessments($q, serviceBroker, "LICENCE", true)])
             .then(([licences, assessments]) => {
                 const definitions = assessments.definitions;
-                const assessmentsByLicenceId = assessments.assessmentsByLicenceId;
+                const assessmentsByLicenceId = assessments.assessmentsByEntityId;
 
                 vm.licences = licences;
                 const licenceWithAssessments =_.map(

@@ -44,10 +44,10 @@ function controller($q, serviceBroker) {
                 .loadViewData(CORE_API.LicenceStore.findBySelector, [mkSelectionOptions(vm.parentEntityRef)])
                 .then(r => r.data);
 
-            $q.all([licencePromise, loadAssessments($q, serviceBroker)])
+            $q.all([licencePromise, loadAssessments($q, serviceBroker, "LICENCE", true)])
                 .then(([licences, assessments]) => {
                     vm.assessmentDefinitions = assessments.definitions;
-                    const assessmentsByLicenceId = assessments.assessmentsByLicenceId;
+                    const assessmentsByLicenceId = assessments.assessmentsByEntityId;
 
                     vm.licences =_.map(
                         licences,
