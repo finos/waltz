@@ -43,7 +43,6 @@ export default [
             return {
                 node : {
                     enter: (selection) => {
-                        console.log("lfu-node-enter");
                         selection
                             .classed("wdfd-intra-node", d => _.includes(appIds, d.id))
                             .classed("wdfd-extra-node", d => ! _.includes(appIds, d.id))
@@ -53,7 +52,6 @@ export default [
                 },
                 link : {
                     update: (selection) => {
-                        console.log("lfu-link-update");
                         return selection
                             .attr("stroke", d => {
                                 const rating = calcRating(d);
@@ -65,7 +63,6 @@ export default [
                             });
                     },
                     enter: (selection) => {
-                        console.log("lfu-link-enter");
                         return selection
                             .attr("stroke-width", 1.5);
 
