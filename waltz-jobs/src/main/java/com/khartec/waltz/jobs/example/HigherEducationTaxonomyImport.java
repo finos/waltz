@@ -18,14 +18,17 @@
 
 package com.khartec.waltz.jobs.example;
 
+import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.IOUtilities;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.common.XmlUtilities;
 import com.khartec.waltz.model.EntityLifecycleStatus;
+import com.khartec.waltz.schema.tables.Measurable;
 import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
+import com.khartec.waltz.schema.tables.records.MeasurableRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
-import org.jooq.Record3;
+import org.jooq.impl.DSL;
 import org.jooq.lambda.Unchecked;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
@@ -51,7 +54,9 @@ import java.util.function.Function;
 
 import static com.khartec.waltz.common.CollectionUtilities.filter;
 import static com.khartec.waltz.common.SetUtilities.map;
-import static com.khartec.waltz.schema.Tables.*;
+import static com.khartec.waltz.schema.Tables.MEASURABLE;
+import static com.khartec.waltz.schema.Tables.MEASURABLE_CATEGORY;
+import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toSet;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
@@ -72,9 +77,10 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 @Service
 public class HigherEducationTaxonomyImport {
 
-    public static final String FILENAME = "taxonomies/higher_education/UCISA UK HE Capability model Final v2 ArchiMate Exchange File.xml";
-    public static final XPathFactory xpathFactory = XPathFactory.newInstance();
-    public static final String CATEGORY_EXTERNAL_ID = "UCISA_UK_HE_CAPABILITIES";
+    private static final String FILENAME = "taxonomies/higher_education/UCISA UK HE Capability model Final v2 ArchiMate Exchange File.xml";
+    private static final XPathFactory xpathFactory = XPathFactory.newInstance();
+    private static final String CATEGORY_EXTERNAL_ID = "UCISA_UK_HE_CAPABILITIES";
+    private static final String PROVENANCE = CATEGORY_EXTERNAL_ID;
 
     private final DSLContext dsl;
 
@@ -110,7 +116,6 @@ public class HigherEducationTaxonomyImport {
                     capabilityTuples.size(),
                     relationshipTuples.size());
 
-
             dsl.transaction(dslCtx -> {
                 DSLContext tx = dslCtx.dsl();
 
@@ -121,14 +126,65 @@ public class HigherEducationTaxonomyImport {
                 log("Category id for this taxonomy is %d", categoryId);
 
                 storeCapabilities(tx, categoryId, capabilityTuples);
+                updateParentIds(tx, categoryId, relationshipTuples);
 
-                log("Forcing a rollback");
-                throw new UnsupportedOperationException("BOOooooOOM");
+                //throw new UnsupportedOperationException("Forcing a rollback: BOOooooOOM");
             });
 
         } catch (Exception e) {
             throw new Exception("Failed to import " + filename, e);
         }
+    }
+
+
+    /**
+     *
+     * @param tx
+     * @param categoryId
+     * @param relationshipTuples  set of tuples (identifier, source, target)
+     */
+    private void updateParentIds(DSLContext tx,
+                                 long categoryId,
+                                 Set<Tuple3<String, String, String>> relationshipTuples) {
+
+        // clear existing external parent id's
+        dsl.update(MEASURABLE)
+                .setNull(MEASURABLE.EXTERNAL_PARENT_ID)
+                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId))
+                .execute();
+
+        // add resolved parent ids
+        relationshipTuples
+                .stream()
+                .map(t -> dsl
+                        .update(MEASURABLE)
+                        .set(MEASURABLE.EXTERNAL_PARENT_ID, t.v2)
+                        .where(MEASURABLE.EXTERNAL_ID.eq(t.v3)))
+                .collect(collectingAndThen(toSet(), tx::batch))
+                .execute();
+
+        int updated = updateParentIdsUsingExtIds(tx, categoryId);
+        log("Updated %d parent ids", updated);
+    }
+
+    private int updateParentIdsUsingExtIds(DSLContext tx, long categoryId) {
+        // clear existing parent ids
+        dsl.update(MEASURABLE)
+                .setNull(MEASURABLE.PARENT_ID)
+                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId))
+                .execute();
+
+        Measurable c = MEASURABLE.as("c");
+        Measurable p = MEASURABLE.as("p");
+        return tx
+                .update(c)
+                .set(c.PARENT_ID, DSL
+                        .select(p.ID)
+                        .from(p)
+                        .where(p.EXTERNAL_ID.eq(c.EXTERNAL_PARENT_ID))
+                        .and(p.MEASURABLE_CATEGORY_ID.eq(categoryId)))
+                .where(c.MEASURABLE_CATEGORY_ID.eq(categoryId))
+                .execute();
     }
 
 
@@ -148,8 +204,8 @@ public class HigherEducationTaxonomyImport {
                 .from(MEASURABLE)
                 .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId))
                 .fetchMap(
-                        Record3::value1,  // key is external id
-                        r -> tuple(r.value2(), r.value3())); // value is tuple(name, description)
+                        r -> r.get(MEASURABLE.EXTERNAL_ID),  // key is external id
+                        r -> tuple(r.get(MEASURABLE.NAME), r.get(MEASURABLE.DESCRIPTION))); // value is tuple(name, description)
 
         Set<String> existingIds = existingExtIdToNameDescTuple.keySet();
         Set<String> requiredIds = map(capabilityTuples, Tuple3::v1);
@@ -157,15 +213,46 @@ public class HigherEducationTaxonomyImport {
         // some simple set logic gets us old, new and holdovers
         Set<String> noLongerNeededIds = SetUtilities.minus(existingIds, requiredIds);
         Set<String> idsThatAreNew = SetUtilities.minus(requiredIds, existingIds);
-        Set<String> remainingIds = SetUtilities.intersection(existingIds, requiredIds);
 
-        removeNoLongerNeederCapabilities(tx, noLongerNeededIds);
-        insertNewCapabilities(tx, filter(capabilityTuples, t -> idsThatAreNew.contains(t.v1())));
+        int removedCount = removeNoLongerNeederCapabilities(
+                tx,
+                noLongerNeededIds);
+
+        int insertedCount = insertNewCapabilities(
+                tx,
+                categoryId,
+                filter(capabilityTuples, t -> idsThatAreNew.contains(t.v1())));
+
+        log("Removed %d capabilities and added %d \n",
+                removedCount,
+                insertedCount);
 
     }
 
-    private void insertNewCapabilities(DSLContext tx, Collection<Tuple3<String, String, String>> newCapabilities) {
-
+    /**
+     * @param tx
+     * @param categoryId
+     * @param newCapabilities  Set of (id, name, desc) tuples
+     */
+    private int insertNewCapabilities(DSLContext tx,
+                                      long categoryId,
+                                      Collection<Tuple3<String, String, String>> newCapabilities) {
+        return newCapabilities
+                .stream()
+                .map(t -> {
+                    MeasurableRecord record = tx.newRecord(MEASURABLE);
+                    record.setMeasurableCategoryId(categoryId);
+                    record.setExternalId(t.v1);
+                    record.setName(t.v2);
+                    record.setDescription(t.v3);
+                    record.setProvenance(PROVENANCE);
+                    record.setLastUpdatedBy("admin");
+                    record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
+                    return record;
+                })
+                .collect(collectingAndThen(toSet(), tx::batchInsert))
+                .execute()
+                .length;
     }
 
 
@@ -195,6 +282,7 @@ public class HigherEducationTaxonomyImport {
                 record.setEditable(false);
                 record.setLastUpdatedBy("admin");
                 record.setRatingSchemeId(1L);
+                record.setExternalId(CATEGORY_EXTERNAL_ID);
 
                 log("Storing the new category and getting returning it's Waltz id");
                 record.store();
