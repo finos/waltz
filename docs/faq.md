@@ -56,14 +56,14 @@ Security
 **What is covered by the security concept ?**
 e.g. access-rights, roles, single-feature protection
 
-Waltz implements a basic [role](https://github.com/khartec/waltz/blob/master/waltz-ng/client/user/roles.js) 
+Waltz implements a basic [role](https://github.com/finos/waltz/blob/master/waltz-ng/client/user/roles.js) 
 based security model.
 
 
 **Is there single-sign-on supported (SAML)?**
 
 SAML is not directly supported.  However Waltz can be configured with a pluggable 
-security authentication layer as described in the [settings](https://github.com/khartec/waltz/blob/master/docs/features/configuration/settings.md#security)
+security authentication layer as described in the [settings](https://github.com/finos/waltz/blob/master/docs/features/configuration/settings.md#security)
 documentation.
 
 
@@ -78,17 +78,17 @@ Non-Functionals
 **How does the meta-model look like?**
 
 The Waltz meta model is described in the 
-[documentation](https://github.com/khartec/waltz/blob/master/docs/features/README.md)
+[documentation](https://github.com/finos/waltz/blob/master/docs/features/README.md)
 
 
 **Which life-cycles for (which) objects are available, e.g. applications?**
 
 There is a basic lifecycle 
-(see the enum [EntityLifecycleStatus](https://github.com/khartec/waltz/blob/master/waltz-model/src/main/java/com/khartec/waltz/model/EntityLifecycleStatus.java))
+(see the enum [EntityLifecycleStatus](https://github.com/finos/waltz/blob/master/waltz-model/src/main/java/com/khartec/waltz/model/EntityLifecycleStatus.java))
 supported by the main entities within Waltz. 
  
 In addition some other classes of entities (e.g. Scenarios and Physical Specifications)
-support and enhanced [ReleaseLifecycleStatus](https://github.com/khartec/waltz/blob/master/waltz-model/src/main/java/com/khartec/waltz/model/ReleaseLifecycleStatus.java)
+support and enhanced [ReleaseLifecycleStatus](https://github.com/finos/waltz/blob/master/waltz-model/src/main/java/com/khartec/waltz/model/ReleaseLifecycleStatus.java)
 which operates independently of the entity lifecycle.
 
 

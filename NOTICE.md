@@ -1,3 +1,9 @@
+Waltz - Enterprise Architecture - FINOS
+
+Copyright (C) 2019 Waltz open source project
+
+This product includes software developed at the Fintech Open Source Foundation (https://www.finos.org/).
+
 The following notice should appear in source files:
 
 ```
