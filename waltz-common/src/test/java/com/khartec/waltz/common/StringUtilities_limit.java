@@ -31,11 +31,20 @@ public class StringUtilities_limit {
         assertNull(result);
     }
 
+
+    @Test
+    public void limitingWithANegativeGivesNull() {
+        String result = StringUtilities.limit(null, -10);
+        assertNull(result);
+    }
+
+
     @Test
     public void limitingLongStringReturnsInitialPortion() {
         String result = StringUtilities.limit("hello world", 5);
         assertEquals("hello", result);
     }
+
 
     @Test
     public void limitingShortStringReturnsFullString() {
