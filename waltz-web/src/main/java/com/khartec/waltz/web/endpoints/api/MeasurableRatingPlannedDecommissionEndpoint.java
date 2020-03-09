@@ -31,9 +31,7 @@ import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.deleteForDatum;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class MeasurableRatingPlannedDecommissionEndpoint implements Endpoint {
@@ -81,7 +79,7 @@ public class MeasurableRatingPlannedDecommissionEndpoint implements Endpoint {
 
         DatumRoute<Boolean> removeRoute = (request, response) -> {
             requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
-            return measurableRatingPlannedDecommissionService.remove(getId(request));
+            return measurableRatingPlannedDecommissionService.remove(getId(request), getUsername(request));
         };
 
         getForList(findForEntityPath, findForEntityRoute);

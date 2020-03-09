@@ -40,7 +40,8 @@
                        ng-value="diagram.id"
                        name="{{ $parent.$id }}"
                        id="{{ diagram.id + '_' + $id }}">
-                <label for="{{ diagram.id + '_' + $id }}"
+                <label class="wt-label"
+                       for="{{ diagram.id + '_' + $id }}"
                        ng-repeat-end>
                     <span ng-bind="diagram.name || 'Diagram'">
                     </span>

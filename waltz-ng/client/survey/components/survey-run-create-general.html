@@ -126,6 +126,7 @@
                 <waltz-entity-selector current-selection="$ctrl.surveyRun.selectorEntity"
                                        required="true"
                                        on-select="$ctrl.onSelectorEntitySelect"
+                                       entity-lifecycle-statuses="['ACTIVE', 'PENDING']"
                                        entity-kinds="[$ctrl.surveyRun.selectorEntityKind]">
                 </waltz-entity-selector>
             </div>

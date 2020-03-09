@@ -33,7 +33,9 @@ public abstract class Involvement implements ProvenanceProvider {
     public abstract long kindId();
     public abstract EntityReference entityReference();
     public abstract String employeeId();
-    public abstract boolean isReadOnly();
+
+    @Value.Default
+    public boolean isReadOnly() { return true; }
 
     @Value.Default
     public String provenance() {

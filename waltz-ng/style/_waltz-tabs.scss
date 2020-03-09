@@ -58,7 +58,7 @@ div.waltz-tabs {
     input[type=radio] {
         display: none;
 
-        &:checked + label {
+        &:checked + .wt-label {
             color: #555;
             background: #fff;
             border-color: #ccc;
@@ -70,7 +70,7 @@ div.waltz-tabs {
             margin-top: 0;
         }
 
-        &:disabled + label {
+        &:disabled + .wt-label {
             color: #999;
             background-color: #eee;
             font-style: italic;
@@ -78,7 +78,7 @@ div.waltz-tabs {
         }
     }
 
-    label {
+    .wt-label {
         color: desaturate($link-color, 10);
         font-weight: lighter;
         display: inline-block;

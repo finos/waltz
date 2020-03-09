@@ -94,8 +94,8 @@ export function store($http, BaseApiUrl) {
         .then(result => result.data);
 
 
-    const addApplications = (groupId, applicationIds) => $http
-        .post(`${BASE}/id/${groupId}/applications/list`, applicationIds)
+    const addApplications = (groupId, applicationIdsAndUnknowns) => $http
+        .post(`${BASE}/id/${groupId}/applications/list`, applicationIdsAndUnknowns)
         .then(result => result.data);
 
 

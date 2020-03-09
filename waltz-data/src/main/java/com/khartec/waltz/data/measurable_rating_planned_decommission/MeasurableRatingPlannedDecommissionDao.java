@@ -23,11 +23,14 @@ import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.command.DateFieldChange;
 import com.khartec.waltz.model.measurable_rating_planned_decommission.ImmutableMeasurableRatingPlannedDecommission;
 import com.khartec.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
 import com.khartec.waltz.schema.tables.records.MeasurableRatingPlannedDecommissionRecord;
 import org.jooq.*;
+import org.jooq.lambda.tuple.Tuple;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -121,7 +124,7 @@ public class MeasurableRatingPlannedDecommissionDao {
     }
 
 
-    public boolean save(EntityReference entityReference, long measurableId, DateFieldChange dateChange, String userName) {
+    public Tuple2<Operation, Boolean> save(EntityReference entityReference, long measurableId, DateFieldChange dateChange, String userName) {
         MeasurableRatingPlannedDecommissionRecord existingRecord = dsl
                 .selectFrom(MEASURABLE_RATING_PLANNED_DECOMMISSION)
                 .where(mkRefCondition(entityReference)
@@ -130,7 +133,9 @@ public class MeasurableRatingPlannedDecommissionDao {
 
         if (existingRecord != null) {
             updateDecommDateOnRecord(existingRecord, dateChange, userName);
-            return existingRecord.update() == 1;
+            boolean updatedRecord = existingRecord.update() == 1;
+
+            return Tuple.tuple(Operation.UPDATE, updatedRecord);
         } else {
             MeasurableRatingPlannedDecommissionRecord record = dsl.newRecord(MEASURABLE_RATING_PLANNED_DECOMMISSION);
             updateDecommDateOnRecord(record, dateChange, userName);
@@ -139,7 +144,9 @@ public class MeasurableRatingPlannedDecommissionDao {
             record.setEntityId(entityReference.id());
             record.setEntityKind(entityReference.kind().name());
             record.setMeasurableId(measurableId);
-            return record.insert() == 1;
+            boolean recordsInserted = record.insert() == 1;
+
+            return Tuple.tuple(Operation.ADD, recordsInserted);
         }
     }
 

@@ -238,6 +238,12 @@ function controller($q,
     };
 
     vm.saveApplications = (results) => {
+
+        const unknownIdentifiers = _.chain(results)
+            .filter(r => r.action == null)
+            .map(r => r.identifier)
+            .value();
+
         const appIdsToAdd = _.chain(results)
             .filter(r => r.action === "ADD")
             .map(r => r.entityRef.id)
@@ -248,10 +254,10 @@ function controller($q,
             .map(r => r.entityRef.id)
             .value();
 
-
         if (appIdsToAdd.length > 0) {
             serviceBroker
-                .execute(CORE_API.AppGroupStore.addApplications, [id, appIdsToAdd])
+                .execute(CORE_API.AppGroupStore.addApplications,
+                    [id, Object.assign({}, {applicationIds: appIdsToAdd, unknownIdentifiers: unknownIdentifiers})])
                 .then(r => r.data)
                 .then(apps => vm.applications = apps, e => handleError(e))
                 .then(() => notification.success(`Added ${appIdsToAdd.length} applications`));
@@ -263,6 +269,10 @@ function controller($q,
                 .then(r => r.data)
                 .then(apps => vm.applications = apps, e => handleError(e))
                 .then(() => notification.success(`Removed ${appIdsToRemove.length} applications`));
+        }
+
+        if (appIdsToRemove.length === 0 && appIdsToAdd.length === 0){
+            notification.info("There are no applications to be added or removed");
         }
     };
 
