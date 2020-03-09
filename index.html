@@ -1,0 +1,378 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="A layout example that shows off a responsive product landing page.">
+    <title>FINOS - Waltz</title>
+    <link rel="stylesheet" href="css/pure-release-0.6.0/pure-min.css">
+<!--[if lte IE 8]>
+
+    <link rel="stylesheet" href="css/pure-release-0.6.0/grids-responsive-old-ie-min.css">
+
+<![endif]-->
+<!--[if gt IE 8]><!-->
+    <link rel="stylesheet" href="css/pure-release-0.6.0/grids-responsive-min.css">
+<!--<![endif]-->
+    <script src="https://use.fontawesome.com/b2532e0cae.js"></script>
+    <!--[if lte IE 8]>
+        <link rel="stylesheet" href="css/layouts/marketing-old-ie.css">
+    <![endif]-->
+    <!--[if gt IE 8]><!-->
+        <link rel="stylesheet" href="css/layouts/marketing.css">
+    <!--<![endif]-->
+</head>
+<body>
+<div class="header">
+    <div class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed">
+        <span class="pure-menu-heading" href="">
+            <img height='22px'
+                 class="pure-img-responsive"
+                 src="img/waltz_badge_bw_145px.png">
+        </span>
+
+        <ul class="pure-menu-list">
+            <li class="pure-menu-item pure-menu-selected"><a href="#" class="pure-menu-link">Home</a></li>
+            <li class="pure-menu-item"><a href="/blog/index.html" class="pure-menu-link">Blog</a></li>
+            <li class="pure-menu-item"><a href="mailto:dwatkins@khartec.com" class="pure-menu-link">Contact</a></li>
+            <li class="pure-menu-item"><a href="http://github.com/finos/waltz" class="pure-menu-link">Github</a></li>
+        </ul>
+    </div>
+</div>
+
+<div class="splash-container"
+     style="background-repeat: no-repeat; background-size: cover; background-image: url(img/cover_image.png)">
+    <div class="splash">
+        <img class="pure-img-responsive"
+             src="img/waltz_badge_mono_600px.png">
+        <p class="splash-subhead" style="color: white; margin-top: 40px; font-size: larger">
+            Enterprise Architecture on the Wire
+        </p>
+    </div>
+</div>
+
+
+<div class="content-wrapper">
+
+    <div class="content">
+        <!-- WHAT IS WALTZ -->
+        <h2 class="content-head is-center">What is Waltz ?</h2>
+
+        <div class="pure-g">
+            <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
+
+                <h3 class="content-subhead">
+                    <i class="fa fa-map-o"></i>
+                    Overview
+                </h3>
+                <p>
+                    In a nutshell Waltz allows you to visualize and define
+                    your organisation's technology landscape.  Think of it
+                    like a structured Wiki for your architecture.
+                </p>
+            </div>
+            <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
+                <h3 class="content-subhead">
+                    <i class="fa fa-file-text-o"></i>
+                    Crowd source your architecture
+                </h3>
+                <p>
+                    A core belief behind Waltz is that technology information should be
+                    accessible by everyone within your organisation.  Furthermore
+                    employees are your best source of information about your technology
+                    landscape and should therefore be empowered to enhance and correct
+                    data.
+                </p>
+            </div>
+            <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
+                <h3 class="content-subhead">
+                    <i class="fa fa-th-large"></i>
+                    Building blocks
+                </h3>
+                <p>
+                    Waltz blends information about your apps, capabilities,
+                    organisational units, people and more to build out a comprehensive
+                    set of views that allow you to focus on the details or zoom
+                    out to see the big picture.
+                </p>
+            </div>
+
+            <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-4">
+                <h3 class="content-subhead">
+                    <i class="fa fa-check-square-o"></i>
+                    Your model
+                </h3>
+                <p>
+                    Waltz is domain agnostic.  Define the models and structures that make
+                    sense for your organisation.
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="content">
+        <!-- WHAT IS WALTZ -->
+        <h2 class="content-head is-center">Features</h2>
+
+        <div class="pure-g">
+            <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-2">
+
+                <h3 class="content-subhead">
+                    <img class="pure-img-responsive"
+                         src="img/screenshots/02_app_view.png">
+                    <i class="fa fa-map-o"></i>
+                    See your applications
+                </h3>
+                <p>
+                    Waltz presents data about your application.  Applications
+                    can be linked to capabilities, organisational units, people,
+                    servers, data types and more.   Once linked, the data
+                    is displayed and relationships can be navigated.
+                </p>
+                <p>
+                    Information in Waltz can be augmented manually to increase the
+                    value, comprehensiveness and accuracy of your application views.
+                </p>
+            </div>
+            <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-2">
+
+                <h3 class="content-subhead">
+                    <img class="pure-img-responsive"
+                         src="img/screenshots/05_person_view.png">
+                    <i class="fa fa-file-text-o"></i>
+                    Aggregate Views
+                </h3>
+                <p>
+                    Once applications have been linked to entities (such as
+                    organisational units, people and capabilities) you can
+                    navigate through dynamic views which show aggregate summaries
+                    of related applications etc.
+                </p>
+            </div>
+            <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-2">
+                <h3 class="content-subhead">
+                    <img class="pure-img-responsive"
+                         src="img/screenshots/03_detail-app_flows.png">
+                    <i class="fa fa-random"></i>
+                    See how an application is connected
+                </h3>
+                <p>
+                    How an application is connected to other applications in your organisation
+                    is a central part of Waltz.  We can describe upstream and downstream
+                    applications along with the data types exchanged.
+                </p>
+                <p>
+                    As this topology is created you may start to define authoritative sources
+                    for datatypes and see which applications are sourcing their data from approved
+                    golden sources.
+                </p>
+            </div>
+
+            <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-2">
+                <h3 class="content-subhead">
+                    <img class="pure-img-responsive"
+                         src="img/screenshots/07_detail-group_flows.png">
+                    <i class="fa fa-random"></i>
+                    See how your organisation is connected
+                </h3>
+                <p>
+                    Building upon an individual applications connections we can start to
+                    view how applications are connected when they are aggregated.
+                </p>
+                <p>
+                    If authoritative sources have been defined a organisational-unit level
+                    scorecard is produced showing what proportion of your logical data
+                    flows are being sourced from strategic systems.
+                </p>
+            </div>
+
+
+            <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-2">
+                <h3 class="content-subhead">
+                    <img class="pure-img-responsive"
+                         src="img/screenshots/09_entity_stats.png">
+                    <i class="fa fa-pie-chart"></i>
+                    Statistics
+                </h3>
+                <p>
+                    Define your own sets of statistic definitions and then
+                    use Waltz to navigate though the collected values
+                    using the structural entities relevant to you.
+                </p>
+            </div>
+
+            <div class="l-box pure-u-1 pure-u-md-1-2 pure-u-lg-1-2">
+                <h3 class="content-subhead">
+                    <img class="pure-img-responsive"
+                         src="img/screenshots/08_group_edit.png">
+                    <i class="fa fa-folder"></i>
+                    Create and share custom groups
+                </h3>
+                <p>
+                    Waltz allows you to create custom, ad-hoc groups of applications.  This
+                    feature is often used to quickly understand a subset of your application
+                    portfolio.  For instance you may wish to create a group containing
+                    SOX relevant applications.
+                </p>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="ribbon l-box-lrg pure-g">
+        <!-- DEMO -->
+        <div class="l-box-lrg is-center pure-u-1 pure-u-md-1-4"></div>
+        <div class="l-box-lrg is-center pure-u-1 pure-u-md-1-2">
+            <img class="pure-img-responsive"
+                 alt="Demo website"
+                 width="160"
+                 src="img/waltz_badge_negative_bw_300px.png">
+            <a href="http://www.waltz-technology.com/waltz-web" style="text-decoration: none">
+                <h2 class="is-center content-head content-head-ribbon" style="color: #a8cbf5;">
+                    Demo
+                </h2>
+            </a>
+            <p>
+                We have a <a href="http://www.waltz-technology.com/waltz-web" style="color: #a8cbf5">
+                demonstration website</a> available.
+                <i>Please</i> note that sample data is currently being created so not all features are demonstrated.
+            </p>
+        </div>
+        <div class="l-box-lrg is-center pure-u-1 pure-u-md-1-4"></div>
+    </div>
+
+
+    <div class="content">
+        <!-- HOW WALT FITS IN -->
+        <h2 class="content-head is-center">How Waltz fits into the EA Tooling landscape</h2>
+        <div class="pure-g">
+            <div class="l-box pure-u-1 pure-u-md-1-1">
+                <p>
+                    Waltz is designed to complement existing architecture-related solutions in your organisation
+                    (such as PowerDesigner, Archimate, Sparx or other Enterprise Architecture tools);
+                    it complements these solutions and enables integration with them as the need arises.
+                    Waltz is not intended to be a golden source of data other than for data attributes
+                    derived uniquely in the tool (e.g. ‘Estate Complexity’ score).
+                </p>
+
+                <p>
+                    As a general principle, Waltz presents read-only information about the organisation
+                    by aggregating data from numerous backend systems.  Where information is not readily
+                    available Waltz does provide basic edit capabilities to facilitate data capture.
+                </p>
+            </div>
+
+
+        </div>
+    </div>
+
+    <div class="ribbon l-box-lrg pure-g">
+        <!-- OPEN SOURCE -->
+        <div class="l-box-lrg is-center pure-u-1 pure-u-md-1-2">
+            <img class="pure-img-responsive"
+                 alt="Hosted on Github"
+                 width="160"
+                 src="img/GitHub_icon_120px.png">
+            <img class="pure-img-responsive"
+                 alt="Built by Travis"
+                 width="160"
+                 src="img/TravisCI-Mascot-grey.png">
+            <br>
+
+        </div>
+        <div class="pure-u-1 pure-u-md-1-2">
+            <h2 class="content-head content-head-ribbon">Open Source</h2>
+
+            <p>
+                Waltz is being developed as open source application and is hosted on
+                Github and is being built via Travis.
+            </p>
+
+            <img src="https://travis-ci.org/finos/waltz.svg?branch=master">
+        </div>
+    </div>
+
+    <div class="content">
+        <!-- TECH DETAILS -->
+        <h2 class="content-head is-center">Technical Details</h2>
+
+        <div class="pure-g">
+            <div class="l-box-lrg pure-u-1 pure-u-md-1-2">
+                <h4>
+                    <i class="fa fa-desktop"></i>
+                    Client Side</h4>
+                <p>
+                    Waltz is accessed via a web browser. Modern web browers are
+                    supported.  We have explicitly tested on:
+                    <ul>
+                        <li>Chrome</li>
+                        <li>Firefox</li>
+                        <li>Safari</li>
+                        <li>IE 11+</li>
+                    </ul>
+                </p>
+                <p>
+                    The application makes heavy use of AngularJS, lodash and D3 for interaction.
+                    Bootstrap and Fontawesome for look n' feel and is built using Webpack and SASS.
+                </p>
+
+                <h4>
+                    <i class="fa fa-unlock-alt"></i>
+                    Security
+                </h4>
+                <p>
+                    Waltz has a pluggable security system and can <i>authenticate</i> users
+                    against a built in set of user profiles or integrate with external
+                    systems such as SSO.  Contact us for more details.
+                </p>
+                <p>
+                    One authenticated users can be granted discrete privileges within the
+                    application for <i>authorization</i> purposes.  New uses can be granted
+                    a default set of permissions, we recommend using a generous set of
+                    defaults as Waltz works best when a diverse set of users contribute their
+                    knowledge.
+                </p>
+            </div>
+
+            <div class="l-box-lrg pure-u-1 pure-u-md-1-2">
+                <h4>
+                    <i class="fa fa-server"></i>
+                    Server Side
+                </h4>
+                <p>
+                    Waltz is built as a Java based web application.  We currently
+                    deploy to (embedded) Jetty and to Apache Tomcat (8+) server.  JDK 8
+                    is required to build and run Waltz.
+                </p>
+                <p>
+                    We recommend a 64 bit JVM running with a minimum of 1GB heap.
+                </p>
+                <p>
+                    Under the covers Waltz uses Spark Framework to expose endpoints,
+                    Spring for dependency injection, JOOQ for database access and we
+                    use Immutables for representing the domain object layer.
+                </p>
+
+                <h4>
+                    <i class="fa fa-database"></i>
+                    Database</h4>
+                <p>
+                    Waltz is being built to support MariaDB (currently supported),
+                    PostgreSQL (in progress) and Microsoft SQL Server (supported -however
+                    you will need to purchase a license for JOOQ to compile and build the
+                    system).
+                </p>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer l-box is-center">
+        Waltz - FINOS 2019
+    </div>
+
+</div>
+
+</body>
+</html>

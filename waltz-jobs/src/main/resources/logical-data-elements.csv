@@ -1,7 +1,0 @@
-external_id,name,description,type
-LDE1,Counterparty Id,Counterparty Id,STRING
-LDE2,Trade Id,Trade Id,STRING
-LDE3,Name,Name,STRING
-LDE4,Execution date,Execution date,DATETIME
-LDE5,Settlement date,Settlement date,DATETIME
-LDE6,Business,Business,STRING
