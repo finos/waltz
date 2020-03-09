@@ -55,7 +55,7 @@
 
                 Please review below and
                 <a class="clickable wbas-inline-link"
-                   ng-click="$ctrl.visibility.editor = true"">correct</a>.
+                   ng-click="$ctrl.visibility.editor = true">correct</a>.
 
                 <a class="clickable"
                    ng-if="$ctrl.showNotFoundOnly"
@@ -183,8 +183,7 @@
 
             <button ng-if="!$ctrl.visibility.editor"
                     class="btn btn-xs btn-success"
-                    ng-click="$ctrl.save()"
-                    ng-disabled="$ctrl.searchSummary.notFound">
+                    ng-click="$ctrl.save()">
                 Save
             </button>
             <a ng-if="!$ctrl.visibility.editor"

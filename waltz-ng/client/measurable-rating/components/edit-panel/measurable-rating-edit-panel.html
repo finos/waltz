@@ -63,7 +63,8 @@
                ng-disabled="! tab.measurables"
                name="measurable_rating_edit"
                id="{{ tab.category.id + '_' + $id }}">
-        <label for="{{ tab.category.id + '_' + $id }}"
+        <label class="wt-label"
+               for="{{ tab.category.id + '_' + $id }}"
                ng-repeat-end>
             <span ng-bind="tab.category.name"
                   ng-class="{ italics: tab.ratings.length == 0 }">

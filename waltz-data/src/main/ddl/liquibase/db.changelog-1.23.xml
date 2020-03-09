@@ -68,6 +68,23 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="20200224-4719-1"
+               author="alimuza">
+        <comment>4719: Assessment rating rating scheme item foreign key</comment>
+        <addForeignKeyConstraint baseTableName="assessment_rating"
+                                 baseColumnNames="rating_id"
+                                 constraintName="assessment_rating_rating_scheme_item_fk"
+                                 referencedTableName="rating_scheme_item"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20200224-4719-2"
+               author="alimuza">
+        <comment>4719: Change string note text column to nvarchar(max) to allow string larger than 4000 characters</comment>
+        <modifyDataType columnName="note_text"
+                        newDataType="${maxvarchar.type}"
+                        tableName="entity_named_note"/>
+    </changeSet>
     <changeSet id="20200224-4712-1"
                author="kamransaleem">
         <dropPrimaryKey tableName="logical_flow_decorator"

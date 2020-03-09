@@ -67,20 +67,24 @@ function controller(notification, serviceBroker) {
             });
     };
 
-    vm.onDismiss = () => {
+    vm.dismiss = () => {
         vm.mode = modes.LIST;
         vm.preview = null;
         vm.selectedPendingChange = null;
+
+        if (vm.onDismiss) {
+            vm.onDismiss();
+        }
     };
 
     vm.onDiscardPendingChange = (c) => {
         vm.onDiscardChange(c)
-            .then(vm.onDismiss);
+            .then(vm.dismiss);
     };
 
     vm.onApplyPendingChange = (c) => {
         vm.onApplyChange(c)
-            .then(vm.onDismiss)
+            .then(vm.dismiss)
             .then(reload);
     };
 

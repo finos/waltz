@@ -76,6 +76,7 @@
 
         <waltz-entity-selector entity-kinds="['CHANGE_INITIATIVE']"
                                on-select="$ctrl.onAdd"
+                               entity-lifecycle-statuses="['ACTIVE', 'PENDING']"
                                selection-filter="$ctrl.searchFilter">
         </waltz-entity-selector>
     </div>

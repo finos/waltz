@@ -94,13 +94,13 @@
                                 Select the <span ng-bind="$ctrl.counterpartType"></span> entity you wish to associate.
                             </div>
                             <div class="waltz-scroll-region-300">
-                                <treecontrol class="tree-light"
-                                             tree-model="$ctrl.nodes"
-                                             options="$ctrl.treeOptions"
-                                             on-selection="$ctrl.onMeasurableSelection(node)"
-                                             order-by="'-name'">
+                                <waltz-multi-select-tree-control items="$ctrl.measurables"
+                                                                 on-check="$ctrl.onItemCheck"
+                                                                 on-uncheck="$ctrl.onItemUncheck"
+                                                                 checked-item-ids="$ctrl.checkedItemIds"
+                                                                 expanded-item-ids="$ctrl.expandedItemIds">
                                     <span ng-bind="node.name"></span>
-                                </treecontrol>
+                                </waltz-multi-select-tree-control>
                             </div>
 
                             <div class="wmt-search-region"
@@ -137,7 +137,7 @@
             <br>
 
             <!-- DESCRIPTION -->
-            <div class="form-group">
+            <div class="form-group" ng-if="!$ctrl.visibility.measurableSelector">
                 <label class="control-label">Description</label>
                 <textarea class='form-control'
                           ng-model="$ctrl.form.description"
@@ -149,14 +149,21 @@
             <hr>
 
             <!-- ACTION BUTTONS -->
+            <div ng-if="!$ctrl.visibility.measurableSelector">
+                <button class="btn btn-xs btn-success"
+                        ng-click="$ctrl.submit()"
+                        ng-disabled="! $ctrl.isFormValid()">
+                    Save
+                </button>
+                <a class="clickable" ng-click="$ctrl.onCancel()">
+                    Cancel
+                </a>
+            </div>
             <button class="btn btn-xs btn-success"
-                    ng-click="$ctrl.submit()"
-                    ng-disabled="! $ctrl.isFormValid()">
-                Save
+                    ng-if="$ctrl.visibility.measurableSelector"
+                    ng-click="$ctrl.onCancel()">
+                Finish
             </button>
-            <a class="clickable" ng-click="$ctrl.onCancel()">
-                Cancel
-            </a>
 
         </form>
 

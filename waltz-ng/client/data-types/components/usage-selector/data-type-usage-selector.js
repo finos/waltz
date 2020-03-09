@@ -159,12 +159,6 @@ function controller(serviceBroker) {
 
     // -- INTERACT
 
-    vm.toggleTypeChecked = (id) => {
-        _.some(vm.checkedItemIds, x => x === id)
-            ? vm.typeUnchecked(id)
-            : vm.typeChecked(id);
-    };
-
     vm.typeUnchecked = (id) => {
         vm.checkedItemIds = _.without(vm.checkedItemIds, id);
         vm.onDirty(hasAnyChanges() && anySelected());
