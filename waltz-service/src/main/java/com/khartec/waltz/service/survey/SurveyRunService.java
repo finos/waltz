@@ -276,7 +276,8 @@ public class SurveyRunService {
 
 
     public boolean createSurveyInstancesAndRecipients(long surveyRunId,
-                                                   List<SurveyInstanceRecipient> excludedRecipients) {
+                                                      List<SurveyInstanceRecipient> excludedRecipients) {
+
         SurveyRun surveyRun = surveyRunDao.getById(surveyRunId);
         checkNotNull(surveyRun, "surveyRun " + surveyRunId + " not found");
 

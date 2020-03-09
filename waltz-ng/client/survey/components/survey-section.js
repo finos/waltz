@@ -93,7 +93,7 @@ function controller(notification, serviceBroker, userService) {
     };
 
     vm.$onInit = () => {
-        serviceBroker.loadViewData(CORE_API.RoleStore.findAllRoles)
+        serviceBroker.loadAppData(CORE_API.RoleStore.findAllRoles)
             .then(r => vm.customRoles = _.filter(r.data, d => d.isCustom === true));
 
         userService

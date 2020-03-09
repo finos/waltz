@@ -151,11 +151,11 @@ function controller($state, serviceBroker, userService, notification) {
 
 
     function loadRoles() {
-        serviceBroker.loadViewData(CORE_API.RoleStore.findAllRoles)
+        serviceBroker.loadAppData(CORE_API.RoleStore.findAllRoles)
             .then(r => {
                 const rolesByKey = _.keyBy(r.data, d => d.key);
                 vm.owningRole = rolesByKey[vm.surveyInstance.owningRole];
-            })
+            });
     }
 
     function reload(force = false) {
