@@ -204,6 +204,7 @@ a.pure-button-primary {
 /* This is the class used for the content sub-headers (<h3>) */
 .content-subhead {
     color: #1f8dd6;
+    text-decoration: none;
 }
     .content-subhead i {
         margin-right: 7px;
