@@ -14,7 +14,7 @@
 # You can create any custom variable you would like, and they will be accessible
 # in the templates via {{ site.myvariable }}.
 title: FINOS - Waltz
-email: dwatkins@khartec.com
+email: fdx-pmc@finos.org
 description: >- # this means to ignore newlines until "baseurl:"
   Khartec, open source producer of Waltz: An Enterprise Architecture information service
 # baseurl: "/blog" # the subpath of your site, e.g. /blog
