@@ -17,6 +17,7 @@
  */
 import {initialiseData} from "../../common/index";
 import template from './survey-run-create-general.html';
+import {CORE_API} from "../../common/services/core-api-utils";
 
 
 const bindings = {
@@ -54,6 +55,10 @@ const initialState = {
         'CHANGE_INITIATIVE': [exactScope],
         'ORG_UNIT': [exactScope, childrenScope],
         'MEASURABLE': [exactScope, childrenScope]
+    },
+    surveyRun: {
+        selectorEntity: null,
+        owningRole: null
     }
 };
 
@@ -80,7 +85,7 @@ function mkAllowedEntityKinds(entityKind) {
 }
 
 
-function controller(appGroupStore, involvementKindStore) {
+function controller(appGroupStore, involvementKindStore, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = () => {
@@ -102,6 +107,11 @@ function controller(appGroupStore, involvementKindStore) {
         }
     );
 
+    vm.$onInit = () => {
+        serviceBroker.loadViewData(CORE_API.RoleStore.findAllRoles)
+            .then(r => vm.customRoles = _.filter(r.data, d => d.isCustom));
+    };
+
     vm.onSelectorEntityKindChange = () => {
         vm.surveyRun.selectorEntity = null;
     };
@@ -118,7 +128,8 @@ function controller(appGroupStore, involvementKindStore) {
 
 controller.$inject = [
     'AppGroupStore',
-    'InvolvementKindStore'
+    'InvolvementKindStore',
+    'ServiceBroker'
 ];
 
 

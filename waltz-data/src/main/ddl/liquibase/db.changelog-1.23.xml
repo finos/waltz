@@ -85,6 +85,28 @@
                         newDataType="${maxvarchar.type}"
                         tableName="entity_named_note"/>
     </changeSet>
+
+    <changeSet id="20200304-4734-1"
+               author="woodjes">
+        <comment>4734: Surveys: Add owning role to allow multiple survey owners</comment>
+        <addColumn tableName="survey_instance">
+            <column name="owning_role"
+                    type="${role.type}">
+                <constraints nullable="true"></constraints>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20200304-4734-2"
+               author="woodjes">
+        <comment>4734: Surveys: Add owning role to allow multiple survey owners</comment>
+        <addColumn tableName="survey_instance">
+            <column name="owner_id"
+                    type="${id.type}">
+                <constraints nullable="true"></constraints>
+            </column>
+        </addColumn>
+    </changeSet>
     <changeSet id="20200224-4712-1"
                author="kamransaleem">
         <dropPrimaryKey tableName="logical_flow_decorator"

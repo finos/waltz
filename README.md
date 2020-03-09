@@ -56,10 +56,6 @@ See [pom.xml](https://github.com/khartec/waltz/blob/master/pom.xml) for a full l
 
 See [package.json](https://github.com/khartec/waltz/blob/master/waltz-ng/package.json) for full list of javascript dependencies.
 
-## Contact
-
-- email: [mailto:dwatkins@khartec.com]
-
 
 ## Contributors
 
