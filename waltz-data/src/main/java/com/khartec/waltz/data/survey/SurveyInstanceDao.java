@@ -81,6 +81,8 @@ public class SurveyInstanceDao {
                 .approvedAt(ofNullable(record.getApprovedAt()).map(Timestamp::toLocalDateTime).orElse(null))
                 .approvedBy(record.getApprovedBy())
                 .originalInstanceId(record.getOriginalInstanceId())
+                .ownerId(record.getOwnerId())
+                .owningRole(record.getOwningRole())
                 .build();
     };
 
@@ -138,6 +140,8 @@ public class SurveyInstanceDao {
         record.setEntityId(command.entityReference().id());
         record.setStatus(command.status().name());
         record.setDueDate(command.dueDate().map(Date::valueOf).orElse(null));
+        record.setOwnerId(command.ownerId());
+        record.setOwningRole(command.owningRole());
 
         record.store();
         return record.getId();
@@ -160,6 +164,8 @@ public class SurveyInstanceDao {
                 .map(dt -> Timestamp.valueOf(currentInstance.approvedAt()))
                 .orElse(null));
         record.setApprovedBy(currentInstance.approvedBy());
+        record.setOwnerId(currentInstance.ownerId());
+        record.setOwningRole(currentInstance.owningRole());
 
         record.store();
         return record.getId();
@@ -197,6 +203,14 @@ public class SurveyInstanceDao {
                 .set(SURVEY_INSTANCE.DUE_DATE, toSqlDate(newDueDate))
                 .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
+                .execute();
+    }
+
+
+    public int updateOwningRoleForSurveyRun(long surveyRunId, String role) {
+        return dsl.update(SURVEY_INSTANCE)
+                .set(SURVEY_INSTANCE.OWNING_ROLE, role)
+                .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
                 .execute();
     }
 

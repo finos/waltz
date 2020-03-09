@@ -19,6 +19,7 @@ import _ from "lodash";
 import {initialiseData} from "../common/index";
 import {timeFormat} from "d3-time-format";
 import template from "./survey-run-create.html";
+import {CORE_API} from "../common/services/core-api-utils";
 
 
 const initialState = {
@@ -39,7 +40,8 @@ function controller($document,
                     $state,
                     $stateParams,
                     surveyRunStore,
-                    surveyTemplateStore) {
+                    surveyTemplateStore,
+                    serviceBroker) {
 
     const vm = initialiseData(this, initialState);
     const templateId = $stateParams.id;
@@ -120,7 +122,8 @@ function controller($document,
 
     vm.onSaveRecipient = (surveyRun, includedRecipients, excludedRecipients) => {
         surveyRunStore.createSurveyRunInstancesAndRecipients(surveyRun.id, excludedRecipients)
-            .then(r => surveyRunStore.updateStatus(surveyRun.id, {newStatus: "ISSUED"})
+            .then(() => serviceBroker.execute(CORE_API.SurveyRunStore.updateOwningRole, [surveyRun.id, {owningRole: surveyRun.owningRole}]))
+            .then(() => surveyRunStore.updateStatus(surveyRun.id, {newStatus: "ISSUED"})
                 .then(() => {
                     vm.step = "COMPLETED";
                     generateEmailLink(surveyRun, includedRecipients);
@@ -141,7 +144,8 @@ controller.$inject = [
     "$state",
     "$stateParams",
     "SurveyRunStore",
-    "SurveyTemplateStore"
+    "SurveyTemplateStore",
+    "ServiceBroker"
 ];
 
 

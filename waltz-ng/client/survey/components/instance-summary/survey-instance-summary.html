@@ -47,8 +47,8 @@
 
     <!-- ISSUED / APPROVED -->
     <div class="row waltz-survey-summary-row">
+        <div ng-include="'wsis-issued-by'"></div>
         <div ng-include="'wsis-issued-date'"></div>
-        <div ng-include="'wsis-approval'"></div>
     </div>
 
     <!-- SUBJECT / DUE -->
@@ -169,20 +169,24 @@
 </script>
 
 
-<!-- ISSUED DATE -->
+<!-- ISSUED BY -->
 <script type="text/ng-template"
-        id="wsis-issued-date">
+        id="wsis-issued-by">
     <div class="col-sm-2 waltz-display-field-label">
-        Issued
+        Issued By
     </div>
     <div class="col-sm-4">
         <waltz-entity-link entity-ref="$ctrl.owner"
                            tooltip-placement="right">
         </waltz-entity-link>
-        /
-        <waltz-from-now timestamp="$ctrl.surveyRun.issuedOn"
-                        days-only="true">
-        </waltz-from-now>
+        <span ng-if="$ctrl.surveyInstance.owningRole">
+            /
+            <span ng-bind="$ctrl.owningRole.name"
+                  uib-popover="Admin group for this survey"
+                  popover-trigger="mouseenter"
+                  popover-append-to-body="true">
+            </span>
+        </span>
     </div>
 </script>
 
@@ -287,5 +291,19 @@
         <span ng-if="! $ctrl.surveyInstance.approvedAt">
             -
         </span>
+    </div>
+</script>
+
+
+<!-- ISSUED ON -->
+<script type="text/ng-template"
+        id="wsis-issued-date">
+    <div class="col-sm-2 waltz-display-field-label">
+        Issued
+    </div>
+    <div class="col-sm-4">
+        <waltz-from-now timestamp="$ctrl.surveyRun.issuedOn"
+                        days-only="true">
+        </waltz-from-now>
     </div>
 </script>
