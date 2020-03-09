@@ -739,7 +739,7 @@
                author="kearash1">
         <sql>
             UPDATE involvement
-            SET is_readonly = CASE WHEN provenance = 'waltz' THEN 0 ELSE 1
+            SET is_readonly = CASE WHEN provenance = 'waltz' THEN ${false.value} ELSE ${true.value}
             END
         </sql>
     </changeSet>

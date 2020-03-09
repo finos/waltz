@@ -23,6 +23,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.khartec.waltz.common.Checks.checkAll;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static java.util.stream.Collectors.toList;
 
@@ -169,5 +170,29 @@ public class StringUtilities {
         return isEmpty(str)
                 ? Optional.empty()
                 : Optional.of(str);
+    }
+
+
+    /**
+     * Given a vararg/array of path segments will join them
+     * to make a string representing the path.  No starting or trailing
+     * slashes are added to the resultant path string.
+     *
+     * @param segs Segments to join
+     * @return String representing the path produced by joining the segments
+     * @throws IllegalArgumentException If any of the segments are null
+     */
+    public static String mkPath(Object... segs) {
+        checkAll(
+                segs,
+                d -> d != null && notEmpty(d.toString()),
+                "Cannot convert empty segments to path");
+
+        return Stream
+                .of(segs)
+                .map(Object::toString)
+                .collect(Collectors.joining("/"))
+                .replaceAll("/+", "/");
+
     }
 }
