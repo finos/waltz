@@ -24,6 +24,7 @@ import {timeFormat} from "d3-time-format";
 import {loadEntity, sameRef} from "../../../common/entity-utils";
 import {displayError} from "../../../common/error-utils";
 import roles from "../../../user/system-roles";
+import {mkDescription} from "../../survey-utils";
 
 
 const bindings = {
@@ -254,7 +255,13 @@ function controller($state, serviceBroker, userService, notification) {
                 return serviceBroker
                     .loadViewData(CORE_API.SurveyRunStore.getById, [runId])
                     .then(r => vm.surveyRun = r.data);
-            });
+            }).then(() => serviceBroker
+                .loadViewData(CORE_API.SurveyTemplateStore.getById, [vm.surveyRun.surveyTemplateId])
+                .then(r => {
+                     const surveyTemplate = r.data;
+                    vm.description = mkDescription([surveyTemplate.description, vm.surveyRun.description]);
+                })
+            );
     }
 
     function loadRecipients(force) {
