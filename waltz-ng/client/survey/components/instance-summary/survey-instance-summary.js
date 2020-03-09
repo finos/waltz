@@ -258,7 +258,7 @@ function controller($state, serviceBroker, userService, notification) {
             }).then(() => serviceBroker
                 .loadViewData(CORE_API.SurveyTemplateStore.getById, [vm.surveyRun.surveyTemplateId])
                 .then(r => {
-                     const surveyTemplate = r.data;
+                    const surveyTemplate = r.data;
                     vm.description = mkDescription([surveyTemplate.description, vm.surveyRun.description]);
                 })
             );
