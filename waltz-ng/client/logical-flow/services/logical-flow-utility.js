@@ -74,7 +74,8 @@ export default [
 
 
         const enrichDataTypeCounts = (dataTypeCounts = [], displayNameService) => {
-            return _.chain(dataTypeCounts)
+            return _
+                .chain(dataTypeCounts)
                 .map(dc => {
                     const enriched = {
                         dataType: {
