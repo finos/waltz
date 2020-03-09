@@ -20,30 +20,21 @@ package com.khartec.waltz.model.survey;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Nullable;
-import com.khartec.waltz.model.command.Command;
 import org.immutables.value.Value;
 
-import java.time.LocalDate;
-import java.util.Optional;
+import java.util.List;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableSurveyInstanceCreateCommand.class)
-@JsonDeserialize(as = ImmutableSurveyInstanceCreateCommand.class)
-public abstract class SurveyInstanceCreateCommand implements Command {
+@JsonSerialize(as = ImmutableSurveyInstanceRecipientsAndOwners.class)
+@JsonDeserialize(as = ImmutableSurveyInstanceRecipientsAndOwners.class)
+public abstract class SurveyInstanceRecipientsAndOwners {
 
-    public abstract Long surveyRunId();
-    public abstract EntityReference entityReference();
-    public abstract Optional<LocalDate> dueDate();
-    @Value.Default
-    public SurveyInstanceStatus status() {
-        return SurveyInstanceStatus.NOT_STARTED;
-    }
+    public abstract List<Long> personIds();
 
     @Nullable
     public abstract String owningRole();
 
     @Nullable
-    public abstract Long ownerId();
+    public abstract String ownerId();
 }

@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
 
@@ -41,7 +42,7 @@ public class MeasurableCategoryDao {
                 .ratingSchemeId(r.getRatingSchemeId())
                 .id(r.getId())
                 .name(r.getName())
-                .externalId(r.getExternalId())
+                .externalId(Optional.ofNullable(r.getExternalId()))
                 .description(r.getDescription())
                 .lastUpdatedBy(r.getLastUpdatedBy())
                 .lastUpdatedAt(r.getLastUpdatedAt().toLocalDateTime())

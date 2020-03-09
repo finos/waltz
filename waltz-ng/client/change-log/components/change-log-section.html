@@ -17,14 +17,6 @@
   -->
 
 <div>
-    <waltz-section-actions>
-        <button ng-click="$ctrl.exportChangeLog()"
-                class="btn btn-xs btn-primary"
-                ng-if="$ctrl.entries.length > 0">
-            <waltz-icon name="cloud-download"></waltz-icon>
-            Export
-        </button>
-    </waltz-section-actions>
 
     <div ng-if="$ctrl.entries.length > 0">
         <waltz-change-log-table entries="$ctrl.entries"
@@ -44,6 +36,12 @@
                ng-click="$ctrl.refresh()">
                 Refresh now
             </a>
+            |&nbsp;
+            <waltz-data-extract-link name="Export"
+                                     styling="link"
+                                     extract="change-log/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
+                                     method="POST">
+            </waltz-data-extract-link>
         </div>
 
     </div>

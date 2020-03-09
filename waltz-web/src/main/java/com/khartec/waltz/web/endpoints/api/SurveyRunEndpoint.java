@@ -31,8 +31,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
-import java.util.List;
-
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
@@ -75,6 +73,7 @@ public class SurveyRunEndpoint implements Endpoint {
         String createSurveyInstancesPath = mkPath(BASE_URL, ":id", "create-instances");
         String updateSurveyRunStatusPath = mkPath(BASE_URL, ":id", "status");
         String updateSurveyRunDueDatePath = mkPath(BASE_URL, ":id", "due-date");
+        String updateOwningRolePath = mkPath(BASE_URL, ":id", "role");
         String getSurveyRunCompletionRate = mkPath(BASE_URL, ":id", "completion-rate");
 
         DatumRoute<SurveyRun> getByIdRoute = (req, res) ->
@@ -131,6 +130,16 @@ public class SurveyRunEndpoint implements Endpoint {
                     command);
         };
 
+        DatumRoute<Integer> surveyRunUpdateOwningRolesRoute = (req, res) -> {
+
+            SurveyInstanceOwningRoleSaveCommand owningRole = readBody(req, SurveyInstanceOwningRoleSaveCommand.class);
+
+            return surveyRunService.updateSurveyInstanceOwningRoles(
+                    getUsername(req),
+                    getId(req),
+                    owningRole);
+        };
+
         ListRoute<SurveyInstanceRecipient> generateSurveyRunRecipientsRoute = (request, response) -> {
             ensureUserHasAdminRights(request);
 
@@ -147,10 +156,13 @@ public class SurveyRunEndpoint implements Endpoint {
 
         DatumRoute<Boolean> createSurveyInstancesRoute = (request, response) -> {
             long runId = getId(request);
-            List<Long> personIds = readIdsFromBody(request);
+
+            SurveyInstanceRecipientsAndOwners recipientsAndOwners = readBody(request, SurveyInstanceRecipientsAndOwners.class);
+
             return surveyRunService.createDirectSurveyInstances(
                     runId,
-                    personIds);
+                    recipientsAndOwners.personIds(),
+                    recipientsAndOwners.owningRole());
         };
 
         DatumRoute<SurveyRunCompletionRate> getSurveyRunCompletionRateRoute = (request, response)
@@ -169,6 +181,7 @@ public class SurveyRunEndpoint implements Endpoint {
         postForDatum(createSurveyInstancesPath, createSurveyInstancesRoute);
         putForDatum(updateSurveyRunStatusPath, surveyRunUpdateStatusRoute);
         putForDatum(updateSurveyRunDueDatePath, surveyRunUpdateDueDateRoute);
+        putForDatum(updateOwningRolePath, surveyRunUpdateOwningRolesRoute);
         getForDatum(getSurveyRunCompletionRate, getSurveyRunCompletionRateRoute);
     }
 
