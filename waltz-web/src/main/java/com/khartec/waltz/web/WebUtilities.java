@@ -75,21 +75,10 @@ public class WebUtilities {
 
 
     /**
-     * Given a vararg/array of path segments will join them
-     * to make a string representing the path.  No starting or trailing
-     * slashes are added to the resultant path string.
-     *
-     * @param segs Segments to join
-     * @return String representing the path produced by joining the segments
-     * @throws IllegalArgumentException If any of the segments are null
+     * @see StringUtilities
      */
     public static String mkPath(String... segs) {
-        checkAll(
-                segs,
-                x -> StringUtilities.notEmpty(x),
-                "Cannot convert empty segments to path");
-
-        return String.join("/", segs);
+        return StringUtilities.mkPath(segs);
     }
 
 
