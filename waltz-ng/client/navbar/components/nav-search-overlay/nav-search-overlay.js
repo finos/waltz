@@ -48,7 +48,8 @@ const initialState = {
         entity.PHYSICAL_SPECIFICATION.key,
         entity.LOGICAL_DATA_ELEMENT.key,
         entity.ROADMAP.key,
-        entity.SERVER.key
+        entity.SERVER.key,
+        entity.SOFTWARE.key
     ],
     selectedCategory: null,
     showActiveOnly: true,
@@ -145,6 +146,7 @@ function controller($element,
         handleSearch(query, entity.LOGICAL_DATA_ELEMENT.key);
         handleSearch(query, entity.ROADMAP.key);
         handleSearch(query, entity.SERVER.key);
+        handleSearch(query, entity.SOFTWARE.key);
     };
 
     vm.doSearch = () => doSearch(vm.query);

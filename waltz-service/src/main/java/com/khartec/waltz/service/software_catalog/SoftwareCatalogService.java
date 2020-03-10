@@ -24,6 +24,7 @@ import com.khartec.waltz.data.software_catalog.SoftwarePackageDao;
 import com.khartec.waltz.data.software_catalog.SoftwareUsageDao;
 import com.khartec.waltz.data.software_catalog.SoftwareVersionDao;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.software_catalog.*;
 import com.khartec.waltz.model.tally.Tally;
 import org.jooq.Record1;
@@ -31,6 +32,7 @@ import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -150,4 +152,7 @@ public class SoftwareCatalogService {
         }
     }
 
+    public Collection<SoftwarePackage> search(EntitySearchOptions options) {
+        return softwarePackageDao.search(options);
+    }
 }

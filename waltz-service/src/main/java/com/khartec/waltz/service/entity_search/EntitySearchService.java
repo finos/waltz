@@ -35,6 +35,7 @@ import com.khartec.waltz.service.person.PersonService;
 import com.khartec.waltz.service.physical_specification.PhysicalSpecificationService;
 import com.khartec.waltz.service.roadmap.RoadmapService;
 import com.khartec.waltz.service.server_information.ServerInformationService;
+import com.khartec.waltz.service.software_catalog.SoftwareCatalogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -64,6 +65,7 @@ public class EntitySearchService {
     private final PhysicalSpecificationService physicalSpecificationService;
     private final RoadmapService roadmapService;
     private final ServerInformationService serverInformationService;
+    private final SoftwareCatalogService softwareCatalogService;
 
 
     @Autowired
@@ -79,7 +81,8 @@ public class EntitySearchService {
                                PersonService personService,
                                PhysicalSpecificationService physicalSpecificationService,
                                RoadmapService roadmapService,
-                               ServerInformationService serverInformationService) {
+                               ServerInformationService serverInformationService,
+                               SoftwareCatalogService softwareCatalogService) {
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
         checkNotNull(actorService, "actorService cannot be null");
         checkNotNull(applicationService, "applicationService cannot be null");
@@ -93,6 +96,7 @@ public class EntitySearchService {
         checkNotNull(physicalSpecificationService, "physicalSpecificationService cannot be null");
         checkNotNull(roadmapService, "roadmapService cannot be null");
         checkNotNull(serverInformationService, "serverInformationService cannot be null");
+        checkNotNull(softwareCatalogService, "softwareCatalogService cannot be null");
 
         this.actorService = actorService;
         this.dbExecutorPool = dbExecutorPool;
@@ -107,6 +111,7 @@ public class EntitySearchService {
         this.physicalSpecificationService = physicalSpecificationService;
         this.roadmapService = roadmapService;
         this.serverInformationService = serverInformationService;
+        this.softwareCatalogService = softwareCatalogService;
     }
 
 
@@ -159,6 +164,8 @@ public class EntitySearchService {
                 return () -> roadmapService.search(options);
             case SERVER:
                 return () -> serverInformationService.search(options);
+            case SOFTWARE:
+                return () -> softwareCatalogService.search(options);
             default:
                 throw new UnsupportedOperationException("no search service available for: " + entityKind);
         }

@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.data.software_catalog;
 
-import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.model.UserTimestamp;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.software_catalog.ImmutableSoftwarePackage;
 import com.khartec.waltz.model.software_catalog.SoftwarePackage;
 import com.khartec.waltz.model.tally.Tally;
@@ -32,13 +32,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
+import static com.khartec.waltz.common.SetUtilities.orderedUnion;
+import static com.khartec.waltz.data.SearchUtilities.mkRelevancyComparator;
+import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.SoftwarePackage.SOFTWARE_PACKAGE;
 import static com.khartec.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
 import static com.khartec.waltz.schema.tables.SoftwareVersion.SOFTWARE_VERSION;
@@ -91,7 +93,7 @@ public class SoftwarePackageDao {
 
 
     public int[] bulkStore(Collection<SoftwarePackage> softwarePackages) {
-        Checks.checkNotNull(softwarePackages, "Cannot store a null collection of software packages");
+        checkNotNull(softwarePackages, "Cannot store a null collection of software packages");
 
         List<SoftwarePackageRecord> records = softwarePackages.stream()
                 .map(TO_RECORD)
@@ -153,4 +155,58 @@ public class SoftwarePackageDao {
                 .fetch(JooqUtilities.TO_STRING_TALLY);
     }
 
+
+    public Collection<SoftwarePackage> search(EntitySearchOptions options) {
+        checkNotNull(options, "options cannot be null");
+        List<String> terms = mkTerms(options.searchQuery());
+
+        if (terms.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        Condition externalIdCondition = terms.stream()
+                .map(SOFTWARE_PACKAGE.EXTERNAL_ID::startsWithIgnoreCase)
+                .collect(Collectors.reducing(
+                        DSL.trueCondition(),
+                        (acc, frag) -> acc.and(frag)));
+
+        List<SoftwarePackage> serversViaExternalId = dsl.selectDistinct(SOFTWARE_PACKAGE.fields())
+                .from(SOFTWARE_PACKAGE)
+                .where(externalIdCondition)
+                .orderBy(SOFTWARE_PACKAGE.EXTERNAL_ID)
+                .limit(options.limit())
+                .fetch(SoftwarePackageDao.TO_DOMAIN);
+
+        Condition nameCondition = terms.stream()
+                .map(SOFTWARE_PACKAGE.NAME::containsIgnoreCase)
+                .collect(Collectors.reducing(
+                        DSL.trueCondition(),
+                        (acc, frag) -> acc.and(frag)));
+
+        List<SoftwarePackage> softwareViaName = dsl.selectDistinct(SOFTWARE_PACKAGE.fields())
+                .from(SOFTWARE_PACKAGE)
+                .where(nameCondition)
+                .orderBy(SOFTWARE_PACKAGE.NAME)
+                .limit(options.limit())
+                .fetch(SoftwarePackageDao.TO_DOMAIN);
+
+        Condition vendorCondition = terms.stream()
+                .map(SOFTWARE_PACKAGE.VENDOR::containsIgnoreCase)
+                .collect(Collectors.reducing(
+                        DSL.trueCondition(),
+                        (acc, frag) -> acc.and(frag)));
+
+        List<SoftwarePackage> softwareViaVendor = dsl.selectDistinct(SOFTWARE_PACKAGE.fields())
+                .from(SOFTWARE_PACKAGE)
+                .where(vendorCondition)
+                .orderBy(SOFTWARE_PACKAGE.VENDOR)
+                .limit(options.limit())
+                .fetch(SoftwarePackageDao.TO_DOMAIN);
+
+        softwareViaName.sort(mkRelevancyComparator(a -> a.name(), terms.get(0)));
+        softwareViaVendor.sort(mkRelevancyComparator(a -> a.vendor(), terms.get(0)));
+        serversViaExternalId.sort(mkRelevancyComparator(a -> a.externalId().orElse(null), terms.get(0)));
+
+        return new ArrayList<>(orderedUnion(serversViaExternalId, softwareViaName, softwareViaVendor));
+    }
 }
