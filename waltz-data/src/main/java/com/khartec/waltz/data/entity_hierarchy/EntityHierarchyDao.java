@@ -20,12 +20,17 @@ package com.khartec.waltz.data.entity_hierarchy;
 
 import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.entity_hierarchy.EntityHierarchyItem;
+import com.khartec.waltz.model.entity_hierarchy.ImmutableEntityHierarchyItem;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.EntityHierarchy;
+import com.khartec.waltz.schema.tables.records.ApplicationRecord;
 import com.khartec.waltz.schema.tables.records.EntityHierarchyRecord;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.RecordMapper;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +58,18 @@ public class EntityHierarchyDao {
                     item.id().get(),
                     item.parentId().orElse(null),
                     item.level());
+
+    public static final RecordMapper<Record, EntityHierarchyItem> TO_DOMAIN_MAPPER = record -> {
+        EntityHierarchyRecord ehRecord = record.into(ENTITY_HIERARCHY);
+        EntityHierarchyItem item = ImmutableEntityHierarchyItem.builder()
+                .id(ehRecord.getId())
+                .kind(Enum.valueOf(EntityKind.class, ehRecord.getKind()))
+                .parentId(ehRecord.getAncestorId())
+                .level(ehRecord.getLevel())
+                .build();
+
+        return item;
+    };
 
     private final DSLContext dsl;
 
@@ -98,6 +115,16 @@ public class EntityHierarchyDao {
                         .and(eh.ID.eq(eh.ANCESTOR_ID)))
                 .groupBy(eh.KIND)
                 .fetch(TO_STRING_TALLY);
+    }
+
+
+    public List<EntityHierarchyItem> findDesendents(EntityReference ref) {
+        checkNotNull(ref, "ref cannot be null");
+        return dsl
+                .selectFrom(ENTITY_HIERARCHY)
+                .where(ENTITY_HIERARCHY.KIND.eq(ref.kind().name()))
+                .and(ENTITY_HIERARCHY.ANCESTOR_ID.eq(ref.id()))
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 }

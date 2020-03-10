@@ -107,4 +107,38 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet id="20200224-4712-1"
+               author="kamransaleem">
+        <dropPrimaryKey tableName="logical_flow_decorator"
+                        constraintName="data_flow_decorator_pkey" />
+    </changeSet>
+
+    <changeSet id="20200224-4712-2"
+               author="kamransaleem">
+        <createIndex indexName="idx_lfd_lfid_deckind_decid"
+                     tableName="logical_flow_decorator"
+                     unique="true">
+            <column name="logical_flow_id" />
+            <column name="decorator_entity_kind" />
+            <column name="decorator_entity_id" />
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20200224-4712-3"
+               author="kamransaleem">
+        <addColumn tableName="logical_flow_decorator">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20200224-4712-4"
+               author="kamransaleem">
+        <addPrimaryKey tableName="logical_flow_decorator"
+                       constraintName="logical_flow_decorator_pkey"
+                       columnNames="id" />
+    </changeSet>
+
 </databaseChangeLog>

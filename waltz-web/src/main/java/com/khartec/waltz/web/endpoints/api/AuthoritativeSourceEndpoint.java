@@ -157,7 +157,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
         String username = getUsername(request);
         LOG.info("Recalculating all flow ratings (requested by: {})", username);
 
-        return authoritativeSourceService.recalculateAllFlowRatings();
+        return authoritativeSourceService.fastRecalculateAllFlowRatings();
     }
 
 

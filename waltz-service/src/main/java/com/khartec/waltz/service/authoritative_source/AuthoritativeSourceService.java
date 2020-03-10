@@ -29,10 +29,7 @@ import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
-import com.khartec.waltz.model.authoritativesource.AuthoritativeSourceCreateCommand;
-import com.khartec.waltz.model.authoritativesource.AuthoritativeSourceUpdateCommand;
-import com.khartec.waltz.model.authoritativesource.NonAuthoritativeSource;
+import com.khartec.waltz.model.authoritativesource.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.datatype.DataType;
@@ -159,13 +156,25 @@ public class AuthoritativeSourceService {
     }
 
 
+    @Deprecated
     public boolean recalculateAllFlowRatings() {
         logicalFlowDecoratorDao.updateRatingsByCondition(AuthoritativenessRating.NO_OPINION, DSL.trueCondition());
         findAll()
                 .forEach(authSource -> ratingCalculator.update(
                         authSource.dataType(),
                         authSource.parentReference()));
+        return true;
+    }
 
+
+    public boolean fastRecalculateAllFlowRatings() {
+        logicalFlowDecoratorDao.updateRatingsByCondition(AuthoritativenessRating.NO_OPINION, DSL.trueCondition());
+        List<AuthoritativeRatingVantagePoint> authoritativeRatingVantagePoints = authoritativeSourceDao.findAuthoritativeRatingVantagePoints();
+        authoritativeRatingVantagePoints.forEach(a -> {
+            LOG.info("Updating decorators for: {}", a);
+            int updateCount = logicalFlowDecoratorDao.updateDecoratorsForAuthSource(a);
+            LOG.info("Updated {} decorators for: {}", updateCount, a);
+        });
         return true;
     }
 

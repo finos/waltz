@@ -68,6 +68,7 @@ public class AuthoritativeSourceDao {
     private final static Field<Long> targetOrgUnitId = ehOrgUnit.ID.as("targetOrgUnitId");
     private final static Field<Integer> declaredOrgUnitLevel = ehOrgUnit.LEVEL.as("declaredOrgUnitLevel");
     private final static Field<String> declaredDataTypeCode = AUTHORITATIVE_SOURCE.DATA_TYPE.as("declaredDataTypeCode");
+    private final static Field<Long> declaredDataTypeId = ehDataType.ID.as("declaredDataTypeId");
     private final static Field<Integer> declaredDataTypeLevel = ehDataType.LEVEL.as("declaredDataTypeLevel");
     private final static Field<String> targetDataTypeCode = impliedDataType.CODE.as("targetDataTypeCode");
 
@@ -110,13 +111,11 @@ public class AuthoritativeSourceDao {
     private static final RecordMapper<Record, AuthoritativeRatingVantagePoint> TO_VANTAGE_MAPPER = r -> {
         AuthoritativeSourceRecord authRecord = r.into(AuthoritativeSourceRecord.class);
         return ImmutableAuthoritativeRatingVantagePoint.builder()
-                .vantagePoint(ImmutableEntityReference.builder()
-                        .kind(EntityKind.ORG_UNIT)
-                        .id(r.get(targetOrgUnitId))
-                        .build())
+                .vantagePoint(mkRef(EntityKind.ORG_UNIT, r.get(targetOrgUnitId)))
                 .vantagePointRank(r.get(declaredOrgUnitLevel))
                 .applicationId(authRecord.getApplicationId())
                 .rating(AuthoritativenessRating.valueOf(authRecord.getRating()))
+                .dataType(mkRef(EntityKind.DATA_TYPE, r.get(declaredDataTypeId)))
                 .dataTypeCode(r.get(targetDataTypeCode))
                 .dataTypeRank(r.get(declaredDataTypeLevel))
                 .build();
@@ -207,11 +206,12 @@ public class AuthoritativeSourceDao {
     }
 
 
-    public List<AuthoritativeRatingVantagePoint> findAuthoritativeRatingVantagePoints(Set<Long> orgIds) {
-        SelectSeekStep3<Record7<Long, Integer, String, Integer, String, Long, String>, Integer, Integer, Long> record7s = dsl.select(
+    public List<AuthoritativeRatingVantagePoint> findExpandedAuthoritativeRatingVantagePoints(Set<Long> orgIds) {
+        SelectSeekStep3<Record8<Long, Integer, String, Long, Integer, String, Long, String>, Integer, Integer, Long> select = dsl.select(
                 targetOrgUnitId,
                 declaredOrgUnitLevel,
                 declaredDataTypeCode,
+                declaredDataTypeId,
                 declaredDataTypeLevel,
                 targetDataTypeCode,
                 AUTHORITATIVE_SOURCE.APPLICATION_ID,
@@ -228,7 +228,38 @@ public class AuthoritativeSourceDao {
                 .where(ehOrgUnit.ID.in(orgIds))
                 .orderBy(ehOrgUnit.LEVEL.desc(), ehDataType.LEVEL.desc(), ehOrgUnit.ID);
 
-        return record7s.fetch(TO_VANTAGE_MAPPER);
+        return select.fetch(TO_VANTAGE_MAPPER);
+    }
+
+
+    public List<AuthoritativeRatingVantagePoint> findAuthoritativeRatingVantagePoints() {
+        SelectSeekStep4<Record8<Long, Integer, String, Long, Integer, String, Long, String>, Integer, Integer, Long, Long> select = dsl.select(
+                targetOrgUnitId,
+                declaredOrgUnitLevel,
+                declaredDataTypeCode,
+                declaredDataTypeId,
+                declaredDataTypeLevel,
+                declaredDataTypeCode.as(targetDataTypeCode),
+                AUTHORITATIVE_SOURCE.APPLICATION_ID,
+                AUTHORITATIVE_SOURCE.RATING)
+                .from(AUTHORITATIVE_SOURCE)
+                .innerJoin(ehOrgUnit)
+                .on(ehOrgUnit.ANCESTOR_ID.eq(AUTHORITATIVE_SOURCE.PARENT_ID)
+                        .and(ehOrgUnit.KIND.eq(EntityKind.ORG_UNIT.name()))
+                        .and(ehOrgUnit.ID.eq(ehOrgUnit.ANCESTOR_ID)))
+                .innerJoin(DATA_TYPE)
+                .on(DATA_TYPE.CODE.eq(AUTHORITATIVE_SOURCE.DATA_TYPE))
+                .innerJoin(ehDataType)
+                .on(ehDataType.ANCESTOR_ID.eq(DATA_TYPE.ID)
+                        .and(ehDataType.KIND.eq(EntityKind.DATA_TYPE.name()))
+                        .and(ehDataType.ID.eq(ehDataType.ANCESTOR_ID)))
+                .orderBy(
+                        ehOrgUnit.LEVEL.desc(),
+                        ehDataType.LEVEL.desc(),
+                        ehOrgUnit.ID,
+                        ehDataType.ID
+                );
+        return select.fetch(TO_VANTAGE_MAPPER);
     }
 
 
