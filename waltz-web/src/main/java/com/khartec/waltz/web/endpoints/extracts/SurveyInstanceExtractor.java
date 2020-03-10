@@ -391,7 +391,7 @@ public class SurveyInstanceExtractor implements DataExtractor {
                                 .map(q -> tuple(q, answersByQuestionId.get(q.id().get())))
                                 .forEach(t -> {
                                     reportRow.add(findValueInRecord(t.v1, t.v2));
-                                    if (t.v1.allowComment()) {
+                                    if (t.v1.allowComment() && t.v2 != null) {
                                         reportRow.add(t.v2.get(sqr.COMMENT));
                                     }
                                 });
