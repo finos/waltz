@@ -270,7 +270,7 @@ function controller($q, $animate, uiGridConstants, serviceBroker) {
             )
             .then(r => r.data);
 
-        $q.all([licencePromise, loadAssessments($q, serviceBroker, "LICENCE", true)])
+        $q.all([licencePromise, loadAssessments($q, serviceBroker, "LICENCE", mkSelectionOptions(vm.parentEntityRef),true)])
             .then(([licences, assessments]) => {
                 const definitions = assessments.definitions;
                 const assessmentsByLicenceId = assessments.assessmentsByEntityId;

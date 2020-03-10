@@ -152,7 +152,7 @@ export function filterByAssessmentRating(entities = [],
  * @param primaryOnly
  * @returns {*}
  */
-export function loadAssessments($q, serviceBroker, kind, primaryOnly = true) {
+export function loadAssessments($q, serviceBroker, kind, options, primaryOnly = true) {
     const definitionsPromise = serviceBroker
         .loadViewData(
             CORE_API.AssessmentDefinitionStore.findByKind,
@@ -160,8 +160,8 @@ export function loadAssessments($q, serviceBroker, kind, primaryOnly = true) {
 
     const ratingsPromise = serviceBroker
         .loadViewData(
-            CORE_API.AssessmentRatingStore.findByEntityKind,
-            [kind],
+            CORE_API.AssessmentRatingStore.findByTargetKindForRelatedSelector,
+            [kind, options],
             {force: true});
 
     const ratingSchemePromise = serviceBroker
