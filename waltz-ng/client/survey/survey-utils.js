@@ -40,3 +40,14 @@ export function isSurveyTargetKind(entityKind = "") {
     return entityKind === "APPLICATION"
             || entityKind === "CHANGE_INITIATIVE";
 }
+
+
+
+export function mkDescription(descriptions = []) {
+
+    return _.chain(descriptions)
+        .filter(d => !_.isEmpty(d))
+        .uniq()
+        .join("\n\n --- \n\n")
+        .value();
+}
