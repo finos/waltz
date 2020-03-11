@@ -141,4 +141,10 @@
                        columnNames="id" />
     </changeSet>
 
+    <!-- 3678 - Remove drill grid -->
+    <changeSet id="20200311-3678-1"
+               author="woodjes">
+        <dropTable tableName="drill_grid_definition"/>
+    </changeSet>
+
 </databaseChangeLog>

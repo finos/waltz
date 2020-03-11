@@ -115,13 +115,6 @@ export const entity = {
         description: null,
         position: 110
     },
-    DRILL_GRID_DEFINITION: {
-        key: "DRILL_GRID_DEFINITION",
-        name: "Drill Grid Definition",
-        icon: "compass",
-        description: "A drill grid is used to compare the co-occurrence of two hierarchical dimensions of data",
-        position: 110
-    },
     END_USER_APPLICATION: {
         key: "END_USER_APPLICATION",
         name: "End User App",
