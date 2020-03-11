@@ -27,8 +27,6 @@ function warmUpCache($q, serviceBroker) {
             .loadAppData(CORE_API.EnumValueStore.findAll),
         serviceBroker
             .loadAppData(CORE_API.DataTypeStore.findAll),
-        serviceBroker
-            .loadAppData(CORE_API.DrillGridDefinitionStore.findAll)
     ]);
     return promises;
 }

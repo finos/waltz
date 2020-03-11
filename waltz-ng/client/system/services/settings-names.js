@@ -18,4 +18,3 @@
 
 export const DEFAULT_CURRENCY = 'settings.asset-cost.default-currency';
 export const DEFAULT_MEASURABLE = 'settings.measurable.default-category';
-export const DRILL_GRID_DEFAULT_DEFINITION_ID = "settings.drill-grid.default-definition";

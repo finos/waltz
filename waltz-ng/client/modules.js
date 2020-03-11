@@ -59,7 +59,6 @@ import DataFlow from "./data-flow";
 import DataTypeUsage from "./data-type-usage";
 import DataTypes from "./data-types";
 import Databases from "./databases";
-import DrillGrid from "./drill-grid";
 import DynamicSection from "./dynamic-section";
 import Embed from "./embed";
 import EndUserApps from "./end-user-apps";
@@ -166,7 +165,6 @@ const dependencies = [
     DataTypeUsage(),
     DataTypes(),
     Databases(),
-    DrillGrid(),
     DynamicSection(),
     Embed(),
     EndUserApps(),
