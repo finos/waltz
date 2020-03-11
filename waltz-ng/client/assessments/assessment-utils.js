@@ -140,6 +140,30 @@ export function filterByAssessmentRating(entities = [],
 }
 
 /**
+ * Loads all assessments for an entity kind and selector, returning the definitions and ratings that for that entity kind.
+ * Returns an object as follows
+ * {
+ *     definitions,
+ *     assessmentsByEntityId //<entity id -> assessment def external id -> assessment>
+ * }
+ * @param $q
+ * @param serviceBroker
+ * @param kind
+ * @param primaryOnly
+ * @returns {*}
+ */
+export function loadAssessmentsBySelector($q, serviceBroker, kind, options, primaryOnly = true) {
+    const ratingsPromise = serviceBroker
+        .loadViewData(
+            CORE_API.AssessmentRatingStore.findByTargetKindForRelatedSelector,
+            [kind, options],
+            {force: true});
+
+    return loadAssessments($q, serviceBroker, kind, ratingsPromise, primaryOnly);
+}
+
+
+/**
  * Loads all assessments for an entity kind, returning the definitions and ratings that for that entity kind.
  * Returns an object as follows
  * {
@@ -152,17 +176,35 @@ export function filterByAssessmentRating(entities = [],
  * @param primaryOnly
  * @returns {*}
  */
-export function loadAssessments($q, serviceBroker, kind, options, primaryOnly = true) {
+export function loadAssessmentsForKind($q, serviceBroker, kind, primaryOnly = true) {
+    const ratingsPromise = serviceBroker
+        .loadViewData(
+            CORE_API.AssessmentRatingStore.findByEntityKind,
+            [kind],
+            {force: true});
+
+    return loadAssessments($q, serviceBroker, kind, ratingsPromise, primaryOnly);
+}
+
+
+/**
+ * loads all assessment for a kind given the rating promise used (by selector or kind)
+ * {
+ *     definitions,
+ *     assessmentsByEntityId //<entity id -> assessment def external id -> assessment>
+ * }
+ * @param $q
+ * @param serviceBroker
+ * @param kind
+ * @param ratingsPromise
+ * @param primaryOnly
+ * @returns {*}
+ */
+function loadAssessments($q, serviceBroker, kind, ratingsPromise, primaryOnly = true) {
     const definitionsPromise = serviceBroker
         .loadViewData(
             CORE_API.AssessmentDefinitionStore.findByKind,
             [kind]);
-
-    const ratingsPromise = serviceBroker
-        .loadViewData(
-            CORE_API.AssessmentRatingStore.findByTargetKindForRelatedSelector,
-            [kind, options],
-            {force: true});
 
     const ratingSchemePromise = serviceBroker
         .loadViewData(

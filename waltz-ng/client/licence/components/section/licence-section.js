@@ -20,7 +20,7 @@ import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 import {mkSelectionOptions} from "../../../common/selector-utils";
-import {loadAssessments} from "../../../assessments/assessment-utils";
+import {loadAssessmentsBySelector} from "../../../assessments/assessment-utils";
 
 import template from "./licence-section.html";
 
@@ -44,7 +44,7 @@ function controller($q, serviceBroker) {
                 .loadViewData(CORE_API.LicenceStore.findBySelector, [mkSelectionOptions(vm.parentEntityRef)])
                 .then(r => r.data);
 
-            $q.all([licencePromise, loadAssessments($q, serviceBroker, "LICENCE", mkSelectionOptions(vm.parentEntityRef), true)])
+            $q.all([licencePromise, loadAssessmentsBySelector($q, serviceBroker, "LICENCE", mkSelectionOptions(vm.parentEntityRef), true)])
                 .then(([licences, assessments]) => {
                     vm.assessmentDefinitions = assessments.definitions;
                     const assessmentsByLicenceId = assessments.assessmentsByEntityId;
