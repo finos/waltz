@@ -25,6 +25,7 @@ import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.Checks.checkTrue;
 
 public class ArrayUtilities {
 
@@ -64,18 +65,25 @@ public class ArrayUtilities {
         return total;
     }
 
+
     public static <T> T last(T[] arr) {
+        checkNotNull(arr, "array cannot be null");
+        checkTrue(arr.length > 0, "array must not be empty");
         return arr[arr.length - 1];
     }
 
 
-    public static <T> T[] initial(T[] bits) {
-        return Arrays.copyOf(bits, bits.length - 1);
+    public static <T> T[] initial(T[] arr) {
+        checkNotNull(arr, "array cannot be null");
+        checkTrue(arr.length > 0, "array must not be empty");
+        return Arrays.copyOf(arr, arr.length - 1);
     }
 
 
     @SuppressWarnings("unchecked")
     public static <A, B> B[] map(A[] arr, Function<A, B> mapper) {
+        checkNotNull(arr, "array cannot be null");
+        checkNotNull(mapper, "mapper cannot be null");
         return (B[]) Stream
                 .of(arr)
                 .map(mapper)
