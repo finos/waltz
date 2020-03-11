@@ -34,7 +34,6 @@ public enum EntityKind {
     CHANGE_UNIT("Change unit"),
     DATABASE("Database"),
     DATA_TYPE("Datatype"),
-    DRILL_GRID_DEFINITION("Drill grid definition"),
     END_USER_APPLICATION("End user application"),
     ENTITY_HIERARCHY("Entity hierarchy"),
     ENTITY_NAMED_NOTE("Entity named note"),

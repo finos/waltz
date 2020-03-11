@@ -17,26 +17,7 @@
   -->
 
 <div>
-    <waltz-section-actions>
-        <div ng-if="$ctrl.visibility.gridAvailable">
-            <button class="btn btn-xs btn-primary"
-                    ng-if="$ctrl.visibility.treeView"
-                    ng-click="$ctrl.showGridView()">
-                <waltz-icon name="th"></waltz-icon>
-                Grid View
-            </button>
-            <button class="btn btn-xs btn-primary"
-                    ng-if="$ctrl.visibility.gridView"
-                    ng-click="$ctrl.showTreeView()">
-                <waltz-icon name="sitemap" rotate="270"></waltz-icon>
-                Tree View
-            </button>
-        </div>
-    </waltz-section-actions>
-
-
-    <div ng-if="$ctrl.visibility.treeView"
-         class="waltz-fade-if">
+    <div class="waltz-fade-if">
          <waltz-sub-section name="Ratings">
             <content>
                 <div style="padding:18px">
@@ -81,13 +62,6 @@
         <br>
         <waltz-roadmap-references parent-entity-ref="$ctrl.parentEntityRef">
         </waltz-roadmap-references>
-    </div>
-
-
-    <div ng-if="$ctrl.visibility.gridView"
-         class="waltz-fade-if">
-        <waltz-drill-grid-panel parent-entity-ref="$ctrl.parentEntityRef">
-        </waltz-drill-grid-panel>
     </div>
 
 </div>
