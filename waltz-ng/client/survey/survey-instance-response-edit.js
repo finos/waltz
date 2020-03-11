@@ -83,6 +83,9 @@ function controller($location,
         .then(r => {
             vm.instanceCanBeEdited = (r.status === "NOT_STARTED" || r.status === "IN_PROGRESS" || r.status === "REJECTED");
             vm.surveyInstance = r;
+            serviceBroker
+                .loadViewData(CORE_API.SurveyRunStore.getById, [vm.surveyInstance.surveyRunId])
+                .then(d => vm.surveyRun = d.data);
             return r;
         });
 
@@ -145,10 +148,9 @@ function controller($location,
     };
 
     vm.saveComment = (valObj, question) => {
-        const questionResponse = vm.surveyResponses[question.id];
-        if (! questionResponse) {
-            vm.surveyResponses[question.id] = {};
-        }
+        const questionResponse = !vm.surveyResponses[question.id]
+            ? {}
+            : vm.surveyResponses[question.id];
         questionResponse.comment = valObj.newVal;
 
         return surveyInstanceStore.saveResponse(
