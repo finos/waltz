@@ -20,6 +20,8 @@ import { indexRatingSchemes } from "../ratings/rating-utils";
 import { nest } from "d3-collection";
 import { grey } from "../common/colors";
 import { refToString } from "../common/entity-utils";
+import {CORE_API} from "../common/services/core-api-utils";
+import {resolveResponses} from "../common/promise-utils";
 
 /**
  * Creates an enriched assessment definition which adds fields for
@@ -135,4 +137,55 @@ export function filterByAssessmentRating(entities = [],
             }
         })
         .value();
+}
+
+/**
+ * Loads all assessments for an entity kind, returning the definitions and ratings that for that entity kind.
+ * Returns an object as follows
+ * {
+ *     definitions,
+ *     assessmentsByEntityId //<entity id -> assessment def external id -> assessment>
+ * }
+ * @param $q
+ * @param serviceBroker
+ * @param kind
+ * @param primaryOnly
+ * @returns {*}
+ */
+export function loadAssessments($q, serviceBroker, kind, options, primaryOnly = true) {
+    const definitionsPromise = serviceBroker
+        .loadViewData(
+            CORE_API.AssessmentDefinitionStore.findByKind,
+            [kind]);
+
+    const ratingsPromise = serviceBroker
+        .loadViewData(
+            CORE_API.AssessmentRatingStore.findByTargetKindForRelatedSelector,
+            [kind, options],
+            {force: true});
+
+    const ratingSchemePromise = serviceBroker
+        .loadViewData(
+            CORE_API.RatingSchemeStore.findAll);
+
+    return $q
+        .all([definitionsPromise, ratingsPromise, ratingSchemePromise])
+        .then(responses => {
+            const [assessmentDefinitions, assessmentRatings, ratingSchemes] = resolveResponses(responses);
+            const ratingsByEntityId = _.groupBy(assessmentRatings, "entityReference.id");
+            const filteredDefinitions = _.filter(assessmentDefinitions, primaryOnly ? d => d.visibility === "PRIMARY" : true);
+            const enrichedByEntityId = _.mapValues(ratingsByEntityId, (v, k) => {
+                const enriched = mkEnrichedAssessmentDefinitions(
+                    filteredDefinitions,
+                    ratingSchemes,
+                    v);
+                return _.keyBy(enriched, e => e.definition.externalId);
+            });
+
+
+            return {
+                definitions: filteredDefinitions,
+                assessmentsByEntityId: enrichedByEntityId // assessmentsByEntityId: entity id -> assessment def external id -> assessment
+            };
+        });
 }

@@ -41,9 +41,7 @@ public abstract class AbstractIdSelectorFactory implements IdSelectorFactory {
 
     @Override
     public Select<Record1<Long>> apply(IdSelectionOptions options) {
-
         EntityKind queryKind = options.entityReference().kind();
-
         if (entityKind == queryKind) {
             return mkForSelf(options);
         } else {
