@@ -92,13 +92,12 @@
                 <div class="row wsirv-response-row"
                      data-question-ext-id="{{qi.question.externalId}}"
                      data-question-id="{{qi.question.id}}">
-                    <div class="col-sm-5">
+                    <div class="col-sm-offset-1 col-sm-4">
                         <div ng-bind="qi.question.questionText"
-                             style="text-align: right;"
                              class="text-muted">
                         </div>
                     </div>
-                    <div class="col-sm-7">
+                    <div class="col-sm-6">
                         <div>
                             <div ng-switch="qi.question.fieldType">
                                 <div ng-switch-when="BOOLEAN">

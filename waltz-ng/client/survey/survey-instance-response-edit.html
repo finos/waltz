@@ -52,25 +52,27 @@
             <div ng-repeat="groupedQuestion in ctrl.surveyQuestionInfos">
 
                 <h4 ng-bind="groupedQuestion.sectionName"
-                    class="text-muted"></h4>
+                    class="text-muted">
+                </h4>
                 <hr>
                 <div ng-repeat="qi in groupedQuestion.questionInfos"
                      class="form-group">
                     <label for="{{ qi.question.id }}"
-                           class="col-sm-5 control-label">
+                           class="col-sm-offset-1 col-sm-4 xxcontrol-label">
                         <span ng-bind="qi.question.questionText">
                         </span>
-                            <span ng-if="qi.question.isMandatory"
-                                  class="text-danger">
+                        <span ng-if="qi.question.isMandatory"
+                              class="text-danger">
                             *
                         </span>
                         <!-- help text -->
                         <waltz-markdown text="qi.question.helpText"
+                                        style="display: block;"
                                         class='small text-muted'>
                         </waltz-markdown>
                     </label>
                     <div ng-switch="qi.question.fieldType"
-                         class="col-sm-7"
+                         class="col-sm-6"
                          ng-class="{'col-md-3': qi.question.fieldType === 'DATE'}">
                         <!-- input control -->
                         <!-- number -->
@@ -206,33 +208,30 @@
                 <hr>
             </div>
 
-            <!-- buttons -->
-            <table class="table-condensed" align="right">
-                <tr>
-                    <td>
-                        <a class="clickable"
-                           ng-click="ctrl.saveForLater()">
-                            Save For Later
-                        </a>
-                    </td>
-                    <td ng-if="surveyResponseForm.$valid">
-                        <button type="button"
+            <div class="row">
+                <div class="col-sm-offset-5 col-sm-7">
+                    <button class="btn btn-info"
+                            ng-click="ctrl.saveForLater()">
+                        <waltz-icon name="clock-o"></waltz-icon>
+                        Save and complete later
+                    </button>
 
-                                ng-click="ctrl.submit()"
-                                class="btn btn-success btn-lg">
-                            <waltz-icon name="envelope">
-                            </waltz-icon>
-                            Submit
-                        </button>
-                    </td>
-                    <td ng-if="surveyResponseForm.$invalid"
-                        style="padding-bottom: 10px;">
-                        <span class="alert alert-warning">
-                                Survey response cannot be submitted until all required questions are answered.
-                        </span>
-                    </td>
-                </tr>
-            </table>
+                    <button class="btn btn-success"
+                            ng-disabled="surveyResponseForm.$invalid"
+                            ng-click="ctrl.submit()"
+                            class="btn btn-success btn-lg">
+                        <waltz-icon name="envelope">
+                        </waltz-icon>
+                        Submit
+                    </button>
+                    <div ng-if="surveyResponseForm.$invalid"
+                         class="help-block">
+                        <waltz-icon name="warning"></waltz-icon>
+                        Cannot submit until all mandatory questions are answered
+                    </div>
+                </div>
+            </div>
+
         </form>
     </waltz-section>
 
@@ -245,7 +244,11 @@
     <div class="alert alert-warning"
          ng-if="ctrl.surveyInstance.status === 'COMPLETED' || ctrl.surveyInstance.status === 'APPROVED'">
         <h4>Survey Completed</h4>
-        <p>This survey response has been completed and is no longer can be edited. Please follow this <a ui-sref="main.survey.instance.response.view ({ id: ctrl.surveyInstance.id })">link</a> to view the responses.</p>
+        <p>
+            This survey response has been completed and is no longer can be edited. Please follow this
+            <a ui-sref="main.survey.instance.response.view ({ id: ctrl.surveyInstance.id })">link</a>
+            to view the responses.
+        </p>
     </div>
 
     <div class="alert alert-warning"

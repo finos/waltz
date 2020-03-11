@@ -16,14 +16,14 @@
  *
  */
 
-import _ from 'lodash';
-import {initialiseData, invokeFunction} from '../../../common';
-import template from './survey-dropdown-editor.html';
+import _ from "lodash";
+import {initialiseData, invokeFunction} from "../../../common";
+import template from "./survey-dropdown-editor.html";
 
 
 const bindings = {
-    entries: '<',
-    onChange: '<'
+    entries: "<",
+    onChange: "<"
 };
 
 
@@ -31,7 +31,7 @@ const initialState = {
     creatingEntry: false,
     entries: [],
     bulkEntriesString: null,
-    editor: 'TABULAR',
+    editor: "TABULAR",
     newEntry: null,
     onSave: () => console.log("default onSave ")
 };
@@ -39,7 +39,7 @@ const initialState = {
 
 function createEntriesString(entries = []) {
     return _.chain(entries)
-        .map('value')
+        .map("value")
         .join("\n");
 }
 
@@ -53,7 +53,7 @@ function mkEntry(id, position, value) {
 }
 
 
-function controller(notification) {
+function controller(notification, $timeout) {
     const vm = this;
 
     vm.$onInit = () => { initialiseData(vm, initialState); };
@@ -68,6 +68,8 @@ function controller(notification) {
 
     vm.startNewEntry = () => {
         vm.creatingEntry = true;
+        $timeout(() => document.getElementById("wsde-entry-input").focus());
+
     };
 
     vm.saveNewEntry = (entry) => {
@@ -110,12 +112,12 @@ function controller(notification) {
     };
 
     vm.showTabularEditor = () => {
-        vm.editor = 'TABULAR'
+        vm.editor = "TABULAR"
     };
 
     vm.showBulkEditor = () => {
         vm.bulkEntriesString = createEntriesString(vm.entries);
-        vm.editor = 'BULK';
+        vm.editor = "BULK";
     };
 
     vm.bulkEntriesChanged = () => {
@@ -131,7 +133,8 @@ function controller(notification) {
 
 
 controller.$inject = [
-    'Notification'
+    "Notification",
+    "$timeout"
 ];
 
 
