@@ -31,6 +31,7 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -227,7 +228,8 @@ public class SurveyInstanceExtractor implements DataExtractor {
                     "SUBMITTED_AT",
                     "SUBMITTED_BY",
                     "APPROVED_AT",
-                    "APPROVED_BY");
+                    "APPROVED_BY",
+                    "Latest");
 
         List<String> questionHeaders = questions
                 .stream()
@@ -351,6 +353,7 @@ public class SurveyInstanceExtractor implements DataExtractor {
                 .select(sqr.QUESTION_ID, sqr.COMMENT)
                 .select(sqr.STRING_RESPONSE, sqr.NUMBER_RESPONSE, sqr.DATE_RESPONSE, sqr.BOOLEAN_RESPONSE, sqr.LIST_RESPONSE_CONCAT)
                 .select(responseNameField, responseExtIdField)
+                .select(DSL.when(si.ORIGINAL_INSTANCE_ID.isNull(), "Yes").else_("No").as("Latest"))
                 .from(st)
                 .innerJoin(sr).on(sr.SURVEY_TEMPLATE_ID.eq(st.ID))
                 .innerJoin(si).on(si.SURVEY_RUN_ID.eq(sr.ID))
@@ -377,6 +380,7 @@ public class SurveyInstanceExtractor implements DataExtractor {
                         reportRow.add(firstAnswer.get(si.SUBMITTED_BY));
                         reportRow.add(firstAnswer.get(si.APPROVED_AT));
                         reportRow.add(firstAnswer.get(si.APPROVED_BY));
+                        reportRow.add(firstAnswer.get("Latest"));
 
                         Map<Long, Record> answersByQuestionId = indexBy(
                                 answersForInstance,
@@ -387,7 +391,7 @@ public class SurveyInstanceExtractor implements DataExtractor {
                                 .map(q -> tuple(q, answersByQuestionId.get(q.id().get())))
                                 .forEach(t -> {
                                     reportRow.add(findValueInRecord(t.v1, t.v2));
-                                    if (t.v1.allowComment()) {
+                                    if (t.v1.allowComment() && t.v2 != null) {
                                         reportRow.add(t.v2.get(sqr.COMMENT));
                                     }
                                 });
