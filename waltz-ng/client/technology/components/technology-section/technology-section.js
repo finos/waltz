@@ -23,7 +23,7 @@ import {mkEntityLinkGridCell, mkLinkGridCell} from "../../../common/grid-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 import {withWidth} from "../../../physical-flow/physical-flow-table-utilities";
 import {countByVersionsByPackageId} from "../../../software-catalog/software-catalog-utilities";
-import {loadAssessments} from "../../../assessments/assessment-utils";
+import {loadAssessmentsBySelector} from "../../../assessments/assessment-utils";
 
 import template from "./technology-section.html";
 
@@ -270,7 +270,7 @@ function controller($q, $animate, uiGridConstants, serviceBroker) {
             )
             .then(r => r.data);
 
-        $q.all([licencePromise, loadAssessments($q, serviceBroker, "LICENCE", mkSelectionOptions(vm.parentEntityRef),true)])
+        $q.all([licencePromise, loadAssessmentsBySelector($q, serviceBroker, "LICENCE", mkSelectionOptions(vm.parentEntityRef),true)])
             .then(([licences, assessments]) => {
                 const definitions = assessments.definitions;
                 const assessmentsByLicenceId = assessments.assessmentsByEntityId;
