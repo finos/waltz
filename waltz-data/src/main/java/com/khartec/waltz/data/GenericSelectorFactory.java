@@ -24,6 +24,7 @@ import com.khartec.waltz.data.change_initiative.ChangeInitiativeIdSelectorFactor
 import com.khartec.waltz.data.change_unit.ChangeUnitIdSelectorFactory;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.flow_diagram.FlowDiagramIdSelectorFactory;
+import com.khartec.waltz.data.licence.LicenceIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
@@ -43,6 +44,7 @@ public class GenericSelectorFactory {
     private final ChangeUnitIdSelectorFactory changeUnitIdSelectorFactory = new ChangeUnitIdSelectorFactory();
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
     private final FlowDiagramIdSelectorFactory flowDiagramIdSelectorFactory = new FlowDiagramIdSelectorFactory();
+    private final LicenceIdSelectorFactory licenceIdSelectorFactory = new LicenceIdSelectorFactory();
     private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
     private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
     private final OrganisationalUnitIdSelectorFactory organisationalUnitIdSelectorFactory = new OrganisationalUnitIdSelectorFactory();
@@ -107,6 +109,8 @@ public class GenericSelectorFactory {
                 return dataTypeIdSelectorFactory.apply(selectionOptions);
             case FLOW_DIAGRAM:
                 return flowDiagramIdSelectorFactory.apply(selectionOptions);
+            case LICENCE:
+                return licenceIdSelectorFactory.apply(selectionOptions);
             case LOGICAL_DATA_FLOW:
                 return logicalFlowIdSelectorFactory.apply(selectionOptions);
             case MEASURABLE:

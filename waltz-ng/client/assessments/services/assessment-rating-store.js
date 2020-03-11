@@ -30,6 +30,17 @@ export function store($http, BaseApiUrl) {
             .then(d => d.data);
     };
 
+    const findByEntityKind = (kind, visibilites = ["PRIMARY"]) => {
+        return $http
+            .post(`${BASE}/entity-kind/${kind}`, visibilites)
+            .then(d => d.data);
+    };
+
+    const findByTargetKindForRelatedSelector = (targetKind, selector) => {
+        return $http
+            .post(`${BASE}/target-kind/${targetKind}/selector`, selector)
+            .then(r => r.data);
+    };
 
     const store = (ref, assessmentDefinitionId, ratingId, comment = null) => {
         checkIsEntityRef(ref);
@@ -45,15 +56,9 @@ export function store($http, BaseApiUrl) {
             .then(d => d.data);
     };
 
-
-    const findByTargetKindForRelatedSelector = (targetKind, selector) => {
-        return $http
-            .post(`${BASE}/target-kind/${targetKind}/selector`, selector)
-            .then(r => r.data);
-    };
-
     return {
         findForEntityReference,
+        findByEntityKind,
         findByTargetKindForRelatedSelector,
         store,
         remove
@@ -75,6 +80,11 @@ export const AssessmentRatingStore_API = {
         serviceName,
         serviceFnName: "findForEntityReference",
         description: "find all assessment ratings for an entity"
+    },
+    findByEntityKind: {
+        serviceName,
+        serviceFnName: "findByEntityKind",
+        description: "find all assessment ratings for an entity kind"
     },
     findByTargetKindForRelatedSelector: {
         serviceName,

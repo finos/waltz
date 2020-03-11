@@ -25,6 +25,7 @@ import com.khartec.waltz.data.assessment_rating.AssessmentRatingDao;
 import com.khartec.waltz.data.rating_scheme.RatingSchemeDAO;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
+import com.khartec.waltz.model.assessment_definition.AssessmentVisibility;
 import com.khartec.waltz.model.assessment_rating.AssessmentRating;
 import com.khartec.waltz.model.assessment_rating.RemoveAssessmentRatingCommand;
 import com.khartec.waltz.model.assessment_rating.SaveAssessmentRatingCommand;
@@ -73,6 +74,18 @@ public class AssessmentRatingService {
     }
 
 
+    public List<AssessmentRating> findByEntityKind(EntityKind targetKind, List<AssessmentVisibility> visibilities) {
+        return assessmentRatingDao.findByEntityKind(targetKind, visibilities);
+    }
+
+
+    public List<AssessmentRating> findByTargetKindForRelatedSelector(EntityKind targetKind,
+                                                                     IdSelectionOptions selectionOptions) {
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, selectionOptions);
+        return assessmentRatingDao.findByGenericSelector(genericSelector);
+    }
+
+
     public boolean store(SaveAssessmentRatingCommand command, String username) {
         AssessmentDefinition assessmentDefinition = assessmentDefinitionDao.getById(command.assessmentDefinitionId());
         ChangeLog logEntry = ImmutableChangeLog.builder()
@@ -110,11 +123,5 @@ public class AssessmentRatingService {
         changeLogService.write(logEntry);
 
         return assessmentRatingDao.remove(command);
-    }
-
-    public List<AssessmentRating> findByTargetKindForRelatedSelector(EntityKind targetKind,
-                                                                     IdSelectionOptions selectionOptions) {
-        GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, selectionOptions);
-        return assessmentRatingDao.findByGenericSelector(genericSelector);
     }
 }
