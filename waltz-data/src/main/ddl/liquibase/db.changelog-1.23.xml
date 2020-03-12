@@ -147,4 +147,16 @@
         <dropTable tableName="drill_grid_definition"/>
     </changeSet>
 
+    <!-- 4769 - Add rating_editor_role to measurable category -->
+    <changeSet id="20200312-4769-1"
+               author="davidwatkins73">
+        <addColumn tableName="measurable_category">
+            <column name="rating_editor_role"
+                    type="${enum.type}"
+                    defaultValue="RATING_EDITOR">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
