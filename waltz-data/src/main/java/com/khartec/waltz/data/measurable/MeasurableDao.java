@@ -236,6 +236,11 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .fetchMap(MEASURABLE.EXTERNAL_ID, MEASURABLE.ID);
     }
 
+    /**
+     * Allows measurable rating, planned decoms and replacement apps to check for the role
+     * @param reference Entity ref to determine condition
+     * @return 'rating_editor_role'
+     */
     public String getRequiredRatingEditRole(EntityReference reference) {
 
         Condition condition = mkCondition(reference);

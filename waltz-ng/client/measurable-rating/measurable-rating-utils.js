@@ -137,7 +137,7 @@ export function loadAllData(
  * @param includeEmpty
  * @returns {*}
  */
-export function mkTabs(ctx, includeEmpty = true) {
+export function mkTabs(ctx, includeEmpty = false) {
 
     const measurablesByCategory = _.groupBy(ctx.measurables, d => d.categoryId);
     const allocationSchemesByCategory = _.groupBy(ctx.allocationSchemes, d => d.measurableCategoryId);
