@@ -18,12 +18,12 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.measurable_rating.*;
 import com.khartec.waltz.model.tally.MeasurableRatingTally;
 import com.khartec.waltz.model.tally.Tally;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
@@ -41,6 +41,7 @@ import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.firstChar;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -111,34 +112,34 @@ public class MeasurableRatingEndpoint implements Endpoint {
     }
 
     private Collection<MeasurableRating> removeCategoryRoute(Request request, Response z) {
-        requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
 
         EntityReference ref = getEntityReference(request);
         long category = getLong(request, "categoryId");
+
+        requireRole(userRoleService, request, measurableRatingService.getRequiredRatingEditRole(ref));
 
         return measurableRatingService.removeForCategory(ref, category, getUsername(request));
     }
 
 
     private Collection<MeasurableRating> saveRoute(Request request, Response z) throws IOException {
-        requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
         SaveMeasurableRatingCommand command = mkCommand(request);
+        requireRole(userRoleService, request, measurableRatingService.getRequiredRatingEditRole(mkRef(EntityKind.MEASURABLE, command.measurableId())));
         return measurableRatingService.save(command);
     }
 
 
     private Collection<MeasurableRating> removeRoute(Request request, Response z) throws IOException {
-        requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
+        long measurableId = getLong(request, "measurableId");
+        requireRole(userRoleService, request, measurableRatingService.getRequiredRatingEditRole(mkRef(EntityKind.MEASURABLE, measurableId)));
         String username = getUsername(request);
         RemoveMeasurableRatingCommand command = ImmutableRemoveMeasurableRatingCommand.builder()
                 .entityReference(getEntityReference(request))
-                .measurableId(getLong(request, "measurableId"))
+                .measurableId(measurableId)
                 .lastUpdate(UserTimestamp.mkForUser(username))
                 .build();
         return measurableRatingService.remove(command);
     }
-
-
 
 
     private SaveMeasurableRatingCommand mkCommand(Request request) throws IOException {

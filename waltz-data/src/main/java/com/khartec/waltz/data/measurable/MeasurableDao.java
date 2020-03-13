@@ -43,9 +43,8 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
-import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
+import static com.khartec.waltz.schema.Tables.MEASURABLE_CATEGORY;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
-import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static java.util.Optional.ofNullable;
 
 
@@ -237,4 +236,14 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .fetchMap(MEASURABLE.EXTERNAL_ID, MEASURABLE.ID);
     }
 
+    public String getRequiredRatingEditRole(long measurableId) {
+        return dsl
+                .select(MEASURABLE_CATEGORY.RATING_EDITOR_ROLE)
+                .from(MEASURABLE_CATEGORY)
+                .innerJoin(MEASURABLE).on(MEASURABLE_CATEGORY.ID.eq(MEASURABLE.MEASURABLE_CATEGORY_ID))
+                .where(MEASURABLE.ID.eq(measurableId))
+                .fetchOne()
+                .get(MEASURABLE_CATEGORY.RATING_EDITOR_ROLE);
+
+    }
 }

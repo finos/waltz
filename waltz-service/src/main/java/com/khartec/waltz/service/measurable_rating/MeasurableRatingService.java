@@ -212,4 +212,17 @@ public class MeasurableRatingService {
                 .deleteByMeasurableIdSelector(selector);
     }
 
+    public String getRequiredRatingEditRole(EntityReference ref) {
+
+        EntityKind kind = ref.kind();
+        if (kind.equals(EntityKind.MEASURABLE)){
+            return measurableDao.getRequiredRatingEditRole(ref.id());
+        } else if (kind.equals(EntityKind.MEASURABLE_CATEGORY)){
+            return measurableCategoryDao.getById(ref.id()).ratingEditorRole();
+        } else {
+            return null;
+        }
+
+    }
+
 }
