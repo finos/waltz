@@ -52,8 +52,8 @@ public class MeasurableRatingService {
 
     private final MeasurableRatingDao measurableRatingDao;
     private final MeasurableDao measurableDao;
-    private final ChangeLogService changeLogService;
     private final MeasurableCategoryDao measurableCategoryDao;
+    private final ChangeLogService changeLogService;
 
     private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
@@ -213,16 +213,7 @@ public class MeasurableRatingService {
     }
 
     public String getRequiredRatingEditRole(EntityReference ref) {
-
-        EntityKind kind = ref.kind();
-        if (kind.equals(EntityKind.MEASURABLE)){
-            return measurableDao.getRequiredRatingEditRole(ref.id());
-        } else if (kind.equals(EntityKind.MEASURABLE_CATEGORY)){
-            return measurableCategoryDao.getById(ref.id()).ratingEditorRole();
-        } else {
-            return null;
-        }
-
+        return measurableDao.getRequiredRatingEditRole(ref);
     }
 
 }

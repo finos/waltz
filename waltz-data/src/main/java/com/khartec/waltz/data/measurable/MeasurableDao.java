@@ -43,7 +43,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
-import static com.khartec.waltz.schema.Tables.MEASURABLE_CATEGORY;
+import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static java.util.Optional.ofNullable;
 
@@ -236,14 +236,33 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .fetchMap(MEASURABLE.EXTERNAL_ID, MEASURABLE.ID);
     }
 
-    public String getRequiredRatingEditRole(long measurableId) {
+    public String getRequiredRatingEditRole(EntityReference reference) {
+
+        Condition condition = mkCondition(reference);
+
+        Condition measurableToRatingJoinCondition = MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_ID)
+                .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_ID.eq(MEASURABLE_RATING.ENTITY_ID)
+                        .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_KIND.eq(MEASURABLE_RATING.ENTITY_KIND)));
+
         return dsl
-                .select(MEASURABLE_CATEGORY.RATING_EDITOR_ROLE)
+                .selectDistinct(MEASURABLE_CATEGORY.RATING_EDITOR_ROLE)
                 .from(MEASURABLE_CATEGORY)
                 .innerJoin(MEASURABLE).on(MEASURABLE_CATEGORY.ID.eq(MEASURABLE.MEASURABLE_CATEGORY_ID))
-                .where(MEASURABLE.ID.eq(measurableId))
+                .leftJoin(MEASURABLE_RATING).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID))
+                .leftJoin(MEASURABLE_RATING_PLANNED_DECOMMISSION).on(measurableToRatingJoinCondition)
+                .where(condition)
                 .fetchOne()
                 .get(MEASURABLE_CATEGORY.RATING_EDITOR_ROLE);
+    }
 
+
+    private Condition mkCondition(EntityReference reference) {
+        if (reference.kind().equals(EntityKind.MEASURABLE)){
+            return MEASURABLE.ID.eq(reference.id());
+        } else if (reference.kind().equals(EntityKind.MEASURABLE_CATEGORY)){
+            return MEASURABLE_CATEGORY.ID.eq(reference.id());
+        } else {
+            return MEASURABLE_RATING_PLANNED_DECOMMISSION.ID.eq(reference.id());
+        }
     }
 }

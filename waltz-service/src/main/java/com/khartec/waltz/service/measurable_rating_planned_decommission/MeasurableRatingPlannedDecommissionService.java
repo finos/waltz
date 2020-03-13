@@ -27,6 +27,7 @@ import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.command.DateFieldChange;
 import com.khartec.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,17 +45,21 @@ public class MeasurableRatingPlannedDecommissionService {
 
     private final MeasurableRatingPlannedDecommissionDao measurableRatingPlannedDecommissionDao;
     private final MeasurableRatingReplacementDao measurableRatingReplacementDao;
+    private final MeasurableRatingService measurableRatingService;
     private final ChangeLogService changeLogService;
 
     @Autowired
     public MeasurableRatingPlannedDecommissionService(MeasurableRatingPlannedDecommissionDao measurableRatingPlannedDecommissionDao,
                                                       MeasurableRatingReplacementDao measurableRatingReplacementDao,
+                                                      MeasurableRatingService measurableRatingService,
                                                       ChangeLogService changeLogService){
         checkNotNull(measurableRatingPlannedDecommissionDao, "MeasurableRatingPlannedDecommissionDao cannot be null");
         checkNotNull(measurableRatingReplacementDao, "MeasurableRatingReplacementDao cannot be null");
+        checkNotNull(measurableRatingService, "MeasurableRatingService cannot be null");
         checkNotNull(changeLogService, "ChangeLogService cannot be null");
         this.measurableRatingPlannedDecommissionDao = measurableRatingPlannedDecommissionDao;
         this.measurableRatingReplacementDao = measurableRatingReplacementDao;
+        this.measurableRatingService = measurableRatingService;
         this.changeLogService = changeLogService;
     }
 
@@ -115,5 +120,9 @@ public class MeasurableRatingPlannedDecommissionService {
                 Operation.REMOVE);
 
         return measurableRatingPlannedDecommissionDao.remove(id);
+    }
+
+    public String getRequiredRatingEditRole(EntityReference entityRef) {
+        return measurableRatingService.getRequiredRatingEditRole(entityRef);
     }
 }

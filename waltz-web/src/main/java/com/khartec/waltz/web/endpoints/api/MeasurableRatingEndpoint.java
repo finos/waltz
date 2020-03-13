@@ -114,11 +114,11 @@ public class MeasurableRatingEndpoint implements Endpoint {
     private Collection<MeasurableRating> removeCategoryRoute(Request request, Response z) {
 
         EntityReference ref = getEntityReference(request);
-        long category = getLong(request, "categoryId");
+        long categoryId = getLong(request, "categoryId");
 
-        requireRole(userRoleService, request, measurableRatingService.getRequiredRatingEditRole(ref));
+        requireRole(userRoleService, request, measurableRatingService.getRequiredRatingEditRole(mkRef(EntityKind.MEASURABLE_CATEGORY, categoryId)));
 
-        return measurableRatingService.removeForCategory(ref, category, getUsername(request));
+        return measurableRatingService.removeForCategory(ref, categoryId, getUsername(request));
     }
 
 
@@ -131,8 +131,10 @@ public class MeasurableRatingEndpoint implements Endpoint {
 
     private Collection<MeasurableRating> removeRoute(Request request, Response z) throws IOException {
         long measurableId = getLong(request, "measurableId");
-        requireRole(userRoleService, request, measurableRatingService.getRequiredRatingEditRole(mkRef(EntityKind.MEASURABLE, measurableId)));
         String username = getUsername(request);
+
+        requireRole(userRoleService, request, measurableRatingService.getRequiredRatingEditRole(mkRef(EntityKind.MEASURABLE, measurableId)));
+
         RemoveMeasurableRatingCommand command = ImmutableRemoveMeasurableRatingCommand.builder()
                 .entityReference(getEntityReference(request))
                 .measurableId(measurableId)
