@@ -122,6 +122,7 @@ public class MeasurableRatingPlannedDecommissionService {
         return measurableRatingPlannedDecommissionDao.remove(id);
     }
 
+
     public String getRequiredRatingEditRole(EntityReference entityRef) {
         return measurableRatingService.getRequiredRatingEditRole(entityRef);
     }
