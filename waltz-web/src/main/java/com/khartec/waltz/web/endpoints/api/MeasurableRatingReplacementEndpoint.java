@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.measurable_rating_replacement.MeasurableRatingReplacement;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.measurable_rating_replacement.MeasurableRatingReplacementService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -66,20 +67,26 @@ public class MeasurableRatingReplacementEndpoint implements Endpoint {
                 -> measurableRatingReplacementService.findForEntityRef(getEntityReference(request));
 
         ListRoute<MeasurableRatingReplacement> saveRoute = (request, response) -> {
-            requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
-            String username = getUsername(request);
             EntityReference entityReference = getEntityReference(request);
             long decommId = getLong(request, "decommId");
             LocalDate commissionDate = readBody(request, LocalDate.class);
+            String username = getUsername(request);
+
+            requireRole(userRoleService, request, measurableRatingReplacementService.getRequiredRatingEditRole(
+                    mkRef(EntityKind.MEASURABLE_RATING_PLANNED_DECOMMISSION, decommId)));
+
             return measurableRatingReplacementService.save(decommId, entityReference, commissionDate, username);
         };
 
 
         ListRoute<MeasurableRatingReplacement> removeRoute = (request, response) -> {
-            requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
             String username = getUsername(request);
             long decommId = getLong(request, "decommId");
             long replacementId = getLong(request, "replacementId");
+
+            requireRole(userRoleService, request, measurableRatingReplacementService.getRequiredRatingEditRole(
+                    mkRef(EntityKind.MEASURABLE_RATING_PLANNED_DECOMMISSION, decommId)));
+
             return measurableRatingReplacementService.remove(decommId, replacementId, username);
         };
 

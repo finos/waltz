@@ -69,7 +69,8 @@ const initialState = {
 function controller($q,
                     $state,
                     notification,
-                    serviceBroker) {
+                    serviceBroker,
+                    userService) {
     const vm = initialiseData(this, initialState);
 
 
@@ -92,9 +93,10 @@ function controller($q,
     const recalcTabs = function () {
         const hasNoRatings = vm.ratings.length === 0;
         const showAllCategories = hasNoRatings || vm.visibility.showAllCategories;
-        vm.tabs = mkTabs(vm, showAllCategories);
+        const allTabs = mkTabs(vm, showAllCategories);
+        vm.tabs = _.filter(allTabs, t => _.includes(vm.userRoles, t.category.ratingEditorRole));
 
-        vm.hasHiddenTabs = vm.categories.length !== vm.tabs.length;
+        vm.hasHiddenTabs = vm.categories.length !== allTabs.length;
         if (vm.activeTab) {
             vm.activeTab = _.find(vm.tabs, t => t.category.id === vm.activeTab.category.id);
         }
@@ -165,13 +167,16 @@ function controller($q,
     // -- BOOT --
 
     vm.$onInit = () => {
-        loadData(true);
+
+        userService
+            .whoami()
+            .then(user => vm.userRoles = user.roles)
+            .then(() => loadData(true));
 
         vm.backUrl = $state
             .href(
                 kindToViewState(vm.parentEntityRef.kind),
                 { id: vm.parentEntityRef.id });
-
         vm.allocationsByMeasurableId = _.groupBy(vm.allocations, a => a.measurableId);
         vm.allocationSchemesById = _.keyBy(vm.allocationSchemes, s => s.id);
     };
@@ -280,6 +285,11 @@ function controller($q,
 
     vm.onTabChange = () => {
         deselectMeasurable();
+
+        if(_.isUndefined(vm.activeTab)){
+            vm.activeTab = _.first(vm.tabs);
+        }
+
         vm.onKeypress = mkRatingsKeyHandler(
             vm.activeTab.ratingScheme.ratings,
             vm.onRatingSelect,
@@ -298,7 +308,8 @@ controller.$inject = [
     "$q",
     "$state",
     "Notification",
-    "ServiceBroker"
+    "ServiceBroker",
+    "UserService"
 ];
 
 
