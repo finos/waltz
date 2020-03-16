@@ -21,11 +21,9 @@ package com.khartec.waltz.model.measurable_category;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.rating.RagName;
 import com.khartec.waltz.model.rating.RatingScheme;
+import com.khartec.waltz.model.user.SystemRole;
 import org.immutables.value.Value;
-
-import java.util.List;
 
 /**
  * A measurable category represents a classifier for a hierarchy of
@@ -64,6 +62,14 @@ public abstract class MeasurableCategory implements
     @Value.Default
     public boolean editable() {
         return false;
+    }
+
+    /**
+     * @return role required for editing measurable ratings against this category
+     */
+    @Value.Default
+    public String ratingEditorRole() {
+        return SystemRole.RATING_EDITOR.name();
     }
 
     /**
