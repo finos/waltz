@@ -48,7 +48,8 @@
         <div class="row wpfes-existing-row"
              ng-repeat="candidate in $ctrl.candidates | orderBy:'name' | filter:$ctrl.qry"
              ng-class="{
-                'wpfes-current': candidate.id == $ctrl.current.id
+                'wpfes-current': candidate.id == $ctrl.current.id,
+                'waltz-entity-removed' : candidate.isRemoved == true
              }"
              ng-click="$ctrl.select(candidate)">
             <div class="col-md-3"><span ng-bind="candidate.name"></span></div>
