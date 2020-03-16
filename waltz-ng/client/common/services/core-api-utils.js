@@ -39,6 +39,7 @@ import {ClientCacheKeyStore_API as ClientCacheKeyStore} from "../../client_cache
 import {ComplexityStore_API as ComplexityStore} from "../../complexity/services/complexity-store";
 import {DatabaseStore_API as DatabaseStore} from "../../databases/services/database-store";
 import {DataTypeStore_API as DataTypeStore} from "../../data-types/services/data-type-store";
+import {DataTypeDecoratorStore_API as DataTypeDecoratorStore} from "../../data-types/services/data-type-decorator-store";
 import {DataTypeUsageStore_API as DataTypeUsageStore} from "../../data-type-usage/services/data-type-usage-store";
 import {EndUserAppStore_API as EndUserAppStore} from "../../end-user-apps/services/end-user-app-store";
 import {EntityEnumStore_API as EntityEnumStore} from "../../entity-enum/services/entity-enum-store";
@@ -123,6 +124,7 @@ export const CORE_API = {
     ComplexityStore,
     DatabaseStore,
     DataTypeStore,
+    DataTypeDecoratorStore,
     DataTypeUsageStore,
     EndUserAppStore,
     EntityEnumStore,
