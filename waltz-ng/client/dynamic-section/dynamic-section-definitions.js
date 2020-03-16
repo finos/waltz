@@ -383,6 +383,7 @@ export const dynamicSectionsByKind = {
         dynamicSections.entityNamedNotesSection,
         dynamicSections.relatedDataTypesSection,
         dynamicSections.relatedMeasurablesSection,
+        dynamicSections.involvedPeopleSection,
         dynamicSections.changeLogSection
     ],
     "SCENARIO": [
