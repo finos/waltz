@@ -29,6 +29,7 @@ import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
 import com.khartec.waltz.model.measurable_rating_replacement.MeasurableRatingReplacement;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -46,18 +47,21 @@ public class MeasurableRatingReplacementService {
 
     private final MeasurableRatingReplacementDao measurableRatingReplacementDao;
     private final MeasurableRatingPlannedDecommissionDao measurableRatingPlannedDecommissionDao;
+    private final MeasurableRatingService measurableRatingService;
     private final EntityReferenceNameResolver nameResolver;
     private final ChangeLogService changeLogService;
 
     @Autowired
     public MeasurableRatingReplacementService(MeasurableRatingReplacementDao measurableRatingReplacementDao,
                                               MeasurableRatingPlannedDecommissionDao measurableRatingPlannedDecommissionDao,
+                                              MeasurableRatingService measurableRatingService,
                                               EntityReferenceNameResolver nameResolver,
                                               ChangeLogService changeLogService){
         checkNotNull(measurableRatingReplacementDao, "measurableRatingReplacementDao cannot be null");
         checkNotNull(measurableRatingPlannedDecommissionDao, "measurableRatingPlannedDecommissionDao cannot be null");
         checkNotNull(nameResolver, "nameResolver cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
+        this.measurableRatingService = measurableRatingService;
         this.measurableRatingReplacementDao = measurableRatingReplacementDao;
         this.measurableRatingPlannedDecommissionDao = measurableRatingPlannedDecommissionDao;
         this.nameResolver = nameResolver;
@@ -113,5 +117,9 @@ public class MeasurableRatingReplacementService {
         boolean isRemoved = measurableRatingReplacementDao.remove(decommId, replacementId);
 
         return measurableRatingReplacementDao.fetchByDecommissionId(decommId);
+    }
+
+    public String getRequiredRatingEditRole(EntityReference ref) {
+        return measurableRatingService.getRequiredRatingEditRole(ref);
     }
 }

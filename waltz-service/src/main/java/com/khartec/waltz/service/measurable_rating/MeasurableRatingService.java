@@ -52,8 +52,8 @@ public class MeasurableRatingService {
 
     private final MeasurableRatingDao measurableRatingDao;
     private final MeasurableDao measurableDao;
-    private final ChangeLogService changeLogService;
     private final MeasurableCategoryDao measurableCategoryDao;
+    private final ChangeLogService changeLogService;
 
     private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
@@ -210,6 +210,10 @@ public class MeasurableRatingService {
                 .apply(selectionOptions);
         return measurableRatingDao
                 .deleteByMeasurableIdSelector(selector);
+    }
+
+    public String getRequiredRatingEditRole(EntityReference ref) {
+        return measurableDao.getRequiredRatingEditRole(ref);
     }
 
 }
