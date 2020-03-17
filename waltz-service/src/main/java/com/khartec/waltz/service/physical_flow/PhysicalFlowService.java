@@ -245,6 +245,10 @@ public class PhysicalFlowService {
 
         long physicalFlowId = physicalFlowDao.create(flow);
 
+        if(command.specification().isRemoved()) {
+            physicalSpecificationService.makeActive(specId, username);
+        }
+
         changeLogService.writeChangeLogEntries(
                 ImmutablePhysicalFlow.copyOf(flow).withId(physicalFlowId),
                 username,

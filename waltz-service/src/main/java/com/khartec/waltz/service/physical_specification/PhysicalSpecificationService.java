@@ -43,6 +43,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 
 
 @Service
@@ -160,5 +162,16 @@ public class PhysicalSpecificationService {
 
     public Long create(ImmutablePhysicalSpecification specification) {
         return specificationDao.create(specification);
+    }
+
+    public int makeActive(Long specificationId, String username) {
+        int result = specificationDao.makeActive(specificationId);
+        if(result > 0) {
+            logChange(username,
+                    mkRef(PHYSICAL_SPECIFICATION, specificationId),
+                    "Physical Specification has been marked as active",
+                    Operation.UPDATE);
+        }
+        return result;
     }
 }
