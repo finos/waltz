@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.command.DateFieldChange;
 import com.khartec.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
@@ -30,6 +30,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.model.EntityKind.MEASURABLE;
+import static com.khartec.waltz.model.EntityKind.MEASURABLE_RATING_PLANNED_DECOMMISSION;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -69,17 +72,25 @@ public class MeasurableRatingPlannedDecommissionEndpoint implements Endpoint {
                 -> measurableRatingPlannedDecommissionService.findForReplacingEntityRef(getEntityReference(request));
 
         DatumRoute<MeasurableRatingPlannedDecommission> saveRoute = (request, response) -> {
-            requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
+            EntityReference entityRef = getEntityReference(request);
+            long measurableId = getLong(request, "measurableId");
+
+            requireRole(userRoleService, request, measurableRatingPlannedDecommissionService.getRequiredRatingEditRole(mkRef(MEASURABLE, measurableId)));
+
             return measurableRatingPlannedDecommissionService.save(
-                    getEntityReference(request),
-                    getLong(request, "measurableId"),
+                    entityRef,
+                    measurableId,
                     readBody(request, DateFieldChange.class),
                     getUsername(request));
         };
 
         DatumRoute<Boolean> removeRoute = (request, response) -> {
-            requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
-            return measurableRatingPlannedDecommissionService.remove(getId(request), getUsername(request));
+            long decommissionId = getId(request);
+            EntityReference entityRef = mkRef(MEASURABLE_RATING_PLANNED_DECOMMISSION, decommissionId);
+
+            requireRole(userRoleService, request,  measurableRatingPlannedDecommissionService.getRequiredRatingEditRole(entityRef));
+
+            return measurableRatingPlannedDecommissionService.remove(decommissionId, getUsername(request));
         };
 
         getForList(findForEntityPath, findForEntityRoute);

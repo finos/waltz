@@ -181,7 +181,10 @@ function controller(
                 .then(r => {
                     const resp = r.data;
                     if(resp.outcome == 'SUCCESS') {
-                        notification.info("Created new flow");
+                        const successMessage = vm.specification.isRemoved
+                            ? "Created new flow and activated the selected specification."
+                            : "Created new flow";
+                        notification.info(successMessage);
                     } else if(resp.outcome == 'FAILURE') {
                         notification.warning(resp.message + ", redirected to existing.")
                     }

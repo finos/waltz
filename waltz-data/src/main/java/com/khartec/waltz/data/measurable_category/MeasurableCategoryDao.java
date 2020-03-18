@@ -20,7 +20,6 @@ package com.khartec.waltz.data.measurable_category;
 
 import com.khartec.waltz.model.measurable_category.ImmutableMeasurableCategory;
 import com.khartec.waltz.model.measurable_category.MeasurableCategory;
-import com.khartec.waltz.model.rating.RatingScheme;
 import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
 import org.jooq.DSLContext;
 import org.jooq.RecordMapper;
@@ -47,6 +46,7 @@ public class MeasurableCategoryDao {
                 .lastUpdatedBy(r.getLastUpdatedBy())
                 .lastUpdatedAt(r.getLastUpdatedAt().toLocalDateTime())
                 .editable(r.getEditable())
+                .ratingEditorRole(r.getRatingEditorRole())
                 .build();
     };
 
