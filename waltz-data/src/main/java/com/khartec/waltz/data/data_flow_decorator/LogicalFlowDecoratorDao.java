@@ -19,7 +19,7 @@
 package com.khartec.waltz.data.data_flow_decorator;
 
 import com.khartec.waltz.common.Checks;
-import com.khartec.waltz.common.ListUtilities;
+import com.khartec.waltz.common.CollectionUtilities;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -232,14 +232,14 @@ public class LogicalFlowDecoratorDao {
     // --- UPDATERS ---
 
     public int deleteDecorators(Long flowId, Collection<EntityReference> decoratorReferences) {
-        if(decoratorReferences.size() == 0) return 0;
+        if(CollectionUtilities.isEmpty(decoratorReferences)) return 0;
 
         // get first to get kind
         EntityReference[] entityReferences = decoratorReferences.toArray(new EntityReference[0]);
         EntityKind decoratorKind = entityReferences[0].kind();
         Checks.checkAll(entityReferences, e -> e.kind() == decoratorKind, "All decorator kinds should match");
 
-        List<Long> decoratorIds = ListUtilities.map(decoratorReferences, d -> d.id());
+        Set<Long> decoratorIds = SetUtilities.map(decoratorReferences, d -> d.id());
 
         int deleteCount = dsl
                 .deleteFrom(LOGICAL_FLOW_DECORATOR)

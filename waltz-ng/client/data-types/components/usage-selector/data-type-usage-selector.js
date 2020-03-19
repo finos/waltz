@@ -163,7 +163,7 @@ function controller(serviceBroker) {
         vm.checkedItemIds = _.without(vm.checkedItemIds, id);
         vm.onDirty(hasAnyChanges() && anySelected());
         //set disable flag of selected non concrete to true
-        if(!vm.allDataTypesById[id].concrete || vm.allDataTypesById[id].deprecated) {
+        if(!vm.allDataTypesById[id].concrete) {
             _.find(vm.allDataTypes, { id: id}).disable = true;
             vm.allDataTypesById[id].disable = true;
         }

@@ -40,7 +40,7 @@ export function findNonConcreteDataTypeIds(dataTypes = []) {
 export function enrichDataTypes(dataTypes = [], selectedDataTypeIds = []) {
     const enrich = (datatype) => {
         datatype.disable = !selectedDataTypeIds.includes(datatype.id)
-            && (!datatype.concrete || datatype.deprecated);
+            && !datatype.concrete;
         return datatype;
     };
     return _.map(dataTypes, enrich);
