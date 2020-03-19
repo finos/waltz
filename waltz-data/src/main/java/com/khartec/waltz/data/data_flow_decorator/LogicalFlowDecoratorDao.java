@@ -18,6 +18,8 @@
 
 package com.khartec.waltz.data.data_flow_decorator;
 
+import com.khartec.waltz.common.Checks;
+import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -229,20 +231,24 @@ public class LogicalFlowDecoratorDao {
 
     // --- UPDATERS ---
 
-    public int[] deleteDecorators(Long flowId, Collection<EntityReference> decoratorReferences) {
-        List<LogicalFlowDecoratorRecord> records = decoratorReferences
-                .stream()
-                .map(ref -> {
-                    LogicalFlowDecoratorRecord record = dsl.newRecord(LOGICAL_FLOW_DECORATOR);
-                    record.setLogicalFlowId(flowId);
-                    record.setDecoratorEntityId(ref.id());
-                    record.setDecoratorEntityKind(ref.kind().name());
-                    return record;
-                })
-                .collect(toList());
-        return dsl
-                .batchDelete(records)
+    public int deleteDecorators(Long flowId, Collection<EntityReference> decoratorReferences) {
+        if(decoratorReferences.size() == 0) return 0;
+
+        // get first to get kind
+        EntityReference[] entityReferences = decoratorReferences.toArray(new EntityReference[0]);
+        EntityKind decoratorKind = entityReferences[0].kind();
+        Checks.checkAll(entityReferences, e -> e.kind() == decoratorKind, "All decorator kinds should match");
+
+        List<Long> decoratorIds = ListUtilities.map(decoratorReferences, d -> d.id());
+
+        int deleteCount = dsl
+                .deleteFrom(LOGICAL_FLOW_DECORATOR)
+                .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(flowId))
+                .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(decoratorKind.name()))
+                .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(decoratorIds))
                 .execute();
+
+        return deleteCount;
     }
 
 
