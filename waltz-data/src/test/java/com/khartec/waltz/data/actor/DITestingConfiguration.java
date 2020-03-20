@@ -29,7 +29,8 @@ public class DITestingConfiguration {
             "postgres:10.3")
             .withDatabaseName("test")
             .withUsername("user")
-            .withPassword("pass").withStartupTimeout(Duration.ofSeconds(600));
+            .withPassword("pass")
+            .withStartupTimeout(Duration.ofSeconds(600));
 
 
     @Bean
