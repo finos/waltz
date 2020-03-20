@@ -29,7 +29,8 @@ const bindings = {
     onCheck: "<",
     onUncheck: "<",
     checkedItemIds: "<",
-    expandedItemIds: "<"
+    expandedItemIds: "<",
+    disablePredicate: "<?"
 };
 
 
@@ -40,7 +41,11 @@ const initialState = {
     hierarchy: [],
     onCheck: id => console.log("default handler in multi-select-treecontrol for node id check: ", id),
     onUncheck: id => console.log("default handler in multi-select-treecontrol for node id uncheck: ", id),
-    onClick: node => console.log("default handler in multi-select-treecontrol for node click: ", node)
+    onClick: node => console.log("default handler in multi-select-treecontrol for node click: ", node),
+    disablePredicate: node => {
+        console.log("default disablePredicate function: ", node);
+        return false;
+    }
 };
 
 
@@ -133,6 +138,12 @@ function controller() {
         }
 
         vm.checkedMap = mkCheckedMap(vm.items, vm.checkedItemIds);
+    };
+
+    vm.$onInit = () => {
+        // determines if a node should be disabled based on the supplied predicate and if the node is not also
+        // currently selected
+        vm.isDisabled = (node) => vm.disablePredicate(node) && !_.get(vm.checkedMap, node.id, false);
     };
 
     vm.searchTermsChanged = (termStr = "") => {
