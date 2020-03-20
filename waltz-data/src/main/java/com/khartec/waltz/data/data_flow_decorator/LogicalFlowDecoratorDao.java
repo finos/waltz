@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.data.data_flow_decorator;
 
+import com.khartec.waltz.common.CollectionUtilities;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -43,6 +44,7 @@ import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -229,20 +231,28 @@ public class LogicalFlowDecoratorDao {
 
     // --- UPDATERS ---
 
-    public int[] deleteDecorators(Long flowId, Collection<EntityReference> decoratorReferences) {
-        List<LogicalFlowDecoratorRecord> records = decoratorReferences
+    public int deleteDecorators(Long flowId, Collection<EntityReference> decoratorReferences) {
+        if(CollectionUtilities.isEmpty(decoratorReferences)) return 0;
+
+        // get first to get kind
+        Map<EntityKind, Collection<EntityReference>> refsByKind = groupBy(r -> r.kind(), decoratorReferences);
+        int deleteCount = refsByKind
+                .entrySet()
                 .stream()
-                .map(ref -> {
-                    LogicalFlowDecoratorRecord record = dsl.newRecord(LOGICAL_FLOW_DECORATOR);
-                    record.setLogicalFlowId(flowId);
-                    record.setDecoratorEntityId(ref.id());
-                    record.setDecoratorEntityKind(ref.kind().name());
-                    return record;
+                .map(r -> {
+                    EntityKind decoratorKind = r.getKey();
+                    Set<Long> decoratorIds = SetUtilities.map(r.getValue(), d -> d.id());
+                    return dsl
+                            .deleteFrom(LOGICAL_FLOW_DECORATOR)
+                            .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(flowId))
+                            .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(decoratorKind.name()))
+                            .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(decoratorIds))
+                            .execute();
                 })
-                .collect(toList());
-        return dsl
-                .batchDelete(records)
-                .execute();
+                .mapToInt(Integer::intValue)
+                .sum();
+
+        return deleteCount;
     }
 
 
