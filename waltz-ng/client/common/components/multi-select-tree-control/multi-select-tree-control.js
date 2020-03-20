@@ -42,10 +42,7 @@ const initialState = {
     onCheck: id => console.log("default handler in multi-select-treecontrol for node id check: ", id),
     onUncheck: id => console.log("default handler in multi-select-treecontrol for node id uncheck: ", id),
     onClick: node => console.log("default handler in multi-select-treecontrol for node click: ", node),
-    disablePredicate: node => {
-        console.log("default disablePredicate function: ", node);
-        return false;
-    }
+    disablePredicate: node => false,
 };
 
 
