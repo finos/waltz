@@ -37,6 +37,7 @@ const initialState = {
     checkedItemIds: [],
     originalSelectedItemIds: [],
     expandedItemIds: [],
+    disablePredicate: null,
     onDirty: (d) => console.log("dtus:onDirty - default impl", d),
     onRegisterSave: (f) => console.log("dtus:onRegisterSave - default impl", f)
 };
@@ -196,6 +197,10 @@ function controller(serviceBroker) {
                 postLoadActions();
                 vm.onDirty(false);
             });
+    };
+
+    vm.disablePredicate = (node) => {
+        return !node.concrete;
     };
 
     // -- LIFECYCLE
