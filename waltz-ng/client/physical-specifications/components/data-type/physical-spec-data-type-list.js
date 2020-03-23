@@ -36,13 +36,14 @@ function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = () => {
+        //TODO remove this unused file
         const selectorOptions = {
             entityReference: vm.parentEntityRef,
             scope: 'EXACT'
         };
 
         serviceBroker
-            .loadViewData(CORE_API.PhysicalSpecDataTypeStore.findBySpecificationSelector, [selectorOptions])
+            .loadViewData(CORE_API.DataTypeDecoratorStore.findByEntityReference, [vm.parentEntityRef])
             .then(result => vm.dataTypes = result.data);
     };
 }

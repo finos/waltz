@@ -20,16 +20,18 @@ package com.khartec.waltz.web.action;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.EntityReference;
 import org.immutables.value.Value;
 
 import java.util.Set;
-//TODO remove this class
-@Value.Immutable
-@JsonSerialize(as = ImmutableUpdatePhysicalSpecDataTypesAction.class)
-@JsonDeserialize(as = ImmutableUpdatePhysicalSpecDataTypesAction.class)
-public abstract class UpdatePhysicalSpecDataTypesAction {
 
-    public abstract long specificationId();
+
+@Value.Immutable
+@JsonSerialize(as = ImmutableUpdateDataTypeDecoratorAction.class)
+@JsonDeserialize(as = ImmutableUpdateDataTypeDecoratorAction.class)
+public abstract class UpdateDataTypeDecoratorAction {
+
+    public abstract EntityReference entityReference();
     public abstract Set<Long> addedDataTypeIds();
     public abstract Set<Long> removedDataTypeIds();
 

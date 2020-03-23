@@ -127,8 +127,8 @@ function controller(serviceBroker) {
         const promise = vm.parentEntityRef.kind === "PHYSICAL_SPECIFICATION"
             ? serviceBroker
                 .loadViewData(
-                    CORE_API.PhysicalSpecDataTypeStore.findBySpecificationSelector,
-                    [ selectorOptions ],
+                    CORE_API.DataTypeDecoratorStore.findByEntityReference,
+                    [ vm.parentEntityRef ],
                     { force })
                 .then(r => r.data)
             : serviceBroker

@@ -19,12 +19,18 @@
 
 import {checkIsEntityRef} from "../../common/checks";
 
-export function store($http, BaseApiUrl) {
+function store($http, BaseApiUrl) {
 
     const BASE = `${BaseApiUrl}/data-type-decorator`;
 
-    const findBySelector = (options) => {
-        return $http.post(`${BASE}/find/selector`, options)
+    const findByEntityReference = (ref) => {
+        return $http
+            .get(`${BASE}/entity/${ref.kind}/${ref.id}`)
+            .then(result => result.data);
+    };
+
+    const findBySelector = (targetKind, options) => {
+        return $http.post(`${BASE}/selector/targetKind/${targetKind}`, options)
             .then(result => result.data);
     };
 
@@ -35,7 +41,8 @@ export function store($http, BaseApiUrl) {
     };
 
     return {
-        findBySelector: findBySelector,
+        findBySelector,
+        findByEntityReference,
         save
     };
 }
@@ -47,7 +54,7 @@ store.$inject = [
 ];
 
 
-export const serviceName = 'DataTypeDecoratorStore';
+const serviceName = 'DataTypeDecoratorStore';
 
 
 export const DataTypeDecoratorStore_API = {
@@ -56,6 +63,11 @@ export const DataTypeDecoratorStore_API = {
         serviceFnName: 'findBySelector',
         description: 'finds data types for a given selector'
     },
+    findByEntityReference: {
+        serviceName,
+        serviceFnName: 'findByEntityReference',
+        description: 'finds by entity reference for data types'
+    },
     save: {
         serviceName,
         serviceFnName: 'save',
@@ -63,3 +75,7 @@ export const DataTypeDecoratorStore_API = {
     }
 };
 
+export default {
+    store,
+    serviceName
+};
