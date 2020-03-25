@@ -28,6 +28,7 @@ import template from "./application-flow-summary-pane.html";
 import {tallyBy} from "../../../common/tally-utils";
 import {color} from "d3-color";
 import indexByKeyForType from "../../../enum-value/enum-value-utilities";
+import {entity} from "../../../common/services/enums/entity";
 
 
 const bindings = {
@@ -137,8 +138,8 @@ function controller($q, serviceBroker) {
 
         const decorationPromise = serviceBroker
             .loadViewData(
-                CORE_API.LogicalFlowDecoratorStore.findBySelectorAndKind,
-                [selector, "DATA_TYPE"])
+                CORE_API.DataTypeDecoratorStore.findBySelector,
+                [selector, entity.LOGICAL_DATA_FLOW.key ])
             .then(r => r.data);
 
         $q.all([logicalFlowPromise, decorationPromise])

@@ -19,29 +19,13 @@
 package com.khartec.waltz.data.physical_specification_data_type;
 
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
-import com.khartec.waltz.model.physical_specification_data_type.ImmutablePhysicalSpecificationDataType;
-import com.khartec.waltz.model.physical_specification_data_type.PhysicalSpecificationDataType;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
-import com.khartec.waltz.schema.tables.records.PhysicalSpecDataTypeRecord;
 import org.jooq.*;
-import org.jooq.impl.DSL;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
-import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
-
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
-import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
-import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
-import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
-import static com.khartec.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE;
-import static java.util.stream.Collectors.toList;
+import java.util.Optional;
 
 public abstract class DataTypeDecoratorDao {
 
@@ -49,7 +33,12 @@ public abstract class DataTypeDecoratorDao {
 
     public abstract List<DataTypeDecorator> findByEntityId(long entityId);
 
-    public abstract List<DataTypeDecorator> findByEntityIdSelector(Select<Record1<Long>> idSelector);
+    public abstract List<DataTypeDecorator> findByEntityIdSelector(Select<Record1<Long>> idSelector,
+                                                                   Optional<EntityKind> entityKind);
+
+    //only implemented for logical flows
+    @Deprecated
+    public abstract Collection<DataTypeDecorator> findByFlowIds(List<Long> flowIds);
 
     public abstract int[] addDataTypes(Collection<DataTypeDecorator> dataTypeDecorators);
 

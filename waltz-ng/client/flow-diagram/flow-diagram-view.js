@@ -120,7 +120,7 @@ function controller(
             .then(r => r.data);
 
         const physicalSpecDataTypesPromise = serviceBroker
-            .loadViewData(CORE_API.DataTypeDecoratorStore.findBySelector, [ entity.PHYSICAL_SPECIFICATION.key, selector ])
+            .loadViewData(CORE_API.DataTypeDecoratorStore.findBySelector, [ selector, entity.PHYSICAL_SPECIFICATION.key ])
             .then(result => result.data);
 
         const logicalFlowPromise = serviceBroker

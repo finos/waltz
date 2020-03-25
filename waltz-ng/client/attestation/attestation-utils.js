@@ -20,6 +20,7 @@ import {CORE_API} from "../common/services/core-api-utils";
 import _ from "lodash";
 import {mkDateGridCell, mkEntityLinkGridCell} from "../common/grid-utils";
 import {mapToDisplayNames} from "../applications/application-utils";
+import {entity} from "../common/services/enums/entity";
 
 
 function mkAttestationCommand(attestedEntityRef, attestationKind){
@@ -108,8 +109,8 @@ export function loadAndCalcUnattestableLogicalFlows($q, serviceBroker, selector)
 
     const logicalFlowDecoratorPromise = serviceBroker
         .loadViewData(
-            CORE_API.LogicalFlowDecoratorStore.findBySelectorAndKind,
-            [selector, "DATA_TYPE"],
+            CORE_API.DataTypeDecoratorStore.findBySelector,
+            [selector, entity.LOGICAL_DATA_FLOW.key ],
             { force: true })
         .then(r => r.data);
 

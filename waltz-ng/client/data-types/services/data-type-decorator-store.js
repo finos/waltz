@@ -17,7 +17,8 @@
  *
  */
 
-import {checkIsEntityRef} from "../../common/checks";
+import {checkIsEntityRef, checkIsIdSelector} from "../../common/checks";
+import {entity} from "../../common/services/enums/entity";
 
 function store($http, BaseApiUrl) {
 
@@ -29,8 +30,24 @@ function store($http, BaseApiUrl) {
             .then(result => result.data);
     };
 
-    const findBySelector = (targetKind, options) => {
+
+    const findBySelector = (options, targetKind) => {
         return $http.post(`${BASE}/selector/targetKind/${targetKind}`, options)
+            .then(result => result.data);
+    };
+
+
+    // ONLY FOR LOGICAL FLOWS
+    const findByFlowIds = (flowIds = [], kind = entity.LOGICAL_DATA_FLOW.key) => {
+        return $http
+            .post(`${BASE}/flow-ids/kind/${kind}`, flowIds)
+            .then(result => result.data);
+    };
+
+    const findDataTypeStatsForEntity = (selector) => {
+        checkIsIdSelector(selector);
+        return $http
+            .post(`${BASE}/datatype-stats`, selector)
             .then(result => result.data);
     };
 
@@ -40,9 +57,11 @@ function store($http, BaseApiUrl) {
             .then(result => result.data);
     };
 
+
     return {
         findBySelector,
         findByEntityReference,
+        findByFlowIds,
         save
     };
 }

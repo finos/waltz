@@ -21,7 +21,6 @@ package com.khartec.waltz.data.physical_specification_data_type;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
-import com.khartec.waltz.model.physical_specification_data_type.PhysicalSpecificationDataType;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.schema.tables.records.PhysicalSpecDataTypeRecord;
 import org.jooq.*;
@@ -32,6 +31,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -45,7 +45,7 @@ import static com.khartec.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC
 import static java.util.stream.Collectors.toList;
 
 @Repository
-public class PhysicalSpecDataTypeDecoratorDao extends DataTypeDecoratorDao{
+public class PhysicalSpecDataTypeDecoratorDao extends DataTypeDecoratorDao {
 
     public static final RecordMapper<? super Record, DataTypeDecorator> TO_DOMAIN_MAPPER = r -> {
         PhysicalSpecDataTypeRecord record = r.into(PHYSICAL_SPEC_DATA_TYPE);
@@ -81,6 +81,7 @@ public class PhysicalSpecDataTypeDecoratorDao extends DataTypeDecoratorDao{
     }
 
 
+    @Override
     public DataTypeDecorator getByEntityIdAndDataTypeId(long specId, long dataTypeId) {
         return dsl.selectFrom(PHYSICAL_SPEC_DATA_TYPE)
                 .where(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(specId))
@@ -89,6 +90,7 @@ public class PhysicalSpecDataTypeDecoratorDao extends DataTypeDecoratorDao{
     }
 
 
+    @Override
     public List<DataTypeDecorator> findByEntityId(long specId) {
         return dsl.selectFrom(PHYSICAL_SPEC_DATA_TYPE)
                 .where(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(specId))
@@ -96,10 +98,17 @@ public class PhysicalSpecDataTypeDecoratorDao extends DataTypeDecoratorDao{
     }
 
 
-    public List<DataTypeDecorator> findByEntityIdSelector(Select<Record1<Long>> specIdSelector) {
+    @Override
+    public List<DataTypeDecorator> findByEntityIdSelector(Select<Record1<Long>> specIdSelector,
+                                                          Optional<EntityKind> entityKind) {
         return dsl.selectFrom(PHYSICAL_SPEC_DATA_TYPE)
                 .where(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.in(specIdSelector))
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+    @Override
+    public Collection<DataTypeDecorator> findByFlowIds(List<Long> flowIds) {
+        throw new IllegalArgumentException("Method not implemented for Physical specification");
     }
 
 

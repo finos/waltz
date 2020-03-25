@@ -18,31 +18,33 @@
 
 package com.khartec.waltz.service.data_type;
 
-import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationIdSelectorFactory;
+import com.khartec.waltz.data.physical_specification_data_type.DataTypeDecoratorDao;
 import com.khartec.waltz.data.physical_specification_data_type.DataTypeDecoratorDaoSelectorFactory;
 import com.khartec.waltz.data.physical_specification_data_type.PhysicalSpecDataTypeDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
 import com.khartec.waltz.model.physical_flow.PhysicalFlow;
-import com.khartec.waltz.model.physical_specification_data_type.ImmutablePhysicalSpecificationDataType;
-import com.khartec.waltz.model.physical_specification_data_type.PhysicalSpecificationDataType;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
+import org.jooq.Record1;
+import org.jooq.Select;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
 import static com.khartec.waltz.common.CollectionUtilities.map;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
+import static com.khartec.waltz.model.EntityKind.*;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
@@ -99,11 +101,15 @@ public class DataTypeDecoratorService {
 
         System.out.println("This should be diff than physical spec " + selectionOptions.entityReference());
         System.out.println("This should be physical spec " + entityKind);
-//        Select<Record1<Long>> selector = specificationIdSelectorFactory.apply(selectionOptions);
-        GenericSelector selector = genericSelectorFactory.applyForKind(entityKind, selectionOptions);
-        return dataTypeDecoratorDaoSelectorFactory
-                .getDao(entityKind)
-                .findByEntityIdSelector(selector.selector());
+
+        DataTypeDecoratorDao dao = dataTypeDecoratorDaoSelectorFactory
+                .getDao(entityKind);
+        if(PHYSICAL_SPECIFICATION.equals(entityKind)){
+            Select<Record1<Long>> selector = genericSelectorFactory
+                    .applyForKind(entityKind, selectionOptions).selector();
+            return dao.findByEntityIdSelector(selector, Optional.empty());
+        }
+        return getSelectorForLogicalFlow(dao, selectionOptions);
     }
 
 
@@ -167,7 +173,7 @@ public class DataTypeDecoratorService {
                     dataTypeIds,
                     dtId -> ImmutableDataTypeDecorator.builder()
                             .entityReference(entityReference)
-                            .dataTypeId(dtId)
+                            .decoratorEntity(mkRef(DATA_TYPE, dtId))
                             .provenance("waltz")
                             .lastUpdatedAt(nowUtc())
                             .lastUpdatedBy(userName)
@@ -193,5 +199,32 @@ public class DataTypeDecoratorService {
                 .build();
 
         changeLogService.write(logEntry);
+    }
+
+    private List<DataTypeDecorator> getSelectorForLogicalFlow(DataTypeDecoratorDao dao, IdSelectionOptions options) {
+        switch (options.entityReference().kind()) {
+            case APPLICATION:
+            case APP_GROUP:
+            case ORG_UNIT:
+            case PERSON:
+                return dao.findByEntityIdSelector(
+                        genericSelectorFactory.applyForKind(APPLICATION, options).selector(),
+                        Optional.of(APPLICATION));
+            case ACTOR:
+                return dao.findByEntityIdSelector(
+                        DSL.select(DSL.val(options.entityReference().id())),
+                        Optional.of(ACTOR));
+            default:
+                throw new UnsupportedOperationException("Cannot find decorators for selector kind: " + options.entityReference().kind());
+        }
+    }
+
+    public Collection<DataTypeDecorator> findByFlowIds(List<Long> ids, EntityKind entityKind) {
+        if (isEmpty(ids)) {
+            return Collections.emptyList();
+        }
+        return dataTypeDecoratorDaoSelectorFactory
+                .getDao(entityKind)
+                .findByFlowIds(ids);
     }
 }

@@ -4,17 +4,23 @@ import com.khartec.waltz.model.EntityKind;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import static com.khartec.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
+
 @Component
 public class DataTypeDecoratorDaoSelectorFactory {
-    private final DataTypeDecoratorDao physicalSpecDecoratorDao;
+    private final PhysicalSpecDataTypeDecoratorDao physicalSpecDataTypeDecoratorDao;
+    private final LogicalFlowDataTypeDecoratorDao logicalFlowDataTypeDecoratorDao;
 
     @Autowired
-    public DataTypeDecoratorDaoSelectorFactory(DataTypeDecoratorDao physicalSpecDecoratorDao) {
-        this.physicalSpecDecoratorDao = physicalSpecDecoratorDao;
+    public DataTypeDecoratorDaoSelectorFactory(PhysicalSpecDataTypeDecoratorDao physicalSpecDataTypeDecoratorDao,
+                                               LogicalFlowDataTypeDecoratorDao logicalFlowDataTypeDecoratorDao) {
+        this.physicalSpecDataTypeDecoratorDao = physicalSpecDataTypeDecoratorDao;
+        this.logicalFlowDataTypeDecoratorDao = logicalFlowDataTypeDecoratorDao;
     }
 
     public DataTypeDecoratorDao getDao(EntityKind entityKind) {
-        //if(entityKind.equals(EntityKind.PHYSICAL_SPECIFICATION))
-            return physicalSpecDecoratorDao;
+        return PHYSICAL_SPECIFICATION.equals(entityKind)
+                ? physicalSpecDataTypeDecoratorDao
+                : logicalFlowDataTypeDecoratorDao;
     }
 }

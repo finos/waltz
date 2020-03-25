@@ -23,6 +23,7 @@ import { initialiseData } from "../../../common";
 import { mkSelectionOptions } from "../../../common/selector-utils";
 
 import template from "./data-flow-section.html";
+import {entity} from "../../../common/services/enums/entity";
 
 
 const bindings = {
@@ -107,8 +108,8 @@ function controller(serviceBroker) {
 
         serviceBroker
             .loadViewData(
-                CORE_API.LogicalFlowDecoratorStore.findBySelectorAndKind,
-                [selector, "DATA_TYPE"])
+                CORE_API.DataTypeDecoratorStore.findBySelector,
+                [ selector, entity.LOGICAL_DATA_FLOW.key])
             .then(r => vm.logicalFlowDecorators = r.data);
 
         serviceBroker
