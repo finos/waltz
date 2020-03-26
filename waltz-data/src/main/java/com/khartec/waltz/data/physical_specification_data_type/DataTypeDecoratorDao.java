@@ -36,6 +36,9 @@ public abstract class DataTypeDecoratorDao {
     public abstract List<DataTypeDecorator> findByEntityIdSelector(Select<Record1<Long>> idSelector,
                                                                    Optional<EntityKind> entityKind);
 
+    public abstract List<DataTypeDecorator> findByAppIdSelector(Select<Record1<Long>> appIdSelector);
+    public abstract List<DataTypeDecorator> findByDataTypeIdSelector(Select<Record1<Long>> dataTypeIdSelector);
+
     //only implemented for logical flows
     @Deprecated
     public abstract Collection<DataTypeDecorator> findByFlowIds(List<Long> flowIds);

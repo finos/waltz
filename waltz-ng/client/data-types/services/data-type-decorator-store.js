@@ -44,12 +44,6 @@ function store($http, BaseApiUrl) {
             .then(result => result.data);
     };
 
-    const findDataTypeStatsForEntity = (selector) => {
-        checkIsIdSelector(selector);
-        return $http
-            .post(`${BASE}/datatype-stats`, selector)
-            .then(result => result.data);
-    };
 
     const save = (ref, command) => {
         checkIsEntityRef(ref);
@@ -86,6 +80,11 @@ export const DataTypeDecoratorStore_API = {
         serviceName,
         serviceFnName: 'findByEntityReference',
         description: 'finds by entity reference for data types'
+    },
+    findByFlowIds: {
+        serviceName,
+        serviceFnName: 'findByFlowIds',
+        description: 'finds data types for flow ids'
     },
     save: {
         serviceName,

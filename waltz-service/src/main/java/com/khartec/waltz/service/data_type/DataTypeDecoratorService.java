@@ -25,15 +25,12 @@ import com.khartec.waltz.data.physical_specification_data_type.DataTypeDecorator
 import com.khartec.waltz.data.physical_specification_data_type.PhysicalSpecDataTypeDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
 import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
-import org.jooq.Record1;
-import org.jooq.Select;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -94,6 +91,26 @@ public class DataTypeDecoratorService {
     }
 
 
+//    public List<DataTypeDecorator> findByEntityIdSelector(
+//            EntityKind entityKind,
+//            IdSelectionOptions selectionOptions) {
+//        checkNotNull(selectionOptions, "selectionOptions cannot be null");
+//
+//        System.out.println("This should be diff than physical spec " + selectionOptions.entityReference());
+//        System.out.println("This should be physical spec " + entityKind);
+//
+//        DataTypeDecoratorDao dao = dataTypeDecoratorDaoSelectorFactory
+//                .getDao(entityKind);
+//
+//        EntityKind targetEntityKind = LOGICAL_DATA_FLOW.equals(entityKind)
+//                ? getSourceAndTargetEntityKindForLogicalFlow(selectionOptions)
+//                : entityKind;
+//
+//        Select<Record1<Long>> selector = genericSelectorFactory
+//                .applyForKind(entityKind, selectionOptions).selector();
+//        return dao.findByEntityIdSelector(selector, Optional.ofNullable(targetEntityKind));
+//    }
+
     public List<DataTypeDecorator> findByEntityIdSelector(
             EntityKind entityKind,
             IdSelectionOptions selectionOptions) {
@@ -104,12 +121,12 @@ public class DataTypeDecoratorService {
 
         DataTypeDecoratorDao dao = dataTypeDecoratorDaoSelectorFactory
                 .getDao(entityKind);
-        if(PHYSICAL_SPECIFICATION.equals(entityKind)){
-            Select<Record1<Long>> selector = genericSelectorFactory
-                    .applyForKind(entityKind, selectionOptions).selector();
-            return dao.findByEntityIdSelector(selector, Optional.empty());
-        }
-        return getSelectorForLogicalFlow(dao, selectionOptions);
+
+        return LOGICAL_DATA_FLOW.equals(entityKind)
+                ? getSelectorForLogicalFlow(dao, selectionOptions)
+                : dao.findByEntityIdSelector(
+                genericSelectorFactory.applyForKind(entityKind, selectionOptions).selector(),
+                Optional.ofNullable(entityKind));
     }
 
 
@@ -207,15 +224,37 @@ public class DataTypeDecoratorService {
             case APP_GROUP:
             case ORG_UNIT:
             case PERSON:
-                return dao.findByEntityIdSelector(
-                        genericSelectorFactory.applyForKind(APPLICATION, options).selector(),
-                        Optional.of(APPLICATION));
+            case MEASURABLE:
+            case SCENARIO:
+            case CHANGE_INITIATIVE:
+                return dao.findByAppIdSelector(
+                        genericSelectorFactory.applyForKind(APPLICATION, options).selector());
             case ACTOR:
                 return dao.findByEntityIdSelector(
                         DSL.select(DSL.val(options.entityReference().id())),
                         Optional.of(ACTOR));
+            case DATA_TYPE:
+                return dao.findByDataTypeIdSelector(
+                        genericSelectorFactory.applyForKind(DATA_TYPE, options).selector());
             default:
                 throw new UnsupportedOperationException("Cannot find decorators for selector kind: " + options.entityReference().kind());
+        }
+    }
+
+    private EntityKind getSourceAndTargetEntityKindForLogicalFlow(IdSelectionOptions options) {
+        switch (options.entityReference().kind()) {
+            case APPLICATION:
+            case APP_GROUP:
+            case ORG_UNIT:
+            case PERSON:
+
+                //TEST MERGING
+                return APPLICATION;
+            default:
+                return options.entityReference().kind();
+//            default:
+//                throw new UnsupportedOperationException("Cannot find decorators for selector kind: " + options.entityReference().kind());
+
         }
     }
 

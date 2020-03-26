@@ -43,26 +43,19 @@ function controller(notification, serviceBroker, userService) {
     const vm = initialiseData(this, initialState);
 
     const reload = (force = false) => {
-        const promise = vm.parentEntityRef.kind === "PHYSICAL_SPECIFICATION"
-            ? serviceBroker
-                .loadViewData(
-                    CORE_API.DataTypeDecoratorStore.findByEntityReference,
-                    [ vm.parentEntityRef ],
-                    { force })
-                .then(r => r.data)
-            : serviceBroker
-                .loadViewData(
-                    CORE_API.LogicalFlowDecoratorStore.findByFlowIdsAndKind,
-                    [ [vm.parentEntityRef.id] ],
-                    { force })
-                .then(r => r.data)
-                .then(decorators => _.map(decorators, d => ({
-                    lastUpdatedAt: d.lastUpdatedAt,
-                    lastUpdatedBy: d.lastUpdatedBy,
-                    provenance: d.provenance,
-                    dataTypeId: d.decoratorEntity.id,
-                    dataFlowId: d.dataFlowId
-                })));
+        const promise = serviceBroker
+            .loadViewData(
+                CORE_API.DataTypeDecoratorStore.findByEntityReference,
+                [ vm.parentEntityRef ],
+                { force })
+            .then(r => r.data)
+            .then(decorators => _.map(decorators, d => ({
+                lastUpdatedAt: d.lastUpdatedAt,
+                lastUpdatedBy: d.lastUpdatedBy,
+                provenance: d.provenance,
+                dataTypeId: d.decoratorEntity.id,
+                dataFlowId: d.dataFlowId
+            })));
 
         return promise
             .then(r => {

@@ -23,6 +23,7 @@ import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifec
 
 import template from "./logical-flows-boingy-graph.html";
 import {buildHierarchies, findNode, flattenChildren} from "../../../common/hierarchy-utils";
+import {entity} from "../../../common/services/enums/entity";
 
 const bindings = {
     filters: "<",
@@ -175,8 +176,8 @@ function controller($scope,
 
         const decoratorPromise = serviceBroker
             .loadViewData(
-                CORE_API.LogicalFlowDecoratorStore.findBySelector,
-                [ vm.selector ])
+                CORE_API.DataTypeDecoratorStore.findBySelector,
+                [ vm.selector, entity.LOGICAL_DATA_FLOW.key ])
             .then(r => {
                 vm.decorators = r.data;
                 vm.usedDataTypes = getDataTypeIds(vm.allDataTypes, vm.decorators);

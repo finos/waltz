@@ -316,7 +316,7 @@ public class LogicalFlowDecoratorService {
         if (isEmpty(ids)) {
             return Collections.emptyList();
         }
-        return logicalFlowDecoratorDao.findByFlowIdsAndKind(ids, decorationKind);
+        return logicalFlowDecoratorDao.findByFlowIds(ids);
     }
 
 

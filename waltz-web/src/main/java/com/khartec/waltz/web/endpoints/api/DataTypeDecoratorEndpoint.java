@@ -67,7 +67,6 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
         String findByEntityReference = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findBySelectorPath = mkPath(BASE_URL, "selector", "targetKind", ":targetKind");
 
-
         String findByFlowIdsAndKindPath = mkPath(BASE_URL, "flow-ids", "kind", ":kind");
         String updateDataTypesPath = mkPath(BASE_URL, "save", "entity", ":kind", ":id");
 
@@ -79,13 +78,14 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
                         getKind(req, "targetKind"),
                 readIdSelectionOptionsFromBody(req));
 
-        ListRoute<LogicalFlowDecorator> findByFlowIdsAndKindRoute =
+        ListRoute<DataTypeDecorator> findByFlowIdsAndKindRoute =
                 (request, response) -> dataTypeDecoratorService
                         .findByFlowIds(
                                 readIdsFromBody(request), getKind(request));
 
         getForList(findByEntityReference, findByEntityReferenceRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
+        postForList(findByFlowIdsAndKindPath, findByFlowIdsAndKindRoute);
         postForDatum(updateDataTypesPath, this::updateDataTypesRoute);
     }
 
