@@ -181,12 +181,12 @@ public class LogicalFlowDecoratorService {
     }
 
 
-    public int[] deleteDecorators(long flowId,
+    public int deleteDecorators(long flowId,
                                   Collection<EntityReference> decoratorReferences,
                                   String username) {
         checkNotNull(decoratorReferences, "decoratorReferences cannot be null");
         LogicalFlow flow = logicalFlowDao.getByFlowId(flowId);
-        int[] deleted = logicalFlowDecoratorDao.deleteDecorators(flowId, decoratorReferences);
+        int deleted = logicalFlowDecoratorDao.deleteDecorators(flowId, decoratorReferences);
         dataTypeUsageService.recalculateForApplications(newArrayList(flow.source(), flow.target()));
 
         changeLogService.writeChangeLogEntries(

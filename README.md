@@ -2,20 +2,20 @@
 
 In a nutshell Waltz allows you to visualize and define your organisation's technology landscape. Think of it like a structured Wiki for your architecture.
 
-[Feature list](docs/features/README.md)
 
-[Learn more](http://www.waltz-technology.com/)
+Learn more
+  - [Features](docs/features/README.md)
+  - [Product Site](https://waltz.finos.org/)
+  - [FINOS Announcement](https://www.finos.org/blog/introduction-to-finos-waltz)
 
-[Building notes](docs/development/build.md)
-
-[Running](waltz-web/README.md)
+Getting started
+ - [Building](docs/development/build.md) 
+ - [Running](waltz-web/README.md)
 
 ---
 
-[![Build Status](https://travis-ci.org/finos/waltz.svg?branch=master)](https://travis-ci.org/finos/waltz)
-
-[![Language Grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/khartec/waltz.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/khartec/waltz/context:javascript)
-
+[![Build Status](https://travis-ci.org/finos/waltz.svg?branch=master)](https://travis-ci.org/finos/waltz) 
+[![Language Grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/khartec/waltz.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/khartec/waltz/context:javascript) 
 [![Language Grade: Java](https://img.shields.io/lgtm/grade/java/g/khartec/waltz.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/khartec/waltz/context:java)
 
 
