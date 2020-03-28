@@ -43,7 +43,7 @@ public abstract class DataTypeDecoratorDao {
     @Deprecated
     public abstract Collection<DataTypeDecorator> findByFlowIds(List<Long> flowIds);
 
-    public abstract int[] addDataTypes(Collection<DataTypeDecorator> dataTypeDecorators);
+    public abstract int[] addDecorators(Collection<DataTypeDecorator> dataTypeDecorators);
 
     public abstract int[] removeDataTypes(Collection<DataTypeDecorator> dataTypeDecorators);
 

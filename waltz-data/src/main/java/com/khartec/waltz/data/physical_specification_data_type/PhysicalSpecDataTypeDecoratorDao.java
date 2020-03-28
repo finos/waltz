@@ -122,7 +122,7 @@ public class PhysicalSpecDataTypeDecoratorDao extends DataTypeDecoratorDao {
     }
 
 
-    public int[] addDataTypes(Collection<DataTypeDecorator> specificationDataTypes) {
+    public int[] addDecorators(Collection<DataTypeDecorator> specificationDataTypes) {
         checkNotNull(specificationDataTypes, "specificationDataTypes cannot be null");
 
         List<PhysicalSpecDataTypeRecord> records = specificationDataTypes.stream()

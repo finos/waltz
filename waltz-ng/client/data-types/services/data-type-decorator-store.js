@@ -47,7 +47,7 @@ function store($http, BaseApiUrl) {
 
     const save = (ref, command) => {
         checkIsEntityRef(ref);
-        return $http.post(`${BASE}/save/entity/${ref.kind}/${ref.id}/`, command)
+        return $http.post(`${BASE}/save/entity/${ref.kind}/${ref.id}`, command)
             .then(result => result.data);
     };
 

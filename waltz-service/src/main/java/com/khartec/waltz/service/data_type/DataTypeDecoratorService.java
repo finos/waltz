@@ -19,6 +19,7 @@
 package com.khartec.waltz.service.data_type;
 
 import com.khartec.waltz.data.GenericSelectorFactory;
+import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationIdSelectorFactory;
 import com.khartec.waltz.data.physical_specification_data_type.DataTypeDecoratorDao;
 import com.khartec.waltz.data.physical_specification_data_type.DataTypeDecoratorDaoSelectorFactory;
@@ -27,10 +28,14 @@ import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
+import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.physical_flow.PhysicalFlow;
+import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.data_flow_decorator.DataTypeDecoratorRatingsCalculator;
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
+import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -41,10 +46,10 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
 import static com.khartec.waltz.common.CollectionUtilities.map;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityKind.*;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toSet;
 
 @Service
 public class DataTypeDecoratorService {
@@ -55,7 +60,9 @@ public class DataTypeDecoratorService {
     private final PhysicalSpecDataTypeDao physicalSpecDataTypeDao;
     private final DataTypeDecoratorDaoSelectorFactory dataTypeDecoratorDaoSelectorFactory;
     private final PhysicalSpecificationIdSelectorFactory specificationIdSelectorFactory = new PhysicalSpecificationIdSelectorFactory();
-
+    private final LogicalFlowDao logicalFlowDao;
+    private final DataTypeDecoratorRatingsCalculator ratingsCalculator;
+    private final DataTypeUsageService dataTypeUsageService;
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
     @Autowired
@@ -63,7 +70,9 @@ public class DataTypeDecoratorService {
                                     LogicalFlowDecoratorService logicalFlowDecoratorService,
                                     PhysicalFlowService physicalFlowService,
                                     PhysicalSpecDataTypeDao physicalSpecDataTypeDao,
-                                    DataTypeDecoratorDaoSelectorFactory dataTypeDecoratorDaoSelectorFactory) {
+                                    DataTypeDecoratorDaoSelectorFactory dataTypeDecoratorDaoSelectorFactory,
+                                    LogicalFlowDao logicalFlowDao,
+                                    DataTypeDecoratorRatingsCalculator ratingsCalculator, DataTypeUsageService dataTypeUsageService) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(logicalFlowDecoratorService, "logicalFlowDecoratorService cannot be null");
         checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
@@ -73,6 +82,9 @@ public class DataTypeDecoratorService {
         this.logicalFlowDecoratorService = logicalFlowDecoratorService;
         this.physicalFlowService = physicalFlowService;
         this.physicalSpecDataTypeDao = physicalSpecDataTypeDao;
+        this.logicalFlowDao = logicalFlowDao;
+        this.ratingsCalculator = ratingsCalculator;
+        this.dataTypeUsageService = dataTypeUsageService;
         this.dataTypeDecoratorDaoSelectorFactory = dataTypeDecoratorDaoSelectorFactory;
     }
 
@@ -130,34 +142,41 @@ public class DataTypeDecoratorService {
     }
 
 
-    public int[] addDataTypes(String userName, EntityReference entityReference, Set<Long> dataTypeIds) {
+    public int[] addDecorators(String userName,
+                               EntityReference entityReference,
+                               Set<Long> dataTypeIds) {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(dataTypeIds, "dataTypeIds cannot be null");
 
-        Collection<DataTypeDecorator> specificationDataTypes
-                = mkSpecificationDataTypes(userName, entityReference, dataTypeIds);
+        Collection<DataTypeDecorator> dataTypeDecorators
+                = mkDecorators(userName, entityReference, dataTypeIds);
 
         int[] result = dataTypeDecoratorDaoSelectorFactory
                 .getDao(entityReference.kind())
-                .addDataTypes(specificationDataTypes);
+                .addDecorators(dataTypeDecorators);
 
         audit("Added", dataTypeIds, entityReference, userName);
 
+        recalculateDataTypeUsageForApplications(entityReference);
         // now update logical flow data types
         // find all physicals with this spec id, for each physical update it's logical decorators
+        if (PHYSICAL_SPECIFICATION.equals(entityReference.kind())) {
+            updateDecoratorForLogicalFlow(userName, entityReference, dataTypeIds);
+        }
+
+        return result;
+    }
+
+    private void updateDecoratorForLogicalFlow(String userName, EntityReference entityReference, Set<Long> dataTypeIds) {
         List<Long> logicalFlowIds = physicalFlowService
                 .findBySpecificationId(entityReference.id())
                 .stream()
                 .map(PhysicalFlow::logicalFlowId)
                 .collect(toList());
 
-        Set<EntityReference> dataTypeRefs = dataTypeIds.stream()
-                .map(id -> EntityReference.mkRef(EntityKind.DATA_TYPE, id))
-                .collect(toSet());
-
-        logicalFlowIds.forEach(lfId -> logicalFlowDecoratorService.addDecorators(lfId, dataTypeRefs, userName));
-
-        return result;
+        logicalFlowIds.forEach(lfId -> addDecorators(userName,
+                mkRef(LOGICAL_DATA_FLOW, lfId),
+                dataTypeIds));
     }
 
 
@@ -166,15 +185,23 @@ public class DataTypeDecoratorService {
         checkNotNull(dataTypeIds, "dataTypeIds cannot be null");
 
         Collection<DataTypeDecorator> specificationDataTypes
-                = mkSpecificationDataTypes(userName, entityReference, dataTypeIds);
+                = mkDecorators(userName, entityReference, dataTypeIds);
 
         int[] result = dataTypeDecoratorDaoSelectorFactory
                 .getDao(entityReference.kind())
                 .removeDataTypes(specificationDataTypes);
 
         audit("Removed", dataTypeIds, entityReference, userName);
+        recalculateDataTypeUsageForApplications(entityReference);
 
         return result;
+    }
+
+    private void recalculateDataTypeUsageForApplications(EntityReference associatedEntityReference) {
+        if(LOGICAL_DATA_FLOW.equals(associatedEntityReference.kind())) {
+            LogicalFlow flow = logicalFlowDao.getByFlowId(associatedEntityReference.id());
+            dataTypeUsageService.recalculateForApplications(newArrayList(flow.source(), flow.target()));
+        }
     }
 
 
@@ -183,18 +210,38 @@ public class DataTypeDecoratorService {
     }
 
 
-    private Collection<DataTypeDecorator> mkSpecificationDataTypes(String userName,
-                                                                               EntityReference entityReference,
-                                                                               Set<Long> dataTypeIds) {
-        return map(
-                    dataTypeIds,
-                    dtId -> ImmutableDataTypeDecorator.builder()
-                            .entityReference(entityReference)
-                            .decoratorEntity(mkRef(DATA_TYPE, dtId))
-                            .provenance("waltz")
-                            .lastUpdatedAt(nowUtc())
-                            .lastUpdatedBy(userName)
-                            .build());
+    private Collection<DataTypeDecorator> mkDecorators(String userName,
+                                                       EntityReference entityReference,
+                                                       Set<Long> dataTypeIds) {
+
+        if(LOGICAL_DATA_FLOW.equals(entityReference.kind())) {
+            Collection<DataTypeDecorator> decorators = map(dataTypeIds,
+                    dtId -> mkDecorator(userName, entityReference, dtId,
+                            Optional.of(AuthoritativenessRating.NO_OPINION)));
+            LogicalFlow flow = logicalFlowDao.getByFlowId(entityReference.id());
+            boolean requiresRating = flow.source().kind() == APPLICATION && flow.target().kind() == APPLICATION;
+
+            return requiresRating
+                    ? ratingsCalculator.calculate(decorators)
+                    : decorators;
+        }
+
+        return map(dataTypeIds,
+                dtId -> mkDecorator(userName, entityReference, dtId, Optional.empty()));
+    }
+
+    private ImmutableDataTypeDecorator mkDecorator(String userName,
+                                                   EntityReference entityReference,
+                                                   Long dtId,
+                                                   Optional<AuthoritativenessRating> rating) {
+        return ImmutableDataTypeDecorator.builder()
+                .rating(rating)
+                .entityReference(entityReference)
+                .decoratorEntity(mkRef(DATA_TYPE, dtId))
+                .provenance("waltz")
+                .lastUpdatedAt(nowUtc())
+                .lastUpdatedBy(userName)
+                .build();
     }
 
 

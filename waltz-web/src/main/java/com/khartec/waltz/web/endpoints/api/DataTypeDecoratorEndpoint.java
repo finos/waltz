@@ -19,16 +19,12 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
-import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
-import com.khartec.waltz.model.physical_specification_data_type.PhysicalSpecificationDataType;
 import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.data_type.DataTypeDecoratorService;
-import com.khartec.waltz.service.physical_specification_data_type.PhysicalSpecDataTypeService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.action.UpdateDataTypeDecoratorAction;
-import com.khartec.waltz.web.action.UpdatePhysicalSpecDataTypesAction;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -97,7 +93,7 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
         UpdateDataTypeDecoratorAction action = readBody(request, UpdateDataTypeDecoratorAction.class);
 
         if (notEmpty(action.addedDataTypeIds())) {
-            dataTypeDecoratorService.addDataTypes(userName, action.entityReference(), action.addedDataTypeIds());
+            dataTypeDecoratorService.addDecorators(userName, action.entityReference(), action.addedDataTypeIds());
         }
         if (notEmpty(action.removedDataTypeIds())) {
             dataTypeDecoratorService.removeDataTypes(userName, action.entityReference(), action.removedDataTypeIds());

@@ -82,9 +82,9 @@ public class LogicalFlowDataTypeDecoratorDao extends DataTypeDecoratorDao {
         LogicalFlowDecoratorRecord r = new LogicalFlowDecoratorRecord();
         r.setId(d.id().orElse(null));
         r.changed(LOGICAL_FLOW_DECORATOR.ID, false);
-        r.setDecoratorEntityKind(d.decoratorEntity().kind().name());
+        r.setDecoratorEntityKind(DATA_TYPE.name());
         r.setDecoratorEntityId(d.decoratorEntity().id());
-        r.setLogicalFlowId(d.dataFlowId());
+        r.setLogicalFlowId(d.entityReference().id());
         r.setProvenance(d.provenance());
         d.rating().ifPresent(rating -> r.setRating(rating.name()));
         r.setLastUpdatedAt(Timestamp.valueOf(d.lastUpdatedAt()));
@@ -196,7 +196,8 @@ public class LogicalFlowDataTypeDecoratorDao extends DataTypeDecoratorDao {
     }
 
 
-    public int[] addDataTypes(Collection<DataTypeDecorator> decorators) {
+    @Override
+    public int[] addDecorators(Collection<DataTypeDecorator> decorators) {
         checkNotNull(decorators, "decorators cannot be null");
 
         List<LogicalFlowDecoratorRecord> records = decorators.stream()
