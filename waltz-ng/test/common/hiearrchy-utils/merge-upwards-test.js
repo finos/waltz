@@ -16,21 +16,15 @@
  *
  */
 
-import {initialiseData} from "../../common/index";
-import template from "./playpen3.html";
-import {CORE_API} from "../../common/services/core-api-utils";
-import {mergeUpwards, populateParents} from "../../common/hierarchy-utils";
+
+import assert from "assert";
+import _ from "lodash";
+import {mergeUpwards} from "../../../client/common/hierarchy-utils";
 
 
-const initialState = {
-    parentEntityRef: {
-        id: 51,
-        kind: "APPLICATION"
-    },
-    schemeId: 2
+const root = {
+    id: 0
 };
-
-const root = { id: 0 }
 
 const nA = {
     id: 1,
@@ -84,38 +78,23 @@ const nC11 = {
 
 const allNodes = [root, nA, nA1, nA2, nB, nB1, nC, nC1, nC11, nC2, nC21];
 
+describe("HierarchyUtils/mergeUpwards", () => {
 
-function controller($stateParams, serviceBroker) {
-    const vm = initialiseData(this, initialState);
+    // these test rely on the behaviour of the default merger (`descendantIdsUpwardMerger`)
 
-    const merged = mergeUpwards(
-        allNodes,
-        (p, c) => {
-            const descendantIds = _.uniq(_.concat(
-                c.descendantIds || [],
-                [c.id],
-                p.descendantIds || []));
+    it("gives back the same number of nodes", () => {
+        const merged = mergeUpwards(allNodes);
+        assert.equal(merged.length, allNodes.length);
+    });
 
-            return Object.assign({}, p, { descendantIds });
-        });
+    it("decorates ancestors with child details", () => {
+        const merged = mergeUpwards(allNodes);
+        assert.deepEqual(
+            new Set(_.find(merged, {id: nC.id }).descendantIds),
+            new Set([nC1.id, nC11.id, nC2.id, nC21.id]));
+        assert.deepEqual(
+            new Set(_.find(merged, {id: nA.id }).descendantIds),
+            new Set([nA1.id, nA2.id]));
+    });
 
-    console.log({merged, allNodes});
-}
-
-
-controller.$inject = [
-    "$stateParams",
-    "ServiceBroker"
-];
-
-
-const view = {
-    template,
-    controller,
-    controllerAs: "ctrl",
-    bindToController: true,
-    scope: {}
-};
-
-
-export default view;
+});

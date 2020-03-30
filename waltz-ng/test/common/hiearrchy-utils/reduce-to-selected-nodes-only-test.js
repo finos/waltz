@@ -54,65 +54,66 @@
 
 
 import {assert} from "chai";
-import { buildHierarchies } from "../../../client/common/hierarchy-utils";
+import {populateParents, reduceToSelectedNodesOnly} from "../../../client/common/hierarchy-utils";
 
 
-const ouA = {
+const nA = {
     id: 1
 };
 
-const ouA1 = {
+const nA1 = {
     id: 11,
-    parentId: 1
+    parentId: nA.id
 };
 
-const ouA2 = {
+const nA2 = {
     id: 12,
-    parentId: 1
+    parentId: nA.id
 };
 
-const ouB = {
+const nB = {
     id: 2
 };
 
-const ouBogusParent = {
-    id: 3,
-    parentId: -3
+const nB1 = {
+    id: 21,
+    parentId: nB.id
 };
 
-const ouCycleA = {
-    id: 4,
-    parentId: 5
+const nC = {
+    id: 3
 };
 
-const ouCycleB = {
-    id: 5,
-    parentId: 4
+const nC1 = {
+    id: 31,
+    parentId: nC.id
 };
 
-describe("HierarchyUtils/buildHierarchies", () => {
-    it("should give empty array when given no data", () => {
-        assert.equal(0, buildHierarchies().length);
+const nC11 = {
+    id: 311,
+    parentId: nC1.id
+};
+
+const allNodes = [nA, nA1, nA2, nB, nB1, nC, nC1, nC11];
+
+const hierarchy = populateParents(allNodes);
+
+
+describe("HierarchyUtils/reduceToSelectedNodesOnly", () => {
+    it("gives back child and their parents", () => {
+        assert.deepEqual(
+            [nA.id, nA2.id],
+            reduceToSelectedNodesOnly(hierarchy, [nA2.id])
+                .map(d => d.id)
+                .sort());
     });
 
-    it("should one back if only given one thing", () => {
-        assert.equal(1, buildHierarchies([ouA]).length);
-    });
-
-    it("gives back an element for each root", () => {
-        assert.equal(2, buildHierarchies([ouA, ouB]).length);
-    });
-
-    it("builds hierarchies and only returns the roots", () => {
-        assert.equal(2, buildHierarchies([ouA, ouA1, ouA2, ouB]).length);
-    });
-
-    it("handles bogus parents", () => {
-        assert.equal(3, buildHierarchies([ouA, ouB, ouBogusParent]).length);
-    });
-
-    it("ignores cycles", () => {
-        assert.equal(0, buildHierarchies([ouCycleA, ouCycleB]).length);
+    it("if given top nodes then only gives back those", () => {
+        assert.deepEqual(
+            [nA.id],
+            reduceToSelectedNodesOnly(hierarchy, [nA.id])
+                .map(d => d.id)
+                .sort());
     });
 
 });

@@ -15,11 +15,11 @@
  * See the License for the specific
  *
  */
-import template from './data-type-usage-stat-table.html';
+import template from "./data-type-usage-stat-table.html";
 
 
 const bindings = {
-    stats: '<'
+    stats: "<"
 };
 
 
@@ -31,4 +31,7 @@ const component = {
 };
 
 
-export default component;
+export default {
+    id: "waltzDataTypeUsageStatTable",
+    component
+};

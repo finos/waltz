@@ -17,9 +17,11 @@
  */
 
 import _ from "lodash";
-import allUsageKinds from "../usage-kinds";
-import {notEmpty} from "../../common";
+import allUsageKinds from "../../usage-kinds";
+import {notEmpty} from "../../../common";
 import template from "./app-data-type-usage-list.html";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {buildHierarchies, reduceToSelectedNodesOnly} from "../../../common/hierarchy-utils";
 
 const BINDINGS = {
     usages: "<"
@@ -34,6 +36,7 @@ const initialState = {
 
 
 function consolidateUsages(usages = []) {
+    console.log({usages})
     return _.chain(usages)
         .groupBy("dataTypeId")
         .mapValues(xs => _.chain(xs)
@@ -49,15 +52,29 @@ function findUsage(usages = [], dataTypeId, usageKind) {
 }
 
 
-function controller($scope) {
+function controller(serviceBroker) {
     const vm = _.defaultsDeep(this, initialState);
 
-    $scope.$watch(
-        "ctrl.usages",
-        (usages = []) => {
-            vm.consolidatedUsages = consolidateUsages(usages);
-        }
-    );
+    vm.$onInit = () => {
+    };
+
+
+    vm.$onChanges = (c) => {
+        serviceBroker
+            .loadAppData(
+                CORE_API.DataTypeStore.findAll)
+            .then(r => {
+                const dtHierarchy = buildHierarchies(r.data);
+
+                vm.consolidatedUsages = consolidateUsages(vm.usages);
+
+                const usedDTs = _.keys(vm.consolidatedUsages);
+
+                const usedHierarchy = reduceToSelectedNodesOnly(dtHierarchy, usedDTs);
+
+                console.log({ cu: vm.consolidatedUsages, u: vm.usages, usedDTs, dtHierarchy, uh: usedHierarchy})
+            })
+    };
 
     vm.isSelected = (dataTypeId, usageKind) => {
         const foundUsage = findUsage(vm.usages, dataTypeId, usageKind);
@@ -78,19 +95,18 @@ function controller($scope) {
 }
 
 
-controller.$inject = ["$scope"];
+controller.$inject = ["ServiceBroker"];
 
 
-const directive = {
-    restrict: "E",
-    replace: false,
+const component = {
     template,
     controller,
-    controllerAs: "ctrl",
-    scope: {},
-    bindToController: BINDINGS
+    bindings: BINDINGS
 };
 
 
-export default () => directive;
+export default {
+    id: "waltzAppDataTypeUsageList",
+    component
+};
 

@@ -16,23 +16,23 @@
  *
  */
 
-import angular from 'angular';
-import * as DataTypeUsageStore from './services/data-type-usage-store';
-import {registerStore} from '../common/module-utils'
-import AppDataTypeUsageList from "./directives/app-data-type-usage-list";
-import DataTypeUsageStatTable from './components/stat-table/data-type-usage-stat-table';
+import angular from "angular";
+import * as DataTypeUsageStore from "./services/data-type-usage-store";
+import {registerComponents, registerStore} from "../common/module-utils"
 import AppDataTypeUsageEditor from "./components/editor/app-data-type-usage-editor";
+import AppDataTypeUsageList from "./components/app-data-type-usage-list/app-data-type-usage-list";
+import DataTypeUsageStatTable from "./components/stat-table/data-type-usage-stat-table";
+
 
 export default () => {
-    const module = angular.module('waltz.data.type.usage', []);
+    const module = angular.module("waltz.data.type.usage", []);
 
-    module
-        .directive('waltzAppDataTypeUsageList', AppDataTypeUsageList)
+    const components = [
+        AppDataTypeUsageEditor,
+        AppDataTypeUsageList,
+        DataTypeUsageStatTable];
 
-    module
-        .component('waltzDataTypeUsageStatTable', DataTypeUsageStatTable)
-        .component('waltzAppDataTypeUsageEditor', AppDataTypeUsageEditor);
-
+    registerComponents(module, components);
     registerStore(module, DataTypeUsageStore);
 
     return module.name;

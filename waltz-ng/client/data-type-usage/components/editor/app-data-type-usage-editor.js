@@ -19,12 +19,12 @@
 import _ from "lodash";
 import allUsageKinds from "../../usage-kinds";
 import {initialiseData} from "../../../common";
-import template from './app-data-type-usage-editor.html';
+import template from "./app-data-type-usage-editor.html";
 
 
 const bindings = {
-    primaryEntity: '<',
-    type: '<',
+    primaryEntity: "<",
+    type: "<",
     usages: "<",
     onCancel: "<",
     onSave: "<"
@@ -33,25 +33,24 @@ const bindings = {
 
 const initialState = {
     rows: [],
-    onCancel: () => 'no onCancel handler provided for app-data-type-usage-editor',
-    onSave: () => 'no onSave handler provided for app-data-type-usage-editor'
+    onCancel: () => "no onCancel handler provided for app-data-type-usage-editor",
+    onSave: () => "no onSave handler provided for app-data-type-usage-editor"
 };
 
 
 function prepareSave(usageRows = []) {
-    const usages = _.map(usageRows, row => {
+    return _.map(usageRows, row => {
         return {
             kind: row.kind,
             isSelected: row.selected,
             description: row.description
         }
     });
-    return usages;
 }
 
 
 function mkUsageRows(usages = []) {
-    const usagesByKind = _.keyBy(usages, 'kind');
+    const usagesByKind = _.keyBy(usages, "kind");
 
     return _.chain(allUsageKinds)
         .map(usageKind => {
@@ -59,12 +58,12 @@ function mkUsageRows(usages = []) {
             return Object.assign({}, usageKind, {
                 description: currentUsageForThisKind
                     ? currentUsageForThisKind.description
-                    : '',
+                    : "",
                 selected: currentUsageForThisKind != null
                 && currentUsageForThisKind.isSelected
             });
         })
-        .orderBy('kind')
+        .orderBy("kind")
         .value()
 }
 
@@ -88,5 +87,8 @@ const component = {
 };
 
 
-export default component;
+export default {
+    id: "waltzAppDataTypeUsageEditor",
+    component
+};
 
