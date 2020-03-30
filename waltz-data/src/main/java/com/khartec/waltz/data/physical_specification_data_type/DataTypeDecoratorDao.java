@@ -19,7 +19,7 @@
 package com.khartec.waltz.data.physical_specification_data_type;
 
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import org.jooq.*;
 
@@ -41,11 +41,11 @@ public abstract class DataTypeDecoratorDao {
 
     //only implemented for logical flows
     @Deprecated
-    public abstract Collection<DataTypeDecorator> findByFlowIds(List<Long> flowIds);
+    public abstract List<DataTypeDecorator> findByFlowIds(Collection<Long> flowIds);
 
     public abstract int[] addDecorators(Collection<DataTypeDecorator> dataTypeDecorators);
 
-    public abstract int[] removeDataTypes(Collection<DataTypeDecorator> dataTypeDecorators);
+    public abstract int removeDataTypes(EntityReference associatedEntityRef, Collection<Long> dataTypeIds);
 
 //might need to remove it and replace it with on demand functionality
  /*   public int rippleDataTypesToLogicalFlows() {

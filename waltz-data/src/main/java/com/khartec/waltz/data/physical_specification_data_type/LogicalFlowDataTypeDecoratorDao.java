@@ -22,16 +22,15 @@ import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.FlowDirection;
-import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
-import com.khartec.waltz.model.data_flow_decorator.*;
-import com.khartec.waltz.model.datatype.DataType;
+import com.khartec.waltz.model.data_flow_decorator.DataTypeDirectionKey;
+import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
+import com.khartec.waltz.model.data_flow_decorator.ImmutableDecoratorRatingSummary;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.schema.tables.LogicalFlow;
 import com.khartec.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
-import com.khartec.waltz.schema.tables.records.PhysicalSpecDataTypeRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.function.Function2;
@@ -43,7 +42,6 @@ import java.util.*;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.Checks.checkOptionalIsPresent;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
@@ -67,6 +65,7 @@ public class LogicalFlowDataTypeDecoratorDao extends DataTypeDecoratorDao {
         LogicalFlowDecoratorRecord record = r.into(LOGICAL_FLOW_DECORATOR);
 
         return ImmutableDataTypeDecorator.builder()
+                .id(record.getId())
                 .entityReference(mkRef(LOGICAL_DATA_FLOW, record.getLogicalFlowId()))
                 .decoratorEntity(mkRef(
                         DATA_TYPE,
@@ -174,15 +173,14 @@ public class LogicalFlowDataTypeDecoratorDao extends DataTypeDecoratorDao {
                 .execute();
     }
 
-    public int[] removeDataTypes(Collection<DataTypeDecorator> decorators) {
-        checkNotNull(decorators, "logical flow decorators cannot be null");
 
-        List<LogicalFlowDecoratorRecord> records = decorators
-                .stream()
-                .map(TO_RECORD)
-                .collect(toList());
-
-        return dsl.batchDelete(records)
+    @Override
+    public int removeDataTypes(EntityReference associatedEntityRef, Collection<Long> dataTypeIds) {
+        return dsl
+                .deleteFrom(LOGICAL_FLOW_DECORATOR)
+                .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(associatedEntityRef.id()))
+                .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(DATA_TYPE.name()))
+                .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeIds))
                 .execute();
     }
 
@@ -369,7 +367,7 @@ public class LogicalFlowDataTypeDecoratorDao extends DataTypeDecoratorDao {
     }
 
     @Override
-    public List<DataTypeDecorator> findByFlowIds(List<Long> flowIds) {
+    public List<DataTypeDecorator> findByFlowIds(Collection<Long> flowIds) {
         checkNotNull(flowIds, "flowIds cannot be null");
 
         Condition condition = LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.in(flowIds);

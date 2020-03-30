@@ -28,11 +28,13 @@ import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowStatsDao;
+import com.khartec.waltz.data.physical_specification_data_type.LogicalFlowDataTypeDecoratorDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.data_flow_decorator.*;
 import com.khartec.waltz.model.datatype.DataType;
+import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlowMeasures;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
@@ -72,6 +74,7 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 public class LogicalFlowDecoratorService {
 
     private final LogicalFlowDecoratorDao logicalFlowDecoratorDao;
+    private final LogicalFlowDataTypeDecoratorDao logicalFlowDataTypeDecoratorDao;
     private final LogicalFlowDecoratorRatingsCalculator ratingsCalculator;
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
@@ -83,6 +86,7 @@ public class LogicalFlowDecoratorService {
 
     @Autowired
     public LogicalFlowDecoratorService(LogicalFlowDecoratorDao logicalFlowDecoratorDao,
+                                       LogicalFlowDataTypeDecoratorDao logicalFlowDataTypeDecoratorDao,
                                        LogicalFlowDecoratorRatingsCalculator ratingsCalculator,
                                        DataTypeUsageService dataTypeUsageService,
                                        DataTypeDao dataTypeDao,
@@ -106,6 +110,7 @@ public class LogicalFlowDecoratorService {
         this.dataTypeDao = dataTypeDao;
         this.logicalFlowDao = logicalFlowDao;
         this.changeLogService = changeLogService;
+        this.logicalFlowDataTypeDecoratorDao = logicalFlowDataTypeDecoratorDao;
     }
 
 
@@ -117,9 +122,9 @@ public class LogicalFlowDecoratorService {
     }
 
 
-    public List<LogicalFlowDecorator> findByFlowIds(Collection<Long> flowIds) {
+    public List<DataTypeDecorator> findByFlowIds(Collection<Long> flowIds) {
         checkNotNull(flowIds, "flowIds cannot be null");
-        return logicalFlowDecoratorDao.findByFlowIds(flowIds);
+        return logicalFlowDataTypeDecoratorDao.findByFlowIds(flowIds);
     }
 
 

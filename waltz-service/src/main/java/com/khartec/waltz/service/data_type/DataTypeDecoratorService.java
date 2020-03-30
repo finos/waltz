@@ -180,16 +180,13 @@ public class DataTypeDecoratorService {
     }
 
 
-    public int[] removeDataTypes(String userName, EntityReference entityReference, Set<Long> dataTypeIds) {
+    public int removeDataTypes(String userName, EntityReference entityReference, Set<Long> dataTypeIds) {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(dataTypeIds, "dataTypeIds cannot be null");
 
-        Collection<DataTypeDecorator> specificationDataTypes
-                = mkDecorators(userName, entityReference, dataTypeIds);
-
-        int[] result = dataTypeDecoratorDaoSelectorFactory
+        int result = dataTypeDecoratorDaoSelectorFactory
                 .getDao(entityReference.kind())
-                .removeDataTypes(specificationDataTypes);
+                .removeDataTypes(entityReference, dataTypeIds);
 
         audit("Removed", dataTypeIds, entityReference, userName);
         recalculateDataTypeUsageForApplications(entityReference);
@@ -305,7 +302,7 @@ public class DataTypeDecoratorService {
         }
     }
 
-    public Collection<DataTypeDecorator> findByFlowIds(List<Long> ids, EntityKind entityKind) {
+    public Collection<DataTypeDecorator> findByFlowIds(Collection<Long> ids, EntityKind entityKind) {
         if (isEmpty(ids)) {
             return Collections.emptyList();
         }

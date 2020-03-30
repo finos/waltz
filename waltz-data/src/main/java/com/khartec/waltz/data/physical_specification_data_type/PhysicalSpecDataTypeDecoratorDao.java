@@ -19,6 +19,7 @@
 package com.khartec.waltz.data.physical_specification_data_type;
 
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
@@ -37,6 +38,7 @@ import java.util.function.Function;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
 import static com.khartec.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static com.khartec.waltz.model.EntityReference.*;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
@@ -117,7 +119,7 @@ public class PhysicalSpecDataTypeDecoratorDao extends DataTypeDecoratorDao {
     }
 
     @Override
-    public Collection<DataTypeDecorator> findByFlowIds(List<Long> flowIds) {
+    public List<DataTypeDecorator> findByFlowIds(Collection<Long> flowIds) {
         throw new IllegalArgumentException("Method not implemented for Physical specification");
     }
 
@@ -134,14 +136,12 @@ public class PhysicalSpecDataTypeDecoratorDao extends DataTypeDecoratorDao {
     }
 
 
-    public int[] removeDataTypes(Collection<DataTypeDecorator> specificationDataTypes) {
-        checkNotNull(specificationDataTypes, "specificationDataTypes cannot be null");
-
-        List<PhysicalSpecDataTypeRecord> records = specificationDataTypes.stream()
-                .map(TO_RECORD_MAPPER)
-                .collect(toList());
-
-        return dsl.batchDelete(records)
+    @Override
+    public int removeDataTypes(EntityReference associatedEntityRef, Collection<Long> dataTypeIds) {
+        return dsl
+                .deleteFrom(PHYSICAL_SPEC_DATA_TYPE)
+                .where(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(associatedEntityRef.id()))
+                .and(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID.in(dataTypeIds))
                 .execute();
     }
 

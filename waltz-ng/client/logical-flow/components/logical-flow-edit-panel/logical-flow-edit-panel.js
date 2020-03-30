@@ -295,11 +295,12 @@ function controller($element,
             .value();
     };
 
+    // NOT USED
     const updateDecorators = (command) => {
         return serviceBroker
             .execute(
-                CORE_API.LogicalFlowDecoratorStore.updateDecorators,
-                [command])
+                CORE_API.DataTypeDecoratorStore.updateDecorators,
+                [vm.parentEntityRef, command])
             .then(reload)
             .then(() => notification.success("Data flow updated"));
     };
@@ -320,6 +321,7 @@ function controller($element,
         vm.setMode("");
     };
 
+    //NOT USED
     vm.updateFlow = (command) => {
         if (! command.flowId) {
             return serviceBroker
