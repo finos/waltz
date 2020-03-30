@@ -20,10 +20,8 @@ package com.khartec.waltz.service.data_type;
 
 import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
-import com.khartec.waltz.data.physical_specification.PhysicalSpecificationIdSelectorFactory;
 import com.khartec.waltz.data.physical_specification_data_type.DataTypeDecoratorDao;
 import com.khartec.waltz.data.physical_specification_data_type.DataTypeDecoratorDaoSelectorFactory;
-import com.khartec.waltz.data.physical_specification_data_type.PhysicalSpecDataTypeDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
@@ -32,7 +30,7 @@ import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.data_flow_decorator.DataTypeDecoratorRatingsCalculator;
+import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorRatingsCalculator;
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
@@ -55,13 +53,10 @@ import static java.util.stream.Collectors.toList;
 public class DataTypeDecoratorService {
 
     private final ChangeLogService changeLogService;
-    private final LogicalFlowDecoratorService logicalFlowDecoratorService;
     private final PhysicalFlowService physicalFlowService;
-    private final PhysicalSpecDataTypeDao physicalSpecDataTypeDao;
     private final DataTypeDecoratorDaoSelectorFactory dataTypeDecoratorDaoSelectorFactory;
-    private final PhysicalSpecificationIdSelectorFactory specificationIdSelectorFactory = new PhysicalSpecificationIdSelectorFactory();
     private final LogicalFlowDao logicalFlowDao;
-    private final DataTypeDecoratorRatingsCalculator ratingsCalculator;
+    private final LogicalFlowDecoratorRatingsCalculator ratingsCalculator;
     private final DataTypeUsageService dataTypeUsageService;
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
@@ -69,19 +64,16 @@ public class DataTypeDecoratorService {
     public DataTypeDecoratorService(ChangeLogService changeLogService,
                                     LogicalFlowDecoratorService logicalFlowDecoratorService,
                                     PhysicalFlowService physicalFlowService,
-                                    PhysicalSpecDataTypeDao physicalSpecDataTypeDao,
                                     DataTypeDecoratorDaoSelectorFactory dataTypeDecoratorDaoSelectorFactory,
                                     LogicalFlowDao logicalFlowDao,
-                                    DataTypeDecoratorRatingsCalculator ratingsCalculator, DataTypeUsageService dataTypeUsageService) {
+                                    LogicalFlowDecoratorRatingsCalculator ratingsCalculator,
+                                    DataTypeUsageService dataTypeUsageService) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(logicalFlowDecoratorService, "logicalFlowDecoratorService cannot be null");
         checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
-        checkNotNull(physicalSpecDataTypeDao, "physicalSpecDataTypeDao cannot be null");
 
         this.changeLogService = changeLogService;
-        this.logicalFlowDecoratorService = logicalFlowDecoratorService;
         this.physicalFlowService = physicalFlowService;
-        this.physicalSpecDataTypeDao = physicalSpecDataTypeDao;
         this.logicalFlowDao = logicalFlowDao;
         this.ratingsCalculator = ratingsCalculator;
         this.dataTypeUsageService = dataTypeUsageService;
@@ -102,26 +94,6 @@ public class DataTypeDecoratorService {
                 .findByEntityId(reference.id());
     }
 
-
-//    public List<DataTypeDecorator> findByEntityIdSelector(
-//            EntityKind entityKind,
-//            IdSelectionOptions selectionOptions) {
-//        checkNotNull(selectionOptions, "selectionOptions cannot be null");
-//
-//        System.out.println("This should be diff than physical spec " + selectionOptions.entityReference());
-//        System.out.println("This should be physical spec " + entityKind);
-//
-//        DataTypeDecoratorDao dao = dataTypeDecoratorDaoSelectorFactory
-//                .getDao(entityKind);
-//
-//        EntityKind targetEntityKind = LOGICAL_DATA_FLOW.equals(entityKind)
-//                ? getSourceAndTargetEntityKindForLogicalFlow(selectionOptions)
-//                : entityKind;
-//
-//        Select<Record1<Long>> selector = genericSelectorFactory
-//                .applyForKind(entityKind, selectionOptions).selector();
-//        return dao.findByEntityIdSelector(selector, Optional.ofNullable(targetEntityKind));
-//    }
 
     public List<DataTypeDecorator> findByEntityIdSelector(
             EntityKind entityKind,
@@ -180,7 +152,7 @@ public class DataTypeDecoratorService {
     }
 
 
-    public int removeDataTypes(String userName, EntityReference entityReference, Set<Long> dataTypeIds) {
+    public int removeDataTypeDecorator(String userName, EntityReference entityReference, Set<Long> dataTypeIds) {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(dataTypeIds, "dataTypeIds cannot be null");
 
@@ -199,11 +171,6 @@ public class DataTypeDecoratorService {
             LogicalFlow flow = logicalFlowDao.getByFlowId(associatedEntityReference.id());
             dataTypeUsageService.recalculateForApplications(newArrayList(flow.source(), flow.target()));
         }
-    }
-
-
-    public int rippleDataTypesToLogicalFlows() {
-        return physicalSpecDataTypeDao.rippleDataTypesToLogicalFlows();
     }
 
 
@@ -285,22 +252,6 @@ public class DataTypeDecoratorService {
         }
     }
 
-    private EntityKind getSourceAndTargetEntityKindForLogicalFlow(IdSelectionOptions options) {
-        switch (options.entityReference().kind()) {
-            case APPLICATION:
-            case APP_GROUP:
-            case ORG_UNIT:
-            case PERSON:
-
-                //TEST MERGING
-                return APPLICATION;
-            default:
-                return options.entityReference().kind();
-//            default:
-//                throw new UnsupportedOperationException("Cannot find decorators for selector kind: " + options.entityReference().kind());
-
-        }
-    }
 
     public Collection<DataTypeDecorator> findByFlowIds(Collection<Long> ids, EntityKind entityKind) {
         if (isEmpty(ids)) {

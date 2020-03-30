@@ -37,35 +37,14 @@ public abstract class DataTypeDecoratorDao {
                                                                    Optional<EntityKind> entityKind);
 
     public abstract List<DataTypeDecorator> findByAppIdSelector(Select<Record1<Long>> appIdSelector);
+
     public abstract List<DataTypeDecorator> findByDataTypeIdSelector(Select<Record1<Long>> dataTypeIdSelector);
 
     //only implemented for logical flows
-    @Deprecated
     public abstract List<DataTypeDecorator> findByFlowIds(Collection<Long> flowIds);
 
     public abstract int[] addDecorators(Collection<DataTypeDecorator> dataTypeDecorators);
 
     public abstract int removeDataTypes(EntityReference associatedEntityRef, Collection<Long> dataTypeIds);
-
-//might need to remove it and replace it with on demand functionality
- /*   public int rippleDataTypesToLogicalFlows() {
-        return dsl.insertInto(LOGICAL_FLOW_DECORATOR)
-                .select(DSL
-                        .selectDistinct(
-                                PHYSICAL_FLOW.LOGICAL_FLOW_ID,
-                                DSL.val(EntityKind.DATA_TYPE.name()),
-                                PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID,
-                                DSL.val(AuthoritativenessRating.NO_OPINION.name()),
-                                DSL.val("waltz"),
-                                DSL.val(Timestamp.valueOf(nowUtc())),
-                                DSL.val("admin"))
-                        .from(PHYSICAL_SPEC_DATA_TYPE)
-                        .join(PHYSICAL_FLOW).on(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
-                        .leftJoin(LOGICAL_FLOW_DECORATOR)
-                            .on(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID)
-                                .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID)))
-                        .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.isNull()))
-                .execute();
-    }*/
 
 }

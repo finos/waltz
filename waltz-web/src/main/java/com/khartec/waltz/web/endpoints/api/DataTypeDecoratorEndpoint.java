@@ -96,7 +96,7 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
             dataTypeDecoratorService.addDecorators(userName, action.entityReference(), action.addedDataTypeIds());
         }
         if (notEmpty(action.removedDataTypeIds())) {
-            dataTypeDecoratorService.removeDataTypes(userName, action.entityReference(), action.removedDataTypeIds());
+            dataTypeDecoratorService.removeDataTypeDecorator(userName, action.entityReference(), action.removedDataTypeIds());
         }
 
         return true;

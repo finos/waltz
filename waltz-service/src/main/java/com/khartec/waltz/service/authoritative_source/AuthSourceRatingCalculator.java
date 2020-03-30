@@ -20,15 +20,15 @@ package com.khartec.waltz.service.authoritative_source;
 
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.entity_hierarchy.EntityHierarchyDao;
+import com.khartec.waltz.data.physical_specification_data_type.LogicalFlowDecoratorDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
 import com.khartec.waltz.model.datatype.DataType;
+import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorRatingsCalculator;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -116,7 +116,7 @@ public class AuthSourceRatingCalculator {
                 .map(d -> d.id().get())
                 .collect(Collectors.toSet());
 
-        Collection<LogicalFlowDecorator> impactedDecorators = logicalFlowDecoratorDao
+        Collection<DataTypeDecorator> impactedDecorators = logicalFlowDecoratorDao
                 .findByEntityIdSelectorAndKind(
                         EntityKind.APPLICATION,
                         selector,
@@ -125,9 +125,9 @@ public class AuthSourceRatingCalculator {
                 .filter(decorator -> dataTypeDescendents.contains(decorator.decoratorEntity().id()))
                 .collect(toList());
 
-        Collection<LogicalFlowDecorator> reRatedDecorators = ratingsCalculator.calculate(impactedDecorators);
+        Collection<DataTypeDecorator> reRatedDecorators = ratingsCalculator.calculate(impactedDecorators);
 
-        Set<LogicalFlowDecorator> modifiedDecorators = SetUtilities.minus(
+        Set<DataTypeDecorator> modifiedDecorators = SetUtilities.minus(
                 fromCollection(reRatedDecorators),
                 fromCollection(impactedDecorators));
 
@@ -141,7 +141,7 @@ public class AuthSourceRatingCalculator {
     }
 
 
-    private int[] updateDecorators(Set<LogicalFlowDecorator> decorators) {
+    private int[] updateDecorators(Set<DataTypeDecorator> decorators) {
         checkNotNull(decorators, "decorators cannot be null");
         if (decorators.isEmpty()) return new int[] {};
         return logicalFlowDecoratorDao.updateDecorators(decorators);

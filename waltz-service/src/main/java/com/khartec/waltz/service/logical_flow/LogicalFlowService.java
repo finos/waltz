@@ -22,14 +22,15 @@ import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorDao;
+import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorSummaryDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowStatsDao;
+import com.khartec.waltz.data.physical_specification_data_type.LogicalFlowDecoratorDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.data_flow_decorator.ImmutableLogicalFlowDecorator;
+import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
 import com.khartec.waltz.model.logical_flow.*;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.model.tally.TallyPack;
@@ -84,15 +85,16 @@ public class LogicalFlowService {
                               DataTypeService dataTypeService,
                               DataTypeUsageService dataTypeUsageService,
                               DBExecutorPoolInterface dbExecutorPool,
-                              LogicalFlowDecoratorDao logicalFlowDecoratorDao,
+                              LogicalFlowDecoratorSummaryDao logicalFlowDecoratorSummaryDao,
                               LogicalFlowDao logicalFlowDao,
-                              LogicalFlowStatsDao logicalFlowStatsDao) {
+                              LogicalFlowStatsDao logicalFlowStatsDao,
+                              LogicalFlowDecoratorDao logicalFlowDecoratorDao) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
         checkNotNull(dataTypeService, "dataTypeService cannot be null");
         checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
         checkNotNull(logicalFlowDao, "logicalFlowDao must not be null");
-        checkNotNull(logicalFlowDecoratorDao, "logicalFlowDecoratorDao cannot be null");
+        checkNotNull(logicalFlowDecoratorDao, "logicalFlowDataTypeDecoratorDao cannot be null");
         checkNotNull(logicalFlowStatsDao, "logicalFlowStatsDao cannot be null");
 
         this.changeLogService = changeLogService;
@@ -100,8 +102,8 @@ public class LogicalFlowService {
         this.dataTypeUsageService = dataTypeUsageService;
         this.dbExecutorPool = dbExecutorPool;
         this.logicalFlowDao = logicalFlowDao;
-        this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
         this.logicalFlowStatsDao = logicalFlowStatsDao;
+        this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
     }
 
 
@@ -340,10 +342,10 @@ public class LogicalFlowService {
                         .map(flowId -> tuple(
                                 mkRef(DATA_TYPE, unknownDataTypeId),
                                 flowId)))
-                .map(t -> ImmutableLogicalFlowDecorator
+                .map(t -> ImmutableDataTypeDecorator
                         .builder()
                         .decoratorEntity(t.v1)
-                        .dataFlowId(t.v2)
+                        .entityReference(mkRef(DATA_TYPE, t.v2))
                         .lastUpdatedBy(username)
                         .rating(AuthoritativenessRating.DISCOURAGED)
                         .build())

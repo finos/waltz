@@ -21,12 +21,13 @@ package com.khartec.waltz.service.change_unit.processors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.attribute_change.AttributeChange;
 import com.khartec.waltz.model.change_unit.ChangeUnit;
 import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.service.change_unit.AttributeChangeCommandProcessor;
+import com.khartec.waltz.service.data_type.DataTypeDecoratorService;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
-import com.khartec.waltz.service.physical_specification_data_type.PhysicalSpecDataTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -47,17 +48,17 @@ public class DataTypeChangeCommandProcessor implements AttributeChangeCommandPro
     private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
     private final PhysicalFlowService physicalFlowService;
-    private final PhysicalSpecDataTypeService physicalSpecDataTypeService;
+    private final DataTypeDecoratorService dataTypeDecoratorService;
 
 
     @Autowired
     public DataTypeChangeCommandProcessor(PhysicalFlowService physicalFlowService,
-                                          PhysicalSpecDataTypeService physicalSpecDataTypeService) {
+                                          DataTypeDecoratorService dataTypeDecoratorService) {
         checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
-        checkNotNull(physicalSpecDataTypeService, "physicalSpecDataTypeService cannot be null");
+        checkNotNull(dataTypeDecoratorService, "dataTypeDecoratorService cannot be null");
 
         this.physicalFlowService = physicalFlowService;
-        this.physicalSpecDataTypeService = physicalSpecDataTypeService;
+        this.dataTypeDecoratorService = dataTypeDecoratorService;
     }
 
 
@@ -82,7 +83,8 @@ public class DataTypeChangeCommandProcessor implements AttributeChangeCommandPro
         Set<Long> oldValues = readValue(attributeChange.oldValue());
         Set<Long> newValues = readValue(attributeChange.newValue());
 
-        Set<Long> existing = physicalSpecDataTypeService.findBySpecificationId(physicalFlow.specificationId())
+        EntityReference specificationEntityRef = EntityReference.mkRef(EntityKind.PHYSICAL_SPECIFICATION, physicalFlow.specificationId());
+        Set<Long> existing = dataTypeDecoratorService.findByEntityId(specificationEntityRef)
                 .stream()
                 .map(a -> a.dataTypeId())
                 .collect(toSet());
@@ -91,10 +93,11 @@ public class DataTypeChangeCommandProcessor implements AttributeChangeCommandPro
         Set<Long> toRemove = minus(oldValues, newValues);
 
 
-        int[] removedCount = physicalSpecDataTypeService.removeDataTypes(userName, physicalFlow.specificationId(), toRemove);
-        int[] addedCount = physicalSpecDataTypeService.addDataTypes(userName, physicalFlow.specificationId(), toAdd);
+        int removedCount = dataTypeDecoratorService.removeDataTypeDecorator(userName, specificationEntityRef, toRemove);
+        int[] addedCount = dataTypeDecoratorService.addDecorators(userName, specificationEntityRef, toAdd);
 
-        return removedCount.length == toRemove.size() && addedCount.length == toAdd.size();
+        //TODO test this scenario
+        return removedCount == toRemove.size() && addedCount.length == toAdd.size();
     }
 
 

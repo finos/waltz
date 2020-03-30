@@ -8,19 +8,19 @@ import static com.khartec.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 
 @Component
 public class DataTypeDecoratorDaoSelectorFactory {
-    private final PhysicalSpecDataTypeDecoratorDao physicalSpecDataTypeDecoratorDao;
-    private final LogicalFlowDataTypeDecoratorDao logicalFlowDataTypeDecoratorDao;
+    private final PhysicalSpecDecoratorDao physicalSpecDecoratorDao;
+    private final LogicalFlowDecoratorDao logicalFlowDecoratorDao;
 
     @Autowired
-    public DataTypeDecoratorDaoSelectorFactory(PhysicalSpecDataTypeDecoratorDao physicalSpecDataTypeDecoratorDao,
-                                               LogicalFlowDataTypeDecoratorDao logicalFlowDataTypeDecoratorDao) {
-        this.physicalSpecDataTypeDecoratorDao = physicalSpecDataTypeDecoratorDao;
-        this.logicalFlowDataTypeDecoratorDao = logicalFlowDataTypeDecoratorDao;
+    public DataTypeDecoratorDaoSelectorFactory(PhysicalSpecDecoratorDao physicalSpecDecoratorDao,
+                                               LogicalFlowDecoratorDao logicalFlowDecoratorDao) {
+        this.physicalSpecDecoratorDao = physicalSpecDecoratorDao;
+        this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
     }
 
     public DataTypeDecoratorDao getDao(EntityKind entityKind) {
         return PHYSICAL_SPECIFICATION.equals(entityKind)
-                ? physicalSpecDataTypeDecoratorDao
-                : logicalFlowDataTypeDecoratorDao;
+                ? physicalSpecDecoratorDao
+                : logicalFlowDecoratorDao;
     }
 }
