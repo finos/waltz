@@ -26,7 +26,7 @@ import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
 import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
-import com.khartec.waltz.data.physical_specification_data_type.LogicalFlowDecoratorDao;
+import com.khartec.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.authoritativesource.*;

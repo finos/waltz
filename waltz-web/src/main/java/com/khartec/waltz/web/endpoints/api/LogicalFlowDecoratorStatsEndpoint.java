@@ -50,9 +50,9 @@ import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 
 @Service
-public class LogicalFlowDecoratorEndpoint implements Endpoint {
+public class LogicalFlowDecoratorStatsEndpoint implements Endpoint {
 
-    private static final Logger LOG = LoggerFactory.getLogger(LogicalFlowDecoratorEndpoint.class);
+    private static final Logger LOG = LoggerFactory.getLogger(LogicalFlowDecoratorStatsEndpoint.class);
     private static final String BASE_URL = mkPath("api", "logical-flow-decorator");
 
 
@@ -62,8 +62,8 @@ public class LogicalFlowDecoratorEndpoint implements Endpoint {
 
 
     @Autowired
-    public LogicalFlowDecoratorEndpoint(LogicalFlowDecoratorService logicalFlowDecoratorService,
-                                        DataTypeDecoratorService dataTypeDecoratorService, UserRoleService userRoleService) {
+    public LogicalFlowDecoratorStatsEndpoint(LogicalFlowDecoratorService logicalFlowDecoratorService,
+                                             DataTypeDecoratorService dataTypeDecoratorService, UserRoleService userRoleService) {
         checkNotNull(logicalFlowDecoratorService, "logicalFlowDecoratorService cannot be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
         this.logicalFlowDecoratorService = logicalFlowDecoratorService;

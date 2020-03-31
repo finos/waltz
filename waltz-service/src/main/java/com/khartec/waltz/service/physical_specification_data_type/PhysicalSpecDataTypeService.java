@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.physical_specification_data_type;
 
-import com.khartec.waltz.data.physical_specification_data_type.PhysicalSpecDecoratorDao;
+import com.khartec.waltz.data.datatype_decorator.PhysicalSpecDecoratorDao;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

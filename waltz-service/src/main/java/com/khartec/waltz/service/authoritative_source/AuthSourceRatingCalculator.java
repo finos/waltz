@@ -22,7 +22,7 @@ import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.entity_hierarchy.EntityHierarchyDao;
-import com.khartec.waltz.data.physical_specification_data_type.LogicalFlowDecoratorDao;
+import com.khartec.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
@@ -38,6 +38,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -117,10 +118,7 @@ public class AuthSourceRatingCalculator {
                 .collect(Collectors.toSet());
 
         Collection<DataTypeDecorator> impactedDecorators = logicalFlowDecoratorDao
-                .findByEntityIdSelectorAndKind(
-                        EntityKind.APPLICATION,
-                        selector,
-                        EntityKind.DATA_TYPE)
+                .findByEntityIdSelector(selector, Optional.of(EntityKind.APPLICATION))
                 .stream()
                 .filter(decorator -> dataTypeDescendents.contains(decorator.decoratorEntity().id()))
                 .collect(toList());

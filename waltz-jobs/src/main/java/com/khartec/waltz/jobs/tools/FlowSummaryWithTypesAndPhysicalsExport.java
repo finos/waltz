@@ -24,7 +24,7 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
-import com.khartec.waltz.data.physical_specification_data_type.LogicalFlowDecoratorDao;
+import com.khartec.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;

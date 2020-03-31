@@ -16,7 +16,7 @@
  *
  */
 
-package com.khartec.waltz.data.physical_specification_data_type;
+package com.khartec.waltz.data.datatype_decorator;
 
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
@@ -96,7 +96,6 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
 
 
     // --- FINDERS ---
-
     @Override
     public DataTypeDecorator getByEntityIdAndDataTypeId(long flowId, long dataTypeId) {
 
@@ -107,27 +106,6 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                 .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(dataTypeId))
                 .fetchOne(TO_DECORATOR_MAPPER);
     }
-
-    @Override
-    public List<DataTypeDecorator> findByEntityId(long entityId) {
-        return dsl
-                .selectFrom(LOGICAL_FLOW_DECORATOR)
-                .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(entityId))
-                .fetch(TO_DECORATOR_MAPPER);
-    }
-
-
-    @Override
-    public List<DataTypeDecorator> findByEntityIdSelector(Select<Record1<Long>> flowSelector, Optional<EntityKind> entityKind) {
-        return dsl.select(LOGICAL_FLOW_DECORATOR.fields())
-                .from(LOGICAL_FLOW_DECORATOR)
-                .innerJoin(LOGICAL_FLOW)
-                .on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID))
-                .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.in(flowSelector))
-                .and(LOGICAL_NOT_REMOVED)
-                .fetch(TO_DECORATOR_MAPPER);
-    }
-
 
     @Override
     public List<DataTypeDecorator> findByAppIdSelector(Select<Record1<Long>> appIdSelector) {
@@ -141,15 +119,6 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                 .and(LOGICAL_NOT_REMOVED)
                 .where(dsl.renderInlined(condition))
                 .fetch(TO_DECORATOR_MAPPER);
-    }
-
-    @Override
-    public List<DataTypeDecorator> findByFlowIds(Collection<Long> flowIds) {
-        checkNotNull(flowIds, "flowIds cannot be null");
-
-        Condition condition = LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.in(flowIds);
-
-        return findByCondition(condition);
     }
 
     @Override
@@ -168,6 +137,52 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                 .and(LOGICAL_NOT_REMOVED)
                 .fetch(TO_DECORATOR_MAPPER);
     }
+
+    @Override
+    public List<DataTypeDecorator> findByFlowIds(Collection<Long> flowIds) {
+        checkNotNull(flowIds, "flowIds cannot be null");
+
+        Condition condition = LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.in(flowIds);
+
+        return findByCondition(condition);
+    }
+
+
+    public List<DataTypeDecorator> findAll() {
+        return dsl
+                .selectFrom(LOGICAL_FLOW_DECORATOR)
+                .fetch(TO_DECORATOR_MAPPER);
+    }
+
+
+    @Override
+    public List<DataTypeDecorator> findByEntityId(long entityId) {
+        return dsl
+                .selectFrom(LOGICAL_FLOW_DECORATOR)
+                .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(entityId))
+                .fetch(TO_DECORATOR_MAPPER);
+    }
+
+    @Override
+    public List<DataTypeDecorator> findByEntityIdSelector(Select<Record1<Long>> entityIdSelector,
+                                                          Optional<EntityKind> entityKind) {
+            checkNotNull(entityKind, "entityKind cannot be null");
+            checkNotNull(entityIdSelector, "entityIdSelector cannot be null");
+
+            return dsl
+                    .select(LOGICAL_FLOW_DECORATOR.fields())
+                    .from(LOGICAL_FLOW_DECORATOR)
+                    .innerJoin(LOGICAL_FLOW)
+                    .on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID))
+                    .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.in(entityIdSelector)
+                            .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(entityKind.get().name())))
+                    .or(LOGICAL_FLOW.TARGET_ENTITY_ID.in(entityIdSelector)
+                            .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(entityKind.get().name())))
+                    .and(LOGICAL_NOT_REMOVED)
+                    .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(DATA_TYPE.name()))
+                    .fetch(TO_DECORATOR_MAPPER);
+    }
+
 
     @Override
     public int removeDataTypes(EntityReference associatedEntityRef, Collection<Long> dataTypeIds) {
@@ -198,62 +213,6 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
         // todo: in jOOQ 3.10.0 this can be written as follows #2979
         // return dsl.batchInsert(records).onDuplicateKeyIgnore().execute();
     }
-
-    public List<DataTypeDecorator> findAll() {
-        return dsl
-                .selectFrom(LOGICAL_FLOW_DECORATOR)
-                .fetch(TO_DECORATOR_MAPPER);
-    }
-
-    public List<DataTypeDecorator> findByEntityIdSelectorAndKind(EntityKind nodeKind,
-                                                                 Select<Record1<Long>> nodeIdSelector,
-                                                                 EntityKind decoratorEntityKind) {
-        checkNotNull(nodeKind, "nodeKind cannot be null");
-        checkNotNull(nodeIdSelector, "nodeIdSelector cannot be null");
-        checkNotNull(decoratorEntityKind, "decoratorEntityKind cannot be null");
-
-        return dsl
-                .select(LOGICAL_FLOW_DECORATOR.fields())
-                .from(LOGICAL_FLOW_DECORATOR)
-                .innerJoin(LOGICAL_FLOW)
-                .on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID))
-                .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.in(nodeIdSelector)
-                        .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(nodeKind.name())))
-                .or(LOGICAL_FLOW.TARGET_ENTITY_ID.in(nodeIdSelector)
-                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(nodeKind.name())))
-                .and(LOGICAL_NOT_REMOVED)
-                .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(decoratorEntityKind.name()))
-                .fetch(TO_DECORATOR_MAPPER);
-    }
-
-
-    // --- UPDATERS ---
-
-    public int[] deleteDecorators(Long flowId, Collection<EntityReference> decoratorReferences) {
-        List<LogicalFlowDecoratorRecord> records = decoratorReferences
-                .stream()
-                .map(ref -> {
-                    LogicalFlowDecoratorRecord record = dsl.newRecord(LOGICAL_FLOW_DECORATOR);
-                    record.setLogicalFlowId(flowId);
-                    record.setDecoratorEntityId(ref.id());
-                    record.setDecoratorEntityKind(ref.kind().name());
-                    return record;
-                })
-                .collect(toList());
-        return dsl
-                .batchDelete(records)
-                .execute();
-    }
-
-
-    @Deprecated
-    // Replace with a method that removes decorators for a single flow
-    public int removeAllDecoratorsForFlowIds(List<Long> flowIds) {
-        return dsl.deleteFrom(LOGICAL_FLOW_DECORATOR)
-                .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.in(flowIds))
-                .execute();
-    }
-
 
 
     public int[] updateDecorators(Set<DataTypeDecorator> decorators) {

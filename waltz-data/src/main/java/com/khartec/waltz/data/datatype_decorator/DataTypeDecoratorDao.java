@@ -16,7 +16,7 @@
  *
  */
 
-package com.khartec.waltz.data.physical_specification_data_type;
+package com.khartec.waltz.data.datatype_decorator;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;

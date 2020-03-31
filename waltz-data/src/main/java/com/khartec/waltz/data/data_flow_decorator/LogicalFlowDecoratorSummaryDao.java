@@ -60,7 +60,6 @@ public class LogicalFlowDecoratorSummaryDao {
         this.dsl = dsl;
     }
 
-    // --- STATS ---
 
     public List<DecoratorRatingSummary> summarizeInboundForSelector(Select<Record1<Long>> selector) {
         Condition condition = LOGICAL_FLOW.TARGET_ENTITY_ID.in(selector)
@@ -79,15 +78,6 @@ public class LogicalFlowDecoratorSummaryDao {
 
     public List<DecoratorRatingSummary> summarizeForAll() {
         return summarizeForCondition(LOGICAL_NOT_REMOVED);
-    }
-
-
-    @Deprecated
-    // Replace with a method that removes decorators for a single flow
-    public int removeAllDecoratorsForFlowIds(List<Long> flowIds) {
-        return dsl.deleteFrom(LOGICAL_FLOW_DECORATOR)
-                .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.in(flowIds))
-                .execute();
     }
 
 

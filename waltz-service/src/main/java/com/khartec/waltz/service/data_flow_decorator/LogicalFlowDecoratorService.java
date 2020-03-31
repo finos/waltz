@@ -27,7 +27,7 @@ import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorSummaryDao
 import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowStatsDao;
-import com.khartec.waltz.data.physical_specification_data_type.LogicalFlowDecoratorDao;
+import com.khartec.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;

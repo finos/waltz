@@ -16,7 +16,7 @@
  *
  */
 
-package com.khartec.waltz.data.physical_specification_data_type;
+package com.khartec.waltz.data.datatype_decorator;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -38,7 +38,6 @@ import java.util.function.Function;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
-import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
 import static com.khartec.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static com.khartec.waltz.model.EntityReference.*;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
@@ -120,7 +119,7 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
 
     @Override
     public List<DataTypeDecorator> findByFlowIds(Collection<Long> flowIds) {
-        throw new IllegalArgumentException("Method not implemented for Physical specification");
+        throw new UnsupportedOperationException("method not supported for " + PHYSICAL_SPECIFICATION.prettyName());
     }
 
 

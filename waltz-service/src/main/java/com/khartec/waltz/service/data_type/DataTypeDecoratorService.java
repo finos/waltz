@@ -20,8 +20,8 @@ package com.khartec.waltz.service.data_type;
 
 import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
-import com.khartec.waltz.data.physical_specification_data_type.DataTypeDecoratorDao;
-import com.khartec.waltz.data.physical_specification_data_type.DataTypeDecoratorDaoSelectorFactory;
+import com.khartec.waltz.data.datatype_decorator.DataTypeDecoratorDao;
+import com.khartec.waltz.data.datatype_decorator.DataTypeDecoratorDaoSelectorFactory;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
