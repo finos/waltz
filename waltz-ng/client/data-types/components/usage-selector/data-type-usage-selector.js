@@ -48,18 +48,6 @@ function mkSelectedTypeIds(dataTypes = []) {
 }
 
 
-function mkSpecDataTypeUpdateCommand(specificationId, selectedIds = [], originalIds = []) {
-    const addedDataTypeIds = _.difference(selectedIds, originalIds);
-    const removedDataTypeIds = _.difference(originalIds, selectedIds);
-
-    return {
-        specificationId,
-        addedDataTypeIds,
-        removedDataTypeIds
-    };
-}
-
-
 function mkDataTypeUpdateCommand(entityReference, selectedIds = [], originalIds = []) {
     const addedDataTypeIds = _.difference(selectedIds, originalIds);
     const removedDataTypeIds = _.difference(originalIds, selectedIds);
@@ -68,25 +56,6 @@ function mkDataTypeUpdateCommand(entityReference, selectedIds = [], originalIds 
         entityReference,
         addedDataTypeIds,
         removedDataTypeIds
-    };
-}
-
-
-function mkFlowDataTypeDecoratorsUpdateCommand(flowId, selectedIds = [], originalIds = []) {
-    const addedDecorators = _.chain(selectedIds)
-        .difference(originalIds)
-        .map(id => ({kind: "DATA_TYPE", id}))
-        .value();
-
-    const removedDecorators = _.chain(originalIds)
-        .difference(selectedIds)
-        .map(id => ({kind: "DATA_TYPE", id}))
-        .value();
-
-    return {
-        flowId,
-        addedDecorators,
-        removedDecorators
     };
 }
 
@@ -112,39 +81,9 @@ function controller(serviceBroker) {
             .execute(
                 CORE_API.DataTypeDecoratorStore.save,
                 [ vm.parentEntityRef, decoratorUpdateCommand ]);
-        // const parentKind = vm.parentEntityRef.kind;
-        // switch (parentKind) {
-        //     case "PHYSICAL_SPECIFICATION":
-        //         const specUpdateCommand = mkSpecDataTypeUpdateCommand(
-        //             vm.parentEntityRef.id,
-        //             vm.checkedItemIds,
-        //             vm.originalSelectedItemIds);
-        //         return serviceBroker
-        //             .execute(
-        //                 CORE_API.DataTypeDecoratorStore.save,
-        //                 [ vm.parentEntityRef, specUpdateCommand ]);
-        //
-        //     case "LOGICAL_DATA_FLOW":
-        //         const flowUpdateCommand = mkFlowDataTypeDecoratorsUpdateCommand(
-        //             vm.parentEntityRef.id,
-        //             vm.checkedItemIds,
-        //             vm.originalSelectedItemIds);
-        //
-        //         return serviceBroker
-        //             .execute(
-        //                 CORE_API.LogicalFlowDecoratorStore.updateDecorators,
-        //                 [ flowUpdateCommand ]);
-        //     default:
-        //         return Promise.reject("Cannot save data types for kind: ${parentKind}");
-        // }
     };
 
     const loadDataTypes = (force = false) => {
-
-        const selectorOptions = {
-            entityReference: vm.parentEntityRef,
-            scope: "EXACT"
-        };
 
         const promise = serviceBroker
             .loadViewData(

@@ -22,7 +22,6 @@ import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorSummaryDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowStatsDao;
@@ -85,7 +84,6 @@ public class LogicalFlowService {
                               DataTypeService dataTypeService,
                               DataTypeUsageService dataTypeUsageService,
                               DBExecutorPoolInterface dbExecutorPool,
-                              LogicalFlowDecoratorSummaryDao logicalFlowDecoratorSummaryDao,
                               LogicalFlowDao logicalFlowDao,
                               LogicalFlowStatsDao logicalFlowStatsDao,
                               LogicalFlowDecoratorDao logicalFlowDecoratorDao) {

@@ -108,15 +108,18 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
+
     @Override
     public List<DataTypeDecorator> findByAppIdSelector(Select<Record1<Long>> appIdSelector) {
         throw new UnsupportedOperationException("method not supported for " + PHYSICAL_SPECIFICATION.prettyName());
     }
 
+
     @Override
     public List<DataTypeDecorator> findByDataTypeIdSelector(Select<Record1<Long>> dataTypeIdSelector) {
         throw new UnsupportedOperationException("method not supported for " + PHYSICAL_SPECIFICATION.prettyName());
     }
+
 
     @Override
     public List<DataTypeDecorator> findByFlowIds(Collection<Long> flowIds) {
@@ -124,6 +127,7 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
     }
 
 
+    @Override
     public int[] addDecorators(Collection<DataTypeDecorator> specificationDataTypes) {
         checkNotNull(specificationDataTypes, "specificationDataTypes cannot be null");
 

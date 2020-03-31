@@ -133,7 +133,7 @@ public class LogicalFlowDecoratorRatingsCalculator {
 
 
     private List<LogicalFlow> loadFlows(Collection<DataTypeDecorator> decorators) {
-        Set<Long> dataFlowIds = map(decorators, d -> d.dataFlowId());
+        Set<Long> dataFlowIds = map(decorators, DataTypeDecorator::dataFlowId);
         return logicalFlowDao.findActiveByFlowIds(dataFlowIds);
     }
 

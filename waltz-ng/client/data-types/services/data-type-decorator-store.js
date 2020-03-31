@@ -17,7 +17,7 @@
  *
  */
 
-import {checkIsEntityRef, checkIsIdSelector} from "../../common/checks";
+import {checkIsEntityRef} from "../../common/checks";
 import {entity} from "../../common/services/enums/entity";
 
 function store($http, BaseApiUrl) {
