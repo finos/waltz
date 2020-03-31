@@ -38,6 +38,7 @@ import java.util.function.Function;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
 import static com.khartec.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static com.khartec.waltz.model.EntityReference.*;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
@@ -51,7 +52,7 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
     public static final RecordMapper<? super Record, DataTypeDecorator> TO_DOMAIN_MAPPER = r -> {
         PhysicalSpecDataTypeRecord record = r.into(PHYSICAL_SPEC_DATA_TYPE);
         return ImmutableDataTypeDecorator.builder()
-                .decoratorEntity(mkRef(EntityKind.DATA_TYPE, record.getDataTypeId()))
+                .decoratorEntity(mkRef(DATA_TYPE, record.getDataTypeId()))
                 .entityReference(mkRef(PHYSICAL_SPECIFICATION,record.getSpecificationId()))
                 .provenance(record.getProvenance())
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
@@ -150,7 +151,7 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
                 .select(DSL
                         .selectDistinct(
                                 PHYSICAL_FLOW.LOGICAL_FLOW_ID,
-                                DSL.val(EntityKind.DATA_TYPE.name()),
+                                DSL.val(DATA_TYPE.name()),
                                 PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID,
                                 DSL.val(AuthoritativenessRating.NO_OPINION.name()),
                                 DSL.val("waltz"),
