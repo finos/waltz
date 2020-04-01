@@ -4,8 +4,6 @@ import com.khartec.waltz.model.EntityKind;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import static com.khartec.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
-
 @Component
 public class DataTypeDecoratorDaoSelectorFactory {
     private final PhysicalSpecDecoratorDao physicalSpecDecoratorDao;
@@ -19,8 +17,13 @@ public class DataTypeDecoratorDaoSelectorFactory {
     }
 
     public DataTypeDecoratorDao getDao(EntityKind entityKind) {
-        return PHYSICAL_SPECIFICATION.equals(entityKind)
-                ? physicalSpecDecoratorDao
-                : logicalFlowDecoratorDao;
+        switch (entityKind) {
+            case PHYSICAL_SPECIFICATION:
+                return physicalSpecDecoratorDao;
+            case LOGICAL_DATA_FLOW:
+                return logicalFlowDecoratorDao;
+            default:
+                throw new IllegalArgumentException("Cannot create dao for entity kind: " + entityKind);
+        }
     }
 }
