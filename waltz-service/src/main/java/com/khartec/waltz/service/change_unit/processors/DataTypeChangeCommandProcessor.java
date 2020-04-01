@@ -96,7 +96,6 @@ public class DataTypeChangeCommandProcessor implements AttributeChangeCommandPro
         int removedCount = dataTypeDecoratorService.removeDataTypeDecorator(userName, specificationEntityRef, toRemove);
         int[] addedCount = dataTypeDecoratorService.addDecorators(userName, specificationEntityRef, toAdd);
 
-        //TODO test this scenario
         return removedCount == toRemove.size() && addedCount.length == toAdd.size();
     }
 
