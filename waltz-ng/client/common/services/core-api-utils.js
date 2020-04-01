@@ -39,6 +39,7 @@ import {ClientCacheKeyStore_API as ClientCacheKeyStore} from "../../client_cache
 import {ComplexityStore_API as ComplexityStore} from "../../complexity/services/complexity-store";
 import {DatabaseStore_API as DatabaseStore} from "../../databases/services/database-store";
 import {DataTypeStore_API as DataTypeStore} from "../../data-types/services/data-type-store";
+import {DataTypeDecoratorStore_API as DataTypeDecoratorStore} from "../../data-types/services/data-type-decorator-store";
 import {DataTypeUsageStore_API as DataTypeUsageStore} from "../../data-type-usage/services/data-type-usage-store";
 import {EndUserAppStore_API as EndUserAppStore} from "../../end-user-apps/services/end-user-app-store";
 import {EntityEnumStore_API as EntityEnumStore} from "../../entity-enum/services/entity-enum-store";
@@ -72,7 +73,6 @@ import {OrgUnitStore_API as OrgUnitStore} from "../../org-units/services/org-uni
 import {PersonStore_API as PersonStore} from "../../person/services/person-store";
 import {PhysicalFlowStore_API as PhysicalFlowStore} from "../../physical-flows/services/physical-flow-store";
 import {PhysicalFlowParticipantStore_API as PhysicalFlowParticipantStore} from "../../physical-flows/services/physical-flow-participant-store";
-import {PhysicalSpecDataTypeStore_API as PhysicalSpecDataTypeStore} from "../../physical-specifications/services/physical-spec-data-type-store";
 import {PhysicalSpecDefinitionFieldStore_API as PhysicalSpecDefinitionFieldStore} from "../../physical-specifications/services/physical-spec-definition-field-store";
 import {PhysicalSpecDefinitionStore_API as PhysicalSpecDefinitionStore} from "../../physical-specifications/services/physical-spec-definition-store";
 import {PhysicalSpecDefinitionSampleFileStore_API as PhysicalSpecDefinitionSampleFileStore} from "../../physical-specifications/services/physical-spec-definition-sample-file-store";
@@ -123,6 +123,7 @@ export const CORE_API = {
     ComplexityStore,
     DatabaseStore,
     DataTypeStore,
+    DataTypeDecoratorStore,
     DataTypeUsageStore,
     EndUserAppStore,
     EntityEnumStore,
@@ -156,7 +157,6 @@ export const CORE_API = {
     PersonStore,
     PhysicalFlowStore,
     PhysicalFlowParticipantStore,
-    PhysicalSpecDataTypeStore,
     PhysicalSpecDefinitionFieldStore,
     PhysicalSpecDefinitionStore,
     PhysicalSpecDefinitionSampleFileStore,

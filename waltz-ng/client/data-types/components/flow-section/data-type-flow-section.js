@@ -24,6 +24,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 
 import template from "./data-type-flow-section.html";
+import {entity} from "../../../common/services/enums/entity";
 
 
 const bindings = {
@@ -156,8 +157,8 @@ function controller($q, $scope, serviceBroker) {
             .then(r => vm.rawFlows = r.data);
         const decoratorPromise = serviceBroker
             .loadViewData(
-                CORE_API.LogicalFlowDecoratorStore.findBySelector,
-                [ selector ])
+                CORE_API.DataTypeDecoratorStore.findBySelector,
+                [ selector, entity.LOGICAL_DATA_FLOW.key ])
             .then(r => {
                 vm.rawDecorators = r.data;
                 vm.graphTweakers = buildGraphTweakers(

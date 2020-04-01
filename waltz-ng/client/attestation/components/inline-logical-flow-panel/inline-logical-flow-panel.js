@@ -20,6 +20,7 @@ import {CORE_API} from '../../../common/services/core-api-utils';
 import {initialiseData} from '../../../common';
 
 import template from './inline-logical-flow-panel.html';
+import {entity} from "../../../common/services/enums/entity";
 
 
 const bindings = {
@@ -53,8 +54,8 @@ function controller(serviceBroker) {
 
         serviceBroker
             .loadViewData(
-                CORE_API.LogicalFlowDecoratorStore.findBySelectorAndKind,
-                [selector, 'DATA_TYPE'])
+                CORE_API.DataTypeDecoratorStore.findBySelector,
+                [selector, entity.LOGICAL_DATA_FLOW.key])
             .then(r => vm.logicalFlowDecorators = r.data);
 
         serviceBroker

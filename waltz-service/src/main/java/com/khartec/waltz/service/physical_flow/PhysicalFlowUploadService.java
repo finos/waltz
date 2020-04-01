@@ -20,7 +20,6 @@ package com.khartec.waltz.service.physical_flow;
 
 import com.khartec.waltz.common.Aliases;
 import com.khartec.waltz.common.MapUtilities;
-import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.actor.ActorDao;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.data_type.DataTypeDao;
@@ -34,8 +33,8 @@ import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.actor.Actor;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.command.CommandOutcome;
-import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
 import com.khartec.waltz.model.datatype.DataType;
+import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.enum_value.EnumValueKind;
 import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
@@ -43,8 +42,7 @@ import com.khartec.waltz.model.physical_flow.*;
 import com.khartec.waltz.model.physical_specification.DataFormatKind;
 import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
-import com.khartec.waltz.model.physical_specification_data_type.PhysicalSpecificationDataType;
-import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
+import com.khartec.waltz.service.data_type.DataTypeDecoratorService;
 import com.khartec.waltz.service.enum_value.EnumValueAliasService;
 import com.khartec.waltz.service.physical_specification_data_type.PhysicalSpecDataTypeService;
 import org.springframework.stereotype.Service;
@@ -59,6 +57,7 @@ import java.util.regex.Pattern;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
+import static com.khartec.waltz.common.SetUtilities.fromArray;
 import static com.khartec.waltz.common.StringUtilities.isEmpty;
 import static com.khartec.waltz.common.StringUtilities.lower;
 import static java.util.function.Function.identity;
@@ -72,7 +71,7 @@ public class PhysicalFlowUploadService {
     private final ApplicationDao applicationDao;
     private final DataTypeDao dataTypeDao;
     private final LogicalFlowDao logicalFlowDao;
-    private final LogicalFlowDecoratorService logicalFlowDecoratorService;
+    private final DataTypeDecoratorService dataTypeDecoratorService;
     private final PhysicalSpecDataTypeService physicalSpecDataTypeService;
     private final PhysicalFlowDao physicalFlowDao;
     private final PhysicalSpecificationDao physicalSpecificationDao;
@@ -85,7 +84,7 @@ public class PhysicalFlowUploadService {
                                      ApplicationDao applicationDao,
                                      DataTypeDao dataTypeDao,
                                      LogicalFlowDao logicalFlowDao,
-                                     LogicalFlowDecoratorService logicalFlowDecoratorService,
+                                     DataTypeDecoratorService dataTypeDecoratorService,
                                      PhysicalSpecDataTypeService physicalSpecDataTypeService,
                                      PhysicalFlowDao physicalFlowDao,
                                      PhysicalSpecificationDao physicalSpecificationDao,
@@ -93,7 +92,7 @@ public class PhysicalFlowUploadService {
         checkNotNull(actorDao, "actorDao cannot be null");
         checkNotNull(applicationDao, "applicationDao cannot be null");
         checkNotNull(dataTypeDao, "dataTypeDao cannot be null");
-        checkNotNull(logicalFlowDecoratorService, "logicalFlowDecoratorService cannot be null");
+        checkNotNull(dataTypeDecoratorService, "dataTypeDecoratorService cannot be null");
         checkNotNull(logicalFlowDao, "logicalFlowDao cannot be null");
         checkNotNull(physicalSpecDataTypeService, "physicalSpecDataTypeService cannot be null");
         checkNotNull(physicalFlowDao, "physicalFlowDao cannot be null");
@@ -103,11 +102,11 @@ public class PhysicalFlowUploadService {
         this.applicationDao = applicationDao;
         this.dataTypeDao = dataTypeDao;
         this.logicalFlowDao = logicalFlowDao;
-        this.logicalFlowDecoratorService = logicalFlowDecoratorService;
         this.physicalSpecDataTypeService = physicalSpecDataTypeService;
         this.physicalFlowDao = physicalFlowDao;
         this.physicalSpecificationDao = physicalSpecificationDao;
         this.enumValueAliasService = enumValueAliasService;
+        this.dataTypeDecoratorService = dataTypeDecoratorService;
     }
 
 
@@ -389,11 +388,15 @@ public class PhysicalFlowUploadService {
             flow = logicalFlowDao.addFlow(flowToAdd);
         }
 
-        LogicalFlowDecorator existingDecorator = logicalFlowDecoratorService
-                .getByFlowIdAndDecoratorRef(flow.id().get(), dataType);
+
+        EntityReference logicalFlowEntityRef = EntityReference.mkRef(EntityKind.LOGICAL_DATA_FLOW, flow.id().get());
+        DataTypeDecorator existingDecorator = dataTypeDecoratorService.getByEntityRefAndDataTypeId(
+                logicalFlowEntityRef,
+                dataType.id());
 
         if(existingDecorator == null) {
-            logicalFlowDecoratorService.addDecorators(flow.id().get(), SetUtilities.fromArray(dataType), username);
+            dataTypeDecoratorService
+                    .addDecorators(username, logicalFlowEntityRef, fromArray(dataType.id()));
         }
         return flow;
     }
@@ -430,11 +433,12 @@ public class PhysicalFlowUploadService {
                     .withId(id);
         }
 
-        EntityReference dataType = flow.dataType();
-        Long specId = spec.id().get();
-        PhysicalSpecificationDataType existingDataType = physicalSpecDataTypeService.getBySpecIdAndDataTypeID(specId, dataType.id());
+        Long dataTypeId = flow.dataType().id();
+        EntityReference specificationEntityRef = EntityReference.mkRef(EntityKind.PHYSICAL_SPECIFICATION, spec.id().get());
+
+        DataTypeDecorator existingDataType = dataTypeDecoratorService.getByEntityRefAndDataTypeId(specificationEntityRef, dataTypeId);
         if(existingDataType == null) {
-            physicalSpecDataTypeService.addDataTypes(username, specId, SetUtilities.fromArray(dataType.id()));
+            dataTypeDecoratorService.addDecorators(username, specificationEntityRef, fromArray(dataTypeId));
         }
         return spec;
     }

@@ -134,7 +134,7 @@ function findExistingLogicalFlowsAndDecorators(serviceBroker, sourcesAndTargets)
             // add decorators
             const existingFlowIds = _.map(flows.data, 'id');
             return serviceBroker
-                .loadViewData(CORE_API.LogicalFlowDecoratorStore.findByFlowIdsAndKind, [existingFlowIds], { force: true })
+                .loadViewData(CORE_API.DataTypeDecoratorStore.findByFlowIds, [existingFlowIds], { force: true })
                 .then(decorators => {
                     const decoratorsByFlowId = _.groupBy(decorators.data, 'dataFlowId');
                     const flowsWithDecorators = _.flatMap(flows.data, f => {

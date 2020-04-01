@@ -22,6 +22,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 
 import template from "./rated-flow-summary-panel.html";
+import {entity} from "../../../common/services/enums/entity";
 
 
 const bindings = {
@@ -183,8 +184,8 @@ function controller(serviceBroker)
                     flowData.flows = r.data;
                     return serviceBroker
                         .loadViewData(
-                            CORE_API.LogicalFlowDecoratorStore.findBySelector,
-                            [ selector ]);
+                            CORE_API.DataTypeDecoratorStore.findBySelector,
+                            [ selector, entity.LOGICAL_DATA_FLOW.key ]);
                 })
                 .then(r => {
                     flowData.decorators = r.data;
