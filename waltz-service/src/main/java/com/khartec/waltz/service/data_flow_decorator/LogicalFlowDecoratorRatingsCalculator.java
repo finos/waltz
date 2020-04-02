@@ -25,9 +25,9 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
-import com.khartec.waltz.model.data_flow_decorator.ImmutableLogicalFlowDecorator;
-import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
 import com.khartec.waltz.model.datatype.DataType;
+import com.khartec.waltz.model.datatype.DataTypeDecorator;
+import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.service.application.ApplicationService;
@@ -78,7 +78,7 @@ public class LogicalFlowDecoratorRatingsCalculator {
     }
 
 
-    public Collection<LogicalFlowDecorator> calculate(Collection<LogicalFlowDecorator> decorators) {
+    public Collection<DataTypeDecorator> calculate(Collection<DataTypeDecorator> decorators) {
 
         List<LogicalFlow> appToAppFlows = filter(
                 IS_APP_TO_APP_FLOW,
@@ -108,7 +108,7 @@ public class LogicalFlowDecoratorRatingsCalculator {
                                     targetAppsById,
                                     resolver,
                                     decorator);
-                            return ImmutableLogicalFlowDecorator
+                            return ImmutableDataTypeDecorator
                                     .copyOf(decorator)
                                     .withRating(rating);
                         }
@@ -132,8 +132,8 @@ public class LogicalFlowDecoratorRatingsCalculator {
     }
 
 
-    private List<LogicalFlow> loadFlows(Collection<LogicalFlowDecorator> decorators) {
-        Set<Long> dataFlowIds = map(decorators, d -> d.dataFlowId());
+    private List<LogicalFlow> loadFlows(Collection<DataTypeDecorator> decorators) {
+        Set<Long> dataFlowIds = map(decorators, DataTypeDecorator::dataFlowId);
         return logicalFlowDao.findActiveByFlowIds(dataFlowIds);
     }
 
@@ -153,7 +153,7 @@ public class LogicalFlowDecoratorRatingsCalculator {
                                                  Map<Long, LogicalFlow> flowsById,
                                                  Map<Long, Application> targetAppsById,
                                                  AuthoritativeSourceResolver resolver,
-                                                 LogicalFlowDecorator decorator) {
+                                                 DataTypeDecorator decorator) {
         LogicalFlow flow = flowsById.get(decorator.dataFlowId());
 
         EntityReference vantagePoint = lookupVantagePoint(targetAppsById, flow);
@@ -174,7 +174,7 @@ public class LogicalFlowDecoratorRatingsCalculator {
     }
 
 
-    private String lookupDataTypeCode(Map<Long, DataType> typesById, LogicalFlowDecorator decorator) {
+    private String lookupDataTypeCode(Map<Long, DataType> typesById, DataTypeDecorator decorator) {
         long dataTypeId = decorator.decoratorEntity().id();
         return typesById.get(dataTypeId).code();
     }

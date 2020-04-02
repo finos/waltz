@@ -18,7 +18,6 @@
 
 import angular from "angular";
 import {registerComponents, registerStores} from "../common/module-utils";
-import * as PhysicalSpecDataTypeStore from "./services/physical-spec-data-type-store";
 import * as PhysicalSpecificationStore from "./services/physical-specification-store";
 import * as PhysicalSpecDefinitionFieldStore from "./services/physical-spec-definition-field-store";
 import * as PhysicalSpecDefinitionStore from "./services/physical-spec-definition-store";
@@ -54,7 +53,6 @@ function setup() {
         .component('waltzPhysicalSpecDefinitionPanel', PhysicalSpecDefintionPanel);
 
     registerStores(module, [
-        PhysicalSpecDataTypeStore,
         PhysicalSpecDefinitionFieldStore,
         PhysicalSpecificationStore,
         PhysicalSpecDefinitionStore,

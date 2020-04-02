@@ -16,23 +16,36 @@
  *
  */
 
-package com.khartec.waltz.model.physical_specification_data_type;
+package com.khartec.waltz.model.datatype;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.LastUpdatedProvider;
-import com.khartec.waltz.model.ProvenanceProvider;
+import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import org.immutables.value.Value;
+
+import java.util.Optional;
 
 /**
  * Data Type decoration for physical specifications
  */
 @Value.Immutable
-@JsonSerialize(as = ImmutablePhysicalSpecificationDataType.class)
-@JsonDeserialize(as = ImmutablePhysicalSpecificationDataType.class)
-public abstract class PhysicalSpecificationDataType implements LastUpdatedProvider, ProvenanceProvider {
+@JsonSerialize(as = ImmutableDataTypeDecorator.class)
+@JsonDeserialize(as = ImmutableDataTypeDecorator.class)
+public abstract class DataTypeDecorator implements
+        LastUpdatedProvider,
+        ProvenanceProvider,
+        WaltzEntity,
+        IdProvider {
 
-    public abstract long specificationId();
-    public abstract long dataTypeId();
+    public abstract EntityReference decoratorEntity();
+
+    public abstract Optional<AuthoritativenessRating> rating();
+
+    @Value.Derived
+    public long dataTypeId() { return decoratorEntity().id(); }
+
+    @Value.Derived
+    public long dataFlowId() { return entityReference().id(); }
 
 }

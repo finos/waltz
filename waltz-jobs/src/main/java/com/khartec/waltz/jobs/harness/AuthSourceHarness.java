@@ -20,7 +20,7 @@ package com.khartec.waltz.jobs.harness;
 
 import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
-import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorDao;
+import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorSummaryDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
@@ -57,7 +57,7 @@ public class AuthSourceHarness {
         AuthoritativeSourceService svc = ctx.getBean(AuthoritativeSourceService.class);
         AuthSourceRatingCalculator authSourceRatingCalculatorCalculator = ctx.getBean(AuthSourceRatingCalculator.class);
         LogicalFlowDecoratorRatingsCalculator flowCalculator = ctx.getBean(LogicalFlowDecoratorRatingsCalculator.class);
-        LogicalFlowDecoratorDao decoratorDao = ctx.getBean(LogicalFlowDecoratorDao.class);
+        LogicalFlowDecoratorSummaryDao decoratorDao = ctx.getBean(LogicalFlowDecoratorSummaryDao.class);
         AuthoritativeSourceDao authoritativeSourceDao = ctx.getBean(AuthoritativeSourceDao.class);
 
 
@@ -89,7 +89,7 @@ public class AuthSourceHarness {
 //        System.exit(-1);
     }
 
-    private static void fastRecalculateAllFlowRatings(DSLContext dsl, LogicalFlowDecoratorDao decoratorDao, AuthoritativeSourceDao authoritativeSourceDao) {
+    private static void fastRecalculateAllFlowRatings(DSLContext dsl, LogicalFlowDecoratorSummaryDao decoratorDao, AuthoritativeSourceDao authoritativeSourceDao) {
         decoratorDao.updateRatingsByCondition(AuthoritativenessRating.NO_OPINION, DSL.trueCondition());
 
         EntityHierarchy ehOrgUnit = ENTITY_HIERARCHY.as("ehOrgUnit");

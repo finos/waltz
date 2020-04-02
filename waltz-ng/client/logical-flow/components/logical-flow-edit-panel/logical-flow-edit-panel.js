@@ -25,6 +25,7 @@ import template from "./logical-flow-edit-panel.html";
 import {displayError} from "../../../common/error-utils";
 import {sameRef} from "../../../common/entity-utils";
 import {event} from "d3-selection";
+import {entity} from "../../../common/services/enums/entity";
 
 
 const bindings = {
@@ -227,8 +228,9 @@ function controller($element,
     function loadLogicalFlowDecorators() {
         return serviceBroker
             .loadViewData(
-                CORE_API.LogicalFlowDecoratorStore.findBySelectorAndKind,
-                [ { entityReference: vm.parentEntityRef, scope: "EXACT" }, "DATA_TYPE" ],
+                CORE_API.DataTypeDecoratorStore.findBySelector,
+                [ { entityReference: vm.parentEntityRef, scope: "EXACT" },
+                    entity.LOGICAL_DATA_FLOW.key ],
                 { force: true })
             .then(r => vm.logicalFlowDecorators = r.data);
     }
@@ -296,8 +298,8 @@ function controller($element,
     const updateDecorators = (command) => {
         return serviceBroker
             .execute(
-                CORE_API.LogicalFlowDecoratorStore.updateDecorators,
-                [command])
+                CORE_API.DataTypeDecoratorStore.save,
+                [vm.parentEntityRef, command])
             .then(reload)
             .then(() => notification.success("Data flow updated"));
     };
