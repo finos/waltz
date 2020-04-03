@@ -5,10 +5,6 @@ jdk: openjdk8
 
 env:
   - NODE_VERSION="7"
-  - DB=h2
-  - DB=postgres
-  - DB=mariadb
-
 
 
 # Stop travis from running mvn install (without profile)
@@ -42,10 +38,10 @@ branches:
 
 jobs:
   include:
-    - stage: Build
+    - stage: Test
       env: DB=h2
 
-    - stage: Build
+    - stage: Test
       env: DB=mariadb
       addons:
         mariadb: 10.1
