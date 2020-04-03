@@ -5,16 +5,11 @@ jdk: openjdk8
 
 env:
   - NODE_VERSION="7"
+  - DB=h2
+  - DB=postgres
+  - DB=mariadb
 
-script:
-  - mvn -s .lgtm.settings.xml  clean package
-  - npm run-script test --prefix ./waltz-ng
 
-addons:
-#  mariadb: '10.1'
-#  apt:
-#    packages:
-#      - open-java8-installer
 
 # Stop travis from running mvn install (without profile)
 install: true
@@ -23,6 +18,13 @@ before_install:
 #  - mysql -u root -e "create database IF NOT EXISTS waltz CHARACTER SET='utf8';"
   - nvm install $NODE_VERSION
   - npm install npm -g
+  - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'DROP DATABASE IF EXISTS waltz;' -U postgres; fi"
+  - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'CREATE DATABASE waltz;' -U postgres; fi"
+  - sh -c "if [ '$DB' = 'mariadb' ]; then mysql -e 'CREATE DATABASE IF NOT EXISTS waltz CHARACTER SET='utf8'; fi"
+
+script:
+  - if [[ "$DB" == "h2" ]]; then mvn -s .lgtm.settings.xml  clean package; fi
+  - npm run-script test --prefix ./waltz-ng
 
 # Enable caching of dependencies
 cache:
@@ -36,3 +38,14 @@ branches:
     - master
     - rel.*
     - /^waltz-.*$/
+
+
+jobs:
+  include:
+    - stage: Build
+      env: DB=h2
+
+    - stage: Build
+      env: DB=mariadb
+      addons:
+        mariadb: 10.1
