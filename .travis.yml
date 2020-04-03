@@ -39,7 +39,7 @@ jobs:
     - stage: Test
       env: DB=h2
       script:
-        - mvn -s .lgtm.settings.xml  clean package; fi
+        - mvn -s .lgtm.settings.xml  clean package;
         - npm run-script test --prefix ./waltz-ng
 
     - stage: Test
