@@ -128,7 +128,7 @@
 
     <changeSet id="20200224-4712-3"
                author="kamransaleem"
-               dbms="mssql,postgresql">
+               dbms="mssql,postgresql,h2">
         <addColumn tableName="logical_flow_decorator">
             <column name="id"
                     type="${id.type}"
@@ -139,7 +139,7 @@
 
     <changeSet id="20200224-4712-4"
                author="kamransaleem"
-               dbms="mssql,postgresql">
+               dbms="mssql,postgresql,h2">
         <addPrimaryKey tableName="logical_flow_decorator"
                        constraintName="logical_flow_decorator_pkey"
                        columnNames="id" />
