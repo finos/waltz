@@ -48,3 +48,6 @@ jobs:
         mariadb: 10.1
       before_script:
         - mysql -e 'CREATE DATABASE IF NOT EXISTS waltz CHARACTER SET='utf8';
+      script:
+        - mvn clean package -Pwaltz-mariadb,travis-mariadb
+        - npm run-script test --prefix ./waltz-ng
