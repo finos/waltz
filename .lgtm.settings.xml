@@ -54,7 +54,7 @@
                 <jooq.group>org.jooq</jooq.group>
                 <jooq.database>org.jooq.meta.postgres.PostgresDatabase</jooq.database>
                 <database.url>jdbc:postgresql://localhost:5432/waltz</database.url>
-                <database.user>root</database.user>
+                <database.user></database.user>
                 <database.password></database.password>
                 <database.schema>PUBLIC</database.schema>
                 <database.catalog></database.catalog>
