@@ -121,6 +121,17 @@
             </properties>
         </profile>
 
+        <profile>
+            <id>travis-postgres</id>
+            <properties>
+                <database.url>jdbc:mysql://127.0.0.1:3306/waltz</database.url>
+                <database.url>jdbc:postgresql://localhost:5432/waltz</database.url>
+                <database.user>postgres</database.user>
+                <database.password></database.password>
+                <database.schema>PUBLIC</database.schema>
+            </properties>
+        </profile>
+
     </profiles>
 
     <dependencies>
