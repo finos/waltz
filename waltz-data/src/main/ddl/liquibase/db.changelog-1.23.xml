@@ -107,6 +107,8 @@
             </column>
         </addColumn>
     </changeSet>
+
+
     <changeSet id="20200224-4712-1"
                author="kamransaleem">
         <dropPrimaryKey tableName="logical_flow_decorator"
@@ -125,7 +127,8 @@
     </changeSet>
 
     <changeSet id="20200224-4712-3"
-               author="kamransaleem">
+               author="kamransaleem"
+               dbms="mssql,postgresql,h2">
         <addColumn tableName="logical_flow_decorator">
             <column name="id"
                     type="${id.type}"
@@ -135,11 +138,28 @@
     </changeSet>
 
     <changeSet id="20200224-4712-4"
-               author="kamransaleem">
+               author="kamransaleem"
+               dbms="mssql,postgresql,h2">
         <addPrimaryKey tableName="logical_flow_decorator"
                        constraintName="logical_flow_decorator_pkey"
                        columnNames="id" />
     </changeSet>
+
+    <!--  MySQL / MariaDB only -->
+    <changeSet id="20200224-4712-3"
+               author="kamransaleem"
+               dbms="mysql">
+        <addColumn tableName="logical_flow_decorator">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             unique="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
 
     <!-- 3678 - Remove drill grid -->
     <changeSet id="20200311-3678-1"
