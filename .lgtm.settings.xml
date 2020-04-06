@@ -41,5 +41,24 @@
                 <database.catalog></database.catalog>
             </properties>
         </profile>
+
+        <profile>
+            <id>lgtm-postgres</id>
+            <activation><activeByDefault>false</activeByDefault></activation>
+            <properties>
+                <jdbc.group>org.postgresql</jdbc.group>
+                <jdbc.artifact>postgresql</jdbc.artifact>
+                <jdbc.version>42.2.5</jdbc.version>
+                <jdbc.driver>org.postgresql.Driver</jdbc.driver>
+                <jooq.dialect>POSTGRES</jooq.dialect>
+                <jooq.group>org.jooq</jooq.group>
+                <jooq.database>org.jooq.meta.postgres.PostgresDatabase</jooq.database>
+                <database.url>jdbc:postgresql://localhost:5432/waltz</database.url>
+                <database.user>root</database.user>
+                <database.password></database.password>
+                <database.schema>PUBLIC</database.schema>
+                <database.catalog></database.catalog>
+            </properties>
+        </profile>
     </profiles>
 </settings>
