@@ -11,6 +11,7 @@ env:
 # Stop travis from running mvn install (without profile)
 install: true
 
+
 before_install:
 #  - mysql -u root -e "create database IF NOT EXISTS waltz CHARACTER SET='utf8';"
   - nvm install $NODE_VERSION
