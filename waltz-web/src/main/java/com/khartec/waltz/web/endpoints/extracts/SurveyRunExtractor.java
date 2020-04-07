@@ -191,8 +191,7 @@ public class SurveyRunExtractor extends DirectQueryBasedDataExtractor {
                         .and(CHANGE_INITIATIVE.ID.in(genericSelectorForChangeInitiativeIds.selector())));
 
         return dsl
-                .selectFrom(applicationSurveySelect
-                        .union(changeInitiativeSurveySelect)
+                .selectFrom(applicationSurveySelect.union(changeInitiativeSurveySelect)
                         .asTable());
     }
 
