@@ -1,7 +1,9 @@
 language:
   - java
 
+
 jdk: openjdk8
+
 
 env:
   global:
@@ -16,9 +18,6 @@ before_install:
 #  - mysql -u root -e "create database IF NOT EXISTS waltz CHARACTER SET='utf8';"
   - nvm install $NODE_VERSION
   - npm install npm -g
-#  - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'DROP DATABASE IF EXISTS waltz;' -U postgres; fi"
-#  - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'CREATE DATABASE waltz;' -U postgres; fi"
-
 
 
 # Enable caching of dependencies
@@ -60,7 +59,7 @@ jobs:
       addons:
         mariadb: 10.4
       before_script:
-        - sh -c "if [ '$DB' = 'mariadb' ]; then mysql -e 'CREATE DATABASE IF NOT EXISTS waltz CHARACTER SET=utf8'; fi"
+        - sh -c "if [ '$DB' = 'mariadb' ]; then mysql -u root -e 'CREATE DATABASE IF NOT EXISTS waltz CHARACTER SET=utf8'; fi"
       script:
         - mvn -s .lgtm.settings.xml -Plgtm-mariadb clean package;
         - npm run-script test --prefix ./waltz-ng
