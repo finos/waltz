@@ -76,7 +76,7 @@
                 <database.url>jdbc:mysql://127.0.0.1:3306/waltzdb</database.url>
                 <database.user>root</database.user>
                 <database.password></database.password>
-                <database.schema>waltz</database.schema>
+                <database.schema></database.schema>
                 <database.catalog></database.catalog>
             </properties>
         </profile>
