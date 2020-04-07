@@ -73,8 +73,8 @@
                 <jooq.dialect>MARIADB</jooq.dialect>
                 <jooq.group>org.jooq</jooq.group>
                 <jooq.database>org.jooq.meta.mariadb.MariaDBDatabase</jooq.database>
-                <database.url>jdbc:mysql://127.0.0.1:3306/waltz</database.url>
-                <database.user>travis</database.user>
+                <database.url>jdbc:mysql://127.0.0.1:3306/waltzdb</database.url>
+                <database.user>root</database.user>
                 <database.password></database.password>
                 <database.schema>waltz</database.schema>
                 <database.catalog></database.catalog>
