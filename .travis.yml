@@ -58,9 +58,9 @@ jobs:
     - stage: Test
       env: DB=mariadb
       addons:
-        mariadb: 10.1
+        mariadb: 10.4
       before_script:
-        - sh -c "if [ '$DB' = 'mariadb' ]; then mysql -e 'CREATE DATABASE IF NOT EXISTS waltz CHARACTER SET=\'utf8\''; fi"
+        - sh -c "if [ '$DB' = 'mariadb' ]; then mysql -e 'CREATE DATABASE IF NOT EXISTS waltz CHARACTER SET=utf8'; fi"
       script:
         - mvn -s .lgtm.settings.xml -Plgtm-mariadb clean package;
         - npm run-script test --prefix ./waltz-ng
