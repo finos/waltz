@@ -24,7 +24,7 @@
 
     <profiles>
         <profile>
-            <id>lgtm-h2</id>
+            <id>build-h2</id>
             <activation><activeByDefault>true</activeByDefault></activation>
             <properties>
                 <jdbc.group>com.h2database</jdbc.group>
@@ -43,7 +43,7 @@
         </profile>
 
         <profile>
-            <id>lgtm-postgres</id>
+            <id>build-postgres</id>
             <activation><activeByDefault>false</activeByDefault></activation>
             <properties>
                 <jdbc.group>org.postgresql</jdbc.group>
@@ -63,7 +63,7 @@
 
 
         <profile>
-            <id>lgtm-mariadb</id>
+            <id>build-mariadb</id>
             <activation><activeByDefault>false</activeByDefault></activation>
             <properties>
                 <jdbc.group>org.mariadb.jdbc</jdbc.group>
