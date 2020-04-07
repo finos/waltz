@@ -17,7 +17,6 @@ install: true
 
 
 before_install:
-#  - mysql -u root -e "create database IF NOT EXISTS waltz CHARACTER SET='utf8';"
   - nvm install $NODE_VERSION
   - npm install npm -g
 
@@ -44,6 +43,7 @@ jobs:
       script:
         - mvn -s .lgtm.settings.xml  clean package;
         - npm run-script test --prefix ./waltz-ng
+        -
 
     - stage: Test
       env: DB=postgres
@@ -56,6 +56,7 @@ jobs:
         - mvn -s .lgtm.settings.xml -Plgtm-postgres clean package;
         - npm run-script test --prefix ./waltz-ng
 
+
     - stage: Test
       env: DB=mariadb
       addons:
@@ -63,7 +64,6 @@ jobs:
       before_script:
         - mysql -e "DROP DATABASE IF EXISTS waltz";
         - mysql -e "CREATE DATABASE IF NOT EXISTS waltz CHARACTER SET='utf8'";
-#        - mysql -e "GRANT ALL PRIVILEGES ON waltzdb.* TO 'root'@'%'";
 
       script:
         - mvn -s .lgtm.settings.xml -Plgtm-mariadb clean package;
