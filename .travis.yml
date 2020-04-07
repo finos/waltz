@@ -61,8 +61,8 @@ jobs:
       addons:
         mariadb: 10.4
       before_script:
-        - mysql -e "DROP DATABASE IF EXISTS waltzdb";
-        - mysql -e "CREATE DATABASE IF NOT EXISTS waltzdb CHARACTER SET='utf8'";
+        - mysql -e "DROP DATABASE IF EXISTS waltz";
+        - mysql -e "CREATE DATABASE IF NOT EXISTS waltz CHARACTER SET='utf8'";
 #        - mysql -e "GRANT ALL PRIVILEGES ON waltzdb.* TO 'root'@'%'";
 
       script:
