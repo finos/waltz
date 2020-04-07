@@ -59,7 +59,7 @@ jobs:
       addons:
         mariadb: 10.4
       before_script:
-        - if [ "$DB" = "mariadb" ]; then mysql -u root -e "CREATE DATABASE IF NOT EXISTS waltz CHARACTER SET='utf8'; GRANT ALL PRIVILEGES ON waltz.* to root@'%'"; fi
+        - if [ "$DB" = "mariadb" ]; then mysql -e "CREATE DATABASE IF NOT EXISTS waltz CHARACTER SET='utf8'; GRANT ALL PRIVILEGES ON waltz.* to 'travis'@'localhost'"; fi
       script:
         - mvn -s .lgtm.settings.xml -Plgtm-mariadb clean package;
         - npm run-script test --prefix ./waltz-ng
