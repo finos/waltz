@@ -56,7 +56,7 @@
                 <database.url>jdbc:postgresql://localhost:5432/waltz</database.url>
                 <database.user>postgres</database.user>
                 <database.password></database.password>
-                <database.schema></database.schema>
+                <database.schema>public</database.schema>
                 <database.catalog></database.catalog>
             </properties>
         </profile>
