@@ -123,7 +123,6 @@ public class SurveyRunExtractor extends DirectQueryBasedDataExtractor {
                     response);
         });
         
-        
         get(surveyPath, (request, response) -> {
             EntityReference ref = getEntityReference(request);
             
@@ -134,7 +133,6 @@ public class SurveyRunExtractor extends DirectQueryBasedDataExtractor {
                     request,
                     response);
         });
-
     }
 
 
