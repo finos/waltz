@@ -85,7 +85,7 @@ public class SurveyRunExtractor extends DirectQueryBasedDataExtractor {
 
     @Override
     public void register() {
-        String surveyPath = mkPath("data-extract", "surveys", ":kind", ":id");
+        String surveysForEntityPath = mkPath("data-extract", "surveys", "entity", ":kind", ":id");
         String surveyRunPath = mkPath("data-extract", "survey-run", ":id");
         String surveyInstanceResponsesPath = mkPath("data-extract", "survey-run-response", "instance", ":id");
         String surveyRunResponsesPath = mkPath("data-extract", "survey-run-response", ":id");
@@ -123,7 +123,7 @@ public class SurveyRunExtractor extends DirectQueryBasedDataExtractor {
                     response);
         });
         
-        get(surveyPath, (request, response) -> {
+        get(surveysForEntityPath, (request, response) -> {
             EntityReference ref = getEntityReference(request);
             
             LOG.info("Survey run with responses has been exported successfully");
@@ -143,16 +143,16 @@ public class SurveyRunExtractor extends DirectQueryBasedDataExtractor {
         GenericSelector genericSelectorForChangeInitiativeIds = genericSelectorFactory.applyForKind(EntityKind.CHANGE_INITIATIVE, idSelectionOptions);
         GenericSelector genericSelectorForApplications = genericSelectorFactory.applyForKind(EntityKind.APPLICATION, idSelectionOptions);
 
-        SelectConditionStep<Record> applicationSurveySelect = DSL.select(
-                ORGANISATIONAL_UNIT.NAME.as("Org Unit"),
-                APPLICATION.ASSET_CODE.as("Entity Id"),
-                APPLICATION.NAME.as("Entity Name"),
-                SURVEY_INSTANCE.ENTITY_KIND.as("Entity Kind"),
-                SURVEY_INSTANCE.ID.as("Survey Instance Id"),
-                SURVEY_TEMPLATE.NAME.as("Survey Template"),
-                SURVEY_RUN.NAME.as("Survey Run"),
-                PERSON.DISPLAY_NAME.as("Survey Owner"),
-                SURVEY_INSTANCE.STATUS.as("Status"))
+        SelectConditionStep<Record> applicationSurveySelect = DSL
+                .select(ORGANISATIONAL_UNIT.NAME.as("Org Unit"),
+                        APPLICATION.ASSET_CODE.as("Entity Id"),
+                        APPLICATION.NAME.as("Entity Name"),
+                        SURVEY_INSTANCE.ENTITY_KIND.as("Entity Kind"),
+                        SURVEY_INSTANCE.ID.as("Survey Instance Id"),
+                        SURVEY_TEMPLATE.NAME.as("Survey Template"),
+                        SURVEY_RUN.NAME.as("Survey Run"),
+                        PERSON.DISPLAY_NAME.as("Survey Owner"),
+                        SURVEY_INSTANCE.STATUS.as("Status"))
                 .select(SURVEY_INSTANCE_FIELDS)
                 .from(SURVEY_INSTANCE)
                 .innerJoin(SURVEY_RUN).on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
@@ -168,16 +168,16 @@ public class SurveyRunExtractor extends DirectQueryBasedDataExtractor {
                                         .and(APPLICATION.ID.in(genericSelectorForApplications.selector())))));
 
 
-        SelectConditionStep<Record> changeInitiativeSurveySelect = DSL.select(
-                ORGANISATIONAL_UNIT.NAME.as("Org Unit"),
-                CHANGE_INITIATIVE.EXTERNAL_ID.as("Entity Id"),
-                CHANGE_INITIATIVE.NAME.as("Entity Name"),
-                SURVEY_INSTANCE.ENTITY_KIND.as("Entity Kind"),
-                SURVEY_INSTANCE.ID.as("Survey Instance Id"),
-                SURVEY_TEMPLATE.NAME.as("Survey Template"),
-                SURVEY_RUN.NAME.as("Survey Run"),
-                PERSON.DISPLAY_NAME.as("Survey Owner"),
-                SURVEY_INSTANCE.STATUS.as("Status"))
+        SelectConditionStep<Record> changeInitiativeSurveySelect = DSL
+                .select(ORGANISATIONAL_UNIT.NAME.as("Org Unit"),
+                        CHANGE_INITIATIVE.EXTERNAL_ID.as("Entity Id"),
+                        CHANGE_INITIATIVE.NAME.as("Entity Name"),
+                        SURVEY_INSTANCE.ENTITY_KIND.as("Entity Kind"),
+                        SURVEY_INSTANCE.ID.as("Survey Instance Id"),
+                        SURVEY_TEMPLATE.NAME.as("Survey Template"),
+                        SURVEY_RUN.NAME.as("Survey Run"),
+                        PERSON.DISPLAY_NAME.as("Survey Owner"),
+                        SURVEY_INSTANCE.STATUS.as("Status"))
                 .select(SURVEY_INSTANCE_FIELDS)
                 .from(SURVEY_INSTANCE)
                 .innerJoin(SURVEY_RUN).on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
