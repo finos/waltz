@@ -18,10 +18,10 @@
 
 import _ from "lodash";
 import allUsageKinds from "../../usage-kinds";
-import {notEmpty} from "../../../common";
 import template from "./app-data-type-usage-list.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {buildHierarchies, reduceToSelectedNodesOnly} from "../../../common/hierarchy-utils";
+import {buildHierarchies, mergeUpwards, reduceToSelectedNodesOnly} from "../../../common/hierarchy-utils";
+
 
 const BINDINGS = {
     usages: "<"
@@ -31,20 +31,12 @@ const BINDINGS = {
 const initialState = {
     consolidatedUsages:{},
     allUsageKinds,
-    usages: []
+    usages: [],
+    treeOptions:  {
+        nodeChildren: "children",
+        equality: (a, b) => a && b && a.id === b.id
+    }
 };
-
-
-function consolidateUsages(usages = []) {
-    console.log({usages})
-    return _.chain(usages)
-        .groupBy("dataTypeId")
-        .mapValues(xs => _.chain(xs)
-            .map("usage")
-            .filter(u => u.isSelected || notEmpty(u.description))
-            .value())
-        .value();
-}
 
 
 function findUsage(usages = [], dataTypeId, usageKind) {
@@ -52,7 +44,61 @@ function findUsage(usages = [], dataTypeId, usageKind) {
 }
 
 
-function controller(serviceBroker) {
+function mkUsageTree(dataTypes = [], usages = [], iconNameService) {
+
+    const usagesByDataTypeId = _.groupBy(
+        usages,
+        u => u.dataTypeId);
+
+    const merged = mergeUpwards(
+        _.map(dataTypes, dt => Object
+            .assign({}, dt, {directUsages: usagesByDataTypeId[dt.id]})),
+        (p, c) => {
+            const cUsages = usagesByDataTypeId[c.id] || [];
+            const pUsages = usagesByDataTypeId[p.id] || [];
+            return Object.assign(
+                {},
+                p,
+                {
+                    directUsages: pUsages,
+                    usages: _
+                        .chain([])
+                        .concat(c.usages, cUsages, pUsages) // todo simplify
+                        .compact()
+                        .value()
+                });
+        });
+
+    const mergedWithIcons = _.map(
+        merged,
+        d => {
+            const icons = _
+                .chain()
+                .concat(d.usages || [], d.directUsages || [])
+                .compact()
+                .map(u => u.usage.kind)
+                .uniq()
+                .sort()
+                .map(uk => iconNameService.lookup("usageKind", uk))
+                .value();
+
+            return Object.assign(d,  {icons});
+        });
+
+    const usedDTs = _
+        .chain(usages)
+        .map(u => u.dataTypeId)
+        .uniq()
+        .value();
+
+    return buildHierarchies(
+        reduceToSelectedNodesOnly(
+            mergedWithIcons,
+            usedDTs));
+}
+
+
+function controller(iconNameService, serviceBroker) {
     const vm = _.defaultsDeep(this, initialState);
 
     vm.$onInit = () => {
@@ -61,41 +107,45 @@ function controller(serviceBroker) {
 
     vm.$onChanges = (c) => {
         serviceBroker
-            .loadAppData(
-                CORE_API.DataTypeStore.findAll)
+            .loadAppData(CORE_API.DataTypeStore.findAll)
             .then(r => {
-                const dtHierarchy = buildHierarchies(r.data);
-
-                vm.consolidatedUsages = consolidateUsages(vm.usages);
-
-                const usedDTs = _.keys(vm.consolidatedUsages);
-
-                const usedHierarchy = reduceToSelectedNodesOnly(dtHierarchy, usedDTs);
-
-                console.log({ cu: vm.consolidatedUsages, u: vm.usages, usedDTs, dtHierarchy, uh: usedHierarchy})
-            })
+                vm.treeData = mkUsageTree(
+                    r.data,
+                    vm.usages,
+                    iconNameService);
+                console.log({ td: vm.treeData })
+            });
     };
 
+
     vm.isSelected = (dataTypeId, usageKind) => {
-        const foundUsage = findUsage(vm.usages, dataTypeId, usageKind);
+        const foundUsage = findUsage(
+            vm.usages,
+            dataTypeId,
+            usageKind);
         return foundUsage && foundUsage.usage.isSelected;
     };
 
+
     vm.hasDescription = (dataTypeId, usageKind) => {
-        const foundUsage = findUsage(vm.usages, dataTypeId, usageKind);
-        return foundUsage && foundUsage.usage.description;
+        return vm.lookupDescription(dataTypeId, usageKind).length > 0;
     };
+
 
     vm.lookupDescription = (dataTypeId, usageKind) => {
         const foundUsage = findUsage(vm.usages, dataTypeId, usageKind);
-        return foundUsage
-            ? foundUsage.usage.description
-            : "";
+        return _.get(
+            foundUsage,
+            ["usage", "description"],
+            "");
     };
 }
 
 
-controller.$inject = ["ServiceBroker"];
+controller.$inject = [
+    "IconNameService",
+    "ServiceBroker"
+];
 
 
 const component = {

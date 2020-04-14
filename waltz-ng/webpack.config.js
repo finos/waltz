@@ -16,11 +16,11 @@
  *
  */
 
-var path = require("path");
-var webpack = require("webpack");
-var HtmlWebpackPlugin = require("html-webpack-plugin");
-var Visualizer = require("webpack-visualizer-plugin");
-var git = require("git-rev-sync");
+const path = require("path");
+const webpack = require("webpack");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const Visualizer = require("webpack-visualizer-plugin");
+const git = require("git-rev-sync");
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 

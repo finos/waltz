@@ -17,71 +17,22 @@
   -->
 
 <div class="waltz-app-data-type-usage-list">
-    <table class="table table-condensed small">
-        <colgroup>
-            <col width="50%">
-            <col ng-repeat="k in $ctrl.allUsageKinds"
-                 width="{{ 50 / $ctrl.allUsageKinds.length }}%">
-        </colgroup>
-        <thead>
-
-        <tr>
-            <th>Type</th>
-            <th ng-repeat="usageKind in $ctrl.allUsageKinds"
-                class="wadtul-rotate-45"
-                align=""
-                uib-popover-html="usageKind.nameDescription"
-                popover-append-to-body="true"
-                popover-trigger="mouseenter">
-                <div>
-                    <span>
-                        <span ng-bind="usageKind.kind | toDisplayName:'usageKind'"></span>
-                        <waltz-icon name="{{ usageKind.kind | toIconName:'usageKind' }}">
-                        </waltz-icon>
-                    </span>
-                </div>
-            </th>
-        </tr>
-        </thead>
-        <tbody ng-repeat="(dataTypeId, usages) in $ctrl.consolidatedUsages">
-        <tr>
-            <td>
-                <span uib-popover="{{ dataTypeId | toDescription: 'dataType' }}"
-                      popover-append-to-body="true"
-                      popover-trigger="mouseenter"
-                      ng-bind="dataTypeId | toDisplayName:'dataType'"></span>
-            </td>
-            <td ng-repeat="usageKind in $ctrl.allUsageKinds"
-                uib-popover="{{ $ctrl.lookupDescription(dataTypeId, usageKind.kind) }}"
-                popover-append-to-body="true"
-                popover-trigger="mouseenter"
-                align="center">
-                <span style="padding-left: 20px">
-                    <span ng-if="$ctrl.isSelected(dataTypeId, usageKind.kind)"
-                          style="color: green">
-                        <waltz-icon name="check"></waltz-icon>
-                    </span>
-
-                    <span ng-if="$ctrl.hasDescription(dataTypeId, usageKind.kind) && ! $ctrl.isSelected(dataTypeId, usageKind.kind)"
-                          style="color: darkred">
-                        <waltz-icon name="times"></waltz-icon>
-                    </span>
-
-                     <span ng-if="$ctrl.hasDescription(dataTypeId, usageKind.kind)"
-                           style="color: blue">
-                        <waltz-icon name="ellipsis-h"></waltz-icon>
-                    </span>
-
-                     <span ng-if="! $ctrl.hasDescription(dataTypeId, usageKind.kind)">
-                        &nbsp;&nbsp;
-                    </span>
+    <br>
+    <treecontrol tree-model="$ctrl.treeData"
+                 class="tree-light small"
+                 order-by="'-name'"
+                 options="$ctrl.treeOptions">
+        <div style="display: inline-block;" class="waltz-visibility-parent">
+            <span ng-bind="node.name"></span>
+            <div style="display:inline-block; width: 32px"></div>
+            <span class="waltz-visibility-child-20">
+                <span ng-repeat="icon in node.icons">
+                    <waltz-icon name="{{ icon }}">
+                    </waltz-icon>
                 </span>
-
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
+            </span>
+        </div>
+    </treecontrol>
 </div>
 
 
