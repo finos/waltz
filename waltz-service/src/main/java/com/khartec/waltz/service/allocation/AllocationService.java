@@ -162,9 +162,10 @@ public class AllocationService {
             case UPDATE:
             case ADD:
                 return String.format(
-                        "Set allocation for measurable '%s' to %d %%",
+                        "Set allocation for measurable '%s' to %d%% from %s%%",
                         measurableIdToName.get(c.measurablePercentage().measurableId()).orElse("Unknown"),
-                        c.measurablePercentage().percentage());
+                        c.measurablePercentage().percentage(),
+                        c.previousPercentage().orElse(0));
             case REMOVE:
                 return String.format(
                         "Unallocated measurable '%s'",

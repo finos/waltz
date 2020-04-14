@@ -23,6 +23,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.Operation;
 import org.immutables.value.Value;
 
+import java.util.Optional;
+
 @Value.Immutable
 @JsonSerialize(as = ImmutableMeasurablePercentageChange.class)
 @JsonDeserialize(as = ImmutableMeasurablePercentageChange.class)
@@ -31,4 +33,6 @@ public abstract class MeasurablePercentageChange {
     public abstract Operation operation();
 
     public abstract MeasurablePercentage measurablePercentage();
+
+    public abstract Optional<Integer> previousPercentage();
 }
