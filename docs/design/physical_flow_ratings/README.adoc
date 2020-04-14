@@ -22,9 +22,9 @@ feature will extend the support to include physical flows.
 
 == Motivation
 
-There is interest in being able to better describe physical flows in terms of existing (and new) _measurable categories_.
-One compelling case is to be able to introduce a _Regulatory_ category which describes a hierarchy of regulations and their
-constituent parts, for example:
+There is interest in being able to better describe physical flows in terms of existing (and new) _measurable
+categories_.  One compelling case is to be able to introduce a _Regulatory_ category which describes a hierarchy
+of regulations, and their constituent parts, for example:
 
 * _Basel III_
 * _Capital_
