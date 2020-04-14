@@ -228,7 +228,7 @@ function controller($q, notification, serviceBroker) {
                     measurableId: d.measurable.id,
                     percentage: d.working.percentage
                 },
-                previousPercentage: d.allocation.percentage
+                previousPercentage: d.allocation == null ? undefined : d.allocation.percentage
             }))
             .value();
 
