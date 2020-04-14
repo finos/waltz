@@ -20,6 +20,10 @@ This section defines what specific terms mean in the remainder of this document
 Currently, only applications can align themselves to _measurables_ via _rating scheme items_. This new
 feature will extend the support to include physical flows.
 
+image:images/physical_flow_ratings.png[Conceptual Diagram]
+
+Diagram link:images/physical_flow_ratings.gv[Source]
+
 == Motivation
 
 There is interest in being able to better describe physical flows in terms of existing (and new) _measurable
@@ -87,6 +91,3 @@ TBC
 
 Implementation tasks will be prefixed with `Flow Ratings` in the issue tracker.
 
-image:images/physical_flow_ratings.png[Conceptual Diagram]
-
-Diagram link:images/physical_flow_ratings.gv[Source]
