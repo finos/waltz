@@ -6,7 +6,7 @@ In a nutshell Waltz allows you to visualize and define your organisation's techn
 Learn more
   - [Features](docs/features/README.md)
   - [Product Site](https://waltz.finos.org/)
-  - [FINOS Announcement](https://www.finos.org/blog/introduction-to-finos-waltz)
+  - [FINOS Announcement](https://www.finos.org/blog/introduction-to-finos-waltz) - now part of the [Linux Foundation](https://www.linuxfoundation.org/blog/2020/04/finos-joins-the-linux-foundation/)
 
 Getting started
  - [Building](docs/development/build.md) 
