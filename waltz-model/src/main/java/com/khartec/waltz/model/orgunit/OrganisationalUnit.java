@@ -23,8 +23,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
-import java.util.Optional;
-
 @Value.Immutable
 @JsonSerialize(as = ImmutableOrganisationalUnit.class)
 @JsonDeserialize(as = ImmutableOrganisationalUnit.class)
@@ -34,6 +32,7 @@ public abstract class OrganisationalUnit implements
         ParentIdProvider,
         NameProvider,
         DescriptionProvider,
+        ExternalIdProvider,
         WaltzEntity {
 
 

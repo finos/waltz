@@ -28,13 +28,10 @@ import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.schema.tables.records.OrganisationalUnitRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
@@ -42,22 +39,24 @@ import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
+import static java.util.Optional.ofNullable;
 
 
 @Repository
 public class OrganisationalUnitDao implements FindEntityReferencesByIdSelector {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OrganisationalUnitDao.class);
     private static final com.khartec.waltz.schema.tables.OrganisationalUnit ou = ORGANISATIONAL_UNIT.as("ou");
 
 
     public static final RecordMapper<Record, OrganisationalUnit> TO_DOMAIN_MAPPER = record -> {
         OrganisationalUnitRecord orgUnitRecord = record.into(OrganisationalUnitRecord.class);
-        return ImmutableOrganisationalUnit.builder()
+        return ImmutableOrganisationalUnit
+                .builder()
                 .name(orgUnitRecord.getName())
                 .description(orgUnitRecord.getDescription())
                 .id(orgUnitRecord.getId())
-                .parentId(Optional.ofNullable(orgUnitRecord.getParentId()))
+                .parentId(ofNullable(orgUnitRecord.getParentId()))
+                .externalId(ofNullable(orgUnitRecord.getExternalId()))
                 .build();
     };
 

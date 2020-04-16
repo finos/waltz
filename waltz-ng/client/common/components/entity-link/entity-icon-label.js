@@ -47,6 +47,15 @@ const entityLoaders = {
     // custom loaders, add more entity types here with links to their CORE_API loader method and
     // a post-processing step (mkProps) to generate a list of { name, value } pairs
 
+    "ORG_UNIT": {
+        method: CORE_API.OrgUnitStore.getById,
+        mkProps: (ou, displayNameService) => ([
+            {
+                name: "External Id",
+                value: ou.externalId || "-"
+            }
+        ])
+    },
     "APPLICATION": {
         method: CORE_API.ApplicationStore.getById,
         mkProps: (app, displayNameService) => ([
