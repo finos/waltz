@@ -21,8 +21,8 @@ package com.khartec.waltz.service.measurable;
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.EntityReferenceNameResolver;
-import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableDao;
+import com.khartec.waltz.data.measurable.MeasurableIdDirectSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.measurable.search.MeasurableSearchDao;
 import com.khartec.waltz.model.*;
@@ -46,10 +46,10 @@ import static java.util.Optional.ofNullable;
 
 @Service
 public class MeasurableService {
-    
+
     private final MeasurableDao measurableDao;
     private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
-    private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
+    private final MeasurableIdDirectSelectorFactory measurableIdDirectSelectorFactory = new MeasurableIdDirectSelectorFactory();
     private final MeasurableSearchDao measurableSearchDao;
     private final ChangeLogService changeLogService;
     private final EntityReferenceNameResolver nameResolver;
@@ -119,7 +119,12 @@ public class MeasurableService {
     }
 
 
-    public Collection<Measurable> findHierarchyForSelector(IdSelectionOptions selectionOptions){
+    public Collection<Measurable> findHierarchyForDirectSelector(IdSelectionOptions selectionOptions) {
+        return measurableDao.findHierarchyForSelector(measurableIdDirectSelectorFactory.apply(selectionOptions));
+    }
+
+
+    public Collection<Measurable> findHierarchyForIndirectSelector(IdSelectionOptions selectionOptions) {
         return measurableDao.findHierarchyForSelector(measurableIdSelectorFactory.apply(selectionOptions));
     }
 
@@ -169,7 +174,7 @@ public class MeasurableService {
      *
      * @param measurableId  measurable id of item to move
      * @param destinationId new parent id (or null if root)
-     * @param userId who initiated this move
+     * @param userId        who initiated this move
      */
     public boolean updateParentId(Long measurableId, Long destinationId, String userId) {
         checkNotNull(measurableId, "Cannot updateParentId a measurable with a null id");
@@ -223,6 +228,4 @@ public class MeasurableService {
                 .message(msg)
                 .build());
     }
-
-
 }
