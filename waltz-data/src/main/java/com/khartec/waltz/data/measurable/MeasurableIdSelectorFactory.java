@@ -154,14 +154,6 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
     }
 
 
-    private Select<Record1<Long>> mkForDirectEntityKindOld(IdSelectionOptions options) {
-        checkTrue(options.scope() == HierarchyQueryScope.EXACT, "Can only calculate application based selectors with exact scopes");
-        return mkBaseRatingBasedSelector()
-                .where(MEASURABLE_RATING.ENTITY_ID.in(options.entityReference().id()))
-                .and(MEASURABLE_RATING.ENTITY_KIND.eq(options.entityReference().kind().name()));
-    }
-
-
     private Select<Record1<Long>> mkForDirectEntityKind(IdSelectionOptions options) {
         checkTrue(options.scope() == HierarchyQueryScope.EXACT, "Can only calculate application based selectors with exact scopes");
 

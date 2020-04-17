@@ -62,11 +62,13 @@ function controller(serviceBroker, $state) {
             undefined,
             vm.filters);
 
-        serviceBroker
+        const measurablePromise = serviceBroker
             .loadViewData(
                 CORE_API.MeasurableStore.getById,
                 [ vm.parentEntityRef.id  ])
-            .then(r => vm.measurable = r.data)
+            .then(r => vm.measurable = r.data);
+
+        measurablePromise
             .then(() => {
                 if (vm.measurable.entityLifecycleStatus !== EntityLifecycleStatus.REMOVED.key) {
                     serviceBroker
@@ -90,6 +92,14 @@ function controller(serviceBroker, $state) {
                         })
                 }
             });
+
+        measurablePromise
+            .then(() => vm.measurable.organisationalUnitId)
+            .then(ouId => _.isNil(ouId)
+                ? Promise.resolve(null)
+                : serviceBroker
+                    .loadViewData(CORE_API.OrgUnitStore.getById, [ouId])
+                    .then(r => vm.owningOrgUnit = r.data));
 
         serviceBroker
             .loadViewData(

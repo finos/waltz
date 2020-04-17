@@ -58,6 +58,13 @@ public abstract class Measurable implements
      */
     public abstract boolean concrete();
 
+    /**
+     * Owning organisational unit id (maybe null)
+     * @return
+     */
+    @Nullable
+    public abstract Long organisationalUnitId();
+
     @Value.Default
     public EntityKind kind() { return EntityKind.MEASURABLE; }
 

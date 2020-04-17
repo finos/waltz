@@ -69,6 +69,7 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .lastUpdatedAt(DateTimeUtilities.toLocalDateTime(r.getLastUpdatedAt()))
                 .lastUpdatedBy(r.getLastUpdatedBy())
                 .entityLifecycleStatus(readEnum(r.getEntityLifecycleStatus(), EntityLifecycleStatus.class, s -> EntityLifecycleStatus.ACTIVE))
+                .organisationalUnitId(r.getOrganisationalUnitId())
                 .build();
     };
 
