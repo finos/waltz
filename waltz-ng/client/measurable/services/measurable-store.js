@@ -40,6 +40,13 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
+    const findHierarchyForSelector = (options) => {
+        checkIsIdSelector(options);
+        return $http
+            .post(`${baseUrl}/hierarchy/measurable-selector`, options)
+            .then(d => d.data);
+    };
+
     const search = (query) => $http
         .get(`${baseUrl}/search/${query}`)
         .then(x => x.data);
@@ -48,6 +55,7 @@ function store($http, baseApiUrl) {
         findAll,
         findByExternalId,
         findMeasurablesBySelector,
+        findHierarchyForSelector,
         getById,
         search
     };
@@ -92,5 +100,10 @@ export const MeasurableStore_API = {
         serviceName,
         serviceFnName: "findMeasurablesBySelector",
         description: "executes findMeasurablesBySelector"
+    },
+    findHierarchyForSelector: {
+        serviceName,
+        serviceFnName: "findHierarchyForSelector",
+        description: "returns hierarchy of measurables for a given selector"
     }
 };

@@ -44,6 +44,7 @@ import static com.khartec.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
 import static com.khartec.waltz.schema.Tables.*;
+import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static java.util.Optional.ofNullable;
 
@@ -270,5 +271,24 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
         } else {
             return MEASURABLE_RATING_PLANNED_DECOMMISSION.ID.eq(reference.id());
         }
+    }
+
+
+    public Collection<Measurable> findHierarchyForSelector(Select<Record1<Long>> selector) {
+        SelectConditionStep<Record1<Long>> ancestors = dsl
+                .select(ENTITY_HIERARCHY.ANCESTOR_ID)
+                .from(ENTITY_HIERARCHY)
+                .where(ENTITY_HIERARCHY.ID.in(selector)
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name())));
+
+        SelectConditionStep<Record1<Long>> descendants = DSL
+                .select(ENTITY_HIERARCHY.ID)
+                .from(ENTITY_HIERARCHY)
+                .where(ENTITY_HIERARCHY.ANCESTOR_ID.in(selector)
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name())));
+
+        SelectOrderByStep<Record1<Long>> hierarchySelector = DSL.selectFrom(descendants.union(ancestors).asTable());
+
+        return findByMeasurableIdSelector(hierarchySelector);
     }
 }

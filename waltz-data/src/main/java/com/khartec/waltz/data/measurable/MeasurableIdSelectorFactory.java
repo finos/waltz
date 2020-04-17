@@ -129,10 +129,20 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
 
     private Select<Record1<Long>> mkForOrgUnit(IdSelectionOptions options) {
         Select<Record1<Long>> orgUnitSelector = orgUnitIdSelectorFactory.apply(options);
-        return mkBaseRatingBasedSelector()
+
+        SelectOnConditionStep<Record1<Long>> indirectAssociations = mkBaseRatingBasedSelector()
                 .innerJoin(APPLICATION)
                 .on(APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitSelector)
                         .and(MEASURABLE_RATING.ENTITY_ID.eq(APPLICATION.ID)));
+
+        SelectConditionStep<Record1<Long>> directAssociations = DSL
+                .selectDistinct(MEASURABLE.ID)
+                .from(MEASURABLE)
+                .where(MEASURABLE.ORGANISATIONAL_UNIT_ID.in(orgUnitSelector));
+
+        return indirectAssociations.union(directAssociations);
+
+
     }
 
 
