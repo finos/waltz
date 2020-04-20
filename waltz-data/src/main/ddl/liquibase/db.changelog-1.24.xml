@@ -40,4 +40,135 @@
                           remarks="The, optional, owner of this measurable"/>
     </changeSet>
 
+
+    <changeSet id="20200420-4812-1"
+               author="davidwatkins73">
+        <comment>4812: Relationships: change initiative to measurable</comment>
+        <createTable tableName="change_initiative_to_measurable">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="ci2m_pkey"/>
+            </column>
+            <column name="change_initiative_id"
+                    type="${id.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="measurable_id"
+                    type="${id.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="relationship_id"
+                    type="${id.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true" />
+            </column>
+            <column name="created_by"
+                    type="${name.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="created_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false" />
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP">
+                <constraints nullable="false" />
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20200420-4812-2"
+               author="davidwatkins73">
+            <setTableRemarks tableName="change_initiative_to_measurable"
+                             remarks="Captures relationships between change initiatives and measurables. The type of relationship is given by the reference to a relationship_kind"/>
+    </changeSet>
+
+
+    <changeSet id="20200420-4812-3"
+               author="davidwatkins73">
+        <comment>4812: Relationships: change initiative to measurable</comment>
+        <createTable tableName="relationship_kind">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="relationship_kind_pkey"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true" />
+            </column>
+            <column name="kind_a"
+                    type="${enum.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="kind_b"
+                    type="${enum.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="category_a"
+                    type="${id.type}">
+                <constraints nullable="true" />
+            </column>
+            <column name="category_b"
+                    type="${id.type}">
+                <constraints nullable="true" />
+            </column>
+            <column name="is_readonly"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20200420-4812-4"
+               author="davidwatkins73">
+        <setTableRemarks tableName="relationship_kind"
+                         remarks="Describes types of relationships between entities"/>
+    </changeSet>
+
+
+    <changeSet id="20200420-4812-5"
+               dbms="mssql,postgresql"
+               author="davidwatkins73">
+        <setColumnRemarks tableName="relationship_kind"
+                          columnName="category_a"
+                          remarks="Placeholder: if kind_a is a MEASURABLE then this may (optionally) be used to restrict it based on category"/>
+        <setColumnRemarks tableName="relationship_kind"
+                          columnName="category_b"
+                          remarks="Placeholder: if kind_b is a MEASURABLE then this may (optionally) be used to restrict it based on category"/>
+    </changeSet>
+
+    <changeSet id="20200420-4812-6"
+               author="davidwatkins73">
+        <addForeignKeyConstraint baseTableName="change_initiative_to_measurable"
+                                 baseColumnNames="relationship_id"
+                                 constraintName="ci2m_rk_fkey"
+                                 referencedTableName="relationship_kind"
+                                 referencedColumnNames="id"
+                                 deleteCascade="true"/>
+    </changeSet>
+
+
 </databaseChangeLog>
