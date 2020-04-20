@@ -6,4 +6,3 @@ extraction:
     after_prepare:
       # Disable modules web and job because of node dependency in web and the ad-hoc nature of jobs
       - sed -i -e '/\s*<module>waltz-\(web\|jobs\)<\/module>/d' pom.xml
-F
