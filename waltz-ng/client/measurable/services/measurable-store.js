@@ -40,17 +40,9 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
-    const findHierarchyForDirectSelector = (options) => {
-        checkIsIdSelector(options);
+    const findByOrgUnitId = (id) => {
         return $http
-            .post(`${baseUrl}/hierarchy/direct-selector`, options)
-            .then(d => d.data);
-    };
-
-    const findHierarchyForIndirectSelector = (options) => {
-        checkIsIdSelector(options);
-        return $http
-            .post(`${baseUrl}/hierarchy/indirect-selector`, options)
+            .get(`${baseUrl}/org-unit/id/${id}`)
             .then(d => d.data);
     };
 
@@ -62,8 +54,7 @@ function store($http, baseApiUrl) {
         findAll,
         findByExternalId,
         findMeasurablesBySelector,
-        findHierarchyForDirectSelector,
-        findHierarchyForIndirectSelector,
+        findByOrgUnitId,
         getById,
         search
     };
@@ -109,14 +100,9 @@ export const MeasurableStore_API = {
         serviceFnName: "findMeasurablesBySelector",
         description: "executes findMeasurablesBySelector"
     },
-    findHierarchyForDirectSelector: {
+    findByOrgUnitId: {
         serviceName,
-        serviceFnName: "findHierarchyForDirectSelector",
-        description: "returns hierarchy of directly related measurables for a given selector"
-    },
-    findHierarchyForIndirectSelector: {
-        serviceName,
-        serviceFnName: "findHierarchyForIndirectSelector",
-        description: "returns hierarchy of measurables (via applications) for a given selector"
+        serviceFnName: "findByOrgUnitId",
+        description: "measurables directly associated to an org unit or its children"
     }
 };

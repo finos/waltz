@@ -274,21 +274,17 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
     }
 
 
-    public Collection<Measurable> findHierarchyForSelector(Select<Record1<Long>> selector) {
-        SelectConditionStep<Record1<Long>> ancestors = dsl
-                .select(ENTITY_HIERARCHY.ANCESTOR_ID)
-                .from(ENTITY_HIERARCHY)
-                .where(ENTITY_HIERARCHY.ID.in(selector)
-                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name())));
+    public Collection<Measurable> findByOrgUnitId(Long orgUnitId) {
 
-        SelectConditionStep<Record1<Long>> descendants = DSL
+        SelectConditionStep<Record1<Long>> orgUnitOrChildIds = DSL
                 .select(ENTITY_HIERARCHY.ID)
                 .from(ENTITY_HIERARCHY)
-                .where(ENTITY_HIERARCHY.ANCESTOR_ID.in(selector)
-                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name())));
+                .where(ENTITY_HIERARCHY.ANCESTOR_ID.in(orgUnitId)
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name())));
 
-        SelectOrderByStep<Record1<Long>> hierarchySelector = DSL.selectFrom(descendants.union(ancestors).asTable());
-
-        return findByMeasurableIdSelector(hierarchySelector);
+        return dsl
+                .selectFrom(MEASURABLE)
+                .where(MEASURABLE.ORGANISATIONAL_UNIT_ID.in(orgUnitOrChildIds))
+                .fetch(TO_DOMAIN_MAPPER);
     }
 }

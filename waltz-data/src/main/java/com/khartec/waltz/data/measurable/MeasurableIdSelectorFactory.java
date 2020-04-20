@@ -29,6 +29,7 @@ import org.jooq.*;
 import org.jooq.impl.DSL;
 
 import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
 import static com.khartec.waltz.data.SelectorUtilities.mkApplicationConditions;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -40,7 +41,6 @@ import static java.lang.String.format;
 public class MeasurableIdSelectorFactory implements IdSelectorFactory {
 
     private final OrganisationalUnitIdSelectorFactory orgUnitIdSelectorFactory = new OrganisationalUnitIdSelectorFactory();
-    private final MeasurableIdDirectSelectorFactory measurableIdDirectSelectorFactory = new MeasurableIdDirectSelectorFactory();
 
 
     @Override
@@ -48,18 +48,21 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
         switch (options.entityReference().kind()) {
             case PERSON:
                 return mkForPerson(options);
+            case MEASURABLE_CATEGORY:
+                return mkForMeasurableCategory(options);
+            case MEASURABLE:
+                return mkForMeasurable(options);
             case APP_GROUP:
                 return mkForAppGroup(options);
             case FLOW_DIAGRAM:
                 return mkForFlowDiagram(options);
+            case SCENARIO:
+                return mkForScenario(options);
             case ORG_UNIT:
                 return mkForOrgUnit(options);
             case ACTOR:
             case APPLICATION:
-            case SCENARIO:
-            case MEASURABLE:
-            case MEASURABLE_CATEGORY:
-                return measurableIdDirectSelectorFactory.apply(options);
+                return mkForDirectEntityKind(options);
             default:
                 throw new UnsupportedOperationException(format(
                         "Cannot create measurable selector from kind: %s",
@@ -105,6 +108,25 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
     }
 
 
+    private Select<Record1<Long>> mkForMeasurableCategory(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        return DSL
+                .select(MEASURABLE.ID)
+                .from(MEASURABLE)
+                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(options.entityReference().id()));
+    }
+
+
+    private Select<Record1<Long>> mkForScenario(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        return DSL
+                .selectDistinct(SCENARIO_AXIS_ITEM.DOMAIN_ITEM_ID)
+                .from(SCENARIO_AXIS_ITEM)
+                .where(SCENARIO_AXIS_ITEM.SCENARIO_ID.eq(options.entityReference().id()))
+                .and(SCENARIO_AXIS_ITEM.DOMAIN_ITEM_KIND.eq(EntityKind.MEASURABLE.name()));
+    }
+
+
     private Select<Record1<Long>> mkForOrgUnit(IdSelectionOptions options) {
         Select<Record1<Long>> orgUnitSelector = orgUnitIdSelectorFactory.apply(options);
         return mkBaseRatingBasedSelector()
@@ -129,6 +151,41 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                 .from(ENTITY_HIERARCHY)
                 .where(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name()))
                 .and(ENTITY_HIERARCHY.ID.in(measurableIdsUsedByGroup));
+    }
+
+
+    private Select<Record1<Long>> mkForDirectEntityKindOld(IdSelectionOptions options) {
+        checkTrue(options.scope() == HierarchyQueryScope.EXACT, "Can only calculate application based selectors with exact scopes");
+        return mkBaseRatingBasedSelector()
+                .where(MEASURABLE_RATING.ENTITY_ID.in(options.entityReference().id()))
+                .and(MEASURABLE_RATING.ENTITY_KIND.eq(options.entityReference().kind().name()));
+    }
+
+
+    private Select<Record1<Long>> mkForDirectEntityKind(IdSelectionOptions options) {
+        checkTrue(options.scope() == HierarchyQueryScope.EXACT, "Can only calculate application based selectors with exact scopes");
+
+        SelectConditionStep<Record1<Long>> measurablesViaReplacements = DSL
+                .select(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_ID)
+                .from(MEASURABLE_RATING_PLANNED_DECOMMISSION)
+                .innerJoin(MEASURABLE_RATING_REPLACEMENT)
+                .on(MEASURABLE_RATING_PLANNED_DECOMMISSION.ID.eq(MEASURABLE_RATING_REPLACEMENT.DECOMMISSION_ID))
+                .where(MEASURABLE_RATING_REPLACEMENT.ENTITY_ID.eq(options.entityReference().id())
+                        .and(MEASURABLE_RATING_REPLACEMENT.ENTITY_KIND.eq(options.entityReference().kind().name())));
+
+        SelectConditionStep<Record1<Long>> measurablesViaRatings = DSL
+                .select(MEASURABLE_RATING.MEASURABLE_ID)
+                .from(MEASURABLE_RATING)
+                .where(MEASURABLE_RATING.ENTITY_ID.eq(options.entityReference().id())
+                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(options.entityReference().kind().name())));
+
+        return DSL
+                .selectDistinct(MEASURABLE.ID)
+                .from(MEASURABLE)
+                .innerJoin(ENTITY_HIERARCHY)
+                .on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(MEASURABLE.ID)
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name())))
+                .where(ENTITY_HIERARCHY.ID.in(measurablesViaRatings.union(measurablesViaReplacements)));
     }
 
 
@@ -168,4 +225,30 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                         .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name()))
                         .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
     }
+
+
+    private Select<Record1<Long>> mkForMeasurable(IdSelectionOptions options) {
+        Select<Record1<Long>> selector = null;
+        final Condition isMeasurable = ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name());
+        switch (options.scope()) {
+            case EXACT:
+                selector = DSL.select(DSL.val(options.entityReference().id()));
+                break;
+            case CHILDREN:
+                selector = DSL.select(ENTITY_HIERARCHY.ID)
+                        .from(ENTITY_HIERARCHY)
+                        .where(ENTITY_HIERARCHY.ANCESTOR_ID.eq(options.entityReference().id()))
+                        .and(isMeasurable);
+                break;
+            case PARENTS:
+                selector = DSL.select(ENTITY_HIERARCHY.ANCESTOR_ID)
+                        .from(ENTITY_HIERARCHY)
+                        .where(ENTITY_HIERARCHY.ID.eq(options.entityReference().id()))
+                        .and(isMeasurable);
+                break;
+        }
+
+        return selector;
+    }
+
 }

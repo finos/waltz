@@ -22,7 +22,6 @@ import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.measurable.MeasurableDao;
-import com.khartec.waltz.data.measurable.MeasurableIdDirectSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.measurable.search.MeasurableSearchDao;
 import com.khartec.waltz.model.*;
@@ -49,7 +48,6 @@ public class MeasurableService {
 
     private final MeasurableDao measurableDao;
     private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
-    private final MeasurableIdDirectSelectorFactory measurableIdDirectSelectorFactory = new MeasurableIdDirectSelectorFactory();
     private final MeasurableSearchDao measurableSearchDao;
     private final ChangeLogService changeLogService;
     private final EntityReferenceNameResolver nameResolver;
@@ -119,13 +117,8 @@ public class MeasurableService {
     }
 
 
-    public Collection<Measurable> findHierarchyForDirectSelector(IdSelectionOptions selectionOptions) {
-        return measurableDao.findHierarchyForSelector(measurableIdDirectSelectorFactory.apply(selectionOptions));
-    }
-
-
-    public Collection<Measurable> findHierarchyForIndirectSelector(IdSelectionOptions selectionOptions) {
-        return measurableDao.findHierarchyForSelector(measurableIdSelectorFactory.apply(selectionOptions));
+    public Collection<Measurable> findByOrgUnitId(Long id) {
+        return measurableDao.findByOrgUnitId(id);
     }
 
 
