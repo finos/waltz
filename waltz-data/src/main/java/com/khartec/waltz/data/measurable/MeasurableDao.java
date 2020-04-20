@@ -44,6 +44,7 @@ import static com.khartec.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
 import static com.khartec.waltz.schema.Tables.*;
+import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static java.util.Optional.ofNullable;
 
@@ -270,5 +271,20 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
         } else {
             return MEASURABLE_RATING_PLANNED_DECOMMISSION.ID.eq(reference.id());
         }
+    }
+
+
+    public Collection<Measurable> findByOrgUnitId(Long orgUnitId) {
+
+        SelectConditionStep<Record1<Long>> orgUnitOrChildIds = DSL
+                .select(ENTITY_HIERARCHY.ID)
+                .from(ENTITY_HIERARCHY)
+                .where(ENTITY_HIERARCHY.ANCESTOR_ID.in(orgUnitId)
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name())));
+
+        return dsl
+                .selectFrom(MEASURABLE)
+                .where(MEASURABLE.ORGANISATIONAL_UNIT_ID.in(orgUnitOrChildIds))
+                .fetch(TO_DOMAIN_MAPPER);
     }
 }

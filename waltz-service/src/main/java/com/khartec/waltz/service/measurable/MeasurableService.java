@@ -45,7 +45,7 @@ import static java.util.Optional.ofNullable;
 
 @Service
 public class MeasurableService {
-    
+
     private final MeasurableDao measurableDao;
     private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
     private final MeasurableSearchDao measurableSearchDao;
@@ -117,6 +117,11 @@ public class MeasurableService {
     }
 
 
+    public Collection<Measurable> findByOrgUnitId(Long id) {
+        return measurableDao.findByOrgUnitId(id);
+    }
+
+
     public boolean updateConcreteFlag(Long id, boolean newValue, String userId) {
         logUpdate(id, "concrete flag", Boolean.toString(newValue), m -> Optional.of(Boolean.toString(m.concrete())), userId);
 
@@ -162,7 +167,7 @@ public class MeasurableService {
      *
      * @param measurableId  measurable id of item to move
      * @param destinationId new parent id (or null if root)
-     * @param userId who initiated this move
+     * @param userId        who initiated this move
      */
     public boolean updateParentId(Long measurableId, Long destinationId, String userId) {
         checkNotNull(measurableId, "Cannot updateParentId a measurable with a null id");
@@ -216,6 +221,4 @@ public class MeasurableService {
                 .message(msg)
                 .build());
     }
-
-
 }
