@@ -167,7 +167,27 @@
                                  constraintName="ci2m_rk_fkey"
                                  referencedTableName="relationship_kind"
                                  referencedColumnNames="id"
-                                 deleteCascade="true"/>
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20200420-4812-7"
+               author="davidwatkins73">
+        <addForeignKeyConstraint baseTableName="change_initiative_to_measurable"
+                                 baseColumnNames="measurable_id"
+                                 constraintName="ci2m_m_fkey"
+                                 referencedTableName="measurable"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20200420-4812-8"
+               author="davidwatkins73">
+        <addForeignKeyConstraint baseTableName="change_initiative_to_measurable"
+                                 baseColumnNames="change_initiative_id"
+                                 constraintName="ci2m_ci_fkey"
+                                 referencedTableName="change_initiative"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
     </changeSet>
 
 
