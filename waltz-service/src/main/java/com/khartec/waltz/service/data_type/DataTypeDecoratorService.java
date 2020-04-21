@@ -100,9 +100,6 @@ public class DataTypeDecoratorService {
             IdSelectionOptions selectionOptions) {
         checkNotNull(selectionOptions, "selectionOptions cannot be null");
 
-        System.out.println("This should be diff than physical spec " + selectionOptions.entityReference());
-        System.out.println("This should be physical spec " + entityKind);
-
         DataTypeDecoratorDao dao = dataTypeDecoratorDaoSelectorFactory
                 .getDao(entityKind);
 
