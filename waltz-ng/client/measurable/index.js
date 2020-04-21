@@ -22,6 +22,8 @@ import MeasurableChangeControl from "./components/change-control/measurable-chan
 import MeasurableInfo from "./components/info/measurable-info";
 import MeasurableTree from "./components/tree/measurable-tree";
 import MeasurableSummary from "./components/summary/measurable-summary";
+import MeasurableOrgUnitRelationshipTree
+    from "./components/org-unit-relationship-tree/measurable-org-unit-relationship-tree";
 import Routes from "./routes";
 import {registerComponents, registerStores} from "../common/module-utils";
 
@@ -36,7 +38,8 @@ export default () => {
         MeasurableChangeControl,
         MeasurableInfo,
         MeasurableTree,
-        MeasurableSummary ]);
+        MeasurableSummary,
+        MeasurableOrgUnitRelationshipTree]);
 
     module
         .config(Routes);
