@@ -1,4 +1,4 @@
-import template from "./measurable-direct-relationship-tree.html";
+import template from "./measurable-org-unit-relationship-tree.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {buildHierarchies, reduceToSelectedNodesOnly} from "../../../common/hierarchy-utils";
@@ -32,7 +32,8 @@ function controller($q, serviceBroker) {
                 [vm.parentEntityRef.id])
             .then(r => r.data);
 
-        const orgUnitPromise = serviceBroker.loadAppData(CORE_API.OrgUnitStore.findAll)
+        const orgUnitPromise = serviceBroker
+            .loadAppData(CORE_API.OrgUnitStore.findAll)
             .then(r => r.data);
 
         $q
@@ -41,7 +42,7 @@ function controller($q, serviceBroker) {
 
                 const relatedMeasurableIds = _.map(relatedMeasurables, d => d.id);
 
-               const orgUnitsById = _.keyBy(orgUnits, d => d.id);
+                const orgUnitsById = _.keyBy(orgUnits, d => d.id);
 
                 vm.enrichedNodes = _.chain(allMeasurables)
                     .filter(m => vm.selectedCategory.id === m.categoryId)
@@ -89,5 +90,5 @@ const component = {
 
 export default {
     component,
-    id: "waltzMeasurableDirectRelationshipTree"
+    id: "waltzMeasurableOrgUnitRelationshipTree"
 };
