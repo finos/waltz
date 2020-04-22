@@ -28,6 +28,7 @@ import com.khartec.waltz.model.attestation.AttestationInstance;
 import com.khartec.waltz.model.attestation.AttestationRun;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.person.Person;
+import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -51,6 +52,7 @@ public class AttestationInstanceService {
 
     private final AttestationInstanceDao attestationInstanceDao;
     private final AttestationRunService attestationRunService;
+    private final ApplicationService applicationService;
     private final PersonDao personDao;
     private final ChangeLogService changeLogService;
 
@@ -59,6 +61,7 @@ public class AttestationInstanceService {
 
     public AttestationInstanceService(AttestationInstanceDao attestationInstanceDao,
                                       AttestationRunService attestationRunService,
+                                      ApplicationService applicationService,
                                       PersonDao personDao, ChangeLogService changeLogService) {
         checkNotNull(attestationInstanceDao, "attestationInstanceDao cannot be null");
         checkNotNull(attestationRunService, "attestationRunService cannot be null");
@@ -67,6 +70,7 @@ public class AttestationInstanceService {
 
         this.attestationInstanceDao = attestationInstanceDao;
         this.attestationRunService = attestationRunService;
+        this.applicationService = applicationService;
         this.personDao = personDao;
         this.changeLogService = changeLogService;
     }
@@ -134,8 +138,14 @@ public class AttestationInstanceService {
 
     private void logChange (String username, AttestationInstance instance, EntityKind attestedKind) {
 
+        String logMessage = EntityKind.APPLICATION.equals(instance.parentEntity().kind())
+                ? String.format("Attestation of %s for application %s",
+                    attestedKind,
+                    applicationService.getById(instance.parentEntity().id()).assetCode().orElse("UNKNOWN"))
+                : String.format("Attestation of %s ", attestedKind);
+
         changeLogService.write(ImmutableChangeLog.builder()
-                .message(String.format("Attestation of %s", attestedKind))
+                .message(logMessage)
                 .parentReference(instance.parentEntity())
                 .userId(username)
                 .severity(Severity.INFORMATION)
