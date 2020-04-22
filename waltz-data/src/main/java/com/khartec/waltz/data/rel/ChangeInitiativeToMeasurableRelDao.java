@@ -18,8 +18,10 @@
 
 package com.khartec.waltz.data.rel;
 
+import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.rel.ChangeInitiativeToMeasurableRel;
+import com.khartec.waltz.model.rel.CreateRelationshipCommand;
 import com.khartec.waltz.model.rel.ImmutableChangeInitiativeToMeasurableRel;
 import com.khartec.waltz.schema.tables.records.ChangeInitiativeToMeasurableRecord;
 import org.jooq.*;
@@ -40,6 +42,7 @@ public class ChangeInitiativeToMeasurableRelDao {
                 .id(record.getId())
                 .changeInitiativeId(record.getChangeInitiativeId())
                 .measurableId(record.getMeasurableId())
+                .relationshipId(record.getRelationshipId())
                 .description(record.getDescription())
                 .provenance(record.getProvenance())
                 .created(UserTimestamp.mkForUser(
@@ -77,5 +80,24 @@ public class ChangeInitiativeToMeasurableRelDao {
                 .from(CHANGE_INITIATIVE_TO_MEASURABLE)
                 .where(cond)
                 .fetchSet(TO_DOMAIN_MAPPER);
+    }
+
+
+    public Long createRelationship(CreateRelationshipCommand cmd, String userId) {
+        ChangeInitiativeToMeasurableRecord record = dsl.newRecord(CHANGE_INITIATIVE_TO_MEASURABLE);
+
+        record.setChangeInitiativeId(cmd.idA());
+        record.setMeasurableId(cmd.idB());
+        record.setRelationshipId(cmd.relationshipKindId());
+
+        record.setProvenance(cmd.provenance());
+        record.setDescription(cmd.description());
+        record.setCreatedAt(DateTimeUtilities.nowUtcTimestamp());
+        record.setCreatedBy(userId);
+        record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
+        record.setLastUpdatedBy(userId);
+
+        record.store();
+        return record.getId();
     }
 }

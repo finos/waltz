@@ -18,14 +18,19 @@
 
 package com.khartec.waltz.model.rel;
 
-import com.khartec.waltz.model.*;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.DescriptionProvider;
+import com.khartec.waltz.model.ProvenanceProvider;
+import org.immutables.value.Value;
 
-public abstract class BaseRelationship implements
-        IdProvider,
-        DescriptionProvider,
-        ProvenanceProvider,
-        LastUpdatedUserTimestampProvider,
-        CreatedUserTimestampProvider {
+@Value.Immutable
+@JsonSerialize(as = ImmutableCreateRelationshipCommand.class)
+@JsonDeserialize(as = ImmutableCreateRelationshipCommand.class)
+public abstract class CreateRelationshipCommand implements DescriptionProvider, ProvenanceProvider {
 
-    public abstract long relationshipId();
+    public abstract long idA();
+    public abstract long idB();
+    public abstract long relationshipKindId();
+
 }
