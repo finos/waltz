@@ -22,6 +22,8 @@ export const dynamicSections = {
         name: "Applications",
         icon: "desktop",
         id: 1,
+        subSections: true,
+        subSectionList: [3, 8]
     },
     assetCostsSection: {
         componentId: "asset-costs-section",
@@ -58,6 +60,8 @@ export const dynamicSections = {
         icon: "history",
         name: "Changes",
         id: 7,
+        subSections: true,
+        subSectionList: [120]
     },
     complexitySection: {
         componentId: "complexity-section",
@@ -100,6 +104,8 @@ export const dynamicSections = {
         name: "Logical Flows",
         icon: "random",
         id: 14,
+        subSections: true,
+        subSectionList: [4]
     },
     measurableRatingAppSection: {
         componentId: "measurable-rating-app-section",
@@ -189,7 +195,7 @@ export const dynamicSections = {
         componentId: "data-type-flow-section",
         name: "Data Flows",
         icon: "random",
-        id: 29
+        id: 29,
     },
     relatedPhysicalFieldSection: {
         componentId: "related-physical-spec-defn-field-section",
@@ -308,16 +314,16 @@ export const dynamicSectionsByKind = {
     "ORG_UNIT": [
         dynamicSections.measurableRatingsBrowserSection,
         dynamicSections.logicalFlowsTabgroupSection,
-        dynamicSections.authSourcesSection,
+        // dynamicSections.authSourcesSection,
         dynamicSections.changeInitiativeSection,
         dynamicSections.changeSetSection,
-        dynamicSections.complexitySection,
+        // dynamicSections.complexitySection,
         dynamicSections.involvedPeopleSection,
         dynamicSections.appsSection,
-        dynamicSections.attestationSummarySection,
+        // dynamicSections.attestationSummarySection,
         dynamicSections.entityStatisticSummarySection,
         dynamicSections.technologySummarySection,
-        dynamicSections.assetCostsSection,
+        // dynamicSections.assetCostsSection,
         dynamicSections.bookmarksSection,
         dynamicSections.changeLogSection
     ],
