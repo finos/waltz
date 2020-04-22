@@ -137,6 +137,4 @@ public class ChangeInitiativeToMeasurableDaoTest extends BaseIntegrationTest {
         return dao.findForChangeInitiativeSelector(ciSelector);
     }
 
-
-
 }
