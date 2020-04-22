@@ -352,6 +352,14 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>ci</id>
+            <modules>
+                <module>waltz-integration-test</module>
+            </modules>
+        </profile>
+    </profiles>
     <reporting>
         <plugins>
             <plugin>

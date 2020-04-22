@@ -28,6 +28,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
 
@@ -75,4 +76,10 @@ public class MeasurableCategoryDao {
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
+    public Set<MeasurableCategory> findByExternalId(String extId) {
+        return dsl
+                .selectFrom(MEASURABLE_CATEGORY)
+                .where(MEASURABLE_CATEGORY.EXTERNAL_ID.eq(extId))
+                .fetchSet(TO_DOMAIN_MAPPER);
+    }
 }

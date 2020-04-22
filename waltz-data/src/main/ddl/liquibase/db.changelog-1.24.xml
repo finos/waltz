@@ -190,5 +190,12 @@
                                  onDelete="CASCADE"/>
     </changeSet>
 
+    <changeSet id="20200422-4812-9"
+               author="davidwatkins73">
+        <comment>4812: Preventing duplicate relationships</comment>
+        <addUniqueConstraint tableName="change_initiative_to_measurable"
+                              constraintName="unique_ci2m_rk"
+                              columnNames="change_initiative_id, measurable_id, relationship_id"/>
+    </changeSet>
 
 </databaseChangeLog>
