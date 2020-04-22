@@ -1,0 +1,33 @@
+<div>
+    <h4>Directly related
+        <span ng-bind="$ctrl.selectedCategory.name"></span>:
+    </h4>
+    <treecontrol class="tree-light"
+                 tree-model="$ctrl.hierarchy"
+                 options="$ctrl.treeOptions"
+                 expanded-nodes="$ctrl.expandedNodes"
+                 order-by="'-name'">
+        <span class="no-overflow">
+            <a ui-state="$ctrl.linkToState"
+               ui-state-params="{id: node.id }">
+                <span ng-class=" {'italics' : ! node.concrete}">
+                    <waltz-entity-icon-label entity-ref="node"
+                                             additional-display-data="[
+                                             { name: 'Ext Id', value: node.externalId },
+                                             { name:'Org Unit', value: (node.orgUnit != null) ? node.orgUnit.name : 'n/a' }] "
+                                             icon-placement="none"
+                                             tooltip-placement="right"
+                                             ng-style="{ 'font-weight': node.direct ? 'bold' : 'none'}">
+                    </waltz-entity-icon-label>
+                </span>
+            </a>
+        </span>
+    </treecontrol>
+    <span>
+        <br>
+        <a ng-if="!$ctrl.displayFullTree"
+           ng-click="$ctrl.showAll()" class="clickable">
+            Show all
+        </a>
+    </span>
+</div>

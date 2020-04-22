@@ -59,7 +59,7 @@ public class AttestationInstanceRecipientDao {
                 .from(ATTESTATION_INSTANCE_RECIPIENT)
                 .innerJoin(ATTESTATION_INSTANCE)
                 .on(ATTESTATION_INSTANCE.ID.eq(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID))
-                .where(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(id))
+                .where(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(id))
                 .fetch(ATTESTATION_INSTANCE_RECIPIENT.USER_ID);
     }
 }
