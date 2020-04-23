@@ -17,8 +17,43 @@
   -->
 
 <div>
-    <h1>Hello</h1>
-    <waltz-measurable-org-unit-relationship-tree parent-entity-ref="$ctrl.parentEntityRef"
-                                                    selected-category="$ctrl.selectedCategory">
-    </waltz-measurable-org-unit-relationship-tree>
+    <waltz-no-data ng-if="$ctrl.tabs.length == 0">
+        <message>
+            No viewpoints are directly related to this org unit
+        </message>
+    </waltz-no-data>
+
+    <span ng-if="$ctrl.tabs.length > 0">
+        <div class="waltz-tabs col-sm-8">
+            <!-- TAB HEADERS -->
+            <input ng-repeat-start="tab in $ctrl.tabs track by tab.id"
+                   type="radio"
+                   ng-change="$ctrl.onTabChange()"
+                   ng-model="$ctrl.activeTab"
+                   ng-value="tab"
+                   xxname="measurable_rating_edit"
+                   id="{{ tab.id + '_' + $id }}">
+            <label class="wt-label"
+                   for="{{ tab.id + '_' + $id }}"
+                   ng-repeat-end>
+                <span ng-bind="tab.name"></span>
+            </label>
+
+            <div class="wt-tab wt-active"
+                 ng-if="$ctrl.activeTab">
+                <waltz-measurable-org-unit-relationship-tree parent-entity-ref="$ctrl.parentEntityRef"
+                                                             selected-category="$ctrl.activeTab">
+                </waltz-measurable-org-unit-relationship-tree>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <br>
+            <span class="text-muted">
+                <waltz-icon name="info-circle"></waltz-icon>
+                Viewpoints in bold are directly related to this org unit or one of it's children.
+                Selecting a viewpoint will navigate to the page. Click on 'show all' to display the whole
+                <span ng-bind="$ctrl.activeTab.name"></span> tree.
+            </span>
+        </div>
+    </span>
 </div>

@@ -1,7 +1,31 @@
 <div>
     <h4>Directly related
-        <span ng-bind="$ctrl.selectedCategory.name"></span>:
+        <span ng-bind="$ctrl.selectedCategory.name"></span> items:
     </h4>
+    <br>
+    <div class="wmt-search-region">
+        <waltz-icon name="search"
+                    ng-class="{
+                    'wmt-search-active' : $ctrl.searchTerms.length > 0,
+                    'wmt-search-inactive' : $ctrl.searchTerms.length == 0
+                }">
+        </waltz-icon>
+        <input type='search'
+               class="form-control"
+               name="searchTerms"
+               autocomplete="off"
+               ng-model="$ctrl.searchTerms"
+               ng-change="$ctrl.searchTermsChanged($ctrl.searchTerms)"
+               ng-model-options="{ debounce: 200 }"
+               placeholder="Search">
+        &nbsp;
+        <waltz-icon name="close"
+                    style="color: darkred"
+                    ng-if="$ctrl.searchTerms.length > 0"
+                    class="clickable"
+                    ng-click="$ctrl.clearSearch()">
+        </waltz-icon>
+    </div>
     <treecontrol class="tree-light"
                  tree-model="$ctrl.hierarchy"
                  options="$ctrl.treeOptions"
@@ -26,7 +50,8 @@
     <span>
         <br>
         <a ng-if="!$ctrl.displayFullTree"
-           ng-click="$ctrl.showAll()" class="clickable">
+           ng-click="$ctrl.showAll()"
+           class="clickable small">
             Show all
         </a>
     </span>

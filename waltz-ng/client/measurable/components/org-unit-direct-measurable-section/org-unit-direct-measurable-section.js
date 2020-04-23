@@ -17,18 +17,43 @@
  */
 import template from "./org-unit-direct-measurable-section.html";
 import {initialiseData} from "../../../common";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import _ from "lodash";
 
 const bindings = {
     parentEntityRef: "<"
 };
 
 const initialState = {
-    selectedCategory: {id: 9, name: "Process" }
+    selectedCategory: {id: 9, name: "Process" },
+    activeTab: null,
+    tabs: []
 };
 
-function controller() {
+function controller(serviceBroker) {
+
     const vm = initialiseData(this, initialState);
+
+    vm.$onInit = () => {
+        serviceBroker
+            .loadViewData(CORE_API.MeasurableCategoryStore.findCategoriesByDirectOrgUnit,
+                [vm.parentEntityRef.id])
+            .then(r => vm.tabs = r.data)
+            .then(() => vm.activeTab = _.first(vm.tabs));
+    };
+
+    vm.onTabChange = () => {
+        if(_.isUndefined(vm.activeTab)){
+            vm.activeTab = _.first(vm.tabs);
+        }
+    };
+
 }
+
+controller.$inject = [
+    "ServiceBroker"
+];
+
 
 export default {
     component: {
