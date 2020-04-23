@@ -256,6 +256,12 @@ export const dynamicSections = {
         name: "Software Packages",
         icon: "gift",
         id: 140
+    },
+    orgUnitDirectMeasurableSection: {
+        componentId: "org-unit-direct-measurable-section",
+        name: "Direct Viewpoints",
+        icon: "puzzle-piece",
+        id: 150
     }
 };
 
@@ -319,7 +325,8 @@ export const dynamicSectionsByKind = {
         dynamicSections.technologySummarySection,
         dynamicSections.assetCostsSection,
         dynamicSections.bookmarksSection,
-        dynamicSections.changeLogSection
+        dynamicSections.changeLogSection,
+        dynamicSections.orgUnitDirectMeasurableSection
     ],
     "MEASURABLE": [
         dynamicSections.entityNamedNotesSection,
