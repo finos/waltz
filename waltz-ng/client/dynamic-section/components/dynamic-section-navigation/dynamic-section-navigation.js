@@ -49,16 +49,22 @@ function controller(dynamicSectionManager,
                     $window) {
     const vm = initialiseData(this, initialState);
 
-    const scrollListener = () => {
-        $scope.$applyAsync(() => {
-            vm.stickyVisible = $window.pageYOffset > vm.offset;
-        });
-    };
+    const scrollListener = _.throttle(
+        () => {
+            $scope.$applyAsync(() => {
+                vm.stickyVisible = $window.pageYOffset > vm.offset;
+            });
+        },
+        150);
 
-    vm.$onInit = () => {
+    function enableScrollListener() {
         angular
             .element($window)
-            .on("scroll", _.throttle(scrollListener, 100));
+            .on("scroll", scrollListener);
+    }
+
+    vm.$onInit = () => {
+        enableScrollListener();
 
         vm.sections = dynamicSectionManager.getAvailable();
 
@@ -93,18 +99,8 @@ function controller(dynamicSectionManager,
 
     vm.onSelect = (section) => {
         dynamicSectionManager.activate(section);
-        // $window.scrollTo(0, vm.offset);
-    };
-
-    vm.onSelectDropdown = (section) => {
-        dynamicSectionManager.activate(section);
         $window.scrollTo(0, vm.offset);
     };
-
-    vm.selectDropdownFilter = (section) => {
-        vm.dropdownSections = _.filter(dynamicSections,
-            s => _.includes(section.subSectionList, s.id));
-    }
 
 }
 

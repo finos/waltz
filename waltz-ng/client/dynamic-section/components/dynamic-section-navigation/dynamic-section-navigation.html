@@ -16,12 +16,30 @@
   ~
   -->
 
-<div class="waltz-dynamic-section-navigation wdsn-summary">
+<!-- IN SUMMARY -->
+<div class="waltz-dynamic-section-navigation wdsn-summary"
+     ng-include="'wdsn-menu'">
+</div>
+
+
+<!-- STICKY -->
+<div class="waltz-dynamic-section-navigation wdsn-sticky"
+     ng-class="{
+        'wdsn-sticky-visible' : $ctrl.stickyVisible
+     }"
+     ng-include="'wdsn-menu'">
+</div>
+
+
+<script type="text/ng-template"
+        id="wdsn-menu">
     <ul class="list-unstyled list-inline">
-        <li ng-repeat="section in $ctrl.sections track by section.id"
+
+        <li ng-repeat="section in $ctrl.sections"
             class="wdsn-option">
-            <span class="clickable"
-                 ng-style="$ctrl.mkStyle(section)">
+            <span ng-if="!section.children"
+                  class="clickable"
+                  ng-style="$ctrl.mkStyle(section)">
                 <a ng-click="$ctrl.onSelect(section)"
                    class="clickable"
                    ng-class="'wdsn-{{section.componentId}}'">
@@ -32,76 +50,45 @@
                     </span>
                 </a>
             </span>
-            <span ng-if="section.subSectionList"
+
+            <span ng-if="section.children"
                   ng-class="'wdsn-{{section.componentId}}'"
                   class="clickable"
                   uib-dropdown
-                  dropdown-append-to-body
+                  dropdown-append-to-body="true"
                   ng-style="$ctrl.mkStyle(section)">
-                <span ng-click="$ctrl.selectDropdownFilter(section)"
-                   class="clickable small text-muted"
+                <a class="small clickable"
                    uib-dropdown-toggle
-                   ng-class="'wdsn-{{section.componentId}}'">
-                    ( more <span class="caret"></span>)
-                </span>
+                   ng-class="'wdsn-{{section.componentId}}-more'">
+                     <waltz-icon name="{{ section.icon }}">
+                    </waltz-icon>
+                    <span class=''
+                          ng-bind="section.name">
+                    </span>
+                    <span class="text-muted">
+                        ( more <span class="caret"></span>)
+                    </span>
+                </a>
                 <ul class="dropdown-menu link dropdown-menu-right"
                     uib-dropdown-menu
                     role="menu">
                     <li role="menuitem"
-                        ng-repeat="subsection in $ctrl.dropdownSections track by subsection.id"
-                        ng-click="$ctrl.onSelectDropdown(subsection)">
-                        <a class=" clickable">
-                            <waltz-icon name="{{ subsection.icon }}">
+                        ng-click="$ctrl.onSelect(section)">
+                        <a class="small clickable">
+                            <waltz-icon name="{{ section.icon }}"
+                                        fixed-width="true">
                             </waltz-icon>
-                            <span ng-bind="subsection.name">
+                            <span ng-bind="section.name">
                             </span>
                         </a>
                     </li>
-                </ul>
-            </span>
-        </li>
-    </ul>
-</div>
-
-<div class="waltz-dynamic-section-navigation wdsn-sticky"
-     ng-class="{
-        'wdsn-sticky-visible' : $ctrl.stickyVisible
-     }">
-    <ul class="list-unstyled list-inline">
-        <li ng-repeat="section in $ctrl.sections track by section.id"
-            class="wdsn-option">
-            <span xxng-if="!section.subSections"
-                  class="clickable"
-                  ng-style="$ctrl.mkStyle(section)">
-                <a ng-click="$ctrl.onSelect(section)"
-                   class="clickable"
-                   ng-class="'wdsn-{{section.componentId}}'">
-                    <waltz-icon name="{{ section.icon }}">
-                    </waltz-icon>
-                    <span class='small'
-                          ng-bind="section.name">
-                    </span>
-                </a>
-            </span>
-            <span ng-if="section.subSectionList"
-                  class="btn-group clickable"
-                  uib-dropdown
-                  dropdown-append-to-body
-                  ng-style="$ctrl.mkStyle(section)">
-                <span ng-click="$ctrl.selectDropdownFilter(section)"
-                      class="clickable small text-muted"
-                      uib-dropdown-toggle
-                      ng-class="'wdsn-{{section.componentId}}'">
-                    ( more <span class="small caret"></span>)
-                </span>
-                <ul class="dropdown-menu link"
-                    uib-dropdown-menu
-                    role="menu">
                     <li role="menuitem"
-                        ng-repeat="subsection in $ctrl.dropdownSections track by subsection.id"
-                        ng-click="$ctrl.onSelectDropdown(subsection)">
-                        <a class=" clickable">
-                            <waltz-icon name="{{ subsection.icon }}">
+                        ng-repeat="subsection in section.children"
+                        ng-click="$ctrl.onSelect(subsection)">
+                        <a class="small clickable">
+                            &nbsp;
+                            <waltz-icon name="{{ subsection.icon }}"
+                                        fixed-width="true">
                             </waltz-icon>
                             <span ng-bind="subsection.name">
                             </span>
@@ -111,4 +98,4 @@
             </span>
         </li>
     </ul>
-</div>
+</script>
