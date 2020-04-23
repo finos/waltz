@@ -20,7 +20,8 @@
     <ul class="list-unstyled list-inline">
         <li ng-repeat="section in $ctrl.sections track by section.id"
             class="wdsn-option">
-            <div ng-style="$ctrl.mkStyle(section)">
+            <span class="clickable"
+                 ng-style="$ctrl.mkStyle(section)">
                 <a ng-click="$ctrl.onSelect(section)"
                    class="clickable"
                    ng-class="'wdsn-{{section.componentId}}'">
@@ -30,7 +31,34 @@
                           ng-bind="section.name">
                     </span>
                 </a>
-            </div>
+            </span>
+            <span ng-if="section.subSectionList"
+                  ng-class="'wdsn-{{section.componentId}}'"
+                  class="clickable"
+                  uib-dropdown
+                  dropdown-append-to-body
+                  ng-style="$ctrl.mkStyle(section)">
+                <span ng-click="$ctrl.selectDropdownFilter(section)"
+                   class="clickable small text-muted"
+                   uib-dropdown-toggle
+                   ng-class="'wdsn-{{section.componentId}}'">
+                    ( more <span class="caret"></span>)
+                </span>
+                <ul class="dropdown-menu link dropdown-menu-right"
+                    uib-dropdown-menu
+                    role="menu">
+                    <li role="menuitem"
+                        ng-repeat="subsection in $ctrl.dropdownSections track by subsection.id"
+                        ng-click="$ctrl.onSelectDropdown(subsection)">
+                        <a class=" clickable">
+                            <waltz-icon name="{{ subsection.icon }}">
+                            </waltz-icon>
+                            <span ng-bind="subsection.name">
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </span>
         </li>
     </ul>
 </div>
@@ -42,14 +70,45 @@
     <ul class="list-unstyled list-inline">
         <li ng-repeat="section in $ctrl.sections track by section.id"
             class="wdsn-option">
-            <a ng-click="$ctrl.onSelect(section)"
-               class="clickable">
-                <waltz-icon name="{{ section.icon }}">
-                </waltz-icon>
-                <span class='small'
-                      ng-bind="section.name">
+            <span xxng-if="!section.subSections"
+                  class="clickable"
+                  ng-style="$ctrl.mkStyle(section)">
+                <a ng-click="$ctrl.onSelect(section)"
+                   class="clickable"
+                   ng-class="'wdsn-{{section.componentId}}'">
+                    <waltz-icon name="{{ section.icon }}">
+                    </waltz-icon>
+                    <span class='small'
+                          ng-bind="section.name">
+                    </span>
+                </a>
+            </span>
+            <span ng-if="section.subSectionList"
+                  class="btn-group clickable"
+                  uib-dropdown
+                  dropdown-append-to-body
+                  ng-style="$ctrl.mkStyle(section)">
+                <span ng-click="$ctrl.selectDropdownFilter(section)"
+                      class="clickable small text-muted"
+                      uib-dropdown-toggle
+                      ng-class="'wdsn-{{section.componentId}}'">
+                    ( more <span class="small caret"></span>)
                 </span>
-            </a>
+                <ul class="dropdown-menu link"
+                    uib-dropdown-menu
+                    role="menu">
+                    <li role="menuitem"
+                        ng-repeat="subsection in $ctrl.dropdownSections track by subsection.id"
+                        ng-click="$ctrl.onSelectDropdown(subsection)">
+                        <a class=" clickable">
+                            <waltz-icon name="{{ subsection.icon }}">
+                            </waltz-icon>
+                            <span ng-bind="subsection.name">
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </span>
         </li>
     </ul>
 </div>

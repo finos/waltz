@@ -21,6 +21,8 @@ import {initialiseData} from "../../../common";
 import template from "./dynamic-section-navigation.html";
 import {scaleLinear} from "d3-scale";
 import {rgb} from "d3-color";
+import {dynamicSections} from "../../dynamic-section-definitions";
+
 
 export const dynamicSectionNavigationDefaultOffset = 250;
 
@@ -60,6 +62,8 @@ function controller(dynamicSectionManager,
 
         vm.sections = dynamicSectionManager.getAvailable();
 
+        vm.sectionsById = _.keyBy(dynamicSections, d => d.id);
+
         const numSections = _.get(vm, ["sections", "length"],  1);
         colorScale
             .domain([0, numSections / fadeFactor]);
@@ -89,8 +93,18 @@ function controller(dynamicSectionManager,
 
     vm.onSelect = (section) => {
         dynamicSectionManager.activate(section);
+        // $window.scrollTo(0, vm.offset);
+    };
+
+    vm.onSelectDropdown = (section) => {
+        dynamicSectionManager.activate(section);
         $window.scrollTo(0, vm.offset);
     };
+
+    vm.selectDropdownFilter = (section) => {
+        vm.dropdownSections = _.filter(dynamicSections,
+            s => _.includes(section.subSectionList, s.id));
+    }
 
 }
 
