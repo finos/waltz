@@ -33,12 +33,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
 import java.util.List;
 
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.web.WebUtilities.*;
+import static java.lang.String.format;
 import static spark.Spark.get;
 
 
@@ -126,9 +128,9 @@ public class SurveyRunExtractor extends DirectQueryBasedDataExtractor {
         get(surveysForEntityPath, (request, response) -> {
             EntityReference ref = getEntityReference(request);
             
-            LOG.info("Survey run with responses has been exported successfully");
+            LOG.info("Survey information for entity has been exported successfully");
             return writeExtract(
-                    mkFilename("test"),
+                    mkFilename(format("%s-%d", ref.kind().name().toLowerCase(), ref.id())),
                     getSurveysForEntity(ref),
                     request,
                     response);
@@ -143,7 +145,7 @@ public class SurveyRunExtractor extends DirectQueryBasedDataExtractor {
         GenericSelector genericSelectorForChangeInitiativeIds = genericSelectorFactory.applyForKind(EntityKind.CHANGE_INITIATIVE, idSelectionOptions);
         GenericSelector genericSelectorForApplications = genericSelectorFactory.applyForKind(EntityKind.APPLICATION, idSelectionOptions);
 
-        SelectConditionStep<Record> applicationSurveySelect = DSL
+        SelectConditionStep<Record14<String, String, String, String, Long, String, String, String, String, Date, String, Date, String, Date>> applicationSurveySelect = DSL
                 .select(ORGANISATIONAL_UNIT.NAME.as("Org Unit"),
                         APPLICATION.ASSET_CODE.as("Entity Id"),
                         APPLICATION.NAME.as("Entity Name"),
@@ -152,8 +154,12 @@ public class SurveyRunExtractor extends DirectQueryBasedDataExtractor {
                         SURVEY_TEMPLATE.NAME.as("Survey Template"),
                         SURVEY_RUN.NAME.as("Survey Run"),
                         PERSON.DISPLAY_NAME.as("Survey Owner"),
-                        SURVEY_INSTANCE.STATUS.as("Status"))
-                .select(SURVEY_INSTANCE_FIELDS)
+                        SURVEY_INSTANCE.STATUS.as("Status"),
+                        SURVEY_INSTANCE.DUE_DATE.as("Due Date"),
+                        SURVEY_INSTANCE.SUBMITTED_BY.as("Submitted By"),
+                        DSL.date(SURVEY_INSTANCE.SUBMITTED_AT).as("Submitted At"),
+                        SURVEY_INSTANCE.APPROVED_BY.as("Approved By"),
+                        DSL.date(SURVEY_INSTANCE.APPROVED_AT).as("Approved At"))
                 .from(SURVEY_INSTANCE)
                 .innerJoin(SURVEY_RUN).on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
                 .innerJoin(SURVEY_TEMPLATE).on(SURVEY_RUN.SURVEY_TEMPLATE_ID.eq(SURVEY_TEMPLATE.ID)
@@ -168,7 +174,7 @@ public class SurveyRunExtractor extends DirectQueryBasedDataExtractor {
                                         .and(APPLICATION.ID.in(genericSelectorForApplications.selector())))));
 
 
-        SelectConditionStep<Record> changeInitiativeSurveySelect = DSL
+        SelectConditionStep<Record14<String, String, String, String, Long, String, String, String, String, Date, String, Date, String, Date>> changeInitiativeSurveySelect = DSL
                 .select(ORGANISATIONAL_UNIT.NAME.as("Org Unit"),
                         CHANGE_INITIATIVE.EXTERNAL_ID.as("Entity Id"),
                         CHANGE_INITIATIVE.NAME.as("Entity Name"),
@@ -177,8 +183,12 @@ public class SurveyRunExtractor extends DirectQueryBasedDataExtractor {
                         SURVEY_TEMPLATE.NAME.as("Survey Template"),
                         SURVEY_RUN.NAME.as("Survey Run"),
                         PERSON.DISPLAY_NAME.as("Survey Owner"),
-                        SURVEY_INSTANCE.STATUS.as("Status"))
-                .select(SURVEY_INSTANCE_FIELDS)
+                        SURVEY_INSTANCE.STATUS.as("Status"),
+                        SURVEY_INSTANCE.DUE_DATE.as("Due Date"),
+                        SURVEY_INSTANCE.SUBMITTED_BY.as("Submitted By"),
+                        DSL.date(SURVEY_INSTANCE.SUBMITTED_AT).as("Submitted At"),
+                        SURVEY_INSTANCE.APPROVED_BY.as("Approved By"),
+                        DSL.date(SURVEY_INSTANCE.APPROVED_AT).as("Approved At"))
                 .from(SURVEY_INSTANCE)
                 .innerJoin(SURVEY_RUN).on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
                 .innerJoin(SURVEY_TEMPLATE).on(SURVEY_RUN.SURVEY_TEMPLATE_ID.eq(SURVEY_TEMPLATE.ID)
