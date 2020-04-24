@@ -43,4 +43,8 @@ public class MeasurableCategoryService {
     public MeasurableCategory getById(long id) {
         return measurableCategoryDao.getById(id);
     }
+
+    public Collection<MeasurableCategory> findCategoriesByDirectOrgUnit(long id) {
+        return measurableCategoryDao.findCategoriesByDirectOrgUnit(id);
+    }
 }
