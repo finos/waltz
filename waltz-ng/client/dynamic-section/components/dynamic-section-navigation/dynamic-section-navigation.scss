@@ -43,10 +43,6 @@
                 background-color: #f4f4f4;
             }
             @include transition(background-color 300ms linear);
-
-            a {
-                display: block;
-            }
         }
     }
 
