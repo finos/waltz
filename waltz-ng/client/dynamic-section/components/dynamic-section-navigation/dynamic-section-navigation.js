@@ -21,6 +21,8 @@ import {initialiseData} from "../../../common";
 import template from "./dynamic-section-navigation.html";
 import {scaleLinear} from "d3-scale";
 import {rgb} from "d3-color";
+import {dynamicSections} from "../../dynamic-section-definitions";
+
 
 export const dynamicSectionNavigationDefaultOffset = 250;
 
@@ -47,18 +49,26 @@ function controller(dynamicSectionManager,
                     $window) {
     const vm = initialiseData(this, initialState);
 
-    const scrollListener = () => {
-        $scope.$applyAsync(() => {
-            vm.stickyVisible = $window.pageYOffset > vm.offset;
-        });
-    };
+    const scrollListener = _.throttle(
+        () => {
+            $scope.$applyAsync(() => {
+                vm.stickyVisible = $window.pageYOffset > vm.offset;
+            });
+        },
+        150);
 
-    vm.$onInit = () => {
+    function enableScrollListener() {
         angular
             .element($window)
-            .on("scroll", _.throttle(scrollListener, 100));
+            .on("scroll", scrollListener);
+    }
+
+    vm.$onInit = () => {
+        enableScrollListener();
 
         vm.sections = dynamicSectionManager.getAvailable();
+
+        vm.sectionsById = _.keyBy(dynamicSections, d => d.id);
 
         const numSections = _.get(vm, ["sections", "length"],  1);
         colorScale
