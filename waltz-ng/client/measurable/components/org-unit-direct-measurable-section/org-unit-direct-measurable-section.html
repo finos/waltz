@@ -31,7 +31,6 @@
                    ng-change="$ctrl.onTabChange()"
                    ng-model="$ctrl.activeTab"
                    ng-value="tab"
-                   xxname="measurable_rating_edit"
                    id="{{ tab.id + '_' + $id }}">
             <label class="wt-label"
                    for="{{ tab.id + '_' + $id }}"
@@ -50,9 +49,18 @@
             <br>
             <span class="text-muted">
                 <waltz-icon name="info-circle"></waltz-icon>
-                Viewpoints in bold are directly related to this org unit or one of it's children.
-                Selecting a viewpoint will navigate to the page. Click on 'show all' to display the whole
-                <span ng-bind="$ctrl.activeTab.name"></span> tree.
+                Viewpoints in <b>bold</b> are directly related to this org unit or one of it's children.
+                Selecting a viewpoint will navigate to the page.
+
+                <br>
+
+                Go to the
+                <a ui-sref="main.measurable-category.list ({id: $ctrl.activeTab.id })"
+                   class="clickable">
+                    <span ng-bind="$ctrl.activeTab.name"></span>
+                </a>
+                viewpoint to see all items.
+
             </span>
         </div>
     </span>

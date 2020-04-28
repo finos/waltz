@@ -1,3 +1,21 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
+ */
+
 import template from "./measurable-org-unit-relationship-tree.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
@@ -18,7 +36,6 @@ const bindings ={
 
 const initialState = {
     linkToState: "main.measurable.view",
-    displayFullTree: false,
     searchNodes: [],
     searchTerms: "",
 };
@@ -35,7 +52,8 @@ function controller($q, serviceBroker) {
             .then(r => r.data);
 
         const relatedMeasurablesPromise = serviceBroker
-            .loadViewData(CORE_API.MeasurableStore.findByOrgUnitId,
+            .loadViewData(
+                CORE_API.MeasurableStore.findByOrgUnitId,
                 [vm.parentEntityRef.id])
             .then(r => r.data);
 
@@ -62,7 +80,7 @@ function controller($q, serviceBroker) {
                 return vm.hierarchy = buildHierarchies(vm.directNodes, false)
 
             })
-            .then(() => vm.searchNodes = prepareSearchNodes(vm.enrichedNodes));
+            .then(() => vm.searchNodes = prepareSearchNodes(vm.directNodes));
     }
 
     vm.$onInit = () => {
@@ -71,20 +89,13 @@ function controller($q, serviceBroker) {
 
     vm.$onChanges = (c) => {
         if(c.selectedCategory){
-            vm.displayFullTree = false;
             loadData();
         }
     };
 
-    vm.showAll = () => {
-        vm.hierarchy = buildHierarchies(vm.enrichedNodes, false);
-        vm.displayFullTree = true;
-    };
-
     vm.searchTermsChanged = (termStr = "") => {
         if (termStr === "") {
-            const nodes = (vm.displayFullTree) ? vm.enrichedNodes : vm.directNodes;
-            vm.hierarchy = buildHierarchies(nodes, false);
+            vm.hierarchy = buildHierarchies(vm.directNodes, false);
             vm.expandedNodes = [];
         } else {
             const matchedNodes = doSearch(termStr, vm.searchNodes);
