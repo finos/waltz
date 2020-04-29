@@ -42,7 +42,7 @@ function controller($filter, settingsService) {
     let currency = null;
 
     const refresh = () => {
-        if (currency && vm.amount) {
+        if (currency && vm.amount != null) {
             if (vm.simplify) {
                 vm.currencyStr = currency.symbol + numberFormatter(vm.amount, 1, true);
             } else {
