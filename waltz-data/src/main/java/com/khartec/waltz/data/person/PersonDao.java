@@ -22,10 +22,7 @@ import com.khartec.waltz.model.person.ImmutablePerson;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.model.person.PersonKind;
 import com.khartec.waltz.schema.tables.records.PersonRecord;
-import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -219,6 +216,19 @@ public class PersonDao {
                 .select(PERSON.fields())
                 .from(PERSON)
                 .where(PERSON.ID.in(ids))
+                .fetchSet(personMapper);
+    }
+
+    public Set<Person> findAllReporteesByEmployeeId(String empId) {
+
+        SelectConditionStep<Record1<String>> reporteeIds = DSL.select(PERSON_HIERARCHY.EMPLOYEE_ID)
+                .from(PERSON_HIERARCHY)
+                .where(PERSON_HIERARCHY.MANAGER_ID.eq(empId));
+
+        return dsl
+                .selectFrom(PERSON)
+                .where(PERSON.EMPLOYEE_ID.in(reporteeIds)
+                        .and(PERSON.IS_REMOVED.isFalse()))
                 .fetchSet(personMapper);
     }
 }

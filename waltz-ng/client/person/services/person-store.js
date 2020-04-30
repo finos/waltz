@@ -44,6 +44,10 @@ function store($http,
         .get(`${BASE}/employee-id/${empId}/directs`)
         .then(result => result.data);
 
+    const findAllReportees = (empId) => $http
+        .get(`${BASE}/employee-id/${empId}/reportees`)
+        .then(result => result.data);
+
 
     const findManagers = (empId) => $http
         .get(`${BASE}/employee-id/${empId}/managers`)
@@ -65,6 +69,7 @@ function store($http,
         getById,
         findByUserId,
         findDirects,
+        findAllReportees,
         findManagers,
         countCumulativeReportsByKind,
         search
@@ -101,6 +106,11 @@ export const PersonStore_API = {
         serviceName,
         serviceFnName: "findDirects",
         description: "find direct reports for person"
+    },
+    findAllReportees: {
+        serviceName,
+        serviceFnName: "findAllReportees",
+        description: "find all reportees for person"
     },
     findManagers: {
         serviceName,

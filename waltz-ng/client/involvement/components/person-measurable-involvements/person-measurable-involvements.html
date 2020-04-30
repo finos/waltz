@@ -1,0 +1,97 @@
+<div>
+
+    <waltz-no-data ng-if="!$ctrl.relatedMeasurableIds">
+        <message>
+            There are no involvements between this person (or any of their direct reports) and viewpoints.
+        </message>
+    </waltz-no-data>
+
+    <uib-tabset ng-if="$ctrl.relatedMeasurableIds">
+
+        <uib-tab heading="Summary" select="showSummaryTab = true">
+
+            <div select="showTreeTab = true">
+
+                <br>
+                <span>This person is involved in the viewpoints below either directly or by inherting the association through one of their reportees.
+                    Click on the viewpoint to see this involvement, those in <b>bold</b> are directly related, those in italics have no involvements but populate the tree.</span>
+                <br>
+
+                <div class="row">
+                    <div class="col-sm-8">
+                        <treecontrol class="tree-light"
+                                     tree-model="$ctrl.hierarchy"
+                                     options="$ctrl.treeOptions"
+                                     expanded-nodes="$ctrl.expandedNodes"
+                                     order-by="'-name'">
+                            <span class="no-overflow">
+                                <a>
+                                    <span ng-class=" {'italics' : ! node.related}"
+                                          ng-click="$ctrl.onSelect(node)">
+                                        <waltz-entity-icon-label entity-ref="node"
+                                                                 additional-display-data=""
+                                                                 icon-placement="none"
+                                                                 tooltip-placement="right"
+                                                                 ng-style="{ 'font-weight': node.direct ? 'bold' : 'none'}">
+                                        </waltz-entity-icon-label>
+                                    </span>
+                                </a>
+                            </span>
+                        </treecontrol>
+                    </div>
+
+                    <div class="col-sm-4">
+                        <waltz-sub-section ng-if="$ctrl.enrichedInvolvements.length > 0"
+                                           name="Involvements">
+                            <content>
+                                <table class="table table-condensed small">
+                                    <tbody>
+                                        <tr ng-repeat="involvement in $ctrl.enrichedInvolvements">
+                                            <td ng-bind="involvement.person.displayName"></td>
+                                            <td ng-bind="involvement.involvementKind.name"></td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </content>
+                        </waltz-sub-section>
+                    </div>
+                </div>
+                <br>
+
+                <pre ng-bind="$ctrl.enrichedInvolvements | json"> </pre>
+            </div>
+        </uib-tab>
+
+        <uib-tab heading="Direct"
+                 select="showDirectTab = true"
+                 ng-if="$ctrl.directlyInvolvedMeasurables.length > 0">
+
+            <div ng-if="showDirectTab">
+                <h4> Direct Involvements </h4>
+
+                <waltz-grid-with-search entries="$ctrl.directlyInvolvedMeasurables"
+                                        column-defs="$ctrl.columnDefs">
+
+                </waltz-grid-with-search>
+            </div>
+
+        </uib-tab>
+
+
+        <uib-tab heading="Oversight"
+                 select="showOversightTab = true"
+                 ng-if="$ctrl.indirectlyInvolvedMeasurables.length > 0">
+
+            <div ng-if="showOversightTab">
+                <h4> Oversight Involvements <small>(Inferred via direct reports)</small></h4>
+
+                <waltz-grid-with-search entries="$ctrl.indirectlyInvolvedMeasurables"
+                                        column-defs="$ctrl.columnDefs">
+
+                </waltz-grid-with-search>
+            </div>
+
+        </uib-tab>
+
+    </uib-tabset>
+</div>

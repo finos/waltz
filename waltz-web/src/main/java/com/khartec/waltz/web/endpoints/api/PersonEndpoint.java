@@ -40,6 +40,7 @@ public class PersonEndpoint implements Endpoint {
     private static final String BASE_URL = mkPath("api", "person");
     private static final String SEARCH_PATH = mkPath(BASE_URL, "search", ":query");
     private static final String DIRECTS_PATH = mkPath(BASE_URL, "employee-id", ":empId", "directs");
+    private static final String REPORTEES_PATH = mkPath(BASE_URL, "employee-id", ":empId", "reportees");
     private static final String COUNT_CUMULATIVE_REPORTS_BY_KIND_PATH = mkPath(BASE_URL, "employee-id", ":empId", "count-cumulative-reports");
     private static final String MANAGERS_PATH = mkPath(BASE_URL, "employee-id", ":empId", "managers");
     private static final String BY_EMPLOYEE_PATH = mkPath(BASE_URL, "employee-id", ":empId");
@@ -72,6 +73,11 @@ public class PersonEndpoint implements Endpoint {
         getForList(DIRECTS_PATH, (request, response) -> {
             String empId = request.params("empId");
             return personService.findDirectsByEmployeeId(empId);
+        });
+
+        getForList(REPORTEES_PATH, (request, response) -> {
+            String empId = request.params("empId");
+            return personService.findReporteesByEmployeeId(empId);
         });
 
         getForDatum(MANAGERS_PATH, (request, response) -> {
