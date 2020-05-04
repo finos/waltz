@@ -96,28 +96,33 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                 .from(PERSON_HIERARCHY)
                 .where(PERSON_HIERARCHY.MANAGER_ID.eq(emp));
 
-        if(options.joiningEntityKind().isPresent()){
+        return options.joiningEntityKind()
+                .map(opt -> {
+                    if (opt.equals(EntityKind.APPLICATION)){
+                        Condition applicationConditions = mkApplicationConditions(options);
 
-            Condition applicationConditions = mkApplicationConditions(options);
+                        Condition condition = applicationConditions
+                                .and(INVOLVEMENT.EMPLOYEE_ID.eq(emp)
+                                        .or(INVOLVEMENT.EMPLOYEE_ID.in(reporteeIds)));
 
-            Condition condition = applicationConditions
-                    .and(INVOLVEMENT.EMPLOYEE_ID.eq(emp)
-                            .or(INVOLVEMENT.EMPLOYEE_ID.in(reporteeIds)));
-
-            return mkBaseRatingBasedSelector()
-                    .innerJoin(APPLICATION).on(APPLICATION.ID.eq(MEASURABLE_RATING.ENTITY_ID))
-                    .innerJoin(INVOLVEMENT).on(APPLICATION.ID.eq(INVOLVEMENT.ENTITY_ID)
-                            .and(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
-                    .where(condition);
-        }
-
-        return DSL
-                .selectDistinct(MEASURABLE.ID)
-                .from(MEASURABLE)
-                .innerJoin(INVOLVEMENT).on(MEASURABLE.ID.eq(INVOLVEMENT.ENTITY_ID)
-                        .and(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.MEASURABLE.name())))
-                .where(INVOLVEMENT.EMPLOYEE_ID.in(reporteeIds)
-                        .or(INVOLVEMENT.EMPLOYEE_ID.eq(emp)));
+                        return mkBaseRatingBasedSelector()
+                                .innerJoin(APPLICATION).on(APPLICATION.ID.eq(MEASURABLE_RATING.ENTITY_ID))
+                                .innerJoin(INVOLVEMENT).on(APPLICATION.ID.eq(INVOLVEMENT.ENTITY_ID)
+                                        .and(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                                .where(condition);
+                    } else {
+                        throw new UnsupportedOperationException(format(
+                                "Cannot create measurable selector for people via entity kind: %s",
+                                opt));
+                    }
+                })
+                .orElse(DSL
+                        .selectDistinct(MEASURABLE.ID)
+                        .from(MEASURABLE)
+                        .innerJoin(INVOLVEMENT).on(MEASURABLE.ID.eq(INVOLVEMENT.ENTITY_ID)
+                                .and(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.MEASURABLE.name())))
+                        .where(INVOLVEMENT.EMPLOYEE_ID.in(reporteeIds)
+                                .or(INVOLVEMENT.EMPLOYEE_ID.eq(emp))));
     }
 
 
