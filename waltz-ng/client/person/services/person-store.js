@@ -31,7 +31,6 @@ function store($http,
         .get(`${BASE}/employee-id/${empId}`)
         .then(result => result.data);
 
-
     const findByUserId = (userId) => $http
         .get(`${BASE}/user-id/${userId}`)
         .then(result => result.data);
@@ -48,16 +47,13 @@ function store($http,
         .get(`${BASE}/employee-id/${empId}/reportees`)
         .then(result => result.data);
 
-
     const findManagers = (empId) => $http
         .get(`${BASE}/employee-id/${empId}/managers`)
         .then(result => result.data);
 
-
     const countCumulativeReportsByKind = (empId) => $http
         .get(`${BASE}/employee-id/${empId}/count-cumulative-reports`)
         .then(result => result.data);
-
 
     const search = (query) => $http
         .get(`${BASE}/search/${query}`)
