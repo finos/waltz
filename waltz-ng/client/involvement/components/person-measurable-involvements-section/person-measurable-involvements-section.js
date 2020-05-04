@@ -6,9 +6,11 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 import {mkRef} from "../../../common/entity-utils";
 import {buildHierarchies, reduceToSelectedNodesOnly} from "../../../common/hierarchy-utils";
 
+
 const bindings = {
     parentEntityRef: "<",
 };
+
 
 const initialState = {
     activeTab: null,
@@ -88,13 +90,11 @@ function controller(serviceBroker, $q){
         vm.hierarchy = buildHierarchies(reducedNodes, false);
     }
 
-
     vm.$onInit = () => {
         serviceBroker.loadViewData(CORE_API.PersonStore.getById, [vm.parentEntityRef.id])
             .then(r => vm.person = r.data)
             .then(loadData);
     };
-
 
     vm.onTabChange = () => {
         mkTree(vm.showDirectsOnly);
@@ -141,6 +141,7 @@ const component = {
     bindings,
     controller
 };
+
 
 export default {
     component,
