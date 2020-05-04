@@ -1,6 +1,6 @@
 <div>
 
-    <waltz-no-data ng-if="!$ctrl.relatedMeasurableIds">
+    <waltz-no-data ng-if="$ctrl.tabs.length == 0">
         <message>
             There are no involvements between this person (or any of their direct reports) and viewpoints.
         </message>
