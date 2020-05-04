@@ -40,7 +40,7 @@ function controller(serviceBroker, $q){
         const involvementPromise = serviceBroker
             .loadViewData(CORE_API.InvolvementStore.findByEmployeeId,
                 [vm.person.employeeId])
-            .then(d => d.data);
+            .then(r => _.filter(r.data, d => d.entityReference.kind === "MEASURABLE"));
 
         const directMeasurablesPromise = serviceBroker
             .loadViewData(CORE_API.MeasurableStore.findMeasurablesBySelector,
