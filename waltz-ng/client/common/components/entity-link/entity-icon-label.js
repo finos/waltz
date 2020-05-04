@@ -56,6 +56,15 @@ const entityLoaders = {
             }
         ])
     },
+    "MEASURABLE": {
+        method: CORE_API.MeasurableStore.getById,
+        mkProps: (measurable, displayNameService) => ([
+            {
+                name: "External Id",
+                value: measurable.externalId || "-"
+            }
+        ])
+    },
     "APPLICATION": {
         method: CORE_API.ApplicationStore.getById,
         mkProps: (app, displayNameService) => ([

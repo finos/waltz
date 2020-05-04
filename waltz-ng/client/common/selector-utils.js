@@ -76,7 +76,7 @@ export function mkSelectionOptions(entityReference, scope, entityLifecycleStatus
 }
 
 
-export function mkSelectionOptionsWithLinkingEntity(entityReference, scope, entityLifecycleStatuses = ["ACTIVE"], filters = {}, linkingEntityKind = null) {
+export function mkSelectionOptionsWithJoiningEntity(entityReference, scope, entityLifecycleStatuses = ["ACTIVE"], filters = {}, joiningEntityKind = null) {
     checkIsEntityRef(entityReference);
 
     return {
@@ -84,7 +84,7 @@ export function mkSelectionOptionsWithLinkingEntity(entityReference, scope, enti
         scope: scope || determineDownwardsScopeForKind(entityReference.kind),
         entityLifecycleStatuses,
         filters,
-        linkingEntityKind: linkingEntityKind
+        joiningEntityKind: joiningEntityKind
     };
 }
 

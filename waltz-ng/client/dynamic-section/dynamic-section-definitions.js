@@ -303,6 +303,12 @@ const orgUnitDirectMeasurableSection = {
     id: 150
 };
 
+const personMeasurableInvolvementsSection = {
+    componentId: "person-measurable-involvements-section",
+    name: "Viewpoint Involvements",
+    icon: "user",
+    id: 160
+};
 
 export const dynamicSections = {
     appCostsSection,
@@ -333,6 +339,7 @@ export const dynamicSections = {
     orgUnitDirectMeasurableSection,
     personAppsSection,
     personChangeSetSection,
+    personMeasurableInvolvementsSection,
     personHierarchySection,
     physicalFlowParticipantsSection,
     relatedAppGroupsSection,
@@ -439,7 +446,8 @@ export const dynamicSectionsByKind = {
             [authSourcesSection]),
         surveySection,
         changeLogSection,
-        measurableRatingsBrowserSection
+        measurableRatingsBrowserSection,
+        personMeasurableInvolvementsSection
     ],
     "DATA_TYPE": [
         appsSection,

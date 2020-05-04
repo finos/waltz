@@ -38,7 +38,7 @@ public abstract class IdSelectionOptions {
 
     public abstract EntityReference entityReference();
     public abstract HierarchyQueryScope scope();
-    public abstract Optional<EntityKind> linkingEntityKind();
+    public abstract Optional<EntityKind> joiningEntityKind();
 
     @Value.Default
     public Set<EntityLifecycleStatus> entityLifecycleStatuses() {
@@ -59,11 +59,11 @@ public abstract class IdSelectionOptions {
     }
 
 
-    public static IdSelectionOptions mkOpts(EntityReference ref, HierarchyQueryScope scope, EntityKind linkingEntityKind) {
+    public static IdSelectionOptions mkOpts(EntityReference ref, HierarchyQueryScope scope, EntityKind joiningEntityKind) {
         return ImmutableIdSelectionOptions.builder()
                 .entityReference(ref)
                 .scope(scope)
-                .linkingEntityKind(linkingEntityKind)
+                .joiningEntityKind(joiningEntityKind)
                 .build();
     }
 

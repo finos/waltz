@@ -96,17 +96,7 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                 .from(PERSON_HIERARCHY)
                 .where(PERSON_HIERARCHY.MANAGER_ID.eq(emp));
 
-        if (!options.linkingEntityKind().isPresent()){
-
-            return DSL
-                    .selectDistinct(MEASURABLE.ID)
-                    .from(MEASURABLE)
-                    .innerJoin(INVOLVEMENT).on(MEASURABLE.ID.eq(INVOLVEMENT.ENTITY_ID)
-                            .and(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.MEASURABLE.name())))
-                    .where(INVOLVEMENT.EMPLOYEE_ID.in(reporteeIds)
-                            .or(INVOLVEMENT.EMPLOYEE_ID.eq(emp)));
-
-        } else {
+        if(options.joiningEntityKind().isPresent()){
 
             Condition applicationConditions = mkApplicationConditions(options);
 
@@ -120,6 +110,14 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                             .and(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                     .where(condition);
         }
+
+        return DSL
+                .selectDistinct(MEASURABLE.ID)
+                .from(MEASURABLE)
+                .innerJoin(INVOLVEMENT).on(MEASURABLE.ID.eq(INVOLVEMENT.ENTITY_ID)
+                        .and(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.MEASURABLE.name())))
+                .where(INVOLVEMENT.EMPLOYEE_ID.in(reporteeIds)
+                        .or(INVOLVEMENT.EMPLOYEE_ID.eq(emp)));
     }
 
 

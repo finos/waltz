@@ -24,7 +24,7 @@ import involvedSectionService from './services/involved-section-service';
 import involvementStore from './services/involvement-store';
 import keyPeopleSubSection from './components/sub-section/key-people-sub-section';
 import personMeasurableInvolvementsSection
-    from './components/person-measurable-involvements/person-measurable-involvements';
+    from './components/person-measurable-involvements-section/person-measurable-involvements-section'
 
 
 export default () => {
