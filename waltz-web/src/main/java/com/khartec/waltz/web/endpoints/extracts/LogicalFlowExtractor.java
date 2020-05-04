@@ -73,6 +73,10 @@ public class LogicalFlowExtractor extends DirectQueryBasedDataExtractor {
 
         Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(options);
 
+        Condition conditionForDataType = EntityKind.DATA_TYPE.equals(options.entityReference().kind())
+                ? LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(options.entityReference().id())
+                : DSL.trueCondition();
+
         Field<Long> sourceFlowId = LOGICAL_FLOW.ID.as("sourceFlowId");
         Field<Long> targetFlowId = LOGICAL_FLOW.ID.as("targetFlowId");
 
@@ -142,6 +146,7 @@ public class LogicalFlowExtractor extends DirectQueryBasedDataExtractor {
                     .on(ENUM_VALUE.KEY.eq(LOGICAL_FLOW_DECORATOR.RATING)
                             .and(ENUM_VALUE.TYPE.eq("AuthoritativenessRating")))
                 .where(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name()))
+                .and(conditionForDataType)
                 .and(sourceFlowId.isNotNull()
                         .or(targetFlowId.isNotNull()));
 

@@ -448,7 +448,7 @@ export const dynamicSectionsByKind = {
         involvedPeopleSection,
         authSourcesSection,
         dataTypeOriginatorsSection,
-        dataTypeFlowSection,
+        logicalFlowsTabgroupSection,
         logicalDataElementsSection,
         changeLogSection
     ],
