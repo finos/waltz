@@ -306,7 +306,7 @@ const orgUnitDirectMeasurableSection = {
 const personMeasurableInvolvementsSection = {
     componentId: "person-measurable-involvements-section",
     name: "Viewpoint Involvements",
-    icon: "user",
+    icon: "user-o",
     id: 160
 };
 
