@@ -102,15 +102,25 @@ public class ScenarioRatingItemService {
 
         if (result) {
             Application application = applicationService.getById(command.appId());
-            List<RagName> ratings = ratingSchemeService.getById(command.ratingSchemeId()).ratings();
             Scenario scenario = scenarioService.getById(command.scenarioId());
 
-            String message = String.format(
-                    "Application %s, moved from %s to %s for %s",
-                    application.assetCode().orElse("Unknown"),
-                    getRatingName(ratings, command.previousRating()),
-                    getRatingName(ratings, command.rating()),
-                    scenario.name());
+            String message;
+            if(command.rating() != command.previousRating()) {
+                List<RagName> ratings = ratingSchemeService.getById(command.ratingSchemeId()).ratings();
+                message = String.format(
+                        "Application %s, moved from %s to %s for %s",
+                        application.assetCode().orElse("Unknown"),
+                        getRatingName(ratings, command.previousRating()),
+                        getRatingName(ratings, command.rating()),
+                        scenario.name());
+            } else {
+                message = String.format(
+                        "Updated rating/description for app %s (%s), a comment was added to %s ",
+                        application.assetCode().orElse("Unknown"),
+                        application.name(),
+                        scenario.name());
+            }
+
             changeLogService.write(mkBasicLogEntry(command.scenarioId(), message, userId));
         }
 
