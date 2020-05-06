@@ -21,6 +21,7 @@ import {registerComponents, registerStore} from '../common/module-utils';
 
 import involvedPeopleSection from './components/involved-people-section';
 import involvedSectionService from './services/involved-section-service';
+import involvementViewService from './services/involvement-view-service';
 import involvementStore from './services/involvement-store';
 import keyPeopleSubSection from './components/sub-section/key-people-sub-section';
 import personMeasurableInvolvementsSection
@@ -39,6 +40,7 @@ export default () => {
         .service('InvolvedSectionService', involvedSectionService);
 
     registerStore(module, involvementStore);
+    registerStore(module, involvementViewService);
 
     return module.name;
 };

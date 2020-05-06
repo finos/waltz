@@ -2,8 +2,6 @@ import template from "./person-measurable-involvements-section.html"
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 import * as _ from "lodash";
-import {mkSelectionOptions} from "../../../common/selector-utils";
-import {mkRef} from "../../../common/entity-utils";
 import {buildHierarchies, reduceToSelectedNodesOnly} from "../../../common/hierarchy-utils";
 
 
@@ -14,7 +12,10 @@ const bindings = {
 
 const initialState = {
     activeTab: null,
-    showDirectsOnly: false
+    showDirectsOnly: false,
+    showInfoPanel: false,
+    nodes: [],
+    activeNode: null
 };
 
 
@@ -26,25 +27,14 @@ function controller(serviceBroker, $q){
 
         const measurableCategoriesPromise = serviceBroker
             .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
-            .then(r =>  r.data);
-
-        const reportingPeoplePromise = serviceBroker
-            .loadViewData(CORE_API.PersonStore.findAllReportees,
-                [vm.person.employeeId])
             .then(r => r.data);
+
+        const involvementsPromise = serviceBroker
+            .loadViewData(CORE_API.InvolvementViewService.findAllInvolvementsByEmployeeId, [vm.person.employeeId])
+            .then(r => _.filter(r.data, d => d.involvement.entityReference.kind === "MEASURABLE"));
 
         const involvementKindPromise = serviceBroker
             .loadAppData(CORE_API.InvolvementKindStore.findAll)
-            .then(r => r.data);
-
-        const involvementPromise = serviceBroker
-            .loadViewData(CORE_API.InvolvementStore.findByEmployeeId,
-                [vm.person.employeeId])
-            .then(r => _.filter(r.data, d => d.entityReference.kind === "MEASURABLE"));
-
-        const directMeasurablesPromise = serviceBroker
-            .loadViewData(CORE_API.MeasurableStore.findMeasurablesBySelector,
-                [ mkSelectionOptions(mkRef("PERSON", vm.person.id), "CHILDREN") ])
             .then(r => r.data);
 
         const allMeasurablesPromise = serviceBroker
@@ -53,21 +43,30 @@ function controller(serviceBroker, $q){
 
 
         $q
-            .all([measurableCategoriesPromise, allMeasurablesPromise, involvementPromise, directMeasurablesPromise, involvementKindPromise, reportingPeoplePromise])
-            .then(([categories, allMeasurables, directInvolvements, directMeasurables, involvementKinds, reportees]) => {
+            .all([measurableCategoriesPromise, allMeasurablesPromise, involvementsPromise, involvementKindPromise])
+            .then(([categories, allMeasurables, measurableInvolvements, involvementKinds]) => {
 
-                const measurableCategoryIds = _.map(directMeasurables, m => m.categoryId);
-                const involvedEntityIds = _.map(directInvolvements, i => i.entityReference.id);
-                vm.relatedMeasurableIds = _.map(directMeasurables, m => m.id);
+                vm.involvementKindsById = _.keyBy(involvementKinds, d => d.id);
+                vm.involvementsByMeasurableId = _.groupBy(measurableInvolvements, i => i.involvement.entityReference.id);
+                vm.relatedMeasurableIds = _.map(measurableInvolvements, i => i.involvement.entityReference.id);
+
+                vm.directlyInvolvedMeasurableIds = _
+                    .chain(measurableInvolvements)
+                    .filter(i => i.involvement.employeeId === vm.person.employeeId)
+                    .map(i => i.involvement.entityReference.id)
+                    .value();
+
+                const measurableCategoryIds = _
+                    .chain(allMeasurables)
+                    .filter(m => _.includes(vm.relatedMeasurableIds, m.id))
+                    .map(m => m.categoryId)
+                    .value();
 
                 vm.tabs = _.filter(categories, d => _.includes(measurableCategoryIds, d.id));
                 vm.activeTab = _.first(vm.tabs);
 
-                vm.peopleByEmployeeId = _.keyBy(_.concat(reportees, vm.person), p => p.employeeId);
-                vm.involvementKindsById = _.keyBy(involvementKinds, d => d.id);
-
                 return vm.nodes = _.map(allMeasurables, m => Object.assign({}, m, {
-                    direct: _.includes(involvedEntityIds, m.id),
+                    direct: _.includes(vm.directlyInvolvedMeasurableIds, m.id),
                     related: _.includes(vm.relatedMeasurableIds, m.id)}));
             })
             .then(() => mkTree(vm.showDirectsOnly));
@@ -75,15 +74,10 @@ function controller(serviceBroker, $q){
 
     function mkTree(showDirectsOnly){
 
-        const nodes = _.filter(vm.nodes, m => m.categoryId === vm.activeTab.id);
-
-        const directNodeIds = _.chain(nodes)
-            .filter(d => d.direct)
-            .map(d => d.id)
-            .value();
+        const nodes = _.filter(vm.nodes, m => m.categoryId === _.get(vm.activeTab, 'id', null));
 
         const selectedIds = (showDirectsOnly)
-            ? _.filter(vm.relatedMeasurableIds, d => _.includes(directNodeIds, d))
+            ? _.filter(vm.relatedMeasurableIds, d => _.includes(vm.directlyInvolvedMeasurableIds, d))
             : vm.relatedMeasurableIds;
 
         const reducedNodes = reduceToSelectedNodesOnly(nodes, selectedIds);
@@ -97,37 +91,30 @@ function controller(serviceBroker, $q){
     };
 
     vm.onTabChange = () => {
+        vm.showInfoPanel = false;
         mkTree(vm.showDirectsOnly);
     };
 
     vm.onSelect = (node) => {
+        vm.showInfoPanel = true;
+        vm.activeNode = node;
+    };
 
-        serviceBroker
-            .loadViewData(CORE_API.InvolvementStore.findByEntityReference, [mkRef("MEASURABLE", node.id)])
-            .then(r => {
-                node.roleInfo = _.chain(r.data)
-                    .filter(d => _.includes(vm.relatedMeasurableIds, d.entityReference.id))
-                    .map(d => {
+    vm.onHover = (node) => {
 
-                        const involvementKind = _.get(vm.involvementKindsById, d.kindId, null);
-                        const person = _.get(vm.peopleByEmployeeId, d.employeeId, null);
+        const involvements = _.get(vm.involvementsByMeasurableId, node.id);
 
-                        if(_.isNull(person)){
-                            return null;
-                        }
+        node.roleInfo = _.map(involvements, i => {
 
-                        return Object.assign({}, {
-                            name: involvementKind.name,
-                            value: person.displayName
-                        })
-                    })
-                    .filter(d => !_.isNull(d))
-                    .value();
-            });
+            const involvementKind = _.get(vm.involvementKindsById, i.involvement.kindId);
+
+            return { name: involvementKind.name, value: i.person.displayName, person: i.person}
+        });
     };
 
     vm.toggleDirectsOnly = () => {
         vm.showDirectsOnly = !vm.showDirectsOnly;
+        vm.showInfoPanel = false;
         mkTree(vm.showDirectsOnly);
     }
 }

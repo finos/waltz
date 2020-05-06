@@ -112,7 +112,7 @@ public class PersonService {
     }
 
 
-    public Set<Person> findReporteesByEmployeeId(String empId) {
-        return personDao.findAllReporteesByEmployeeId(empId);
+    public Set<Person> findByEmployeeIds(Set<String> empIds) {
+        return personDao.findByEmployeeIds(empIds);
     }
 }
