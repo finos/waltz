@@ -20,6 +20,7 @@ package com.khartec.waltz.data.scenario;
 
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.scenario.ChangeScenarioCommand;
 import com.khartec.waltz.model.scenario.CloneScenarioCommand;
 import com.khartec.waltz.model.scenario.ImmutableScenarioRatingItem;
 import com.khartec.waltz.model.scenario.ScenarioRatingItem;
@@ -150,18 +151,18 @@ public class ScenarioRatingItemDao {
     }
 
 
-    public boolean updateRating(long scenarioId, long appId, long columnId, long rowId, char rating, String comment, String userId) {
+    public boolean updateRating(ChangeScenarioCommand command, String userId) {
         boolean rc = dsl
                 .update(SCENARIO_RATING_ITEM)
-                .set(SCENARIO_RATING_ITEM.RATING, String.valueOf(rating))
-                .set(SCENARIO_RATING_ITEM.DESCRIPTION, comment)
+                .set(SCENARIO_RATING_ITEM.RATING, String.valueOf(command.rating()))
+                .set(SCENARIO_RATING_ITEM.DESCRIPTION, command.comment())
                 .set(SCENARIO_RATING_ITEM.LAST_UPDATED_BY, userId)
                 .set(SCENARIO_RATING_ITEM.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
-                .where(mkCoordinatesCondition(scenarioId, appId, columnId, rowId))
+                .where(mkCoordinatesCondition(command.scenarioId(), command.appId(), command.columnId(), command.rowId()))
                 .execute() == 1;
 
         if (rc) {
-            updateScenarioTimestamp(scenarioId, userId);
+            updateScenarioTimestamp(command.scenarioId(), userId);
         }
 
         return rc;

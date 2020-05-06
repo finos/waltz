@@ -505,20 +505,22 @@ function controller($q,
             });
     };
 
-    vm.onSaveCell =(item, column, row, workingState) => {
-        const args = [
-            vm.scenarioDefn.scenario.id,
-            item.id,
-            column.id,
-            row.id,
-            workingState.rating,
-            workingState.comment
-        ];
+    vm.onSaveCell =(item, column, row, workingState, currentRating) => {
+        const changeScenarioCommand = {
+            scenarioId: vm.scenarioDefn.scenario.id,
+            appId: item.id,
+            columnId: column.id,
+            rowId: row.id,
+            ratingSchemeId: vm.scenarioDefn.roadmap.ratingSchemeId,
+            rating: workingState.rating,
+            comment: workingState.comment,
+            previousRating: currentRating
+        };
 
         serviceBroker
             .execute(
                 CORE_API.ScenarioStore.updateRating,
-                args)
+                [changeScenarioCommand])
             .then(() => {
                 reload();
                 notification.success("Edited rating");

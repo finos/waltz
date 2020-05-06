@@ -56,9 +56,9 @@ function store($http, baseUrl) {
             .post(`${BASE}/id/${scenarioId}/rating/${appId}/${columnId}/${rowId}/${rating}`)
             .then(result => result.data);
 
-    const updateRating = (scenarioId, appId, columnId, rowId, rating, comment) =>
+    const updateRating = (command) =>
         $http
-            .post(`${BASE}/id/${scenarioId}/rating/${appId}/${columnId}/${rowId}/rating/${rating}`, comment)
+            .post(`${BASE}/change-rating`, command)
             .then(result => result.data);
 
     const updateDescription = (scenarioId, newDescription) => {
