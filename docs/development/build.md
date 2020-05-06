@@ -68,7 +68,7 @@ SQL Server) would look like:
                 <database.user>dbuser</database.user>
                 <database.password>dbpassword</database.password>
                 <database.schema>dbschema</database.schema>
-                <database.catalog>watlzdb</database.catalog> <!-- only req'd for code gen w/ mssql -->
+                <database.catalog>waltzdb</database.catalog> <!-- only req'd for code gen w/ mssql -->
             </properties>
         </profile>
     </profiles>
