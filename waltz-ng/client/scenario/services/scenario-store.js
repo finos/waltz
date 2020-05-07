@@ -46,9 +46,9 @@ function store($http, baseUrl) {
             .post(`${BASE}/id/${scenarioId}/clone`, newName)
             .then(result => result.data);
 
-    const removeRating = (scenarioId, appId, columnId, rowId) =>
+    const removeRating = (command) =>
         $http
-            .delete(`${BASE}/id/${scenarioId}/rating/${appId}/${columnId}/${rowId}`)
+            .post(`${BASE}/remove-rating`, command)
             .then(result => result.data);
 
     const addRating = (command) =>

@@ -33,6 +33,7 @@ public abstract class ChangeScenarioCommand implements Command {
     public abstract long columnId();
     public abstract long rowId();
     public abstract long ratingSchemeId();
+    @Nullable
     public abstract Character rating();
     @Nullable
     public abstract Character previousRating();

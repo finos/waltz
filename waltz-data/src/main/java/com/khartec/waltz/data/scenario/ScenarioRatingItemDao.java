@@ -111,15 +111,15 @@ public class ScenarioRatingItemDao {
     }
 
 
-    public boolean remove(long scenarioId, long appId, long columnId, long rowId, String userId) {
+    public boolean remove(ChangeScenarioCommand command, String userId) {
 
         boolean rc = dsl
                 .deleteFrom(SCENARIO_RATING_ITEM)
-                .where(mkCoordinatesCondition(scenarioId, appId, columnId, rowId))
+                .where(mkCoordinatesCondition(command))
                 .execute() == 1;
 
         if (rc) {
-            updateScenarioTimestamp(scenarioId, userId);
+            updateScenarioTimestamp(command.scenarioId(), userId);
         }
 
         return rc;
@@ -158,7 +158,7 @@ public class ScenarioRatingItemDao {
                 .set(SCENARIO_RATING_ITEM.DESCRIPTION, command.comment())
                 .set(SCENARIO_RATING_ITEM.LAST_UPDATED_BY, userId)
                 .set(SCENARIO_RATING_ITEM.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
-                .where(mkCoordinatesCondition(command.scenarioId(), command.appId(), command.columnId(), command.rowId()))
+                .where(mkCoordinatesCondition(command))
                 .execute() == 1;
 
         if (rc) {
@@ -171,11 +171,11 @@ public class ScenarioRatingItemDao {
 
     // -- helpers
 
-    private Condition mkCoordinatesCondition(long scenarioId, long appId, long columnId, long rowId) {
-        return SCENARIO_RATING_ITEM.DOMAIN_ITEM_ID.eq(appId)
-                .and(SCENARIO_RATING_ITEM.SCENARIO_ID.eq(scenarioId))
-                .and(SCENARIO_RATING_ITEM.ROW_ID.eq(rowId))
-                .and(SCENARIO_RATING_ITEM.COLUMN_ID.eq(columnId));
+    private Condition mkCoordinatesCondition(ChangeScenarioCommand command) {
+        return SCENARIO_RATING_ITEM.DOMAIN_ITEM_ID.eq(command.appId())
+                .and(SCENARIO_RATING_ITEM.SCENARIO_ID.eq(command.scenarioId()))
+                .and(SCENARIO_RATING_ITEM.ROW_ID.eq(command.rowId()))
+                .and(SCENARIO_RATING_ITEM.COLUMN_ID.eq(command.columnId()));
     }
 
 

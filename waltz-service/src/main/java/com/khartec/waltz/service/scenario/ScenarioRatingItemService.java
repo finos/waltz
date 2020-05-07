@@ -66,16 +66,11 @@ public class ScenarioRatingItemService {
     }
 
 
-    public boolean remove(long scenarioId, long appId, long columnId, long rowId, String userId) {
-        boolean result = scenarioRatingItemDao.remove(scenarioId, appId, columnId, rowId, userId);
+    public boolean remove(ChangeScenarioCommand command, String userId) {
+        boolean result = scenarioRatingItemDao.remove(command, userId);
 
         if (result) {
-            String message = String.format(
-                    "Removed app %d from colId: %d, rowId: %d",
-                    appId,
-                    columnId,
-                    rowId);
-            changeLogService.write(mkBasicLogEntry(scenarioId, message, userId));
+            writeApplicationChangeLog(command, userId, "Application %s (%s) was removed from %s");
         }
 
         return result;
@@ -85,14 +80,7 @@ public class ScenarioRatingItemService {
     public boolean add(ChangeScenarioCommand command, String userId) {
         boolean result = scenarioRatingItemDao.add(command, userId);
         if (result) {
-            Application application = applicationService.getById(command.appId());
-            Scenario scenario = scenarioService.getById(command.scenarioId());
-            String message = String.format(
-                    "Application %s (%s) was added to %s",
-                    application.assetCode().orElse("Unknown"),
-                    application.name(),
-                    scenario.name());
-            changeLogService.write(mkBasicLogEntry(command.scenarioId(), message, userId));
+            writeApplicationChangeLog(command, userId, "Application %s (%s) was added to %s");
         }
 
         return result;
@@ -103,31 +91,42 @@ public class ScenarioRatingItemService {
         boolean result = scenarioRatingItemDao.updateRating(command, userId);
 
         if (result) {
-            Application application = applicationService.getById(command.appId());
-            Scenario scenario = scenarioService.getById(command.scenarioId());
-
-            String message;
             if(command.rating() != command.previousRating()) {
-                List<RagName> ratings = ratingSchemeService.getById(command.ratingSchemeId()).ratings();
-                message = String.format(
-                        "Application %s (%s), moved from %s to %s for %s",
-                        application.assetCode().orElse("Unknown"),
-                        application.name(),
-                        getRatingName(ratings, command.previousRating()),
-                        getRatingName(ratings, command.rating()),
-                        scenario.name());
+                writeUpdateRatingLog(command, userId);
             } else {
-                message = String.format(
-                        "Updated rating/description for app %s (%s), a comment was added to %s ",
-                        application.assetCode().orElse("Unknown"),
-                        application.name(),
-                        scenario.name());
+                 writeApplicationChangeLog(command, userId,
+                         "Updated rating/description for app %s (%s), a comment was added to %s ");
             }
-
-            changeLogService.write(mkBasicLogEntry(command.scenarioId(), message, userId));
         }
 
         return result;
+    }
+
+    private void writeUpdateRatingLog(ChangeScenarioCommand command, String userId) {
+        String message;
+        Application application = applicationService.getById(command.appId());
+        Scenario scenario = scenarioService.getById(command.scenarioId());
+        List<RagName> ratings = ratingSchemeService.getById(command.ratingSchemeId()).ratings();
+        message = String.format(
+                "Application %s (%s), moved from %s to %s for %s",
+                application.assetCode().orElse("Unknown"),
+                application.name(),
+                getRatingName(ratings, command.previousRating()),
+                getRatingName(ratings, command.rating()),
+                scenario.name());
+
+        changeLogService.write(mkBasicLogEntry(command.scenarioId(), message, userId));
+    }
+
+    private void writeApplicationChangeLog(ChangeScenarioCommand command, String userId, String messageFormat) {
+        Application application = applicationService.getById(command.appId());
+        Scenario scenario = scenarioService.getById(command.scenarioId());
+        String message = String.format(
+                messageFormat,
+                application.assetCode().orElse("Unknown"),
+                application.name(),
+                scenario.name());
+        changeLogService.write(mkBasicLogEntry(command.scenarioId(), message, userId));
     }
 
     private String getRatingName(List<RagName> ratings, char rating) {

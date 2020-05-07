@@ -81,6 +81,19 @@ function prepareAxisHeadings(scenarioDefinition, measurablesById, hiddenAxes = [
         .value();
 }
 
+export function getChangeScenarioCommand(scenarioDefn, appId, columnId, rowId, rating=null, comment=null, currentRating=null) {
+    return {
+        scenarioId: scenarioDefn.scenario.id,
+        appId: appId,
+        columnId: columnId,
+        rowId: rowId,
+        ratingSchemeId: scenarioDefn.roadmap.ratingSchemeId,
+        rating: rating,
+        comment: comment,
+        previousRating: currentRating
+    };
+}
+
 
 export function prepareData(scenarioDefinition, applications = [], measurables = [], hiddenAxes = []) {
     const applicationsById = _.keyBy(applications, "id");

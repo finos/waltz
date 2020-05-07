@@ -81,7 +81,7 @@ public class ScenarioEndpoint implements Endpoint {
         registerFindScenariosByRoadmapSelector(mkPath(BASE_URL, "by-roadmap-selector"));
         registerGetScenarioById(mkPath(BASE_URL, "id", ":id"));
         registerCloneScenario(mkPath(BASE_URL, "id", ":id", "clone"));
-        registerRemoveRating(mkPath(BASE_URL, "id", ":id", "rating", ":appId", ":columnId", ":rowId"));
+        registerRemoveRating(mkPath(BASE_URL, "remove-rating"));
         registerUpdateRating(mkPath(BASE_URL, "change-rating"));
         registerAddRating(mkPath(BASE_URL, "add-rating"));
         registerUpdateName(mkPath(BASE_URL, "id", ":id", "name"));
@@ -242,13 +242,10 @@ public class ScenarioEndpoint implements Endpoint {
 
 
     private void registerRemoveRating(String path) {
-        deleteForDatum(path, (request, response) -> {
+        postForDatum(path, (request, response) -> {
             ensureUserHasEditRights(request);
             return scenarioRatingItemService.remove(
-                    getId(request),
-                    getLong(request, "appId"),
-                    getLong(request, "columnId"),
-                    getLong(request, "rowId"),
+                    readBody(request, ImmutableChangeScenarioCommand.class),
                     getUsername(request));
         });
     }
