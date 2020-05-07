@@ -83,7 +83,7 @@ public class ScenarioEndpoint implements Endpoint {
         registerCloneScenario(mkPath(BASE_URL, "id", ":id", "clone"));
         registerRemoveRating(mkPath(BASE_URL, "id", ":id", "rating", ":appId", ":columnId", ":rowId"));
         registerUpdateRating(mkPath(BASE_URL, "change-rating"));
-        registerAddRating(mkPath(BASE_URL, "id", ":id", "rating", ":appId", ":columnId", ":rowId", ":rating"));
+        registerAddRating(mkPath(BASE_URL, "add-rating"));
         registerUpdateName(mkPath(BASE_URL, "id", ":id", "name"));
         registerUpdateDescription(mkPath(BASE_URL, "id", ":id", "description"));
         registerUpdateEffectiveDate(mkPath(BASE_URL, "id", ":id", "effective-date"));
@@ -235,11 +235,7 @@ public class ScenarioEndpoint implements Endpoint {
         postForDatum(path, (request, response) -> {
             ensureUserHasEditRights(request);
             return scenarioRatingItemService.add(
-                    getId(request),
-                    getLong(request, "appId"),
-                    getLong(request, "columnId"),
-                    getLong(request, "rowId"),
-                    getRating(request),
+                    readBody(request, ImmutableChangeScenarioCommand.class),
                     getUsername(request));
         });
     }

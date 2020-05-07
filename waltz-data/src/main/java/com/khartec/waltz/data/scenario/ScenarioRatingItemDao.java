@@ -126,25 +126,25 @@ public class ScenarioRatingItemDao {
     }
 
 
-    public boolean add(long scenarioId, long appId, long columnId, long rowId, char rating, String userId) {
+    public boolean add(ChangeScenarioCommand command, String userId) {
 
         boolean rc = dsl
                 .insertInto(SCENARIO_RATING_ITEM)
-                .set(SCENARIO_RATING_ITEM.SCENARIO_ID, scenarioId)
-                .set(SCENARIO_RATING_ITEM.DOMAIN_ITEM_ID, appId)
+                .set(SCENARIO_RATING_ITEM.SCENARIO_ID, command.scenarioId())
+                .set(SCENARIO_RATING_ITEM.DOMAIN_ITEM_ID, command.appId())
                 .set(SCENARIO_RATING_ITEM.DOMAIN_ITEM_KIND, EntityKind.APPLICATION.name())
-                .set(SCENARIO_RATING_ITEM.COLUMN_ID, columnId)
+                .set(SCENARIO_RATING_ITEM.COLUMN_ID, command.columnId())
                 .set(SCENARIO_RATING_ITEM.COLUMN_KIND, EntityKind.MEASURABLE.name())
-                .set(SCENARIO_RATING_ITEM.ROW_ID, rowId)
+                .set(SCENARIO_RATING_ITEM.ROW_ID, command.rowId())
                 .set(SCENARIO_RATING_ITEM.ROW_KIND, EntityKind.MEASURABLE.name())
-                .set(SCENARIO_RATING_ITEM.RATING, String.valueOf(rating))
+                .set(SCENARIO_RATING_ITEM.RATING, String.valueOf(command.rating()))
                 .set(SCENARIO_RATING_ITEM.DESCRIPTION, "")
                 .set(SCENARIO_RATING_ITEM.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
                 .set(SCENARIO_RATING_ITEM.LAST_UPDATED_BY, userId)
                 .execute() == 1;
 
         if (rc) {
-            updateScenarioTimestamp(scenarioId, userId);
+            updateScenarioTimestamp(command.scenarioId(), userId);
         }
 
         return rc;

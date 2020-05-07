@@ -82,15 +82,17 @@ public class ScenarioRatingItemService {
     }
 
 
-    public boolean add(long scenarioId, long appId, long columnId, long rowId, char rating, String userId) {
-        boolean result = scenarioRatingItemDao.add(scenarioId, appId, columnId, rowId, rating, userId);
+    public boolean add(ChangeScenarioCommand command, String userId) {
+        boolean result = scenarioRatingItemDao.add(command, userId);
         if (result) {
+            Application application = applicationService.getById(command.appId());
+            Scenario scenario = scenarioService.getById(command.scenarioId());
             String message = String.format(
-                    "Added app %d to colId: %d, rowId: %d",
-                    appId,
-                    columnId,
-                    rowId);
-            changeLogService.write(mkBasicLogEntry(scenarioId, message, userId));
+                    "Application %s (%s) was added to %s",
+                    application.assetCode().orElse("Unknown"),
+                    application.name(),
+                    scenario.name());
+            changeLogService.write(mkBasicLogEntry(command.scenarioId(), message, userId));
         }
 
         return result;
@@ -108,8 +110,9 @@ public class ScenarioRatingItemService {
             if(command.rating() != command.previousRating()) {
                 List<RagName> ratings = ratingSchemeService.getById(command.ratingSchemeId()).ratings();
                 message = String.format(
-                        "Application %s, moved from %s to %s for %s",
+                        "Application %s (%s), moved from %s to %s for %s",
                         application.assetCode().orElse("Unknown"),
+                        application.name(),
                         getRatingName(ratings, command.previousRating()),
                         getRatingName(ratings, command.rating()),
                         scenario.name());

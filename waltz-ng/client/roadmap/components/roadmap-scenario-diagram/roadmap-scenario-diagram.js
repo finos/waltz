@@ -486,18 +486,19 @@ function controller($q,
     vm.onAddApplication = (app) => {
         const lastOrDefaultRating = getLastOrDefaultRating(app);
 
-        const args = [
-            vm.scenarioDefn.scenario.id,
-            app.id,
-            vm.selectedColumn.id,
-            vm.selectedRow.id,
-            lastOrDefaultRating
-        ];
+        const addRatingScenarioCommand = {
+            scenarioId: vm.scenarioDefn.scenario.id,
+            appId: app.id,
+            columnId: vm.selectedColumn.id,
+            rowId: vm.selectedRow.id,
+            ratingSchemeId: vm.scenarioDefn.roadmap.ratingSchemeId,
+            rating: lastOrDefaultRating
+        };
 
         serviceBroker
             .execute(
                 CORE_API.ScenarioStore.addRating,
-                args)
+                [addRatingScenarioCommand])
             .then(() => {
                 _.remove(vm.dialog.applicationPickList, a => a.id === app.id);
                 reload();

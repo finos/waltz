@@ -51,9 +51,9 @@ function store($http, baseUrl) {
             .delete(`${BASE}/id/${scenarioId}/rating/${appId}/${columnId}/${rowId}`)
             .then(result => result.data);
 
-    const addRating = (scenarioId, appId, columnId, rowId, rating) =>
+    const addRating = (command) =>
         $http
-            .post(`${BASE}/id/${scenarioId}/rating/${appId}/${columnId}/${rowId}/${rating}`)
+            .post(`${BASE}/add-rating`, command)
             .then(result => result.data);
 
     const updateRating = (command) =>
