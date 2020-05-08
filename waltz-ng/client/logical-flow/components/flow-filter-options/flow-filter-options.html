@@ -20,6 +20,10 @@
     <div ng-include="'wffo-scope-options'"></div>
     <hr>
     <div ng-include="'wffo-type-options'"></div>
+    <div ng-if="$ctrl.usedTags.length > 0">
+        <hr>
+        <div ng-include="'wffo-tag-options'"></div>
+    </div>
 </div>
 
 
@@ -64,7 +68,7 @@
 
         Alternatively,
         <a class='clickable'
-           ng-click="$ctrl.onShowAll()">
+           ng-click="$ctrl.onShowAllTypes()">
             show all.
         </a>
     </div>
@@ -128,5 +132,51 @@
                 </span>
             </label>
         </div>
+    </div>
+</script>
+
+
+<!-- TAG_FILTER -->
+<script type="text/ng-template"
+        id="wffo-tag-options">
+    <h5>
+        <waltz-icon name="filter"></waltz-icon>
+        Tags
+        <small>Filter</small>
+    </h5>
+
+    <div class="waltz-paragraph small"
+         style="padding-bottom: 4px;">
+        <span ng-if="$ctrl.selectedTags.length == $ctrl.usedTags.length">
+            All tags included, exclude tags to filter
+        </span>
+        <div ng-if="$ctrl.selectedTags.length < $ctrl.usedTags.length">
+            Filter applied,
+            <span ng-bind="$ctrl.selectedTags.length"></span>
+            of
+            <span ng-bind="$ctrl.usedTags.length"></span>
+            tags included,
+            <a class='clickable'
+               ng-click="$ctrl.showAllTags()">
+                include all
+            </a>
+        </div>
+    </div>
+
+    <div style="width: 380px;">
+        <ui-select multiple="true"
+                   theme="bootstrap"
+                   ng-model="$ctrl.selectedTags"
+                   on-select="$ctrl.onTagsChange()"
+                   on-remove="$ctrl.onTagsChange()">
+            <ui-select-match placeholder="Select tags..."
+                             class="waltz-ui-select-match-multi"
+                             ui-lock-choice="$select.selected.length == 1">
+                <span ng-bind-html="$item.name"></span>
+            </ui-select-match>
+            <ui-select-choices repeat="tag in $ctrl.usedTags | orderBy:'name' | filter: { name: $select.search }">
+                <span ng-bind-html="tag.name | highlight: $select.search"></span>
+            </ui-select-choices>
+        </ui-select>
     </div>
 </script>

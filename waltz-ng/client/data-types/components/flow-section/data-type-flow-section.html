@@ -103,9 +103,54 @@
             </div>
 
             <a class="clickable"
-               ng-click="$ctrl.showAll()">
-                <strong>Show All Flows</strong>
+               ng-click="$ctrl.showAllRatings()">
+                <strong>Select All Ratings</strong>
             </a>
+        </div>
+    </div>
+
+    <!-- Tags -->
+    <div ng-if="$ctrl.tags.length > 0">
+        <hr>
+        <h5>
+            <waltz-icon name="filter"></waltz-icon>
+            Tags
+            <small>Filter</small>
+        </h5>
+
+        <div class="waltz-paragraph small"
+             style="padding-bottom: 4px;">
+        <span ng-if="$ctrl.filterOptions.selectedTags.length == $ctrl.tags.length">
+            All tags included, exclude tags to filter
+        </span>
+            <div ng-if="$ctrl.filterOptions.selectedTags.length < $ctrl.tags.length">
+                Filter applied,
+                <span ng-bind="$ctrl.filterOptions.selectedTags.length"></span>
+                of
+                <span ng-bind="$ctrl.tags.length"></span>
+                tags included,
+                <a class='clickable'
+                   ng-click="$ctrl.showAllTags()">
+                    include all
+                </a>
+            </div>
+        </div>
+
+        <div style="width: 380px;">
+            <ui-select multiple="true"
+                       theme="bootstrap"
+                       ng-model="$ctrl.filterOptions.selectedTags"
+                       on-select="$ctrl.onTagsChange()"
+                       on-remove="$ctrl.onTagsChange()">
+                <ui-select-match placeholder="Select tags..."
+                                 class="waltz-ui-select-match-multi"
+                                 ui-lock-choice="$select.selected.length == 1">
+                    <span ng-bind-html="$item.name"></span>
+                </ui-select-match>
+                <ui-select-choices repeat="tag in $ctrl.tags | orderBy:'name' | filter: { name: $select.search }">
+                    <span ng-bind-html="tag.name | highlight: $select.search"></span>
+                </ui-select-choices>
+            </ui-select>
         </div>
     </div>
 </script>
