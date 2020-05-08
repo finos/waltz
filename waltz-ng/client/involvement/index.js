@@ -17,12 +17,15 @@
  */
 
 import angular from 'angular';
-import { registerComponents, registerStore } from '../common/module-utils';
+import {registerComponents, registerStore} from '../common/module-utils';
 
 import involvedPeopleSection from './components/involved-people-section';
 import involvedSectionService from './services/involved-section-service';
+import involvementViewService from './services/involvement-view-service';
 import involvementStore from './services/involvement-store';
 import keyPeopleSubSection from './components/sub-section/key-people-sub-section';
+import personMeasurableInvolvementsSection
+    from './components/person-measurable-involvements-section/person-measurable-involvements-section'
 
 
 export default () => {
@@ -31,12 +34,13 @@ export default () => {
     module
         .component('waltzInvolvedPeopleSection', involvedPeopleSection);
 
-    registerComponents(module, [keyPeopleSubSection]);
+    registerComponents(module, [keyPeopleSubSection, personMeasurableInvolvementsSection]);
 
     module
         .service('InvolvedSectionService', involvedSectionService);
 
     registerStore(module, involvementStore);
+    registerStore(module, involvementViewService);
 
     return module.name;
 };
