@@ -76,3 +76,24 @@ input::-ms-clear {
     background-color: #e5e5e5;
     color: #262626;
 }
+
+/* ui-select multiple > ui-select-match fix display issues */
+.ui-select-bootstrap.ui-select-multiple .ui-select-match {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/* ui-select multiple > ui-select-match overrides */
+.ui-select-bootstrap.ui-select-multiple .ui-select-match.waltz-ui-select-match-multi {
+    .btn {
+        cursor: default;
+    }
+    .btn-primary {
+        color: #333;
+        background-color: #fff;
+        border-color: #ccc;
+    }
+    .btn-primary:hover {
+        background-color: #e6e6e6;
+        border-color: #adadad;
+    }
+}
