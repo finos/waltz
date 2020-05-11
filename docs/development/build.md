@@ -26,6 +26,10 @@ For Mariadb create a new database:
 ```
 mysql -u root -e "create database IF NOT EXISTS waltz CHARACTER SET='utf8';"
 ```
+For SQL Server create a new database
+```
+CREATE DATABASE waltz ;
+```
 
 When you run the first build (using `mvn package`) the schema will be generated using the liquibase maven task (ref: `waltz-schema/pom.xml`).  
 
