@@ -19,6 +19,7 @@
 package com.khartec.waltz.model.application;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.*;
@@ -32,6 +33,7 @@ import java.util.Optional;
 @Value.Immutable
 @JsonSerialize(as = ImmutableApplication.class)
 @JsonDeserialize(as = ImmutableApplication.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class Application implements
         EntityKindProvider,
         IdProvider,
