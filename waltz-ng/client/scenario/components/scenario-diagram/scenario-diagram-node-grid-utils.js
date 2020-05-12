@@ -17,7 +17,8 @@
  */
 
 import _ from "lodash";
-import {drawUnit, NODE_STYLES, updateUnit} from "./scenario-diagram-static-node-utils";
+import {drawUnit, NODE_STYLES, updateUnit} from "./scenario-diagram-delta-node-utils";
+// import {drawUnit, NODE_STYLES, updateUnit} from "./scenario-diagram-static-node-utils";
 import {CELL_DIMENSIONS} from "./scenario-diagram-dimensions";
 import {defaultOptions} from "./scenario-diagram-utils";
 import {d3ContextMenu} from "../../../common/d3-context-menu";

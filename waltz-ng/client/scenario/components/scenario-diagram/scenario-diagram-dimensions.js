@@ -16,7 +16,7 @@
  *
  */
 
-import {NODE_DIMENSIONS} from "./scenario-diagram-static-node-utils";
+import {NODE_DIMENSIONS} from "./scenario-diagram-delta-node-utils";
 
 const CELL_PADDING = 10;
 

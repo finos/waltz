@@ -48,14 +48,17 @@ export const NODE_STYLES = {
     nodeCellChangeIndicatorBaseState: "node-cell-change-indicator-base-state"
 };
 
+export function updateUnit() {
+    console.log("update unit not supported in delta mode");
+}
 
-export function drawUnit(selection, ratingColorScheme) {
+export function drawUnit(selection, options) {
 
     selection
         .call(drawUnitTitle)
         .call(drawUnitExternalId)
         .call(drawUnitChangeInitiative)
-        .call(drawStateChangeIndicator, ratingColorScheme);
+        .call(drawStateChangeIndicator, options.colorScale);
 
     selection
         .append("rect")
@@ -88,34 +91,34 @@ function drawStateChangeIndicator(selection, ratingColorScale) {
         .attr("transform", `translate(${dx} ${dy})`);
 
     const baseStateShape = [
-        {x: 0, y: h * 0.3},
+        {x: 0, y: h * 0.4},
         {x: w * 0.3, y: h * 0.15},
         {x: w * 0.4, y: h * 0.5 },
         {x: w * 0.3, y: h * 0.85},
-        {x: 0, y: h * 0.7},
+        {x: 0, y: h * 0.6},
         {x: w * 0.02, y: h * 0.5}
     ];
 
     const targetStateShape = [
-        {x: w * 0.3, y: h * 0.2},
+        {x: w * 0.3, y: h * 0.3},
         {x: w * 0.9, y: 0},
         {x: w, y: h * 0.5 },
         {x: w * 0.9, y: h},
-        {x: w * 0.3, y: h * 0.8}
+        {x: w * 0.3, y: h * 0.7}
     ];
 
     section
         .append("path")
         .classed(NODE_STYLES.nodeCellChangeIndicatorTargetState, true)
         .attr("d", toPath(targetStateShape))
-        .attr("fill", d => ratingColorScale(d.change.target.rating))
+        .attr("fill", d => ratingColorScale(d.state.rating))
         .attr("stroke", "#959797");
 
     section
         .append("path")
         .classed(NODE_STYLES.nodeCellChangeIndicatorBaseState, true)
         .attr("d", toPath(baseStateShape))
-        .attr("fill", d => ratingColorScale(d.change.base.rating))
+        .attr("fill", "red") //d => ratingColorScale(d.change.base.rating))
         .attr("stroke", "#959797");
 }
 
@@ -176,7 +179,7 @@ function drawUnitTitle(selection) {
 
     selection
         .append("text")
-        .text(d => d.node.name)
+        .text(d => console.log(d) || d.node.name)
         .classed(NODE_STYLES.nodeTitle, true)
         .attr("dy", NODE_DIMENSIONS.text.dy)
         .attr("dx", NODE_DIMENSIONS.text.dx)
