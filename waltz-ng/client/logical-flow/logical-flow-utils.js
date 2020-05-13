@@ -80,20 +80,6 @@ export function categorizeDirection(flow, ref) {
 
 
 /**
- * We calculate flow summary stats differently based on the entity kind.
- * This helper method takes a kind and returns a method reference which
- * can be used by the ServiceBroker
- * @param kind
- * @returns {*}
- */
-export function determineStatMethod(kind) {
-    return kind === 'DATA_TYPE'
-        ? CORE_API.DataTypeUsageStore.calculateStats
-        : CORE_API.LogicalFlowStore.calculateStats;
-}
-
-
-/**
  * Given a service broker and logical flow returns a json
  * object with `source` and `target` keys containing the
  * relevant entities.  An additional property of `entityReference`
