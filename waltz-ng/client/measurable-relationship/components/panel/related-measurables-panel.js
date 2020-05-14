@@ -133,19 +133,11 @@ function mkGridData(selfRef,
             const a = mkCell(r.a.kind, r.a);
             const b = mkCell(r.b.kind, r.b);
 
-            const relatedKinds = _.chain(relationships)
-                .filter(k => k.a.id === a.id && k.b.id === b.id)
-                .map(rel => rel.relationship)
-                .value();
-
-            const relationshipString = _.join(relatedKinds, ", ");
-
             return {
                 outbound,
                 a,
                 b,
                 relationship: r.relationship,
-                relationships: relationshipString
             };
         })
         .filter(r => r !== null)

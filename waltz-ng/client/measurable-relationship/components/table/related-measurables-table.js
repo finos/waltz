@@ -101,11 +101,19 @@ function controller() {
 
     vm.$onChanges = (c) => {
         if (c.rows){
+            const collectedRels = _.map(vm.rows, r => {
 
+                const relatedKinds = _.chain(vm.rows)
+                    .filter(d => d.a.id === r.a.id && d.b.id === r.b.id)
+                    .map(rel => rel.relationship)
+                    .value();
 
+                const relationshipString = _.join(relatedKinds, ", ");
 
-            vm.data = _.map(vm.rows, r =>
-                Object.assign("", {a: r.a, b: r.b, relationships: r.relationships}));
+                return Object.assign("", {a: r.a, b: r.b, relationships: relationshipString});
+            });
+
+            vm.data = _.uniqBy(collectedRels, r => JSON.stringify([r.a, r.b, r.relationships]));
         }
     };
 
