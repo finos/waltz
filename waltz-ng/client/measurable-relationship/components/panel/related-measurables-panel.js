@@ -283,9 +283,13 @@ function controller($q, $timeout, serviceBroker, notification) {
                 kind: 'MEASURABLE_CATEGORY'}
             : vm.parentEntityRef;
 
+        const selectedCategory = (_.has(vm.selectedCategory, 'ref'))
+            ? vm.selectedCategory.ref
+            : { kind: vm.selectedCategory.id, id: 0};
+
         return serviceBroker.loadViewData(
             CORE_API.RelationshipKindStore.findRelationshipKindsBetweenEntities,
-            [parentRef, vm.selectedCategory.ref])
+            [parentRef, selectedCategory])
             .then(r => vm.relationshipKinds = r.data)
     };
 
