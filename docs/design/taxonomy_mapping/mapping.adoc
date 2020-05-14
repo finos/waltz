@@ -1,0 +1,168 @@
+= Taxonomy Variants
+
+== Overview
+
+Organizational areas often evolve their own particular taxonomies to communicate between the
+business and IT. These taxonomies are often _related-to_ but *not* _identical-to_ common enterprise
+taxonomies. They will often go into more detail in some areas and less detail in others as well
+as using slightly different terminology.
+
+Within Waltz there is a desire to allow these areas to express themselves using their taxonomies but
+have a mechanism to describe how their taxonomy relates back to the enterprise taxonomy.
+
+Using a mapping may allow for a fully or semi-automatic translation between taxonomies.
+
+The purpose of this issue is to analyse the requirement, examine 'prior-art' and discuss potential approaches.
+
+
+== Approaches
+
+We will consider two approaches to this task.  The first is to model variations within the enterprise taxonomy
+and use filtering to allow sections to be enabled/disabled and also to allow for variations of the names of elements.
+We shall refer to this as the _Merged_ approach
+
+=== Merged
+
+
+
+[graphviz, merged, svg]
+----
+digraph B {
+    nodesep=0.7;
+
+    subgraph ent {
+        node [style=filled,fillcolor=wheat,color=brown,shape=oval];
+
+        Er [label="enterprise taxonomy", shape=rectangle, fillcolor=none];
+        Eab [label="{Eab|Variant1|Variant2}", shape=Mrecord]
+
+        Er -> E [style=dotted, arrowhead=none]
+
+        E -> Ea;
+        E -> Eb;
+        Ea -> Eaa;
+        Ea -> Eab;
+        Eb -> Cba [style=dashed, fontsize=9, label="Only for org unit C"];
+
+
+    }
+}
+----
+
+
+
+=== Distinct
+
+Let us assume we have an enterprise taxonomy and a custom taxonomy.  The example taxonomies shown are
+extremely simplified and generic.
+
+
+[graphviz, distinct1, svg]
+----
+digraph A {
+    nodesep=0.7;
+
+    subgraph ent {
+        node [style=filled,fillcolor=wheat,color=brown,shape=oval];
+
+        Er [label="enterprise taxonomy", shape=rectangle, fillcolor=none];
+        Er -> E [style=dotted, arrowhead=none]
+
+        E -> Ea;
+        E -> Eb;
+        Ea -> Eaa;
+        Ea -> Eab;
+    }
+
+    subgraph custom {
+        node [style=filled,fillcolor=lightcyan2, color=darblue, shape=rect];
+
+        Cr [label="custom taxonomy", shape=rectangle, fillcolor=none];
+        Cr -> C [style=dotted, arrowhead=none]
+
+        C -> Ca;
+        C -> Cb;
+        Ca -> Caa;
+        Ca -> Cab;
+        Caa -> Caaa;
+        Caa -> Caab;
+    }
+
+}
+----
+
+
+
+== References
+
+- https://github.com/finos/waltz/issues/4866[Waltz Issue]
+- https://www.hedden-information.com/wp-content/uploads/2019/09/Mapping-Taxonomies-Thesauri-Ontologies.pdf[Mapping Taxonomies, Thesauri, and Ontologies]
+
+
+---
+---
+---
+
+== Scrap
+
+
+
+[graphviz, dot-example, svg]
+----
+digraph G {
+    nodesep=0.7;
+
+    // forcing layout
+    {rank="same"; Ar; Br; Cr}
+    Br -> Ar [style=invis];
+    Ar -> Cr [style=invis];
+
+
+    subgraph t2 {
+        node [style=filled,fillcolor=mintcream, color=darkgreen, shape=trapezium,];
+
+
+        Br [label="bespoke taxonomy"];
+
+        Br -> Ba;
+        Ba -> Baa;
+        Baa -> Baaa;
+        Ba -> Bab;
+
+    }
+
+
+    subgraph t1 {
+        node [style=filled,fillcolor=wheat,color=brown,shape=oval];
+
+        Ar [label="enterprise taxonomy"];
+
+        Ar -> Aa [style=dotted,arrowhead=none];
+        Aa -> Aaa;
+        Aa -> Aab;
+        Aaa -> Aaaa;
+        Aaa -> Aaab;
+    }
+
+
+    subgraph t3 {
+        node [style=filled,fillcolor=lightcyan2, color=darblue, shape=rect];
+
+
+        Cr [label="custom taxonomy"];
+
+        Cr -> Ca;
+        Ca -> Caa;
+        Caa -> Caaa;
+        Ca -> Cab;
+    }
+
+    Ba -> Aa [color="#aaaaaa" constraint=false];
+    Baa -> Aaa [color="#aaaaaa" constraint=false];
+    Bab -> Aab [color="#aaaaaa" constraint=false];
+
+    Ca -> Aa [color="#aaaaaa" constraint=false];
+    Caa -> Aaa [color="#aaaaaa" constraint=false];
+    Cab -> Aab [color="#aaaaaa" constraint=false style=dashed fontsize=9 label="#1"];
+}
+----

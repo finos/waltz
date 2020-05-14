@@ -1,0 +1,57 @@
+digraph G {
+    nodesep=0.7;
+
+    // forcing layout
+    {rank="same"; Ar; Br; Cr}
+    Br -> Ar [style=invis];
+    Ar -> Cr [style=invis];
+
+
+    subgraph t2 {
+        node [style=filled,fillcolor=mintcream, color=darkgreen, shape=trapezium,];
+
+
+        Br [label="bespoke taxonomy"];
+
+        Br -> Ba;
+        Ba -> Baa;
+        Baa -> Baaa;
+        Ba -> Bab;
+
+    }
+
+
+    subgraph t1 {
+        label="Foo"
+        node [style=filled,fillcolor=wheat,color=brown,shape=oval];
+
+        Ar [label="enterpise taxonomy"];
+
+        Ar -> Aa;
+        Aa -> Aaa;
+        Aa -> Aab;
+        Aaa -> Aaaa;
+        Aaa -> Aaab;
+    }
+
+
+    subgraph t3 {
+        node [style=filled,fillcolor=lightcyan2, color=darblue, shape=rect];
+
+
+        Cr [label="custom taxonomy"];
+
+        Cr -> Ca;
+        Ca -> Caa;
+        Caa -> Caaa;
+        Ca -> Cab;
+    }
+
+    Ba -> Aa [color="#aaaaaa" constraint=false];
+    Baa -> Aaa [color="#aaaaaa" constraint=false];
+    Bab -> Aab [color="#aaaaaa" constraint=false];
+
+    Ca -> Aa [color="#aaaaaa" constraint=false];
+    Caa -> Aaa [color="#aaaaaa" constraint=false];
+    Cab -> Aab [color="#aaaaaa" constraint=false];
+}
