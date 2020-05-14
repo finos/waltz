@@ -23,7 +23,7 @@
                     </span>
 
                     <span class="wrmp-pill wrmp-rel">
-                        <span ng-bind="$ctrl.item.relationship.relationship | toDisplayName:'relationshipKind'"></span>
+                        <span ng-bind="$ctrl.item.relationship | toDisplayName:'relationshipKind'"></span>
                     </span>
                     <span class="wrmp-pill wrmp-self">
                         This
@@ -41,7 +41,7 @@
                     </span>
 
                     <span class="wrmp-pill wrmp-rel">
-                        <span ng-bind="$ctrl.item.relationship.relationship | toDisplayName:'relationshipKind'">
+                        <span ng-bind="$ctrl.item.relationship | toDisplayName:'relationshipKind'">
                         </span>
                     </span>
 
@@ -57,10 +57,10 @@
 
 <br>
 <label>Description:</label>
-<div ng-if="$ctrl.item.relationship.description">
-    <waltz-markdown text="$ctrl.item.relationship.description"></waltz-markdown>
+<div ng-if="$ctrl.item.description">
+    <waltz-markdown text="$ctrl.item.description"></waltz-markdown>
 </div>
-<div ng-if="!$ctrl.item.relationship.description"
+<div ng-if="!$ctrl.item.description"
      class="text-muted">
     <strong>No description provided</strong>
 </div>
@@ -74,7 +74,7 @@
         Edit
     </button>
     <button class="btn btn-xs btn-danger"
-            ng-click="$ctrl.onRemove($ctrl.item.relationship)">
+            ng-click="$ctrl.onRemove($ctrl.item)">
         Delete
     </button>
     <a ng-click="$ctrl.onDismiss()"
@@ -85,6 +85,6 @@
 </div>
 
 <div class="small">
-    <waltz-last-updated entity="$ctrl.item.relationship">
+    <waltz-last-updated entity="$ctrl.item">
     </waltz-last-updated>
 </div>

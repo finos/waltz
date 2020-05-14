@@ -45,6 +45,7 @@ const bindings = {
 
 const initialState = {
     categories: [],
+    columnDefs: [],
     measurables: [],
     relationships: [],
     selectedCategory: null,
@@ -52,12 +53,36 @@ const initialState = {
     gridData: [],
     visibility: {
         editor: false,
-        detailMode: "table", // table | tree,
+        detailMode: "Tree", // table | tree,
         detailModeChanger: false,
         createEditor: false,
         updateEditor: false,
+        newRelationshipKind: false
     }
 };
+
+
+const columnDefs = [
+    {
+        field: "a.name",
+        name: "From",
+    },
+    {
+        field: "a.type",
+        name: "(From Type)"
+    }, {
+        field: "relationship",
+        name: "Relationship",
+        cellFilter: "toDisplayName:'relationshipKind'"
+    },
+    {
+        field: "b.name",
+        name: "To"
+    }, {
+        field: "b.type",
+        name: "(To Type)"
+    }
+];
 
 
 const DEFAULT_SELECTION_FILTER_FN = () => true;
@@ -99,6 +124,7 @@ function mkGridData(selfRef,
         }
     };
 
+
     return _
         .chain(relationships)
         .filter(rowFilterFn)
@@ -107,11 +133,19 @@ function mkGridData(selfRef,
             const a = mkCell(r.a.kind, r.a);
             const b = mkCell(r.b.kind, r.b);
 
+            const relatedKinds = _.chain(relationships)
+                .filter(k => k.a.id === a.id && k.b.id === b.id)
+                .map(rel => rel.relationship)
+                .value();
+
+            const relationshipString = _.join(relatedKinds, ", ");
+
             return {
                 outbound,
                 a,
                 b,
-                relationship: r
+                relationship: r.relationship,
+                relationships: relationshipString
             };
         })
         .filter(r => r !== null)
@@ -165,6 +199,7 @@ function controller($q, $timeout, serviceBroker, notification) {
         vm.selectedRow = null;
         vm.selectionFilterFn = c.relationshipFilter;
         vm.gridData = calcGridData();
+        loadAllowedRelationshipKinds();
         vm.cancelEditor();
     });
 
@@ -181,6 +216,7 @@ function controller($q, $timeout, serviceBroker, notification) {
         if (r === vm.selectedRow) {
             vm.clearRowSelection(); // toggle
         } else {
+            vm.filteredGridData = _.filter(vm.gridData, d => d.a.id === r.a.id && d.b.id === r.b.id);
             vm.selectedRow = r;
         }
         vm.cancelEditor();
@@ -190,6 +226,14 @@ function controller($q, $timeout, serviceBroker, notification) {
         vm.selectedRow = null;
     };
 
+    vm.selectRelationship = (r) => {
+        if (r === vm.selectedRelationship) {
+            vm.selectedRelationship = null; // toggle
+        } else {
+            vm.selectedRelationship = r;
+        }
+        vm.cancelEditor();
+    };
 
     vm.removeRelationship = (rel) => {
         if (confirm("Are you sure you want to delete this relationship ?")) {
@@ -240,6 +284,19 @@ function controller($q, $timeout, serviceBroker, notification) {
             });
     };
 
+    const loadAllowedRelationshipKinds = () => {
+
+        const parentRef = (_.get(vm.parentEntityRef, 'kind') === 'MEASURABLE')
+            ? { id: _.find(vm.measurables, m => m.id === vm.parentEntityRef.id).categoryId,
+                kind: 'MEASURABLE_CATEGORY'}
+            : vm.parentEntityRef;
+
+        return serviceBroker.loadViewData(
+            CORE_API.RelationshipKindStore.findRelationshipKindsBetweenEntities,
+            [parentRef, vm.selectedCategory.ref])
+            .then(r => vm.relationshipKinds = r.data)
+    };
+
     const loadAll = () => {
         const promises = [
             serviceBroker.loadAppData(CORE_API.MeasurableCategoryStore.findAll).then(r => r.data),
@@ -267,6 +324,7 @@ function controller($q, $timeout, serviceBroker, notification) {
     // -- BOOT --
     vm.$onInit = () => {
         initialiseData(vm, initialState);
+        vm.columnDefs = columnDefs;
         loadAll();
     };
 }

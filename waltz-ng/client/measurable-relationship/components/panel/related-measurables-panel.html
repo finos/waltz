@@ -110,7 +110,29 @@
                      class="waltz-fade-if">
                     <hr>
 
-                    <waltz-related-measurable-item-view item="$ctrl.selectedRow"
+                    <h4>Relationships: </h4>
+                    <p>Select a relationship to edit the relationship type...</p>
+                    <table class="table table-condensed small">
+                        <tbody>
+                            <tr ng-repeat="relationship in $ctrl.filteredGridData"
+                                ng-click="$ctrl.selectRelationship(relationship)"
+                                class="clickable">
+                                <td ng-bind="relationship.a.name"></td>
+                                <td ng-bind="relationship.relationship"></td>
+                                <td ng-bind="relationship.b.name">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <a class="clickable"
+                       ng-click="$ctrl.addNewRelationshipKind">...or add a new relationship
+                    </a>
+
+                    <br>
+
+                    <waltz-related-measurable-item-view ng-if="$ctrl.selectedRelationship"
+                                                        item="$ctrl.selectedRelationship"
                                                         on-dismiss="$ctrl.clearRowSelection"
                                                         on-edit="$ctrl.updateExistingRelationship"
                                                         on-remove="$ctrl.removeRelationship">
@@ -144,6 +166,10 @@
             </div>
         </div>
 
+        <div ng-if="$ctrl.visibility.newRelationshipKind">
+
+        </div>
+
         <div ng-if="$ctrl.visibility.createEditor"
              class="waltz-fade-if">
             <hr>
@@ -158,9 +184,10 @@
         <div ng-if="$ctrl.visibility.updateEditor"
              class="waltz-fade-if">
             <hr>
-            <waltz-update-related-measurable-editor relationship="$ctrl.selectedRow.relationship"
+            <waltz-update-related-measurable-editor relationship="$ctrl.selectedRelationship"
                                                     on-cancel="$ctrl.cancelEditor"
-                                                    on-refresh="$ctrl.refresh">
+                                                    on-refresh="$ctrl.refresh"
+                                                    relationship-kinds="$ctrl.relationshipKinds">
             </waltz-update-related-measurable-editor>
         </div>
 

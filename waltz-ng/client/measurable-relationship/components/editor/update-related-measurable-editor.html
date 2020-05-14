@@ -24,6 +24,21 @@
 
         <form>
 
+            <!-- KIND -->
+            <div class="form-group">
+                <label>Relationship Kind</label>
+                <select ng-model="$ctrl.form.relationshipKind"
+                        class="form-control">
+                    <option ng-repeat="kind in $ctrl.relationshipKinds"
+                            value="{{kind.code}}"
+                            ng-bind="kind.name">
+                    </option>
+                </select>
+                <div class="help-block">
+                    The relationship kind describes the nature of the relationship between the entities.
+                </div>
+            </div>
+
             <!-- DESCRIPTION -->
             <div class="form-group">
                 <label class="control-label">

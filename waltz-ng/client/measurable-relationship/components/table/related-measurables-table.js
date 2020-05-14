@@ -24,6 +24,7 @@ import {sameRef} from "../../../common/entity-utils";
 import {downloadTextFile} from "../../../common/file-utils";
 import {getEnumName} from "../../../common/services/enums/index";
 import {relationshipKind} from "../../../common/services/enums/relationship-kind";
+import {mkEntityLinkGridCell} from "../../../common/grid-utils";
 
 
 const bindings = {
@@ -34,20 +35,17 @@ const bindings = {
 
 
 const columnDefs = [
+    mkEntityLinkGridCell("From", "a"),
     {
-        field: "a.name",
-        name: "From"
-    }, {
         field: "a.type",
         name: "(From Type)"
     }, {
-        field: "relationship.relationship",
-        name: "Relationship",
-        cellFilter: "toDisplayName:'relationshipKind'"
-    }, {
-        field: "b.name",
-        name: "To"
-    }, {
+        field: "relationships",
+        name: "Relationships",
+        // cellFilter: "toDisplayName:'relationshipKind'"
+    },
+    mkEntityLinkGridCell("From", "b"),
+    {
         field: "b.type",
         name: "(To Type)"
     }
@@ -101,6 +99,15 @@ function controller() {
         }
     };
 
+    vm.$onChanges = (c) => {
+        if (c.rows){
+
+
+
+            vm.data = _.map(vm.rows, r =>
+                Object.assign("", {a: r.a, b: r.b, relationships: r.relationships}));
+        }
+    };
 
     vm.export = () => {
         const data = mkExportData(vm.rows);
