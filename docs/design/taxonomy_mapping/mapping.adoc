@@ -1,4 +1,5 @@
 = Taxonomy Variants
+:toc:
 
 == Overview
 
@@ -13,7 +14,6 @@ have a mechanism to describe how their taxonomy relates back to the enterprise t
 Using a mapping may allow for a fully or semi-automatic translation between taxonomies.
 
 The purpose of this issue is to analyse the requirement, examine 'prior-art' and discuss potential approaches.
-
 
 == Approaches
 
@@ -181,9 +181,7 @@ importantly, seems to agree with the approach that taxonomy experts and
 methodologies recommend.
 
 
----
-
-=== Notes
+== Notes
 
 There is a https://github.com/finos/waltz/issues/4866[Waltz Issue]
 for tracking this proposal and to open the discussion to the wider Waltz
