@@ -220,21 +220,6 @@ function controller($element,
     vm.$onInit = () => {
         serviceBroker.loadViewData(CORE_API.DataTypeStore.findAll)
             .then(r => vm.dataTypes = _.keyBy(r.data, dt => dt.id));
-
-        // initialise selected tags (change to userPref)
-        if (! _.isEmpty(vm.tags)) {
-            getSelectedTagsFromPreferences(
-                vm.tags,
-                appLogicalFlowFilterExcludedTagIdsKey,
-                userPreferenceService)
-                .then(selectedTags => {
-                    vm.filterOptions.selectedTags = selectedTags;
-                    filterChanged();
-                });
-        } else {
-            vm.filterOptions.selectedTags = [];
-            filterChanged();
-        }
     };
 
     vm.$onChanges = (changes) => {
@@ -243,16 +228,24 @@ function controller($element,
             vm.resetNodeAndTypeFilter();
         }
 
+        if (!_.isEmpty(vm.tags)) {
+            vm.tags = maybeAddUntaggedFlowsTag(vm.tags);
+
+            getSelectedTagsFromPreferences(
+                vm.tags,
+                appLogicalFlowFilterExcludedTagIdsKey,
+                userPreferenceService)
+                .then(selectedTags => {
+                    vm.filterOptions.selectedTags = selectedTags;
+                    filterChanged();
+                });
+        }
+
         const keyedLogicalFlows = calculateSourceAndTargetFlowsByEntity(
             vm.entityRef,
             vm.logicalFlows);
 
         const logicalFlowsById = _.keyBy(vm.logicalFlows, "id");
-
-        // add untaggedFlowsTag
-        if (!_.isEmpty(vm.tags)) {
-            vm.tags = maybeAddUntaggedFlowsTag(vm.tags);
-        }
 
         function select(entity, type, logicalFlowId, evt) {
             const typeInfoByFlowId = mkTypeInfo(vm.decorators, vm.dataTypes);
