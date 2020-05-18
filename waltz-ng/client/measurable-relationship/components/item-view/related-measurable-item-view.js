@@ -20,6 +20,7 @@
 import template from './related-measurable-item-view.html';
 import {initialiseData} from "../../../common/index";
 import * as _ from "lodash";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
@@ -46,14 +47,26 @@ const initialState = {
 
 
 
-function controller() {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
+
+    function enrichItemsWithRelationshipKind() {
+        vm.list = _.map(vm.items, i => Object.assign({},
+            i,
+            {relationshipKind: _.get(vm.relationshipKindsByCode, i.relationship.relationship, null)}));
+    }
+
+    vm.$onInit = () => {
+        serviceBroker.loadAppData(CORE_API.RelationshipKindStore.findAll)
+            .then(r => vm.relationshipKindsByCode = _.keyBy(r.data, d => d.code))
+            .then(() => enrichItemsWithRelationshipKind())
+    };
 
     vm.$onChanges = (c) => {
         if(c.items){
             vm.selectedItem = null;
-            vm.list = vm.items;
             vm.counterpart = _.first(_.map(vm.items, i => (i.outbound) ? i.b : i.a));
+            enrichItemsWithRelationshipKind();
         }
     };
 
@@ -68,6 +81,11 @@ function controller() {
     };
 
 }
+
+
+controller.$inject = [
+    "ServiceBroker"
+];
 
 
 const component = {

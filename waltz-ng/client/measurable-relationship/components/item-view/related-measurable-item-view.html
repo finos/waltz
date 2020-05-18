@@ -25,7 +25,7 @@
             <span ng-repeat="item in $ctrl.items">
                 <span class="wrmp-pill wrmp-rel-inner clickable"
                       ng-click="$ctrl.selectItem(item)"
-                      ng-bind="item.relationship.relationship | toDisplayName:'relationshipKind'">
+                      ng-bind="item.relationshipKind.name">
                 </span>
                 <br>
                 <br>
@@ -59,7 +59,7 @@
             <span ng-repeat="item in $ctrl.list">
                 <span class="wrmp-pill wrmp-rel-inner clickable"
                       ng-click="$ctrl.selectItem(item)"
-                      ng-bind="item.relationship.relationship | toDisplayName:'relationshipKind'">
+                      ng-bind="item.relationshipKind.name">
                 </span>
                 <br>
                 <br>
