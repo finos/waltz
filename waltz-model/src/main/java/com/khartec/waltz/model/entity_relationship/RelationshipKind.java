@@ -85,10 +85,6 @@ public enum RelationshipKind {
 
     DATA_CONSUMER(fromArray(
             tuple(CHANGE_INITIATIVE, APPLICATION)
-    )),
-
-    TEST_9(fromArray(
-        tuple(CHANGE_INITIATIVE, MEASURABLE)
     ));
 
 

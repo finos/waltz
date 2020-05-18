@@ -54,7 +54,8 @@
             This
         </span>
 
-        <span class="wrmp-pill wrmp-rel">
+        <span class="wrmp-pill wrmp-rel"
+              ng-if="$ctrl.relationshipKinds.length > 0 || $ctrl.list.length > 1">
             <span ng-repeat="item in $ctrl.list">
                 <span class="wrmp-pill wrmp-rel-inner clickable"
                       ng-click="$ctrl.selectItem(item)"
@@ -69,6 +70,15 @@
                 <waltz-icon name="plus"></waltz-icon>
                 add relationship
             </a>
+        </span>
+        <span class="wrmp-pill wrmp-rel"
+              ng-if="$ctrl.relationshipKinds.length == 0 && $ctrl.list.length == 1">
+            <span ng-repeat="item in $ctrl.list">
+                <span class="wrmp-pill wrmp-rel-inner clickable"
+                      ng-click="$ctrl.selectItem(item)"
+                      ng-bind="item.relationship.relationship | toDisplayName:'relationshipKind'">
+                </span>
+            </span>
         </span>
 
         <span class="wrmp-pill wrmp-counterpart">
