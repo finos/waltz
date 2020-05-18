@@ -27,8 +27,12 @@
             <!-- KIND -->
             <div class="form-group">
                 <label>Relationship Kind</label>
+                <waltz-no-data ng-if="$ctrl.relationshipKinds.length == 0">
+                    <message>This relationship is being described by all available relationship kinds.</message>
+                </waltz-no-data>
                 <select ng-model="$ctrl.form.relationshipKind"
-                        class="form-control">
+                        class="form-control"
+                        ng-if="$ctrl.relationshipKinds.length > 0">
                     <option ng-repeat="kind in $ctrl.relationshipKinds"
                             value="{{kind.code}}"
                             ng-bind="kind.name">

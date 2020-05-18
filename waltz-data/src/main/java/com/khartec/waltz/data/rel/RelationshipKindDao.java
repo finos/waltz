@@ -23,15 +23,14 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.rel.ImmutableRelationshipKind;
 import com.khartec.waltz.model.rel.RelationshipKind;
 import com.khartec.waltz.schema.tables.records.RelationshipKindRecord;
-import org.jooq.Condition;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
+import static com.khartec.waltz.schema.Tables.MEASURABLE;
 import static com.khartec.waltz.schema.Tables.RELATIONSHIP_KIND;
 
 @Repository
@@ -73,27 +72,33 @@ public class RelationshipKindDao {
 
     public Set<RelationshipKind> findRelationshipKindsBetweenEntites(EntityReference parent, EntityReference target){
 
-        EntityKind parentKind = (isMeasurableCategory(parent)) ? EntityKind.MEASURABLE : parent.kind();
-        EntityKind targetKind = (isMeasurableCategory(target)) ? EntityKind.MEASURABLE : target.kind();
-
-        Condition categoryACondition = (isMeasurableCategory(parent))
-                ? RELATIONSHIP_KIND.CATEGORY_A.isNull().or(RELATIONSHIP_KIND.CATEGORY_A.eq(parent.id()))
+        Condition categoryACondition = (isMeasurable(parent))
+                ? RELATIONSHIP_KIND.CATEGORY_A.isNull().or(RELATIONSHIP_KIND.CATEGORY_A.eq(getCategory(parent.id())))
                 : RELATIONSHIP_KIND.CATEGORY_A.isNull();
 
-        Condition categoryBCondition = (isMeasurableCategory(target))
-                ? RELATIONSHIP_KIND.CATEGORY_B.isNull().or(RELATIONSHIP_KIND.CATEGORY_B.eq(target.id()))
+        Condition categoryBCondition = (isMeasurable(target))
+                ? RELATIONSHIP_KIND.CATEGORY_B.isNull().or(RELATIONSHIP_KIND.CATEGORY_B.eq(getCategory(target.id())))
                 : RELATIONSHIP_KIND.CATEGORY_B.isNull();
 
         return dsl.selectFrom(RELATIONSHIP_KIND)
-                .where(RELATIONSHIP_KIND.KIND_A.eq(parentKind.name())
-                        .and(RELATIONSHIP_KIND.KIND_B.eq(targetKind.name())
+                .where(RELATIONSHIP_KIND.KIND_A.eq(parent.kind().name())
+                        .and(RELATIONSHIP_KIND.KIND_B.eq(target.kind().name())
                                 .and(categoryACondition)
                                 .and(categoryBCondition)))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 
-    private Boolean isMeasurableCategory(EntityReference ref) {
-        return ref.kind().equals(EntityKind.MEASURABLE_CATEGORY);
+    private SelectConditionStep<Record1<Long>> getCategory(long measurableId) {
+        SelectConditionStep<Record1<Long>> where = DSL
+                .select(MEASURABLE.MEASURABLE_CATEGORY_ID)
+                .from(MEASURABLE)
+                .where(MEASURABLE.ID.eq(measurableId));
+
+        return where;
+    }
+
+    private Boolean isMeasurable(EntityReference ref) {
+        return ref.kind().equals(EntityKind.MEASURABLE);
     }
 
 }

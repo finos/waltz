@@ -105,7 +105,7 @@ function controller() {
 
                 const relatedKinds = _.chain(vm.rows)
                     .filter(d => d.a.id === r.a.id && d.b.id === r.b.id)
-                    .map(rel => rel.relationship)
+                    .map(rel => rel.relationship.relationship)
                     .value();
 
                 const relationshipString = _.join(relatedKinds, ", ");

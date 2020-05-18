@@ -19,27 +19,54 @@
 
 import template from './related-measurable-item-view.html';
 import {initialiseData} from "../../../common/index";
+import * as _ from "lodash";
 
 
 const bindings = {
-    item: '<',
+    items: '<',
+    relationshipKinds: '<',
+    onSelect: '<',
     onDismiss: '<',
     onEdit: '<',
-    onRemove: '<'
+    onRemove: '<',
+    onAdd: '<'
 };
 
 
 const initialState = {
-    item: null,
+    selectedItem: null,
+    displayInfo: false,
+    relationshipKinds: [],
     onDismiss: () => console.log('default on dismiss'),
     onEdit: () => console.log('default on edit'),
-    onRemove: () => console.log('default on remove')
+    onRemove: () => console.log('default on remove'),
+    onSelect: () => console.log('default on select'),
+    onAdd: () => console.log('default on add')
 };
 
 
 
 function controller() {
-    initialiseData(this, initialState);
+    const vm = initialiseData(this, initialState);
+
+    vm.$onChanges = (c) => {
+        if(c.items){
+            vm.selectedItem = null;
+            vm.list = vm.items;
+            vm.counterpart = _.first(_.map(vm.items, i => (i.outbound) ? i.b : i.a));
+        }
+    };
+
+    vm.selectItem = (item) => {
+        vm.selectedItem = item;
+        vm.onSelect(item);
+    };
+
+    vm.onAddItem = () => {
+        vm.selectedItem = null;
+        vm.onAdd();
+    };
+
 }
 
 
