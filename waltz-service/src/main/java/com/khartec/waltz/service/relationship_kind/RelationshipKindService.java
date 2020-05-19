@@ -16,11 +16,13 @@ public class RelationshipKindService {
 
     private final RelationshipKindDao relationshipKindDao;
 
+
     @Autowired
     public RelationshipKindService (RelationshipKindDao relationshipKindDao) {
         checkNotNull(relationshipKindDao, "relationshipKindDao cannot be null");
         this.relationshipKindDao = relationshipKindDao;
     }
+
 
     public Set<RelationshipKind> findRelationshipKindsBetweenEntites(EntityReference parent, EntityReference target){
         return relationshipKindDao.findRelationshipKindsBetweenEntites(parent, target);

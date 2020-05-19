@@ -109,5 +109,4 @@ public class EntityRelationshipService {
         GenericSelector selector = genericSelectorFactory.apply(selectionOptions);
         return entityRelationshipDao.deleteForGenericEntitySelector(selector);
     }
-
 }

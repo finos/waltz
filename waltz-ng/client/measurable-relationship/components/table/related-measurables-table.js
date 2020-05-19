@@ -42,7 +42,6 @@ const columnDefs = [
     }, {
         field: "relationships",
         name: "Relationships",
-        // cellFilter: "toDisplayName:'relationshipKind'"
     },
     mkEntityLinkGridCell("From", "b"),
     {
