@@ -1,6 +1,6 @@
 # Design for EUDA promotion in Waltz
 
-## Status: DRAFT
+## Status:  IMPLEMENTED
 
 ## Motivation
 EUDAs that exist in Waltz need to be promoted to full applications for use in logical flows, roadmaps, diagrams etc.
