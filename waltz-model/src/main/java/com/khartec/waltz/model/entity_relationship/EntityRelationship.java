@@ -39,8 +39,8 @@ public abstract class EntityRelationship implements ProvenanceProvider, LastUpda
 
 
     @Value.Default
-    public RelationshipKind relationship() {
-        return HAS;
+    public String relationship() {
+        return HAS.name();
     }
 
 

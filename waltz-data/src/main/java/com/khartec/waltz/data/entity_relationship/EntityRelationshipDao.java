@@ -23,7 +23,10 @@ import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.entity_relationship.*;
+import com.khartec.waltz.model.entity_relationship.EntityRelationship;
+import com.khartec.waltz.model.entity_relationship.EntityRelationshipKey;
+import com.khartec.waltz.model.entity_relationship.ImmutableEntityRelationship;
+import com.khartec.waltz.model.entity_relationship.UpdateEntityRelationshipParams;
 import com.khartec.waltz.schema.tables.records.EntityRelationshipRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -80,7 +83,7 @@ public class EntityRelationshipDao {
                         record.getIdB(),
                         r.get(NAME_B)))
                 .provenance(record.getProvenance())
-                .relationship(RelationshipKind.valueOf(record.getRelationship()))
+                .relationship(record.getRelationship())
                 .description(record.getDescription())
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
@@ -90,7 +93,7 @@ public class EntityRelationshipDao {
 
     private static final Function<EntityRelationship, EntityRelationshipRecord> TO_RECORD_MAPPER = rel -> {
         EntityRelationshipRecord record = new EntityRelationshipRecord();
-        record.setRelationship(rel.relationship().name());
+        record.setRelationship(rel.relationship());
         record.setIdA(rel.a().id());
         record.setKindA(rel.a().kind().name());
         record.setIdB(rel.b().id());
@@ -186,7 +189,7 @@ public class EntityRelationshipDao {
                           UpdateEntityRelationshipParams params,
                           String username) {
         return dsl.update(ENTITY_RELATIONSHIP)
-                .set(ENTITY_RELATIONSHIP.RELATIONSHIP, params.relationshipKind().name())
+                .set(ENTITY_RELATIONSHIP.RELATIONSHIP, params.relationshipKind())
                 .set(ENTITY_RELATIONSHIP.DESCRIPTION, params.description())
                 .set(ENTITY_RELATIONSHIP.LAST_UPDATED_BY, username)
                 .set(ENTITY_RELATIONSHIP.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
@@ -250,7 +253,7 @@ public class EntityRelationshipDao {
                 .and(ENTITY_RELATIONSHIP.KIND_A.eq(key.a().kind().name()))
                 .and(ENTITY_RELATIONSHIP.ID_B.eq(key.b().id())
                         .and(ENTITY_RELATIONSHIP.KIND_B.eq(key.b().kind().name())))
-                .and(ENTITY_RELATIONSHIP.RELATIONSHIP.eq(key.relationshipKind().name()));
+                .and(ENTITY_RELATIONSHIP.RELATIONSHIP.eq(key.relationshipKind()));
     }
 
 

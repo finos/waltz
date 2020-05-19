@@ -65,11 +65,15 @@ const initialState = {
 };
 
 
+const DEFAULT_SELECTION_FILTER_FN = () => true;
+
+
 function mkGridData(selfRef,
                     relationships = [],
                     measurables = [],
                     categories = [],
-                    appGroups = []) {
+                    appGroups = [],
+                    rowFilterFn = () => true) {
 
     const measurablesById = _.keyBy(measurables, "id");
     const categoriesById = _.keyBy(categories, "id");
@@ -103,6 +107,7 @@ function mkGridData(selfRef,
 
     return _
         .chain(relationships)
+        .filter(rowFilterFn)
         .map(r => {
             const outbound = sameRef(r.a, selfRef, { skipChecks: true });
             const a = mkCell(r.a.kind, r.a);
@@ -130,7 +135,8 @@ function controller($q, $timeout, serviceBroker, notification) {
             vm.relationships,
             vm.measurables,
             vm.categories,
-            vm.appGroups);
+            vm.appGroups,
+            vm.selectionFilterFn);
     };
 
 
@@ -165,6 +171,7 @@ function controller($q, $timeout, serviceBroker, notification) {
             vm.visibility.detailModeChanger = false;
         }
         vm.selectedRow = null;
+        vm.selectionFilterFn = c.relationshipFilter;
         vm.gridData = calcGridData();
         vm.cancelEditor();
     });
@@ -172,6 +179,7 @@ function controller($q, $timeout, serviceBroker, notification) {
     vm.clearCategory = () => $timeout(() => {
         vm.selectedCategory = null;
         vm.selectedRow = null;
+        vm.selectionFilterFn = DEFAULT_SELECTION_FILTER_FN;
         vm.gridData = calcGridData();
         vm.visibility.detailMode = "table";
         vm.visibility.detailModeChanger = false;
