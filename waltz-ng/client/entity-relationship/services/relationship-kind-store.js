@@ -2,7 +2,6 @@ export function store($http, baseUrl) {
 
     const BASE = `${baseUrl}/relationship-kind`;
 
-
     const findAll = () => {
         return $http.get(`${BASE}`)
             .then(result => result.data);
@@ -12,7 +11,6 @@ export function store($http, baseUrl) {
         return $http.get(`${BASE}/entities/${parentRef.kind}/${parentRef.id}/${targetRef.kind}/${targetRef.id}`)
             .then(result => result.data);
     };
-
 
     return {
         findAll,

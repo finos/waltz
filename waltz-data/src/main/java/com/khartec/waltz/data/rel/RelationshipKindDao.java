@@ -88,14 +88,14 @@ public class RelationshipKindDao {
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 
+
     private SelectConditionStep<Record1<Long>> getCategory(long measurableId) {
-        SelectConditionStep<Record1<Long>> where = DSL
+        return DSL
                 .select(MEASURABLE.MEASURABLE_CATEGORY_ID)
                 .from(MEASURABLE)
                 .where(MEASURABLE.ID.eq(measurableId));
-
-        return where;
     }
+
 
     private Boolean isMeasurable(EntityReference ref) {
         return ref.kind().equals(EntityKind.MEASURABLE);
