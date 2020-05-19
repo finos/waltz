@@ -20,7 +20,10 @@ package com.khartec.waltz.service.measurable_relationship;
 
 import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.entity_relationship.EntityRelationshipDao;
-import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.Operation;
+import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.entity_relationship.*;
 import com.khartec.waltz.service.changelog.ChangeLogService;
@@ -162,7 +165,8 @@ public class MeasurableRelationshipService {
                 key.b());
 
         String msg = format(
-                "Removed explicit relationship from: '%s', to: '%s'",
+                "Removed explicit relationship: '%s' from: '%s', to: '%s'",
+                key.relationshipKind(),
                 niceNames.get(0),
                 niceNames.get(1));
 
@@ -185,7 +189,8 @@ public class MeasurableRelationshipService {
                 relationship.b());
 
         String msg = format(
-                "Added explicit relationship from: '%s', to: '%s'",
+                "Added explicit relationship: '%s' from: '%s', to: '%s'",
+                relationship.relationship(),
                 niceNames.get(0),
                 niceNames.get(1));
 
