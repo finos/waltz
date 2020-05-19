@@ -65,15 +65,11 @@ const initialState = {
 };
 
 
-const DEFAULT_SELECTION_FILTER_FN = () => true;
-
-
 function mkGridData(selfRef,
                     relationships = [],
                     measurables = [],
                     categories = [],
-                    appGroups = [],
-                    rowFilterFn = () => true) {
+                    appGroups = []) {
 
     const measurablesById = _.keyBy(measurables, "id");
     const categoriesById = _.keyBy(categories, "id");
@@ -107,7 +103,6 @@ function mkGridData(selfRef,
 
     return _
         .chain(relationships)
-        .filter(rowFilterFn)
         .map(r => {
             const outbound = sameRef(r.a, selfRef, { skipChecks: true });
             const a = mkCell(r.a.kind, r.a);
@@ -135,8 +130,7 @@ function controller($q, $timeout, serviceBroker, notification) {
             vm.relationships,
             vm.measurables,
             vm.categories,
-            vm.appGroups,
-            vm.selectionFilterFn);
+            vm.appGroups);
     };
 
 
@@ -156,8 +150,8 @@ function controller($q, $timeout, serviceBroker, notification) {
                         return sameSource && sameTarget;
                     });
 
-                    const existingRelKinds = findExistingRelationshipKinds(vm.selectedRow);
-                    loadAllowedRelationshipKinds(existingRelKinds)
+                    vm.filteredGridData = _.filter(vm.gridData, d => d.a.id === vm.selectedRow.a.id && d.b.id === vm.selectedRow.b.id);
+                    loadAllowedRelationshipKinds(vm.filteredGridData)
                 }
             });
     };
@@ -171,7 +165,6 @@ function controller($q, $timeout, serviceBroker, notification) {
             vm.visibility.detailModeChanger = false;
         }
         vm.selectedRow = null;
-        vm.selectionFilterFn = c.relationshipFilter;
         vm.gridData = calcGridData();
         vm.cancelEditor();
     });
@@ -179,24 +172,18 @@ function controller($q, $timeout, serviceBroker, notification) {
     vm.clearCategory = () => $timeout(() => {
         vm.selectedCategory = null;
         vm.selectedRow = null;
-        vm.selectionFilterFn = DEFAULT_SELECTION_FILTER_FN;
         vm.gridData = calcGridData();
         vm.visibility.detailMode = "table";
         vm.visibility.detailModeChanger = false;
     });
-
-    function findExistingRelationshipKinds(r) {
-        vm.filteredGridData = _.filter(vm.gridData, d => d.a.id === r.a.id && d.b.id === r.b.id);
-        return _.map(vm.filteredGridData, d => d.relationship.relationship);
-    }
 
     vm.selectRow = (r) => {
         if (r === vm.selectedRow) {
             vm.clearRowSelection(); // toggle
         } else {
             vm.selectedRow = r;
-            const existingRelKinds = findExistingRelationshipKinds(r);
-            loadAllowedRelationshipKinds(existingRelKinds);
+            vm.filteredGridData = _.filter(vm.gridData, d => d.a.id === vm.selectedRow.a.id && d.b.id === vm.selectedRow.b.id);
+            loadAllowedRelationshipKinds(vm.filteredGridData);
         }
         vm.cancelEditor();
     };
@@ -248,8 +235,6 @@ function controller($q, $timeout, serviceBroker, notification) {
         vm.visibility.createRelationshipKind = false;
     };
 
-    vm.selectionFilterFn = DEFAULT_SELECTION_FILTER_FN;
-
 
     // -- API --
 
@@ -265,7 +250,10 @@ function controller($q, $timeout, serviceBroker, notification) {
             });
     };
 
-    const loadAllowedRelationshipKinds = (existingKinds) => {
+    const loadAllowedRelationshipKinds = (data) => {
+
+        const existingKinds = _.map(data, d => d.relationship.relationship);
+
         return serviceBroker.loadViewData(
             CORE_API.RelationshipKindStore.findRelationshipKindsBetweenEntities,
             [vm.selectedRow.a, vm.selectedRow.b])
