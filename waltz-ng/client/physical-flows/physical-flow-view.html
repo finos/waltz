@@ -26,11 +26,11 @@
             <li><a ui-sref="main">Home</a></li>
             <li>Logical Flow</li>
             <li ng-if="ctrl.logicalFlow">
-                <waltz-entity-link entity-ref="ctrl.logicalFlow.source">
-                </waltz-entity-link>
-            </li>
-            <li ng-if="ctrl.logicalFlow">
-                <waltz-entity-link entity-ref="ctrl.logicalFlow.target">
+                <waltz-entity-link entity-ref="{
+                    kind: 'LOGICAL_DATA_FLOW',
+                    id: ctrl.logicalFlow.id,
+                    name: ctrl.logicalFlow.source.name + ' &raquo; ' + ctrl.logicalFlow.target.name
+                }">
                 </waltz-entity-link>
             </li>
             <li ng-if="!ctrl.logicalFlow">physical Flow</li>

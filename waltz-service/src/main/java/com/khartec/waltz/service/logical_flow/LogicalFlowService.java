@@ -269,6 +269,7 @@ public class LogicalFlowService {
             case ORG_UNIT:
             case PERSON:
             case SCENARIO:
+            case DATA_TYPE:
                 return calculateStatsForAppIdSelector(options);
             default:
                 throw new UnsupportedOperationException("Cannot calculate stats for selector kind: "+ options.entityReference().kind());

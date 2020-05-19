@@ -127,6 +127,16 @@ public class InvolvementDao {
     }
 
 
+    public List<Involvement> findAllByEmployeeId(String employeeId) {
+        return dsl.select()
+                .from(INVOLVEMENT)
+                .innerJoin(PERSON_HIERARCHY).on(INVOLVEMENT.EMPLOYEE_ID.eq(PERSON_HIERARCHY.EMPLOYEE_ID))
+                .where(PERSON_HIERARCHY.MANAGER_ID.eq(employeeId)
+                        .or(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId)))
+                .fetch(TO_MODEL_MAPPER);
+    }
+
+
     @Deprecated
     public List<Application> findDirectApplicationsByEmployeeId(String employeeId) {
         return dsl.select()

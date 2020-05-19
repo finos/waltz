@@ -15,7 +15,7 @@
  * See the License for the specific
  *
  */
-import {checkIsEntityRef, checkIsStringList} from "../../common/checks";
+import {checkIsEntityRef, checkIsIdSelector, checkIsStringList} from "../../common/checks";
 
 
 export function store($http, base) {
@@ -33,6 +33,13 @@ export function store($http, base) {
         .get(`${BASE}/target-kind/${entityKind}`)
         .then(x => x.data);
 
+    const findTagsByEntityKindAndTargetSelector = (entityKind, options) => {
+        checkIsIdSelector(options);
+        return $http
+            .post(`${BASE}/target-kind/${entityKind}/target-selector`, options)
+            .then(x => x.data);
+    }
+
     const update = (entityRef, tags = []) => {
         checkIsEntityRef(entityRef);
         checkIsStringList(tags);
@@ -46,6 +53,7 @@ export function store($http, base) {
         getTagById,
         findTagsByEntityRef,
         findTagsByEntityKind,
+        findTagsByEntityKindAndTargetSelector,
         update
     };
 }
@@ -75,6 +83,11 @@ export const TagStore_API = {
         serviceName,
         serviceFnName: 'findTagsByEntityKind',
         description: 'executes findTagsByEntityKind'
+    },
+    findTagsByEntityKindAndTargetSelector: {
+        serviceName,
+        serviceFnName: 'findTagsByEntityKindAndTargetSelector',
+        description: 'executes findTagsByEntityKindAndTargetSelector'
     },
     update: {
         serviceName,

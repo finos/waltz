@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -108,5 +109,10 @@ public class PersonService {
 
     public Map<PersonKind, Integer> countAllUnderlingsByKind(String employeeId){
         return personDao.countAllUnderlingsByKind(employeeId);
+    }
+
+
+    public Set<Person> findByEmployeeIds(Set<String> empIds) {
+        return personDao.findByEmployeeIds(empIds);
     }
 }

@@ -1,0 +1,114 @@
+<div>
+
+    <waltz-no-data ng-if="$ctrl.tabs.length == 0">
+        <message>
+            There are no involvements between this person (or any of their direct reports) and viewpoints.
+        </message>
+    </waltz-no-data>
+
+    <div class="row"
+         ng-if="$ctrl.tabs.length > 0">
+        <div class="waltz-tabs col-sm-12">
+            <!-- TAB HEADERS -->
+            <input ng-repeat-start="tab in $ctrl.tabs track by tab.id"
+                   type="radio"
+                   ng-change="$ctrl.onTabChange()"
+                   ng-model="$ctrl.activeTab"
+                   ng-value="tab"
+                   id="{{ tab.id + '_' + $id }}">
+            <label class="wt-label"
+                   for="{{ tab.id + '_' + $id }}"
+                   ng-repeat-end>
+                <span ng-bind="tab.name"></span>
+            </label>
+
+            <div class="wt-tab wt-active"
+                 ng-if="$ctrl.activeTab">
+                <div>
+                    This person is involved in the
+                    <span ng-bind="$ctrl.activeTab.name"></span>
+                    viewpoint either directly or by inheriting the association through one of their reportees.
+                    Click on the viewpoint to see this involvement, those in <b>bold</b> are directly related, those in <i>italics</i> have no involvements but populate the tree.
+                </div>
+
+                <br>
+
+                <span>
+                    <waltz-toggle class="pull-right"
+                                  state="$ctrl.showDirectsOnly"
+                                  on-toggle="$ctrl.toggleDirectsOnly()"
+                                  label-on="Direct only"
+                                  label-off="Direct only">
+                    </waltz-toggle>
+                </span>
+
+                <div class="row">
+                    <br>
+                    <div class="col-sm-8">
+                        <waltz-no-data ng-if="$ctrl.hierarchy.length == 0">
+                            <message>
+                                This person has no direct involvements with items in this viewpoint.
+                            </message>
+                        </waltz-no-data>
+                        <treecontrol class="tree-light"
+                                     tree-model="$ctrl.hierarchy"
+                                     options="$ctrl.treeOptions"
+                                     expanded-nodes="$ctrl.expandedNodes"
+                                     order-by="'-name'"
+                                     ng-if="$ctrl.hierarchy.length > 0">
+                            <span class="no-overflow">
+                                <a>
+                                    <span ng-class=" {'italics' : ! node.related}"
+                                          ng-click="$ctrl.onSelect(node)"
+                                          ng-init="$ctrl.onHover(node)">
+                                        <waltz-entity-icon-label entity-ref="node"
+                                                                 additional-display-data="node.roleInfo"
+                                                                 icon-placement="none"
+                                                                 tooltip-placement="right"
+                                                                 ng-style="{ 'font-weight': node.direct ? 'bold' : 'none' }">
+                                        </waltz-entity-icon-label>
+                                        <waltz-icon ng-if="node.direct" name="user"></waltz-icon>
+                                        <waltz-icon ng-if="node.related && !node.direct" name="user-o"></waltz-icon>
+                                    </span>
+                                </a>
+                            </span>
+                        </treecontrol>
+                    </div>
+                    <div class="col-sm-4"
+                         ng-if="$ctrl.showInfoPanel">
+                        <waltz-sub-section name="{{$ctrl.activeNode.name}}">
+                            <content>
+                                <table class="table table-condensed small">
+                                    <tbody>
+                                        <tr>
+                                            <td class="text-muted">External Id:</td>
+                                            <td ng-bind="$ctrl.activeNode.externalId"></td>
+                                        </tr>
+                                        <tr ng-repeat="involvement in $ctrl.activeNode.roleInfo">
+                                            <td class="text-muted" ng-bind="involvement.name"></td>
+                                            <td>
+                                                <waltz-entity-link entity-ref="involvement.person"></waltz-entity-link>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                            </td>
+                                            <td>
+                                                <a ui-sref="main.measurable.view ({id: $ctrl.activeNode.id })"
+                                                   class="clickable pull-right">
+                                                    Go to page
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </content>
+                        </waltz-sub-section>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>
