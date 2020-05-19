@@ -25,6 +25,13 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 
 import template from "./data-type-flow-section.html";
 import {entity} from "../../../common/services/enums/entity";
+import {
+    filterUtils,
+    getSelectedTagsFromPreferences,
+    maybeAddUntaggedFlowsTag,
+    saveTagFilterPreferences
+} from "../../../logical-flow/logical-flow-utils";
+import {groupLogicalFlowFilterExcludedTagIdsKey} from "../../../user/services/user-preference-service";
 
 
 const bindings = {
@@ -39,8 +46,10 @@ const initialState = {
         showPrimary: true,
         showSecondary: true,
         showDiscouraged: false,
-        showNoOpinion: false
-    }
+        showNoOpinion: false,
+        selectedTags: filterUtils.defaultOptions.selectedTags
+    },
+    tags: []
 };
 
 
@@ -118,18 +127,21 @@ function filterDecorators(decorators =[],
 
 
 function filterFlows(flows = [],
-                     decorators = []) {
+                     decorators = [],
+                     allTags = [],
+                     selectedTags = []) {
     const flowIds = _.map(decorators, "dataFlowId");
-    return _.filter(flows, f => _.includes(flowIds, f.id));
-
+    const tagFilterFn = filterUtils.mkTagFilterFn(selectedTags, allTags, flows);
+    return _.filter(flows, f => _.includes(flowIds, f.id) && tagFilterFn(f));
 }
 
 
 function filterData(flows = [],
                     decorators = [],
+                    allTags = [],
                     filterOptions) {
     const filteredDecorators = filterDecorators(decorators, filterOptions);
-    const filteredFlows = filterFlows(flows, filteredDecorators);
+    const filteredFlows = filterFlows(flows, filteredDecorators, allTags, filterOptions.selectedTags);
     const filteredEntities = calculateEntities(filteredFlows);
     return {
         entities: filteredEntities,
@@ -139,7 +151,7 @@ function filterData(flows = [],
 }
 
 
-function controller($q, $scope, serviceBroker) {
+function controller($q, $scope, userPreferenceService, serviceBroker) {
     const vm = initialiseData(this, initialState);
     const onAppSelect = (app) => $scope.$applyAsync(() => vm.selectedApp = app);
 
@@ -155,6 +167,7 @@ function controller($q, $scope, serviceBroker) {
                 CORE_API.LogicalFlowStore.findBySelector,
                 [ selector ])
             .then(r => vm.rawFlows = r.data);
+
         const decoratorPromise = serviceBroker
             .loadViewData(
                 CORE_API.DataTypeDecoratorStore.findBySelector,
@@ -166,7 +179,23 @@ function controller($q, $scope, serviceBroker) {
                     onAppSelect);
             });
 
-        $q.all([flowPromise, decoratorPromise])
+        const tagsPromise = serviceBroker
+            .loadViewData(
+                CORE_API.TagStore.findTagsByEntityKindAndTargetSelector,
+                [ entity.LOGICAL_DATA_FLOW.key, selector ])
+            .then(r => {
+                vm.tags = maybeAddUntaggedFlowsTag(r.data);
+
+                return getSelectedTagsFromPreferences(
+                    vm.tags,
+                    groupLogicalFlowFilterExcludedTagIdsKey,
+                    userPreferenceService)
+                    .then(selectedTags => {
+                        vm.filterOptions.selectedTags = selectedTags;
+                    });
+            });
+
+        $q.all([flowPromise, decoratorPromise, tagsPromise])
             .then(() => vm.filterChanged());
     };
 
@@ -175,17 +204,38 @@ function controller($q, $scope, serviceBroker) {
         vm.flowData = filterData(
             vm.rawFlows,
             vm.rawDecorators,
+            vm.tags,
             vm.filterOptions);
     };
 
-    vm.showAll = () => {
-        vm.filterOptions = {
-            showPrimary: true,
-            showSecondary: true,
-            showDiscouraged: true,
-            showNoOpinion: true
-        };
+    vm.showAllRatings = () => {
+        vm.filterOptions.showPrimary = true;
+        vm.filterOptions.showSecondary = true;
+        vm.filterOptions.showDiscouraged = true;
+        vm.filterOptions.showNoOpinion = true;
+
         vm.filterChanged();
+    };
+
+    vm.showAllTags = () => {
+      vm.filterOptions.selectedTags = vm.tags;
+      vm.filterChanged();
+
+      saveTagFilterPreferences(
+        vm.tags,
+        vm.filterOptions.selectedTags,
+        groupLogicalFlowFilterExcludedTagIdsKey,
+        userPreferenceService);
+    };
+
+    vm.onTagsChange = () => {
+        vm.filterChanged();
+
+        saveTagFilterPreferences(
+            vm.tags,
+            vm.filterOptions.selectedTags,
+            groupLogicalFlowFilterExcludedTagIdsKey,
+            userPreferenceService);
     };
 
     vm.refocusApp = app => {
@@ -207,6 +257,7 @@ function controller($q, $scope, serviceBroker) {
 controller.$inject = [
     "$q",
     "$scope",
+    "UserPreferenceService",
     "ServiceBroker"
 ];
 

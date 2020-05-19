@@ -24,6 +24,7 @@ import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifec
 import template from "./logical-flows-boingy-graph.html";
 import {buildHierarchies, findNode, flattenChildren} from "../../../common/hierarchy-utils";
 import {entity} from "../../../common/services/enums/entity";
+import {filterUtils, maybeAddUntaggedFlowsTag} from "../../logical-flow-utils";
 
 const bindings = {
     filters: "<",
@@ -32,8 +33,9 @@ const bindings = {
 
 
 const defaultFilterOptions = {
-    type: "ALL",
-    scope: "ALL"
+    typeIds: filterUtils.defaultOptions.typeIds,
+    scope: "ALL",
+    selectedTags: filterUtils.defaultOptions.selectedTags
 };
 
 
@@ -53,6 +55,7 @@ const initialState = {
     applications: [],
     flows: [],
     decorators: [],
+    tags: [],
     usedDataTypes: [],
     filterOptions: defaultFilterOptions,
     options: defaultOptions,
@@ -90,45 +93,30 @@ function mkScopeFilterFn(appIds = [], scope = "INTRA") {
 }
 
 
-function mkTypeFilterFn(decorators = []) {
-    const flowIds = _.chain(decorators)
-        .map("dataFlowId")
-        .uniq()
-        .value();
-    return f => _.includes(flowIds, f.id);
-}
-
-
 function buildFlowFilter(filterOptions = defaultFilterOptions,
+                         allFlows = [],
                          appIds = [],
-                         flowDecorators = []) {
+                         flowDecorators = [],
+                         allTags = []) {
 
-    const typeFilterFn = mkTypeFilterFn(flowDecorators);
+    const typeFilterFn = filterUtils.mkTypeFilterFn(flowDecorators);
     const scopeFilterFn = mkScopeFilterFn(appIds, filterOptions.scope);
-    return f => typeFilterFn(f) && scopeFilterFn(f);
-}
-
-
-function buildDecoratorFilter(options = defaultFilterOptions) {
-    const datatypeIds = _.map(options.type, id => (id === "ALL") ? "ALL" : Number(id));
-    return d => {
-        const isDataType = d.decoratorEntity.kind === "DATA_TYPE";
-        const matchesDataType = _.includes(datatypeIds, "ALL") || _.includes(datatypeIds, d.decoratorEntity.id);
-        return isDataType && matchesDataType;
-    };
+    const tagFilterFn = filterUtils.mkTagFilterFn(filterOptions.selectedTags, allTags, allFlows);
+    return f => typeFilterFn(f) && scopeFilterFn(f) && tagFilterFn(f);
 }
 
 
 function calculateFlowData(allFlows = [],
                            applications = [],
                            allDecorators = [],
+                           allTags = [],
                            filterOptions = defaultFilterOptions) {
     // note order is important.  We need to find decorators first
-    const decoratorFilterFn = buildDecoratorFilter(filterOptions);
+    const decoratorFilterFn = filterUtils.buildDecoratorFilter(filterOptions.typeIds);
     const decorators = _.filter(allDecorators, decoratorFilterFn);
 
     const appIds = _.map(applications, d => d.id);
-    const flowFilterFn = buildFlowFilter(filterOptions, appIds, decorators);
+    const flowFilterFn = buildFlowFilter(filterOptions, allFlows, appIds, decorators, allTags);
     const flows = _.filter(allFlows, flowFilterFn);
 
     const entities = calculateEntities(flows);
@@ -189,8 +177,16 @@ function controller($scope,
                 [ vm.selector ])
             .then(r => vm.applications = r.data);
 
+        const tagsPromise = serviceBroker
+            .loadViewData(
+                CORE_API.TagStore.findTagsByEntityKindAndTargetSelector,
+                [ entity.LOGICAL_DATA_FLOW.key, vm.selector ])
+            .then(r => {
+                vm.tags = maybeAddUntaggedFlowsTag(r.data);
+            });
+
         return $q
-            .all([flowPromise, decoratorPromise, appsPromise])
+            .all([flowPromise, decoratorPromise, appsPromise, tagsPromise])
             .then(() => {
                 vm.filterChanged();
                 vm.visibility.loadingFlows = false;
@@ -200,15 +196,15 @@ function controller($scope,
     vm.filterChanged = (filterOptions = vm.filterOptions) => {
 
         const dataTypes = buildHierarchies(vm.allDataTypes, true);
-        const node = findNode(dataTypes, Number(filterOptions.type));
-
+        const node = findNode(dataTypes, Number(filterOptions.typeIds[0]));
         const children = (node)
             ? _.map(flattenChildren(node),d => d.id)
             : [];
 
         vm.filterOptions = filterOptions;
 
-        vm.filterOptions.type = _.concat(filterOptions.type, children);
+        vm.filterOptions.typeIds = _.concat(filterOptions.typeIds, children);
+        vm.filterOptions.selectedTags = filterOptions.selectedTags;
 
         if (! (vm.flows && vm.decorators)) return;
 
@@ -216,6 +212,7 @@ function controller($scope,
             vm.flows,
             vm.applications,
             vm.decorators,
+            vm.tags,
             vm.filterOptions);
 
         vm.graphTweakers = prepareGraphTweakers(

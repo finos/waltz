@@ -18,9 +18,9 @@
 
 import _ from "lodash";
 
-import { CORE_API } from "../../../common/services/core-api-utils";
-import { initialiseData } from "../../../common";
-import { mkSelectionOptions } from "../../../common/selector-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {initialiseData} from "../../../common";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 import template from "./data-flow-section.html";
 import {entity} from "../../../common/services/enums/entity";
@@ -38,6 +38,7 @@ const initialState = {
     logicalFlowDecorators: [],
     physicalFlows: [],
     physicalSpecifications: [],
+    tags: [],
     visibility: {
         dataTab: 0,
         logicalFlows: false, // this is the source data ratings panel, rename
@@ -125,6 +126,12 @@ function controller(serviceBroker) {
                 CORE_API.ChangeUnitStore.findBySelector,
                 [mkSelectionOptions(vm.parentEntityRef)])
             .then(r => vm.changeUnits = r.data);
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.TagStore.findTagsByEntityKindAndTargetSelector,
+                [entity.LOGICAL_DATA_FLOW.key, mkSelectionOptions(vm.parentEntityRef)])
+            .then(r => vm.tags = r.data);
     }
 
 

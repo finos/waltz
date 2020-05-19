@@ -19,11 +19,18 @@
 import {checkIsEntityRef, checkIsLogicalFlow} from "../common/checks";
 import {sameRef} from "../common/entity-utils";
 import {CORE_API} from "../common/services/core-api-utils";
+import {entity} from "../common/services/enums/entity";
+import _ from "lodash";
 
 
 export const INBOUND = 'INBOUND';
 export const OUTBOUND = 'OUTBOUND';
 export const NEITHER = 'NEITHER';
+
+export const untaggedFlowsTag = {
+    name: "<i>Untagged Flows</i>",
+    id: -1
+};
 
 
 /**
@@ -73,20 +80,6 @@ export function categorizeDirection(flow, ref) {
 
 
 /**
- * We calculate flow summary stats differently based on the entity kind.
- * This helper method takes a kind and returns a method reference which
- * can be used by the ServiceBroker
- * @param kind
- * @returns {*}
- */
-export function determineStatMethod(kind) {
-    return kind === 'DATA_TYPE'
-        ? CORE_API.DataTypeUsageStore.calculateStats
-        : CORE_API.LogicalFlowStore.calculateStats;
-}
-
-
-/**
  * Given a service broker and logical flow returns a json
  * object with `source` and `target` keys containing the
  * relevant entities.  An additional property of `entityReference`
@@ -110,4 +103,117 @@ export function resolveSourceAndTarget(serviceBroker, logicalFlow) {
     const sourcePromise = load(logicalFlow.source).then(r => results.source = r);
     const targetPromise = load(logicalFlow.source).then(r => results.target = r);
     return sourcePromise.then(() => targetPromise).then(() => results);
+}
+
+
+/**
+ * Add untaggedFlowsTag to allTags if not already added
+ * @param allTags
+ * @returns {*[]}
+ */
+export function maybeAddUntaggedFlowsTag(allTags = []) {
+    if (!_.isEmpty(allTags) && !_.includes(_.map(allTags, "id"), untaggedFlowsTag.id)) {
+        allTags.push(untaggedFlowsTag);
+    }
+
+    return allTags;
+}
+
+
+/**
+ * Saves excluded tags ids under user preferences
+ * @param allTags
+ * @param selectedTags
+ * @param preferenceKey either app-level or group-level view key
+ * @param userPreferenceService
+ */
+export function saveTagFilterPreferences(allTags = [],
+                                         selectedTags = [],
+                                         preferenceKey = "",
+                                         userPreferenceService) {
+    const allTagIds = _.map(allTags, "id");
+    const selectedTagIds = _.map(selectedTags, "id");
+    const excludedTagIds = _.difference(allTagIds, selectedTagIds);
+
+    userPreferenceService.savePreference(preferenceKey, _.join(excludedTagIds, ";"));
+}
+
+
+/**
+ * Filters excluded tags from allTags based on stored user preferences
+ * @param allTags
+ * @param preferenceKey
+ * @param userPreferenceService
+ */
+export function getSelectedTagsFromPreferences(allTags = [],
+                                               preferenceKey,
+                                               userPreferenceService) {
+    return userPreferenceService.loadPreferences()
+        .then(preferences => {
+            const excludedTagIdsStr = preferences[preferenceKey]
+                ? preferences[preferenceKey].value
+                : "";
+
+            if (!_.isEmpty(excludedTagIdsStr)) {
+                const excludedTagIds = _.map(
+                    _.split(excludedTagIdsStr, ";"),
+                        id => Number(id));
+
+                return _.filter(allTags, t => !_.includes(excludedTagIds, t.id));
+            }
+            return allTags;
+        });
+}
+
+
+/**
+ * Filter utils
+ */
+export const filterUtils = {
+    defaultOptions: {
+        typeIds: ["ALL"], // [dataTypeId...]
+        selectedTags: [] // [{name, id, tagUsages}...]
+    },
+    buildDecoratorFilter: (typeIds = ["ALL"]) => {
+        const datatypeIds = _.map(typeIds, id => (id === "ALL") ? "ALL" : Number(id));
+        return d => {
+            const isDataType = d.decoratorEntity.kind === entity.DATA_TYPE.key;
+            const matchesDataType = _.includes(datatypeIds, "ALL")
+                                    || _.includes(datatypeIds, d.decoratorEntity.id);
+            return isDataType && matchesDataType;
+        };
+    },
+    mkTypeFilterFn: (decorators = []) => {
+        const flowIds = _.chain(decorators)
+            .map("dataFlowId")
+            .uniq()
+            .value();
+        return f => _.includes(flowIds, f.id);
+    },
+    mkTagFilterFn: (selectedTags = [],
+                    allTags = [],
+                    allFlows = []) => {
+        const shouldFilter = !_.isEmpty(selectedTags)
+            && !_.isEmpty(allTags)
+            && selectedTags.length !== allTags.length;
+
+        if (shouldFilter) {
+            const includeUntaggedFlows = _.includes(_.map(selectedTags, "id"), untaggedFlowsTag.id);
+            const allFlowIds = _.map(allFlows, "id");
+            const allTaggedFlowIds = _.chain(allTags)
+                .flatMap(t => _.map(t.tagUsages, "entityReference.id"))
+                .uniq()
+                .value();
+            const allUntaggedFlowIds = _.difference(allFlowIds, allTaggedFlowIds);
+            const selectedTagFlowIds = _.chain(selectedTags)
+                .flatMap(t => _.map(t.tagUsages, "entityReference.id"))
+                .uniq()
+                .value();
+
+            return f => _.includes(selectedTagFlowIds, f.id)
+                        || (includeUntaggedFlows && _.includes(allUntaggedFlowIds, f.id));
+        }
+
+        return f => true;
+    }
 }

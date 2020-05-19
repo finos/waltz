@@ -20,16 +20,20 @@ import _ from "lodash";
 import {buildHierarchies} from "../../../common/hierarchy-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./flow-filter-options.html";
+import {getSelectedTagsFromPreferences, saveTagFilterPreferences} from "../../logical-flow-utils";
+import {groupLogicalFlowFilterExcludedTagIdsKey} from "../../../user/services/user-preference-service";
 
 const bindings = {
     onChange: "<",
-    usedTypes: "<" // [ dataTypeId... ]
+    usedTypes: "<", // [ dataTypeId... ],
+    usedTags: "<" // [ {name, id, tagUsages}... ]
 };
 
 
 const initialState = {
     selectedType: "ALL",
     selectedScope: "ALL",
+    selectedTags: [],
     visibility: {
         tree: false
     },
@@ -46,7 +50,8 @@ function buildHierarchyWithUsageEnrichment(vm) {
     return hierarchy;
 }
 
-function controller(serviceBroker) {
+
+function controller(userPreferenceService, serviceBroker) {
     const vm = _.defaults(this, initialState);
 
     function loadDataTypes() {
@@ -54,13 +59,14 @@ function controller(serviceBroker) {
             .loadAppData(CORE_API.DataTypeStore.findAll)
             .then(r => vm.allDataTypes = r.data);
     }
-    vm.onShowAll= () => {
+
+    vm.onShowAllTypes = () => {
         vm.selectedType = "ALL";
         vm.visibility.tree = false;
         vm.notifyChanges();
     };
 
-    vm.onShowTree= () => {
+    vm.onShowTree = () => {
         vm.visibility.tree = true;
     };
 
@@ -69,10 +75,29 @@ function controller(serviceBroker) {
         vm.notifyChanges()
     };
 
+    vm.onTagsChange = () => {
+        vm.notifyChanges();
+
+        saveTagFilterPreferences(
+            vm.usedTags,
+            vm.selectedTags,
+            groupLogicalFlowFilterExcludedTagIdsKey,
+            userPreferenceService);
+    };
+
+    vm.showAllTags = () => {
+        vm.selectedTags = vm.usedTags;
+        vm.notifyChanges();
+
+        saveTagFilterPreferences(
+            vm.usedTags,
+            vm.selectedTags,
+            groupLogicalFlowFilterExcludedTagIdsKey,
+            userPreferenceService);
+    };
+
     vm.$onChanges = () => {
-        if (_.isEmpty(vm.usedTypes)) {
-            return;
-        } else {
+        if (!_.isEmpty(vm.usedTypes)) {
             loadDataTypes()
                 .then(() => {
                     const hierarchy = buildHierarchyWithUsageEnrichment(vm);
@@ -81,12 +106,23 @@ function controller(serviceBroker) {
                 });
         }
 
+        if (!_.isEmpty(vm.usedTags)) {
+            getSelectedTagsFromPreferences(
+                vm.usedTags,
+                groupLogicalFlowFilterExcludedTagIdsKey,
+                userPreferenceService)
+                .then(selectedTags => {
+                    vm.selectedTags = selectedTags;
+                    vm.notifyChanges();
+                });
+        }
     };
 
     vm.notifyChanges = () => {
         const options = {
-            type: vm.selectedType || "ALL",
-            scope: vm.selectedScope || "ALL"
+            typeIds: [vm.selectedType || "ALL"],
+            scope: vm.selectedScope || "ALL",
+            selectedTags: vm.selectedTags || []
         };
         vm.onChange(options);
     };
@@ -96,7 +132,10 @@ function controller(serviceBroker) {
 }
 
 
-controller.$inject = ["ServiceBroker"];
+controller.$inject = [
+    "UserPreferenceService",
+    "ServiceBroker"
+];
 
 
 const component = {
