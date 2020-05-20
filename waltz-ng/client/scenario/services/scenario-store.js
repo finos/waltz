@@ -46,19 +46,19 @@ function store($http, baseUrl) {
             .post(`${BASE}/id/${scenarioId}/clone`, newName)
             .then(result => result.data);
 
-    const removeRating = (scenarioId, appId, columnId, rowId) =>
+    const removeRating = (command) =>
         $http
-            .delete(`${BASE}/id/${scenarioId}/rating/${appId}/${columnId}/${rowId}`)
+            .post(`${BASE}/remove-rating`, command)
             .then(result => result.data);
 
-    const addRating = (scenarioId, appId, columnId, rowId, rating) =>
+    const addRating = (command) =>
         $http
-            .post(`${BASE}/id/${scenarioId}/rating/${appId}/${columnId}/${rowId}/${rating}`)
+            .post(`${BASE}/add-rating`, command)
             .then(result => result.data);
 
-    const updateRating = (scenarioId, appId, columnId, rowId, rating, comment) =>
+    const updateRating = (command) =>
         $http
-            .post(`${BASE}/id/${scenarioId}/rating/${appId}/${columnId}/${rowId}/rating/${rating}`, comment)
+            .post(`${BASE}/change-rating`, command)
             .then(result => result.data);
 
     const updateDescription = (scenarioId, newDescription) => {

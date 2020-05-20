@@ -19,12 +19,20 @@
 package com.khartec.waltz.service.scenario;
 
 import com.khartec.waltz.data.scenario.ScenarioRatingItemDao;
+import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.rating.RagName;
+import com.khartec.waltz.model.scenario.ChangeScenarioCommand;
+import com.khartec.waltz.model.scenario.Scenario;
 import com.khartec.waltz.model.scenario.ScenarioRatingItem;
+import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.rating_scheme.RatingSchemeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.service.scenario.ScenarioUtilities.mkBasicLogEntry;
@@ -34,12 +42,17 @@ public class ScenarioRatingItemService {
 
     private final ScenarioRatingItemDao scenarioRatingItemDao;
     private final ChangeLogService changeLogService;
-
+    private final ApplicationService applicationService;
+    private final RatingSchemeService ratingSchemeService;
+    private final ScenarioService scenarioService;
 
 
     @Autowired
     public ScenarioRatingItemService(ScenarioRatingItemDao scenarioRatingItemDao,
-                                     ChangeLogService changeLogService) {
+                                     ChangeLogService changeLogService, ApplicationService applicationService, RatingSchemeService ratingSchemeService, ScenarioService scenarioService) {
+        this.applicationService = applicationService;
+        this.ratingSchemeService = ratingSchemeService;
+        this.scenarioService = scenarioService;
         checkNotNull(scenarioRatingItemDao, "scenarioRatingItemDao cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
 
@@ -53,48 +66,71 @@ public class ScenarioRatingItemService {
     }
 
 
-    public boolean remove(long scenarioId, long appId, long columnId, long rowId, String userId) {
-        boolean result = scenarioRatingItemDao.remove(scenarioId, appId, columnId, rowId, userId);
+    public boolean remove(ChangeScenarioCommand command, String userId) {
+        boolean result = scenarioRatingItemDao.remove(command, userId);
 
         if (result) {
-            String message = String.format(
-                    "Removed app %d from colId: %d, rowId: %d",
-                    appId,
-                    columnId,
-                    rowId);
-            changeLogService.write(mkBasicLogEntry(scenarioId, message, userId));
+            writeApplicationChangeLog(command, userId, "Application %s (%s) was removed from %s");
         }
 
         return result;
     }
 
 
-    public boolean add(long scenarioId, long appId, long columnId, long rowId, char rating, String userId) {
-        boolean result = scenarioRatingItemDao.add(scenarioId, appId, columnId, rowId, rating, userId);
+    public boolean add(ChangeScenarioCommand command, String userId) {
+        boolean result = scenarioRatingItemDao.add(command, userId);
         if (result) {
-            String message = String.format(
-                    "Added app %d to colId: %d, rowId: %d",
-                    appId,
-                    columnId,
-                    rowId);
-            changeLogService.write(mkBasicLogEntry(scenarioId, message, userId));
+            writeApplicationChangeLog(command, userId, "Application %s (%s) was added to %s");
         }
 
         return result;
     }
 
 
-    public boolean updateRating(long scenarioId, long appId, long columnId, long rowId, char rating, String comment, String userId) {
-        boolean result = scenarioRatingItemDao.updateRating(scenarioId, appId, columnId, rowId, rating, comment, userId);
+    public boolean updateRating(ChangeScenarioCommand command, String userId) {
+        boolean result = scenarioRatingItemDao.updateRating(command, userId);
+
         if (result) {
-            String message = String.format(
-                    "Updated rating/description for app %d in colId: %d, rowId: %d",
-                    appId,
-                    columnId,
-                    rowId);
-            changeLogService.write(mkBasicLogEntry(scenarioId, message, userId));
+            if(command.rating() != command.previousRating()) {
+                writeUpdateRatingLog(command, userId);
+            } else {
+                 writeApplicationChangeLog(command, userId,
+                         "Updated rating/description for app %s (%s), a comment was added to %s ");
+            }
         }
 
         return result;
+    }
+
+    private void writeUpdateRatingLog(ChangeScenarioCommand command, String userId) {
+        String message;
+        Application application = applicationService.getById(command.appId());
+        Scenario scenario = scenarioService.getById(command.scenarioId());
+        List<RagName> ratings = ratingSchemeService.getById(command.ratingSchemeId()).ratings();
+        message = String.format(
+                "Application %s (%s), moved from %s to %s for %s",
+                application.assetCode().orElse("Unknown"),
+                application.name(),
+                getRatingName(ratings, command.previousRating()),
+                getRatingName(ratings, command.rating()),
+                scenario.name());
+
+        changeLogService.write(mkBasicLogEntry(command.scenarioId(), message, userId));
+    }
+
+    private void writeApplicationChangeLog(ChangeScenarioCommand command, String userId, String messageFormat) {
+        Application application = applicationService.getById(command.appId());
+        Scenario scenario = scenarioService.getById(command.scenarioId());
+        String message = String.format(
+                messageFormat,
+                application.assetCode().orElse("Unknown"),
+                application.name(),
+                scenario.name());
+        changeLogService.write(mkBasicLogEntry(command.scenarioId(), message, userId));
+    }
+
+    private String getRatingName(List<RagName> ratings, char rating) {
+        Optional<RagName> ratingOptional = ratings.stream().filter(r -> r.rating() == rating).findFirst();
+        return ratingOptional.isPresent() ? ratingOptional.get().name() : "Unknown";
     }
 }
