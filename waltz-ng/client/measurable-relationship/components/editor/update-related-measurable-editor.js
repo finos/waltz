@@ -25,7 +25,8 @@ import {displayError} from "../../../common/error-utils";
 const bindings = {
     relationship: '<',
     onCancel: '<',
-    onRefresh: '<'
+    onRefresh: '<',
+    relationshipKinds: '<'
 };
 
 
@@ -46,10 +47,6 @@ function controller(notification, serviceBroker) {
         vm.form.relationshipKind = vm.relationship.relationship;
     };
 
-    vm.$onChange = (c) => {
-    };
-
-
     // -- INTERACT --
 
     vm.isFormValid = () => true;
@@ -63,7 +60,7 @@ function controller(notification, serviceBroker) {
                 relationshipKind: vm.relationship.relationship
             };
             const changes = {
-                relationshipKind: vm.relationship.relationship,
+                relationshipKind: form.relationshipKind,
                 description: form.description
             };
             return save(key, changes)

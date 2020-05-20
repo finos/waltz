@@ -13,6 +13,7 @@ Waltz is built using [Maven](https://maven.apache.org/).
 - Database - either
   - [MariaDB](https://mariadb.org/)
   - [Microsoft SQL Server](https://www.microsoft.com/en-gb/sql-server/)
+  - [Postgres](https://www.postgresql.org/)
 - [Liquibase](http://www.liquibase.org/) (recommended but not essential)
 - [_jOOQ Pro_](https://www.jooq.org/download/) (if using Microsoft SQL Server) 
 
@@ -22,9 +23,15 @@ It is recommended that you clone the repository on GitHub to maintain your own f
 
 ## Preparing the database
 
-For Mariadb create a new database:
+For **Mariadb** create a new database:
 ```
 mysql -u root -e "create database IF NOT EXISTS waltz CHARACTER SET='utf8';"
+```
+
+
+For **SQL Server** create a new database
+```
+CREATE DATABASE waltz ;
 ```
 
 When you run the first build (using `mvn package`) the schema will be generated using the liquibase maven task (ref: `waltz-schema/pom.xml`).  

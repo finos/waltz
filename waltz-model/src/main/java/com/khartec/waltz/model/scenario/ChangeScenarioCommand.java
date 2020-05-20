@@ -16,20 +16,27 @@
  *
  */
 
-package com.khartec.waltz.model.entity_relationship;
+package com.khartec.waltz.model.scenario;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.DescriptionProvider;
+import com.khartec.waltz.model.Nullable;
+import com.khartec.waltz.model.command.Command;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableUpdateEntityRelationshipParams.class)
-@JsonDeserialize(as = ImmutableUpdateEntityRelationshipParams.class)
-
-/**
- * Use in conjunction with EntityRelationshipKey
- */
-public abstract class UpdateEntityRelationshipParams implements DescriptionProvider {
-    public abstract String relationshipKind();
+@JsonSerialize(as = ImmutableChangeScenarioCommand.class)
+@JsonDeserialize(as = ImmutableChangeScenarioCommand.class)
+public abstract class ChangeScenarioCommand implements Command {
+    public abstract long scenarioId();
+    public abstract long appId();
+    public abstract long columnId();
+    public abstract long rowId();
+    public abstract long ratingSchemeId();
+    @Nullable
+    public abstract Character rating();
+    @Nullable
+    public abstract Character previousRating();
+    @Nullable
+    public abstract String comment();
 }
