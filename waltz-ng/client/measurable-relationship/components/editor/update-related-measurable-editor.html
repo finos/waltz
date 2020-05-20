@@ -24,6 +24,25 @@
 
         <form>
 
+            <!-- KIND -->
+            <div class="form-group">
+                <label>Relationship Kind</label>
+                <waltz-no-data ng-if="$ctrl.relationshipKinds.length == 0">
+                    <message>This relationship is being described by all available relationship kinds.</message>
+                </waltz-no-data>
+                <select ng-model="$ctrl.form.relationshipKind"
+                        class="form-control"
+                        ng-if="$ctrl.relationshipKinds.length > 0">
+                    <option ng-repeat="kind in $ctrl.relationshipKinds"
+                            value="{{kind.code}}"
+                            ng-bind="kind.name">
+                    </option>
+                </select>
+                <div class="help-block">
+                    The relationship kind describes the nature of the relationship between the entities.
+                </div>
+            </div>
+
             <!-- DESCRIPTION -->
             <div class="form-group">
                 <label class="control-label">
