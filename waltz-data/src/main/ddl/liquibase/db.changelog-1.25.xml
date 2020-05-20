@@ -60,7 +60,7 @@
             <column name="code" value="DEPRECATES"/>
             <column name="kind_a" value="CHANGE_INITIATIVE"/>
             <column name="kind_b" value="APPLICATION"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="20"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -68,7 +68,7 @@
             <column name="code" value="DEPRECATES"/>
             <column name="kind_a" value="CHANGE_INITIATIVE"/>
             <column name="kind_b" value="MEASURABLE"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="20"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -76,7 +76,7 @@
             <column name="code" value="PARTICIPATES_IN"/>
             <column name="kind_a" value="APPLICATION"/>
             <column name="kind_b" value="CHANGE_INITIATIVE"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="20"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -84,7 +84,7 @@
             <column name="code" value="RELATES_TO"/>
             <column name="kind_a" value="APP_GROUP"/>
             <column name="kind_b" value="APP_GROUP"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="10"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -92,7 +92,7 @@
             <column name="code" value="RELATES_TO"/>
             <column name="kind_a" value="APP_GROUP"/>
             <column name="kind_b" value="CHANGE_INITIATIVE"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="10"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -100,7 +100,7 @@
             <column name="code" value="RELATES_TO"/>
             <column name="kind_a" value="APP_GROUP"/>
             <column name="kind_b" value="MEASURABLE"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="10"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -108,7 +108,7 @@
             <column name="code" value="RELATES_TO"/>
             <column name="kind_a" value="APP_GROUP"/>
             <column name="kind_b" value="ROADMAP"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="10"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -116,7 +116,7 @@
             <column name="code" value="RELATES_TO"/>
             <column name="kind_a" value="APP_GROUP"/>
             <column name="kind_b" value="DATA_TYPE"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="10"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -124,7 +124,7 @@
             <column name="code" value="RELATES_TO"/>
             <column name="kind_a" value="CHANGE_INITIATIVE"/>
             <column name="kind_b" value="MEASURABLE"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="10"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -132,7 +132,7 @@
             <column name="code" value="RELATES_TO"/>
             <column name="kind_a" value="CHANGE_INITIATIVE"/>
             <column name="kind_b" value="CHANGE_INITIATIVE"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="10"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -140,7 +140,7 @@
             <column name="code" value="RELATES_TO"/>
             <column name="kind_a" value="CHANGE_INITIATIVE"/>
             <column name="kind_b" value="DATA_TYPE"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="10"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -148,7 +148,7 @@
             <column name="code" value="RELATES_TO"/>
             <column name="kind_a" value="CHANGE_INITIATIVE"/>
             <column name="kind_b" value="APP_GROUP"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="10"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -156,7 +156,7 @@
             <column name="code" value="RELATES_TO"/>
             <column name="kind_a" value="CHANGE_INITIATIVE"/>
             <column name="kind_b" value="APPLICATION"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="10"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -164,7 +164,7 @@
             <column name="code" value="RELATES_TO"/>
             <column name="kind_a" value="MEASURABLE"/>
             <column name="kind_b" value="APP_GROUP"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="10"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -172,7 +172,7 @@
             <column name="code" value="RELATES_TO"/>
             <column name="kind_a" value="MEASURABLE"/>
             <column name="kind_b" value="MEASURABLE"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="10"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -180,7 +180,7 @@
             <column name="code" value="RELATES_TO"/>
             <column name="kind_a" value="MEASURABLE"/>
             <column name="kind_b" value="CHANGE_INITIATIVE"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="10"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -188,7 +188,7 @@
             <column name="code" value="RELATES_TO"/>
             <column name="kind_a" value="ORG_UNIT"/>
             <column name="kind_b" value="ROADMAP"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="10"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -196,7 +196,7 @@
             <column name="code" value="RELATES_TO"/>
             <column name="kind_a" value="ROADMAP"/>
             <column name="kind_b" value="ORG_UNIT"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="10"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -204,7 +204,7 @@
             <column name="code" value="RELATES_TO"/>
             <column name="kind_a" value="LICENCE"/>
             <column name="kind_b" value="APPLICATION"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="10"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -212,7 +212,7 @@
             <column name="code" value="SUPPORTS"/>
             <column name="kind_a" value="APPLICATION"/>
             <column name="kind_b" value="CHANGE_INITIATIVE"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="20"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -220,7 +220,7 @@
             <column name="code" value="SUPPORTS"/>
             <column name="kind_a" value="ACTOR"/>
             <column name="kind_b" value="CHANGE_INITIATIVE"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="20"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -228,7 +228,7 @@
             <column name="code" value="APPLICATION_NEW"/>
             <column name="kind_a" value="CHANGE_INITIATIVE"/>
             <column name="kind_b" value="APPLICATION"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="20"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -236,7 +236,7 @@
             <column name="code" value="APPLICATION_FUNCTIONAL_CHANGE"/>
             <column name="kind_a" value="CHANGE_INITIATIVE"/>
             <column name="kind_b" value="APPLICATION"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="20"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -244,7 +244,7 @@
             <column name="code" value="APPLICATION_DECOMMISSIONED"/>
             <column name="kind_a" value="CHANGE_INITIATIVE"/>
             <column name="kind_b" value="APPLICATION"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="20"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -252,7 +252,7 @@
             <column name="code" value="APPLICATION_NFR_CHANGE"/>
             <column name="kind_a" value="CHANGE_INITIATIVE"/>
             <column name="kind_b" value="APPLICATION"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="20"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -260,7 +260,7 @@
             <column name="code" value="DATA_PUBLISHER"/>
             <column name="kind_a" value="CHANGE_INITIATIVE"/>
             <column name="kind_b" value="APPLICATION"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="20"/>
         </insert>
         <insert tableName="relationship_kind">
@@ -268,7 +268,7 @@
             <column name="code" value="DATA_CONSUMER"/>
             <column name="kind_a" value="CHANGE_INITIATIVE"/>
             <column name="kind_b" value="APPLICATION"/>
-            <column name="is_readonly" value="${false.value}"/>
+            <column name="is_readonly" valueBoolean="false"/>
             <column name="position" value="20"/>
         </insert>
     </changeSet>
