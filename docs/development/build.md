@@ -13,6 +13,7 @@ Waltz is built using [Maven](https://maven.apache.org/).
 - Database - either
   - [MariaDB](https://mariadb.org/)
   - [Microsoft SQL Server](https://www.microsoft.com/en-gb/sql-server/)
+  - [Postgres](https://www.postgresql.org/)
 - [Liquibase](http://www.liquibase.org/) (recommended but not essential)
 - [_jOOQ Pro_](https://www.jooq.org/download/) (if using Microsoft SQL Server) 
 
