@@ -49,6 +49,7 @@ public class RelationshipKindDao {
                 .categoryA(record.getCategoryA())
                 .categoryB(record.getCategoryB())
                 .code(record.getCode())
+                .reverseName(record.getReverseName())
                 .position(record.getPosition())
                 .build();
     };
