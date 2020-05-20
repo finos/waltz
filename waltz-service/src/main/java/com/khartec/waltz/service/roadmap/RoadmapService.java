@@ -99,7 +99,7 @@ public class RoadmapService {
         EntityRelationship reln = ImmutableEntityRelationship.builder()
                 .a(command.linkedEntity())
                 .b(mkRef(EntityKind.ROADMAP, roadmapId))
-                .relationship(RelationshipKind.RELATES_TO)
+                .relationship(RelationshipKind.RELATES_TO.name())
                 .lastUpdatedBy(userId)
                 .build();
 

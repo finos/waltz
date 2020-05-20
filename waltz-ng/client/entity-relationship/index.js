@@ -19,6 +19,7 @@
 import angular from 'angular';
 
 import * as EntityRelationshipStore from './services/entity-relationship-store';
+import * as RelationshipKindStore from './services/relationship-kind-store';
 import {registerStores} from "../common/module-utils";
 
 
@@ -26,7 +27,7 @@ export default () => {
 
     const module = angular.module('waltz.entity-relationship', []);
 
-    registerStores(module, [ EntityRelationshipStore ])
+    registerStores(module, [ EntityRelationshipStore, RelationshipKindStore]);
 
     return module.name;
 };

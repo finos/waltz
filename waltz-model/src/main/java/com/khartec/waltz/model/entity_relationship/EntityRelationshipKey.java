@@ -31,5 +31,5 @@ public abstract class EntityRelationshipKey {
     public abstract EntityReference a();
     public abstract EntityReference b();
 
-    public abstract RelationshipKind relationshipKind();
+    public abstract String relationshipKind();
 }

@@ -82,7 +82,7 @@ public class EntityRelationshipService {
     private Predicate<EntityRelationship> mkRelationshipKindFilter(List<RelationshipKind> relationshipKinds) {
         return relationshipKinds.isEmpty()
             ? r -> true
-            : r -> relationshipKinds.contains(r.relationship());
+            : r -> relationshipKinds.contains(RelationshipKind.valueOf(r.relationship()));
     }
 
 
