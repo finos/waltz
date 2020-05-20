@@ -18,6 +18,12 @@
 
 <div>
     <waltz-section-actions>
+        <waltz-data-extract-link name="Export"
+                                 extract="app-cost/by-selector"
+                                 method="POST"
+                                 request-body="$ctrl.selectionOptions"
+                                 styling="link">
+        </waltz-data-extract-link>
         <button class="btn btn-xs waltz-btn-transparent"
                 ng-click="$ctrl.sourceDataOverlay = ! $ctrl.sourceDataOverlay">
             <waltz-icon name="map-signs"></waltz-icon>
