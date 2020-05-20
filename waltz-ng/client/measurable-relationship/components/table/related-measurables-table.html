@@ -17,9 +17,9 @@
   ~
   -->
 
-<waltz-grid-with-search  ng-if="$ctrl.rows.length > 0"
+<waltz-grid-with-search  ng-if="$ctrl.data.length > 0"
                          column-defs="$ctrl.columnDefs"
-                         entries="$ctrl.rows"
+                         entries="$ctrl.data"
                          on-row-select="$ctrl.onRowSelect"
                          search-placeholder-text="Search relationships...">
 </waltz-grid-with-search>
