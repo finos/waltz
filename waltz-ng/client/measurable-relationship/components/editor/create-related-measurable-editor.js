@@ -72,6 +72,14 @@ function prepareTree(nodes = []) {
 function controller(notification, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
+     const setDefaultRelationshipKind = (counterpart) => {
+        serviceBroker
+            .loadViewData(
+                CORE_API.RelationshipKindStore.findRelationshipKindsBetweenEntities,
+                [vm.parentEntityRef, counterpart])
+            .then(r => vm.form.relationshipKind = _.first(_.sortBy(r.data, 'position')).code);
+    };
+
     const loadRelationships = (autoExpand = false) => {
 
         return serviceBroker
@@ -115,7 +123,8 @@ function controller(notification, serviceBroker) {
                 vm.measurablesById = _.keyBy(vm.measurables, d => d.id);
                 vm.searchNodes = prepareSearchNodes(vm.measurables);
                 vm.nodes = prepareTree(vm.measurables);
-            });
+            })
+            .then(() => setDefaultRelationshipKind(_.first(vm.measurables)));
 
     };
 
@@ -174,10 +183,12 @@ function controller(notification, serviceBroker) {
 
     vm.onAppGroupSelection = (appGroup) => {
         vm.form.counterpart = appGroup;
+        setDefaultRelationshipKind(vm.form.counterpart);
     };
 
     vm.onChangeInitiativeSelection = (changeInitiative) => {
         vm.form.counterpart = changeInitiative;
+        setDefaultRelationshipKind(vm.form.counterpart);
     };
 
     vm.onItemCheck = (node) => {
