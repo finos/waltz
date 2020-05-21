@@ -50,8 +50,14 @@
               ng-if="$ctrl.relationshipKinds.length == 0 && $ctrl.list.length == 1">
             <span ng-repeat="item in $ctrl.list">
                 <span class="wrmp-pill wrmp-rel-inner clickable"
+                      ng-if="item.outbound"
                       ng-click="$ctrl.selectItem(item)"
-                      ng-bind="item.relationship.relationship | toDisplayName:'relationshipKind'">
+                      ng-bind="item.relationshipKind.name">
+                </span>
+                <span class="wrmp-pill wrmp-rel-inner clickable"
+                      ng-if="!item.outbound"
+                      ng-click="$ctrl.selectItem(item)"
+                      ng-bind="item.relationshipKind.reverseName">
                 </span>
             </span>
         </span>
