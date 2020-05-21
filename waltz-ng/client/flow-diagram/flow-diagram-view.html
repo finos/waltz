@@ -40,6 +40,13 @@
 
     <div class="row">
         <div class="col-md-12">
+            <div class="small text-muted">
+                Last updated by
+                <span ng-bind="ctrl.diagram.lastUpdatedBy"></span>
+                (<waltz-from-now timestamp="ctrl.diagram.lastUpdatedAt"></waltz-from-now>)
+            </div>
+            <br/>
+
             <!-- HELP -->
             <div class="help-block small small">
                 This diagram may be moved and resized by holding down
