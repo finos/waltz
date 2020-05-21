@@ -399,7 +399,7 @@ public class AppGroupService {
         return ImmutableEntityRelationship.builder()
                 .a(appGroupRef)
                 .b(changeInitiativeRef)
-                .relationship(RelationshipKind.RELATES_TO)
+                .relationship(RelationshipKind.RELATES_TO.name())
                 .lastUpdatedBy(username)
                 .provenance("waltz")
                 .build();

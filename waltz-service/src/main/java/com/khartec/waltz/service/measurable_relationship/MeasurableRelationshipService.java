@@ -20,18 +20,22 @@ package com.khartec.waltz.service.measurable_relationship;
 
 import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.entity_relationship.EntityRelationshipDao;
-import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.Operation;
+import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.entity_relationship.*;
+import com.khartec.waltz.model.entity_relationship.EntityRelationship;
+import com.khartec.waltz.model.entity_relationship.EntityRelationshipKey;
+import com.khartec.waltz.model.entity_relationship.ImmutableEntityRelationship;
+import com.khartec.waltz.model.entity_relationship.UpdateEntityRelationshipParams;
 import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.entity_relationship.EntityRelationshipUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.map;
@@ -85,24 +89,16 @@ public class MeasurableRelationshipService {
     public boolean create(String userName,
                           EntityReference entityRefA,
                           EntityReference entityRefB,
-                          RelationshipKind relationshipKind,
+                          String relationshipKind,
                           String description) {
 
-        Optional<EntityRelationshipKey> entityRelationshipKey =
-                EntityRelationshipUtilities.mkEntityRelationshipKey(entityRefA, entityRefB, relationshipKind, true);
-
-        EntityRelationship relationship = entityRelationshipKey
-                .map(erKey -> ImmutableEntityRelationship.builder()
-                        .a(erKey.a())
-                        .b(erKey.b())
-                        .relationship(relationshipKind)
-                        .description(description)
-                        .lastUpdatedBy(userName)
-                        .build())
-                .orElseThrow(() -> new IllegalArgumentException("Entity relationship type " + relationshipKind
-                        + " cannot be created between " + entityRefA
-                        + " and " + entityRefB));
-
+        EntityRelationship relationship = ImmutableEntityRelationship.builder()
+                .a(entityRefA)
+                .b(entityRefB)
+                .relationship(relationshipKind)
+                .description(description)
+                .lastUpdatedBy(userName)
+                .build();
 
         boolean result = entityRelationshipDao.create(relationship);
         if (result) {
@@ -162,7 +158,8 @@ public class MeasurableRelationshipService {
                 key.b());
 
         String msg = format(
-                "Removed explicit relationship from: '%s', to: '%s'",
+                "Removed explicit relationship: '%s' from: '%s', to: '%s'",
+                key.relationshipKind(),
                 niceNames.get(0),
                 niceNames.get(1));
 
@@ -185,7 +182,8 @@ public class MeasurableRelationshipService {
                 relationship.b());
 
         String msg = format(
-                "Added explicit relationship from: '%s', to: '%s'",
+                "Added explicit relationship: '%s' from: '%s', to: '%s'",
+                relationship.relationship(),
                 niceNames.get(0),
                 niceNames.get(1));
 

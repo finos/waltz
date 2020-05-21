@@ -27,19 +27,6 @@
 
         <form>
 
-            <!-- KIND -->
-            <div class="form-group">
-                <label>Relationship Kind</label>
-                <select ng-model="$ctrl.form.relationshipKind"
-                        ng-options="relationshipKind.code as relationshipKind.label for relationshipKind in $ctrl.availableRelationshipKinds[$ctrl.relationshipKindsKey]"
-                        class="form-control">
-                </select>
-                <div class="help-block">
-                    The relationship kind describes the nature of the relationship between the entities.
-                </div>
-            </div>
-
-
             <!-- CHANGE INITIATIVE ... or ... -->
             <div class="form-group"
                  ng-if="$ctrl.visibility.changeInitiativeSelector">

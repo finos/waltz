@@ -23,6 +23,7 @@
         border-radius: 3px;
         padding: 0 4px 0 4px;
         margin: 0 4px 0 4px;
+        vertical-align: center;
 
         &.wrmp-counterpart {
             border-color: #9ed18f;
@@ -32,12 +33,18 @@
             background-color: #f9f9f9;
         }
         &.wrmp-rel {
+            display: inline-block;
+            border: none;
+            text-align: center;
+            vertical-align: middle;
+        }
+        &.wrmp-rel-inner {
             background-color: #e9ecf9;
         }
     }
 
     .wrmp-relationship-heading {
-        padding: 4px;
+        padding: 10px;
         border: 1px solid #eee;
         border-radius: 3px;
     }
