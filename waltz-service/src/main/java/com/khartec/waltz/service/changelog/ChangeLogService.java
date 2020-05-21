@@ -21,7 +21,6 @@ package com.khartec.waltz.service.changelog;
 import com.khartec.waltz.common.CollectionUtilities;
 import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.data.EntityReferenceNameResolver;
-import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.changelog.ChangeLogDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionDao;
@@ -67,7 +66,6 @@ public class ChangeLogService {
     private final PhysicalFlowDao physicalFlowDao;
     private final LogicalFlowDao logicalFlowDao;
     private final PhysicalSpecificationDao physicalSpecificationDao;
-    private final ApplicationDao applicationDao;
     private final MeasurableRatingReplacementDao measurableRatingReplacementdao;
     private final MeasurableRatingPlannedDecommissionDao measurableRatingPlannedDecommissionDao;
     private final EntityReferenceNameResolver nameResolver;
@@ -79,7 +77,6 @@ public class ChangeLogService {
                             PhysicalFlowDao physicalFlowDao,
                             PhysicalSpecificationDao physicalSpecificationDao,
                             LogicalFlowDao logicalFlowDao,
-                            ApplicationDao applicationDao,
                             MeasurableRatingReplacementDao measurableRatingReplacementDao,
                             MeasurableRatingPlannedDecommissionDao measurableRatingPlannedDecommissionDao,
                             EntityReferenceNameResolver nameResolver) {
@@ -97,7 +94,6 @@ public class ChangeLogService {
         this.physicalFlowDao = physicalFlowDao;
         this.physicalSpecificationDao = physicalSpecificationDao;
         this.logicalFlowDao = logicalFlowDao;
-        this.applicationDao = applicationDao;
         this.measurableRatingReplacementdao = measurableRatingReplacementDao;
         this.measurableRatingPlannedDecommissionDao = measurableRatingPlannedDecommissionDao;
         this.nameResolver = nameResolver;
@@ -327,23 +323,17 @@ public class ChangeLogService {
         String entityName = resolveName(entityReference.id(), entityReference.kind());
 
         String messagePreamble = format(
-                "Measurable Rating: %s [%d] on: %s [%s]",
+                "Measurable Rating: %s [%d] on: %s [%d]",
                 measurableName,
                 measurableRatingPlannedDecommission.measurableId(),
                 entityName,
-                getExternalId(entityReference).orElse(String.valueOf(entityReference.id())));
+                entityReference.id());
 
         return tuple(
                 messagePreamble,
                 union(map(replacements, MeasurableRatingReplacement::entityReference), asSet(entityReference)));
     }
 
-
-    private Optional<String> getExternalId(EntityReference entityReference) {
-        return entityReference.kind().equals(APPLICATION)
-                ? applicationDao.getById(entityReference.id()).assetCode()
-                : Optional.empty();
-    }
 
     private String resolveName(long id, EntityKind kind) {
         return nameResolver
