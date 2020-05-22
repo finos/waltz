@@ -310,22 +310,22 @@
         <comment>4852: Insert reverse names for relationship kinds</comment>
         <sql>
             UPDATE relationship_kind
-            SET relationship_kind.reverse_name = relationship_kind.name
-            WHERE relationship_kind.name not in ('Deprecates', 'Participates in', 'Supports');
+            SET reverse_name = name
+            WHERE name not in ('Deprecates', 'Participates in', 'Supports');
         </sql>
         <sql>
             UPDATE relationship_kind
-            SET relationship_kind.reverse_name = 'Is deprecated by'
+            SET reverse_name = 'Is deprecated by'
             where name = 'Deprecates';
         </sql>
         <sql>
             UPDATE relationship_kind
-            SET relationship_kind.reverse_name = 'Has participant'
+            SET reverse_name = 'Has participant'
             WHERE name = 'Participates in';
         </sql>
         <sql>
             UPDATE relationship_kind
-            SET relationship_kind.reverse_name = 'Is supported by'
+            SET reverse_name = 'Is supported by'
             WHERE name = 'Supports';
         </sql>
     </changeSet>
