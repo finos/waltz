@@ -292,4 +292,50 @@
                                  onDelete="CASCADE"/>
     </changeSet>
 
+
+    <!-- 4852 - add reverse_name to relationship_kind-->
+    <changeSet id="202005020-4852-1"
+               author="woodjes">
+        <comment>4852: Add reverse_name to relationship_kind</comment>
+        <addColumn tableName="relationship_kind">
+            <column name="reverse_name"
+                    type="${name.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20200520-4852-2"
+               author="woodjes">
+        <comment>4852: Insert reverse names for relationship kinds</comment>
+        <sql>
+            UPDATE relationship_kind
+            SET relationship_kind.reverse_name = relationship_kind.name
+            WHERE relationship_kind.name not in ('Deprecates', 'Participates in', 'Supports');
+        </sql>
+        <sql>
+            UPDATE relationship_kind
+            SET relationship_kind.reverse_name = 'Is deprecated by'
+            where name = 'Deprecates';
+        </sql>
+        <sql>
+            UPDATE relationship_kind
+            SET relationship_kind.reverse_name = 'Has participant'
+            WHERE name = 'Participates in';
+        </sql>
+        <sql>
+            UPDATE relationship_kind
+            SET relationship_kind.reverse_name = 'Is supported by'
+            WHERE name = 'Supports';
+        </sql>
+    </changeSet>
+
+    <changeSet id="20200520-4852-3"
+               author="woodjes">
+        <comment>4852: Update reverse_name to not nullable</comment>
+        <addNotNullConstraint columnDataType="${name.type}"
+                              columnName="reverse_name"
+                              tableName="relationship_kind"/>
+    </changeSet>
+
 </databaseChangeLog>
