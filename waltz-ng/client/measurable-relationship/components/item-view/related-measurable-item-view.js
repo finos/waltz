@@ -53,12 +53,16 @@ function controller(serviceBroker) {
     function enrichItemsWithRelationshipKind() {
         vm.list = _.map(vm.items, i => Object.assign({},
             i,
-            {relationshipKind: _.get(vm.relationshipKindsByCode, i.relationship.relationship, null)}));
+            {relationshipKind: _.find(vm.allRelationshipKinds,
+                    {'code': i.relationship.relationship,
+                        'kindA': i.a.kind,
+                        'kindB': i.b.kind
+                    })}));
     }
 
     vm.$onInit = () => {
         serviceBroker.loadAppData(CORE_API.RelationshipKindStore.findAll)
-            .then(r => vm.relationshipKindsByCode = _.keyBy(r.data, d => d.code))
+            .then(r => vm.allRelationshipKinds = r.data)
             .then(() => enrichItemsWithRelationshipKind())
     };
 

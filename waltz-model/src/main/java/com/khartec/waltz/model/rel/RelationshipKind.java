@@ -31,6 +31,7 @@ public abstract class RelationshipKind implements IdProvider, NameProvider, Desc
     public abstract EntityKind kindA();
     public abstract EntityKind kindB();
     public abstract String code();
+    public abstract String reverseName();
     public abstract int position();
 
     @Nullable

@@ -1,0 +1,125 @@
+= Homepage redesign
+:toc:
+
+== Problem
+
+The Waltz homepage is largely static.  Only including recently viewed entities and
+a collection of app-groups a user has either created or 'subscribed' to.  The lack
+of fresh information on the homepage leads to it being rarely (intentionally) visited.
+To get an overview of _"what's happening"_ a user must undertake a trawl through
+the Waltz dataset. This trawl is time consuming and tedious and therefore infrequently
+happens leading to a lack of awareness of important changes.
+
+
+== Overview
+
+When users visit Waltz they  wish to see what recent changes have taken place
+on entities that they care about. They would like to see tasks assigned to them,
+for example surveys and attestations.
+
+
+== Reporting Data sets
+
+=== Scope
+
+Defining which applications (or other entities) are in the reporting scope for a
+user will need to be considered.  Approaches include:
+
+* App associations via `involvement` records
+** Peer associations (look for colleagues and inherit their involvements)
+* Explicit inclusion via a 'favourite' app group
+* Org unit based
+
+Or some combination of the above.
+
+These approaches may work for many users however we need some way to limit the
+scope for users with large application portfolios.  For example, senior employees
+are often associated with many applications dues to oversight roles.
+
+To mitigate this, avoiding flooding these users with data, we may wish to allow users
+to modify their 'subscription' settings by:
+
+* (de)selecting specific apps
+* (de)selecting involvement roles
+* include/exclude peer associations
+
+
+=== Changes
+
+Waltz keeps detailed changelogs for entities in the `change_log` table.  If
+a user has 'noisy' applications in their scope the detail could quickly become
+overwhelming.
+
+To mitigate this we could simply show a list of changed applications
+possibly with some annotations about the number of change types.
+
+
+=== Change Sets, Decomms & Comms
+
+Waltz has information about both historic and upcoming change sets (which typically
+describe alterations to the data flow landscape) as well as decommissioning information
+(both at the app level and the app/measurable level).
+
+=== Attestations and Surveys
+
+
+
+== Design thoughts
+
+=== Detailed Historic data
+
+==== Overview table
+
+|===
+|App |Change type |Change count
+
+|AppA
+|Logical Flows
+|22
+
+|-
+|Physical Flows
+|6
+
+|AppB
+|Bookmarks
+|2
+
+|-
+|Physical Flows
+|6
+
+|===
+
+==== Contribution graph
+
+Github style contribution graph:
+
+image::gh.png[Contribution Graph]
+
+=== Milestone data
+
+Better for sparse data.  For example change sets, releases, decomms etc.
+
+==== Timelines
+
+image::timeline.png[Timeline]
+
+
+=== Mockup
+
+Combining these aspects could give a redesign similar to
+
+image::homepage-mockup.png[Mockup]
+
+
+== Notes
+
+Related issues:
+
+* https://github.com/finos/waltz/issues/4876[4786],
+* https://github.com/finos/waltz/issues/4609[4609]
+
+Libraries:
+
+* https://github.com/DKirwan/calendar-heatmap[Github style contribution graph]
