@@ -265,7 +265,7 @@ function controller($q, $timeout, serviceBroker, notification) {
         return serviceBroker.loadViewData(
             CORE_API.RelationshipKindStore.findRelationshipKindsBetweenEntities,
             [vm.selectedRow.a, vm.selectedRow.b])
-            .then(r => vm.relationshipKinds = _.filter(r.data, d => !_.includes(existingKinds, d.code)));
+            .then(r => vm.relationshipKinds = _.filter(r.data, d => !d.isReadonly && !_.includes(existingKinds, d.code)));
     };
 
     const loadAll = () => {
