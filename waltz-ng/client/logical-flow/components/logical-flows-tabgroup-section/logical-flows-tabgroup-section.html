@@ -19,9 +19,15 @@
 <div>
 
     <waltz-section-actions>
-        <waltz-data-extract-link name="Export"
+        <waltz-data-extract-link name="Export Logical Flows"
                                  styling="button"
                                  extract="logical-flows"
+                                 method="POST"
+                                 request-body="$ctrl.selector">
+        </waltz-data-extract-link>
+        <waltz-data-extract-link name="Export Physical Flows"
+                                 styling="button"
+                                 extract="physical-flows/by-selector"
                                  method="POST"
                                  request-body="$ctrl.selector">
         </waltz-data-extract-link>

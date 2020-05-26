@@ -109,7 +109,7 @@ const involvedPeopleSection = {
 
 const logicalFlowsTabgroupSection = {
     componentId: "logical-flows-tabgroup-section",
-    name: "Logical Flows",
+    name: "Data Flows",
     icon: "random",
     id: 14
 };
