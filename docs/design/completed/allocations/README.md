@@ -1,6 +1,18 @@
 # Measurable Allocation
 
-## Status: DRAFT 
+## Status: IMPLEMENTED
+
+This design has been implemented with some changes.
+
+The main deviations between this doc and the final implementation are:
+
+- relaxed rule stating that allocations _must_ always add up to 100%
+- this allows for simpler editing experience as partial mappings are allowed
+- hierarchies are ignored
+
+
+## Historic Notes:
+ 
 
 This document is a rough draft.  
 

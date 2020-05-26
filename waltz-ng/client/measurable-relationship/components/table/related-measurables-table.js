@@ -43,7 +43,7 @@ const columnDefs = [
         field: "relationships",
         name: "Relationships",
     },
-    mkEntityLinkGridCell("From", "b"),
+    mkEntityLinkGridCell("To", "b"),
     {
         field: "b.type",
         name: "(To Type)"
