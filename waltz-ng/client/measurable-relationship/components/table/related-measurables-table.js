@@ -24,6 +24,7 @@ import {sameRef} from "../../../common/entity-utils";
 import {downloadTextFile} from "../../../common/file-utils";
 import {getEnumName} from "../../../common/services/enums/index";
 import {relationshipKind} from "../../../common/services/enums/relationship-kind";
+import {mkEntityLinkGridCell} from "../../../common/grid-utils";
 
 
 const bindings = {
@@ -34,20 +35,16 @@ const bindings = {
 
 
 const columnDefs = [
+    mkEntityLinkGridCell("From", "a"),
     {
-        field: "a.name",
-        name: "From"
-    }, {
         field: "a.type",
         name: "(From Type)"
     }, {
-        field: "relationship.relationship",
-        name: "Relationship",
-        cellFilter: "toDisplayName:'relationshipKind'"
-    }, {
-        field: "b.name",
-        name: "To"
-    }, {
+        field: "relationships",
+        name: "Relationships",
+    },
+    mkEntityLinkGridCell("To", "b"),
+    {
         field: "b.type",
         name: "(To Type)"
     }
@@ -101,6 +98,23 @@ function controller() {
         }
     };
 
+    vm.$onChanges = (c) => {
+        if (c.rows){
+            const collectedRels = _.map(vm.rows, r => {
+
+                const relatedKinds = _.chain(vm.rows)
+                    .filter(d => d.a.id === r.a.id && d.b.id === r.b.id)
+                    .map(rel => rel.relationship.relationship)
+                    .value();
+
+                const relationshipString = _.join(relatedKinds, ", ");
+
+                return Object.assign("", {a: r.a, b: r.b, relationships: relationshipString});
+            });
+
+            vm.data = _.uniqBy(collectedRels, r => JSON.stringify([r.a, r.b, r.relationships]));
+        }
+    };
 
     vm.export = () => {
         const data = mkExportData(vm.rows);

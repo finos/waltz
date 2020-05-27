@@ -16,32 +16,27 @@
  *
  */
 
-package com.khartec.waltz.model.rel;
+package com.khartec.waltz.model.scenario;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.Nullable;
+import com.khartec.waltz.model.command.Command;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableRelationshipKind.class)
-@JsonDeserialize(as = ImmutableRelationshipKind.class)
-public abstract class RelationshipKind implements IdProvider, NameProvider, DescriptionProvider {
-
-    public abstract EntityKind kindA();
-    public abstract EntityKind kindB();
-    public abstract String code();
-    public abstract String reverseName();
-    public abstract int position();
-
+@JsonSerialize(as = ImmutableChangeScenarioCommand.class)
+@JsonDeserialize(as = ImmutableChangeScenarioCommand.class)
+public abstract class ChangeScenarioCommand implements Command {
+    public abstract long scenarioId();
+    public abstract long appId();
+    public abstract long columnId();
+    public abstract long rowId();
+    public abstract long ratingSchemeId();
     @Nullable
-    public abstract Long categoryA();
-
+    public abstract Character rating();
     @Nullable
-    public abstract Long categoryB();
-
-    @Value.Default
-    public boolean isReadOnly() {
-        return false;
-    }
+    public abstract Character previousRating();
+    @Nullable
+    public abstract String comment();
 }

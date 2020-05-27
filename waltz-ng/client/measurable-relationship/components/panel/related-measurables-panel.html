@@ -106,16 +106,56 @@
                 </div>
 
                 <!-- SELECTED RELATIONSHIP -->
-                <div ng-if="$ctrl.selectedRow && ! $ctrl.visibility.editor"
+                <div ng-if="$ctrl.selectedRow"
                      class="waltz-fade-if">
                     <hr>
 
-                    <waltz-related-measurable-item-view item="$ctrl.selectedRow"
+                    <h4>Relationships:</h4>
+                    <p>Select a relationship below to make changes</p>
+                    <br>
+                    <waltz-related-measurable-item-view ng-if="$ctrl.selectedRow"
+                                                        relationship-kinds="$ctrl.relationshipKinds"
+                                                        items="$ctrl.filteredGridData"
+                                                        on-select="$ctrl.selectRelationship"
                                                         on-dismiss="$ctrl.clearRowSelection"
                                                         on-edit="$ctrl.updateExistingRelationship"
-                                                        on-remove="$ctrl.removeRelationship">
+                                                        on-remove="$ctrl.removeRelationship"
+                                                        on-add="$ctrl.onAddRelationshipKind">
                     </waltz-related-measurable-item-view>
+                    <div ng-if="$ctrl.visibility.createRelationshipKind">
+                        <hr>
+                        <div class="form-group">
+                            <label>Relationship Kind</label>
+                            <select ng-model="$ctrl.form.relationshipKind"
+                                    class="form-control">
+                                <option ng-repeat="kind in $ctrl.relationshipKinds"
+                                        value="{{kind.code}}"
+                                        ng-bind="kind.name">
+                                </option>
+                            </select>
+                            <div class="help-block">
+                                The relationship kind describes the nature of the relationship between the entities.
+                            </div>
+                        </div>
 
+                        <div class="form-group">
+                            <label class="control-label">Description</label>
+                            <textarea class='form-control'
+                                      ng-model="$ctrl.form.description"
+                                      placeholder="Please provide any additional details here"
+                                      rows="2">
+                            </textarea>
+                        </div>
+
+                        <button class="btn btn-xs btn-success"
+                                ng-click="$ctrl.onSubmit()">
+                            Save
+                        </button>
+                        <a ng-click="$ctrl.cancelEditor()"
+                           class="clickable">
+                            Dismiss
+                        </a>
+                    </div>
                 </div>
             </span>
         </div>
@@ -144,6 +184,7 @@
             </div>
         </div>
 
+
         <div ng-if="$ctrl.visibility.createEditor"
              class="waltz-fade-if">
             <hr>
@@ -158,9 +199,10 @@
         <div ng-if="$ctrl.visibility.updateEditor"
              class="waltz-fade-if">
             <hr>
-            <waltz-update-related-measurable-editor relationship="$ctrl.selectedRow.relationship"
+            <waltz-update-related-measurable-editor relationship="$ctrl.selectedRelationship.relationship"
                                                     on-cancel="$ctrl.cancelEditor"
-                                                    on-refresh="$ctrl.refresh">
+                                                    on-refresh="$ctrl.refresh"
+                                                    relationship-kinds="$ctrl.relationshipKinds">
             </waltz-update-related-measurable-editor>
         </div>
 
