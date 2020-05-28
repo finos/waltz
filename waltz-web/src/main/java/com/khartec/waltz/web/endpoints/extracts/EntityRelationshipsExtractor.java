@@ -115,9 +115,9 @@ public class EntityRelationshipsExtractor extends DirectQueryBasedDataExtractor{
                 .selectDistinct(baseTable.fields(selectFields.fields()))
                 .select(baseTable
                         .fieldStream()
-                        .filter(f -> f.getName().equalsIgnoreCase("Email")
-                                || f.getName().equalsIgnoreCase("Involvement"))
-                        .collect(Collectors.toSet()))
+                        .filter(f -> f.getName().equalsIgnoreCase("Involvement")
+                                || f.getName().equalsIgnoreCase("Email"))
+                        .collect(Collectors.toList()))
                 .from(baseTable);
     }
 
