@@ -20,28 +20,15 @@ package com.khartec.waltz.model.rel;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.DescriptionProvider;
+import com.khartec.waltz.model.NameProvider;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableRelationshipKind.class)
-@JsonDeserialize(as = ImmutableRelationshipKind.class)
-public abstract class RelationshipKind implements IdProvider, NameProvider, DescriptionProvider {
+@JsonSerialize(as = ImmutableUpdateRelationshipKindCommand.class)
+@JsonDeserialize(as = ImmutableUpdateRelationshipKindCommand.class)
+public abstract class UpdateRelationshipKindCommand implements NameProvider, DescriptionProvider {
 
-    public abstract EntityKind kindA();
-    public abstract EntityKind kindB();
-    public abstract String code();
     public abstract String reverseName();
     public abstract int position();
-
-    @Nullable
-    public abstract Long categoryA();
-
-    @Nullable
-    public abstract Long categoryB();
-
-    @Value.Default
-    public boolean isReadonly() {
-        return false;
-    }
 }
