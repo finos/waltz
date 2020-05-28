@@ -152,8 +152,10 @@ public class PhysicalFlowExtractor extends DirectQueryBasedDataExtractor {
     private SelectConditionStep<Record> getQuery(List<Field> senderOrReceiverColumn,
                                                  Condition condition) {
 
-        return dsl.select(PHYSICAL_SPECIFICATION.NAME.as("Name"),
-                PHYSICAL_SPECIFICATION.EXTERNAL_ID.as("External Id"))
+        return dsl
+                .select(
+                        PHYSICAL_SPECIFICATION.NAME.as("Name"),
+                        PHYSICAL_FLOW.EXTERNAL_ID.as("External Id"))
                 .select(senderOrReceiverColumn)
                 .select(
                         PHYSICAL_SPECIFICATION.FORMAT.as("Format"),

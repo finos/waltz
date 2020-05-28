@@ -23,7 +23,7 @@ import {CORE_API} from "../common/services/core-api-utils";
 
 export const columnDef = {
     name : mkLinkGridCell("Name", "specification.name", "physicalFlow.id", "main.physical-flow.view"),
-    extId : { field: "specification.externalId", displayName: "Ext. Id"},
+    extId : { field: "physicalFlow.externalId", displayName: "Ext. Id"},
     observation: mkEnumGridCell("Observation", "physicalFlow.freshnessIndicator", "FreshnessIndicator", true, true),
     format: { field: "specification.format", displayName: "Format", cellFilter: "toDisplayName:\"dataFormatKind\"" },
     transport: { field: "physicalFlow.transport", displayName: "Transport", cellFilter: "toDisplayName:\"TransportKind\"" },
