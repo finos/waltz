@@ -80,8 +80,8 @@
 
             <!-- PANELS -->
             <div class="col-sm-5">
-                <strong ng-bind="$ctrl.category.description">
-                </strong>
+                <waltz-markdown text="$ctrl.category.description">
+                </waltz-markdown>
 
                 <waltz-static-panels render-mode="chromeless"
                                      group-key="HOME.MEASURABLE.{{$ctrl.category.id}}">
