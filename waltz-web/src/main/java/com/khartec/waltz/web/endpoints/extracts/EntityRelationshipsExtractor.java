@@ -11,6 +11,7 @@ import spark.Request;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.common.SetUtilities.map;
@@ -107,9 +108,17 @@ public class EntityRelationshipsExtractor extends DirectQueryBasedDataExtractor{
             baseTable = baseTable.leftJoin(joinTable)
                     .on(ciId.eq(entityId).or(mId.eq(entityId))
                             .and(joinTable.field("Kind Id", Long.class).eq(invId)));
+
         }
 
-        return dsl.selectDistinct().from(baseTable);
+        return dsl
+                .selectDistinct(baseTable.fields(selectFields.fields()))
+                .select(baseTable
+                        .fieldStream()
+                        .filter(f -> f.getName().equalsIgnoreCase("Email")
+                                || f.getName().equalsIgnoreCase("Involvement"))
+                        .collect(Collectors.toSet()))
+                .from(baseTable);
     }
 
 
