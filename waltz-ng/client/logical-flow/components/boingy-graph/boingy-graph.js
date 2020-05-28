@@ -39,7 +39,9 @@ const DEFAULT_NODE_LIMIT = 500;
 
 const bindings = {
     data: "<", // { decorators: [], entities: [], flows: [] }
-    tweakers: "<"
+    tweakers: "<",
+    filterOptions: "<"
+
 };
 
 const initialState = {
