@@ -68,6 +68,7 @@ public class RelationshipKindEndpoint implements Endpoint {
                 relationshipKindService.findRelationshipKindsBetweenEntites(readEntityA(req), readEntityB(req));
 
         DatumRoute<Boolean> createRoute = (req, resp) -> {
+            ensureUserHasAdminRights(req);
             RelationshipKind relationshipKind = readBody(req, RelationshipKind.class);
             return relationshipKindService.create(relationshipKind);
         };
