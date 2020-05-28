@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
+import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
@@ -121,6 +122,8 @@ public class EntityRelationshipsExtractor extends DirectQueryBasedDataExtractor{
 
     private static Set<Long> getInvolvementKinds(Request request) {
         String involvementKindList = request.queryParams("inv-kind-ids");
-        return map(asSet(involvementKindList.split(",")), Long::valueOf);
+        return (involvementKindList == null)
+                ? Collections.emptySet()
+                : map(asSet(involvementKindList.split(",")), Long::valueOf);
     }
 }
