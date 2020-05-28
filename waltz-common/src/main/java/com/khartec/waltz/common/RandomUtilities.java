@@ -18,12 +18,15 @@
 
 package com.khartec.waltz.common;
 
+import org.jooq.lambda.tuple.Tuple2;
+
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class RandomUtilities {
 
@@ -95,4 +98,22 @@ public class RandomUtilities {
         return IntStream.range(0, randomIntBetween(lower, upper));
     }
 
+
+    public static <T> Tuple2<T, List<T>> pickAndRemove(List<T> xs) {
+        checkNotEmpty(xs, "xs cannot be empty");
+        int idx = rnd.nextInt(xs.size());
+        T pick = xs.get(idx);
+        List<T> remainder = new ArrayList<>();
+        for (int i = 0; i < xs.size(); i++) {
+            if (i == idx) continue;
+            else remainder.add(xs.get(i));
+        }
+
+        return tuple(pick, remainder);
+    }
+
+
+    public static boolean randomTrue(double ratio) {
+        return rnd.nextDouble() < ratio;
+    }
 }
