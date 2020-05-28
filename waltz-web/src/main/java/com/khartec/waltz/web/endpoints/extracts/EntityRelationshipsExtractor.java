@@ -78,7 +78,7 @@ public class EntityRelationshipsExtractor extends DirectQueryBasedDataExtractor{
                 .select(CHANGE_INITIATIVE.EXTERNAL_ID.as("Change Initiative External Id"),
                         CHANGE_INITIATIVE.NAME.as("Change Initiative Name"),
                         CHANGE_INITIATIVE.DESCRIPTION.as("Change Initiative Description"),
-                        ENTITY_RELATIONSHIP.RELATIONSHIP.as("Relationship"),
+                        RELATIONSHIP_KIND.NAME.as("Relationship"),
                         MEASURABLE.ID.as("Viewpoint Id"),
                         MEASURABLE.NAME.as("Viewpoint"),
                         MEASURABLE.DESCRIPTION.as("Viewpoint Description"),
@@ -90,6 +90,7 @@ public class EntityRelationshipsExtractor extends DirectQueryBasedDataExtractor{
                         .and(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.CHANGE_INITIATIVE.name())))
                 .innerJoin(MEASURABLE).on(ENTITY_RELATIONSHIP.ID_B.eq(MEASURABLE.ID)
                         .and(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.MEASURABLE.name())))
+                .innerJoin(RELATIONSHIP_KIND).on(ENTITY_RELATIONSHIP.RELATIONSHIP.eq(RELATIONSHIP_KIND.CODE))
                 .where(condition)
                 .and(MEASURABLE.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()));
 
