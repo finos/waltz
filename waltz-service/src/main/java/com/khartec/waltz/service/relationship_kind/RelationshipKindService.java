@@ -3,6 +3,7 @@ package com.khartec.waltz.service.relationship_kind;
 import com.khartec.waltz.data.rel.RelationshipKindDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.rel.RelationshipKind;
+import com.khartec.waltz.model.rel.UpdateRelationshipKindCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,5 +32,20 @@ public class RelationshipKindService {
 
     public Collection<RelationshipKind> findAll() {
         return relationshipKindDao.findAll();
+    }
+
+
+    public boolean create(RelationshipKind relationshipKind) {
+        return relationshipKindDao.create(relationshipKind);
+    }
+
+
+    public boolean remove(Long id) {
+        return relationshipKindDao.remove(id);
+    }
+
+
+    public boolean update(long relKindId, UpdateRelationshipKindCommand updateCommand) {
+        return relationshipKindDao.update(relKindId, updateCommand);
     }
 }
