@@ -85,22 +85,24 @@
             <table class="table table-condensed small">
                 <thead>
                 <tr>
+                    <th>External Id</th>
                     <th>From</th>
                     <th>To</th>
                     <th>Frequency</th>
                     <th>Transport</th>
+                    <th>Comment</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr ng-repeat="flow in ctrl.physicalFlows"
-                    ng-class="{
-                                'waltz-entity-removed':flow.entityLifecycleStatus === 'REMOVED',
-                              }">
+                    ng-class="{ 'waltz-entity-removed':flow.entityLifecycleStatus === 'REMOVED' }">
+                    <td>
+                        <span ng-bind="flow.externalId"></span>
+                    </td>
                     <td>
                         <a ng-bind="ctrl.logicalFlowsById[flow.logicalFlowId].source.name"
                            class="clickable"
                            ui-sref="main.physical-flow.view ({id: flow.id })">
-
                         </a>
                     </td>
                     <td>
@@ -114,6 +116,9 @@
                     </td>
                     <td>
                         <span ng-bind="flow.transport | toDisplayName:'TransportKind'"></span>
+                    </td>
+                    <td>
+                        <span ng-bind="flow.description | truncateMiddle:80"></span>
                     </td>
                 </tr>
                 </tbody>
