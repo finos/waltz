@@ -89,18 +89,26 @@
     <!-- ACTIONS -->
     <div waltz-has-role="CAPABILITY_EDITOR"
          ng-if="$ctrl.selectedItem">
-        <button class="btn btn-xs btn-primary"
-                ng-click="$ctrl.onEdit()">
-            Edit
-        </button>
-        <button class="btn btn-xs btn-danger"
-                ng-click="$ctrl.onRemove($ctrl.selectedItem.relationship)">
-            Delete
-        </button>
-        <a ng-click="$ctrl.onDismiss()"
-           class="clickable">
-            Dismiss
-        </a>
+        <span>
+            <button class="btn btn-xs btn-primary"
+                    ng-if="!$ctrl.selectedItem.relationshipKind.isReadonly"
+                    ng-click="$ctrl.onEdit()">
+                Edit
+            </button>
+            <button class="btn btn-xs btn-danger"
+                    ng-if="!$ctrl.selectedItem.relationshipKind.isReadonly"
+                    ng-click="$ctrl.onRemove($ctrl.selectedItem.relationship)">
+                Delete
+            </button>
+            <i class="text-muted"
+               ng-if="$ctrl.selectedItem.relationshipKind.isReadonly">
+                This relationship kind is <b>read only</b> &nbsp;
+            </i>
+            <a ng-click="$ctrl.onDismiss()"
+               class="clickable">
+                Dismiss
+            </a>
+        </span>
         <div ng-if="$ctrl.items.length == 1">
             <hr>
             <waltz-warning>

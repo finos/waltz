@@ -1,0 +1,326 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<div>
+    <waltz-page-header icon="puzzle-piece" name="Relationship Kinds">
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><a ui-sref="main.system.list">System Admin</a></li>
+            <li>Relationship Kinds</li>
+        </ol>
+    </waltz-page-header>
+
+    <div class="col-sm-12 waltz-page-summary waltz-page-summary-attach">
+        <p class="col-sm-12 waltz-paragraph">
+            Relationship Kinds used across entities in Waltz.
+        </p>
+
+        <br>
+        <br>
+
+        <div class="col-sm-12">
+            <div class="col-sm-8">
+
+                <waltz-grid-with-search column-defs="$ctrl.columnDefs"
+                                        entries="$ctrl.relationshipKinds"
+                                        on-row-select="$ctrl.onSelectRelationshipKind"
+                                        search-placeholder-text="Search relationship kinds...">
+                </waltz-grid-with-search>
+
+                <a ng-if="!$ctrl.visibility.create"
+                   class="clickable"
+                   ng-click="$ctrl.createRelationshipKind()">
+                    ...or add a new relationship kind
+                </a>
+
+            </div>
+            <div class="col-sm-4">
+                <waltz-sub-section name="Relationship Kind">
+                    <content>
+                        <div class="container-fluid"
+                             style="padding: 18px;">
+                            <waltz-no-data ng-if="!$ctrl.selectedRelationshipKind">
+                                <message>
+                                    Select a relationship kind from the table to view and edit.
+                                </message>
+                            </waltz-no-data>
+
+                            <div ng-if="$ctrl.selectedRelationshipKind">
+
+                                <h4 ng-bind="$ctrl.selectedRelationshipKind.name"></h4>
+                                <waltz-markdown text="$ctrl.selectedRelationshipKind.description"
+                                                class="text-muted small"
+                                                ng-if="$ctrl.selectedRelationshipKind.description">
+                                </waltz-markdown>
+                                <div ng-if="!$ctrl.selectedRelationshipKind.description"
+                                     class="text-muted small">
+                                    No description provided
+                                </div>
+
+                                <br>
+                                <br>
+
+                                <table class="table table-condensed table-hover">
+                                    <tbody>
+                                    <tr class="small">
+                                        <td class="col-sm-4">
+                                            Reverse Name
+                                        </td>
+                                        <td class="col-sm-8">
+                                            <span ng-bind="$ctrl.selectedRelationshipKind.name"></span>
+                                        </td>
+                                    <tr>
+                                    <tr class="small">
+                                        <td class="col-sm-4">
+                                            Code
+                                        </td>
+                                        <td class="col-sm-8">
+                                            <span ng-bind="$ctrl.selectedRelationshipKind.code"></span>
+                                        </td>
+                                    <tr>
+                                    <tr class="small">
+                                        <td class="col-sm-4">
+                                            Kind A
+                                        </td>
+                                        <td class="col-sm-8">
+                                            <span ng-bind="$ctrl.selectedRelationshipKind.kindA | toDisplayName: 'entity'"></span>
+                                        </td>
+                                    <tr>
+                                    <tr class="small">
+                                        <td class="col-sm-4">
+                                            Kind B
+                                        </td>
+                                        <td class="col-sm-8">
+                                            <span ng-bind="$ctrl.selectedRelationshipKind.kindB | toDisplayName: 'entity'"></span>
+                                        </td>
+                                    <tr>
+                                    <tr class="small">
+                                        <td class="col-sm-4">
+                                            Category A
+                                        </td>
+                                        <td class="col-sm-8">
+                                            <span ng-bind="$ctrl.selectedRelationshipKind.categoryA.name"
+                                                  ng-if="$ctrl.selectedRelationshipKind.categoryA">
+                                            </span>
+                                            <span ng-if="!$ctrl.selectedRelationshipKind.categoryA">
+                                                -
+                                            </span>
+                                        </td>
+                                    <tr>
+                                    <tr class="small">
+                                        <td class="col-sm-4">
+                                            Category B
+                                        </td>
+                                        <td class="col-sm-8">
+                                            <span ng-bind="$ctrl.selectedRelationshipKind.categoryB.name"
+                                                  ng-if="$ctrl.selectedRelationshipKind.categoryB">
+                                            </span>
+                                            <span ng-if="!$ctrl.selectedRelationshipKind.categoryB">
+                                                -
+                                            </span>
+                                        </td>
+                                    <tr>
+                                    <tr class="small">
+                                        <td class="col-sm-4">
+                                            Position
+                                        </td>
+                                        <td class="col-sm-8">
+                                            <span ng-bind="$ctrl.selectedRelationshipKind.position"></span>
+                                        </td>
+                                    <tr>
+                                    <tr class="small">
+                                        <td class="col-sm-4">
+                                            Read Only
+                                        </td>
+                                        <td class="col-sm-8">
+                                            <span ng-bind="$ctrl.selectedRelationshipKind.isReadonly"></span>
+                                        </td>
+                                    <tr>
+                                    </tbody>
+                                </table>
+                                <span class=" small pull-right">
+                                    <a ng-click="$ctrl.editRelationshipKind()"
+                                       class="clickable">
+                                        Edit
+                                    </a>
+                                    |
+                                    <a ng-click="$ctrl.removeRelationshipKind()"
+                                       class="clickable">
+                                        Remove
+                                    </a>
+                                </span>
+                            </div>
+                        </div>
+                    </content>
+                </waltz-sub-section>
+            </div>
+        </div>
+
+        <hr>
+
+        <div ng-if="$ctrl.visibility.update" class="col-sm-12">
+            <hr>
+            <h4> Update relationship kind: </h4>
+            <br>
+
+            <div class="col-sm-12" ng-include="'rk-form'">
+            </div>
+
+            <span>
+                <button class="btn btn-success"
+                        ng-click="$ctrl.onSaveUpdate()">
+                    Save
+                </button>
+                <a class="clickable"
+                   ng-click="$ctrl.onDismiss()">
+                    Dismiss
+                </a>
+            </span>
+        </div>
+
+        <div ng-if="$ctrl.visibility.create" class="col-sm-12">
+            <hr>
+            <h4> Create a new relationship kind: </h4>
+            <br>
+
+            <div class="col-sm-12">
+                <div class="form-group col-sm-6">
+                    <label>Kind A (From)</label>
+                    <select ng-model="$ctrl.form.kindA"
+                            ng-options="entity.key as entity.name for entity in $ctrl.entityKinds"
+                            class="form-control">
+                    </select>
+                    <div class="help-block">
+                        Specify the entity kind (From)
+                    </div>
+                </div>
+
+                <div class="form-group col-sm-6">
+                    <label>Kind B (To)</label>
+                    <select ng-model="$ctrl.form.kindB"
+                            ng-options="entity.key as entity.name for entity in $ctrl.entityKinds"
+                            class="form-control">
+                    </select>
+                    <div class="help-block">
+                        Specify the entity kind (To)
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="form-group col-sm-6"
+                     ng-if="$ctrl.form.kindA == 'MEASURABLE'">
+                    <label>Category A</label>
+                    <select ng-model="$ctrl.form.categoryA"
+                            ng-options="measurableCategory.id as measurableCategory.name for measurableCategory in $ctrl.measurableCategories"
+                            class="form-control">
+                    </select>
+                    <div class="help-block">
+                        Select a category (if none selected, applies to all)
+                    </div>
+                </div>
+
+                <div class="form-group col-sm-5"
+                     ng-if="$ctrl.form.kindB == 'MEASURABLE'">
+                    <label>Category B</label>
+                    <select ng-model="$ctrl.form.categoryB"
+                            ng-options="measurableCategory.id as measurableCategory.name for measurableCategory in $ctrl.measurableCategories"
+                            class="form-control">
+                    </select>
+                    <div class="help-block">
+                        Select a category (if none selected, applies to all)
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12" ng-include="'rk-form'">
+            </div>
+
+            <div class="col-sm-12">
+                <div class="form-group col-sm-6">
+                    <label class="control-label">
+                        <input type="checkbox"
+                               ng-model="$ctrl.form.isReadonly"/>
+                        Read Only
+                    </label>
+                </div>
+            </div>
+
+            <waltz-warning ng-if="!$ctrl.isValid()">
+                <message>This relationship kind already exists between these two entity kinds</message>
+                <content></content>
+            </waltz-warning>
+
+            <span>
+                <button class="btn btn-success"
+                        ng-disabled="$ctrl.isDisabled() || !$ctrl.isValid()"
+                        ng-click="$ctrl.onSubmit()">
+                    Submit
+                </button>
+                <a class="clickable" ng-click="$ctrl.onDismiss()"> Dismiss</a>
+            </span>
+        </div>
+    </div>
+</div>
+
+<script type="text/ng-template"
+        id="rk-form">
+    <div class="form-group col-sm-6">
+        <label class="control-label">
+            Name
+        </label>
+        <textarea class='form-control'
+                  ng-model="$ctrl.form.name"
+                  rows="1">
+                    </textarea>
+        <div class="help-block">
+            Describes the relationship from Kind A to Kind B
+        </div>
+    </div>
+    <div class="form-group col-sm-6">
+        <label class="control-label">
+            Reverse Name
+        </label>
+        <textarea class='form-control'
+                  ng-model="$ctrl.form.reverseName"
+                  rows="1">
+        </textarea>
+        <div class="help-block">
+            Describes the relationship from Kind B to Kind A
+        </div>
+    </div>
+    <div class="form-group col-sm-12">
+        <label class="control-label">
+            Description
+        </label>
+        <textarea class='form-control'
+                  ng-model="$ctrl.form.description"
+                  placeholder="Please provide any additional details here"
+                  rows="2">
+        </textarea>
+    </div>
+    <div class="form-group col-sm-6">
+        <label class="control-label">
+            Position
+        </label>
+        <input type="number"
+               placeholder="please enter a number"
+               ng-model="$ctrl.form.position"
+               class="form-control"/>
+    </div>
+</script>
