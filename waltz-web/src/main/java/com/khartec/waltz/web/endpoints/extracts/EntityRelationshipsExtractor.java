@@ -9,12 +9,12 @@ import org.springframework.stereotype.Service;
 import spark.Request;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.SetUtilities.asSet;
-import static com.khartec.waltz.common.SetUtilities.map;
+import static com.khartec.waltz.common.ListUtilities.asList;
+import static com.khartec.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
@@ -47,7 +47,7 @@ public class EntityRelationshipsExtractor extends DirectQueryBasedDataExtractor{
                     .map(MEASURABLE.MEASURABLE_CATEGORY_ID::eq)
                     .orElse(DSL.trueCondition());
 
-            Set<Long> involvementKindsIds = getInvolvementKinds(request);
+            List<Long> involvementKindsIds = getInvolvementKinds(request);
 
             SelectWhereStep<Record> qry = prepareCiMeasurableQuery(dsl,
                     involvementKindsIds,
@@ -62,7 +62,7 @@ public class EntityRelationshipsExtractor extends DirectQueryBasedDataExtractor{
     }
 
 
-    private SelectWhereStep<Record> prepareCiMeasurableQuery(DSLContext dsl, Set<Long> involvementKinds, Condition condition) {
+    private SelectWhereStep<Record> prepareCiMeasurableQuery(DSLContext dsl, List<Long> involvementKinds, Condition condition) {
 
         SelectConditionStep<Record> involvementsSubQry = dsl
                 .select(INVOLVEMENT.KIND_ID.as("Kind Id"))
@@ -130,10 +130,10 @@ public class EntityRelationshipsExtractor extends DirectQueryBasedDataExtractor{
     }
 
 
-    private static Set<Long> getInvolvementKinds(Request request) {
+    private static List<Long> getInvolvementKinds(Request request) {
         String involvementKindList = request.queryParams("inv-kind-ids");
         return (involvementKindList == null)
-                ? Collections.emptySet()
-                : map(asSet(involvementKindList.split(",")), Long::valueOf);
+                ? Collections.emptyList()
+                : map(asList(involvementKindList.split(",")), Long::valueOf);
     }
 }
