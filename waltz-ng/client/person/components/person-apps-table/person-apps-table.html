@@ -1,0 +1,53 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<div>
+    <div class="row">
+        <div class="col-md-12">
+            <waltz-grid-with-search entries="$ctrl.gridData"
+                                    column-defs="$ctrl.columnDefs">
+            </waltz-grid-with-search>
+        </div>
+    </div>
+</div>
+
+<script type="text/ng-template"
+        id="wpat/role-popup.html">
+    <div>
+
+        <div ng-repeat="role in $ctrl.getRoles(row)"></div>
+
+        <table class="table table-condensed small table-hover">
+            <thead>
+            <tr>
+                <th>Roles</th>
+            </tr>
+            </thead>
+
+            <tbody>
+            <tr>
+                <pre ng-bind="col"></pre>
+            </tr>
+            <tr ng-repeat="role in col.field">
+                <td ng-bind="role"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</script>
+
