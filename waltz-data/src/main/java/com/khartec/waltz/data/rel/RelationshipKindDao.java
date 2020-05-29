@@ -22,6 +22,7 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.rel.ImmutableRelationshipKind;
 import com.khartec.waltz.model.rel.RelationshipKind;
+import com.khartec.waltz.model.rel.UpdateRelationshipKindCommand;
 import com.khartec.waltz.schema.tables.records.RelationshipKindRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -29,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Set;
+import java.util.function.Function;
 
 import static com.khartec.waltz.schema.Tables.MEASURABLE;
 import static com.khartec.waltz.schema.Tables.RELATIONSHIP_KIND;
@@ -43,7 +45,7 @@ public class RelationshipKindDao {
                 .id(record.getId())
                 .name(record.getName())
                 .description(record.getDescription())
-                .isReadOnly(record.getIsReadonly())
+                .isReadonly(record.getIsReadonly())
                 .kindA(EntityKind.valueOf(record.getKindA()))
                 .kindB(EntityKind.valueOf(record.getKindB()))
                 .categoryA(record.getCategoryA())
@@ -51,7 +53,24 @@ public class RelationshipKindDao {
                 .code(record.getCode())
                 .reverseName(record.getReverseName())
                 .position(record.getPosition())
+                .reverseName(record.getReverseName())
                 .build();
+    };
+
+
+    private static final Function<RelationshipKind, RelationshipKindRecord> TO_RECORD_MAPPER = relKind -> {
+        RelationshipKindRecord record = new RelationshipKindRecord();
+        record.setName(relKind.name());
+        record.setCode(relKind.code());
+        record.setDescription(relKind.description());
+        record.setKindA(relKind.kindA().name());
+        record.setKindB(relKind.kindB().name());
+        record.setCategoryA(relKind.categoryA());
+        record.setCategoryB(relKind.categoryB());
+        record.setPosition(relKind.position());
+        record.setIsReadonly(relKind.isReadonly());
+        record.setReverseName(relKind.reverseName());
+        return record;
     };
 
 
@@ -90,6 +109,19 @@ public class RelationshipKindDao {
     }
 
 
+    public boolean create(RelationshipKind relationshipKind){
+        return dsl.executeInsert(TO_RECORD_MAPPER.apply(relationshipKind)) == 1;
+    }
+
+
+    public boolean remove(Long id){
+        return dsl
+                .deleteFrom(RELATIONSHIP_KIND)
+                .where(RELATIONSHIP_KIND.ID.eq(id))
+                .execute() == 1;
+    }
+
+
     private SelectConditionStep<Record1<Long>> getCategory(long measurableId) {
         return DSL
                 .select(MEASURABLE.MEASURABLE_CATEGORY_ID)
@@ -102,4 +134,15 @@ public class RelationshipKindDao {
         return ref.kind().equals(EntityKind.MEASURABLE);
     }
 
+
+    public boolean update(long relKindId, UpdateRelationshipKindCommand updateCommand) {
+        return dsl
+                .update(RELATIONSHIP_KIND)
+                .set(RELATIONSHIP_KIND.NAME, updateCommand.name())
+                .set(RELATIONSHIP_KIND.REVERSE_NAME, updateCommand.reverseName())
+                .set(RELATIONSHIP_KIND.DESCRIPTION, updateCommand.description())
+                .set(RELATIONSHIP_KIND.POSITION, updateCommand.position())
+                .where(RELATIONSHIP_KIND.ID.eq(relKindId))
+                .execute() == 1;
+    }
 }

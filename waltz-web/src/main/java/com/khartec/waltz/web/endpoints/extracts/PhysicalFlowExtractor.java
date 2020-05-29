@@ -47,9 +47,9 @@ public class PhysicalFlowExtractor extends DirectQueryBasedDataExtractor {
 
     private final PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory = new PhysicalFlowIdSelectorFactory();
 
-    private static List<Field> RECEIVER_NAME_AND_NAR_FIELDS;
-    private static List<Field> SOURCE_NAME_AND_NAR_FIELDS;
-    private static List<Field> SOURCE_AND_TARGET_NAME_AND_NAR;
+    private static List<Field> RECEIVER_NAME_AND_ASSET_CODE_FIELDS;
+    private static List<Field> SOURCE_NAME_AND_ASSET_CODE_FIELDS;
+    private static List<Field> SOURCE_AND_TARGET_NAME_AND_ASSET_CODE;
 
     static {
         Field<String> SOURCE_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
@@ -63,10 +63,9 @@ public class PhysicalFlowExtractor extends DirectQueryBasedDataExtractor {
                                 .from(APPLICATION)
                                 .where(APPLICATION.ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID)));
 
-        SOURCE_NAME_AND_NAR_FIELDS = ListUtilities.asList(
+        SOURCE_NAME_AND_ASSET_CODE_FIELDS = ListUtilities.asList(
                 SOURCE_NAME_FIELD.as("Source"),
                 sourceAssetCodeField.as("Source Asset Code"));
-
 
         Field<String> TARGET_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
                 LOGICAL_FLOW.TARGET_ENTITY_ID,
@@ -79,12 +78,13 @@ public class PhysicalFlowExtractor extends DirectQueryBasedDataExtractor {
                                 .from(APPLICATION)
                                 .where(APPLICATION.ID.eq(LOGICAL_FLOW.TARGET_ENTITY_ID)));
 
-        RECEIVER_NAME_AND_NAR_FIELDS = ListUtilities.asList(
+        RECEIVER_NAME_AND_ASSET_CODE_FIELDS = ListUtilities.asList(
                 TARGET_NAME_FIELD.as("Receiver"),
                 targetAssetCodeField.as("Receiver Asset Code"));
 
-        SOURCE_AND_TARGET_NAME_AND_NAR = ListUtilities
-                .concat(SOURCE_NAME_AND_NAR_FIELDS, RECEIVER_NAME_AND_NAR_FIELDS);
+        SOURCE_AND_TARGET_NAME_AND_ASSET_CODE = ListUtilities.concat(
+                SOURCE_NAME_AND_ASSET_CODE_FIELDS,
+                RECEIVER_NAME_AND_ASSET_CODE_FIELDS);
     }
 
 
@@ -114,7 +114,7 @@ public class PhysicalFlowExtractor extends DirectQueryBasedDataExtractor {
                     PhysicalFlow.PHYSICAL_FLOW.ID.in(idSelector)
                             .and(physicalFlowIdSelectorFactory.getLifecycleCondition(idSelectionOptions));
             SelectConditionStep<?> qry = getQuery(
-                    SOURCE_AND_TARGET_NAME_AND_NAR,
+                    SOURCE_AND_TARGET_NAME_AND_ASSET_CODE,
                     condition);
             String fileName = String.format("physical-flows-for-%s-%s",
                     idSelectionOptions.entityReference().kind().name().toLowerCase(),
@@ -135,7 +135,7 @@ public class PhysicalFlowExtractor extends DirectQueryBasedDataExtractor {
 
         Condition isProduces = isOwnerCondition.or(isSourceCondition);
 
-        return getQuery(RECEIVER_NAME_AND_NAR_FIELDS, isProduces);
+        return getQuery(RECEIVER_NAME_AND_ASSET_CODE_FIELDS, isProduces);
     }
 
 
@@ -145,15 +145,17 @@ public class PhysicalFlowExtractor extends DirectQueryBasedDataExtractor {
                 .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(ref.kind().name()))
                 .and(LOGICAL_NOT_REMOVED);
 
-        return getQuery(SOURCE_NAME_AND_NAR_FIELDS, isConsumes);
+        return getQuery(SOURCE_NAME_AND_ASSET_CODE_FIELDS, isConsumes);
     }
 
 
     private SelectConditionStep<Record> getQuery(List<Field> senderOrReceiverColumn,
                                                  Condition condition) {
 
-        return dsl.select(PHYSICAL_SPECIFICATION.NAME.as("Name"),
-                PHYSICAL_SPECIFICATION.EXTERNAL_ID.as("External Id"))
+        return dsl
+                .select(
+                        PHYSICAL_SPECIFICATION.NAME.as("Name"),
+                        PHYSICAL_FLOW.EXTERNAL_ID.as("External Id"))
                 .select(senderOrReceiverColumn)
                 .select(
                         PHYSICAL_SPECIFICATION.FORMAT.as("Format"),
