@@ -94,8 +94,6 @@ function controller(serviceBroker) {
 
                 vm.direct =  summary.direct;
                 vm.indirect = summary.indirect;
-
-                console.log(vm.direct);
             });
     }
 
