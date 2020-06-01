@@ -80,7 +80,7 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
         checkNotNull(selector, "selector cannot be null");
 
         return dsl
-                .select(DATA_TYPE.ID, DATA_TYPE.CODE, DSL.val(EntityKind.DATA_TYPE.name()))
+                .select(DATA_TYPE.ID, DATA_TYPE.NAME, DSL.val(EntityKind.DATA_TYPE.name()))
                 .from(DATA_TYPE)
                 .where(DATA_TYPE.ID.in(selector))
                 .fetch(TO_ENTITY_REFERENCE);

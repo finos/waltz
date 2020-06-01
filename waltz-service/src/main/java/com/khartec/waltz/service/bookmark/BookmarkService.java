@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.service.bookmark;
 
+import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.bookmark.BookmarkDao;
@@ -42,15 +43,18 @@ public class BookmarkService {
     private final ChangeLogService changeLogService;
     private final BookmarkIdSelectorFactory bookmarkIdSelectorFactory = new BookmarkIdSelectorFactory();
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
+    private final EntityReferenceNameResolver entityReferenceNameResolver;
 
 
     @Autowired
     public BookmarkService(BookmarkDao bookmarkDao,
-                           ChangeLogService changeLogService) {
+                           ChangeLogService changeLogService,
+                           EntityReferenceNameResolver entityReferenceNameResolver) {
         checkNotNull(bookmarkDao, "bookmarkDao must not be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
         this.bookmarkDao = bookmarkDao;
         this.changeLogService = changeLogService;
+        this.entityReferenceNameResolver = entityReferenceNameResolver;
     }
 
 
@@ -88,10 +92,13 @@ public class BookmarkService {
 
     private void logChange(String verb, Bookmark bookmark, String username, Operation operation) {
         changeLogService.write(ImmutableChangeLog.builder()
-                .message(String.format("%s bookmark: %s / %s",
+                .message(String.format("%s bookmark: %s / %s to %s / %s",
                         verb,
                         bookmark.title().orElse("?"),
-                        bookmark.bookmarkKind()))
+                        bookmark.bookmarkKind(),
+                        bookmark.parent().kind().prettyName(),
+                        getEntityName(bookmark.parent())
+                ))
                 .parentReference(bookmark.parent())
                 .userId(username)
                 .severity(Severity.INFORMATION)
@@ -110,6 +117,14 @@ public class BookmarkService {
         GenericSelector selector = genericSelectorFactory.apply(selectionOptions);
         return bookmarkDao
                 .deleteByParentSelector(selector);
+    }
+
+    private String getEntityName(EntityReference entityReference) {
+        return (entityReference.name().isPresent()
+                        ? entityReference
+                        : entityReferenceNameResolver.resolve(entityReference).orElse(entityReference))
+                .name()
+                .orElse("");
     }
 
 }
