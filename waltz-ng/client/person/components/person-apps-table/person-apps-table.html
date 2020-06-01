@@ -29,22 +29,22 @@
 <script type="text/ng-template"
         id="wpat/role-popup.html">
     <div>
-
-        <div ng-repeat="role in $ctrl.getRoles(row)"></div>
-
         <table class="table table-condensed small table-hover">
             <thead>
             <tr>
-                <th>Roles</th>
+                <th>Role</th>
+                <th>Description</th>
             </tr>
             </thead>
 
             <tbody>
-            <tr>
-                <pre ng-bind="col"></pre>
-            </tr>
-            <tr ng-repeat="role in col.field">
-                <td ng-bind="role"></td>
+            <tr ng-repeat="role in row.entity.roles">
+                <td>
+                    <div ng-bind="role.name"></div>
+                </td>
+                <td>
+                    <span ng-bind="role.description"></span>
+                </td>
             </tr>
             </tbody>
         </table>

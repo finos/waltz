@@ -26,10 +26,19 @@ const bindings = {
 
 
 function mkGridData(displayNameService, apps = []) {
-    return _.map(apps || [], a => Object.assign(
-        {},
-        a,
-        mapToDisplayNames(displayNameService, a))
+    return _.map(apps || [], a => {
+
+        const roles = _.chain(a.roles)
+            .map(d => d.name)
+            .sort()
+            .join(", ")
+            .value();
+
+        return Object.assign(
+            {},
+            a,
+            mapToDisplayNames(displayNameService, a),
+            { displayRoles: roles})}
     );
 }
 
@@ -54,12 +63,8 @@ const columnDefs = [
     { field: "riskRatingDisplay", name: "Risk Rating"},
     { field: "businessCriticalityDisplay", name: "Business Criticality"},
     { field: "lifecyclePhaseDisplay", name: "Lifecycle Phase"},
-    { field: "roles",
+    { field: "displayRoles",
         name: "Roles",
-        sortingAlgorithm: (a, b) => {
-            const aNames = _.join(_.map(a, 'displayName'), ", ");
-            const bNames = _.join(_.map(b, 'displayName'), ", ");
-            return aNames.localeCompare(bNames)},
         cellTemplate: `
                 <div class="ui-grid-cell-contents">
                     <span ng-bind="COL_FIELD"
@@ -67,7 +72,9 @@ const columnDefs = [
                           popover-trigger="mouseenter"
                           popover-append-to-body="true">
                     </span>
-                </div>`}
+                </div>`,
+        width: '20%'
+    }
 ];
 
 
@@ -78,11 +85,6 @@ function controller(displayNameService) {
     vm.columnDefs = columnDefs;
 
     vm.$onChanges= () => vm.gridData = mkGridData(displayNameService, vm.applications);
-
-
-    vm.getRoles = (row) => {
-        console.log(row)
-    }
 }
 
 
