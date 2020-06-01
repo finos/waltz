@@ -40,12 +40,7 @@ public class EntityRelationshipsExtractor extends DirectQueryBasedDataExtractor{
     private void registerExtractForCItoMeasurable(String path) {
         get(path, (request, response) -> {
 
-            Optional<Long> categoryId = getCategoryId(request);
-
-            Condition condition = categoryId
-                    .map(MEASURABLE.MEASURABLE_CATEGORY_ID::eq)
-                    .orElse(DSL.trueCondition());
-
+            Condition condition = getCondition(request);
             List<Long> involvementKindsIds = getInvolvementKinds(request);
 
             SelectConditionStep<Record> qry = prepareCiMeasurableQuery(dsl,
@@ -53,15 +48,32 @@ public class EntityRelationshipsExtractor extends DirectQueryBasedDataExtractor{
                     condition);
 
             return writeExtract(
-                    "entity_relationships_ci_measurable",
+                    "ci_measurable_relationships",
                     qry,
                     request,
                     response);
         });
     }
 
+    private Condition getCondition(Request request) {
+        Optional<Long> categoryId = getCategoryId(request);
+        List<Long> relationshipKindIds = getRelationshipKinds(request);
 
-    private SelectConditionStep<Record> prepareCiMeasurableQuery(DSLContext dsl, List<Long> involvementKinds, Condition condition) {
+        Condition categoryCondition = categoryId
+                .map(MEASURABLE.MEASURABLE_CATEGORY_ID::eq)
+                .orElse(DSL.trueCondition());
+
+        Condition relKindCondition = (relationshipKindIds.isEmpty())
+                ? DSL.trueCondition()
+                : RELATIONSHIP_KIND.ID.in(relationshipKindIds);
+
+        return categoryCondition.and(relKindCondition);
+    }
+
+
+    private SelectConditionStep<Record> prepareCiMeasurableQuery(DSLContext dsl,
+                                                                 List<Long> involvementKinds,
+                                                                 Condition condition) {
 
         Table<Record3<String, Long, String>> involvementsSubQry = dsl
                 .select(INVOLVEMENT_KIND.NAME.as("Involvement"),
@@ -114,5 +126,13 @@ public class EntityRelationshipsExtractor extends DirectQueryBasedDataExtractor{
         return (involvementKindList == null)
                 ? Collections.emptyList()
                 : map(asList(involvementKindList.split(",")), Long::valueOf);
+    }
+
+
+    private static List<Long> getRelationshipKinds(Request request) {
+        String relationshipKindList = request.queryParams("rel-kind-ids");
+        return (relationshipKindList == null)
+                ? Collections.emptyList()
+                : map(asList(relationshipKindList.split(",")), Long::valueOf);
     }
 }
