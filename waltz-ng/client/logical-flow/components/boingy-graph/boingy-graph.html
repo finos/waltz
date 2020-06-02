@@ -98,7 +98,8 @@
             ng-click="$ctrl.showFilters ? $ctrl.onHideFilters() : $ctrl.onShowFilters()"
             ng-class="{
                 'waltz-visibility-child-30': !$ctrl.filtersEnabled,
-                'waltz-visibility-child-50': $ctrl.filtersEnabled
+                'waltz-visibility-child-50': $ctrl.filtersEnabled,
+                'btn-warning': $ctrl.filterOptions.scope != 'ALL'
             }">
         Filters
     </button>
