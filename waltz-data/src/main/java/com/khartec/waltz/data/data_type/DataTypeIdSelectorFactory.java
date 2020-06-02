@@ -24,6 +24,10 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
+import org.jooq.impl.DSL;
+
+import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
+import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 
 public class DataTypeIdSelectorFactory extends AbstractIdSelectorFactory {
 
@@ -34,7 +38,21 @@ public class DataTypeIdSelectorFactory extends AbstractIdSelectorFactory {
 
     @Override
     protected Select<Record1<Long>> mkForOptions(IdSelectionOptions options) {
-        throw new UnsupportedOperationException("Cannot create dataType selector from kind: " +
-                options.entityReference().kind());
+        switch (options.entityReference().kind()) {
+            case LOGICAL_DATA_FLOW:
+                return mkForLogicalFlow(options);
+            default:
+                throw new UnsupportedOperationException("Cannot create dataType selector from kind: " +
+                        options.entityReference().kind());
+        }
+
+    }
+
+    private Select<Record1<Long>> mkForLogicalFlow(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        return DSL
+                .selectDistinct(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID)
+                .from(LOGICAL_FLOW_DECORATOR)
+                .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(options.entityReference().id()));
     }
 }
