@@ -25,7 +25,11 @@
 
         <span class="wrmp-pill wrmp-rel"
               ng-if="$ctrl.relationshipKinds.length > 0 || $ctrl.list.length > 1">
-            <span ng-repeat="item in $ctrl.list">
+            <span ng-repeat="item in $ctrl.list"
+                  uib-popover-template="'wrmiv-popover.html'"
+                  popover-append-to-body="true"
+                  popover-popup-delay="300"
+                  popover-trigger="mouseenter">
                 <span class="wrmp-pill wrmp-rel-inner clickable"
                       ng-if="item.outbound"
                       ng-click="$ctrl.selectItem(item)"
@@ -48,7 +52,11 @@
         </span>
         <span class="wrmp-pill wrmp-rel"
               ng-if="$ctrl.relationshipKinds.length == 0 && $ctrl.list.length == 1">
-            <span ng-repeat="item in $ctrl.list">
+            <span ng-repeat="item in $ctrl.list"
+                  uib-popover-template="'wrmiv-popover.html'"
+                  popover-append-to-body="true"
+                  popover-popup-delay="300"
+                  popover-trigger="mouseenter">
                 <span class="wrmp-pill wrmp-rel-inner clickable"
                       ng-if="item.outbound"
                       ng-click="$ctrl.selectItem(item)"
@@ -128,3 +136,18 @@
         </div>
     </div>
 </div>
+
+
+<script type="text/ng-template"
+        id="wrmiv-popover.html">
+    <div class="small">
+        <waltz-markdown ng-if="item.relationshipKind.description"
+                        text="item.relationshipKind.description">
+        </waltz-markdown>
+        <span ng-if="!item.relationshipKind.description"
+              class="text-muted">
+            No description provided
+        </span>
+    </div>
+</script>
+
