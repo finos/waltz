@@ -19,6 +19,7 @@
 package com.khartec.waltz.service.measurable_rating;
 
 import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableDao;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
@@ -54,6 +55,7 @@ public class MeasurableRatingService {
     private final MeasurableDao measurableDao;
     private final MeasurableCategoryDao measurableCategoryDao;
     private final ChangeLogService changeLogService;
+    private final EntityReferenceNameResolver entityReferenceNameResolver;
 
     private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
@@ -63,7 +65,8 @@ public class MeasurableRatingService {
     public MeasurableRatingService(MeasurableRatingDao measurableRatingDao,
                                    MeasurableDao measurableDao,
                                    MeasurableCategoryDao measurableCategoryDao,
-                                   ChangeLogService changeLogService) {
+                                   ChangeLogService changeLogService,
+                                   EntityReferenceNameResolver entityReferenceNameResolver) {
         checkNotNull(measurableRatingDao, "measurableRatingDao cannot be null");
         checkNotNull(measurableDao, "measurableDao cannot be null");
         checkNotNull(measurableCategoryDao, "measurableCategoryDao cannot be null");
@@ -73,6 +76,7 @@ public class MeasurableRatingService {
         this.measurableDao = measurableDao;
         this.measurableCategoryDao = measurableCategoryDao;
         this.changeLogService = changeLogService;
+        this.entityReferenceNameResolver = entityReferenceNameResolver;
     }
 
     // -- READ
@@ -107,9 +111,16 @@ public class MeasurableRatingService {
 
         Operation operationThatWasPerformed = measurableRatingDao.save(command);
 
+        String entityName = getEntityName(command);
+
         writeChangeLogEntry(
                 command,
-                format("Saved: %s with a rating of: %s",
+                format("Saved: %s with a rating of: %s for %s",
+                        measurable.name(),
+                        command.rating(),
+                        entityName),
+                format("Saved: %s has assigned %s with a rating of: %s",
+                        entityName,
                         measurable.name(),
                         command.rating()),
                 operationThatWasPerformed);
@@ -144,7 +155,7 @@ public class MeasurableRatingService {
                 .childKind(EntityKind.MEASURABLE)
                 .operation(Operation.REMOVE)
                 .build());
-        
+
         return findForEntity(ref);
     }
 
@@ -156,9 +167,15 @@ public class MeasurableRatingService {
         boolean success = measurableRatingDao.remove(command);
 
         if (success && measurable != null) {
+            String entityName = getEntityName(command);
+
             writeChangeLogEntry(
                     command,
-                    format("Removed: %s",
+                    format("Removed: %s for %s",
+                            measurable.name(),
+                            entityName),
+                    format("Removed: %s for %s",
+                            entityName,
                             measurable.name()),
                     Operation.REMOVE);
 
@@ -186,15 +203,28 @@ public class MeasurableRatingService {
 
     // -- HELPERS --
 
+    private void writeChangeLogEntry(MeasurableRatingCommand command,
+                                     String message1,
+                                     String message2,
+                                     Operation operation) {
 
-    private void writeChangeLogEntry(MeasurableRatingCommand command, String message, Operation operation) {
         changeLogService.write(ImmutableChangeLog.builder()
-                .message(message)
+                .message(message1)
                 .parentReference(command.entityReference())
                 .userId(command.lastUpdate().by())
                 .createdAt(command.lastUpdate().at())
                 .severity(Severity.INFORMATION)
                 .childKind(EntityKind.MEASURABLE)
+                .operation(operation)
+                .build());
+
+        changeLogService.write(ImmutableChangeLog.builder()
+                .message(message2)
+                .parentReference(EntityReference.mkRef(EntityKind.MEASURABLE, command.measurableId()))
+                .userId(command.lastUpdate().by())
+                .createdAt(command.lastUpdate().at())
+                .severity(Severity.INFORMATION)
+                .childKind(command.entityReference().kind())
                 .operation(operation)
                 .build());
     }
@@ -216,4 +246,11 @@ public class MeasurableRatingService {
         return measurableDao.getRequiredRatingEditRole(ref);
     }
 
+
+    private String getEntityName(MeasurableRatingCommand command) {
+        EntityReference entityReference = command.entityReference().name().isPresent()
+                ? command.entityReference()
+                : entityReferenceNameResolver.resolve(command.entityReference()).orElse(command.entityReference());
+        return entityReference.name().orElse("");
+    }
 }
