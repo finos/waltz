@@ -85,20 +85,3 @@
         </uib-tabset>
     </div>
 </div>
-
-<script type="text/ng-template"
-        id="wlft-summary-popup.html">
-    <div class="small">
-        <strong ng-bind="summary.title"></strong>
-
-        <table class="table table-condensed small" style="margin-top: 0.4em">
-            <tr ng-repeat="d in summary.summary">
-                <td>
-                    <span ng-bind="d.key"></span>
-                </td>
-                <td><span ng-bind="d.count"></span></td>
-            </tr>
-        </table>
-    </div>
-
-</script>
