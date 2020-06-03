@@ -88,9 +88,12 @@ public class EntityRelationshipsExtractor extends DirectQueryBasedDataExtractor{
         SelectSelectStep<Record> selectFields = dsl
                 .selectDistinct(CHANGE_INITIATIVE.ID.as("Change Initiative Id"),
                         CHANGE_INITIATIVE.EXTERNAL_ID.as("Change Initiative External Id"),
+                        CHANGE_INITIATIVE.KIND.as("Change Initiative Kind"),
                         CHANGE_INITIATIVE.NAME.as("Change Initiative Name"),
                         CHANGE_INITIATIVE.DESCRIPTION.as("Change Initiative Description"),
                         RELATIONSHIP_KIND.NAME.as("Relationship"),
+                        RELATIONSHIP_KIND.DESCRIPTION.as("Relationship Kind Description"),
+                        ENTITY_RELATIONSHIP.DESCRIPTION.as("Relationship Description"),
                         MEASURABLE.ID.as("Viewpoint Id"),
                         MEASURABLE.NAME.as("Viewpoint"),
                         MEASURABLE.DESCRIPTION.as("Viewpoint Description"),
