@@ -338,4 +338,11 @@
                               tableName="relationship_kind"/>
     </changeSet>
 
+    <!-- 4918 - Remove change_initiative_to_measurable -->
+    <changeSet id="20200602-4918-1"
+               author="woodjes">
+        <comment>4918: Drop change_initiative_to_measurable</comment>
+        <dropTable tableName="change_initiative_to_measurable"/>
+    </changeSet>
+
 </databaseChangeLog>
