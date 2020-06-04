@@ -68,7 +68,7 @@ function controller(serviceBroker) {
                 [vm.parentEntityRef.id])
             .then(r => {
                 vm.currentYear = (new Date()).getFullYear();
-                vm.costs = r.data;
+                vm.costs = _.orderBy(r.data, ['cost.year'], ['desc']);
                 vm.costsMostRecentYear = getCurrentYear(vm.costs);
                 vm.mostRecentCosts = filterCostsForYear(vm.costsMostRecentYear, vm.costs);
                 vm.mostRecentTotal = calcTotalCost(vm.mostRecentCosts);
