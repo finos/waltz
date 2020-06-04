@@ -55,6 +55,7 @@ const initialState = {
         measurableSelector: false
     },
     checkedItemIds: [],
+    disableNode: n => !n.concrete
 };
 
 
