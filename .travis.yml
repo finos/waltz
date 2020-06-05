@@ -52,7 +52,7 @@ jobs:
         - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'DROP DATABASE IF EXISTS waltz;' -U postgres; fi"
         - sh -c "if [ '$DB' = 'postgres' ]; then psql -c 'CREATE DATABASE waltz;' -U postgres; fi"
       script:
-        - mvn -s .build.settings.xml -Pbuild-postgres clean package;
+        - mvn -s .build.settings.xml -Pbuild-postgres,waltz-postgres clean package;
         - npm run-script test --prefix ./waltz-ng
 
 
@@ -65,5 +65,5 @@ jobs:
         - mysql -e "CREATE DATABASE IF NOT EXISTS waltz CHARACTER SET='utf8'";
 
       script:
-        - mvn -s .build.settings.xml -Pbuild-mariadb clean package;
+        - mvn -s .build.settings.xml -Pbuild-mariadb,waltz-mariadb clean package;
         - npm run-script test --prefix ./waltz-ng
