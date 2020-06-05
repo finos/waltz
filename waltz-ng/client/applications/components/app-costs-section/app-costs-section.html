@@ -50,7 +50,9 @@
                             </h3>
                             <h4>
                                 <span ng-bind="$ctrl.costsMostRecentYear"></span>
-                                <span ng-if="$ctrl.costsMostRecentYear == $ctrl.currentYear">YTD</span>
+                                <span ng-if="$ctrl.costsMostRecentYear == $ctrl.currentYear"
+                                      ng-bind="$ctrl.currentYearText">
+                                </span>
                             </h4>
                         </div>
                         <div class="col-md-7">
