@@ -41,9 +41,8 @@ jobs:
     - stage: Test
       env: DB=h2
       script:
-        - mvn -s .build.settings.xml -Pbuild-h2 clean package;
+        - mvn -s .build.settings.xml -Pbuild-h2,waltz-h2 clean package;
         - npm run-script test --prefix ./waltz-ng
-        -
 
     - stage: Test
       env: DB=postgres

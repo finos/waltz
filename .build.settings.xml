@@ -27,31 +27,12 @@
             <id>build-h2</id>
             <activation><activeByDefault>true</activeByDefault></activation>
             <properties>
-                <jdbc.group>com.h2database</jdbc.group>
-                <jdbc.artifact>h2</jdbc.artifact>
-                <jdbc.version>1.4.197</jdbc.version>
-                <jdbc.driver>org.h2.Driver</jdbc.driver>
-                <jooq.dialect>H2</jooq.dialect>
-                <jooq.group>org.jooq</jooq.group>
-                <jooq.database>org.jooq.meta.h2.H2Database</jooq.database>
                 <database.url>jdbc:h2:file/./waltzdb;DATABASE_TO_UPPER=false</database.url>
                 <database.user>root</database.user>
                 <database.password></database.password>
                 <database.schema>PUBLIC</database.schema>
                 <database.catalog></database.catalog>
             </properties>
-            <dependencies>
-                <dependency>
-                    <groupId>${jdbc.group}</groupId>
-                    <artifactId>${jdbc.artifact}</artifactId>
-                    <version>${jdbc.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>${jooq.group}</groupId>
-                    <artifactId>jooq</artifactId>
-                    <version>${jooq.version}</version>
-                </dependency>
-            </dependencies>
         </profile>
 
         <profile>
