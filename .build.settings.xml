@@ -78,7 +78,7 @@
                     <version>${jdbc.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>org.jooq.pro-java-8</groupId>
+                    <groupId>${jooq.group}</groupId>
                     <artifactId>jooq</artifactId>
                     <version>${jooq.version}</version>
                 </dependency>
@@ -110,7 +110,7 @@
                     <version>${jdbc.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>org.jooq.pro-java-8</groupId>
+                    <groupId>${jooq.group}</groupId>
                     <artifactId>jooq</artifactId>
                     <version>${jooq.version}</version>
                 </dependency>
