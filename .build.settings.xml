@@ -40,6 +40,18 @@
                 <database.schema>PUBLIC</database.schema>
                 <database.catalog></database.catalog>
             </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>${jdbc.group}</groupId>
+                    <artifactId>${jdbc.artifact}</artifactId>
+                    <version>${jdbc.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.jooq.pro-java-8</groupId>
+                    <artifactId>jooq</artifactId>
+                    <version>${jooq.version}</version>
+                </dependency>
+            </dependencies>
         </profile>
 
         <profile>
@@ -59,6 +71,18 @@
                 <database.schema>public</database.schema>
                 <database.catalog></database.catalog>
             </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>${jdbc.group}</groupId>
+                    <artifactId>${jdbc.artifact}</artifactId>
+                    <version>${jdbc.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.jooq.pro-java-8</groupId>
+                    <artifactId>jooq</artifactId>
+                    <version>${jooq.version}</version>
+                </dependency>
+            </dependencies>
         </profile>
 
 
@@ -79,6 +103,18 @@
                 <database.schema>waltz</database.schema>
                 <database.catalog></database.catalog>
             </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>${jdbc.group}</groupId>
+                    <artifactId>${jdbc.artifact}</artifactId>
+                    <version>${jdbc.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.jooq.pro-java-8</groupId>
+                    <artifactId>jooq</artifactId>
+                    <version>${jooq.version}</version>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
 </settings>
