@@ -214,6 +214,7 @@ function controller($q, $timeout, serviceBroker, notification) {
             vm.onRemove(rel)
                 .then(() => {
                     notification.warning("Relationship removed");
+                    vm.cancelEditor();
                     vm.clearRowSelection();
                     loadRelationships();
                 })
@@ -289,7 +290,6 @@ function controller($q, $timeout, serviceBroker, notification) {
     vm.onRemove = (rel) => {
         return serviceBroker
             .execute(CORE_API.MeasurableRelationshipStore.remove, [rel])
-            .then(() => vm.cancelEditor())
     };
 
     vm.onAddRelationshipKind = () => {
