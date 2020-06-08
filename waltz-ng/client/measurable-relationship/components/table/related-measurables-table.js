@@ -39,8 +39,16 @@ const columnDefs = [
         field: "a.type",
         name: "(From Type)"
     }, {
-        field: "relationships",
+        field: "relationshipsString",
         name: "Relationships",
+        cellTemplate:`
+                <div class="ui-grid-cell-contents"
+                     uib-popover-template="'wrmt/relationships-popup.html'"
+                     popover-trigger="mouseenter"
+                     popover-append-to-body="true">
+                    <span ng-bind="COL_FIELD">
+                    </span>
+                </div>`
     },
     mkEntityLinkGridCell("To", "b"),
     {
@@ -92,13 +100,20 @@ function controller(serviceBroker) {
             const relatedKinds = _.chain(vm.rows)
                 .filter(d => d.a.id === r.a.id && d.b.id === r.b.id)
                 .map(rel => _.get(vm.relationshipKindsByCode, rel.relationship.relationship).name)
-                .join(", ")
                 .value();
 
-            return Object.assign("", {a: r.a, b: r.b, relationships: relatedKinds});
+            const relatedKindsString =  _.join(relatedKinds, ", ");
+
+            return Object.assign({},
+                {
+                    a: r.a,
+                    b: r.b,
+                    relationships: relatedKinds,
+                    relationshipsString: relatedKindsString
+                });
         });
 
-        vm.data = _.uniqBy(collectedRels, r => JSON.stringify([r.a, r.b, r.relationships]));
+        vm.data = _.uniqBy(collectedRels, r => JSON.stringify([r.a, r.b, r.relationshipsString]));
     };
 
     vm.$onInit = () => {

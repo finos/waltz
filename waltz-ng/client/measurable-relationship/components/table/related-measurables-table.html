@@ -33,3 +33,24 @@
     <waltz-icon name="download"></waltz-icon>
     Export
 </a>
+
+
+<script type="text/ng-template"
+        id="wrmt/relationships-popup.html">
+    <div>
+        <table class="table table-condensed small table-hover">
+            <thead>
+            <tr>
+                <th>Relationships</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr ng-repeat="relationship in row.entity.relationships">
+                <td>
+                    <div ng-bind="relationship"></div>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</script>
