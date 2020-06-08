@@ -55,6 +55,7 @@ const initialState = {
         measurableSelector: false
     },
     checkedItemIds: [],
+    disableNode: n => !n.concrete
 };
 
 
@@ -115,11 +116,7 @@ function controller(notification, serviceBroker) {
         serviceBroker
             .loadAppData(CORE_API.MeasurableStore.findAll)
             .then(r => {
-                vm.measurables = _
-                    .chain(r.data)
-                    .filter(m => m.categoryId === categoryId)
-                    .map(d => Object.assign({}, d, {disable: !d.concrete}))
-                    .value();
+                vm.measurables = _.filter(r.data, m => m.categoryId === categoryId);
                 vm.measurablesById = _.keyBy(vm.measurables, d => d.id);
                 vm.searchNodes = prepareSearchNodes(vm.measurables);
                 vm.nodes = prepareTree(vm.measurables);
