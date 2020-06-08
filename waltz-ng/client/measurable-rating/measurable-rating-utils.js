@@ -171,4 +171,10 @@ export function determineStartingTab(tabs = []) {
     return _.find(tabs, t => t.ratings.length > 0 ) || tabs[0];
 }
 
+export function getDateFixedBstToUtcOffset(inputDate) {
+    const date = new Date(inputDate);
+    //Hours will be ignored from the date. Datepicker is changing dateformat when initial value is not set.
+    date.setHours(2);
+    return date.toISOString().split("T")[0];
+}
 
