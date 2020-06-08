@@ -27,7 +27,7 @@
             <id>build-h2</id>
             <activation><activeByDefault>true</activeByDefault></activation>
             <properties>
-                <database.url>jdbc:h2:file/./waltzdb;DATABASE_TO_UPPER=false</database.url>
+                <database.url>jdbc:h2:file/./waltzdb2;DATABASE_TO_UPPER=false</database.url>
                 <database.user>root</database.user>
                 <database.password></database.password>
                 <database.schema>PUBLIC</database.schema>

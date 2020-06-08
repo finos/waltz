@@ -43,7 +43,7 @@ jobs:
       script:
         - mvn -s .build.settings.xml -Pbuild-h2,waltz-h2 clean package;
         - npm run-script test --prefix ./waltz-ng
-        -
+
 
     - stage: Test
       env: DB=postgres
