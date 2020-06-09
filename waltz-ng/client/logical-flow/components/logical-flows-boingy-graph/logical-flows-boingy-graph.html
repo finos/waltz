@@ -29,6 +29,7 @@
         <div>
 
             <waltz-logical-flow-diagram data="$ctrl.filteredFlowData"
+                                        ng-if="!$ctrl.visibility.loadingFlows"
                                         tweakers="$ctrl.graphTweakers"
                                         filter-options="$ctrl.filterOptions">
 
