@@ -133,7 +133,7 @@ function controller(serviceBroker) {
     };
 
     vm.$onChanges = (c) => {
-        if (c.rows){
+        if (c.rows && vm.relationshipKindsByCode){
            vm.loadData();
         }
     };
