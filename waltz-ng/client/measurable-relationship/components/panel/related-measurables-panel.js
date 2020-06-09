@@ -254,9 +254,17 @@ function controller($q, $timeout, serviceBroker, notification) {
                 [ vm.parentEntityRef ],
                 { force: true })
             .then(r => {
-                vm.relationships = sanitizeRelationships(r.data, vm.measurables, vm.categories);
+                const data = rejectInvalidAppGroups(r.data, vm.appGroups);
+                vm.relationships = sanitizeRelationships(data, vm.measurables, vm.categories);
                 vm.gridData = calcGridData();
             });
+    };
+
+    const rejectInvalidAppGroups = (data, validAppGroups) => {
+        const validAppGroupIds = _.map(validAppGroups, g => g.id);
+        return _.reject(data, d =>
+            (d.a.kind === "APP_GROUP" && !_.includes(validAppGroupIds, d.a.id)
+            || (d.b.kind === "APP_GROUP" && !_.includes(validAppGroupIds, d.b.id))));
     };
 
     const loadAllowedRelationshipKinds = (data) => {
