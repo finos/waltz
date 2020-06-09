@@ -20,7 +20,7 @@ import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 import {kindToViewState} from "../../../common/link-utils";
-import {loadAllData, loadDecommData, mkTabs} from "../../measurable-rating-utils";
+import {getDateAsUtc, loadAllData, loadDecommData, mkTabs} from "../../measurable-rating-utils";
 import {indexRatingSchemes, mkRatingsKeyHandler} from "../../../ratings/rating-utils";
 
 import template from "./measurable-rating-edit-panel.html";
@@ -211,6 +211,8 @@ function controller($q,
     };
 
     vm.onSaveDecommissionDate = (dateChange) => {
+        dateChange.newVal = getDateAsUtc(dateChange.newVal);
+
         serviceBroker
             .execute(
                 CORE_API.MeasurableRatingPlannedDecommissionStore.save,

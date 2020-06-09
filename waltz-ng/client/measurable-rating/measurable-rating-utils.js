@@ -16,6 +16,7 @@
  *
  */
 import _ from "lodash";
+import moment from "moment";
 import {CORE_API} from "../common/services/core-api-utils";
 import {mkSelectionOptions} from "../common/selector-utils";
 
@@ -171,4 +172,12 @@ export function determineStartingTab(tabs = []) {
     return _.find(tabs, t => t.ratings.length > 0 ) || tabs[0];
 }
 
+export function getDateAsUtc(inputDate) {
+    const formats = {
+        daysOnly: 'YYYY-MM-DD',
+        parse:'ddd MMM Do YYYY',
+    };
+    const localDate = new Date(inputDate).toDateString();
+    return moment.utc(localDate, formats.parse).format(formats.daysOnly);
+}
 
