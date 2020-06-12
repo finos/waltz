@@ -19,7 +19,7 @@ import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {availableRelationshipKinds} from "./related-measurable-editor-utils";
-import {buildHierarchies, doSearch, prepareSearchNodes} from "../../../common/hierarchy-utils";
+import {doSearch, prepareSearchNodes} from "../../../common/hierarchy-utils";
 import {refToString, toEntityRef} from "../../../common/entity-utils";
 
 import template from "./create-related-measurable-editor.html";
@@ -62,11 +62,6 @@ const initialState = {
 function readCategoryId(compoundId) {
     // e.g. MEASURABLE/12
     return +_.split(compoundId, "/")[1];
-}
-
-
-function prepareTree(nodes = []) {
-    return buildHierarchies(nodes, false);
 }
 
 
@@ -119,7 +114,7 @@ function controller(notification, serviceBroker) {
                 vm.measurables = _.filter(r.data, m => m.categoryId === categoryId);
                 vm.measurablesById = _.keyBy(vm.measurables, d => d.id);
                 vm.searchNodes = prepareSearchNodes(vm.measurables);
-                vm.nodes = prepareTree(vm.measurables);
+                vm.nodes = vm.measurables;
             })
             .then(() => setDefaultRelationshipKind(_.first(vm.measurables)));
 
@@ -236,8 +231,17 @@ function controller(notification, serviceBroker) {
 
 
     vm.searchTermsChanged = (termStr = "") => {
-        vm.nodes = prepareTree(doSearch(termStr, vm.searchNodes));
+        vm.nodes = doSearch(termStr, vm.searchNodes);
+        vm.expandedItemIds = _.map(vm.nodes,n => n.id);
     };
+
+
+    vm.clearSearch = () => {
+        vm.searchTerms = "";
+        vm.nodes = vm.measurables;
+        vm.expandedItemIds = vm.checkedItemIds;
+    };
+
 
     // -- API ---
 
