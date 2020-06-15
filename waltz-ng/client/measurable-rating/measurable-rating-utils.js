@@ -19,6 +19,7 @@ import _ from "lodash";
 import moment from "moment";
 import {CORE_API} from "../common/services/core-api-utils";
 import {mkSelectionOptions} from "../common/selector-utils";
+import {formats} from "../common";
 
 
 export function loadDecommData(
@@ -172,12 +173,18 @@ export function determineStartingTab(tabs = []) {
     return _.find(tabs, t => t.ratings.length > 0 ) || tabs[0];
 }
 
+export function getDateAsUTCStartOfDay(inputDate) {
+    const inputDateAsMoment = moment(inputDate, formats.parseDateOnly);
+    const finalDate = moment.utc({year: inputDateAsMoment.year(), month: inputDateAsMoment.month(), date: inputDateAsMoment.date()});
+    if(moment().utcOffset() < 0) {
+        finalDate.minutes(finalDate.minutes() - moment().utcOffset());
+    }
+    return finalDate.toISOString();
+}
+
 export function getDateAsUtc(inputDate) {
-    const formats = {
-        daysOnly: 'YYYY-MM-DD',
-        parse:'ddd MMM Do YYYY',
-    };
-    const localDate = new Date(inputDate).toDateString();
-    return moment.utc(localDate, formats.parse).format(formats.daysOnly);
+    const inputDateAsMoment = moment(inputDate, formats.parseDateOnly);
+    const finalDate = moment.utc({year: inputDateAsMoment.year(), month: inputDateAsMoment.month(), date: inputDateAsMoment.date()});
+    return finalDate.toISOString();
 }
 
