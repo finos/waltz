@@ -17,8 +17,10 @@
  */
 
 import {allEntityLifecycleStatuses, initialiseData} from "../../../common";
-import template from "./flow-diagram-editor.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import {svgAsDataUri, saveSvgAsPng} from "save-svg-as-png";
+
+import template from "./flow-diagram-editor.html";
 
 
 /**
@@ -264,7 +266,9 @@ function mkAnnotationMenu(commandProcessor, $timeout, vm) {
 }
 
 
-function controller($q,
+function controller($document,
+                    $element,
+                    $q,
                     $scope,
                     $timeout,
                     flowDiagramStateService,
@@ -300,9 +304,32 @@ function controller($q,
     };
 
     vm.doSave = () => {
+        console.log('save diagram', $element, $document, window.document);
+        const fd = $document.find("svg");
+        global.fd = fd;
+        console.log("fd: ", fd);
 
-        console.log('save diagram');
+        // approach 1 - using library
+        // saveSvgAsPng(fd[0], "diagram.png");
 
+
+        // approach 2 - manual and render inline
+        var svgString = new XMLSerializer().serializeToString(fd[0]);
+
+        var canvas = $document.find("canvas")[0];
+        console.log("canvas: ", canvas);
+        var ctx = canvas.getContext("2d");
+        var DOMURL = self.URL || self.webkitURL || self;
+        var img = new Image();
+        var svg = new Blob([svgString], {type: "image/svg+xml;charset=utf-8"});
+        var url = DOMURL.createObjectURL(svg);
+        img.onload = function() {
+            ctx.drawImage(img, 0, 0);
+            var png = canvas.toDataURL("image/png");
+            document.querySelector('#png-container').innerHTML = '<img src="'+png+'"/>';
+            DOMURL.revokeObjectURL(png);
+        };
+        img.src = url;
 
         flowDiagramStateService.save()
             .then(r => vm.id = r)
@@ -361,6 +388,8 @@ function controller($q,
 
 
 controller.$inject = [
+    "$document",
+    "$element",
     "$q",
     "$scope",
     "$timeout",
