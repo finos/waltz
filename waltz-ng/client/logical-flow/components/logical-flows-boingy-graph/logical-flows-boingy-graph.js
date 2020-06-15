@@ -168,7 +168,7 @@ function controller($scope,
                 [ vm.selector, entity.LOGICAL_DATA_FLOW.key ])
             .then(r => {
                 vm.decorators = r.data;
-                vm.usedDataTypes = getDataTypeIds(vm.allDataTypes, vm.decorators);
+                return vm.usedDataTypes = getDataTypeIds(vm.allDataTypes, vm.decorators);
             });
 
         const appsPromise = serviceBroker
@@ -181,16 +181,12 @@ function controller($scope,
             .loadViewData(
                 CORE_API.TagStore.findTagsByEntityKindAndTargetSelector,
                 [ entity.LOGICAL_DATA_FLOW.key, vm.selector ])
-            .then(r => {
-                vm.tags = maybeAddUntaggedFlowsTag(r.data);
-            });
+            .then(r => vm.tags = maybeAddUntaggedFlowsTag(r.data));
 
         return $q
             .all([flowPromise, decoratorPromise, appsPromise, tagsPromise])
-            .then(() => {
-                vm.filterChanged();
-                vm.visibility.loadingFlows = false;
-            });
+            .then(() => vm.filterChanged())
+            .then(() => vm.visibility.loadingFlows = false);
     };
 
     vm.filterChanged = (filterOptions = vm.filterOptions) => {
