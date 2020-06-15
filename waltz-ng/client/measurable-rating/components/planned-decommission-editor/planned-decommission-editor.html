@@ -26,7 +26,7 @@
         <div class="col-sm-9">
             <!-- EDITOR -->
             <waltz-editable-field field-type="date"
-                                  initial-val="$ctrl.plannedDecommission.plannedDecommissionDate"
+                                  initial-val="$ctrl.existingDecommissionDate()"
                                   on-save="$ctrl.onSaveDecommissionDate"
                                   date-format="yyyy-MM-dd"
                                   button-label="Set"
