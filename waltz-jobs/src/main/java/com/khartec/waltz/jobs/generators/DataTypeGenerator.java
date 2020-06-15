@@ -18,6 +18,8 @@
 
 package com.khartec.waltz.jobs.generators;
 
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
 
@@ -86,6 +88,9 @@ public class DataTypeGenerator implements SampleDataGenerator {
                 .set(DATA_TYPE.ID, 1L)
                 .set(DATA_TYPE.UNKNOWN, true)
                 .execute();
+
+        EntityHierarchyService ehSvc = ctx.getBean(EntityHierarchyService.class);
+        ehSvc.buildFor(EntityKind.DATA_TYPE);
 
         return null;
     }

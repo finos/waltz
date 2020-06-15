@@ -20,7 +20,11 @@ package com.khartec.waltz.jobs.generators;
 
 
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.ImmutableReleaseLifecycleStatusChangeCommand;
+import com.khartec.waltz.model.ReleaseLifecycleStatus;
+import com.khartec.waltz.model.ReleaseLifecycleStatusChangeCommand;
 import com.khartec.waltz.model.survey.*;
+import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.service.survey.SurveyQuestionService;
 import com.khartec.waltz.service.survey.SurveyTemplateService;
 import org.jooq.DSLContext;
@@ -30,6 +34,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.schema.Tables.SURVEY_QUESTION_RESPONSE;
 import static com.khartec.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
 import static com.khartec.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
 
@@ -54,6 +59,9 @@ public class SurveyTemplateGenerator implements SampleDataGenerator {
         long pid = surveyTemplateService.create("admin", projectSurvey);
         List<SurveyQuestion> projQs = mkProjQuestions(pid);
         projQs.forEach(surveyQuestionService::create);
+
+        surveyTemplateService.updateStatus("admin", aid, ImmutableReleaseLifecycleStatusChangeCommand.builder().newStatus(ReleaseLifecycleStatus.ACTIVE).build());
+        surveyTemplateService.updateStatus("admin", pid, ImmutableReleaseLifecycleStatusChangeCommand.builder().newStatus(ReleaseLifecycleStatus.ACTIVE).build());
 
         return null;
     }
@@ -163,8 +171,9 @@ public class SurveyTemplateGenerator implements SampleDataGenerator {
     @Override
     public boolean remove(ApplicationContext ctx) {
         DSLContext dsl = getDsl(ctx);
-        dsl.deleteFrom(SURVEY_TEMPLATE).execute();
+        dsl.deleteFrom(SURVEY_QUESTION_RESPONSE).execute();
         dsl.deleteFrom(SURVEY_QUESTION).execute();
+        dsl.deleteFrom(SURVEY_TEMPLATE).execute();
         return true;
     }
 }

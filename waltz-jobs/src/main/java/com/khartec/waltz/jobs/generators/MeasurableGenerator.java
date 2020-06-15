@@ -19,8 +19,10 @@
 package com.khartec.waltz.jobs.generators;
 
 import com.khartec.waltz.common.StringUtilities;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
 import com.khartec.waltz.schema.tables.records.MeasurableRecord;
+import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.jooq.DSLContext;
 import org.jooq.SelectConditionStep;
 import org.jooq.lambda.Unchecked;
@@ -100,6 +102,9 @@ public class MeasurableGenerator implements SampleDataGenerator {
                             .where(MEASURABLE.EXTERNAL_ID.equal(category + " _ " + cells[0]))
                             .execute();
                 });
+
+        EntityHierarchyService ehSvc = ctx.getBean(EntityHierarchyService.class);
+        ehSvc.buildFor(EntityKind.MEASURABLE);
 
         return null;
     }

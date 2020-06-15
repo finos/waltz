@@ -23,10 +23,10 @@ import com.khartec.waltz.common.StreamUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.application.LifecyclePhase;
 import com.khartec.waltz.model.change_initiative.ChangeInitiativeKind;
-import com.khartec.waltz.model.entity_relationship.RelationshipKind;
 import com.khartec.waltz.schema.tables.records.ChangeInitiativeRecord;
 import com.khartec.waltz.schema.tables.records.EntityRelationshipRecord;
 import com.khartec.waltz.schema.tables.records.InvolvementRecord;
+import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
@@ -98,8 +98,9 @@ public class ChangeInitiativeGenerator implements SampleDataGenerator {
     }
 
 
-    private static Stream<TableRecord<?>> buildEntityRelationships(List<Long> ciIds,
-                                                                   EntityKind kind,
+    private static Stream<TableRecord<?>> buildEntityRelationships(EntityKind kind,
+                                                                   String relKind,
+                                                                   List<Long> ciIds,
                                                                    List<Long> targetIds,
                                                                    double ratioWithCi,
                                                                    int maxLinks) {
@@ -127,7 +128,7 @@ public class ChangeInitiativeGenerator implements SampleDataGenerator {
                     record.setKindB(EntityKind.CHANGE_INITIATIVE.name());
                     record.setIdB(t.v2);
 
-                    record.setRelationship(RelationshipKind.RELATES_TO.name());
+                    record.setRelationship(relKind);
                     record.setProvenance(SampleDataGenerator.SAMPLE_DATA_PROVENANCE);
 
                     return record;
@@ -175,12 +176,15 @@ public class ChangeInitiativeGenerator implements SampleDataGenerator {
         List<TableRecord<?>> relationships = StreamUtilities
                 .concat(
                         buildPersonLinks(ciIds, employeeIds),
-                        buildEntityRelationships(ciIds, EntityKind.APP_GROUP, groupIds, 0.5, 2),
-                        buildEntityRelationships(ciIds, EntityKind.APPLICATION, appIds, 0.6, 3))
+                        buildEntityRelationships(EntityKind.APP_GROUP, "RELATES_TO", ciIds, groupIds, 0.5, 2),
+                        buildEntityRelationships(EntityKind.APPLICATION, "SUPPORTS", ciIds, appIds, 0.6, 3))
                 .collect(toList());
 
         LOG.info("Storing {} relationships", relationships.size());
         dsl.batchInsert(relationships).execute();
+
+        EntityHierarchyService ehSvc = ctx.getBean(EntityHierarchyService.class);
+        ehSvc.buildFor(EntityKind.CHANGE_INITIATIVE);
 
         return null;
     }
