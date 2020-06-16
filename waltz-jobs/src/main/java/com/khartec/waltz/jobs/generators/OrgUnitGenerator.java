@@ -20,7 +20,9 @@ package com.khartec.waltz.jobs.generators;
 
 import com.khartec.waltz.common.MapUtilities;
 import com.khartec.waltz.common.StringUtilities;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.schema.tables.records.OrganisationalUnitRecord;
+import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.jooq.DSLContext;
 import org.jooq.lambda.Unchecked;
 import org.springframework.context.ApplicationContext;
@@ -70,6 +72,9 @@ public class OrgUnitGenerator implements SampleDataGenerator {
 
         log("Inserting new OU's");
         dsl.batchInsert(records).execute();
+
+        EntityHierarchyService ehSvc = ctx.getBean(EntityHierarchyService.class);
+        ehSvc.buildFor(EntityKind.ORG_UNIT);
 
         return MapUtilities.newHashMap("created", records.size());
     }

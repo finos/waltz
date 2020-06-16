@@ -65,6 +65,7 @@ public class DatabaseGenerator implements SampleDataGenerator {
                 databaseRecord.setEnvironment(randomPick("PROD", "PROD", "QA", "DEV", "DEV"));
                 databaseRecord.setDbmsVendor(pkg.vendor());
                 databaseRecord.setDbmsName(pkg.name());
+                databaseRecord.setDbmsVersion("1.0.1");
                 databaseRecord.setExternalId("ext_" + i + "_" +j);
                 databaseRecord.setProvenance("RANDOM_GENERATOR");
                 databaseRecord.setAssetCode(randomPick(codes));
@@ -91,6 +92,7 @@ public class DatabaseGenerator implements SampleDataGenerator {
             databaseRecord.setEnvironment(dupDbEnvironment);
             databaseRecord.setDbmsVendor(dupDbPackage.vendor());
             databaseRecord.setDbmsName(dupDbPackage.name());
+            databaseRecord.setDbmsVersion("1.0.2");
             databaseRecord.setExternalId("ext_ref_data");
             databaseRecord.setProvenance("RANDOM_GENERATOR");
             databaseRecord.setAssetCode(randomPick(codes));
@@ -103,7 +105,7 @@ public class DatabaseGenerator implements SampleDataGenerator {
 
 
         log("-- storing db records ( " + databaseRecords.size() + " )");
-        databaseRecords.forEach(r -> r.store());
+        dsl.batchStore(databaseRecords).execute();
         log("-- done inserting db records");
 
         return null;
