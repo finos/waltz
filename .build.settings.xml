@@ -27,14 +27,7 @@
             <id>build-h2</id>
             <activation><activeByDefault>true</activeByDefault></activation>
             <properties>
-                <jdbc.group>com.h2database</jdbc.group>
-                <jdbc.artifact>h2</jdbc.artifact>
-                <jdbc.version>1.4.197</jdbc.version>
-                <jdbc.driver>org.h2.Driver</jdbc.driver>
-                <jooq.dialect>H2</jooq.dialect>
-                <jooq.group>org.jooq</jooq.group>
-                <jooq.database>org.jooq.meta.h2.H2Database</jooq.database>
-                <database.url>jdbc:h2:file/./waltzdb;DATABASE_TO_UPPER=false</database.url>
+                <database.url>jdbc:h2:file/./waltzdb2;DATABASE_TO_UPPER=false</database.url>
                 <database.user>root</database.user>
                 <database.password></database.password>
                 <database.schema>PUBLIC</database.schema>
@@ -46,13 +39,6 @@
             <id>build-postgres</id>
             <activation><activeByDefault>false</activeByDefault></activation>
             <properties>
-                <jdbc.group>org.postgresql</jdbc.group>
-                <jdbc.artifact>postgresql</jdbc.artifact>
-                <jdbc.version>42.2.5</jdbc.version>
-                <jdbc.driver>org.postgresql.Driver</jdbc.driver>
-                <jooq.dialect>POSTGRES</jooq.dialect>
-                <jooq.group>org.jooq</jooq.group>
-                <jooq.database>org.jooq.meta.postgres.PostgresDatabase</jooq.database>
                 <database.url>jdbc:postgresql://localhost:5432/waltz</database.url>
                 <database.user>postgres</database.user>
                 <database.password></database.password>
@@ -61,18 +47,10 @@
             </properties>
         </profile>
 
-
         <profile>
             <id>build-mariadb</id>
             <activation><activeByDefault>false</activeByDefault></activation>
             <properties>
-                <jdbc.group>org.mariadb.jdbc</jdbc.group>
-                <jdbc.artifact>mariadb-java-client</jdbc.artifact>
-                <jdbc.version>1.6.5</jdbc.version>
-                <jdbc.driver>org.mariadb.jdbc.Driver</jdbc.driver>
-                <jooq.dialect>MARIADB</jooq.dialect>
-                <jooq.group>org.jooq</jooq.group>
-                <jooq.database>org.jooq.meta.mariadb.MariaDBDatabase</jooq.database>
                 <database.url>jdbc:mysql://127.0.0.1:3306/waltz</database.url>
                 <database.user>root</database.user>
                 <database.password></database.password>

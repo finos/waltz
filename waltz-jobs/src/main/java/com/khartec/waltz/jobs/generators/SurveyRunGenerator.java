@@ -185,14 +185,15 @@ public class SurveyRunGenerator implements SampleDataGenerator {
     public Map<String, Integer> create(ApplicationContext ctx) {
         final DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        List<Person> owners = dsl.selectFrom(PERSON)
+        List<Person> owners = dsl
+                .selectFrom(PERSON)
                 .limit(NUMBER_OF_RUNS)
                 .fetch()
                 .map(PersonDao.personMapper);
         checkFalse(isEmpty(owners), "No person found, please generate person data first");
 
         final SurveyTemplateDao surveyTemplateDao = ctx.getBean(SurveyTemplateDao.class);
-        List<SurveyTemplate> surveyTemplates = surveyTemplateDao.findAll(owners.get(0).id().get());
+        List<SurveyTemplate> surveyTemplates = surveyTemplateDao.findAllActive();
         checkFalse(isEmpty(surveyTemplates), "No template found, please generate templates first");
 
         final AppGroupDao appGroupDao = ctx.getBean(AppGroupDao.class);

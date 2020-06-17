@@ -18,6 +18,7 @@
 
 import template from "./planned-decommission-editor.html";
 import {initialiseData, invokeFunction} from "../../../common";
+import {getDateAsUTCStartOfDay} from "../../measurable-rating-utils";
 
 const modes= {
     VIEW: "VIEW",
@@ -79,6 +80,13 @@ function controller() {
         } else {
             const existingReplacementApps = _.map(vm.replacementApps, d => d.entityReference.id);
             return !_.includes(existingReplacementApps, candidate.id);
+        }
+    };
+
+    vm.existingDecommissionDate = () => {
+        if(!_.isEmpty(vm.plannedDecommission)
+            && !_.isEmpty(vm.plannedDecommission.plannedDecommissionDate)) {
+            return getDateAsUTCStartOfDay(vm.plannedDecommission.plannedDecommissionDate);
         }
     };
 

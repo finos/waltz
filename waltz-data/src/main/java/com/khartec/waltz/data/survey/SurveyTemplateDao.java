@@ -102,6 +102,14 @@ public class SurveyTemplateDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
+
+    public List<SurveyTemplate> findAllActive() {
+        return dsl.select()
+                .from(SURVEY_TEMPLATE)
+                .where(SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name()))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
     
     public long create(SurveyTemplate surveyTemplate) {
         checkNotNull(surveyTemplate, "surveyTemplate cannot be null");
