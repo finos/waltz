@@ -80,7 +80,7 @@
         <jool.version>0.9.12</jool.version>
         <jooq.version>3.13.2</jooq.version>
         <jooq.version>3.12.3</jooq.version> <!--If this changes see issue #4553 -->
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13</junit.version>
         <jwt.version>3.8.3</jwt.version>
         <liquibase.maven.version>3.5.1</liquibase.maven.version>
         <logback.version>1.2.3</logback.version>
