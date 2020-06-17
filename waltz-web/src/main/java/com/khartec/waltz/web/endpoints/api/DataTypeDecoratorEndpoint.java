@@ -22,7 +22,6 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.data_type.DataTypeDecoratorService;
-import com.khartec.waltz.service.data_type.DataTypeService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.action.UpdateDataTypeDecoratorAction;
@@ -33,10 +32,8 @@ import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
-import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.CollectionUtilities.notEmpty;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -94,11 +91,9 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
         String userName = getUsername(request);
         UpdateDataTypeDecoratorAction action = readBody(request, UpdateDataTypeDecoratorAction.class);
 
-        dataTypeDecoratorService.updateDecorators(userName,
+        return dataTypeDecoratorService.updateDecorators(userName,
                 action.entityReference(),
                 action.addedDataTypeIds(),
                 action.removedDataTypeIds());
-
-        return true;
     }
 }
