@@ -20,6 +20,7 @@ package com.khartec.waltz.jobs.tools.resolvers;
 
 import org.jooq.DSLContext;
 import org.jooq.Field;
+import org.jooq.impl.DSL;
 
 import java.util.Map;
 import java.util.Optional;
@@ -45,7 +46,7 @@ public class PersonNameToEmpIdResolver implements Resolver<String> {
 
 
     private Map<String, String> loadPersonToEmpIdMap(DSLContext dsl) {
-        Field<String> normalizedName = PERSON.DISPLAY_NAME.trim().lower();
+        Field<String> normalizedName = DSL.trim(DSL.lower(PERSON.DISPLAY_NAME));
         return dsl
                 .select(normalizedName, PERSON.EMPLOYEE_ID)
                 .from(PERSON)

@@ -39,8 +39,8 @@ public class PostgresChangeInitiativeSearch implements FullTextSearch<ChangeInit
         Field<Double> rank = DSL
                 .field("ts_rank_cd(to_tsvector({0} || ' ' || coalesce({1}, '')), plainto_tsquery({2}))",
                         Double.class,
-                        CHANGE_INITIATIVE.DESCRIPTION.lower(),
-                        CHANGE_INITIATIVE.EXTERNAL_ID.lower(),
+                        DSL.lower(CHANGE_INITIATIVE.DESCRIPTION),
+                        DSL.lower(CHANGE_INITIATIVE.EXTERNAL_ID),
                         DSL.inline(options.searchQuery().toLowerCase()));
 
         return dsl

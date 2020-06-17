@@ -39,8 +39,8 @@ public class PostgresAppSearch implements FullTextSearch<Application>, DatabaseV
         Field<Double> rank = DSL
                 .field("ts_rank_cd(to_tsvector({0} || ' ' || coalesce({1}, '')), plainto_tsquery({2}))",
                         Double.class,
-                        APPLICATION.DESCRIPTION.lower(),
-                        APPLICATION.PARENT_ASSET_CODE.lower(),
+                        DSL.lower(APPLICATION.DESCRIPTION),
+                        DSL.lower(APPLICATION.PARENT_ASSET_CODE),
                         DSL.inline(options.searchQuery().toLowerCase()));
 
         Condition lifecycleCondition = APPLICATION.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
