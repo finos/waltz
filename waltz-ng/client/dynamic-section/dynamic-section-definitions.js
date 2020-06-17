@@ -491,7 +491,8 @@ export const dynamicSectionsByKind = {
             [assetCostsSection, complexitySection, entityStatisticSummarySection, technologySummarySection]),
         bookmarksSection,
         changeLogSection,
-        measurableRatingsBrowserSection
+        measurableRatingsBrowserSection,
+        entityNamedNotesSection
     ],
     "PHYSICAL_FLOW": [
         bookmarksSection,
