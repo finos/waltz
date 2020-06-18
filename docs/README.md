@@ -7,6 +7,24 @@
 - Integration
   - [Neo4J](integration/neo4j)
 
+----
+
+## Authoring notes
+
+### Markdown Table of Contents
+Use [markdown-toc](https://github.com/jonschlinkert/markdown-toc)
+
+
+## Diagrams
+
+### Graphviz
+Generate SVG from `.gv` files by running a command similar to:
+
+```
+dot -Tsvg <file>.gv -o <out>.svg
+```
+
+----
 
 ## License 
 
@@ -19,7 +37,3 @@ This work is licensed under a
     Creative Commons Attribution 4.0 International License
 </a>.
 
-
-----
-
-If you would like to contribute documentation see the [Authoring](authoring.md) page for some guidance.
