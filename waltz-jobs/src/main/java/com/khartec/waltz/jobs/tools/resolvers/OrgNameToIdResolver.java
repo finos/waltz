@@ -20,6 +20,7 @@ package com.khartec.waltz.jobs.tools.resolvers;
 
 import org.jooq.DSLContext;
 import org.jooq.Field;
+import org.jooq.impl.DSL;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -46,7 +47,7 @@ public class OrgNameToIdResolver implements Resolver<Long> {
 
 
     private Map<String, Long> loadMap(DSLContext dsl) {
-        Field<String> normalizedName = ORGANISATIONAL_UNIT.NAME.trim().lower();
+        Field<String> normalizedName = DSL.trim(DSL.lower(ORGANISATIONAL_UNIT.NAME));
         Map<String, Long> result = new HashMap<>();
         dsl.select(normalizedName, ORGANISATIONAL_UNIT.ID)
                 .from(ORGANISATIONAL_UNIT)

@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.data.bookmark;
 
+import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -30,6 +31,7 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -121,7 +123,7 @@ public class BookmarkDao {
                 .set(BOOKMARK.PARENT_KIND, bookmark.parent().kind().name())
                 .set(BOOKMARK.IS_PRIMARY, bookmark.isPrimary())
                 .set(BOOKMARK.CREATED_AT, DSL.currentTimestamp())
-                .set(BOOKMARK.UPDATED_AT, DSL.currentTimestamp())
+                .set(BOOKMARK.UPDATED_AT, Timestamp.valueOf(bookmark.lastUpdatedAt()))
                 .set(BOOKMARK.LAST_UPDATED_BY, username.trim())
                 .set(BOOKMARK.PROVENANCE, bookmark.provenance())
                 .set(BOOKMARK.IS_RESTRICTED, bookmark.isRestricted())
@@ -142,11 +144,11 @@ public class BookmarkDao {
 
         int rc = dsl.update(BOOKMARK)
                 .set(BOOKMARK.KIND, bookmark.bookmarkKind())
-                .set(BOOKMARK.DESCRIPTION, bookmark.description().orElse(""))
+                .set(BOOKMARK.DESCRIPTION, bookmark.description().orElse(null))
                 .set(BOOKMARK.URL, bookmark.url().orElse(""))
                 .set(BOOKMARK.TITLE, bookmark.title().orElse(""))
                 .set(BOOKMARK.IS_PRIMARY, bookmark.isPrimary())
-                .set(BOOKMARK.UPDATED_AT, DSL.currentTimestamp())
+                .set(BOOKMARK.UPDATED_AT, Timestamp.valueOf(bookmark.lastUpdatedAt()))
                 .set(BOOKMARK.LAST_UPDATED_BY, username.trim())
                 .set(BOOKMARK.PROVENANCE, bookmark.provenance())
                 .set(BOOKMARK.IS_RESTRICTED, bookmark.isRestricted())

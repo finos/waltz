@@ -67,27 +67,28 @@
         <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 
+        <annotation-api.version>1.2</annotation-api.version>
         <archunit.version>0.12.0</archunit.version>
-        <freemarker.version>2.3.28</freemarker.version>
+        <freemarker.version>2.3.30</freemarker.version>
         <hikari.version>3.4.1</hikari.version>
-        <immutables.version>2.8.2</immutables.version>
+        <immutables.version>2.8.8</immutables.version>
         <jackson.version>2.10.1</jackson.version>
         <java.version>1.8</java.version>
         <javax.mail.version>1.4.7</javax.mail.version>
         <jackson-jsr310.version>2.10.1</jackson-jsr310.version>
         <jbcrypt.version>0.4.1</jbcrypt.version>
         <jgrapht.version>1.3.1</jgrapht.version>
-        <jool.version>0.9.12</jool.version>
-        <jooq.version>3.12.3</jooq.version> <!--If this changes see issue #4553 -->
-        <junit.version>4.12</junit.version>
+        <jool.version>0.9.14</jool.version>
+        <jooq.version>3.13.2</jooq.version> <!--If this changes see issue #4553 -->
+        <junit.version>4.13</junit.version>
         <jwt.version>3.8.3</jwt.version>
         <liquibase.maven.version>3.5.1</liquibase.maven.version>
         <logback.version>1.2.3</logback.version>
-        <pcollections.version>2.1.2</pcollections.version>
+        <pcollections.version>3.1.3</pcollections.version>
         <poi.version>4.1.1</poi.version>
-        <slf4j.version>1.7.29</slf4j.version>
+        <slf4j.version>1.7.30</slf4j.version>
         <spark.version>2.9.1</spark.version>
-        <spring.version>5.2.1.RELEASE</spring.version>
+        <spring.version>5.2.2.RELEASE</spring.version>
         <super-csv.version>2.4.0</super-csv.version>
         <timestamp>${maven.build.timestamp}</timestamp>
     </properties>
@@ -95,11 +96,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>javax.annotation</groupId>
-                <artifactId>javax.annotation-api</artifactId>
-                <version>1.2</version>
-            </dependency>
 
             <!-- web -->
             <dependency>
@@ -193,7 +189,7 @@
             </dependency>
             <dependency>
                 <groupId>org.jooq</groupId>
-                <artifactId>jool</artifactId>
+                <artifactId>jool-java-8</artifactId>
                 <version>${jool.version}</version>
             </dependency>
             <dependency>
@@ -211,7 +207,11 @@
                 <artifactId>jgrapht-core</artifactId>
                 <version>${jgrapht.version}</version>
             </dependency>
-
+            <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>${annotation-api.version}</version>
+            </dependency>
 
             <!-- db -->
             <dependency>
@@ -410,7 +410,7 @@
                     <version>${jdbc.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>org.jooq.pro-java-8</groupId>
+                    <groupId>${jooq.group}</groupId>
                     <artifactId>jooq</artifactId>
                     <version>${jooq.version}</version>
                 </dependency>
