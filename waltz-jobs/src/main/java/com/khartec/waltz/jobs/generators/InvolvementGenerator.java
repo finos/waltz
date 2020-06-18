@@ -36,6 +36,7 @@ import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.ListUtilities.concat;
 import static com.khartec.waltz.common.RandomUtilities.randomPick;
+import static com.khartec.waltz.schema.Tables.MEASURABLE_CATEGORY;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
@@ -155,6 +156,20 @@ public class InvolvementGenerator implements SampleDataGenerator {
                         true))
                 .collect(Collectors.toList());
 
+        List<InvolvementRecord> categoryInvolvements = dsl
+                .select(MEASURABLE_CATEGORY.ID)
+                .from(MEASURABLE_CATEGORY)
+                .fetch(MEASURABLE_CATEGORY.ID)
+                .stream()
+                .map(id -> new InvolvementRecord(
+                        EntityKind.MEASURABLE_CATEGORY.name(),
+                        id,
+                        randomPick(directors),
+                        SAMPLE_DATA_PROVENANCE,
+                        Long.valueOf(rnd.nextInt(13) + 1),
+                        true))
+                .collect(Collectors.toList());
+
         dsl.batchInsert(devInvolvements).execute();
         dsl.batchInsert(qaInvolvements).execute();
         dsl.batchInsert(supportManagerInvolvments).execute();
@@ -162,6 +177,7 @@ public class InvolvementGenerator implements SampleDataGenerator {
         dsl.batchInsert(analystInvolvments).execute();
         dsl.batchInsert(ouArchitects).execute();
         dsl.batchInsert(ouSponsors).execute();
+        dsl.batchInsert(categoryInvolvements).execute();
 
 
         System.out.println("Done");
