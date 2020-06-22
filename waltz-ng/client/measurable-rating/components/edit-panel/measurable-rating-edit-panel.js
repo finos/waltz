@@ -88,6 +88,8 @@ function controller($q,
                 }
                 vm.onTabChange();
             })
+            .then(() => serviceBroker.loadViewData(CORE_API.ApplicationStore.getById, [vm.parentEntityRef.id])
+                .then(r => vm.application = r.data))
     };
 
     const recalcTabs = function () {
@@ -210,19 +212,43 @@ function controller($q,
             .finally(reloadDecommData);
     };
 
-    vm.onSaveDecommissionDate = (dateChange) => {
-        dateChange.newVal = getDateAsUtc(dateChange.newVal);
+    vm.checkPlannedDecomDateIsValid = (decomDate) => {
 
-        serviceBroker
-            .execute(
-                CORE_API.MeasurableRatingPlannedDecommissionStore.save,
-                [vm.parentEntityRef, vm.selected.measurable.id, dateChange])
-            .then(r => {
-                vm.selected = Object.assign({}, vm.selected, { decommission: r.data });
-                notification.success(`Saved decommission date for ${vm.selected.measurable.name}`);
-            })
-            .catch(e => displayError(notification, "Could not save decommission date", e))
-            .finally(reloadDecommData);
+        const appDate = new Date(vm.application.plannedRetirementDate);
+
+        const sameDate = appDate.getFullYear() === decomDate.getFullYear()
+            && appDate.getMonth() === decomDate.getMonth()
+            && appDate.getDate() === decomDate.getDate();
+
+        return appDate > decomDate || sameDate;
+    };
+
+    vm.onSaveDecommissionDate = (dateChange) => {
+
+        if (vm.application.entityLifecycleStatus === 'REMOVED'){
+            notification.error("Decommission date cannot be set. This application is no longer active");
+            return;
+        }
+
+        if (_.isNull(vm.application.plannedRetirementDate) || vm.checkPlannedDecomDateIsValid(dateChange.newVal)){
+
+            dateChange.newVal = getDateAsUtc(dateChange.newVal);
+
+            serviceBroker
+                .execute(
+                    CORE_API.MeasurableRatingPlannedDecommissionStore.save,
+                    [vm.parentEntityRef, vm.selected.measurable.id, dateChange])
+                .then(r => {
+                    vm.selected = Object.assign({}, vm.selected, { decommission: r.data });
+                    notification.success(`Saved decommission date for ${vm.selected.measurable.name}`);
+                })
+                .catch(e => displayError(notification, "Could not save decommission date", e))
+                .finally(reloadDecommData);
+
+        } else {
+            const appDate = new Date(vm.application.plannedRetirementDate).toDateString();
+            notification.error("Decommission date cannot be later than the planned retirement date of the application: " + appDate);
+        }
     };
 
     vm.onRemoveDecommission = () => {
