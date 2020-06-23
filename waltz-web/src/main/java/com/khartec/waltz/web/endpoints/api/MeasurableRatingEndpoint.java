@@ -157,6 +157,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
                 .entityReference(getEntityReference(request))
                 .measurableId(getLong(request, "measurableId"))
                 .rating(firstChar(body.getOrDefault("rating", "Z"), 'Z'))
+                .previousRating(firstChar(body.getOrDefault("previousRating", "")))
                 .description(body.getOrDefault("description", ""))
                 .lastUpdate(UserTimestamp.mkForUser(username))
                 .provenance("waltz")

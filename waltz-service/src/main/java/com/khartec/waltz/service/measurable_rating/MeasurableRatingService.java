@@ -113,16 +113,21 @@ public class MeasurableRatingService {
 
         String entityName = getEntityName(command);
 
+        String previousRatingMessage = command.previousRating().isPresent()
+                ? "from " + command.previousRating().get() : "";
+
         writeChangeLogEntry(
                 command,
-                format("Saved: %s with a rating of: %s for %s",
+                format("Saved: %s with a rating of: %s %s for %s",
                         measurable.name(),
                         command.rating(),
+                        previousRatingMessage,
                         entityName),
-                format("Saved: %s has assigned %s with a rating of: %s",
+                format("Saved: %s has assigned %s with a rating of: %s %s",
                         entityName,
                         measurable.name(),
-                        command.rating()),
+                        command.rating(),
+                        previousRatingMessage),
                 operationThatWasPerformed);
 
         return findForEntity(command.entityReference());

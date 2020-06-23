@@ -111,10 +111,11 @@ function controller($q,
         ["rating", "rating"]);
 
     const doRatingSave = (rating, description) => {
+        const currentRating = !_.isEmpty(vm.selected.rating) ? vm.selected.rating.rating : null;
         return serviceBroker
             .execute(
                 CORE_API.MeasurableRatingStore.save,
-                [vm.parentEntityRef, vm.selected.measurable.id, rating, description])
+                [vm.parentEntityRef, vm.selected.measurable.id, rating, currentRating, description])
             .then(r => { vm.ratings = r.data })
             .then(() => recalcTabs())
             .then(() => {

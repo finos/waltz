@@ -69,10 +69,10 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
-    const save = (ref, measurableId, rating = "Z", description = "") => {
+    const save = (ref, measurableId, rating = "Z", previousRating, description = "") => {
         checkIsEntityRef(ref);
         return $http
-            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/measurable/${measurableId}`, { rating, description })
+            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/measurable/${measurableId}`, { rating, previousRating, description })
             .then(d => d.data);
     };
 
