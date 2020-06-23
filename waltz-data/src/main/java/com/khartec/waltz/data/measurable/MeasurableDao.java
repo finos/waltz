@@ -160,8 +160,8 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
     }
 
 
-    public boolean create(Measurable measurable) {
-        int rc = dsl.insertInto(MEASURABLE)
+    public Long create(Measurable measurable) {
+        return dsl.insertInto(MEASURABLE)
                 .set(MEASURABLE.MEASURABLE_CATEGORY_ID, measurable.categoryId())
                 .set(MEASURABLE.PARENT_ID, measurable.parentId().orElse(null))
                 .set(MEASURABLE.EXTERNAL_ID, measurable.externalId().orElse(null))
@@ -172,9 +172,9 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .set(MEASURABLE.PROVENANCE, "waltz")
                 .set(MEASURABLE.LAST_UPDATED_BY, measurable.lastUpdatedBy())
                 .set(MEASURABLE.LAST_UPDATED_AT, Timestamp.valueOf(measurable.lastUpdatedAt()))
-                .execute();
-
-        return rc == 1;
+                .returning(MEASURABLE.ID)
+                .fetchOne()
+                .getId();
     }
 
 
