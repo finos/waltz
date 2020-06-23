@@ -200,9 +200,7 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
 
     public TaxonomyChangeCommand apply(TaxonomyChangeCommand cmd, String userId) {
         doBasicValidation(cmd);
-        validatePrimaryMeasurable(measurableService, cmd);
-
-        Measurable measurable = measurableService.getById(cmd.primaryReference().id());
+        Measurable measurable = validatePrimaryMeasurable(measurableService, cmd);
 
         IdSelectionOptions selectionOptions = mkOpts(cmd.primaryReference(), HierarchyQueryScope.CHILDREN);
 
