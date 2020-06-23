@@ -34,7 +34,8 @@ const bindings = {
     startingCategoryId: "<?",
     plannedDecommissions: "<?",
     replacementApps: "<?",
-    replacingDecommissions: "<?"
+    replacingDecommissions: "<?",
+    application: "<"
 };
 
 
@@ -88,8 +89,6 @@ function controller($q,
                 }
                 vm.onTabChange();
             })
-            .then(() => serviceBroker.loadViewData(CORE_API.ApplicationStore.getById, [vm.parentEntityRef.id])
-                .then(r => vm.application = r.data))
     };
 
     const recalcTabs = function () {
@@ -215,12 +214,13 @@ function controller($q,
     vm.checkPlannedDecomDateIsValid = (decomDate) => {
 
         const appDate = new Date(vm.application.plannedRetirementDate);
+        const newDecomDate = new Date(decomDate);
 
-        const sameDate = appDate.getFullYear() === decomDate.getFullYear()
-            && appDate.getMonth() === decomDate.getMonth()
-            && appDate.getDate() === decomDate.getDate();
+        const sameDate = appDate.getFullYear() === newDecomDate.getFullYear()
+            && appDate.getMonth() === newDecomDate.getMonth()
+            && appDate.getDate() === newDecomDate.getDate();
 
-        return appDate > decomDate || sameDate;
+        return appDate > newDecomDate || sameDate;
     };
 
     vm.onSaveDecommissionDate = (dateChange) => {
@@ -239,7 +239,8 @@ function controller($q,
                     CORE_API.MeasurableRatingPlannedDecommissionStore.save,
                     [vm.parentEntityRef, vm.selected.measurable.id, dateChange])
                 .then(r => {
-                    vm.selected = Object.assign({}, vm.selected, { decommission: r.data });
+                    const decom = Object.assign(r.data, {isValid: true});
+                    vm.selected = Object.assign({}, vm.selected, { decommission: decom});
                     notification.success(`Saved decommission date for ${vm.selected.measurable.name}`);
                 })
                 .catch(e => displayError(notification, "Could not save decommission date", e))

@@ -23,7 +23,8 @@ import {initialiseData} from "../../../common";
 const bindings = {
     plannedDecommission: "<",
     replacementApps: "<?",
-    replacingDecommissions: "<?"
+    replacingDecommissions: "<?",
+    application: "<"
 };
 
 

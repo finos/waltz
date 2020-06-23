@@ -36,7 +36,8 @@ const bindings = {
     onRemoveDecommission: "<",
     onAddReplacementApp: "<",
     onRemoveReplacementApp: "<",
-    category: "<"
+    category: "<",
+    application: "<?"
 };
 
 
