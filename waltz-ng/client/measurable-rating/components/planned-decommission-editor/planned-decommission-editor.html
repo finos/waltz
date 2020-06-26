@@ -148,7 +148,7 @@
                     <waltz-entity-icon-label entity-ref="$ctrl.candidateApp"></waltz-entity-icon-label>
 
                     <waltz-editable-field field-type="date"
-                                          initial-val="$ctrl.plannedDecommission.plannedDecommissionDate"
+                                          initial-val="$ctrl.existingDecommissionDate()"
                                           on-save="$ctrl.onSetCommissionDate"
                                           date-format="yyyy-MM-dd"
                                           button-label="Set"
