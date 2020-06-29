@@ -1,11 +1,11 @@
 ---
 layout: post
-title:  "Developers: Getting Started"
+title:  "Screencast: Developers - Getting Started"
 date:   2020-06-18
 categories: waltz dev
 ---
 
-# Developers: Getting Started
+# Screencast: Developers - Getting Started
 
 If you would like to set Waltz up in a development environment check 
 out this screencast:

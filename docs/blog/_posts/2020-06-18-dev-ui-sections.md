@@ -1,11 +1,11 @@
 ---
 layout: post
-title:  "Developers: UI Sections"
+title:  "Screencast: Developers - UI Sections"
 date:   2020-06-18
-categories: waltz dev
+categories: waltz dev screencast
 ---
 
-# Developers: UI Sections
+# Screencast: Developers - UI Sections
 
 This screencast walks you through how sections in the UI are configured and added to pages
 
