@@ -32,6 +32,7 @@ import com.khartec.waltz.schema.tables.LogicalFlowDecorator;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.Unchecked;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -136,7 +137,8 @@ public class LogicalFlowStatsDao {
                 .and(BOTH_APPS)
                 .and(NOT_REMOVED);
 
-        Result<Record3<Long, String, Integer>> records = dsl.select(
+        Map<EntityReference, List<Tally<String>>> dataTypeRefToTallies  = dsl
+                .select(
                     lfd.DECORATOR_ENTITY_ID,
                     flowTypeCase.as(flowType),
                     count().as(flowCount))
@@ -150,18 +152,12 @@ public class LogicalFlowStatsDao {
                     .on(targetAppId.eq(lf.TARGET_ENTITY_ID))
                 .where(dsl.renderInlined(condition))
                 .groupBy(lfd.DECORATOR_ENTITY_ID, flowTypeCase)
-                .fetch();
-
-        Map<EntityReference, List<Tally<String>>> dataTypeRefToTallies = records.stream()
-                .map(r -> tuple(
-                        mkRef(EntityKind.DATA_TYPE, r.getValue(lfd.DECORATOR_ENTITY_ID)),
-                        ImmutableTally.<String>builder()
+                .fetchGroups(
+                        r -> mkRef(EntityKind.DATA_TYPE, r.getValue(lfd.DECORATOR_ENTITY_ID)),
+                        r -> ImmutableTally.<String>builder()
                                 .id(r.getValue(flowType))
                                 .count(r.getValue(flowCount))
-                                .build()))
-                .collect(groupingBy(t -> t.v1(),
-                            mapping(t -> t.v2(),
-                                    toList())));
+                                .build());
 
         return dataTypeRefToTallies.entrySet()
                 .stream()
