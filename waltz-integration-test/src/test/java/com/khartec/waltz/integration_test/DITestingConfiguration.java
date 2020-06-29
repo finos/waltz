@@ -31,6 +31,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableMBeanExport;
+import org.springframework.jmx.support.RegistrationPolicy;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import javax.sql.DataSource;
@@ -40,7 +42,8 @@ import java.time.Duration;
 import static java.lang.String.format;
 
 @Configuration
-@ComponentScan(basePackages = "com.khartec.waltz.data")
+@ComponentScan(basePackages = {"com.khartec.waltz.data", "com.khartec.waltz.service"})
+@EnableMBeanExport(registration = RegistrationPolicy.REPLACE_EXISTING)
 public class DITestingConfiguration {
 
     static PostgreSQLContainer postgreSQLContainer = (PostgreSQLContainer) new PostgreSQLContainer(
