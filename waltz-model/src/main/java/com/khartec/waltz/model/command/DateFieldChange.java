@@ -22,10 +22,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.immutables.value.Value;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableDateFieldChange.class)
 @JsonDeserialize(as = ImmutableDateFieldChange.class)
-public abstract class DateFieldChange extends FieldChange<Date> {
+public abstract class DateFieldChange extends FieldChange<LocalDate> {
 }
