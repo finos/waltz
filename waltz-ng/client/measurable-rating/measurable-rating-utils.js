@@ -181,15 +181,12 @@ export function getDateAsUTCStartOfDay(inputDate) {
     }
     console.log('getDateAsUTCStartOfDay before= ',inputDate, ', after=', finalDate.toISOString(), ', zoneoffset= ', moment().utcOffset()/60);
     return finalDate.toISOString();
-    // return inputDate;
 }
 
 export function getDateAsUtc(inputDate) {
     const inputDateAsMoment = moment(inputDate, formats.parseDateOnly);
     const finalDate = moment.utc({year: inputDateAsMoment.year(), month: inputDateAsMoment.month(), date: inputDateAsMoment.date()});
-
     console.log('getDateAsUtc before :: ', inputDate, ', after :: ', finalDate.toISOString());
     return finalDate.toISOString();
-    // return inputDate;
 }
 

@@ -7,7 +7,6 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.LastUpdatedProvider;
 import org.immutables.value.Value;
 
-import java.time.LocalDate;
 import java.util.Date;
 
 @Value.Immutable

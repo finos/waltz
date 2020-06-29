@@ -163,7 +163,6 @@ public class MeasurableRatingPlannedDecommissionDao {
                                           String userName) {
         record.setUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
         record.setUpdatedBy(userName);
-//        record.setPlannedDecommissionDate(toSqlDate(toLocalDate(dateChange.newVal())));
         record.setPlannedDecommissionDate(toSqlDate(dateChange.newVal()));
     }
 
