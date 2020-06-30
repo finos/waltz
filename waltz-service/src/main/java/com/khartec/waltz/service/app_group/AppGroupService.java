@@ -115,8 +115,8 @@ public class AppGroupService {
     public List<AppGroupSubscription> findGroupSubscriptionsForUser(String userId) {
         List<AppGroupMember> subscriptions = appGroupMemberDao.getSubscriptions(userId);
         Map<Long, AppGroupMemberRole> roleByGroup = indexBy(
-                m -> m.groupId(),
-                m -> m.role(),
+                AppGroupMember::groupId,
+                AppGroupMember::role,
                 subscriptions);
 
         List<AppGroup> groups = appGroupDao.findGroupsForUser(userId);
@@ -185,7 +185,7 @@ public class AppGroupService {
     }
 
 
-    public List<EntityReference> addApplication(String userId, long groupId, long applicationId) throws InsufficientPrivelegeException {
+    public List<AppGroupEntry> addApplication(String userId, long groupId, long applicationId) throws InsufficientPrivelegeException {
 
         verifyUserCanUpdateGroup(userId, groupId);
 
@@ -199,7 +199,7 @@ public class AppGroupService {
     }
 
 
-    public List<EntityReference> addApplications(String userId,
+    public List<AppGroupEntry> addApplications(String userId,
                                                  long groupId,
                                                  List<Long> applicationIds,
                                                  List<String> unknownIdentifiers) throws InsufficientPrivelegeException {
@@ -238,7 +238,7 @@ public class AppGroupService {
     }
 
 
-    public List<EntityReference> removeApplication(String userId, long groupId, long applicationId) throws InsufficientPrivelegeException {
+    public List<AppGroupEntry> removeApplication(String userId, long groupId, long applicationId) throws InsufficientPrivelegeException {
         verifyUserCanUpdateGroup(userId, groupId);
         appGroupEntryDao.removeApplication(groupId, applicationId);
         Application app = applicationDao.getById(applicationId);
@@ -252,7 +252,7 @@ public class AppGroupService {
         return appGroupEntryDao.getEntriesForGroup(groupId);
     }
 
-    public List<EntityReference> addOrganisationalUnit(String userId, long groupId, long orgUnitId) throws InsufficientPrivelegeException {
+    public List<AppGroupEntry> addOrganisationalUnit(String userId, long groupId, long orgUnitId) throws InsufficientPrivelegeException {
 
         verifyUserCanUpdateGroup(userId, groupId);
         OrganisationalUnit orgUnit = organisationalUnitDao.getById(orgUnitId);
@@ -263,14 +263,14 @@ public class AppGroupService {
         return appGroupOrganisationalUnitDao.getEntriesForGroup(groupId);
     }
 
-    public List<EntityReference> removeOrganisationalUnit(String userId, long groupId, long orgUnitId) throws InsufficientPrivelegeException {
+    public List<AppGroupEntry> removeOrganisationalUnit(String userId, long groupId, long orgUnitId) throws InsufficientPrivelegeException {
         verifyUserCanUpdateGroup(userId, groupId);
         appGroupOrganisationalUnitDao.removeOrgUnit(groupId, orgUnitId);
         OrganisationalUnit ou = organisationalUnitDao.getById(orgUnitId);
         audit(groupId, userId, format("Removed application %s from group", ou != null ? ou.name() : orgUnitId), EntityKind.ORG_UNIT, Operation.REMOVE);
         return appGroupOrganisationalUnitDao.getEntriesForGroup(groupId);
     }
-    public List<EntityReference> removeApplications(String userId, long groupId, List<Long> applicationIds) throws InsufficientPrivelegeException {
+    public List<AppGroupEntry> removeApplications(String userId, long groupId, List<Long> applicationIds) throws InsufficientPrivelegeException {
         verifyUserCanUpdateGroup(userId, groupId);
 
         appGroupEntryDao.removeApplications(groupId, applicationIds);
@@ -372,7 +372,7 @@ public class AppGroupService {
         verifyUserCanUpdateGroup(username, groupId);
 
         EntityRelationship entityRelationship = buildChangeInitiativeRelationship(username, groupId, changeInitiativeId);
-        entityRelationshipDao.remove(entityRelationship);
+        entityRelationshipDao.remove(entityRelationship.toKey());
 
         audit(groupId,
                 username,
