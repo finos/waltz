@@ -45,7 +45,7 @@ public class WaltzEmailer {
 
     private final JavaMailSender mailSender;
 
-    @Value("${waltz.from.email}")
+    @Value("${waltz.from.email:waltz.admin}")
     private String fromEmail;
 
 
