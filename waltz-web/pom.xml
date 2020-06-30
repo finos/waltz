@@ -193,11 +193,11 @@
                         </goals>
                         <configuration>
                             <archive>
-                                <manifesdumt>
+                                <manifest>
                                     <mainClass>
                                         com.khartec.waltz.web.Main
                                     </mainClass>
-                                </manifesdumt>
+                                </manifest>
                             </archive>
                             <descriptorRefs>
                                 <descriptorRef>jar-with-dependencies</descriptorRef>
