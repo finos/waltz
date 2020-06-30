@@ -26,6 +26,7 @@
         <tagDatabase tag="v1.25"/> <!-- tag the current db version -->
     </changeSet>
 
+    <!-- 4936: Entity Alias PK -->
     <changeSet id="20200618-4936-1"
                author="davidwatkins73">
         <comment>4936:  Add kind to entity_alias pk (drop existing)</comment>
@@ -43,4 +44,50 @@
                        columnNames="id,kind,alias"/>
     </changeSet>
 
+
+    <!-- 4876: Favourites -->
+    <changeSet id="20200630-4876-1"
+               author="davidwatkins73">
+        <comment>4876: Add provenance and is_readonly to app_group_entries</comment>
+        <addColumn tableName="application_group_entry">
+            <column name="is_readonly"
+                       type="boolean"
+                       defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="application_group_entry">
+            <column name="provenance"
+                    type="${provenance.type}"
+                    defaultValue="waltz">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+        <addColumn tableName="application_group_ou_entry">
+            <column name="is_readonly"
+                       type="boolean"
+                       defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="application_group_ou_entry">
+            <column name="provenance"
+                    type="${provenance.type}"
+                    defaultValue="waltz">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20200630-4876-2"
+               author="davidwatkins73">
+    <comment>4876: Add is_favourite_group column to app_group</comment>
+        <addColumn tableName="application_group">
+            <column name="is_favourite_group"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>
