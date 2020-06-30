@@ -56,7 +56,7 @@ public class AppGroupOrganisationalUnitDao {
                         .id(r.getValue(ORGANISATIONAL_UNIT.ID))
                         .name(r.getValue(ORGANISATIONAL_UNIT.NAME))
                         .description(r.getValue(ORGANISATIONAL_UNIT.DESCRIPTION))
-                        .kind(EntityKind.APPLICATION)
+                        .kind(EntityKind.ORG_UNIT)
                         .isReadOnly(r.getValue(APPLICATION_GROUP_OU_ENTRY.IS_READONLY))
                         .provenance(r.getValue(APPLICATION_GROUP_OU_ENTRY.PROVENANCE))
                         .build());
