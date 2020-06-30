@@ -62,9 +62,14 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.jooq</groupId>
+            <groupId>${jooq.group}</groupId>
             <artifactId>jooq</artifactId>
+            <version>${jooq.version}</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>org.jooq</groupId>-->
+<!--            <artifactId>jooq</artifactId>-->
+<!--        </dependency>-->
 
     </dependencies>
 
