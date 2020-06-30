@@ -72,7 +72,6 @@ public class DIBaseConfiguration {
     @Value("${database.performance.query.slow.threshold:10}")
     private int databasePerformanceQuerySlowThreshold;
 
-
     @Bean
     public DataSource dataSource() {
 

@@ -22,15 +22,23 @@ import com.khartec.waltz.common.CollectionUtilities;
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.LoggingUtilities;
 import com.khartec.waltz.data.actor.ActorDao;
+import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.measurable_category.MeasurableCategoryDao;
+import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.actor.ImmutableActorCreateCommand;
+import com.khartec.waltz.model.application.AppRegistrationResponse;
+import com.khartec.waltz.model.application.ApplicationKind;
+import com.khartec.waltz.model.application.ImmutableAppRegistrationRequest;
+import com.khartec.waltz.model.application.LifecyclePhase;
 import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.measurable_category.MeasurableCategory;
+import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.schema.tables.records.*;
+import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.jetbrains.annotations.NotNull;
 import org.jooq.DSLContext;
 import org.junit.BeforeClass;
@@ -41,13 +49,16 @@ import java.time.LocalDate;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
 
 public class BaseIntegrationTest {
 
     protected static ApplicationContext ctx;
+    protected static final String LAST_UPDATE_USER = "last";
+    protected static final String PROVENANCE = "test";
 
-    private AtomicLong ctr = new AtomicLong(1_000_000);
+    private static final AtomicLong ctr = new AtomicLong(1_000_000);
 
     @BeforeClass
     public static void baseSetUp() {
@@ -80,18 +91,18 @@ public class BaseIntegrationTest {
     }
 
 
-    protected long createMeasurableCategory(String testCategory) {
+    protected long createMeasurableCategory(String name) {
         MeasurableCategoryDao dao = ctx.getBean(MeasurableCategoryDao.class);
-        Set<MeasurableCategory> categories = dao.findByExternalId(testCategory);
+        Set<MeasurableCategory> categories = dao.findByExternalId(name);
         return CollectionUtilities
                 .maybeFirst(categories)
                 .map(c -> c.id().get())
                 .orElseGet(() -> {
                     long schemeId = createEmptyRatingScheme("test");
                     MeasurableCategoryRecord record = getDsl().newRecord(MEASURABLE_CATEGORY);
-                    record.setDescription(testCategory);
-                    record.setName(testCategory);
-                    record.setExternalId(testCategory);
+                    record.setDescription(name);
+                    record.setName(name);
+                    record.setExternalId(name);
                     record.setRatingSchemeId(schemeId);
                     record.setLastUpdatedBy("admin");
                     record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
@@ -118,7 +129,6 @@ public class BaseIntegrationTest {
                 });
     }
 
-
     protected long createMeasurable(String name, long categoryId) {
         return getDsl()
                 .select(MEASURABLE.ID)
@@ -133,8 +143,8 @@ public class BaseIntegrationTest {
                     record.setDescription(name);
                     record.setConcrete(true);
                     record.setExternalId(name);
-                    record.setProvenance("test");
-                    record.setLastUpdatedBy("test");
+                    record.setProvenance(PROVENANCE);
+                    record.setLastUpdatedBy(LAST_UPDATE_USER);
                     record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
                     record.store();
                     return record.getId();
@@ -187,6 +197,36 @@ public class BaseIntegrationTest {
     @NotNull
     public DSLContext getDsl() {
         return ctx.getBean(DSLContext.class);
+    }
+
+
+
+    public EntityReference mkNewAppRef() {
+        return mkRef(
+                EntityKind.APPLICATION,
+                ctr.incrementAndGet());
+    }
+
+
+    public EntityReference mkNewApp(String name) {
+        AppRegistrationResponse resp = ctx.getBean(ApplicationDao.class)
+                .registerApp(ImmutableAppRegistrationRequest.builder()
+                        .name(name)
+                        .organisationalUnitId(1L)
+                        .applicationKind(ApplicationKind.IN_HOUSE)
+                        .businessCriticality(Criticality.MEDIUM)
+                        .lifecyclePhase(LifecyclePhase.PRODUCTION)
+                        .overallRating(RagRating.G)
+                        .businessCriticality(Criticality.MEDIUM)
+                        .build());
+
+        return resp.id().map(id -> mkRef(EntityKind.APPLICATION, id)).get();
+    }
+
+
+    protected void rebuildHierarachy(EntityKind kind) {
+        EntityHierarchyService ehSvc = ctx.getBean(EntityHierarchyService.class);
+        ehSvc.buildFor(kind);
     }
 }
 
