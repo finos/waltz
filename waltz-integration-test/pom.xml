@@ -66,10 +66,6 @@
             <artifactId>jooq</artifactId>
             <version>${jooq.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.jooq</groupId>-->
-<!--            <artifactId>jooq</artifactId>-->
-<!--        </dependency>-->
 
     </dependencies>
 
