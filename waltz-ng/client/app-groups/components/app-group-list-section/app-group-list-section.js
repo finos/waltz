@@ -59,6 +59,7 @@ function controller(serviceBroker, notification, $scope, $state) {
                     .concat(group)
                     .uniqBy(g => g.id)
                     .value();
+                return r.data;
             })
     }
 
