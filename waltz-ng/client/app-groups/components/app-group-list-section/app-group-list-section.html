@@ -1,0 +1,112 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<div>
+    <waltz-section icon='object-group'
+                   name="Application Groups"
+                   id="application-groups-section">
+
+
+        <div ng-if="!$ctrl.showPublicSearch">
+
+            <div class="small waltz-paragraph text-muted">
+                <waltz-icon name="info-circle"></waltz-icon>
+                Application groups are used to create ad-hoc views over
+                a specified subset of applications within the organisation.
+                You can create groups and assign applications to them. These
+                groups are private by default.
+            </div>
+
+            <br>
+
+            <waltz-app-group-list group-subscriptions="$ctrl.groupSubscriptions"
+                                  delete-group="$ctrl.deleteGroup"
+                                  unsubscribe="$ctrl.unsubscribe">
+            </waltz-app-group-list>
+
+            <div class="text-right"
+                 style="margin-top: 6px;">
+                <a class="clickable"
+                   ng-click="$ctrl.createNewGroup()">
+                    Create new group
+                </a>
+                |
+                <a class="clickable"
+                   ng-click="$ctrl.onShowPublicSearch()">
+                    Add shared groups
+                </a>
+
+            </div>
+        </div>
+
+        <div ng-if="$ctrl.showPublicSearch">
+            <div class="small waltz-paragraph text-muted">
+                <waltz-icon name="info-circle"></waltz-icon>
+                You can subscribe to existing public groups by searching for them
+                using the search field below.
+            </div>
+
+            <br>
+
+            <input type="text"
+                   ng-model="$ctrl.selectedPublicGroup"
+                   placeholder="Search for public group"
+                   uib-typeahead="group as group.name for group in $ctrl.availableGroups | filter:{name:$viewValue}"
+                   typeahead-template-url="app-group-list-section/app-group-search-result.html"
+                   class="form-control"
+                   typeahead-show-hint="true"
+                   typeahead-min-length="0">
+
+            <div ng-if="$ctrl.recentlySubscribed.length > 0">
+                <br>
+
+
+                Recently subscribed:
+                <ul class="list">
+                    <li ng-repeat="recent in $ctrl.recentlySubscribed">
+                        <waltz-entity-link entity-ref="recent"></waltz-entity-link>
+                    </li>
+                </ul>
+            </div>
+
+            <br>
+
+            <div class="text-right"
+                 style="margin-top: 6px;">
+                <a class="clickable"
+                   ng-click="$ctrl.onHidePublicSearch()">
+                    Done
+                </a>
+            </div>
+        </div>
+
+
+    </waltz-section>
+
+
+    <script type="text/ng-template"
+            id="app-group-list-section/app-group-search-result.html">
+        <a style="padding-left: 6px">
+            <span ng-bind-html="match.label | uibTypeaheadHighlight:query"></span>
+            <span class="small no-overflow">
+                -
+                <span ng-bind="match.model.description | limitTo:100"></span>
+            </span>
+        </a>
+    </script>
+</div>
