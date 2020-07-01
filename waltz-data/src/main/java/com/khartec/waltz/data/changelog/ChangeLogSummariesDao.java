@@ -31,6 +31,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
 import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG;
@@ -56,7 +57,7 @@ public class ChangeLogSummariesDao {
     private static final RecordMapper<Record4<Long, String, String, Integer>, ChangeLogTally> TO_CHANGE_LOG_TALLY_MAPPER = record -> {
 
         EntityKind parentKind = EntityKind.valueOf(record.value2());
-        EntityKind childKind = EntityKind.valueOf(record.value3());
+        EntityKind childKind = (record.value3() != null) ? EntityKind.valueOf(record.value3()) : null;
         Integer count = record.value4();
 
         return ImmutableChangeLogTally.builder()
@@ -75,7 +76,8 @@ public class ChangeLogSummariesDao {
 
 
     public List<DateTally> findCountByDateForParentKindBySelector(EntityKind parentKind,
-                                                               Select<Record1<Long>> selector) {
+                                                                  Select<Record1<Long>> selector,
+                                                                  Optional<Integer> limit) {
         checkNotNull(parentKind, "parentKind must not be null");
 
         Field<Date> date = DSL.date(CHANGE_LOG.CREATED_AT);
@@ -86,13 +88,15 @@ public class ChangeLogSummariesDao {
                 .and(CHANGE_LOG.PARENT_KIND.eq(parentKind.name())))
                 .groupBy(date)
                 .orderBy(date.desc())
+                .limit(limit.orElse(Integer.MAX_VALUE))
                 .fetch(TO_DATE_TALLY_MAPPER);
     }
 
 
     public List<ChangeLogTally> findCountByParentAndChildKindForDateBySelector(EntityKind parentKind,
                                                                                Select<Record1<Long>> selector,
-                                                                               Date date) {
+                                                                               Date date,
+                                                                               Optional<Integer> limit) {
         checkNotNull(parentKind, "parentKind must not be null");
 
         AggregateFunction<Integer> count = DSL.count(CHANGE_LOG.ID);
@@ -105,6 +109,7 @@ public class ChangeLogSummariesDao {
                         .and(changelogDate.eq(date)))
                 .groupBy(CHANGE_LOG.PARENT_ID, CHANGE_LOG.PARENT_KIND, CHANGE_LOG.CHILD_KIND)
                 .orderBy(count.desc())
+                .limit(limit.orElse(Integer.MAX_VALUE))
                 .fetch(TO_CHANGE_LOG_TALLY_MAPPER);
     }
 }

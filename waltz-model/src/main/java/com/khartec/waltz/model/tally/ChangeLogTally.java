@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.Nullable;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -30,7 +31,10 @@ import org.immutables.value.Value;
 public abstract class ChangeLogTally {
 
     public abstract EntityReference ref();
+
+    @Nullable
     public abstract EntityKind childKind();
+
     public abstract long count();
 
 }
