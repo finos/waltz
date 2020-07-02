@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.service.measurable_rating_planned_decommission;
 
+import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.exception.UpdateFailedException;
 import com.khartec.waltz.data.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionDao;
 import com.khartec.waltz.data.measurable_rating_replacement.MeasurableRatingReplacementDao;
@@ -90,13 +91,16 @@ public class MeasurableRatingPlannedDecommissionService {
                             measurableId));
         } else {
             MeasurableRatingPlannedDecommission plannedDecommission = measurableRatingPlannedDecommissionDao.getByEntityAndMeasurable(entityReference, measurableId);
+            String logMessage = operation.v1.equals(Operation.UPDATE)
+                    ? String.format("Updated planned decommission date: from %s to %s",
+                    DateTimeUtilities.toLocalDate(dateChange.oldVal()),
+                    plannedDecommission.plannedDecommissionDate())
+                    : String.format("Added planned decommission date:%s", plannedDecommission.plannedDecommissionDate());
 
             changeLogService.writeChangeLogEntries(
                     plannedDecommission,
                     userName,
-                    format("%s planned decommission date: %s",
-                            operation.v1.equals(Operation.ADD) ? "Added" : "Updated",
-                            plannedDecommission.plannedDecommissionDate()),
+                    logMessage,
                     operation.v1);
 
             return plannedDecommission;
