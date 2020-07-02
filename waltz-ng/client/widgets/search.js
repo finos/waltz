@@ -21,8 +21,8 @@ import template from './search.html';
 
 
 const BINDINGS = {
-    clear: '=',
-    search: '='
+    clear: '<',
+    search: '<'
 };
 
 

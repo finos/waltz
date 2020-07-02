@@ -23,8 +23,8 @@ import template from './search-control.html';
 
 const bindings = {
     onQuery: '<',
-    minCharacters: '<',
-    delay: '<',
+    minCharacters: '<?',
+    delay: '<?',
     placeholderText: '@',
     localStorageKey: '@?'
 };
