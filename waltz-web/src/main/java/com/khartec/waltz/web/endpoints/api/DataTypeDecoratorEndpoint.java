@@ -34,7 +34,6 @@ import spark.Response;
 import java.io.IOException;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.CollectionUtilities.notEmpty;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -92,13 +91,9 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
         String userName = getUsername(request);
         UpdateDataTypeDecoratorAction action = readBody(request, UpdateDataTypeDecoratorAction.class);
 
-        if (notEmpty(action.addedDataTypeIds())) {
-            dataTypeDecoratorService.addDecorators(userName, action.entityReference(), action.addedDataTypeIds());
-        }
-        if (notEmpty(action.removedDataTypeIds())) {
-            dataTypeDecoratorService.removeDataTypeDecorator(userName, action.entityReference(), action.removedDataTypeIds());
-        }
-
-        return true;
+        return dataTypeDecoratorService.updateDecorators(userName,
+                action.entityReference(),
+                action.addedDataTypeIds(),
+                action.removedDataTypeIds());
     }
 }
