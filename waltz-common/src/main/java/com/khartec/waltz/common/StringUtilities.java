@@ -165,6 +165,12 @@ public class StringUtilities {
                 : dflt;
     }
 
+    public static Optional<Character> firstChar(String str) {
+        return mkSafe(str).length() > 0
+                ? Optional.of(str.charAt(0))
+                : Optional.empty();
+    }
+
 
     public static Optional<String> toOptional(String str) {
         return isEmpty(str)
