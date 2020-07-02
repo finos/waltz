@@ -93,7 +93,7 @@ function controller($state, serviceBroker, notification) {
         return serviceBroker
             .loadAppData(
                 CORE_API.AppGroupStore.findRelatedByEntityRef,
-                [vm.parentEntityRef])
+                [vm.parentEntityRef], {force: true})
             .then(r => {
                 vm.appGroups = _.orderBy(r.data, ['appGroupKind', 'name'], ['desc', 'asc']);
 
@@ -102,7 +102,13 @@ function controller($state, serviceBroker, notification) {
                 } else {
                     vm.appGroupsToDisplay = _.filter(vm.appGroups, r => vm.appGroups.indexOf(r) < 10);
                 }
-            });
+
+                vm.isFavourite = _.find(vm.appGroups, d => d.isFavouriteGroup);
+
+                serviceBroker
+                    .loadViewData(CORE_API.FavouritesStore.getFavouritesGroupEntries)
+                    .then(r => vm.isReadOnly = _.get(_.find(r.data, d => d.id === vm.parentEntityRef.id), 'isReadOnly', false))
+            })
     }
 
     vm.$onInit = () => {
@@ -140,6 +146,29 @@ function controller($state, serviceBroker, notification) {
     vm.toggleAppGroupDisplay = () => {
         vm.showAllAppGroups = !vm.showAllAppGroups;
         loadAppGroups();
+    };
+
+    vm.addFavouriteApplication = () => {
+        serviceBroker
+            .execute(CORE_API.FavouritesStore.addApplication, [vm.parentEntityRef.id])
+            .then(() => {
+                notification.success("Added to favourites");
+                loadAppGroups()
+            })
+    };
+
+    vm.removeFavouriteApplication = () => {
+
+        if (vm.isReadOnly){
+            notification.error("This app is a direct involvement and cannot be removed from favorites")
+        } else {
+            serviceBroker
+                .execute(CORE_API.FavouritesStore.removeApplication, [vm.parentEntityRef.id])
+                .then(() => {
+                    notification.info("Removed from favourites");
+                    loadAppGroups()
+                })
+        }
     }
 }
 

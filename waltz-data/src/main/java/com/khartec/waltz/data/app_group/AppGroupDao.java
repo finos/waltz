@@ -103,6 +103,19 @@ public class AppGroupDao {
     }
 
 
+    public AppGroup findFavouritesGroupByOwner(String userId) {
+        SelectConditionStep<Record1<Long>> groupIds = getPrivateGroupIdByOwner(userId);
+
+        return dsl.select(APPLICATION_GROUP.fields())
+                .from(APPLICATION_GROUP)
+                .where(APPLICATION_GROUP.ID.in(groupIds)
+                        .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PRIVATE.name())
+                                .and(notRemoved)
+                                .and(APPLICATION_GROUP.IS_FAVOURITE_GROUP.isTrue())))
+                .fetchOne(TO_DOMAIN);
+    }
+
+
     public List<AppGroup> findRelatedByApplicationId(long appId, String username) {
 
         SelectConditionStep<Record1<Long>> groupsFromAppGroupEntry = dsl
@@ -229,6 +242,8 @@ public class AppGroupDao {
                 .set(APPLICATION_GROUP.DESCRIPTION, appGroup.description())
                 .set(APPLICATION_GROUP.NAME, appGroup.name())
                 .set(APPLICATION_GROUP.KIND, appGroup.appGroupKind().name())
+                .set(APPLICATION_GROUP.IS_REMOVED, appGroup.isRemoved())
+                .set(APPLICATION_GROUP.IS_FAVOURITE_GROUP, appGroup.isFavouriteGroup())
                 .returning(APPLICATION_GROUP.ID)
                 .fetchOne()
                 .getId();
