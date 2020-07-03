@@ -148,7 +148,9 @@ public class MeasurableService {
 
 
     public boolean create(Measurable measurable, String userId) {
-        return measurableDao.create(measurable);
+        Long measurableId = measurableDao.create(measurable);
+        writeAuditMessage(measurableId, userId, String.format("created new measurable %s", measurable.name()));
+        return measurableId > 1;
     }
 
 
@@ -211,7 +213,7 @@ public class MeasurableService {
     }
 
 
-    private void writeAuditMessage(Long measurableId, String userId, String msg) {
+    public void writeAuditMessage(Long measurableId, String userId, String msg) {
         changeLogService.write(ImmutableChangeLog.builder()
                 .severity(Severity.INFORMATION)
                 .userId(userId)
