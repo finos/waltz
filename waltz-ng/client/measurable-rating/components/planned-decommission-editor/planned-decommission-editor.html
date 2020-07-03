@@ -52,6 +52,16 @@
             </small>
         </div>
     </div>
+    <div ng-if="$ctrl.plannedDecommission && !$ctrl.plannedDecommission.isValid">
+        <br>
+        <waltz-warning>
+            <message>Invalid decommission date</message>
+            <content>
+                <span>The set decommission date is after the planned retirement date for this application:</span>
+                <strong ng-bind="$ctrl.application.plannedRetirementDate | date:'yyyy-MM-dd'"></strong>
+            </content>
+        </waltz-warning>
+    </div>
 
     <!-- REPLACEMENT APPS -->
     <div ng-if="$ctrl.plannedDecommission !== null"

@@ -39,7 +39,8 @@ const bindings = {
     ratingScheme: "<",
     plannedDecommissions: "<?",
     replacingDecommissions: "<?",
-    replacementApps: "<?"
+    replacementApps: "<?",
+    application: "<"
 };
 
 
