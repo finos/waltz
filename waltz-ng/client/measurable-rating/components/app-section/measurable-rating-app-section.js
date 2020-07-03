@@ -65,7 +65,9 @@ function controller($q, serviceBroker) {
             });
     };
 
-    vm.$onInit = () => loadData();
+    vm.$onInit = () => loadData()
+        .then(() => serviceBroker.loadViewData(CORE_API.ApplicationStore.getById, [vm.parentEntityRef.id])
+        .then(r => vm.application = r.data));
 
 
     // -- INTERACT ---
