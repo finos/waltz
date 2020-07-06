@@ -34,7 +34,8 @@ const bindings = {
     startingCategoryId: "<?",
     plannedDecommissions: "<?",
     replacementApps: "<?",
-    replacingDecommissions: "<?"
+    replacingDecommissions: "<?",
+    application: "<"
 };
 
 
@@ -111,10 +112,11 @@ function controller($q,
         ["rating", "rating"]);
 
     const doRatingSave = (rating, description) => {
+        const currentRating = !_.isEmpty(vm.selected.rating) ? vm.selected.rating.rating : null;
         return serviceBroker
             .execute(
                 CORE_API.MeasurableRatingStore.save,
-                [vm.parentEntityRef, vm.selected.measurable.id, rating, description])
+                [vm.parentEntityRef, vm.selected.measurable.id, rating, currentRating, description])
             .then(r => { vm.ratings = r.data })
             .then(() => recalcTabs())
             .then(() => {
@@ -210,19 +212,45 @@ function controller($q,
             .finally(reloadDecommData);
     };
 
-    vm.onSaveDecommissionDate = (dateChange) => {
-        dateChange.newVal = getDateAsUtc(dateChange.newVal);
+    vm.checkPlannedDecomDateIsValid = (decomDate) => {
 
-        serviceBroker
-            .execute(
-                CORE_API.MeasurableRatingPlannedDecommissionStore.save,
-                [vm.parentEntityRef, vm.selected.measurable.id, dateChange])
-            .then(r => {
-                vm.selected = Object.assign({}, vm.selected, { decommission: r.data });
-                notification.success(`Saved decommission date for ${vm.selected.measurable.name}`);
-            })
-            .catch(e => displayError(notification, "Could not save decommission date", e))
-            .finally(reloadDecommData);
+        const appDate = new Date(vm.application.plannedRetirementDate);
+        const newDecomDate = new Date(decomDate);
+
+        const sameDate = appDate.getFullYear() === newDecomDate.getFullYear()
+            && appDate.getMonth() === newDecomDate.getMonth()
+            && appDate.getDate() === newDecomDate.getDate();
+
+        return appDate > newDecomDate || sameDate;
+    };
+
+    vm.onSaveDecommissionDate = (dateChange) => {
+
+        if (vm.application.entityLifecycleStatus === 'REMOVED'){
+            notification.error("Decommission date cannot be set. This application is no longer active");
+            return;
+        }
+
+        if (_.isNull(vm.application.plannedRetirementDate) || vm.checkPlannedDecomDateIsValid(dateChange.newVal)){
+
+            dateChange.newVal = getDateAsUtc(dateChange.newVal);
+
+            serviceBroker
+                .execute(
+                    CORE_API.MeasurableRatingPlannedDecommissionStore.save,
+                    [vm.parentEntityRef, vm.selected.measurable.id, dateChange])
+                .then(r => {
+                    const decom = Object.assign(r.data, {isValid: true});
+                    vm.selected = Object.assign({}, vm.selected, { decommission: decom});
+                    notification.success(`Saved decommission date for ${vm.selected.measurable.name}`);
+                })
+                .catch(e => displayError(notification, "Could not save decommission date", e))
+                .finally(reloadDecommData);
+
+        } else {
+            const appDate = new Date(vm.application.plannedRetirementDate).toDateString();
+            notification.error("Decommission date cannot be later than the planned retirement date of the application: " + appDate);
+        }
     };
 
     vm.onRemoveDecommission = () => {

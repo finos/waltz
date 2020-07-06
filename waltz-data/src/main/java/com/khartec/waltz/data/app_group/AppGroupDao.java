@@ -57,6 +57,7 @@ public class AppGroupDao {
                 .externalId(Optional.ofNullable(record.getExternalId()))
                 .appGroupKind(AppGroupKind.valueOf(record.getKind()))
                 .isRemoved(record.getIsRemoved())
+                .isFavouriteGroup(record.getIsFavouriteGroup())
                 .build();
     };
 
@@ -252,7 +253,7 @@ public class AppGroupDao {
                 .and(notRemoved)
                 .fetch()
                 .stream()
-                .map(r -> TO_DOMAIN.map(r))
+                .map(TO_DOMAIN::map)
                 .collect(Collectors.toSet());
     }
 

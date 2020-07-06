@@ -19,11 +19,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.app_group.AppGroup;
-import com.khartec.waltz.model.app_group.AppGroupBulkAddRequest;
-import com.khartec.waltz.model.app_group.AppGroupDetail;
-import com.khartec.waltz.model.app_group.AppGroupMember;
+import com.khartec.waltz.model.app_group.*;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
 import com.khartec.waltz.service.app_group.AppGroupService;
 import com.khartec.waltz.service.app_group.AppGroupSubscription;
@@ -158,15 +154,17 @@ public class AppGroupEndpoint implements Endpoint {
             return findGroupSubscriptionsRoute.apply(request, response);
         };
 
-        ListRoute<EntityReference> addApplicationRoute = (request, response) -> {
+        ListRoute<AppGroupEntry> addApplicationRoute = (request, response) -> {
             long groupId = getId(request);
             long applicationId = readBody(request, Long.class);
             LOG.info("Adding application: {}, to group: {} ", applicationId,  groupId);
-            String userId = getUsername(request);
-            return appGroupService.addApplication(getUsername(request), groupId, applicationId);
+            return appGroupService.addApplication(
+                    getUsername(request),
+                    groupId,
+                    applicationId);
         };
 
-        ListRoute<EntityReference> addApplicationListRoute = (request, response) -> {
+        ListRoute<AppGroupEntry> addApplicationListRoute = (request, response) -> {
             long groupId = getId(request);
             AppGroupBulkAddRequest appGroupBulkAddRequest = readBody(request, AppGroupBulkAddRequest.class);
             LOG.info("Adding applications: {}, to group: {} ", appGroupBulkAddRequest.applicationIds(),  groupId);
@@ -178,28 +176,28 @@ public class AppGroupEndpoint implements Endpoint {
                     appGroupBulkAddRequest.unknownIdentifiers());
         };
 
-        ListRoute<EntityReference> removeApplicationRoute = (request, response) -> {
+        ListRoute<AppGroupEntry> removeApplicationRoute = (request, response) -> {
             long groupId = getId(request);
             long applicationId = getLong(request, "applicationId");
             LOG.info("Removing application: {}, from group: {} ", applicationId,  groupId);
             return appGroupService.removeApplication(getUsername(request), groupId, applicationId);
         };
 
-        ListRoute<EntityReference> addOrgUnitRoute = (request, response) -> {
+        ListRoute<AppGroupEntry> addOrgUnitRoute = (request, response) -> {
             long groupId = getId(request);
             long orgUnitId = readBody(request, Long.class);
             LOG.info("Adding orgUnit: {}, to application group: {} ", orgUnitId,  groupId);
             return appGroupService.addOrganisationalUnit(getUsername(request), groupId, orgUnitId);
         };
 
-        ListRoute<EntityReference> removeOrgUnitRoute = (request, response) -> {
+        ListRoute<AppGroupEntry> removeOrgUnitRoute = (request, response) -> {
             long groupId = getId(request);
             long orgUnitId = getLong(request, "orgUnitId");
             LOG.info("Removing orgUnit: {}, from application group: {} ", orgUnitId,  groupId);
             return appGroupService.removeOrganisationalUnit(getUsername(request), groupId, orgUnitId);
         };
 
-        ListRoute<EntityReference> removeApplicationListRoute = (request, response) -> {
+        ListRoute<AppGroupEntry> removeApplicationListRoute = (request, response) -> {
             long groupId = getId(request);
             List<Long> applicationIds = readIdsFromBody(request);
             LOG.info("Removing applications: {}, from group: {} ", applicationIds,  groupId);
@@ -215,8 +213,7 @@ public class AppGroupEndpoint implements Endpoint {
 
         DatumRoute<Long> createNewGroupRoute = (request, response) -> {
             String userId = getUsername(request);
-            Long groupId = appGroupService.createNewGroup(userId);
-            return groupId;
+            return appGroupService.createNewGroup(userId);
         };
 
         ListRoute<ChangeInitiative> addChangeInitiativeRoute = (request, response) -> {

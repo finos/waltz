@@ -20,6 +20,7 @@ import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common/index";
 import template from "./app-costs-section.html";
+import namedSettings from "../../../system/named-settings";
 
 
 const bindings = {
@@ -58,7 +59,7 @@ function filterCostsForYear(year, costs = []) {
 }
 
 
-function controller(serviceBroker) {
+function controller(serviceBroker, settingsService) {
     const vm = initialiseData(this, initialState);
 
     const refresh = () => {
@@ -77,6 +78,10 @@ function controller(serviceBroker) {
 
     vm.$onInit = () => {
 
+        settingsService
+            .findOrDefault(namedSettings.currentYearText, "YTD")
+            .then(r => vm.currentYearText = r);
+
         serviceBroker
             .loadAppData(CORE_API.SourceDataRatingStore.findAll)
             .then(r => vm.sourceDataRatings = r.data);
@@ -90,6 +95,7 @@ function controller(serviceBroker) {
 
 controller.$inject = [
     "ServiceBroker",
+    "SettingsService"
 ];
 
 

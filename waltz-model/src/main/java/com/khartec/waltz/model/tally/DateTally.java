@@ -1,4 +1,4 @@
-/*!
+/*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
@@ -16,17 +16,20 @@
  *
  */
 
-waltz-measurable-rating-tree {
-    .wmrt-node {
-    }
+package com.khartec.waltz.model.tally;
 
-    .wmrt-label {
-        position: relative;
-        top: -3px;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.immutables.value.Value;
 
-        .wmrt-icon-warning {
-            color: red;
-        }
-    }
+import java.sql.Date;
+
+@Value.Immutable
+@JsonSerialize(as = ImmutableDateTally.class)
+@JsonDeserialize(as = ImmutableDateTally.class)
+public abstract class DateTally {
+
+    public abstract Date date();
+    public abstract long count();
 
 }

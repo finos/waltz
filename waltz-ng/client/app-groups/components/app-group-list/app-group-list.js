@@ -16,31 +16,47 @@
  *
  */
 import template from './app-group-list.html';
+import {initialiseData, termSearch} from "../../../common";
 
 
-const BINDINGS = {
-    groupSubscriptions: '=',
-    editing: '=',
-    unsubscribe: '=',
-    deleteGroup: '='
+const bindings = {
+    groupSubscriptions: '<',
+    unsubscribe: '<',
+    deleteGroup: '<'
+};
+
+
+const initialData = {
+    searchTerms: "",
+    filteredSubscriptions: []
 };
 
 
 function controller() {
+    const vm = initialiseData(this, initialData);
 
+    vm.$onChanges = () => vm.searchTermsChanged(vm.searchTerms);
+
+    vm.clearSearch = () => vm.searchTermsChanged("");
+
+    vm.searchTermsChanged = (terms) => {
+        vm.searchTerms = terms;
+        vm.filteredSubscriptions = termSearch(
+            vm.groupSubscriptions,
+            terms,
+            ["appGroup.name"]);
+    };
 }
 
 controller.$inject = [];
 
+const component = {
+    controller,
+    template,
+    bindings
+}
 
-export default () => {
-    return {
-        restrict: 'E',
-        replace: true,
-        template,
-        scope: {},
-        bindToController: BINDINGS,
-        controllerAs: 'ctrl',
-        controller
-    };
-};
+export default {
+    component,
+    id: "waltzAppGroupList"
+}

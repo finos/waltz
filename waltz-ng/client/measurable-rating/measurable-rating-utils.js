@@ -40,7 +40,7 @@ export function loadDecommData(
             CORE_API.MeasurableRatingPlannedDecommissionStore.findForEntityRef,
             [parentEntityRef],
             {force})
-        .then(r => ({plannedDecommissions: r.data}));
+        .then(r => r.data);
 
     const replacingDecomms = serviceBroker
         .loadViewData(
@@ -48,11 +48,40 @@ export function loadDecommData(
             [parentEntityRef])
         .then(r => ({replacingDecommissions: r.data}));
 
-    return $q
-        .all([replacementAppPromise, decommissionDatePromise, replacingDecomms])
-        .then(responses => Object.assign({}, ...responses));
+    const parentApplication = serviceBroker.loadViewData(CORE_API.ApplicationStore.getById, [parentEntityRef.id])
+        .then(r => r.data);
 
+    return $q
+        .all([replacementAppPromise, decommissionDatePromise, replacingDecomms, parentApplication])
+        .then(([replacementApps, decommissionDates, replacingDecoms, parentApplication]) => {
+
+            const appRetirementDate = new Date(parentApplication.plannedRetirementDate);
+
+            const plannedDecomms = (_.isNull(parentApplication.plannedRetirementDate))
+                ? _.map(decommissionDates, d => Object.assign({}, d, { isValid: true}))
+                : _.map(decommissionDates,d => {
+
+                    const decomDate = new Date(d.plannedDecommissionDate);
+
+                    const sameDate = appRetirementDate.getFullYear() === decomDate.getFullYear()
+                        && appRetirementDate.getMonth() === decomDate.getMonth()
+                        && appRetirementDate.getDate() === decomDate.getDate();
+
+                    const isValid = appRetirementDate > decomDate || sameDate;
+
+                    return Object.assign({}, d, { isValid: isValid})
+            });
+
+            return Object.assign({},
+                replacementApps,
+                replacingDecoms,
+                {plannedDecommissions: plannedDecomms});
+        });
 }
+
+
+
+
 
 export function loadAllData(
     $q,

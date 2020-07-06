@@ -1,0 +1,88 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<div>
+
+    <style>
+        .glyphicon {top: 0px}
+    </style>
+    <waltz-search-control on-query="$ctrl.searchTermsChanged"
+                          placeholder-text="Search group subscriptions"
+                          local-storage-key="waltz-group-subscriptions.search-terms"
+                          min-characters='1'>
+    </waltz-search-control>
+
+    <br>
+
+    <waltz-no-data ng-if="$ctrl.filteredSubscriptions.length === 0">
+        <message>
+            No group subscriptions found.  You may like to create a new group or subscribe to an existing group.
+        </message>
+    </waltz-no-data>
+
+    <div class="waltz-scroll-region"
+         style="max-height: 300px"
+         ng-if="$ctrl.filteredSubscriptions.length > 0">
+
+        <table class="table table-condensed table-hover">
+            <colgroup>
+                <col width="75%">
+                <col width="25%">
+            </colgroup>
+            <tr ng-repeat="subscription in $ctrl.filteredSubscriptions | orderBy:'appGroup.name' "
+                class="waltz-visibility-parent">
+                <td>
+                    <div>
+                        <waltz-entity-link tooltip-placement="none"
+                                           entity-ref="subscription.appGroup">
+                        </waltz-entity-link>
+                    </div>
+                    <div>
+                        <small ng-bind="subscription.appGroup.description"></small>
+                    </div>
+                </td>
+                <td class="waltz-visibility-child-30">
+                    <small>
+                        <ul class="list-unstyled list-inline">
+                            <li  ng-if="subscription.role == 'OWNER'">
+                                <a class="clickable" ng-click="$ctrl.deleteGroup(subscription)">
+                                    Delete
+                                    <waltz-icon name="trash"></waltz-icon>
+                                </a>
+                            </li>
+                            <li ng-if="subscription.role == 'VIEWER'">
+                                <a class="clickable" ng-click="$ctrl.unsubscribe(subscription)">
+                                    Unsubscribe
+                                    <waltz-icon name="minus-circle"></waltz-icon>
+                                </a>
+                            </li>
+                            <li ng-if="subscription.role == 'OWNER'">
+                                <a ui-sref="main.app-group.edit ({ id:subscription.appGroup.id })">
+                                    Edit
+                                    <waltz-icon name="edit"></waltz-icon>
+                                </a>
+                            </li>
+                        </ul>
+                    </small>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+
+</div>

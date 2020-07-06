@@ -1,4 +1,4 @@
-/*!
+/*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
@@ -16,17 +16,25 @@
  *
  */
 
-waltz-measurable-rating-tree {
-    .wmrt-node {
-    }
+package com.khartec.waltz.model.tally;
 
-    .wmrt-label {
-        position: relative;
-        top: -3px;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.Nullable;
+import org.immutables.value.Value;
 
-        .wmrt-icon-warning {
-            color: red;
-        }
-    }
+@Value.Immutable
+@JsonSerialize(as = ImmutableChangeLogTally.class)
+@JsonDeserialize(as = ImmutableChangeLogTally.class)
+public abstract class ChangeLogTally {
+
+    public abstract EntityReference ref();
+
+    @Nullable
+    public abstract EntityKind childKind();
+
+    public abstract long count();
 
 }
