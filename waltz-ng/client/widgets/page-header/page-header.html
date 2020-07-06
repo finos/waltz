@@ -19,7 +19,7 @@
 <div>
     <div class="waltz-page-header wph-free no-overflow">
 
-        <div ng-transclude>
+        <div ng-transclude="breadcrumbs">
         </div>
 
         <h2>
@@ -29,6 +29,9 @@
             <span ng-bind="$ctrl.name | truncateMiddle:50"></span>
 
             <small ng-bind="$ctrl.small"></small>
+
+            <span ng-transclude="actions">
+            </span>
         </h2>
     </div>
 

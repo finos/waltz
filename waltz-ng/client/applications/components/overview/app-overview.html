@@ -23,24 +23,10 @@
      }">
     <waltz-section-actions>
         <a waltz-has-role="APP_EDITOR"
-           style="vertical-align: top"
            class="btn btn-xs btn-primary"
            ui-sref="main.app.edit ({id: $ctrl.app.id})">
             Edit
         </a>
-        <waltz-icon name="bookmark-o"
-                    size="2x"
-                    class="clickable small"
-                    ng-if="!$ctrl.isFavourite"
-                    ng-click="$ctrl.addFavouriteApplication()">
-        </waltz-icon>
-        <waltz-icon name="bookmark"
-                    size="2x"
-                    class="clickable small"
-                    ng-class="{'text-muted': $ctrl.isReadOnly}"
-                    ng-if="$ctrl.isFavourite"
-                    ng-click="$ctrl.removeFavouriteApplication()">
-        </waltz-icon>
     </waltz-section-actions>
     <div class="waltz-display-section">
         <div class="row">
