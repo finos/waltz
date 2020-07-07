@@ -20,11 +20,13 @@
     <waltz-page-header icon="user"
                        name="{{ ctrl.person.displayName || ctrl.userId}}"
                        small="profile">
-        <ol class="waltz-breadcrumbs">
-            <li><a ui-sref="main">Home</a></li>
-            <li>Profile</li>
-            <li ng-bind="ctrl.person.displayName || ctrl.userId"></li>
-        </ol>
+        <breadcrumbs>
+            <ol class="waltz-breadcrumbs">
+                <li><a ui-sref="main">Home</a></li>
+                <li>Profile</li>
+                <li ng-bind="ctrl.person.displayName || ctrl.userId"></li>
+            </ol>
+        </breadcrumbs>
     </waltz-page-header>
 
     <div class="row">
