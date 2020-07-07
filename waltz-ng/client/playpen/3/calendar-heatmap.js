@@ -17,17 +17,29 @@
  */
 
 import {initialiseData} from "../../common";
-import {select} from "d3-selection";
+import {nest} from "d3-collection";
 import {scaleLinear} from "d3-scale";
-
-const template = "";
-
+import {select} from "d3-selection";
+import moment from "moment";
 
 const bindings = {
     config: "<"
 };
 
+
+function getDates(start, stop) {
+    const dateArray = [];
+    let currentDate = moment(start);
+    const stopDate = moment(stop);
+    while (currentDate <= stopDate) {
+        dateArray.push( moment(currentDate).format("YYYY-MM-DD") )
+        currentDate = moment(currentDate).add(1, "days");
+    }
+    return dateArray;
+}
+
 const NUM_WEEKS = 53;
+
 
 const DIMENSIONS = {
     margins: {
@@ -36,78 +48,126 @@ const DIMENSIONS = {
         top: 50,
         bottom: 10
     },
-    cellSize: 12
+    cellSize: 14
 }
+
 
 const initData = {
 
 };
 
+const dates = getDates(
+    moment().subtract(   1, "years"),
+    moment().add(3, "days"));
+
+global.moment = moment;
+global.dates = dates;
+
 function mkData() {
+
+    const dayDist = {
+        0: 20,
+        1: 70,
+        2: 80,
+        3: 90,
+        4: 100,
+        5: 70,
+        6: 10
+    };
+
     return _
-        .chain(_.range(NUM_WEEKS))
-        .map(d => [
-            Math.random() * 10,
-            Math.random() * 80,
-            Math.random() * 70,
-            Math.random() * 80,
-            Math.random() * 90,
-            Math.random() * 60,
-            Math.random() * 10
-        ])
+        .chain(dates)
+        .map(d => {
+            const dt = moment(d);
+            const day = dt.day();
+            const val = Math.random() * dayDist[day];
+            console.log(day, val)
+            return {
+                date: moment(d),
+                day,
+                val
+            };
+        })
         .value();
 }
 
 
+function prepareData(data) {
+    const byYearWeek = nest()
+        .key(d => d.date.year())
+        .key(d => d.date.week())
+        .entries(data);
+
+    let acc = 0;
+    _.forEach(byYearWeek, d => {
+        d.offset = acc;
+        acc += d.values.length ;
+        d.endOffset = acc;
+    });
+
+    return byYearWeek;
+}
+
+function draw(data, holder) {
+    const maxOffset = _.max(_.map(data, "endOffset"));
+
+    const svg = select(holder)
+        .append("svg")
+        .attr("width", DIMENSIONS.margins.left + DIMENSIONS.margins.right + (maxOffset * (DIMENSIONS.cellSize + 2)))
+
+    const gYears = svg
+        .append("g")
+        .classed("wch-years", true)
+        .attr("transform", `translate(${DIMENSIONS.margins.left}, ${DIMENSIONS.margins.top})`)
+
+    const gWeeks = gYears
+        .selectAll("g.wch-year")
+        .data(data)
+        .enter()
+        .append("g")
+        .classed("wch-year", true)
+        .attr("transform", d => `translate(${DIMENSIONS.cellSize * d.offset}, 0)`)
+
+    const gWeek = gWeeks
+        .selectAll("g.wch-week")
+        .data(d => d.values)
+        .enter()
+        .append("g")
+        .classed(".wch-week", true)
+        .attr("transform", (d, idx) => `translate(${idx * (DIMENSIONS.cellSize)}, 0)`);
+
+    const colorScale = scaleLinear()
+        .domain([0, 100])
+        .range(["#ffffff", "#7df563"]);
+
+    gWeek
+        .selectAll("rect.wch-day")
+        .data(d => d.values)
+        .enter()
+        .append("rect")
+        .classed("wch-day", true)
+        .attr("width", DIMENSIONS.cellSize - 2)
+        .attr("height", DIMENSIONS.cellSize - 2)
+        .attr("rx", 2)
+        .attr("ry", 2)
+        .attr("y", (d, i) => d.date.day() * DIMENSIONS.cellSize)
+        .attr("fill", (d) => colorScale(d.val))
+        .attr("stroke", "#93d489")
+        .on("mouseover", d => console.log(d.date.day(), d.val))
+}
 
 function controller($element) {
     const vm = initialiseData(this, initData);
 
     vm.$onInit = () => {
-        console.log("on init");
-        const d = mkData();
-
-        const svg = select($element[0])
-            .append("svg")
-            .attr("width", DIMENSIONS.margins.left + DIMENSIONS.margins.right + (NUM_WEEKS * (DIMENSIONS.cellSize + 2)))
-
-        const gWeeks = svg
-            .append("g")
-            .classed("wch-weeks", true)
-            .attr("transform", `translate(${DIMENSIONS.margins.left}, ${DIMENSIONS.margins.top})`)
-
-        const gWeek = gWeeks
-            .selectAll("g.wch-week")
-            .data(d)
-            .enter()
-            .append("g")
-            .classed(".wch-week", true)
-            .attr("transform", (d, idx) => `translate(${idx * (DIMENSIONS.cellSize + 2) }, 0)`);
-
-        const scale = scaleLinear()
-            .domain([0, 100])
-            .range(["#ffffff", "#a5f196"]);
-
-        gWeek
-            .selectAll("rect.wch-day")
-            .data(d => d)
-            .enter()
-            .append("rect")
-            .classed("wch-day", true)
-            .classed("wch-day2", (d) => console.log(d, scale(d)))
-            .attr("width", DIMENSIONS.cellSize)
-            .attr("height", DIMENSIONS.cellSize)
-            .attr("rx", 2)
-            .attr("ry", 2)
-            .attr("y", (d, i) => i * DIMENSIONS.cellSize)
-            .attr("fill", (d) => scale(d))
-            .attr("stroke", "#9cd48e");
+        const data = mkData();
+        const byYearWeek = prepareData(data);
+        draw(byYearWeek, $element[0]);
     };
 
     vm.$onChanges = () => {
         console.log("On change")
-    }
-
+    };
 }
 
 
@@ -116,7 +176,7 @@ controller.$inject = ["$element"];
 export default {
     id: "waltzCalendarHeatmap",
     component: {
-        template,
+        template: "",
         bindings,
         controller
     }
