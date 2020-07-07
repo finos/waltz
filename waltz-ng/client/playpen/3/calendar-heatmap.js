@@ -58,12 +58,12 @@ const initData = {
 
 const dates = getDates(
     moment().subtract(   1, "years"),
-    moment().add(3, "days"));
+    moment());
 
 global.moment = moment;
 global.dates = dates;
 
-function mkData() {
+function mkRawData() {
 
     const dayDist = {
         0: 20,
@@ -81,7 +81,6 @@ function mkData() {
             const dt = moment(d);
             const day = dt.day();
             const val = Math.random() * dayDist[day];
-            console.log(day, val)
             return {
                 date: moment(d),
                 day,
@@ -111,9 +110,14 @@ function prepareData(data) {
 function draw(data, holder) {
     const maxOffset = _.max(_.map(data, "endOffset"));
 
+    const w = DIMENSIONS.margins.left + DIMENSIONS.margins.right + (maxOffset * DIMENSIONS.cellSize);
+    const h = DIMENSIONS.margins.top + DIMENSIONS.margins.bottom + (7 * DIMENSIONS.cellSize)
+
     const svg = select(holder)
         .append("svg")
-        .attr("width", DIMENSIONS.margins.left + DIMENSIONS.margins.right + (maxOffset * (DIMENSIONS.cellSize + 2)))
+        .style("border", "1px dashed red")
+        .attr("viewBox", `0 0 ${w} ${h}`)
+        .attr("width", 900)
 
     const gYears = svg
         .append("g")
@@ -137,8 +141,8 @@ function draw(data, holder) {
         .attr("transform", (d, idx) => `translate(${idx * (DIMENSIONS.cellSize)}, 0)`);
 
     const colorScale = scaleLinear()
-        .domain([0, 100])
-        .range(["#ffffff", "#7df563"]);
+        .domain([20, 100])
+        .range(["#e7fae2", "#7df563"]);
 
     gWeek
         .selectAll("rect.wch-day")
@@ -146,13 +150,17 @@ function draw(data, holder) {
         .enter()
         .append("rect")
         .classed("wch-day", true)
-        .attr("width", DIMENSIONS.cellSize - 2)
-        .attr("height", DIMENSIONS.cellSize - 2)
+        .attr("width", DIMENSIONS.cellSize - 4)
+        .attr("height", DIMENSIONS.cellSize - 4)
         .attr("rx", 2)
         .attr("ry", 2)
         .attr("y", (d, i) => d.date.day() * DIMENSIONS.cellSize)
-        .attr("fill", (d) => colorScale(d.val))
-        .attr("stroke", "#93d489")
+        .attr("fill", (d) => d.val > 20
+                ? colorScale(d.val)
+                : "#fafafa")
+        .attr("stroke", d => d.val > 20
+            ? "#93d489"
+            : "#ddd")
         .on("mouseover", d => console.log(d.date.day(), d.val))
 }
 
@@ -160,9 +168,7 @@ function controller($element) {
     const vm = initialiseData(this, initData);
 
     vm.$onInit = () => {
-        const data = mkData();
-        const byYearWeek = prepareData(data);
-        draw(byYearWeek, $element[0]);
+        draw(prepareData(mkRawData()), $element[0]);
     };
 
     vm.$onChanges = () => {
