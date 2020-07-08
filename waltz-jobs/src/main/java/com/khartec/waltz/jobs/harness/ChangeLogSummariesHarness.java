@@ -51,13 +51,16 @@ public class ChangeLogSummariesHarness {
         ChangeLogService svc = ctx.getBean(ChangeLogService.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        dsl.update(CHANGE_LOG)
-                .set(CHANGE_LOG.CREATED_AT,
-                     DSL.timestampSub(
-                        DSL.now(),
-                        CHANGE_LOG.ID.plus(CHANGE_LOG.PARENT_ID).mod(360),
-                        DatePart.DAY))
-                .execute();
+        if (false) {
+            // enable this if you want to randomize your changelog dates (i.e. for testing)
+            dsl.update(CHANGE_LOG)
+                    .set(CHANGE_LOG.CREATED_AT,
+                            DSL.timestampSub(
+                                    DSL.now(),
+                                    CHANGE_LOG.ID.plus(CHANGE_LOG.PARENT_ID).mod(360),
+                                    DatePart.DAY))
+                    .execute();
+        }
 
 
         IdSelectionOptions opts = mkOpts(mkRef(EntityKind.ORG_UNIT, 20), HierarchyQueryScope.CHILDREN);

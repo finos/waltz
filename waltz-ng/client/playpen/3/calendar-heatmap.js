@@ -57,7 +57,7 @@ function getDates(start, stop) {
     let currentDate = moment(start);
     const stopDate = moment(stop);
     while (currentDate <= stopDate) {
-        dateArray.push( moment(currentDate).format("YYYY-MM-DD") )
+        dateArray.push( moment(currentDate).format("YYYY-MM-DD"));
         currentDate = moment(currentDate).add(1, "days");
     }
     return dateArray;
@@ -219,7 +219,7 @@ function draw(rawData, holder) {
         .attr("height", DIMENSIONS.cellSize - 4)
         .attr("rx", 2)
         .attr("ry", 2)
-        .attr("y", (d, i) => d.date.day() * DIMENSIONS.cellSize)
+        .attr("y", (d) => d.date.day() * DIMENSIONS.cellSize)
         .attr("fill", (d) => d.count === 0
             ? COLORS.emptyCellFill
             : colorScale(d.count))
