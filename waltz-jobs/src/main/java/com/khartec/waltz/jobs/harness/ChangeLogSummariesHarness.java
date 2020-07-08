@@ -22,8 +22,11 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.changelog.ChangeLogSummariesDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.HierarchyQueryScope;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.tally.DateTally;
 import com.khartec.waltz.service.DIBaseConfiguration;
+import com.khartec.waltz.service.DIConfiguration;
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.jooq.DSLContext;
 import org.jooq.DatePart;
 import org.jooq.Record1;
@@ -44,23 +47,23 @@ public class ChangeLogSummariesHarness {
 
     public static void main(String[] args) {
 
-        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIBaseConfiguration.class);
-        ChangeLogSummariesDao dao = ctx.getBean(ChangeLogSummariesDao.class);
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
+        ChangeLogService svc = ctx.getBean(ChangeLogService.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
         dsl.update(CHANGE_LOG)
                 .set(CHANGE_LOG.CREATED_AT,
                      DSL.timestampSub(
-                        CHANGE_LOG.CREATED_AT,
-                        CHANGE_LOG.ID.plus(CHANGE_LOG.PARENT_ID).mod(250),
+                        DSL.now(),
+                        CHANGE_LOG.ID.plus(CHANGE_LOG.PARENT_ID).mod(360),
                         DatePart.DAY))
                 .execute();
 
-        Select<Record1<Long>> selector = new ApplicationIdSelectorFactory().apply(
-                mkOpts(mkRef(EntityKind.ORG_UNIT, 20), HierarchyQueryScope.CHILDREN));
+
+        IdSelectionOptions opts = mkOpts(mkRef(EntityKind.ORG_UNIT, 20), HierarchyQueryScope.CHILDREN);
 
         List<DateTally> res = time("findCountByDateForParentKindBySelector", () ->
-                dao.findCountByDateForParentKindBySelector(EntityKind.APPLICATION, selector, Optional.empty()));
+                svc.findCountByDateForParentKindBySelector(EntityKind.APPLICATION, opts, Optional.empty()));
 
         System.out.println(res);
     }

@@ -21,9 +21,36 @@ import {nest} from "d3-collection";
 import {scaleLinear} from "d3-scale";
 import {select} from "d3-selection";
 import moment from "moment";
+import {CORE_API} from "../../common/services/core-api-utils";
+import {mkSelectionOptions} from "../../common/selector-utils";
+
+global.moment = moment;
 
 const bindings = {
-    config: "<"
+    parentEntityRef: "<"
+};
+
+const COLORS = {
+    cellBorder: "#93d489",
+    filledCellRange: ["#e7fae2", "#7df563"],
+    emptyCellFill: "#fafafa",
+    emptyCellBorder: "#ddd",
+    label: "#8b8888"
+};
+
+const DIMENSIONS = {
+    margins: {
+        left: 50,
+        right: 10,
+        top: 50,
+        bottom: 10
+    },
+    cellSize: 14,
+    fontSize: 12
+}
+
+const initData = {
+
 };
 
 
@@ -38,86 +65,96 @@ function getDates(start, stop) {
     return dateArray;
 }
 
-const NUM_WEEKS = 53;
 
+function prepareData(data = []) {
 
-const DIMENSIONS = {
-    margins: {
-        left: 50,
-        right: 10,
-        top: 50,
-        bottom: 10
-    },
-    cellSize: 14
-}
+    const rawDates = getDates(
+        moment().subtract(   12, "months"),
+        moment());
 
-
-const initData = {
-
-};
-
-const dates = getDates(
-    moment().subtract(   1, "years"),
-    moment());
-
-global.moment = moment;
-global.dates = dates;
-
-function mkRawData() {
-
-    const dayDist = {
-        0: 20,
-        1: 70,
-        2: 80,
-        3: 90,
-        4: 100,
-        5: 70,
-        6: 10
-    };
+    const dataByDate = _.keyBy(data, "date");
 
     return _
-        .chain(dates)
+        .chain(rawDates)
         .map(d => {
             const dt = moment(d);
             const day = dt.day();
-            const val = Math.random() * dayDist[day];
             return {
+                dateStr: d,
                 date: moment(d),
                 day,
-                val
+                count:  _.get(dataByDate, [d, "count"], 0)
             };
         })
         .value();
 }
 
 
-function prepareData(data) {
+function nestData(preparedData = []) {
     const byYearWeek = nest()
         .key(d => d.date.year())
         .key(d => d.date.week())
-        .entries(data);
+        .entries(preparedData);
 
     let acc = 0;
     _.forEach(byYearWeek, d => {
         d.offset = acc;
         acc += d.values.length ;
+        _.forEach(d.values, (v,idx) => v.offset = d.offset + idx)
         d.endOffset = acc;
     });
 
     return byYearWeek;
 }
 
-function draw(data, holder) {
-    const maxOffset = _.max(_.map(data, "endOffset"));
+
+function drawDayLabels(svg) {
+    svg.append("g")
+        .classed("wch-day-labels", true)
+        .attr("transform", `translate(${DIMENSIONS.margins.left - 5}, ${DIMENSIONS.margins.top})`)
+        .selectAll("text.wch-day-label")
+        .data([{label: "Mon", day: 1}, {label: "Wed", day: 3}, {label: "Fri", day: 5}])
+        .enter()
+        .append("text")
+        .classed("wch-day-label", true)
+        .attr("text-anchor", "end")
+        .attr("fill", COLORS.label)
+        .attr("font-size", DIMENSIONS.fontSize)
+        .attr("dy", d => DIMENSIONS.cellSize * d.day + DIMENSIONS.fontSize - 2)
+        .text(d => d.label);
+}
+
+
+function drawMonthLabels(svg, rawData, nestedData) {
+    global.rawData = rawData;
+    global.nestedData = nestedData;
+    let t = _.groupBy(rawData, d => d.date.year() * 100 + d.date.month());
+    console.log({rawData, nestedData, t})
+
+}
+
+
+function draw(rawData, holder) {
+    const nestedData = nestData(rawData);
+    const maxOffset = _.max(_.map(nestedData, "endOffset"));
 
     const w = DIMENSIONS.margins.left + DIMENSIONS.margins.right + (maxOffset * DIMENSIONS.cellSize);
-    const h = DIMENSIONS.margins.top + DIMENSIONS.margins.bottom + (7 * DIMENSIONS.cellSize)
+    const h = DIMENSIONS.margins.top + DIMENSIONS.margins.bottom + (7 * DIMENSIONS.cellSize);
+
+    const colorScale = scaleLinear()
+        .domain([0, 8])
+        .range(COLORS.filledCellRange);
 
     const svg = select(holder)
         .append("svg")
+        // .style("width", "100%")
         .style("border", "1px dashed red")
         .attr("viewBox", `0 0 ${w} ${h}`)
-        .attr("width", 900)
+        .attr("preserveAspectRatio", "xMinYMin meet");
+
+    drawDayLabels(svg);
+
+
 
     const gYears = svg
         .append("g")
@@ -126,11 +163,21 @@ function draw(data, holder) {
 
     const gWeeks = gYears
         .selectAll("g.wch-year")
-        .data(data)
+        .data(nestedData)
         .enter()
         .append("g")
         .classed("wch-year", true)
-        .attr("transform", d => `translate(${DIMENSIONS.cellSize * d.offset}, 0)`)
+        .attr("transform", d => `translate(${DIMENSIONS.cellSize * d.offset }, 0)`)
+
+    const foo = gWeeks
+        .selectAll("text.wch-month-label")
+        .data(d => d.values)
+        .enter()
+        .append("text")
+        .classed(".wch-month-label", true)
+        .attr("transform", (d, idx) => `translate(${idx * (DIMENSIONS.cellSize)}, -16)`)
+        .attr("foo", d => console.log(d))
+        .text(d => moment().week(d.key).month())
 
     const gWeek = gWeeks
         .selectAll("g.wch-week")
@@ -139,10 +186,6 @@ function draw(data, holder) {
         .append("g")
         .classed(".wch-week", true)
         .attr("transform", (d, idx) => `translate(${idx * (DIMENSIONS.cellSize)}, 0)`);
-
-    const colorScale = scaleLinear()
-        .domain([20, 100])
-        .range(["#e7fae2", "#7df563"]);
 
     gWeek
         .selectAll("rect.wch-day")
@@ -155,20 +198,28 @@ function draw(data, holder) {
         .attr("rx", 2)
         .attr("ry", 2)
         .attr("y", (d, i) => d.date.day() * DIMENSIONS.cellSize)
-        .attr("fill", (d) => d.val > 20
-                ? colorScale(d.val)
-                : "#fafafa")
-        .attr("stroke", d => d.val > 20
-            ? "#93d489"
-            : "#ddd")
-        .on("mouseover", d => console.log(d.date.day(), d.val))
+        .attr("fill", (d) => d.count === 0
+            ? COLORS.emptyCellFill
+            : colorScale(d.count))
+        .attr("stroke", d => d.count > 20
+            ? COLORS.cellBorder
+            : COLORS.emptyCellBorder)
+        .on("mouseover", d => console.log(d.dateStr, d.count, {d}))
 }
 
-function controller($element) {
+
+function controller(serviceBroker, $element) {
     const vm = initialiseData(this, initData);
 
     vm.$onInit = () => {
-        draw(prepareData(mkRawData()), $element[0]);
+        const selectionOptions = mkSelectionOptions(vm.parentEntityRef);
+        serviceBroker
+            .loadViewData(
+                CORE_API.ChangeLogStore.findSummaries,
+                ["APPLICATION", selectionOptions, 365])
+            .then(r => {
+                draw(prepareData(r.data), $element[0]);
+            })
     };
 
     vm.$onChanges = () => {
@@ -177,7 +228,11 @@ function controller($element) {
 }
 
 
-controller.$inject = ["$element"];
+controller.$inject = [
+    "ServiceBroker",
+    "$element"
+];
+
 
 export default {
     id: "waltzCalendarHeatmap",

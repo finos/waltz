@@ -23,8 +23,8 @@ import {CORE_API} from "../../common/services/core-api-utils";
 
 const initialState = {
     parentEntityRef: {
-        id: 51,
-        kind: "APPLICATION"
+        id: 10,
+        kind: "ORG_UNIT"
     },
     schemeId: 2
 };

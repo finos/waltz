@@ -19,7 +19,17 @@
 <div>
 
     <waltz-section>
-        <waltz-calendar-heatmap config="ctrl.config"></waltz-calendar-heatmap>
+        <waltz-calendar-heatmap parent-entity-ref="ctrl.parentEntityRef"></waltz-calendar-heatmap>
+
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" preserveAspectRatio="xMinYMin meet">
+            <g>
+                <circle cx="300" cy="300" r="200" fill="red"/>
+                <polygon points="300,150 430,400 170,400" fill="black" />
+
+            </g>
+        </svg>
+
     </waltz-section>
 
 </div>

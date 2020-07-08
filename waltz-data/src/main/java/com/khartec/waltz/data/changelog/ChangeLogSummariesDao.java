@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.data.changelog;
 
+import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.tally.ChangeLogTally;
@@ -75,20 +76,19 @@ public class ChangeLogSummariesDao {
     }
 
 
-    public List<DateTally> findCountByDateForParentKindBySelector(EntityKind parentKind,
-                                                                  Select<Record1<Long>> selector,
+    public List<DateTally> findCountByDateForParentKindBySelector(GenericSelector selector,
                                                                   Optional<Integer> limit) {
-        checkNotNull(parentKind, "parentKind must not be null");
+        checkNotNull(selector, "selector must not be null");
 
         Field<Date> date = DSL.date(CHANGE_LOG.CREATED_AT);
 
         return dsl.select(date, DSL.count(CHANGE_LOG.ID))
                 .from(CHANGE_LOG)
-                .where(CHANGE_LOG.PARENT_ID.in(selector)
-                .and(CHANGE_LOG.PARENT_KIND.eq(parentKind.name())))
+                .where(CHANGE_LOG.PARENT_ID.in(selector.selector())
+                .and(CHANGE_LOG.PARENT_KIND.eq(selector.kind().name())))
                 .groupBy(date)
                 .orderBy(date.desc())
-                .limit(limit.orElse(Integer.MAX_VALUE))
+                .limit(limit.orElse(365))
                 .fetch(TO_DATE_TALLY_MAPPER);
     }
 
