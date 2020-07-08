@@ -53,6 +53,7 @@ import {EnumValueStore_API as EnumValueStore} from "../../enum-value/services/en
 import {EntitySvgDiagramStore_API as EntitySvgDiagramStore} from "../../entity-svg-diagram/services/entity-svg-diagram-store";
 import {ExternalIdentifierStore_API as ExternalIdentifierStore} from "../../external-identifier/services/external-identifier-store"
 import {FacetStore_API as FacetStore} from "../../facet/services/facet-store";
+import {FavouritesStore_API as FavouritesStore} from "../../app-groups/services/favourites-store";
 import {FlowDiagramStore_API as FlowDiagramStore} from "../../flow-diagram/services/flow-diagram-store";
 import {FlowDiagramAnnotationStore_API as FlowDiagramAnnotationStore} from "../../flow-diagram/services/flow-diagram-annotation-store";
 import {FlowDiagramEntityStore_API as FlowDiagramEntityStore} from "../../flow-diagram/services/flow-diagram-entity-store";
@@ -138,6 +139,7 @@ export const CORE_API = {
     EnumValueStore,
     ExternalIdentifierStore,
     FacetStore,
+    FavouritesStore,
     FlowDiagramStore,
     FlowDiagramAnnotationStore,
     FlowDiagramEntityStore,

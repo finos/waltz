@@ -19,17 +19,19 @@
 <waltz-page-header name="{{ $ctrl.scenario.name }}"
                    icon="picture-o"
                    small="Scenario">
-    <ol class="waltz-breadcrumbs">
-        <li><a ui-sref="main">Home</a></li>
-        <li><a ui-sref="main.roadmap.list">Roadmaps</a></li>
-        <li>
-            <a ui-sref="main.roadmap.view ({ id: $ctrl.roadmap.id })">
+    <breadcrumbs>
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><a ui-sref="main.roadmap.list">Roadmaps</a></li>
+            <li>
+                <a ui-sref="main.roadmap.view ({ id: $ctrl.roadmap.id })">
                 <span ng-bind="$ctrl.roadmap.name">
                 </span>
-            </a>
-        </li>
-        <li><span ng-bind="$ctrl.scenario.name"></span></li>
-    </ol>
+                </a>
+            </li>
+            <li><span ng-bind="$ctrl.scenario.name"></span></li>
+        </ol>
+    </breadcrumbs>
 </waltz-page-header>
 
 <div class="waltz-page-summary waltz-page-summary-attach">

@@ -22,17 +22,19 @@
     <waltz-page-header name="{{ ctrl.specification.name }}"
                        small="Physical Specification"
                        icon="file-text">
-        <ol class="waltz-breadcrumbs">
-            <li><a ui-sref="main">Home</a></li>
-            <li>
-                <waltz-entity-link entity-ref="{
+        <breadcrumbs>
+            <ol class="waltz-breadcrumbs">
+                <li><a ui-sref="main">Home</a></li>
+                <li>
+                    <waltz-entity-link entity-ref="{
                         id: ctrl.owningEntity.id,
                         kind: 'APPLICATION',
                         name: ctrl.owningEntity.name }">
-                </waltz-entity-link>
-            </li>
-            <li ng-bind="ctrl.specification.name"></li>
-        </ol>
+                    </waltz-entity-link>
+                </li>
+                <li ng-bind="ctrl.specification.name"></li>
+            </ol>
+        </breadcrumbs>
     </waltz-page-header>
 
 

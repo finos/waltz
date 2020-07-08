@@ -20,17 +20,19 @@
     <waltz-page-header name="{{$ctrl.category.name}}"
                        small="Viewpoints"
                        icon="puzzle-piece">
-        <ol class="waltz-breadcrumbs">
-            <li>
-                <a ui-sref="main">
-                    Home
-                </a>
-            </li>
-            <li>
-                <span ng-bind="$ctrl.category.name">
-                </span>
-            </li>
-        </ol>
+        <breadcrumbs>
+            <ol class="waltz-breadcrumbs">
+                <li>
+                    <a ui-sref="main">
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <span ng-bind="$ctrl.category.name">
+                    </span>
+                </li>
+            </ol>
+        </breadcrumbs>
     </waltz-page-header>
 
     <div class='waltz-page-summary-attach waltz-page-summary'>
