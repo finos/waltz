@@ -24,8 +24,6 @@ import moment from "moment";
 import {CORE_API} from "../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../common/selector-utils";
 
-global.moment = moment;
-
 const bindings = {
     parentEntityRef: "<"
 };
@@ -42,7 +40,7 @@ const DIMENSIONS = {
     margins: {
         left: 50,
         right: 10,
-        top: 50,
+        top: 32,
         bottom: 10
     },
     cellSize: 14,
@@ -124,13 +122,49 @@ function drawDayLabels(svg) {
         .text(d => d.label);
 }
 
-
+/**
+ * Drawing the labels for the months is tricky.
+ * First we construct a map of the first occurences of
+ * year/month combinations (the key of the map)
+ * which has a reference to the offset it first
+ * occurred at.  We can then take the values of
+ * that map to creat the labels.
+ *
+ * @param svg
+ * @param rawData
+ * @param nestedData
+ */
 function drawMonthLabels(svg, rawData, nestedData) {
-    global.rawData = rawData;
-    global.nestedData = nestedData;
-    let t = _.groupBy(rawData, d => d.date.year() * 100 + d.date.month());
-    console.log({rawData, nestedData, t})
+    const curr = moment();
+    const monthOffsets = {};
+    _.forEach(nestedData, y => {
+        curr.year(y.key);
+        _.forEach(y.values, w => {
+            curr.isoWeek(w.key);
+            const m = curr.month();
+            const accKey = `${y.key}-${m}`;
+            if (! monthOffsets[accKey]) {
+                monthOffsets[accKey] = {
+                    year: y.key,
+                    month: m,
+                    offset: w.offset
+                };
+            }
+        })
+    });
 
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+    svg.append("g")
+        .attr("transform", `translate(${DIMENSIONS.margins.left}, ${DIMENSIONS.margins.top - (DIMENSIONS.fontSize + 2)})`)
+        .selectAll("text.wch-month-label")
+        .data(_.values(monthOffsets))
+        .enter()
+        .append("text")
+        .attr("fill", COLORS.label)
+        .attr("font-size", DIMENSIONS.fontSize)
+        .attr("transform", d => `translate(${d.offset * DIMENSIONS.cellSize} 0)`)
+        .text(d => months[d.month]);
 }
 
 
@@ -147,14 +181,12 @@ function draw(rawData, holder) {
 
     const svg = select(holder)
         .append("svg")
-        // .style("width", "100%")
+        .style("max-width", "1200px")
         .style("border", "1px dashed red")
         .attr("viewBox", `0 0 ${w} ${h}`)
         .attr("preserveAspectRatio", "xMinYMin meet");
 
     drawDayLabels(svg);
-
-
 
     const gYears = svg
         .append("g")
@@ -168,16 +200,6 @@ function draw(rawData, holder) {
         .append("g")
         .classed("wch-year", true)
         .attr("transform", d => `translate(${DIMENSIONS.cellSize * d.offset }, 0)`)
-
-    const foo = gWeeks
-        .selectAll("text.wch-month-label")
-        .data(d => d.values)
-        .enter()
-        .append("text")
-        .classed(".wch-month-label", true)
-        .attr("transform", (d, idx) => `translate(${idx * (DIMENSIONS.cellSize)}, -16)`)
-        .attr("foo", d => console.log(d))
-        .text(d => moment().week(d.key).month())
 
     const gWeek = gWeeks
         .selectAll("g.wch-week")
@@ -204,7 +226,9 @@ function draw(rawData, holder) {
         .attr("stroke", d => d.count > 20
             ? COLORS.cellBorder
             : COLORS.emptyCellBorder)
-        .on("mouseover", d => console.log(d.dateStr, d.count, {d}))
+        .on("mouseover", d => console.log(d.dateStr, d.count, {d}));
+
+    drawMonthLabels(svg, rawData, nestedData)
 }
 
 
