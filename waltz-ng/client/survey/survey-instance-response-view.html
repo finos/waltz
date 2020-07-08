@@ -20,17 +20,19 @@
     <waltz-page-header icon="wpforms"
                        name="{{ ctrl.surveyRun.name }}"
                        small="{{ ctrl.surveyInstance.surveyEntity.name }}">
-        <ol class="waltz-breadcrumbs">
-            <li><a ui-sref="main">Home</a></li>
-            <li>
-                <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity"></waltz-entity-link>
-            </li>
-            <li>Surveys</li>
-            <li>
+        <breadcrumbs>
+            <ol class="waltz-breadcrumbs">
+                <li><a ui-sref="main">Home</a></li>
+                <li>
+                    <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity"></waltz-entity-link>
+                </li>
+                <li>Surveys</li>
+                <li>
                 <span ng-bind="ctrl.surveyRun.name">
                 </span>
-            </li>
-        </ol>
+                </li>
+            </ol>
+        </breadcrumbs>
     </waltz-page-header>
 
     <div class="waltz-page-summary waltz-page-summary-attach">
