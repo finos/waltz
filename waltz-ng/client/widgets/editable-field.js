@@ -15,9 +15,10 @@
  * See the License for the specific
  *
  */
-import {initialiseData, invokeFunction} from "../common";
+import {formats, initialiseData, invokeFunction} from "../common";
 
 import template from "./editable-field.html";
+import moment from "moment";
 
 
 const bindings = {
@@ -54,7 +55,7 @@ const initialState = {
 
 function mkNewVal(initialVal, fieldType) {
     return initialVal && fieldType === "date" ?
-        new Date(initialVal)
+        moment(initialVal, formats.parseDateOnly).toDate()
         : initialVal;
 }
 

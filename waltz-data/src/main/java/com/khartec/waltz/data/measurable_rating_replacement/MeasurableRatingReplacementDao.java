@@ -32,7 +32,7 @@ import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
+import java.util.Date;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -128,7 +128,7 @@ public class MeasurableRatingReplacementDao {
     }
 
 
-    public Tuple2<Operation, Boolean> save(long decommId, EntityReference entityReference, LocalDate commissionDate, String username) {
+    public Tuple2<Operation, Boolean> save(long decommId, EntityReference entityReference, Date commissionDate, String username) {
 
         Condition condition = MEASURABLE_RATING_REPLACEMENT.DECOMMISSION_ID.eq(decommId)
                 .and(MEASURABLE_RATING_REPLACEMENT.ENTITY_ID.eq(entityReference.id())

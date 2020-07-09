@@ -18,7 +18,7 @@
 
 import template from "./planned-decommission-editor.html";
 import {initialiseData, invokeFunction} from "../../../common";
-import {getDateAsUTCStartOfDay} from "../../measurable-rating-utils";
+import {getDateAsUtc} from "../../measurable-rating-utils";
 
 const modes= {
     VIEW: "VIEW",
@@ -84,13 +84,6 @@ function controller() {
         }
     };
 
-    vm.existingDecommissionDate = () => {
-        if(!_.isEmpty(vm.plannedDecommission)
-            && !_.isEmpty(vm.plannedDecommission.plannedDecommissionDate)) {
-            return getDateAsUTCStartOfDay(vm.plannedDecommission.plannedDecommissionDate);
-        }
-    };
-
     vm.onSelectReplacementCandidate = (d) => {
         vm.mode = modes.SELECT_COMM_DATE;
         vm.candidateApp = d;
@@ -98,7 +91,7 @@ function controller() {
 
     vm.onSetCommissionDate = (c) => {
         vm.mode = modes.CONFIRM_ADDITION;
-        vm.candidateCommissionDate = c.newVal;
+        vm.candidateCommissionDate = JSON.stringify(getDateAsUtc(c.newVal));
     };
 
     vm.onAddReplacement = () => {
