@@ -15,7 +15,7 @@
  * See the License for the specific
  *
  */
-import {checkIsEntityRef} from "../../common/checks";
+import {checkIsEntityRef, checkIsIdSelector} from "../../common/checks";
 
 
 function store($http, BaseApiUrl) {
@@ -41,10 +41,18 @@ function store($http, BaseApiUrl) {
         $http.get(`${BASE}/user/${userName}`, {params: {limit}})
             .then(r => r.data);
 
+    const findSummaries = (kind, options, limit = null) => {
+        checkIsIdSelector(options);
+        return $http
+            .post(`${BASE}/summaries/${kind}`, options, {params: {limit}})
+            .then(r => r.data);
+    }
+
     return {
         findByEntityReference,
         findUnattestedChangesByEntityReference,
-        findForUserName
+        findForUserName,
+        findSummaries,
     };
 }
 
@@ -71,7 +79,12 @@ export const ChangeLogStore_API = {
     findForUserName: {
         serviceName,
         serviceFnName: "findForUserName",
-        description: "'finds change log entries for a given user name and limit (default: no limit)"
+        description: "finds change log entries for a given user name and limit (default: no limit)"
+    },
+    findSummaries: {
+        serviceName,
+        serviceFnName: "findSummaries",
+        description: "finds tallies by date for all changes of the given kind for entities related to the given selector [desiredKind, selector, limit]"
     }
 };
 

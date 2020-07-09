@@ -19,19 +19,17 @@
 <div>
 
     <waltz-section>
-            <waltz-roadmaps-panel parent-entity-ref="ctrl.parentEntityRef">
+        <waltz-calendar-heatmap parent-entity-ref="ctrl.parentEntityRef"></waltz-calendar-heatmap>
 
-            </waltz-roadmaps-panel>
+
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" preserveAspectRatio="xMinYMin meet">
+            <g>
+                <circle cx="300" cy="300" r="200" fill="red"/>
+                <polygon points="300,150 430,400 170,400" fill="black" />
+
+            </g>
+        </svg>
+
     </waltz-section>
 
-
-    <waltz-section name="Allocation Panel">
-        <waltz-allocation-entity-panel entity-reference="ctrl.parentEntityRef"
-                                       scheme-id="ctrl.schemeId">
-        </waltz-allocation-entity-panel>
-    </waltz-section>
-
-    <waltz-section name="debug">
-        <pre ng-bind="ctrl.parentEntityRef | json"></pre>
-    </waltz-section>
 </div>

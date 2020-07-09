@@ -25,6 +25,7 @@ import playpenView4 from "./4/playpen4";
 
 import {registerComponents} from "../common/module-utils";
 import list from "./list.html";
+import heatmap from "./3/calendar-heatmap";
 
 export default () => {
 
@@ -61,7 +62,7 @@ export default () => {
         }
     ]);
 
-    registerComponents(module, []);
+    registerComponents(module, [heatmap]);
     return module.name;
 
 };
