@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.data.changelog;
 
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.tally.ChangeLogTally;
@@ -34,6 +35,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG;
 
 
@@ -41,6 +44,12 @@ import static com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG;
 public class ChangeLogSummariesDao {
 
     private final DSLContext dsl;
+
+    private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+            CHANGE_LOG.PARENT_ID,
+            CHANGE_LOG.PARENT_KIND,
+            newArrayList(EntityKind.APPLICATION))
+            .as("entity_name");
 
 
     private static final RecordMapper<Record2<Date,Integer>, DateTally> TO_DATE_TALLY_MAPPER = record -> {
@@ -54,18 +63,35 @@ public class ChangeLogSummariesDao {
     };
 
 
-    private static final RecordMapper<Record4<Long, String, String, Integer>, ChangeLogTally> TO_CHANGE_LOG_TALLY_MAPPER = record -> {
+    private static final RecordMapper<Record5<Long, String, String, String, Integer>, ChangeLogTally> TO_CHANGE_LOG_TALLY_MAPPER = record -> {
 
         EntityKind parentKind = EntityKind.valueOf(record.value2());
-        EntityKind childKind = (record.value3() != null) ? EntityKind.valueOf(record.value3()) : null;
-        Integer count = record.value4();
+        EntityKind childKind = (record.value4() != null) ? EntityKind.valueOf(record.value4()) : null;
+        Integer count = record.value5();
+
+        EntityReference ref = mkRef(parentKind, record.value1(), record.value3());
 
         return ImmutableChangeLogTally.builder()
-                .ref(EntityReference.mkRef(parentKind, record.value1()))
+                .ref(ref)
                 .childKind(childKind)
                 .count(count)
                 .build();
     };
+
+//    private static final RecordMapper<Record4<Long, String, String, Integer>, ChangeLogTally> TO_CHANGE_LOG_TALLY_MAPPER = record -> {
+//
+//        EntityKind parentKind = EntityKind.valueOf(record.value2());
+//        EntityKind childKind = (record.value3() != null) ? EntityKind.valueOf(record.value3()) : null;
+//        Integer count = record.value4();
+//
+//        EntityReference ref = mkRef(parentKind, record.value1());
+//
+//        return ImmutableChangeLogTally.builder()
+//                .ref(ref)
+//                .childKind(childKind)
+//                .count(count)
+//                .build();
+//    };
 
 
     @Autowired
@@ -102,7 +128,12 @@ public class ChangeLogSummariesDao {
         AggregateFunction<Integer> count = DSL.count(CHANGE_LOG.ID);
         Field<Date> changelogDate = DSL.date(CHANGE_LOG.CREATED_AT);
 
-        return dsl.select(CHANGE_LOG.PARENT_ID, CHANGE_LOG.PARENT_KIND, CHANGE_LOG.CHILD_KIND, count)
+        return dsl
+                .select(CHANGE_LOG.PARENT_ID,
+                        CHANGE_LOG.PARENT_KIND,
+                        ENTITY_NAME_FIELD,
+                        CHANGE_LOG.CHILD_KIND,
+                        count)
                 .from(CHANGE_LOG)
                 .where(CHANGE_LOG.PARENT_ID.in(selector)
                         .and(CHANGE_LOG.PARENT_KIND.eq(parentKind.name()))

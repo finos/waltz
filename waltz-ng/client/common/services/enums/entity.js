@@ -192,6 +192,20 @@ export const entity = {
         description: null,
         position: 190
     },
+    MEASURABLE_RATING_PLANNED_DECOMMISSION: {
+        key: "MEASURABLE_RATING_PLANNED_DECOMMISSION",
+        name: "Viewpoint Rating Decommission",
+        icon: undefined,
+        description: null,
+        position: 195
+    },
+    MEASURABLE_RATING_REPLACEMENT: {
+        key: "MEASURABLE_RATING_REPLACEMENT",
+        name: "Viewpoint Rating Replacement Application",
+        icon: undefined,
+        description: null,
+        position: 196
+    },
     PERSON: {
         key: "PERSON",
         name: "Person",

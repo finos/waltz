@@ -16,45 +16,54 @@
  *
  */
 
-import {initialiseData} from "../../common/index";
-import template from "./playpen3.html";
+import {initialiseData} from "../../common";
+import template from './change-summaries-section.html';
+
+
+const bindings = {
+};
 
 
 const initialState = {
-    parentEntityRef: {
-        id: 11874,
-        kind: "APP_GROUP"
-    },
-    schemeId: 2,
     selectedDate: null,
-    // data: [{ref: {id: 20506, kind: "APPLICATION", name: "Waltz"}, childKind: 'DATA_TYPE', count: 30}]
-
+    favouritesGroup: {id: 11874}
 };
 
-function controller($stateParams, serviceBroker) {
+
+
+
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.selectedDate = new Date('2020-07-07');
+    vm.$onInit = () => {
+        console.log(vm.selectedDate);
+        console.log(vm.selectedDate);
 
-    // serviceBroker.loadViewData(CORE_API.ChangeLogSummariesStore.findSummariesForKindBySelector,
-    //     ['APPLICATION', mkSelectionOptions(vm.parentEntityRef, 'EXACT')])
-    //     .then(r => vm.data = r.data)
-    //     .then(console.log(vm.data));
+        // serviceBroker
+        //     .loadViewData(CORE_API.AppGroupStore.findMyGroupSubscriptions, [])
+        //     .then(r => vm.favouritesGroup = r.data)
+    };
+
+
+    vm.onSelectDate = (date) => {
+        vm.selectedDate = date;
+    }
 }
 
+
 controller.$inject = [
-    "$stateParams",
     "ServiceBroker"
 ];
 
 
-const view = {
+const component = {
+    bindings,
     template,
-    controller,
-    controllerAs: "$ctrl",
-    bindToController: true,
-    scope: {}
+    controller
 };
 
 
-export default view;
+export default {
+    id: "waltzChangeSummariesSection",
+    component
+}

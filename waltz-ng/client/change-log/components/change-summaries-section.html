@@ -17,6 +17,15 @@
   -->
 
 <div>
-    <waltz-change-summaries-section>
-    </waltz-change-summaries-section>
+    <waltz-section icon='bookmark'
+                   name="Change Summaries"
+                   id="change-summaries-section">
+        <waltz-date-picker-form-input place-holder="yyyy-MM-dd"
+                                      format="yyyy-MM-dd"
+                                      model="$ctrl.selectedDate">
+        </waltz-date-picker-form-input>
+        <waltz-change-breakdown-table parent-entity-ref="{id: $ctrl.favouritesGroup.id, kind: 'APP_GROUP'}"
+                                      selected-date="$ctrl.selectedDate">
+        </waltz-change-breakdown-table>
+    </waltz-section>
 </div>

@@ -17,11 +17,14 @@
  */
 
 import angular from "angular";
-import {registerStores} from "../common/module-utils";
+import {registerComponents, registerStores} from "../common/module-utils";
 import changeLogStore from "./services/change-log-store";
+import changeLogSummariesStore from "./services/change-log-summaries-store";
 import Routes from './routes';
 import ChangeLogSection from './components/change-log-section';
 import ChangeLogTable from './components/change-log-table';
+import ChangeBreakdownTable from './components/change-breakdown-table';
+import ChangeSummariesSection from './components/change-summaries-section';
 
 export default () => {
     const module = angular.module('waltz.change.log', []);
@@ -30,8 +33,11 @@ export default () => {
         .config(Routes);
 
     registerStores(module, [
-        changeLogStore
+        changeLogStore,
+        changeLogSummariesStore
     ]);
+
+    registerComponents(module, [ChangeBreakdownTable, ChangeSummariesSection]);
 
     module
         .component('waltzChangeLogSection', ChangeLogSection)
