@@ -20,15 +20,17 @@
     <waltz-page-header name="{{ ctrl.appGroup.name }}"
                        icon="edit"
                        small="Edit">
-        <ol class="waltz-breadcrumbs">
-            <li><a ui-sref="main">Home</a></li>
-            <li>
-                <a ui-sref="main.app-group.view ({ id:ctrl.appGroup.id })"
-                   ng-bind="ctrl.appGroup.name">
-                </a>
-            </li>
-            <li>Edit</li>
-        </ol>
+        <breadcrumbs>
+            <ol class="waltz-breadcrumbs">
+                <li><a ui-sref="main">Home</a></li>
+                <li>
+                    <a ui-sref="main.app-group.view ({ id:ctrl.appGroup.id })"
+                       ng-bind="ctrl.appGroup.name">
+                    </a>
+                </li>
+                <li>Edit</li>
+            </ol>
+        </breadcrumbs>
     </waltz-page-header>
 
 

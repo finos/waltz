@@ -20,16 +20,18 @@
     <waltz-page-header name="{{ ctrl.statistic.definition.name }}"
                        small="Indicator"
                        icon="pie-chart">
-        <ol class="waltz-breadcrumbs">
-            <li><a ui-sref="main">Home</a></li>
-            <li>
-                <a ui-sref="main.person.view ({ empId: ctrl.person.employeeId })"
-                   ng-bind="ctrl.person.displayName">
-                </a>
-            </li>
-            <li>Indicators</li>
-            <li ng-bind="ctrl.statistic.definition.name"></li>
-        </ol>
+        <breadcrumbs>
+            <ol class="waltz-breadcrumbs">
+                <li><a ui-sref="main">Home</a></li>
+                <li>
+                    <a ui-sref="main.person.view ({ empId: ctrl.person.employeeId })"
+                       ng-bind="ctrl.person.displayName">
+                    </a>
+                </li>
+                <li>Indicators</li>
+                <li ng-bind="ctrl.statistic.definition.name"></li>
+            </ol>
+        </breadcrumbs>
     </waltz-page-header>
 
     <div class="waltz-page-summary waltz-page-summary-attach">

@@ -24,7 +24,7 @@ import Routes from './routes';
 import ChangeLogSection from './components/change-log-section';
 import ChangeLogTable from './components/change-log-table';
 import ChangeBreakdownTable from './components/change-breakdown-table';
-import ChangeSummariesSection from './components/change-summaries-section';
+import ChangeSummariesPanel from './components/summaries-panel/change-summaries-panel';
 
 export default () => {
     const module = angular.module('waltz.change.log', []);
@@ -37,7 +37,7 @@ export default () => {
         changeLogSummariesStore
     ]);
 
-    registerComponents(module, [ChangeBreakdownTable, ChangeSummariesSection]);
+    registerComponents(module, [ChangeBreakdownTable, ChangeSummariesPanel]);
 
     module
         .component('waltzChangeLogSection', ChangeLogSection)

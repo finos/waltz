@@ -26,6 +26,8 @@ import Routes from './routes';
 import AppGroupList from './components/app-group-list/app-group-list';
 import AppGroupListSection from './components/app-group-list-section/app-group-list-section';
 import AppGroupAppSelectionList from './directives/app-group-app-selection-list';
+import FavouritesStore from "./services/favourites-store";
+import FavouritesPanel from "./components/favourites-panel/favourites-panel";
 
 
 export default () => {
@@ -42,9 +44,10 @@ export default () => {
         AppGroupListSection,
         AppGroupSummary,
         SubscriptionButtons,
-        RelatedAppGroupsSection ]);
+        RelatedAppGroupsSection,
+        FavouritesPanel ]);
 
-    registerStores(module, [ AppGroupStore ]);
+    registerStores(module, [ AppGroupStore, FavouritesStore ]);
 
     return module.name;
 

@@ -59,8 +59,7 @@ public class ChangeLogHarness {
 
         FunctionUtilities.time("test", () -> dao
                 .findCountByParentAndChildKindForDateBySelector(
-                        EntityKind.APPLICATION,
-                        factory.applyForKind(EntityKind.APPLICATION, idSelectionOptions).selector(),
+                        factory.applyForKind(EntityKind.APPLICATION, idSelectionOptions),
                         DateTimeUtilities.toSqlDate(DateTimeUtilities.today()),
                         Optional.of(10))
         );

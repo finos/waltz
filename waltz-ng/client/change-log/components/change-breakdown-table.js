@@ -23,23 +23,12 @@ import {mkSelectionOptions} from "../../common/selector-utils";
 
 const bindings = {
     parentEntityRef: "<",
-    selectedDate: "<",
+    selectedDate: "<?",
 };
 
 
 const initialState = {
     targetKind: "APPLICATION",
-    // data: [{ref: {id: 20506, kind: "APPLICATION", name: "Waltz"}, childKind: 'DATA_TYPE', count: 30},
-    //     {ref: {id: 17396, kind: "APPLICATION", name: "db-IB-GB"}, childKind: 'DATA_TYPE', count: 10},
-    //     {ref: {id: 17396, kind: "APPLICATION", name: "db-IB-GB"}, childKind: 'DATA_TYPE', count: 10},
-    //     {ref: {id: 17396, kind: "APPLICATION", name: "db-IB-GB"}, childKind: 'DATA_TYPE', count: 10},
-    //     {ref: {id: 17396, kind: "APPLICATION", name: "db-IB-GB"}, childKind: 'DATA_TYPE', count: 10},
-    //     {ref: {id: 17396, kind: "APPLICATION", name: "db-IB-GB"}, childKind: 'DATA_TYPE', count: 10},
-    //     {ref: {id: 17396, kind: "APPLICATION", name: "db-IB-GB"}, childKind: 'DATA_TYPE', count: 10},
-    //     {ref: {id: 17396, kind: "APPLICATION", name: "db-IB-GB"}, childKind: 'DATA_TYPE', count: 10},
-    //     {ref: {id: 17396, kind: "APPLICATION", name: "db-IB-GB"}, childKind: 'DATA_TYPE', count: 10},
-    //     {ref: {id: 17396, kind: "APPLICATION", name: "db-IB-GB"}, childKind: 'DATA_TYPE', count: 10},
-    // ],
     visibility:{
         loading: false
     }
@@ -76,7 +65,7 @@ function controller(serviceBroker, $q) {
         vm.visibility.loading = true;
         serviceBroker
             .loadViewData(CORE_API.ChangeLogSummariesStore.findSummariesForKindBySelector,
-                [vm.targetKind, opts, vm.selectedDate, 20])
+                ["APPLICATION", opts, vm.selectedDate])
             .then(r => {
                 vm.data = r.data;
                 vm.total = _.sumBy(vm.data, "count");
@@ -89,7 +78,8 @@ function controller(serviceBroker, $q) {
 
     vm.$onChanges = (c) => {
         if(c.selectedDate && vm.selectedDate != null){
-            loadChangeSummaries(mkSelectionOptions(vm.parentEntityRef, 'EXACT'))
+            const opts = mkSelectionOptions(vm.parentEntityRef);
+            loadChangeSummaries(opts)
         } else if (vm.selectedDate == null){
             vm.data = null;
         }

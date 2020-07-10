@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 
 @Service
@@ -51,6 +52,13 @@ public class ChangeLogEndpoint implements Endpoint {
         getForList(
                 mkPath(BASE_URL, "user", ":userId"),
                 (request, response) -> service.findByUser(request.params("userId"), getLimit(request)));
+
+        postForList(
+                mkPath(BASE_URL, "summaries", ":kind"),
+                (request, response) -> service.findCountByDateForParentKindBySelector(
+                        getKind(request),
+                        readIdSelectionOptionsFromBody(request),
+                        getLimit(request)));
 
         getForList(
                 mkPath(BASE_URL, ":kind", ":id"),

@@ -22,7 +22,7 @@ function store($http, BaseApiUrl) {
 
     const BASE = `${BaseApiUrl}/change-log-summaries`;
 
-    const findSummariesForKindBySelector = (kind, selector, date, limit = 10) => {
+    const findSummariesForKindBySelector = (kind, selector, date, limit) => {
         checkIsIdSelector(selector);
         return $http
             .post(`${BASE}/kind/${kind}/selector`, selector, { params: {limit: limit, date: date}})
@@ -40,7 +40,7 @@ store.$inject = [
 ];
 
 
-const serviceName = "ChangeLogStore";
+const serviceName = "ChangeLogSummariesStore";
 
 
 export const ChangeLogSummariesStore_API = {

@@ -28,6 +28,8 @@ import GridSref from "./grid-sref/grid-sref";
 import GridWithSearch from "./grid/grid-with-search";
 import DatePickerFormInput from "./date-picker/date-picker-form-input";
 import MiniActions from "./mini-actions/mini-actions";
+import FavouritesButton from "./favourites-button/favourites-button"
+import CalendarHeatmap from "./calendar-heatmap/calendar-heatmap"
 import {registerComponents} from "../module-utils";
 
 
@@ -48,7 +50,9 @@ export default (module) => {
 
     registerComponents(module, [
         FilterChangedWatcher,
-        MiniActions
+        MiniActions,
+        FavouritesButton,
+        CalendarHeatmap
     ]);
 
 };

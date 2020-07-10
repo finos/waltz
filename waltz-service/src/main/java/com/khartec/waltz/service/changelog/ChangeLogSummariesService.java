@@ -18,13 +18,12 @@
 
 package com.khartec.waltz.service.changelog;
 
+import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.changelog.ChangeLogSummariesDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.tally.ChangeLogTally;
-import org.jooq.Record1;
-import org.jooq.Select;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,10 +57,9 @@ public class ChangeLogSummariesService {
                                                                                Date date,
                                                                                Optional<Integer> limit) {
 
-        Select<Record1<Long>> genericSelector = genericSelectorFactory.applyForKind(targetKind, options).selector();
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, options);
 
         return changeLogSummariesDao.findCountByParentAndChildKindForDateBySelector(
-                targetKind,
                 genericSelector,
                 date,
                 limit);

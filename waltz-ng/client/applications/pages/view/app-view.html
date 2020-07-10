@@ -21,11 +21,17 @@
     <waltz-page-header icon="desktop"
                        name="{{ ctrl.app.name }}"
                        small="{{ ctrl.app.assetCode }}">
-        <ol class="waltz-breadcrumbs">
-            <li><a ui-sref="main">Home</a></li>
-            <li>Applications</li>
-            <li><span ng-bind="ctrl.app.name"></span></li>
-        </ol>
+        <breadcrumbs>
+            <ol class="waltz-breadcrumbs">
+                <li><a ui-sref="main">Home</a></li>
+                <li>Applications</li>
+                <li><span ng-bind="ctrl.app.name"></span></li>
+            </ol>
+        </breadcrumbs>
+        <actions>
+            <waltz-favourites-button parent-entity-ref="ctrl.parentEntityRef">
+            </waltz-favourites-button>
+        </actions>
     </waltz-page-header>
 
 

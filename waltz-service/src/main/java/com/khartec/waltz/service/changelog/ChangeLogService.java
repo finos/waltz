@@ -21,17 +21,17 @@ package com.khartec.waltz.service.changelog;
 import com.khartec.waltz.common.CollectionUtilities;
 import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.data.EntityReferenceNameResolver;
+import com.khartec.waltz.data.GenericSelector;
+import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.changelog.ChangeLogDao;
+import com.khartec.waltz.data.changelog.ChangeLogSummariesDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionDao;
 import com.khartec.waltz.data.measurable_rating_replacement.MeasurableRatingReplacementDao;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowDao;
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.Severity;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
@@ -39,6 +39,7 @@ import com.khartec.waltz.model.measurable_rating_planned_decommission.Measurable
 import com.khartec.waltz.model.measurable_rating_replacement.MeasurableRatingReplacement;
 import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
+import com.khartec.waltz.model.tally.DateTally;
 import org.jooq.lambda.Unchecked;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
@@ -63,6 +64,7 @@ public class ChangeLogService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ChangeLogService.class);
     private final ChangeLogDao changeLogDao;
+    private final ChangeLogSummariesDao changeLogSummariesDao;
     private final DBExecutorPoolInterface dbExecutorPool;
     private final PhysicalFlowDao physicalFlowDao;
     private final LogicalFlowDao logicalFlowDao;
@@ -75,6 +77,7 @@ public class ChangeLogService {
 
     @Autowired
     public ChangeLogService(ChangeLogDao changeLogDao,
+                            ChangeLogSummariesDao changeLogSummariesDao,
                             DBExecutorPoolInterface dbExecutorPool,
                             PhysicalFlowDao physicalFlowDao,
                             PhysicalSpecificationDao physicalSpecificationDao,
@@ -84,6 +87,7 @@ public class ChangeLogService {
                             MeasurableRatingPlannedDecommissionDao measurableRatingPlannedDecommissionDao,
                             EntityReferenceNameResolver nameResolver) {
         checkNotNull(changeLogDao, "changeLogDao must not be null");
+        checkNotNull(changeLogSummariesDao, "changeLogSummariesDao must not be null");
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
         checkNotNull(physicalFlowDao, "physicalFlowDao cannot be null");
         checkNotNull(physicalSpecificationDao, "physicalSpecificationDao cannot be null");
@@ -93,6 +97,7 @@ public class ChangeLogService {
         checkNotNull(nameResolver, "nameResolver cannot be null");
 
         this.changeLogDao = changeLogDao;
+        this.changeLogSummariesDao = changeLogSummariesDao;
         this.dbExecutorPool = dbExecutorPool;
         this.physicalFlowDao = physicalFlowDao;
         this.physicalSpecificationDao = physicalSpecificationDao;
@@ -212,7 +217,14 @@ public class ChangeLogService {
     }
 
 
-    ////////////////////// PRIVATE HELPERS //////////////////////////////////////////
+    public List<DateTally> findCountByDateForParentKindBySelector(EntityKind parentKind,
+                                                                  IdSelectionOptions selectionOptions,
+                                                                  Optional<Integer> limit) {
+        GenericSelector genericSelector = new GenericSelectorFactory().applyForKind(parentKind, selectionOptions);
+        return changeLogSummariesDao.findCountByDateForParentKindBySelector(genericSelector, limit);
+    }
+
+        ////////////////////// PRIVATE HELPERS //////////////////////////////////////////
 
     private List<ChangeLog> findByParentReferenceForPhysicalFlow(EntityReference ref,
                                                                  Optional<Integer> limit) {

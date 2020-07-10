@@ -22,8 +22,8 @@ import template from "./playpen3.html";
 
 const initialState = {
     parentEntityRef: {
-        id: 11874,
-        kind: "APP_GROUP"
+        id: 95,
+        kind: "ORG_UNIT"
     },
     schemeId: 2,
     selectedDate: null,

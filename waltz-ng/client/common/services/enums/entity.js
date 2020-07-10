@@ -24,6 +24,13 @@ export const entity = {
         description: null,
         position: 10
     },
+    ALLOCATION_SCHEME: {
+        key: "ALLOCATION_SCHEME",
+        name: "Allocation Scheme",
+        icon: null,
+        description: null,
+        position: 20
+    },
     APP_CAPABILITY: {
         key: "APP_CAPABILITY",
         name: "Application Function",

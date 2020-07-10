@@ -16,8 +16,11 @@
  *
  */
 
-import {initialiseData} from "../../common";
-import template from './change-summaries-section.html';
+
+import template from "./favourites-panel.html";
+
+import {initialiseData} from "../../../common/index";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
@@ -25,45 +28,45 @@ const bindings = {
 
 
 const initialState = {
-    selectedDate: null,
-    favouritesGroup: {id: 11874}
+    hasFavourites: false,
+    favouritesGroupRef: null
 };
-
-
 
 
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-        console.log(vm.selectedDate);
-        console.log(vm.selectedDate);
-
-        // serviceBroker
-        //     .loadViewData(CORE_API.AppGroupStore.findMyGroupSubscriptions, [])
-        //     .then(r => vm.favouritesGroup = r.data)
+        serviceBroker.loadViewData(CORE_API.FavouritesStore.getFavouritesGroup)
+            .then(r => {
+                const favouritesGroup = r.data;
+                vm.favouritesGroupRef = {
+                    id: _.get(favouritesGroup, 'id', null),
+                    kind: 'APP_GROUP'
+                }
+            })
+            .then(() => serviceBroker.loadViewData(CORE_API.FavouritesStore.getFavouritesGroupEntries)
+                .then(r => vm.hasFavourites = !_.isEmpty(r.data)));
     };
-
-
-    vm.onSelectDate = (date) => {
-        vm.selectedDate = date;
-    }
 }
 
 
 controller.$inject = [
-    "ServiceBroker"
+    "ServiceBroker",
 ];
 
 
 const component = {
+    controller,
     bindings,
-    template,
-    controller
+    template
 };
 
 
+const id = "waltzFavouritesPanel";
+
+
 export default {
-    id: "waltzChangeSummariesSection",
+    id,
     component
 }
