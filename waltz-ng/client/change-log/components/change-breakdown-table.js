@@ -47,9 +47,6 @@ function controller(serviceBroker, $q) {
             <div class="ui-grid-cell-contents">
                 <waltz-entity-link entity-ref="COL_FIELD"
                 </waltz-entity-link>
-            </div>
-            <div ng-if="row.entity.name == 'Total'">
-                <span>HI</span>
             </div>`
         },{
             field: "childKind",
