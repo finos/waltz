@@ -80,6 +80,10 @@ function controller(serviceBroker, $q) {
         } else if (vm.selectedDate == null){
             vm.data = null;
         }
+    };
+
+    vm.clearSelectedDate = () => {
+        vm.selectedDate = null;
     }
 }
 

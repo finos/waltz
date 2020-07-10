@@ -26,6 +26,10 @@
     <div ng-if="$ctrl.selectedDate">
         <h4>Changes for
             <span ng-bind="$ctrl.selectedDate |  date:'yyyy-MM-dd'"></span>:
+            <a class="pull-right clickable"
+               ng-click="$ctrl.clearSelectedDate()">
+                (x)
+            </a>
         </h4>
         <waltz-loading-notification show="$ctrl.visibility.loading"
                                     style="padding-top: 54px;"
