@@ -17,9 +17,9 @@
   -->
 
 <div>
-    <div ng-if="!$ctrl.data" ng-transclude="noData">
+    <div ng-if="$ctrl.data.length == 0" ng-transclude="noData">
     </div>
-    <div ng-if="$ctrl.data">
+    <div ng-if="$ctrl.data.length > 0">
         <waltz-calendar-heatmap data="$ctrl.data"
                                 on-select-date="$ctrl.onSelectDate">
         </waltz-calendar-heatmap>

@@ -64,7 +64,7 @@ const component = {
     template,
     controller,
     transclude: {
-        noData: "?noData"
+        "noData": "?noData"
     }
 };
 

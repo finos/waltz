@@ -17,9 +17,13 @@
   -->
 
 <div>
-    <h3>Changes</h3>
+    <h3>
+        <waltz-icon name="history"></waltz-icon>
+        Changes
+    </h3>
     <p>These are the changes for your favourite applications:</p>
-    <waltz-change-summaries-panel parent-entity-ref="$ctrl.favouritesGroupRef">
+    <waltz-change-summaries-panel ng-if="$ctrl.favouritesGroupRef"
+                                  parent-entity-ref="$ctrl.favouritesGroupRef">
         <no-data>
             <waltz-no-data>
                 <message>You have no favourite applications, visit an application page to add some</message>
