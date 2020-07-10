@@ -27,8 +27,6 @@ const initialState = {
     },
     schemeId: 2,
     selectedDate: null,
-    // data: [{ref: {id: 20506, kind: "APPLICATION", name: "Waltz"}, childKind: 'DATA_TYPE', count: 30}]
-
 };
 
 function controller($stateParams, serviceBroker) {
