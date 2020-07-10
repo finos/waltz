@@ -28,7 +28,6 @@ const bindings = {
 
 
 const initialState = {
-    hasFavourites: false,
     favouritesGroupRef: null
 };
 
@@ -45,8 +44,6 @@ function controller(serviceBroker) {
                     kind: 'APP_GROUP'
                 }
             })
-            .then(() => serviceBroker.loadViewData(CORE_API.FavouritesStore.getFavouritesGroupEntries)
-                .then(r => vm.hasFavourites = !_.isEmpty(r.data)));
     };
 }
 

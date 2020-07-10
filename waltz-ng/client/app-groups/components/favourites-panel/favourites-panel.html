@@ -19,10 +19,11 @@
 <div>
     <h3>Changes</h3>
     <p>These are the changes for your favourite applications:</p>
-    <waltz-change-summaries-panel ng-if="$ctrl.hasFavourites"
-                                  parent-entity-ref="$ctrl.favouritesGroupRef">
+    <waltz-change-summaries-panel parent-entity-ref="$ctrl.favouritesGroupRef">
+        <no-data>
+            <waltz-no-data>
+                <message>You have no favourite applications, visit an application page to add some</message>
+            </waltz-no-data>
+        </no-data>
     </waltz-change-summaries-panel>
-    <waltz-no-data ng-if="!$ctrl.hasFavourites">
-        <message>You have no favourite applications, visit an application page to add some</message>
-    </waltz-no-data>
 </div>

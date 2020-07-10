@@ -39,8 +39,6 @@ function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-        console.log(vm.parentEntityRef);
-
         const selectionOptions = mkSelectionOptions(vm.parentEntityRef);
 
         serviceBroker
@@ -64,7 +62,10 @@ controller.$inject = [
 const component = {
     bindings,
     template,
-    controller
+    controller,
+    transclude: {
+        noData: "?noData"
+    }
 };
 
 
