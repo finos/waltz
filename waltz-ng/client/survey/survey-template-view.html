@@ -74,9 +74,13 @@
                    name="Runs"
                    small="( {{ctrl.issuedAndCompleted.length }} )" >
         <waltz-section-actions>
-            <waltz-data-extract-link name="Export All Completed/Approved Instances"
+            <waltz-data-extract-link name="Export Completed/Approved Instances"
                                      styling="button"
                                      extract="survey-instance/template-id/{{ctrl.template.id}}?status=COMPLETED&status=APPROVED">
+            </waltz-data-extract-link>
+            <waltz-data-extract-link name="Export In-Progress Instances"
+                                     styling="button"
+                                     extract="survey-instance/template-id/{{ctrl.template.id}}?status=IN_PROGRESS">
             </waltz-data-extract-link>
             <a class="btn btn-primary btn-xs"
                waltz-has-role="SURVEY_ADMIN"

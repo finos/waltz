@@ -49,9 +49,13 @@
                                      styling="button"
                                      extract="survey-run/{{ctrl.surveyRun.id}}">
             </waltz-data-extract-link>
-            <waltz-data-extract-link name="Export Responses"
+            <waltz-data-extract-link name="Export Completed Responses"
                                      styling="button"
                                      extract="survey-instance/run-id/{{ctrl.surveyRun.id}}?status=COMPLETED&status=APPROVED">
+            </waltz-data-extract-link>
+            <waltz-data-extract-link name="Export In-Progress Responses"
+                                     styling="button"
+                                     extract="survey-instance/run-id/{{ctrl.surveyRun.id}}?status=IN_PROGRESS">
             </waltz-data-extract-link>
         </waltz-section-actions>
 
