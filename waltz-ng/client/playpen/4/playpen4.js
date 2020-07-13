@@ -20,8 +20,7 @@ import template from "./playpen4.html";
 import {CORE_API} from "../../common/services/core-api-utils";
 
 const initialState = {
-    parentEntityRef: { kind: "ORG_UNIT", id: 6811 }, //10524
-    selectedCategoryId: 9
+    parentEntityRef: { kind: "ORG_UNIT", id: 10 }, //10524
 };
 
 
@@ -30,9 +29,6 @@ function controller($q, serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
-    serviceBroker
-        .loadViewData(CORE_API.MeasurableCategoryStore.getById, [ vm.selectedCategoryId ])
-        .then(r => vm.selectedCategory = r.data);
 }
 
 

@@ -248,6 +248,20 @@ export const entity = {
         description: null,
         position: 250
     },
+    SURVEY: {
+        key: "SURVEY",
+        name: "Survey",
+        icon: "wpforms",
+        description: null,
+        position: 255
+    },
+    SURVEY_INSTANCE: {
+        key: "SURVEY_INSTANCE",
+        name: "Survey Instance",
+        icon: "wpforms",
+        description: null,
+        position: 257
+    },
     SYSTEM: {
         key: "SYSTEM",
         name: "System",

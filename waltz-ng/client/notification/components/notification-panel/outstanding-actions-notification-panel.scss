@@ -1,0 +1,33 @@
+.woanp-notification {
+    background-color: #fafafa;
+    text-decoration: none;
+    padding: 0.8em 1.5em;
+    position: relative;
+    display: inline-block;
+    border-radius: 2px;
+    border: 2px solid #eee;
+
+    &:hover {
+        background: #f0f0f0;
+    }
+
+    .woanp-badge {
+        @extend .badge;
+        position: absolute;
+        top: -8px;
+        right: -10px;
+    }
+
+    .woanp-count-badge {
+        @extend .woanp-badge;
+        background: #ff7f0e;
+    }
+
+    .woanp-zero-badge {
+        @extend .woanp-badge;
+        background: #e1f5e4;
+        border: 1px solid #bdf3c6;
+        color: #119521
+    }
+}
+
