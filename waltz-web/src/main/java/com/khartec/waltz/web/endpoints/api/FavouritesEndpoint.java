@@ -18,8 +18,10 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.app_group.AppGroup;
 import com.khartec.waltz.model.app_group.AppGroupEntry;
 import com.khartec.waltz.service.app_group.FavouritesService;
+import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.slf4j.Logger;
@@ -49,9 +51,13 @@ public class FavouritesEndpoint implements Endpoint {
     @Override
     public void register() {
 
+        String getFavouriteGroupPath = mkPath(BASE_URL, "group");
         String getFavouriteGroupEntriesPath = mkPath(BASE_URL, "entries");
         String addApplicationPath = mkPath(BASE_URL, "application", ":id");
         String removeApplicationPath = mkPath(BASE_URL, "application", ":id");
+
+        DatumRoute<AppGroup> getFavouriteGroupRoute = (request, response) ->
+                favouritesService.getFavouritesGroup(getUsername(request));
 
         ListRoute<AppGroupEntry> getFavouriteGroupEntriesRoute = (request, response) ->
                 favouritesService.getFavouriteGroupEntries(getUsername(request));
@@ -71,6 +77,7 @@ public class FavouritesEndpoint implements Endpoint {
         postForList(addApplicationPath, addApplicationRoute);
         deleteForList(removeApplicationPath, removeApplicationRoute);
         getForList(getFavouriteGroupEntriesPath, getFavouriteGroupEntriesRoute);
+        getForDatum(getFavouriteGroupPath, getFavouriteGroupRoute);
 
     }
 }

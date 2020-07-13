@@ -40,8 +40,6 @@ import com.khartec.waltz.model.measurable_rating_replacement.MeasurableRatingRep
 import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.model.tally.DateTally;
-import org.jooq.Record1;
-import org.jooq.Select;
 import org.jooq.lambda.Unchecked;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
@@ -223,7 +221,7 @@ public class ChangeLogService {
                                                                   IdSelectionOptions selectionOptions,
                                                                   Optional<Integer> limit) {
         GenericSelector genericSelector = new GenericSelectorFactory().applyForKind(parentKind, selectionOptions);
-        return changeLogSummariesDao.findCountByDateForParentKindBySelector(genericSelector, Optional.empty());
+        return changeLogSummariesDao.findCountByDateForParentKindBySelector(genericSelector, limit);
     }
 
         ////////////////////// PRIVATE HELPERS //////////////////////////////////////////

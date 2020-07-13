@@ -20,6 +20,10 @@ export function store($http, BaseApiUrl) {
 
     const BASE = `${BaseApiUrl}/favourites`;
 
+    const getFavouritesGroup = () => $http
+        .get(`${BASE}/group`)
+        .then(result => result.data);
+
     const getFavouritesGroupEntries = () => $http
         .get(`${BASE}/entries`)
         .then(result => result.data);
@@ -33,6 +37,7 @@ export function store($http, BaseApiUrl) {
         .then(result => result.data);
 
     return {
+        getFavouritesGroup,
         getFavouritesGroupEntries,
         addApplication,
         removeApplication
@@ -50,6 +55,11 @@ const serviceName = "FavouritesStore";
 
 
 export const FavouritesStore_API = {
+    getFavouritesGroup: {
+        serviceName,
+        serviceFnName: 'getFavouritesGroup',
+        description: 'fetches Favourites Group for user'
+    },
     getFavouritesGroupEntries: {
         serviceName,
         serviceFnName: 'getFavouritesGroupEntries',
