@@ -46,6 +46,8 @@ import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.model.EntityLifecycleStatus.ACTIVE;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
+import static com.khartec.waltz.schema.Tables.PHYSICAL_FLOW;
+import static com.khartec.waltz.schema.Tables.PHYSICAL_SPECIFICATION;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.Optional.ofNullable;
@@ -116,6 +118,10 @@ public class LogicalFlowDao {
     public static final Condition LOGICAL_NOT_REMOVED = LOGICAL_FLOW.IS_REMOVED.isFalse()
             .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name()));
 
+    public static final Condition PHYSICAL_FLOW_NOT_REMOVED = PHYSICAL_FLOW.IS_REMOVED.isFalse()
+            .and(PHYSICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name()));
+
+    public static final Condition SPEC_NOT_REMOVED = PHYSICAL_SPECIFICATION.IS_REMOVED.isFalse();
 
     private final DSLContext dsl;
 
