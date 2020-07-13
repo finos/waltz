@@ -17,14 +17,15 @@
  */
 
 import angular from 'angular';
-import {registerStores} from '../common/module-utils';
+import {registerComponents, registerStores} from '../common/module-utils';
 import * as NotificationStore from './services/notification-store';
+import OutstandingActionsNotificationPanel from "./components/notification-panel/outstanding-actions-notification-panel";
 
 export default () => {
-
     const module = angular.module('waltz.notification', []);
 
     registerStores(module, [NotificationStore]);
+    registerComponents(module, [OutstandingActionsNotificationPanel]);
 
     return module.name;
 };
