@@ -67,4 +67,4 @@ export default {
         bindings,
         template
     }
-}
+};
