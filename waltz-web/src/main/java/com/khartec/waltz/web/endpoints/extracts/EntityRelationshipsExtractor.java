@@ -43,7 +43,8 @@ public class EntityRelationshipsExtractor extends DirectQueryBasedDataExtractor{
             Condition condition = getCondition(request);
             List<Long> involvementKindsIds = getInvolvementKinds(request);
 
-            SelectConditionStep<Record> qry = prepareCiMeasurableQuery(dsl,
+            //returns all of kindA, with kindB if exists
+            SelectOnConditionStep<Record> qry = prepareCiMeasurableQuery(dsl,
                     involvementKindsIds,
                     condition);
 
@@ -54,6 +55,7 @@ public class EntityRelationshipsExtractor extends DirectQueryBasedDataExtractor{
                     response);
         });
     }
+
 
     private Condition getCondition(Request request) {
         Optional<Long> categoryId = getCategoryId(request);
@@ -71,9 +73,9 @@ public class EntityRelationshipsExtractor extends DirectQueryBasedDataExtractor{
     }
 
 
-    private SelectConditionStep<Record> prepareCiMeasurableQuery(DSLContext dsl,
-                                                                 List<Long> involvementKinds,
-                                                                 Condition condition) {
+    private SelectOnConditionStep<Record> prepareCiMeasurableQuery(DSLContext dsl,
+                                                                   List<Long> involvementKinds,
+                                                                   Condition condition) {
 
         Table<Record3<String, Long, String>> involvementsSubQry = dsl
                 .select(INVOLVEMENT_KIND.NAME.as("Involvement"),
@@ -85,33 +87,49 @@ public class EntityRelationshipsExtractor extends DirectQueryBasedDataExtractor{
                 .where(INVOLVEMENT.KIND_ID.in(involvementKinds))
                 .asTable();
 
-        SelectSelectStep<Record> selectFields = dsl
-                .selectDistinct(CHANGE_INITIATIVE.ID.as("Change Initiative Id"),
-                        CHANGE_INITIATIVE.EXTERNAL_ID.as("Change Initiative External Id"),
-                        CHANGE_INITIATIVE.KIND.as("Change Initiative Kind"),
-                        CHANGE_INITIATIVE.NAME.as("Change Initiative Name"),
-                        CHANGE_INITIATIVE.DESCRIPTION.as("Change Initiative Description"),
-                        RELATIONSHIP_KIND.NAME.as("Relationship"),
+        Table<Record> entityRelationshipsSubQry = DSL
+                .select(RELATIONSHIP_KIND.NAME.as("Relationship"),
                         RELATIONSHIP_KIND.DESCRIPTION.as("Relationship Kind Description"),
+                        ENTITY_RELATIONSHIP.ID_A.as("Id A"),
+                        ENTITY_RELATIONSHIP.KIND_A.as("Kind A"),
                         ENTITY_RELATIONSHIP.DESCRIPTION.as("Relationship Description"),
                         MEASURABLE.ID.as("Viewpoint Id"),
                         MEASURABLE.NAME.as("Viewpoint"),
                         MEASURABLE.DESCRIPTION.as("Viewpoint Description"),
                         MEASURABLE.EXTERNAL_ID.as("Viewpoint External Id"))
                 .select(involvementsSubQry.field("Involvement", String.class),
-                        involvementsSubQry.field("Email", String.class));
-
-        return selectFields
+                        involvementsSubQry.field("Email", String.class))
                 .from(ENTITY_RELATIONSHIP)
-                .innerJoin(CHANGE_INITIATIVE).on(ENTITY_RELATIONSHIP.ID_A.eq(CHANGE_INITIATIVE.ID)
-                        .and(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.CHANGE_INITIATIVE.name())))
                 .innerJoin(MEASURABLE).on(ENTITY_RELATIONSHIP.ID_B.eq(MEASURABLE.ID)
                         .and(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.MEASURABLE.name())))
                 .innerJoin(RELATIONSHIP_KIND).on(ENTITY_RELATIONSHIP.RELATIONSHIP.eq(RELATIONSHIP_KIND.CODE))
-                .leftJoin(involvementsSubQry).on(CHANGE_INITIATIVE.ID.eq(involvementsSubQry.field("Involved Entity Id", Long.class))
+                .leftJoin(involvementsSubQry).on(ENTITY_RELATIONSHIP.ID_A.eq(involvementsSubQry.field("Involved Entity Id", Long.class))
                         .or(MEASURABLE.ID.eq(involvementsSubQry.field("Involved Entity Id", Long.class))))
                 .where(condition)
-                .and(MEASURABLE.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()));
+                .and(MEASURABLE.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))
+                .and(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.CHANGE_INITIATIVE.name()))
+                .asTable();
+
+        SelectSelectStep<Record> selectFields = dsl
+                .selectDistinct(CHANGE_INITIATIVE.ID.as("Change Initiative Id"),
+                        CHANGE_INITIATIVE.EXTERNAL_ID.as("Change Initiative External Id"),
+                        CHANGE_INITIATIVE.KIND.as("Change Initiative Kind"),
+                        CHANGE_INITIATIVE.NAME.as("Change Initiative Name"),
+                        CHANGE_INITIATIVE.DESCRIPTION.as("Change Initiative Description"))
+                .select(entityRelationshipsSubQry.field("Relationship", String.class),
+                        entityRelationshipsSubQry.field("Relationship Kind Description", String.class),
+                        entityRelationshipsSubQry.field("Relationship Description", String.class),
+                        entityRelationshipsSubQry.field("Viewpoint Id", String.class),
+                        entityRelationshipsSubQry.field("Viewpoint", String.class),
+                        entityRelationshipsSubQry.field("Viewpoint Description", String.class),
+                        entityRelationshipsSubQry.field("Viewpoint External Id", String.class),
+                        entityRelationshipsSubQry.field("Involvement", String.class),
+                        entityRelationshipsSubQry.field("Email", String.class));
+
+        return selectFields
+                .from(CHANGE_INITIATIVE)
+                .leftJoin(entityRelationshipsSubQry)
+                .on(CHANGE_INITIATIVE.ID.eq(entityRelationshipsSubQry.field("Id A", Long.class)));
 
     }
 
