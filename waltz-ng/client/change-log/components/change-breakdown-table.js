@@ -35,7 +35,7 @@ const initialState = {
 };
 
 
-function controller(serviceBroker, $q) {
+function controller(serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
@@ -43,6 +43,7 @@ function controller(serviceBroker, $q) {
         {
             field: "ref",
             name: "Entity",
+            toSearchTerm: d => d.ref.name,
             cellTemplate:`
             <div class="ui-grid-cell-contents">
                 <waltz-entity-link entity-ref="COL_FIELD"
@@ -61,13 +62,14 @@ function controller(serviceBroker, $q) {
     function loadChangeSummaries(opts) {
         vm.visibility.loading = true;
         serviceBroker
-            .loadViewData(CORE_API.ChangeLogSummariesStore.findSummariesForKindBySelector,
+            .loadViewData(
+                CORE_API.ChangeLogSummariesStore.findSummariesForKindBySelector,
                 ["APPLICATION", opts, vm.selectedDate])
             .then(r => {
                 vm.data = r.data;
                 vm.total = _.sumBy(vm.data, "count");
                 vm.visibility.loading = false;
-            })
+            });
     }
 
     vm.$onInit = () => {
@@ -84,13 +86,12 @@ function controller(serviceBroker, $q) {
 
     vm.clearSelectedDate = () => {
         vm.selectedDate = null;
-    }
+    };
 }
 
 
 controller.$inject = [
-    "ServiceBroker",
-    "$q"
+    "ServiceBroker"
 ];
 
 

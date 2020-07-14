@@ -168,20 +168,22 @@ function drawMonthLabels(svg, rawData, nestedData) {
 
 /**
  * We dynamically determine a color scale based on the maximum
- * value.  If the number is large then we use a sqrt scale, otherwise
- * we use a linear scale.
+ * count value in the `rawData`.  If the number is large then we
+ * use a sqrt scale, otherwise we use a linear scale.
  *
- * @param actualMax
+ * @param rawData
  * @returns {*}
  */
-function determineColorScale(actualMax) {
+function determineColorScale(rawData) {
+    const actualMax = _.get(_.maxBy(rawData, "count"), ["count"], 0);
+
     return (actualMax > 100)
         ? scaleSqrt()
             .domain([1, _.min([1000, actualMax])])
             .range(COLORS.filledCellRange)
             .clamp(true)
         : scaleLinear()
-            .domain([1, _.min([1000, actualMax])])
+            .domain([1, actualMax])
             .range(COLORS.filledCellRange)
             .clamp(true);
 }
@@ -194,9 +196,7 @@ function draw(rawData, holder, onSelect) {
     const w = DIMENSIONS.margins.left + DIMENSIONS.margins.right + (maxOffset * DIMENSIONS.cellSize);
     const h = DIMENSIONS.margins.top + DIMENSIONS.margins.bottom + (7 * DIMENSIONS.cellSize);
 
-    const actualMax = _.get(_.maxBy(rawData, "count"), ["count"], 0);
-
-    const colorScale = determineColorScale(actualMax);
+    const colorScale = determineColorScale(rawData);
 
     const svg = select(holder)
         .append("svg")
@@ -254,12 +254,15 @@ function draw(rawData, holder, onSelect) {
 function controller(serviceBroker, $element, $timeout) {
     const vm = initialiseData(this, initData);
 
-    vm.$onInit = () => {
-    };
+    // wrap the callback in $timeout to make angular aware of the event
+    const clickHandler = d => $timeout(() => vm.onSelectDate(d));
 
     vm.$onChanges = (c) => {
-        if(c.data && vm.data != null){
-            draw(prepareData(vm.data), $element[0], d => $timeout(() => vm.onSelectDate(d)));
+        if(c.data && vm.data != null) {
+            draw(
+                prepareData(vm.data),
+                $element[0],
+                clickHandler);
         }
     };
 }
