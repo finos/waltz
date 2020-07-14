@@ -46,7 +46,7 @@ function store($http, BaseApiUrl) {
         return $http
             .post(`${BASE}/summaries/${kind}`, options, {params: {limit}})
             .then(r => r.data);
-    }
+    };
 
     return {
         findByEntityReference,

@@ -21,11 +21,11 @@
                 class="clickable small"
                 ng-if="!$ctrl.isFavourite"
                 ng-click="$ctrl.addFavourite()">
-        </waltz-icon>
-        <waltz-icon name="bookmark"
-                    class="clickable small"
-                    ng-class="{'text-muted': $ctrl.isReadOnly}"
-                    ng-if="$ctrl.isFavourite"
-                    ng-click="$ctrl.removeFavourite()">
-        </waltz-icon>
+    </waltz-icon>
+    <waltz-icon name="bookmark"
+                class="clickable small"
+                ng-class="{'text-muted': $ctrl.isReadOnly}"
+                ng-if="$ctrl.isFavourite"
+                ng-click="$ctrl.removeFavourite()">
+    </waltz-icon>
 </span>

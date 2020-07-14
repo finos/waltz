@@ -18,19 +18,14 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.changelog.ChangeLogSummariesDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.tally.DateTally;
-import com.khartec.waltz.service.DIBaseConfiguration;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.jooq.DSLContext;
 import org.jooq.DatePart;
-import org.jooq.Record1;
-import org.jooq.Select;
 import org.jooq.impl.DSL;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
