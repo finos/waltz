@@ -16,7 +16,7 @@ const initialState = {
 
 
 const stateNameByKind = {
-    SURVEY: "main.survey.instance.user",
+    SURVEY_INSTANCE: "main.survey.instance.user",
     ATTESTATION: "main.attestation.instance.user"
 };
 

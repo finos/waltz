@@ -39,9 +39,11 @@ function controller(serviceBroker) {
         serviceBroker.loadViewData(CORE_API.FavouritesStore.getFavouritesGroup)
             .then(r => {
                 const favouritesGroup = r.data;
-                vm.favouritesGroupRef = {
-                    id: _.get(favouritesGroup, 'id', null),
-                    kind: 'APP_GROUP'
+                if(favouritesGroup) {
+                    vm.favouritesGroupRef = {
+                        id: _.get(favouritesGroup, 'id', null),
+                        kind: 'APP_GROUP'
+                    }
                 }
             })
     };
