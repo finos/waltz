@@ -67,6 +67,11 @@ public class FavouritesService {
     }
 
 
+    public AppGroup getFavouritesGroup(String username){
+        return appGroupDao.findFavouritesGroupByOwner(username);
+    }
+
+
     public Collection<AppGroupEntry> getFavouriteGroupEntries(String username) {
 
         AppGroup favouritesGroup = appGroupDao.findFavouritesGroupByOwner(username);

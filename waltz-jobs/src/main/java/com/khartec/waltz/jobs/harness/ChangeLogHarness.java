@@ -18,17 +18,21 @@
 
 package com.khartec.waltz.jobs.harness;
 
+import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.FunctionUtilities;
-import com.khartec.waltz.data.changelog.ChangeLogDao;
+import com.khartec.waltz.data.GenericSelectorFactory;
+import com.khartec.waltz.data.changelog.ChangeLogSummariesDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.changelog.ChangeLog;
+import com.khartec.waltz.model.HierarchyQueryScope;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.service.DIBaseConfiguration;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 
 
 public class ChangeLogHarness {
@@ -40,14 +44,28 @@ public class ChangeLogHarness {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIBaseConfiguration.class);
 
-        ChangeLogDao dao = ctx.getBean(ChangeLogDao.class);
+        ChangeLogSummariesDao dao = ctx.getBean(ChangeLogSummariesDao.class);
         EntityReference ref = mkRef(EntityKind.APPLICATION, 1234L);
 
-        FunctionUtilities.time("findUnattestedChanges", () -> dao.findUnattestedChanges(ref));
-        FunctionUtilities.time("findUnattestedChanges", () -> dao.findUnattestedChanges(ref));
-        FunctionUtilities.time("findUnattestedChanges", () -> dao.findUnattestedChanges(ref));
-        List<ChangeLog> changes = FunctionUtilities.time("findUnattestedChanges", () -> dao.findUnattestedChanges(ref));
-        System.out.println(changes);
+//        FunctionUtilities.time("findUnattestedChanges", () -> dao.findUnattestedChanges(ref));
+//        FunctionUtilities.time("findUnattestedChanges", () -> dao.findUnattestedChanges(ref));
+//        FunctionUtilities.time("findUnattestedChanges", () -> dao.findUnattestedChanges(ref));
+//        List<ChangeLog> changes = FunctionUtilities.time("findUnattestedChanges", () -> dao.findUnattestedChanges(ref));
+//        System.out.println(changes);
+
+        GenericSelectorFactory factory = new GenericSelectorFactory();
+
+        IdSelectionOptions idSelectionOptions = mkOpts(mkRef(EntityKind.APP_GROUP, 11874), HierarchyQueryScope.EXACT);
+
+        FunctionUtilities.time("test", () -> dao
+                .findCountByParentAndChildKindForDateBySelector(
+                        factory.applyForKind(EntityKind.APPLICATION, idSelectionOptions),
+                        DateTimeUtilities.toSqlDate(DateTimeUtilities.today()),
+                        Optional.of(10))
+        );
+
+        System.out.println("done");
+
     }
 
 

@@ -16,21 +16,20 @@
  *
  */
 
-import {initialiseData} from "../../common";
+import {initialiseData} from "../..";
 import {nest} from "d3-collection";
-import {scaleLinear} from "d3-scale";
+import {scaleLinear, scaleSqrt} from "d3-scale";
 import {select} from "d3-selection";
 import moment from "moment";
-import {CORE_API} from "../../common/services/core-api-utils";
-import {mkSelectionOptions} from "../../common/selector-utils";
 
 const bindings = {
-    parentEntityRef: "<"
+    data: "<",
+    onSelectDate: "<"
 };
 
 const COLORS = {
     cellBorder: "#93d489",
-    filledCellRange: ["#e7fae2", "#7df563"],
+    filledCellRange: ["#e7fae2", "#07ed4a"],
     emptyCellFill: "#fafafa",
     emptyCellBorder: "#ddd",
     label: "#8b8888"
@@ -45,7 +44,7 @@ const DIMENSIONS = {
     },
     cellSize: 14,
     fontSize: 12
-}
+};
 
 const initData = {
 
@@ -98,7 +97,7 @@ function nestData(preparedData = []) {
     _.forEach(byYearWeek, d => {
         d.offset = acc;
         acc += d.values.length ;
-        _.forEach(d.values, (v,idx) => v.offset = d.offset + idx)
+        _.forEach(d.values, (v,idx) => v.offset = d.offset + idx);
         d.endOffset = acc;
     });
 
@@ -168,21 +167,28 @@ function drawMonthLabels(svg, rawData, nestedData) {
 }
 
 
-function draw(rawData, holder) {
+function draw(rawData, holder, onSelect) {
     const nestedData = nestData(rawData);
     const maxOffset = _.max(_.map(nestedData, "endOffset"));
 
     const w = DIMENSIONS.margins.left + DIMENSIONS.margins.right + (maxOffset * DIMENSIONS.cellSize);
     const h = DIMENSIONS.margins.top + DIMENSIONS.margins.bottom + (7 * DIMENSIONS.cellSize);
 
-    const colorScale = scaleLinear()
-        .domain([0, 8])
-        .range(COLORS.filledCellRange);
+    const actualMax = _.get(_.maxBy(rawData, 'count'), ['count'], 0);
+
+    const colorScale = (actualMax > 100)
+        ? scaleSqrt()
+            .domain([0, _.min([1000, actualMax])])
+            .range(COLORS.filledCellRange)
+            .clamp(true)
+        : scaleLinear()
+            .domain([0, _.min([1000, actualMax])])
+            .range(COLORS.filledCellRange)
+            .clamp(true);
 
     const svg = select(holder)
         .append("svg")
         .style("max-width", "1200px")
-        .style("border", "1px dashed red")
         .attr("viewBox", `0 0 ${w} ${h}`)
         .attr("preserveAspectRatio", "xMinYMin meet");
 
@@ -220,41 +226,36 @@ function draw(rawData, holder) {
         .attr("rx", 2)
         .attr("ry", 2)
         .attr("y", (d) => d.date.day() * DIMENSIONS.cellSize)
-        .attr("fill", (d) => d.count === 0
-            ? COLORS.emptyCellFill
-            : colorScale(d.count))
-        .attr("stroke", d => d.count > 20
+        .attr("fill", (d) => d.count > 0
+            ? colorScale(d.count)
+            : COLORS.emptyCellFill)
+        .attr("stroke", d => d.count > 0
             ? COLORS.cellBorder
             : COLORS.emptyCellBorder)
-        .on("mouseover", d => console.log(d.dateStr, d.count, {d}));
+        .on("click", d => onSelect(d.date.format('YYYY-MM-DD')));
 
     drawMonthLabels(svg, rawData, nestedData)
 }
 
 
-function controller(serviceBroker, $element) {
+function controller(serviceBroker, $element, $timeout) {
     const vm = initialiseData(this, initData);
 
     vm.$onInit = () => {
-        const selectionOptions = mkSelectionOptions(vm.parentEntityRef);
-        serviceBroker
-            .loadViewData(
-                CORE_API.ChangeLogStore.findSummaries,
-                ["APPLICATION", selectionOptions, 365])
-            .then(r => {
-                draw(prepareData(r.data), $element[0]);
-            })
     };
 
-    vm.$onChanges = () => {
-        console.log("On change")
+    vm.$onChanges = (c) => {
+        if(c.data && vm.data != null){
+            draw(prepareData(vm.data), $element[0], d => $timeout(() => vm.onSelectDate(d)));
+        }
     };
 }
 
 
 controller.$inject = [
     "ServiceBroker",
-    "$element"
+    "$element",
+    "$timeout"
 ];
 
 

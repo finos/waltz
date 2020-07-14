@@ -17,8 +17,14 @@
   -->
 
 <div>
-    <waltz-section>
-        <waltz-change-summaries-panel parent-entity-ref="$ctrl.parentEntityRef">
-        </waltz-change-summaries-panel>
-    </waltz-section>
+    <div ng-if="$ctrl.data.length == 0" ng-transclude="noData">
+    </div>
+    <div ng-if="$ctrl.data.length > 0">
+        <waltz-calendar-heatmap data="$ctrl.data"
+                                on-select-date="$ctrl.onSelectDate">
+        </waltz-calendar-heatmap>
+        <waltz-change-breakdown-table parent-entity-ref="$ctrl.parentEntityRef"
+                                      selected-date="$ctrl.selectedDate">
+        </waltz-change-breakdown-table>
+    </div>
 </div>
