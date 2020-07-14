@@ -39,8 +39,8 @@ const DIMENSIONS = {
     margins: {
         left: 50,
         right: 10,
-        top: 32,
-        bottom: 10
+        top: 14,
+        bottom: 12
     },
     cellSize: 14,
     fontSize: 12
@@ -89,15 +89,14 @@ function prepareData(data = []) {
 
 function nestData(preparedData = []) {
     const byYearWeek = nest()
-        .key(d => d.date.year())
-        .key(d => d.date.week())
+        .key(d => d.date.isoWeekYear())
+        .key(d => d.date.isoWeek())
         .entries(preparedData);
 
     let acc = 0;
     _.forEach(byYearWeek, d => {
         d.offset = acc;
-        acc += d.values.length ;
-        _.forEach(d.values, (v,idx) => v.offset = d.offset + idx);
+        _.forEach(d.values, (v) => v.offset = acc++);
         d.endOffset = acc;
     });
 
@@ -110,14 +109,14 @@ function drawDayLabels(svg) {
         .classed("wch-day-labels", true)
         .attr("transform", `translate(${DIMENSIONS.margins.left - 5}, ${DIMENSIONS.margins.top})`)
         .selectAll("text.wch-day-label")
-        .data([{label: "Mon", day: 1}, {label: "Wed", day: 3}, {label: "Fri", day: 5}])
+        .data([{label: "Mon", day: 1}, {label: "Wed", day: 3}, {label: "Fri", day: 5}, {label: "Sun", day: 7}])
         .enter()
         .append("text")
         .classed("wch-day-label", true)
         .attr("text-anchor", "end")
         .attr("fill", COLORS.label)
         .attr("font-size", DIMENSIONS.fontSize)
-        .attr("dy", d => DIMENSIONS.cellSize * d.day + DIMENSIONS.fontSize - 2)
+        .attr("dy", d => DIMENSIONS.cellSize * d.day + DIMENSIONS.fontSize - 3)
         .text(d => d.label);
 }
 
@@ -134,19 +133,19 @@ function drawDayLabels(svg) {
  * @param nestedData
  */
 function drawMonthLabels(svg, rawData, nestedData) {
-    const curr = moment();
     const monthOffsets = {};
+
     _.forEach(nestedData, y => {
-        curr.year(y.key);
         _.forEach(y.values, w => {
+            const curr = _.last(w.values).date;
             curr.isoWeek(w.key);
             const m = curr.month();
-            const accKey = `${y.key}-${m}`;
+            const accKey = `${curr.isoWeekYear()}-${m}`;
             if (! monthOffsets[accKey]) {
                 monthOffsets[accKey] = {
-                    year: y.key,
+                    year: curr.isoWeekYear(),
                     month: m,
-                    offset: w.offset
+                    offset: w.offset + 1
                 };
             }
         })
@@ -155,7 +154,7 @@ function drawMonthLabels(svg, rawData, nestedData) {
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
     svg.append("g")
-        .attr("transform", `translate(${DIMENSIONS.margins.left}, ${DIMENSIONS.margins.top - (DIMENSIONS.fontSize + 2)})`)
+        .attr("transform", `translate(${DIMENSIONS.margins.left}, ${DIMENSIONS.margins.top})`) // - (DIMENSIONS.fontSize + 2)})`)
         .selectAll("text.wch-month-label")
         .data(_.values(monthOffsets))
         .enter()
@@ -167,6 +166,27 @@ function drawMonthLabels(svg, rawData, nestedData) {
 }
 
 
+/**
+ * We dynamically determine a color scale based on the maximum
+ * value.  If the number is large then we use a sqrt scale, otherwise
+ * we use a linear scale.
+ *
+ * @param actualMax
+ * @returns {*}
+ */
+function determineColorScale(actualMax) {
+    return (actualMax > 100)
+        ? scaleSqrt()
+            .domain([1, _.min([1000, actualMax])])
+            .range(COLORS.filledCellRange)
+            .clamp(true)
+        : scaleLinear()
+            .domain([1, _.min([1000, actualMax])])
+            .range(COLORS.filledCellRange)
+            .clamp(true);
+}
+
+
 function draw(rawData, holder, onSelect) {
     const nestedData = nestData(rawData);
     const maxOffset = _.max(_.map(nestedData, "endOffset"));
@@ -174,17 +194,9 @@ function draw(rawData, holder, onSelect) {
     const w = DIMENSIONS.margins.left + DIMENSIONS.margins.right + (maxOffset * DIMENSIONS.cellSize);
     const h = DIMENSIONS.margins.top + DIMENSIONS.margins.bottom + (7 * DIMENSIONS.cellSize);
 
-    const actualMax = _.get(_.maxBy(rawData, 'count'), ['count'], 0);
+    const actualMax = _.get(_.maxBy(rawData, "count"), ["count"], 0);
 
-    const colorScale = (actualMax > 100)
-        ? scaleSqrt()
-            .domain([0, _.min([1000, actualMax])])
-            .range(COLORS.filledCellRange)
-            .clamp(true)
-        : scaleLinear()
-            .domain([0, _.min([1000, actualMax])])
-            .range(COLORS.filledCellRange)
-            .clamp(true);
+    const colorScale = determineColorScale(actualMax);
 
     const svg = select(holder)
         .append("svg")
@@ -221,20 +233,21 @@ function draw(rawData, holder, onSelect) {
         .enter()
         .append("rect")
         .classed("wch-day", true)
+        .style("cursor", "pointer")
         .attr("width", DIMENSIONS.cellSize - 4)
         .attr("height", DIMENSIONS.cellSize - 4)
         .attr("rx", 2)
         .attr("ry", 2)
-        .attr("y", (d) => d.date.day() * DIMENSIONS.cellSize)
+        .attr("y", (d) => d.date.isoWeekday() * DIMENSIONS.cellSize)
         .attr("fill", (d) => d.count > 0
             ? colorScale(d.count)
             : COLORS.emptyCellFill)
         .attr("stroke", d => d.count > 0
             ? COLORS.cellBorder
             : COLORS.emptyCellBorder)
-        .on("click", d => onSelect(d.date.format('YYYY-MM-DD')));
+        .on("click", d => onSelect(d.date.format("YYYY-MM-DD")));
 
-    drawMonthLabels(svg, rawData, nestedData)
+    drawMonthLabels(svg, rawData, nestedData);
 }
 
 
