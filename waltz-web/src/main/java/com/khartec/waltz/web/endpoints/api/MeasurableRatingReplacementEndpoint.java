@@ -28,7 +28,7 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.util.Date;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityReference.mkRef;
@@ -69,7 +69,7 @@ public class MeasurableRatingReplacementEndpoint implements Endpoint {
         ListRoute<MeasurableRatingReplacement> saveRoute = (request, response) -> {
             EntityReference entityReference = getEntityReference(request);
             long decommId = getLong(request, "decommId");
-            LocalDate commissionDate = readBody(request, LocalDate.class);
+            Date commissionDate = readBody(request, Date.class);
             String username = getUsername(request);
 
             requireRole(userRoleService, request, measurableRatingReplacementService.getRequiredRatingEditRole(

@@ -202,14 +202,6 @@ export function determineStartingTab(tabs = []) {
     return _.find(tabs, t => t.ratings.length > 0 ) || tabs[0];
 }
 
-export function getDateAsUTCStartOfDay(inputDate) {
-    const inputDateAsMoment = moment(inputDate, formats.parseDateOnly);
-    const finalDate = moment.utc({year: inputDateAsMoment.year(), month: inputDateAsMoment.month(), date: inputDateAsMoment.date()});
-    if(moment().utcOffset() < 0) {
-        finalDate.minutes(finalDate.minutes() - moment().utcOffset());
-    }
-    return finalDate.toISOString();
-}
 
 export function getDateAsUtc(inputDate) {
     const inputDateAsMoment = moment(inputDate, formats.parseDateOnly);

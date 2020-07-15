@@ -34,8 +34,8 @@ import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -75,9 +75,9 @@ public class MeasurableRatingReplacementService {
 
 
     public Set<MeasurableRatingReplacement> save(long decommId,
-                        EntityReference entityReference,
-                        LocalDate commissionDate,
-                        String username) {
+                                                 EntityReference entityReference,
+                                                 Date commissionDate,
+                                                 String username) {
 
         Tuple2<Operation, Boolean> operation = measurableRatingReplacementDao.save(decommId, entityReference, commissionDate, username);
 
