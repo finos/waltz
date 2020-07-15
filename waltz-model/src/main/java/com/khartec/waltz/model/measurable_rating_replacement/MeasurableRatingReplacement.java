@@ -7,7 +7,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.LastUpdatedProvider;
 import org.immutables.value.Value;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableMeasurableRatingReplacement.class)
@@ -19,6 +19,6 @@ public abstract class MeasurableRatingReplacement implements
     public abstract Long id();
     public abstract EntityReference entityReference();
     public abstract Long decommissionId();
-    public abstract LocalDateTime plannedCommissionDate();
+    public abstract Date plannedCommissionDate();
 
 }

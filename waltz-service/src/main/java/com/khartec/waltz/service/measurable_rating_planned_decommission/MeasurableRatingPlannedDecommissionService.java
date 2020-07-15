@@ -93,7 +93,7 @@ public class MeasurableRatingPlannedDecommissionService {
             MeasurableRatingPlannedDecommission plannedDecommission = measurableRatingPlannedDecommissionDao.getByEntityAndMeasurable(entityReference, measurableId);
             String logMessage = operation.v1.equals(Operation.UPDATE)
                     ? String.format("Updated planned decommission date: from %s to %s",
-                    DateTimeUtilities.toLocalDate(dateChange.oldVal()),
+                    dateChange.oldVal(),
                     plannedDecommission.plannedDecommissionDate())
                     : String.format("Added planned decommission date:%s", plannedDecommission.plannedDecommissionDate());
 

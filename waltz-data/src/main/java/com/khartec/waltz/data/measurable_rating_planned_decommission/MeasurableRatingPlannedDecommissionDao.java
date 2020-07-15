@@ -38,8 +38,7 @@ import java.util.Collection;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
-import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
+import static com.khartec.waltz.common.DateTimeUtilities.*;
 import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.MeasurableRatingPlannedDecommission.MEASURABLE_RATING_PLANNED_DECOMMISSION;
@@ -64,7 +63,7 @@ public class MeasurableRatingPlannedDecommissionDao {
                         r.getEntityId(),
                         record.get(NAME_FIELD)))
                 .measurableId(r.getMeasurableId())
-                .plannedDecommissionDate(r.getPlannedDecommissionDate().toLocalDate())
+                .plannedDecommissionDate(r.getPlannedDecommissionDate())
                 .createdAt(toLocalDateTime(r.getCreatedAt()))
                 .createdBy(r.getCreatedBy())
                 .lastUpdatedAt(toLocalDateTime(r.getUpdatedAt()))
