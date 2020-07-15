@@ -25,13 +25,6 @@ release we have a calendar heatmap which shows changes to the records related to
 the apps.  This can be used to get an immediate oversight of what is changing within 
 Waltz.    
 
----
-## Screenshot:
-
-![Screenshot](./images/favourites-screenshots2.png)
-
----
-
 If you have questions please contact us via [Github issues](https://github.com/finos/waltz/issues/).
 
 ----
