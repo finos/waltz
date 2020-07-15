@@ -102,4 +102,20 @@
         </insert>
     </changeSet>
 
+
+    <!-- 4876: add dedicated news section -->
+    <changeSet id="20200714-4876-1"
+               author="woodjes">
+        <comment>4876: Insert dedicated news section to static panels</comment>
+        <insert tableName="static_panel">
+            <column name="group" value="NEWS"/>
+            <column name="title" value="News"/>
+            <column name="icon" value="bolt"/>
+            <column name="priority" value="0"/>
+            <column name="width" value="12"/>
+            <column name="encoding" value="HTML"/>
+            <column name="content" value="Welcome to the new WIP 1.26 Release of Waltz"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>
