@@ -118,4 +118,15 @@
         </insert>
     </changeSet>
 
+
+    <!-- 4815: insert banner message settings value -->
+    <changeSet id="20200713-4876-1"
+               author="woodjes">
+        <comment>4876: Insert banner message into table</comment>
+        <insert tableName="settings">
+            <column name="name" value="ui.banner.message"/>
+            <column name="value" value="Waltz is optimised for use in Google Chrome, try a different browser for better performance"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>

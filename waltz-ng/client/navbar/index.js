@@ -22,6 +22,7 @@ import NavbarFilters from "./components/navbar-filters/navbar-filters"
 import NavbarSearch from './components/navbar-search/navbar-search';
 import NavFiltersOverlay from "./components/nav-filters-overlay/nav-filters-overlay";
 import NavSearchOverlay from './components/nav-search-overlay/nav-search-overlay';
+import BrowserDetectBanner from './components/browser-detect-banner/browser-detect-banner';
 
 import Navbar from './directives/navbar';
 import NavbarRecentlyViews from './directives/navbar-recently-viewed';
@@ -41,7 +42,8 @@ export default () => {
         NavbarFilters,
         NavbarSearch,
         NavFiltersOverlay,
-        NavSearchOverlay
+        NavSearchOverlay,
+        BrowserDetectBanner
     ]);
 
     return module.name;
