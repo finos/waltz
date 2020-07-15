@@ -17,7 +17,7 @@
  */
 
 import {initialiseData} from "../../../common";
-import template from './change-summaries-panel.html';
+import template from "./change-summaries-panel.html";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
@@ -50,7 +50,7 @@ function controller(serviceBroker) {
 
     vm.onSelectDate = (date) => {
         vm.selectedDate = date;
-    }
+    };
 }
 
 

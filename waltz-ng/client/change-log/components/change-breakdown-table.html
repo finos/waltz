@@ -24,22 +24,24 @@
         </span>
     </div>
     <div ng-if="$ctrl.selectedDate">
-        <h4>Changes for
-            <span ng-bind="$ctrl.selectedDate |  date:'yyyy-MM-dd'"></span>:
+        <h5>
+            <span ng-bind="$ctrl.selectedDate |  date:'yyyy-MM-dd'"></span>
+            changes
+            <span ng-if="$ctrl.total" class="text-muted">
+                ( Total: <span ng-bind="$ctrl.total"></span> )
+            </span>
             <a class="pull-right clickable"
                ng-click="$ctrl.clearSelectedDate()">
-                (x)
+                <waltz-icon name="times" title="Close"></waltz-icon>
             </a>
-        </h4>
+        </h5>
+
         <waltz-loading-notification show="$ctrl.visibility.loading"
-                                    style="padding-top: 54px;"
+                                    style="height: 200px"
                                     name="Loading">
         </waltz-loading-notification>
+
         <div ng-if="!$ctrl.visibility.loading">
-            <div style="margin-top: 4px" class="small text-muted">
-                (Total: <span ng-bind="$ctrl.total"></span>)
-            </div>
-            <br>
             <waltz-no-data ng-if="$ctrl.data.length == 0">
                 <message>
                     There are no changes on this date
