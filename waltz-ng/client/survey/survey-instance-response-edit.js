@@ -23,6 +23,7 @@ import {CORE_API} from "../common/services/core-api-utils";
 import moment from "moment";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 import template from "./survey-instance-response-edit.html";
+import BigEval from "bigeval";
 
 
 const initialState = {
@@ -59,6 +60,41 @@ function indexResponses(responses = []) {
 
 
 
+const refreshQuestions = (allQuestions = [], responses = []) => {
+
+    const ctx = {
+        resp: (qExtId) => {
+            console.log("exec resp:" + qExtId)
+            const referencedQuestion = _.find(allQuestions, d => d.question.externalId === qExtId);
+            if (!referencedQuestion) {
+                console.log("SurveyVisibilityCondition [resp]: Cannot find referenced question with external id: " + qExtId);
+            } else {
+                const referencedId = referencedQuestion.question.id;
+                const value =  _
+                    .chain(responses)
+                    .find(r => r.questionId === referencedId)
+                    .get(["booleanResponse"], "false")
+                    .value();
+                console.log("resps: ", {q: referencedId, responses, value})
+                return value
+            }
+            return true;
+        }
+    };
+
+    const be = new BigEval(ctx);
+
+    const activeQs = _.filter(allQuestions, q => {
+        if (q.visibilityCondition) {
+            console.log("Evaluating: ", {q})
+            return be.exec(q.visibilityCondition);
+        }
+        return true;
+    });
+    return groupQuestions(activeQs);
+};
+
+
 function controller($location,
                     $state,
                     $stateParams,
@@ -91,7 +127,18 @@ function controller($location,
 
     surveyQuestionStore
         .findForInstance(id)
-        .then(qis => vm.surveyQuestionInfos = groupQuestions(qis));
+        .then(qis => {
+            vm.allQuestions = _.map(
+                qis,
+                q => Object.assign(
+                    {},
+                    q,
+                    {visibilityCondition: q.question.externalId === "COMMENTARY"
+                        ? "resp('IN_SCOPE') == 'true'"
+                        : null}));
+
+            vm.surveyQuestionInfos = refreshQuestions(vm.allQuestions, vm.surveyResponses);
+        });
 
     Promise
         .all([userService.whoami(), surveyInstanceStore.findRecipients(id)])
@@ -107,7 +154,11 @@ function controller($location,
 
     surveyInstanceStore
         .findResponses(id)
-        .then(rs => vm.surveyResponses = indexResponses(rs));
+        .then(rs => {
+            vm.surveyResponses = indexResponses(rs);
+
+            vm.surveyQuestionInfos = refreshQuestions(vm.allQuestions, vm.surveyResponses);
+        });
 
 
     vm.surveyInstanceLink = encodeURIComponent(
@@ -116,6 +167,8 @@ function controller($location,
 
     vm.saveResponse = (questionId) => {
         const questionResponse = vm.surveyResponses[questionId];
+        vm.surveyQuestionInfos = refreshQuestions(vm.allQuestions, vm.surveyResponses);
+
         surveyInstanceStore.saveResponse(
             vm.surveyInstance.id,
             Object.assign(
