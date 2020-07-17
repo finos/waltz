@@ -73,8 +73,21 @@ function lookupResponse(responses, q) {
 }
 
 
-function lookupQuestionResponse(questions = [], responses = [], questionExternalId, expr = "") {
-    const question = lookupQuestion(questions, questionExternalId, expr);
+/**
+ * Using a list of questions and responses will attempt to return a tuple array
+ * with the `[question?, response?]` which matches a given question external id.
+ *
+ * @param questions
+ * @param responses
+ * @param questionExternalId
+ * @param exprStr  message used in logging message to help diagnose which function caused this error
+ * @returns {*[]}
+ */
+function lookupQuestionResponse(questions = [],
+                                responses = [],
+                                questionExternalId,
+                                exprStr = "") {
+    const question = lookupQuestion(questions, questionExternalId, exprStr);
     const response = question
         ? lookupResponse(responses, question)
         : null;
@@ -82,6 +95,32 @@ function lookupQuestionResponse(questions = [], responses = [], questionExternal
 }
 
 
+/**
+ * Given a set of questions and the current state of any responses this
+ * will return an object which can evaluate expressions.
+ *
+ * Currently supported operations are:
+ * ```
+ *  ['!'],  // Factorial
+ *  ['**'],  // power
+ *  ['/', '*', '%'],
+ *  ['+', '-'],
+ *  ['<<', '>>'],  // bit shifts
+ *  ['<', '<=', '>', '>='],
+ *  ['==', '=', '!='],   // equality comparisons
+ *  ['&'], ['^'], ['|'],   // bitwise operations
+ *  ['&&'], ['||']   // logical operations
+ * ```
+ *
+ * The evaluator also has built in functions:
+ *
+ * - `isChecked(questionExtId, defaultValue = false)` : returns boolean value of
+ *    a response (or default if response is not given)
+ *
+ * @param questions
+ * @param responses
+ * @returns {BigEval}
+ */
 export function mkSurveyExpressionEvaluator(questions = [], responses = []) {
     const ctx = {
         isChecked: (qExtId, dfltVal = false) => {
