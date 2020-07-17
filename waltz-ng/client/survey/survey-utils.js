@@ -16,11 +16,13 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
+import BigEval from "bigeval";
 
 
 export function groupQuestions(questionInfos = []) {
-    const sections = _.chain(questionInfos)
+    const sections = _
+        .chain(questionInfos)
         .map(q => q.question.sectionName || "Other")
         .uniq()
         .value();
@@ -29,9 +31,9 @@ export function groupQuestions(questionInfos = []) {
 
     return _.map(sections, s => {
         return {
-            'sectionName': s,
-            'questionInfos': groupedQuestionInfos[s]
-        }
+            "sectionName": s,
+            "questionInfos": groupedQuestionInfos[s]
+        };
     });
 }
 
@@ -44,10 +46,55 @@ export function isSurveyTargetKind(entityKind = "") {
 
 
 export function mkDescription(descriptions = []) {
-
-    return _.chain(descriptions)
+    return _
+        .chain(descriptions)
         .filter(d => !_.isEmpty(d))
         .uniq()
         .join("\n\n --- \n\n")
         .value();
 }
+
+
+
+function lookupQuestion(questions = [],
+                        qExtId,
+                        expr = "") {
+    const referencedQuestion = _.find(questions, d => d.question.externalId === qExtId);
+    if (!referencedQuestion) {
+        console.log(`SurveyVisibilityCondition [${expr}]: Cannot find referenced question with external id: ${qExtId}`);
+    }
+    return referencedQuestion;
+}
+
+
+function lookupResponse(responses, q) {
+    const referencedId = q.question.id;
+    return _.find(responses,r => r.questionId === referencedId);
+}
+
+
+function lookupQuestionResponse(questions = [], responses = [], questionExternalId, expr = "") {
+    const question = lookupQuestion(questions, questionExternalId, expr);
+    const response = question
+        ? lookupResponse(responses, question)
+        : null;
+    return [question, response]
+}
+
+
+export function mkSurveyExpressionEvaluator(questions = [], responses = []) {
+    const ctx = {
+        isChecked: (qExtId, dfltVal = false) => {
+            const [q,r] = lookupQuestionResponse(questions, responses, qExtId, "isChecked");
+            return r
+                ? JSON.parse(r.booleanResponse.toLowerCase())
+                : dfltVal;
+        },
+        resp: (qExtId) => {
+            const [q,r] = lookupQuestionResponse(questions, responses, qExtId, "resp");
+            return r;
+        }
+    };
+    return new BigEval(ctx);
+}
+

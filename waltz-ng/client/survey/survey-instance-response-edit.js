@@ -17,7 +17,7 @@
  */
 
 import {formats, initialiseData} from "../common/index";
-import {groupQuestions} from "./survey-utils";
+import {groupQuestions, mkSurveyExpressionEvaluator} from "./survey-utils";
 import _ from "lodash";
 import {CORE_API} from "../common/services/core-api-utils";
 import moment from "moment";
@@ -59,34 +59,12 @@ function indexResponses(responses = []) {
 }
 
 
-
 const refreshQuestions = (allQuestions = [], responses = []) => {
-
-    const ctx = {
-        resp: (qExtId) => {
-            console.log("exec resp:" + qExtId)
-            const referencedQuestion = _.find(allQuestions, d => d.question.externalId === qExtId);
-            if (!referencedQuestion) {
-                console.log("SurveyVisibilityCondition [resp]: Cannot find referenced question with external id: " + qExtId);
-            } else {
-                const referencedId = referencedQuestion.question.id;
-                const value =  _
-                    .chain(responses)
-                    .find(r => r.questionId === referencedId)
-                    .get(["booleanResponse"], "false")
-                    .value();
-                console.log("resps: ", {q: referencedId, responses, value})
-                return value
-            }
-            return true;
-        }
-    };
-
-    const be = new BigEval(ctx);
+    const be = mkSurveyExpressionEvaluator(allQuestions, responses);
 
     const activeQs = _.filter(allQuestions, q => {
         if (q.visibilityCondition) {
-            console.log("Evaluating: ", {q})
+            console.log("Evaluating: ", {cond: q.visibilityCondition})
             return be.exec(q.visibilityCondition);
         }
         return true;
@@ -134,7 +112,7 @@ function controller($location,
                     {},
                     q,
                     {visibilityCondition: q.question.externalId === "COMMENTARY"
-                        ? "resp('IN_SCOPE') == 'true'"
+                        ? "isChecked('IN_SCOPE', false)"
                         : null}));
 
             vm.surveyQuestionInfos = refreshQuestions(vm.allQuestions, vm.surveyResponses);
