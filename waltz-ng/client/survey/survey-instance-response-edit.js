@@ -63,9 +63,8 @@ const refreshQuestions = (allQuestions = [], responses = []) => {
     const be = mkSurveyExpressionEvaluator(allQuestions, responses);
 
     const activeQs = _.filter(allQuestions, q => {
-        if (q.visibilityCondition) {
-            console.log("Evaluating: ", {cond: q.visibilityCondition})
-            return be.exec(q.visibilityCondition);
+        if (q.question.inclusionPredicate) {
+            return be.exec(q.question.inclusionPredicate);
         }
         return true;
     });
@@ -108,12 +107,7 @@ function controller($location,
         .then(qis => {
             vm.allQuestions = _.map(
                 qis,
-                q => Object.assign(
-                    {},
-                    q,
-                    {visibilityCondition: q.question.externalId === "COMMENTARY"
-                        ? "isChecked('IN_SCOPE', false)"
-                        : null}));
+                q => Object.assign({}, q));
 
             vm.surveyQuestionInfos = refreshQuestions(vm.allQuestions, vm.surveyResponses);
         });
@@ -134,7 +128,6 @@ function controller($location,
         .findResponses(id)
         .then(rs => {
             vm.surveyResponses = indexResponses(rs);
-
             vm.surveyQuestionInfos = refreshQuestions(vm.allQuestions, vm.surveyResponses);
         });
 

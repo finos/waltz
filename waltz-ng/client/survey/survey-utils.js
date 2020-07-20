@@ -117,23 +117,40 @@ function lookupQuestionResponse(questions = [],
  * - `isChecked(questionExtId, defaultValue = false)` : returns boolean value of
  *    a response (or default if response is not given)
  *
+ *  For more information see [BigEval](https://github.com/aviaryan/BigEval.js)
+ *
  * @param questions
  * @param responses
  * @returns {BigEval}
  */
 export function mkSurveyExpressionEvaluator(questions = [], responses = []) {
-    const ctx = {
+    let ctx = {};
+    const evaluator = new BigEval(ctx);
+    Object.assign(ctx, {
         isChecked: (qExtId, dfltVal = false) => {
             const [q,r] = lookupQuestionResponse(questions, responses, qExtId, "isChecked");
             return r
                 ? JSON.parse(r.booleanResponse.toLowerCase())
                 : dfltVal;
         },
+        numberValue: (qExtId, dfltVal = 0) => {
+            const [q, r] = lookupQuestionResponse(questions, responses, qExtId, "numberValue");
+            return r
+                ? r.numberResponse
+                : dfltVal;
+        },
+        ditto: (qExtId) => {
+            const q = lookupQuestion(questions, qExtId, "ditto");
+            if (q) {
+                return evaluator.exec(q.question.inclusionPredicate);
+            }
+            return true
+        },
         resp: (qExtId) => {
             const [q,r] = lookupQuestionResponse(questions, responses, qExtId, "resp");
             return r;
         }
-    };
-    return new BigEval(ctx);
+    });
+    return evaluator;
 }
 

@@ -21,6 +21,19 @@ import {initialiseData} from "../common/index";
 import template from "./survey-template-edit.html";
 
 
+const qInclusionPredicateHelp = `
+The inclusion predicate allows for questions to be included in a survey depending on the values of other fields.
+See <a href="">the documentation</a> for a complete list of functions and their arguments.
+Below is a selection of the main functions/operators:
+
+* Logical operators: \`< <= > >= == != && || ! \`
+* \`isChecked(extId, defaultValue)\`: \`true\` if the question with the given ext id is checked, \`false\` if not checked,
+  or \`defaultValue\` if the answer is currently undefined.
+* \`numberValue(extId, defaultValue)\`: numeric value of the response for the given ext id (or \`defaultValue\`)
+* \`ditto(extId)\`: evaluates same conditions from a different question.  Good for repetition, enhancements.
+`;
+
+
 const initialState = {
     editingQuestion: false,
     questionFieldTypes: [{
@@ -60,7 +73,8 @@ const initialState = {
     },{
         name: "Change Initiative",
         value: "CHANGE_INITIATIVE"
-    }]
+    }],
+    qInclusionPredicateHelp
 };
 
 
@@ -105,7 +119,8 @@ function controller($stateParams,
                 isMandatory: false,
                 allowComment: false,
                 position: (currentMaxPos || 0) + 10,
-                externalId: null
+                externalId: null,
+                inclusionPredicate: null
             },
             dropdownEntries: []
         };
