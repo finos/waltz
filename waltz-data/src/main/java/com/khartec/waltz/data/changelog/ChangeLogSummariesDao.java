@@ -26,21 +26,18 @@ import com.khartec.waltz.model.tally.ChangeLogTally;
 import com.khartec.waltz.model.tally.DateTally;
 import com.khartec.waltz.model.tally.ImmutableChangeLogTally;
 import com.khartec.waltz.model.tally.ImmutableDateTally;
-import com.khartec.waltz.schema.tables.records.ChangeLogRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.DateTimeUtilities.toLocalDate;
-import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.data.JooqUtilities.mkDateRangeCondition;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG;
 
@@ -132,19 +129,4 @@ public class ChangeLogSummariesDao {
                 .fetch(TO_CHANGE_LOG_TALLY_MAPPER);
     }
 
-
-    private Condition mkDateRangeCondition(TableField<ChangeLogRecord, Timestamp> field, Date date) {
-        long time = date.getTime();
-        Timestamp startOfDay = new Timestamp(time);
-
-        long timeAfterDay = getOneDayLater(startOfDay).getTime();
-        Timestamp endOfDay = new Timestamp(timeAfterDay);
-
-        return field.ge(startOfDay).and(field.lt(endOfDay));
-    }
-
-
-    private Date getOneDayLater(Timestamp timestamp) {
-        return toSqlDate(toLocalDate(timestamp).plusDays(1));
-    }
 }
