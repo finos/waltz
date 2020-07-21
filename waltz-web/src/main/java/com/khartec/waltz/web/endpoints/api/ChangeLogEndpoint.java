@@ -25,6 +25,9 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+import java.util.Optional;
+
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
@@ -64,10 +67,13 @@ public class ChangeLogEndpoint implements Endpoint {
                 mkPath(BASE_URL, ":kind", ":id"),
                 (request, response) -> {
                     EntityReference ref = getEntityReference(request);
+                    Optional<Date> dateParam = getDateParam(request);
+                    Optional<Integer> limitParam = getLimit(request);
+
                     if(ref.kind() == EntityKind.PERSON) {
-                        return service.findByPersonReference(ref, getLimit(request));
+                        return service.findByPersonReference(ref, dateParam, limitParam);
                     } else {
-                        return service.findByParentReference(ref, getLimit(request));
+                        return service.findByParentReference(ref, dateParam, limitParam);
                     }
                 });
 

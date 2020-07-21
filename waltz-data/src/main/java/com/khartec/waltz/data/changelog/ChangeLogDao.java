@@ -33,6 +33,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,34 +78,50 @@ public class ChangeLogDao {
 
 
     public List<ChangeLog> findByParentReference(EntityReference ref,
+                                                 Optional<Date> date,
                                                  Optional<Integer> limit) {
         checkNotNull(ref, "ref must not be null");
+
+        Condition dateCondition = date
+                .map(d -> mkDateRangeCondition(CHANGE_LOG.CREATED_AT, d))
+                .orElse(DSL.trueCondition());
+        Integer limitValue = limit.orElse(Integer.MAX_VALUE);
 
         return dsl.select()
                 .from(CHANGE_LOG)
                 .where(CHANGE_LOG.PARENT_ID.eq(ref.id()))
                 .and(CHANGE_LOG.PARENT_KIND.eq(ref.kind().name()))
+                .and(dateCondition)
                 .orderBy(CHANGE_LOG.CREATED_AT.desc())
-                .limit(limit.orElse(Integer.MAX_VALUE))
+                .limit(limitValue)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
     public List<ChangeLog> findByPersonReference(EntityReference ref,
+                                                 Optional<Date> date,
                                                  Optional<Integer> limit) {
         checkNotNull(ref, "ref must not be null");
+
+        Condition dateCondition = date
+                .map(d -> mkDateRangeCondition(CHANGE_LOG.CREATED_AT, d))
+                .orElse(DSL.trueCondition());
+
+        Integer limitValue = limit.orElse(Integer.MAX_VALUE);
 
         SelectConditionStep<Record> byParentRef = DSL
                 .select(CHANGE_LOG.fields())
                 .from(CHANGE_LOG)
                 .where(CHANGE_LOG.PARENT_ID.eq(ref.id()))
+                .and(dateCondition)
                 .and(CHANGE_LOG.PARENT_KIND.eq(ref.kind().name()));
 
         SelectConditionStep<Record> byUserId = DSL
                 .select(CHANGE_LOG.fields())
                 .from(CHANGE_LOG)
                 .innerJoin(PERSON).on(PERSON.EMAIL.eq(CHANGE_LOG.USER_ID))
-                .where(PERSON.ID.eq(ref.id()));
+                .where(PERSON.ID.eq(ref.id()))
+                .and(dateCondition);
 
         SelectOrderByStep<Record> union = byParentRef.unionAll(byUserId);
 
@@ -112,7 +129,7 @@ public class ChangeLogDao {
                 .select(union.fields())
                 .from(union.asTable())
                 .orderBy(union.field("created_at").desc())
-                .limit(limit.orElse(Integer.MAX_VALUE))
+                .limit(limitValue)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
