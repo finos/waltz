@@ -73,7 +73,6 @@ function controller(serviceBroker) {
                 CORE_API.ChangeLogStore.findByEntityReferenceForDate,
                 [ref, date])
             .then(r => {
-                console.log(r.data);
                 vm.detail = {
                     ref,
                     entries: r.data,
