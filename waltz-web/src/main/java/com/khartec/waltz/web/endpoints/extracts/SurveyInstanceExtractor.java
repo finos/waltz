@@ -357,7 +357,8 @@ public class SurveyInstanceExtractor implements DataExtractor {
                 .from(st)
                 .innerJoin(sr).on(sr.SURVEY_TEMPLATE_ID.eq(st.ID))
                 .innerJoin(si).on(si.SURVEY_RUN_ID.eq(sr.ID))
-                .innerJoin(sqr).on(sqr.SURVEY_INSTANCE_ID.eq(si.ID))
+                .innerJoin(sq).on(sq.SURVEY_TEMPLATE_ID.eq(st.ID))
+                .innerJoin(sqr).on(sqr.SURVEY_INSTANCE_ID.eq(si.ID).and(sqr.QUESTION_ID.eq(sq.ID)))
                 .where(condition);
 
         Result<Record> results = extractAnswersQuery.fetch();
@@ -393,6 +394,8 @@ public class SurveyInstanceExtractor implements DataExtractor {
                                     reportRow.add(findValueInRecord(t.v1, t.v2));
                                     if (t.v1.allowComment() && t.v2 != null) {
                                         reportRow.add(t.v2.get(sqr.COMMENT));
+                                    } else {
+                                        reportRow.add("");
                                     }
                                 });
 
@@ -404,7 +407,7 @@ public class SurveyInstanceExtractor implements DataExtractor {
 
     private Object findValueInRecord(SurveyQuestion q, Record r) {
         if (r == null) {
-            return null;
+            return "";
         }
         switch (q.fieldType()) {
             case NUMBER:
