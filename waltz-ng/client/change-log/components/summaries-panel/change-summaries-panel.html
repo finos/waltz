@@ -17,15 +17,50 @@
   -->
 
 <div>
-    <div ng-if="$ctrl.data.length == 0" ng-transclude="noData">
+    <div ng-if="$ctrl.heatmapData.length == 0" ng-transclude="noData">
     </div>
-    <div ng-if="$ctrl.data.length > 0">
-        <waltz-calendar-heatmap data="$ctrl.data"
+    <div ng-if="$ctrl.heatmapData.length > 0">
+
+        <waltz-calendar-heatmap data="$ctrl.heatmapData"
                                 on-select-date="$ctrl.onSelectDate">
         </waltz-calendar-heatmap>
-        <br>
-        <waltz-change-breakdown-table parent-entity-ref="$ctrl.parentEntityRef"
-                                      selected-date="$ctrl.selectedDate">
-        </waltz-change-breakdown-table>
+
+
+        <div ng-switch="$ctrl.mode">
+            <waltz-loading-notification ng-switch-when="LOADING"
+                                        style="height: 200px"
+                                        name="Loading">
+            </waltz-loading-notification>
+
+            <div ng-switch-when="NO_SELECTION" class="help-block">
+                Select a cell above to see a events that occurred on that day
+            </div>
+
+            <waltz-change-breakdown-table ng-switch-when="DATE_SELECTED"
+                                          summaries="$ctrl.summaries"
+                                          on-dismiss="$ctrl.onClearSelectedDate"
+                                          on-detail-select="$ctrl.onDetailSelect"
+                                          selected-date="$ctrl.selectedDate">
+            </waltz-change-breakdown-table>
+
+            <div ng-switch-when="DETAIL_SELECTED">
+                <h5>
+                    Changes for
+                    <waltz-entity-link entity-ref="$ctrl.detail.ref"></waltz-entity-link>
+                    on
+                    <span ng-bind="$ctrl.selectedDate |  date:'yyyy-MM-dd'"></span>
+                    :
+                    <a class="pull-right clickable"
+                       ng-click="$ctrl.onClearSelectedDetail()">
+                        <waltz-icon name="times" title="Close"></waltz-icon>
+                    </a>
+                </h5>
+
+                <waltz-change-log-table entries="$ctrl.detail.entries">
+                </waltz-change-log-table>
+            </div>
+
+        </div>
+
     </div>
 </div>

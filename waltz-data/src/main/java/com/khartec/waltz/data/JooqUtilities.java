@@ -18,7 +18,6 @@
 
 package com.khartec.waltz.data;
 
-import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.model.EndOfLifeStatus;
 import com.khartec.waltz.model.EntityKind;
@@ -28,19 +27,22 @@ import com.khartec.waltz.model.tally.ImmutableOrderedTally;
 import com.khartec.waltz.model.tally.ImmutableTally;
 import com.khartec.waltz.model.tally.OrderedTally;
 import com.khartec.waltz.model.tally.Tally;
+import com.khartec.waltz.schema.tables.records.ChangeLogRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.DateTimeUtilities.toLocalDate;
+import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.common.SetUtilities.union;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static java.util.stream.Collectors.*;
@@ -282,6 +284,33 @@ public class JooqUtilities {
         Function<String, Condition> mapper = (term) -> field.likeIgnoreCase("%"+term+"%");
         BinaryOperator<Condition> combiner = (a, b) -> a.and(b);
         return terms.stream().collect(Collectors.reducing(DSL.trueCondition(), mapper, combiner));
+    }
+
+
+    public static Condition mkDateRangeCondition(TableField<ChangeLogRecord, Timestamp> field, java.sql.Date date) {
+        long time = date.getTime();
+        Timestamp startOfDay = new Timestamp(time);
+
+        long timeAfterDay = getOneDayLater(startOfDay).getTime();
+        Timestamp endOfDay = new Timestamp(timeAfterDay);
+
+        return field.ge(startOfDay).and(field.lt(endOfDay));
+    }
+
+
+    public static Condition mkDateRangeCondition(TableField<ChangeLogRecord, Timestamp> field, java.util.Date date) {
+        long time = date.getTime();
+        Timestamp startOfDay = new Timestamp(time);
+
+        long timeAfterDay = getOneDayLater(startOfDay).getTime();
+        Timestamp endOfDay = new Timestamp(timeAfterDay);
+
+        return field.ge(startOfDay).and(field.lt(endOfDay));
+    }
+
+
+    private static Date getOneDayLater(Timestamp timestamp) {
+        return toSqlDate(toLocalDate(timestamp).plusDays(1));
     }
 
 }

@@ -110,19 +110,21 @@ public class ChangeLogService {
 
 
     public List<ChangeLog> findByParentReference(EntityReference ref,
+                                                 Optional<Date> date,
                                                  Optional<Integer> limit) {
         checkNotNull(ref, "ref must not be null");
         if(ref.kind() == EntityKind.PHYSICAL_FLOW) {
-            return findByParentReferenceForPhysicalFlow(ref, limit);
+            return findByParentReferenceForPhysicalFlow(ref, date, limit);
         }
-        return changeLogDao.findByParentReference(ref, limit);
+        return changeLogDao.findByParentReference(ref, date, limit);
     }
 
 
     public List<ChangeLog> findByPersonReference(EntityReference ref,
+                                                 Optional<Date> date,
                                                  Optional<Integer> limit) {
         checkNotNull(ref, "ref must not be null");
-        return changeLogDao.findByPersonReference(ref, limit);
+        return changeLogDao.findByPersonReference(ref, date, limit);
     }
 
 
@@ -227,15 +229,16 @@ public class ChangeLogService {
         ////////////////////// PRIVATE HELPERS //////////////////////////////////////////
 
     private List<ChangeLog> findByParentReferenceForPhysicalFlow(EntityReference ref,
+                                                                 Optional<Date> date,
                                                                  Optional<Integer> limit) {
         checkNotNull(ref, "ref must not be null");
         checkTrue(ref.kind() == EntityKind.PHYSICAL_FLOW, "ref should refer to a Physical Flow");
 
-        Future<List<ChangeLog>> flowLogsFuture = dbExecutorPool.submit(() -> changeLogDao.findByParentReference(ref, limit));
+        Future<List<ChangeLog>> flowLogsFuture = dbExecutorPool.submit(() -> changeLogDao.findByParentReference(ref, date, limit));
 
         Future<List<ChangeLog>> specLogsFuture = dbExecutorPool.submit(() -> {
             PhysicalFlow flow = physicalFlowDao.getById(ref.id());
-            return changeLogDao.findByParentReference(mkRef(EntityKind.PHYSICAL_SPECIFICATION, flow.specificationId()), limit);
+            return changeLogDao.findByParentReference(mkRef(EntityKind.PHYSICAL_SPECIFICATION, flow.specificationId()), date, limit);
         });
 
         return Unchecked.supplier(() -> {

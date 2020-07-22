@@ -21,6 +21,13 @@ import template from "./change-summaries-panel.html";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
+const modes = {
+    LOADING: "LOADING",
+    NO_SELECTION: "NO_SELECTION",
+    DATE_SELECTED: "DATE_SELECTED",
+    DETAIL_SELECTED: "DETAIL_SELECTED"
+};
+
 
 const bindings = {
     parentEntityRef: "<"
@@ -28,11 +35,12 @@ const bindings = {
 
 
 const initialState = {
+    modes,
+    mode: modes.NO_SELECTION,
     selectedDate: null,
-    data: null
+    heatmapData: null,
+    summaries: []
 };
-
-
 
 
 function controller(serviceBroker) {
@@ -41,16 +49,62 @@ function controller(serviceBroker) {
     vm.$onInit = () => {
         const selectionOptions = mkSelectionOptions(vm.parentEntityRef);
 
+        vm.mode = modes.LOADING;
         serviceBroker
             .loadViewData(
                 CORE_API.ChangeLogStore.findSummaries,
                 ["APPLICATION", selectionOptions, 365])
-            .then(r => vm.data = r.data);
+            .then(r => {
+                vm.heatmapData = r.data;
+                vm.mode = modes.NO_SELECTION;
+            });
     };
 
     vm.onSelectDate = (date) => {
         vm.selectedDate = date;
+        loadChangeSummaries();
+        vm.mode = modes.DATE_SELECTED;
     };
+
+    vm.onDetailSelect = (ref, date) => {
+        vm.mode = modes.LOADING;
+        serviceBroker
+            .loadViewData(
+                CORE_API.ChangeLogStore.findByEntityReferenceForDate,
+                [ref, date])
+            .then(r => {
+                vm.detail = {
+                    ref,
+                    entries: r.data,
+                    date
+                };
+                vm.mode = modes.DETAIL_SELECTED;
+            })
+            .catch(() => vm.mode = modes.DATE_SELECTED);
+    };
+
+    vm.onClearSelectedDate = () => {
+        vm.selectedDate = null;
+        vm.mode = modes.NO_SELECTION;
+    };
+
+
+    vm.onClearSelectedDetail = () => {
+        vm.detail = null;
+        vm.mode = modes.DATE_SELECTED;
+    };
+
+
+    function loadChangeSummaries() {
+        vm.mode = modes.LOADING;
+        serviceBroker
+            .loadViewData(
+                CORE_API.ChangeLogSummariesStore.findSummariesForKindBySelector,
+                ["APPLICATION", mkSelectionOptions(vm.parentEntityRef), vm.selectedDate])
+            .then(r => {
+                vm.summaries = r.data;
+            });
+    }
 }
 
 

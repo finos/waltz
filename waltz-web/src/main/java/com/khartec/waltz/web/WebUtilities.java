@@ -37,11 +37,12 @@ import spark.Response;
 import spark.ResponseTransformer;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.Checks.checkAll;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ObjectUtilities.firstNotNull;
 import static com.khartec.waltz.common.SetUtilities.asSet;
@@ -351,6 +352,21 @@ public class WebUtilities {
         return Optional
                 .ofNullable(limitVal)
                 .map(s -> Integer.valueOf(s));
+    }
+
+
+    public static Optional<Date> getDateParam(Request request) {
+        String dateVal = request.queryParams("date");
+        return Optional
+                .ofNullable(dateVal)
+                .map(s -> {
+                    try {
+                        return new SimpleDateFormat("yyyy-MM-dd").parse(s);
+                    } catch (ParseException pe) {
+                        LOG.warn("Could not parse date: " + s);
+                        return null;
+                    }
+                });
     }
 
 
