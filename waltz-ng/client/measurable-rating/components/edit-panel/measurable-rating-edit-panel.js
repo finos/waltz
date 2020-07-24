@@ -160,10 +160,26 @@ function controller($q,
         vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: false, ratingEditor: true});
     };
 
-
     const reloadDecommData = () => {
         return loadDecommData($q, serviceBroker, vm.parentEntityRef, true)
             .then(r => Object.assign(vm, r));
+    };
+
+    const saveDecommissionDate = (dateChange)  => {
+
+        dateChange.newVal = getDateAsUtc(dateChange.newVal);
+
+        serviceBroker
+            .execute(
+                CORE_API.MeasurableRatingPlannedDecommissionStore.save,
+                [vm.parentEntityRef, vm.selected.measurable.id, dateChange])
+            .then(r => {
+                const decom = Object.assign(r.data, {isValid: true});
+                vm.selected = Object.assign({}, vm.selected, {decommission: decom});
+                notification.success(`Saved decommission date for ${vm.selected.measurable.name}`);
+            })
+            .catch(e => displayError(notification, "Could not save decommission date", e))
+            .finally(reloadDecommData);
     };
 
     // -- BOOT --
@@ -232,24 +248,16 @@ function controller($q,
         }
 
         if (_.isNull(vm.application.plannedRetirementDate) || vm.checkPlannedDecomDateIsValid(dateChange.newVal)){
-
-            dateChange.newVal = getDateAsUtc(dateChange.newVal);
-
-            serviceBroker
-                .execute(
-                    CORE_API.MeasurableRatingPlannedDecommissionStore.save,
-                    [vm.parentEntityRef, vm.selected.measurable.id, dateChange])
-                .then(r => {
-                    const decom = Object.assign(r.data, {isValid: true});
-                    vm.selected = Object.assign({}, vm.selected, { decommission: decom});
-                    notification.success(`Saved decommission date for ${vm.selected.measurable.name}`);
-                })
-                .catch(e => displayError(notification, "Could not save decommission date", e))
-                .finally(reloadDecommData);
+            saveDecommissionDate(dateChange);
 
         } else {
             const appDate = new Date(vm.application.plannedRetirementDate).toDateString();
-            notification.error("Decommission date cannot be later than the planned retirement date of the application: " + appDate);
+
+            if (!confirm(`This decommission date is later then the planned retirement date of the application: ${appDate}. Are you sure you want to save it?`)){
+                notification.error("Decommission date was not saved");
+                return;
+            }
+            saveDecommissionDate(dateChange)
         }
     };
 
