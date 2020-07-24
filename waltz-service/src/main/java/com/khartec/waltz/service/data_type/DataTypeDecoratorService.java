@@ -22,12 +22,14 @@ import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.datatype_decorator.DataTypeDecoratorDao;
 import com.khartec.waltz.data.datatype_decorator.DataTypeDecoratorDaoSelectorFactory;
+import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.physical_flow.PhysicalFlow;
+import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorRatingsCalculator;
@@ -63,6 +65,8 @@ public class DataTypeDecoratorService {
     private final DataTypeUsageService dataTypeUsageService;
     private final DataTypeService dataTypeService;
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
+    private final PhysicalSpecificationDao physicalSpecificationDao;
+
 
     @Autowired
     public DataTypeDecoratorService(ChangeLogService changeLogService,
@@ -72,7 +76,8 @@ public class DataTypeDecoratorService {
                                     LogicalFlowDao logicalFlowDao,
                                     LogicalFlowDecoratorRatingsCalculator ratingsCalculator,
                                     DataTypeUsageService dataTypeUsageService,
-                                    DataTypeService dataTypeService) {
+                                    DataTypeService dataTypeService,
+                                    PhysicalSpecificationDao physicalSpecificationDao) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(logicalFlowDecoratorService, "logicalFlowDecoratorService cannot be null");
         checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
@@ -84,6 +89,7 @@ public class DataTypeDecoratorService {
         this.dataTypeUsageService = dataTypeUsageService;
         this.dataTypeService = dataTypeService;
         this.dataTypeDecoratorDaoSelectorFactory = dataTypeDecoratorDaoSelectorFactory;
+        this.physicalSpecificationDao = physicalSpecificationDao;
     }
 
     public boolean updateDecorators(String userName,
@@ -103,7 +109,7 @@ public class DataTypeDecoratorService {
             removeDataTypeDecorator(userName, entityReference, dataTypeIdsToRemove);
         }
 
-        auditAgainstSourceAndTargetApps(userName, entityReference, currentDataTypeNames);
+        auditEntityDataTypeChanges(userName, entityReference, currentDataTypeNames);
         return true;
     }
 
@@ -284,17 +290,29 @@ public class DataTypeDecoratorService {
         changeLogService.write(logEntry);
     }
 
-    private void auditAgainstSourceAndTargetApps(String userName, EntityReference entityReference, String currentDataTypeNames) {
-        LogicalFlow logicalFlow = logicalFlowDao.getByFlowId(entityReference.id());
+
+    private void auditEntityDataTypeChanges(String userName, EntityReference entityReference, String currentDataTypeNames) {
         String updatedDataTypeNames = getAssociatedDatatypeNamesAsCsv(entityReference);
-        String auditMessage = String.format("Logical Flow from %s to %s: Data types changed from [%s] to [%s]",
-                logicalFlow.source().name().orElse(""),
-                logicalFlow.target().name().orElse(""),
-                currentDataTypeNames,
-                updatedDataTypeNames);
-        audit(auditMessage, logicalFlow.source(), userName);
-        audit(auditMessage, logicalFlow.target(), userName);
+        switch(entityReference.kind()) {
+            case LOGICAL_DATA_FLOW:
+                LogicalFlow logicalFlow = logicalFlowDao.getByFlowId(entityReference.id());
+                String auditMessage = String.format("Logical Flow from %s to %s: Data types changed from [%s] to [%s]",
+                        logicalFlow.source().name().orElse(""),
+                        logicalFlow.target().name().orElse(""),
+                        currentDataTypeNames,
+                        updatedDataTypeNames);
+                audit(auditMessage, logicalFlow.source(), userName);
+                audit(auditMessage, logicalFlow.target(), userName);
+            case PHYSICAL_SPECIFICATION:
+                PhysicalSpecification physicalSpecification = physicalSpecificationDao.getById(entityReference.id());
+                String message = String.format("Physical Specification [%s]: Data types changed from [%s] to [%s]",
+                        physicalSpecification,
+                        currentDataTypeNames,
+                        updatedDataTypeNames);
+                audit(message, physicalSpecification.entityReference(), userName);
+        }
     }
+
 
     private String getAssociatedDatatypeNamesAsCsv(EntityReference entityReference) {
         IdSelectionOptions idSelectionOptions = IdSelectionOptions.mkOpts(
