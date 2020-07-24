@@ -18,7 +18,7 @@
 
 import _ from "lodash";
 import {initialiseData} from "../common";
-import {groupQuestions} from "./survey-utils";
+import {groupQuestions, mkSurveyExpressionEvaluator} from "./survey-utils";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 import template from "./survey-instance-response-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
@@ -31,12 +31,12 @@ const initialState = {
 
 function extractAnswer(response = {}) {
     return !_.isNil(response.booleanResponse)
-            ? response.booleanResponse
-            : (response.stringResponse
-                || response.numberResponse
-                || response.dateResponse
-                || response.entityResponse
-                || response.listResponse)
+        ? response.booleanResponse
+        : (response.stringResponse
+            || response.numberResponse
+            || response.dateResponse
+            || response.entityResponse
+            || response.listResponse)
 }
 
 
@@ -53,7 +53,8 @@ function indexResponses(rs = []) {
 }
 
 
-function controller($stateParams,
+function controller($q,
+                    $stateParams,
                     serviceBroker) {
 
     const vm = initialiseData(this, initialState);
@@ -77,24 +78,41 @@ function controller($stateParams,
         })
         .then(r => vm.surveyRun = r.data);
 
-    serviceBroker
+    const questionPromise = serviceBroker
         .loadViewData(
             CORE_API.SurveyQuestionStore.findForInstance,
             [ id ])
-        .then(r => vm.surveyQuestionInfos = groupQuestions(r.data));
+        .then(r => r.data);
 
-    serviceBroker
+    const responsePromise= serviceBroker
         .loadViewData(
             CORE_API.SurveyInstanceStore.findResponses,
             [ id ])
         .then(r => {
             vm.answers = indexResponses(r.data);
+            return r.data;
+        });
+
+    $q.all([questionPromise, responsePromise])
+        .then(([allQuestions, surveyResponses]) => {
+            const questionResponses = _.map(surveyResponses, d => d.questionResponse);
+            const be = mkSurveyExpressionEvaluator(allQuestions, questionResponses);
+
+            const activeQs = _.filter(allQuestions, q => {
+                if (q.question.inclusionPredicate) {
+                    return be.exec(q.question.inclusionPredicate);
+                }
+                return true;
+            });
+
+            vm.groupedQuestions = groupQuestions(activeQs);
         });
 
 }
 
 
 controller.$inject = [
+    "$q",
     "$stateParams",
     "ServiceBroker"
 ];

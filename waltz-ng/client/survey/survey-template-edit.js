@@ -20,11 +20,13 @@ import _ from "lodash";
 import {initialiseData} from "../common/index";
 import template from "./survey-template-edit.html";
 
-
+/*
+    Note: this list of functions/operators is derived from the capabilities of BigEval and the extension methods
+    in `surveyUtils::mkSurveyExpressionEvaluator`
+*/
 const qInclusionPredicateHelp = `
-The inclusion predicate allows for questions to be included in a survey depending on the values of other fields.
-See <a href="">the documentation</a> for a complete list of functions and their arguments.
-Below is a selection of the main functions/operators:
+The inclusion predicate allows for questions to be conditionally included in a survey depending on the values of other fields.
+See the documentation for a complete list of functions and their arguments.  Below is a selection of the main functions/operators:
 
 * Logical operators: \`< <= > >= == != && || ! \`
 * \`isChecked(extId, defaultValue)\`: \`true\` if the question with the given ext id is checked, \`false\` if not checked,

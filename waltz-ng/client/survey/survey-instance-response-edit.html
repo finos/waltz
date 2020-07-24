@@ -22,12 +22,16 @@
                        small="edit response">
         <breadcrumbs>
             <ol class="waltz-breadcrumbs">
-                <li><a ui-sref="main">Home</a></li>
+                <li>
+                    <a ui-sref="main">Home</a>
+                </li>
                 <li>
                     <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity">
                     </waltz-entity-link>
                 </li>
-                <li>Surveys</li>
+                <li>
+                    <a ui-sref="main.survey.instance.user">Surveys</a>
+                </li>
                 <li>
                 <span ng-bind="ctrl.surveyRun.name">
                 </span>
@@ -60,7 +64,7 @@
                 <div ng-repeat="qi in groupedQuestion.questionInfos"
                      class="form-group">
                     <label for="{{ qi.question.id }}"
-                           class="col-sm-offset-1 col-sm-4 xxcontrol-label">
+                           class="col-sm-offset-1 col-sm-4">
                         <span ng-bind="qi.question.questionText">
                         </span>
                         <span ng-if="qi.question.isMandatory"
@@ -98,8 +102,6 @@
                                 Yes
                             </label>
                             &nbsp;
-                            &nbsp;
-                            &nbsp;
                             <label>
                                 <input name="{{ qi.question.id }}"
                                        type="radio"
@@ -109,8 +111,6 @@
                                        value="false"/>
                                 No
                             </label>
-                            &nbsp;
-                            &nbsp;
                             &nbsp;
                             <label ng-if="! qi.question.isMandatory">
                                 <input name="{{ qi.question.id }}"

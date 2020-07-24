@@ -69,7 +69,7 @@ function lookupQuestion(questions = [],
 
 function lookupResponse(responses, q) {
     const referencedId = q.question.id;
-    return _.find(responses,r => r.questionId === referencedId);
+    return _.find(responses, r => r.questionId === referencedId);
 }
 
 

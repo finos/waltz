@@ -26,10 +26,12 @@
                 <li>
                     <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity"></waltz-entity-link>
                 </li>
-                <li>Surveys</li>
                 <li>
-                <span ng-bind="ctrl.surveyRun.name">
-                </span>
+                    <a ui-sref="main.survey.instance.user">Surveys</a>
+                </li>
+                <li>
+                    <span ng-bind="ctrl.surveyRun.name">
+                    </span>
                 </li>
             </ol>
         </breadcrumbs>
@@ -82,7 +84,7 @@
                                      extract="survey-run-response/instance/{{ctrl.surveyInstance.id}}">
             </waltz-data-extract-link>
         </waltz-section-actions>
-        <div ng-repeat="groupedQuestion in ctrl.surveyQuestionInfos">
+        <div ng-repeat="groupedQuestion in ctrl.groupedQuestions">
             <br ng-hide="$first">
 
             <h4 ng-bind="groupedQuestion.sectionName"
