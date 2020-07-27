@@ -32,6 +32,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -52,6 +53,7 @@ import static com.khartec.waltz.common.ListUtilities.*;
 import static com.khartec.waltz.common.MapUtilities.indexBy;
 import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.common.SetUtilities.fromArray;
+import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.tables.SurveyInstance.SURVEY_INSTANCE;
 import static com.khartec.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
 import static com.khartec.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
@@ -392,16 +394,21 @@ public class SurveyInstanceExtractor implements DataExtractor {
                                 .map(q -> tuple(q, answersByQuestionId.get(q.id().get())))
                                 .forEach(t -> {
                                     reportRow.add(findValueInRecord(t.v1, t.v2));
-                                    if (t.v1.allowComment() && t.v2 != null) {
-                                        reportRow.add(t.v2.get(sqr.COMMENT));
-                                    } else {
-                                        reportRow.add("");
+                                    if (t.v1.allowComment()) {
+                                        reportRow.add(getComment(t));
                                     }
                                 });
 
                         return reportRow;
                     })
                     .collect(toList());
+    }
+
+
+    private String getComment(Tuple2<SurveyQuestion, Record> t) {
+        return (t.v2 == null)
+                ? ""
+                : mkSafe(t.v2.get(sqr.COMMENT));
     }
 
 
