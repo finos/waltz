@@ -18,7 +18,7 @@
 
 import _ from "lodash";
 import {initialiseData} from "../common";
-import {groupQuestions, mkSurveyExpressionEvaluator} from "./survey-utils";
+import {groupQuestions, indexResponses, mkSurveyExpressionEvaluator, refreshQuestions} from "./survey-utils";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 import template from "./survey-instance-response-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
@@ -37,19 +37,6 @@ function extractAnswer(response = {}) {
             || response.dateResponse
             || response.entityResponse
             || response.listResponse)
-}
-
-
-function indexResponses(rs = []) {
-    return _.chain(rs)
-        .map("questionResponse")
-        .map(qr => ({
-            questionId: qr.questionId,
-            answer: extractAnswer(qr),
-            comment: qr.comment
-        }))
-        .keyBy("questionId")
-        .value();
 }
 
 
@@ -89,23 +76,13 @@ function controller($q,
             CORE_API.SurveyInstanceStore.findResponses,
             [ id ])
         .then(r => {
-            vm.answers = indexResponses(r.data);
             return r.data;
         });
 
     $q.all([questionPromise, responsePromise])
         .then(([allQuestions, surveyResponses]) => {
-            const questionResponses = _.map(surveyResponses, d => d.questionResponse);
-            const be = mkSurveyExpressionEvaluator(allQuestions, questionResponses);
-
-            const activeQs = _.filter(allQuestions, q => {
-                if (q.question.inclusionPredicate) {
-                    return be.exec(q.question.inclusionPredicate);
-                }
-                return true;
-            });
-
-            vm.groupedQuestions = groupQuestions(activeQs);
+            vm.answersById = indexResponses(surveyResponses);
+            vm.groupedQuestions = refreshQuestions(allQuestions, vm.answersById);
         });
 
 }

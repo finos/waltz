@@ -18,6 +18,8 @@
 
 import _ from "lodash";
 import BigEval from "bigeval";
+import moment from "moment";
+import {formats} from "../common";
 
 
 export function groupQuestions(questionInfos = []) {
@@ -67,9 +69,9 @@ function lookupQuestion(questions = [],
 }
 
 
-function lookupResponse(responses, q) {
+function lookupResponse(responsesById, q) {
     const referencedId = q.question.id;
-    return _.find(responses, r => r.questionId === referencedId);
+    return responsesById[q.question.id];
 }
 
 
@@ -78,18 +80,18 @@ function lookupResponse(responses, q) {
  * with the `[question?, response?]` which matches a given question external id.
  *
  * @param questions
- * @param responses
+ * @param responsesById
  * @param questionExternalId
  * @param exprStr  message used in logging message to help diagnose which function caused this error
  * @returns {*[]}
  */
 function lookupQuestionResponse(questions = [],
-                                responses = [],
+                                responsesById = {},
                                 questionExternalId,
                                 exprStr = "") {
     const question = lookupQuestion(questions, questionExternalId, exprStr);
     const response = question
-        ? lookupResponse(responses, question)
+        ? lookupResponse(responsesById, question)
         : null;
     return [question, response]
 }
@@ -117,24 +119,24 @@ function lookupQuestionResponse(questions = [],
  * - `isChecked(questionExtId, defaultValue = false)` : returns boolean value of
  *    a response (or default if response is not given)
  *
- *  For more information see [BigEval](https://github.com/aviaryan/BigEval.js)
+ *  Implementation is provided by [BigEval](https://github.com/aviaryan/BigEval.js)
  *
  * @param questions
- * @param responses
- * @returns {BigEval}
+ * @param responsesById
+ * @returns function which takes an expression and gives a result
  */
-export function mkSurveyExpressionEvaluator(questions = [], responses = []) {
+export function mkSurveyExpressionEvaluator(questions = [], responsesById = {}) {
     let ctx = {};
     const evaluator = new BigEval(ctx);
     Object.assign(ctx, {
         isChecked: (qExtId, dfltVal = false) => {
-            const [q,r] = lookupQuestionResponse(questions, responses, qExtId, "isChecked");
+            const [q,r] = lookupQuestionResponse(questions, responsesById, qExtId, "isChecked");
             return r
                 ? JSON.parse(r.booleanResponse.toLowerCase())
                 : dfltVal;
         },
         numberValue: (qExtId, dfltVal = 0) => {
-            const [q, r] = lookupQuestionResponse(questions, responses, qExtId, "numberValue");
+            const [q, r] = lookupQuestionResponse(questions, responsesById, qExtId, "numberValue");
             return r
                 ? r.numberResponse
                 : dfltVal;
@@ -147,10 +149,68 @@ export function mkSurveyExpressionEvaluator(questions = [], responses = []) {
             return true
         },
         resp: (qExtId) => {
-            const [q,r] = lookupQuestionResponse(questions, responses, qExtId, "resp");
+            const [q,r] = lookupQuestionResponse(questions, responsesById, qExtId, "resp");
             return r;
         }
     });
-    return evaluator;
+    return (expr, message, ctx) => {
+        const result = evaluator.exec(expr);
+        // leaving this here because it's very useful!
+        // console.log({expr, message, ctx, result})
+        return result;
+    }
+}
+
+
+/**
+ * Question should be included if it's inclusion predicate evaulates to `true` or it
+ * does not have an incusion predicate
+ * @param q
+ * @param evaluator
+ * @returns boolean
+ */
+function shouldQuestionBeIncluded(q, evaluator) {
+    return q.question.inclusionPredicate
+        ? evaluator(q.question.inclusionPredicate, q.question.externalId, q)
+        : true;
+}
+
+
+/**
+ * Give a list of all questions and indexed responses returns a grouped
+ * collection of included questions.  Inclusion is determined by
+ * evaluating any inclusionPredicate against the current responses.
+ *
+ * @param allQuestions
+ * @param responsesById
+ * @returns grouped questions
+ */
+export function refreshQuestions(allQuestions = [], responsesById = {}) {
+    const inclusionEvaluator = mkSurveyExpressionEvaluator(allQuestions, responsesById);
+    const activeQs = _.filter(allQuestions, q => shouldQuestionBeIncluded(q, inclusionEvaluator));
+    return groupQuestions(activeQs);
+}
+
+
+export function indexResponses(responses = []) {
+    return _
+        .chain(responses)
+        .map(d => d.questionResponse)
+        .map(qr => {
+            if (!_.isNil(qr.booleanResponse) && !_.isString(qr.booleanResponse)) {
+                qr.booleanResponse = qr.booleanResponse
+                    ? "true"
+                    : "false";
+            }
+            if (_.isNil(qr.booleanResponse) && !_.isString(qr.booleanResponse)){
+                qr.booleanResponse = "null"
+            }
+            if (!_.isNil(qr.dateResponse)) {
+                qr.dateResponse = moment(qr.dateResponse, formats.parseDateOnly).toDate()
+            }
+            return qr;
+        })
+        .keyBy("questionId")
+        .value();
 }
 
