@@ -57,13 +57,14 @@
               class="form-horizontal waltz-survey-form"
               role="form"
               novalidate>
-            <div ng-repeat="groupedQuestion in ctrl.surveyQuestionInfos" class="waltz-survey-question-section">
+            <div ng-repeat="groupedQuestion in ctrl.surveyQuestionInfos track by groupedQuestion.sectionName"
+                 class="waltz-survey-question-section">
 
                 <h4 ng-bind="groupedQuestion.sectionName"
                     class="text-muted">
                 </h4>
                 <hr>
-                <div ng-repeat="qi in groupedQuestion.questionInfos"
+                <div ng-repeat="qi in groupedQuestion.questionInfos track by qi.question.id"
                      class="form-group">
                     <label ng-attr-for="{{ qi.question.id }}"
                            class="col-sm-4">
@@ -89,7 +90,7 @@
                         <input ng-switch-when="NUMBER"
                                type="number"
                                ng-attr-id="{{ qi.question.id }}"
-                               placeholder="please enter a number"
+                               placeholder="Please enter a number"
                                ng-model="ctrl.surveyResponses[qi.question.id].numberResponse"
                                ng-required="qi.question.isMandatory"
                                ng-blur="ctrl.saveResponse(qi.question.id)"
@@ -213,32 +214,32 @@
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="pull-right" style="padding-right: 1em;">
-                        <button class="btn btn-info"
-                                ng-click="ctrl.saveForLater()">
-                            <waltz-icon name="clock-o"></waltz-icon>
-                            Save and complete later
-                        </button>
+<!--            <div class="row">-->
+<!--                <div class="col-sm-12">-->
+<!--                    <div class="pull-right" style="padding-right: 1em;">-->
+<!--                        <button class="btn btn-info"-->
+<!--                                ng-click="ctrl.saveForLater()">-->
+<!--                            <waltz-icon name="clock-o"></waltz-icon>-->
+<!--                            Save and complete later-->
+<!--                        </button>-->
 
-                        <button class="btn btn-success"
-                                ng-disabled="surveyResponseForm.$invalid"
-                                ng-click="ctrl.submit()"
-                                class="btn btn-success btn-lg">
-                            <waltz-icon name="envelope">
-                            </waltz-icon>
-                            Submit
-                        </button>
-                        <div ng-if="surveyResponseForm.$invalid"
-                             class="help-block">
-                            <waltz-icon name="warning"></waltz-icon>
-                            Cannot submit until all mandatory questions are answered
-                        </div>
-                    </div>
+<!--                        <button class="btn btn-success"-->
+<!--                                ng-disabled="surveyResponseForm.$invalid"-->
+<!--                                ng-click="ctrl.submit()"-->
+<!--                                class="btn btn-success btn-lg">-->
+<!--                            <waltz-icon name="envelope">-->
+<!--                            </waltz-icon>-->
+<!--                            Submit-->
+<!--                        </button>-->
+<!--                        <div ng-if="surveyResponseForm.$invalid"-->
+<!--                             class="help-block">-->
+<!--                            <waltz-icon name="warning"></waltz-icon>-->
+<!--                            Cannot submit until all mandatory questions are answered-->
+<!--                        </div>-->
+<!--                    </div>-->
 
-                </div>
-            </div>
+<!--                </div>-->
+<!--            </div>-->
 
         </form>
     </waltz-section>
