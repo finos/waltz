@@ -54,7 +54,7 @@ const statusActions = [
                         notification.success("Survey response approved");
                     });
             } else {
-                return Promise.reject();
+                return Promise.reject("Approval cancelled");
             }
         }
     }, {
@@ -76,7 +76,7 @@ const statusActions = [
                         notification.success("Survey instance withdrawn");
                     });
             } else {
-                Promise.reject();
+                Promise.reject("Withdraw cancelled");
             }
         }
     }, {
@@ -97,7 +97,7 @@ const statusActions = [
                         notification.success("Survey response rejected");
                     });
             } else {
-                Promise.reject();
+                return Promise.reject("Reject cancelled");
             }
         }
     }, {
@@ -118,7 +118,7 @@ const statusActions = [
                         notification.success("Survey response reopened");
                     });
             } else {
-                Promise.reject();
+                return Promise.reject("Reopen cancelled");
             }
         }
     },
@@ -356,7 +356,8 @@ function controller($state, serviceBroker, userService, notification) {
     vm.invokeStatusAction = (action) => {
         action
             .onPerform(serviceBroker, vm.surveyInstance, notification)
-            .then(() => reload(true));
+            .then(() => reload(true))
+            .catch(msg => notification.warning(msg))
     };
 
     // -- LIFECYCLE
