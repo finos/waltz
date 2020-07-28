@@ -19,13 +19,16 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.schema.tables.ChangeLog;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 
 import static com.khartec.waltz.schema.Tables.CHANGE_LOG;
+import static com.khartec.waltz.schema.Tables.PERSON;
 import static com.khartec.waltz.web.WebUtilities.getEntityReference;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static spark.Spark.post;
@@ -41,25 +44,24 @@ public class ChangeLogExtractor extends DirectQueryBasedDataExtractor {
 
     @Override
     public void register() {
-        registerExtractForApp( mkPath("data-extract", "change-log", ":kind", ":id"));
+        registerExtractForApp(mkPath("data-extract", "change-log", ":kind", ":id"));
     }
 
-    private void registerExtractForApp(String path) { post(path, (request, response) -> {
+
+    private void registerExtractForApp(String path) {
+        post(path, (request, response) -> {
 
             EntityReference entityRef = getEntityReference(request);
-            Condition condition = CHANGE_LOG.PARENT_ID.eq(entityRef.id())
-                    .and(CHANGE_LOG.PARENT_KIND.eq(entityRef.kind().name()));
+
+            Select<Record> select = mkQuery(entityRef);
 
             SelectSeekStep1<Record4<String, String, String, Timestamp>, Timestamp> qry = dsl
-                    .select(
-                    CHANGE_LOG.SEVERITY.as("Severity"),
-                    CHANGE_LOG.MESSAGE.as("Message"),
-                    CHANGE_LOG.USER_ID.as("User"),
-                    CHANGE_LOG.CREATED_AT.as("Timestamp")
-                    )
-                    .from(CHANGE_LOG)
-                    .where(condition)
-                    .orderBy(CHANGE_LOG.CREATED_AT.desc());
+                    .select(select.field(CHANGE_LOG.SEVERITY).as("Severity"),
+                            select.field(CHANGE_LOG.MESSAGE).as("Message"),
+                            select.field(CHANGE_LOG.USER_ID).as("User"),
+                            select.field(CHANGE_LOG.CREATED_AT).as("Timestamp"))
+                    .from(select)
+                    .orderBy(select.field(CHANGE_LOG.CREATED_AT).desc());
 
             return writeExtract(
                     "change-log-" + entityRef.id(),
@@ -67,6 +69,29 @@ public class ChangeLogExtractor extends DirectQueryBasedDataExtractor {
                     request,
                     response);
         });
+    }
+
+
+    private Select<Record> mkQuery(EntityReference entityRef) {
+        Select<Record> byParentRef = DSL
+                .select(CHANGE_LOG.fields())
+                .from(ChangeLog.CHANGE_LOG)
+                .where(ChangeLog.CHANGE_LOG.PARENT_ID.eq(entityRef.id()))
+                .and(ChangeLog.CHANGE_LOG.PARENT_KIND.eq(entityRef.kind().name()));
+
+        Select<Record> union;
+        switch (entityRef.kind()) {
+            case PERSON:
+                SelectConditionStep<Record> byUserId = DSL
+                        .select(CHANGE_LOG.fields())
+                        .from(ChangeLog.CHANGE_LOG)
+                        .innerJoin(PERSON).on(PERSON.EMAIL.eq(ChangeLog.CHANGE_LOG.USER_ID))
+                        .where(PERSON.ID.eq(entityRef.id()));
+                byParentRef.unionAll(byUserId);
+            default:
+                union = byParentRef;
+        }
+        return union;
     }
 
 }
