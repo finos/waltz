@@ -44,18 +44,33 @@
 
     <br>
 
-    <div class="alert alert-info"
-         ng-if="ctrl.surveyInstance.status === 'IN_PROGRESS' || ctrl.surveyInstance.status === 'REJECTED'">
-        <h4>Survey In Progress</h4>
-        <p>Survey responses cannot be viewed until they have been submitted</p>
+
+    <!-- IN PROGRESS -->
+    <div ng-if="ctrl.surveyInstance.status === 'IN_PROGRESS' || ctrl.surveyInstance.status === 'REJECTED'"
+         style="xxpadding-bottom: 1em;">
+        <waltz-warning>
+            <message>Survey In Progress</message>
+            <content>
+                <p>Survey responses cannot be viewed until they have been submitted</p>
+                <p ng-if="ctrl.userCanEdit">
+                    You may
+                    <a ui-sref="main.survey.instance.response.edit ({id: ctrl.surveyInstance.id})">
+                        edit this survey
+                    </a>
+                </p>
+            </content>
+        </waltz-warning>
     </div>
 
+
+    <!-- NOT STARTED -->
     <div class="alert alert-warning"
          ng-if="ctrl.surveyInstance.status === 'NOT_STARTED'">
         <h4>Survey Not Started</h4>
         <p>This survey response has not yet been started</p>
     </div>
 
+    <!-- EXPIRED -->
     <div class="alert alert-fatal"
          ng-if="ctrl.surveyInstance.status === 'EXPIRED'">
         <h4>Survey Expired</h4>

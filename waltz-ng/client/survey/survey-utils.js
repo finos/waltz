@@ -20,6 +20,9 @@ import _ from "lodash";
 import BigEval from "bigeval";
 import moment from "moment";
 import {formats} from "../common";
+import roles from "../user/system-roles";
+import {CORE_API} from "../common/services/core-api-utils";
+import {loadEntity} from "../common/entity-utils";
 
 
 export function groupQuestions(questionInfos = []) {
@@ -70,7 +73,6 @@ function lookupQuestion(questions = [],
 
 
 function lookupResponse(responsesById, q) {
-    const referencedId = q.question.id;
     return responsesById[q.question.id];
 }
 
@@ -214,3 +216,99 @@ export function indexResponses(responses = []) {
         .value();
 }
 
+
+export function loadSurveyInfo($q,
+                               serviceBroker,
+                               userService,
+                               surveyInstanceId,
+                               force = false) {
+
+    const recipientsPromise = serviceBroker
+        .loadViewData(CORE_API.SurveyInstanceStore.findRecipients, [surveyInstanceId], {force})
+        .then(r => r.data);
+
+    const instancePromise = serviceBroker
+        .loadViewData(CORE_API.SurveyInstanceStore.getById, [surveyInstanceId], {force})
+        .then(r => r.data);
+
+    const versionsPromise = instancePromise
+        .then(instance => serviceBroker
+            .loadViewData(
+                CORE_API.SurveyInstanceStore.findPreviousVersions,
+                [instance.originalInstanceId || instance.id]))
+        .then(r => r.data);
+
+    const runPromise = instancePromise
+        .then(instance => serviceBroker
+            .loadViewData(CORE_API.SurveyRunStore.getById, [instance.surveyRunId]))
+        .then(r => r.data);
+
+    const templatePromise = runPromise
+        .then(run => serviceBroker
+            .loadViewData(CORE_API.SurveyTemplateStore.getById, [run.surveyTemplateId]))
+        .then(r => r.data);
+
+    const ownerPromise = runPromise
+        .then(run => serviceBroker
+            .loadViewData(CORE_API.PersonStore.getById, [run.ownerId]))
+        .then(r => r.data);
+
+    const owningRolePromise = instancePromise
+        .then(instance => serviceBroker
+            .loadAppData(CORE_API.RoleStore.findAllRoles)
+            .then(r => _.find(r.data, d => d.key === instance.owningRole)));
+
+    const userPromise = userService.whoami();
+
+    const  subjectPromise = instancePromise
+        .then(instance => loadEntity(serviceBroker, instance.surveyEntity));
+
+    const promises = [
+        userPromise,
+        instancePromise,
+        runPromise,
+        templatePromise,
+        recipientsPromise,
+        ownerPromise,
+        owningRolePromise,
+        versionsPromise,
+        subjectPromise
+    ];
+
+    return $q
+        .all(promises)
+        .then(([u, instance, run, template, recipients, owner, owningRole, versions, subject]) => {
+
+            const people = _.map(recipients, d => d.person);
+            const latestInstanceId = instance.originalInstanceId || instance.id;
+
+            const isLatest = latestInstanceId === instance.id;
+            const isOwner = owner.userId === u.userName;
+            const isParticipant = _.some(people, p => p.userId === u.userName);
+            const hasOwningRole = _.includes(u.roles, instance.owningRole);
+            const isAdmin = userService.hasRole(u, roles.SURVEY_ADMIN);
+
+            const permissions = {
+                admin: isAdmin,
+                owner: isOwner || hasOwningRole,
+                participant: isParticipant,
+                metaEdit: isLatest && (isOwner || isAdmin)
+            };
+
+            const result = {
+                instance,
+                recipients,
+                owner,
+                owningRole,
+                run,
+                template,
+                isLatest,
+                latestInstanceId,
+                permissions,
+                versions,
+                subject
+            };
+
+            return result;
+        });
+}

@@ -168,8 +168,8 @@ export function numberFormatter(num, digits = 0, simplify = true) {
         for (let i = 0; i < si.length; i++) {
             if (num >= si[i].value) {
                 return (num / si[i].value)
-                        .toFixed(digits)
-                        .replace(/\.?0+$/, "") + si[i].symbol;
+                    .toFixed(digits)
+                    .replace(/\.?0+$/, "") + si[i].symbol;
             }
         }
         return num;

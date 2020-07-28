@@ -25,7 +25,8 @@ import {CORE_API} from "../common/services/core-api-utils";
 
 
 const initialState = {
-    changeLogSection: dynamicSections.changeLogSection
+    changeLogSection: dynamicSections.changeLogSection,
+    userCanEdit: true
 };
 
 
