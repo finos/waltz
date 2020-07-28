@@ -18,7 +18,7 @@
 
 import _ from "lodash";
 import {initialiseData} from "../common";
-import {groupQuestions} from "./survey-utils";
+import {groupQuestions, indexResponses, mkSurveyExpressionEvaluator, refreshQuestions} from "./survey-utils";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 import template from "./survey-instance-response-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
@@ -31,29 +31,17 @@ const initialState = {
 
 function extractAnswer(response = {}) {
     return !_.isNil(response.booleanResponse)
-            ? response.booleanResponse
-            : (response.stringResponse
-                || response.numberResponse
-                || response.dateResponse
-                || response.entityResponse
-                || response.listResponse)
+        ? response.booleanResponse
+        : (response.stringResponse
+            || response.numberResponse
+            || response.dateResponse
+            || response.entityResponse
+            || response.listResponse)
 }
 
 
-function indexResponses(rs = []) {
-    return _.chain(rs)
-        .map("questionResponse")
-        .map(qr => ({
-            questionId: qr.questionId,
-            answer: extractAnswer(qr),
-            comment: qr.comment
-        }))
-        .keyBy("questionId")
-        .value();
-}
-
-
-function controller($stateParams,
+function controller($q,
+                    $stateParams,
                     serviceBroker) {
 
     const vm = initialiseData(this, initialState);
@@ -77,24 +65,31 @@ function controller($stateParams,
         })
         .then(r => vm.surveyRun = r.data);
 
-    serviceBroker
+    const questionPromise = serviceBroker
         .loadViewData(
             CORE_API.SurveyQuestionStore.findForInstance,
             [ id ])
-        .then(r => vm.surveyQuestionInfos = groupQuestions(r.data));
+        .then(r => r.data);
 
-    serviceBroker
+    const responsePromise= serviceBroker
         .loadViewData(
             CORE_API.SurveyInstanceStore.findResponses,
             [ id ])
         .then(r => {
-            vm.answers = indexResponses(r.data);
+            return r.data;
+        });
+
+    $q.all([questionPromise, responsePromise])
+        .then(([allQuestions, surveyResponses]) => {
+            vm.answersById = indexResponses(surveyResponses);
+            vm.groupedQuestions = refreshQuestions(allQuestions, vm.answersById);
         });
 
 }
 
 
 controller.$inject = [
+    "$q",
     "$stateParams",
     "ServiceBroker"
 ];

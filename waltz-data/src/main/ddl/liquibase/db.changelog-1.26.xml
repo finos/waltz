@@ -100,6 +100,11 @@
             <column name="name" value="settings.asset-cost.current-year-text"/>
             <column name="value" value="YTD"/>
         </insert>
+        <rollback>
+            <delete tableName="settings">
+                <where>name='settings.asset-cost.current-year-text'</where>
+            </delete>
+        </rollback>
     </changeSet>
 
 
@@ -116,6 +121,7 @@
             <column name="encoding" value="HTML"/>
             <column name="content" value="Welcome to the new WIP 1.26 Release of Waltz"/>
         </insert>
+        <rollback/>
     </changeSet>
 
 
@@ -127,6 +133,11 @@
             <column name="name" value="ui.banner.message"/>
             <column name="value" value="Waltz is optimised for use in Google Chrome, try a different browser for better performance"/>
         </insert>
+        <rollback>
+            <delete tableName="settings">
+                <where>name='ui.banner.message'</where>
+            </delete>
+        </rollback>
     </changeSet>
 
 </databaseChangeLog>

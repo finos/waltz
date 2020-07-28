@@ -22,12 +22,16 @@
                        small="edit response">
         <breadcrumbs>
             <ol class="waltz-breadcrumbs">
-                <li><a ui-sref="main">Home</a></li>
+                <li>
+                    <a ui-sref="main">Home</a>
+                </li>
                 <li>
                     <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity">
                     </waltz-entity-link>
                 </li>
-                <li>Surveys</li>
+                <li>
+                    <a ui-sref="main.survey.instance.user">Surveys</a>
+                </li>
                 <li>
                 <span ng-bind="ctrl.surveyRun.name">
                 </span>
@@ -45,22 +49,25 @@
 
     <br>
 
+
     <waltz-section name="Responses"
+                   icon="pencil-square"
                    ng-if="ctrl.isUserInstanceRecipient && ctrl.instanceCanBeEdited">
         <form name="surveyResponseForm"
               class="form-horizontal waltz-survey-form"
               role="form"
               novalidate>
-            <div ng-repeat="groupedQuestion in ctrl.surveyQuestionInfos">
+            <div ng-repeat="groupedQuestion in ctrl.surveyQuestionInfos track by groupedQuestion.sectionName"
+                 class="waltz-survey-question-section">
 
                 <h4 ng-bind="groupedQuestion.sectionName"
                     class="text-muted">
                 </h4>
                 <hr>
-                <div ng-repeat="qi in groupedQuestion.questionInfos"
+                <div ng-repeat="qi in groupedQuestion.questionInfos track by qi.question.id"
                      class="form-group">
-                    <label for="{{ qi.question.id }}"
-                           class="col-sm-offset-1 col-sm-4 xxcontrol-label">
+                    <label ng-attr-for="{{ qi.question.id }}"
+                           class="col-sm-4">
                         <span ng-bind="qi.question.questionText">
                         </span>
                         <span ng-if="qi.question.isMandatory"
@@ -73,15 +80,17 @@
                                         class='small text-muted'>
                         </waltz-markdown>
                     </label>
+
+                    <!-- inputs -->
                     <div ng-switch="qi.question.fieldType"
                          class="col-sm-6"
                          ng-class="{'col-md-3': qi.question.fieldType === 'DATE'}">
-                        <!-- input control -->
+
                         <!-- number -->
                         <input ng-switch-when="NUMBER"
                                type="number"
-                               id="{{ qi.question.id }}"
-                               placeholder="please enter a number"
+                               ng-attr-id="{{ qi.question.id }}"
+                               placeholder="Please enter a number"
                                ng-model="ctrl.surveyResponses[qi.question.id].numberResponse"
                                ng-required="qi.question.isMandatory"
                                ng-blur="ctrl.saveResponse(qi.question.id)"
@@ -89,7 +98,7 @@
                         <!-- boolean -->
                         <div ng-switch-when="BOOLEAN">
                             <label>
-                                <input name="{{ qi.question.id }}"
+                                <input ng-attr-name="{{ qi.question.id }}"
                                        type="radio"
                                        ng-model="ctrl.surveyResponses[qi.question.id].booleanResponse"
                                        ng-required="qi.question.isMandatory"
@@ -98,10 +107,8 @@
                                 Yes
                             </label>
                             &nbsp;
-                            &nbsp;
-                            &nbsp;
                             <label>
-                                <input name="{{ qi.question.id }}"
+                                <input ng-attr-name="{{ qi.question.id }}"
                                        type="radio"
                                        ng-model="ctrl.surveyResponses[qi.question.id].booleanResponse"
                                        ng-required="qi.question.isMandatory"
@@ -110,10 +117,8 @@
                                 No
                             </label>
                             &nbsp;
-                            &nbsp;
-                            &nbsp;
                             <label ng-if="! qi.question.isMandatory">
-                                <input name="{{ qi.question.id }}"
+                                <input ng-attr-name="{{ qi.question.id }}"
                                        type="radio"
                                        ng-model="ctrl.surveyResponses[qi.question.id].booleanResponse"
                                        ng-change="ctrl.saveResponse(qi.question.id)"
@@ -123,7 +128,7 @@
                         </div>
                         <!-- text -->
                         <textarea ng-switch-when="TEXT"
-                                  id="{{ qi.question.id }}"
+                                  ng-attr-id="{{ qi.question.id }}"
                                   ng-model="ctrl.surveyResponses[qi.question.id].stringResponse"
                                   ng-required="qi.question.isMandatory"
                                   ng-blur="ctrl.saveResponse(qi.question.id)"
@@ -132,7 +137,7 @@
                         </textarea>
                         <!-- textarea -->
                         <textarea ng-switch-when="TEXTAREA"
-                                  id="{{ qi.question.id }}"
+                                  ng-attr-id="{{ qi.question.id }}"
                                   ng-model="ctrl.surveyResponses[qi.question.id].stringResponse"
                                   ng-required="qi.question.isMandatory"
                                   ng-blur="ctrl.saveResponse(qi.question.id)"
@@ -141,7 +146,7 @@
                         </textarea>
                         <!-- date -->
                         <waltz-date-picker-form-input ng-switch-when="DATE"
-                                                      id="{{ qi.question.id }}"
+                                                      ng-attr-id="{{ qi.question.id }}"
                                                       item-id="qi.question.id"
                                                       allow-past-dates="true"
                                                       place-holder="dd-MMM-yyyy"
@@ -152,7 +157,7 @@
                         </waltz-date-picker-form-input>
                         <!-- dropdown (single value) -->
                         <select ng-switch-when="DROPDOWN"
-                                id="{{ qi.question.id }}"
+                                ng-attr-id="{{ qi.question.id }}"
                                 ng-model="ctrl.surveyResponses[qi.question.id].stringResponse"
                                 ng-required="qi.question.isMandatory"
                                 ng-blur="ctrl.saveResponse(qi.question.id)"
@@ -207,32 +212,34 @@
                         </waltz-editable-field>
                     </div>
                 </div>
-                <hr>
             </div>
 
-            <div class="row">
-                <div class="col-sm-offset-5 col-sm-7">
-                    <button class="btn btn-info"
-                            ng-click="ctrl.saveForLater()">
-                        <waltz-icon name="clock-o"></waltz-icon>
-                        Save and complete later
-                    </button>
+<!--            <div class="row">-->
+<!--                <div class="col-sm-12">-->
+<!--                    <div class="pull-right" style="padding-right: 1em;">-->
+<!--                        <button class="btn btn-info"-->
+<!--                                ng-click="ctrl.saveForLater()">-->
+<!--                            <waltz-icon name="clock-o"></waltz-icon>-->
+<!--                            Save and complete later-->
+<!--                        </button>-->
 
-                    <button class="btn btn-success"
-                            ng-disabled="surveyResponseForm.$invalid"
-                            ng-click="ctrl.submit()"
-                            class="btn btn-success btn-lg">
-                        <waltz-icon name="envelope">
-                        </waltz-icon>
-                        Submit
-                    </button>
-                    <div ng-if="surveyResponseForm.$invalid"
-                         class="help-block">
-                        <waltz-icon name="warning"></waltz-icon>
-                        Cannot submit until all mandatory questions are answered
-                    </div>
-                </div>
-            </div>
+<!--                        <button class="btn btn-success"-->
+<!--                                ng-disabled="surveyResponseForm.$invalid"-->
+<!--                                ng-click="ctrl.submit()"-->
+<!--                                class="btn btn-success btn-lg">-->
+<!--                            <waltz-icon name="envelope">-->
+<!--                            </waltz-icon>-->
+<!--                            Submit-->
+<!--                        </button>-->
+<!--                        <div ng-if="surveyResponseForm.$invalid"-->
+<!--                             class="help-block">-->
+<!--                            <waltz-icon name="warning"></waltz-icon>-->
+<!--                            Cannot submit until all mandatory questions are answered-->
+<!--                        </div>-->
+<!--                    </div>-->
+
+<!--                </div>-->
+<!--            </div>-->
 
         </form>
     </waltz-section>
@@ -258,7 +265,6 @@
         <h4>Permission Denied</h4>
         <p>You don't have permission to respond to this survey.</p>
     </div>
-
 
     <!-- CHANGE LOG -->
     <waltz-dynamic-section-wrapper section="ctrl.changeLogSection"
