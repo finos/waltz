@@ -123,13 +123,14 @@ function controller($location,
     };
 
     vm.saveEntityResponse = (entity, questionId) => {
+        const entityResponse = entity
+            ? _.pick(entity, ["id", "kind", "name"])
+            : null;
+
         vm.surveyResponses[questionId] = {
-            entityResponse: {
-                id: entity.id,
-                kind: entity.kind,
-                name: entity.name
-            }
+            entityResponse
         };
+
         vm.saveResponse(questionId);
     };
 
