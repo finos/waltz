@@ -18,19 +18,19 @@
 
 <div>
     <waltz-page-header icon="wpforms"
-                       name="{{ ctrl.surveyRun.name }}"
-                       small="{{ ctrl.surveyInstance.surveyEntity.name }}">
+                       name="{{ ctrl.surveyDetails.run.name }}"
+                       small="{{ ctrl.surveyDetails.subject.name }}">
         <breadcrumbs>
             <ol class="waltz-breadcrumbs">
                 <li><a ui-sref="main">Home</a></li>
                 <li>
-                    <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity"></waltz-entity-link>
+                    <waltz-entity-link entity-ref="ctrl.surveyDetails.subject"></waltz-entity-link>
                 </li>
                 <li>
                     <a ui-sref="main.survey.instance.user">Surveys</a>
                 </li>
                 <li>
-                    <span ng-bind="ctrl.surveyRun.name">
+                    <span ng-bind="ctrl.surveyDetails.run.name">
                     </span>
                 </li>
             </ol>
@@ -38,7 +38,7 @@
     </waltz-page-header>
 
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <waltz-survey-instance-summary instance-id="ctrl.surveyInstance.id">
+        <waltz-survey-instance-summary instance-id="ctrl.surveyDetails.instance.id">
         </waltz-survey-instance-summary>
     </div>
 
@@ -46,15 +46,14 @@
 
 
     <!-- IN PROGRESS -->
-    <div ng-if="ctrl.surveyInstance.status === 'IN_PROGRESS' || ctrl.surveyInstance.status === 'REJECTED'"
-         style="xxpadding-bottom: 1em;">
+    <div ng-if="ctrl.surveyDetails.instance.status === 'IN_PROGRESS' || ctrl.surveyDetails.instance.status === 'REJECTED'">
         <waltz-warning>
             <message>Survey In Progress</message>
             <content>
                 <p>Survey responses cannot be viewed until they have been submitted</p>
-                <p ng-if="ctrl.userCanEdit">
-                    You may
-                    <a ui-sref="main.survey.instance.response.edit ({id: ctrl.surveyInstance.id})">
+                <p ng-if="ctrl.surveyDetails.permissions.participant">
+                    However, you may
+                    <a ui-sref="main.survey.instance.response.edit ({id: ctrl.surveyDetails.instance.id})">
                         edit this survey
                     </a>
                 </p>
@@ -65,24 +64,24 @@
 
     <!-- NOT STARTED -->
     <div class="alert alert-warning"
-         ng-if="ctrl.surveyInstance.status === 'NOT_STARTED'">
+         ng-if="ctrl.surveyDetails.instance.status === 'NOT_STARTED'">
         <h4>Survey Not Started</h4>
         <p>This survey response has not yet been started</p>
     </div>
 
     <!-- EXPIRED -->
     <div class="alert alert-fatal"
-         ng-if="ctrl.surveyInstance.status === 'EXPIRED'">
+         ng-if="ctrl.surveyDetails.instance.status === 'EXPIRED'">
         <h4>Survey Expired</h4>
         <p>This survey response expired without being submitted</p>
     </div>
 
     <waltz-section name="Survey Response"
-                   ng-if="ctrl.surveyInstance.status === 'COMPLETED' || ctrl.surveyInstance.status === 'APPROVED'">
+                   ng-if="ctrl.surveyDetails.instance.status === 'COMPLETED' || ctrl.surveyDetails.instance.status === 'APPROVED'">
         <waltz-section-actions>
             <waltz-data-extract-link name="Export"
                                      styling="button"
-                                     extract="survey-run-response/instance/{{ctrl.surveyInstance.id}}">
+                                     extract="survey-run-response/instance/{{ctrl.surveyDetails.instance.id}}">
             </waltz-data-extract-link>
         </waltz-section-actions>
         <div ng-repeat="groupedQuestion in ctrl.groupedQuestions"

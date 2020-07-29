@@ -16,34 +16,22 @@
  *
  */
 
-import _ from "lodash";
 import {initialiseData} from "../common";
-import {groupQuestions, indexResponses, mkSurveyExpressionEvaluator, refreshQuestions} from "./survey-utils";
+import * as SurveyUtils from "./survey-utils";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 import template from "./survey-instance-response-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
 
 
 const initialState = {
-    changeLogSection: dynamicSections.changeLogSection,
-    userCanEdit: true
+    changeLogSection: dynamicSections.changeLogSection
 };
-
-
-function extractAnswer(response = {}) {
-    return !_.isNil(response.booleanResponse)
-        ? response.booleanResponse
-        : (response.stringResponse
-            || response.numberResponse
-            || response.dateResponse
-            || response.entityResponse
-            || response.listResponse)
-}
 
 
 function controller($q,
                     $stateParams,
-                    serviceBroker) {
+                    serviceBroker,
+                    userService) {
 
     const vm = initialiseData(this, initialState);
     const id = $stateParams.id;
@@ -53,18 +41,9 @@ function controller($q,
         kind: "SURVEY_INSTANCE"
     };
 
-    serviceBroker
-        .loadViewData(
-            CORE_API.SurveyInstanceStore.getById,
-            [ id ])
-        .then(r => {
-            vm.surveyInstance = r.data;
-            return serviceBroker
-                .loadViewData(
-                    CORE_API.SurveyRunStore.getById,
-                    [ vm.surveyInstance.surveyRunId ]);
-        })
-        .then(r => vm.surveyRun = r.data);
+    SurveyUtils
+        .loadSurveyInfo($q, serviceBroker, userService, id)
+        .then(details => vm.surveyDetails = details);
 
     const questionPromise = serviceBroker
         .loadViewData(
@@ -82,8 +61,8 @@ function controller($q,
 
     $q.all([questionPromise, responsePromise])
         .then(([allQuestions, surveyResponses]) => {
-            vm.answersById = indexResponses(surveyResponses);
-            vm.groupedQuestions = refreshQuestions(allQuestions, vm.answersById);
+            vm.answersById = SurveyUtils.indexResponses(surveyResponses);
+            vm.groupedQuestions = SurveyUtils.refreshQuestions(allQuestions, vm.answersById);
         });
 
 }
@@ -92,7 +71,8 @@ function controller($q,
 controller.$inject = [
     "$q",
     "$stateParams",
-    "ServiceBroker"
+    "ServiceBroker",
+    "UserService"
 ];
 
 
