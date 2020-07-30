@@ -16,21 +16,33 @@
   ~
   -->
 
-<waltz-multi-select-tree-control items="$ctrl.allDataTypes"
-                                 on-check="$ctrl.typeChecked"
-                                 on-uncheck="$ctrl.typeUnchecked"
-                                 checked-item-ids="$ctrl.checkedItemIds"
-                                 expanded-item-ids="$ctrl.expandedItemIds"
-                                 disable-predicate="$ctrl.disablePredicate">
+<div>
+    <waltz-multi-select-tree-control items="$ctrl.visibleDataTypes"
+                                     on-check="$ctrl.typeChecked"
+                                     on-uncheck="$ctrl.typeUnchecked"
+                                     checked-item-ids="$ctrl.checkedItemIds"
+                                     expanded-item-ids="$ctrl.expandedItemIds"
+                                     disable-predicate="$ctrl.disablePredicate">
 
-        <strong uib-popover-template="'wdtus-popup.html'"
-                popover-trigger="mouseenter"
-                popover-popup-delay="400"
-                popover-append-to-body="true"
-                ng-style="$ctrl.isNonConcreteAndSelected(node) && {'color': 'darkred', 'font-style': 'italic'}"
-                ng-bind="node.name">
-        </strong>
-</waltz-multi-select-tree-control>
+            <strong uib-popover-template="'wdtus-popup.html'"
+                    popover-trigger="mouseenter"
+                    popover-popup-delay="400"
+                    popover-append-to-body="true"
+                    ng-style="$ctrl.isNonConcreteAndSelected(node) && {'color': 'darkred', 'font-style': 'italic'}"
+                    ng-bind="node.name">
+            </strong>
+    </waltz-multi-select-tree-control>
+
+    <a class="small clickable"
+       style="margin-left: 22px">
+        <waltz-icon ng-if="!$ctrl.showAllDataTypes"
+                    name="plus"></waltz-icon>
+        <waltz-icon ng-if="$ctrl.showAllDataTypes" name="minus"></waltz-icon>
+        <span ng-click="$ctrl.toggleShowAll()"
+              ng-bind="$ctrl.showAllMessage">
+        </span>
+    </a>
+</div>
 
 <script type="text/ng-template"
         id="wdtus-popup.html">

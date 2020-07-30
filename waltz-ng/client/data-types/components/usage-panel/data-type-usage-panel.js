@@ -25,6 +25,7 @@ import roles from "../../../user/system-roles";
 
 const bindings = {
     parentEntityRef: "<",
+    parentFlow: "<?",
     helpText: "@"
 };
 
@@ -32,6 +33,7 @@ const bindings = {
 const initialState = {
     helpText: null,
     isDirty: false,
+    parentFlow: null,
     visibility: {
         editor: false,
         controls: false

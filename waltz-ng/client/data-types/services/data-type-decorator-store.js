@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
@@ -37,6 +36,13 @@ function store($http, BaseApiUrl) {
     };
 
 
+    const findSuggestedByEntityRef = (ref) => {
+        return $http
+            .get(`${BASE}/suggested/entity/${ref.kind}/${ref.id}`)
+            .then(result => result.data);
+    };
+
+
     // ONLY FOR LOGICAL FLOWS
     const findByFlowIds = (flowIds = [], kind = entity.LOGICAL_DATA_FLOW.key) => {
         return $http
@@ -55,6 +61,7 @@ function store($http, BaseApiUrl) {
     return {
         findBySelector,
         findByEntityReference,
+        findSuggestedByEntityRef,
         findByFlowIds,
         save
     };
@@ -85,6 +92,11 @@ export const DataTypeDecoratorStore_API = {
         serviceName,
         serviceFnName: 'findByFlowIds',
         description: 'finds data types for flow ids'
+    },
+    findSuggestedByEntityRef: {
+        serviceName,
+        serviceFnName: 'findSuggestedByEntityRef',
+        description: 'finds suggested datatypes by entity reference'
     },
     save: {
         serviceName,
