@@ -21,10 +21,11 @@ import template from "./survey-instance-summary.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import {timeFormat} from "d3-time-format";
-import {loadEntity, sameRef} from "../../../common/entity-utils";
+import {sameRef} from "../../../common/entity-utils";
 import {displayError} from "../../../common/error-utils";
-import roles from "../../../user/system-roles";
-import {mkDescription} from "../../survey-utils";
+import * as surveyUtils from "../../survey-utils";
+import * as actions from "./survey-actions";
+import moment from "moment";
 
 
 const bindings = {
@@ -33,96 +34,6 @@ const bindings = {
 
 
 const initialState = {};
-
-const statusActions = [
-    {
-        name: "Approve",
-        severity: "success",
-        helpText: "....",
-        predicate: (instance, permissions, isLatest) => isLatest
-            && (permissions.admin || permissions.owner)
-            && instance.status === "COMPLETED"
-            && _.isNil(instance.approvedAt),
-        onPerform: (serviceBroker, instance, notification) => {
-            const reason = prompt("Are you sure you want to approve this survey? Please enter a reason below (optional):");
-            if (!_.isNil(reason)) {
-                return serviceBroker
-                    .execute(
-                        CORE_API.SurveyInstanceStore.markApproved,
-                        [ instance.id, {newStringVal: _.isEmpty(reason) ? null : reason}])
-                    .then(result => {
-                        notification.success("Survey response approved");
-                    });
-            } else {
-                return Promise.reject();
-            }
-        }
-    }, {
-        name: "Withdraw",
-        severity: "danger",
-        helpText: "....",
-        predicate: (instance, permissions, isLatest) => isLatest
-            && (permissions.admin || permissions.owner)
-            && instance.status !== "WITHDRAWN"
-            && instance.status !== "APPROVED"
-            && instance.status !== "COMPLETED",
-        onPerform: (serviceBroker, instance, notification) => {
-            if (confirm("Are you sure you want to withdraw this survey instance? ")) {
-                return serviceBroker
-                    .execute(
-                        CORE_API.SurveyInstanceStore.updateStatus,
-                        [instance.id, {newStatus: "WITHDRAWN"} ])
-                    .then(() => {
-                        notification.success("Survey instance withdrawn");
-                    });
-            } else {
-                Promise.reject();
-            }
-        }
-    }, {
-        name: "Reject",
-        severity: "danger",
-        helpText: "....",
-        predicate: (instance, permissions, isLatest) => isLatest
-            && (permissions.admin || permissions.owner)
-            && instance.status === "COMPLETED",
-        onPerform: (serviceBroker, instance, notification) => {
-            const reason = prompt("Are you sure you want reject this survey? Please enter a reason below (mandatory):");
-            if (reason) {
-                return serviceBroker
-                    .execute(
-                        CORE_API.SurveyInstanceStore.updateStatus,
-                        [instance.id, {newStatus: "REJECTED", reason}])
-                    .then(() => {
-                        notification.success("Survey response rejected");
-                    });
-            } else {
-                Promise.reject();
-            }
-        }
-    }, {
-        name: "Reopen",
-        severity: "warning",
-        helpText: "....",
-        predicate: (instance, permissions, isLatest) => isLatest
-            && (permissions.admin || permissions.owner || permissions.participant)
-            && ( instance.status === "WITHDRAWN" || instance.status === "REJECTED" || instance.status === "APPROVED"),
-        onPerform: (serviceBroker, instance, notification) => {
-            const confirmation = confirm("Are you sure you want reopen this survey?");
-            if (confirmation) {
-                return serviceBroker
-                    .execute(
-                        CORE_API.SurveyInstanceStore.updateStatus,
-                        [instance.id, {newStatus: "IN_PROGRESS"}])
-                    .then(() => {
-                        notification.success("Survey response reopened");
-                    });
-            } else {
-                Promise.reject();
-            }
-        }
-    },
-];
 
 
 function mkUpdateRecipientCommand(instanceRecipientId, person, surveyInstanceId) {
@@ -147,135 +58,54 @@ function findMatchingRecipient(recipients = [], person) {
 }
 
 
-function controller($state, serviceBroker, userService, notification) {
+function controller($q,
+                    $state,
+                    serviceBroker,
+                    userService,
+                    notification) {
     const vm = initialiseData(this, initialState);
 
 
-    function loadRoles() {
-        serviceBroker.loadAppData(CORE_API.RoleStore.findAllRoles)
-            .then(r => {
-                const rolesByKey = _.keyBy(r.data, d => d.key);
-                vm.owningRole = rolesByKey[vm.surveyInstance.owningRole];
-            });
-    }
-
     function reload(force = false) {
-        loadInstanceAndRun(force)
-            .then(loadSubject)
-            .then(loadOwner)
-            .then(loadRoles)
-            .then(() => loadRecipients(force))
-            .then(() => loadPreviousVersions(force))
-            .then(loadUser)
-            .then(determineAvailableStatusActions);
-    }
+        return surveyUtils
+            .loadSurveyInfo($q,  serviceBroker, userService, vm.instanceId, true)
+            .then(details => {
+                vm.surveyDetails = details;
 
-    function determineAvailableStatusActions() {
-        vm.availableStatusActions = _.filter(
-            statusActions,
-            act => act.predicate(
-                vm.surveyInstance,
-                vm.permissions,
-                vm.currentResponseVersion.isLatest));
-    }
+                vm.description = surveyUtils.mkDescription([details.template.description, details.run.description]);
+                vm.people = _.map(details.recipients, d => d.person);
+                vm.availableStatusActions = actions.determineAvailableStatusActions(
+                    details.instance,
+                    details.permissions,
+                    details.isLatest);
 
-    function loadUser() {
-        userService
-            .whoami()
-            .then(u => {
-                const isOwner = vm.owner.userId === u.userName;
-                const isParticipant = _.some(vm.people, p => p.userId === u.userName);
-                const hasOwningRole = _.includes(u.roles, vm.surveyInstance.owningRole);
-                const isAdmin = userService.hasRole(u, roles.SURVEY_ADMIN);
-                vm.permissions = {
-                    admin: isAdmin,
-                    owner: isOwner || hasOwningRole,
-                    participant: isParticipant,
-                    metaEdit: vm.currentResponseVersion.isLatest && (isOwner || isAdmin)
-                };
-            });
-    }
-
-    function loadPreviousVersions(force) {
-        const latestInstanceId = vm.surveyInstance.originalInstanceId || vm.surveyInstance.id;
-        return serviceBroker
-            .loadViewData(
-                CORE_API.SurveyInstanceStore.findPreviousVersions,
-                [ latestInstanceId ],
-                { force })
-            .then(r => {
-                const prevVersions = _.chain(r.data)
-                    .sortBy("submittedAt")
-                    .map((pv, i) => ({
-                        versionNum: `${i + 1}.0`,
-                        instanceId: pv.id,
-                        isLatest: false
-                    }))
+                const prevVersions = _
+                    .chain(details.versions)
+                    .sortBy(d => d.submittedAt)
+                    .map((pv, i) => {
+                        const m = moment.utc(pv.submittedAt);
+                        return {
+                            versionNum: `Version ${i + 1} / Submitted: ${m.fromNow()}`,
+                            instanceId: pv.id,
+                            isLatest: false
+                        };
+                    })
                     .reverse()
                     .value();
 
                 const latestResponseVersion = {
-                    versionNum: `${prevVersions.length + 1}.0`,
-                    instanceId: latestInstanceId,
+                    versionNum: `Version: ${prevVersions.length + 1} / Latest`,
+                    instanceId: details.latestInstanceId,
                     isLatest: true
                 };
 
                 const allResponseVersions = [latestResponseVersion].concat(prevVersions);
-                vm.currentResponseVersion = _.keyBy(allResponseVersions, "instanceId")[vm.surveyInstance.id];
+                vm.currentResponseVersion = _.keyBy(allResponseVersions, "instanceId")[details.instance.id];
                 vm.otherResponseVersions = _.filter(
                     allResponseVersions,
                     rv => rv.instanceId !== vm.currentResponseVersion.instanceId);
             });
     }
-
-    function loadOwner() {
-        return serviceBroker
-            .loadViewData(
-                CORE_API.PersonStore.getById,
-                [ vm.surveyRun.ownerId ])
-            .then(r => {
-                vm.owner = r.data;
-            });
-    }
-
-    function loadSubject() {
-        return loadEntity(serviceBroker, vm.surveyInstance.surveyEntity)
-            .then(entity => vm.subject = entity);
-    }
-
-    function loadInstanceAndRun(force = false) {
-        return serviceBroker
-            .loadViewData(
-                CORE_API.SurveyInstanceStore.getById,
-                [vm.instanceId],
-                { force })
-            .then(r => {
-                vm.surveyInstance = r.data;
-                const runId = vm.surveyInstance.surveyRunId;
-                return serviceBroker
-                    .loadViewData(CORE_API.SurveyRunStore.getById, [runId])
-                    .then(r => vm.surveyRun = r.data);
-            }).then(() => serviceBroker
-                .loadViewData(CORE_API.SurveyTemplateStore.getById, [vm.surveyRun.surveyTemplateId])
-                .then(r => {
-                    const surveyTemplate = r.data;
-                    vm.description = mkDescription([surveyTemplate.description, vm.surveyRun.description]);
-                })
-            );
-    }
-
-    function loadRecipients(force) {
-        return serviceBroker
-            .loadViewData(
-                CORE_API.SurveyInstanceStore.findRecipients,
-                [vm.instanceId],
-                { force })
-            .then(r => {
-                vm.recipients = r.data;
-                vm.people = _.map(vm.recipients, r => r.person);
-            });
-    }
-
 
     // -- INTERACT --
 
@@ -292,7 +122,7 @@ function controller($state, serviceBroker, userService, notification) {
             .execute(CORE_API.SurveyInstanceStore.addRecipient, [ vm.instanceId, cmd ])
             .then(r => {
                 if(r.data) {
-                    loadRecipients(true);
+                    reload(true);
                     notification.success(`${p.name} added as a recipient`);
                 } else {
                     notification.error(`${p.name} not added as a recipient`)
@@ -305,24 +135,26 @@ function controller($state, serviceBroker, userService, notification) {
     };
 
     vm.onRemoveRecipient = p => {
-        const recipient = findMatchingRecipient(vm.recipients, p);
+        const recipient = findMatchingRecipient(vm.surveyDetails.recipients, p);
         notification.info(`Removing ${p.name} as a recipient`);
+        console.log({recipient})
         if (recipient) {
             return serviceBroker
                 .execute(
                     CORE_API.SurveyInstanceStore.deleteRecipient,
-                    [vm.surveyInstance.id, recipient.id])
+                    [vm.surveyDetails.instance.id, recipient.id])
                 .then(r => {
                     if(r.data) {
-                        loadRecipients(true);
+                        reload(true);
                         notification.success(`Removed ${p.name} from recipients`);
                     } else {
-                        notification.error(`${p.name} not removed from recipients`)
+                        notification.error(`Failed to remove ${p.name}`);
                     }
-                });
+                })
+                .catch(e => displayError(notification, `${p.name} not removed from recipients`, e));
         } else {
             // we couldn't find the recipient so lets reload in case something happened elsewhere
-            return loadRecipients();
+            return reload();
         }
     };
 
@@ -347,7 +179,7 @@ function controller($state, serviceBroker, userService, notification) {
                     [ instanceId, {newDateVal: timeFormat("%Y-%m-%d")(change.newVal)}])
                 .then(() => {
                     notification.success("Survey instance due date updated successfully");
-                    loadInstanceAndRun(true);
+                    reload(true);
                 })
                 .catch(e => displayError(notification, "Failed to update survey instance due date", e));
         }
@@ -355,8 +187,9 @@ function controller($state, serviceBroker, userService, notification) {
 
     vm.invokeStatusAction = (action) => {
         action
-            .onPerform(serviceBroker, vm.surveyInstance, notification)
-            .then(() => reload(true));
+            .onPerform(serviceBroker, vm.surveyDetails.instance, notification)
+            .then(() => reload(true))
+            .catch(msg => notification.warning(msg))
     };
 
     // -- LIFECYCLE
@@ -367,11 +200,10 @@ function controller($state, serviceBroker, userService, notification) {
         }
     };
 
-    vm.$onDestroy = () => {
-    };
 }
 
 controller.$inject = [
+    "$q",
     "$state",
     "ServiceBroker",
     "UserService",

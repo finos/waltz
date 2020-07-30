@@ -15,19 +15,20 @@
  * See the License for the specific
  *
  */
+@import "../../../style/util";
+
 
 .waltz-warning {
     background: #fffdfa;
     background: linear-gradient(90deg, #fffdfa 0%, rgba(255,255,255,1) 100%);
-    padding: 15px;
-    margin-bottom: 6px;
+    padding: 0.5em 1em 1em 2em;
+    margin-bottom: 1.5em;
     border-radius: 3px;
-    box-shadow: 0 0 2px 0 hsla(0, 0%, 0%, 0.2);
+    @include waltz-box-shadow();
     border-left: 4px solid rgba(222, 139, 6, 0.99);
 
     .ww-message {
         color: #DE8B06;
-
         span {
             vertical-align: middle;
         }
