@@ -101,6 +101,6 @@
     <property name="weight.type" value="${int.type}"></property>
     <property name="url.type" value="VARCHAR(500)"></property>
     <property name="user-agent.type" value="VARCHAR(500)"></property>
-
+    <property name="expression.type" value="VARCHAR(500)"></property>
 
 </databaseChangeLog>

@@ -1,0 +1,118 @@
+
+<input type="search"
+       class="form-control"
+       placeholder="Search..."
+       ng-model-options="{ debounce: 200 }"
+       ng-model="$ctrl.qry">
+
+<br>
+
+<div class="row"
+     ng-if="$ctrl.mode === $ctrl.modes.DEFAULT_VIEW">
+    <div class="col-sm-12">
+        <table class="table table-condensed table-striped">
+            <thead>
+            <tr>
+                <th>Section Name</th>
+                <th>Question Text</th>
+                <th>Field Type</th>
+                <th>Position</th>
+                <th>External Id</th>
+                <th>Conditional?</th>
+                <th>Help Text?</th>
+                <th>Mandatory?</th>
+                <th>Allows Comment?</th>
+                <th ng-show="$ctrl.actions.length > 0">Actions</th>
+            </tr>
+            </thead>
+            <tr ng-repeat="qi in $ctrl.questionInfos | filter:$ctrl.qry | orderBy:'position'">
+                <td><span ng-bind="qi.question.sectionName"></span></td>
+                <td><span ng-bind="qi.question.questionText"></span></td>
+                <td><span ng-bind="qi.question.fieldType | toDisplayName:'surveyQuestionFieldType'"></span></td>
+                <td><span ng-bind="qi.question.position"></span></td>
+                <td><span ng-bind="qi.question.externalId || '-'"></span></td>
+                <td>
+                    <span uib-popover="{{qi.question.inclusionPredicate}}"
+                          popover-trigger="mouseenter"
+                          popover-placement="right">
+                        <waltz-boolean-renderer mute-false="true"
+                                                value="qi.question.inclusionPredicate.length > 0">
+                        </waltz-boolean-renderer>
+                    </span>
+                </td>
+                <td>
+                    <span uib-popover="{{qi.question.helpText}}"
+                          popover-trigger="mouseenter">
+                        <waltz-boolean-renderer mute-false="true"
+                                                value="qi.question.helpText.length > 0">
+                        </waltz-boolean-renderer>
+                    </span>
+                </td>
+                <td>
+                    <waltz-boolean-renderer mute-false="true"
+                                            value="qi.question.isMandatory">
+                    </waltz-boolean-renderer>
+                </td>
+                <td>
+                    <waltz-boolean-renderer mute-false="true"
+                                            value="qi.question.allowComment">
+                    </waltz-boolean-renderer>
+                </td>
+                <td ng-show="$ctrl.actions.length > 0">
+                    <span ng-include="'wstqot-actions'"></span>
+                </td>
+            </tr>
+        </table>
+
+        Switch to the
+        <a class="clickable" ng-click="$ctrl.mode=$ctrl.modes.CONDITIONAL_VIEW">
+            conditional view
+        </a>
+        to see any conditional logic associated with this survey.
+
+    </div>
+</div>
+
+
+<div class="row"
+     ng-if="$ctrl.mode === $ctrl.modes.CONDITIONAL_VIEW">
+    <div class="col-sm-12">
+        <table class="table table-condensed table-striped">
+            <thead>
+            <tr>
+                <th>Question Text</th>
+                <th>External Id</th>
+                <th>Conditional</th>
+                <th ng-show="$ctrl.actions.length > 0">Actions</th>
+            </tr>
+            </thead>
+            <tr ng-repeat="qi in $ctrl.questionInfos | filter:$ctrl.qry | orderBy:'position'">
+                <td><span ng-bind="qi.question.questionText"></span></td>
+                <td><span style="font-family: monospace" ng-bind="qi.question.externalId"></span></td>
+                <td><span style="font-family: monospace" ng-bind="qi.question.inclusionPredicate"></span></td>
+                <td ng-show="$ctrl.actions.length > 0">
+                    <span ng-include="'wstqot-actions'"></span>
+                </td>
+            </tr>
+        </table>
+
+        Switch back to the
+        <a class="clickable" ng-click="$ctrl.mode=$ctrl.modes.DEFAULT_VIEW">
+            default view
+        </a>
+        to see the overall summary.
+
+    </div>
+</div>
+
+
+<script type="text/ng-template"
+        id="wstqot-actions">
+    <span ng-repeat="action in $ctrl.actions">
+        <a ng-click="action.action(qi)"
+           class="clickable btn btn-xs waltz-visibility-child-30">
+            <waltz-icon name="{{action.icon}}"></waltz-icon>
+            <span ng-bind="action.name"></span>
+        </a>
+    </span>
+</script>

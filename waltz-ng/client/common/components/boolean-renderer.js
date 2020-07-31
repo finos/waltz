@@ -20,17 +20,23 @@ import {stringToBoolean} from "../string-utils";
 
 
 const bindings = {
-    value: "<"
+    value: "<",
+    muteFalse: "<?",
+    muteTrue: "<?",
+    muteNull: "<?"
 };
 
 
-const template = `<waltz-icon ng-if="$ctrl.booleanValue === true" name="check" class="text-success"></waltz-icon>
-                  <waltz-icon ng-if="$ctrl.booleanValue === false" name="times" class="text-danger"></waltz-icon>
-                  <span ng-if="$ctrl.booleanValue == null" class="text-muted">-</span>`;
+const template = `<waltz-icon ng-if="$ctrl.booleanValue === true"  ng-style="{opacity: $ctrl.muteTrue ? 0.4 : 1}" name="check" class="text-success"></waltz-icon>
+                  <waltz-icon ng-if="$ctrl.booleanValue === false" ng-style="{opacity: $ctrl.muteFalse ? 0.4 : 1}" name="times" class="text-danger"></waltz-icon>
+                  <span ng-if="$ctrl.booleanValue == null" ng-style="{opacity: $ctrl.muteNull ? 0.4 : 1}" class="text-muted">-</span>`;
 
 
 const initialState = {
-    booleanValue: null
+    booleanValue: null,
+    muteFalse: false,
+    muteTrue: false,
+    muteNull: false
 };
 
 

@@ -113,4 +113,13 @@ public class SurveyInstanceRecipientDao {
                 .where(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.eq(surveyInstanceId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
+
+
+    public Long getPersonIdForRecipientId(long recipientId) {
+        return dsl
+                .select(SURVEY_INSTANCE_RECIPIENT.PERSON_ID)
+                .from(SURVEY_INSTANCE_RECIPIENT)
+                .where(SURVEY_INSTANCE_RECIPIENT.ID.eq(recipientId))
+                .fetchOne(SURVEY_INSTANCE_RECIPIENT.PERSON_ID);
+    }
 }

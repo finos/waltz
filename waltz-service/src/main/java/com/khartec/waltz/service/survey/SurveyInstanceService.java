@@ -312,12 +312,13 @@ public class SurveyInstanceService {
 
     public boolean deleteRecipient(String username, long surveyInstanceId, long recipientId) {
         checkPersonIsOwnerOrAdmin(username, surveyInstanceId);
+        Long personId = surveyInstanceRecipientDao.getPersonIdForRecipientId(recipientId);
         boolean rc = surveyInstanceRecipientDao.delete(recipientId);
 
         logRecipientChange(
                 username,
                 surveyInstanceId,
-                recipientId,
+                personId,
                 Operation.REMOVE,
                 "Survey Instance: Removed %s as a recipient");
 

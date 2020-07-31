@@ -41,10 +41,11 @@ function mkSurveyData(surveyRuns = [], surveyInstances = []) {
         }
     });
 
-    const [incomplete = [], complete = []] = _.partition(mappedData,
+    const [incomplete = [], complete = []] = _.partition(
+        mappedData,
         data => data.surveyInstance.status === "NOT_STARTED"
-        || data.surveyInstance.status === "IN_PROGRESS"
-        || data.surveyInstance.status === "REJECTED");
+            || data.surveyInstance.status === "IN_PROGRESS"
+            || data.surveyInstance.status === "REJECTED");
 
     return {
         "incomplete": incomplete,
@@ -90,7 +91,8 @@ function mkCommonColumnDefs() {
 
 function mkIncompleteColumnDefs() {
     const columnDefs = mkCommonColumnDefs();
-    columnDefs.splice(0, 0, Object.assign({},
+    columnDefs.splice(0, 0, Object.assign(
+        {},
         mkLinkGridCell("Survey", "surveyRun.name", "surveyInstance.id", "main.survey.instance.response.edit"),
         { width: "25%"}
     ));
@@ -100,7 +102,8 @@ function mkIncompleteColumnDefs() {
 
 function mkCompleteColumnDefs() {
     const columnDefs = mkCommonColumnDefs();
-    columnDefs.splice(0, 0, Object.assign({},
+    columnDefs.splice(0, 0, Object.assign(
+        {},
         mkLinkGridCell("Survey", "surveyRun.name", "surveyInstance.id", "main.survey.instance.response.view"),
         { width: "25%"}
     ));
