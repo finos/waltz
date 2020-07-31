@@ -33,11 +33,20 @@
             </strong>
     </waltz-multi-select-tree-control>
 
+    <p class="small clickable text text-muted"
+       style="margin-left: 22px"
+       ng-if="!$ctrl.showAllDataTypes">
+        <waltz-icon name="info-circle"></waltz-icon>
+        This is a reduced list of recommended datatypes based on your upstream source
+    </p>
+
     <a class="small clickable"
        style="margin-left: 22px">
         <waltz-icon ng-if="!$ctrl.showAllDataTypes"
-                    name="plus"></waltz-icon>
-        <waltz-icon ng-if="$ctrl.showAllDataTypes" name="minus"></waltz-icon>
+                    name="plus">
+        </waltz-icon>
+        <waltz-icon ng-if="$ctrl.showAllDataTypes" name="minus">
+        </waltz-icon>
         <span ng-click="$ctrl.toggleShowAll()"
               ng-bind="$ctrl.showAllMessage">
         </span>
