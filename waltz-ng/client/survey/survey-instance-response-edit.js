@@ -104,6 +104,16 @@ function controller($location,
 
     loadAll();
 
+    function reloadQuestions() {
+        const questionPromise = serviceBroker
+            .loadViewData(CORE_API.SurveyQuestionStore.findForInstance, [id], { force: true })
+            .then(r => {
+                vm.allQuestions = r.data;
+                vm.surveyQuestionInfos = groupQuestions(r.data);
+            });
+    }
+
+
     vm.saveResponse = (questionId) => {
         const questionResponse = vm.surveyResponses[questionId];
         vm.surveyQuestionInfos = refreshQuestions(vm.allQuestions, vm.surveyResponses);
@@ -117,9 +127,12 @@ function controller($location,
                     : null
             });
 
-        serviceBroker.execute(
-            CORE_API.SurveyInstanceStore.saveResponse,
-            [vm.surveyInstance.id, saveParams]);
+        serviceBroker
+            .execute(
+                CORE_API.SurveyInstanceStore.saveResponse,
+                [vm.surveyInstance.id, saveParams])
+            .then(() => reloadQuestions());
+
     };
 
     vm.saveEntityResponse = (entity, questionId) => {

@@ -190,7 +190,8 @@ function shouldQuestionBeIncluded(question, evaluator) {
 export function refreshQuestions(allQuestions = [], responsesById = {}) {
     const inclusionEvaluator = mkSurveyExpressionEvaluator(allQuestions, responsesById);
     const activeQs = _.filter(allQuestions, q => shouldQuestionBeIncluded(q.question, inclusionEvaluator));
-    return groupQuestions(activeQs);
+    // return groupQuestions(activeQs);
+    return groupQuestions(allQuestions);
 }
 
 
