@@ -165,15 +165,15 @@ export function mkSurveyExpressionEvaluator(questions = [], responsesById = {}) 
 
 
 /**
- * Question should be included if it's inclusion predicate evaulates to `true` or it
- * does not have an incusion predicate
- * @param q
+ * Question should be included if it's inclusion predicate evaluates to `true` or it
+ * does not have an inclusion predicate
+ * @param question
  * @param evaluator
  * @returns boolean
  */
-function shouldQuestionBeIncluded(q, evaluator) {
-    return q.question.inclusionPredicate
-        ? evaluator(q.question.inclusionPredicate, q.question.externalId, q)
+function shouldQuestionBeIncluded(question, evaluator) {
+    return question.inclusionPredicate
+        ? evaluator(question.inclusionPredicate, question.externalId, question) === true
         : true;
 }
 
@@ -189,7 +189,7 @@ function shouldQuestionBeIncluded(q, evaluator) {
  */
 export function refreshQuestions(allQuestions = [], responsesById = {}) {
     const inclusionEvaluator = mkSurveyExpressionEvaluator(allQuestions, responsesById);
-    const activeQs = _.filter(allQuestions, q => shouldQuestionBeIncluded(q, inclusionEvaluator));
+    const activeQs = _.filter(allQuestions, q => shouldQuestionBeIncluded(q.question, inclusionEvaluator));
     return groupQuestions(activeQs);
 }
 

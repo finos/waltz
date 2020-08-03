@@ -104,6 +104,11 @@
             <artifactId>jBCrypt</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-jexl3</artifactId>
+        </dependency>
+
         <!-- TEST -->
 
         <dependency>
