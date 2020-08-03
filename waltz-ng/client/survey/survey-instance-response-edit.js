@@ -17,7 +17,7 @@
  */
 
 import {formats, initialiseData} from "../common/index";
-import {groupQuestions, indexResponses, mkSurveyExpressionEvaluator, refreshQuestions} from "./survey-utils";
+import * as SurveyUtils from "./survey-utils";
 import _ from "lodash";
 import {CORE_API} from "../common/services/core-api-utils";
 import moment from "moment";
@@ -27,10 +27,8 @@ import template from "./survey-instance-response-edit.html";
 
 const initialState = {
     changeLogSection: dynamicSections.changeLogSection,
-    isUserInstanceRecipient: false,
     instanceCanBeEdited: false,
-    surveyInstance: {},
-    surveyQuestionInfos: [],
+    groupedQuestions: [],
     surveyResponses: {},
     user: {}
 };
@@ -40,8 +38,11 @@ Please ensure you have saved any comments you may have entered (by clicking 'Sav
 Are you sure you want to submit your responses?`;
 
 
-
-const statusesWhichSupportEditing = ["NOT_STARTED", "IN_PROGRESS", "REJECTED"];
+const statusesWhichSupportEditing = [
+    "NOT_STARTED",
+    "IN_PROGRESS",
+    "REJECTED"
+];
 
 
 function controller($location,
@@ -62,61 +63,32 @@ function controller($location,
         kind: "SURVEY_INSTANCE"
     };
 
-    function loadAll() {
-        const recipientsPromise = serviceBroker
-            .loadViewData(CORE_API.SurveyInstanceStore.findRecipients, [id])
-            .then(r => r.data);
-
-        const instancePromise = serviceBroker
-            .loadViewData(CORE_API.SurveyInstanceStore.getById, [id])
-            .then(r => {
-                vm.surveyInstance = r.data;
-                vm.instanceCanBeEdited = _.includes(statusesWhichSupportEditing, vm.surveyInstance.status);
-            });
-
-        const runPromise = instancePromise
-            .then(() => serviceBroker
-                .loadViewData(CORE_API.SurveyRunStore.getById, [vm.surveyInstance.surveyRunId]))
-            .then(r => vm.surveyRun = r.data);
-
-        const questionPromise = serviceBroker
-            .loadViewData(CORE_API.SurveyQuestionStore.findForInstance, [id])
-            .then(r => vm.allQuestions = r.data);
-
+    function boot() {
         const responsePromise = serviceBroker
             .loadViewData(CORE_API.SurveyInstanceStore.findResponses, [id])
-            .then(r => vm.surveyResponses = indexResponses(r.data));
+            .then(r => vm.surveyResponses = SurveyUtils.indexResponses(r.data));
 
-        $q.all([questionPromise, responsePromise])
-            .then(() => vm.surveyQuestionInfos = refreshQuestions(vm.allQuestions, vm.surveyResponses));
-
-        $q.all([userService.whoami(), recipientsPromise])
-            .then(([user = {}, recipients = []]) => {
-                vm.user = user;
-                const [currentRecipients = [], otherRecipients = []] = _.partition(
-                    recipients,
-                    r => _.toLower(r.person.email) === _.toLower(user.userName));
-
-                vm.isUserInstanceRecipient = currentRecipients.length > 0;
-                vm.otherRecipients = otherRecipients.map(r => r.person);
+        SurveyUtils
+            .loadSurveyInfo($q, serviceBroker, userService, id, true)
+            .then(details => {
+                vm.surveyDetails = details;
+                vm.instanceCanBeEdited = _.includes(statusesWhichSupportEditing, details.instance.status);
             });
-    }
 
-    loadAll();
+        reloadQuestions();
+    }
 
     function reloadQuestions() {
         const questionPromise = serviceBroker
             .loadViewData(CORE_API.SurveyQuestionStore.findForInstance, [id], { force: true })
             .then(r => {
-                vm.allQuestions = r.data;
-                vm.surveyQuestionInfos = groupQuestions(r.data);
+                vm.groupedQuestions = SurveyUtils.groupQuestions(r.data);
             });
     }
 
 
     vm.saveResponse = (questionId) => {
         const questionResponse = vm.surveyResponses[questionId];
-        vm.surveyQuestionInfos = refreshQuestions(vm.allQuestions, vm.surveyResponses);
 
         const saveParams = Object.assign(
             {questionId},
@@ -130,7 +102,7 @@ function controller($location,
         serviceBroker
             .execute(
                 CORE_API.SurveyInstanceStore.saveResponse,
-                [vm.surveyInstance.id, saveParams])
+                [vm.surveyDetails.instance.id, saveParams])
             .then(() => reloadQuestions());
 
     };
@@ -159,11 +131,17 @@ function controller($location,
         const questionResponse = _.get(vm.surveyResponses, [question.id], {});
         questionResponse.comment = valObj.newVal;
 
+        const saveParams = [
+            vm.surveyDetails.instance.id,
+            Object.assign({"questionId": question.id}, questionResponse)
+        ];
+
         return serviceBroker
             .execute(
                 CORE_API.SurveyInstanceStore.saveResponse,
-                [vm.surveyInstance.id, Object.assign({"questionId": question.id}, questionResponse)]);
+                saveParams);
     };
+
 
     /**
      * This is a bit of fakery as the questions are saved each time a response is updated.
@@ -176,13 +154,16 @@ function controller($location,
         }, 200); // allow blur events to fire
     };
 
+
     const doSubmit = () => {
         serviceBroker
             .execute(
                 CORE_API.SurveyInstanceStore.updateStatus,
-                [vm.surveyInstance.id, {newStatus: "COMPLETED"}])
+                [vm.surveyDetails.instance.id, {newStatus: "COMPLETED"}])
             .then(() => {
                 notification.success("Survey response submitted successfully");
+                // we force a reload of the notification store to update any listeners that the number
+                // of open surveys may have changed (i.e. the counter in the profile menu)
                 serviceBroker.loadAppData(
                     CORE_API.NotificationStore.findAll,
                     [],
@@ -198,6 +179,10 @@ function controller($location,
             }
         }, 200); // allow blur events to fire, because 'confirm' blocks events
     };
+
+
+    // --- BOOT
+    boot();
 
 }
 

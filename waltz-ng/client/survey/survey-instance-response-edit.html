@@ -18,7 +18,7 @@
 
 <div>
     <waltz-page-header icon="wpforms"
-                       name="{{ ctrl.surveyRun.name }}"
+                       name="{{ ctrl.surveyDetails.run.name }}"
                        small="edit response">
         <breadcrumbs>
             <ol class="waltz-breadcrumbs">
@@ -26,38 +26,37 @@
                     <a ui-sref="main">Home</a>
                 </li>
                 <li>
-                    <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity">
+                    <waltz-entity-link entity-ref="ctrl.surveyDetails.instance.surveyEntity"
+                                       tooltip-placement="bottom">
                     </waltz-entity-link>
                 </li>
                 <li>
                     <a ui-sref="main.survey.instance.user">Surveys</a>
                 </li>
                 <li>
-                <span ng-bind="ctrl.surveyRun.name">
-                </span>
+                    <span ng-bind="ctrl.surveyDetails.run.name">
+                    </span>
                 </li>
             </ol>
         </breadcrumbs>
     </waltz-page-header>
 
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <waltz-survey-instance-summary instance-id="ctrl.surveyInstance.id">
+        <waltz-survey-instance-summary instance-id="ctrl.surveyDetails.instance.id">
         </waltz-survey-instance-summary>
     </div>
 
     <br>
-
     <br>
-
 
     <waltz-section name="Responses"
                    icon="pencil-square"
-                   ng-if="ctrl.isUserInstanceRecipient && ctrl.instanceCanBeEdited">
+                   ng-if="ctrl.surveyDetails.permissions.participant && ctrl.instanceCanBeEdited">
         <form name="surveyResponseForm"
               class="form-horizontal waltz-survey-form"
               role="form"
               novalidate>
-            <div ng-repeat="groupedQuestion in ctrl.surveyQuestionInfos track by groupedQuestion.sectionName"
+            <div ng-repeat="groupedQuestion in ctrl.groupedQuestions track by groupedQuestion.sectionName"
                  class="waltz-survey-question-section">
 
                 <h4 ng-bind="groupedQuestion.sectionName"
@@ -245,23 +244,23 @@
     </waltz-section>
 
     <div class="alert alert-warning"
-         ng-if="ctrl.surveyInstance.status === 'EXPIRED'">
+         ng-if="ctrl.surveyDetails.instance.status === 'EXPIRED'">
         <h4>Survey Expired</h4>
         <p>This survey response has been expired without being submitted.</p>
     </div>
 
     <div class="alert alert-warning"
-         ng-if="ctrl.surveyInstance.status === 'COMPLETED' || ctrl.surveyInstance.status === 'APPROVED'">
+         ng-if="ctrl.surveyDetails.instance.status === 'COMPLETED' || ctrl.surveyDetails.instance.status === 'APPROVED'">
         <h4>Survey Completed</h4>
         <p>
             This survey response has been completed and is no longer can be edited. Please follow this
-            <a ui-sref="main.survey.instance.response.view ({ id: ctrl.surveyInstance.id })">link</a>
+            <a ui-sref="main.survey.instance.response.view ({ id: ctrl.surveyDetails.instance.id })">link</a>
             to view the responses.
         </p>
     </div>
 
     <div class="alert alert-warning"
-         ng-if="!ctrl.isUserInstanceRecipient">
+         ng-if="!ctrl.surveyDetails.permissions.participant">
         <h4>Permission Denied</h4>
         <p>You don't have permission to respond to this survey.</p>
     </div>
