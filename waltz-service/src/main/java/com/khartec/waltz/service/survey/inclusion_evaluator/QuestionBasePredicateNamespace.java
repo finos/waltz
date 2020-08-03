@@ -1,14 +1,10 @@
 package com.khartec.waltz.service.survey.inclusion_evaluator;
 
-import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ExternalIdProvider;
 import com.khartec.waltz.model.survey.SurveyQuestion;
 import com.khartec.waltz.model.survey.SurveyQuestionResponse;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.MapContext;
-import org.jooq.Condition;
-import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 
 import java.util.List;
 import java.util.Map;
@@ -16,18 +12,17 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
-public class WaltzBasePredicateNamespace {
+public class QuestionBasePredicateNamespace {
 
     private final Map<String, SurveyQuestion> questionsByExtId;
     private final Map<Long, SurveyQuestionResponse> responsesByQuestionId;
     private JexlEngine jexl;
 
 
-    public WaltzBasePredicateNamespace(List<SurveyQuestion> questions,
-                                       Map<Long, SurveyQuestionResponse> responsesByQuestionId) {
+    public QuestionBasePredicateNamespace(List<SurveyQuestion> questions,
+                                          Map<Long, SurveyQuestionResponse> responsesByQuestionId) {
         this.responsesByQuestionId = responsesByQuestionId;
         questionsByExtId = maybeIndexBy(questions, ExternalIdProvider::externalId);
     }
@@ -75,6 +70,45 @@ public class WaltzBasePredicateNamespace {
                 .orElse(true);
     }
 
+
+    public Object val(String qExtId) {
+        return val(qExtId, null);
+    }
+
+
+    public <T> T val(String qExtId, T defaultValue) {
+        SurveyQuestion referencedQuestion = questionsByExtId
+                .get(qExtId);
+
+        return ((Optional<T>) referencedQuestion
+                .id()
+                .map(responsesByQuestionId::get)
+                .flatMap(resp -> getVal(referencedQuestion, resp)))
+                .orElse(defaultValue);
+    }
+
+
+    private Optional<? extends Object> getVal(SurveyQuestion referencedQuestion, SurveyQuestionResponse resp) {
+        switch (referencedQuestion.fieldType()) {
+            case TEXT:
+            case TEXTAREA:
+            case DROPDOWN:
+                return resp.stringResponse();
+            case NUMBER:
+                return resp.numberResponse();
+            case DATE:
+                return resp.dateResponse();
+            case BOOLEAN:
+                return resp.booleanResponse();
+            case DROPDOWN_MULTI_SELECT:
+                return resp.listResponse();
+            case APPLICATION:
+            case PERSON:
+                return resp.entityResponse();
+            default:
+                return Optional.empty();
+        }
+    }
 
     /**
      * Need to pass in the evaluator so that 'recursive' functions can be computed (e.g. 'DITTO')

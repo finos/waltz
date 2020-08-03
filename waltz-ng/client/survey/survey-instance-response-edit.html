@@ -90,9 +90,10 @@
                                type="number"
                                ng-attr-id="{{ qi.question.id }}"
                                placeholder="Please enter a number"
+                               ng-model-options="{ allowInvalid: true, debounce: 200 }"
                                ng-model="ctrl.surveyResponses[qi.question.id].numberResponse"
                                ng-required="qi.question.isMandatory"
-                               ng-blur="ctrl.saveResponse(qi.question.id)"
+                               ng-change="ctrl.saveResponse(qi.question.id)"
                                class="form-control"/>
                         <!-- boolean -->
                         <div ng-switch-when="BOOLEAN">
@@ -159,7 +160,7 @@
                                 ng-attr-id="{{ qi.question.id }}"
                                 ng-model="ctrl.surveyResponses[qi.question.id].stringResponse"
                                 ng-required="qi.question.isMandatory"
-                                ng-blur="ctrl.saveResponse(qi.question.id)"
+                                ng-change="ctrl.saveResponse(qi.question.id)"
                                 ng-options="entry.value as entry.value for entry in qi.dropdownEntries | orderBy:'position'"
                                 class="form-control">
                         </select>

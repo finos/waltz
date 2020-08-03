@@ -24,7 +24,7 @@ import static com.khartec.waltz.common.MapUtilities.newHashMap;
 import static com.khartec.waltz.common.StringUtilities.isEmpty;
 
 @Service
-public class WaltzPredicateEvaluator {
+public class QuestionPredicateEvaluator {
 
     private final DSLContext dsl;
     private final SurveyQuestionDao questionDao;
@@ -33,10 +33,10 @@ public class WaltzPredicateEvaluator {
 
 
     @Autowired
-    public WaltzPredicateEvaluator(DSLContext dsl,
-                                   SurveyQuestionDao questionDao,
-                                   SurveyInstanceDao instanceDao,
-                                   SurveyQuestionResponseDao responseDao) {
+    public QuestionPredicateEvaluator(DSLContext dsl,
+                                      SurveyQuestionDao questionDao,
+                                      SurveyInstanceDao instanceDao,
+                                      SurveyQuestionResponseDao responseDao) {
         this.dsl = dsl;
         this.questionDao = questionDao;
         this.instanceDao = instanceDao;
@@ -58,7 +58,7 @@ public class WaltzPredicateEvaluator {
                                       EntityReference subjectRef,
                                       Map<Long, SurveyQuestionResponse> responsesByQuestionId) {
 
-        WaltzAppPredicateNamespace defaultNamespace = new WaltzAppPredicateNamespace(
+        QuestionAppPredicateNamespace defaultNamespace = new QuestionAppPredicateNamespace(
                 dsl,
                 subjectRef,
                 qs,
@@ -118,7 +118,7 @@ public class WaltzPredicateEvaluator {
 
     public static void main(String[] args) {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-        WaltzPredicateEvaluator evaluator = ctx.getBean(WaltzPredicateEvaluator.class);
+        QuestionPredicateEvaluator evaluator = ctx.getBean(QuestionPredicateEvaluator.class);
 
         long surveyInstanceId = 147L; // 95L;
         List<SurveyQuestion> activeQs = evaluator.determineActiveQuestions(surveyInstanceId);

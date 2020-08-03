@@ -3,8 +3,6 @@ package com.khartec.waltz.service.survey.inclusion_evaluator;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.survey.SurveyQuestion;
 import com.khartec.waltz.model.survey.SurveyQuestionResponse;
-import org.apache.commons.jexl3.JexlEngine;
-import org.apache.commons.jexl3.MapContext;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -16,16 +14,16 @@ import static com.khartec.waltz.common.StringUtilities.isEmpty;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
-public class WaltzAppPredicateNamespace extends WaltzBasePredicateNamespace {
+public class QuestionAppPredicateNamespace extends QuestionBasePredicateNamespace {
 
     private final DSLContext dsl;
     private final EntityReference subjectRef;
 
 
-    public WaltzAppPredicateNamespace(DSLContext dsl,
-                                      EntityReference subjectRef,
-                                      List<SurveyQuestion> questions,
-                                      Map<Long, SurveyQuestionResponse> responsesByQuestionId) {
+    public QuestionAppPredicateNamespace(DSLContext dsl,
+                                         EntityReference subjectRef,
+                                         List<SurveyQuestion> questions,
+                                         Map<Long, SurveyQuestionResponse> responsesByQuestionId) {
         super(questions, responsesByQuestionId);
         this.dsl = dsl;
         this.subjectRef = subjectRef;
