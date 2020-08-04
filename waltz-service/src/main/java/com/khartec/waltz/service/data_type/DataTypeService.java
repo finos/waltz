@@ -86,4 +86,9 @@ public class DataTypeService {
                 .filter(DataType::unknown)
                 .findFirst();
     }
+
+
+    public Collection<DataType> findSuggestedBySourceEntityRef(EntityReference source){
+        return dataTypeDao.findSuggestedBySourceEntityRef(source);
+    }
 }

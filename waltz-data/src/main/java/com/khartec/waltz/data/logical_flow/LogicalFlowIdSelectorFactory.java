@@ -74,6 +74,8 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 return mkForFlowDiagram(options);
             case PHYSICAL_SPECIFICATION:
                 return mkForPhysicalSpecification(options);
+            case PHYSICAL_FLOW:
+                return mkForPhysicalFlow(options);
             case SERVER:
                 return mkForServer(options);
             case TAG:
@@ -136,6 +138,17 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 .on(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID))
                 .where(PHYSICAL_FLOW.SPECIFICATION_ID.eq(options.entityReference().id()))
                 .and(LOGICAL_NOT_REMOVED);
+    }
+
+
+    private Select<Record1<Long>> mkForPhysicalFlow(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        return DSL.select(LOGICAL_FLOW.ID)
+                .from(LOGICAL_FLOW)
+                .innerJoin(PHYSICAL_FLOW)
+                .on(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID))
+                .and(LOGICAL_NOT_REMOVED)
+                .where(PHYSICAL_FLOW.ID.eq(options.entityReference().id()));
     }
 
 

@@ -19,6 +19,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
+import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.data_type.DataTypeDecoratorService;
@@ -61,6 +62,8 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
     public void register() {
         String findByEntityReference = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findBySelectorPath = mkPath(BASE_URL, "selector", "targetKind", ":targetKind");
+        String findSuggestedByEntityRefPath = mkPath(BASE_URL, "suggested", "entity", ":kind", ":id");
+
 
         String findByFlowIdsAndKindPath = mkPath(BASE_URL, "flow-ids", "kind", ":kind");
         String updateDataTypesPath = mkPath(BASE_URL, "save", "entity", ":kind", ":id");
@@ -78,7 +81,12 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
                         .findByFlowIds(
                                 readIdsFromBody(request), getKind(request));
 
+
+        ListRoute<DataType> findSuggestedByEntityRefRoute = (req, res)
+                -> dataTypeDecoratorService.findSuggestedByEntityRef(getEntityReference(req));
+
         getForList(findByEntityReference, findByEntityReferenceRoute);
+        getForList(findSuggestedByEntityRefPath, findSuggestedByEntityRefRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
         postForList(findByFlowIdsAndKindPath, findByFlowIdsAndKindRoute);
         postForDatum(updateDataTypesPath, this::updateDataTypesRoute);
