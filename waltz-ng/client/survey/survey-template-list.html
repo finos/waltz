@@ -54,8 +54,8 @@
                     <col width="30%">
                     <col width="10%">
                     <col width="10%">
-                    <col width="20%">
-                    <col width="30%">
+                    <col width="15%">
+                    <col width="35%">
                 </colgroup>
                 <thead>
                 <tr>
@@ -84,8 +84,7 @@
                         <span ng-bind="ctrl.owners[template.ownerId].displayName"></span>
                     </td>
                     <td>
-                        <waltz-markdown class='small'
-                                        text="template.description | limitTo:100">
+                        <waltz-markdown text="template.description | limitTo:100">
                         </waltz-markdown>
                         <span ng-if="template.description.length > 100">...</span>
                     </td>
