@@ -32,8 +32,10 @@ import SurveyRunCreateGeneral from "./components/survey-run-create-general";
 import SurveyRunCreateRecipient from "./components/survey-run-create-recipient";
 import SurveyRunOverview from "./components/survey-run-overview";
 import SurveyTemplateOverview from "./components/survey-template-overview";
-import SurveyTemplateQuestionOverviewTable from "./components/question-overview-table/survey-template-question-overview-table";
+import SurveyTemplateQuestionOverviewTable
+    from "./components/question-overview-table/survey-template-question-overview-table";
 import SurveyQuestionStore from "./services/survey-question-store";
+import HistoricalResponsesPanel from "./components/historical-responses-panel/historical-responses-panel"
 
 export default () => {
     const module = angular.module("waltz.survey", []);
@@ -64,7 +66,8 @@ export default () => {
     registerComponents(module, [
         SurveyInstanceList,
         SurveyInstanceSummary,
-        SurveyTemplateQuestionOverviewTable
+        SurveyTemplateQuestionOverviewTable,
+        HistoricalResponsesPanel
     ]);
 
     return module.name;

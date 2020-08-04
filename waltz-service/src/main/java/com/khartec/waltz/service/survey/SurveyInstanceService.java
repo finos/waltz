@@ -115,6 +115,11 @@ public class SurveyInstanceService {
     }
 
 
+    public List<SurveyInstanceQuestionResponse> findHistoricalResponsesForQuestion(long instanceId, long questionId) {
+        return surveyQuestionResponseDao.findHistoricalResponsesForQuestion(instanceId, questionId);
+    }
+
+
     public List<SurveyInstanceRecipient> findRecipients(long instanceId) {
         return surveyInstanceRecipientDao.findForSurveyInstance(instanceId);
     }

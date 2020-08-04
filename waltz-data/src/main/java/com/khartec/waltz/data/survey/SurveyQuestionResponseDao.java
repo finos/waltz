@@ -46,6 +46,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.StringUtilities.ifEmpty;
 import static com.khartec.waltz.common.StringUtilities.join;
+import static com.khartec.waltz.model.survey.SurveyInstanceStatus.WITHDRAWN;
 import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
 import static com.khartec.waltz.schema.Tables.SURVEY_QUESTION_LIST_RESPONSE;
 import static com.khartec.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
@@ -130,8 +131,8 @@ public class SurveyQuestionResponseDao {
                         return ImmutableSurveyInstanceQuestionResponse
                                 .copyOf(r)
                                 .withQuestionResponse(ImmutableSurveyQuestionResponse
-                                                        .copyOf(r.questionResponse())
-                                                        .withListResponse(listResponse));
+                                        .copyOf(r.questionResponse())
+                                        .withListResponse(listResponse));
                     } else {
                         return r;
                     }
@@ -243,6 +244,58 @@ public class SurveyQuestionResponseDao {
         return dsl.delete(SURVEY_QUESTION_RESPONSE)
                 .where(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.in(surveyInstanceIdSelector))
                 .execute();
+    }
+
+
+    public List<SurveyInstanceQuestionResponse> findHistoricalResponsesForQuestion(Long surveyInstanceId, Long questionId){
+
+        SelectConditionStep<Record1<Long>> historicalInstanceIds = dsl
+                .select(SURVEY_INSTANCE.ID)
+                .from(SURVEY_INSTANCE)
+                .where(SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.eq(surveyInstanceId)
+                        .and(SURVEY_INSTANCE.STATUS.ne(WITHDRAWN.name())));
+
+        List<SurveyInstanceQuestionResponse> questionResponses = dsl
+                .select(entityNameField)
+                .select(SURVEY_QUESTION_RESPONSE.fields())
+                .from(SURVEY_INSTANCE)
+                .innerJoin(SURVEY_QUESTION_RESPONSE).on(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
+                .where(SURVEY_INSTANCE.ID.in(historicalInstanceIds))
+                .and(SURVEY_QUESTION_RESPONSE.QUESTION_ID.eq(questionId))
+                .fetch(TO_DOMAIN_MAPPER);
+
+        Map<Long, List<SurveyQuestionListResponseRecord>> instanceIdToListResponses =
+                dsl.selectFrom(SURVEY_QUESTION_LIST_RESPONSE)
+                        .where(SURVEY_QUESTION_LIST_RESPONSE.SURVEY_INSTANCE_ID.in(historicalInstanceIds)
+                                .and(SURVEY_QUESTION_LIST_RESPONSE.QUESTION_ID.eq(questionId)))
+                        .fetch()
+                        .stream()
+                        .collect(groupingBy(SurveyQuestionListResponseRecord::getSurveyInstanceId, toList()));
+
+        return getSurveyInstanceQuestionResponsesWithListResponse(questionResponses, instanceIdToListResponses);
+    }
+
+
+    private List<SurveyInstanceQuestionResponse> getSurveyInstanceQuestionResponsesWithListResponse(List<SurveyInstanceQuestionResponse> questionResponses, Map<Long, List<SurveyQuestionListResponseRecord>> instanceIdToListResponses) {
+        return questionResponses.stream()
+                .map(r -> {
+                    if (instanceIdToListResponses.containsKey(r.surveyInstanceId())) {
+                        List<String> listResponse = instanceIdToListResponses.get(r.surveyInstanceId())
+                                .stream()
+                                .sorted(comparingInt(lr -> lr.getPosition()))
+                                .map(lr -> lr.getResponse())
+                                .collect(toList());
+
+                        return ImmutableSurveyInstanceQuestionResponse
+                                .copyOf(r)
+                                .withQuestionResponse(ImmutableSurveyQuestionResponse
+                                        .copyOf(r.questionResponse())
+                                        .withListResponse(listResponse));
+                    } else {
+                        return r;
+                    }
+                })
+                .collect(toList());
     }
 
 
