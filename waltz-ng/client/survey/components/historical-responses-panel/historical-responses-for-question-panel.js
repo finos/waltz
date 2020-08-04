@@ -18,7 +18,7 @@
 import {initialiseData} from "../../../common/index";
 
 
-import template from "./historical-responses-panel.html";
+import template from "./historical-responses-for-question-panel.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import * as _ from "lodash";
 
@@ -46,9 +46,9 @@ function controller($q, serviceBroker) {
             .loadViewData(CORE_API.SurveyInstanceStore.findHistoricalResponses,
                 [vm.parentEntityRef.id, vm.question.question.id])
             .then(r =>  vm.historicalResponses = _.chain(r.data)
-                    .map(d => Object.assign({}, d, {response: vm.getResponse(d)}))
+                    .map(d => Object.assign({}, d, {responseString: vm.getResponse(d)}))
                     .orderBy('lastUpdatedAt', 'desc')
-                    .uniqBy(d => d.response)
+                    .uniqBy(d => d.responseString)
                     .value());
     };
 

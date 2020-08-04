@@ -35,7 +35,8 @@ import SurveyTemplateOverview from "./components/survey-template-overview";
 import SurveyTemplateQuestionOverviewTable
     from "./components/question-overview-table/survey-template-question-overview-table";
 import SurveyQuestionStore from "./services/survey-question-store";
-import HistoricalResponsesPanel from "./components/historical-responses-panel/historical-responses-panel"
+import HistoricalResponsesForQuestionPanel
+    from "./components/historical-responses-panel/historical-responses-for-question-panel"
 
 export default () => {
     const module = angular.module("waltz.survey", []);
@@ -67,7 +68,7 @@ export default () => {
         SurveyInstanceList,
         SurveyInstanceSummary,
         SurveyTemplateQuestionOverviewTable,
-        HistoricalResponsesPanel
+        HistoricalResponsesForQuestionPanel
     ]);
 
     return module.name;

@@ -7,7 +7,7 @@
         <tr ng-style="{'background-color': ($ctrl.isSelected(response) ? '#dbf7d2' : null) }">
             <td class="clickable"
                 ng-click="$ctrl.onSelectResponse(response)">
-                <span ng-bind="$ctrl.getResponse(response)"></span>
+                <span ng-bind="response.responseString"></span>
                 <span class="text-muted small" ng-bind="response.lastUpdatedAt | date:'yyyy-MM-dd'"></span>
             </td>
             <td>
