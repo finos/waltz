@@ -46,7 +46,6 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.StringUtilities.ifEmpty;
 import static com.khartec.waltz.common.StringUtilities.join;
-import static com.khartec.waltz.model.survey.SurveyInstanceStatus.WITHDRAWN;
 import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
 import static com.khartec.waltz.schema.Tables.SURVEY_QUESTION_LIST_RESPONSE;
 import static com.khartec.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
@@ -252,8 +251,7 @@ public class SurveyQuestionResponseDao {
         SelectConditionStep<Record1<Long>> historicalInstanceIds = dsl
                 .select(SURVEY_INSTANCE.ID)
                 .from(SURVEY_INSTANCE)
-                .where(SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.eq(surveyInstanceId)
-                        .and(SURVEY_INSTANCE.STATUS.ne(WITHDRAWN.name())));
+                .where(SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.eq(surveyInstanceId));
 
         List<SurveyInstanceQuestionResponse> questionResponses = dsl
                 .select(entityNameField)

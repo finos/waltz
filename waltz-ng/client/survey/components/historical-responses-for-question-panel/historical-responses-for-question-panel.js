@@ -83,6 +83,9 @@ function controller($q, serviceBroker) {
                 return _.get(questionResponse, 'dateResponse', null);
             case 'DROPDOWN_MULTI_SELECT':
                 return _.join(_.get(questionResponse, 'listResponse', null), ', ');
+            case 'APPLICATION':
+            case 'PERSON':
+                return _.get(questionResponse, 'entityResponse.name', null);
             default:
                 return null;
         }
