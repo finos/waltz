@@ -79,7 +79,6 @@ public class ChangeLogExtractor extends DirectQueryBasedDataExtractor {
                 .where(ChangeLog.CHANGE_LOG.PARENT_ID.eq(entityRef.id()))
                 .and(ChangeLog.CHANGE_LOG.PARENT_KIND.eq(entityRef.kind().name()));
 
-        Select<Record> union;
         switch (entityRef.kind()) {
             case PERSON:
                 SelectConditionStep<Record> byUserId = DSL
@@ -87,11 +86,10 @@ public class ChangeLogExtractor extends DirectQueryBasedDataExtractor {
                         .from(ChangeLog.CHANGE_LOG)
                         .innerJoin(PERSON).on(PERSON.EMAIL.eq(ChangeLog.CHANGE_LOG.USER_ID))
                         .where(PERSON.ID.eq(entityRef.id()));
-                byParentRef.unionAll(byUserId);
+                return byParentRef.unionAll(byUserId);
             default:
-                union = byParentRef;
+                return byParentRef;
         }
-        return union;
     }
 
 }

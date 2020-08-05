@@ -19,9 +19,9 @@
 package com.khartec.waltz.service.data_type;
 
 import com.khartec.waltz.data.GenericSelectorFactory;
-import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.datatype_decorator.DataTypeDecoratorDao;
 import com.khartec.waltz.data.datatype_decorator.DataTypeDecoratorDaoSelectorFactory;
+import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
@@ -47,7 +47,6 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.*;
-import static com.khartec.waltz.common.CollectionUtilities.notEmpty;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityKind.*;
@@ -303,6 +302,7 @@ public class DataTypeDecoratorService {
                         updatedDataTypeNames);
                 audit(auditMessage, logicalFlow.source(), userName);
                 audit(auditMessage, logicalFlow.target(), userName);
+                break;
             case PHYSICAL_SPECIFICATION:
                 PhysicalSpecification physicalSpecification = physicalSpecificationDao.getById(entityReference.id());
                 String message = String.format("Physical Specification [%s]: Data types changed from [%s] to [%s]",
@@ -310,6 +310,7 @@ public class DataTypeDecoratorService {
                         currentDataTypeNames,
                         updatedDataTypeNames);
                 audit(message, physicalSpecification.entityReference(), userName);
+                break;
         }
     }
 
