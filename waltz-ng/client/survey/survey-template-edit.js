@@ -28,11 +28,13 @@ const qInclusionPredicateHelp = `
 The inclusion predicate allows for questions to be conditionally included in a survey depending on the values of other fields.
 See the documentation for a complete list of functions and their arguments.  Below is a selection of the main functions/operators:
 
-* Logical operators: \`< <= > >= == != && || ! \`
-* \`isChecked(extId, defaultValue)\`: \`true\` if the question with the given ext id is checked, \`false\` if not checked,
+* \`< <= > >= == != && || ! \`: logical operators
+* \`isChecked(extId, <defaultValue>)\`: \`true\` if the question with the given ext id is checked, \`false\` if not checked,
   or \`defaultValue\` if the answer is currently undefined.
-* \`numberValue(extId, defaultValue)\`: numeric value of the response for the given ext id (or \`defaultValue\`)
-* \`ditto(extId)\`: evaluates same conditions from a different question.  Good for repetition, enhancements.
+* \`numberValue(extId, <defaultValue>)\`: numeric value of the response for the given ext id (or \`defaultValue\`)
+* \`ditto(extId)\`: evaluates same conditions from a different question.  Useful for repetition of complex predicates.
+* \`val(extId, <defaultValue>)\`: returns the current value
+* \`isRetiring()\`: (application only) true if app has planned retirement date but no actual retirement date
 `;
 
 

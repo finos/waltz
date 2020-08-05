@@ -62,7 +62,7 @@ function controller($q,
     $q.all([questionPromise, responsePromise])
         .then(([allQuestions, surveyResponses]) => {
             vm.answersById = SurveyUtils.indexResponses(surveyResponses);
-            vm.groupedQuestions = SurveyUtils.refreshQuestions(allQuestions, vm.answersById);
+            vm.groupedQuestions = SurveyUtils.groupQuestions(allQuestions);
         });
 
 }

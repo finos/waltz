@@ -90,6 +90,8 @@
         <spark.version>2.9.1</spark.version>
         <spring.version>5.2.2.RELEASE</spring.version>
         <super-csv.version>2.4.0</super-csv.version>
+        <commons-jexl3.version>3.1</commons-jexl3.version>
+
         <timestamp>${maven.build.timestamp}</timestamp>
     </properties>
 
@@ -212,6 +214,12 @@
                 <artifactId>javax.annotation-api</artifactId>
                 <version>${annotation-api.version}</version>
             </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-jexl3</artifactId>
+                <version>${commons-jexl3.version}</version>
+            </dependency>
+
 
             <!-- db -->
             <dependency>
