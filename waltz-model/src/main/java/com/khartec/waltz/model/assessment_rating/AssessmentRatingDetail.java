@@ -20,8 +20,11 @@ package com.khartec.waltz.model.assessment_rating;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
 import com.khartec.waltz.model.rating.RagName;
 import org.immutables.value.Value;
+
+import java.util.Optional;
 
 
 @Value.Immutable
@@ -31,4 +34,6 @@ public abstract class AssessmentRatingDetail {
 
     public abstract AssessmentRating assessmentRating();
     public abstract RagName ratingDefinition();
+    public abstract Optional<AssessmentDefinition> assessmentDefinition();
+
 }
