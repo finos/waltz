@@ -1,0 +1,22 @@
+<table class="table table-condensed table-hover">
+    <thead>
+        <th>Previous responses</th>
+        <th></th>
+    </thead>
+    <tbody ng-repeat="response in $ctrl.historicalResponses">
+        <tr ng-style="{'background-color': ($ctrl.isSelected(response) ? '#dbf7d2' : null) }">
+            <td class="clickable"
+                ng-click="$ctrl.onSelectResponse(response)">
+                <span ng-bind="response.responseString"></span>
+                <span class="text-muted small" ng-bind="response.lastUpdatedAt | date:'yyyy-MM-dd'"></span>
+            </td>
+            <td>
+                <waltz-icon name="close"
+                            ng-if="$ctrl.isSelected(response)"
+                            ng-click="$ctrl.clearSelection()"
+                            class="pull-right clickable">
+                </waltz-icon>
+            </td>
+        </tr>
+    </tbody>
+</table>

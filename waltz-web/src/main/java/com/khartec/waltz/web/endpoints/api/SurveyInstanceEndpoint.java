@@ -65,6 +65,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
         String findPreviousVersionsPath = mkPath(BASE_URL, "id", ":id", "previous-versions");
         String findRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
         String findResponsesPath = mkPath(BASE_URL, ":id", "responses");
+        String findHistoricalResponsesPath = mkPath(BASE_URL, ":id", "question-id", ":questionId", "historical-responses");
         String saveResponsePath = mkPath(BASE_URL, ":id", "response");
         String updateStatusPath = mkPath(BASE_URL, ":id", "status");
         String updateDueDatePath = mkPath(BASE_URL, ":id", "due-date");
@@ -86,6 +87,11 @@ public class SurveyInstanceEndpoint implements Endpoint {
 
         ListRoute<SurveyInstanceQuestionResponse> findResponsesRoute =
                 (req, res) -> surveyInstanceService.findResponses(getId(req));
+
+        ListRoute<SurveyInstanceQuestionResponse> findHistoricalResponsesRoute = (req, res) -> {
+            long questionId = getLong(req, "questionId");
+            return surveyInstanceService.findHistoricalResponsesForQuestion(getId(req), questionId);
+        };
 
         ListRoute<SurveyInstanceRecipient> findRecipientsRoute =
                 (req, res) -> surveyInstanceService.findRecipients(getId(req));
@@ -171,6 +177,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
         getForList(findPreviousVersionsPath, findPreviousVersionsRoute);
         getForList(findRecipientsPath, findRecipientsRoute);
         getForList(findResponsesPath, findResponsesRoute);
+        getForList(findHistoricalResponsesPath, findHistoricalResponsesRoute);
         putForDatum(saveResponsePath, saveResponseRoute);
         putForDatum(updateStatusPath, updateStatusRoute);
         putForDatum(updateDueDatePath, updateDueDateRoute);
