@@ -35,6 +35,7 @@ See the documentation for a complete list of functions and their arguments.  Bel
 * \`ditto(extId)\`: evaluates same conditions from a different question.  Useful for repetition of complex predicates.
 * \`val(extId, <defaultValue>)\`: returns the current value
 * \`isRetiring()\`: (application only) true if app has planned retirement date but no actual retirement date
+* \`assessmentRating(name|extId, <defaultValue>)\`: returns code value of the matching rating (returns null if no default given and no assessment found)
 `;
 
 

@@ -30,18 +30,13 @@ import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 
-public class QuestionAppPredicateNamespace extends QuestionBasePredicateNamespace {
-
-    private final DSLContext dsl;
-    private final EntityReference subjectRef;
+public class QuestionAppPredicateNamespace extends QuestionEntityPredicateNamespace {
 
     public QuestionAppPredicateNamespace(DSLContext dsl,
                                          EntityReference subjectRef,
                                          List<SurveyQuestion> questions,
                                          Map<Long, SurveyQuestionResponse> responsesByQuestionId) {
-        super(questions, responsesByQuestionId);
-        this.dsl = dsl;
-        this.subjectRef = subjectRef;
+        super(dsl, subjectRef, questions, responsesByQuestionId);
     }
 
 
@@ -99,76 +94,6 @@ public class QuestionAppPredicateNamespace extends QuestionBasePredicateNamespac
                         .concrete(r.get(DATA_TYPE.CONCRETE))
                         .unknown(r.get(DATA_TYPE.UNKNOWN))
                         .build());
-    }
-
-
-    public boolean hasRatingByName(String defnName, String ratingName){
-
-        List<AssessmentRatingDetail> assessmentRatings = assessmentRatings();
-
-        long count = assessmentRatings
-                .stream()
-                .filter(r -> r.assessmentDefinition().get().name().equalsIgnoreCase(defnName)
-                        && r.ratingDefinition().name().equalsIgnoreCase(ratingName))
-                .count();
-
-        return count > 0;
-
-    }
-
-
-    private List<AssessmentRatingDetail> assessmentRatings() {
-        return dsl
-                .select()
-                .from(ASSESSMENT_RATING)
-                .innerJoin(ASSESSMENT_DEFINITION).on(ASSESSMENT_DEFINITION.ID.eq(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID))
-                .innerJoin(RATING_SCHEME_ITEM).on(ASSESSMENT_RATING.RATING_ID.eq(RATING_SCHEME_ITEM.ID))
-                .where(ASSESSMENT_RATING.ENTITY_ID.eq(subjectRef.id())
-                            .and(ASSESSMENT_RATING.ENTITY_KIND.eq(subjectRef.kind().name())
-                                    .and(ASSESSMENT_DEFINITION.ENTITY_KIND.eq(subjectRef.kind().name()))))
-                .fetch(r -> {
-
-                    RagName ratingDefinition = ImmutableRagName.builder()
-                            .id(r.get(RATING_SCHEME_ITEM.ID))
-                            .name(r.get(RATING_SCHEME_ITEM.NAME))
-                            .description(r.get(RATING_SCHEME_ITEM.DESCRIPTION))
-                            .color(r.get(RATING_SCHEME_ITEM.COLOR))
-                            .rating(firstChar(r.get(RATING_SCHEME_ITEM.CODE), 'X'))
-                            .ratingSchemeId(r.get(RATING_SCHEME_ITEM.SCHEME_ID))
-                            .position(r.get(RATING_SCHEME_ITEM.POSITION))
-                            .userSelectable(r.get(RATING_SCHEME_ITEM.USER_SELECTABLE))
-                            .build();
-
-                    AssessmentRating assessmentRating = ImmutableAssessmentRating.builder()
-                            .assessmentDefinitionId(r.get(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID))
-                            .entityReference(subjectRef)
-                            .ratingId(r.get(ASSESSMENT_RATING.RATING_ID))
-                            .lastUpdatedAt(toLocalDateTime(r.get(ASSESSMENT_RATING.LAST_UPDATED_AT)))
-                            .lastUpdatedBy(r.get(ASSESSMENT_RATING.LAST_UPDATED_BY))
-                            .provenance(r.get(ASSESSMENT_RATING.PROVENANCE))
-                            .build();
-
-                    AssessmentDefinition assessmentDefinition = ImmutableAssessmentDefinition.builder()
-                            .id(r.get(ASSESSMENT_DEFINITION.ID))
-                            .name(r.get(ASSESSMENT_DEFINITION.NAME))
-                            .externalId(Optional.ofNullable(r.get(ASSESSMENT_DEFINITION.EXTERNAL_ID)))
-                            .ratingSchemeId(r.get(ASSESSMENT_DEFINITION.RATING_SCHEME_ID))
-                            .entityKind(EntityKind.valueOf(r.get(ASSESSMENT_DEFINITION.ENTITY_KIND)))
-                            .description(mkSafe(r.get(ASSESSMENT_DEFINITION.DESCRIPTION)))
-                            .permittedRole(Optional.ofNullable(r.get(ASSESSMENT_DEFINITION.PERMITTED_ROLE)))
-                            .lastUpdatedAt(toLocalDateTime(r.get(ASSESSMENT_DEFINITION.LAST_UPDATED_AT)))
-                            .lastUpdatedBy(r.get(ASSESSMENT_DEFINITION.LAST_UPDATED_BY))
-                            .isReadOnly(r.get(ASSESSMENT_DEFINITION.IS_READONLY))
-                            .provenance(r.get(ASSESSMENT_DEFINITION.PROVENANCE))
-                            .visibility(AssessmentVisibility.valueOf(r.get(ASSESSMENT_DEFINITION.VISIBILITY)))
-                            .build();
-
-                    return ImmutableAssessmentRatingDetail.builder()
-                            .assessmentRating(assessmentRating)
-                            .ratingDefinition(ratingDefinition)
-                            .assessmentDefinition(assessmentDefinition)
-                            .build();
-                });
     }
 
 }
