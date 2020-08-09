@@ -36,6 +36,8 @@ See the documentation for a complete list of functions and their arguments.  Bel
 * \`val(extId, <defaultValue>)\`: returns the current value
 * \`isRetiring()\`: (application only) true if app has planned retirement date but no actual retirement date
 * \`assessmentRating(name|extId, <defaultValue>)\`: returns code value of the matching rating (returns null if no default given and no assessment found)
+* \`hasDataType(name|extId)\`: returns whether the specified datatype (or a descendent) is in use by the app
+* \`dataTypeUsages(name|extId)\`: returns set of usage kinds for the given data types (use the \`=~\` operator to test for membership)
 `;
 
 
@@ -108,7 +110,7 @@ function controller($stateParams,
                 description: vm.surveyTemplate.description,
                 targetEntityKind: vm.surveyTemplate.targetEntityKind
             })
-            .then(updateCount => notification.success("Survey template updated successfully"));
+            .then(() => notification.success("Survey template updated successfully"));
     };
 
     vm.showAddQuestionForm = () => {
