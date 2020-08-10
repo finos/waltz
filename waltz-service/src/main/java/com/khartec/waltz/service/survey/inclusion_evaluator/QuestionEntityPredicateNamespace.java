@@ -11,6 +11,11 @@ import java.util.Optional;
 
 import static com.khartec.waltz.schema.Tables.*;
 
+/**
+ *
+ * NOTE: methods in this class may show as unused.  This is to be expected as they are referred to via
+ * predicates in survey questions
+ */
 public class QuestionEntityPredicateNamespace extends QuestionBasePredicateNamespace {
 
     protected final DSLContext dsl;

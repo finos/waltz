@@ -34,10 +34,11 @@ See the documentation for a complete list of functions and their arguments.  Bel
 * \`numberValue(extId, <defaultValue>)\`: numeric value of the response for the given ext id (or \`defaultValue\`)
 * \`ditto(extId)\`: evaluates same conditions from a different question.  Useful for repetition of complex predicates.
 * \`val(extId, <defaultValue>)\`: returns the current value
-* \`isRetiring()\`: (application only) true if app has planned retirement date but no actual retirement date
 * \`assessmentRating(name|extId, <defaultValue>)\`: returns code value of the matching rating (returns null if no default given and no assessment found)
-* \`hasDataType(name|extId)\`: returns whether the specified datatype (or a descendent) is in use by the app
+* \`belongsToOrgUnit(name|extId)\`: returns true if the subject app is part of the given org unit tree
 * \`dataTypeUsages(name|extId)\`: returns set of usage kinds for the given data types (use the \`=~\` operator to test for membership)
+* \`isRetiring()\`: (application only) true if app has planned retirement date but no actual retirement date
+* \`hasDataType(name|extId)\`: returns whether the specified datatype (or a descendent) is in use by the app
 `;
 
 

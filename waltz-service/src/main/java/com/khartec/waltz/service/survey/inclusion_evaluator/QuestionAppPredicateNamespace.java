@@ -4,11 +4,11 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.survey.SurveyQuestion;
 import com.khartec.waltz.model.survey.SurveyQuestionResponse;
-import com.khartec.waltz.schema.tables.DataType;
-import com.khartec.waltz.schema.tables.DataTypeUsage;
-import com.khartec.waltz.schema.tables.EntityHierarchy;
+import com.khartec.waltz.schema.tables.*;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 
 import java.util.List;
@@ -18,6 +18,11 @@ import java.util.Set;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 
+/**
+ *
+ * NOTE: methods in this class may show as unused.  This is to be expected as they are referred to via
+ * predicates in survey questions
+ */
 public class QuestionAppPredicateNamespace extends QuestionEntityPredicateNamespace {
 
     public QuestionAppPredicateNamespace(DSLContext dsl,
@@ -42,6 +47,32 @@ public class QuestionAppPredicateNamespace extends QuestionEntityPredicateNamesp
                 .and(notRetiredYet)
                 .fetch()
                 .isNotEmpty();
+    }
+
+
+    public boolean belongsToOrgUnit(String name) {
+        EntityHierarchy eh = ENTITY_HIERARCHY.as("eh");
+        Application app = APPLICATION.as("app");
+        OrganisationalUnit ou = OrganisationalUnit.ORGANISATIONAL_UNIT.as("ou");
+
+        SelectConditionStep<Record1<Long>> qryGivenOrgUnit = DSL
+                .select(ou.ID)
+                .from(ou)
+                .where(ou.NAME.eq(name))
+                .or(ou.EXTERNAL_ID.eq(name));
+
+        Condition appInOrgUnitTree = app.ORGANISATIONAL_UNIT_ID.in(DSL
+                .selectDistinct(eh.ID)
+                .from(eh)
+                .where(eh.ANCESTOR_ID.eq(qryGivenOrgUnit)));
+
+        Condition appMatchesSubject = app.ID.eq(subjectRef.id());
+
+        return dsl.fetchExists(DSL
+                .select(app.ID)
+                .from(app)
+                .where(appMatchesSubject)
+                .and(appInOrgUnitTree));
     }
 
 
