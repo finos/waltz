@@ -1,47 +1,35 @@
 package com.khartec.waltz.service.survey.inclusion_evaluator;
 
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
-import com.khartec.waltz.model.assessment_definition.AssessmentVisibility;
-import com.khartec.waltz.model.assessment_definition.ImmutableAssessmentDefinition;
-import com.khartec.waltz.model.assessment_rating.AssessmentRating;
-import com.khartec.waltz.model.assessment_rating.AssessmentRatingDetail;
-import com.khartec.waltz.model.assessment_rating.ImmutableAssessmentRating;
-import com.khartec.waltz.model.assessment_rating.ImmutableAssessmentRatingDetail;
-import com.khartec.waltz.model.datatype.DataType;
-import com.khartec.waltz.model.datatype.ImmutableDataType;
-import com.khartec.waltz.model.rating.ImmutableRagName;
-import com.khartec.waltz.model.rating.RagName;
 import com.khartec.waltz.model.survey.SurveyQuestion;
 import com.khartec.waltz.model.survey.SurveyQuestionResponse;
+import com.khartec.waltz.schema.tables.*;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
 
-import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
-import static com.khartec.waltz.common.StringUtilities.firstChar;
-import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 
-public class QuestionAppPredicateNamespace extends QuestionBasePredicateNamespace {
-
-    private final DSLContext dsl;
-    private final EntityReference subjectRef;
+/**
+ *
+ * NOTE: methods in this class may show as unused.  This is to be expected as they are referred to via
+ * predicates in survey questions
+ */
+public class QuestionAppPredicateNamespace extends QuestionEntityPredicateNamespace {
 
     public QuestionAppPredicateNamespace(DSLContext dsl,
                                          EntityReference subjectRef,
                                          List<SurveyQuestion> questions,
                                          Map<Long, SurveyQuestionResponse> responsesByQuestionId) {
-        super(questions, responsesByQuestionId);
-        this.dsl = dsl;
-        this.subjectRef = subjectRef;
+        super(dsl, subjectRef, questions, responsesByQuestionId);
     }
 
 
@@ -62,113 +50,59 @@ public class QuestionAppPredicateNamespace extends QuestionBasePredicateNamespac
     }
 
 
-    public boolean hasDatatypeByName(String name){
+    public boolean belongsToOrgUnit(String name) {
+        EntityHierarchy eh = ENTITY_HIERARCHY.as("eh");
+        Application app = APPLICATION.as("app");
+        OrganisationalUnit ou = OrganisationalUnit.ORGANISATIONAL_UNIT.as("ou");
 
-        List<DataType> datatypes = datatypes();
+        SelectConditionStep<Record1<Long>> qryGivenOrgUnit = DSL
+                .select(ou.ID)
+                .from(ou)
+                .where(ou.NAME.eq(name))
+                .or(ou.EXTERNAL_ID.eq(name));
 
-        long count = datatypes
-                .stream()
-                .filter(d -> d.name().equalsIgnoreCase(name))
-                .count();
+        Condition appInOrgUnitTree = app.ORGANISATIONAL_UNIT_ID.in(DSL
+                .selectDistinct(eh.ID)
+                .from(eh)
+                .where(eh.ANCESTOR_ID.eq(qryGivenOrgUnit)));
 
-        return count > 0;
+        Condition appMatchesSubject = app.ID.eq(subjectRef.id());
+
+        return dsl.fetchExists(DSL
+                .select(app.ID)
+                .from(app)
+                .where(appMatchesSubject)
+                .and(appInOrgUnitTree));
     }
 
 
-    private List<DataType> datatypes(){
+    public boolean hasDataType(String name){
+        return ! dataTypeUsages(name).isEmpty();
+    }
+
+
+    public Set<String> dataTypeUsages(String name){
+
+        DataTypeUsage dtu = DATA_TYPE_USAGE.as("dtu");
+        DataType dt = DATA_TYPE.as("dt");
+        EntityHierarchy eh = ENTITY_HIERARCHY.as("eh");
+
+        Condition dtNameMatches = dt.CODE.eq(name)
+                .or(dt.NAME.eq(name));
+
+        Condition subjectMatches = dtu.ENTITY_ID.eq(subjectRef.id())
+                .and(dtu.ENTITY_KIND.eq(subjectRef.kind().name()));
 
         return dsl
-                .select()
-                .from(DATA_TYPE)
-                .innerJoin(LOGICAL_FLOW_DECORATOR).on(DATA_TYPE.ID.eq(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID)
-                    .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
-                .innerJoin(LOGICAL_FLOW).on(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID))
-                .where((LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(subjectRef.id())
-                        .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
-                .or(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(subjectRef.id())
-                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))))
-                .and(LOGICAL_FLOW.IS_REMOVED.isFalse()
-                        .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name())))
-                .fetch(r -> ImmutableDataType.builder()
-                        .code(r.get(DATA_TYPE.CODE))
-                        .description(mkSafe(r.get(DATA_TYPE.DESCRIPTION)))
-                        .name(r.get(DATA_TYPE.NAME))
-                        .id(Optional.ofNullable(r.get(DATA_TYPE.ID)))
-                        .parentId(Optional.ofNullable(r.get(DATA_TYPE.PARENT_ID)))
-                        .deprecated(r.get(DATA_TYPE.DEPRECATED))
-                        .concrete(r.get(DATA_TYPE.CONCRETE))
-                        .unknown(r.get(DATA_TYPE.UNKNOWN))
-                        .build());
-    }
-
-
-    public boolean hasRatingByName(String defnName, String ratingName){
-
-        List<AssessmentRatingDetail> assessmentRatings = assessmentRatings();
-
-        long count = assessmentRatings
-                .stream()
-                .filter(r -> r.assessmentDefinition().get().name().equalsIgnoreCase(defnName)
-                        && r.ratingDefinition().name().equalsIgnoreCase(ratingName))
-                .count();
-
-        return count > 0;
-
-    }
-
-
-    private List<AssessmentRatingDetail> assessmentRatings() {
-        return dsl
-                .select()
-                .from(ASSESSMENT_RATING)
-                .innerJoin(ASSESSMENT_DEFINITION).on(ASSESSMENT_DEFINITION.ID.eq(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID))
-                .innerJoin(RATING_SCHEME_ITEM).on(ASSESSMENT_RATING.RATING_ID.eq(RATING_SCHEME_ITEM.ID))
-                .where(ASSESSMENT_RATING.ENTITY_ID.eq(subjectRef.id())
-                            .and(ASSESSMENT_RATING.ENTITY_KIND.eq(subjectRef.kind().name())
-                                    .and(ASSESSMENT_DEFINITION.ENTITY_KIND.eq(subjectRef.kind().name()))))
-                .fetch(r -> {
-
-                    RagName ratingDefinition = ImmutableRagName.builder()
-                            .id(r.get(RATING_SCHEME_ITEM.ID))
-                            .name(r.get(RATING_SCHEME_ITEM.NAME))
-                            .description(r.get(RATING_SCHEME_ITEM.DESCRIPTION))
-                            .color(r.get(RATING_SCHEME_ITEM.COLOR))
-                            .rating(firstChar(r.get(RATING_SCHEME_ITEM.CODE), 'X'))
-                            .ratingSchemeId(r.get(RATING_SCHEME_ITEM.SCHEME_ID))
-                            .position(r.get(RATING_SCHEME_ITEM.POSITION))
-                            .userSelectable(r.get(RATING_SCHEME_ITEM.USER_SELECTABLE))
-                            .build();
-
-                    AssessmentRating assessmentRating = ImmutableAssessmentRating.builder()
-                            .assessmentDefinitionId(r.get(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID))
-                            .entityReference(subjectRef)
-                            .ratingId(r.get(ASSESSMENT_RATING.RATING_ID))
-                            .lastUpdatedAt(toLocalDateTime(r.get(ASSESSMENT_RATING.LAST_UPDATED_AT)))
-                            .lastUpdatedBy(r.get(ASSESSMENT_RATING.LAST_UPDATED_BY))
-                            .provenance(r.get(ASSESSMENT_RATING.PROVENANCE))
-                            .build();
-
-                    AssessmentDefinition assessmentDefinition = ImmutableAssessmentDefinition.builder()
-                            .id(r.get(ASSESSMENT_DEFINITION.ID))
-                            .name(r.get(ASSESSMENT_DEFINITION.NAME))
-                            .externalId(Optional.ofNullable(r.get(ASSESSMENT_DEFINITION.EXTERNAL_ID)))
-                            .ratingSchemeId(r.get(ASSESSMENT_DEFINITION.RATING_SCHEME_ID))
-                            .entityKind(EntityKind.valueOf(r.get(ASSESSMENT_DEFINITION.ENTITY_KIND)))
-                            .description(mkSafe(r.get(ASSESSMENT_DEFINITION.DESCRIPTION)))
-                            .permittedRole(Optional.ofNullable(r.get(ASSESSMENT_DEFINITION.PERMITTED_ROLE)))
-                            .lastUpdatedAt(toLocalDateTime(r.get(ASSESSMENT_DEFINITION.LAST_UPDATED_AT)))
-                            .lastUpdatedBy(r.get(ASSESSMENT_DEFINITION.LAST_UPDATED_BY))
-                            .isReadOnly(r.get(ASSESSMENT_DEFINITION.IS_READONLY))
-                            .provenance(r.get(ASSESSMENT_DEFINITION.PROVENANCE))
-                            .visibility(AssessmentVisibility.valueOf(r.get(ASSESSMENT_DEFINITION.VISIBILITY)))
-                            .build();
-
-                    return ImmutableAssessmentRatingDetail.builder()
-                            .assessmentRating(assessmentRating)
-                            .ratingDefinition(ratingDefinition)
-                            .assessmentDefinition(assessmentDefinition)
-                            .build();
-                });
+                .select(dtu.USAGE_KIND)
+                .from(dt)
+                .innerJoin(eh)
+                .on(eh.ANCESTOR_ID.eq(dt.ID).and(eh.KIND.eq(EntityKind.DATA_TYPE.name())))
+                .innerJoin(dtu)
+                .on(dtu.DATA_TYPE_ID.eq(eh.ID))
+                .where(dtNameMatches)
+                .and(subjectMatches)
+                .fetchSet(dtu.USAGE_KIND);
     }
 
 }

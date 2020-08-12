@@ -14,6 +14,11 @@ import java.util.stream.Collectors;
 
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
+/**
+ *
+ * NOTE: methods in this class may show as unused.  This is to be expected as they are referred to via
+ * predicates in survey questions
+ */
 public class QuestionBasePredicateNamespace {
 
     private final Map<String, SurveyQuestion> questionsByExtId;
