@@ -3,6 +3,9 @@ David Watkins <david.watkins@db.com>
 v0.1, 2020-08-14
 :toc:
 
+<<<
+== Document Info
+
 |===
 | Attribute | Value
 
@@ -16,13 +19,15 @@ v0.1, 2020-08-14
 | Dave Watkins
 |===
 
+<<<
+
 == Overview
 
 This design doc discusses approaches to implementing default / constraining value in Waltz.  The driver
 behind this enhancement is to ensure data consistency in Waltz.  For example if an app is rated as
 _'Disinvest'_ then it should have should no individual features rated as _'Invest'_.
 
-== Rating Scheme recap
+=== Rating Scheme recap
 
 The table below shows a typical rating scheme, ordered by the `position` database column (ascending,
 not shown):
@@ -56,6 +61,7 @@ not shown):
 NOTE: Usage of special character `X` to indicate deletion should probably be examined to see if it is still
       needed. Suspect it no longer serves a required purpose, especially with formal app-fn decomms.
 
+<<<
 
 == Challenges
 
@@ -125,6 +131,7 @@ batch job.  When the values are changed we have two fundamental choices:
 NOTE: I think the _ratchet limit_ is the most useful of the options presented above.  _Hard limits_ can
       be enforced via the batch loaders.
 
+<<<
 
 == Proposal
 
@@ -139,6 +146,8 @@ NOTE: I think the _ratchet limit_ is the most useful of the options presented ab
 * [ ] Update importers to populate new assessment
 * [ ] Implement _hard limit_ logic based on the assessments
 
+
+<<<
 
 == Appendices
 
