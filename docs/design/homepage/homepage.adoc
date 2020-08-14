@@ -1,6 +1,13 @@
 = Homepage redesign
 :toc:
 
+== Status
+
+**Partial implementation** - Waltz 1.26 delivered the change and survey/attestation
+summaries. The timeline features are not yet implemented. Scope is defined via the
+new favourite app group feature (also in 1.26)
+
+
 == Problem
 
 The Waltz homepage is largely static.  Only including recently viewed entities and
@@ -21,6 +28,9 @@ for example surveys and attestations.
 == Reporting Data sets
 
 === Scope
+
+**Status: completed** : The implemented solution was to build upon the favourite group functionality.
+Favourite groups were pre-populated (by examining involvement records) using a batch process.
 
 Defining which applications (or other entities) are in the reporting scope for a
 user will need to be considered.  Approaches include:
@@ -43,8 +53,9 @@ to modify their 'subscription' settings by:
 * (de)selecting involvement roles
 * include/exclude peer associations
 
-
 === Changes
+
+**Status: completed** : An interactive change summary widget was delivered in 1.26.
 
 Waltz keeps detailed changelogs for entities in the `change_log` table.  If
 a user has 'noisy' applications in their scope the detail could quickly become
@@ -62,7 +73,7 @@ describe alterations to the data flow landscape) as well as decommissioning info
 
 === Attestations and Surveys
 
-
+**Status: completed** : A simple summary widget was introduced in Waltz 1.26
 
 == Design thoughts
 
