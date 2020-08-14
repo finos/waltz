@@ -3,6 +3,24 @@ David Watkins <david.watkins@db.com>
 v0.1, 2020-08-14
 :toc:
 
+|===
+| Attribute | Value
+
+| Status
+| DESIGN
+
+| Target Version
+| 1.27
+
+| Lead
+| Dave Watkins
+|===
+
+== Overview
+
+This design doc discusses approaches to implementing default / constraining value in Waltz.  The driver
+behind this enhancement is to ensure data consistency in Waltz.  For example if an app is rated as
+_'Disinvest'_ then it should have should no individual features rated as _'Invest'_.
 
 == Rating Scheme recap
 
@@ -41,8 +59,7 @@ NOTE: Usage of special character `X` to indicate deletion should probably be exa
 
 == Challenges
 
-This section outlines some of the challenges we face in implementing a solution for this feature.
-
+This section outlines some challenges we face in implementing a solution for this feature.
 
 * **Constraint Relationship**, how do we tell Waltz that there is a constraining relationship between a
   _measurable rating_ and some other value in Waltz (for example the app's overall _investment rating_) ?
@@ -57,11 +74,11 @@ This section outlines some of the challenges we face in implementing a solution 
 
 
 === Constraint Relationship
-Each apps needs to (optionally) have a maximal rating per _rating-scheme_ / _measurable category_.
+Each apps needs to (optionally) have a constraining rating per _rating scheme_ / _measurable category_.
 This may require a new table.  An alternative may be to reuse assessments and link a
 _measurable category_ to a constraining _assessment rating_.  In this case the assessment and category
-would need to share a common _rating scheme_ and be specified somewhere.  We assume that if an application
-has no constraining value then _measurable ratings_ are free to pick any value.
+would need to share a common _rating scheme_.  We assume that if an application has no constraining
+value then users are free to assign any _measurable ratings_ to that application.
 
 NOTE: we need to be careful about using the overall investment rating as a constraint since
       we do not have a clean way of referencing it, unlike assessment_definitions.  However moving
@@ -109,13 +126,26 @@ NOTE: I think the _ratchet limit_ is the most useful of the options presented ab
       be enforced via the batch loaders.
 
 
+== Proposal
+
+=== Core Waltz changes
+
+* [ ] Duplicate Investment status as a read-only assessment detail
+* [ ] Update `measurable_category` to have an (optional) ref to a constraining assessment
+* [ ] Implement ratchet limit
+
+=== (Optional) Client-site batch job changes
+
+* [ ] Update importers to populate new assessment
+* [ ] Implement _hard limit_ logic based on the assessments
 
 
 == Appendices
 
-=== Moving overall investment status to assessments
+=== Appendix A: Moving overall investment status to assessments
 
-
+Approaches to moving the fixed overall investment status app field into a more generic
+assessment rating:
 
 ** Duplicate investment status as an _assessment rating_
 ** Remove investment status from application and _only_ have it as an _assessment rating_
@@ -126,12 +156,11 @@ data to include in our exports (e.g. all assessments for an application).
 
 IMPORTANT: moving investment status will impact batch jobs as inserts/updates will fail unless modified.
 
-
 ==== Example exporters using pivot functions
 
 Database vendors have differing ways of supporting pivoting
 
-.postgres example
+.Postgres example
 [source,sql]
 ----
 select a.name, f.*
@@ -149,11 +178,18 @@ inner join (
 AS assessment_rating(entity_id bigint, c1 varchar, c2 varchar, c3 varchar, c4 varchar)) f on f.entity_id = a.id
 ----
 
+NOTE: The Postgres example needs to have a fixed ordering of assessments and a matching (hard-coded) column list
+      for the output.  This should be fairly straightforward to implement using jOOQ.
 
-=== Original ask from Architects
 
-Below is a lightly edited copy of the request, included here as it provides the driving rationale behind
-the design options outlined in the main sections above.
+MySQL and SQL Server examples to be completed later.
+
+
+
+=== Appendix B: Original ask from Architects
+
+Below is a (lightly edited) copy of the request.  It is included here as it provides the driving rationale
+behind the design options outlined in the main sections above.
 
 ==== Invest Status:
 
