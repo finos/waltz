@@ -39,7 +39,6 @@ const initialState = {
     logicalFlows: [],
     specifications: [],
     selectedFilter: "ALL",
-    // onInitialise: (e) => {}
 };
 
 
@@ -62,7 +61,6 @@ const _isProducer = (entityRef) => (f) => {
     return source.id === entityRef.id && source.kind === entityRef.kind;
 };
 
-
 /**
  * Takes a entityReference and returns a new function which takes an
  * enriched flow and returns true if the entity is consuming the flow
@@ -75,36 +73,47 @@ const _isConsumer = (entityRef) => (f) => {
     return target.id === entityRef.id && target.kind === entityRef.kind;
 };
 
-const _allFlows = (entityRef) => (f) => true;
 
-function mkData(primaryRef,
-                specifications = { produces: [], consumes: [] },
-                physicalFlows = [],
-                logicalFlows = [],
-                filter = _allFlows)
-{
-    if (!primaryRef) return [];
 
+function mkData(entityRef, specifications, logicalFlows, physicalFlows) {
     const specsById = _.keyBy(specifications, "id");
     const logicalById = _.keyBy(logicalFlows, "id");
 
     const enrichFlow = (pf) => {
         return {
-            physicalFlow: Object.assign({}, pf, {name: _.get(specsById[pf.specificationId], 'name')}),
+            physicalFlow: Object.assign({}, pf, {name: _.get(specsById[pf.specificationId], "name")}),
             logicalFlow: logicalById[pf.logicalFlowId],
             specification: specsById[pf.specificationId]
         };
     };
 
-    const filteredFlows = _
+    const enrichedFlows = _
         .chain(physicalFlows)
         .reject(isRemoved)
         .map(enrichFlow)
         .reject(isIncomplete)
-        .filter(filter(primaryRef))
         .value();
 
-    return { filteredFlows };
+    const flowsByDirection = {
+        ALL: [],
+        UPSTREAM: [],
+        DOWNSTREAM: []
+    };
+
+    const isProducer = _isProducer(entityRef);
+    const isConsumer = _isConsumer(entityRef);
+
+    enrichedFlows.forEach(f => {
+        flowsByDirection.ALL.push(f);
+        if (isProducer(f)) {
+            flowsByDirection.UPSTREAM.push(f);
+        }
+        if (isConsumer(f)) {
+            flowsByDirection.DOWNSTREAM.push(f);
+        }
+    });
+
+    return flowsByDirection;
 }
 
 
@@ -129,22 +138,28 @@ function controller() {
     ];
 
     vm.$onChanges = () => {
-        Object.assign(vm, mkData(vm.primaryRef, vm.specifications, vm.physicalFlows, vm.logicalFlows, _allFlows));
+        vm.flowsByDirection = mkData(
+            vm.primaryRef,
+            vm.specifications,
+            vm.logicalFlows,
+            vm.physicalFlows);
+        vm.selectedFilter = "ALL";
+        vm.gridData = vm.flowsByDirection.ALL;
     };
 
     vm.changeFilter = (str) => {
         switch (str) {
             case "ALL":
-                Object.assign(vm, mkData(vm.primaryRef, vm.specifications, vm.physicalFlows, vm.logicalFlows, _allFlows));
                 vm.header = "All Flows";
+                vm.gridData = vm.flowsByDirection.ALL;
                 break;
             case "PRODUCES":
-                Object.assign(vm, mkData(vm.primaryRef, vm.specifications, vm.physicalFlows, vm.logicalFlows, _isProducer));
                 vm.header = "Produces";
+                vm.gridData = vm.flowsByDirection.UPSTREAM;
                 break;
             case "CONSUMES":
-                Object.assign(vm, mkData(vm.primaryRef, vm.specifications, vm.physicalFlows, vm.logicalFlows, _isConsumer));
                 vm.header = "Consumes";
+                vm.gridData = vm.flowsByDirection.DOWNSTREAM;
                 break;
         }
     }

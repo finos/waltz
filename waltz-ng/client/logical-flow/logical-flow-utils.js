@@ -23,9 +23,9 @@ import {entity} from "../common/services/enums/entity";
 import _ from "lodash";
 
 
-export const INBOUND = 'INBOUND';
-export const OUTBOUND = 'OUTBOUND';
-export const NEITHER = 'NEITHER';
+export const INBOUND = "INBOUND";
+export const OUTBOUND = "OUTBOUND";
+export const NEITHER = "NEITHER";
 
 export const untaggedFlowsTag = {
     name: "<i>Untagged Flows</i>",
@@ -90,7 +90,7 @@ export function categorizeDirection(flow, ref) {
  */
 export function resolveSourceAndTarget(serviceBroker, logicalFlow) {
     const load = (node) => {
-        const serviceCall = node.kind === 'APPLICATION'
+        const serviceCall = node.kind === "APPLICATION"
             ? CORE_API.ApplicationStore.getById
             : CORE_API.ActorStore.getById;
 
@@ -157,9 +157,11 @@ export function getSelectedTagsFromPreferences(allTags = [],
             if (!_.isEmpty(excludedTagIdsStr)) {
                 const excludedTagIds = _.map(
                     _.split(excludedTagIdsStr, ";"),
-                        id => Number(id));
+                    id => Number(id));
 
-                return _.filter(allTags, t => !_.includes(excludedTagIds, t.id));
+                return _.filter(
+                    allTags,
+                    t => !_.includes(excludedTagIds, t.id));
             }
             return allTags;
         });

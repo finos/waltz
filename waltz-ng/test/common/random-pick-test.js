@@ -35,6 +35,24 @@
  */
 
 /*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
+ */
+
+/*
  *  Waltz
  * Copyright (c) David Watkins. All rights reserved.
  * The use and distribution terms for this software are covered by the
@@ -47,7 +65,8 @@
  */
 
 import {assert} from "chai";
-import {notEmpty, perhaps, randomPick} from "../../client/common";
+import {notEmpty, randomPick} from "../../client/common";
+import {tryOrDefault} from "../../client/common/function-utils";
 
 
 
@@ -67,14 +86,14 @@ describe("Common", () => {
         });
     });
 
-    describe("perhaps", () => {
+    describe("tryOrDefault", () => {
 
         it("gives the result of calling `fn()` as long as `fn` does not throw an error", () => {
-            assert.equal(4, perhaps(() => 2 + 2, -1));
+            assert.equal(4, tryOrDefault(() => 2 + 2, -1));
         });
 
         it("gives the default value if  `fn()` throws an error", () => {
-            assert.equal(-1, perhaps(() => { throw "bang"; }, -1));
+            assert.equal(-1, tryOrDefault(() => { throw "bang"; }, -1));
         });
 
     });

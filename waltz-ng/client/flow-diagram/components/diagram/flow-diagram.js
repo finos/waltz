@@ -20,11 +20,12 @@ import _ from "lodash";
 import {event, select, selectAll} from "d3-selection";
 import {drag} from "d3-drag";
 import {zoom} from "d3-zoom";
-import {initialiseData, perhaps} from "../../../common";
+import {initialiseData} from "../../../common";
 import {mkCurvedLine, responsivefy, wrapText} from "../../../common/d3-utils";
 import {d3ContextMenu} from "../../../common/d3-context-menu";
 import {drawNodeShape, positionFor, shapeFor, toGraphId, toNodeShape} from "../../flow-diagram-utils";
 import template from "./flow-diagram.html";
+import {tryOrDefault} from "../../../common/function-utils";
 
 
 /**
@@ -113,7 +114,7 @@ const clickHandlers = Object.assign({}, DEFAULT_CLICK_HANDLERS);
 let dragStartPos = null;
 
 
-function dragStarted(d) {
+function dragStarted() {
     dragStartPos = { x: event.x, y: event.y };
     return select(this)
         .raise()
@@ -222,7 +223,7 @@ function drawNodes(state, group, commandProcessor) {
         .text(d => d.data.name)
         .each(function(d) {
             const self = this;
-            const computedLength = perhaps(() => self.getComputedTextLength(), 10);
+            const computedLength = tryOrDefault(() => self.getComputedTextLength(), 10);
             // update shape to accommodate label
             const labelWidth = Math.max(computedLength + 32, 60);
             state.layout.shapes[d.id] = toNodeShape(d.data, labelWidth);
