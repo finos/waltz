@@ -19,6 +19,8 @@
 import _ from "lodash";
 import {nest} from "d3-collection";
 
+export {invokeFunction} from "./function-utils";
+
 
 export const formats = {
     daysAndMinutes: "ddd Do MMM YYYY - HH:mm:ss",
@@ -46,37 +48,12 @@ export function isEmpty(xs) {
 }
 
 
-export function ifPresent(obj, fn, dflt) {
-    return obj
-        ? fn(obj)
-        : dflt;
-}
-
-
 export function randomPick(xs) {
     if (!xs) throw new Error("Cannot pick from a null set of options");
 
     const choiceCount = xs.length - 1;
     const idx = Math.round(Math.random() * choiceCount);
     return xs[idx];
-}
-
-
-/**
- * Attempts to return the result of the given function.
- * If the function throws an exception the default value
- * will be returned
- *
- * @param fn
- * @param dflt  value to return if fn throws an exception
- * @returns {*}
- */
-export function perhaps(fn, dflt) {
-    try {
-        return fn();
-    } catch (e) {
-        return dflt;
-    }
 }
 
 
@@ -162,20 +139,7 @@ export function initialiseData(vm, initData) {
 
 
 
-/**
- * Invokes a function and also passes in any provided arguments in order
- * e.g. invokeFunction(onClick, arg1, arg2)
- * @param fn
- * @returns {*}
- */
-export function invokeFunction(fn) {
-    if (_.isFunction(fn)) {
-        const parameters = _.slice(arguments, 1);
-        return fn(...parameters);
-    }
-    console.log("invokeFunction - attempted to invoke empty function: ", fn)
-    return null;
-}
+
 
 const getElemHierarchy = (elem) => {
     // Set up a parent array

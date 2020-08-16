@@ -17,7 +17,7 @@
  */
 
 import _ from "lodash";
-import {initialiseData, perhaps, termSearch} from "../../../common";
+import {initialiseData, termSearch} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkEntityLinkGridCell, mkLinkGridCell} from "../../../common/grid-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
@@ -26,6 +26,7 @@ import {countByVersionsByPackageId} from "../../../software-catalog/software-cat
 import {loadAssessmentsBySelector} from "../../../assessments/assessment-utils";
 
 import template from "./technology-section.html";
+import {tryOrDefault} from "../../../common/function-utils";
 
 
 const bindings = {
@@ -334,10 +335,10 @@ function controller($q, $animate, uiGridConstants, serviceBroker) {
     vm.doSearch = () => refresh(vm.qry);
 
     vm.hasAnyData = () => {
-        const hasServers = perhaps(() => vm.servers.length > 0, false);
-        const hasDatabases = perhaps(() => vm.databases.length > 0, false);
-        const hasLicences = perhaps(() => vm.licences.length > 0, false);
-        const hasSoftware = perhaps(() => vm.softwareCatalog.length > 0, false);
+        const hasServers = tryOrDefault(() => vm.servers.length > 0, false);
+        const hasDatabases = tryOrDefault(() => vm.databases.length > 0, false);
+        const hasLicences = tryOrDefault(() => vm.licences.length > 0, false);
+        const hasSoftware = tryOrDefault(() => vm.softwareCatalog.length > 0, false);
         return hasServers || hasDatabases || hasLicences || hasSoftware;
     };
 }

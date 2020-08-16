@@ -16,9 +16,9 @@
  *
  */
 
-import { perhaps } from "./index";
 import { select } from "d3-selection";
 import _ from "lodash";
+import {tryOrDefault} from "./function-utils";
 
 
 /**
@@ -140,7 +140,7 @@ export function wrapText(selection, width) {
         while (word = words.pop()) {
             line.push(word);
             tspan.text(line.join(" "));
-            const computedLength = perhaps(() => tspan.node().getComputedTextLength(), 150);
+            const computedLength = tryOrDefault(() => tspan.node().getComputedTextLength(), 150);
             if (computedLength > width) {
                 lineNumber++;
                 line.pop();
