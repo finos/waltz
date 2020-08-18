@@ -156,11 +156,6 @@ function controller($element, $scope) {
     const vm = initialiseData(this, initialState);
 
     const holder = $element.find("div")[0];
-    const svg = select(holder)
-        .append("svg")
-        .attr("id", "waltz-complexity-bar-chart")
-        .style("max-width", "700px")
-        .attr("preserveAspectRatio", "xMinYMin meet");
 
     vm.$onChanges = () => {
         if (isEmpty(vm.complexity) || isEmpty(vm.apps)) {
@@ -170,8 +165,12 @@ function controller($element, $scope) {
         const complexityChartData = prepareChartData(vm.complexity, vm.apps);
 
         dimensions.graph.height = calcGraphHeight(complexityChartData);
-
-        svg.attr("viewBox", `0 0 ${dimensions.graph.width} ${dimensions.graph.height}`);
+        const svg = select(holder)
+            .append("svg")
+            .attr("id", "waltz-complexity-bar-chart")
+            .style("min-height", "300px")
+            .attr("viewBox", `0 0 ${dimensions.graph.width} ${dimensions.graph.height}`)
+            .attr("preserveAspectRatio", "xMinYMin meet")
 
         draw(
             svg,

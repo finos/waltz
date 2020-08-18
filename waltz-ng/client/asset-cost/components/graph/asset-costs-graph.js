@@ -71,6 +71,7 @@ function processCosts(costs = []) {
         }, {})
         .values()
         .orderBy("total", "desc")
+        .take(10)
         .value();
 }
 
@@ -155,7 +156,7 @@ function controller($element, $scope, settingsService) {
     const svg = select(holder)
         .append("svg")
         .attr("id", "waltz-asset-costs-graph")
-        .style("max-width", "700px")
+        .style("min-height", "300px")
         .attr("preserveAspectRatio", "xMinYMin meet");
 
     let currencyFormat = null;

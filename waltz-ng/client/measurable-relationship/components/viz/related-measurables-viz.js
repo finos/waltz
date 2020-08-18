@@ -103,7 +103,8 @@ const styles = {
 function prepareGroups(holder, onCategoryClear) {
     const svg = select(holder)
     svg
-        .style("max-width", "700px")
+        .style("min-height", "300px")
+        .style("max-height", "800px")
         .attr("viewBox", `0 0 ${dimensions.width} ${dimensions.height}`)
         .attr("preserveAspectRatio", "xMinYMin meet")
         .on("click", () => onCategoryClear());
