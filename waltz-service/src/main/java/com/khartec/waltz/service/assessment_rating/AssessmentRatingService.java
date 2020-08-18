@@ -31,11 +31,13 @@ import com.khartec.waltz.model.assessment_rating.RemoveAssessmentRatingCommand;
 import com.khartec.waltz.model.assessment_rating.SaveAssessmentRatingCommand;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.rating.RagName;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityReference.mkRef;
@@ -88,19 +90,7 @@ public class AssessmentRatingService {
 
     public boolean store(SaveAssessmentRatingCommand command, String username) {
         AssessmentDefinition assessmentDefinition = assessmentDefinitionDao.getById(command.assessmentDefinitionId());
-        ChangeLog logEntry = ImmutableChangeLog.builder()
-                .message(format(
-                        "Storing assessment %s as [%s - %s]",
-                        assessmentDefinition.name(),
-                        ratingSchemeDAO.getRagNameById(command.ratingId()).name(),
-                        command.comment()))
-                .parentReference(mkRef(command.entityReference().kind(), command.entityReference().id()))
-                .userId(username)
-                .severity(Severity.INFORMATION)
-                .operation(Operation.UPDATE)
-                .build();
-
-        changeLogService.write(logEntry);
+        createChangeLogEntry(command, username, assessmentDefinition);
 
         return assessmentRatingDao.store(command);
     }
@@ -123,5 +113,33 @@ public class AssessmentRatingService {
         changeLogService.write(logEntry);
 
         return assessmentRatingDao.remove(command);
+    }
+
+    private void createChangeLogEntry(SaveAssessmentRatingCommand command, String username, AssessmentDefinition assessmentDefinition) {
+        Optional<AssessmentRating> previousRating = assessmentRatingDao.findForEntity(command.entityReference())
+                .stream()
+                .filter(r -> r.assessmentDefinitionId() == command.assessmentDefinitionId())
+                .findAny();
+        Optional<RagName> previousRatingName = previousRating.map(assessmentRating -> ratingSchemeDAO.getRagNameById(assessmentRating.ratingId()));
+        Optional<String> messagePostfix = previousRatingName
+                .map(rn -> format(" from assessment %s as [%s - %s]",
+                        assessmentDefinition.name(),
+                        rn.name(),
+                        previousRating.get().comment()));
+
+        ChangeLog logEntry = ImmutableChangeLog.builder()
+                .message(format(
+                        "Storing assessment %s as [%s - %s]%s",
+                        assessmentDefinition.name(),
+                        ratingSchemeDAO.getRagNameById(command.ratingId()).name(),
+                        command.comment(),
+                        messagePostfix.orElse("")))
+                .parentReference(mkRef(command.entityReference().kind(), command.entityReference().id()))
+                .userId(username)
+                .severity(Severity.INFORMATION)
+                .operation(Operation.UPDATE)
+                .build();
+
+        changeLogService.write(logEntry);
     }
 }
