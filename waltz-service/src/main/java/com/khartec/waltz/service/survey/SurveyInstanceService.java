@@ -43,6 +43,7 @@ import java.util.List;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.common.OptionalUtilities.contentsEqual;
+import static com.khartec.waltz.model.survey.SurveyInstanceStateMachine.*;
 import static java.util.Optional.ofNullable;
 
 @Service
@@ -170,31 +171,36 @@ public class SurveyInstanceService {
     public int updateStatus(String userName, long instanceId, SurveyInstanceStatusChangeCommand command) {
         checkNotNull(command, "command cannot be null");
 
-        if (command.newStatus() != SurveyInstanceStatus.COMPLETED) {
+        if (command.action() != SurveyInstanceAction.SUBMITTING) {
             checkPersonIsOwnerOrAdmin(userName, instanceId);
         }
 
         SurveyInstance surveyInstance = surveyInstanceDao.getById(instanceId);
+        SurveyInstanceStatus newStatus = simple(surveyInstance.status()).process(command.action());
 
-        // if survey is being sent back, store current responses as a version
-        if ((surveyInstance.status() == SurveyInstanceStatus.COMPLETED || surveyInstance.status() == SurveyInstanceStatus.APPROVED)
-                && command.newStatus() == SurveyInstanceStatus.REJECTED) {
+
+        if (command.action() == SurveyInstanceAction.REOPENING) {
             long versionedInstanceId = surveyInstanceDao.createPreviousVersion(surveyInstance);
             surveyQuestionResponseDao.cloneResponses(surveyInstance.id().get(), versionedInstanceId);
             surveyInstanceDao.clearApproved(instanceId);
         }
 
-        if ((surveyInstance.status() == SurveyInstanceStatus.APPROVED || surveyInstance.status() == SurveyInstanceStatus.WITHDRAWN)
-                && command.newStatus() == SurveyInstanceStatus.IN_PROGRESS) {
-            long versionedInstanceId = surveyInstanceDao.createPreviousVersion(surveyInstance);
-            surveyQuestionResponseDao.cloneResponses(surveyInstance.id().get(), versionedInstanceId);
-            surveyInstanceDao.clearApproved(instanceId);
+        int nbupdates = 0;
+        switch (command.action()) {
+            case APPROVING:
+                nbupdates = surveyInstanceDao.markApproved(instanceId, userName);
+                break;
+            case REOPENING:
+                // if survey is being sent back, store current responses as a version
+                long versionedInstanceId = surveyInstanceDao.createPreviousVersion(surveyInstance);
+                surveyQuestionResponseDao.cloneResponses(surveyInstance.id().get(), versionedInstanceId);
+                surveyInstanceDao.clearApproved(instanceId);
+            default:
+                nbupdates = surveyInstanceDao.updateStatus(instanceId, newStatus);
         }
 
-        int result = surveyInstanceDao.updateStatus(instanceId, command.newStatus());
-
-        if (result > 0) {
-            if (command.newStatus() == SurveyInstanceStatus.COMPLETED) {
+        if (nbupdates > 0) {
+            if (newStatus == SurveyInstanceStatus.COMPLETED) {
                 surveyInstanceDao.updateSubmitted(instanceId, userName);
             }
 
@@ -203,12 +209,12 @@ public class SurveyInstanceService {
                             .operation(Operation.UPDATE)
                             .userId(userName)
                             .parentReference(EntityReference.mkRef(EntityKind.SURVEY_INSTANCE, instanceId))
-                            .message("Survey Instance: status changed to " + command.newStatus()
+                            .message("Survey Instance: status changed to " + newStatus + " with action " + command.action()
                                     + command.reason().map(r -> ", [Reason]: " + r).orElse(""))
                             .build());
         }
 
-        return result;
+        return nbupdates;
     }
 
 
@@ -372,4 +378,9 @@ public class SurveyInstanceService {
                         .build());
     }
 
+    public List<SurveyInstanceAction> findPossibleActionsForInstance(long instanceId) {
+        SurveyInstance surveyInstance = surveyInstanceDao.getById(instanceId);
+        SurveyInstanceStateMachine stateMachine = simple(surveyInstance.status());
+        return stateMachine.nextPossibleActions();
+    }
 }

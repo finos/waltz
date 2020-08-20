@@ -97,6 +97,10 @@ export function loadSurveyInfo($q,
         .loadViewData(CORE_API.SurveyInstanceStore.getById, [surveyInstanceId], {force})
         .then(r => r.data);
 
+    const possibleActionsPromise = serviceBroker
+        .loadViewData(CORE_API.SurveyInstanceStore.findPossibleActions, [surveyInstanceId], {force})
+        .then(r => r.data);
+
     const versionsPromise = instancePromise
         .then(instance => serviceBroker
             .loadViewData(
@@ -138,12 +142,13 @@ export function loadSurveyInfo($q,
         ownerPromise,
         owningRolePromise,
         versionsPromise,
-        subjectPromise
+        subjectPromise,
+        possibleActionsPromise
     ];
 
     return $q
         .all(promises)
-        .then(([u, instance, run, template, recipients, owner, owningRole, versions, subject]) => {
+        .then(([u, instance, run, template, recipients, owner, owningRole, versions, subject, possibleActions]) => {
 
             const people = _.map(recipients, d => d.person);
             const latestInstanceId = instance.originalInstanceId || instance.id;
@@ -172,7 +177,8 @@ export function loadSurveyInfo($q,
                 latestInstanceId,
                 permissions,
                 versions,
-                subject
+                subject,
+                possibleActions
             };
 
             return result;

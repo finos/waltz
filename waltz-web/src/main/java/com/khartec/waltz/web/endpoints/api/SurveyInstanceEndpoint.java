@@ -35,6 +35,7 @@ import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class SurveyInstanceEndpoint implements Endpoint {
@@ -65,6 +66,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
         String findPreviousVersionsPath = mkPath(BASE_URL, "id", ":id", "previous-versions");
         String findRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
         String findResponsesPath = mkPath(BASE_URL, ":id", "responses");
+        String findPossibleActionsPath = mkPath(BASE_URL, ":id", "actions");
         String saveResponsePath = mkPath(BASE_URL, ":id", "response");
         String updateStatusPath = mkPath(BASE_URL, ":id", "status");
         String updateDueDatePath = mkPath(BASE_URL, ":id", "due-date");
@@ -96,6 +98,12 @@ public class SurveyInstanceEndpoint implements Endpoint {
         ListRoute<SurveyInstance> findPreviousVersionsRoute =
                 (req, res) -> surveyInstanceService.findPreviousVersionsForInstance(getId(req));
 
+        ListRoute<String> findPossibleActionsRoute =
+                (req, res) -> surveyInstanceService.findPossibleActionsForInstance(getId(req))
+                                .stream()
+                                .map(a -> a.getDisplay())
+                                .collect(toList());
+
         DatumRoute<Boolean> saveResponseRoute = (req, res) -> {
             String userName = getUsername(req);
             Long instanceId = getId(req);
@@ -108,7 +116,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
                     userName,
                     instanceId,
                     ImmutableSurveyInstanceStatusChangeCommand.builder()
-                            .newStatus(SurveyInstanceStatus.IN_PROGRESS)
+                            .action(SurveyInstanceAction.SAVING)
                             .build());
 
             return result;
@@ -171,6 +179,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
         getForList(findPreviousVersionsPath, findPreviousVersionsRoute);
         getForList(findRecipientsPath, findRecipientsRoute);
         getForList(findResponsesPath, findResponsesRoute);
+        getForList(findPossibleActionsPath, findPossibleActionsRoute);
         putForDatum(saveResponsePath, saveResponseRoute);
         putForDatum(updateStatusPath, updateStatusRoute);
         putForDatum(updateDueDatePath, updateDueDateRoute);

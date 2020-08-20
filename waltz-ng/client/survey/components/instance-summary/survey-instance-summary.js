@@ -60,6 +60,7 @@ function findMatchingRecipient(recipients = [], person) {
 
 function controller($q,
                     $state,
+                    $timeout,
                     serviceBroker,
                     userService,
                     notification) {
@@ -77,7 +78,8 @@ function controller($q,
                 vm.availableStatusActions = actions.determineAvailableStatusActions(
                     details.instance,
                     details.permissions,
-                    details.isLatest);
+                    details.isLatest,
+                    details.possibleActions);
 
                 const prevVersions = _
                     .chain(details.versions)
@@ -190,6 +192,14 @@ function controller($q,
             .onPerform(serviceBroker, vm.surveyDetails.instance, notification)
             .then(() => reload(true))
             .catch(msg => notification.warning(msg))
+            .then(() => {
+                if (action.view) {
+                    $timeout(() => $state.go(action.view, {id: vm.surveyDetails.instance.id}));
+                } else {
+                    console.log("No view for " + action.name)
+                }
+                
+            })
     };
 
     // -- LIFECYCLE
@@ -205,6 +215,7 @@ function controller($q,
 controller.$inject = [
     "$q",
     "$state",
+    "$timeout",
     "ServiceBroker",
     "UserService",
     "Notification"

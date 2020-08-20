@@ -31,7 +31,7 @@ import java.util.Optional;
 @JsonDeserialize(as = ImmutableSurveyInstanceStatusChangeCommand.class)
 public abstract class SurveyInstanceStatusChangeCommand implements Command {
 
-    public abstract SurveyInstanceStatus newStatus();
+    public abstract SurveyInstanceAction action();
 
     public abstract Optional<String> reason();
 

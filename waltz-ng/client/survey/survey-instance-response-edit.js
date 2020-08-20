@@ -159,7 +159,7 @@ function controller($location,
         serviceBroker
             .execute(
                 CORE_API.SurveyInstanceStore.updateStatus,
-                [vm.surveyDetails.instance.id, {newStatus: "COMPLETED"}])
+                [vm.surveyDetails.instance.id, {action: "SUBMITTING"}])
             .then(() => {
                 notification.success("Survey response submitted successfully");
                 // we force a reload of the notification store to update any listeners that the number
