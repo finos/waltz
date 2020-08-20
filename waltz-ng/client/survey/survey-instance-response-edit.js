@@ -143,42 +143,42 @@ function controller($location,
     };
 
 
-    /**
-     * This is a bit of fakery as the questions are saved each time a response is updated.
-     * Therefore this method merely moves the user back to their instance list.
-     */
-    vm.saveForLater = () => {
-        $timeout(() => {
-            notification.success("Survey response saved successfully");
-            $state.go("main.survey.instance.user");
-        }, 200); // allow blur events to fire
-    };
+    // /**
+    //  * This is a bit of fakery as the questions are saved each time a response is updated.
+    //  * Therefore this method merely moves the user back to their instance list.
+    //  */
+    // vm.saveForLater = () => {
+    //     $timeout(() => {
+    //         notification.success("Survey response saved successfully");
+    //         $state.go("main.survey.instance.user");
+    //     }, 200); // allow blur events to fire
+    // };
 
 
-    const doSubmit = () => {
-        serviceBroker
-            .execute(
-                CORE_API.SurveyInstanceStore.updateStatus,
-                [vm.surveyDetails.instance.id, {action: "SUBMITTING"}])
-            .then(() => {
-                notification.success("Survey response submitted successfully");
-                // we force a reload of the notification store to update any listeners that the number
-                // of open surveys may have changed (i.e. the counter in the profile menu)
-                serviceBroker.loadAppData(
-                    CORE_API.NotificationStore.findAll,
-                    [],
-                    {force: true});
-                $state.go("main.survey.instance.response.view", {id});
-            });
-    };
+    // const doSubmit = () => {
+    //     serviceBroker
+    //         .execute(
+    //             CORE_API.SurveyInstanceStore.updateStatus,
+    //             [vm.surveyDetails.instance.id, {action: "SUBMITTING"}])
+    //         .then(() => {
+    //             notification.success("Survey response submitted successfully");
+    //             // we force a reload of the notification store to update any listeners that the number
+    //             // of open surveys may have changed (i.e. the counter in the profile menu)
+    //             serviceBroker.loadAppData(
+    //                 CORE_API.NotificationStore.findAll,
+    //                 [],
+    //                 {force: true});
+    //             $state.go("main.survey.instance.response.view", {id});
+    //         });
+    // };
 
-    vm.submit = () => {
-        $timeout(() => {
-            if (confirm(submissionConfirmationPrompt)) {
-                doSubmit();
-            }
-        }, 200); // allow blur events to fire, because 'confirm' blocks events
-    };
+    // vm.submit = () => {
+    //     $timeout(() => {
+    //         if (confirm(submissionConfirmationPrompt)) {
+    //             doSubmit();
+    //         }
+    //     }, 200); // allow blur events to fire, because 'confirm' blocks events
+    // };
 
 
     // --- BOOT

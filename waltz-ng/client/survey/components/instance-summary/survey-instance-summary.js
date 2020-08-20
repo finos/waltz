@@ -189,7 +189,7 @@ function controller($q,
 
     vm.invokeStatusAction = (action) => {
         action
-            .onPerform(serviceBroker, vm.surveyDetails.instance, notification)
+            .onPerform(serviceBroker, vm.surveyDetails.instance, notification, action.actionName)
             .then(() => reload(true))
             .catch(msg => notification.warning(msg))
             .then(() => {

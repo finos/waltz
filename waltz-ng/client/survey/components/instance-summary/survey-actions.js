@@ -8,7 +8,7 @@ const statusActions = [
         helpText: "....",
         view: "main.survey.instance.user",
         predicate: (instance, permissions, isLatest) => isLatest,
-        onPerform: (serviceBroker, instance, notification) => {
+        onPerform: (serviceBroker, instance, notification, actionName) => {
             /**
              * This is a bit of fakery as the questions are saved each time a response is updated.
              * Therefore this method merely moves the user back to their instance list.
@@ -22,13 +22,13 @@ const statusActions = [
         view: "main.survey.instance.response.view",
         predicate: (instance, permissions, isLatest) => isLatest
             && (permissions.admin || permissions.owner),
-        onPerform: (serviceBroker, instance, notification) => {
+        onPerform: (serviceBroker, instance, notification, actionName) => {
             const reason = prompt("Are you sure you want to approve this survey? Please enter a reason below (optional):");
             if (!_.isNil(reason)) {
                 return serviceBroker
                     .execute(
                         CORE_API.SurveyInstanceStore.updateStatus,
-                        [ instance.id, {action: "SUBMITTING", reason: reason}])
+                        [ instance.id, {action: actionName, reason: reason}])
                     .then(result => {
                         notification.success("Survey response submitted successfully");
                         // we force a reload of the notification store to update any listeners that the number
@@ -49,13 +49,13 @@ const statusActions = [
         predicate: (instance, permissions, isLatest) => isLatest
             && (permissions.admin || permissions.owner)
             && _.isNil(instance.approvedAt),
-        onPerform: (serviceBroker, instance, notification) => {
+        onPerform: (serviceBroker, instance, notification, actionName) => {
             const reason = prompt("Are you sure you want to approve this survey? Please enter a reason below (optional):");
             if (!_.isNil(reason)) {
                 return serviceBroker
                     .execute(
                         CORE_API.SurveyInstanceStore.updateStatus,
-                        [ instance.id, {action: "APPROVING", reason: reason}])
+                        [ instance.id, {action: actionName, reason: reason}])
                     .then(result => {
                         notification.success("Survey response approved");
                     });
@@ -69,12 +69,12 @@ const statusActions = [
         helpText: "....",
         predicate: (instance, permissions, isLatest) => isLatest
             && (permissions.admin || permissions.owner),
-        onPerform: (serviceBroker, instance, notification) => {
+        onPerform: (serviceBroker, instance, notification, actionName) => {
             if (confirm("Are you sure you want to withdraw this survey instance? ")) {
                 return serviceBroker
                     .execute(
                         CORE_API.SurveyInstanceStore.updateStatus,
-                        [instance.id, {action: "WITHDRAWING"} ])
+                        [instance.id, {action: actionName} ])
                     .then(() => {
                         notification.success("Survey instance withdrawn");
                     });
@@ -88,13 +88,13 @@ const statusActions = [
         helpText: "....",
         predicate: (instance, permissions, isLatest) => isLatest
             && (permissions.admin || permissions.owner),
-        onPerform: (serviceBroker, instance, notification) => {
+        onPerform: (serviceBroker, instance, notification, actionName) => {
             const reason = prompt("Are you sure you want reject this survey? Please enter a reason below (mandatory):");
             if (reason) {
                 return serviceBroker
                     .execute(
                         CORE_API.SurveyInstanceStore.updateStatus,
-                        [instance.id, {action: "REJECTING", reason: reason}])
+                        [instance.id, {action: actionName, reason: reason}])
                     .then(() => {
                         notification.success("Survey response rejected");
                     });
@@ -109,12 +109,12 @@ const statusActions = [
         view: "main.survey.instance.response.edit",
         predicate: (instance, permissions, isLatest) => isLatest
             && (permissions.admin || permissions.owner || permissions.participant),
-        onPerform: (serviceBroker, instance, notification) => {
+        onPerform: (serviceBroker, instance, notification, actionName) => {
             if (confirm("Are you sure you want reopen this survey?")) {
                 return serviceBroker
                     .execute(
                         CORE_API.SurveyInstanceStore.updateStatus,
-                        [instance.id, {action: "REOPENING"}])
+                        [instance.id, {action: actionName}])
                     .then(() => {
                         notification.success("Survey response reopened");
                     });
@@ -128,6 +128,10 @@ const statusActions = [
 
 export function determineAvailableStatusActions(surveyInstance, permissions, isLatest, possibleActions) {
     return statusActions
-        .filter(act => possibleActions.includes(act.name))
-        .filter(act => act.predicate(surveyInstance, permissions,isLatest));
+        .filter(act => possibleActions.some(pa => pa.display === act.name))
+        .filter(act => act.predicate(surveyInstance, permissions, isLatest))
+        .map(act => {
+            act.actionName =  possibleActions.find(pa => pa.display === act.name).name;
+            return act;
+        });
 }

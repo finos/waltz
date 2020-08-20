@@ -30,12 +30,15 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 @Service
 public class SurveyInstanceEndpoint implements Endpoint {
@@ -98,11 +101,8 @@ public class SurveyInstanceEndpoint implements Endpoint {
         ListRoute<SurveyInstance> findPreviousVersionsRoute =
                 (req, res) -> surveyInstanceService.findPreviousVersionsForInstance(getId(req));
 
-        ListRoute<String> findPossibleActionsRoute =
-                (req, res) -> surveyInstanceService.findPossibleActionsForInstance(getId(req))
-                                .stream()
-                                .map(a -> a.getDisplay())
-                                .collect(toList());
+        ListRoute<SurveyInstanceAction> findPossibleActionsRoute =
+                (req, res) -> surveyInstanceService.findPossibleActionsForInstance(getId(req));
 
         DatumRoute<Boolean> saveResponseRoute = (req, res) -> {
             String userName = getUsername(req);
