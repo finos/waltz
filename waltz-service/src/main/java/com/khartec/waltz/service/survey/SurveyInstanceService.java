@@ -44,6 +44,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.common.OptionalUtilities.contentsEqual;
 import static com.khartec.waltz.model.survey.SurveyInstanceStateMachine.*;
+import static com.khartec.waltz.model.survey.SurveyInstanceStateMachineFactory.simple;
 import static java.util.Optional.ofNullable;
 
 @Service
@@ -168,15 +169,16 @@ public class SurveyInstanceService {
     }
 
 
-    public int updateStatus(String userName, long instanceId, SurveyInstanceStatusChangeCommand command) {
+    public SurveyInstanceStatus updateStatus(String userName, long instanceId, SurveyInstanceStatusChangeCommand command) {
         checkNotNull(command, "command cannot be null");
 
+        SurveyInstancePermissions permissions = getPermissions(userName, instanceId);
         if (command.action() != SurveyInstanceAction.SUBMITTING) {
-            checkPersonIsOwnerOrAdmin(userName, instanceId);
+            checkTrue(permissions.isAdmin() || permissions.isOwner(),"Permission denied");
         }
 
         SurveyInstance surveyInstance = surveyInstanceDao.getById(instanceId);
-        SurveyInstanceStatus newStatus = simple(surveyInstance.status()).process(command.action());
+        SurveyInstanceStatus newStatus = simple(surveyInstance.status()).process(command.action(), permissions, surveyInstance);
 
 
         if (command.action() == SurveyInstanceAction.REOPENING) {
@@ -214,7 +216,7 @@ public class SurveyInstanceService {
                             .build());
         }
 
-        return nbupdates;
+        return newStatus;
     }
 
 
@@ -378,9 +380,29 @@ public class SurveyInstanceService {
                         .build());
     }
 
-    public List<SurveyInstanceAction> findPossibleActionsForInstance(long instanceId) {
+    public List<SurveyInstanceAction> findPossibleActionsForInstance(String userName, long instanceId) {
         SurveyInstance surveyInstance = surveyInstanceDao.getById(instanceId);
+        SurveyInstancePermissions permissions = getPermissions(userName, instanceId);
         SurveyInstanceStateMachine stateMachine = simple(surveyInstance.status());
-        return stateMachine.nextPossibleActions();
+        return stateMachine.nextPossibleActions(permissions, surveyInstance);
+    }
+
+    public SurveyInstancePermissions getPermissions(String userName, Long instanceId) {
+        Person person = personDao.getActiveByUserEmail(userName);
+        SurveyInstance instance = surveyInstanceDao.getById(instanceId);
+        SurveyRun run = surveyRunDao.getById(instance.surveyRunId());
+
+        boolean isAdmin = userRoleService.hasRole(userName, SystemRole.SURVEY_ADMIN);
+        boolean isParticipant = surveyInstanceRecipientDao.isPersonInstanceRecipient(person.id().get(),instanceId);
+        boolean isOwner = person.id().equals(run.ownerId());
+        boolean hasOwningRole = userRoleService.hasRole(person.email(), instance.owningRole());
+        boolean isLatest = instance.originalInstanceId() == null;
+
+        return ImmutableSurveyInstancePermissions.builder()
+                .isAdmin(isAdmin)
+                .isParticipant(isParticipant)
+                .isOwner(isOwner || hasOwningRole)
+                .isMetaEdit(isLatest && (isAdmin || isOwner))
+                .build();
     }
 }

@@ -1,11 +1,13 @@
 package com.khartec.waltz.model.survey;
 
+import com.khartec.waltz.model.exceptions.NotAuthorizedException;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 
 import static com.khartec.waltz.model.survey.SurveyInstanceAction.*;
 import static com.khartec.waltz.model.survey.SurveyInstanceStateTransition.transition;
@@ -26,54 +28,29 @@ public class SurveyInstanceStateMachine {
         return current;
     }
 
-    public List<SurveyInstanceStatus> nextPossibleStatus() {
+    public List<SurveyInstanceStatus> nextPossibleStatus(SurveyInstancePermissions permissions, SurveyInstance instance) {
         return transitions.getOrDefault(current, emptyList())
                 .stream()
+                .filter(t -> t.getPredicate().apply(permissions, instance))
                 .map(t -> t.getFutureStatus())
                 .collect(toList());
     }
 
-    public List<SurveyInstanceAction> nextPossibleActions() {
+    public List<SurveyInstanceAction> nextPossibleActions(SurveyInstancePermissions permissions, SurveyInstance instance) {
         return transitions.getOrDefault(current, emptyList())
                 .stream()
+                .filter(t -> t.getPredicate().apply(permissions, instance))
                 .map(t -> t.getAction())
                 .collect(toList());
     }
 
-    public SurveyInstanceStatus process(SurveyInstanceAction action) {
+    public SurveyInstanceStatus process(SurveyInstanceAction action, SurveyInstancePermissions permissions, SurveyInstance instance) {
         for (SurveyInstanceStateTransition possibleTransition: transitions.getOrDefault(current, emptyList())) {
-            if (possibleTransition.getAction() == action) {
+            if (possibleTransition.getAction() == action && possibleTransition.getPredicate().apply(permissions, instance)) {
                 current = possibleTransition.getFutureStatus();
                 return current;
             }
         }
-        throw new RuntimeException("You cannot transition from "  + current + " with action " + action);
-    }
-
-    public static SurveyInstanceStateMachine simple(String status) {
-        return simple(SurveyInstanceStatus.valueOf(status));
-    }
-
-    public static SurveyInstanceStateMachine simple(SurveyInstanceStatus status) {
-        MultiValueMap<SurveyInstanceStatus, SurveyInstanceStateTransition> transitions = new LinkedMultiValueMap<>();
-        transitions.add(SurveyInstanceStatus.NOT_STARTED, transition(WITHDRAWING, WITHDRAWN));
-        transitions.add(SurveyInstanceStatus.NOT_STARTED, transition(SUBMITTING, COMPLETED));
-        transitions.add(SurveyInstanceStatus.NOT_STARTED, transition(SAVING, IN_PROGRESS));
-
-        transitions.add(SurveyInstanceStatus.IN_PROGRESS, transition(SUBMITTING, COMPLETED));
-        transitions.add(SurveyInstanceStatus.IN_PROGRESS, transition(WITHDRAWING, WITHDRAWN));
-        transitions.add(SurveyInstanceStatus.IN_PROGRESS, transition(SAVING, IN_PROGRESS));
-
-        transitions.add(SurveyInstanceStatus.COMPLETED, transition(APPROVING, APPROVED));
-        transitions.add(SurveyInstanceStatus.COMPLETED, transition(REJECTING, REJECTED));
-
-        transitions.add(SurveyInstanceStatus.APPROVED, transition(REOPENING, IN_PROGRESS));
-
-        transitions.add(SurveyInstanceStatus.REJECTED, transition(WITHDRAWING, WITHDRAWN));
-        transitions.add(SurveyInstanceStatus.REJECTED, transition(REOPENING, IN_PROGRESS));
-
-        transitions.add(SurveyInstanceStatus.WITHDRAWN, transition(REOPENING, IN_PROGRESS));
-
-        return new SurveyInstanceStateMachine(status, transitions);
+        throw new NotAuthorizedException("You cannot transition from "  + current + " with action " + action  + " given permissions: " + permissions);
     }
 }

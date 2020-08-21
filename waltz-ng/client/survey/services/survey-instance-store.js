@@ -115,7 +115,7 @@ function store($http, baseApiUrl) {
 
     const deleteRecipient = (id, instanceRecipientId) => {
         return $http
-            .delete(`${base}/${id}/recipient/${instanceRecipientId}`,)
+            .delete(`${base}/${id}/recipient/${instanceRecipientId}`)
             .then(result => result.data);
     };
 

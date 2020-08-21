@@ -62,6 +62,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
     @Override
     public void register() {
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
+        String getPermissionsPath = mkPath(BASE_URL, ":id", "permissions");
         String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findForRecipientIdPath = mkPath(BASE_URL, "recipient", "id", ":id");
         String findForUserPath = mkPath(BASE_URL, "user");
@@ -79,6 +80,12 @@ public class SurveyInstanceEndpoint implements Endpoint {
 
         DatumRoute<SurveyInstance> getByIdRoute =
                 (req, res) -> surveyInstanceService.getById(getId(req));
+
+        DatumRoute<SurveyInstancePermissions> getPermissionsRoute = (req, res) -> {
+            String userName = getUsername(req);
+            Long instanceId = getId(req);
+            return surveyInstanceService.getPermissions(userName, instanceId);
+        };
 
         ListRoute<SurveyInstance> findByEntityRefRoute = (req, res)
                 -> surveyInstanceService.findBySurveyInstanceIdSelector(mkOpts(getEntityReference(req), EXACT));
@@ -102,7 +109,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
                 (req, res) -> surveyInstanceService.findPreviousVersionsForInstance(getId(req));
 
         ListRoute<SurveyInstanceAction> findPossibleActionsRoute =
-                (req, res) -> surveyInstanceService.findPossibleActionsForInstance(getId(req));
+                (req, res) -> surveyInstanceService.findPossibleActionsForInstance(getUsername(req), getId(req));
 
         DatumRoute<Boolean> saveResponseRoute = (req, res) -> {
             String userName = getUsername(req);
@@ -122,7 +129,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
             return result;
         };
 
-        DatumRoute<Integer> updateStatusRoute =
+        DatumRoute<SurveyInstanceStatus> updateStatusRoute =
                 (req, res) -> {
                     SurveyInstanceStatusChangeCommand command = readBody(req, SurveyInstanceStatusChangeCommand.class);
 
@@ -172,6 +179,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
 
 
         getForDatum(getByIdPath, getByIdRoute);
+        getForDatum(getPermissionsPath, getPermissionsRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
         getForList(findForRecipientIdPath, findForRecipientIdRoute);
         getForList(findForUserPath, findForUserRoute);
