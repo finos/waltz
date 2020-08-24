@@ -16,7 +16,6 @@
  *
  */
 import {initialiseData, isEmpty} from "../../../common";
-import {responsivefy} from "../../../common/d3-utils";
 import _ from "lodash";
 import {scaleLinear, scaleBand} from "d3-scale";
 import {select} from "d3-selection";
@@ -26,12 +25,12 @@ import {format} from "d3-format";
 import "d3-selection-multi";
 
 
-const template = `<div class='waltz-complexity-bar-chart'></div>`;
+const template = "<div class='waltz-complexity-bar-chart'></div>";
 
 const bindings = {
-    complexity: '<',
-    apps: '<',
-    onSelect: '<'
+    complexity: "<",
+    apps: "<",
+    onSelect: "<"
 };
 
 
@@ -45,7 +44,6 @@ const initialState = {
 
 const numberFormat = format(".2f");
 const complexityFormat = d => `${numberFormat(d)}`;
-
 const startColor = "#FFF3E5";
 const endColor = "#FFA54F";
 
@@ -65,10 +63,10 @@ const dimensions = {
 
 
 function prepareChartData(complexity = [], apps = []) {
-    const appsByIds = _.keyBy(apps, 'id');
+    const appsByIds = _.keyBy(apps, "id");
 
     return _.chain(complexity)
-        .orderBy('overallScore', 'desc')
+        .orderBy("overallScore", "desc")
         .take(10)
         .map(c => Object.assign(c, { app: appsByIds[c.id] }))
         .value();
@@ -80,8 +78,8 @@ function drawXAxis(xScale, container) {
         .tickFormat(complexityFormat)
         .ticks(5);
 
-    container.append('g')
-        .attr('transform', `translate(0, ${dimensions.graph.height - (dimensions.margin.top + dimensions.margin.bottom)})`)
+    container.append("g")
+        .attr("transform", `translate(0, ${dimensions.graph.height - (dimensions.margin.top + dimensions.margin.bottom)})`)
         .call(xAxis);
 }
 
@@ -89,8 +87,8 @@ function drawXAxis(xScale, container) {
 function drawYAxis(yScale, container) {
     const yAxis = axisLeft(yScale);
 
-    container.append('g')
-        .attr('transform', `translate(${dimensions.margin.left}, ${dimensions.margin.top})`)
+    container.append("g")
+        .attr("transform", `translate(${dimensions.margin.left}, ${dimensions.margin.top})`)
         .call(yAxis);
 }
 
@@ -118,28 +116,28 @@ function draw(svg,
         .range([startColor, endColor]);
 
     const g = svg
-        .append('g')
-        .attr('transform', `translate(${dimensions.margin.left},${dimensions.margin.top})`);
+        .append("g")
+        .attr("transform", `translate(${dimensions.margin.left},${dimensions.margin.top})`);
 
     const bars = g
-        .selectAll('.wcbc-bar')
+        .selectAll(".wcbc-bar")
         .data(complexityChartData, d => d.id)
         .enter()
-        .append('g')
-        .classed('wcbc-bar', true)
-        .attr("transform", (d, i) => `translate(0, ${yScale(d.app.name)})`)
+        .append("g")
+        .classed("wcbc-bar", true)
+        .attr("transform", (d) => `translate(0, ${yScale(d.app.name)})`)
         .on("mouseenter.hover", d => onHover(d))
-        .on("mouseleave.hover", d => onHover(null))
+        .on("mouseleave.hover", () => onHover(null))
         .on("click.select", d => onSelect(d));
 
-    bars.append('rect')
-        .attr('x', 0)
-        .attr('y', 0)
-        .attr('width', d => xScale(d.overallScore))
-        .attr('height', yScale.bandwidth())
-        .attr('fill', (d, i) => colorScale(d.overallScore));
+    bars.append("rect")
+        .attr("x", 0)
+        .attr("y", 0)
+        .attr("width", d => xScale(d.overallScore))
+        .attr("height", yScale.bandwidth())
+        .attr("fill", (d) => colorScale(d.overallScore));
 
-    bars.append('text')
+    bars.append("text")
         .attr("x", 10)
         .attr("y", yScale.bandwidth() / 2 + 3)  // middle of the bar
         .text(d => complexityFormat(d.overallScore));
@@ -149,17 +147,15 @@ function draw(svg,
 }
 
 
+function calcGraphHeight(complexityChartData) {
+    return 100 + (complexityChartData.length * 20);
+}
+
+
 function controller($element, $scope) {
     const vm = initialiseData(this, initialState);
 
-    const holder = $element.find('div')[0];
-    const svg = select(holder)
-        .append('svg')
-        .attr('id', 'waltz-complexity-bar-chart');
-
-    let unregisterResponsivefy = () => {};
-
-    vm.$onDestroy = () => unregisterResponsivefy();
+    const holder = $element.find("div")[0];
 
     vm.$onChanges = () => {
         if (isEmpty(vm.complexity) || isEmpty(vm.apps)) {
@@ -168,27 +164,26 @@ function controller($element, $scope) {
 
         const complexityChartData = prepareChartData(vm.complexity, vm.apps);
 
-        dimensions.graph.height = 100 + (complexityChartData.length * 20);
-
-        svg.attr('width', dimensions.graph.width)
-            .attr('height', dimensions.graph.height)
-            .attr('viewbox', `0 0 ${dimensions.graph.width} ${dimensions.graph.height}`);
+        dimensions.graph.height = calcGraphHeight(complexityChartData);
+        const svg = select(holder)
+            .append("svg")
+            .attr("id", "waltz-complexity-bar-chart")
+            .style("min-height", "300px")
+            .attr("viewBox", `0 0 ${dimensions.graph.width} ${dimensions.graph.height}`)
+            .attr("preserveAspectRatio", "xMinYMin meet")
 
         draw(
             svg,
             complexityChartData,
             x => $scope.$applyAsync(() => vm.onHover(x)),
             x => $scope.$applyAsync(() => vm.onSelect(x)));
-
-        unregisterResponsivefy();
-        unregisterResponsivefy = responsivefy(svg, 'width-only');
     };
 }
 
 
 controller.$inject = [
-    '$element',
-    '$scope'
+    "$element",
+    "$scope"
 ];
 
 

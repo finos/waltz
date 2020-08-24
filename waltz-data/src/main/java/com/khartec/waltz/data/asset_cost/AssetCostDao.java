@@ -125,39 +125,42 @@ public class AssetCostDao {
     }
 
 
-    public List<ApplicationCost> findTopAppCostsByAppIdSelector(
-            int year, Select<Record1<Long>> appIdSelector, int limit) {
+    public List<ApplicationCost> findTopAppCostsByAppIdSelector(int year,
+                                                                Select<Record1<Long>> appIdSelector,
+                                                                int limit) {
         Table<Record1<String>> topAssetCodeTable = dsl
                 .select(ASSET_COST.ASSET_CODE)
                 .from(ASSET_COST)
-                .innerJoin(APPLICATION).on(APPLICATION.ASSET_CODE.eq(ASSET_COST.ASSET_CODE))
+                .innerJoin(APPLICATION)
+                .on(APPLICATION.ASSET_CODE.eq(ASSET_COST.ASSET_CODE))
                 .where(APPLICATION.ID.in(appIdSelector)
                         .and(ASSET_COST.YEAR.eq(year)))
                 .groupBy(ASSET_COST.ASSET_CODE)
                 .orderBy(DSL.sum(ASSET_COST.AMOUNT).desc())
-                        .limit(limit).asTable();
+                .limit(limit)
+                .asTable();
 
-        SelectConditionStep<Record> appCostSelector = dsl
+        Select<Record> appCostSelector = dsl
                 .select(ASSET_COST.fields())
-                .select(
-                        APPLICATION.NAME,
+                .select(APPLICATION.NAME,
                         APPLICATION.ID,
                         ORGANISATIONAL_UNIT.NAME,
                         ORGANISATIONAL_UNIT.ID)
                 .from(ASSET_COST)
                 .innerJoin(APPLICATION)
-                    .on(ASSET_COST.ASSET_CODE.eq(APPLICATION.ASSET_CODE))
+                .on(ASSET_COST.ASSET_CODE.eq(APPLICATION.ASSET_CODE))
                 .innerJoin(ORGANISATIONAL_UNIT)
-                    .on(APPLICATION.ORGANISATIONAL_UNIT_ID.eq(ORGANISATIONAL_UNIT.ID))
+                .on(APPLICATION.ORGANISATIONAL_UNIT_ID.eq(ORGANISATIONAL_UNIT.ID))
                 .innerJoin(topAssetCodeTable)
-                    .on(ASSET_COST.ASSET_CODE.eq(topAssetCodeTable.field(0, String.class)))
+                .on(ASSET_COST.ASSET_CODE.eq(topAssetCodeTable.field(0, String.class)))
                 .where(ASSET_COST.YEAR.eq(year));
 
         return appCostSelector.fetch(appCostMapper);
     }
 
 
-    public List<Tuple2<Long, BigDecimal>> calculateCombinedAmountsForSelector(int year, Select<Record1<Long>> appIdSelector) {
+    public List<Tuple2<Long, BigDecimal>> calculateCombinedAmountsForSelector(int year,
+                                                                              Select<Record1<Long>> appIdSelector) {
         checkNotNull(appIdSelector, "appIdSelector cannot be null");
 
         Field<BigDecimal> totalAmount = DSL.sum(ASSET_COST.AMOUNT).as("total_amount");
@@ -165,7 +168,8 @@ public class AssetCostDao {
         Condition condition = ASSET_COST.YEAR.eq(year)
                 .and(APPLICATION.ID.in(appIdSelector));
 
-        return dsl.select(APPLICATION.ID, totalAmount)
+        return dsl
+                .select(APPLICATION.ID, totalAmount)
                 .from(ASSET_COST)
                 .innerJoin(APPLICATION)
                 .on(APPLICATION.ASSET_CODE.eq(ASSET_COST.ASSET_CODE))
