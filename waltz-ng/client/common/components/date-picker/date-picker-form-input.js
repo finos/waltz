@@ -24,11 +24,12 @@ const bindings = {
     id: "@?",
     placeHolder: "@",
     required: "@?",
-    format: "@",
+    format: "@?",
     allowPastDates: "@?",
     model: "=",
     itemId: "<?",
-    onChange: "<?"
+    onChange: "<?",
+    maxDate: "<?"
 };
 
 
@@ -39,6 +40,7 @@ const initialState = {
         formatYear: "yyyy",
         startingDay: 1
     },
+    format: "yyyy-MM-dd",
     datePickerOpened: false,
     placeHolder: "",
     onChange: (itemId, val) => console.log("default onChange ")
@@ -48,9 +50,12 @@ const initialState = {
 function controller() {
     const vm = initialiseData(this, initialState);
 
-    vm.$onInit = () => {
+    vm.$onChanges = () => {
         if (!vm.allowPastDates) {
             vm.dateOptions.minDate = new Date();
+        }
+        if (vm.maxDate) {
+            vm.dateOptions.maxDate = new Date(vm.maxDate);
         }
     };
 

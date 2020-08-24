@@ -242,7 +242,7 @@ function controller($q,
 
     vm.onSaveDecommissionDate = (dateChange) => {
 
-        if (vm.application.entityLifecycleStatus === 'REMOVED'){
+        if (vm.application.entityLifecycleStatus === "REMOVED"){
             notification.error("Decommission date cannot be set. This application is no longer active");
             return;
         }

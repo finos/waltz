@@ -108,11 +108,18 @@
             </waltz-entity-selector>
         </div>
 
+        <!-- DATE -->
         <div ng-if="$ctrl.fieldType === 'date'">
             <waltz-date-picker-form-input place-holder="{{ $ctrl.dateFormat }}"
                                           format="{{ $ctrl.dateFormat }}"
+                                          max-date="$ctrl.maxDate"
                                           model="$ctrl.newVal">
             </waltz-date-picker-form-input>
+        </div>
+
+        <!-- INLINE HELP (common) -->
+        <div class="help-block"
+             ng-transclude="inlineHelp">
         </div>
 
         <div style="margin-top: 4px">
