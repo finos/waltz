@@ -1,6 +1,28 @@
 = Homepage redesign
+= Default Ratings
+David Watkins <david.watkins@db.com>
+:version: v0.2
+:modified: 2020-07
+:status: WIP
 :toc:
 
+<<<
+== Document Info
+
+|===
+| Attribute | Value
+
+| Status
+| {status} {version} ({modified})
+
+| Target Version
+| 1.26
+
+| Lead
+| Dave Watkins
+|===
+
+<<<
 == Status
 
 **Partial implementation** - Waltz 1.26 delivered the change and survey/attestation

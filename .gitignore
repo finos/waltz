@@ -13,7 +13,7 @@ npm-debug.log
 */.factorypath
 **/.project
 /docs/development/sample/.asciidoctor/diagram
-/docs/design/taxonomy_mapping/distinct.svg
-/docs/design/taxonomy_mapping/.asciidoctor/diagram/distinct.svg.cache
-/docs/design/taxonomy_mapping/merged.svg
-/docs/design/taxonomy_mapping/.asciidoctor/diagram/merged.svg.cache
+/docs/design/draft/taxonomy_mapping/distinct.svg
+/docs/design/draft/taxonomy_mapping/.asciidoctor/diagram/distinct.svg.cache
+/docs/design/draft/taxonomy_mapping/merged.svg
+/docs/design/draft/taxonomy_mapping/.asciidoctor/diagram/merged.svg.cache
