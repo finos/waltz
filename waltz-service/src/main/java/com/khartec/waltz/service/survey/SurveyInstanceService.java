@@ -178,9 +178,9 @@ public class SurveyInstanceService {
         }
 
         SurveyInstance surveyInstance = surveyInstanceDao.getById(instanceId);
+        checkTrue(surveyInstance.originalInstanceId() == null,"You cannot change the status of Approved/Rejected surveys");
+
         SurveyInstanceStatus newStatus = simple(surveyInstance.status()).process(command.action(), permissions, surveyInstance);
-
-
         if (command.action() == SurveyInstanceAction.REOPENING) {
             long versionedInstanceId = surveyInstanceDao.createPreviousVersion(surveyInstance);
             surveyQuestionResponseDao.cloneResponses(surveyInstance.id().get(), versionedInstanceId);
@@ -401,8 +401,9 @@ public class SurveyInstanceService {
         return ImmutableSurveyInstancePermissions.builder()
                 .isAdmin(isAdmin)
                 .isParticipant(isParticipant)
-                .isOwner(isOwner || hasOwningRole)
-                .isMetaEdit(isLatest && (isAdmin || isOwner))
+                .isOwner(isOwner)
+                .hasOwnerRole(hasOwningRole)
+                .isMetaEdit(isLatest && (isAdmin || isOwner || hasOwningRole))
                 .build();
     }
 }

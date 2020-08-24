@@ -20,6 +20,15 @@ public abstract class SurveyInstancePermissions {
     }
 
     @Value.Default
+    public boolean hasOwnerRole() {
+        return false;
+    }
+
+    public boolean hasOwnership() {
+        return isOwner() || hasOwnerRole();
+    }
+
+    @Value.Default
     public boolean isParticipant() {
         return false;
     }

@@ -51,7 +51,7 @@
             <message>Survey In Progress</message>
             <content>
                 <p>Survey responses cannot be viewed until they have been submitted</p>
-                <p ng-if="ctrl.surveyDetails.permissions.participant">
+                <p ng-if="ctrl.surveyDetails.permissions.isParticipant">
                     However, you may
                     <a ui-sref="main.survey.instance.response.edit ({id: ctrl.surveyDetails.instance.id})">
                         edit this survey

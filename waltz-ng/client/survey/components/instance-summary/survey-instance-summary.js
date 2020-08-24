@@ -76,8 +76,6 @@ function controller($q,
                 vm.description = surveyUtils.mkDescription([details.template.description, details.run.description]);
                 vm.people = _.map(details.recipients, d => d.person);
                 vm.availableStatusActions = actions.determineAvailableStatusActions(
-                    details.instance,
-                    details.permissions,
                     details.isLatest,
                     details.possibleActions);
 
@@ -188,15 +186,36 @@ function controller($q,
     };
 
     vm.invokeStatusAction = (action) => {
-        action
-            .onPerform(serviceBroker, vm.surveyDetails.instance, notification, action.actionName)
+        const display = action.actionDisplay
+        const verb = action.verb
+        const name = action.actionName
+        const id = vm.surveyDetails.instance.id
+        // SHOW MESSAGE
+        const msg = "Are you sure you want " + display + " this survey?"
+        const reason = action.isCommentMandatory
+            ? prompt(msg + " Please enter a reason below (mandatory):")
+            : confirm(msg);
+        
+        // SEND API SERVER CALL    
+        const prom = reason
+            ? serviceBroker
+                .execute(
+                    CORE_API.SurveyInstanceStore.updateStatus,
+                    [id, {action: name, reason: reason}])
+                .then(() => {
+                    notification.success("Survey response " + verb + " successfully");
+                })
+            : Promise.reject(display+ " cancelled")
+    
+        // PREPARE RENDERING
+        return prom
             .then(() => reload(true))
-            .catch(msg => notification.warning(msg))
+            .catch(msg2 => notification.warning(msg2))
             .then(() => {
                 if (action.view) {
-                    $timeout(() => $state.go(action.view, {id: vm.surveyDetails.instance.id}));
+                    $timeout(() => $state.go(action.view, {id: id}));
                 } else {
-                    console.log("No view for " + action.name)
+                    console.log("No view for " + name)
                 }
                 
             })

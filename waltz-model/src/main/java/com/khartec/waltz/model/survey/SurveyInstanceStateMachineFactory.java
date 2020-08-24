@@ -14,11 +14,11 @@ import static com.khartec.waltz.model.survey.SurveyInstanceStatus.IN_PROGRESS;
 public class SurveyInstanceStateMachineFactory {
     // FILTERS
     private static BiFunction<SurveyInstancePermissions, SurveyInstance, Boolean> isAdminOrOwnerOrParticipant =
-            (p, i) -> p.isAdmin() || p.isOwner() || p.isParticipant();
+            (p, i) -> p.isAdmin() || p.hasOwnership() || p.isParticipant();
     private static BiFunction<SurveyInstancePermissions, SurveyInstance, Boolean> isAdminOrOwner =
-            (p, i) -> p.isAdmin() || p.isOwner();
+            (p, i) -> p.isAdmin() || p.hasOwnership();
     private static BiFunction<SurveyInstancePermissions, SurveyInstance, Boolean> isAdminOrOwnerOrNoApprovedDate =
-            (p, i) -> (p.isAdmin() || p.isOwner()) && (i.approvedAt() == null);
+            (p, i) -> (p.isAdmin() || p.hasOwnership()) && (i.approvedAt() == null);
 
     // TRANSITIONS FOR THE SIMPLE SRUVEY WORKFLOW
     private static MultiValueMap<SurveyInstanceStatus, SurveyInstanceStateTransition> simpleTransitions = new LinkedMultiValueMap<>();

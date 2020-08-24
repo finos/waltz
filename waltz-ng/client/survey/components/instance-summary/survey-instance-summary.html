@@ -93,7 +93,7 @@
 <!-- GROUP_RECIPIENTS -->
 <script type="text/ng-template"
         id="wsis-group-recipients">
-    <span ng-if="$ctrl.surveyDetails.permissions.metaEdit">
+    <span ng-if="$ctrl.surveyDetails.permissions.isMetaEdit">
         <waltz-user-pick-list people="$ctrl.people"
                               can-remove-last="false"
                               on-add="$ctrl.onAddRecipient"
@@ -101,7 +101,7 @@
                               required-role="SURVEY_ADMIN">
         </waltz-user-pick-list>
     </span>
-    <span ng-if="!$ctrl.surveyDetails.permissions.metaEdit">
+    <span ng-if="!$ctrl.surveyDetails.permissions.isMetaEdit">
         <ul class="list-unstyled list-inline">
             <li ng-repeat="participant in $ctrl.people">
                 <waltz-entity-icon-label entity-ref="participant">
@@ -156,7 +156,7 @@
         Due
     </div>
     <div class="col-sm-4">
-        <span ng-if="$ctrl.surveyDetails.permissions.metaEdit">
+        <span ng-if="$ctrl.surveyDetails.permissions.isMetaEdit">
             <waltz-editable-field on-save="$ctrl.updateDueDate"
                                   field-type="date"
                                   date-format="yyyy-MM-dd"
@@ -176,6 +176,7 @@
 <!-- ISSUED BY -->
 <script type="text/ng-template"
         id="wsis-issued-by">
+
     <div class="col-sm-2 waltz-display-field-label">
         Issued By
     </div>

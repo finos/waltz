@@ -51,7 +51,7 @@
 
     <waltz-section name="Responses"
                    icon="pencil-square"
-                   ng-if="ctrl.surveyDetails.permissions.participant && ctrl.instanceCanBeEdited">
+                   ng-if="ctrl.surveyDetails.permissions.isParticipant && ctrl.instanceCanBeEdited">
         <form name="surveyResponseForm"
               class="form-horizontal waltz-survey-form"
               role="form"
@@ -261,7 +261,7 @@
     </div>
 
     <div class="alert alert-warning"
-         ng-if="!ctrl.surveyDetails.permissions.participant">
+         ng-if="!ctrl.surveyDetails.permissions.isParticipant">
         <h4>Permission Denied</h4>
         <p>You don't have permission to respond to this survey.</p>
     </div>

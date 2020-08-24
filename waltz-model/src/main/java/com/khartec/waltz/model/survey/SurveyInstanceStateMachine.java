@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
+import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.model.survey.SurveyInstanceAction.*;
 import static com.khartec.waltz.model.survey.SurveyInstanceStateTransition.transition;
 import static com.khartec.waltz.model.survey.SurveyInstanceStatus.*;
@@ -46,11 +47,13 @@ public class SurveyInstanceStateMachine {
 
     public SurveyInstanceStatus process(SurveyInstanceAction action, SurveyInstancePermissions permissions, SurveyInstance instance) {
         for (SurveyInstanceStateTransition possibleTransition: transitions.getOrDefault(current, emptyList())) {
-            if (possibleTransition.getAction() == action && possibleTransition.getPredicate().apply(permissions, instance)) {
-                current = possibleTransition.getFutureStatus();
-                return current;
+            boolean isSameAction = possibleTransition.getAction() == action;
+            boolean isAllowedByPredicate = possibleTransition.getPredicate().apply(permissions, instance);
+            if (isSameAction && isAllowedByPredicate) {
+                this.current = possibleTransition.getFutureStatus();
+                return this.current;
             }
         }
-        throw new NotAuthorizedException("You cannot transition from "  + current + " with action " + action  + " given permissions: " + permissions);
+        throw new IllegalArgumentException("You cannot transition from "  + current + " with action " + action  + " given permissions: " + permissions);
     }
 }

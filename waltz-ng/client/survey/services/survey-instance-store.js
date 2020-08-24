@@ -77,6 +77,12 @@ function store($http, baseApiUrl) {
             .then(result => result.data);
     };
 
+    const getPermissions = (id) => {
+        return $http
+            .get(`${base}/${id}/permissions`)
+            .then(result => result.data);
+    };
+
     const saveResponse = (id, questionResponse) => {
         return $http
             .put(`${base}/${id}/response`, questionResponse)
@@ -121,6 +127,7 @@ function store($http, baseApiUrl) {
 
     return {
         getById,
+        getPermissions,
         findByEntityReference,
         findForRecipientId,
         findForUser,
@@ -194,6 +201,11 @@ export const SurveyInstanceStore_API = {
         serviceName,
         serviceFnName: 'findPossibleActions',
         description: 'finds all possible action on this survey instance'
+    },
+    getPermissions: {
+        serviceName,
+        serviceFnName: 'getPermissions',
+        description: 'get permissions for this survey instance'
     },
     saveResponse: {
         serviceName,

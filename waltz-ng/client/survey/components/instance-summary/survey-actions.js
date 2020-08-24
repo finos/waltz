@@ -1,137 +1,50 @@
-import _ from "lodash";
-import {CORE_API} from "../../../common/services/core-api-utils";
-
 const statusActions = [
     {
         name: "Save",
+        verb: "saved",
         severity: "info",
         helpText: "....",
         view: "main.survey.instance.user",
-        predicate: (instance, permissions, isLatest) => isLatest,
-        onPerform: (serviceBroker, instance, notification, actionName) => {
-            /**
-             * This is a bit of fakery as the questions are saved each time a response is updated.
-             * Therefore this method merely moves the user back to their instance list.
-             */
-            return notification.success("Survey response saved successfully");
-        }
     },{
         name: "Submit",
+        verb: "submitted",
         severity: "success",
         helpText: "....",
         view: "main.survey.instance.response.view",
-        predicate: (instance, permissions, isLatest) => isLatest
-            && (permissions.admin || permissions.owner),
-        onPerform: (serviceBroker, instance, notification, actionName) => {
-            const reason = prompt("Are you sure you want to approve this survey? Please enter a reason below (optional):");
-            if (!_.isNil(reason)) {
-                return serviceBroker
-                    .execute(
-                        CORE_API.SurveyInstanceStore.updateStatus,
-                        [ instance.id, {action: actionName, reason: reason}])
-                    .then(result => {
-                        notification.success("Survey response submitted successfully");
-                        // we force a reload of the notification store to update any listeners that the number
-                        // of open surveys may have changed (i.e. the counter in the profile menu)
-                        serviceBroker.loadAppData(
-                            CORE_API.NotificationStore.findAll,
-                            [],
-                            {force: true});
-                    });
-            } else {
-                return Promise.reject("Approval cancelled");
-            }
-        }
     }, {
         name: "Approve",
+        verb: "approved",
         severity: "success",
         helpText: "....",
-        predicate: (instance, permissions, isLatest) => isLatest
-            && (permissions.admin || permissions.owner)
-            && _.isNil(instance.approvedAt),
-        onPerform: (serviceBroker, instance, notification, actionName) => {
-            const reason = prompt("Are you sure you want to approve this survey? Please enter a reason below (optional):");
-            if (!_.isNil(reason)) {
-                return serviceBroker
-                    .execute(
-                        CORE_API.SurveyInstanceStore.updateStatus,
-                        [ instance.id, {action: actionName, reason: reason}])
-                    .then(result => {
-                        notification.success("Survey response approved");
-                    });
-            } else {
-                return Promise.reject("Approval cancelled");
-            }
-        }
     }, {
         name: "Withdraw",
+        verb: "withdrawn",
         severity: "danger",
         helpText: "....",
-        predicate: (instance, permissions, isLatest) => isLatest
-            && (permissions.admin || permissions.owner),
-        onPerform: (serviceBroker, instance, notification, actionName) => {
-            if (confirm("Are you sure you want to withdraw this survey instance? ")) {
-                return serviceBroker
-                    .execute(
-                        CORE_API.SurveyInstanceStore.updateStatus,
-                        [instance.id, {action: actionName} ])
-                    .then(() => {
-                        notification.success("Survey instance withdrawn");
-                    });
-            } else {
-                Promise.reject("Withdraw cancelled");
-            }
-        }
+        view: "main.survey.instance.response.view",
     }, {
         name: "Reject",
+        verb: "rejected",
         severity: "danger",
         helpText: "....",
-        predicate: (instance, permissions, isLatest) => isLatest
-            && (permissions.admin || permissions.owner),
-        onPerform: (serviceBroker, instance, notification, actionName) => {
-            const reason = prompt("Are you sure you want reject this survey? Please enter a reason below (mandatory):");
-            if (reason) {
-                return serviceBroker
-                    .execute(
-                        CORE_API.SurveyInstanceStore.updateStatus,
-                        [instance.id, {action: actionName, reason: reason}])
-                    .then(() => {
-                        notification.success("Survey response rejected");
-                    });
-            } else {
-                return Promise.reject("Reject cancelled");
-            }
-        }
     }, {
         name: "Reopen",
+        verb: "reopened",
         severity: "warning",
         helpText: "....",
         view: "main.survey.instance.response.edit",
-        predicate: (instance, permissions, isLatest) => isLatest
-            && (permissions.admin || permissions.owner || permissions.participant),
-        onPerform: (serviceBroker, instance, notification, actionName) => {
-            if (confirm("Are you sure you want reopen this survey?")) {
-                return serviceBroker
-                    .execute(
-                        CORE_API.SurveyInstanceStore.updateStatus,
-                        [instance.id, {action: actionName}])
-                    .then(() => {
-                        notification.success("Survey response reopened");
-                    });
-            } else {
-                return Promise.reject("Reopen cancelled");
-            }
-        }
     },
 ];
 
 
-export function determineAvailableStatusActions(surveyInstance, permissions, isLatest, possibleActions) {
+export function determineAvailableStatusActions(isLatest, possibleActions) {
     return statusActions
-        .filter(act => possibleActions.some(pa => pa.display === act.name))
-        .filter(act => act.predicate(surveyInstance, permissions, isLatest))
+        .filter(act => possibleActions.some(pa => isLatest && pa.display === act.name))
         .map(act => {
-            act.actionName =  possibleActions.find(pa => pa.display === act.name).name;
+            let possibleAction = possibleActions.find(pa => pa.display === act.name)
+            act.actionName =  possibleAction.name;
+            act.actionDisplay =  possibleAction.display;
+            act.isCommentMandatory =  possibleAction.commentMandatory;
             return act;
         });
 }
