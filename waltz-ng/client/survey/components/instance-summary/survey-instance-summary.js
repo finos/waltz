@@ -24,7 +24,7 @@ import {timeFormat} from "d3-time-format";
 import {sameRef} from "../../../common/entity-utils";
 import {displayError} from "../../../common/error-utils";
 import * as surveyUtils from "../../survey-utils";
-import * as actions from "./survey-actions";
+import * as actions from "../../survey-actions";
 import moment from "moment";
 
 
@@ -185,41 +185,7 @@ function controller($q,
         }
     };
 
-    vm.invokeStatusAction = (action) => {
-        const display = action.actionDisplay
-        const verb = action.verb
-        const name = action.actionName
-        const id = vm.surveyDetails.instance.id
-        // SHOW MESSAGE
-        const msg = "Are you sure you want " + display + " this survey?"
-        const reason = action.isCommentMandatory
-            ? prompt(msg + " Please enter a reason below (mandatory):")
-            : confirm(msg);
-        
-        // SEND API SERVER CALL    
-        const prom = reason
-            ? serviceBroker
-                .execute(
-                    CORE_API.SurveyInstanceStore.updateStatus,
-                    [id, {action: name, reason: reason}])
-                .then(() => {
-                    notification.success("Survey response " + verb + " successfully");
-                })
-            : Promise.reject(display+ " cancelled")
-    
-        // PREPARE RENDERING
-        return prom
-            .then(() => reload(true))
-            .catch(msg2 => notification.warning(msg2))
-            .then(() => {
-                if (action.view) {
-                    $timeout(() => $state.go(action.view, {id: id}));
-                } else {
-                    console.log("No view for " + name)
-                }
-                
-            })
-    };
+    vm.invokeStatusAction = actions.invokeStatusAction(serviceBroker, notification, reload, $timeout, $state)
 
     // -- LIFECYCLE
 

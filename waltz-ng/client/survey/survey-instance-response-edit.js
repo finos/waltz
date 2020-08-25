@@ -23,6 +23,7 @@ import {CORE_API} from "../common/services/core-api-utils";
 import moment from "moment";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 import template from "./survey-instance-response-edit.html";
+import * as actions from "./survey-actions";
 
 
 const initialState = {
@@ -63,7 +64,7 @@ function controller($location,
         kind: "SURVEY_INSTANCE"
     };
 
-    function boot() {
+    function reload() {
         const responsePromise = serviceBroker
             .loadViewData(CORE_API.SurveyInstanceStore.findResponses, [id])
             .then(r => vm.surveyResponses = SurveyUtils.indexResponses(r.data));
@@ -73,6 +74,9 @@ function controller($location,
             .then(details => {
                 vm.surveyDetails = details;
                 vm.instanceCanBeEdited = _.includes(statusesWhichSupportEditing, details.instance.status);
+                vm.availableStatusActions = actions.determineAvailableStatusActions(
+                    details.isLatest,
+                    details.possibleActions);
             });
 
         reloadQuestions();
@@ -142,6 +146,8 @@ function controller($location,
                 saveParams);
     };
 
+    vm.invokeStatusAction = actions.invokeStatusAction(serviceBroker, notification, reload, $timeout, $state)
+
 
     // /**
     //  * This is a bit of fakery as the questions are saved each time a response is updated.
@@ -182,7 +188,7 @@ function controller($location,
 
 
     // --- BOOT
-    boot();
+    reload();
 
 }
 

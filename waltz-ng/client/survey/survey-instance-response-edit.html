@@ -217,20 +217,14 @@
             <div class="row">
                 <div class="col-sm-12">
                     <div class="pull-right" style="padding-right: 1em;">
-                        <!-- <button class="btn btn-info"
-                                ng-click="ctrl.saveForLater()">
-                            <waltz-icon name="clock-o"></waltz-icon>
-                            Save and complete later
-                        </button>
+                        <span ng-repeat="action in ctrl.availableStatusActions">
+                            <a class="btn btn-xs"
+                               ng-class="'btn-{{action.severity}}'"
+                               ng-click="ctrl.invokeStatusAction(action, ctrl.surveyDetails.instance.id)">
+                                <span ng-bind="action.name"></span>
+                            </a>
+                        </span>
 
-                        <button class="btn btn-success"
-                                ng-disabled="surveyResponseForm.$invalid"
-                                ng-click="ctrl.submit()"
-                                class="btn btn-success btn-lg">
-                            <waltz-icon name="envelope">
-                            </waltz-icon>
-                            Submit
-                        </button> -->
                         <div ng-if="surveyResponseForm.$invalid"
                              class="help-block">
                             <waltz-icon name="warning"></waltz-icon>

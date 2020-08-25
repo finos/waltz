@@ -25,7 +25,7 @@
         <span ng-repeat="action in $ctrl.availableStatusActions">
             <a class="btn btn-xs"
                ng-class="'btn-{{action.severity}}'"
-               ng-click="$ctrl.invokeStatusAction(action)">
+               ng-click="$ctrl.invokeStatusAction(action, $ctrl.surveyDetails.instance.id)">
                 <span ng-bind="action.name"></span>
             </a>
         </span>
