@@ -18,7 +18,6 @@
 import _ from "lodash";
 import "d3-selection-multi";
 import {initialiseData, isEmpty} from "../../../common";
-import {responsivefy} from "../../../common/d3-utils";
 import {scaleBand, scaleLinear} from "d3-scale";
 import {select} from "d3-selection";
 import {extent} from "d3-array";
@@ -72,6 +71,7 @@ function processCosts(costs = []) {
         }, {})
         .values()
         .orderBy("total", "desc")
+        .take(10)
         .value();
 }
 
@@ -87,7 +87,8 @@ function drawXAxis(xScale, container, currencyFormat) {
 }
 
 
-function drawYAxis(yScale, container) {
+function drawYAxis(yScale,
+                   container) {
     const yAxis = axisLeft(yScale);
 
     container.append("g")
@@ -96,7 +97,8 @@ function drawYAxis(yScale, container) {
 }
 
 
-function draw(svg, costs = [],
+function draw(svg,
+              costs = [],
               onSelect = _.identity,
               currencyFormat) {
     // remove any previous elements
@@ -127,7 +129,7 @@ function draw(svg, costs = [],
         .enter()
         .append("g")
         .classed("wacg-bar", true)
-        .attr("transform", (d, i) => `translate(0, ${yScale(d.entityRef.name)})`)
+        .attr("transform", (d) => `translate(0, ${yScale(d.entityRef.name)})`)
         .on("click.select", d => onSelect(d));
 
     bars.append("rect")
@@ -135,7 +137,7 @@ function draw(svg, costs = [],
         .attr("y", 0)
         .attr("width", d => xScale(d.total))
         .attr("height", yScale.bandwidth())
-        .attr("fill", (d, i) => colorScale(d.total));
+        .attr("fill", (d) => colorScale(d.total));
 
     bars.append("text")
         .attr("x", 10)
@@ -153,11 +155,11 @@ function controller($element, $scope, settingsService) {
     const holder = $element.find("div")[0];
     const svg = select(holder)
         .append("svg")
-        .attr("id", "waltz-asset-costs-graph");
+        .attr("id", "waltz-asset-costs-graph")
+        .style("min-height", "300px")
+        .attr("preserveAspectRatio", "xMinYMin meet");
 
-    let unregisterResponsivefy = () => {};
     let currencyFormat = null;
-
 
     const refresh = () => {
         if (isEmpty(vm.costs) || ! currencyFormat) {
@@ -168,9 +170,7 @@ function controller($element, $scope, settingsService) {
 
         dimensions.graph.height = 100 + (aggCosts.length * 20);
 
-        svg.attr("width", dimensions.graph.width)
-            .attr("height", dimensions.graph.height)
-            .attr("viewbox", `0 0 ${dimensions.graph.width} ${dimensions.graph.height}`);
+        svg.attr("viewBox", `0 0 ${dimensions.graph.width} ${dimensions.graph.height}`);
 
         draw(
             svg,
@@ -178,12 +178,8 @@ function controller($element, $scope, settingsService) {
             x => $scope.$applyAsync(() => vm.onSelect(x)),
             currencyFormat);
 
-        unregisterResponsivefy();
-        $scope.$applyAsync(() => unregisterResponsivefy = responsivefy(svg, "width-only"));
     };
 
-
-    vm.$onDestroy = () => unregisterResponsivefy();
 
     vm.$onInit = () => {
         settingsService
@@ -192,7 +188,7 @@ function controller($element, $scope, settingsService) {
                 const currency = currenciesByCode[code]
                 currencyFormat = d => `${currency.symbol}${format(",d")(d)}`;
                 refresh();
-            })
+            });
     };
 
     vm.$onChanges = refresh;

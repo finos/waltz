@@ -1,6 +1,27 @@
 = Physical Flow Ratings in Waltz
+David Watkins <david.watkins@db.com>
+:version: v0.1
+:modified: 2020
+:status: DRAFT
+:toc:
 
-== Status: DESIGN (Possibly targeting Q1/2 2020)
+<<<
+== Document Info
+
+|===
+| Attribute | Value
+
+| Status
+| {status} {version} ({modified})
+
+| Target Version
+| ?
+
+| Lead
+| Dave Watkins
+|===
+
+<<<
 
 == Terminology
 

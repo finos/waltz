@@ -20,7 +20,7 @@ import _ from "lodash";
 import {scaleLinear} from 'd3-scale';
 import {select} from 'd3-selection';
 import "d3-selection-multi";
-import{perhaps} from '../common';
+import {tryOrDefault} from "../common/function-utils";
 
 const bindings = {
     values: '<',
@@ -63,7 +63,7 @@ function controller($element) {
     const update = (values = [], max) => {
 
         const height = 24;
-        const width = perhaps(
+        const width = tryOrDefault(
             () => $element[0].parentElement.clientWidth || 150,
             150);
 

@@ -16,7 +16,7 @@
  *
  */
 import _ from "lodash";
-import { ifPresent } from "../../common";
+import { ifPresent } from "../../common/function-utils";
 import { positionFor, toGraphFlow, toGraphId, toGraphNode } from "../flow-diagram-utils";
 import { toEntityRef } from "../../common/entity-utils";
 

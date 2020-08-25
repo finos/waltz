@@ -28,11 +28,17 @@ const qInclusionPredicateHelp = `
 The inclusion predicate allows for questions to be conditionally included in a survey depending on the values of other fields.
 See the documentation for a complete list of functions and their arguments.  Below is a selection of the main functions/operators:
 
-* Logical operators: \`< <= > >= == != && || ! \`
-* \`isChecked(extId, defaultValue)\`: \`true\` if the question with the given ext id is checked, \`false\` if not checked,
+* \`< <= > >= == != && || ! \`: logical operators
+* \`isChecked(extId, <defaultValue>)\`: \`true\` if the question with the given ext id is checked, \`false\` if not checked,
   or \`defaultValue\` if the answer is currently undefined.
-* \`numberValue(extId, defaultValue)\`: numeric value of the response for the given ext id (or \`defaultValue\`)
-* \`ditto(extId)\`: evaluates same conditions from a different question.  Good for repetition, enhancements.
+* \`numberValue(extId, <defaultValue>)\`: numeric value of the response for the given ext id (or \`defaultValue\`)
+* \`ditto(extId)\`: evaluates same conditions from a different question.  Useful for repetition of complex predicates.
+* \`val(extId, <defaultValue>)\`: returns the current value
+* \`assessmentRating(name|extId, <defaultValue>)\`: returns code value of the matching rating (returns null if no default given and no assessment found)
+* \`belongsToOrgUnit(name|extId)\`: returns true if the subject app is part of the given org unit tree
+* \`dataTypeUsages(name|extId)\`: returns set of usage kinds for the given data types (use the \`=~\` operator to test for membership)
+* \`isRetiring()\`: (application only) true if app has planned retirement date but no actual retirement date
+* \`hasDataType(name|extId)\`: returns whether the specified datatype (or a descendent) is in use by the app
 `;
 
 
@@ -105,7 +111,7 @@ function controller($stateParams,
                 description: vm.surveyTemplate.description,
                 targetEntityKind: vm.surveyTemplate.targetEntityKind
             })
-            .then(updateCount => notification.success("Survey template updated successfully"));
+            .then(() => notification.success("Survey template updated successfully"));
     };
 
     vm.showAddQuestionForm = () => {
