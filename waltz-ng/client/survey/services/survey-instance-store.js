@@ -71,6 +71,12 @@ function store($http, baseApiUrl) {
             .then(result => result.data);
     };
 
+    const findHistoricalResponses = (id, questionId) => {
+        return $http
+            .get(`${base}/${id}/question-id/${questionId}/historical-responses`)
+            .then(result => result.data);
+    };
+
     const saveResponse = (id, questionResponse) => {
         return $http
             .put(`${base}/${id}/response`, questionResponse)
@@ -122,6 +128,7 @@ function store($http, baseApiUrl) {
         findPreviousVersions,
         findRecipients,
         findResponses,
+        findHistoricalResponses,
         saveResponse,
         updateStatus,
         updateDueDate,
@@ -177,6 +184,11 @@ export const SurveyInstanceStore_API = {
         serviceName,
         serviceFnName: 'findResponses',
         description: 'finds responses for a given survey instance id'
+    },
+    findHistoricalResponses: {
+        serviceName,
+        serviceFnName: 'findHistoricalResponses',
+        description: 'finds historical responses for a given survey instance id'
     },
     findPreviousVersions: {
         serviceName,

@@ -18,7 +18,12 @@
 
 <div>
     <waltz-section>
-        <waltz-change-summaries-panel parent-entity-ref="$ctrl.parentEntityRef">
-        </waltz-change-summaries-panel>
+        <waltz-historical-responses-panel ng-if="$ctrl.selectedQuestion"
+                                          parent-entity-ref="$ctrl.parentEntityRef"
+                                          question="$ctrl.selectedQuestion"
+                                          on-select="$ctrl.onSelectHistoricalResponse"
+                                          on-cancel="$ctrl.clearSelected">
+        </waltz-historical-responses-panel>
+
     </waltz-section>
 </div>

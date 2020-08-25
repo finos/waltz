@@ -18,27 +18,36 @@
 
 import {initialiseData} from "../../common/index";
 import template from "./playpen3.html";
+import {CORE_API} from "../../common/services/core-api-utils";
+import _ from "lodash";
 
 
 const initialState = {
     parentEntityRef: {
-        id: 95,
-        kind: "ORG_UNIT"
+        id: 45832,
+        kind: "SURVEY_INSTANCE"
     },
-    schemeId: 2,
-    selectedDate: null,
 };
 
 function controller($stateParams, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.selectedDate = new Date('2020-07-07');
+    serviceBroker
+        .loadViewData(CORE_API.SurveyQuestionStore.findForInstance, [45832])
+        .then(r =>  {
+            console.log(r.data);
+            return vm.selectedQuestion = _.find(r.data, d => d.question.id === 1164)
+        });
 
-    // serviceBroker.loadViewData(CORE_API.ChangeLogSummariesStore.findSummariesForKindBySelector,
-    //     ['APPLICATION', mkSelectionOptions(vm.parentEntityRef, 'EXACT')])
-    //     .then(r => vm.data = r.data)
-    //     .then(console.log(vm.data));
+    vm.onSelectHistoricalResponse = () =>  {
+        console.log("Selecting")
+    };
+
+    vm.clearSelected = () => {
+        console.log("Clear selected response")
+    }
 }
+
 
 controller.$inject = [
     "$stateParams",
