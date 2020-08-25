@@ -22,12 +22,14 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./data-type-usage-selector.html";
 import {enrichDataTypes} from "../../data-type-utils";
+import {reduceToSelectedNodesOnly} from "../../../common/hierarchy-utils";
 
 
 const bindings = {
     parentEntityRef: "<",
     onDirty: "<",
-    onRegisterSave: "<"
+    onRegisterSave: "<",
+    parentFlow:"<?"
 };
 
 
@@ -38,6 +40,8 @@ const initialState = {
     originalSelectedItemIds: [],
     expandedItemIds: [],
     disablePredicate: null,
+    suggestedDataTypes: [],
+    showAllDataTypes: false,
     onDirty: (d) => console.log("dtus:onDirty - default impl", d),
     onRegisterSave: (f) => console.log("dtus:onRegisterSave - default impl", f)
 };
@@ -68,8 +72,14 @@ function controller(serviceBroker) {
         vm.checkedItemIds = selectedDataTypeIds;
         vm.originalSelectedItemIds = selectedDataTypeIds;
         vm.expandedItemIds = selectedDataTypeIds;
+
+        const suggestedAndSelectedTypes = _.concat(selectedDataTypeIds, _.map(vm.suggestedDataTypes, d => d.id));
         vm.allDataTypes = enrichDataTypes(vm.allDataTypes, vm.checkedItemIds);
         vm.allDataTypesById = _.keyBy(vm.allDataTypes, "id");
+
+        vm.visibleDataTypes = vm.showAllDataTypes
+            ? vm.allDataTypes
+            :reduceToSelectedNodesOnly(vm.allDataTypes, suggestedAndSelectedTypes);
     };
 
     const doSave = () => {
@@ -156,11 +166,34 @@ function controller(serviceBroker) {
         return !node.concrete;
     };
 
+    const determineMessage = () => {
+        vm.showAllMessage = (vm.showAllDataTypes)
+            ? "Show suggested data types"
+            : "Show all data types";
+    };
+
+    vm.toggleShowAll = () => {
+        vm.showAllDataTypes = !vm.showAllDataTypes;
+        postLoadActions();
+        determineMessage();
+    };
+
     // -- LIFECYCLE
+
+    const loadSuggestedDatatypes = () => {
+        if (vm.parentFlow) {
+            return serviceBroker.loadViewData(CORE_API.DataTypeDecoratorStore.findSuggestedByEntityRef, [vm.parentFlow])
+                .then(r => vm.suggestedDataTypes = _.filter(r.data, dt => !dt.unknown))
+                .then(() => vm.showAllDataTypes = _.isEmpty(vm.suggestedDataTypes));
+        } else {
+            vm.showAllDataTypes = true;
+        }
+    };
 
     vm.$onInit = () => {
         vm.onDirty(false);
         vm.onRegisterSave(vm.save);
+        determineMessage();
 
         serviceBroker
             .loadAppData(CORE_API.DataTypeStore.findAll)
@@ -170,7 +203,8 @@ function controller(serviceBroker) {
             });
 
         loadDataTypes()
-            .then(postLoadActions);
+            .then(() => loadSuggestedDatatypes())
+            .then(() => postLoadActions());
     };
 
     vm.$onChanges = () => {
