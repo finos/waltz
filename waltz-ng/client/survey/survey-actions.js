@@ -52,12 +52,10 @@ export function determineAvailableStatusActions(isLatest, possibleActions) {
 }
 
 export function invokeStatusAction(serviceBroker, notification, reloader, $timeout, $state)  {
-    console.log("building invokeStatus")
     return function(action, id) {
         const display = action.actionDisplay
         const verb = action.verb
         const name = action.actionName
-        console.log("Doing " + name + " on " + id)
         
         // SHOW MESSAGE
         const msg = "Are you sure you want " + display + " this survey?"
