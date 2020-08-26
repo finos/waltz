@@ -36,4 +36,20 @@
         </addColumn>
     </changeSet>
 
+
+    <!-- 4441: Housekeeping: remove backup tables -->
+    <changeSet id="20200826-4441-1"
+               failOnError="false"
+               author="davidwatkins73">
+        <comment>4441: Housekeeping: remove measurable_1_21 backup table</comment>
+        <dropTable tableName="measurable_1_21"/>
+    </changeSet>
+
+    <changeSet id="20200826-4441-2"
+               failOnError="false"
+               author="davidwatkins73">
+        <comment>4441: Housekeeping: remove attestation_1_11 backup table</comment>
+        <dropTable tableName="attestation_1_11"/>
+    </changeSet>
+
 </databaseChangeLog>
