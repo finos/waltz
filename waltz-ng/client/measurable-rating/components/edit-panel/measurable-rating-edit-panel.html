@@ -226,6 +226,19 @@
             </div>
         </div>
 
+        <div ng-if="$ctrl.selected.rating && !$ctrl.selected.rating.isValid">
+            <br>
+            <waltz-warning>
+                <message>Invalid rating</message>
+                <content>
+                    <span>The rating for </span>
+                    <strong ng-bind="$ctrl.selected.measurable.name"></strong>
+                    <span> is not valid because of a limiting assessment rating </span>
+                    <strong ng-bind="$ctrl.selected.ratingScheme.name"></strong>
+                </content>
+            </waltz-warning>
+        </div>
+
         <!-- COMMENT -->
         <div class="row"
              style="padding-top: 8px;">
@@ -251,19 +264,6 @@
                                                category="$ctrl.activeTab.category"
                                                application="$ctrl.application">
             </waltz-planned-decommission-editor>
-        </div>
-
-        <div ng-if="$ctrl.selected.rating && !$ctrl.selected.rating.isValid">
-            <br>
-            <waltz-warning>
-                <message>Invalid rating</message>
-                <content>
-                    <span>The rating for </span>
-                    <strong ng-bind="$ctrl.selected.measurable.name"></strong>
-                    <span> is not valid because of a limiting assessment rating </span>
-                    <strong ng-bind="$ctrl.selected.ratingScheme.name"></strong>
-                </content>
-            </waltz-warning>
         </div>
     </div>
 

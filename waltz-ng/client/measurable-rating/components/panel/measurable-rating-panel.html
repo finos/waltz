@@ -88,6 +88,19 @@
                     </div>
                 </div>
 
+
+                <div ng-if="$ctrl.selected.rating && !$ctrl.selected.rating.isValid">
+                    <br>
+                    <waltz-warning>
+                        <message>Invalid rating</message>
+                        <content>
+                            <span>The rating for </span>
+                            <strong ng-bind="$ctrl.selected.measurable.name"></strong>
+                            <span> is not valid because of a limiting assessment</span>
+                        </content>
+                    </waltz-warning>
+                </div>
+
                 <div ng-if="$ctrl.selected.allocations.length > 0">
                     <hr>
                     <div class="row waltz-visibility-parent"
@@ -118,18 +131,6 @@
                                                      replacement-apps="$ctrl.selected.replacementApps"
                                                      application="$ctrl.application">
                     </waltz-planned-decommission-info>
-                </div>
-
-                <div ng-if="$ctrl.selected.rating && !$ctrl.selected.rating.isValid">
-                    <br>
-                    <waltz-warning>
-                        <message>Invalid rating</message>
-                        <content>
-                            <span>The rating for </span>
-                            <strong ng-bind="$ctrl.selected.measurable.name"></strong>
-                            <span> is not valid because of a limiting assessment</span>
-                        </content>
-                    </waltz-warning>
                 </div>
             </div>
         </div>
