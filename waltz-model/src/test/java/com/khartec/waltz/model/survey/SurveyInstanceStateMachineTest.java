@@ -78,14 +78,14 @@ public class SurveyInstanceStateMachineTest {
         assertEquals(REJECTED, state.process(REJECTING, admin, survey));
     }
 
-    @Test(expected = NotAuthorizedException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void permissionCheck() {
         SurveyInstanceStateMachine state = SurveyInstanceStateMachineFactory.simple("NOT_STARTED");
         assertEquals(IN_PROGRESS, state.process(SAVING, participant, survey));
         assertEquals(COMPLETED, state.process(SUBMITTING, participant, survey));
     }
 
-    @Test(expected = NotAuthorizedException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void instanceCheck() {
         SurveyInstanceStateMachine state = SurveyInstanceStateMachineFactory.simple("NOT_STARTED");
         assertEquals(IN_PROGRESS, state.process(SAVING, owner, surveyWithApprovedDate));
