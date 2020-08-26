@@ -91,16 +91,21 @@ public class ScenarioRatingItemService {
         boolean result = scenarioRatingItemDao.updateRating(command, userId);
 
         if (result) {
-            if(command.rating() != command.previousRating()) {
-                writeUpdateRatingLog(command, userId);
+            if (command.hasRatingChanged()) {
+                writeUpdateRatingLog(
+                        command,
+                        userId);
             } else {
-                 writeApplicationChangeLog(command, userId,
+                 writeApplicationChangeLog(
+                         command,
+                         userId,
                          "Updated rating/description for app %s (%s), a comment was added to %s ");
             }
         }
 
         return result;
     }
+
 
     private void writeUpdateRatingLog(ChangeScenarioCommand command, String userId) {
         String message;

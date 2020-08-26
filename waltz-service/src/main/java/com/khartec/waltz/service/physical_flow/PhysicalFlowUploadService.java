@@ -72,7 +72,6 @@ public class PhysicalFlowUploadService {
     private final DataTypeDao dataTypeDao;
     private final LogicalFlowDao logicalFlowDao;
     private final DataTypeDecoratorService dataTypeDecoratorService;
-    private final PhysicalSpecDataTypeService physicalSpecDataTypeService;
     private final PhysicalFlowDao physicalFlowDao;
     private final PhysicalSpecificationDao physicalSpecificationDao;
     private final EnumValueAliasService enumValueAliasService;
@@ -85,7 +84,6 @@ public class PhysicalFlowUploadService {
                                      DataTypeDao dataTypeDao,
                                      LogicalFlowDao logicalFlowDao,
                                      DataTypeDecoratorService dataTypeDecoratorService,
-                                     PhysicalSpecDataTypeService physicalSpecDataTypeService,
                                      PhysicalFlowDao physicalFlowDao,
                                      PhysicalSpecificationDao physicalSpecificationDao,
                                      EnumValueAliasService enumValueAliasService) {
@@ -94,7 +92,6 @@ public class PhysicalFlowUploadService {
         checkNotNull(dataTypeDao, "dataTypeDao cannot be null");
         checkNotNull(dataTypeDecoratorService, "dataTypeDecoratorService cannot be null");
         checkNotNull(logicalFlowDao, "logicalFlowDao cannot be null");
-        checkNotNull(physicalSpecDataTypeService, "physicalSpecDataTypeService cannot be null");
         checkNotNull(physicalFlowDao, "physicalFlowDao cannot be null");
         checkNotNull(physicalSpecificationDao, "physicalSpecificationDao cannot be null");
         checkNotNull(enumValueAliasService, "enumValueAliasService cannot be null");
@@ -102,7 +99,6 @@ public class PhysicalFlowUploadService {
         this.applicationDao = applicationDao;
         this.dataTypeDao = dataTypeDao;
         this.logicalFlowDao = logicalFlowDao;
-        this.physicalSpecDataTypeService = physicalSpecDataTypeService;
         this.physicalFlowDao = physicalFlowDao;
         this.physicalSpecificationDao = physicalSpecificationDao;
         this.enumValueAliasService = enumValueAliasService;
@@ -324,21 +320,21 @@ public class PhysicalFlowUploadService {
 
     private EntityReference getActorRefByName(Map<String, Actor> actorsByName, String name) {
         return Optional.ofNullable(actorsByName.get(lower(name)))
-                .map(a -> a.entityReference())
+                .map(Actor::entityReference)
                 .orElse(null);
     }
 
 
     private EntityReference getAppRefByAssetCode(Map<String, Application> applicationsByAssetCode, String source) {
         return Optional.ofNullable(applicationsByAssetCode.get(lower(source)))
-                .map(a -> a.entityReference())
+                .map(Application::entityReference)
                 .orElse(null);
     }
 
 
     private EntityReference getDataTypeByString(Map<String, DataType> dataTypeMap, String value) {
         return Optional.ofNullable(dataTypeMap.get(lower(value)))
-                .map(a -> a.entityReference())
+                .map(DataType::entityReference)
                 .orElse(null);
     }
 
@@ -433,7 +429,7 @@ public class PhysicalFlowUploadService {
                     .withId(id);
         }
 
-        Long dataTypeId = flow.dataType().id();
+        long dataTypeId = flow.dataType().id();
         EntityReference specificationEntityRef = EntityReference.mkRef(EntityKind.PHYSICAL_SPECIFICATION, spec.id().get());
 
         DataTypeDecorator existingDataType = dataTypeDecoratorService.getByEntityRefAndDataTypeId(specificationEntityRef, dataTypeId);
