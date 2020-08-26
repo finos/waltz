@@ -32,7 +32,9 @@ const bindings = {
     editRole: "@",
     emptyLabel: "@?",
     startInEditMode: "<?",
-    onCancel: "<?"
+    onCancel: "<?",
+    maxDate: "<?",  // only for date fields
+    inlineHelp: "@?"
 };
 
 
@@ -137,7 +139,10 @@ controller.$inject = [];
 const component = {
     template,
     bindings,
-    controller
+    controller,
+    transclude: {
+        inlineHelp: "?inlineHelp"
+    }
 };
 
 
