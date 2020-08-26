@@ -24,7 +24,7 @@ import {timeFormat} from "d3-time-format";
 import {sameRef} from "../../../common/entity-utils";
 import {displayError} from "../../../common/error-utils";
 import * as surveyUtils from "../../survey-utils";
-import * as actions from "./survey-actions";
+import * as actions from "../../survey-actions";
 import moment from "moment";
 
 
@@ -60,6 +60,7 @@ function findMatchingRecipient(recipients = [], person) {
 
 function controller($q,
                     $state,
+                    $timeout,
                     serviceBroker,
                     userService,
                     notification) {
@@ -75,9 +76,8 @@ function controller($q,
                 vm.description = surveyUtils.mkDescription([details.template.description, details.run.description]);
                 vm.people = _.map(details.recipients, d => d.person);
                 vm.availableStatusActions = actions.determineAvailableStatusActions(
-                    details.instance,
-                    details.permissions,
-                    details.isLatest);
+                    details.isLatest,
+                    details.possibleActions);
 
                 const prevVersions = _
                     .chain(details.versions)
@@ -185,12 +185,7 @@ function controller($q,
         }
     };
 
-    vm.invokeStatusAction = (action) => {
-        action
-            .onPerform(serviceBroker, vm.surveyDetails.instance, notification)
-            .then(() => reload(true))
-            .catch(msg => notification.warning(msg))
-    };
+    vm.invokeStatusAction = actions.invokeStatusAction(serviceBroker, notification, reload, $timeout, $state)
 
     // -- LIFECYCLE
 
@@ -205,6 +200,7 @@ function controller($q,
 controller.$inject = [
     "$q",
     "$state",
+    "$timeout",
     "ServiceBroker",
     "UserService",
     "Notification"

@@ -43,6 +43,8 @@ import java.util.List;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.common.OptionalUtilities.contentsEqual;
+import static com.khartec.waltz.model.survey.SurveyInstanceStateMachine.*;
+import static com.khartec.waltz.model.survey.SurveyInstanceStateMachineFactory.simple;
 import static java.util.Optional.ofNullable;
 
 @Service
@@ -167,34 +169,40 @@ public class SurveyInstanceService {
     }
 
 
-    public int updateStatus(String userName, long instanceId, SurveyInstanceStatusChangeCommand command) {
+    public SurveyInstanceStatus updateStatus(String userName, long instanceId, SurveyInstanceStatusChangeCommand command) {
         checkNotNull(command, "command cannot be null");
 
-        if (command.newStatus() != SurveyInstanceStatus.COMPLETED) {
-            checkPersonIsOwnerOrAdmin(userName, instanceId);
+        SurveyInstancePermissions permissions = getPermissions(userName, instanceId);
+        if (command.action() != SurveyInstanceAction.SUBMITTING) {
+            checkTrue(permissions.isAdmin() || permissions.isOwner(),"Permission denied");
         }
 
         SurveyInstance surveyInstance = surveyInstanceDao.getById(instanceId);
+        checkTrue(surveyInstance.originalInstanceId() == null,"You cannot change the status of Approved/Rejected surveys");
 
-        // if survey is being sent back, store current responses as a version
-        if ((surveyInstance.status() == SurveyInstanceStatus.COMPLETED || surveyInstance.status() == SurveyInstanceStatus.APPROVED)
-                && command.newStatus() == SurveyInstanceStatus.REJECTED) {
+        SurveyInstanceStatus newStatus = simple(surveyInstance.status()).process(command.action(), permissions, surveyInstance);
+        if (command.action() == SurveyInstanceAction.REOPENING) {
             long versionedInstanceId = surveyInstanceDao.createPreviousVersion(surveyInstance);
             surveyQuestionResponseDao.cloneResponses(surveyInstance.id().get(), versionedInstanceId);
             surveyInstanceDao.clearApproved(instanceId);
         }
 
-        if ((surveyInstance.status() == SurveyInstanceStatus.APPROVED || surveyInstance.status() == SurveyInstanceStatus.WITHDRAWN)
-                && command.newStatus() == SurveyInstanceStatus.IN_PROGRESS) {
-            long versionedInstanceId = surveyInstanceDao.createPreviousVersion(surveyInstance);
-            surveyQuestionResponseDao.cloneResponses(surveyInstance.id().get(), versionedInstanceId);
-            surveyInstanceDao.clearApproved(instanceId);
+        int nbupdates = 0;
+        switch (command.action()) {
+            case APPROVING:
+                nbupdates = surveyInstanceDao.markApproved(instanceId, userName);
+                break;
+            case REOPENING:
+                // if survey is being sent back, store current responses as a version
+                long versionedInstanceId = surveyInstanceDao.createPreviousVersion(surveyInstance);
+                surveyQuestionResponseDao.cloneResponses(surveyInstance.id().get(), versionedInstanceId);
+                surveyInstanceDao.clearApproved(instanceId);
+            default:
+                nbupdates = surveyInstanceDao.updateStatus(instanceId, newStatus);
         }
 
-        int result = surveyInstanceDao.updateStatus(instanceId, command.newStatus());
-
-        if (result > 0) {
-            if (command.newStatus() == SurveyInstanceStatus.COMPLETED) {
+        if (nbupdates > 0) {
+            if (newStatus == SurveyInstanceStatus.COMPLETED) {
                 surveyInstanceDao.updateSubmitted(instanceId, userName);
             }
 
@@ -203,12 +211,12 @@ public class SurveyInstanceService {
                             .operation(Operation.UPDATE)
                             .userId(userName)
                             .parentReference(EntityReference.mkRef(EntityKind.SURVEY_INSTANCE, instanceId))
-                            .message("Survey Instance: status changed to " + command.newStatus()
+                            .message("Survey Instance: status changed to " + newStatus + " with action " + command.action()
                                     + command.reason().map(r -> ", [Reason]: " + r).orElse(""))
                             .build());
         }
 
-        return result;
+        return newStatus;
     }
 
 
@@ -372,4 +380,30 @@ public class SurveyInstanceService {
                         .build());
     }
 
+    public List<SurveyInstanceAction> findPossibleActionsForInstance(String userName, long instanceId) {
+        SurveyInstance surveyInstance = surveyInstanceDao.getById(instanceId);
+        SurveyInstancePermissions permissions = getPermissions(userName, instanceId);
+        SurveyInstanceStateMachine stateMachine = simple(surveyInstance.status());
+        return stateMachine.nextPossibleActions(permissions, surveyInstance);
+    }
+
+    public SurveyInstancePermissions getPermissions(String userName, Long instanceId) {
+        Person person = personDao.getActiveByUserEmail(userName);
+        SurveyInstance instance = surveyInstanceDao.getById(instanceId);
+        SurveyRun run = surveyRunDao.getById(instance.surveyRunId());
+
+        boolean isAdmin = userRoleService.hasRole(userName, SystemRole.SURVEY_ADMIN);
+        boolean isParticipant = surveyInstanceRecipientDao.isPersonInstanceRecipient(person.id().get(),instanceId);
+        boolean isOwner = person.id().equals(run.ownerId());
+        boolean hasOwningRole = userRoleService.hasRole(person.email(), instance.owningRole());
+        boolean isLatest = instance.originalInstanceId() == null;
+
+        return ImmutableSurveyInstancePermissions.builder()
+                .isAdmin(isAdmin)
+                .isParticipant(isParticipant)
+                .isOwner(isOwner)
+                .hasOwnerRole(hasOwningRole)
+                .isMetaEdit(isLatest && (isAdmin || isOwner || hasOwningRole))
+                .build();
+    }
 }

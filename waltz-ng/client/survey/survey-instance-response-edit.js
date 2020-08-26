@@ -23,6 +23,7 @@ import {CORE_API} from "../common/services/core-api-utils";
 import moment from "moment";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 import template from "./survey-instance-response-edit.html";
+import * as actions from "./survey-actions";
 
 
 const initialState = {
@@ -63,7 +64,7 @@ function controller($location,
         kind: "SURVEY_INSTANCE"
     };
 
-    function boot() {
+    function reload() {
         const responsePromise = serviceBroker
             .loadViewData(CORE_API.SurveyInstanceStore.findResponses, [id])
             .then(r => vm.surveyResponses = SurveyUtils.indexResponses(r.data));
@@ -73,6 +74,9 @@ function controller($location,
             .then(details => {
                 vm.surveyDetails = details;
                 vm.instanceCanBeEdited = _.includes(statusesWhichSupportEditing, details.instance.status);
+                vm.availableStatusActions = actions.determineAvailableStatusActions(
+                    details.isLatest,
+                    details.possibleActions);
             });
 
         reloadQuestions();
@@ -142,47 +146,11 @@ function controller($location,
                 saveParams);
     };
 
-
-    /**
-     * This is a bit of fakery as the questions are saved each time a response is updated.
-     * Therefore this method merely moves the user back to their instance list.
-     */
-    vm.saveForLater = () => {
-        $timeout(() => {
-            notification.success("Survey response saved successfully");
-            $state.go("main.survey.instance.user");
-        }, 200); // allow blur events to fire
-    };
-
-
-    const doSubmit = () => {
-        serviceBroker
-            .execute(
-                CORE_API.SurveyInstanceStore.updateStatus,
-                [vm.surveyDetails.instance.id, {newStatus: "COMPLETED"}])
-            .then(() => {
-                notification.success("Survey response submitted successfully");
-                // we force a reload of the notification store to update any listeners that the number
-                // of open surveys may have changed (i.e. the counter in the profile menu)
-                serviceBroker.loadAppData(
-                    CORE_API.NotificationStore.findAll,
-                    [],
-                    {force: true});
-                $state.go("main.survey.instance.response.view", {id});
-            });
-    };
-
-    vm.submit = () => {
-        $timeout(() => {
-            if (confirm(submissionConfirmationPrompt)) {
-                doSubmit();
-            }
-        }, 200); // allow blur events to fire, because 'confirm' blocks events
-    };
+    vm.invokeStatusAction = actions.invokeStatusAction(serviceBroker, notification, reload, $timeout, $state)
 
 
     // --- BOOT
-    boot();
+    reload();
 
 }
 

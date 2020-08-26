@@ -97,6 +97,14 @@ export function loadSurveyInfo($q,
         .loadViewData(CORE_API.SurveyInstanceStore.getById, [surveyInstanceId], {force})
         .then(r => r.data);
 
+    const possibleActionsPromise = serviceBroker
+        .loadViewData(CORE_API.SurveyInstanceStore.findPossibleActions, [surveyInstanceId], {force})
+        .then(r => r.data);
+
+    const permissionsPromise = serviceBroker
+        .loadViewData(CORE_API.SurveyInstanceStore.getPermissions, [surveyInstanceId], {force})
+        .then(r => r.data);
+
     const versionsPromise = instancePromise
         .then(instance => serviceBroker
             .loadViewData(
@@ -109,20 +117,20 @@ export function loadSurveyInfo($q,
             .loadViewData(CORE_API.SurveyRunStore.getById, [instance.surveyRunId]))
         .then(r => r.data);
 
-    const templatePromise = runPromise
-        .then(run => serviceBroker
-            .loadViewData(CORE_API.SurveyTemplateStore.getById, [run.surveyTemplateId]))
-        .then(r => r.data);
-
     const ownerPromise = runPromise
         .then(run => serviceBroker
             .loadViewData(CORE_API.PersonStore.getById, [run.ownerId]))
         .then(r => r.data);
-
+    
     const owningRolePromise = instancePromise
         .then(instance => serviceBroker
             .loadAppData(CORE_API.RoleStore.findAllRoles)
             .then(r => _.find(r.data, d => d.key === instance.owningRole)));
+
+    const templatePromise = runPromise
+        .then(run => serviceBroker
+            .loadViewData(CORE_API.SurveyTemplateStore.getById, [run.surveyTemplateId]))
+        .then(r => r.data);
 
     const userPromise = userService.whoami();
 
@@ -135,44 +143,34 @@ export function loadSurveyInfo($q,
         runPromise,
         templatePromise,
         recipientsPromise,
+        versionsPromise,
+        subjectPromise,
         ownerPromise,
         owningRolePromise,
-        versionsPromise,
-        subjectPromise
+        possibleActionsPromise,
+        permissionsPromise
     ];
 
     return $q
         .all(promises)
-        .then(([u, instance, run, template, recipients, owner, owningRole, versions, subject]) => {
-
-            const people = _.map(recipients, d => d.person);
+        .then(([u, instance, run, template, recipients,  versions, subject, owner, ownerRole, possibleActions, permissions]) => {
+            
             const latestInstanceId = instance.originalInstanceId || instance.id;
-
             const isLatest = latestInstanceId === instance.id;
-            const isOwner = owner.userId === u.userName;
-            const isParticipant = _.some(people, p => p.userId === u.userName);
-            const hasOwningRole = _.includes(u.roles, instance.owningRole);
-            const isAdmin = userService.hasRole(u, roles.SURVEY_ADMIN);
-
-            const permissions = {
-                admin: isAdmin,
-                owner: isOwner || hasOwningRole,
-                participant: isParticipant,
-                metaEdit: isLatest && (isOwner || isAdmin)
-            };
 
             const result = {
                 instance,
                 recipients,
-                owner,
-                owningRole,
                 run,
                 template,
                 isLatest,
                 latestInstanceId,
-                permissions,
                 versions,
-                subject
+                subject,
+                owner,
+                ownerRole,
+                possibleActions,
+                permissions
             };
 
             return result;

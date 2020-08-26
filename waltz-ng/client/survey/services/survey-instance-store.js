@@ -71,6 +71,18 @@ function store($http, baseApiUrl) {
             .then(result => result.data);
     };
 
+    const findPossibleActions = (id) => {
+        return $http
+            .get(`${base}/${id}/actions`)
+            .then(result => result.data);
+    };
+
+    const getPermissions = (id) => {
+        return $http
+            .get(`${base}/${id}/permissions`)
+            .then(result => result.data);
+    };
+
     const saveResponse = (id, questionResponse) => {
         return $http
             .put(`${base}/${id}/response`, questionResponse)
@@ -109,12 +121,13 @@ function store($http, baseApiUrl) {
 
     const deleteRecipient = (id, instanceRecipientId) => {
         return $http
-            .delete(`${base}/${id}/recipient/${instanceRecipientId}`,)
+            .delete(`${base}/${id}/recipient/${instanceRecipientId}`)
             .then(result => result.data);
     };
 
     return {
         getById,
+        getPermissions,
         findByEntityReference,
         findForRecipientId,
         findForUser,
@@ -122,6 +135,7 @@ function store($http, baseApiUrl) {
         findPreviousVersions,
         findRecipients,
         findResponses,
+        findPossibleActions,
         saveResponse,
         updateStatus,
         updateDueDate,
@@ -182,6 +196,16 @@ export const SurveyInstanceStore_API = {
         serviceName,
         serviceFnName: 'findPreviousVersions',
         description: 'finds previouse versions for a given survey instance id'
+    },
+    findPossibleActions: {
+        serviceName,
+        serviceFnName: 'findPossibleActions',
+        description: 'finds all possible action on this survey instance'
+    },
+    getPermissions: {
+        serviceName,
+        serviceFnName: 'getPermissions',
+        description: 'get permissions for this survey instance'
     },
     saveResponse: {
         serviceName,
