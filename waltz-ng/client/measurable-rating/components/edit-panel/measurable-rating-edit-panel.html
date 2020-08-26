@@ -219,7 +219,8 @@
                                      on-select="$ctrl.onRatingSelect"
                                      on-keypress="$ctrl.onKeypress">
                 </waltz-rating-picker>
-                <div class="text-muted" ng-if="$ctrl.disallowedRatingIds">
+                <div class="text-muted"
+                     ng-if="$ctrl.disallowedRatingIds && $ctrl.disallowedRatingIds.length > 0">
                     <waltz-icon name="info-circle"></waltz-icon>
                     <span>Some ratings are restricted due to the the outcome of an assessment</span>
                 </div>

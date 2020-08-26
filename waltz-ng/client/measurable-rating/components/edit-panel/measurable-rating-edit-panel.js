@@ -327,6 +327,8 @@ function controller($q,
                 .loadViewData(CORE_API.MeasurableCategoryStore.findDisallowedRatingsForEntity,
                     [category.id, vm.parentEntityRef])
                 .then(r => vm.disallowedRatingIds = r.data);
+        } else {
+            vm.disallowedRatingIds = [];
         }
     };
 
