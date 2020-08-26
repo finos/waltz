@@ -120,6 +120,17 @@
                     </waltz-planned-decommission-info>
                 </div>
 
+                <div ng-if="$ctrl.selected.rating && !$ctrl.selected.rating.isValid">
+                    <br>
+                    <waltz-warning>
+                        <message>Invalid rating</message>
+                        <content>
+                            <span>The rating for </span>
+                            <strong ng-bind="$ctrl.selected.measurable.name"></strong>
+                            <span> is not valid because of a limiting assessment</span>
+                        </content>
+                    </waltz-warning>
+                </div>
             </div>
         </div>
     </div>

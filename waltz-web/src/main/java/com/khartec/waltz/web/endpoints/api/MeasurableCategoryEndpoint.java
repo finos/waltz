@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.measurable_category.MeasurableCategory;
 import com.khartec.waltz.service.measurable_category.MeasurableCategoryService;
 import com.khartec.waltz.web.DatumRoute;
@@ -26,8 +27,7 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.web.WebUtilities.getId;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 
@@ -51,6 +51,7 @@ public class MeasurableCategoryEndpoint implements Endpoint {
         String findAllPath = mkPath(BASE_URL, "all");
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String getCategoriesByDirectOrgUnitPath = mkPath(BASE_URL, "direct", "org-unit", ":id");
+        String findDisallowedRatingsForEntityPath = mkPath(BASE_URL, "kind", ":kind", "id", ":id", "category-id", ":categoryId", "disallowed-ratings");
 
         ListRoute<MeasurableCategory> findAllRoute = (request, response)
                 -> measurableCategoryService.findAll();
@@ -61,8 +62,17 @@ public class MeasurableCategoryEndpoint implements Endpoint {
         DatumRoute<MeasurableCategory> getByIdRoute = (request, response)
                 -> measurableCategoryService.getById(getId(request));
 
+        ListRoute<Long> findDisallowedRatingsForEntityRoute = (request, response) -> {
+
+            EntityReference ref = getEntityReference(request);
+            long categoryId = getLong(request, "categoryId");
+
+            return measurableCategoryService.findDisallowedRatingIdsForEntity(ref, categoryId);
+        };
+
         getForList(findAllPath, findAllRoute);
         getForList(getCategoriesByDirectOrgUnitPath, findCategoriesByDirectOrgUnitRoute);
+        getForList(findDisallowedRatingsForEntityPath, findDisallowedRatingsForEntityRoute);
         getForDatum(getByIdPath, getByIdRoute);
     }
 

@@ -129,6 +129,10 @@ export function loadAllData(
             { force })
         .then(r => ({ratings: r.data}));
 
+    const assessmentRatingsPromise = serviceBroker
+        .loadViewData(CORE_API.AssessmentRatingStore.findForEntityReference, [ parentEntityRef ])
+        .then(r => ({assessmentRatings: r.data}));
+
     const allocationsPromise = serviceBroker
         .loadViewData(
             CORE_API.AllocationStore.findByEntity,
@@ -157,7 +161,8 @@ export function loadAllData(
             allocationsPromise,
             allocationSchemesPromise,
             decommPromise,
-            roadmapsPromise])
+            roadmapsPromise,
+            assessmentRatingsPromise])
         .then(results => Object.assign({}, ...results));
 }
 
@@ -173,6 +178,8 @@ export function mkTabs(ctx, includeEmpty = false) {
     const measurablesByCategory = _.groupBy(ctx.measurables, d => d.categoryId);
     const allocationSchemesByCategory = _.groupBy(ctx.allocationSchemes, d => d.measurableCategoryId);
 
+    const assessmentsBySchemeId = _.keyBy(ctx.assessmentRatings, d => d.ratingId);
+
     return _
         .chain(ctx.categories)
         .map(category => {
@@ -182,11 +189,24 @@ export function mkTabs(ctx, includeEmpty = false) {
                 ctx.ratings,
                 r => _.includes(measurableIds, r.measurableId));
             const ratingScheme = ctx.ratingSchemesById[category.ratingSchemeId];
+            const noLimitingAssessment = _.isNull(category.assessmentDefinitionId);
+
+            const ratingsWithValidity = (noLimitingAssessment)
+                ? _.map(ratingsForCategory, r =>  Object.assign({}, r, {isValid: true}))
+                : _.map(ratingsForCategory, d => {
+
+                    const limitingAssessment = _.find(assessmentsBySchemeId, d => d.assessmentDefinitionId === category.assessmentDefinitionId);
+                    const limitingRating = _.find(ratingScheme.ratings, r => r.id === limitingAssessment.ratingId);
+                    const rating = _.find(ratingScheme.ratings, r => r.rating === d.rating);
+
+                    return Object.assign({}, d, {isValid: rating.position >= limitingRating.position})
+                });
+
             return {
                 category,
                 ratingScheme,
                 measurables: measurablesForCategory,
-                ratings: ratingsForCategory,
+                ratings: ratingsWithValidity,
                 allocationSchemes: allocationSchemesByCategory[category.id] || [],
                 allocations: ctx.allocations
             };
@@ -208,4 +228,3 @@ export function getDateAsUtc(inputDate) {
     const finalDate = moment.utc({year: inputDateAsMoment.year(), month: inputDateAsMoment.month(), date: inputDateAsMoment.date()});
     return finalDate.toISOString();
 }
-

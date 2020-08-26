@@ -28,11 +28,13 @@ const bindings = {
     onSelect: "<?",
     onKeypress: "<?",
     schemeId: "<",
+    disallowedRatingIds: "<?"
 };
 
 
 const initialState = {
     pickerStyle: {},
+    disallowedRatingIds: [],
     onSelect: (rating) => "No onSelect handler defined for rating-picker: " + rating,
 };
 
@@ -48,7 +50,7 @@ function controller(serviceBroker) {
                 .loadAppData(CORE_API.RatingSchemeStore.getById, [vm.schemeId])
                 .then(r => vm.options = _
                     .chain(r.data.ratings)
-                    .filter(d => d.userSelectable)
+                    .filter(d => d.userSelectable && !_.includes(vm.disallowedRatingIds, d.id))
                     .map(d => Object.assign({}, d, { foregroundColor: determineForegroundColor(d.color) }))
                     .orderBy(d => d.position)
                     .value());

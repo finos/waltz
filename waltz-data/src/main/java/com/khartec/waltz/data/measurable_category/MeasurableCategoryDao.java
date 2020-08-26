@@ -20,6 +20,7 @@ package com.khartec.waltz.data.measurable_category;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.measurable_category.ImmutableMeasurableCategory;
 import com.khartec.waltz.model.measurable_category.MeasurableCategory;
 import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
@@ -32,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -54,6 +56,7 @@ public class MeasurableCategoryDao {
                 .lastUpdatedAt(r.getLastUpdatedAt().toLocalDateTime())
                 .editable(r.getEditable())
                 .ratingEditorRole(r.getRatingEditorRole())
+                .assessmentDefinitionId(Optional.ofNullable(r.getAssessmentDefinitionId()))
                 .build();
     };
 
@@ -105,5 +108,28 @@ public class MeasurableCategoryDao {
                 .where(MEASURABLE_CATEGORY.ID.in(categoryIds))
                 .fetch(TO_DOMAIN_MAPPER);
 
+    }
+
+
+    public List<Long> findDisallowedRatingIdsForEntity(EntityReference ref, long id) {
+
+        Integer assessmentRatingConstraint = dsl
+                .selectDistinct(RATING_SCHEME_ITEM.POSITION)
+                .from(MEASURABLE_CATEGORY)
+                .innerJoin(ASSESSMENT_RATING)
+                .on(MEASURABLE_CATEGORY.ASSESSMENT_DEFINITION_ID.eq(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID))
+                .innerJoin(RATING_SCHEME_ITEM).on(RATING_SCHEME_ITEM.ID.eq(ASSESSMENT_RATING.RATING_ID))
+                .where(MEASURABLE_CATEGORY.ID.eq(id)
+                        .and(ASSESSMENT_RATING.ENTITY_ID.eq(ref.id())
+                                .and(ASSESSMENT_RATING.ENTITY_KIND.eq(ref.kind().name()))))
+                .fetchOne(RATING_SCHEME_ITEM.POSITION);
+
+        return dsl
+                .select(RATING_SCHEME_ITEM.ID)
+                .from(RATING_SCHEME_ITEM)
+                .innerJoin(MEASURABLE_CATEGORY).on(RATING_SCHEME_ITEM.SCHEME_ID.eq(MEASURABLE_CATEGORY.RATING_SCHEME_ID))
+                .where(RATING_SCHEME_ITEM.POSITION.lt(assessmentRatingConstraint))
+                .and(MEASURABLE_CATEGORY.ID.eq(id))
+                .fetch(RATING_SCHEME_ITEM.ID);
     }
 }

@@ -36,4 +36,104 @@
         </addColumn>
     </changeSet>
 
+
+    <changeSet id="20200824-5036-1"
+               author="woodjes">
+        <addColumn tableName="measurable_category">
+            <column name="assessment_definition_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20200824-5036-2"
+               author="woodjes">
+        <insert tableName="rating_scheme">
+            <column name="name" value="Application Investment Status"/>
+            <column name="description" value="Investment status of an application"/>
+        </insert>
+    </changeSet>
+
+    <changeSet id="20200824-5036-3"
+               author="woodjes">
+        <sql>
+            INSERT INTO rating_scheme_item (scheme_id, name, description, code, color, position)
+            SELECT id,
+            'Invest',
+            'The overall rating for this application is invest',
+            'G',
+            '#5BB65D',
+            10
+            FROM rating_scheme
+            WHERE name = 'Application Investment Status';
+        </sql>
+        <sql>
+            INSERT INTO rating_scheme_item (scheme_id, name, description, code, color, position)
+            SELECT id,
+            'Maintain',
+            'The overall rating for this application is maintain',
+            'A',
+            '#D9923F',
+            20
+            FROM rating_scheme
+            WHERE name = 'Application Investment Status';
+        </sql>
+        <sql>
+            INSERT INTO rating_scheme_item (scheme_id, name, description, code, color, position)
+            SELECT id,
+            'Disinvest',
+            'The overall rating for this application is disinvest',
+            'R',
+            '#DA524B',
+            30
+            FROM rating_scheme
+            WHERE name = 'Application Investment Status';
+        </sql>
+        <sql>
+            INSERT INTO rating_scheme_item (scheme_id, name, description, code, color, position)
+            SELECT id,
+            'Unknown',
+            'The overall rating for this application is unknown',
+            'Z',
+            '#939393',
+            0
+            FROM rating_scheme
+            WHERE name = 'Application Investment Status';
+        </sql>
+    </changeSet>
+
+    <changeSet id="20200824-5036-4"
+               author="woodjes">
+        <sql>
+            INSERT INTO assessment_definition (name,
+            external_id,
+            rating_scheme_id,
+            entity_kind,
+            description,
+            last_updated_by,
+            provenance,
+            visibility)
+            SELECT 'Application Investment Status',
+            'APPLICATION_INVESTMENT_STATUS',
+            id,
+            'APPLICATION',
+            'The overall rating for this application',
+            'admin',
+            'waltz',
+            'PRIMARY'
+            FROM rating_scheme
+            WHERE name = 'Application Investment Status';
+        </sql>
+    </changeSet>
+
+    <changeSet id="20200824-5036-5"
+               author="woodjes">
+        <update tableName="assessment_definition">
+            <column name="is_readonly"
+                    valueBoolean="true"/>
+            <where>name = 'Application Investment Status'</where>
+        </update>
+    </changeSet>
+
 </databaseChangeLog>

@@ -321,12 +321,23 @@ function controller($q,
         }
     };
 
+    const findDisallowedRatings = (category) => {
+        if(category.assessmentDefinitionId){
+            return serviceBroker
+                .loadViewData(CORE_API.MeasurableCategoryStore.findDisallowedRatingsForEntity,
+                    [category.id, vm.parentEntityRef])
+                .then(r => vm.disallowedRatingIds = r.data);
+        }
+    };
+
     vm.onTabChange = () => {
         deselectMeasurable();
 
         if(_.isUndefined(vm.activeTab)){
             vm.activeTab = _.first(vm.tabs);
         }
+
+        findDisallowedRatings(vm.activeTab.category);
 
         vm.onKeypress = mkRatingsKeyHandler(
             vm.activeTab.ratingScheme.ratings,
