@@ -86,6 +86,10 @@
                     <username>${database.user}</username>
                     <password>${database.password}</password>
                     <promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
+                    <!--
+                        Enable the `exclude-ft` context if testing with linux mssql image as full text not yet supported
+                        <contexts>exclude-ft</contexts>
+                    -->
                 </configuration>
 
                 <executions>
