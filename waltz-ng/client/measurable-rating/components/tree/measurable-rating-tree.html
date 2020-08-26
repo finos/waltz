@@ -68,7 +68,8 @@
                         'waltz-inactive' : node.measurable.entityLifecycleStatus === 'REMOVED'
                   }"
                   class="no-overflow wmrt-label">
-                <span ng-bind="::node.displayName">
+                <span ng-bind="::node.displayName"
+                      ng-class="{'wmrt-label-warning': node.rating && !node.rating.isValid}">
                 </span>
                 <span style="position: relative; top: -1px"
                       class="waltz-visibility-child-30">
