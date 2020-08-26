@@ -24,6 +24,8 @@ import com.khartec.waltz.model.Nullable;
 import com.khartec.waltz.model.command.Command;
 import org.immutables.value.Value;
 
+import java.util.Objects;
+
 @Value.Immutable
 @JsonSerialize(as = ImmutableChangeScenarioCommand.class)
 @JsonDeserialize(as = ImmutableChangeScenarioCommand.class)
@@ -39,4 +41,9 @@ public abstract class ChangeScenarioCommand implements Command {
     public abstract Character previousRating();
     @Nullable
     public abstract String comment();
+
+    @Value.Derived
+    public boolean hasRatingChanged() {
+        return !Objects.equals(rating(), previousRating());
+    }
 }
