@@ -74,7 +74,6 @@ public class SurveyInstanceEndpoint implements Endpoint {
         String saveResponsePath = mkPath(BASE_URL, ":id", "response");
         String updateStatusPath = mkPath(BASE_URL, ":id", "status");
         String updateDueDatePath = mkPath(BASE_URL, ":id", "due-date");
-        String markApprovedPath = mkPath(BASE_URL, ":id", "approval");
         String recipientPath = mkPath(BASE_URL, ":id", "recipient");
         String deleteRecipientPath = mkPath(BASE_URL, ":id", "recipient", ":instanceRecipientId");
 
@@ -149,16 +148,6 @@ public class SurveyInstanceEndpoint implements Endpoint {
                     command);
         };
 
-        DatumRoute<Integer> markApprovedRoute = (req, res) -> {
-            StringChangeCommand command = readBody(req, StringChangeCommand.class);
-
-            return surveyInstanceService.markApproved(
-                    getUsername(req),
-                    getId(req),
-                    command.newStringVal().orElse(null));
-        };
-
-
         DatumRoute<Boolean> updateRecipientRoute =
                 (req, res) -> {
                     SurveyInstanceRecipientUpdateCommand command = readBody(req, SurveyInstanceRecipientUpdateCommand.class);
@@ -191,7 +180,6 @@ public class SurveyInstanceEndpoint implements Endpoint {
         putForDatum(saveResponsePath, saveResponseRoute);
         putForDatum(updateStatusPath, updateStatusRoute);
         putForDatum(updateDueDatePath, updateDueDateRoute);
-        putForDatum(markApprovedPath, markApprovedRoute);
         putForDatum(recipientPath, updateRecipientRoute);
         postForDatum(recipientPath, addRecipientRoute);
         deleteForDatum(deleteRecipientPath, deleteRecipientRoute);
