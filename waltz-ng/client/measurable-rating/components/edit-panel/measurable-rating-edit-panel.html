@@ -213,31 +213,12 @@
             </div>
             <div class="col-sm-9">
                 <waltz-rating-picker selected="$ctrl.selected.rating.rating"
-                                     scheme-id="$ctrl.selected.ratingScheme.id"
-                                     disallowed-rating-ids="$ctrl.disallowedRatingIds"
+                                     rating-scheme-items="$ctrl.selected.ratingSchemeItems"
                                      edit-disabled="$ctrl.saveInProgress"
                                      on-select="$ctrl.onRatingSelect"
                                      on-keypress="$ctrl.onKeypress">
                 </waltz-rating-picker>
-                <div class="text-muted"
-                     ng-if="$ctrl.disallowedRatingIds && $ctrl.disallowedRatingIds.length > 0">
-                    <waltz-icon name="info-circle"></waltz-icon>
-                    <span>Some ratings are restricted due to the the outcome of an assessment</span>
-                </div>
             </div>
-        </div>
-
-        <div ng-if="$ctrl.selected.rating && !$ctrl.selected.rating.isValid">
-            <br>
-            <waltz-warning>
-                <message>Invalid rating</message>
-                <content>
-                    <span>The rating for </span>
-                    <strong ng-bind="$ctrl.selected.measurable.name"></strong>
-                    <span> is not valid because of a limiting assessment rating </span>
-                    <strong ng-bind="$ctrl.selected.ratingScheme.name"></strong>
-                </content>
-            </waltz-warning>
         </div>
 
         <!-- COMMENT -->

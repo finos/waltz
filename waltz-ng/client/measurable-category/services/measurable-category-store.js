@@ -35,15 +35,10 @@ function store($http, baseApiUrl) {
         .then(d => d.data);
 
 
-    const findDisallowedRatingsForEntity = (categoryId, ref) => $http
-        .get(`${baseUrl}/kind/${ref.kind}/id/${ref.id}/category-id/${categoryId}/disallowed-ratings`)
-        .then(d => d.data);
-
     return {
         findAll,
         getById,
-        findCategoriesByDirectOrgUnit,
-        findDisallowedRatingsForEntity
+        findCategoriesByDirectOrgUnit
     };
 
 }
@@ -73,10 +68,5 @@ export const MeasurableCategoryStore_API = {
         serviceName,
         serviceFnName: "findCategoriesByDirectOrgUnit",
         description: "retrieves list of category ids with measurables directly related to org unit"
-    },
-    findDisallowedRatingsForEntity: {
-        serviceName,
-        serviceFnName: "findDisallowedRatingsForEntity",
-        description: "finds list of ids that are not allowed due to assessment rating outcome"
     }
 };

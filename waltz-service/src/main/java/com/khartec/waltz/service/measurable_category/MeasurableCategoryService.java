@@ -19,13 +19,11 @@
 package com.khartec.waltz.service.measurable_category;
 
 import com.khartec.waltz.data.measurable_category.MeasurableCategoryDao;
-import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.measurable_category.MeasurableCategory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.List;
 
 @Service
 public class MeasurableCategoryService {
@@ -50,7 +48,4 @@ public class MeasurableCategoryService {
         return measurableCategoryDao.findCategoriesByDirectOrgUnit(id);
     }
 
-    public List<Long> findDisallowedRatingIdsForEntity(EntityReference ref, long id){
-        return measurableCategoryDao.findDisallowedRatingIdsForEntity(ref, id);
-    }
 }

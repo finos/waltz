@@ -158,6 +158,13 @@ function controller($q,
 
         vm.selected = Object.assign({}, node, { category, hasWarnings, ratingScheme });
         vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: false, ratingEditor: true});
+
+        serviceBroker
+            .loadViewData(CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
+            [vm.parentEntityRef, category.id])
+            .then(r => {
+                vm.selected.ratingSchemeItems = r.data;
+            });
     };
 
     const reloadDecommData = () => {
@@ -321,16 +328,6 @@ function controller($q,
         }
     };
 
-    const findDisallowedRatings = (category) => {
-        if(category.assessmentDefinitionId){
-            return serviceBroker
-                .loadViewData(CORE_API.MeasurableCategoryStore.findDisallowedRatingsForEntity,
-                    [category.id, vm.parentEntityRef])
-                .then(r => vm.disallowedRatingIds = r.data);
-        } else {
-            vm.disallowedRatingIds = [];
-        }
-    };
 
     vm.onTabChange = () => {
         deselectMeasurable();
@@ -339,7 +336,6 @@ function controller($q,
             vm.activeTab = _.first(vm.tabs);
         }
 
-        findDisallowedRatings(vm.activeTab.category);
 
         vm.onKeypress = mkRatingsKeyHandler(
             vm.activeTab.ratingScheme.ratings,

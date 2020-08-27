@@ -445,7 +445,10 @@ function controller($q,
             .then( () => serviceBroker.loadAppData(
                 CORE_API.RatingSchemeStore.getById,
                 [ vm.scenarioDefn.roadmap.ratingSchemeId ]))
-            .then(r => vm.ratingsByCode = _.keyBy(r.data.ratings, "rating"));
+            .then(r => {
+                vm.ratingsByCode = _.keyBy(r.data.ratings, "rating");
+                vm.ratingSchemeItems = r.data.ratings;
+            });
 
         $q.all([scenarioPromise, applicationPromise, measurablePromise])
             .then(() => {

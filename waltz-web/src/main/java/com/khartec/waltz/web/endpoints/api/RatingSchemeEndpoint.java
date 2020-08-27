@@ -18,14 +18,16 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.rating.RagName;
 import com.khartec.waltz.service.rating_scheme.RatingSchemeService;
+import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.web.WebUtilities.getId;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 
@@ -46,8 +48,17 @@ public class RatingSchemeEndpoint implements Endpoint {
     public void register() {
         String findAllPath = BASE_URL;
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
+        String findRatingSchemeItemsForEntityAndCategoryPath = mkPath(BASE_URL, "items", "kind", ":kind", "id", ":id", "category-id", ":categoryId");
+
+        ListRoute<RagName> findRatingSchemeItemsForEntityAndCategoryRoute = (request, response) -> {
+            EntityReference ref = getEntityReference(request);
+            long categoryId = getLong(request, "categoryId");
+
+            return ratingSchemeService.findRatingSchemeItemsForEntityAndCategory(ref, categoryId);
+        };
 
         getForList(findAllPath, (req, resp) -> ratingSchemeService.findAll());
+        getForList(findRatingSchemeItemsForEntityAndCategoryPath, findRatingSchemeItemsForEntityAndCategoryRoute);
         getForDatum(getByIdPath, (req, resp) -> ratingSchemeService.getById(getId(req)));
     }
 }
