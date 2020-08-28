@@ -104,7 +104,7 @@
     <div style="padding-top: 6px">
         <waltz-measurable-rating-tree ratings="$ctrl.activeTab.ratings"
                                       allocations="$ctrl.activeTab.allocations"
-                                      rating-scheme="$ctrl.activeTab.ratingScheme"
+                                      rating-scheme-items="$ctrl.activeTab.ratingSchemeItems"
                                       measurables="$ctrl.activeTab.measurables"
                                       on-keypress="$ctrl.onKeypress"
                                       scroll-height="600"
@@ -213,7 +213,7 @@
             </div>
             <div class="col-sm-9">
                 <waltz-rating-picker selected="$ctrl.selected.rating.rating"
-                                     rating-scheme-items="$ctrl.selected.ratingSchemeItems"
+                                     rating-scheme-items="$ctrl.activeTab.ratingSchemeItems"
                                      edit-disabled="$ctrl.saveInProgress"
                                      on-select="$ctrl.onRatingSelect"
                                      on-keypress="$ctrl.onKeypress">

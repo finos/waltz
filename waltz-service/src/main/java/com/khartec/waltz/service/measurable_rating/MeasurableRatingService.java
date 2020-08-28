@@ -33,9 +33,11 @@ import com.khartec.waltz.model.measurable_rating.MeasurableRating;
 import com.khartec.waltz.model.measurable_rating.MeasurableRatingCommand;
 import com.khartec.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
 import com.khartec.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
+import com.khartec.waltz.model.rating.RagName;
 import com.khartec.waltz.model.tally.MeasurableRatingTally;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.rating_scheme.RatingSchemeService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,8 +46,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.common.Checks.*;
 import static java.lang.String.format;
 
 @Service
@@ -55,6 +56,7 @@ public class MeasurableRatingService {
     private final MeasurableDao measurableDao;
     private final MeasurableCategoryDao measurableCategoryDao;
     private final ChangeLogService changeLogService;
+    private final RatingSchemeService ratingSchemeService;
     private final EntityReferenceNameResolver entityReferenceNameResolver;
 
     private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
@@ -66,16 +68,19 @@ public class MeasurableRatingService {
                                    MeasurableDao measurableDao,
                                    MeasurableCategoryDao measurableCategoryDao,
                                    ChangeLogService changeLogService,
+                                   RatingSchemeService ratingSchemeService,
                                    EntityReferenceNameResolver entityReferenceNameResolver) {
         checkNotNull(measurableRatingDao, "measurableRatingDao cannot be null");
         checkNotNull(measurableDao, "measurableDao cannot be null");
         checkNotNull(measurableCategoryDao, "measurableCategoryDao cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
+        checkNotNull(ratingSchemeService, "ratingSchemeService cannot be null");
 
         this.measurableRatingDao = measurableRatingDao;
         this.measurableDao = measurableDao;
         this.measurableCategoryDao = measurableCategoryDao;
         this.changeLogService = changeLogService;
+        this.ratingSchemeService = ratingSchemeService;
         this.entityReferenceNameResolver = entityReferenceNameResolver;
     }
 
@@ -104,6 +109,8 @@ public class MeasurableRatingService {
 
     public Collection<MeasurableRating> save(SaveMeasurableRatingCommand command) {
         checkNotNull(command, "command cannot be null");
+
+        checkRatingIsAllowable(command);
 
         Measurable measurable = measurableDao.getById(command.measurableId());
         checkNotNull(measurable, format("Unknown measurable with id: %d", command.measurableId()));
@@ -257,5 +264,22 @@ public class MeasurableRatingService {
                 ? command.entityReference()
                 : entityReferenceNameResolver.resolve(command.entityReference()).orElse(command.entityReference());
         return entityReference.name().orElse("");
+    }
+
+
+    private void checkRatingIsAllowable(SaveMeasurableRatingCommand command) {
+
+        long measurableCategory = measurableDao.getById(command.measurableId()).categoryId();
+        EntityReference entityReference = command.entityReference();
+
+        Boolean isRestricted = ratingSchemeService
+                .findRatingSchemeItemsForEntityAndCategory(entityReference, measurableCategory)
+                .stream()
+                .filter(r -> r.rating().equals(command.rating()))
+                .map(RagName::isRestricted)
+                .findFirst()
+                .orElse(false);
+
+        checkFalse(isRestricted, "New rating is restricted, rating not saved");
     }
 }

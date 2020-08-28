@@ -41,7 +41,7 @@
                author="woodjes">
         <addColumn tableName="measurable_category">
             <column name="assessment_definition_id"
-                    type="${id.type}">measurable_category_pkey
+                    type="${id.type}">
                 <constraints nullable="true"/>
             </column>
         </addColumn>

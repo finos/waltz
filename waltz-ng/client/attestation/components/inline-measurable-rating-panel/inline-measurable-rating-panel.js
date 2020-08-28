@@ -19,7 +19,7 @@
 import {initialiseData} from "../../../common";
 
 import template from "./inline-measurable-rating-panel.html";
-import {loadAllData} from "../../../measurable-rating/measurable-rating-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
@@ -40,14 +40,28 @@ const initialState = {
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    const loadData = (force = false) => {
-        return loadAllData($q, serviceBroker, vm.parentEntityRef, false, true)
-            .then(results => Object.assign(vm, ...results));
+    const loadData = () => {
+        serviceBroker
+            .loadAppData(CORE_API.MeasurableStore.findAll)
+            .then(r => vm.measurables = _
+                .filter(r.data, d => d.categoryId === vm.measurableCategoryRef.id));
+
+        serviceBroker
+            .loadViewData(CORE_API.MeasurableRatingStore.findForEntityReference,
+                [vm.parentEntityRef],
+                {force: true})
+            .then(r => vm.ratings = r.data);
+
+        serviceBroker.loadViewData(CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
+            [vm.parentEntityRef, vm.measurableCategoryRef.id])
+            .then(r => vm.ratingSchemeItems = r.data);
     };
 
-    vm.$onInit = () => loadData();
 
     vm.$onChanges = (changes) => {
+        if(vm.parentEntityRef && vm.measurableCategoryRef){
+            loadData();
+        }
     };
 }
 
