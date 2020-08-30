@@ -52,6 +52,7 @@ function controller() {
     };
 
     function pieOnSelect(d) {
+        console.log('onSelect', d)
         if (d.isOverspillSummary === true || vm.config.onSelect == null) {
             vm.selectedSegmentKey = d.key;
         } else {
