@@ -16,7 +16,6 @@
  *
  */
 import _ from "lodash";
-import {event} from "d3-selection";
 import {initialiseData} from "../../../common";
 import {downloadTextFile} from "../../../common/file-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
@@ -286,15 +285,15 @@ function controller($element,
                 })
             },
             type: {
-                onSelect: d => {
-                    event.stopPropagation();
+                onSelect: (d, e) => {
+                    e.stopPropagation();
                     vm.filterOptions.typeIds = [d.id];
                     filterChanged();
                 }
             },
             typeBlock: {
-                onSelect: () => {
-                    event.stopPropagation();
+                onSelect: (d, e) => {
+                    e.stopPropagation();
                     resetTypeFilter();
                 }
             }
