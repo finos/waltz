@@ -92,7 +92,7 @@ function mkNodeMenu($timeout, logicalFlowStore, vm, flowDiagramStateService) {
     return (d) => {
         return [
             {
-                title: (e, d) => `Add upstream source to ${d.data.name}`,
+                title: (d) => console.log({d}) || `Add upstream source to ${d.data.name}`,
                 action: (elm, d) => {
                     $timeout(() => {
                         prepareAddLogicalFlowPopup(d, true, logicalFlowStore, flowDiagramStateService)
@@ -104,7 +104,7 @@ function mkNodeMenu($timeout, logicalFlowStore, vm, flowDiagramStateService) {
                     });
                 }
             }, {
-                title: (e, d) => `Add downstream target from ${d.data.name}`,
+                title: (d) => `Add downstream target from ${d.data.name}`,
                 action: (elm, d, i) => {
                     $timeout(() => {
                         prepareAddLogicalFlowPopup(d, false, logicalFlowStore, flowDiagramStateService)
@@ -116,7 +116,7 @@ function mkNodeMenu($timeout, logicalFlowStore, vm, flowDiagramStateService) {
                     });
                 }
             }, {
-                title: (e, d) => `Add annotation to ${d.data.name}`,
+                title: (d) => `Add annotation to ${d.data.name}`,
                 action: (elm, d, i) => {
                     $timeout(() => {
                         vm.popup = prepareAddAnnotationPopup(d);
@@ -126,7 +126,7 @@ function mkNodeMenu($timeout, logicalFlowStore, vm, flowDiagramStateService) {
             }, {
                 divider: true
             }, {
-                title: (e, d) => `Remove ${d.data.name}`,
+                title: (d) => `Remove ${d.data.name}`,
                 action: (elm, d, i) =>
                     vm.issueCommands([{command: "REMOVE_NODE", payload: d}])
             }
