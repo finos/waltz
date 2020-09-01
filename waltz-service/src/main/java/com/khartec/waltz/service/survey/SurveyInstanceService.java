@@ -387,12 +387,14 @@ public class SurveyInstanceService {
                         .build());
     }
 
+
     public List<SurveyInstanceAction> findPossibleActionsForInstance(String userName, long instanceId) {
         SurveyInstance surveyInstance = surveyInstanceDao.getById(instanceId);
         SurveyInstancePermissions permissions = getPermissions(userName, instanceId);
         SurveyInstanceStateMachine stateMachine = simple(surveyInstance.status());
         return stateMachine.nextPossibleActions(permissions, surveyInstance);
     }
+
 
     public SurveyInstancePermissions getPermissions(String userName, Long instanceId) {
         Person person = personDao.getActiveByUserEmail(userName);
