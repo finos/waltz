@@ -27,6 +27,7 @@ import com.khartec.waltz.model.survey.ImmutableSurveyInstanceQuestionResponse;
 import com.khartec.waltz.model.survey.ImmutableSurveyQuestionResponse;
 import com.khartec.waltz.model.survey.SurveyInstanceQuestionResponse;
 import com.khartec.waltz.model.survey.SurveyQuestionResponse;
+import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.records.SurveyQuestionListResponseRecord;
 import com.khartec.waltz.schema.tables.records.SurveyQuestionResponseRecord;
 import org.jooq.*;
@@ -40,10 +41,14 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.common.CollectionUtilities.first;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.common.StringUtilities.ifEmpty;
 import static com.khartec.waltz.common.StringUtilities.join;
 import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
@@ -108,7 +113,7 @@ public class SurveyQuestionResponseDao {
                 .where(SURVEY_QUESTION_LIST_RESPONSE.SURVEY_INSTANCE_ID.eq(surveyInstanceId))
                 .fetch()
                 .stream()
-                .collect(groupingBy(r -> r.getQuestionId(), toList()));
+                .collect(groupingBy(SurveyQuestionListResponseRecord::getQuestionId, toList()));
 
         // fetch responses
         List<SurveyInstanceQuestionResponse> responses = dsl.select(SURVEY_QUESTION_RESPONSE.fields())
@@ -123,8 +128,8 @@ public class SurveyQuestionResponseDao {
                     if (questionIdToListResponses.containsKey(r.questionResponse().questionId())) {
                         List<String> listResponse = questionIdToListResponses.get(r.questionResponse().questionId())
                                 .stream()
-                                .sorted(comparingInt(lr -> lr.getPosition()))
-                                .map(lr -> lr.getResponse())
+                                .sorted(comparingInt(SurveyQuestionListResponseRecord::getPosition))
+                                .map(SurveyQuestionListResponseRecord::getResponse)
                                 .collect(toList());
 
                         return ImmutableSurveyInstanceQuestionResponse
@@ -137,6 +142,39 @@ public class SurveyQuestionResponseDao {
                     }
                 })
                 .collect(toList());
+    }
+
+
+    public int deletePreviousResponse(List<SurveyInstanceQuestionResponse> previousResponses) {
+        checkNotNull(previousResponses, "responses cannot be null");
+        if (!previousResponses.isEmpty()) {
+            Set<Long> instanceIds = map(
+                    previousResponses,
+                    SurveyInstanceQuestionResponse::surveyInstanceId);
+
+            checkTrue(instanceIds.size() == 1, "All responses must for the same surveyInstance");
+            final Long instanceId = first(previousResponses).surveyInstanceId();
+
+            final Set<Long> previousResponseIds = map(
+                    previousResponses,
+                    qr -> qr.questionResponse().questionId());
+
+            int rmSingleCount = dsl
+                    .deleteFrom(Tables.SURVEY_QUESTION_RESPONSE)
+                    .where(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.eq(instanceId))
+                    .and(SURVEY_QUESTION_RESPONSE.QUESTION_ID.in(previousResponseIds))
+                    .execute();
+
+            int rmListCount = dsl
+                    .deleteFrom(SURVEY_QUESTION_LIST_RESPONSE)
+                    .where(SURVEY_QUESTION_LIST_RESPONSE.SURVEY_INSTANCE_ID.eq(instanceId))
+                    .and(SURVEY_QUESTION_LIST_RESPONSE.QUESTION_ID.in(previousResponseIds))
+                    .execute();
+
+            return rmSingleCount + rmListCount;
+        } else {
+            return 0;
+        }
     }
 
 
@@ -269,7 +307,7 @@ public class SurveyQuestionResponseDao {
                                     .map(DateTimeUtilities::toSqlDate)
                                     .orElse(null));
         record.setEntityResponseKind(entityResponse.map(er -> er.kind().name()).orElse(null));
-        record.setEntityResponseId(entityResponse.map(er -> er.id()).orElse(null));
+        record.setEntityResponseId(entityResponse.map(EntityReference::id).orElse(null));
         record.setListResponseConcat(questionResponse.listResponse()
                                         .filter(l -> ! l.isEmpty())
                                         .map(l -> join(l, ";;"))
