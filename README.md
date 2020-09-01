@@ -50,7 +50,7 @@ See [pom.xml](https://github.com/finos/waltz/blob/master/pom.xml) for a full lis
 
 - Browser based
     - IE 10+, Chrome, Safari, Firefox)
-- AngularJS 1.5
+- AngularJS 1.7
 - Bootstrap 3
 - D3 
 
@@ -85,7 +85,7 @@ Individual and organisational contributors are listed in [the contributors file]
 
 ## License
 
-Copyright (C) 2019 Waltz open source project
+Copyright (C) 2020 Waltz open source project
 
 Distributed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
