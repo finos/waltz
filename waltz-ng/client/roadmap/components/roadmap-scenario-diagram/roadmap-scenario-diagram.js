@@ -105,10 +105,10 @@ function hideInfoPopup() {
 }
 
 
-function showInfoPopup(html) {
+function showInfoPopup(html, e) {
     return select(`.${styles.INFOPOP}`)
-        .style("left", (event.pageX - 2) + "px")
-        .style("top", (event.pageY - 2) + "px")
+        .style("left", (e.pageX - 2) + "px")
+        .style("top", (e.pageY - 2) + "px")
         .style("display", "block")
         .html(html)
         .select(`.${styles.INFOPOP_CLOSE}`)
@@ -333,7 +333,7 @@ function controller($q,
             return _.compact([
                 hide,
                 data.axisOrientation === "COLUMN" ? contract : null,
-                data.axisOrientation === 'COLUMN' ? expand : null
+                data.axisOrientation === "COLUMN" ? expand : null
             ]);
         };
     }
@@ -381,7 +381,7 @@ function controller($q,
             .attr("class", styles.INFOPOP);
 
         return {
-            onNodeClick: (d) => {
+            onNodeClick: (e, d) => {
                 const name = d.node.name;
                 const column = d.domainCoordinates.column.name;
                 const row = d.domainCoordinates.row.name;
@@ -423,7 +423,7 @@ function controller($q,
                     </a>
                 `;
 
-                showInfoPopup(html);
+                showInfoPopup(html, e);
             },
             onNodeGridClick: () => {
                 hideInfoPopup();
