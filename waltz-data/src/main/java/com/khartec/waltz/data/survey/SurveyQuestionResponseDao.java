@@ -40,9 +40,12 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.StringUtilities.ifEmpty;
 import static com.khartec.waltz.common.StringUtilities.join;
@@ -50,8 +53,7 @@ import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
 import static com.khartec.waltz.schema.Tables.SURVEY_QUESTION_LIST_RESPONSE;
 import static com.khartec.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
 import static java.util.Comparator.comparingInt;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.*;
 import static org.jooq.impl.DSL.*;
 
 @Repository
@@ -139,6 +141,25 @@ public class SurveyQuestionResponseDao {
                 .collect(toList());
     }
 
+    public int deletePreviousResponse(List<SurveyInstanceQuestionResponse> previousResponses) {
+        checkNotNull(previousResponses, "responses cannot be null");
+        if (!previousResponses.isEmpty()) {
+            Set<Long> instanceIds = previousResponses.stream().map(qr -> qr.surveyInstanceId()).collect(toSet());
+            checkTrue(instanceIds.size() == 1, "All responses must for the same surveyInstance");
+            final Long instanceId = previousResponses.get(0).surveyInstanceId();
+
+            final Set<Long> previousResponseIds = previousResponses.stream()
+                    .map(qr -> qr.questionResponse().questionId())
+                    .collect(toSet());
+
+            return dsl.deleteFrom(SURVEY_QUESTION_LIST_RESPONSE)
+                    .where(SURVEY_QUESTION_LIST_RESPONSE.SURVEY_INSTANCE_ID.eq(instanceId))
+                    .and(SURVEY_QUESTION_LIST_RESPONSE.QUESTION_ID.in(previousResponseIds))
+                    .execute();
+        } else {
+            return 0;
+        }
+    }
 
     public void saveResponse(SurveyInstanceQuestionResponse response) {
         checkNotNull(response, "response cannot be null");

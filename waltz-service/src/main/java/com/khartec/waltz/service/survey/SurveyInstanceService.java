@@ -38,12 +38,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.common.OptionalUtilities.contentsEqual;
-import static com.khartec.waltz.model.survey.SurveyInstanceStateMachine.*;
 import static com.khartec.waltz.model.survey.SurveyInstanceStateMachineFactory.simple;
 import static java.util.Optional.ofNullable;
 
@@ -56,8 +59,9 @@ public class SurveyInstanceService {
     private final SurveyInstanceRecipientDao surveyInstanceRecipientDao;
     private final SurveyQuestionResponseDao surveyQuestionResponseDao;
     private final SurveyInstanceIdSelectorFactory surveyInstanceIdSelectorFactory = new SurveyInstanceIdSelectorFactory();
-    private SurveyRunDao surveyRunDao;
-    private UserRoleService userRoleService;
+    private final SurveyRunDao surveyRunDao;
+    private final UserRoleService userRoleService;
+    private final SurveyQuestionService surveyQuestionService;
 
 
     @Autowired
@@ -67,7 +71,9 @@ public class SurveyInstanceService {
                                  SurveyInstanceRecipientDao surveyInstanceRecipientDao,
                                  SurveyQuestionResponseDao surveyQuestionResponseDao,
                                  SurveyRunDao surveyRunDao,
-                                 UserRoleService userRoleService) {
+                                 UserRoleService userRoleService,
+                                 SurveyQuestionService surveyQuestionService) {
+
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(personDao, "personDao cannot be null");
         checkNotNull(surveyInstanceDao, "surveyInstanceDao cannot be null");
@@ -75,6 +81,7 @@ public class SurveyInstanceService {
         checkNotNull(surveyQuestionResponseDao, "surveyQuestionResponseDao cannot be null");
         checkNotNull(surveyRunDao, "surveyRunDao cannot be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
+        checkNotNull(surveyQuestionService, "surveyQuestionService cannot be null");
 
         this.changeLogService = changeLogService;
         this.personDao = personDao;
@@ -83,6 +90,7 @@ public class SurveyInstanceService {
         this.surveyQuestionResponseDao = surveyQuestionResponseDao;
         this.surveyRunDao = surveyRunDao;
         this.userRoleService = userRoleService;
+        this.surveyQuestionService = surveyQuestionService;
     }
 
 
@@ -180,6 +188,9 @@ public class SurveyInstanceService {
         SurveyInstance surveyInstance = surveyInstanceDao.getById(instanceId);
         checkTrue(surveyInstance.originalInstanceId() == null,"You cannot change the status of Approved/Rejected surveys");
 
+
+        removeUnnecessaryResponses(instanceId);
+
         SurveyInstanceStatus newStatus = simple(surveyInstance.status()).process(command.action(), permissions, surveyInstance);
         if (command.action() == SurveyInstanceAction.REOPENING) {
             long versionedInstanceId = surveyInstanceDao.createPreviousVersion(surveyInstance);
@@ -219,6 +230,27 @@ public class SurveyInstanceService {
         return newStatus;
     }
 
+    protected int removeUnnecessaryResponses(long instanceId) {
+        List<SurveyQuestion> availableQuestions = surveyQuestionService.findForSurveyInstance(instanceId);
+        List<SurveyInstanceQuestionResponse> questionResponses = surveyQuestionResponseDao.findForInstance(instanceId);
+        Set<Long> availableQuestionIds = availableQuestions.stream()
+                .map(q -> q.id().orElse(0L))
+                .collect(Collectors.toSet());
+
+        List<SurveyInstanceQuestionResponse> toRemove = new ArrayList<>();
+        for (SurveyInstanceQuestionResponse qr: questionResponses) {
+            if (!availableQuestionIds.contains(qr.questionResponse().questionId())) {
+                toRemove.add(qr);
+            }
+        }
+
+        if (!toRemove.isEmpty()) {
+            return surveyQuestionResponseDao.deletePreviousResponse(toRemove);
+        } else {
+            return 0;
+        }
+    }
+
 
     public int updateDueDate(String userName, long instanceId, DateChangeCommand command) {
         checkNotNull(userName, "userName cannot be null");
@@ -237,28 +269,6 @@ public class SurveyInstanceService {
                         .userId(userName)
                         .parentReference(EntityReference.mkRef(EntityKind.SURVEY_INSTANCE, instanceId))
                         .message("Survey Instance: due date changed to " + newDueDate)
-                        .build());
-
-        return result;
-    }
-
-
-    public int markApproved(String userName, long instanceId, String reason) {
-        checkNotNull(userName, "userName cannot be null");
-
-        checkPersonIsOwnerOrAdmin(userName, instanceId);
-        SurveyInstance surveyInstance = surveyInstanceDao.getById(instanceId);
-
-        checkTrue(surveyInstance.status() == SurveyInstanceStatus.COMPLETED, "Only completed surveys can be approved");
-
-        int result = surveyInstanceDao.markApproved(instanceId, userName);
-
-        changeLogService.write(
-                ImmutableChangeLog.builder()
-                        .operation(Operation.UPDATE)
-                        .userId(userName)
-                        .parentReference(EntityReference.mkRef(EntityKind.SURVEY_INSTANCE, instanceId))
-                        .message("Survey Instance: Approved" + ofNullable(reason).map(r -> ", [Reason]: " + r).orElse(""))
                         .build());
 
         return result;
