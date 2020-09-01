@@ -30,6 +30,7 @@ import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.model.survey.*;
 import com.khartec.waltz.model.user.SystemRole;
+import com.khartec.waltz.model.utils.IdUtilities;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.user.UserRoleService;
 import org.jooq.Record1;
@@ -39,16 +40,13 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.common.OptionalUtilities.contentsEqual;
 import static com.khartec.waltz.model.survey.SurveyInstanceStateMachineFactory.simple;
-import static java.util.Optional.ofNullable;
 
 @Service
 public class SurveyInstanceService {
@@ -141,8 +139,8 @@ public class SurveyInstanceService {
 
         SurveyInstance surveyInstance = surveyInstanceDao.getById(instanceId);
         checkTrue(surveyInstance.status() == SurveyInstanceStatus.NOT_STARTED
-                    || surveyInstance.status() == SurveyInstanceStatus.IN_PROGRESS
-                    || surveyInstance.status() == SurveyInstanceStatus.REJECTED,
+                        || surveyInstance.status() == SurveyInstanceStatus.IN_PROGRESS
+                        || surveyInstance.status() == SurveyInstanceStatus.REJECTED,
                 "Survey instance cannot be updated, current status: " + surveyInstance.status());
 
         SurveyInstanceQuestionResponse instanceQuestionResponse = ImmutableSurveyInstanceQuestionResponse.builder()
@@ -182,14 +180,13 @@ public class SurveyInstanceService {
 
         SurveyInstancePermissions permissions = getPermissions(userName, instanceId);
         if (command.action() != SurveyInstanceAction.SUBMITTING) {
-            checkTrue(permissions.isAdmin() || permissions.isOwner(),"Permission denied");
+            checkTrue(permissions.isAdmin() || permissions.isOwner(), "Permission denied");
         }
 
         SurveyInstance surveyInstance = surveyInstanceDao.getById(instanceId);
-        checkTrue(surveyInstance.originalInstanceId() == null,"You cannot change the status of Approved/Rejected surveys");
+        checkTrue(surveyInstance.originalInstanceId() == null, "You cannot change the status of Approved/Rejected surveys");
 
 
-        removeUnnecessaryResponses(instanceId);
 
         SurveyInstanceStatus newStatus = simple(surveyInstance.status()).process(command.action(), permissions, surveyInstance);
         if (command.action() == SurveyInstanceAction.REOPENING) {
@@ -208,6 +205,7 @@ public class SurveyInstanceService {
                 long versionedInstanceId = surveyInstanceDao.createPreviousVersion(surveyInstance);
                 surveyQuestionResponseDao.cloneResponses(surveyInstance.id().get(), versionedInstanceId);
                 surveyInstanceDao.clearApproved(instanceId);
+                // intended drop thru'
             default:
                 nbupdates = surveyInstanceDao.updateStatus(instanceId, newStatus);
         }
@@ -215,6 +213,7 @@ public class SurveyInstanceService {
         if (nbupdates > 0) {
             if (newStatus == SurveyInstanceStatus.COMPLETED) {
                 surveyInstanceDao.updateSubmitted(instanceId, userName);
+                removeUnnecessaryResponses(instanceId);
             }
 
             changeLogService.write(
@@ -230,15 +229,14 @@ public class SurveyInstanceService {
         return newStatus;
     }
 
+
     protected int removeUnnecessaryResponses(long instanceId) {
         List<SurveyQuestion> availableQuestions = surveyQuestionService.findForSurveyInstance(instanceId);
         List<SurveyInstanceQuestionResponse> questionResponses = surveyQuestionResponseDao.findForInstance(instanceId);
-        Set<Long> availableQuestionIds = availableQuestions.stream()
-                .map(q -> q.id().orElse(0L))
-                .collect(Collectors.toSet());
+        Set<Long> availableQuestionIds = IdUtilities.toIds(availableQuestions);
 
         List<SurveyInstanceQuestionResponse> toRemove = new ArrayList<>();
-        for (SurveyInstanceQuestionResponse qr: questionResponses) {
+        for (SurveyInstanceQuestionResponse qr : questionResponses) {
             if (!availableQuestionIds.contains(qr.questionResponse().questionId())) {
                 toRemove.add(qr);
             }
@@ -276,7 +274,7 @@ public class SurveyInstanceService {
 
 
     public List<SurveyInstance> findBySurveyInstanceIdSelector(IdSelectionOptions idSelectionOptions) {
-        checkNotNull(idSelectionOptions,  "idSelectionOptions cannot be null");
+        checkNotNull(idSelectionOptions, "idSelectionOptions cannot be null");
 
         Select<Record1<Long>> selector = surveyInstanceIdSelectorFactory.apply(idSelectionOptions);
 
@@ -303,7 +301,6 @@ public class SurveyInstanceService {
 
         return rc;
     }
-
 
 
     public boolean updateRecipient(String username, SurveyInstanceRecipientUpdateCommand command) {
@@ -403,8 +400,8 @@ public class SurveyInstanceService {
         SurveyRun run = surveyRunDao.getById(instance.surveyRunId());
 
         boolean isAdmin = userRoleService.hasRole(userName, SystemRole.SURVEY_ADMIN);
-        boolean isParticipant = surveyInstanceRecipientDao.isPersonInstanceRecipient(person.id().get(),instanceId);
-        boolean isOwner = person.id().equals(run.ownerId());
+        boolean isParticipant = surveyInstanceRecipientDao.isPersonInstanceRecipient(person.id().get(), instanceId);
+        boolean isOwner = contentsEqual(person.id(), run.ownerId());
         boolean hasOwningRole = userRoleService.hasRole(person.email(), instance.owningRole());
         boolean isLatest = instance.originalInstanceId() == null;
 
