@@ -70,6 +70,10 @@
                   class="no-overflow wmrt-label">
                 <span ng-bind="::node.displayName">
                 </span>
+                <waltz-icon name="exclamation-triangle"
+                            ng-if="node.ratingSchemeItem.isRestricted"
+                            style="color: red; position: relative; top: -1px">
+                </waltz-icon>
                 <span style="position: relative; top: -1px"
                       class="waltz-visibility-child-30">
                     <waltz-icon name="sticky-note-o"
@@ -153,5 +157,12 @@
             This application will be taking over this feature from existing application/s
         </div>
 
+        <div ng-if="node.ratingSchemeItem.isRestricted"
+             style="border-top: 1px solid #eee; margin-top: 12px; padding-top: 4px"
+             class="text-muted">
+            <waltz-icon name="exclamation-triangle">
+            </waltz-icon>
+            This rating is in breach of the constraining assessment
+        </div>
     </div>
 </script>

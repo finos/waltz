@@ -35,7 +35,7 @@ const bindings = {
     replacingDecommissions: "<?",
     replacementApps: "<?",
     ratings: "<",
-    ratingScheme: "<",
+    ratingSchemeItems: "<",
     measurables: "<",
     onKeypress: "<",
     onSelect: "<",
@@ -52,7 +52,7 @@ const initialState = {
     hierarchy: [],
     measurables: [],
     ratings: [],
-    ratingScheme: null,
+    ratingSchemeItems: [],
     searchTerms: "",
     treeOptions: {
         nodeChildren: "children",
@@ -103,10 +103,10 @@ function controller() {
     vm.$onInit = () => initialiseData(vm, initialState);
 
     vm.$onChanges = (c) => {
-        const toDisplayName = m => truncateMiddle(m.name, 96);
+        const toDisplayName = m => truncateMiddle(m.name, 70);
 
         const ratingsByMeasurable = _.keyBy(vm.ratings || [], "measurableId");
-        const ratingSchemeItemsByCode = _.keyBy(_.get(vm.ratingScheme, "ratings", []), "rating");
+        const ratingSchemeItemsByCode = _.keyBy(vm.ratingSchemeItems, "rating");
         const allocationsByMeasurable = _.groupBy(vm.allocations, d => d.measurableId);
         const decommissionDatesByMeasurable = _.keyBy(vm.plannedDecommissions, d => d.measurableId);
         const replacementAppsByDecommissionId = _.groupBy(vm.replacementApps, d => d.decommissionId);
