@@ -81,9 +81,6 @@ const dimensions = {
 const ANGLE_OFFSET = -0.7;
 const ANIMATION_DURATION = 300;
 
-const TRANSITION = transition()
-    .ease(easeLinear)
-    .duration(ANIMATION_DURATION);
 
 const styles = {
     centerNodes: "wrmv-center-nodes",
@@ -174,15 +171,14 @@ function drawOuterNodes(group, buckets = [], deltaAngle, handlers) {
         .selectAll(`.${styles.outerNode}`)
         .data(buckets, d => d.id);
 
-
     // -- ENTER --
     const newOuterNodes = outerNodes
         .enter()
         .append("g")
         .classed(styles.outerNode, true)
-        .on("click", d => {
+        .on("click", (e, d) => {
             handlers.onCategorySelect(d);
-            stopPropagation(event);
+            stopPropagation(e);
         })
         .attr("transform", `translate(${dimensions.width / 2}, ${dimensions.height / 2})`);
 
@@ -213,7 +209,9 @@ function drawOuterNodes(group, buckets = [], deltaAngle, handlers) {
         .classed(styles.selected, d => d.isSelected)
         .classed(styles.hasRelationships, d => d.count > 0)
         .classed(styles.noRelationships, d => d.count === 0)
-        .transition(TRANSITION)
+        .transition()
+        .ease(easeLinear)
+        .duration(ANIMATION_DURATION)
         .attr("transform", (d, i) => {
             const { x, y } = calculatePositionOfOuterNode(deltaAngle(i));
             return `translate(${x}, ${y})`;
@@ -221,7 +219,9 @@ function drawOuterNodes(group, buckets = [], deltaAngle, handlers) {
 
     allOuterNodes
         .select("circle")
-        .transition(TRANSITION)
+        .transition()
+        .ease(easeLinear)
+        .duration(ANIMATION_DURATION)
         .attr("r", d => {
             const hasRelationships = d.count > 0;
             const scaleFactor = hasRelationships
