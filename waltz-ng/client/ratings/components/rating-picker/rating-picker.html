@@ -26,7 +26,7 @@
         <input type="radio"
                value="{{ option.rating }}"
                ng-model='$ctrl.selected'
-               ng-disabled="$ctrl.editDisabled"
+               ng-disabled="$ctrl.editDisabled || option.isRestricted"
                ng-change="$ctrl.onSelect(option.rating)"
                id="wrp-inp-{{ option.rating }}-{{ $id }}">
         <label for="wrp-inp-{{ option.rating }}-{{ $id }}"
@@ -34,8 +34,16 @@
                     'background-color': option.color,
                     'color': option.foregroundColor
                }"
-               ng-bind="option.name"
-               class="clickable">
+               class="clickable"
+               uib-popover="This rating is restricted due to an assessment outcome"
+               popover-enable="option.isRestricted"
+               popover-append-to-body="true"
+               popover-popup-delay="300"
+               popover-trigger="mouseenter">
+            <waltz-icon ng-if="option.isRestricted" name="lock" fixed-width="true"></waltz-icon>
+            <waltz-icon ng-if="!option.isRestricted" fixed-width="true"></waltz-icon>
+            <span ng-bind="option.name">
+            </span>
         </label>
         <div class="small text-muted"
              ng-if="option.description"

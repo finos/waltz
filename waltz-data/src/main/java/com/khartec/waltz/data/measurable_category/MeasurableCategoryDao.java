@@ -54,6 +54,7 @@ public class MeasurableCategoryDao {
                 .lastUpdatedAt(r.getLastUpdatedAt().toLocalDateTime())
                 .editable(r.getEditable())
                 .ratingEditorRole(r.getRatingEditorRole())
+                .assessmentDefinitionId(Optional.ofNullable(r.getAssessmentDefinitionId()))
                 .build();
     };
 
@@ -104,6 +105,5 @@ public class MeasurableCategoryDao {
                 .selectFrom(MEASURABLE_CATEGORY)
                 .where(MEASURABLE_CATEGORY.ID.in(categoryIds))
                 .fetch(TO_DOMAIN_MAPPER);
-
     }
 }

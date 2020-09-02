@@ -26,6 +26,7 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 const bindings = {
     attestationKind: "<",
     parentEntityRef: "<",
+    attestedEntityRef: "<?",
     onConfirm: "<?",
     onCancel: "<?"
 };

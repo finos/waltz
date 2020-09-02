@@ -208,4 +208,3 @@ export function getDateAsUtc(inputDate) {
     const finalDate = moment.utc({year: inputDateAsMoment.year(), month: inputDateAsMoment.month(), date: inputDateAsMoment.date()});
     return finalDate.toISOString();
 }
-

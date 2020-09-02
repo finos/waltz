@@ -62,6 +62,7 @@ function controller($q, serviceBroker) {
                 vm.tabs = mkTabs(vm, false);
                 const firstNonEmptyTab = determineStartingTab(vm.tabs);
                 vm.visibility.tab = firstNonEmptyTab ? firstNonEmptyTab.category.id : null;
+                vm.onTabChange(firstNonEmptyTab);
             });
     };
 
@@ -113,6 +114,13 @@ function controller($q, serviceBroker) {
 
     vm.onTabChange = (tab) => {
         hideAllocationScheme();
+
+        serviceBroker
+            .loadViewData(CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
+                [vm.parentEntityRef, tab.category.id])
+            .then(r => {
+                tab.ratingSchemeItems = r.data;
+            });
     };
 
 }
