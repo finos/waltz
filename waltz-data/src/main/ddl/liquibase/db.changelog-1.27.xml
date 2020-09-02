@@ -73,4 +73,81 @@
                                  referencedColumnNames="id"/>
     </changeSet>
 
+
+    <!-- 5061: Software Version Vulnerabilities -->
+    <changeSet id="20200902-5061-1"
+               author="kamransaleem">
+        <comment>5061: Vulnerability</comment>
+        <createTable tableName="vulnerability">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="vulnerability_pkey"/>
+            </column>
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="false"
+                             unique="true"
+                             uniqueConstraintName="idx_vulnerability_external_id" />
+            </column>
+            <column name="severity"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="20200902-5061-2"
+               author="kamransaleem">
+        <comment>5061: software version vulnerability table</comment>
+        <createTable tableName="software_version_vulnerability">
+            <column name="software_version_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="vulnerability_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false" />
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20200902-5061-3"
+               author="kamransaleem">
+        <comment>5061: adding unique index on software version vulnerability (software version id, vulnerability id)</comment>
+        <createIndex tableName="software_version_vulnerability"
+                     unique="true"
+                     indexName="idx_svv_version_vulnerability">
+            <column name="software_version_id"
+                    type="${id.type}" />
+            <column name="vulnerability_id"
+                    type="${id.type}" />
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
