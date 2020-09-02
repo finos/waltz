@@ -44,4 +44,7 @@ public abstract class RagName implements
     public boolean userSelectable() {
         return true;
     }
+
+    @Value.Default
+    public boolean isRestricted() { return false; }
 }

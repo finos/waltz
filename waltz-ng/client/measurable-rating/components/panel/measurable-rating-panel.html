@@ -19,7 +19,7 @@
 <div class="row">
     <div class="col-sm-6">
         <waltz-measurable-rating-tree ratings="$ctrl.ratings"
-                                      rating-scheme="$ctrl.ratingScheme"
+                                      rating-scheme-items="$ctrl.ratingSchemeItems"
                                       on-select="$ctrl.onSelect"
                                       allocations="$ctrl.allocations"
                                       measurables="$ctrl.measurables"
@@ -88,6 +88,7 @@
                     </div>
                 </div>
 
+
                 <div ng-if="$ctrl.selected.allocations.length > 0">
                     <hr>
                     <div class="row waltz-visibility-parent"
@@ -119,7 +120,6 @@
                                                      application="$ctrl.application">
                     </waltz-planned-decommission-info>
                 </div>
-
             </div>
         </div>
     </div>

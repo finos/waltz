@@ -17,41 +17,39 @@
  */
 import {initialiseData} from "../../../common";
 import _ from "lodash";
-import {CORE_API} from "../../../common/services/core-api-utils";
 import {determineForegroundColor} from "../../../common/colors";
 import template from "./rating-picker.html";
 
 
 const bindings = {
-    selected: "<",
+    selected: "<", // code of selected item
     editDisabled: "<",
     onSelect: "<?",
     onKeypress: "<?",
-    schemeId: "<",
+    ratingSchemeItems: "<",
 };
 
 
 const initialState = {
     pickerStyle: {},
+    ratingSchemeItems: [],
     onSelect: (rating) => "No onSelect handler defined for rating-picker: " + rating,
 };
 
 
-function controller(serviceBroker) {
+function controller() {
     const vm = this;
 
     vm.$onInit = () => initialiseData(this, initialState);
 
     vm.$onChanges = (c) => {
-        if (c.schemeId && vm.schemeId) {
-            serviceBroker
-                .loadAppData(CORE_API.RatingSchemeStore.getById, [vm.schemeId])
-                .then(r => vm.options = _
-                    .chain(r.data.ratings)
-                    .filter(d => d.userSelectable)
-                    .map(d => Object.assign({}, d, { foregroundColor: determineForegroundColor(d.color) }))
-                    .orderBy(d => d.position)
-                    .value());
+        if (c.ratingSchemeItems && vm.ratingSchemeItems) {
+            vm.options = _
+                .chain(vm.ratingSchemeItems)
+                .filter(d => d.userSelectable)
+                .map(d => Object.assign({}, d, { foregroundColor: determineForegroundColor(d.color) }))
+                .orderBy(d => d.position)
+                .value();
         }
         if (c.editDisabled) {
             vm.pickerStyle = vm.editDisabled
@@ -62,9 +60,6 @@ function controller(serviceBroker) {
     }
 
 }
-
-
-controller.$inject = [ "ServiceBroker" ];
 
 
 const component = {

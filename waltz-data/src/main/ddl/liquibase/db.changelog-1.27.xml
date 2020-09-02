@@ -52,4 +52,25 @@
         <dropTable tableName="attestation_1_11"/>
     </changeSet>
 
+    <!-- 5036: limiting assessment on measurable category -->
+    <changeSet id="20200824-5036-1"
+               author="woodjes">
+        <addColumn tableName="measurable_category">
+            <column name="assessment_definition_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20191017-5036-2"
+               author="woodjes">
+        <comment>5036: fk between measurable category and assessment definition</comment>
+        <addForeignKeyConstraint baseTableName="measurable_category"
+                                 baseColumnNames="assessment_definition_id"
+                                 constraintName="measurable_category_assessment_def_fk"
+                                 referencedTableName="assessment_definition"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
 </databaseChangeLog>

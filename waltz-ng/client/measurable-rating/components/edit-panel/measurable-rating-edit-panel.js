@@ -96,10 +96,11 @@ function controller($q,
         const showAllCategories = hasNoRatings || vm.visibility.showAllCategories;
         const allTabs = mkTabs(vm, showAllCategories);
         vm.tabs = _.filter(allTabs, t => _.includes(vm.userRoles, t.category.ratingEditorRole));
-
         vm.hasHiddenTabs = vm.categories.length !== allTabs.length;
         if (vm.activeTab) {
+            const ratingSchemeItems =  vm.activeTab.ratingSchemeItems;
             vm.activeTab = _.find(vm.tabs, t => t.category.id === vm.activeTab.category.id);
+            vm.activeTab.ratingSchemeItems = ratingSchemeItems;
         }
     };
 
@@ -124,7 +125,10 @@ function controller($q,
                 const newRating = { rating, description };
                 vm.selected = Object.assign({}, vm.selected, { rating: newRating });
             })
-            .catch(e => displayError(notification, "Could not save rating", e))
+            .catch(e => {
+                displayError(notification, "Could not save rating", e);
+                throw e;
+            })
     };
 
     const doRemove = () => {
@@ -158,6 +162,7 @@ function controller($q,
 
         vm.selected = Object.assign({}, node, { category, hasWarnings, ratingScheme });
         vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: false, ratingEditor: true});
+
     };
 
     const reloadDecommData = () => {
@@ -291,7 +296,7 @@ function controller($q,
             ? doRemove()
                 .then(() => notification.success(`Removed: ${vm.selected.measurable.name}`))
             : doRatingSave(r, getDescription())
-                .then(() => notification.success(`Saved: ${vm.selected.measurable.name}`));
+                .then(() => notification.success(`Saved: ${vm.selected.measurable.name}`))
     };
 
     vm.onSaveComment = (comment) => {
@@ -321,6 +326,7 @@ function controller($q,
         }
     };
 
+
     vm.onTabChange = () => {
         deselectMeasurable();
 
@@ -328,8 +334,15 @@ function controller($q,
             vm.activeTab = _.first(vm.tabs);
         }
 
+        serviceBroker
+            .loadViewData(CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
+                [vm.parentEntityRef, vm.activeTab.category.id])
+            .then(r => {
+                vm.activeTab.ratingSchemeItems = r.data;
+            });
+
         vm.onKeypress = mkRatingsKeyHandler(
-            vm.activeTab.ratingScheme.ratings,
+            vm.activeTab.ratingSchemeItems,
             vm.onRatingSelect,
             vm.doCancel);
     };
