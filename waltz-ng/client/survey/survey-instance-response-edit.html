@@ -216,14 +216,19 @@
 
             <div class="row">
                 <div class="col-sm-12">
-                    <div class="pull-right" style="padding-right: 1em;">
-                        <span ng-repeat="action in ctrl.availableStatusActions">
+                    <div class="pull-right">
+                        <span ng-repeat="action in ctrl.availableStatusActions" >
                             <a class="btn btn-xs"
-                               ng-class="'btn-{{action.severity}}'"
-                               ng-click="ctrl.invokeStatusAction(action, ctrl.surveyDetails.instance.id)">
+                                ng-if="action.type.includes('response')"
+                                ng-disabled="action.isDisabled(surveyResponseForm)"
+                                ng-class="'btn-{{action.severity}}'"
+                                ng-click="!action.isDisabled(surveyResponseForm) && ctrl.invokeStatusAction(action, ctrl.surveyDetails.instance.id)">
                                 <span ng-bind="action.name"></span>
                             </a>
                         </span>
+                    </div>
+                    <div class="pull-right" style="padding-right: 1em;">
+
 
                         <div ng-if="surveyResponseForm.$invalid"
                              class="help-block">
