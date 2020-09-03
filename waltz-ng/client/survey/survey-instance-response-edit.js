@@ -148,7 +148,6 @@ function controller($location,
 
     vm.invokeStatusAction = actions.invokeStatusAction(serviceBroker, notification, reload, $timeout, $state)
 
-
     // --- BOOT
     reload();
 

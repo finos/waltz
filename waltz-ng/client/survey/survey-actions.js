@@ -54,26 +54,24 @@ export function determineAvailableStatusActions(isLatest, possibleActions, form)
             act.actionName =  possibleAction.name;
             act.actionDisplay =  possibleAction.display;
             act.isCommentMandatory =  possibleAction.commentMandatory;
-            act.isDisabled = form && form.$invalid && act.validation && act.validation.includes("isFormValid")
+            act.isDisabled = (form) => form && form.$invalid && act.validation && act.validation.includes("isFormValid")
             return act;
         });
 }
 
 export function invokeStatusAction(serviceBroker, notification, reloader, $timeout, $state)  {
     return function(action, id) {
-        if (action.isDisabled) return;
-        
         const display = action.actionDisplay
         const verb = action.verb
         const name = action.actionName
-        
+
         // SHOW MESSAGE
         const msg = "Are you sure you want " + display + " this survey?"
         const reason = action.isCommentMandatory
             ? prompt(msg + " Please enter a reason below (mandatory):")
             : confirm(msg);
-        
-        // SEND API SERVER CALL    
+
+        // SEND API SERVER CALL
         const prom = reason
             ? serviceBroker
                 .execute(
@@ -93,7 +91,7 @@ export function invokeStatusAction(serviceBroker, notification, reloader, $timeo
                 } else {
                     console.log("No view for " + name)
                 }
-                
+
             })
             .catch(err => notification.warning(err))
     }
