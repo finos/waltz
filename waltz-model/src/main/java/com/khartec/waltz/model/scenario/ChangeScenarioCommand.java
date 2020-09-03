@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.model.scenario;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.Nullable;
@@ -43,6 +44,7 @@ public abstract class ChangeScenarioCommand implements Command {
     public abstract String comment();
 
     @Value.Derived
+    @JsonIgnore
     public boolean hasRatingChanged() {
         return !Objects.equals(rating(), previousRating());
     }

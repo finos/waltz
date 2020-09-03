@@ -94,7 +94,7 @@ export function d3ContextMenu(menu, opts) {
             .on("click", (e, d, i) => {
                 if (d.disabled) return; // do nothing if disabled
                 if (!d.action) return; // headers have no "action"
-                const result = d.action(elem, data, index);
+                const result = d.action(elem, data, index, e);
                 select(".d3-context-menu")
                     .style("display", "none");
 

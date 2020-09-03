@@ -124,12 +124,12 @@ function mkAction(title, action) {
 }
 
 
-function mkDialogStyle() {
+function mkDialogStyle(e) {
     return {
         display: "block",
         position: "absolute",
-        left: `${event.pageX - 2}px`,
-        top: `${event.pageY - 100}px`
+        left: `${e.pageX - 2}px`,
+        top: `${e.pageY - 100}px`
     };
 }
 
@@ -188,7 +188,7 @@ function controller($q,
         localStorageService.set(localStorageKey, vm.layoutOptions.colWidths);
     }
 
-    function addApplicationAction(domainCoordinates) {
+    function addApplicationAction(domainCoordinates, e) {
         const column = domainCoordinates.column;
         const row = domainCoordinates.row;
 
@@ -197,8 +197,6 @@ function controller($q,
             vm.scenarioDefn.ratings,
             column,
             row);
-
-        const style = mkDialogStyle();
 
         $timeout(() => {
             vm.selectedRow = row;
@@ -213,7 +211,7 @@ function controller($q,
                     { name: "Search for any app", value: "SEARCH" }
                 ],
                 tab: "PICK",
-                style
+                style: mkDialogStyle(e)
             };
         });
     }
@@ -225,18 +223,17 @@ function controller($q,
 
     const addAction = mkAction(
         "Add another application",
-        (elm, d) => addApplicationAction(d.domainCoordinates));
+        (elm, d, idx, e) => addApplicationAction(d.domainCoordinates, e));
 
     const editAction = mkAction(
         "Edit",
-        (elm, d) => {
-            const style = mkDialogStyle();
+        (elm, d, idx, e) => {
             $timeout(() => {
                 vm.dialog = {
                     type: dialogs.EDIT_CELL,
                     data: d,
                     workingState: Object.assign({ rating: "G", comment: "" }, d.state),
-                    style
+                    style: mkDialogStyle(e)
                 };
             });
         });
@@ -294,7 +291,7 @@ function controller($q,
                 return [
                     {
                         title: "Add application",
-                        action: (elm, d) => addApplicationAction({ row: d.row, column: d.column })
+                        action: (elm, d, idx, e) => addApplicationAction({ row: d.row, column: d.column }, e)
                     }
                 ];
             }
