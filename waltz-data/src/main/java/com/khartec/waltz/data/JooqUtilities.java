@@ -147,7 +147,7 @@ public class JooqUtilities {
 
 
     public static List<Tally<String>> calculateStringTallies(
-            Result<? extends Record> records,
+            Collection<? extends Record> records,
             Field<String> fieldToTally) {
 
         return records.stream()
