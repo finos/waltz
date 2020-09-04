@@ -65,24 +65,35 @@
                 </div>
             </waltz-section-actions>
 
+            <!-- CLEANUP DUPE MODE -->
             <div class="row"
                  style="padding-bottom: 12px"
-                 ng-if="ctrl.mode=== 'DUPLICATE'">
+                 ng-if="ctrl.mode === 'DUPLICATE'">
                 <div class="col-md-12"
                      ng-include="'wpfv-dupe-sub-section'">
                 </div>
             </div>
 
+            <!-- VIEW MODE -->
             <div class="row"
-                 ng-if="ctrl.mode==='OVERVIEW'">
+                 ng-if="ctrl.mode === 'OVERVIEW'">
+                <!-- OVERVIEW -->
                 <div class="col-md-7">
                     <div ng-include="'wpfv-overview'"></div>
                 </div>
+
+                <!-- DATA USAGE & ASSESSMENTS -->
                 <div class="col-md-5">
                     <waltz-data-type-usage-panel parent-entity-ref="ctrl.specificationReference"
                                                  parent-flow="ctrl.physicalFlow"
                                                  help-text="Data types referenced by the specification">
                     </waltz-data-type-usage-panel>
+
+                    <br>
+
+                    <!-- Assessment Ratings -->
+                    <waltz-assessment-rating-sub-section parent-entity-ref="ctrl.parentEntityRef">
+                    </waltz-assessment-rating-sub-section>
                 </div>
             </div>
 
