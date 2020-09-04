@@ -45,11 +45,17 @@
                 'ws-draft': ctrl.logicalFlow.entityLifecycleStatus ==='PENDING',
              }">
             <div class="row">
-                <div class="col-md-12">
+                <div class="col-md-6">
                     <waltz-data-type-usage-panel parent-entity-ref="ctrl.entityReference"
                                                  parent-flow="ctrl.entityReference"
                                                  help-text="Data types referenced by this logical flow">
                     </waltz-data-type-usage-panel>
+                </div>
+
+                <div class="col-md-6">
+                    <!-- Assessment Ratings -->
+                    <waltz-assessment-rating-sub-section parent-entity-ref="ctrl.entityReference">
+                    </waltz-assessment-rating-sub-section>
                 </div>
             </div>
 
