@@ -19,6 +19,7 @@
 import angular from "angular";
 import {registerComponents, registerStore} from "../common/module-utils";
 import * as SoftwareCatalogStore from "./services/software-catalog-store";
+import * as VulnerabilityStore from "./services/vulnerability-store";
 // components
 import SimpleSoftwareUsagePies from "./components/usage-pies/simple-software-usage-pies";
 import SoftwarePackageOverview from "./components/overview/software-package-overview";
@@ -43,6 +44,7 @@ export default () => {
         .config(Routes);
 
     registerStore(module, SoftwareCatalogStore);
+    registerStore(module, VulnerabilityStore);
 
 
     registerComponents(module, [

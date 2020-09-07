@@ -23,6 +23,8 @@ import {countByVersionId} from "../../software-catalog-utilities";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 
 import template from "./software-package-versions.html";
+import {loadAssessmentsBySelector} from "../../../assessments/assessment-utils";
+import {nest} from "d3-collection";
 
 
 const bindings = {
@@ -31,9 +33,15 @@ const bindings = {
 
 
 const initialState = {
+    licenceAssessmentDefinitions: [],
     softwareCatalog: null,
     softwarePackage: null,
-    selectedVersion: null
+    selectedVersion: null,
+    selectedApps: [],
+    selectedDetails: "NONE", // NONE | VERSIONS | APPS
+    selectedLicences: [],
+    selectedVulnerabilityCounts: null,
+    vulnerabilityCountsByVersionId: {}
 };
 
 
@@ -44,10 +52,12 @@ function mkColumnDefs() {
             displayName: "Version",
             cellTemplate: `
                 <div class="ui-grid-cell-contents">
-                    <waltz-entity-link entity-ref="row.entity"
-                                       tooltip-placement="right"
-                                       icon-placement="none">
-                    </waltz-entity-link>
+                    <a class="clickable"
+                              ng-bind="COL_FIELD"
+                              ng-click="grid.appScope.onSelectVersion(row.entity)">
+                    </a>
+                    <waltz-icon ng-if="row.entity.vulnerabilityCounts.High" name="exclamation-circle" style="color: #d62728"></waltz-icon>
+                    <waltz-icon ng-if="!row.entity.vulnerabilityCounts.High && row.entity.vulnerabilityCounts.Medium" name="warning" style="color: #ff7f0e"></waltz-icon>
                 </div>`
         },
         {
@@ -68,7 +78,7 @@ function mkColumnDefs() {
             cellTemplate: `<div class="ui-grid-cell-contents">
                                <a class="clickable"
                                   ng-bind="COL_FIELD"
-                                  ng-click="grid.appScope.onSelectVersion(row.entity)">
+                                  ng-click="grid.appScope.onSelectVersionAppCount(row.entity)">
                                </a>
                            </div>`
         }
@@ -76,43 +86,84 @@ function mkColumnDefs() {
 }
 
 
-function mkGridData(softwarePackage = {}, versions = [], usages = []) {
+function mkGridData(softwarePackage = {}, versions = [], usages = [], vulnerabilityCountsByVersionId = {}) {
     const countsByVersionId = countByVersionId(usages);
-    const gridData = _.map(versions, v => Object.assign(
-        {},
-        v,
-        {usageCount: _.get(countsByVersionId, `[${v.id}]`, 0) }));
+    const gridData = _.map(versions, v => {
+        const countList = _.get(vulnerabilityCountsByVersionId, `[${v.id}].tallies`, []);
+        const countMap = _.keyBy(countList, 'id');
+        return Object.assign(
+            {},
+            v,
+            {usageCount: _.get(countsByVersionId, `[${v.id}]`, 0) },
+            {vulnerabilityCounts: countMap });
+    });
     return gridData;
 }
 
 
-function controller(serviceBroker) {
+function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const loadPackage = () => {
-        return serviceBroker
+        const catalogPromise = serviceBroker
             .loadViewData(
                 CORE_API.SoftwareCatalogStore.getByPackageId,
                 [vm.parentEntityRef.id])
-            .then(r => {
-                vm.softwareCatalog = r.data;
+            .then(r => r.data);
+
+        const vulnerabilitySeverityPromise = serviceBroker
+            .loadViewData(CORE_API.VulnerabilityStore.countSeveritiesBySelector, [mkSelectionOptions(vm.parentEntityRef)])
+            .then(r => r.data);
+
+        $q.all([catalogPromise, vulnerabilitySeverityPromise])
+            .then(([softwareCatalog, vulnerabilityCounts]) => {
+                vm.softwareCatalog = softwareCatalog;
                 vm.softwarePackage = _.get(vm.softwareCatalog, "packages[0]");
+                const nestedTallies = _.map(vulnerabilityCounts, v => Object.assign({}, v, {tallyMap: nest().key(t => t.id).object(v.tallies) }));
+                vm.vulnerabilityCountsByVersionId = _.keyBy(nestedTallies, v => v.entityReference.id);
 
                 vm.columnDefs = mkColumnDefs();
                 vm.gridData = mkGridData(vm.softwarePackage,
                                          vm.softwareCatalog.versions,
-                                         vm.softwareCatalog.usages);
+                                         vm.softwareCatalog.usages,
+                                         vm.vulnerabilityCountsByVersionId);
             });
     };
 
 
-    vm.onSelectVersion = (version) => {
+    vm.onSelectVersionAppCount = (version) => {
         vm.selectedVersion = version;
+        vm.selectedDetails = "APPS";
         serviceBroker
             .loadViewData(CORE_API.ApplicationStore.findBySelector, [mkSelectionOptions(version)])
             .then(r => r.data)
             .then(apps => {
                 vm.selectedApps = apps;
+            });
+    };
+
+    vm.onSelectVersion = (version) => {
+        vm.selectedVersion = version;
+        vm.selectedDetails = "VERSIONS";
+
+        vm.selectedVulnerabilityCounts = _.get(vm.vulnerabilityCountsByVersionId, `[${version.id}.tallyMap]`, null);
+
+        // get the licences for this version
+        const licencePromise = serviceBroker
+            .loadViewData(CORE_API.LicenceStore.findBySelector, [mkSelectionOptions(version)])
+            .then(r => r.data);
+
+        $q.all([licencePromise, loadAssessmentsBySelector($q, serviceBroker, "LICENCE", mkSelectionOptions(vm.parentEntityRef), true)])
+            .then(([licences, assessments]) => {
+                vm.licenceAssessmentDefinitions = assessments.definitions;
+                const assessmentsByLicenceId = assessments.assessmentsByEntityId;
+
+                vm.selectedLicences =_.map(
+                    licences,
+                    l => {
+                        const assessmentsByDefinitionExtId = _.get(assessmentsByLicenceId, l.id, []);
+                        return Object.assign({}, l, assessmentsByDefinitionExtId)
+                    });
             });
     };
 
@@ -124,6 +175,7 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
+    "$q",
     "ServiceBroker"
 ];
 
