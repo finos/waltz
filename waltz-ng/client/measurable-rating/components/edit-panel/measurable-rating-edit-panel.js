@@ -172,19 +172,24 @@ function controller($q,
 
     const saveDecommissionDate = (dateChange)  => {
 
-        dateChange.newVal = getDateAsUtc(dateChange.newVal);
+        if(_.isEmpty(dateChange.newVal)){
+            notification.error("Could not save this decommission date. " +
+                "Check the date entered is valid or to remove this decommission date use the 'Revoke' button below");
+        } else {
+            dateChange.newVal = getDateAsUtc(dateChange.newVal);
 
-        serviceBroker
-            .execute(
-                CORE_API.MeasurableRatingPlannedDecommissionStore.save,
-                [vm.parentEntityRef, vm.selected.measurable.id, dateChange])
-            .then(r => {
-                const decom = Object.assign(r.data, {isValid: true});
-                vm.selected = Object.assign({}, vm.selected, {decommission: decom});
-                notification.success(`Saved decommission date for ${vm.selected.measurable.name}`);
-            })
-            .catch(e => displayError(notification, "Could not save decommission date", e))
-            .finally(reloadDecommData);
+            serviceBroker
+                .execute(
+                    CORE_API.MeasurableRatingPlannedDecommissionStore.save,
+                    [vm.parentEntityRef, vm.selected.measurable.id, dateChange])
+                .then(r => {
+                    const decom = Object.assign(r.data, {isValid: true});
+                    vm.selected = Object.assign({}, vm.selected, {decommission: decom});
+                    notification.success(`Saved decommission date for ${vm.selected.measurable.name}`);
+                })
+                .catch(e => displayError(notification, "Could not save decommission date", e))
+                .finally(reloadDecommData);
+        }
     };
 
     // -- BOOT --
