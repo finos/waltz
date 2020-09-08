@@ -172,7 +172,7 @@ function controller($q,
 
     const saveDecommissionDate = (dateChange)  => {
 
-        if(_.isEmpty(dateChange.newVal)){
+        if(_.isNil(dateChange.newVal)){
             notification.error("Could not save this decommission date. " +
                 "Check the date entered is valid or to remove this decommission date use the 'Revoke' button below");
         } else {
