@@ -102,6 +102,16 @@
                         </span>
                     </td>
                 </tr>
+                <tr ng-if="$ctrl.selectedVulnerabilityCounts.Unknown">
+                    <td>
+                        <span ng-bind="$ctrl.selectedVulnerabilityCounts.Unknown[0].id">
+                    </span>
+                    </td>
+                    <td>
+                        <span ng-bind="$ctrl.selectedVulnerabilityCounts.Unknown[0].count">
+                        </span>
+                    </td>
+                </tr>
                 </tbody>
             </table>
         </div>

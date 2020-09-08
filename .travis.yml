@@ -9,7 +9,7 @@ jdk: openjdk8
 
 env:
   global:
-    - NODE_VERSION="7"
+    - NODE_VERSION="12"
 
 
 # Stop travis from running mvn install (without profile)
