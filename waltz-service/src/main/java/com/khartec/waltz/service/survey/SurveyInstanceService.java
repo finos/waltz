@@ -178,16 +178,10 @@ public class SurveyInstanceService {
     public SurveyInstanceStatus updateStatus(String userName, long instanceId, SurveyInstanceStatusChangeCommand command) {
         checkNotNull(command, "command cannot be null");
 
-        SurveyInstancePermissions permissions = getPermissions(userName, instanceId);
-        if (command.action() != SurveyInstanceAction.SUBMITTING) {
-            checkTrue(permissions.isAdmin() || permissions.isOwner(), "Permission denied");
-        }
-
         SurveyInstance surveyInstance = surveyInstanceDao.getById(instanceId);
         checkTrue(surveyInstance.originalInstanceId() == null, "You cannot change the status of Approved/Rejected surveys");
 
-
-
+        SurveyInstancePermissions permissions = getPermissions(userName, instanceId);
         SurveyInstanceStatus newStatus = simple(surveyInstance.status()).process(command.action(), permissions, surveyInstance);
         if (command.action() == SurveyInstanceAction.REOPENING) {
             long versionedInstanceId = surveyInstanceDao.createPreviousVersion(surveyInstance);
