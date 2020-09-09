@@ -55,7 +55,6 @@ public class RoleEndpoint implements Endpoint {
     public void register() {
 
         DatumRoute<Set<Role>> findAllRolesRoute = (request, response) -> {
-            requireAnyRole(userRoleService, request, SystemRole.USER_ADMIN, SystemRole.ADMIN);
             return roleService.findAllRoles();
         };
 
