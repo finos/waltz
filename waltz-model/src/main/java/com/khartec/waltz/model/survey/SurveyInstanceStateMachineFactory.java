@@ -17,21 +17,19 @@ public class SurveyInstanceStateMachineFactory {
             (p, i) -> p.isAdmin() || p.hasOwnership() || p.isParticipant();
     private static BiFunction<SurveyInstancePermissions, SurveyInstance, Boolean> isAdminOrOwner =
             (p, i) -> p.isAdmin() || p.hasOwnership();
-    private static BiFunction<SurveyInstancePermissions, SurveyInstance, Boolean> isAdminOrOwnerOrNoApprovedDate =
-            (p, i) -> (p.isAdmin() || p.hasOwnership()) && (i.approvedAt() == null);
 
-    // TRANSITIONS FOR THE SIMPLE SRUVEY WORKFLOW
+    // TRANSITIONS FOR THE SIMPLE SURVEY WORKFLOW
     private static MultiValueMap<SurveyInstanceStatus, SurveyInstanceStateTransition> simpleTransitions = new LinkedMultiValueMap<>();
     static {
         simpleTransitions.add(NOT_STARTED, transition(WITHDRAWING, WITHDRAWN, isAdminOrOwner));
-        simpleTransitions.add(NOT_STARTED, transition(SUBMITTING, COMPLETED, isAdminOrOwner));
+        simpleTransitions.add(NOT_STARTED, transition(SUBMITTING, COMPLETED, isAdminOrOwnerOrParticipant));
         simpleTransitions.add(NOT_STARTED, transition(SAVING, IN_PROGRESS, isAdminOrOwnerOrParticipant));
 
-        simpleTransitions.add(IN_PROGRESS, transition(SUBMITTING, COMPLETED, isAdminOrOwner));
+        simpleTransitions.add(IN_PROGRESS, transition(SUBMITTING, COMPLETED, isAdminOrOwnerOrParticipant));
         simpleTransitions.add(IN_PROGRESS, transition(WITHDRAWING, WITHDRAWN, isAdminOrOwner));
         simpleTransitions.add(IN_PROGRESS, transition(SAVING, IN_PROGRESS, isAdminOrOwnerOrParticipant));
 
-        simpleTransitions.add(COMPLETED, transition(APPROVING, APPROVED, isAdminOrOwnerOrNoApprovedDate));
+        simpleTransitions.add(COMPLETED, transition(APPROVING, APPROVED, isAdminOrOwner));
         simpleTransitions.add(COMPLETED, transition(REJECTING, REJECTED, isAdminOrOwner));
 
         simpleTransitions.add(APPROVED, transition(REOPENING, IN_PROGRESS, isAdminOrOwnerOrParticipant));
@@ -39,7 +37,7 @@ public class SurveyInstanceStateMachineFactory {
         simpleTransitions.add(REJECTED, transition(WITHDRAWING, WITHDRAWN, isAdminOrOwner));
         simpleTransitions.add(REJECTED, transition(REOPENING, IN_PROGRESS, isAdminOrOwnerOrParticipant));
 
-        simpleTransitions.add(WITHDRAWN, transition(REOPENING, IN_PROGRESS, isAdminOrOwnerOrParticipant));
+        simpleTransitions.add(WITHDRAWN, transition(REOPENING, IN_PROGRESS, isAdminOrOwner));
     }
 
     public static SurveyInstanceStateMachine simple(String status) {
