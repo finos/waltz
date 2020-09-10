@@ -1,21 +1,17 @@
 package com.khartec.waltz.model.survey;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.exceptions.NotAuthorizedException;
 import org.junit.Test;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collections;
 
 import static com.khartec.waltz.model.EntityKind.ACTOR;
 import static com.khartec.waltz.model.EntityLifecycleStatus.ACTIVE;
 import static com.khartec.waltz.model.survey.SurveyInstanceAction.*;
 import static com.khartec.waltz.model.survey.SurveyInstanceStatus.*;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class SurveyInstanceStateMachineTest {
     private final SurveyInstancePermissions admin = ImmutableSurveyInstancePermissions.builder()
@@ -78,18 +74,18 @@ public class SurveyInstanceStateMachineTest {
         assertEquals(REJECTED, state.process(REJECTING, admin, survey));
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void permissionCheck() {
+    @Test
+    public void permissionCheckPasses() {
         SurveyInstanceStateMachine state = SurveyInstanceStateMachineFactory.simple("NOT_STARTED");
         assertEquals(IN_PROGRESS, state.process(SAVING, participant, survey));
         assertEquals(COMPLETED, state.process(SUBMITTING, participant, survey));
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void instanceCheck() {
-        SurveyInstanceStateMachine state = SurveyInstanceStateMachineFactory.simple("NOT_STARTED");
-        assertEquals(IN_PROGRESS, state.process(SAVING, owner, surveyWithApprovedDate));
-        assertEquals(COMPLETED, state.process(SUBMITTING, owner, surveyWithApprovedDate));
-        state.process(APPROVING, owner, surveyWithApprovedDate);
+    public void permissionCheckRejects() {
+        SurveyInstanceStateMachine state = SurveyInstanceStateMachineFactory.simple("APPROVED");
+        assertEquals(IN_PROGRESS, state.process(REOPENING, participant, survey));
+        state.process(WITHDRAWING, participant, survey); // fails as only admin
     }
+
 }
