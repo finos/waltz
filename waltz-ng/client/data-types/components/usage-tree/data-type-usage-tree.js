@@ -60,7 +60,9 @@ function controller(serviceBroker) {
             .loadAppData(CORE_API.DataTypeStore.findAll)
             .then(r => {
                 const dataTypesById = _.keyBy(r.data, "id");
-                const explicitIds = _.map(vm.used, r => r.kind === "DATA_TYPE"
+                const explicitIds = _.map(
+                    vm.used,
+                    r => r.kind === "DATA_TYPE"
                         ? r.id
                         : r.dataTypeId);
 

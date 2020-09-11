@@ -81,8 +81,7 @@ module.exports = {
         new webpack.DefinePlugin({
             "__ENV__": JSON.stringify(process.env.BUILD_ENV || "dev"),
             "__REVISION__": JSON.stringify(git.long()),
-        }),
-        new Visualizer()
+        })
     ],
     module: {
         rules: [
