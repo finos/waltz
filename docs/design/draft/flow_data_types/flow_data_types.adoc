@@ -1,0 +1,114 @@
+= Flow Datatype Decorators
+David Watkins <david.watkins@db.com>
+:version: v0.1
+:modified: 2020-09-10
+:status: DRAFT
+:toc:
+
+<<<
+== Document Info
+
+|===
+| Attribute | Value
+
+| Status
+| {status} {version} ({modified})
+
+| Target Version
+| 1.28
+
+| Lead
+| Dave Watkins
+|===
+
+<<<
+
+== Overview
+This design doc discusses approaches to managing flow datatype decorators.
+The driver behind this enhancement is to ensure data consistency in Waltz.
+
+Waltz captures datatypes as decorators for both logical flows and physical specifications, which relate to a physical flow.
+Logical flows can have many associated physical flows or none.
+
+As it currently stands there is nothing in core Waltz to keep these datatypes aligned.
+Supporting loader jobs may force this alignment leading to confusion if users edit datatypes on a logical flow but not a physical spec and these changes are not persisted.
+
+This doc hopes to clarify when these datatypes should be kept in sync and when they should be allowed to diverge.
+
+Answering questions such as:
+
+* Should datatypes on physical flows always be copied up to the parent logical flow
+* Should a logical flow be allowed to own datatypes that do not belong to any of its associated physicals
+* Upon removing a datatype from a physical flow what should happen to the datatype on the logical flow
+* Upon removing a datatype from a logical flow what should happen to the datatypes on associated physical flows.
+
+
+<<<
+== Proposal
+
+=== Core Waltz changes
+
+* Need an 'is_read_only' flag on decorators to prevent users removing those that will reappear due to loader jobs
+** Potentially need an 'is_read_only' flag on flows?
+
+* Logical flows should be allowed their own datatypes which are not on physical flows.
+Consistent with when no physical exists / consider if adding a datatype not already shared by physical flow do we
+1) add it to all, 2) force a physical flow to be chosen, 3) create a new physical flow?
+
+* Datatypes added to physical flows must copied onto the logical flow.
+
+* Removing a datatype from a physical flow should remove from logical flow - provided there are no other physical flows with this datatype and provenance shows that it is not manually added.
+We need to differentiate between datatypes inherited from physical flows and those that they own.
+
+* Visual warnings needed when datatypes are no longer aligned - ie. datatypes present on logical flow that are not on an associated physical.
+
+* User needs to be able to bulk align datatypes - either for a logical flow or for an app (some apps will have 100's flows).
+
+* Removing a datatype from a logical flow should remove it from the associated physicals or should be prevented (unless no associated physicals)?
+
+* User needs to be notified of the consequence of performing a change (if removing a datatype from a logical this might affect X physicals)
+
+=== (Optional) Client-site batch job changes
+
+* Need to update datatypes / flows created by automated job/s to be read-only.
+
+<<<
+
+
+== Appendices
+
+* Service to find out if a logical flow has any datatypes not belonging to a physical flow
+
+[source, sql]
+---
+select dt.*
+from logical_flow lf
+inner join logical_flow_decorator lfd on lf.id = lfd.logical_flow_id
+inner join data_type dt on lfd.decorator_entity_id = dt.id
+where lfd.decorator_entity_kind = 'DATA_TYPE'
+and lf.id = 14798 -- datatypes on logical flow
+except (
+select dt.*
+from logical_flow lf
+inner join physical_flow pf on lf.id = pf.logical_flow_id
+inner join physical_specification ps on pf.specification_id = ps.id
+inner join physical_spec_data_type psdt on ps.id = psdt.specification_id
+inner join data_type dt on psdt.data_type_id = dt.id
+where lf.id = 14798) -- datatypes on physical specs
+---
+
+
+[source, xml]
+---
+    <changeSet id="2020-xxxx-1"
+               author="woodjes">
+        <comment>xxx: Add is_readonly flag to physcial_spec_data_type</comment>
+        <addColumn tableName="physical_spec_data_type">
+            <column name="is_readonly"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+---
