@@ -64,7 +64,7 @@ public class BaseArchitectureComplianceCheck {
                         .filter(m -> m.getName().startsWith("find"))
                         .filter(m -> m.getModifiers().contains(JavaModifier.PUBLIC))
                         .forEach(m -> {
-                            JavaClass returnType = m.getReturnType();
+                            JavaClass returnType = m.getRawReturnType();
                             if (! any(validReturnTypes, vrt -> returnType.isAssignableTo(vrt))) {
                                 String message = String.format(
                                         "Method %s.%s does not return a collection, map or optional. It returns: %s",
