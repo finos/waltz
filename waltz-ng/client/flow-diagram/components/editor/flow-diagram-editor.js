@@ -57,13 +57,12 @@ function prepareAddLogicalFlowPopup(graphNode, isUpstream = true, logicalFlowSto
     return logicalFlowStore
         .findByEntityReference(graphNode.data)
         .then(flows => {
-            const popup = {
+            return {
                 logicalFlows: flows,
                 node: graphNode.data,
                 existingEntities: flowDiagramStateService.getAllEntities(),
                 isUpstream
             };
-            return popup;
         });
 }
 
@@ -89,7 +88,7 @@ function prepareUpdateAnnotationPopup(graphNode) {
 
 
 function mkNodeMenu($timeout, logicalFlowStore, vm, flowDiagramStateService) {
-    return (d) => {
+    return () => {
         return [
             {
                 title: (d) => `Add upstream source to ${d.data.name}`,
@@ -105,7 +104,7 @@ function mkNodeMenu($timeout, logicalFlowStore, vm, flowDiagramStateService) {
                 }
             }, {
                 title: (d) => `Add downstream target from ${d.data.name}`,
-                action: (elm, d, i) => {
+                action: (elm, d) => {
                     $timeout(() => {
                         prepareAddLogicalFlowPopup(d, false, logicalFlowStore, flowDiagramStateService)
                             .then(popup => {
@@ -117,7 +116,7 @@ function mkNodeMenu($timeout, logicalFlowStore, vm, flowDiagramStateService) {
                 }
             }, {
                 title: (d) => `Add annotation to ${d.data.name}`,
-                action: (elm, d, i) => {
+                action: (elm, d) => {
                     $timeout(() => {
                         vm.popup = prepareAddAnnotationPopup(d);
                         vm.visibility.annotationPopup = true;
@@ -127,32 +126,31 @@ function mkNodeMenu($timeout, logicalFlowStore, vm, flowDiagramStateService) {
                 divider: true
             }, {
                 title: (d) => `Remove ${d.data.name}`,
-                action: (elm, d, i) =>
+                action: (elm, d) =>
                     vm.issueCommands([{command: "REMOVE_NODE", payload: d}])
             }
-        ]
-    }
+        ];
+    };
 }
 
 
 function mkDisjointNodeMenu($timeout, vm, flowDiagramStateService) {
-    return (d) => {
+    return () => {
         return [
             {
-                title: (d) => "Add an actor or application",
-                action: (elm, d, i) => {
+                title: () => "Add an actor or application",
+                action: () => {
                     $timeout(() => {
-                        const popup = {
+                        vm.popup = {
                             existingEntities: flowDiagramStateService.getAllEntities(),
                         };
-                        vm.popup = popup;
                         vm.visibility.disjointNodePopup = true;
                         vm.visibility.anyPopup = true;
                     });
                 }
             },
-        ]
-    }
+        ];
+    };
 }
 
 
@@ -175,14 +173,13 @@ function preparePhysicalFlowPopup(
     return $q
         .all([physFlowPromise, physSpecPromise])
         .then(([physicalFlows = [], physicalSpecifications = []]) => {
-            const popup = {
+            return {
                 logicalFlow,
                 physicalFlows,
                 physicalSpecifications,
                 existingEntities: flowDiagramStateService.getAllEntities()
             };
-            return popup;
-        })
+        });
 
 }
 
@@ -192,7 +189,7 @@ function mkFlowBucketMenu($q, $timeout, vm, flowDiagramStateService, physicalFlo
 
         const removeFlow = {
             title: "Remove Flow",
-            action: (elm, d, i) =>
+            action: (elm, d) =>
                 flowDiagramStateService.processCommands([{command: "REMOVE_FLOW", payload: d}])
         };
 
@@ -202,10 +199,9 @@ function mkFlowBucketMenu($q, $timeout, vm, flowDiagramStateService, physicalFlo
             return [
                 {
                     title: "Add annotation",
-                    action: (elm, d, i) => {
+                    action: (elm, d) => {
                         $timeout(() => {
-                            const popup = prepareAddAnnotationPopup(d);
-                            vm.popup = popup;
+                            vm.popup = prepareAddAnnotationPopup(d);
                             vm.visibility.annotationPopup = true;
                             vm.visibility.anyPopup = true;
                         });
@@ -213,7 +209,7 @@ function mkFlowBucketMenu($q, $timeout, vm, flowDiagramStateService, physicalFlo
                 },
                 {
                     title: "Define physical flows",
-                    action: (elm, logicalFlowNode, i) => {
+                    action: (elm, logicalFlowNode) => {
                         $timeout(() => {
                             preparePhysicalFlowPopup(
                                 $q,
@@ -239,14 +235,13 @@ function mkFlowBucketMenu($q, $timeout, vm, flowDiagramStateService, physicalFlo
 
 
 function mkAnnotationMenu(commandProcessor, $timeout, vm) {
-    return (d) => {
+    return () => {
         return [
             {
                 title: "Edit",
-                action: (elm, d, i) => {
+                action: (elm, d) => {
                     $timeout(() => {
-                        const popup = prepareUpdateAnnotationPopup(d);
-                        vm.popup = popup;
+                        vm.popup = prepareUpdateAnnotationPopup(d);
                         vm.visibility.annotationPopup = true;
                         vm.visibility.anyPopup = true;
                     });
@@ -255,7 +250,7 @@ function mkAnnotationMenu(commandProcessor, $timeout, vm) {
             { divider: true },
             {
                 title: "Remove",
-                action: (elm, d, i) => {
+                action: (elm, d) => {
                     commandProcessor([{ command: "REMOVE_ANNOTATION", payload: d }]);
                 }
             },
@@ -300,16 +295,13 @@ function controller($q,
     };
 
     vm.doSave = () => {
-
-        console.log('save diagram');
-
-
-        flowDiagramStateService.save()
+        flowDiagramStateService
+            .save()
             .then(r => vm.id = r)
             .then(() => notification.success("Saved"))
     };
 
-    vm.$onChanges = (c) => {
+    vm.$onChanges = () => {
         const state = flowDiagramStateService.getState();
         vm.title = state.model.title;
         vm.id = state.diagramId;
@@ -321,14 +313,15 @@ function controller($q,
         vm.visibility.anyPopup = true;
     };
 
-    vm.onSaveTitle = (t, id) => {
+    vm.onSaveTitle = (t) => {
         flowDiagramStateService.processCommands([{
             command: "SET_TITLE",
             payload: t.newVal
         }]);
         vm.title = t.newVal;
 
-        flowDiagramStateService.updateName()
+        flowDiagramStateService
+            .updateName()
             .then(() => notification.success("Saved Title"))
     };
 
@@ -339,7 +332,8 @@ function controller($q,
         }]);
         vm.description = d.newVal;
 
-        flowDiagramStateService.updateDescription()
+        flowDiagramStateService
+            .updateDescription()
             .then(() => notification.success("Saved Description"))
     };
 
@@ -356,7 +350,6 @@ function controller($q,
                 });
         }
     };
-
 }
 
 

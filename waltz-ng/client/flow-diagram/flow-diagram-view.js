@@ -165,10 +165,10 @@ function controller(
         vm.visibility.layers = flowDiagramStateService.getState().visibility.layers;
 
     vm.clickHandlers =  {
-        node: d => $timeout(
+        node: (d) => $timeout(
             () => vm.highlightIds = [d.data.id],
             0),
-        flowBucket: d => $timeout(
+        flowBucket: (d) => $timeout(
             () => vm.highlightIds = [d.data.id],
             0)
     };

@@ -16,7 +16,6 @@
  *
  */
 import {zoom, zoomIdentity} from "d3-zoom";
-import {event} from "d3-selection";
 
 
 export const defaultOptions = { cols: 3, sortFn: d => d.node.name };
@@ -27,10 +26,10 @@ const myZoom = zoom()
 
 
 export function setupZoom(svgGroups) {
-    const zoomer = myZoom.on("zoom.myZoom", () => {
-        const tx = event.transform.x;
-        const ty = event.transform.y;
-        const k = event.transform.k;
+    const zoomer = myZoom.on("zoom.myZoom", (e) => {
+        const tx = e.transform.x;
+        const ty = e.transform.y;
+        const k = e.transform.k;
 
         svgGroups
             .rowAxisContent
@@ -42,7 +41,7 @@ export function setupZoom(svgGroups) {
 
         svgGroups
             .gridContent
-            .attr("transform", event.transform);
+            .attr("transform", e.transform);
     });
 
     return svgGroups

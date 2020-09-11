@@ -147,11 +147,11 @@ function controller($element,
             reload()
                 .then(() => {
                     const baseTweakers = {
-                        source: {onSelect: a => $scope.$applyAsync(() => selectSource(a))},
-                        target: {onSelect: a => $scope.$applyAsync(() => selectTarget(a))},
+                        source: {onSelect: (e, d) => $scope.$applyAsync(() => selectSource(d))},
+                        target: {onSelect: (e, d) => $scope.$applyAsync(() => selectTarget(d))},
                         type: {
-                            onSelect: d => {
-                                event.stopPropagation();
+                            onSelect: (e, d) => {
+                                e.stopPropagation();
                                 $scope.$applyAsync(() => selectType(d));
                                 vm.activeFilter = () => filterByType(
                                     d.id,
@@ -161,8 +161,8 @@ function controller($element,
                             }
                         },
                         typeBlock: {
-                            onSelect: () => {
-                                event.stopPropagation();
+                            onSelect: (e, d) => {
+                                e.stopPropagation();
                                 if (vm.filteredFlowData.filterApplied) {
                                     vm.activeFilter = resetFilter;
                                     applyFilter();

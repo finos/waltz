@@ -17,7 +17,7 @@
  */
 
 import _ from "lodash";
-import {event, select, selectAll} from "d3-selection";
+import {select, selectAll} from "d3-selection";
 import {drag} from "d3-drag";
 import {zoom} from "d3-zoom";
 import {initialiseData} from "../../../common";
@@ -114,8 +114,8 @@ const clickHandlers = Object.assign({}, DEFAULT_CLICK_HANDLERS);
 let dragStartPos = null;
 
 
-function dragStarted() {
-    dragStartPos = { x: event.x, y: event.y };
+function dragStarted(e) {
+    dragStartPos = { x: e.x, y: e.y };
     return select(this)
         .raise()
         .classed("wfd-active", true);
@@ -123,18 +123,18 @@ function dragStarted() {
 
 
 function dragger(commandProcessor) {
-    return (d) => {
+    return (e, d) => {
         const cmd = {
             command: "MOVE",
-            payload: {id: d.id, dx: event.dx, dy: event.dy}
+            payload: {id: d.id, dx: e.dx, dy: e.dy}
         };
         commandProcessor([cmd]);
     };
 }
 
 
-function dragEnded(d) {
-    const noMove = dragStartPos.x === event.x && dragStartPos.y === event.y;
+function dragEnded(e, d) {
+    const noMove = dragStartPos.x === e.x && dragStartPos.y === e.y;
     if (noMove) {
         clickHandlers.node(d);
     }
@@ -265,7 +265,7 @@ function drawFlows(state, group) {
         .on("contextmenu", contextMenus.flowBucket
             ? d3ContextMenu(contextMenus.flowBucket)
             : null)
-        .on("click.flowBucket", clickHandlers.flowBucket);
+        .on("click.flowBucket", (e, d) => clickHandlers.flowBucket(d));
 
     newBucketElems
         .append("circle");
@@ -527,30 +527,32 @@ function prepareGroups(holder) {
  * @param commandProcessor
  */
 function setupPanAndZoom(commandProcessor) {
-    function zoomed() {
-        const t = event.transform;
+    function zoomed(e) {
+        const t = e.transform;
         commandProcessor([{ command: "TRANSFORM_DIAGRAM", payload: t }]);
     }
 
     const myZoom = zoom()
-        .filter(() => event.metaKey || event.ctrlKey)
+        .filter(e => e.metaKey || e.ctrlKey)
         .scaleExtent([1 / 4, 2])
         .on("zoom", zoomed);
 
 
-    select("body").on("keyup.zoom", () => {
-        groups.svg
-            .on(".zoom", null);
-    });
-
-    select("body").on("keydown.zoom", () => {
-        const active = event.metaKey || event.ctrlKey;
-        if (active) {
+    select("body")
+        .on("keyup.zoom", (e) => {
             groups.svg
-                .call(myZoom)
-                .on("dblclick.zoom", null);
-        }
-    });
+                .on(".zoom", null);
+        });
+
+    select("body")
+        .on("keydown.zoom", (e) => {
+            const active = e.metaKey || e.ctrlKey;
+            if (active) {
+                groups.svg
+                    .call(myZoom)
+                    .on("dblclick.zoom", null);
+            }
+        });
 }
 
 
