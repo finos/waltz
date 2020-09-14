@@ -130,7 +130,7 @@ function draw(svg,
         .append("g")
         .classed("wacg-bar", true)
         .attr("transform", (d) => `translate(0, ${yScale(d.entityRef.name)})`)
-        .on("click.select", d => onSelect(d));
+        .on("click.select", (e, d) => onSelect(d));
 
     bars.append("rect")
         .attr("x", 0)
