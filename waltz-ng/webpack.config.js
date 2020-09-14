@@ -17,12 +17,12 @@
  */
 
 const { CleanWebpackPlugin } = require("clean-webpack-plugin");
-const basePath = path.resolve(__dirname);
 const git = require("git-rev-sync");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
 const webpack = require("webpack");
 
+const basePath = path.resolve(__dirname);
 
 module.exports = {
     entry: {
