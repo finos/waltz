@@ -185,7 +185,6 @@ function controller($element,
     };
 
     const showFlowBucketDetail = (logicalFlow, e) => {
-        console.log("sfbd", {logicalFlow, e})
         $timeout(() => vm.visibility.contextPopup = false);
         vm.contextPopup.styling = determinePopupPosition(event, $window, $element);
 
