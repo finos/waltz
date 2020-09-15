@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@uirouter/angularjs": "1.0.28",
-    "angular": "1.7.9",
+    "angular": "1.8.0",
     "angular-animate": "1.7.9",
     "angular-formly": "8.4.1",
     "angular-formly-templates-bootstrap": "6.5.1",
