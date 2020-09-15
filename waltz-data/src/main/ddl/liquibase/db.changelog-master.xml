@@ -111,4 +111,7 @@
     <include file="db.changelog-1.27.xml"
              relativeToChangelogFile="true"/>
 
+    <include file="db.changelog-1.28.xml"
+             relativeToChangelogFile="true"/>
+
 </databaseChangeLog>
