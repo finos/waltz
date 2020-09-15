@@ -77,6 +77,11 @@ function controller(serviceBroker) {
         vm.allDataTypes = enrichDataTypes(vm.allDataTypes, vm.checkedItemIds);
         vm.allDataTypesById = _.keyBy(vm.allDataTypes, "id");
 
+        vm.readOnlyDatatypeIdsForParent = _.chain(vm.dataTypes)
+            .filter(d => d.isReadonly)
+            .map(d => d.dataTypeId)
+            .value();
+
         vm.visibleDataTypes = vm.showAllDataTypes
             ? vm.allDataTypes
             :reduceToSelectedNodesOnly(vm.allDataTypes, suggestedAndSelectedTypes);
@@ -106,7 +111,8 @@ function controller(serviceBroker) {
                 lastUpdatedBy: d.lastUpdatedBy,
                 provenance: d.provenance,
                 dataTypeId: d.decoratorEntity.id,
-                dataFlowId: d.dataFlowId
+                dataFlowId: d.dataFlowId,
+                isReadonly: d.isReadonly
             })));
 
         return promise.then(result => vm.dataTypes = result);
@@ -164,6 +170,10 @@ function controller(serviceBroker) {
 
     vm.disablePredicate = (node) => {
         return !node.concrete;
+    };
+
+    vm.isReadonlyPredicate = (node) => {
+        return _.includes(vm.readOnlyDatatypeIdsForParent, node.id);
     };
 
     const determineMessage = () => {
