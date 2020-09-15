@@ -16,7 +16,6 @@
  *
  */
 
-import "babel-polyfill";
 import "angular-animate";
 import "angular-loading-bar";
 import "angular-local-storage";

@@ -69,25 +69,27 @@ public class LogicalFlowDecorationGenerator implements SampleDataGenerator {
                     return record;
                 });
 
-        Set<LogicalFlowDecoratorRecord> deduped = uniqBy(records, r ->
-                "lfd:"
+        Set<LogicalFlowDecoratorRecord> deduped = uniqBy(
+                records,
+                r -> "lfd:"
                         + r.getLogicalFlowId() + "_"
                         + r.getDecoratorEntityId() + "_"
                         + r.getDecoratorEntityKind());
 
         log("--- saving: " + deduped.size());
-        dsl.batchStore(records)
+        dsl.batchStore(deduped)
                 .execute();
         log("--- done");
 
         return null;
     }
 
+
     @Override
     public boolean remove(ApplicationContext ctx) {
         getDsl(ctx)
                 .deleteFrom(LOGICAL_FLOW_DECORATOR)
-                .where(LOGICAL_FLOW_DECORATOR.PROVENANCE.eq(SAMPLE_DATA_PROVENANCE))
+                //.where(LOGICAL_FLOW_DECORATOR.PROVENANCE.eq(SAMPLE_DATA_PROVENANCE))
                 .execute();
         return false;
     }

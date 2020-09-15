@@ -16,7 +16,8 @@
  *
  */
 import {rgb} from "d3-color";
-import {scaleOrdinal, schemeCategory20c} from "d3-scale";
+import {scaleOrdinal} from "d3-scale";
+import {schemeTableau10} from "d3-scale-chromatic";
 import _ from "lodash";
 
 export const black = rgb("#000");
@@ -44,9 +45,6 @@ export const ragColorScale = scaleOrdinal()
 
 
 export const capabilityColorScale = ragColorScale;
-
-
-export const investmentRatingColorScale = ragColorScale;
 
 
 export const maturityColorScale = scaleOrdinal()
@@ -226,7 +224,7 @@ const variableScaleMap = _.reduce(
     },
     {});
 
-export const randomColorScale = scaleOrdinal(schemeCategory20c);
+export const randomColorScale = scaleOrdinal(schemeTableau10);
 
 
 export const variableScale = (x = "") => {

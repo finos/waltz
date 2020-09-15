@@ -19,7 +19,7 @@
 import template from "./svg-diagram.html";
 import _ from "lodash";
 import angular from "angular";
-import {event, select} from "d3-selection";
+import {select} from "d3-selection";
 import {zoom, zoomIdentity} from "d3-zoom";
 import {initialiseData} from "../../common";
 
@@ -68,10 +68,14 @@ function controller($element, $window) {
             .append(vm.diagram.svg);
 
         vm.svgGroupSel = select($element[0])
-                            .select("svg")
-                            .select("svg > g");
+            .select("svg")
+            .select("svg > g");
 
-        resize($element, $window, vm.diagram.displayWidthPercent, vm.diagram.displayHeightPercent);
+        resize(
+            $element,
+            $window,
+            vm.diagram.displayWidthPercent,
+            vm.diagram.displayHeightPercent);
 
         const dataProp = `data-${vm.diagram.keyProperty}`;
         const dataBlocks = svgEl.querySelectorAll(`[${dataProp}]`);
@@ -87,15 +91,15 @@ function controller($element, $window) {
     };
 
     // pan + zoom
-    function zoomed() {
-        const t = event.transform;
+    function zoomed(e) {
+        const t = e.transform;
 
         vm.svgGroupSel
             .attr("transform", t);
     }
 
     const myZoom = zoom()
-        .on("zoom", zoomed);
+        .on("zoom", e => zoomed(e));
 
     vm.enableZoom = () => {
         select($element[0])
