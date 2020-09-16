@@ -69,6 +69,15 @@ function mkDataTypeUpdateCommand(entityReference, selectedIds = [], originalIds 
 function controller(serviceBroker, notification) {
     const vm = initialiseData(this, initialState);
 
+    const loadLogicalOnlyDatatypes = () => {
+        if(vm.parentEntityRef.kind === "LOGICAL_DATA_FLOW"){
+            serviceBroker
+                .loadViewData(CORE_API.DataTypeDecoratorStore.findDecoratorsExclusiveToEntity,
+                [vm.parentEntityRef])
+                .then(r => vm.logicalOnlyDatatypes = _.map(r.data, d => d.dataTypeId))
+        }
+    };
+
     const postLoadActions = () => {
         const selectedDataTypeIds = mkSelectedTypeIds(vm.dataTypes);
         vm.checkedItemIds = selectedDataTypeIds;
@@ -199,8 +208,19 @@ function controller(serviceBroker, notification) {
         return !node.concrete;
     };
 
-    vm.isReadonlyPredicate = (node) => {
+    vm.isReadonly = (node) => {
         return _.includes(vm.readOnlyDatatypeIdsForParent, node.id);
+    };
+
+    vm.isReadonlyPredicate = (node) => {
+        return vm.isReadonly(node) || vm.isRestrictedBySpecs(node);
+    };
+
+    vm.isRestrictedBySpecs = (node) => {
+        const isLogical = vm.parentEntityRef.kind === 'LOGICAL_DATA_FLOW';
+        const originallyChecked = _.includes(vm.originalSelectedItemIds, node.id);
+        const logicalDatatypeOnly = !_.includes(vm.logicalOnlyDatatypes, node.id);
+        return isLogical && originallyChecked && logicalDatatypeOnly;
     };
 
     const determineMessage = () => {
@@ -241,7 +261,8 @@ function controller(serviceBroker, notification) {
 
         loadDataTypes()
             .then(() => loadSuggestedDatatypes())
-            .then(() => postLoadActions());
+            .then(() => postLoadActions())
+            .then(() => loadLogicalOnlyDatatypes());
     };
 
     vm.$onChanges = () => {

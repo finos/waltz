@@ -71,4 +71,10 @@
             </span>
         </span>
     </div>
+    <div class="alert alert-warning small"
+         ng-if="$ctrl.isReadonlyPredicate(node)">
+        <span>
+            This datatype cannot be edited as it is read-only or shared with underlying physical specs.
+        </span>
+    </div>
 </script>
