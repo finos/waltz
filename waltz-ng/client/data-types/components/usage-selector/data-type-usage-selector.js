@@ -89,15 +89,15 @@ function controller(serviceBroker, notification) {
             :reduceToSelectedNodesOnly(vm.allDataTypes, suggestedAndSelectedTypes);
     };
 
-    function getUnableToBeRemoved(decoratorUpdateCommand) {
+    function getDatatypesUnableToBeRemoved(decoratorUpdateCommand) {
         serviceBroker
             .loadViewData(CORE_API.DataTypeDecoratorStore.getRemovableDatatypes,
                 [mkRef('LOGICAL_DATA_FLOW', vm.parentFlow.logicalFlowId), decoratorUpdateCommand.removedDataTypeIds])
             .then(r => {
-                vm.unableToBeRemoved = _.map(
+                vm.datatypesNotRemoved = _.map(
                     _.difference(decoratorUpdateCommand.removedDataTypeIds, r.data),
                     d => vm.allDataTypesById[d].name);
-                vm.unableToBeRemovedString = _.join(vm.unableToBeRemoved, ", ");
+                vm.notRemovedString = _.join(vm.datatypesNotRemoved, ", ");
             });
     }
 
@@ -109,7 +109,7 @@ function controller(serviceBroker, notification) {
             vm.originalSelectedItemIds);
 
         if (_.get(vm.parentFlow, 'kind', null) === 'PHYSICAL_FLOW'){
-            getUnableToBeRemoved(decoratorUpdateCommand);
+            getDatatypesUnableToBeRemoved(decoratorUpdateCommand);
         }
 
         return serviceBroker
@@ -117,10 +117,10 @@ function controller(serviceBroker, notification) {
                 CORE_API.DataTypeDecoratorStore.save,
                 [ vm.parentEntityRef, decoratorUpdateCommand ])
             .then(r => {
-                if(!_.isEmpty(vm.unableToBeRemoved)){
+                if(!_.isEmpty(vm.datatypesNotRemoved)){
                     notification.error(
                         "These datatypes were not removed from the logical flow as they are shared with other physical specs: "
-                        + vm.unableToBeRemovedString)
+                        + vm.notRemovedString)
                 }
             });
     };

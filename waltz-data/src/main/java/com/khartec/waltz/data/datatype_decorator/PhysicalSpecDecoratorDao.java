@@ -58,7 +58,7 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
                 .provenance(record.getProvenance())
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
-//                .isReadonly(record.getIsReadonly())
+                .isReadonly(record.getIsReadonly())
                 .build();
     };
 
@@ -70,7 +70,7 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
         r.setProvenance(sdt.provenance());
         r.setLastUpdatedAt(Timestamp.valueOf(sdt.lastUpdatedAt()));
         r.setLastUpdatedBy(sdt.lastUpdatedBy());
-//        r.setIsReadonly(sdt.isReadonly());
+        r.setIsReadonly(sdt.isReadonly());
         return r;
     };
 
