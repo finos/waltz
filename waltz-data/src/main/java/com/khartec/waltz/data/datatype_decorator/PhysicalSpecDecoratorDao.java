@@ -33,6 +33,7 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -40,7 +41,7 @@ import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
 import static com.khartec.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
-import static com.khartec.waltz.model.EntityReference.*;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE;
@@ -57,6 +58,7 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
                 .provenance(record.getProvenance())
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
+//                .isReadonly(record.getIsReadonly())
                 .build();
     };
 
@@ -68,6 +70,7 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
         r.setProvenance(sdt.provenance());
         r.setLastUpdatedAt(Timestamp.valueOf(sdt.lastUpdatedAt()));
         r.setLastUpdatedBy(sdt.lastUpdatedBy());
+//        r.setIsReadonly(sdt.isReadonly());
         return r;
     };
 
@@ -146,7 +149,14 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
                 .deleteFrom(PHYSICAL_SPEC_DATA_TYPE)
                 .where(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(associatedEntityRef.id()))
                 .and(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID.in(dataTypeIds))
+                        .and(PHYSICAL_SPEC_DATA_TYPE.IS_READONLY.isFalse())
                 .execute();
+    }
+
+
+    @Override
+    public List<DataTypeDecorator> findDecoratorsExclusiveToEntity(EntityReference ref) {
+        throw new UnsupportedOperationException("method not supported for " + PHYSICAL_SPECIFICATION.prettyName());
     }
 
 
@@ -168,6 +178,12 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
                                 .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID)))
                         .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.isNull()))
                 .execute();
+    }
+
+
+    @Override
+    public Set<Long> getRemovableDatatypesForEntity(EntityReference reference, Collection<Long> datatypeIds) {
+        throw new UnsupportedOperationException("method not supported for " + PHYSICAL_SPECIFICATION.prettyName());
     }
 
 }

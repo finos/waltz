@@ -193,6 +193,20 @@ public class DataTypeDecoratorService {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(dataTypeIds, "dataTypeIds cannot be null");
 
+        if(entityReference.kind().equals(PHYSICAL_SPECIFICATION)){
+            Collection<Long> logicalFlowIds = map(physicalFlowService.findBySpecificationId(entityReference.id()), PhysicalFlow::logicalFlowId);
+
+            logicalFlowIds
+                    .forEach(id -> {
+                        EntityReference ref = mkRef(LOGICAL_DATA_FLOW, id);
+
+                        Set<Long> removableDatatypesForFlow = dataTypeDecoratorDaoSelectorFactory.getDao(LOGICAL_DATA_FLOW)
+                                .getRemovableDatatypesForEntity(ref, dataTypeIds);
+
+                        removeDataTypeDecorator(userName, ref, removableDatatypesForFlow);
+                    });
+        }
+
         int result = dataTypeDecoratorDaoSelectorFactory
                 .getDao(entityReference.kind())
                 .removeDataTypes(entityReference, dataTypeIds);
@@ -203,6 +217,7 @@ public class DataTypeDecoratorService {
 
         return result;
     }
+
 
     private void recalculateDataTypeUsageForApplications(EntityReference associatedEntityReference) {
         if(LOGICAL_DATA_FLOW.equals(associatedEntityReference.kind())) {
@@ -347,5 +362,19 @@ public class DataTypeDecoratorService {
             LogicalFlow flow = first(logicalFlows);
             return dataTypeService.findSuggestedBySourceEntityRef(flow.source());
         }
+    }
+
+
+    public Set<Long> getRemovableDatatypesForEntity(EntityReference ref, List<Long> datatypeIds) {
+        return dataTypeDecoratorDaoSelectorFactory
+            .getDao(ref.kind())
+            .getRemovableDatatypesForEntity(ref, datatypeIds);
+    }
+
+
+    public Collection<DataTypeDecorator> findDecoratorsExclusiveToEntity(EntityReference ref) {
+        return dataTypeDecoratorDaoSelectorFactory
+            .getDao(ref.kind())
+            .findDecoratorsExclusiveToEntity(ref);
     }
 }

@@ -20,6 +20,7 @@ package com.khartec.waltz.data.datatype_decorator;
 
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
@@ -45,10 +46,13 @@ import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REM
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
 import static com.khartec.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.schema.Tables.PHYSICAL_FLOW;
+import static com.khartec.waltz.schema.Tables.PHYSICAL_SPECIFICATION;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
+import static com.khartec.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE;
 import static java.util.stream.Collectors.toList;
 
 
@@ -69,6 +73,7 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                 .provenance(record.getProvenance())
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .lastUpdatedBy(record.getLastUpdatedBy())
+                .isReadonly(record.getIsReadonly())
                 .build();
     };
 
@@ -83,6 +88,7 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
         d.rating().ifPresent(rating -> r.setRating(rating.name()));
         r.setLastUpdatedAt(Timestamp.valueOf(d.lastUpdatedAt()));
         r.setLastUpdatedBy(d.lastUpdatedBy());
+        r.setIsReadonly(d.isReadonly());
         return r;
     };
 
@@ -191,8 +197,10 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                 .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(associatedEntityRef.id()))
                 .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(DATA_TYPE.name()))
                 .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeIds))
+                        .and(LOGICAL_FLOW_DECORATOR.IS_READONLY.isFalse())
                 .execute();
     }
+
 
     @Override
     public int[] addDecorators(Collection<DataTypeDecorator> decorators) {
@@ -267,6 +275,52 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
         int nonAuthSourceUpdateCount = updateNonAuthSources.execute();
         return authSourceUpdateCount + nonAuthSourceUpdateCount;
     }
+
+
+    @Override
+    public Set<Long> getRemovableDatatypesForEntity(EntityReference reference, Collection<Long> datatypeIds) {
+
+        Field<Integer> numberOfSpecsWithDatatypeOnFlow = DSL.countDistinct(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID).as("numberOfSpecsWithDatatypeOnFlow");
+
+        return dsl
+                .select(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID, numberOfSpecsWithDatatypeOnFlow)
+                .from(LOGICAL_FLOW)
+                .leftJoin(PHYSICAL_FLOW).on(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID)
+                        .and(PHYSICAL_FLOW.IS_REMOVED.isFalse())
+                        .and(PHYSICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name())))
+                .leftJoin(PHYSICAL_SPECIFICATION).on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID)
+                        .and(PHYSICAL_SPECIFICATION.IS_REMOVED.isFalse()))
+                .leftJoin(PHYSICAL_SPEC_DATA_TYPE).on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID))
+                .where(LOGICAL_FLOW.ID.eq(reference.id()))
+                .and(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID.in(datatypeIds))
+                .groupBy(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID)
+                .having(DSL.countDistinct(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID).le(1))
+                .fetchSet(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID);
+    }
+
+
+    @Override
+    public List<DataTypeDecorator> findDecoratorsExclusiveToEntity(EntityReference ref) {
+
+        SelectConditionStep<Record1<Long>> datatypesOnPhysicalSpecs = DSL
+                .select(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID)
+                .from(PHYSICAL_SPEC_DATA_TYPE)
+                .innerJoin(PHYSICAL_SPECIFICATION).on(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
+                .innerJoin(PHYSICAL_FLOW).on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID)
+                        .and(PHYSICAL_FLOW.IS_REMOVED.isFalse()
+                                .and(PHYSICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name()))))
+                .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(ref.id()));
+
+        return dsl
+                .select(LOGICAL_FLOW_DECORATOR.fields())
+                .from(LOGICAL_FLOW)
+                .innerJoin(LOGICAL_FLOW_DECORATOR).on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID)
+                        .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(DATA_TYPE.name())))
+                .where(LOGICAL_FLOW.ID.eq(ref.id())
+                        .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.notIn(datatypesOnPhysicalSpecs)))
+                .fetch(TO_DECORATOR_MAPPER);
+    }
+
 
     // --- HELPERS ---
 

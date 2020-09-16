@@ -41,11 +41,12 @@ const initialState = {
 };
 
 
-function controller(notification, serviceBroker, userService) {
+function controller(notification, serviceBroker, userService, $q) {
     const vm = initialiseData(this, initialState);
 
     const reload = (force = false) => {
-        const promise = serviceBroker
+
+        const decoratorPromise = serviceBroker
             .loadViewData(
                 CORE_API.DataTypeDecoratorStore.findByEntityReference,
                 [ vm.parentEntityRef ],
@@ -59,10 +60,21 @@ function controller(notification, serviceBroker, userService) {
                 dataFlowId: d.dataFlowId
             })));
 
-        return promise
-            .then(r => {
-                vm.used = r;
-            });
+        const decoratorDifferencePromise = (vm.parentEntityRef.kind === 'LOGICAL_DATA_FLOW')
+            ? serviceBroker
+                .loadViewData(CORE_API.DataTypeDecoratorStore.findDecoratorsExclusiveToEntity,
+                [vm.parentEntityRef])
+                .then(r => _.map(r.data, d => d.dataTypeId))
+            : Promise.resolve();
+
+
+        return $q.all([decoratorPromise, decoratorDifferencePromise])
+            .then(([decorators, exclusiveToEntityDatatypeIds]) => {
+                return vm.used = _.map(decorators, d => {
+                    return Object.assign({},
+                        d,
+                        { exclusive: _.includes(exclusiveToEntityDatatypeIds, d.dataTypeId) });
+                })});
     };
 
     vm.$onInit = () => {
@@ -112,7 +124,8 @@ function controller(notification, serviceBroker, userService) {
 controller.$inject = [
     "Notification",
     "ServiceBroker",
-    "UserService"
+    "UserService",
+    "$q"
 ];
 
 

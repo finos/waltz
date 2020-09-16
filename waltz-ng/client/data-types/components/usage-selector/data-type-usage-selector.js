@@ -23,6 +23,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./data-type-usage-selector.html";
 import {enrichDataTypes} from "../../data-type-utils";
 import {reduceToSelectedNodesOnly} from "../../../common/hierarchy-utils";
+import {mkRef} from "../../../common/entity-utils";
 
 
 const bindings = {
@@ -42,6 +43,7 @@ const initialState = {
     disablePredicate: null,
     suggestedDataTypes: [],
     showAllDataTypes: false,
+    unableToBeRemoved: [],
     onDirty: (d) => console.log("dtus:onDirty - default impl", d),
     onRegisterSave: (f) => console.log("dtus:onRegisterSave - default impl", f)
 };
@@ -64,7 +66,7 @@ function mkDataTypeUpdateCommand(entityReference, selectedIds = [], originalIds 
 }
 
 
-function controller(serviceBroker) {
+function controller(serviceBroker, notification) {
     const vm = initialiseData(this, initialState);
 
     const postLoadActions = () => {
@@ -87,15 +89,40 @@ function controller(serviceBroker) {
             :reduceToSelectedNodesOnly(vm.allDataTypes, suggestedAndSelectedTypes);
     };
 
+    function getUnableToBeRemoved(decoratorUpdateCommand) {
+        serviceBroker
+            .loadViewData(CORE_API.DataTypeDecoratorStore.getRemovableDatatypes,
+                [mkRef('LOGICAL_DATA_FLOW', vm.parentFlow.logicalFlowId), decoratorUpdateCommand.removedDataTypeIds])
+            .then(r => {
+                vm.unableToBeRemoved = _.map(
+                    _.difference(decoratorUpdateCommand.removedDataTypeIds, r.data),
+                    d => vm.allDataTypesById[d].name);
+                vm.unableToBeRemovedString = _.join(vm.unableToBeRemoved, ", ");
+            });
+    }
+
     const doSave = () => {
+
         const decoratorUpdateCommand = mkDataTypeUpdateCommand(
             vm.parentEntityRef,
             vm.checkedItemIds,
             vm.originalSelectedItemIds);
+
+        if (_.get(vm.parentFlow, 'kind', null) === 'PHYSICAL_FLOW'){
+            getUnableToBeRemoved(decoratorUpdateCommand);
+        }
+
         return serviceBroker
             .execute(
                 CORE_API.DataTypeDecoratorStore.save,
-                [ vm.parentEntityRef, decoratorUpdateCommand ]);
+                [ vm.parentEntityRef, decoratorUpdateCommand ])
+            .then(r => {
+                if(!_.isEmpty(vm.unableToBeRemoved)){
+                    notification.error(
+                        "These datatypes were not removed from the logical flow as they are shared with other physical specs: "
+                        + vm.unableToBeRemovedString)
+                }
+            });
     };
 
     const loadDataTypes = (force = false) => {
@@ -229,7 +256,8 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
-    "ServiceBroker"
+    "ServiceBroker",
+    "Notification"
 ];
 
 

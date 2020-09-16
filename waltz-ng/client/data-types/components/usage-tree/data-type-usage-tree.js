@@ -50,6 +50,13 @@ function enrichDataTypeWithExplicitFlag(dataType, explicitIds = []) {
         { explicit: _.includes(explicitIds, dataType.id)});
 }
 
+function enrichDataTypeWithExclusiveFlag(dataType, exclusiveIds = []) {
+    return Object.assign(
+        {},
+        dataType,
+        { exclusive: _.includes(exclusiveIds, dataType.id)});
+}
+
 
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
@@ -66,11 +73,17 @@ function controller(serviceBroker) {
                         ? r.id
                         : r.dataTypeId);
 
+                const exclusiveIds = _.chain(vm.used)
+                    .filter(r => _.has(r, 'exclusive') && r.exclusive)
+                    .map(r => r.dataTypeId)
+                    .value();
+
                 const requiredDataTypes = _
                     .chain(explicitIds)
                     .flatMap(dtId => findParents(dtId, dataTypesById))
                     .uniqBy("id")
                     .map(dataType => enrichDataTypeWithExplicitFlag(dataType, explicitIds))
+                    .map(dataType => enrichDataTypeWithExclusiveFlag(dataType, exclusiveIds))
                     .value();
 
                 const hierarchy = buildHierarchies(requiredDataTypes, false);

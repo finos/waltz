@@ -22,7 +22,7 @@
                  order-by="'-name'"
                  expanded-nodes="$ctrl.expandedNodes"
                  options="$ctrl.treeOptions">
-        <span uib-popover="{{node.description}}"
+        <span uib-popover-template="'wdtut-popover.html'"
               popover-trigger="mouseenter"
               popover-popup-delay="400"
               popover-append-to-body="true"
@@ -33,10 +33,35 @@
               }">
             <span ng-bind="node.name">
             </span>
-            <a class='waltz-visibility-child-30 small'
-               ui-sref="main.data-type.view ({id: node.id })">
-                (more)
-            </a>
+            <span style="position: relative; top: -1px"
+                  class="waltz-visibility-child-30">
+                    <waltz-icon name="exclamation-triangle"
+                                class="wdtut-warning-icon"
+                                ng-if="node.exclusive">
+                    </waltz-icon>
+                    <a class='waltz-visibility-child-30 small'
+                       ui-sref="main.data-type.view ({id: node.id })">
+                        (more)
+                    </a>
+            </span>
         </span>
     </treecontrol>
 </div>
+
+<script type="text/ng-template"
+        id="wdtut-popover.html">
+    <div class="small">
+        <div ng-bind="node.description">
+        </div>
+
+        <div ng-if="node.exclusive"
+             style="border-top: 1px solid #eee; margin-top: 12px; padding-top: 4px"
+             class="text-muted">
+            <waltz-icon name="exclamation-triangle">
+            </waltz-icon>
+            <span>
+                This datatype is not shared with any of its underlying physical specs.
+            </span>
+        </div>
+    </div>
+</script>

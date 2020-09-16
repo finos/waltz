@@ -57,13 +57,31 @@ function store($http, BaseApiUrl) {
             .then(result => result.data);
     };
 
+    // ONLY FOR LOGICAL FLOWS
+    const findDecoratorsExclusiveToEntity = (ref) => {
+        checkIsEntityRef(ref);
+        return $http
+            .get(`${BASE}/exclusive/entity/${ref.kind}/${ref.id}`)
+            .then(result => result.data);
+    };
+
+    // ONLY FOR LOGICAL FLOWS
+    const getRemovableDatatypes = (ref, datatypeIds) => {
+        checkIsEntityRef(ref);
+        return $http
+            .post(`${BASE}/entity/${ref.kind}/${ref.id}/removable-datatype-ids`, datatypeIds)
+            .then(result => result.data);
+    };
+
 
     return {
         findBySelector,
         findByEntityReference,
         findSuggestedByEntityRef,
         findByFlowIds,
-        save
+        save,
+        findDecoratorsExclusiveToEntity,
+        getRemovableDatatypes
     };
 }
 
@@ -102,6 +120,16 @@ export const DataTypeDecoratorStore_API = {
         serviceName,
         serviceFnName: 'save',
         description: 'saves (inserts/deletes) data types for a given entity ref'
+    },
+    findDecoratorsExclusiveToEntity: {
+        serviceName,
+        serviceFnName: 'findDecoratorsExclusiveToEntity',
+        description: 'finds decorators exclusively on this entity'
+    },
+    getRemovableDatatypes: {
+        serviceName,
+        serviceFnName: 'getRemovableDatatypes',
+        description: 'finds which datatypes out of list can be removed'
     }
 };
 
