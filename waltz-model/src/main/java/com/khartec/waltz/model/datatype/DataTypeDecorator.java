@@ -48,4 +48,6 @@ public abstract class DataTypeDecorator implements
     @Value.Derived
     public long dataFlowId() { return entityReference().id(); }
 
+    @Value.Default
+    public boolean isReadonly() { return false; };
 }

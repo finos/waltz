@@ -30,7 +30,8 @@ const bindings = {
     onUncheck: "<",
     checkedItemIds: "<",
     expandedItemIds: "<",
-    disablePredicate: "<?"
+    disablePredicate: "<?",
+    isReadonlyPredicate: "<?" //overwrites if selected to mark as read only
 };
 
 
@@ -43,8 +44,8 @@ const initialState = {
     onUncheck: id => console.log("default handler in multi-select-treecontrol for node id uncheck: ", id),
     onClick: node => console.log("default handler in multi-select-treecontrol for node click: ", node),
     disablePredicate: node => false,
+    isReadonlyPredicate: node => false
 };
-
 
 function haltEvent() {
     preventDefault(event);
@@ -139,8 +140,10 @@ function controller() {
 
     vm.$onInit = () => {
         // determines if a node should be disabled based on the supplied predicate and if the node is not also
-        // currently selected
-        vm.isDisabled = (node) => vm.disablePredicate(node) && !_.get(vm.checkedMap, node.id, false);
+        // currently selected unless it is read only when it should always be disabled
+        vm.isDisabled = (node) =>
+            (vm.disablePredicate(node) && !_.get(vm.checkedMap, node.id, false))
+            || vm.isReadonlyPredicate(node)
     };
 
     vm.searchTermsChanged = (termStr = "") => {
