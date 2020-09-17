@@ -73,14 +73,14 @@ Use `ditto` to increase readability and to minimise rework if a common base pred
 ## Full Example
 Let's look at an application based survey to see a complete example:
 
-![Survey Definition](/assets/images/surveys/example.png)
+![Survey Definition](/blog/assets/images/surveys/example.png)
 
 Here we can see the survey definition for a simple survey which is gathering data for a cloud migration programme.
 The first question toggles the all the other questions, with q2 being shown if the app is out of scope 
 (note the negation operator, `!` in `! isChecked('IN_SCOPE')`).
 The remaining questions build upon each other using `ditto` and the end result is a dynamic form which can manifest itself in any of the following ways:
 
-![Survey Definition](/assets/images/surveys/results.png)
+![Survey Definition](/blog/assets/images/surveys/results.png)
 
 
 ## Conclusion
