@@ -22,12 +22,24 @@ WHERE
   m.measurable_kind = 'PROCESS'
 ;
 
--- update parent id's based on external parent ids
+-- update parent id's based on external parent ids (mssql)
 UPDATE child
 SET child.parent_id = parent.id
 FROM measurable AS child
   INNER JOIN measurable AS parent ON parent.external_id = child.external_parent_id
-WHERE child.measurable_category_id = 12;
+WHERE child.measurable_category_id = 18;
+
+
+-- update parent id's based on external parent ids (postgres)
+update measurable
+set parent_id = d.pid
+from (
+    select c.id, p.id
+    from measurable c
+    inner join measurable p on p.external_id = c.external_parent_id and p.measurable_category_id = 18
+    where c.measurable_category_id = 18) d (cid, pid)
+where id = d.cid;
+
 
 -- apps in and org unit without any ratings against a measurable category
 select * from application

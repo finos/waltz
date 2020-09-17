@@ -39,7 +39,6 @@ import com.khartec.waltz.model.measurable_category.MeasurableCategory;
 import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.schema.tables.records.*;
 import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
-import org.jetbrains.annotations.NotNull;
 import org.jooq.DSLContext;
 import org.junit.BeforeClass;
 import org.springframework.context.ApplicationContext;
@@ -194,7 +193,6 @@ public class BaseIntegrationTest {
 
 
 
-    @NotNull
     public DSLContext getDsl() {
         return ctx.getBean(DSLContext.class);
     }
