@@ -73,7 +73,8 @@ function controller(serviceBroker, notification) {
         if(vm.parentEntityRef.kind === "LOGICAL_DATA_FLOW"){
             serviceBroker
                 .loadViewData(CORE_API.DataTypeDecoratorStore.findDecoratorsExclusiveToEntity,
-                [vm.parentEntityRef])
+                    [vm.parentEntityRef],
+                    {force: true})
                 .then(r => vm.logicalOnlyDatatypes = _.map(r.data, d => d.dataTypeId))
         }
     };
@@ -96,6 +97,8 @@ function controller(serviceBroker, notification) {
         vm.visibleDataTypes = vm.showAllDataTypes
             ? vm.allDataTypes
             :reduceToSelectedNodesOnly(vm.allDataTypes, suggestedAndSelectedTypes);
+
+        loadLogicalOnlyDatatypes();
     };
 
     function getDatatypesUnableToBeRemoved(decoratorUpdateCommand) {
@@ -261,8 +264,7 @@ function controller(serviceBroker, notification) {
 
         loadDataTypes()
             .then(() => loadSuggestedDatatypes())
-            .then(() => postLoadActions())
-            .then(() => loadLogicalOnlyDatatypes());
+            .then(() => postLoadActions());
     };
 
     vm.$onChanges = () => {
