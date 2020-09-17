@@ -63,7 +63,7 @@ function controller(notification, serviceBroker, userService, $q) {
         const decoratorDifferencePromise = (vm.parentEntityRef.kind === 'LOGICAL_DATA_FLOW')
             ? serviceBroker
                 .loadViewData(CORE_API.DataTypeDecoratorStore.findDecoratorsExclusiveToEntity,
-                [vm.parentEntityRef])
+                    [vm.parentEntityRef])
                 .then(r => _.map(r.data, d => d.dataTypeId))
             : Promise.resolve();
 
