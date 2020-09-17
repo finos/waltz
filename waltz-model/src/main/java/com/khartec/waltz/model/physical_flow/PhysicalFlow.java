@@ -81,4 +81,7 @@ public abstract class PhysicalFlow implements
                 .description(description())
                 .build();
     }
+
+    @Value.Default
+    public boolean isReadOnly() { return false; }
 }

@@ -45,4 +45,7 @@ public abstract class LogicalFlow implements
                 EntityKind.LOGICAL_DATA_FLOW,
                 id().get());
     }
+
+    @Value.Default
+    public boolean isReadOnly() { return false; }
 }
