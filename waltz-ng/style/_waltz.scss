@@ -19,6 +19,7 @@
 @import "breadcrumbs";
 @import "bootstrap-styles";
 @import "grid";
+@import "util";
 @import "waltz-field-table";
 @import "waltz-draft";
 @import "waltz-inactive";
@@ -41,7 +42,6 @@
 @import "../client/change-unit/components/data-type-change-panel/data-type-change-panel";
 @import "../client/common/common";
 @import "../client/complexity/components/chart/complexity-bar-chart";
-@import "../client/data-flow/components/application-flow-summary-pane/application-flow-summary-pane";
 @import "../client/data-types/components/usage-count-tree/data-type-usage-count-tree";
 @import "../client/data-types/components/usage-panel/data-type-usage-panel";
 @import "../client/data-types/components/usage-tree/data-type-usage-tree";
@@ -308,7 +308,7 @@ textarea {
 
 
 .waltz-side-nav-help {
-    @extend small;
+    @extend small !optional;
     color: $text-muted;
     white-space: normal !important;
 }
@@ -319,7 +319,7 @@ textarea {
     padding: 0 6px 4px 6px;
     border-radius: 3px;
     border: 1px solid $waltz-border-color-lighter;
-    @include box-shadow(4px, 4px, 4px, $waltz-border-color);
+    @include waltz-box-shadow();
 
     .dismiss:hover {
         color: mediumblue;
@@ -358,18 +358,18 @@ a.subtle-link:hover {
 
 
 .waltz-action-link {
-    @extend .clickable;
+    @extend .clickable !optional;
     border-bottom: 1px blue dashed;
 }
 
 
 .waltz-btn-transparent {
-    @extend .btn-default;
+    @extend .btn-default !optional;
     background-color: transparent;
 }
 
 .waltz-error {
-    @extend small;
+    @extend small !optional;
     padding: 2px 4px;
     color: #c7254e;
     background-color: #f4edef;

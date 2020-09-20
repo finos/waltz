@@ -30,7 +30,7 @@
 
 @mixin waltz-scroll-region($height) {
     .waltz-scroll-region-#{$height} {
-        @extend .waltz-scroll-region;
+        @extend .waltz-scroll-region !optional;
         height: #{$height}px;
     }
 }

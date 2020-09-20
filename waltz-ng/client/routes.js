@@ -22,13 +22,13 @@ import WelcomeHtml from "./welcome/welcome.html";
 
 
 function warmUpCache($q, serviceBroker) {
-    const promises = $q.all([
-        serviceBroker
-            .loadAppData(CORE_API.EnumValueStore.findAll),
-        serviceBroker
-            .loadAppData(CORE_API.DataTypeStore.findAll),
-    ]);
-    return promises;
+    return $q
+        .all([
+            serviceBroker
+                .loadAppData(CORE_API.EnumValueStore.findAll),
+            serviceBroker
+                .loadAppData(CORE_API.DataTypeStore.findAll),
+        ]);
 }
 
 
