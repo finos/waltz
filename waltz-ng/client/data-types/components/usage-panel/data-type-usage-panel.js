@@ -60,20 +60,25 @@ function controller(notification, serviceBroker, userService, $q) {
                 dataFlowId: d.dataFlowId
             })));
 
-        const decoratorDifferencePromise = (vm.parentEntityRef.kind === 'LOGICAL_DATA_FLOW')
+        const datatypeUsageCharacteristicsPromise = (vm.parentEntityRef.kind === 'LOGICAL_DATA_FLOW')
             ? serviceBroker
-                .loadViewData(CORE_API.DataTypeDecoratorStore.findDecoratorsExclusiveToEntity,
-                    [vm.parentEntityRef])
-                .then(r => _.map(r.data, d => d.dataTypeId))
+                .loadViewData(CORE_API.DataTypeDecoratorStore.findDatatypeUsageCharacteristics,
+                    [vm.parentEntityRef],
+                    { force })
+                .then(r => r.data)
             : Promise.resolve();
 
 
-        return $q.all([decoratorPromise, decoratorDifferencePromise])
-            .then(([decorators, exclusiveToEntityDatatypeIds]) => {
+        return $q
+            .all([decoratorPromise, datatypeUsageCharacteristicsPromise])
+            .then(([decorators, decoratorUsages]) => {
+
+                const datatypeUsageCharacteristicsById = _.keyBy(decoratorUsages, d => d.dataTypeId);
+
                 return vm.used = _.map(decorators, d => {
                     return Object.assign({},
                         d,
-                        { exclusive: _.includes(exclusiveToEntityDatatypeIds, d.dataTypeId) });
+                        { usageCharacteristics: _.get(datatypeUsageCharacteristicsById, d.dataTypeId, null) });
                 })});
     };
 
@@ -85,7 +90,7 @@ function controller(notification, serviceBroker, userService, $q) {
 
     vm.$onChanges = () => {
         if (! vm.parentEntityRef) return;
-        reload();
+        reload(true);
     };
 
     vm.onShowEdit = () => {

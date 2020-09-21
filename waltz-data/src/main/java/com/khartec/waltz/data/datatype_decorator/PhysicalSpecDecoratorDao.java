@@ -19,10 +19,14 @@
 package com.khartec.waltz.data.datatype_decorator;
 
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
+import com.khartec.waltz.model.datatype.DataTypeUsageCharacteristics;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
+import com.khartec.waltz.model.datatype.ImmutableDataTypeUsageCharacteristics;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.records.PhysicalSpecDataTypeRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -33,7 +37,6 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -155,8 +158,23 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
 
 
     @Override
-    public List<DataTypeDecorator> findDecoratorsExclusiveToEntity(EntityReference ref) {
-        throw new UnsupportedOperationException("method not supported for " + PHYSICAL_SPECIFICATION.prettyName());
+    public List<DataTypeUsageCharacteristics> findDatatypeUsageCharacteristics(EntityReference ref) {
+
+        Field<Integer> numberOfFlowsSharingDatatype = DSL.countDistinct(Tables.PHYSICAL_FLOW.ID).as("numberOfFlowsSharingDatatype");
+
+        return dsl
+                .select(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID, PHYSICAL_SPEC_DATA_TYPE.IS_READONLY, numberOfFlowsSharingDatatype)
+                .from(PHYSICAL_SPEC_DATA_TYPE)
+                .leftJoin(Tables.PHYSICAL_FLOW).on(Tables.PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID)
+                        .and(Tables.PHYSICAL_FLOW.IS_REMOVED.isFalse())
+                        .and(Tables.PHYSICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name())))
+                .where(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(ref.id()))
+                .groupBy(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID, PHYSICAL_SPEC_DATA_TYPE.IS_READONLY)
+                .fetch(r -> ImmutableDataTypeUsageCharacteristics.builder()
+                        .dataTypeId(r.get(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID))
+                        .physicalFlowUsageCount(r.get(numberOfFlowsSharingDatatype))
+                        .isReadonly(r.get(PHYSICAL_SPEC_DATA_TYPE.IS_READONLY))
+                        .build());
     }
 
 
@@ -179,11 +197,4 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
                         .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.isNull()))
                 .execute();
     }
-
-
-    @Override
-    public Set<Long> getRemovableDatatypesForEntity(EntityReference reference, Collection<Long> datatypeIds) {
-        throw new UnsupportedOperationException("method not supported for " + PHYSICAL_SPECIFICATION.prettyName());
-    }
-
 }

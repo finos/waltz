@@ -21,13 +21,13 @@ package com.khartec.waltz.data.datatype_decorator;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
+import com.khartec.waltz.model.datatype.DataTypeUsageCharacteristics;
 import org.jooq.Record1;
 import org.jooq.Select;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public abstract class DataTypeDecoratorDao {
 
@@ -49,10 +49,6 @@ public abstract class DataTypeDecoratorDao {
 
     public abstract int removeDataTypes(EntityReference associatedEntityRef, Collection<Long> dataTypeIds);
 
-    //only implemented for logical flows
-    public abstract List<DataTypeDecorator> findDecoratorsExclusiveToEntity(EntityReference ref);
-
-    //only implemented for logical flows
-    public abstract Set<Long> getRemovableDatatypesForEntity(EntityReference ref, Collection<Long> datatypeIds);
+    public abstract List<DataTypeUsageCharacteristics> findDatatypeUsageCharacteristics(EntityReference ref);
 
 }

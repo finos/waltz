@@ -37,7 +37,7 @@
                   class="waltz-visibility-child-30">
                     <waltz-icon name="exclamation-triangle"
                                 class="wdtut-warning-icon"
-                                ng-if="node.exclusive">
+                                ng-if="node.physicalFlowUsageCount === 0">
                     </waltz-icon>
                     <a class='waltz-visibility-child-30 small'
                        ui-sref="main.data-type.view ({id: node.id })">
@@ -54,7 +54,7 @@
         <div ng-bind="node.description">
         </div>
 
-        <div ng-if="node.exclusive"
+        <div ng-if="node.physicalFlowUsageCount === 0"
              style="border-top: 1px solid #eee; margin-top: 12px; padding-top: 4px"
              class="text-muted">
             <waltz-icon name="exclamation-triangle">

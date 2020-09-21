@@ -27,6 +27,7 @@ import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
+import com.khartec.waltz.model.datatype.DataTypeUsageCharacteristics;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.physical_flow.PhysicalFlow;
@@ -193,20 +194,6 @@ public class DataTypeDecoratorService {
         checkNotNull(userName, "userName cannot be null");
         checkNotNull(dataTypeIds, "dataTypeIds cannot be null");
 
-        if(entityReference.kind().equals(PHYSICAL_SPECIFICATION)){
-            Collection<Long> logicalFlowIds = map(physicalFlowService.findBySpecificationId(entityReference.id()), PhysicalFlow::logicalFlowId);
-
-            logicalFlowIds
-                    .forEach(id -> {
-                        EntityReference ref = mkRef(LOGICAL_DATA_FLOW, id);
-
-                        Set<Long> removableDatatypesForFlow = dataTypeDecoratorDaoSelectorFactory.getDao(LOGICAL_DATA_FLOW)
-                                .getRemovableDatatypesForEntity(ref, dataTypeIds);
-
-                        removeDataTypeDecorator(userName, ref, removableDatatypesForFlow);
-                    });
-        }
-
         int result = dataTypeDecoratorDaoSelectorFactory
                 .getDao(entityReference.kind())
                 .removeDataTypes(entityReference, dataTypeIds);
@@ -365,16 +352,9 @@ public class DataTypeDecoratorService {
     }
 
 
-    public Set<Long> getRemovableDatatypesForEntity(EntityReference ref, List<Long> datatypeIds) {
+    public Collection<DataTypeUsageCharacteristics> findDatatypeUsageCharacteristics(EntityReference ref) {
         return dataTypeDecoratorDaoSelectorFactory
             .getDao(ref.kind())
-            .getRemovableDatatypesForEntity(ref, datatypeIds);
-    }
-
-
-    public Collection<DataTypeDecorator> findDecoratorsExclusiveToEntity(EntityReference ref) {
-        return dataTypeDecoratorDaoSelectorFactory
-            .getDao(ref.kind())
-            .findDecoratorsExclusiveToEntity(ref);
+            .findDatatypeUsageCharacteristics(ref);
     }
 }

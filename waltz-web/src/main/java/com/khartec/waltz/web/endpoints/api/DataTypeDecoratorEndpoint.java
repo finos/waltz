@@ -21,6 +21,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
+import com.khartec.waltz.model.datatype.DataTypeUsageCharacteristics;
 import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.data_type.DataTypeDecoratorService;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -33,7 +34,6 @@ import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
-import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
@@ -67,8 +67,7 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
 
         String findByFlowIdsAndKindPath = mkPath(BASE_URL, "flow-ids", "kind", ":kind");
         String updateDataTypesPath = mkPath(BASE_URL, "save", "entity", ":kind", ":id");
-        String findDecoratorsExclusiveToEntityPath = mkPath(BASE_URL, "exclusive", "entity", ":kind", ":id");
-        String getRemovableDatatypesForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id", "removable-datatype-ids");
+        String findDatatypeUsageCharacteristicsPath = mkPath(BASE_URL, "entity", ":kind", ":id", "usage-characteristics");
 
         ListRoute<DataTypeDecorator> findByEntityReferenceRoute = (req, res)
                 -> dataTypeDecoratorService.findByEntityId(getEntityReference(req));
@@ -86,17 +85,12 @@ public class DataTypeDecoratorEndpoint implements Endpoint {
         ListRoute<DataType> findSuggestedByEntityRefRoute = (req, res)
                 -> dataTypeDecoratorService.findSuggestedByEntityRef(getEntityReference(req));
 
-        ListRoute<Long> getRemovableDatatypesForEntityRoute = (req, res) -> {
-            List<Long> datatypeIds = readList(req, Long.class);
-            return dataTypeDecoratorService.getRemovableDatatypesForEntity(getEntityReference(req), datatypeIds);
-        };
-
-        ListRoute<DataTypeDecorator> findDecoratorsExclusiveToEntityRoute = (req, res) -> dataTypeDecoratorService.findDecoratorsExclusiveToEntity(getEntityReference(req));
+        ListRoute<DataTypeUsageCharacteristics> findDatatypeUsageCharacteristicsRoute = (req, res) -> dataTypeDecoratorService
+                .findDatatypeUsageCharacteristics(getEntityReference(req));
 
         getForList(findByEntityReference, findByEntityReferenceRoute);
         getForList(findSuggestedByEntityRefPath, findSuggestedByEntityRefRoute);
-        getForList(findDecoratorsExclusiveToEntityPath, findDecoratorsExclusiveToEntityRoute);
-        postForList(getRemovableDatatypesForEntityPath, getRemovableDatatypesForEntityRoute);
+        getForList(findDatatypeUsageCharacteristicsPath, findDatatypeUsageCharacteristicsRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
         postForList(findByFlowIdsAndKindPath, findByFlowIdsAndKindRoute);
         postForDatum(updateDataTypesPath, this::updateDataTypesRoute);

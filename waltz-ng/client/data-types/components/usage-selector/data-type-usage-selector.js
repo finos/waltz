@@ -23,7 +23,6 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./data-type-usage-selector.html";
 import {enrichDataTypes} from "../../data-type-utils";
 import {reduceToSelectedNodesOnly} from "../../../common/hierarchy-utils";
-import {mkRef} from "../../../common/entity-utils";
 
 
 const bindings = {
@@ -43,7 +42,6 @@ const initialState = {
     disablePredicate: null,
     suggestedDataTypes: [],
     showAllDataTypes: false,
-    unableToBeRemoved: [],
     onDirty: (d) => console.log("dtus:onDirty - default impl", d),
     onRegisterSave: (f) => console.log("dtus:onRegisterSave - default impl", f)
 };
@@ -66,52 +64,33 @@ function mkDataTypeUpdateCommand(entityReference, selectedIds = [], originalIds 
 }
 
 
-function controller(serviceBroker, notification) {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    const loadLogicalOnlyDatatypes = () => {
-        if(vm.parentEntityRef.kind === "LOGICAL_DATA_FLOW"){
-            serviceBroker
-                .loadViewData(CORE_API.DataTypeDecoratorStore.findDecoratorsExclusiveToEntity,
+    const loadDatatypeUsageCharacteristics = () => {
+            return serviceBroker
+                .loadViewData(CORE_API.DataTypeDecoratorStore.findDatatypeUsageCharacteristics,
                     [vm.parentEntityRef],
                     {force: true})
-                .then(r => vm.logicalOnlyDatatypes = _.map(r.data, d => d.dataTypeId))
-        }
+                .then(r => vm.datatypeUsageCharacteristics = r.data)
     };
 
     const postLoadActions = () => {
+
         const selectedDataTypeIds = mkSelectedTypeIds(vm.dataTypes);
         vm.checkedItemIds = selectedDataTypeIds;
         vm.originalSelectedItemIds = selectedDataTypeIds;
         vm.expandedItemIds = selectedDataTypeIds;
 
         const suggestedAndSelectedTypes = _.concat(selectedDataTypeIds, _.map(vm.suggestedDataTypes, d => d.id));
-        vm.allDataTypes = enrichDataTypes(vm.allDataTypes, vm.checkedItemIds);
+        vm.allDataTypes = enrichDataTypes(vm.allDataTypes, vm.datatypeUsageCharacteristics, vm.checkedItemIds);
         vm.allDataTypesById = _.keyBy(vm.allDataTypes, "id");
-
-        vm.readOnlyDatatypeIdsForParent = _.chain(vm.dataTypes)
-            .filter(d => d.isReadonly)
-            .map(d => d.dataTypeId)
-            .value();
 
         vm.visibleDataTypes = vm.showAllDataTypes
             ? vm.allDataTypes
             :reduceToSelectedNodesOnly(vm.allDataTypes, suggestedAndSelectedTypes);
-
-        loadLogicalOnlyDatatypes();
     };
 
-    function getDatatypesUnableToBeRemoved(decoratorUpdateCommand) {
-        serviceBroker
-            .loadViewData(CORE_API.DataTypeDecoratorStore.getRemovableDatatypes,
-                [mkRef('LOGICAL_DATA_FLOW', vm.parentFlow.logicalFlowId), decoratorUpdateCommand.removedDataTypeIds])
-            .then(r => {
-                vm.datatypesNotRemoved = _.map(
-                    _.difference(decoratorUpdateCommand.removedDataTypeIds, r.data),
-                    d => vm.allDataTypesById[d].name);
-                vm.notRemovedString = _.join(vm.datatypesNotRemoved, ", ");
-            });
-    }
 
     const doSave = () => {
 
@@ -120,21 +99,10 @@ function controller(serviceBroker, notification) {
             vm.checkedItemIds,
             vm.originalSelectedItemIds);
 
-        if (_.get(vm.parentFlow, 'kind', null) === 'PHYSICAL_FLOW'){
-            getDatatypesUnableToBeRemoved(decoratorUpdateCommand);
-        }
-
         return serviceBroker
             .execute(
                 CORE_API.DataTypeDecoratorStore.save,
-                [ vm.parentEntityRef, decoratorUpdateCommand ])
-            .then(r => {
-                if(!_.isEmpty(vm.datatypesNotRemoved)){
-                    notification.error(
-                        "These datatypes were not removed from the logical flow as they are shared with other physical specs: "
-                        + vm.notRemovedString)
-                }
-            });
+                [ vm.parentEntityRef, decoratorUpdateCommand ]);
     };
 
     const loadDataTypes = (force = false) => {
@@ -211,19 +179,11 @@ function controller(serviceBroker, notification) {
         return !node.concrete;
     };
 
-    vm.isReadonly = (node) => {
-        return _.includes(vm.readOnlyDatatypeIdsForParent, node.id);
-    };
-
     vm.isReadonlyPredicate = (node) => {
-        return vm.isReadonly(node) || vm.isRestrictedBySpecs(node);
-    };
 
-    vm.isRestrictedBySpecs = (node) => {
-        const isLogical = vm.parentEntityRef.kind === 'LOGICAL_DATA_FLOW';
-        const originallyChecked = _.includes(vm.originalSelectedItemIds, node.id);
-        const logicalDatatypeOnly = !_.includes(vm.logicalOnlyDatatypes, node.id);
-        return isLogical && originallyChecked && logicalDatatypeOnly;
+        return (vm.parentEntityRef.kind === "LOGICAL_DATA_FLOW")
+            ? !_.isNull(node.usageCharacteristics) && (node.usageCharacteristics.isReadonly || node.usageCharacteristics.physicalFlowUsageCount > 0)
+            : !_.isNull(node.usageCharacteristics) && node.usageCharacteristics.isReadonly;
     };
 
     const determineMessage = () => {
@@ -263,12 +223,14 @@ function controller(serviceBroker, notification) {
             });
 
         loadDataTypes()
+            .then(() => loadDatatypeUsageCharacteristics())
             .then(() => loadSuggestedDatatypes())
             .then(() => postLoadActions());
     };
 
     vm.$onChanges = () => {
         loadDataTypes()
+            .then(() => loadDatatypeUsageCharacteristics())
             .then(() => {
                 postLoadActions();
                 vm.onDirty(false);
