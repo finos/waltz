@@ -78,7 +78,7 @@
         </span>
     </div>
     <div class="alert alert-warning small"
-         ng-if="node.usageCharacteristics.physicalFlowUsageCount > 0">
+         ng-if="$ctrl.isReadonlyPredicate(node) && !node.usageCharacteristics.isReadonly">
         <span>
             This datatype cannot be edited as it is shared with underlying physical specs.
         </span>

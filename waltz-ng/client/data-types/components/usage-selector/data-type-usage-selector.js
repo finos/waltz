@@ -180,7 +180,6 @@ function controller(serviceBroker) {
     };
 
     vm.isReadonlyPredicate = (node) => {
-
         return (vm.parentEntityRef.kind === "LOGICAL_DATA_FLOW")
             ? !_.isNull(node.usageCharacteristics) && (node.usageCharacteristics.isReadonly || node.usageCharacteristics.physicalFlowUsageCount > 0)
             : !_.isNull(node.usageCharacteristics) && node.usageCharacteristics.isReadonly;
