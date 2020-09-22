@@ -60,13 +60,11 @@ function controller(notification, serviceBroker, userService, $q) {
                 dataFlowId: d.dataFlowId
             })));
 
-        const datatypeUsageCharacteristicsPromise = (vm.parentEntityRef.kind === 'LOGICAL_DATA_FLOW')
-            ? serviceBroker
+        const datatypeUsageCharacteristicsPromise = serviceBroker
                 .loadViewData(CORE_API.DataTypeDecoratorStore.findDatatypeUsageCharacteristics,
                     [vm.parentEntityRef],
                     { force })
-                .then(r => r.data)
-            : Promise.resolve();
+                .then(r => r.data);
 
 
         return $q
@@ -74,6 +72,8 @@ function controller(notification, serviceBroker, userService, $q) {
             .then(([decorators, decoratorUsages]) => {
 
                 const datatypeUsageCharacteristicsById = _.keyBy(decoratorUsages, d => d.dataTypeId);
+
+                vm.affectedPhysicals = _.get(_.first(decoratorUsages), 'physicalFlowUsageCount', null);
 
                 return vm.used = _.map(decorators, d => {
                     return Object.assign({},
@@ -104,6 +104,9 @@ function controller(notification, serviceBroker, userService, $q) {
     vm.onSave = () => {
         if(!vm.isDirty)
             return;
+        if(vm.parentEntityRef.kind === 'PHYSICAL_SPECIFICATION' && !confirm("This will affect " + vm.affectedPhysicals + " physical flows. Do you want to continue?")){
+            return;
+        }
         if (vm.save) {
             vm.save()
                 .then(() => {
