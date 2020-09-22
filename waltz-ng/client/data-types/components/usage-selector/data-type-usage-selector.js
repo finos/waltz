@@ -77,7 +77,7 @@ function controller(serviceBroker) {
 
     const postLoadActions = () => {
 
-        const selectedDataTypeIds = mkSelectedTypeIds(vm.dataTypes);
+        const selectedDataTypeIds = mkSelectedTypeIds(vm.datatypeUsageCharacteristics);
         vm.checkedItemIds = selectedDataTypeIds;
         vm.originalSelectedItemIds = selectedDataTypeIds;
         vm.expandedItemIds = selectedDataTypeIds;
@@ -91,7 +91,6 @@ function controller(serviceBroker) {
             :reduceToSelectedNodesOnly(vm.allDataTypes, suggestedAndSelectedTypes);
     };
 
-
     const doSave = () => {
 
         const decoratorUpdateCommand = mkDataTypeUpdateCommand(
@@ -103,26 +102,6 @@ function controller(serviceBroker) {
             .execute(
                 CORE_API.DataTypeDecoratorStore.save,
                 [ vm.parentEntityRef, decoratorUpdateCommand ]);
-    };
-
-    const loadDataTypes = (force = false) => {
-
-        const promise = serviceBroker
-            .loadViewData(
-                CORE_API.DataTypeDecoratorStore.findByEntityReference,
-                [ vm.parentEntityRef ],
-                { force })
-            .then(r => r.data)
-            .then(decorators => _.map(decorators, d => ({
-                lastUpdatedAt: d.lastUpdatedAt,
-                lastUpdatedBy: d.lastUpdatedBy,
-                provenance: d.provenance,
-                dataTypeId: d.decoratorEntity.id,
-                dataFlowId: d.dataFlowId,
-                isReadonly: d.isReadonly
-            })));
-
-        return promise.then(result => vm.dataTypes = result);
     };
 
     const anySelected = () => {
@@ -168,7 +147,7 @@ function controller(serviceBroker) {
 
     vm.save = () => {
         return doSave()
-            .then(() => loadDataTypes(true))
+            .then(() => loadDatatypeUsageCharacteristics(true))
             .then(() => {
                 postLoadActions();
                 vm.onDirty(false);
@@ -180,9 +159,13 @@ function controller(serviceBroker) {
     };
 
     vm.isReadonlyPredicate = (node) => {
-        return (vm.parentEntityRef.kind === "LOGICAL_DATA_FLOW")
-            ? !_.isNull(node.usageCharacteristics) && (node.usageCharacteristics.isReadonly || node.usageCharacteristics.physicalFlowUsageCount > 0)
-            : !_.isNull(node.usageCharacteristics) && node.usageCharacteristics.isReadonly;
+        if(_.isNull(node.usageCharacteristics)){
+            return false;
+        } else {
+            return (vm.parentEntityRef.kind === "LOGICAL_DATA_FLOW")
+                ? node.usageCharacteristics.isReadonly || node.usageCharacteristics.physicalFlowUsageCount > 0
+                : node.usageCharacteristics.isReadonly;
+        }
     };
 
     const determineMessage = () => {
@@ -221,15 +204,13 @@ function controller(serviceBroker) {
                 vm.unknownDataType = _.find(vm.allDataTypes, dt => dt.unknown);
             });
 
-        loadDataTypes()
-            .then(() => loadDatatypeUsageCharacteristics())
+        loadDatatypeUsageCharacteristics()
             .then(() => loadSuggestedDatatypes())
             .then(() => postLoadActions());
     };
 
     vm.$onChanges = () => {
-        loadDataTypes()
-            .then(() => loadDatatypeUsageCharacteristics())
+        loadDatatypeUsageCharacteristics()
             .then(() => {
                 postLoadActions();
                 vm.onDirty(false);
