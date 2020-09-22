@@ -65,15 +65,6 @@ function store($http, BaseApiUrl) {
             .then(result => result.data);
     };
 
-    // ONLY FOR LOGICAL FLOWS
-    const getRemovableDatatypes = (ref, datatypeIds) => {
-        checkIsEntityRef(ref);
-        return $http
-            .post(`${BASE}/entity/${ref.kind}/${ref.id}/removable-datatype-ids`, datatypeIds)
-            .then(result => result.data);
-    };
-
-
     return {
         findBySelector,
         findByEntityReference,
@@ -81,7 +72,6 @@ function store($http, BaseApiUrl) {
         findByFlowIds,
         save,
         findDatatypeUsageCharacteristics,
-        getRemovableDatatypes
     };
 }
 
