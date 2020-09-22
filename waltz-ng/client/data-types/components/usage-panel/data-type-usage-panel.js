@@ -66,14 +66,11 @@ function controller(notification, serviceBroker, userService, $q) {
                     { force })
                 .then(r => r.data);
 
-
         return $q
             .all([decoratorPromise, datatypeUsageCharacteristicsPromise])
             .then(([decorators, decoratorUsages]) => {
 
                 const datatypeUsageCharacteristicsById = _.keyBy(decoratorUsages, d => d.dataTypeId);
-
-                vm.affectedPhysicals = _.get(_.first(decoratorUsages), 'physicalFlowUsageCount', null);
 
                 return vm.used = _.map(decorators, d => {
                     return Object.assign({},
@@ -104,7 +101,7 @@ function controller(notification, serviceBroker, userService, $q) {
     vm.onSave = () => {
         if(!vm.isDirty)
             return;
-        if(vm.parentEntityRef.kind === 'PHYSICAL_SPECIFICATION' && !confirm("This will affect " + vm.affectedPhysicals + " physical flows. Do you want to continue?")){
+        if(vm.parentEntityRef.kind === 'PHYSICAL_SPECIFICATION' && !confirm("This will affect all associated physical flows. Do you want to continue?")){
             return;
         }
         if (vm.save) {
