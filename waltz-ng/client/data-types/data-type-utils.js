@@ -37,10 +37,17 @@ export function findNonConcreteDataTypeIds(dataTypes = []) {
             .map(dt => dt.id);
 }
 
-export function enrichDataTypes(dataTypes = [], selectedDataTypeIds = []) {
+export function enrichDataTypes(dataTypes = [], datatypeUsageCharacteristics = [], selectedDataTypeIds = []) {
+
+    const usageCharacteristicsByDatatypeId = _.keyBy(datatypeUsageCharacteristics, d => d.dataTypeId);
+
     const enrich = (datatype) => {
+
         datatype.disable = !selectedDataTypeIds.includes(datatype.id)
             && !datatype.concrete;
+
+        datatype.usageCharacteristics = _.get(usageCharacteristicsByDatatypeId, datatype.id, null);
+
         return datatype;
     };
     return _.map(dataTypes, enrich);

@@ -50,6 +50,13 @@ function enrichDataTypeWithExplicitFlag(dataType, explicitIds = []) {
         { explicit: _.includes(explicitIds, dataType.id)});
 }
 
+function enrichDataTypeWithUsageCharacteristics(dataType, datatypeUsageCharacteristics = []) {
+    return Object.assign(
+        {},
+        dataType,
+        _.get(datatypeUsageCharacteristics, dataType.id, null));
+}
+
 
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
@@ -66,11 +73,18 @@ function controller(serviceBroker) {
                         ? r.id
                         : r.dataTypeId);
 
+                const datatypeUsageCharacteristicsById = _.chain(vm.used)
+                    .filter(d => _.has(d, 'usageCharacteristics'))
+                    .keyBy(d => d.dataTypeId)
+                    .mapValues(d => d.usageCharacteristics)
+                    .value();
+
                 const requiredDataTypes = _
                     .chain(explicitIds)
                     .flatMap(dtId => findParents(dtId, dataTypesById))
                     .uniqBy("id")
                     .map(dataType => enrichDataTypeWithExplicitFlag(dataType, explicitIds))
+                    .map(dataType => enrichDataTypeWithUsageCharacteristics(dataType, datatypeUsageCharacteristicsById))
                     .value();
 
                 const hierarchy = buildHierarchies(requiredDataTypes, false);

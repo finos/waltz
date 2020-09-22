@@ -41,11 +41,12 @@ const initialState = {
 };
 
 
-function controller(notification, serviceBroker, userService) {
+function controller(notification, serviceBroker, userService, $q) {
     const vm = initialiseData(this, initialState);
 
     const reload = (force = false) => {
-        const promise = serviceBroker
+
+        const decoratorPromise = serviceBroker
             .loadViewData(
                 CORE_API.DataTypeDecoratorStore.findByEntityReference,
                 [ vm.parentEntityRef ],
@@ -59,10 +60,23 @@ function controller(notification, serviceBroker, userService) {
                 dataFlowId: d.dataFlowId
             })));
 
-        return promise
-            .then(r => {
-                vm.used = r;
-            });
+        const datatypeUsageCharacteristicsPromise = serviceBroker
+                .loadViewData(CORE_API.DataTypeDecoratorStore.findDatatypeUsageCharacteristics,
+                    [vm.parentEntityRef],
+                    { force })
+                .then(r => r.data);
+
+        return $q
+            .all([decoratorPromise, datatypeUsageCharacteristicsPromise])
+            .then(([decorators, decoratorUsages]) => {
+
+                const datatypeUsageCharacteristicsById = _.keyBy(decoratorUsages, d => d.dataTypeId);
+
+                return vm.used = _.map(decorators, d => {
+                    return Object.assign({},
+                        d,
+                        { usageCharacteristics: _.get(datatypeUsageCharacteristicsById, d.dataTypeId, null) });
+                })});
     };
 
     vm.$onInit = () => {
@@ -73,7 +87,7 @@ function controller(notification, serviceBroker, userService) {
 
     vm.$onChanges = () => {
         if (! vm.parentEntityRef) return;
-        reload();
+        reload(true);
     };
 
     vm.onShowEdit = () => {
@@ -87,6 +101,9 @@ function controller(notification, serviceBroker, userService) {
     vm.onSave = () => {
         if(!vm.isDirty)
             return;
+        if(vm.parentEntityRef.kind === 'PHYSICAL_SPECIFICATION' && !confirm("This will affect all associated physical flows. Do you want to continue?")){
+            return;
+        }
         if (vm.save) {
             vm.save()
                 .then(() => {
@@ -112,7 +129,8 @@ function controller(notification, serviceBroker, userService) {
 controller.$inject = [
     "Notification",
     "ServiceBroker",
-    "UserService"
+    "UserService",
+    "$q"
 ];
 
 

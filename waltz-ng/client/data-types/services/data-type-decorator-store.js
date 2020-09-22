@@ -57,13 +57,21 @@ function store($http, BaseApiUrl) {
             .then(result => result.data);
     };
 
+    // ONLY FOR LOGICAL FLOWS
+    const findDatatypeUsageCharacteristics = (ref) => {
+        checkIsEntityRef(ref);
+        return $http
+            .get(`${BASE}/entity/${ref.kind}/${ref.id}/usage-characteristics`)
+            .then(result => result.data);
+    };
 
     return {
         findBySelector,
         findByEntityReference,
         findSuggestedByEntityRef,
         findByFlowIds,
-        save
+        save,
+        findDatatypeUsageCharacteristics,
     };
 }
 
@@ -102,6 +110,11 @@ export const DataTypeDecoratorStore_API = {
         serviceName,
         serviceFnName: 'save',
         description: 'saves (inserts/deletes) data types for a given entity ref'
+    },
+    findDatatypeUsageCharacteristics: {
+        serviceName,
+        serviceFnName: 'findDatatypeUsageCharacteristics',
+        description: 'finds datatype usage characteristics for this entity'
     }
 };
 
