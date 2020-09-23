@@ -34,7 +34,7 @@
                             <a class="clickable" ng-click="$ctrl.changeFinancialYear(yr)">
                                 {{yr}}
                             </a>
-                        </li>
+                        </li>select
                     </ul>
                 </div>
             </div>
@@ -61,8 +61,8 @@
 
     <br>
 
-    <waltz-grid column-defs="$ctrl.columnDefs" selected-fy="$ctrl.selectedFinancialYear" row-data="$ctrl.filteredEntries" 
-    scope-provider="$ctrl.scopeProvider" on-initialise="$ctrl.onInitialise" on-row-select="$ctrl.onRowSelect" 
+    <waltz-grid column-defs="$ctrl.columnDefs" selected-financial-year="$ctrl.selectedFinancialYear" row-data="$ctrl.filteredEntries"
+    scope-provider="$ctrl.scopeProvider" on-initialise="$ctrl.onInitialise" on-row-select="$ctrl.onRowSelect"
     class="small">
     </waltz-grid>
 </div>

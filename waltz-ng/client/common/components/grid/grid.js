@@ -28,7 +28,7 @@ const bindings = {
     onInitialise: "<?",
     scopeProvider: "<?",
     onRowSelect: "<",
-    selectedFy: "<?"
+    selectedFinancialYear: "<?"
 };
 
 
@@ -46,7 +46,7 @@ const initialState = {
 };
 
 function filterByYear(gridApi){
-    let year = gridApi.selectedYear.split('-')[1];
+    let year = gridApi.selectedFinancialYear.split('-')[1];
     if(gridApi.gridApi.grid.options.data[0].isAttested=="ATTESTED"){
         let temp = gridApi.gridApi.grid.options.data.filter(function(item){
             return  (''+(moment(item.attestation.attestedAt,"YYYY-MM-DD").year()) == year)
@@ -76,7 +76,7 @@ function controller(uiGridExporterConstants,
                     {
                         exportFn: vm.exportData,
                         gridApi: vm.gridApi,
-                        selectedYear: vm.selectedFy
+                        selectedFinancialYear: vm.selectedFinancialYear
                     });
 
                 if (vm.onRowSelect) {
@@ -113,7 +113,7 @@ function controller(uiGridExporterConstants,
             {
                 exportFn: vm.exportData,
                 gridApi: vm.gridApi,
-                selectedYear: vm.selectedFy
+                selectedFinancialYear: vm.selectedFinancialYear
             });
     };
 

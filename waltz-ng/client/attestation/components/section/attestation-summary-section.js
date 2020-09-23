@@ -38,7 +38,8 @@ const initialState = {
 
 const bindings = {
     parentEntityRef: "<",
-    filters: "<"
+    filters: "<",
+    selectedFinancialYear: "<?"
 };
 
 
@@ -48,12 +49,13 @@ function controller($q,
     const vm = initialiseData(this, initialState);
 
     const loadData = () => {
-
+        console.log('vm.selectedFinancialYear: ',vm.selectedFinancialYear);
         vm.selectionOptions = mkSelectionOptions(
             vm.parentEntityRef,
             determineDownwardsScopeForKind(vm.parentEntityRef.kind),
             [entityLifecycleStatus.ACTIVE.key],
-            vm.filters);
+            vm.filters,
+            vm.selectedFinancialYear);
 
         const attestationInstancePromise = serviceBroker
             .loadViewData(
@@ -107,6 +109,7 @@ function controller($q,
     };
 
     vm.$onChanges = (changes) => {
+        console.log(changes);
         if(changes.filters) {
             loadData();
         }

@@ -30,7 +30,7 @@ const bindings = {
     format: "@?",
     filename: "@?",
     requestBody: "<",
-    styling: "@?" // link | button
+    styling: "@?", // link | button
 };
 
 

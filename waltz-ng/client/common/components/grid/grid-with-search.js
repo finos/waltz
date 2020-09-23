@@ -31,7 +31,7 @@ const bindings = {
     onChange: "<?",
     onRowSelect: "<?",
     localStorageKey: "@?",
-    selectedFinancialYear: "@?"
+    selectedFinancialYear: "<?"
 };
 
 
@@ -56,7 +56,7 @@ const initialState = {
 };
 
 function filterByYear(gridApi){
-    let year = gridApi.selectedYear.split('-')[1];
+    let year = gridApi.selectedFinancialYear.split('-')[1];
     if(gridApi.gridApi.grid.options.data[0].isAttested=="ATTESTED"){
         let temp = gridApi.gridApi.grid.options.data.filter(function(item){
             return  (''+(moment(item.attestation.attestedAt,"YYYY-MM-DD").year()) == year)
