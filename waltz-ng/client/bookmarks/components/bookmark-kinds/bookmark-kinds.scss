@@ -31,7 +31,7 @@
     }
 
     .wbk-no-bookmarks {
-        @extend .small;
+        @extend .small !optional;
         color: #ddd;
         padding-top: 5px;
         padding-bottom: 5px;
