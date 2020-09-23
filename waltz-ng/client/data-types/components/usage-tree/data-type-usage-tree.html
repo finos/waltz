@@ -22,21 +22,21 @@
                  order-by="'-name'"
                  expanded-nodes="$ctrl.expandedNodes"
                  options="$ctrl.treeOptions">
-            <span uib-popover="{{node.description}}"
-                  popover-trigger="mouseenter"
-                  popover-popup-delay="400"
-                  popover-append-to-body="true"
-                  class="waltz-visibility-parent"
-                  ng-class="{
-                    'wdtut-implicit' : !node.explicit,
-                    'wdtut-explicit' : node.explicit
-                  }">
-                <span ng-bind="node.name">
-                </span>
-                <a class='waltz-visibility-child-30 small'
-                   ui-sref="main.data-type.view ({id: node.id })">
-                    (more)
-                </a>
+        <span uib-popover="{{node.description}}"
+              popover-trigger="mouseenter"
+              popover-popup-delay="400"
+              popover-append-to-body="true"
+              class="waltz-visibility-parent"
+              ng-class="{
+                'wdtut-implicit' : !node.explicit,
+                'wdtut-explicit' : node.explicit
+              }">
+            <span ng-bind="node.name">
             </span>
+            <a class='waltz-visibility-child-30 small'
+               ui-sref="main.data-type.view ({id: node.id })">
+                (more)
+            </a>
+        </span>
     </treecontrol>
 </div>

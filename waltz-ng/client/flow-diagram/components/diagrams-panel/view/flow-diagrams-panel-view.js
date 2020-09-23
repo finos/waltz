@@ -24,7 +24,7 @@ import template from "./flow-diagrams-panel-view.html";
 import {allEntityLifecycleStatuses, initialiseData} from "../../../../common/index";
 import {CORE_API} from "../../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../../common/selector-utils";
-import {dyamicSectionNavigationDefaultOffset} from "../../../../dynamic-section/components/dynamic-section-navigation/dynamic-section-navigation";
+import {dynamicSectionNavigationDefaultOffset} from "../../../../dynamic-section/components/dynamic-section-navigation/dynamic-section-navigation";
 import {pageHeaderDefaultOffset} from "../../../../widgets/page-header/page-header";
 import {displayError} from "../../../../common/error-utils";
 
@@ -53,7 +53,7 @@ function determinePopupTopPosition(evt, scrollOffset, elementHeight) {
     // get the width and height of the element
     const navOffset = 60; // the nav bar margin (navbar.html)
     const pageHeaderOffset = scrollOffset > pageHeaderDefaultOffset ? 40 : 0;  // refer to page-header.js
-    const dynamicNavOffset = scrollOffset > dyamicSectionNavigationDefaultOffset ? 40 : 0; // refer to dynamic-section-navigation
+    const dynamicNavOffset = scrollOffset > dynamicSectionNavigationDefaultOffset ? 40 : 0; // refer to dynamic-section-navigation
 
     const halfHeight = elementHeight / 2;
 
@@ -184,7 +184,7 @@ function controller($element,
         }
     };
 
-    const showFlowBucketDetail = (logicalFlow) => {
+    const showFlowBucketDetail = (logicalFlow, e) => {
         $timeout(() => vm.visibility.contextPopup = false);
         vm.contextPopup.styling = determinePopupPosition(event, $window, $element);
 
@@ -223,7 +223,8 @@ function controller($element,
                 const specsById = _.keyBy(specs, "id");
 
                 vm.changeUnits = changeUnits;
-                const changeUnitsByPhysicalFlowId = _.chain(vm.changeUnits)
+                const changeUnitsByPhysicalFlowId = _
+                    .chain(vm.changeUnits)
                     .filter(cu => cu.subjectEntity.kind = "PHYSICAL_FLOW")
                     .keyBy(cu => cu.subjectEntity.id)
                     .value();

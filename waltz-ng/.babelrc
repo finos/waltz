@@ -1,4 +1,3 @@
 {
-  "presets": ["env"],
-  "plugins": ["syntax-async-functions"]
+  "presets": ["@babel/env"]
 }

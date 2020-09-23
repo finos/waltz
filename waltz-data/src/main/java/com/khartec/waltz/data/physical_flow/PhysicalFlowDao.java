@@ -80,6 +80,7 @@ public class PhysicalFlowDao {
                 .externalId(Optional.ofNullable(record.getExternalId()))
                 .entityLifecycleStatus(EntityLifecycleStatus.valueOf(record.getEntityLifecycleStatus()))
                 .created(UserTimestamp.mkForUser(record.getCreatedBy(), record.getCreatedAt()))
+                .isReadOnly(record.getIsReadonly())
                 .build();
     };
 

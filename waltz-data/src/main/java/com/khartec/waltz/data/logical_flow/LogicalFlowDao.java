@@ -93,6 +93,7 @@ public class LogicalFlowDao {
                 .lastAttestedAt(Optional.ofNullable(record.getLastAttestedAt()).map(ts -> ts.toLocalDateTime()))
                 .created(UserTimestamp.mkForUser(record.getCreatedBy(), record.getCreatedAt()))
                 .provenance(record.getProvenance())
+                .isReadOnly(record.getIsReadonly())
                 .build();
     };
 
@@ -111,6 +112,7 @@ public class LogicalFlowDao {
         record.setEntityLifecycleStatus(flow.entityLifecycleStatus().name());
         record.setCreatedAt(flow.created().map(c -> c.atTimestamp()).orElse(Timestamp.valueOf(flow.lastUpdatedAt())));
         record.setCreatedBy(flow.created().map(c -> c.by()).orElse(flow.lastUpdatedBy()));
+        record.setIsReadonly(flow.isReadOnly());
         return record;
     };
 

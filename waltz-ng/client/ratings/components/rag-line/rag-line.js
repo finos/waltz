@@ -36,7 +36,7 @@ const initialState = {
 };
 
 
-const template = "<svg class=\"rag-line\"></svg>";
+const template = "<svg/>";
 
 
 function controller($element) {
@@ -48,7 +48,9 @@ function controller($element) {
 
     const svg = select($element[0])
         .select("svg")
-        .attrs({ width: `${width}px`, height: `${height}px` });
+        .classed("rag-line", true)
+        .attr("width", `${width}px`)
+        .attr("height", `${height}px`);
 
     const update = (scores, range = [0, 0], ratingSchemeItems) => {
         const xScale = scaleLinear()
@@ -78,7 +80,8 @@ function controller($element) {
             .attr("height", height)
             .attr("y", 0);
 
-        newRects.merge(rects)
+        newRects
+            .merge(rects)
             .attr("x", d => xScale(d.start))
             .attr("width", d => xScale(d.width));
 

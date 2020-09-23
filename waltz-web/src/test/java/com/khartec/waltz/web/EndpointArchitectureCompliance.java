@@ -46,7 +46,7 @@ public class EndpointArchitectureCompliance extends BaseArchitectureComplianceCh
         ArchRule rule = classes().that()
                 .areNotInterfaces()
                 .and()
-                .dontHaveSimpleName("StaticResourcesEndpoint")
+                .doNotHaveSimpleName("StaticResourcesEndpoint")
                 .and()
                 .haveNameMatching(".*Endpoint")
                 .should()
@@ -60,7 +60,7 @@ public class EndpointArchitectureCompliance extends BaseArchitectureComplianceCh
         ArchRule rule = classes().that()
                 .areAssignableTo(DataExtractor.class)
                 .and()
-                .dontHaveSimpleName("DataExtractor")
+                .doNotHaveSimpleName("DataExtractor")
                 .should()
                 .haveNameMatching(".*Extractor")
                 .andShould()
@@ -74,7 +74,7 @@ public class EndpointArchitectureCompliance extends BaseArchitectureComplianceCh
         ArchRule rule = classes().that()
                 .haveNameMatching(".*Extractor")
                 .and()
-                .dontHaveSimpleName("DirectQueryBasedDataExtractor")
+                .doNotHaveSimpleName("DirectQueryBasedDataExtractor")
                 .should()
                 .beAssignableTo(DirectQueryBasedDataExtractor.class);
         rule.check(waltzOnlyClasses);

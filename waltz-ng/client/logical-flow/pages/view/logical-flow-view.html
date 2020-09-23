@@ -25,13 +25,17 @@
             <ol class="waltz-breadcrumbs">
                 <li><a ui-sref="main">Home</a></li>
                 <li ng-if="ctrl.logicalFlow">
-                    <waltz-entity-link entity-ref="ctrl.logicalFlow.source"></waltz-entity-link>
+                    <waltz-entity-link tooltip-placement="bottom"
+                                       entity-ref="ctrl.logicalFlow.source">
+                    </waltz-entity-link>
                 </li>
                 <li ng-if="!ctrl.logicalFlow">
                     Logical Flow
                 </li>
                 <li>
-                    <waltz-entity-link entity-ref="ctrl.logicalFlow.target"></waltz-entity-link>
+                    <waltz-entity-link tooltip-placement="bottom"
+                                       entity-ref="ctrl.logicalFlow.target">
+                    </waltz-entity-link>
                 </li>
             </ol>
         </breadcrumbs>
