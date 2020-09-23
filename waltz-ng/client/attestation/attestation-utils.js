@@ -8,6 +8,7 @@
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -18,7 +19,7 @@
 
 import {CORE_API} from "../common/services/core-api-utils";
 import _ from "lodash";
-import {mkDateGridCell, mkEntityLinkGridCell} from "../common/grid-utils";
+import {mkOnlyDateGridCell , mkEntityLinkGridCell} from "../common/grid-utils";
 import {mapToDisplayNames} from "../applications/application-utils";
 import {entity} from "../common/services/enums/entity";
 
@@ -164,5 +165,5 @@ export const attestationSummaryColumnDefs = [
     {field: "application.businessCriticalityDisplay", name: "Business Criticality"},
     {field: "application.lifecyclePhaseDisplay", name: "Lifecycle Phase"},
     {field: "attestation.attestedBy", name: "Last Attested By"},
-    mkDateGridCell("Last Attested At", "attestation.attestedAt")
+    mkOnlyDateGridCell("Last Attested At", "attestation.attestedAt")
 ];

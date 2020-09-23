@@ -19,6 +19,7 @@
 import _ from "lodash";
 import {initialiseData, invokeFunction, termSearch} from "../../../common";
 import template from "./grid-with-search.html";
+import moment from "moment";
 
 const bindings = {
     columnDefs: "<",
@@ -29,7 +30,8 @@ const bindings = {
     onInitialise: "<?",
     onChange: "<?",
     onRowSelect: "<?",
-    localStorageKey: "@?"
+    localStorageKey: "@?",
+    selectedFinancialYear: "@?"
 };
 
 
@@ -42,9 +44,26 @@ const initialState = {
     searchControlMinRows: 5,
     searchPlaceholderText: "Search...",
     searchQuery: null,
-    onInitialise: (gridApi) => console.log("Default onInitialise handler for grid-search: ", gridApi),
+    financialYearFilter : [
+            'FY-'+moment().year(),
+            'FY-'+(moment().year()-1),
+            'FY-'+(moment().year()-2),
+            'FY-'+(moment().year()-3)
+    ],
+    selectedFinancialYear: 'FY-'+moment().year(),
+    onInitialise: (gridApi) => {filterByYear(gridApi)},
     onChange: (gridApi) => {}
 };
+
+function filterByYear(gridApi){
+    let year = gridApi.selectedYear.split('-')[1];
+    if(gridApi.gridApi.grid.options.data[0].isAttested=="ATTESTED"){
+        let temp = gridApi.gridApi.grid.options.data.filter(function(item){
+            return  (''+(moment(item.attestation.attestedAt,"YYYY-MM-DD").year()) == year)
+        });
+        gridApi.gridApi.grid.options.data = temp;
+    }
+}
 
 
 function mkSearchFields(columnDefs = []) {
@@ -55,7 +74,6 @@ function mkSearchFields(columnDefs = []) {
         .value();
 }
 
-
 function controller() {
     const vm = initialiseData(this, initialState);
 
@@ -64,7 +82,6 @@ function controller() {
         vm.searchFields = mkSearchFields(vm.columnDefs);
         invokeFunction(vm.onChange, { entriesCount: _.size(vm.filteredEntries) });
     };
-
 
     vm.filterEntries = query => {
         vm.searchQuery = query;
@@ -78,7 +95,8 @@ function controller() {
 const component = {
     bindings,
     template,
-    controller
+    controller,
+    transclude:true
 };
 
 

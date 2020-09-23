@@ -17,25 +17,52 @@
   -->
 
 <div>
-    <div class="row"
-         ng-if="$ctrl.entries.length > $ctrl.searchControlMinRows">
+    <div class="row" ng-if="$ctrl.entries.length > $ctrl.searchControlMinRows">
         <div class="col-md-6">
-            <waltz-search-control min-characters="3"
-                                  delay="250"
-                                  on-query="$ctrl.filterEntries"
-                                  local-storage-key="{{ $ctrl.localStorageKey }}"
-                                  placeholder-text="{{ $ctrl.searchPlaceholderText }}">
+            <waltz-search-control min-characters="3" delay="250" on-query="$ctrl.filterEntries"
+                local-storage-key="{{ $ctrl.localStorageKey }}" placeholder-text="{{ $ctrl.searchPlaceholderText }}">
             </waltz-search-control>
+        </div>
+        <div class="col-md-6" ng-if="$ctrl.entries[0].isAttested!='NEVER_ATTESTED'">
+            <div class="input-group">
+                <div class="btn-group" uib-dropdown keyboard-nav dropdown-append-to-body>
+                    <button type="button" class="btn btn-default" id="financialYear" uib-dropdown-toggle>
+                        {{$ctrl.selectedFinancialYear}}<span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" uib-dropdown-menu role="menu">
+                        <li ng-repeat="yr in $ctrl.financialYearFilter" role="menuitem">
+                            <a class="clickable" ng-click="$ctrl.changeFinancialYear(yr)">
+                                {{yr}}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" ng-if="$ctrl.entries.length <= $ctrl.searchControlMinRows">
+        <div class="col-md-12" ng-if="$ctrl.entries[0].isAttested!='NEVER_ATTESTED'">
+            <div class="input-group">
+                <div class="btn-group" uib-dropdown keyboard-nav dropdown-append-to-body>
+                    <button type="button" class="btn btn-default" id="financialYear" uib-dropdown-toggle>
+                        {{$ctrl.selectedFinancialYear}}<span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" uib-dropdown-menu role="menu">
+                        <li ng-repeat="yr in $ctrl.financialYearFilter" role="menuitem">
+                            <a class="clickable" ng-click="$ctrl.selectedFinancialYear=yr">
+                                {{yr}}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 
     <br>
 
-    <waltz-grid column-defs="$ctrl.columnDefs"
-                row-data="$ctrl.filteredEntries"
-                scope-provider="$ctrl.scopeProvider"
-                on-initialise="$ctrl.onInitialise"
-                on-row-select="$ctrl.onRowSelect"
-                class="small">
+    <waltz-grid column-defs="$ctrl.columnDefs" selected-fy="$ctrl.selectedFinancialYear" row-data="$ctrl.filteredEntries" 
+    scope-provider="$ctrl.scopeProvider" on-initialise="$ctrl.onInitialise" on-row-select="$ctrl.onRowSelect" 
+    class="small">
     </waltz-grid>
 </div>

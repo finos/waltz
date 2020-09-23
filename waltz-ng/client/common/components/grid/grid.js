@@ -18,6 +18,7 @@
 
 import {initialiseData, invokeFunction} from "../../../common";
 import template from "./grid.html";
+import moment from "moment";
 
 
 const bindings = {
@@ -26,7 +27,8 @@ const bindings = {
     rowTemplate: "<",
     onInitialise: "<?",
     scopeProvider: "<?",
-    onRowSelect: "<"
+    onRowSelect: "<",
+    selectedFy: "<?"
 };
 
 
@@ -39,10 +41,19 @@ const initialState = {
     minRowsToShow: 10,
     rowTemplate: null,
     scopeProvider: null,
-    onInitialise: (e) => {}
+    onInitialise: (gridApi) => {filterByYear(gridApi)},
+    onChange: (gridApi) => {filterByYear(gridApi);}
 };
 
-
+function filterByYear(gridApi){
+    let year = gridApi.selectedYear.split('-')[1];
+    if(gridApi.gridApi.grid.options.data[0].isAttested=="ATTESTED"){
+        let temp = gridApi.gridApi.grid.options.data.filter(function(item){
+            return  (''+(moment(item.attestation.attestedAt,"YYYY-MM-DD").year()) == year)
+        });
+        gridApi.gridApi.grid.options.data = temp;
+    }
+}
 function controller(uiGridExporterConstants,
                     uiGridExporterService) {
     const vm = initialiseData(this, initialState);
@@ -64,7 +75,8 @@ function controller(uiGridExporterConstants,
                     vm.onInitialise,
                     {
                         exportFn: vm.exportData,
-                        gridApi: vm.gridApi
+                        gridApi: vm.gridApi,
+                        selectedYear: vm.selectedFy
                     });
 
                 if (vm.onRowSelect) {
@@ -89,14 +101,20 @@ function controller(uiGridExporterConstants,
 
 
     vm.$onChanges = (changes) => {
+
         if (! vm.gridOptions) return;
 
         if (changes.columnDefs) {
             vm.gridOptions.columnDefs = vm.columnDefs;
         }
-
         vm.gridOptions.minRowsToShow = Math.min(vm.minRowsToShow, vm.rowData.length);
         vm.gridOptions.data = vm.rowData;
+        invokeFunction(vm.onChange,
+            {
+                exportFn: vm.exportData,
+                gridApi: vm.gridApi,
+                selectedYear: vm.selectedFy
+            });
     };
 
     vm.exportData = (fileName = "download.csv") => {
@@ -108,7 +126,7 @@ function controller(uiGridExporterConstants,
             .then(() => {
                 // prepare data
                 const exportColumnHeaders = uiGridExporterService.getColumnHeaders(grid, colVisibility);
-                const exportData = uiGridExporterService.getData(grid, rowVisibility, colVisibility);
+                const exportData = uiGridExporterService.getData(grid, uiGridExporterConstants.VISIBLE, colVisibility);
                 const csvContent = uiGridExporterService.formatAsCsv(exportColumnHeaders, exportData, exportDataSeparator);
 
                 // trigger file download
