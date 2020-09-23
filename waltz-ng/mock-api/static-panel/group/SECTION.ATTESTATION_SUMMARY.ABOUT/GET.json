@@ -1,0 +1,12 @@
+[
+    {
+        "id": 22,
+        "title": "About",
+        "icon": "shield",
+        "group": "SECTION.ATTESTATION_SUMMARY.ABOUT",
+        "content": "Display the summary of attested and non attested applications as pie chart.<br/><br/>                     Application distribution based on <ul><li>Logical flow attestation</li><li>Physical flow attestation</li>",
+        "priority": 1,
+        "width": 12,
+        "encoding": "MARKDOWN"
+    }
+]

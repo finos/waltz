@@ -1,0 +1,44 @@
+{
+    "environmentCounts": [
+        {
+            "id": "N/A",
+            "count": 53.0
+        },
+        {
+            "id": "PRD",
+            "count": 9.0
+        },
+        {
+            "id": "DEV",
+            "count": 10.0
+        },
+        {
+            "id": "UAT",
+            "count": 7.0
+        },
+        {
+            "id": "DR",
+            "count": 7.0
+        }
+    ],
+    "vendorCounts": [
+        {
+            "id": "ORACLE CORPORATION",
+            "count": 77.0
+        },
+        {
+            "id": "MICROSOFT",
+            "count": 9.0
+        }
+    ],
+    "endOfLifeStatusCounts": [
+        {
+            "id": "NOT_END_OF_LIFE",
+            "count": 69.0
+        },
+        {
+            "id": "END_OF_LIFE",
+            "count": 17.0
+        }
+    ]
+}

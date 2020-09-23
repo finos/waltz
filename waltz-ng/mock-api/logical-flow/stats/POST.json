@@ -1,0 +1,430 @@
+{
+    "appCounts": {
+        "inbound": 11.0,
+        "outbound": 6.0,
+        "intra": 80.0
+    },
+    "flowCounts": {
+        "inbound": 11.0,
+        "outbound": 7.0,
+        "intra": 1.0
+    },
+    "dataTypeCounts": [
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 19000,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "INBOUND",
+                    "count": 2.0
+                },
+                {
+                    "id": "OUTBOUND",
+                    "count": 2.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        },
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 32200,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "INBOUND",
+                    "count": 1.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        },
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 32300,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "INBOUND",
+                    "count": 1.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        },
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 32400,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "INBOUND",
+                    "count": 1.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        },
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 33100,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "INBOUND",
+                    "count": 1.0
+                },
+                {
+                    "id": "OUTBOUND",
+                    "count": 1.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        },
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 34300,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "INBOUND",
+                    "count": 1.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        },
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 38100,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "INBOUND",
+                    "count": 1.0
+                },
+                {
+                    "id": "OUTBOUND",
+                    "count": 1.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        },
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 41400,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "INBOUND",
+                    "count": 1.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        },
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 48400,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "INBOUND",
+                    "count": 1.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        },
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 48415,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "INBOUND",
+                    "count": 1.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        },
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 48427,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "INBOUND",
+                    "count": 1.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        },
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 48436,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "INBOUND",
+                    "count": 1.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        },
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 48450,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "INBOUND",
+                    "count": 1.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        },
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 48460,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "INBOUND",
+                    "count": 1.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        },
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 48473,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "INBOUND",
+                    "count": 1.0
+                },
+                {
+                    "id": "OUTBOUND",
+                    "count": 1.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        },
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 60084,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "INBOUND",
+                    "count": 1.0
+                },
+                {
+                    "id": "INTRA",
+                    "count": 1.0
+                },
+                {
+                    "id": "OUTBOUND",
+                    "count": 1.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        },
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 60484,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "INBOUND",
+                    "count": 2.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        },
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 61684,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "INBOUND",
+                    "count": 1.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        },
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 61784,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "INBOUND",
+                    "count": 1.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        },
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 62184,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "INBOUND",
+                    "count": 1.0
+                },
+                {
+                    "id": "INTRA",
+                    "count": 1.0
+                },
+                {
+                    "id": "OUTBOUND",
+                    "count": 1.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        },
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 46100,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "OUTBOUND",
+                    "count": 1.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        },
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 48459,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "OUTBOUND",
+                    "count": 1.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        },
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 48468,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "OUTBOUND",
+                    "count": 1.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        },
+        {
+            "entityReference": {
+                "description": null,
+                "kind": "DATA_TYPE",
+                "id": 48484,
+                "name": null,
+                "entityLifecycleStatus": "ACTIVE"
+            },
+            "tallies": [
+                {
+                    "id": "OUTBOUND",
+                    "count": 1.0
+                }
+            ],
+            "lastUpdatedAt": "2020-09-17T10:13:50.277"
+        }
+    ]
+}

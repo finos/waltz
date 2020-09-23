@@ -1,0 +1,632 @@
+[
+    {
+        "icon": "fw",
+        "description": "Approved for internal and external use",
+        "name": "Approved for all use",
+        "position": 20,
+        "type": "ApprovalStatus",
+        "key": "APPROVED_ALL",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Approved for internal use only, external use would require further review",
+        "name": "Approved for internal use",
+        "position": 30,
+        "type": "ApprovalStatus",
+        "key": "INTERNAL_ONLY",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Pending approval, therefore no current opinion",
+        "name": "Pending Approval",
+        "position": 10,
+        "type": "ApprovalStatus",
+        "key": "PENDING_APPROVAL",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Cannot be used",
+        "name": "Rejected",
+        "position": 40,
+        "type": "ApprovalStatus",
+        "key": "REJECTED_ALL",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Exception must be obtained before use",
+        "name": "Requires Exception",
+        "position": 50,
+        "type": "ApprovalStatus",
+        "key": "REQUIRES_EXCEPTION",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "A non authoritative source is one where an alternative authoritative source is available",
+        "name": "Non Authoritative",
+        "position": 0,
+        "type": "AuthoritativenessRating",
+        "key": "DISCOURAGED",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "A source's rating is 'no opinion' when no primary or secondary sources have been declared for the associated data type",
+        "name": "No Opinion",
+        "position": 0,
+        "type": "AuthoritativenessRating",
+        "key": "NO_OPINION",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Authority Statement sourced from Collibra",
+        "name": "RAS",
+        "position": 0,
+        "type": "AuthoritativenessRating",
+        "key": "PRIMARY",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Authoritative Sources defined in Waltz",
+        "name": "Non RAS",
+        "position": 0,
+        "type": "AuthoritativenessRating",
+        "key": "SECONDARY",
+        "iconColor": "none"
+    },
+    {
+        "icon": "desktop",
+        "description": "Application Instance",
+        "name": "Application Instance",
+        "position": 0,
+        "type": "BookmarkKind",
+        "key": "APPLICATION_INSTANCE",
+        "iconColor": "none"
+    },
+    {
+        "icon": "simplybuilt",
+        "description": "Automated Build and Deployment Systems, e.g. Teamcity, Jenkins, Hudson",
+        "name": "Automated Build / Deployment System",
+        "position": 0,
+        "type": "BookmarkKind",
+        "key": "BUILD_SYSTEM",
+        "iconColor": "none"
+    },
+    {
+        "icon": "briefcase",
+        "description": "Business Specification",
+        "name": "Business Specification",
+        "position": 0,
+        "type": "BookmarkKind",
+        "key": "BUSINESS_SPECIFICATION",
+        "iconColor": "none"
+    },
+    {
+        "icon": "book",
+        "description": "Documentation, e.g. Wiki, Sharepoint",
+        "name": "Documentation",
+        "position": 0,
+        "type": "BookmarkKind",
+        "key": "DOCUMENTATION",
+        "iconColor": "none"
+    },
+    {
+        "icon": "tasks",
+        "description": "Issue Tracker, e.g. Jira, Bugzilla",
+        "name": "Issue Tracker",
+        "position": 0,
+        "type": "BookmarkKind",
+        "key": "ISSUE_TRACKER",
+        "iconColor": "none"
+    },
+    {
+        "icon": "bar-chart",
+        "description": "Monitoring Systems",
+        "name": "Monitoring",
+        "position": 0,
+        "type": "BookmarkKind",
+        "key": "MONITORING",
+        "iconColor": "none"
+    },
+    {
+        "icon": "file-text-o",
+        "description": "Operational Level Agreement",
+        "name": "Operational Level Agreement",
+        "position": 0,
+        "type": "BookmarkKind",
+        "key": "OLA",
+        "iconColor": "none"
+    },
+    {
+        "icon": "sliders",
+        "description": "Quality Control Systems",
+        "name": "Quality Control",
+        "position": 0,
+        "type": "BookmarkKind",
+        "key": "QUALITY_CONTROL",
+        "iconColor": "none"
+    },
+    {
+        "icon": "list-alt",
+        "description": "A runbook is a compilation of routine procedures and operations that the system administrator or operator carries out",
+        "name": "Runbook",
+        "position": 0,
+        "type": "BookmarkKind",
+        "key": "RUNBOOK",
+        "iconColor": "none"
+    },
+    {
+        "icon": "code",
+        "description": "Source Code Control / Management",
+        "name": "Source Code Control",
+        "position": 0,
+        "type": "BookmarkKind",
+        "key": "SOURCE_CODE_CONTROL",
+        "iconColor": "none"
+    },
+    {
+        "icon": "tty",
+        "description": "Technical Specification",
+        "name": "Technical Specification",
+        "position": 0,
+        "type": "BookmarkKind",
+        "key": "TECHNICAL_SPECIFICATION",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Architecture rating inconclusive",
+        "name": "0 - Too Early To Rate",
+        "position": 0,
+        "type": "changeInitiativeArchitectureRating",
+        "key": "0 - Too Early To Rate",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "No architecture issues. No deviations from Target State as defined by Domain Architect",
+        "name": "A - Fully Aligned",
+        "position": 0,
+        "type": "changeInitiativeArchitectureRating",
+        "key": "A - Fully Aligned",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Architecture issues and/or deviations from Target State as defined by Domain Architect. Mitigation plan is in place and has been agreed with domain architect. Ownership to execute against plan lies with the programme",
+        "name": "B - Partially Aligned (action plan in place)",
+        "position": 0,
+        "type": "changeInitiativeArchitectureRating",
+        "key": "B - Partially Aligned (action plan in place)",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Architecture issues and/or deviations from Target State as defined by Domain Architect. Mitigation plan is *not* in place and has not been agreed with domain architect.",
+        "name": "C - Partially Aligned (no action plan in place)",
+        "position": 0,
+        "type": "changeInitiativeArchitectureRating",
+        "key": "C - Partially Aligned (no action plan in place)",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Significant architecture issues and/or deviations from Target State. Agreement obtained from Domain CIO to accept the risk or architecture deviation and proceed.",
+        "name": "D - Not Aligned (risk/deviation accepted)",
+        "position": 0,
+        "type": "changeInitiativeArchitectureRating",
+        "key": "D - Not Aligned (risk/deviation accepted)",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Significant architecture issues and/or deviations from Target State that require immediate management attention.",
+        "name": "F - Not Aligned",
+        "position": 0,
+        "type": "changeInitiativeArchitectureRating",
+        "key": "F - Not Aligned",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Out of scope for programme architecture governance",
+        "name": "N/A - Rating Not Applicable",
+        "position": 0,
+        "type": "changeInitiativeArchitectureRating",
+        "key": "N/A - Rating Not Applicable",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Target state is not available or undefined",
+        "name": "U - Undefined Target State",
+        "position": 0,
+        "type": "changeInitiativeArchitectureRating",
+        "key": "U - Undefined Target State",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Initiation",
+        "name": "Initiation",
+        "position": 0,
+        "type": "changeInitiativeLifecyclePhase",
+        "key": "CONCEPTUAL",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Planning",
+        "name": "Planning",
+        "position": 0,
+        "type": "changeInitiativeLifecyclePhase",
+        "key": "DEVELOPMENT",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Execution",
+        "name": "Execution",
+        "position": 0,
+        "type": "changeInitiativeLifecyclePhase",
+        "key": "PRODUCTION",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Closure",
+        "name": "Closure",
+        "position": 0,
+        "type": "changeInitiativeLifecyclePhase",
+        "key": "RETIRED",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Software amortisation costs",
+        "name": "Software Amortisation",
+        "position": 0,
+        "type": "CostKind",
+        "key": "AMORTISATION",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Application development costs",
+        "name": "Application Development",
+        "position": 0,
+        "type": "CostKind",
+        "key": "APPLICATION_DEVELOPMENT",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "CTB costs",
+        "name": "CTB",
+        "position": 0,
+        "type": "CostKind",
+        "key": "CTB",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Cumulative costs",
+        "name": "Cumulative",
+        "position": 0,
+        "type": "CostKind",
+        "key": "CUMULATIVE",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Infrastructure costs",
+        "name": "Infrastructure",
+        "position": 0,
+        "type": "CostKind",
+        "key": "INFRASTRUCTURE",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Other costs",
+        "name": "Other",
+        "position": 0,
+        "type": "CostKind",
+        "key": "OTHER",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Person costs",
+        "name": "Person Costs",
+        "position": 0,
+        "type": "CostKind",
+        "key": "PERSON",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "RTB costs",
+        "name": "RTB",
+        "position": 0,
+        "type": "CostKind",
+        "key": "RTB",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Software amortisation costs",
+        "name": "Software Amortisation",
+        "position": 0,
+        "type": "CostKind",
+        "key": "SW_AMORTISATION",
+        "iconColor": "none"
+    },
+    {
+        "icon": "circle",
+        "description": "No recent communication but there is some historic communication observed",
+        "name": "Historically Observed",
+        "position": 0,
+        "type": "FreshnessIndicator",
+        "key": "HISTORICALLY_OBSERVED",
+        "iconColor": "red"
+    },
+    {
+        "icon": "circle",
+        "description": "No communication observed",
+        "name": "Never Observed",
+        "position": 0,
+        "type": "FreshnessIndicator",
+        "key": "NEVER_OBSERVED",
+        "iconColor": "grey"
+    },
+    {
+        "icon": "circle",
+        "description": "Observed within a week",
+        "name": "Observed",
+        "position": 0,
+        "type": "FreshnessIndicator",
+        "key": "OBSERVED",
+        "iconColor": "orange"
+    },
+    {
+        "icon": "circle",
+        "description": "The communication was observed recently",
+        "name": "Recently Observed",
+        "position": 0,
+        "type": "FreshnessIndicator",
+        "key": "RECENTLY_OBSERVED",
+        "iconColor": "green"
+    },
+    {
+        "icon": "fw",
+        "description": "External consultant",
+        "name": "Contingent Worker",
+        "position": 0,
+        "type": "PersonKind",
+        "key": "CONSULTANT",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "External contractor",
+        "name": "Contingent Worker",
+        "position": 0,
+        "type": "PersonKind",
+        "key": "CONTRACTOR",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Full time employee",
+        "name": "Staff",
+        "position": 0,
+        "type": "PersonKind",
+        "key": "EMPLOYEE",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "High criticality",
+        "name": "High",
+        "position": 0,
+        "type": "physicalFlowCriticality",
+        "key": "HIGH",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Low criticality",
+        "name": "Low",
+        "position": 0,
+        "type": "physicalFlowCriticality",
+        "key": "LOW",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Medium criticality",
+        "name": "Medium",
+        "position": 0,
+        "type": "physicalFlowCriticality",
+        "key": "MEDIUM",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Criticality Not specified",
+        "name": "None",
+        "position": 0,
+        "type": "physicalFlowCriticality",
+        "key": "NONE",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Criticality not known",
+        "name": "Unknown",
+        "position": 0,
+        "type": "physicalFlowCriticality",
+        "key": "UNKNOWN",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Very high criticality",
+        "name": "Very High",
+        "position": 0,
+        "type": "physicalFlowCriticality",
+        "key": "VERY_HIGH",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Current state",
+        "name": "Current",
+        "position": 0,
+        "type": "scenarioType",
+        "key": "CURRENT",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Interim state",
+        "name": "Interim",
+        "position": 1,
+        "type": "scenarioType",
+        "key": "INTERIM",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Target state",
+        "name": "Target",
+        "position": 2,
+        "type": "scenarioType",
+        "key": "TARGET",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Database connection (jdbc, odbc etc)",
+        "name": "Database Connection",
+        "position": 10,
+        "type": "TransportKind",
+        "key": "DATABASE_CONNECTION",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "DIF API",
+        "name": "DIF",
+        "position": 15,
+        "type": "TransportKind",
+        "key": "DIF",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Electronic emails",
+        "name": "Email",
+        "position": 20,
+        "type": "TransportKind",
+        "key": "EMAIL",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "File share (nfs, samba etc)",
+        "name": "File Share",
+        "position": 40,
+        "type": "TransportKind",
+        "key": "FILE_SHARE",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "File transfer (sftp, ftp, rcp etc)",
+        "name": "File Transport",
+        "position": 30,
+        "type": "TransportKind",
+        "key": "FILE_TRANSPORT",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "The Lightweight Directory Access Protocol is an open, vendor-neutral, industry standard application protocol for accessing and maintaining distributed directory information services over an Internet Protocol network",
+        "name": "LDAP",
+        "position": 45,
+        "type": "TransportKind",
+        "key": "LDAP",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Manual input (Keying in etc)",
+        "name": "Manual",
+        "position": 50,
+        "type": "TransportKind",
+        "key": "MANUAL",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Messaging (queues, topics etc)",
+        "name": "Messaging",
+        "position": 60,
+        "type": "TransportKind",
+        "key": "MESSAGING",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Other",
+        "name": "Other",
+        "position": 70,
+        "type": "TransportKind",
+        "key": "OTHER",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Remote Procedure Call (CORBA etc)",
+        "name": "Remote Procedure Call",
+        "position": 80,
+        "type": "TransportKind",
+        "key": "RPC",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "UDP",
+        "name": "UDP",
+        "position": 90,
+        "type": "TransportKind",
+        "key": "UDP",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Unknown",
+        "name": "Unknown",
+        "position": 100,
+        "type": "TransportKind",
+        "key": "UNKNOWN",
+        "iconColor": "none"
+    },
+    {
+        "icon": "fw",
+        "description": "Web based (REST, GraphQL, HTTP etc)",
+        "name": "Web",
+        "position": 110,
+        "type": "TransportKind",
+        "key": "WEB",
+        "iconColor": "none"
+    }
+]

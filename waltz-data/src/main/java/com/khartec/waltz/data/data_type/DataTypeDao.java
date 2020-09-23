@@ -19,6 +19,7 @@
 package com.khartec.waltz.data.data_type;
 
 import com.khartec.waltz.data.FindEntityReferencesByIdSelector;
+import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.datatype.DataType;
@@ -26,6 +27,8 @@ import com.khartec.waltz.model.datatype.ImmutableDataType;
 import com.khartec.waltz.schema.tables.records.DataTypeRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -44,7 +47,7 @@ import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 
 @Repository
 public class DataTypeDao implements FindEntityReferencesByIdSelector {
-
+    private static final Logger LOG = LoggerFactory.getLogger(LogicalFlowDao.class);
     public final static RecordMapper<Record, DataType> TO_DOMAIN = r -> {
         DataTypeRecord record = r.into(DataTypeRecord.class);
         return ImmutableDataType.builder()
@@ -71,6 +74,9 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
 
 
     public List<DataType> findAll() {
+        LOG.debug((dsl
+                .selectFrom(DATA_TYPE)
+                .fetch(TO_DOMAIN)).toString());
         return dsl
                 .selectFrom(DATA_TYPE)
                 .fetch(TO_DOMAIN);

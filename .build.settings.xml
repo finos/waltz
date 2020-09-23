@@ -23,7 +23,7 @@
 
 
     <profiles>
-        <profile>
+        <!--<profile>
             <id>build-h2</id>
             <activation><activeByDefault>true</activeByDefault></activation>
             <properties>
@@ -33,9 +33,9 @@
                 <database.schema>PUBLIC</database.schema>
                 <database.catalog></database.catalog>
             </properties>
-        </profile>
+        </profile>-->
 
-        <profile>
+        <!--<profile>
             <id>build-postgres</id>
             <activation><activeByDefault>false</activeByDefault></activation>
             <properties>
@@ -45,17 +45,17 @@
                 <database.schema>public</database.schema>
                 <database.catalog></database.catalog>
             </properties>
-        </profile>
+        </profile>-->
 
         <profile>
             <id>build-mariadb</id>
             <activation><activeByDefault>false</activeByDefault></activation>
             <properties>
-                <database.url>jdbc:mysql://127.0.0.1:3306/waltz</database.url>
-                <database.user>root</database.user>
-                <database.password></database.password>
-                <database.schema>waltz</database.schema>
-                <database.catalog></database.catalog>
+                <database.url>jdbc:sqlserver://loncgdbu0006:1433;databaseName=waltz_owner</database.url>
+                <database.user>WALTZ_USER</database.user>
+                <database.password>WaltzU@123</database.password>
+                <database.schema>dbo</database.schema>
+                <database.catalog>WALTZ_OWNER</database.catalog>
             </properties>
         </profile>
     </profiles>

@@ -78,7 +78,8 @@ function setupNetworking(module) {
             ? './'
             : __ENV__ === 'test'
             ? 'http://10.217.34.239:8443/'
-            : 'http://localhost:8443/';
+            : 'http://localhost:9000/'; //Added new port for DEV ENV 
+    //        : 'http://localhost:8443/' Uncomment for TEST ENV
     //: 'http://192.168.1.147:8443/'  // TODO (if testing IE on Mac) : use ip lookup
 
     module

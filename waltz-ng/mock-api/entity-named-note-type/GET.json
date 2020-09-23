@@ -1,0 +1,212 @@
+[
+    {
+        "id": 1,
+        "name": "pRDS Data",
+        "description": "Additional data fetched from pRDS",
+        "applicableEntityKinds": [
+            "MEASURABLE"
+        ],
+        "position": 0,
+        "isReadOnly": true
+    },
+    {
+        "id": 2,
+        "name": "EUC Technology",
+        "description": "EUC Technology used (sourced from ClusterSeven)",
+        "applicableEntityKinds": [
+            "APPLICATION"
+        ],
+        "position": 0,
+        "isReadOnly": true
+    },
+    {
+        "id": 3,
+        "name": "Owned By Division",
+        "description": "Owned By Division",
+        "applicableEntityKinds": [
+            "MEASURABLE"
+        ],
+        "position": 0,
+        "isReadOnly": false
+    },
+    {
+        "id": 4,
+        "name": "Managed By",
+        "description": "Managed By",
+        "applicableEntityKinds": [
+            "MEASURABLE"
+        ],
+        "position": 0,
+        "isReadOnly": false
+    },
+    {
+        "id": 5,
+        "name": "Problem It Solves",
+        "description": "Problem It Solves",
+        "applicableEntityKinds": [
+            "MEASURABLE"
+        ],
+        "position": 0,
+        "isReadOnly": false
+    },
+    {
+        "id": 6,
+        "name": "Product Feature",
+        "description": "Product Feature",
+        "applicableEntityKinds": [
+            "MEASURABLE"
+        ],
+        "position": 0,
+        "isReadOnly": false
+    },
+    {
+        "id": 7,
+        "name": "Additional Resources",
+        "description": "Additional Resources",
+        "applicableEntityKinds": [
+            "MEASURABLE"
+        ],
+        "position": 0,
+        "isReadOnly": false
+    },
+    {
+        "id": 8,
+        "name": "Product Marketing Manager",
+        "description": "Product Marketing Manager",
+        "applicableEntityKinds": [
+            "MEASURABLE"
+        ],
+        "position": 0,
+        "isReadOnly": false
+    },
+    {
+        "id": 9,
+        "name": "GTB Ref",
+        "description": "GTB Ref",
+        "applicableEntityKinds": [
+            "MEASURABLE"
+        ],
+        "position": 0,
+        "isReadOnly": false
+    },
+    {
+        "id": 10,
+        "name": "Services Provided",
+        "description": "Services Provided",
+        "applicableEntityKinds": [
+            "MEASURABLE"
+        ],
+        "position": 0,
+        "isReadOnly": false
+    },
+    {
+        "id": 11,
+        "name": "Business Product Manager",
+        "description": "Business Product Manager",
+        "applicableEntityKinds": [
+            "MEASURABLE"
+        ],
+        "position": 0,
+        "isReadOnly": false
+    },
+    {
+        "id": 12,
+        "name": "Clarity Programme Data",
+        "description": "Clarity Programme Data",
+        "applicableEntityKinds": [
+            "CHANGE_INITIATIVE"
+        ],
+        "position": 0,
+        "isReadOnly": true
+    },
+    {
+        "id": 13,
+        "name": "Collibra Logical Data Element Note",
+        "description": "Notes from Collibra",
+        "applicableEntityKinds": [
+            "LOGICAL_DATA_ELEMENT"
+        ],
+        "position": 0,
+        "isReadOnly": true
+    },
+    {
+        "id": 14,
+        "name": "Application Production Support Contact",
+        "description": "Application Function Escalation (Support) Contacts from NAR",
+        "applicableEntityKinds": [
+            "APPLICATION"
+        ],
+        "position": 0,
+        "isReadOnly": true
+    },
+    {
+        "id": 15,
+        "name": "Conditions",
+        "description": "Condition of the license or active requirement that must be met for license compliance for the listed use-case(s)",
+        "applicableEntityKinds": [
+            "LICENCE"
+        ],
+        "position": 0,
+        "isReadOnly": true
+    },
+    {
+        "id": 16,
+        "name": "Termination Provisions",
+        "description": "License termination clause",
+        "applicableEntityKinds": [
+            "LICENCE"
+        ],
+        "position": 0,
+        "isReadOnly": true
+    },
+    {
+        "id": 17,
+        "name": "Licence Versioning",
+        "description": "Information related to how other versions of the same license may be applied",
+        "applicableEntityKinds": [
+            "LICENCE"
+        ],
+        "position": 0,
+        "isReadOnly": true
+    },
+    {
+        "id": 18,
+        "name": "Other Terms",
+        "description": "Other clauses may modify conditions or trigger requirement on different use-cases than the four defined here",
+        "applicableEntityKinds": [
+            "LICENCE"
+        ],
+        "position": 0,
+        "isReadOnly": true
+    },
+    {
+        "id": 19,
+        "name": "Clarity Data",
+        "description": "Clarity Data",
+        "applicableEntityKinds": [
+            "CHANGE_INITIATIVE"
+        ],
+        "position": 0,
+        "isReadOnly": true
+    },
+    {
+        "id": 20,
+        "name": "Legal Licence Conditions",
+        "description": "Condition of licence use",
+        "applicableEntityKinds": [
+            "LICENCE"
+        ],
+        "position": 0,
+        "isReadOnly": true
+    },
+    {
+        "id": 21,
+        "name": "Retention Details",
+        "description": "Information about the retention period for data",
+        "applicableEntityKinds": [
+            "MEASURABLE"
+        ],
+        "position": 0,
+        "isReadOnly": true
+    }
+]

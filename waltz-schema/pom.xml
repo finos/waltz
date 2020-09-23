@@ -81,6 +81,7 @@
                     <changeLogFile>
                         ${basedir}/../waltz-data/src/main/ddl/liquibase/db.changelog-master.xml
                     </changeLogFile>
+                    <!--suppress UnresolvedMavenProperty -->
                     <driver>${jdbc.driver}</driver>
                     <url>${database.url}</url>
                     <username>${database.user}</username>
@@ -104,6 +105,7 @@
 
             <plugin>
                 <!-- Specify the maven code generator plugin -->
+                <!--suppress UnresolvedMavenProperty -->
                 <groupId>${jooq.group}</groupId>
                 <artifactId>jooq-codegen-maven</artifactId>
                 <version>${jooq.version}</version>
@@ -119,8 +121,11 @@
 
                 <dependencies>
                     <dependency>
+                        <!--suppress UnresolvedMavenProperty -->
                         <groupId>${jdbc.group}</groupId>
+                        <!--suppress UnresolvedMavenProperty -->
                         <artifactId>${jdbc.artifact}</artifactId>
+                        <!--suppress UnresolvedMavenProperty -->
                         <version>${jdbc.version}</version>
                     </dependency>
                 </dependencies>
@@ -131,6 +136,7 @@
 
                     <!-- JDBC connection parameters -->
                     <jdbc>
+                        <!--suppress UnresolvedMavenProperty -->
                         <driver>${jdbc.driver}</driver>
                         <url>${database.url}</url>
                         <user>${database.user}</user>
@@ -144,6 +150,7 @@
                             <javaTimeTypes>false</javaTimeTypes>
                         </generate>
                         <database>
+                            <!--suppress UnresolvedMavenProperty -->
                             <name>${jooq.database}</name>
                             <inputSchema>${database.schema}</inputSchema>
                             <inputCatalog>${database.catalog}</inputCatalog>

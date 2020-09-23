@@ -1,0 +1,22 @@
+[
+    {
+        "id": 1,
+        "title": "About Waltz",
+        "icon": "info",
+        "group": "HOME",
+        "content": "<div>\n<p>\nWaltz, sometimes referred to as `Architecture on the Wire', \nis a Group Architecture tool that provides architecture-related information \nto a broad spectrum of DB consumers. Waltz acquires, aggregates \nand presents data from a set of distinct authoritative/golden \nsources to provide insights into the state of DB's data, \napplication and technology assets. \n</p>\n<p>\nTo measure the progress towards DB's strategic goals, Waltz provides \na set of indicators that include KPI's and KRI's (Key Performance / Risk Indicators)\nwhich can be accessed from any of the tabs at the top of the screen.\n</p>\n<p>\nWaltz is not an alternative to existing architecture-related solutions in \nDB (such as PowerDesigner, Sparx or other Enterprise Architecture tool); \nit complements these solutions and enables integration with them as \nthe need arises.\n</p>\n<p>\nMore information about Waltz is available on the\n<a href='https://confluence.gslb.db.com/display/CTCTOWALTZ/Group+Architecture+Waltz+Home' target='_new'>Waltz Confluence Site</a>.\nIf you have any questions, observations or suggestions please direct them to the  \n<a href='mailto:waltz.support@db.com;?Subject=Waltz%20Feedback' target='_top'>\n    Waltz team\n    <i class='fa fa-envelope-o'></i>\n</a>\n</p>\n</div>",
+        "priority": 1,
+        "width": 12,
+        "encoding": "HTML"
+    },
+    {
+        "id": 19,
+        "title": "New to Waltz?",
+        "icon": "info",
+        "group": "HOME",
+        "content": "- Register your interest for a Waltz introductory webinar from the [Architecture Training page](https://mydb.intranet.db.com/events/124956)\n- Discover how to perform common tasks with the [Waltz step-by-step guide](https://confluence.intranet.db.com/display/CTCTOWALTZ/Waltz+Guide)\n- Got a question? Check out the [Waltz FAQ](https://confluence.intranet.db.com/display/CTCTOWALTZ/FAQs)\n- Contact [Waltz Support](mailto:Waltz.Support@db.com)",
+        "priority": 4,
+        "width": 12,
+        "encoding": "HTML"
+    }
+]

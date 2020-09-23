@@ -1,0 +1,12 @@
+[
+    {
+        "id": 5,
+        "title": "About",
+        "icon": "sitemap",
+        "group": "HOME.ORG_UNIT",
+        "content": "<div>\r\n<p>Access to the data in Waltz from an Organisational Unit viewpoint using the UBR structure.</p>\r\n<p>E.g. for any Org. Unit, view the associated applications and their attributes (such as investment status) and the lines of business supported.</p>\r\n</div>\r\n",
+        "priority": 0,
+        "width": 12,
+        "encoding": "HTML"
+    }
+]

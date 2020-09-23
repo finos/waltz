@@ -291,7 +291,7 @@
             </modules>
         </profile>
 
-        <profile>
+        <!--<profile>
             <id>waltz-h2</id>
             <properties>
                 <jdbc.group>com.h2database</jdbc.group>
@@ -301,7 +301,7 @@
                 <jooq.dialect>H2</jooq.dialect>
                 <jooq.group>org.jooq</jooq.group>
                 <jooq.database>org.jooq.meta.h2.H2Database</jooq.database>
-                <database.catalog></database.catalog> <!-- only required for MSSQL -->
+                <database.catalog></database.catalog> &lt;!&ndash; only required for MSSQL &ndash;&gt;
             </properties>
             <dependencies>
                 <dependency>
@@ -315,7 +315,7 @@
                     <version>${jooq.version}</version>
                 </dependency>
             </dependencies>
-        </profile>
+        </profile>-->
 
         <profile>
             <id>waltz-mariadb</id>
@@ -371,7 +371,7 @@
             </dependencies>
         </profile>
 
-        <profile>
+        <!--<profile>
             <id>waltz-postgres</id>
             <properties>
                 <jdbc.group>org.postgresql</jdbc.group>
@@ -381,7 +381,7 @@
                 <jooq.dialect>POSTGRES</jooq.dialect>
                 <jooq.group>org.jooq</jooq.group>
                 <jooq.database>org.jooq.meta.postgres.PostgresDatabase</jooq.database>
-                <database.catalog></database.catalog> <!-- only required for MSSQL -->
+                <database.catalog></database.catalog> &lt;!&ndash; only required for MSSQL &ndash;&gt;
             </properties>
             <dependencies>
                 <dependency>
@@ -395,7 +395,7 @@
                     <version>${jooq.version}</version>
                 </dependency>
             </dependencies>
-        </profile>
+        </profile>-->
         <profile>
             <!--
                 Note: this profile requires a professional license for JOOQ,
@@ -426,7 +426,7 @@
         </profile>
 
         <!-- profiles for travis -->
-        <profile>
+        <!--<profile>
             <id>travis-postgres</id>
             <properties>
                 <database.url>jdbc:mysql://127.0.0.1:3306/waltz</database.url>
@@ -435,16 +435,16 @@
                 <database.password></database.password>
                 <database.schema>PUBLIC</database.schema>
             </properties>
-        </profile>
+        </profile>-->
 
 
         <profile>
             <id>travis-mariadb</id>
             <properties>
-                <database.url>jdbc:mysql://127.0.0.1:3306/waltz</database.url>
-                <database.user>root</database.user>
-                <database.password></database.password>
-                <database.schema>waltz</database.schema>
+                <database.url>jdbc:sqlserver://loncgdbu0006:1433;databaseName=waltz_owner</database.url>
+                <database.user>WALTZ_USER</database.user>
+                <database.password>WaltzU@123</database.password>
+                <database.schema>dbo</database.schema>
             </properties>
         </profile>
     </profiles>
