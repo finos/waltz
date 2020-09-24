@@ -18,6 +18,7 @@
 
 <div>
     <waltz-multi-select-tree-control items="$ctrl.visibleDataTypes"
+                                     order-by-expression="-dataType.name"
                                      on-check="$ctrl.typeChecked"
                                      on-uncheck="$ctrl.typeUnchecked"
                                      checked-item-ids="$ctrl.checkedItemIds"
@@ -25,13 +26,33 @@
                                      disable-predicate="$ctrl.disablePredicate"
                                      is-readonly-predicate="$ctrl.isReadonlyPredicate">
 
-            <strong uib-popover-template="'wdtus-popup.html'"
-                    popover-trigger="mouseenter"
-                    popover-popup-delay="400"
-                    popover-append-to-body="true"
-                    ng-style="$ctrl.isNonConcreteAndSelected(node) && {'color': 'darkred', 'font-style': 'italic'}"
-                    ng-bind="node.name">
-            </strong>
+        <span uib-popover-template="'wdtus-popup.html'"
+              popover-trigger="mouseenter"
+              popover-popup-delay="400"
+              popover-placement="bottom"
+              popover-append-to-body="true"
+              ng-class="{
+                'waltz-tree-node-implicit': !node.usage,
+                'waltz-tree-node-explicit': node.usage
+              }">
+            <span ng-bind="node.dataType.name">
+            </span>
+
+            <span style="position: relative; top: -1px"
+                 class="waltz-visibility-child-30">
+                <waltz-icon name="exclamation-triangle"
+                            class="waltz-error-icon"
+                            ng-if="!node.dataType.concrete && node.usage">
+                </waltz-icon>
+                <waltz-icon name="info-circle"
+                            class="waltz-warning-icon"
+                            ng-if="node.usage.warningMessageForEditors">
+                </waltz-icon>
+                <waltz-icon name="lock"
+                            ng-if="node.usage.readOnly">
+                </waltz-icon>
+            </span>
+        </span>
     </waltz-multi-select-tree-control>
 
     <p class="small clickable text text-muted"
@@ -46,7 +67,8 @@
         <waltz-icon ng-if="!$ctrl.showAllDataTypes"
                     name="plus">
         </waltz-icon>
-        <waltz-icon ng-if="$ctrl.showAllDataTypes" name="minus">
+        <waltz-icon ng-if="$ctrl.showAllDataTypes"
+                    name="minus">
         </waltz-icon>
         <span ng-click="$ctrl.toggleShowAll()"
               ng-bind="$ctrl.showAllMessage">
@@ -54,33 +76,43 @@
     </a>
 </div>
 
+
 <script type="text/ng-template"
         id="wdtus-popup.html">
-    <strong ng-bind="node.name"></strong>
-    <p class="small text-muted"
-       ng-bind="node.description">
-    </p>
-    <div class="alert alert-warning small" ng-if="!node.concrete">
-        Direct mappings have been disabled for this data type.
-        <span ng-if="$ctrl.checkedItemIds.indexOf(node.id) > -1">
-            <span ng-if="$ctrl.hasAnyChild(node)">
-                Please remove this mapping by selecting a more specific sub type.
+    <div class="small">
+
+        <p ng-bind="node.dataType.description">
+        </p>
+
+        <div ng-if="!node.dataType.concrete && node.usage"
+             style="margin-top: 12px; padding-top: 4px; border-left: 3px solid red; padding-left: 4px; "
+             class="text-muted">
+            <waltz-icon name="exclamation-triangle">
+            </waltz-icon>
+            This mapping is invalid as the datatype has been declared non-concrete.
+            <span ng-if="! node.usage.readOnly">
+                Please select another datatype and replace this mapping.
             </span>
-            <span ng-if="!$ctrl.hasAnyChild(node)">
-                Click to remove this mapping.
+        </div>
+
+        <div ng-if="node.usage.warningMessageForEditors"
+             style="margin-top: 12px; padding-top: 4px; border-left: 3px solid orange; padding-left: 4px; "
+             class="text-muted">
+            <waltz-icon name="info-circle">
+            </waltz-icon>
+            <span ng-bind="node.usage.warningMessageForEditors">
             </span>
-        </span>
+        </div>
+
+        <div ng-if="node.usage.readOnly"
+             style="margin-top: 12px; padding-top: 4px; border-left: 3px solid grey; padding-left: 4px; "
+             class="text-muted">
+            <waltz-icon name="lock">
+            </waltz-icon>
+            <span>
+                This datatype mapping is locked and cannot be changed within Waltz.
+            </span>
+        </div>
     </div>
-    <div class="alert alert-warning small"
-         ng-if="node.usageCharacteristics.isReadonly">
-        <span>
-            This datatype cannot be edited as it is read-only.
-        </span>
-    </div>
-    <div class="alert alert-warning small"
-         ng-if="$ctrl.isReadonlyPredicate(node) && !node.usageCharacteristics.isReadonly">
-        <span>
-            This datatype cannot be edited as it is shared with underlying physical specs.
-        </span>
-    </div>
+
 </script>

@@ -21,21 +21,20 @@ import {initialiseData, notEmpty} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./data-type-usage-selector.html";
-import {enrichDataTypes} from "../../data-type-utils";
+import {loadUsageData} from "../../data-type-utils";
 import {reduceToSelectedNodesOnly} from "../../../common/hierarchy-utils";
 
 
 const bindings = {
     parentEntityRef: "<",
-    onDirty: "<",
-    onRegisterSave: "<",
-    parentFlow:"<?"
+    onDirty: "<?",
+    onRegisterSave: "<?"
 };
 
 
 const initialState = {
     dataTypes: [],
-    allDataTypes: [],
+    rawDataTypes: [],
     checkedItemIds: [],
     originalSelectedItemIds: [],
     expandedItemIds: [],
@@ -47,8 +46,8 @@ const initialState = {
 };
 
 
-function mkSelectedTypeIds(dataTypes = []) {
-    return _.map(dataTypes, "dataTypeId");
+function mkSelectedTypeIds(usage = []) {
+    return _.map(usage, d => d.dataTypeId);
 }
 
 
@@ -64,31 +63,53 @@ function mkDataTypeUpdateCommand(entityReference, selectedIds = [], originalIds 
 }
 
 
-function controller(serviceBroker) {
+function enrichDataTypeWithUsage(dataType, usageById = {}) {
+    const usage = _.get(usageById, dataType.id, null);
+    return {
+        id: dataType.id,
+        parentId: dataType.parentId,
+        dataType,
+        usage
+    };
+}
+
+
+function enrichDataTypes(dataTypes = [], usageCharacteristics = []) {
+    const usageById = _.keyBy(usageCharacteristics, d => d.dataTypeId);
+    return _.map(dataTypes, dt => enrichDataTypeWithUsage(dt, usageById));
+}
+
+
+
+function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    const loadDatatypeUsageCharacteristics = () => {
-            return serviceBroker
-                .loadViewData(CORE_API.DataTypeDecoratorStore.findDatatypeUsageCharacteristics,
-                    [vm.parentEntityRef],
-                    {force: true})
-                .then(r => vm.datatypeUsageCharacteristics = r.data)
+
+    const loadSuggestedDataTypes = () => {
+        return serviceBroker
+            .loadViewData(
+                CORE_API.DataTypeDecoratorStore.findSuggestedByEntityRef,
+                [vm.parentEntityRef],
+                {force: true})
+            .then(r => _.filter(r.data, dt => !dt.unknown));
     };
 
-    const postLoadActions = () => {
 
-        const selectedDataTypeIds = mkSelectedTypeIds(vm.datatypeUsageCharacteristics);
+    const postLoadActions = (used = [], suggestions = []) => {
+
+        vm.enrichedDataTypes = enrichDataTypes(vm.rawDataTypes, used);
+
+        const selectedDataTypeIds = mkSelectedTypeIds(used);
         vm.checkedItemIds = selectedDataTypeIds;
         vm.originalSelectedItemIds = selectedDataTypeIds;
         vm.expandedItemIds = selectedDataTypeIds;
 
-        const suggestedAndSelectedTypes = _.concat(selectedDataTypeIds, _.map(vm.suggestedDataTypes, d => d.id));
-        vm.allDataTypes = enrichDataTypes(vm.allDataTypes, vm.datatypeUsageCharacteristics, vm.checkedItemIds);
-        vm.allDataTypesById = _.keyBy(vm.allDataTypes, "id");
+        const suggestedAndSelectedTypes = _.concat(selectedDataTypeIds, _.map(suggestions, d => d.id));
+        vm.enrichedDataTypesById = _.keyBy(vm.enrichedDataTypes, "id");
 
         vm.visibleDataTypes = vm.showAllDataTypes
-            ? vm.allDataTypes
-            :reduceToSelectedNodesOnly(vm.allDataTypes, suggestedAndSelectedTypes);
+            ? vm.enrichedDataTypes
+            : reduceToSelectedNodesOnly(vm.enrichedDataTypes, suggestedAndSelectedTypes);
     };
 
     const doSave = () => {
@@ -115,23 +136,19 @@ function controller(serviceBroker) {
 
     // -- INTERACT
 
-    vm.typeUnchecked = (id) => {
+    vm.typeUnchecked = (id, node) => {
         vm.checkedItemIds = _.without(vm.checkedItemIds, id);
         vm.onDirty(hasAnyChanges() && anySelected());
-        //set disable flag of selected non concrete to true
-        if(!vm.allDataTypesById[id].concrete) {
-            _.find(vm.allDataTypes, { id: id}).disable = true;
-            vm.allDataTypesById[id].disable = true;
-        }
+        node.usage = null;
     };
 
-    vm.typeChecked = (id) => {
+    vm.typeChecked = (id, node) => {
         // deselect any parents that are non-concrete
-        let dt = vm.allDataTypesById[id];
+        let dt = vm.enrichedDataTypesById[id];
         while (dt) {
-            const parent = vm.allDataTypesById[dt.parentId];
-            if (_.get(parent, "concrete", true) === false) {
-                vm.typeUnchecked(parent.id);
+            const parent = vm.enrichedDataTypesById[dt.parentId];
+            if (_.get(parent, ["dataType", "concrete"], true) === false) {
+                vm.typeUnchecked(parent.id, parent);
             }
             dt = parent;
         }
@@ -145,26 +162,45 @@ function controller(serviceBroker) {
         vm.onDirty(hasAnyChanges());
     };
 
-    vm.save = () => {
-        return doSave()
-            .then(() => loadDatatypeUsageCharacteristics(true))
-            .then(() => {
-                postLoadActions();
+    const reload = (force = false) => {
+        serviceBroker
+            .loadAppData(CORE_API.DataTypeStore.findAll)
+            .then(result => {
+                vm.rawDataTypes = result.data;
+                vm.unknownDataType = _.find(vm.rawDataTypes, dt => dt.unknown);
+            });
+
+        const suggestedPromise = loadSuggestedDataTypes();
+        const usagePromise = loadUsageData($q, serviceBroker, vm.parentEntityRef, force);
+
+        return $q
+            .all([usagePromise, suggestedPromise])
+            .then(([usage, suggestions]) => {
+                vm.used = usage;
+                vm.suggestedDataTypes = suggestions;
                 vm.onDirty(false);
+                postLoadActions(usage, suggestions);
             });
     };
 
+    vm.save = () => {
+        return doSave()
+            .then(() => reload(true));
+    };
+
     vm.disablePredicate = (node) => {
-        return !node.concrete;
+        const isAbstract = !node.dataType.concrete;
+        const notUsed = node.usage === null;
+        return isAbstract && notUsed;
     };
 
     vm.isReadonlyPredicate = (node) => {
-        if(_.isNull(node.usageCharacteristics)){
+        if(_.isNull(node.usage)){
             return false;
         } else {
             return (vm.parentEntityRef.kind === "LOGICAL_DATA_FLOW")
-                ? node.usageCharacteristics.isReadonly || node.usageCharacteristics.physicalFlowUsageCount > 0
-                : node.usageCharacteristics.isReadonly;
+                ? node.usage.readOnly || ! node.usage.isRemovable
+                : node.usage.readOnly;
         }
     };
 
@@ -176,53 +212,34 @@ function controller(serviceBroker) {
 
     vm.toggleShowAll = () => {
         vm.showAllDataTypes = !vm.showAllDataTypes;
-        postLoadActions();
+        postLoadActions(vm.used, vm.suggestedDataTypes);
         determineMessage();
     };
 
     // -- LIFECYCLE
 
-    const loadSuggestedDatatypes = () => {
-        if (vm.parentFlow) {
-            return serviceBroker.loadViewData(CORE_API.DataTypeDecoratorStore.findSuggestedByEntityRef, [vm.parentFlow])
-                .then(r => vm.suggestedDataTypes = _.filter(r.data, dt => !dt.unknown))
-                .then(() => vm.showAllDataTypes = _.isEmpty(vm.suggestedDataTypes));
-        } else {
-            vm.showAllDataTypes = true;
+    vm.$onInit = () => {
+        vm.onDirty(false);
+        vm.onRegisterSave(vm.save);  // pass the save function out so it can be called (i.e. a save btn)
+        determineMessage();
+
+        reload(true);
+    };
+
+    vm.$onChanges = (c) => {
+        if (c.parentEntityRef && vm.parentEntityRef) {
+            reload(true);
         }
     };
 
-    vm.$onInit = () => {
-        vm.onDirty(false);
-        vm.onRegisterSave(vm.save);
-        determineMessage();
-
-        serviceBroker
-            .loadAppData(CORE_API.DataTypeStore.findAll)
-            .then(result => {
-                vm.allDataTypes = result.data;
-                vm.unknownDataType = _.find(vm.allDataTypes, dt => dt.unknown);
-            });
-
-        loadDatatypeUsageCharacteristics()
-            .then(() => loadSuggestedDatatypes())
-            .then(() => postLoadActions());
-    };
-
-    vm.$onChanges = () => {
-        loadDatatypeUsageCharacteristics()
-            .then(() => {
-                postLoadActions();
-                vm.onDirty(false);
-            });
-    };
+    vm.dump = d => console.log("dump", d)
 
 }
 
 
 controller.$inject = [
-    "ServiceBroker",
-    "Notification"
+    "$q",
+    "ServiceBroker"
 ];
 
 

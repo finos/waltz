@@ -20,6 +20,7 @@ package com.khartec.waltz.model.datatype;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -31,8 +32,14 @@ import org.immutables.value.Value;
 public abstract class DataTypeUsageCharacteristics {
 
     public abstract long dataTypeId();
-    public abstract int physicalFlowUsageCount(); //number of physical flows with a spec that has that datatype
 
     @Value.Default
-    public boolean isReadonly() { return false; };
+    public boolean isRemovable() { return true; };
+
+    @Nullable
+    public abstract String warningMessageForViewers();
+
+    @Nullable
+    public abstract String warningMessageForEditors();
+
 }

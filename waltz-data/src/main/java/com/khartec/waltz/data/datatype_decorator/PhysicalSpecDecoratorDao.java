@@ -48,6 +48,7 @@ import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE;
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
 @Repository
@@ -170,11 +171,37 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
                         .and(Tables.PHYSICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name())))
                 .where(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(ref.id()))
                 .groupBy(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID, PHYSICAL_SPEC_DATA_TYPE.IS_READONLY)
-                .fetch(r -> ImmutableDataTypeUsageCharacteristics.builder()
-                        .dataTypeId(r.get(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID))
-                        .physicalFlowUsageCount(r.get(numberOfFlowsSharingDatatype))
-                        .isReadonly(r.get(PHYSICAL_SPEC_DATA_TYPE.IS_READONLY))
-                        .build());
+                .fetch(r -> {
+                    Integer usageCount = r.get(numberOfFlowsSharingDatatype);
+                    return ImmutableDataTypeUsageCharacteristics.builder()
+                            .dataTypeId(r.get(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID))
+                            .warningMessageForEditors(calcWarningMessageForEditors(usageCount))
+                            .warningMessageForViewers(calcWarningMessageForViewers(usageCount))
+                            .isRemovable(true)
+                            .build();
+                });
+    }
+
+
+    private String calcWarningMessageForEditors(int usageCount) {
+        if (usageCount == 0) {
+            return "This spec has no implementing flows.";
+        } else if (usageCount > 1) {
+            return format(
+                    "Caution, this spec is used by multiple physical flows. There are %d usages.",
+                    usageCount);
+        } else {
+            return null;
+        }
+    }
+
+
+    private String calcWarningMessageForViewers(int usageCount) {
+        if (usageCount == 0) {
+            return "This spec has no implementing flows.";
+        } else {
+            return null;
+        }
     }
 
 

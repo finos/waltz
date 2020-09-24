@@ -54,6 +54,7 @@ import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE;
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
 
@@ -288,7 +289,10 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                 .as("numberOfFlowsSharingDatatype");
 
         return dsl
-                .select(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID, LOGICAL_FLOW_DECORATOR.IS_READONLY, numberOfFlowsSharingDatatype)
+                .select(
+                        LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID,
+                        LOGICAL_FLOW_DECORATOR.IS_READONLY,
+                        numberOfFlowsSharingDatatype)
                 .from(LOGICAL_FLOW)
                 .innerJoin(LOGICAL_FLOW_DECORATOR).on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID)
                         .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(DATA_TYPE.name())))
@@ -299,11 +303,19 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                         .and(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID.eq(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID)))
                 .where(LOGICAL_FLOW.ID.eq(ref.id()))
                 .groupBy(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID, LOGICAL_FLOW_DECORATOR.IS_READONLY)
-                .fetch(r -> ImmutableDataTypeUsageCharacteristics.builder()
-                        .dataTypeId(r.get(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID))
-                        .physicalFlowUsageCount(r.get(numberOfFlowsSharingDatatype))
-                        .isReadonly(r.get(LOGICAL_FLOW_DECORATOR.IS_READONLY))
-                        .build());
+                .fetch(r -> {
+                    int usageCount = r.get(numberOfFlowsSharingDatatype);
+                    return ImmutableDataTypeUsageCharacteristics.builder()
+                            .dataTypeId(r.get(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID))
+                            .warningMessageForViewers(usageCount == 0
+                                    ? "Warning: None of the underlying physical flows reference this data type."
+                                    : null)
+                            .warningMessageForEditors(usageCount > 0
+                                    ? format("Cannot be removed as used in %d physical flows. These must be removed first.", usageCount)
+                                    : null)
+                            .isRemovable(usageCount == 0)
+                            .build();
+                });
     }
 
 

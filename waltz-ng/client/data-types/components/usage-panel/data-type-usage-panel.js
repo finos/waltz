@@ -15,12 +15,11 @@
  * See the License for the specific
  *
  */
-import _ from "lodash";
 import {initialiseData} from "../../../common/index";
-import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./data-type-usage-panel.html";
 import roles from "../../../user/system-roles";
+import {loadUsageData} from "../../data-type-utils";
 
 
 const bindings = {
@@ -45,38 +44,8 @@ function controller(notification, serviceBroker, userService, $q) {
     const vm = initialiseData(this, initialState);
 
     const reload = (force = false) => {
-
-        const decoratorPromise = serviceBroker
-            .loadViewData(
-                CORE_API.DataTypeDecoratorStore.findByEntityReference,
-                [ vm.parentEntityRef ],
-                { force })
-            .then(r => r.data)
-            .then(decorators => _.map(decorators, d => ({
-                lastUpdatedAt: d.lastUpdatedAt,
-                lastUpdatedBy: d.lastUpdatedBy,
-                provenance: d.provenance,
-                dataTypeId: d.decoratorEntity.id,
-                dataFlowId: d.dataFlowId
-            })));
-
-        const datatypeUsageCharacteristicsPromise = serviceBroker
-                .loadViewData(CORE_API.DataTypeDecoratorStore.findDatatypeUsageCharacteristics,
-                    [vm.parentEntityRef],
-                    { force })
-                .then(r => r.data);
-
-        return $q
-            .all([decoratorPromise, datatypeUsageCharacteristicsPromise])
-            .then(([decorators, decoratorUsages]) => {
-
-                const datatypeUsageCharacteristicsById = _.keyBy(decoratorUsages, d => d.dataTypeId);
-
-                return vm.used = _.map(decorators, d => {
-                    return Object.assign({},
-                        d,
-                        { usageCharacteristics: _.get(datatypeUsageCharacteristicsById, d.dataTypeId, null) });
-                })});
+        loadUsageData($q, serviceBroker, vm.parentEntityRef, force)
+            .then(usageData => vm.used = usageData);
     };
 
     vm.$onInit = () => {
