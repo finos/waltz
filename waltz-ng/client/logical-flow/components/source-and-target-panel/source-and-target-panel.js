@@ -182,7 +182,6 @@ function controller($element,
         $timeout(fn)
             .then(filteredData => {
                 vm.filteredFlowData = filteredData;
-                scrollIntoView($element[0], $window);
             });
     }
 
@@ -289,6 +288,7 @@ function controller($element,
                     e.stopPropagation();
                     vm.filterOptions.typeIds = [d.id];
                     filterChanged();
+                    scrollIntoView($element[0], $window);
                 }
             },
             typeBlock: {

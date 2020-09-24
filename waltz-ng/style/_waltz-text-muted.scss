@@ -20,7 +20,7 @@
 // Text
 @mixin waltz-text-muted($percent) {
     .waltz-text-muted-#{$percent} {
-        @extend .text-muted;
+        @extend .text-muted !optional;
         opacity: #{$percent / 100};
     }
 }

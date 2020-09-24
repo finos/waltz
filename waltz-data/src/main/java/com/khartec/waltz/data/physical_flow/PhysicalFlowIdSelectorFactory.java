@@ -58,11 +58,12 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
                 return mkForChangeSet(options);
             case TAG:
                 return mkForTag(options);
-            case ORG_UNIT:
+            case APP_GROUP:
             case CHANGE_INITIATIVE:
-            case MEASURABLE:
-            case PERSON:
             case DATA_TYPE:
+            case MEASURABLE:
+            case ORG_UNIT:
+            case PERSON:
             case SCENARIO:
                 return mkViaLogicalFlowSelector(options);
             default:
