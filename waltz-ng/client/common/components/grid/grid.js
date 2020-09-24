@@ -28,7 +28,8 @@ const bindings = {
     onInitialise: "<?",
     scopeProvider: "<?",
     onRowSelect: "<",
-    selectedFinancialYear: "<?"
+    selectedFinancialYear: "<?",
+    returnYear: "&"
 };
 
 
@@ -41,8 +42,8 @@ const initialState = {
     minRowsToShow: 10,
     rowTemplate: null,
     scopeProvider: null,
-    onInitialise: (gridApi) => {filterByYear(gridApi)},
-    onChange: (gridApi) => {filterByYear(gridApi);}
+    onInitialise: (gridApi) => {filterByYear(gridApi); },
+    onChange: (gridApi) => {filterByYear(gridApi); }
 };
 
 function filterByYear(gridApi){
@@ -58,7 +59,12 @@ function controller(uiGridExporterConstants,
                     uiGridExporterService) {
     const vm = initialiseData(this, initialState);
 
+    vm.getYear = (year)=>{
+        vm.returnYear({year:year});
+    }
+
     vm.$onInit = () => {
+
         vm.gridOptions = {
             appScopeProvider: vm.scopeProvider,
             columnDefs: vm.columnDefs,
@@ -78,8 +84,8 @@ function controller(uiGridExporterConstants,
                         gridApi: vm.gridApi,
                         selectedFinancialYear: vm.selectedFinancialYear
                     });
-
-                if (vm.onRowSelect) {
+                   
+                    if (vm.onRowSelect) {
                     gridApi.selection.setMultiSelect(false);
                     gridApi.selection.toggleRowSelection(true);
                     gridApi.selection.on.rowSelectionChanged(null, function(row){
@@ -101,7 +107,12 @@ function controller(uiGridExporterConstants,
 
 
     vm.$onChanges = (changes) => {
-
+        if(vm.rowData && vm.rowData[0].isAttested=="ATTESTED"){
+           vm.getYear(vm.selectedFinancialYear);
+        }else{
+            vm.getYear(null);
+        }
+        
         if (! vm.gridOptions) return;
 
         if (changes.columnDefs) {

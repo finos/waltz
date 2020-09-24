@@ -58,12 +58,12 @@
         overflow-y: auto !important;
     }
 }
-#financialYear.btn{
-    width: 8em;
-    text-align: left;
-}
-#financialYear.btn .caret{
-    margin-left: 5px;
-    float: right;
-    margin-top: 7px;
-}
+    .btn{
+        width: 8em;
+        text-align: left;
+    }
+    .btn .caret{
+        margin-left: 5px;
+        float: right;
+        margin-top: 7px;
+    }

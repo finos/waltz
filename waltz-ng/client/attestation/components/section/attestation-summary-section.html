@@ -43,7 +43,8 @@
      ng-if="$ctrl.visibility.tableView">
     <div class="col-md-12">
         <waltz-grid-with-search entries="$ctrl.selectedApps"
-                                column-defs="$ctrl.columnDefs">
+                                column-defs="$ctrl.columnDefs"
+                               return-selected-year="$ctrl.selectedYear(year)">
         <ng-include></ng-include>
         </waltz-grid-with-search>
         <div class="small pull-right">

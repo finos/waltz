@@ -25,6 +25,7 @@ import {entity} from "../../../common/services/enums/entity";
 import {attestationSummaryColumnDefs, mkAttestationSummaryDataForApps} from "../../attestation-utils";
 import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 import * as _ from "lodash";
+import moment from "moment";
 
 
 const initialState = {
@@ -38,8 +39,7 @@ const initialState = {
 
 const bindings = {
     parentEntityRef: "<",
-    filters: "<",
-    selectedFinancialYear: "<?"
+    filters: "<"
 };
 
 
@@ -47,15 +47,18 @@ function controller($q,
                     serviceBroker,
                     displayNameService) {
     const vm = initialiseData(this, initialState);
+    
+    vm.selectedYear = (year)=>{
+        vm.selectionOptions.entityReference.year = year.split('-')[1];
+    }
 
     const loadData = () => {
-        console.log('vm.selectedFinancialYear: ',vm.selectedFinancialYear);
+       
         vm.selectionOptions = mkSelectionOptions(
             vm.parentEntityRef,
             determineDownwardsScopeForKind(vm.parentEntityRef.kind),
             [entityLifecycleStatus.ACTIVE.key],
-            vm.filters,
-            vm.selectedFinancialYear);
+            vm.filters);
 
         const attestationInstancePromise = serviceBroker
             .loadViewData(
@@ -88,7 +91,7 @@ function controller($q,
             logical: Object.assign({}, attestationPieConfig, { onSelect: vm.onSelectLogicalFlow }),
             physical: Object.assign({}, attestationPieConfig, { onSelect: vm.onSelectPhysicalFlow }),
         };
-
+      
         loadData();
     };
 
@@ -109,7 +112,7 @@ function controller($q,
     };
 
     vm.$onChanges = (changes) => {
-        console.log(changes);
+
         if(changes.filters) {
             loadData();
         }

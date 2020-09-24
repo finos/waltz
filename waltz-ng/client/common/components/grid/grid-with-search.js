@@ -31,7 +31,8 @@ const bindings = {
     onChange: "<?",
     onRowSelect: "<?",
     localStorageKey: "@?",
-    selectedFinancialYear: "<?"
+    selectedFinancialYear: "<?",
+    returnSelectedYear: '&'
 };
 
 
@@ -56,6 +57,7 @@ const initialState = {
 };
 
 function filterByYear(gridApi){
+    
     let year = gridApi.selectedFinancialYear.split('-')[1];
     if(gridApi.gridApi.grid.options.data[0].isAttested=="ATTESTED"){
         let temp = gridApi.gridApi.grid.options.data.filter(function(item){
@@ -63,6 +65,7 @@ function filterByYear(gridApi){
         });
         gridApi.gridApi.grid.options.data = temp;
     }
+    
 }
 
 
@@ -76,7 +79,7 @@ function mkSearchFields(columnDefs = []) {
 
 function controller() {
     const vm = initialiseData(this, initialState);
-
+    
     vm.$onChanges = (changes) => {
         vm.filterEntries(vm.searchQuery);
         vm.searchFields = mkSearchFields(vm.columnDefs);
@@ -88,6 +91,14 @@ function controller() {
         vm.filteredEntries = termSearch(vm.entries, query, vm.searchFields);
         invokeFunction(vm.onChange, { entriesCount: _.size(vm.filteredEntries) });
     };
+
+    vm.changeYear = (yr)=>{
+        vm.selectedFinancialYear=yr;
+    }
+
+    vm.onReturnYear = (yr)=>{
+        vm.returnSelectedYear({ year: yr });
+    }
 
 }
 

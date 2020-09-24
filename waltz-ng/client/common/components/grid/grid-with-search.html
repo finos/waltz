@@ -26,15 +26,15 @@
         <div class="col-md-6" ng-if="$ctrl.entries[0].isAttested!='NEVER_ATTESTED'">
             <div class="input-group">
                 <div class="btn-group" uib-dropdown keyboard-nav dropdown-append-to-body>
-                    <button type="button" class="btn btn-default" id="financialYear" uib-dropdown-toggle>
-                        {{$ctrl.selectedFinancialYear}}<span class="caret"></span>
+                    <button type="button" class="btn btn-default" uib-dropdown-toggle>
+                    {{$ctrl.selectedFinancialYear}}<span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" uib-dropdown-menu role="menu">
                         <li ng-repeat="yr in $ctrl.financialYearFilter" role="menuitem">
-                            <a class="clickable" ng-click="$ctrl.changeFinancialYear(yr)">
+                            <a class="clickable" ng-click="$ctrl.changeYear(yr)">
                                 {{yr}}
                             </a>
-                        </li>select
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -44,12 +44,12 @@
         <div class="col-md-12" ng-if="$ctrl.entries[0].isAttested!='NEVER_ATTESTED'">
             <div class="input-group">
                 <div class="btn-group" uib-dropdown keyboard-nav dropdown-append-to-body>
-                    <button type="button" class="btn btn-default" id="financialYear" uib-dropdown-toggle>
+                    <button type="button" class="btn btn-default" uib-dropdown-toggle>
                         {{$ctrl.selectedFinancialYear}}<span class="caret"></span>
                     </button>
                     <ul class="dropdown-menu" uib-dropdown-menu role="menu">
                         <li ng-repeat="yr in $ctrl.financialYearFilter" role="menuitem">
-                            <a class="clickable" ng-click="$ctrl.selectedFinancialYear=yr">
+                            <a class="clickable" ng-click="$ctrl.changeYear(yr)">
                                 {{yr}}
                             </a>
                         </li>
@@ -61,7 +61,7 @@
 
     <br>
 
-    <waltz-grid column-defs="$ctrl.columnDefs" selected-financial-year="$ctrl.selectedFinancialYear" row-data="$ctrl.filteredEntries"
+    <waltz-grid column-defs="$ctrl.columnDefs" return-year="$ctrl.onReturnYear(year)" selected-financial-year="$ctrl.selectedFinancialYear" row-data="$ctrl.filteredEntries"
     scope-provider="$ctrl.scopeProvider" on-initialise="$ctrl.onInitialise" on-row-select="$ctrl.onRowSelect"
     class="small">
     </waltz-grid>
