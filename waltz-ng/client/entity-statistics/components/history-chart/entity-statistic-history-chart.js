@@ -112,9 +112,11 @@ function drawPoints(section, points = [], scales) {
         .enter()
         .append("circle")
         .classed("point", true)
-        .attr("fill", d => variableScale(d.series))
-        .attr("opacity", 0.7)
-        .attr("r", 0);
+        .attrs({
+            fill: d => variableScale(d.series),
+            opacity: 0.7,
+            r: 0
+        });
 
     pointSelection
         .exit()
@@ -147,10 +149,12 @@ function drawLines(section, points = [], scales) {
         .enter()
         .append("path")
         .classed("line", true)
-        .attr("stroke", d => variableScale(d.key))
-        .attr("stroke-width", 1)
-        .attr("fill", "none")
-        .attr("opacity", 0.7);
+        .attrs({
+            stroke: d => variableScale(d.key),
+            "stroke-width": 1,
+            fill: "none",
+            opacity: 0.7
+        });
 
     pathSelector
         .exit()
@@ -165,8 +169,10 @@ function drawLines(section, points = [], scales) {
 function adjustSections(sections, dimensions) {
     sections
         .svg
-        .attr("width", dimensions.width)
-        .attr("height", dimensions.height);
+        .attrs({
+            width: dimensions.width,
+            height: dimensions.height
+        });
 
     sections
         .chart
@@ -194,8 +200,7 @@ function drawBands(section,
     const bandWidth = width / numDates;
     const extraHeight = 30;
 
-    const dates = _
-        .chain(points)
+    const dates = _.chain(points)
         .map("date")
         .uniqBy(d => d.getTime())
         .value();
@@ -210,16 +215,22 @@ function drawBands(section,
         .classed("band", true)
         .attr("pointer-events", "all")
         .style("visibility", "hidden")
-        .on("mouseenter.band-hover", (e, d) => tryInvoke(onHover, d))
-        .on("mouseleave.band-hover", () => tryInvoke(onHover, null))
+        .on("mouseenter.band-hover", d => {
+            tryInvoke(onHover, d);
+        })
+        .on("mouseleave.band-hover", () => {
+            tryInvoke(onHover, null);
+        })
        ;
 
     bands
         .merge(newBands)
-        .attr("x", d => scales.x(d) - (bandWidth / 2))
-        .attr("y", extraHeight / 2 * -1)
-        .attr("width", bandWidth)
-        .attr("height", scales.y.range()[0] + extraHeight);
+        .attrs({
+            x: d => scales.x(d) - (bandWidth / 2),
+            y: extraHeight / 2 * -1,
+            width: bandWidth,
+            height: scales.y.range()[0] + extraHeight,
+        });
 }
 
 
