@@ -272,19 +272,19 @@ function controller($element,
 
         const baseTweakers = {
             source: {
-                onSelect: (evt, entity) => $timeout(() => {
+                onSelect: (entity, evt) => $timeout(() => {
                     const flowId = keyedLogicalFlows.sourceFlowsByEntityId[entity.id];
                     vm.selected = select(entity, "source", flowId, evt);
                 })
             },
             target: {
-                onSelect: (evt, entity) => $timeout(() => {
+                onSelect: (entity, evt) => $timeout(() => {
                     const flowId = keyedLogicalFlows.targetFlowsByEntityId[entity.id];
                     vm.selected = select(entity, "target", flowId, evt);
                 })
             },
             type: {
-                onSelect: (e, d) => {
+                onSelect: (d, e) => {
                     e.stopPropagation();
                     vm.filterOptions.typeIds = [d.id];
                     filterChanged();
@@ -292,7 +292,7 @@ function controller($element,
                 }
             },
             typeBlock: {
-                onSelect: (e, d) => {
+                onSelect: (d, e) => {
                     e.stopPropagation();
                     resetTypeFilter();
                 }
