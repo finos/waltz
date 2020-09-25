@@ -19,7 +19,7 @@
 import {initialiseData} from "../../../common";
 
 import {lineWithArrowPath, responsivefy} from "../../../common/d3-utils";
-import {select} from "d3-selection";
+import {event, select} from "d3-selection";
 import {forceLink, forceManyBody, forceSimulation, forceX, forceY} from "d3-force";
 import {drag} from "d3-drag";
 import {symbol, symbolWye} from "d3-shape";
@@ -144,30 +144,29 @@ function addNodeCircle(selection) {
 function drawNodes(nodes,
                    holder,
                    tweakers = DEFAULT_TWEAKER,
-                   onSelectNode,
-                   tickFn) {
+                   onSelectNode) {
 
-    function dragStarted(e, d) {
-        simulation
-            .stop();
+    function dragStarted(d) {
+        if (!event.active) {
+            simulation
+                .restart();
+        }
         d.fx = d.x;
         d.fy = d.y;
     }
 
-    function dragged(e, d) {
-        d.x = e.x;
-        d.y = e.y;
-        d.px = e.x;
-        d.py = e.y;
-        tickFn();
+    function dragged(d) {
+        d.fx = event.x;
+        d.fy = event.y;
     }
 
-    function dragEnded(e, d) {
-        simulation
-            .alpha(0.2)
-            .restart();
-        d.fx = e.x;
-        d.fy = e.y;
+    function dragEnded(d) {
+        if (!event.active) {
+            simulation
+                .restart();
+        }
+        d.fx = event.x;
+        d.fy = event.y;
     }
 
     const nodeSelection = holder
@@ -178,7 +177,7 @@ function drawNodes(nodes,
         .enter()
         .append("g")
         .classed("wdfd-node", true)
-        .on("dblclick.unfix", (e, d) => { d.fx = null; d.fy = null })
+        .on("dblclick.unfix", d => { d.fx = null; d.fy = null })
         .on("click.node-selected", onSelectNode)
         .call(drag()
             .on("start", dragStarted)
@@ -220,7 +219,7 @@ function drawNodes(nodes,
     };
 
     allNodes
-        .on("mouseenter.opacityHover", function (e, d) {
+        .on("mouseenter.opacityHover", function (d) {
             const selection = select(this);
             setOpacity(selection, 1);
             selection
@@ -228,7 +227,7 @@ function drawNodes(nodes,
                 .attr("r", nodeSizeScale(d.flowCount) + 2);
             return selection;
         })
-        .on("mouseout.opacityHover", function (e, d) {
+        .on("mouseout.opacityHover", function (d) {
             const selection = select(this);
             setOpacity(selection, opacityScale(d.flowCount));
             selection
@@ -271,16 +270,6 @@ function draw(data = [],
     const links = mkLinkData(data.flows);
     const nodes = data.entities;
 
-
-    const tickFn = () => {
-        nodeSelection
-            .attr("transform", d => `translate(${d.x}, ${d.y})`);
-
-        linkSelection
-            .call(lineWithArrowPath);
-    };
-
-
     const linkSelection = drawLinks(
         links,
         parts.svg.select(".links"),
@@ -290,12 +279,19 @@ function draw(data = [],
         nodes,
         parts.svg.select(".nodes"),
         nodeTweakers,
-        onSelectNode,
-        tickFn);
+        onSelectNode);
+
+    const ticked = () => {
+        nodeSelection
+            .attr("transform", d => `translate(${d.x}, ${d.y})`);
+
+        linkSelection
+            .call(lineWithArrowPath);
+    };
 
     simulation
         .nodes(nodes)
-        .on("tick", tickFn);
+        .on("tick", ticked);
 
     simulation
         .force("link")
@@ -364,11 +360,11 @@ function controller($timeout, $element) {
         parts.destroyResizeListener();
     };
 
-    function zoomed(e) {
+    function zoomed() {
         const svg = vizElem
             .select("svg");
 
-        const t = e.transform;
+        const t = event.transform;
 
         svg.select(".nodes")
             .attr("transform", t);
@@ -417,7 +413,7 @@ function controller($timeout, $element) {
     };
 
     // not registered as a method on `vm` as will be invoked via d3 handler code...
-    function onSelectNode(e, node) {
+    function onSelectNode(node) {
         $timeout(() => {
             vm.onHideFilters();
             if (vm.selectedNode === node) {
