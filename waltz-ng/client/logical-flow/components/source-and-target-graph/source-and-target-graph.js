@@ -401,11 +401,11 @@ function drawLabels(section, items = [], scale, anchor = "start", tweakers) {
     labels
         .merge(newLabels)
         .classed("wsat-hover", (d) => highlighted === d.id)
-        .on("mouseenter.highlight", (e, d) => { highlighted = d.id; redraw(); })
-        .on("mouseleave.highlight", (e, d) => { highlighted = null; redraw(); })
-        .on("click.tweaker", (e, d) => tweakers.onSelect(d, e))
-        .on("mouseenter.tweaker", (e, d) => tweakers.onEnter(d, e))
-        .on("mouseleave.tweaker", (e, d) => tweakers.onLeave(d, e))
+        .on("mouseenter.highlight", d => { highlighted = d.id; redraw(); })
+        .on("mouseleave.highlight", d => { highlighted = null; redraw(); })
+        .on("click.tweaker", (d) => tweakers.onSelect(d, event))
+        .on("mouseenter.tweaker", tweakers.onEnter)
+        .on("mouseleave.tweaker", tweakers.onLeave)
         .transition()
         .duration(animationDuration)
         .attr("transform",  (d, i) => `translate(0, ${ scale(d.id) })`)
@@ -476,7 +476,7 @@ function drawArcs(section, model, layoutFn) {
 
 function drawTypeBoxes(section, model, scale, dimensions, tweakers) {
 
-    section.on("click", (e, d) => tweakers.onSelect(d, e));
+    section.on("click", tweakers.onSelect);
 
     const boxes = section
         .selectAll(".wsat-type-box")
