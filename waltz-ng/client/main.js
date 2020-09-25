@@ -16,8 +16,8 @@
  *
  */
 
+import "@babel/polyfill";
 import angular from "angular";
-
 import "../style/style.scss";
 import modules from "./modules";
 import routes from "./routes";

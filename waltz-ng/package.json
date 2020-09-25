@@ -61,7 +61,8 @@
     "patch-package": "6.2.2",
     "satellizer": "0.15.5",
     "ui-select": "0.19.8",
-    "xlsx": "0.16.7"
+    "xlsx": "0.16.7",
+    "@babel/polyfill": "7.11.5"
   },
   "devDependencies": {
     "@babel/core": "7.11.6",

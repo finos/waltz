@@ -127,6 +127,7 @@ const dependencies = [
     "ui.grid.exporter",
     "ui.grid.resizeColumns",
     "ui.grid.selection",
+    "ui.grid.pinning",
     "ui-notification",
     "ngAnimate",
     "ngSanitize",
