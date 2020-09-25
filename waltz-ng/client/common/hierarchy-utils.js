@@ -125,7 +125,6 @@ export const reduceToSelectedNodesOnly = (nodes, selectedNodeIds = []) => {
         .compact()
         .value();
 
-
     const selectedWithParents = _
         .chain(selectedNodesOnly)
         .flatMap(n => _.concat([n], getParents(n, d => byId[d.parentId])))
