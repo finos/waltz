@@ -17,6 +17,7 @@
  */
 
 import _ from "lodash";
+import {CORE_API} from "../common/services/core-api-utils";
 
 
 export function findUnknownDataTypeId(dataTypes = []) {
@@ -37,11 +38,59 @@ export function findNonConcreteDataTypeIds(dataTypes = []) {
             .map(dt => dt.id);
 }
 
-export function enrichDataTypes(dataTypes = [], selectedDataTypeIds = []) {
-    const enrich = (datatype) => {
-        datatype.disable = !selectedDataTypeIds.includes(datatype.id)
-            && !datatype.concrete;
-        return datatype;
-    };
-    return _.map(dataTypes, enrich);
+
+
+
+
+function prepareUsageData(decoratorUsages = [], decorators = []) {
+    const datatypeUsageCharacteristicsById = _.keyBy(decoratorUsages, d => d.dataTypeId);
+
+    return _.map(
+        decorators,
+        d => {
+            const usageInfo = _.get(
+                datatypeUsageCharacteristicsById,
+                [d.dataTypeId],
+                {});
+            return Object.assign(
+                {},
+                usageInfo,
+                { readOnly: d.isReadOnly});
+        });
+}
+
+/**
+ * Given a parent will load all decorators and also determine usage characteristics.
+ *
+ * @param $q
+ * @param serviceBroker
+ * @param parentEntityRef
+ * @param force
+ * @returns array [ { dataTypeId, physicalFlowUsageCount, readOnly }, ... ]
+ */
+export function loadUsageData($q, serviceBroker, parentEntityRef, force) {
+    const decoratorPromise = serviceBroker
+        .loadViewData(
+            CORE_API.DataTypeDecoratorStore.findByEntityReference,
+            [parentEntityRef],
+            { force })
+        .then(r => r.data)
+        .then(decorators => _.map(decorators, d => ({
+            lastUpdatedAt: d.lastUpdatedAt,
+            lastUpdatedBy: d.lastUpdatedBy,
+            provenance: d.provenance,
+            dataTypeId: d.decoratorEntity.id,
+            dataFlowId: d.dataFlowId,
+            isReadOnly: d.isReadonly // note case change!
+        })));
+
+    const datatypeUsageCharacteristicsPromise = serviceBroker
+        .loadViewData(CORE_API.DataTypeDecoratorStore.findDatatypeUsageCharacteristics,
+            [parentEntityRef],
+            { force })
+        .then(r => r.data);
+
+    return $q
+        .all([decoratorPromise, datatypeUsageCharacteristicsPromise])
+        .then(([decorators, decoratorUsages]) => prepareUsageData(decoratorUsages, decorators));
 }

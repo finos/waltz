@@ -28,6 +28,7 @@ const bindings = {
     onClick: "<?",
     onCheck: "<",
     onUncheck: "<",
+    orderByExpression: '@?',
     checkedItemIds: "<",
     expandedItemIds: "<",
     disablePredicate: "<?",
@@ -40,9 +41,10 @@ const initialState = {
     expandedNodes: [],
     checkedMap: {},
     hierarchy: [],
-    onCheck: id => console.log("default handler in multi-select-treecontrol for node id check: ", id),
-    onUncheck: id => console.log("default handler in multi-select-treecontrol for node id uncheck: ", id),
-    onClick: node => console.log("default handler in multi-select-treecontrol for node click: ", node),
+    orderByExpression: "-name",
+    onCheck: (id, node) => console.log("default handler in multi-select-treecontrol for node id check: ", id),
+    onUncheck: (id, node) => console.log("default handler in multi-select-treecontrol for node id uncheck: ", id),
+    onClick: (id, node) => console.log("default handler in multi-select-treecontrol for node click: ", node),
     disablePredicate: node => false,
     isReadonlyPredicate: node => false
 };
@@ -98,25 +100,25 @@ function controller() {
     };
 
     vm.onNodeClick = (node) => {
-        invokeFunction(vm.onClick, node.id);
+        invokeFunction(vm.onClick, node.id, node);
     };
 
     vm.onToggleCheck = (node) => {
         if (_.includes(vm.checkedItemIds, node.id)) {
-            vm.onNodeUncheck(node.id)
+            vm.onNodeUncheck(node.id, node)
         } else {
-            vm.onNodeCheck(node.id)
+            vm.onNodeCheck(node.id, node)
         }
     };
 
-    vm.onNodeCheck = (id) => {
-        invokeFunction(vm.onCheck, id);
+    vm.onNodeCheck = (id, d) => {
+        invokeFunction(vm.onCheck, id, d);
         haltEvent();
     };
 
 
-    vm.onNodeUncheck = (id) => {
-        invokeFunction(vm.onUncheck, id);
+    vm.onNodeUncheck = (id, d) => {
+        invokeFunction(vm.onUncheck, id, d);
         haltEvent();
     };
 

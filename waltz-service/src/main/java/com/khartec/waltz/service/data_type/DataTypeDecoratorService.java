@@ -27,6 +27,7 @@ import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
+import com.khartec.waltz.model.datatype.DataTypeUsageCharacteristics;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.physical_flow.PhysicalFlow;
@@ -204,6 +205,7 @@ public class DataTypeDecoratorService {
         return result;
     }
 
+
     private void recalculateDataTypeUsageForApplications(EntityReference associatedEntityReference) {
         if(LOGICAL_DATA_FLOW.equals(associatedEntityReference.kind())) {
             LogicalFlow flow = logicalFlowDao.getByFlowId(associatedEntityReference.id());
@@ -347,5 +349,12 @@ public class DataTypeDecoratorService {
             LogicalFlow flow = first(logicalFlows);
             return dataTypeService.findSuggestedBySourceEntityRef(flow.source());
         }
+    }
+
+
+    public Collection<DataTypeUsageCharacteristics> findDatatypeUsageCharacteristics(EntityReference ref) {
+        return dataTypeDecoratorDaoSelectorFactory
+            .getDao(ref.kind())
+            .findDatatypeUsageCharacteristics(ref);
     }
 }
