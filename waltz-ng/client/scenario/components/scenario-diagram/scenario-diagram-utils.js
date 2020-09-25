@@ -16,6 +16,7 @@
  *
  */
 import {zoom, zoomIdentity} from "d3-zoom";
+import {event} from "d3-selection";
 
 
 export const defaultOptions = { cols: 3, sortFn: d => d.node.name };
