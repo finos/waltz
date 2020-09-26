@@ -214,14 +214,14 @@ function controller($q, $scope, userPreferenceService, serviceBroker) {
     };
 
     vm.showAllTags = () => {
-      vm.filterOptions.selectedTags = vm.tags;
-      vm.filterChanged();
+        vm.filterOptions.selectedTags = vm.tags;
+        vm.filterChanged();
 
-      saveTagFilterPreferences(
-        vm.tags,
-        vm.filterOptions.selectedTags,
-        groupLogicalFlowFilterExcludedTagIdsKey,
-        userPreferenceService);
+        saveTagFilterPreferences(
+            vm.tags,
+            vm.filterOptions.selectedTags,
+            groupLogicalFlowFilterExcludedTagIdsKey,
+            userPreferenceService);
     };
 
     vm.onTagsChange = () => {
