@@ -24,7 +24,6 @@ import {CORE_API} from "../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../common/selector-utils";
 import {mkLinkGridCell} from "../../common/grid-utils";
 import _ from "lodash";
-import {nest} from "d3-collection"
 
 const initData = {
     categoryId: 1,
