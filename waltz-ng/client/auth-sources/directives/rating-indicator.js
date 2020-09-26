@@ -34,20 +34,15 @@ function link(scope, elem) {
         .data(data)
         .enter()
         .append('circle')
-        .attrs({
-            cx: (d, i) => i * (radius * 2 + padding * 2) + radius + padding / 2,
-            cy: radius + padding / 2,
-            r: radius
-        });
+        .attr("cx", (d, i) => i * (radius * 2 + padding * 2) + radius + padding / 2)
+        .attr("cy", radius + padding / 2)
+        .attr("r", radius);
 
-    scope.$watch('value', (value) => {
-        svg.selectAll('circle')
-            .data(data)
-            .attrs({
-                fill: (d) => ( d === value) ? authoritativeSourceColorScale(d) : '#eee',
-                stroke: (d) => ( d === value) ? authoritativeSourceColorScale(d).darker() : '#ddd'
-            });
-    });
+    scope.$watch('value', (value) => svg
+        .selectAll('circle')
+        .data(data)
+        .attr("fill", (d) => ( d === value) ? authoritativeSourceColorScale(d) : '#eee')
+        .attr("stroke", (d) => ( d === value) ? authoritativeSourceColorScale(d).darker() : '#ddd'));
 }
 
 

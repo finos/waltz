@@ -35,10 +35,8 @@ function render(config, onBucketSelect) {
 
     const { svg, buckets, dimensions } = config;
 
-    svg.attrs({
-        width: dimensions.width,
-        height: dimensions.height
-    });
+    svg.attr("width", dimensions.width)
+        .attr("height", dimensions.height);
 
     const maxBucketSize = _.chain(buckets)
         .map(b => b.size)
@@ -84,11 +82,9 @@ function render(config, onBucketSelect) {
 
     bucketElems
         .merge(newBucketElems)
-        .attrs({
-            r: d => blobScale(d.size),
-            cx: d => xScale(d.name) + xScale.bandwidth() / 2,
-            cy: dimensions.height / 2
-        });
+        .attr("r", d => blobScale(d.size))
+        .attr("cx", d => xScale(d.name) + xScale.bandwidth() / 2)
+        .attr("cy", dimensions.height / 2);
 
 }
 
