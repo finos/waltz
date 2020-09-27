@@ -31,7 +31,6 @@ import flowDiagramNodePopup from "./components/editor/flow-diagram-node-popup";
 import flowDiagramPhysicalFlowPopup from "./components/editor/flow-diagram-physical-flow-popup";
 import flowDiagramAnnotationPopup from "./components/editor/flow-diagram-annotation-popup";
 import flowDiagramEditor from "./components/editor/flow-diagram-editor";
-import FlowDiagramsPanelBrowse from "./components/diagrams-panel/browse/flow-diagrams-panel-browse";
 import FlowDiagramsPanelView from "./components/diagrams-panel/view/flow-diagrams-panel-view";
 import FlowDiagramMeasurableAssociations from "./components/measurable-associations/flow-diagram-measurable-associations";
 import FlowDiagramChangeInitiativeAssociations from "./components/change-initiative-associations/flow-diagram-change-initiative-associations";
@@ -44,20 +43,20 @@ import routes from "./routes";
 
 export default () => {
 
-    const module = angular.module('waltz.flow-diagram', []);
+    const module = angular.module("waltz.flow-diagram", []);
 
     module
-        .component('waltzFlowDiagram', flowDiagram)
-        .component('waltzFlowDiagramLogicalFlowPopup', flowDiagramLogicalFlowPopup)
-        .component('waltzFlowDiagramNodePopup', flowDiagramNodePopup)
-        .component('waltzFlowDiagramPhysicalFlowPopup', flowDiagramPhysicalFlowPopup)
-        .component('waltzFlowDiagramAnnotationPopup', flowDiagramAnnotationPopup)
-        .component('waltzFlowDiagramEditor', flowDiagramEditor)
-        ;
+        .component("waltzFlowDiagram", flowDiagram)
+        .component("waltzFlowDiagramLogicalFlowPopup", flowDiagramLogicalFlowPopup)
+        .component("waltzFlowDiagramNodePopup", flowDiagramNodePopup)
+        .component("waltzFlowDiagramPhysicalFlowPopup", flowDiagramPhysicalFlowPopup)
+        .component("waltzFlowDiagramAnnotationPopup", flowDiagramAnnotationPopup)
+        .component("waltzFlowDiagramEditor", flowDiagramEditor)
+    ;
 
     module
         .config(routes)
-        ;
+    ;
 
     registerServices(module, [
         FlowDiagramStateService
@@ -66,7 +65,6 @@ export default () => {
     registerComponents(module, [
         FlowDiagramMeasurableAssociations,
         FlowDiagramChangeInitiativeAssociations,
-        FlowDiagramsPanelBrowse,
         FlowDiagramsPanelView,
         FlowDiagramInfoPopup
     ]);

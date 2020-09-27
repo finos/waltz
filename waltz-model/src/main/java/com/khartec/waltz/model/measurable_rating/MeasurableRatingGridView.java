@@ -15,7 +15,6 @@ import java.util.Set;
 @JsonDeserialize(as = ImmutableMeasurableRatingGridView.class)
 public abstract class MeasurableRatingGridView {
 
-
     public abstract MeasurableCategory category();
 
     public abstract Set<Application> applications();
