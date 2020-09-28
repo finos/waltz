@@ -1,3 +1,39 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
+ */
+
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
+ */
+
 /**
  *   Adapted from: https://github.com/pkerpedjiev/d3-context-menu
  *
@@ -25,10 +61,9 @@
  *
  *   - converted to ES6 and d3 v4
  *   - allowed actions to return a `result` object which is passed to the `onClose` callback handler
- *   - converted to d3 v6
  */
 
-import {select, selectAll} from "d3-selection";
+import {event, select, selectAll} from "d3-selection";
 
 
 export function d3ContextMenu(menu, opts) {
@@ -61,16 +96,16 @@ export function d3ContextMenu(menu, opts) {
         });
 
     // this gets executed when a contextmenu event occurs
-    return function(e, data, index) {
+    return function(data, index) {
         const elem = this;
 
         selectAll(".d3-context-menu")
             .html("");
         var list = selectAll(".d3-context-menu")
-            .on("contextmenu", function(e, d) {
+            .on("contextmenu", function(d) {
                 select(".d3-context-menu").style("display", "none");
-                e.preventDefault();
-                e.stopPropagation();
+                event.preventDefault();
+                event.stopPropagation();
             })
             .append("ul");
 
@@ -91,10 +126,10 @@ export function d3ContextMenu(menu, opts) {
                 }
                 return (typeof d.title === "string") ? d.title : d.title(data);
             })
-            .on("click", (e, d, i) => {
+            .on("click", (d, i) => {
                 if (d.disabled) return; // do nothing if disabled
                 if (!d.action) return; // headers have no "action"
-                const result = d.action(elem, data, index, e);
+                const result = d.action(elem, data, index);
                 select(".d3-context-menu")
                     .style("display", "none");
 
@@ -117,7 +152,7 @@ export function d3ContextMenu(menu, opts) {
             .style("top", (event.pageY - 2) + "px")
             .style("display", "block");
 
-        e.preventDefault();
-        e.stopPropagation();
+        event.preventDefault();
+        event.stopPropagation();
     };
 }

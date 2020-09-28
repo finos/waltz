@@ -20,7 +20,6 @@
 import angular from "angular";
 
 import {registerComponents} from "../common/module-utils";
-import AppAuthorityPanel from "./components/app-authority-panel/app-authority-panel";
 import ApplicationFlowSummaryGraph from "./components/application-flow-summary-graph/application-flow-summary-graph";
 import ApplicationFlowSummaryPane from "./components/application-flow-summary-pane/application-flow-summary-pane";
 import DataFlowSection from "./components/data-flow-section/data-flow-section";
@@ -32,7 +31,6 @@ function setup() {
     registerComponents(
         module,
         [
-            AppAuthorityPanel,
             ApplicationFlowSummaryGraph,
             ApplicationFlowSummaryPane,
             DataFlowSection ]);

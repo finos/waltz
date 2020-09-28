@@ -24,7 +24,6 @@ import {CORE_API} from "../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../common/selector-utils";
 import {mkLinkGridCell} from "../../common/grid-utils";
 import _ from "lodash";
-import {groups, group} from "d3-array"
 
 const initData = {
     categoryId: 1,
@@ -61,30 +60,20 @@ function prepareColumnDefs(gridData) {
 }
 
 
-function mkRow(appGroup, appsById, ratingSchemeItemsByCode) {
-    const row = {
-        application: appsById[appGroup[0]]
-    };
-
-    appGroup[1]
-        .forEach(measurableGroup => _.set(
-            row,
-            `_${measurableGroup[0]}`,
-            ratingSchemeItemsByCode[measurableGroup[1][0].rating]));
-
-    return row;
-}
-
-
 function prepareTableData(gridData) {
     const appsById = _.keyBy(gridData.applications, d => d.id);
     const ratingSchemeItemsByCode = _.keyBy(gridData.ratingSchemeItems, d => d.rating);
 
-    const ratingsByAppAndMeasurable = groups(gridData.ratings, r => r.applicationId, r => r.measurableId);
-
     return _
-        .chain(ratingsByAppAndMeasurable)
-        .map(g => mkRow(g, appsById, ratingSchemeItemsByCode))
+        .chain(gridData.ratings)
+        .groupBy(d => d.applicationId)
+        .map((xs, k) => _.reduce(
+            xs,
+            (acc, x) => {
+                acc[`_${x.measurableId}`] = ratingSchemeItemsByCode[x.rating];
+                return acc;
+            },
+            { application: appsById[k]}))
         .orderBy(d => d.application.name)
         .value();
 }

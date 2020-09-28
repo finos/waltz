@@ -105,10 +105,10 @@ function hideInfoPopup() {
 }
 
 
-function showInfoPopup(html, e) {
+function showInfoPopup(html) {
     return select(`.${styles.INFOPOP}`)
-        .style("left", (e.pageX - 2) + "px")
-        .style("top", (e.pageY - 2) + "px")
+        .style("left", (event.pageX - 2) + "px")
+        .style("top", (event.pageY - 2) + "px")
         .style("display", "block")
         .html(html)
         .select(`.${styles.INFOPOP_CLOSE}`)
@@ -124,12 +124,12 @@ function mkAction(title, action) {
 }
 
 
-function mkDialogStyle(e) {
+function mkDialogStyle() {
     return {
         display: "block",
         position: "absolute",
-        left: `${e.pageX - 2}px`,
-        top: `${e.pageY - 100}px`
+        left: `${event.pageX - 2}px`,
+        top: `${event.pageY - 100}px`
     };
 }
 
@@ -188,7 +188,7 @@ function controller($q,
         localStorageService.set(localStorageKey, vm.layoutOptions.colWidths);
     }
 
-    function addApplicationAction(domainCoordinates, e) {
+    function addApplicationAction(domainCoordinates) {
         const column = domainCoordinates.column;
         const row = domainCoordinates.row;
 
@@ -197,6 +197,8 @@ function controller($q,
             vm.scenarioDefn.ratings,
             column,
             row);
+
+        const style = mkDialogStyle();
 
         $timeout(() => {
             vm.selectedRow = row;
@@ -211,7 +213,7 @@ function controller($q,
                     { name: "Search for any app", value: "SEARCH" }
                 ],
                 tab: "PICK",
-                style: mkDialogStyle(e)
+                style
             };
         });
     }
@@ -223,17 +225,18 @@ function controller($q,
 
     const addAction = mkAction(
         "Add another application",
-        (elm, d, idx, e) => addApplicationAction(d.domainCoordinates, e));
+        (elm, d) => addApplicationAction(d.domainCoordinates));
 
     const editAction = mkAction(
         "Edit",
-        (elm, d, idx, e) => {
+        (elm, d) => {
+            const style = mkDialogStyle();
             $timeout(() => {
                 vm.dialog = {
                     type: dialogs.EDIT_CELL,
                     data: d,
                     workingState: Object.assign({ rating: "G", comment: "" }, d.state),
-                    style: mkDialogStyle(e)
+                    style
                 };
             });
         });
@@ -291,7 +294,7 @@ function controller($q,
                 return [
                     {
                         title: "Add application",
-                        action: (elm, d, idx, e) => addApplicationAction({ row: d.row, column: d.column }, e)
+                        action: (elm, d) => addApplicationAction({ row: d.row, column: d.column })
                     }
                 ];
             }
@@ -330,7 +333,7 @@ function controller($q,
             return _.compact([
                 hide,
                 data.axisOrientation === "COLUMN" ? contract : null,
-                data.axisOrientation === "COLUMN" ? expand : null
+                data.axisOrientation === 'COLUMN' ? expand : null
             ]);
         };
     }
@@ -378,7 +381,7 @@ function controller($q,
             .attr("class", styles.INFOPOP);
 
         return {
-            onNodeClick: (e, d) => {
+            onNodeClick: (d) => {
                 const name = d.node.name;
                 const column = d.domainCoordinates.column.name;
                 const row = d.domainCoordinates.row.name;
@@ -420,7 +423,7 @@ function controller($q,
                     </a>
                 `;
 
-                showInfoPopup(html, e);
+                showInfoPopup(html);
             },
             onNodeGridClick: () => {
                 hideInfoPopup();

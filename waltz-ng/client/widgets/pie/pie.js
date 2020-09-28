@@ -116,10 +116,7 @@ function renderArcs(holder, config, data, onSelect) {
         .enter()
         .append("path")
         .classed("arc clickable", true)
-        .on("click", (e, d) => {
-            e.stopPropagation();
-            onSelect(d.data)
-        });
+        .on("click", d => onSelect(d.data));
 
     newArcs
         .append("title")

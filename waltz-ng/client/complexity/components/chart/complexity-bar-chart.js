@@ -126,9 +126,9 @@ function draw(svg,
         .append("g")
         .classed("wcbc-bar", true)
         .attr("transform", (d) => `translate(0, ${yScale(d.app.name)})`)
-        .on("mouseenter.hover", (e, d) => onHover(d))
+        .on("mouseenter.hover", d => onHover(d))
         .on("mouseleave.hover", () => onHover(null))
-        .on("click.select", (e, d) => onSelect(d));
+        .on("click.select", d => onSelect(d));
 
     bars.append("rect")
         .attr("x", 0)

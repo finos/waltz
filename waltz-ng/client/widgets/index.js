@@ -24,7 +24,6 @@ import EditableDropdown from "./editable-dropdown/editable-dropdown";
 import SpreadsheetLoader from "./spreadsheet-loader/spreadsheet-loader";
 import {registerComponents} from "../common/module-utils";
 import ChangeTimeline from "./change-timeline";
-import ErrorAlert from "./error-alert";
 import ExternalLink from "./external-link";
 import FromNow from "./from-now";
 import JumpTo from "./jump-to";
@@ -36,7 +35,6 @@ import RagIndicator from "./rag-indicator";
 import Search from "./search";
 import SectionActions from "./section-actions";
 import StepCount from "./step-count";
-import YqSelect from "./yq-select";
 import BasicInfoTile from "./basic-info-tile";
 import DataExtractLink from "./data-extract-link";
 import EditableField from "./editable-field";
@@ -61,7 +59,6 @@ export default () => {
     const module = angular.module("waltz.widgets", []);
 
     module.directive("waltzChangeTimeline", ChangeTimeline);
-    module.directive("waltzErrorAlert", ErrorAlert);
     module.directive("waltzExternalLink", ExternalLink);
     module.directive("waltzFromNow", FromNow);
     module.directive("waltzJumpTo", JumpTo);
@@ -73,7 +70,6 @@ export default () => {
     module.directive("waltzSearch", Search);
     module.directive("waltzSectionActions", SectionActions);
     module.directive("waltzStepCount", StepCount);
-    module.directive("waltzYqSelect", YqSelect);
     module
         .component("waltzBasicInfoTile", BasicInfoTile)
         .component("waltzDataExtractLink", DataExtractLink)
