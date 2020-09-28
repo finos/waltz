@@ -401,9 +401,9 @@ function drawLabels(section, items = [], scale, anchor = "start", tweakers) {
     labels
         .merge(newLabels)
         .classed("wsat-hover", (d) => highlighted === d.id)
-        .on("mouseenter.highlight", (e, d) => { highlighted = d.id; redraw(); })
-        .on("mouseleave.highlight", (e, d) => { highlighted = null; redraw(); })
-        .on("click.tweaker", tweakers.onSelect)
+        .on("mouseenter.highlight", d => { highlighted = d.id; redraw(); })
+        .on("mouseleave.highlight", d => { highlighted = null; redraw(); })
+        .on("click.tweaker", (d) => tweakers.onSelect(d, event))
         .on("mouseenter.tweaker", tweakers.onEnter)
         .on("mouseleave.tweaker", tweakers.onLeave)
         .transition()

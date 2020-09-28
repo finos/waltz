@@ -79,9 +79,9 @@ function toCUIcon(count = 0) {
 
 
 export function mkTweakers(tweakers = {},
-                           physicalFlows = [],
-                           logicalFlows = [],
-                           changeUnits = []) {
+                    physicalFlows = [],
+                    logicalFlows = [],
+                    changeUnits = []) {
 
     const logicalFlowsById = _.keyBy(logicalFlows, d => d.id);
     const physicalFlowsById = _.keyBy(physicalFlows, d => d.id);

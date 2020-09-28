@@ -210,8 +210,12 @@ function drawBands(section,
         .classed("band", true)
         .attr("pointer-events", "all")
         .style("visibility", "hidden")
-        .on("mouseenter.band-hover", (e, d) => tryInvoke(onHover, d))
-        .on("mouseleave.band-hover", () => tryInvoke(onHover, null))
+        .on("mouseenter.band-hover", d => {
+            tryInvoke(onHover, d);
+        })
+        .on("mouseleave.band-hover", () => {
+            tryInvoke(onHover, null);
+        })
        ;
 
     bands

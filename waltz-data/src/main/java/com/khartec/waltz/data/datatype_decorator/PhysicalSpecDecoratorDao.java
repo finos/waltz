@@ -19,10 +19,14 @@
 package com.khartec.waltz.data.datatype_decorator;
 
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
+import com.khartec.waltz.model.datatype.DataTypeUsageCharacteristics;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
+import com.khartec.waltz.model.datatype.ImmutableDataTypeUsageCharacteristics;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.records.PhysicalSpecDataTypeRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -40,10 +44,11 @@ import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
 import static com.khartec.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
-import static com.khartec.waltz.model.EntityReference.*;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE;
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
 @Repository
@@ -57,6 +62,7 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
                 .provenance(record.getProvenance())
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
+                .isReadonly(record.getIsReadonly())
                 .build();
     };
 
@@ -68,6 +74,7 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
         r.setProvenance(sdt.provenance());
         r.setLastUpdatedAt(Timestamp.valueOf(sdt.lastUpdatedAt()));
         r.setLastUpdatedBy(sdt.lastUpdatedBy());
+        r.setIsReadonly(sdt.isReadonly());
         return r;
     };
 
@@ -146,7 +153,55 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
                 .deleteFrom(PHYSICAL_SPEC_DATA_TYPE)
                 .where(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(associatedEntityRef.id()))
                 .and(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID.in(dataTypeIds))
+                        .and(PHYSICAL_SPEC_DATA_TYPE.IS_READONLY.isFalse())
                 .execute();
+    }
+
+
+    @Override
+    public List<DataTypeUsageCharacteristics> findDatatypeUsageCharacteristics(EntityReference ref) {
+
+        Field<Integer> numberOfFlowsSharingDatatype = DSL.countDistinct(Tables.PHYSICAL_FLOW.ID).as("numberOfFlowsSharingDatatype");
+
+        return dsl
+                .select(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID, PHYSICAL_SPEC_DATA_TYPE.IS_READONLY, numberOfFlowsSharingDatatype)
+                .from(PHYSICAL_SPEC_DATA_TYPE)
+                .leftJoin(Tables.PHYSICAL_FLOW).on(Tables.PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID)
+                        .and(Tables.PHYSICAL_FLOW.IS_REMOVED.isFalse())
+                        .and(Tables.PHYSICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name())))
+                .where(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(ref.id()))
+                .groupBy(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID, PHYSICAL_SPEC_DATA_TYPE.IS_READONLY)
+                .fetch(r -> {
+                    Integer usageCount = r.get(numberOfFlowsSharingDatatype);
+                    return ImmutableDataTypeUsageCharacteristics.builder()
+                            .dataTypeId(r.get(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID))
+                            .warningMessageForEditors(calcWarningMessageForEditors(usageCount))
+                            .warningMessageForViewers(calcWarningMessageForViewers(usageCount))
+                            .isRemovable(true)
+                            .build();
+                });
+    }
+
+
+    private String calcWarningMessageForEditors(int usageCount) {
+        if (usageCount == 0) {
+            return "This spec has no implementing flows.";
+        } else if (usageCount > 1) {
+            return format(
+                    "Caution, this spec is used by multiple physical flows. There are %d usages.",
+                    usageCount);
+        } else {
+            return null;
+        }
+    }
+
+
+    private String calcWarningMessageForViewers(int usageCount) {
+        if (usageCount == 0) {
+            return "This spec has no implementing flows.";
+        } else {
+            return null;
+        }
     }
 
 
@@ -169,5 +224,4 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
                         .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.isNull()))
                 .execute();
     }
-
 }

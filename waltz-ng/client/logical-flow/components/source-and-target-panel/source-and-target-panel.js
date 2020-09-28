@@ -16,6 +16,7 @@
  *
  */
 import _ from "lodash";
+import {event} from "d3-selection";
 import {initialiseData} from "../../../common";
 import {downloadTextFile} from "../../../common/file-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
@@ -272,28 +273,28 @@ function controller($element,
 
         const baseTweakers = {
             source: {
-                onSelect: (evt, entity) => $timeout(() => {
+                onSelect: (entity, evt) => $timeout(() => {
                     const flowId = keyedLogicalFlows.sourceFlowsByEntityId[entity.id];
                     vm.selected = select(entity, "source", flowId, evt);
                 })
             },
             target: {
-                onSelect: (evt, entity) => $timeout(() => {
+                onSelect: (entity, evt) => $timeout(() => {
                     const flowId = keyedLogicalFlows.targetFlowsByEntityId[entity.id];
                     vm.selected = select(entity, "target", flowId, evt);
                 })
             },
             type: {
-                onSelect: (e, d) => {
-                    e.stopPropagation();
+                onSelect: d => {
+                    event.stopPropagation();
                     vm.filterOptions.typeIds = [d.id];
                     filterChanged();
                     scrollIntoView($element[0], $window);
                 }
             },
             typeBlock: {
-                onSelect: (e, d) => {
-                    e.stopPropagation();
+                onSelect: () => {
+                    event.stopPropagation();
                     resetTypeFilter();
                 }
             }

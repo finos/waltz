@@ -21,6 +21,7 @@ import {checkIsEntityRef, checkIsIdSelector} from "../../common/checks";
 function store($http, baseApiUrl) {
 
     const baseUrl = `${baseApiUrl}/measurable-rating`;
+    const viewBaseUrl = `${baseApiUrl}/measurable-rating-view`;
 
     const findForEntityReference = (ref) => {
         checkIsEntityRef(ref);
@@ -90,6 +91,12 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
+    const getGridView = (categoryId, selectionOptions) => {
+        return $http
+            .post(`${viewBaseUrl}/category-id/${categoryId}`, selectionOptions)
+            .then(d => d.data);
+    };
+
     return {
         findByMeasurableSelector,
         findByAppSelector,
@@ -100,7 +107,8 @@ function store($http, baseApiUrl) {
         statsForRelatedMeasurables,
         save,
         remove,
-        removeByCategory
+        removeByCategory,
+        getGridView
     };
 
 }
@@ -161,6 +169,11 @@ export const MeasurableRatingStore_API = {
         serviceName,
         serviceFnName: "removeByCategory",
         description: "remove all measurable ratings for an entity in a given category [entityRef, categoryId]"
+    },
+    getGridView: {
+        serviceName,
+        serviceFnName: "getGridView",
+        description: "gets a grid view [categoryId, selectOpts]"
     }
 };
 
