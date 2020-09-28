@@ -33,7 +33,6 @@ export default () => {
     ]);
 
     registerComponents(module, [
-        entitySvgDiagramsPanel,
         entitySvgDiagramsViewer
     ]);
 
