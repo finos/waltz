@@ -310,6 +310,13 @@ const personMeasurableInvolvementsSection = {
     id: 160
 };
 
+const reportGridViewSection = {
+    componentId: "report-grid-view-section",
+    name: "Reports",
+    icon: "cloud",
+    id: 170
+};
+
 export const dynamicSections = {
     appCostsSection,
     appsSection,
@@ -336,6 +343,7 @@ export const dynamicSections = {
     measurableRatingAppSection,
     measurableRatingExplorerSection,
     measurableRatingsBrowserSection,
+    measurableRatingGridView: reportGridViewSection,
     orgUnitDirectMeasurableSection,
     personAppsSection,
     personChangeSetSection,
@@ -410,6 +418,7 @@ export const dynamicSectionsByKind = {
         pack(appsSection,
             [assetCostsSection, complexitySection, entityStatisticSummarySection, technologySummarySection]),
         measurableRatingsBrowserSection,
+        reportGridViewSection,
         pack(logicalFlowsTabgroupSection,
             [authSourcesSection]),
         changeInitiativeSection,
@@ -425,6 +434,7 @@ export const dynamicSectionsByKind = {
             [assetCostsSection, complexitySection, entityStatisticSummarySection, technologySummarySection]),
         entityNamedNotesSection,
         measurableRatingExplorerSection,
+        reportGridViewSection,
         relatedMeasurablesSection,
         bookmarksSection,
         changeSetSection,
@@ -447,6 +457,7 @@ export const dynamicSectionsByKind = {
         surveySection,
         changeLogSection,
         measurableRatingsBrowserSection,
+        reportGridViewSection,
         personMeasurableInvolvementsSection
     ],
     "DATA_TYPE": [
@@ -469,6 +480,7 @@ export const dynamicSectionsByKind = {
         changeInitiativeSection,
         changeSetSection,
         measurableRatingsBrowserSection,
+        reportGridViewSection,
         relatedAppGroupsSection,
         bookmarksSection,
         entityNamedNotesSection,
@@ -492,6 +504,7 @@ export const dynamicSectionsByKind = {
         bookmarksSection,
         changeLogSection,
         measurableRatingsBrowserSection,
+        reportGridViewSection,
         entityNamedNotesSection
     ],
     "PHYSICAL_FLOW": [

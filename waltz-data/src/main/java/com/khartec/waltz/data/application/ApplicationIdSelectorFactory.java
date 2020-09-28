@@ -355,7 +355,7 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                 .from(APPLICATION_GROUP_OU_ENTRY)
                 .innerJoin(ENTITY_HIERARCHY)
                 .on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(APPLICATION_GROUP_OU_ENTRY.ORG_UNIT_ID)
-                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name())))
+                        .and(ENTITY_HIERARCHY.KIND.eq(DSL.val(EntityKind.ORG_UNIT.name()))))
                 .where(APPLICATION_GROUP_OU_ENTRY.GROUP_ID.eq(options.entityReference().id()));
 
         SelectConditionStep<Record1<Long>> applicationIdsFromAssociatedOrgUnits = DSL
@@ -379,6 +379,7 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                 .select(APPLICATION.ID)
                 .from(APPLICATION)
                 .where(APPLICATION.ID.in(appIds))
+                //                    .where(APPLICATION.ID.in(directApps).or(APPLICATION.ID.in(applicationIdsFromAssociatedOrgUnits)))
                 .and(applicationConditions);
     }
 
