@@ -49,7 +49,8 @@ function controller($q,
     const vm = initialiseData(this, initialState);
     
     vm.selectedYear = (year)=>{
-        vm.selectionOptions.entityReference.year = year.split('-')[1];
+        if(year)
+        vm.selectionOptions.year = year.split('-')[1];
     }
 
     const loadData = () => {
