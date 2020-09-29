@@ -1,20 +1,56 @@
 <div>
-    <div class="row"
-         ng-repeat="row in $ctrl.summaryRows">
+
+    <!-- NO SUMMARIES -->
+    <waltz-no-data class="small"
+                   ng-if="$ctrl.chunkedSummaryData.length == 0">
+        <message>
+            <strong>No summaries selected</strong>
+            <p>
+                There are no active summaries.  To add one select the
+                'Add to summary' option in the column drop down menu.
+                Once added you can select summary rows to quickly filter
+                the report.
+            </p>
+        </message>
+    </waltz-no-data>
+
+
+    <!-- HELP -->
+    <p ng-if="$ctrl.chunkedSummaryData.length > 0"
+       class="help-block small">
+        Select a value in the summary tables to quickly filter the data.
+        Select the row again to clear the filter.
+        You can add more summaries using the column menu ('Add to summary').
+    </p>
+
+
+    <!-- SUMMARIES -->
+    <div class="row small"
+         ng-repeat="row in $ctrl.chunkedSummaryData">
         <div ng-repeat="summary in row" class="col-sm-3">
-            <h4 ng-bind="summary.columnEntityReference.name"></h4>
-            <waltz-rag-line></waltz-rag-line>
+            <h5 class="waltz-visibility-parent">
+                <span ng-bind="summary.column.columnEntityReference.name"></span>
+                <a ng-click="$ctrl.onRemoveSummary(summary)"
+                   class="waltz-visibility-child-30 clickable pull-right">
+                    <waltz-icon name="close"></waltz-icon>
+                </a>
+            </h5>
             <table class="table table-condensed small">
                 <tbody>
-                <tr ng-repeat="counter in summary.counts"
+                <tr ng-repeat="counter in summary.counters"
                     class="clickable"
-                    ng-class="{ 'waltz-highlighted-row' : $ctrl.selectedCounter == counter.counterId }"
-                    ng-click="$ctrl.onToggleFilter(summary.columnEntityReference, counter)">
+                    ng-class="{ 'waltz-highlighted-row' : $ctrl.selectedCounter === counter.counterId }"
+                    ng-click="$ctrl.onToggleFilter(counter)">
                     <td>
                         <div style="display: inline-block; height: 10px; width: 10px;"
                              ng-style="{ 'background-color': counter.rating.color }">
                         </div>
-                        <span ng-bind="counter.rating.name"></span>
+                        <span ng-bind="counter.rating.name"
+                              uib-popover="{{counter.rating.description}}"
+                              popover-popup-delay="300"
+                              popover-append-to-body="true"
+                              popover-trigger="mouseenter">
+                        </span>
                     </td>
                     <td class="text-right"><span ng-bind="counter.count"></span></td>
                 </tr>
@@ -33,9 +69,12 @@
         </div>
     </div>
 
+
+    <!-- GRID -->
     <waltz-grid-with-search column-defs="$ctrl.columnDefs"
                             entries="$ctrl.tableData"
                             class="small">
     </waltz-grid-with-search>
+
 </div>
 

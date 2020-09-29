@@ -12,6 +12,8 @@ const bindings = {
 
 const initData = {
     categoryExtId: "CLOUD_READINESS",
+    selectedCounterId: null,
+    activeSummaryColRefs: []
 };
 
 const nameCol = mkLinkGridCell("Name", "application.name", "application.id", "main.app.view", { pinnedLeft:true, width: 200});
@@ -36,6 +38,7 @@ function prepareColumnDefs(gridData) {
         .map(c => ({
             field: mkPropNameForRef(c.columnEntityReference),
             displayName: c.columnEntityReference.name,
+            columnDef: c,
             width: 100,
             cellTemplate: `
             <div class="waltz-grid-color-cell"
@@ -54,7 +57,7 @@ function prepareColumnDefs(gridData) {
 }
 
 
-function prepareTableData(gridData, filterParams = null) {
+function prepareTableData(gridData) {
     const appsById = _.keyBy(gridData.instance.applications, d => d.id);
     const ratingSchemeItemsById = _.keyBy(gridData.instance.ratingSchemeItems, d => d.id);
     return _
@@ -66,64 +69,80 @@ function prepareTableData(gridData, filterParams = null) {
                 acc[mkPropNameForCellRef(x)] = ratingSchemeItemsById[x.ratingId];
                 return acc;
             },
-            { application: appsById[k]}))
-        .filter(row => filterParams
-            ? _.get(row, [filterParams.propName, "id"], -1) === filterParams.ratingId
-            : true)
+            { application: appsById[k] }))
         .orderBy(d => d.application.name)
         .value();
 }
 
 
-function prepareSummaries(gridData) {
-    const summarisedColsByRef = _.chain(gridData.definition.columnDefinitions)
-        .filter(cd => cd.usageKind === "SUMMARY")
-        .keyBy(cd => mkPropNameForRef(cd.columnEntityReference))
-        .value();
-    const ratingSchemeItemsById = _.keyBy(gridData.instance.ratingSchemeItems, d => d.id);
-    const cellData = _.get(gridData, ["instance", "cellData"], []);
+function refreshSummaries(tableData, columnDefinitions, ratingSchemeItems) {
+    const ratingSchemeItemsById = _.keyBy(ratingSchemeItems, d => d.id);
+    const columnsByRef = _.keyBy(columnDefinitions, d => mkPropNameForRef(d.columnEntityReference));
 
-    const summaries = _
-        .chain(cellData)
-        .filter(d => _.has(summarisedColsByRef, mkPropNameForCellRef(d)))
-        .groupBy(d => mkPropNameForCellRef(d))
-        .mapValues(dataForSingleCol => _.countBy(dataForSingleCol, d => d.ratingId))
-        .mapValues(ratingCountsForSingleCol => _.map(
-            ratingCountsForSingleCol,
-            (count, k) => ({
-                rating: ratingSchemeItemsById[k],
-                count
-            })))
-        .map((counts, colRef) => ({
-            columnEntityReference: _.get(summarisedColsByRef, [colRef, "columnEntityReference"], null),
-            position: _.get(summarisedColsByRef, [colRef, "position"], 0),
-            counts: _.map(counts, c => Object.assign(c, { counterId: colRef + "_" + c.rating.id }))
-        }))
-        .orderBy([d => d.position, d => d.columnEntityReference.name])
-        .value();
+    const accInc = (acc, prop) => _.set(acc, prop, _.get(acc, prop, 0) + 1);
+    const reducer = (acc, row) => {
+        _.forEach(
+            row,
+            (v, k) => k === "application" || k === "$$hashKey"
+                ? acc
+                : accInc(acc, k + "#"+ v.id));
+        return acc;
+    };
 
-    return mkChunks(summaries, 4);
+    return _
+        .chain(tableData)
+        .reduce(reducer, {})
+        .map((count, k) => {
+            const [colRef, ratingId] = _.split(k, "#");
+            return {counterId: k, count, colRef, rating: ratingSchemeItemsById[ratingId]};
+        })
+        .groupBy(d => d.colRef)
+        .map((counters, colRef) => ({ column: columnsByRef[colRef], counters }))
+        .orderBy([
+            d => d.column.position,
+            d => d.column.columnEntityReference.name
+        ])
+        .value();
 }
+
 
 function controller(serviceBroker) {
 
     const vm = initialiseData(this, initData);
 
-    function prepareData(gridData, filterParams = null) {
-        vm.columnDefs = _.map(prepareColumnDefs(gridData), cd => Object.assign(cd, {menuItems: [
+    function refresh(filterParams) {
+        vm.columnDefs = _.map(vm.allColumnDefs, cd => Object.assign(cd, {menuItems: [
             {
                 title: "Add to summary",
                 icon: "ui-grid-icon-info-circled",
                 action: function($event) {
-                    console.log($event, cd)
-                    this.context.blat(); // $scope.blargh() would work too, this is just an example
+                    vm.onAddSummary(cd);
                 },
                 context: vm
             }
         ]}));
 
-        vm.tableData = prepareTableData(gridData, filterParams);
-        vm.summaryRows = prepareSummaries(gridData, filterParams);
+        const rowFilter = td => {
+            const assocRatingIdForRow = _.get(td, [filterParams.propName, "id"], null);
+            return assocRatingIdForRow === filterParams.ratingId;
+        };
+
+        vm.tableData = filterParams
+            ? _.filter(
+                vm.allTableData,
+                rowFilter)
+            : vm.allTableData;
+
+        const summaries = refreshSummaries(
+            vm.tableData,
+            vm.rawGridData.definition.columnDefinitions,
+            vm.rawGridData.instance.ratingSchemeItems);
+
+        vm.chunkedSummaryData = mkChunks(
+            _.filter(
+                summaries,
+                d => _.includes(vm.activeSummaryColRefs, mkPropNameForRef(d.column.columnEntityReference))),
+            4);
     }
 
     vm.$onChanges = () => {
@@ -133,8 +152,16 @@ function controller(serviceBroker) {
                 CORE_API.ReportGridStore.getViewById,
                 [1, mkSelectionOptions(vm.parentEntityRef)])
             .then(r => {
-                vm.gridData = r.data;
-                prepareData(vm.gridData);
+                vm.rawGridData = r.data;
+                vm.allTableData = prepareTableData(vm.rawGridData);
+                vm.allColumnDefs = prepareColumnDefs(vm.rawGridData);
+                vm.activeSummaryColRefs = _
+                    .chain(vm.rawGridData.definition.columnDefinitions)
+                    .filter(d => d.usageKind === "SUMMARY")
+                    .map(d => mkPropNameForRef(d.columnEntityReference))
+                    .value();
+
+                refresh();
             });
     };
 
@@ -142,20 +169,31 @@ function controller(serviceBroker) {
         vm.tableData = _.filter(vm.tableData, d => d.application.id % 2 === 0);
     };
 
-    vm.onToggleFilter = (colRef, counter) => {
+    vm.onToggleFilter = (counter) => {
         if (vm.selectedCounter === counter.counterId) {
             vm.selectedCounter = null;
-            prepareData(vm.gridData);
+            refresh();
         } else {
             vm.selectedCounter = counter.counterId;
             const filterParams = {
-                propName: mkPropNameForRef(colRef),
+                propName: counter.colRef,
                 ratingId: counter.rating.id
             };
-            prepareData(vm.gridData, filterParams);
+            refresh(filterParams);
         }
     };
 
+    vm.onRemoveSummary = (summary) => {
+        const refToRemove = mkPropNameForRef(summary.column.columnEntityReference);
+        vm.activeSummaryColRefs = _.reject(vm.activeSummaryColRefs, ref => ref === refToRemove);
+        refresh();
+    };
+
+    vm.onAddSummary = (c) => {
+        const colRef = mkPropNameForRef(c.columnDef.columnEntityReference);
+        vm.activeSummaryColRefs = _.concat(vm.activeSummaryColRefs, [colRef]);
+        refresh();
+    };
 }
 
 controller.$inject = ["ServiceBroker"];
