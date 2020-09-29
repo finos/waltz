@@ -26,9 +26,8 @@ import {mkLinkGridCell} from "../../common/grid-utils";
 import _ from "lodash";
 
 const initData = {
-    categoryId: 1,
-    entityRef: mkRef("ORG_UNIT", 10)
-
+    categoryExtId: "CLOUD_READINESS",
+    parentEntityRef: mkRef("APP_GROUP", 11785)
 };
 
 const nameCol = mkLinkGridCell("Name", "application.name", "application.id", "main.app.view", { pinnedLeft:true, width: 200});
@@ -79,14 +78,14 @@ function prepareTableData(gridData) {
 }
 
 
-function controller($element, $q, serviceBroker) {
+function controller(serviceBroker) {
 
     const vm = initialiseData(this, initData);
 
     serviceBroker
         .loadViewData(
-            CORE_API.MeasurableRatingStore.getGridView,
-            [vm.categoryId, mkSelectionOptions(vm.entityRef)])
+            CORE_API.MeasurableRatingStore.getGridViewByCategoryExtId,
+            [vm.categoryExtId, mkSelectionOptions(vm.parentEntityRef)])
         .then(r => {
             const gridData = r.data;
             vm.columnDefs = prepareColumnDefs(gridData);
@@ -96,7 +95,7 @@ function controller($element, $q, serviceBroker) {
 
 }
 
-controller.$inject = ["$element", "$q", "ServiceBroker"];
+controller.$inject = ["ServiceBroker"];
 
 const view = {
     template,
