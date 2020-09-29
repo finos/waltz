@@ -165,10 +165,6 @@ function controller(serviceBroker) {
             });
     };
 
-    vm.blat = () => {
-        vm.tableData = _.filter(vm.tableData, d => d.application.id % 2 === 0);
-    };
-
     vm.onToggleFilter = (counter) => {
         if (vm.selectedCounter === counter.counterId) {
             vm.selectedCounter = null;
