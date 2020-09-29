@@ -24,7 +24,7 @@
                             column-defs="$ctrl.columnDefs">
     </waltz-grid-with-search>
 
-    <div ng-if="$ctrl.selectedApps && $ctrl.selectedApps.length > 0">
+    <div ng-if="$ctrl.selectedDetails == 'APPS' && $ctrl.selectedApps && $ctrl.selectedApps.length > 0">
         <hr>
         <h4>
             Applications using
@@ -42,6 +42,87 @@
 
         <waltz-app-table applications="$ctrl.selectedApps">
         </waltz-app-table>
+    </div>
+
+
+    <div ng-if="$ctrl.selectedDetails == 'VERSIONS' && $ctrl.selectedVersion">
+        <hr>
+        <h4>
+            About
+            <strong>
+                    <span ng-bind="$ctrl.softwarePackage.name">
+                    </span>
+            </strong>
+            version
+            <strong>
+                    <span ng-bind="$ctrl.selectedVersion.name">
+                    </span>
+            </strong>
+        </h4>
+
+        <div ng-if="$ctrl.selectedVulnerabilityCounts">
+            <br>
+            <h4>Vulnerability Counts</h4>
+            <table class="table table-condensed"
+                   style="border-collapse: separate;">
+                <thead>
+                <tr>
+                    <th>Severity</th>
+                    <th>Count</th>
+                </tr>
+                </thead>
+                <tbody class="small text-muted">
+                <tr ng-if="$ctrl.selectedVulnerabilityCounts.High">
+                    <td>
+                        <span ng-bind="$ctrl.selectedVulnerabilityCounts.High[0].id">
+                        </span>
+                    </td>
+                    <td>
+                        <span ng-bind="$ctrl.selectedVulnerabilityCounts.High[0].count">
+                        </span>
+                    </td>
+                </tr>
+                <tr ng-if="$ctrl.selectedVulnerabilityCounts.Medium">
+                    <td>
+                        <span ng-bind="$ctrl.selectedVulnerabilityCounts.Medium[0].id">
+                        </span>
+                    </td>
+                    <td>
+                        <span ng-bind="$ctrl.selectedVulnerabilityCounts.Medium[0].count">
+                        </span>
+                    </td>
+                </tr>
+                <tr ng-if="$ctrl.selectedVulnerabilityCounts.Low">
+                    <td>
+                        <span ng-bind="$ctrl.selectedVulnerabilityCounts.Low[0].id">
+                    </span>
+                    </td>
+                    <td>
+                        <span ng-bind="$ctrl.selectedVulnerabilityCounts.Low[0].count">
+                        </span>
+                    </td>
+                </tr>
+                <tr ng-if="$ctrl.selectedVulnerabilityCounts.Unknown">
+                    <td>
+                        <span ng-bind="$ctrl.selectedVulnerabilityCounts.Unknown[0].id">
+                    </span>
+                    </td>
+                    <td>
+                        <span ng-bind="$ctrl.selectedVulnerabilityCounts.Unknown[0].count">
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div ng-if="$ctrl.selectedLicences.length > 0">
+            <br>
+            <h4>Licences</h4>
+            <waltz-licence-panel assessment-definitions="$ctrl.licenceAssessmentDefinitions"
+                                 licences="$ctrl.selectedLicences">
+            </waltz-licence-panel>
+        </div>
     </div>
 
 </div>

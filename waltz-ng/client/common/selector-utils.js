@@ -61,6 +61,7 @@ export function determineUpwardsScopeForKind(kind) {
  * @param scope
  * @param entityLifecycleStatuses
  * @param filters
+ * @param linkingEntityKind
  * @returns {{entityLifecycleStatuses: string[], entityReference: {kind: *, id: *}, scope: (*|string), filters}}
  */
 export function mkSelectionOptions(entityReference, scope, entityLifecycleStatuses = ["ACTIVE"], filters = {}) {
@@ -71,6 +72,19 @@ export function mkSelectionOptions(entityReference, scope, entityLifecycleStatus
         scope: scope || determineDownwardsScopeForKind(entityReference.kind),
         entityLifecycleStatuses,
         filters
+    };
+}
+
+
+export function mkSelectionOptionsWithJoiningEntity(entityReference, scope, entityLifecycleStatuses = ["ACTIVE"], filters = {}, joiningEntityKind = null) {
+    checkIsEntityRef(entityReference);
+
+    return {
+        entityReference: { id: entityReference.id, kind: entityReference.kind }, // use minimal ref to increase cache hits in broker
+        scope: scope || determineDownwardsScopeForKind(entityReference.kind),
+        entityLifecycleStatuses,
+        filters,
+        joiningEntityKind: joiningEntityKind
     };
 }
 

@@ -138,14 +138,12 @@ function renderArcs(holder, config, data, onSelect) {
     emptyPie
         .enter()
         .append("circle")
-        .attrs({
-            cx: 0,
-            cy: 0,
-            r: radius / 2,
-            fill: "#eee",
-            stroke: "#bbb",
-            "stroke-dasharray": [5, 1]
-        })
+        .attr("cx", 0)
+        .attr("cy", 0)
+        .attr("r", radius / 2)
+        .attr("fill", "#eee")
+        .attr("stroke", "#bbb")
+        .attr("stroke-dasharray", [5, 1])
         .classed(styles.emptyPie, true);
 
     emptyPie
@@ -159,9 +157,9 @@ function render(svg, config, data, onSelect) {
     const width = size;
     const height = size;
 
-    svg.attrs( { width, height });
-
     const mainGroup = svg
+        .attr("width", width)
+        .attr("height", height)
         .selectAll(".main-group")
         .data([1]);
 

@@ -178,7 +178,7 @@ public class SurveyHarness {
                 userName,
                 instance.id().get(),
                 ImmutableSurveyInstanceStatusChangeCommand.builder()
-                        .newStatus(SurveyInstanceStatus.IN_PROGRESS)
+                        .action(SurveyInstanceAction.SAVING)
                         .build());
     }
 

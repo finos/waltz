@@ -1,0 +1,7 @@
+SPDXVersion: SPDX-2.1
+DataLicense: CC0-1.0
+Creator: David Watkins (dwatkins@khartec.com)
+PackageName: waltz
+PackageOriginator: David Watkins (dwatkins@khartec.com)
+PackageHomePage: https://github.com/finos/waltz
+PackageLicenseDeclared: Apache-2.0

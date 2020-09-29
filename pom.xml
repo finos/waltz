@@ -41,7 +41,7 @@
     <url>http://khartec.com</url>
 
     <issueManagement>
-        <url>https://github.com/khartec/waltz/issues</url>
+        <url>https://github.com/finos/waltz/issues</url>
         <system>GitHub Issues</system>
     </issueManagement>
 
@@ -55,8 +55,8 @@
     </licenses>
 
     <scm>
-        <url>https://github.com/khartec/waltz</url>
-        <connection>scm:git:git://github.com/khartec/waltz.git</connection>
+        <url>https://github.com/finos/waltz</url>
+        <connection>scm:git:git://github.com/finos/waltz.git</connection>
         <developerConnection>scm:git:git@github.com:davidwatkins73/waltz.git</developerConnection>
     </scm>
 
@@ -67,26 +67,31 @@
         <maven-shade-plugin.version>3.2.1</maven-shade-plugin.version>
         <maven.build.timestamp.format>yyyy-MM-dd HH:mm</maven.build.timestamp.format>
 
-        <archunit.version>0.12.0</archunit.version>
-        <freemarker.version>2.3.28</freemarker.version>
-        <hikari.version>3.4.1</hikari.version>
-        <immutables.version>2.8.2</immutables.version>
-        <jackson.version>2.10.1</jackson.version>
+        <annotation-api.version>1.2</annotation-api.version>
+        <archunit.version>0.14.1</archunit.version>
+        <freemarker.version>2.3.30</freemarker.version>
+        <hikari.version>3.4.5</hikari.version>
+        <immutables.version>2.8.8</immutables.version>
+        <jackson.version>2.11.1</jackson.version>
         <java.version>1.8</java.version>
         <javax.mail.version>1.4.7</javax.mail.version>
-        <jackson-jsr310.version>2.10.1</jackson-jsr310.version>
+        <jackson-jsr310.version>2.11.1</jackson-jsr310.version>
         <jbcrypt.version>0.4.1</jbcrypt.version>
-        <jgrapht.version>1.3.1</jgrapht.version>
-        <jool.version>0.9.12</jool.version>
-        <junit.version>4.12</junit.version>
-        <jwt.version>3.8.3</jwt.version>
+        <jgrapht.version>1.5.0</jgrapht.version>
+        <jool.version>0.9.14</jool.version>
+        <jooq.version>3.13.2</jooq.version> <!--If this changes see issue #4553 -->
+        <junit.version>4.13</junit.version>
+        <jwt.version>3.10.3</jwt.version>
+        <liquibase.maven.version>3.5.1</liquibase.maven.version>
         <logback.version>1.2.3</logback.version>
-        <pcollections.version>2.1.2</pcollections.version>
-        <poi.version>4.1.1</poi.version>
-        <slf4j.version>1.7.29</slf4j.version>
-        <spark.version>2.9.1</spark.version>
-        <spring.version>5.2.1.RELEASE</spring.version>
+        <pcollections.version>3.1.3</pcollections.version>
+        <poi.version>4.1.2</poi.version>
+        <slf4j.version>1.7.30</slf4j.version>
+        <spark.version>2.9.2</spark.version>
+        <spring.version>5.2.2.RELEASE</spring.version>
         <super-csv.version>2.4.0</super-csv.version>
+        <commons-jexl3.version>3.1</commons-jexl3.version>
+
         <timestamp>${maven.build.timestamp}</timestamp>
     </properties>
 
@@ -186,7 +191,7 @@
             </dependency>
             <dependency>
                 <groupId>org.jooq</groupId>
-                <artifactId>jool</artifactId>
+                <artifactId>jool-java-8</artifactId>
                 <version>${jool.version}</version>
             </dependency>
             <dependency>
@@ -203,6 +208,16 @@
                 <groupId>org.jgrapht</groupId>
                 <artifactId>jgrapht-core</artifactId>
                 <version>${jgrapht.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.annotation</groupId>
+                <artifactId>javax.annotation-api</artifactId>
+                <version>${annotation-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-jexl3</artifactId>
+                <version>${commons-jexl3.version}</version>
             </dependency>
 
 
@@ -267,6 +282,172 @@
 
         </dependencies>
     </dependencyManagement>
+
+    <profiles>
+        <profile>
+            <id>ci</id>
+            <modules>
+                <module>waltz-integration-test</module>
+            </modules>
+        </profile>
+
+        <profile>
+            <id>waltz-h2</id>
+            <properties>
+                <jdbc.group>com.h2database</jdbc.group>
+                <jdbc.artifact>h2</jdbc.artifact>
+                <jdbc.version>1.3.176</jdbc.version>
+                <jdbc.driver>org.h2.Driver</jdbc.driver>
+                <jooq.dialect>H2</jooq.dialect>
+                <jooq.group>org.jooq</jooq.group>
+                <jooq.database>org.jooq.meta.h2.H2Database</jooq.database>
+                <database.catalog></database.catalog> <!-- only required for MSSQL -->
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>${jdbc.group}</groupId>
+                    <artifactId>${jdbc.artifact}</artifactId>
+                    <version>${jdbc.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>${jooq.group}</groupId>
+                    <artifactId>jooq</artifactId>
+                    <version>${jooq.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>waltz-mariadb</id>
+            <properties>
+                <jdbc.group>org.mariadb.jdbc</jdbc.group>
+                <jdbc.artifact>mariadb-java-client</jdbc.artifact>
+                <jdbc.version>1.6.5</jdbc.version>
+                <jdbc.driver>org.mariadb.jdbc.Driver</jdbc.driver>
+                <jooq.dialect>MARIADB</jooq.dialect>
+                <jooq.group>org.jooq</jooq.group>
+                <jooq.database>org.jooq.meta.mariadb.MariaDBDatabase</jooq.database>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>${jdbc.group}</groupId>
+                    <artifactId>${jdbc.artifact}</artifactId>
+                    <version>${jdbc.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>${jooq.group}</groupId>
+                    <artifactId>jooq</artifactId>
+                    <version>${jooq.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <!--
+                Note: this profile requires a professional license for JOOQ,
+                see: http://www.jooq.org/download/
+            -->
+            <id>waltz-mssql</id>
+            <properties>
+                <jdbc.group>com.microsoft.sqlserver</jdbc.group>
+                <jdbc.artifact>sqljdbc4</jdbc.artifact>
+                <jdbc.version>4.0</jdbc.version>
+                <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
+                <jooq.group>org.jooq.pro-java-8</jooq.group>
+                <jooq.database>org.jooq.meta.sqlserver.SQLServerDatabase</jooq.database>
+                <jooq.dialect>SQLSERVER2014</jooq.dialect>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>${jdbc.group}</groupId>
+                    <artifactId>${jdbc.artifact}</artifactId>
+                    <version>${jdbc.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>${jooq.group}</groupId>
+                    <artifactId>jooq</artifactId>
+                    <version>${jooq.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>waltz-postgres</id>
+            <properties>
+                <jdbc.group>org.postgresql</jdbc.group>
+                <jdbc.artifact>postgresql</jdbc.artifact>
+                <jdbc.version>42.2.5</jdbc.version>
+                <jdbc.driver>org.postgresql.Driver</jdbc.driver>
+                <jooq.dialect>POSTGRES</jooq.dialect>
+                <jooq.group>org.jooq</jooq.group>
+                <jooq.database>org.jooq.meta.postgres.PostgresDatabase</jooq.database>
+                <database.catalog></database.catalog> <!-- only required for MSSQL -->
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>${jdbc.group}</groupId>
+                    <artifactId>${jdbc.artifact}</artifactId>
+                    <version>${jdbc.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>${jooq.group}</groupId>
+                    <artifactId>jooq</artifactId>
+                    <version>${jooq.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+        <profile>
+            <!--
+                Note: this profile requires a professional license for JOOQ,
+                see: http://www.jooq.org/download/
+            -->
+            <id>waltz-mssql-alt</id>
+            <properties>
+                <jdbc.group>com.microsoft.sqlserver</jdbc.group>
+                <jdbc.artifact>mssql-jdbc</jdbc.artifact>
+                <jdbc.version>6.1.0.jre8</jdbc.version>
+                <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
+                <jooq.group>org.jooq.pro-java-8</jooq.group>
+                <jooq.database>org.jooq.meta.sqlserver.SQLServerDatabase</jooq.database>
+                <jooq.dialect>SQLSERVER2014</jooq.dialect>
+            </properties>
+            <dependencies>
+                <dependency>
+                    <groupId>${jdbc.group}</groupId>
+                    <artifactId>${jdbc.artifact}</artifactId>
+                    <version>${jdbc.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>${jooq.group}</groupId>
+                    <artifactId>jooq</artifactId>
+                    <version>${jooq.version}</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <!-- profiles for travis -->
+        <profile>
+            <id>travis-postgres</id>
+            <properties>
+                <database.url>jdbc:mysql://127.0.0.1:3306/waltz</database.url>
+                <database.url>jdbc:postgresql://localhost:5432/waltz</database.url>
+                <database.user>postgres</database.user>
+                <database.password></database.password>
+                <database.schema>PUBLIC</database.schema>
+            </properties>
+        </profile>
+
+
+        <profile>
+            <id>travis-mariadb</id>
+            <properties>
+                <database.url>jdbc:mysql://127.0.0.1:3306/waltz</database.url>
+                <database.user>root</database.user>
+                <database.password></database.password>
+                <database.schema>waltz</database.schema>
+            </properties>
+        </profile>
+    </profiles>
 
     <build>
         <plugins>

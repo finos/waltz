@@ -72,7 +72,6 @@ function controller($http, notification, baseExtractUrl) {
         vm.classes = calcClasses(vm.styling);
     };
 
-
     const invokeExport = (format) => {
         const options = {
             params : { format }

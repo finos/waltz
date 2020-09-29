@@ -19,9 +19,11 @@
 package com.khartec.waltz.data.physical_flow;
 
 import com.khartec.waltz.data.IdSelectorFactory;
+import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.schema.tables.PhysicalFlow;
 import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -29,8 +31,7 @@ import org.jooq.impl.DSL;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
-import static com.khartec.waltz.schema.Tables.CHANGE_UNIT;
-import static com.khartec.waltz.schema.Tables.TAG_USAGE;
+import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_FLOW_PARTICIPANT;
@@ -38,8 +39,8 @@ import static com.khartec.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_F
 
 public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
 
-    private static final Condition PHYSICAL_FLOW_NOT_REMOVED = PHYSICAL_FLOW.IS_REMOVED.isFalse()
-            .and(PHYSICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name()));
+    private static final Condition PHYSICAL_FLOW_NOT_REMOVED = PhysicalFlow.PHYSICAL_FLOW.IS_REMOVED.isFalse()
+            .and(PhysicalFlow.PHYSICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name()));
 
     @Override
     public Select<Record1<Long>> apply(IdSelectionOptions options) {
@@ -57,10 +58,30 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
                 return mkForChangeSet(options);
             case TAG:
                 return mkForTag(options);
+            case APP_GROUP:
+            case CHANGE_INITIATIVE:
+            case DATA_TYPE:
+            case MEASURABLE:
+            case ORG_UNIT:
+            case PERSON:
+            case SCENARIO:
+                return mkViaLogicalFlowSelector(options);
             default:
                 throw new UnsupportedOperationException("Cannot create physical flow selector from options: "+options);
         }
     }
+
+
+    private Select<Record1<Long>> mkViaLogicalFlowSelector(IdSelectionOptions options) {
+        Select<Record1<Long>> logicalFlowSelector = new LogicalFlowIdSelectorFactory().apply(options);
+
+        return DSL
+                .select(PHYSICAL_FLOW.ID)
+                .from(PHYSICAL_FLOW)
+                .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.in(logicalFlowSelector));
+
+    }
+
 
     private Select<Record1<Long>> mkForTag(IdSelectionOptions options) {
         ensureScopeIsExact(options);
@@ -69,8 +90,8 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
         return DSL
                 .select(TAG_USAGE.ENTITY_ID)
                 .from(TAG_USAGE)
-                .join(PHYSICAL_FLOW)
-                .on(PHYSICAL_FLOW.ID.eq(TAG_USAGE.ENTITY_ID)
+                .join(PhysicalFlow.PHYSICAL_FLOW)
+                .on(PhysicalFlow.PHYSICAL_FLOW.ID.eq(TAG_USAGE.ENTITY_ID)
                         .and(TAG_USAGE.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name())))
                 .where(TAG_USAGE.TAG_ID.eq(tagId))
                 .and(getLifecycleCondition(options));
@@ -84,8 +105,8 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
         return DSL
                 .select(PHYSICAL_FLOW_PARTICIPANT.PHYSICAL_FLOW_ID)
                 .from(PHYSICAL_FLOW_PARTICIPANT)
-                .innerJoin(PHYSICAL_FLOW)
-                .on(PHYSICAL_FLOW.ID.eq(PHYSICAL_FLOW_PARTICIPANT.PHYSICAL_FLOW_ID))
+                .innerJoin(PhysicalFlow.PHYSICAL_FLOW)
+                .on(PhysicalFlow.PHYSICAL_FLOW.ID.eq(PHYSICAL_FLOW_PARTICIPANT.PHYSICAL_FLOW_ID))
                 .where(PHYSICAL_FLOW_PARTICIPANT.PARTICIPANT_ENTITY_KIND.eq(EntityKind.SERVER.name()))
                 .and(PHYSICAL_FLOW_PARTICIPANT.PARTICIPANT_ENTITY_ID.eq(serverId))
                 .and(getLifecycleCondition(options));
@@ -96,10 +117,10 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
         ensureScopeIsExact(options);
         long diagramId = options.entityReference().id();
         return DSL
-                .select(PHYSICAL_FLOW.ID)
-                .from(PHYSICAL_FLOW)
+                .select(PhysicalFlow.PHYSICAL_FLOW.ID)
+                .from(PhysicalFlow.PHYSICAL_FLOW)
                 .innerJoin(FLOW_DIAGRAM_ENTITY)
-                .on(PHYSICAL_FLOW.ID.eq(FLOW_DIAGRAM_ENTITY.ENTITY_ID))
+                .on(PhysicalFlow.PHYSICAL_FLOW.ID.eq(FLOW_DIAGRAM_ENTITY.ENTITY_ID))
                 .where(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId))
                 .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name()))
                 .and(getLifecycleCondition(options));
@@ -110,9 +131,9 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
         ensureScopeIsExact(options);
         long logicalFlowId = options.entityReference().id();
         return DSL
-                .select(PHYSICAL_FLOW.ID)
-                .from(PHYSICAL_FLOW)
-                .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(logicalFlowId))
+                .select(PhysicalFlow.PHYSICAL_FLOW.ID)
+                .from(PhysicalFlow.PHYSICAL_FLOW)
+                .where(PhysicalFlow.PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(logicalFlowId))
                 .and(getLifecycleCondition(options));
     }
 
@@ -120,9 +141,9 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
     private Select<Record1<Long>> mkForChangeSet(IdSelectionOptions options) {
         ensureScopeIsExact(options);
         return DSL
-                .select(PHYSICAL_FLOW.ID)
-                .from(PHYSICAL_FLOW)
-                .innerJoin(CHANGE_UNIT).on(PHYSICAL_FLOW.ID.eq(CHANGE_UNIT.SUBJECT_ENTITY_ID)
+                .select(PhysicalFlow.PHYSICAL_FLOW.ID)
+                .from(PhysicalFlow.PHYSICAL_FLOW)
+                .innerJoin(CHANGE_UNIT).on(PhysicalFlow.PHYSICAL_FLOW.ID.eq(CHANGE_UNIT.SUBJECT_ENTITY_ID)
                         .and(CHANGE_UNIT.SUBJECT_ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name())))
                 .where(CHANGE_UNIT.CHANGE_SET_ID.eq(options.entityReference().id()))
                 .and(getLifecycleCondition(options));
@@ -133,9 +154,9 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
         ensureScopeIsExact(options);
         long specificationId = options.entityReference().id();
         return DSL
-                .select(PHYSICAL_FLOW.ID)
-                .from(PHYSICAL_FLOW)
-                .where(PHYSICAL_FLOW.SPECIFICATION_ID.eq(specificationId));
+                .select(PhysicalFlow.PHYSICAL_FLOW.ID)
+                .from(PhysicalFlow.PHYSICAL_FLOW)
+                .where(PhysicalFlow.PHYSICAL_FLOW.SPECIFICATION_ID.eq(specificationId));
     }
 
 

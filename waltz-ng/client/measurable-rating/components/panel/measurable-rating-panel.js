@@ -36,10 +36,11 @@ const bindings = {
     allocationSchemes: "<",
     measurables: "<",
     ratings: "<",
-    ratingScheme: "<",
+    ratingSchemeItems: "<",
     plannedDecommissions: "<?",
     replacingDecommissions: "<?",
-    replacementApps: "<?"
+    replacementApps: "<?",
+    application: "<"
 };
 
 

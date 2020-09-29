@@ -18,74 +18,87 @@
 
 <div>
     <waltz-page-header icon="wpforms"
-                       name="{{ ctrl.surveyRun.name }}"
+                       name="{{ ctrl.surveyDetails.run.name }}"
                        small="edit response">
-        <ol class="waltz-breadcrumbs">
-            <li><a ui-sref="main">Home</a></li>
-            <li>
-                <waltz-entity-link entity-ref="ctrl.surveyInstance.surveyEntity">
-                </waltz-entity-link>
-            </li>
-            <li>Surveys</li>
-            <li>
-                <span ng-bind="ctrl.surveyRun.name">
-                </span>
-            </li>
-        </ol>
+        <breadcrumbs>
+            <ol class="waltz-breadcrumbs">
+                <li>
+                    <a ui-sref="main">Home</a>
+                </li>
+                <li>
+                    <waltz-entity-link entity-ref="ctrl.surveyDetails.instance.surveyEntity"
+                                       tooltip-placement="bottom">
+                    </waltz-entity-link>
+                </li>
+                <li>
+                    <a ui-sref="main.survey.instance.user">Surveys</a>
+                </li>
+                <li>
+                    <span ng-bind="ctrl.surveyDetails.run.name">
+                    </span>
+                </li>
+            </ol>
+        </breadcrumbs>
     </waltz-page-header>
 
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <waltz-survey-instance-summary instance-id="ctrl.surveyInstance.id">
+        <waltz-survey-instance-summary instance-id="ctrl.surveyDetails.instance.id">
         </waltz-survey-instance-summary>
     </div>
 
     <br>
-
     <br>
 
     <waltz-section name="Responses"
-                   ng-if="ctrl.isUserInstanceRecipient && ctrl.instanceCanBeEdited">
+                   icon="pencil-square"
+                   ng-if="ctrl.surveyDetails.permissions.isParticipant && ctrl.instanceCanBeEdited">
         <form name="surveyResponseForm"
               class="form-horizontal waltz-survey-form"
               role="form"
               novalidate>
-            <div ng-repeat="groupedQuestion in ctrl.surveyQuestionInfos">
+            <div ng-repeat="groupedQuestion in ctrl.groupedQuestions track by groupedQuestion.sectionName"
+                 class="waltz-survey-question-section">
 
                 <h4 ng-bind="groupedQuestion.sectionName"
-                    class="text-muted"></h4>
+                    class="text-muted">
+                </h4>
                 <hr>
-                <div ng-repeat="qi in groupedQuestion.questionInfos"
+                <div ng-repeat="qi in groupedQuestion.questionInfos track by qi.question.id"
                      class="form-group">
-                    <label for="{{ qi.question.id }}"
-                           class="col-sm-5 control-label">
+                    <label ng-attr-for="{{ qi.question.id }}"
+                           class="col-sm-4">
                         <span ng-bind="qi.question.questionText">
                         </span>
-                            <span ng-if="qi.question.isMandatory"
-                                  class="text-danger">
+                        <span ng-if="qi.question.isMandatory"
+                              class="text-danger">
                             *
                         </span>
                         <!-- help text -->
                         <waltz-markdown text="qi.question.helpText"
+                                        style="display: block;"
                                         class='small text-muted'>
                         </waltz-markdown>
                     </label>
+
+                    <!-- inputs -->
                     <div ng-switch="qi.question.fieldType"
-                         class="col-sm-7"
+                         class="col-sm-6"
                          ng-class="{'col-md-3': qi.question.fieldType === 'DATE'}">
-                        <!-- input control -->
+
                         <!-- number -->
                         <input ng-switch-when="NUMBER"
                                type="number"
-                               id="{{ qi.question.id }}"
-                               placeholder="please enter a number"
+                               ng-attr-id="{{ qi.question.id }}"
+                               placeholder="Please enter a number"
+                               ng-model-options="{ allowInvalid: true, debounce: 200 }"
                                ng-model="ctrl.surveyResponses[qi.question.id].numberResponse"
                                ng-required="qi.question.isMandatory"
-                               ng-blur="ctrl.saveResponse(qi.question.id)"
+                               ng-change="ctrl.saveResponse(qi.question.id)"
                                class="form-control"/>
                         <!-- boolean -->
                         <div ng-switch-when="BOOLEAN">
                             <label>
-                                <input name="{{ qi.question.id }}"
+                                <input ng-attr-name="{{ qi.question.id }}"
                                        type="radio"
                                        ng-model="ctrl.surveyResponses[qi.question.id].booleanResponse"
                                        ng-required="qi.question.isMandatory"
@@ -94,10 +107,8 @@
                                 Yes
                             </label>
                             &nbsp;
-                            &nbsp;
-                            &nbsp;
                             <label>
-                                <input name="{{ qi.question.id }}"
+                                <input ng-attr-name="{{ qi.question.id }}"
                                        type="radio"
                                        ng-model="ctrl.surveyResponses[qi.question.id].booleanResponse"
                                        ng-required="qi.question.isMandatory"
@@ -106,10 +117,8 @@
                                 No
                             </label>
                             &nbsp;
-                            &nbsp;
-                            &nbsp;
                             <label ng-if="! qi.question.isMandatory">
-                                <input name="{{ qi.question.id }}"
+                                <input ng-attr-name="{{ qi.question.id }}"
                                        type="radio"
                                        ng-model="ctrl.surveyResponses[qi.question.id].booleanResponse"
                                        ng-change="ctrl.saveResponse(qi.question.id)"
@@ -119,7 +128,7 @@
                         </div>
                         <!-- text -->
                         <textarea ng-switch-when="TEXT"
-                                  id="{{ qi.question.id }}"
+                                  ng-attr-id="{{ qi.question.id }}"
                                   ng-model="ctrl.surveyResponses[qi.question.id].stringResponse"
                                   ng-required="qi.question.isMandatory"
                                   ng-blur="ctrl.saveResponse(qi.question.id)"
@@ -128,7 +137,7 @@
                         </textarea>
                         <!-- textarea -->
                         <textarea ng-switch-when="TEXTAREA"
-                                  id="{{ qi.question.id }}"
+                                  ng-attr-id="{{ qi.question.id }}"
                                   ng-model="ctrl.surveyResponses[qi.question.id].stringResponse"
                                   ng-required="qi.question.isMandatory"
                                   ng-blur="ctrl.saveResponse(qi.question.id)"
@@ -137,7 +146,7 @@
                         </textarea>
                         <!-- date -->
                         <waltz-date-picker-form-input ng-switch-when="DATE"
-                                                      id="{{ qi.question.id }}"
+                                                      ng-attr-id="{{ qi.question.id }}"
                                                       item-id="qi.question.id"
                                                       allow-past-dates="true"
                                                       place-holder="dd-MMM-yyyy"
@@ -148,10 +157,10 @@
                         </waltz-date-picker-form-input>
                         <!-- dropdown (single value) -->
                         <select ng-switch-when="DROPDOWN"
-                                id="{{ qi.question.id }}"
+                                ng-attr-id="{{ qi.question.id }}"
                                 ng-model="ctrl.surveyResponses[qi.question.id].stringResponse"
                                 ng-required="qi.question.isMandatory"
-                                ng-blur="ctrl.saveResponse(qi.question.id)"
+                                ng-change="ctrl.saveResponse(qi.question.id)"
                                 ng-options="entry.value as entry.value for entry in qi.dropdownEntries | orderBy:'position'"
                                 class="form-control">
                         </select>
@@ -203,57 +212,58 @@
                         </waltz-editable-field>
                     </div>
                 </div>
-                <hr>
             </div>
 
-            <!-- buttons -->
-            <table class="table-condensed" align="right">
-                <tr>
-                    <td>
-                        <a class="clickable"
-                           ng-click="ctrl.saveForLater()">
-                            Save For Later
-                        </a>
-                    </td>
-                    <td ng-if="surveyResponseForm.$valid">
-                        <button type="button"
-
-                                ng-click="ctrl.submit()"
-                                class="btn btn-success btn-lg">
-                            <waltz-icon name="envelope">
-                            </waltz-icon>
-                            Submit
-                        </button>
-                    </td>
-                    <td ng-if="surveyResponseForm.$invalid"
-                        style="padding-bottom: 10px;">
-                        <span class="alert alert-warning">
-                                Survey response cannot be submitted until all required questions are answered.
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="pull-right">
+                        <span ng-repeat="action in ctrl.availableStatusActions" >
+                            <a class="btn btn-xs"
+                                ng-if="action.type.includes('response')"
+                                ng-disabled="action.isDisabled(surveyResponseForm)"
+                                ng-class="'btn-{{action.severity}}'"
+                                ng-click="!action.isDisabled(surveyResponseForm) && ctrl.invokeStatusAction(action, ctrl.surveyDetails.instance.id)">
+                                <span ng-bind="action.name"></span>
+                            </a>
                         </span>
-                    </td>
-                </tr>
-            </table>
+                    </div>
+                    <div class="pull-right" style="padding-right: 1em;">
+
+
+                        <div ng-if="surveyResponseForm.$invalid"
+                             class="help-block">
+                            <waltz-icon name="warning"></waltz-icon>
+                            Cannot submit until all mandatory questions are answered
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
         </form>
     </waltz-section>
 
     <div class="alert alert-warning"
-         ng-if="ctrl.surveyInstance.status === 'EXPIRED'">
+         ng-if="ctrl.surveyDetails.instance.status === 'EXPIRED'">
         <h4>Survey Expired</h4>
         <p>This survey response has been expired without being submitted.</p>
     </div>
 
     <div class="alert alert-warning"
-         ng-if="ctrl.surveyInstance.status === 'COMPLETED' || ctrl.surveyInstance.status === 'APPROVED'">
+         ng-if="ctrl.surveyDetails.instance.status === 'COMPLETED' || ctrl.surveyDetails.instance.status === 'APPROVED'">
         <h4>Survey Completed</h4>
-        <p>This survey response has been completed and is no longer can be edited. Please follow this <a ui-sref="main.survey.instance.response.view ({ id: ctrl.surveyInstance.id })">link</a> to view the responses.</p>
+        <p>
+            This survey response has been completed and is no longer can be edited. Please follow this
+            <a ui-sref="main.survey.instance.response.view ({ id: ctrl.surveyDetails.instance.id })">link</a>
+            to view the responses.
+        </p>
     </div>
 
     <div class="alert alert-warning"
-         ng-if="!ctrl.isUserInstanceRecipient">
+         ng-if="!ctrl.surveyDetails.permissions.isParticipant">
         <h4>Permission Denied</h4>
         <p>You don't have permission to respond to this survey.</p>
     </div>
-
 
     <!-- CHANGE LOG -->
     <waltz-dynamic-section-wrapper section="ctrl.changeLogSection"

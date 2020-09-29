@@ -35,6 +35,4 @@ public abstract class Licence implements
         CreatedUserTimestampProvider,
         LastUpdatedUserTimestampProvider,
         ProvenanceProvider {
-
-    public abstract ApprovalStatus approvalStatus();
 }

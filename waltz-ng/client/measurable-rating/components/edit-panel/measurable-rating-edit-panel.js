@@ -20,7 +20,7 @@ import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 import {kindToViewState} from "../../../common/link-utils";
-import {loadAllData, loadDecommData, mkTabs} from "../../measurable-rating-utils";
+import {getDateAsUtc, loadAllData, loadDecommData, mkTabs} from "../../measurable-rating-utils";
 import {indexRatingSchemes, mkRatingsKeyHandler} from "../../../ratings/rating-utils";
 
 import template from "./measurable-rating-edit-panel.html";
@@ -34,7 +34,8 @@ const bindings = {
     startingCategoryId: "<?",
     plannedDecommissions: "<?",
     replacementApps: "<?",
-    replacingDecommissions: "<?"
+    replacingDecommissions: "<?",
+    application: "<"
 };
 
 
@@ -69,7 +70,8 @@ const initialState = {
 function controller($q,
                     $state,
                     notification,
-                    serviceBroker) {
+                    serviceBroker,
+                    userService) {
     const vm = initialiseData(this, initialState);
 
 
@@ -92,11 +94,13 @@ function controller($q,
     const recalcTabs = function () {
         const hasNoRatings = vm.ratings.length === 0;
         const showAllCategories = hasNoRatings || vm.visibility.showAllCategories;
-        vm.tabs = mkTabs(vm, showAllCategories);
-
-        vm.hasHiddenTabs = vm.categories.length !== vm.tabs.length;
+        const allTabs = mkTabs(vm, showAllCategories);
+        vm.tabs = _.filter(allTabs, t => _.includes(vm.userRoles, t.category.ratingEditorRole));
+        vm.hasHiddenTabs = vm.categories.length !== allTabs.length;
         if (vm.activeTab) {
+            const ratingSchemeItems =  vm.activeTab.ratingSchemeItems;
             vm.activeTab = _.find(vm.tabs, t => t.category.id === vm.activeTab.category.id);
+            vm.activeTab.ratingSchemeItems = ratingSchemeItems;
         }
     };
 
@@ -109,10 +113,11 @@ function controller($q,
         ["rating", "rating"]);
 
     const doRatingSave = (rating, description) => {
+        const currentRating = !_.isEmpty(vm.selected.rating) ? vm.selected.rating.rating : null;
         return serviceBroker
             .execute(
                 CORE_API.MeasurableRatingStore.save,
-                [vm.parentEntityRef, vm.selected.measurable.id, rating, description])
+                [vm.parentEntityRef, vm.selected.measurable.id, rating, currentRating, description])
             .then(r => { vm.ratings = r.data })
             .then(() => recalcTabs())
             .then(() => {
@@ -120,7 +125,10 @@ function controller($q,
                 const newRating = { rating, description };
                 vm.selected = Object.assign({}, vm.selected, { rating: newRating });
             })
-            .catch(e => displayError(notification, "Could not save rating", e))
+            .catch(e => {
+                displayError(notification, "Could not save rating", e);
+                throw e;
+            })
     };
 
     const doRemove = () => {
@@ -154,24 +162,49 @@ function controller($q,
 
         vm.selected = Object.assign({}, node, { category, hasWarnings, ratingScheme });
         vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: false, ratingEditor: true});
-    };
 
+    };
 
     const reloadDecommData = () => {
         return loadDecommData($q, serviceBroker, vm.parentEntityRef, true)
             .then(r => Object.assign(vm, r));
     };
 
+    const saveDecommissionDate = (dateChange)  => {
+
+        if(_.isNil(dateChange.newVal)){
+            notification.error("Could not save this decommission date. " +
+                "Check the date entered is valid or to remove this decommission date use the 'Revoke' button below");
+        } else {
+            dateChange.newVal = getDateAsUtc(dateChange.newVal);
+
+            serviceBroker
+                .execute(
+                    CORE_API.MeasurableRatingPlannedDecommissionStore.save,
+                    [vm.parentEntityRef, vm.selected.measurable.id, dateChange])
+                .then(r => {
+                    const decom = Object.assign(r.data, {isValid: true});
+                    vm.selected = Object.assign({}, vm.selected, {decommission: decom});
+                    notification.success(`Saved decommission date for ${vm.selected.measurable.name}`);
+                })
+                .catch(e => displayError(notification, "Could not save decommission date", e))
+                .finally(reloadDecommData);
+        }
+    };
+
     // -- BOOT --
 
     vm.$onInit = () => {
-        loadData(true);
+
+        userService
+            .whoami()
+            .then(user => vm.userRoles = user.roles)
+            .then(() => loadData(true));
 
         vm.backUrl = $state
             .href(
                 kindToViewState(vm.parentEntityRef.kind),
                 { id: vm.parentEntityRef.id });
-
         vm.allocationsByMeasurableId = _.groupBy(vm.allocations, a => a.measurableId);
         vm.allocationSchemesById = _.keyBy(vm.allocationSchemes, s => s.id);
     };
@@ -205,17 +238,37 @@ function controller($q,
             .finally(reloadDecommData);
     };
 
+    vm.checkPlannedDecomDateIsValid = (decomDate) => {
+
+        const appDate = new Date(vm.application.plannedRetirementDate);
+        const newDecomDate = new Date(decomDate);
+
+        const sameDate = appDate.getFullYear() === newDecomDate.getFullYear()
+            && appDate.getMonth() === newDecomDate.getMonth()
+            && appDate.getDate() === newDecomDate.getDate();
+
+        return appDate > newDecomDate || sameDate;
+    };
+
     vm.onSaveDecommissionDate = (dateChange) => {
-        serviceBroker
-            .execute(
-                CORE_API.MeasurableRatingPlannedDecommissionStore.save,
-                [vm.parentEntityRef, vm.selected.measurable.id, dateChange])
-            .then(r => {
-                vm.selected = Object.assign({}, vm.selected, { decommission: r.data });
-                notification.success(`Saved decommission date for ${vm.selected.measurable.name}`);
-            })
-            .catch(e => displayError(notification, "Could not save decommission date", e))
-            .finally(reloadDecommData);
+
+        if (vm.application.entityLifecycleStatus === "REMOVED"){
+            notification.error("Decommission date cannot be set. This application is no longer active");
+            return;
+        }
+
+        if (_.isNull(vm.application.plannedRetirementDate) || vm.checkPlannedDecomDateIsValid(dateChange.newVal)){
+            saveDecommissionDate(dateChange);
+
+        } else {
+            const appDate = new Date(vm.application.plannedRetirementDate).toDateString();
+
+            if (!confirm(`This decommission date is later then the planned retirement date of the application: ${appDate}. Are you sure you want to save it?`)){
+                notification.error("Decommission date was not saved");
+                return;
+            }
+            saveDecommissionDate(dateChange)
+        }
     };
 
     vm.onRemoveDecommission = () => {
@@ -248,7 +301,7 @@ function controller($q,
             ? doRemove()
                 .then(() => notification.success(`Removed: ${vm.selected.measurable.name}`))
             : doRatingSave(r, getDescription())
-                .then(() => notification.success(`Saved: ${vm.selected.measurable.name}`));
+                .then(() => notification.success(`Saved: ${vm.selected.measurable.name}`))
     };
 
     vm.onSaveComment = (comment) => {
@@ -278,10 +331,23 @@ function controller($q,
         }
     };
 
+
     vm.onTabChange = () => {
         deselectMeasurable();
+
+        if(_.isUndefined(vm.activeTab)){
+            vm.activeTab = _.first(vm.tabs);
+        }
+
+        serviceBroker
+            .loadViewData(CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
+                [vm.parentEntityRef, vm.activeTab.category.id])
+            .then(r => {
+                vm.activeTab.ratingSchemeItems = r.data;
+            });
+
         vm.onKeypress = mkRatingsKeyHandler(
-            vm.activeTab.ratingScheme.ratings,
+            vm.activeTab.ratingSchemeItems,
             vm.onRatingSelect,
             vm.doCancel);
     };
@@ -298,7 +364,8 @@ controller.$inject = [
     "$q",
     "$state",
     "Notification",
-    "ServiceBroker"
+    "ServiceBroker",
+    "UserService"
 ];
 
 

@@ -21,20 +21,18 @@ import {registerComponents, registerStores} from "../common/module-utils";
 
 import * as entitySvgDiagramStore from "./services/entity-svg-diagram-store";
 
-import entitySvgDiagramsPanel from "./components/panel/entity-svg-diagrams-panel";
 import entitySvgDiagramsViewer from "./components/viewer/entity-svg-diagram-viewer";
 
 
 export default () => {
 
-    const module = angular.module('waltz.entity.svg-diagram', []);
+    const module = angular.module("waltz.entity.svg-diagram", []);
 
     registerStores(module, [
         entitySvgDiagramStore
     ]);
 
     registerComponents(module, [
-        entitySvgDiagramsPanel,
         entitySvgDiagramsViewer
     ]);
 

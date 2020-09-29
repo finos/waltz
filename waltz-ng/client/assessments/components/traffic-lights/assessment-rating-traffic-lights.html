@@ -1,0 +1,56 @@
+<span class="waltz-assessment-rating-traffic-lights">
+     <span ng-repeat="item in $ctrl.assessments"
+         style="vertical-align: middle">
+         <span ng-include="'wartl-light'"></span>
+    </span>
+
+</span>
+
+
+<!-- RATING NAME WITH POPOVER -->
+<script type="text/ng-template"
+        id="wartl-light">
+    <span uib-popover-template="'wartl-popover.html'"
+          popover-placement="left"
+          popover-trigger="mouseenter"
+          popover-popup-delay="300"
+          popover-class="waltz-popover-width-500"
+          popover-append-to-body="true">
+        <waltz-rating-indicator-cell rating="item.ratingItem"
+                                     show-name="false">
+        </waltz-rating-indicator-cell>
+    </span>
+</script>
+
+
+<!-- RATING POPOVER -->
+<script type="text/ng-template"
+        id="wartl-popover.html">
+    <div>
+        <div>
+            <div>
+                <strong>
+                    <span ng-bind="item.definition.name"></span>: <span ng-bind="item.ratingItem.name"></span>
+                </strong>
+
+                <div class="small"
+                     ng-if="item.ratingItem.description"
+                     ng-bind="item.ratingItem.description">
+                </div>
+            </div>
+            <hr class="waltz-no-margins"
+                ng-if="item.rating.comment">
+            <span class="text-muted">
+                <waltz-markdown text="item.rating.comment">
+                </waltz-markdown>
+            </span>
+        </div>
+
+        <br>
+
+        <div class="small">
+            <waltz-last-updated entity="item.rating">
+            </waltz-last-updated>
+        </div>
+    </div>
+</script>

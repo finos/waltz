@@ -22,22 +22,24 @@
     <waltz-page-header name="{{ ctrl.measurable.name }}"
                        icon="puzzle-piece"
                        small="{{ ctrl.measurableCategory.name }}">
-        <ol class="waltz-breadcrumbs">
-            <li><a ui-sref="main">Home</a></li>
-            <li><a ui-sref="main.measurable-category.list ({id: ctrl.measurableCategory.id })"
-                   ng-bind="ctrl.measurableCategory.name"
-                   ng-if="ctrl.measurable">
+        <breadcrumbs>
+            <ol class="waltz-breadcrumbs">
+                <li><a ui-sref="main">Home</a></li>
+                <li><a ui-sref="main.measurable-category.list ({id: ctrl.measurableCategory.id })"
+                       ng-bind="ctrl.measurableCategory.name"
+                       ng-if="ctrl.measurable">
                 </a>
-                <a ng-if="!ctrl.measurable">
-                    Measurable
-                </a>
-            </li>
-            <li>
+                    <a ng-if="!ctrl.measurable">
+                        Measurable
+                    </a>
+                </li>
+                <li>
                 <span ng-bind="ctrl.measurable.name"
                       ng-if="ctrl.measurable">
                 </span>
-            </li>
-        </ol>
+                </li>
+            </ol>
+        </breadcrumbs>
     </waltz-page-header>
 
 

@@ -19,6 +19,7 @@
 import angular from "angular";
 import {registerComponents, registerStores} from "../common/module-utils";
 import DataTypeStore from "./services/data-type-store";
+import DataTypeDecoratorStore from "./services/data-type-decorator-store";
 import DataTypeUsageCountTree from './components/usage-count-tree/data-type-usage-count-tree';
 import DataTypeUsagePanel from './components/usage-panel/data-type-usage-panel';
 import DataTypeUsageSelector from './components/usage-selector/data-type-usage-selector';
@@ -35,7 +36,7 @@ export default () => {
 
     module.config(Routes);
 
-    registerStores(module, [ DataTypeStore ]);
+    registerStores(module, [ DataTypeStore, DataTypeDecoratorStore ]);
     registerComponents(module, [
         DataTypeOriginators,
         DataTypeFlowSection,

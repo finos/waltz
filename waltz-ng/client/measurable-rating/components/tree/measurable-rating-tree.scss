@@ -18,10 +18,16 @@
 
 waltz-measurable-rating-tree {
     .wmrt-node {
+        white-space: nowrap;
     }
 
     .wmrt-label {
         position: relative;
         top: -3px;
+
+        .wmrt-icon-warning {
+            color: red;
+        }
     }
+
 }

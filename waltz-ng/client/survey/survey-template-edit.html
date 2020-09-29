@@ -20,17 +20,19 @@
     <waltz-page-header icon="wpforms"
                        name="Survey Template"
                        small="Edit">
-        <ol class="waltz-breadcrumbs">
-            <li><a ui-sref="main">Home</a></li>
-            <li><a ui-sref="main.survey.instance.user">Survey</a></li>
-            <li><a ui-sref="main.survey.template.list">Templates</a></li>
-            <li>
-                <a ui-sref="main.survey.template.view ({id: ctrl.id})">
-                    <span ng-bind="ctrl.surveyTemplate.name"></span>
-                </a>
-            </li>
-            <li>Edit</li>
-        </ol>
+        <breadcrumbs>
+            <ol class="waltz-breadcrumbs">
+                <li><a ui-sref="main">Home</a></li>
+                <li><a ui-sref="main.survey.instance.user">Survey</a></li>
+                <li><a ui-sref="main.survey.template.list">Templates</a></li>
+                <li>
+                    <a ui-sref="main.survey.template.view ({id: ctrl.id})">
+                        <span ng-bind="ctrl.surveyTemplate.name"></span>
+                    </a>
+                </li>
+                <li>Edit</li>
+            </ol>
+        </breadcrumbs>
     </waltz-page-header>
 
     <div class="waltz-page-summary waltz-page-summary-attach">
@@ -114,6 +116,18 @@
             </a>
         </waltz-section-actions>
 
+        <!-- LIST: (not editing) -->
+        <div ng-if="!ctrl.editingQuestion">
+            <waltz-survey-template-question-overview-table question-infos="ctrl.surveyQuestionInfos"
+                                                           actions="[{
+                                                                name: 'Edit',
+                                                                icon:'pencil',
+                                                                action: ctrl.showEditQuestionForm
+                                                           }]">
+            </waltz-survey-template-question-overview-table>
+        </div>
+
+        <!-- QUESTION: (editing) -->
         <div ng-if="ctrl.editingQuestion">
             <form name="surveyQuestionForm"
                   class="waltz-survey-form form-horizontal"
@@ -158,17 +172,20 @@
                         <select id="qFieldType"
                                 required
                                 class="form-control"
-                                ng-options="fieldType.value as fieldType.name for fieldType in ctrl.questionFieldTypes"
+                                ng-options="fieldType.value as fieldType.name for fieldType in ctrl.questionFieldTypes | orderBy:'name'"
                                 ng-model="ctrl.selectedQuestionInfo.question.fieldType">
                         </select>
                     </div>
                     <div ng-if="ctrl.selectedQuestionInfo.question.fieldType === 'DROPDOWN'
                                 || ctrl.selectedQuestionInfo.question.fieldType === 'DROPDOWN_MULTI_SELECT'"
-                         class="col-sm-7 col-sm-offset-3"
-                         style="background-color: #F8F9F9; margin-top:10px;">
-                        <waltz-survey-dropdown-editor entries="ctrl.selectedQuestionInfo.dropdownEntries"
-                                                      on-change="ctrl.updateEntries">
-                        </waltz-survey-dropdown-editor>
+                         class="col-sm-7 col-sm-offset-2">
+                        <div class=""
+                             style="display: block; background-color: #F8F9F9; margin-top:10px; padding: 1em; border-radius: 2px; border: 1px solid #eee">
+                            <waltz-survey-dropdown-editor entries="ctrl.selectedQuestionInfo.dropdownEntries"
+                                                          on-change="ctrl.updateEntries">
+                            </waltz-survey-dropdown-editor>
+                        </div>
+
                     </div>
                 </div>
 
@@ -194,22 +211,30 @@
                     class="col-sm-2 control-label">
                         Is Mandatory
                     </label>
-                    <div class="col-sm-4">
+                    <div class="col-sm-10">
                         <input class="checkbox"
                         type="checkbox"
                         id="qIsMandatory"
                         ng-model="ctrl.selectedQuestionInfo.question.isMandatory" />
+                        <div class='small text-muted'>
+                            Prevents survey submission if this question has not been answered
+                        </div>
                     </div>
+                </div>
 
+                <div class="form-group">
                     <label for="qAllowComment"
                            class="col-sm-2 control-label">
                         Allow Comment
                     </label>
-                    <div class="col-sm-4">
+                    <div class="col-sm-10">
                         <input class="checkbox"
                                type="checkbox"
                                id="qAllowComment"
                                ng-model="ctrl.selectedQuestionInfo.question.allowComment" />
+                        <div class='small text-muted'>
+                            Include an optional commentary field for this question
+                        </div>
                     </div>
                 </div>
 
@@ -246,7 +271,29 @@
                             Reporting on surveys using generated identifiers (or using free-text names) is
                             brittle.  Using an external identifier alleviates this problem and allows for
                             a question to be consistently identified even across survey template versions.
+                            Identifiers are also used to identify answers when computing inclusion predicates
+                            (conditional questions).
+
                             Note: external identifiers must be unique within a template.
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="qInclusionPredicate"
+                           class="col-sm-2 control-label">
+                        Inclusion Predicate
+                    </label>
+                    <div class="col-sm-10">
+                        <input class="form-control form-control-warning"
+                               spellcheck="false"
+                               id="qInclusionPredicate"
+                               placeholder="Condition for showing a question.  Example: `isChecked('IN_SCOPE', false)`"
+                               ng-model="ctrl.selectedQuestionInfo.question.inclusionPredicate" />
+                        <div class='small text-muted'>
+                            <waltz-markdown text="ctrl.qInclusionPredicateHelp">
+                            </waltz-markdown>
                         </div>
                     </div>
                 </div>
@@ -290,60 +337,6 @@
             <hr>
         </div>
 
-        <div class="row"
-             ng-if="!ctrl.editingQuestion">
-            <div class="col-sm-12">
-                <table class="table table-hover">
-                    <colgroup>
-                        <col width="10%">
-                        <col width="15%">
-                        <col width="10%">
-                        <col width="15%">
-                        <col width="10%">
-                        <col width="10%">
-                        <col width="10%">
-                        <col width="10%">
-                        <col width="10%">
-                    </colgroup>
-                    <thead>
-                    <tr>
-                        <th>Section Name</th>
-                        <th>Question Text</th>
-                        <th>Field Type</th>
-                        <th>Help Text</th>
-                        <th>Mandatory</th>
-                        <th>Allow Comment</th>
-                        <th>Position</th>
-                        <th>External Id</th>
-                        <th/>
-                    </tr>
-                    </thead>
-                    <tr ng-repeat="qi in ctrl.surveyQuestionInfos | orderBy:'question.position'">
-                        <td><span ng-bind="qi.question.sectionName"></span></td>
-                        <td><span ng-bind="qi.question.questionText"></span></td>
-                        <td><span ng-bind="qi.question.fieldType | toDisplayName:'surveyQuestionFieldType'"></span></td>
-                        <td>
-                            <waltz-markdown text="qi.question.helpText">
-                            </waltz-markdown>
-                        </td>
-                        <td>
-                            <waltz-boolean-renderer value="qi.question.isMandatory">
-                            </waltz-boolean-renderer>
-                        </td>
-                        <td>
-                            <waltz-boolean-renderer value="qi.question.allowComment">
-                            </waltz-boolean-renderer>
-                        </td>
-                        <td><span ng-bind="qi.question.position"></span></td>
-                        <td><span ng-bind="qi.question.externalId||'-'"></span></td>
-                        <td><a ng-click="ctrl.showEditQuestionForm(qi)"
-                               class="btn btn-xs waltz-visibility-child-30">
-                            <waltz-icon name="pencil"></waltz-icon>
-                            Edit
-                        </a></td>
-                    </tr>
-                </table>
-            </div>
-        </div>
+
     </waltz-section>
 </div>

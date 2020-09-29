@@ -27,19 +27,6 @@
 
         <form>
 
-            <!-- KIND -->
-            <div class="form-group">
-                <label>Relationship Kind</label>
-                <select ng-model="$ctrl.form.relationshipKind"
-                        ng-options="relationshipKind.code as relationshipKind.label for relationshipKind in $ctrl.availableRelationshipKinds[$ctrl.relationshipKindsKey]"
-                        class="form-control">
-                </select>
-                <div class="help-block">
-                    The relationship kind describes the nature of the relationship between the entities.
-                </div>
-            </div>
-
-
             <!-- CHANGE INITIATIVE ... or ... -->
             <div class="form-group"
                  ng-if="$ctrl.visibility.changeInitiativeSelector">
@@ -94,11 +81,12 @@
                                 Select the <span ng-bind="$ctrl.counterpartType"></span> entity you wish to associate.
                             </div>
                             <div class="waltz-scroll-region-300">
-                                <waltz-multi-select-tree-control items="$ctrl.measurables"
+                                <waltz-multi-select-tree-control items="$ctrl.nodes"
                                                                  on-check="$ctrl.onItemCheck"
                                                                  on-uncheck="$ctrl.onItemUncheck"
                                                                  checked-item-ids="$ctrl.checkedItemIds"
-                                                                 expanded-item-ids="$ctrl.expandedItemIds">
+                                                                 expanded-item-ids="$ctrl.expandedItemIds"
+                                                                 disable-predicate="$ctrl.disableNode">
                                     <span ng-bind="node.name"></span>
                                 </waltz-multi-select-tree-control>
                             </div>

@@ -276,7 +276,8 @@ public class SurveyRunService {
 
 
     public boolean createSurveyInstancesAndRecipients(long surveyRunId,
-                                                   List<SurveyInstanceRecipient> excludedRecipients) {
+                                                      List<SurveyInstanceRecipient> excludedRecipients) {
+
         SurveyRun surveyRun = surveyRunDao.getById(surveyRunId);
         checkNotNull(surveyRun, "surveyRun " + surveyRunId + " not found");
 
@@ -290,7 +291,6 @@ public class SurveyRunService {
                         SurveyInstanceRecipient::surveyInstance,
                         toList()
                 ));
-
 
         // delete existing instances and recipients
         deleteSurveyInstancesAndRecipients(surveyRunId);
@@ -412,7 +412,7 @@ public class SurveyRunService {
     }
 
 
-    public boolean createDirectSurveyInstances(long runId, List<Long> personIds) {
+    public boolean createDirectSurveyInstances(long runId, List<Long> personIds, String owningRole) {
         SurveyRun run = getById(runId);
         EntityReference subjectRef = run.selectionOptions().entityReference();
 
@@ -421,33 +421,47 @@ public class SurveyRunService {
                 map(personIds, p -> mkSurveyInstance(
                         subjectRef,
                         run,
-                        ListUtilities.newArrayList(p)));
+                        ListUtilities.newArrayList(p),
+                        owningRole));
                 return true;
             case GROUP:
                 mkSurveyInstance(
                         subjectRef,
                         run,
-                        personIds);
+                        personIds,
+                        owningRole);
                 return true;
             default:
                 return false;
         }
     }
 
+
     private int[] mkSurveyInstance(EntityReference entityRef,
                                    SurveyRun run,
-                                   List<Long> personIds) {
+                                   List<Long> personIds,
+                                   String owningRole) {
         SurveyInstanceCreateCommand instanceCreateCommand = ImmutableSurveyInstanceCreateCommand
                 .builder()
                 .dueDate(run.dueDate())
                 .entityReference(entityRef)
                 .surveyRunId(run.id().get())
                 .status(SurveyInstanceStatus.NOT_STARTED)
+                .owningRole(owningRole)
+                .ownerId(run.ownerId())
                 .build();
         long instanceId = surveyInstanceDao.create(instanceCreateCommand);
         return surveyInstanceDao.createInstanceRecipients(
                 instanceId,
                 personIds);
+    }
+
+
+    public int updateSurveyInstanceOwningRoles(String username,
+                                               long id,
+                                               SurveyInstanceOwningRoleSaveCommand owningRoleSaveCommand) {
+
+        return surveyInstanceDao.updateOwningRoleForSurveyRun(id, owningRoleSaveCommand.owningRole());
     }
 }
 

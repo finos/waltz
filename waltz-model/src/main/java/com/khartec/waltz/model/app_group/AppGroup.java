@@ -27,7 +27,7 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableAppGroup.class)
 @JsonDeserialize(as = ImmutableAppGroup.class)
-public abstract class AppGroup implements
+public interface AppGroup extends
         IdProvider,
         EntityKindProvider,
         NameProvider,
@@ -36,12 +36,14 @@ public abstract class AppGroup implements
         ExternalIdProvider,
         IsRemovedProvider {
 
-    public abstract AppGroupKind appGroupKind();
+    AppGroupKind appGroupKind();
+
 
     @Value.Default
-    public EntityKind kind() { return EntityKind.APP_GROUP; }
+    default EntityKind kind() { return EntityKind.APP_GROUP; }
 
-    public EntityReference entityReference() {
+
+    default EntityReference entityReference() {
         return ImmutableEntityReference.builder()
                 .kind(EntityKind.APP_GROUP)
                 .id(id().get())
@@ -49,5 +51,12 @@ public abstract class AppGroup implements
                 .description(description())
                 .build();
     }
+
+
+    @Value.Default
+    default boolean isFavouriteGroup() {
+        return false;
+    }
+
 
 }

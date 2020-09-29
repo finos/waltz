@@ -1,0 +1,18 @@
+<span ng-repeat="summary in $ctrl.summaries">
+    <a ui-sref="{{summary.uiStateName}}"
+       style="margin-right: 1em"
+       class="woanp-notification clickable">
+        <waltz-icon name="{{summary.icon}}"></waltz-icon>
+        <span ng-bind="summary.label"></span>
+        <span ng-if="summary.count === 0">
+            <span class="woanp-zero-badge">
+                <waltz-icon name="check"></waltz-icon>
+            </span>
+        </span>
+        <span ng-if="summary.count > 0">
+            <span class="woanp-count-badge"
+                  ng-bind="summary.count">
+            </span>
+        </span>
+    </a>
+</span>

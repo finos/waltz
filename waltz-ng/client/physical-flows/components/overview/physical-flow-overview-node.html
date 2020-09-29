@@ -38,7 +38,7 @@
 
     <div style="padding: 4px 0 0 12px">
         <ul class="list-unstyled small">
-            <li ng-repeat="p in $ctrl.participants">
+            <li ng-repeat="p in $ctrl.participants | orderBy: 'name'">
                 <waltz-entity-link entity-ref="p">
                 </waltz-entity-link>
             </li>

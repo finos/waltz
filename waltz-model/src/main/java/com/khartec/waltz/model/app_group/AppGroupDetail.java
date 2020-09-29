@@ -20,7 +20,6 @@ package com.khartec.waltz.model.app_group;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.EntityReference;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -32,6 +31,6 @@ public abstract class AppGroupDetail {
 
     public abstract AppGroup appGroup();
     public abstract List<AppGroupMember> members();
-    public abstract List<EntityReference> applications();
-    public abstract List<EntityReference> organisationalUnits();
+    public abstract List<AppGroupEntry> applications();
+    public abstract List<AppGroupEntry> organisationalUnits();
 }

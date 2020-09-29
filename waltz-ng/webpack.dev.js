@@ -15,11 +15,13 @@
  * See the License for the specific
  *
  */
+const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 
-const merge = require("webpack-merge");
+const smp = new SpeedMeasurePlugin();
+const {merge} = require("webpack-merge");
 const common = require("./webpack.config");
 
-module.exports = merge(common, {
+module.exports = smp.wrap(merge(common, {
     mode: "development",
     //devtool: "inline-source-map",
     devtool: "cheap-module-eval-source-map",
@@ -30,4 +32,4 @@ module.exports = merge(common, {
             disableDotRule: true
         }
     }
-});
+}));

@@ -25,11 +25,13 @@ import template from "./data-type-usage-tree.html";
 
 
 const bindings = {
-    used: "<"
+    used: "<?"
 };
 
 
-const initialState = {};
+const initialState = {
+    used: []
+};
 
 
 function findParents(dtId, dataTypesById) {
@@ -43,11 +45,14 @@ function findParents(dtId, dataTypesById) {
 }
 
 
-function enrichDataTypeWithExplicitFlag(dataType, explicitIds = []) {
-    return Object.assign(
-        {},
+function enrichDataTypeWithUsage(dataType, usedById = {}) {
+    const usage = _.get(usedById, dataType.id, null);
+    return {
+        id: dataType.id,
+        parentId: dataType.parentId,
         dataType,
-        { explicit: _.includes(explicitIds, dataType.id)});
+        usage
+    };
 }
 
 
@@ -59,16 +64,15 @@ function controller(serviceBroker) {
         serviceBroker
             .loadAppData(CORE_API.DataTypeStore.findAll)
             .then(r => {
-                const dataTypesById = _.keyBy(r.data, "id");
-                const explicitIds = _.map(vm.used, r => r.kind === "DATA_TYPE"
-                        ? r.id
-                        : r.dataTypeId);
+                const dataTypesById = _.keyBy(r.data, d => d.id);
+                const usageById = _.keyBy(vm.used, d => d.dataTypeId);
+
 
                 const requiredDataTypes = _
-                    .chain(explicitIds)
-                    .flatMap(dtId => findParents(dtId, dataTypesById))
-                    .uniqBy("id")
-                    .map(dataType => enrichDataTypeWithExplicitFlag(dataType, explicitIds))
+                    .chain(vm.used)
+                    .flatMap(usage => findParents(usage.dataTypeId, dataTypesById))
+                    .uniqBy(d => d.id)
+                    .map(dataType => enrichDataTypeWithUsage(dataType, usageById))
                     .value();
 
                 const hierarchy = buildHierarchies(requiredDataTypes, false);

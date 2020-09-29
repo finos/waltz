@@ -19,17 +19,12 @@
 import template from "./measurable-info.html";
 
 const bindings = {
-    measurable: "<"
+    measurable: "<",
+    owningOrgUnit: "<?"
 };
-
-
-function controller() {
-
-}
 
 const component = {
     template,
-    controller,
     bindings
 };
 

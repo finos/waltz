@@ -103,6 +103,18 @@ public class MapUtilities {
         return groupBy(keyFn, x -> x, xs);
     }
 
+    public static <K, V> Map<K, Collection<V>> groupBy(Collection<V> xs,
+                                                       Function<V, K> keyFn) {
+        return groupBy(keyFn, x -> x, xs);
+    }
+
+
+    public static <K, V, V2> Map<K, Collection<V2>> groupBy(Collection<V> xs,
+                                                           Function<V, K> keyFn,
+                                                           Function<V, V2> valueFn) {
+        return groupBy(keyFn, valueFn, xs);
+    }
+
     public static <K, V, V2> Map<K, Collection<V2>> groupBy(Function<V, K> keyFn,
                                                             Function<V, V2> valueFn,
                                                             Collection<V> xs) {

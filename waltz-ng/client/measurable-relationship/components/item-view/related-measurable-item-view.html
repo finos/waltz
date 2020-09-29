@@ -16,75 +16,138 @@
   ~
   -->
 
-<h4 ng-if="!$ctrl.item.outbound">
-                <span class="wrmp-relationship-heading">
-                    <span class="wrmp-pill wrmp-counterpart">
-                       <waltz-entity-link entity-ref="$ctrl.item.a"></waltz-entity-link>
-                    </span>
+<h5 class="wrmp-relationship-heading">
+    <span>
 
-                    <span class="wrmp-pill wrmp-rel">
-                        <span ng-bind="$ctrl.item.relationship.relationship | toDisplayName:'relationshipKind'"></span>
-                    </span>
-                    <span class="wrmp-pill wrmp-self">
-                        This
-                    </span>
+        <span class="wrmp-pill wrmp-self">
+            This
+        </span>
+
+        <span class="wrmp-pill wrmp-rel"
+              ng-if="$ctrl.relationshipKinds.length > 0 || $ctrl.list.length > 1">
+            <span ng-repeat="item in $ctrl.list"
+                  uib-popover-template="'wrmiv-popover.html'"
+                  popover-append-to-body="true"
+                  popover-popup-delay="300"
+                  popover-trigger="mouseenter">
+                <span class="wrmp-pill wrmp-rel-inner clickable"
+                      ng-if="item.outbound"
+                      ng-click="$ctrl.selectItem(item)"
+                      ng-bind="item.relationshipKind.name">
                 </span>
-    <a class='clickable pull-right'
-       ng-click="$ctrl.onDismiss()">
-        (x)
-    </a>
-</h4>
-<h4 ng-if="$ctrl.item.outbound">
-                <span class="wrmp-relationship-heading">
-                    <span class="wrmp-pill wrmp-self">
-                        This
-                    </span>
-
-                    <span class="wrmp-pill wrmp-rel">
-                        <span ng-bind="$ctrl.item.relationship.relationship | toDisplayName:'relationshipKind'">
-                        </span>
-                    </span>
-
-                    <span class="wrmp-pill wrmp-counterpart">
-                        <waltz-entity-link entity-ref="$ctrl.item.b"></waltz-entity-link>
-                    </span>
+                <span class="wrmp-pill wrmp-rel-inner clickable"
+                      ng-if="!item.outbound"
+                      ng-click="$ctrl.selectItem(item)"
+                      ng-bind="item.relationshipKind.reverseName">
                 </span>
-    <a class='clickable pull-right'
-       ng-click="$ctrl.onDismiss()">
-        (x)
-    </a>
-</h4>
+                <br>
+                <br>
+            </span>
+            <a class="wrmp-pill wrmp-rel-inner clickable"
+               ng-if="$ctrl.relationshipKinds.length > 0"
+               ng-click="$ctrl.onAddItem()">
+                <waltz-icon name="plus"></waltz-icon>
+                add relationship
+            </a>
+        </span>
+        <span class="wrmp-pill wrmp-rel"
+              ng-if="$ctrl.relationshipKinds.length == 0 && $ctrl.list.length == 1">
+            <span ng-repeat="item in $ctrl.list"
+                  uib-popover-template="'wrmiv-popover.html'"
+                  popover-append-to-body="true"
+                  popover-popup-delay="300"
+                  popover-trigger="mouseenter">
+                <span class="wrmp-pill wrmp-rel-inner clickable"
+                      ng-if="item.outbound"
+                      ng-click="$ctrl.selectItem(item)"
+                      ng-bind="item.relationshipKind.name">
+                </span>
+                <span class="wrmp-pill wrmp-rel-inner clickable"
+                      ng-if="!item.outbound"
+                      ng-click="$ctrl.selectItem(item)"
+                      ng-bind="item.relationshipKind.reverseName">
+                </span>
+            </span>
+        </span>
+
+        <span class="wrmp-pill wrmp-counterpart">
+            <waltz-entity-link entity-ref="$ctrl.counterpart"></waltz-entity-link>
+        </span>
+
+        <a class='clickable pull-right'
+           ng-click="$ctrl.onDismiss()">
+            (x)
+        </a>
+    </span>
+</h5>
 
 <br>
-<label>Description:</label>
-<div ng-if="$ctrl.item.relationship.description">
-    <waltz-markdown text="$ctrl.item.relationship.description"></waltz-markdown>
-</div>
-<div ng-if="!$ctrl.item.relationship.description"
-     class="text-muted">
-    <strong>No description provided</strong>
-</div>
+<div ng-if="$ctrl.selectedItem">
+    <label>Description:</label>
+    <div ng-if="$ctrl.selectedItem.relationship.description">
+        <waltz-markdown text="$ctrl.selectedItem.relationship.description"></waltz-markdown>
+    </div>
+    <div ng-if="!$ctrl.selectedItem.relationship.description"
+         class="text-muted">
+        <strong>No description provided</strong>
+    </div>
 
-<hr>
-
-<!-- ACTIONS -->
-<div waltz-has-role="CAPABILITY_EDITOR">
-    <button class="btn btn-xs btn-primary"
-            ng-click="$ctrl.onEdit()">
-        Edit
-    </button>
-    <button class="btn btn-xs btn-danger"
-            ng-click="$ctrl.onRemove($ctrl.item.relationship)">
-        Delete
-    </button>
-    <a ng-click="$ctrl.onDismiss()"
-       class="clickable">
-        Dismiss
-    </a>
     <hr>
+
+    <!-- ACTIONS -->
+    <div waltz-has-role="CAPABILITY_EDITOR"
+         ng-if="$ctrl.selectedItem">
+        <span>
+            <button class="btn btn-xs btn-primary"
+                    ng-if="!$ctrl.selectedItem.relationshipKind.isReadonly"
+                    ng-click="$ctrl.onEdit()">
+                Edit
+            </button>
+            <button class="btn btn-xs btn-danger"
+                    ng-if="!$ctrl.selectedItem.relationshipKind.isReadonly"
+                    ng-click="$ctrl.onRemove($ctrl.selectedItem.relationship)">
+                Delete
+            </button>
+            <i class="text-muted"
+               ng-if="$ctrl.selectedItem.relationshipKind.isReadonly">
+                This relationship kind is <b>read only</b> &nbsp;
+            </i>
+            <a ng-click="$ctrl.onDismiss()"
+               class="clickable">
+                Dismiss
+            </a>
+        </span>
+        <div ng-if="$ctrl.items.length == 1">
+            <hr>
+            <waltz-warning>
+                <message>This is the last relationship between
+                    <span ng-bind="$ctrl.selectedItem.a.name"></span>
+                    and
+                    <span ng-bind="$ctrl.selectedItem.b.name"></span>
+                </message>
+                <content>
+                </content>
+            </waltz-warning>
+        </div>
+        <hr>
+        <div class="small">
+            <waltz-last-updated entity="$ctrl.selectedItem.relationship">
+            </waltz-last-updated>
+        </div>
+    </div>
 </div>
 
-<div class="small">
-    <waltz-last-updated entity="$ctrl.item.relationship">
-    </waltz-last-updated>
-</div>
+
+<script type="text/ng-template"
+        id="wrmiv-popover.html">
+    <div class="small">
+        <waltz-markdown ng-if="item.relationshipKind.description"
+                        text="item.relationshipKind.description">
+        </waltz-markdown>
+        <span ng-if="!item.relationshipKind.description"
+              class="text-muted">
+            No description provided
+        </span>
+    </div>
+</script>
+

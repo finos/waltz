@@ -20,7 +20,10 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.entity_relationship.*;
+import com.khartec.waltz.model.entity_relationship.EntityRelationship;
+import com.khartec.waltz.model.entity_relationship.EntityRelationshipKey;
+import com.khartec.waltz.model.entity_relationship.ImmutableEntityRelationshipKey;
+import com.khartec.waltz.model.entity_relationship.UpdateEntityRelationshipParams;
 import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.measurable_relationship.MeasurableRelationshipService;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -89,7 +92,7 @@ public class MeasurableRelationshipEndpoint implements Endpoint {
             String userName = getUsername(request);
             EntityReference entityRefA = getEntityReferenceA(request);
             EntityReference entityRefB = getEntityReferenceB(request);
-            RelationshipKind relationshipKind = getRelationshipKind(request);
+            String relationshipKind = request.params("relationshipKind");
             String description = request.body();
 
             return measurableRelationshipService.create(
@@ -122,17 +125,8 @@ public class MeasurableRelationshipEndpoint implements Endpoint {
         return ImmutableEntityRelationshipKey.builder()
                         .a(getEntityReferenceA(request))
                         .b(getEntityReferenceB(request))
-                        .relationshipKind(getRelationshipKind(request))
+                        .relationshipKind(request.params("relationshipKind"))
                         .build();
-    }
-
-
-    private RelationshipKind getRelationshipKind(Request request) {
-        return readEnum(
-                request,
-                "relationshipKind",
-                RelationshipKind.class,
-                s -> RelationshipKind.RELATES_TO);
     }
 
 

@@ -16,26 +16,6 @@
  *
  */
 
-$waltz-border-color: #9a99ad;
-$waltz-border-color-lighter: lighten($waltz-border-color, 20%);
-$waltz-background-color: #e4e7f0;
-$waltz-section-background-color: #f0f3fa;  // section header bars etc
-$waltz-font-color: #332b23;
-$waltz-link-color: #2c369d;
-$waltz-section-font-color: #332b23;
-$waltz-field-label-color: lighten($waltz-font-color, 20%);
-
-$waltz-navbar-background-color: #2f3544;
-
-
-
-$navbar-default-color:             white;
-$navbar-default-bg:                #2f3544;
-$navbar-default-border:            darken($navbar-default-bg, 6.5%);
-
-$navbar-default-link-color:                #ddd;
-$navbar-default-link-hover-color:          #fff;
-
 $waltz-amber: #ff7f0e;
 $waltz-green: #2ca02c;
 $waltz-red: #d62728;
@@ -50,14 +30,34 @@ $waltz-red-background: #f2d7d7;
 $waltz-grey-background: #f5f5f5;
 $waltz-actor-background: #ede5ee;
 
+$waltz-base-background-color: #1f7fe0;
+
+$waltz-background-color: lighten($waltz-base-background-color, 50%);
+$waltz-section-background-color: lighten($waltz-base-background-color, 45%); //#ecf1ff;  // section header bars etc
+
+$waltz-font-color: #332b23;
+$waltz-link-color: #2c369d;
+$waltz-section-font-color: #332b23;
+$waltz-field-label-color: lighten($waltz-font-color, 20%);
+$text-muted: lighten($waltz-font-color, 30%);
+$font-size-base: 14px;
+
+$waltz-border-color: #9a99ad;
+$waltz-border-color-lighter: lighten($waltz-border-color, 20%);
+
+$navbar-default-color: white;
+$navbar-default-bg: darken($waltz-base-background-color, 30%);
+$navbar-default-link-active-bg: lighten($navbar-default-bg, 15%);
+$navbar-default-link-active-color: #fff;
+$navbar-default-link-color: #ddd;
+$navbar-default-link-hover-color: #fff;
+
 $waltz-selected-item-bg-color: #e2ffd9;
 
-$text-muted: lighten($waltz-font-color, 30%);
 
 $border-radius-small: 1px;
 $border-radius-base: 2px;
 $border-radius-large: 3px;
-$font-size-base: 14px;
 
 $panel-default-heading-bg: $waltz-section-background-color;
 $panel-heading-padding: 6px;
@@ -68,8 +68,6 @@ $blockquote-border-color: none;
 $blockquote-font-size: ($font-size-base * 1.1);
 $input-border-focus: $waltz-border-color;
 $popover-title-bg: $waltz-section-background-color;
-$navbar-default-link-active-bg: #202636;
-$navbar-default-link-active-color: #fff;
 
 
 $grid-gutter-width: 60px !default;

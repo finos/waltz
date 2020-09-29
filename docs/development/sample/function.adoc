@@ -1,0 +1,40 @@
+This file provides a sample graphic for the functional taxonomy hierarchy
+
+***
+
+[graphviz, functions, svg]
+----
+digraph A {
+    nodesep=0.7;
+    subgraph ent {
+        node [style=filled,fillcolor=wheat,color=brown,shape=rectangle];
+        edge [color=brown];
+
+        OPS [label="Operations",fillcolor=gold];
+        REF [label="Reference Data Services",fillcolor=gold];
+        TRADE [label="Sales & Trading",fillcolor=gold];
+
+        PAYMENTS [label="Payments"]
+        SETTLEMENTS [label="Settlements"]
+        CONFIRMATIONS [label="Confirmations"]
+
+
+        OPS->PAYMENTS
+        OPS->SETTLEMENTS
+        OPS->CONFIRMATIONS
+
+        REF->"Instrument Data"
+        REF->"Pricing Data"
+        REF->"Prodcut Data"
+        REF->"Party Data"
+
+        TRADE->"Position Services"
+        TRADE->"Risk Services"
+        TRADE->"Trade Management"
+
+
+
+    }
+
+}
+----

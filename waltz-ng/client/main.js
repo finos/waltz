@@ -16,40 +16,40 @@
  *
  */
 
+import "@babel/polyfill";
 import angular from "angular";
-
 import "../style/style.scss";
-import Modules from './modules';
-import Routes from './routes';
-import Networking from './networking';
-import ThirdpartySetup from './thirdparty-setup';
+import modules from "./modules";
+import routes from "./routes";
+import networking from "./networking";
+import thirdpartySetup from "./thirdparty-setup";
 
 
+angular.module("contextMenu", []);  // this is needed due to bug in treecontrol 0.2.30 lib
+const waltzApp = angular.module("waltz.app", modules);
 
-const waltzApp = angular.module('waltz.app', Modules);
 
-
-if (__ENV__ === 'prod') {
-    waltzApp.config(['$compileProvider', function ($compileProvider) {
+if (__ENV__ === "prod") {
+    waltzApp.config(["$compileProvider", function ($compileProvider) {
         $compileProvider.debugInfoEnabled(false);
         console.log("debug disabled, re-enable with:", "angular.reloadWithDebugInfo();");
     }]);
 }
 
-Routes(waltzApp);
-Networking(waltzApp);
-ThirdpartySetup(waltzApp);
+routes(waltzApp);
+networking(waltzApp);
+thirdpartySetup(waltzApp);
 
 
 function hrefSanitizer($compileProvider) {
     $compileProvider.aHrefSanitizationWhitelist(/^\s*(mailto|https?|sip|chrome-extension):/);
 }
-hrefSanitizer.$inject = ['$compileProvider'];
+hrefSanitizer.$inject = ["$compileProvider"];
 
 waltzApp.config(hrefSanitizer);
 
 
 waltzApp.run([
-    'UserAgentInfoStore',
+    "UserAgentInfoStore",
     (userAgentStore) => userAgentStore.save()
 ]);

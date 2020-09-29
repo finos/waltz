@@ -22,7 +22,6 @@ import java.util.*;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
-import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
@@ -75,6 +74,8 @@ public class CollectionUtilities {
      * @return true if all items in the collection satisfy the given predicate
      */
     public static <T> boolean all(Collection<T> ts, Predicate<T> pred) {
+        checkNotNull(ts, "Collection cannot be null");
+        checkNotNull(pred, "Predicate cannot be null");
         return ts
                 .stream()
                 .allMatch(pred);
@@ -134,24 +135,6 @@ public class CollectionUtilities {
      */
     public static <X> void maybe(Collection<X> xs, Consumer<Collection<X>> fn) {
         if (notEmpty(xs)) fn.accept(xs);
-    }
-
-
-    /**
-     * If the given collection (`xs`) is not empty apply the given function to it (`fn(xs)`)
-     * and return the result.  If the collection is null then return the supplied default
-     * argument.
-     *
-     * @param xs   - collection
-     * @param fn   - transformation for the collection
-     * @param dflt default value to return if the collection is empty
-     * @param <X>  type of the items in the collection
-     * @param <Y>  resultant type of the transformation
-     * @return the result of `fn(xs)` or `dflt` if xs is empty
-     */
-    public static <X, Y> Y maybe(Collection<X> xs, Function<Collection<X>, Y> fn, Y dflt) {
-        if (notEmpty(xs)) return fn.apply(xs);
-        else return dflt;
     }
 
 
@@ -239,15 +222,12 @@ public class CollectionUtilities {
 
     public static <X> Optional<X> maybeFirst(Collection<X> xs,
                                              Predicate<X> predicate) {
-        return xs
-                .stream()
-                .filter(predicate)
-                .findFirst();
-    }
-
-
-    public static <X> long sumBy(Collection<X> xs, ToLongFunction<X> fn) {
-        return xs.stream().mapToLong(fn).sum();
+        checkNotNull(predicate, "predicate cannot be null");
+        return isEmpty(xs)
+                ? Optional.empty()
+                : xs.stream()
+                    .filter(predicate)
+                    .findFirst();
     }
 
 
@@ -260,11 +240,4 @@ public class CollectionUtilities {
     }
 
 
-    public static Long sumLongs(Collection<Long> values) {
-        long acc = 0;
-        for(Long v : values) {
-            acc += v;
-        }
-        return acc;
-    }
 }

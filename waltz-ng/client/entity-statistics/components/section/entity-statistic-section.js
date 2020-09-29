@@ -21,10 +21,10 @@ import {nest} from "d3-collection";
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
-import template from './entity-statistic-section.html';
+import template from "./entity-statistic-section.html";
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
 };
 
 
@@ -45,7 +45,7 @@ function controller(serviceBroker) {
                     .sortKeys(ascending)
                     .key(x => x.definition.name)
                     .sortKeys(ascending)
-                    .sortValues((a, b) => a.value.outcome < b.value.outcome)
+                    .sortValues((a, b) => ascending(a.value.outcome, b.value.outcome))
                     .entries(result.data));
         }
     };
@@ -53,7 +53,7 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 
@@ -63,5 +63,5 @@ export default {
         bindings,
         controller
     },
-    id: 'waltzEntityStatisticSection'
+    id: "waltzEntityStatisticSection"
 };

@@ -18,6 +18,7 @@
 
 import template from "./planned-decommission-editor.html";
 import {initialiseData, invokeFunction} from "../../../common";
+import {getDateAsUtc} from "../../measurable-rating-utils";
 
 const modes= {
     VIEW: "VIEW",
@@ -35,7 +36,8 @@ const bindings = {
     onRemoveDecommission: "<",
     onAddReplacementApp: "<",
     onRemoveReplacementApp: "<",
-    category: "<"
+    category: "<",
+    application: "<?"
 };
 
 
@@ -89,7 +91,7 @@ function controller() {
 
     vm.onSetCommissionDate = (c) => {
         vm.mode = modes.CONFIRM_ADDITION;
-        vm.candidateCommissionDate = c.newVal;
+        vm.candidateCommissionDate = JSON.stringify(getDateAsUtc(c.newVal));
     };
 
     vm.onAddReplacement = () => {

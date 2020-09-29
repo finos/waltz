@@ -23,9 +23,11 @@ import SubscriptionButtons from './components/subscription-buttons/subscription-
 import {registerComponents, registerStores} from "../common/module-utils";
 import * as AppGroupStore from './services/app-group-store';
 import Routes from './routes';
-import AppGroupList from './directives/app-group-list';
-import AppGroupListSection from './directives/app-group-list-section';
+import AppGroupList from './components/app-group-list/app-group-list';
+import AppGroupListSection from './components/app-group-list-section/app-group-list-section';
 import AppGroupAppSelectionList from './directives/app-group-app-selection-list';
+import FavouritesStore from "./services/favourites-store";
+import FavouritesPanel from "./components/favourites-panel/favourites-panel";
 
 
 export default () => {
@@ -35,16 +37,17 @@ export default () => {
         .config(Routes);
 
     module
-        .directive('waltzAppGroupList', AppGroupList)
-        .directive('waltzAppGroupListSection', AppGroupListSection)
         .directive('waltzAppGroupAppSelectionList', AppGroupAppSelectionList);
 
     registerComponents(module, [
+        AppGroupList,
+        AppGroupListSection,
         AppGroupSummary,
         SubscriptionButtons,
-        RelatedAppGroupsSection ]);
+        RelatedAppGroupsSection,
+        FavouritesPanel ]);
 
-    registerStores(module, [ AppGroupStore ]);
+    registerStores(module, [ AppGroupStore, FavouritesStore ]);
 
     return module.name;
 

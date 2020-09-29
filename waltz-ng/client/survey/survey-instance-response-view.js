@@ -16,9 +16,8 @@
  *
  */
 
-import _ from "lodash";
 import {initialiseData} from "../common";
-import {groupQuestions} from "./survey-utils";
+import * as SurveyUtils from "./survey-utils";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 import template from "./survey-instance-response-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
@@ -29,32 +28,10 @@ const initialState = {
 };
 
 
-function extractAnswer(response = {}) {
-    return !_.isNil(response.booleanResponse)
-            ? response.booleanResponse
-            : (response.stringResponse
-                || response.numberResponse
-                || response.dateResponse
-                || response.entityResponse
-                || response.listResponse)
-}
-
-
-function indexResponses(rs = []) {
-    return _.chain(rs)
-        .map("questionResponse")
-        .map(qr => ({
-            questionId: qr.questionId,
-            answer: extractAnswer(qr),
-            comment: qr.comment
-        }))
-        .keyBy("questionId")
-        .value();
-}
-
-
-function controller($stateParams,
-                    serviceBroker) {
+function controller($q,
+                    $stateParams,
+                    serviceBroker,
+                    userService) {
 
     const vm = initialiseData(this, initialState);
     const id = $stateParams.id;
@@ -64,39 +41,38 @@ function controller($stateParams,
         kind: "SURVEY_INSTANCE"
     };
 
-    serviceBroker
-        .loadViewData(
-            CORE_API.SurveyInstanceStore.getById,
-            [ id ])
-        .then(r => {
-            vm.surveyInstance = r.data;
-            return serviceBroker
-                .loadViewData(
-                    CORE_API.SurveyRunStore.getById,
-                    [ vm.surveyInstance.surveyRunId ]);
-        })
-        .then(r => vm.surveyRun = r.data);
+    SurveyUtils
+        .loadSurveyInfo($q, serviceBroker, userService, id)
+        .then(details => vm.surveyDetails = details);
 
-    serviceBroker
+    const questionPromise = serviceBroker
         .loadViewData(
             CORE_API.SurveyQuestionStore.findForInstance,
             [ id ])
-        .then(r => vm.surveyQuestionInfos = groupQuestions(r.data));
+        .then(r => r.data);
 
-    serviceBroker
+    const responsePromise= serviceBroker
         .loadViewData(
             CORE_API.SurveyInstanceStore.findResponses,
             [ id ])
         .then(r => {
-            vm.answers = indexResponses(r.data);
+            return r.data;
+        });
+
+    $q.all([questionPromise, responsePromise])
+        .then(([allQuestions, surveyResponses]) => {
+            vm.answersById = SurveyUtils.indexResponses(surveyResponses);
+            vm.groupedQuestions = SurveyUtils.groupQuestions(allQuestions);
         });
 
 }
 
 
 controller.$inject = [
+    "$q",
     "$stateParams",
-    "ServiceBroker"
+    "ServiceBroker",
+    "UserService"
 ];
 
 

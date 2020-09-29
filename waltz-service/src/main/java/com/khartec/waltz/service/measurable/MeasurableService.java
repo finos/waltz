@@ -45,7 +45,7 @@ import static java.util.Optional.ofNullable;
 
 @Service
 public class MeasurableService {
-    
+
     private final MeasurableDao measurableDao;
     private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
     private final MeasurableSearchDao measurableSearchDao;
@@ -117,6 +117,11 @@ public class MeasurableService {
     }
 
 
+    public Collection<Measurable> findByOrgUnitId(Long id) {
+        return measurableDao.findByOrgUnitId(id);
+    }
+
+
     public boolean updateConcreteFlag(Long id, boolean newValue, String userId) {
         logUpdate(id, "concrete flag", Boolean.toString(newValue), m -> Optional.of(Boolean.toString(m.concrete())), userId);
 
@@ -143,7 +148,9 @@ public class MeasurableService {
 
 
     public boolean create(Measurable measurable, String userId) {
-        return measurableDao.create(measurable);
+        Long measurableId = measurableDao.create(measurable);
+        writeAuditMessage(measurableId, userId, String.format("created new measurable %s", measurable.name()));
+        return measurableId > 1;
     }
 
 
@@ -162,7 +169,7 @@ public class MeasurableService {
      *
      * @param measurableId  measurable id of item to move
      * @param destinationId new parent id (or null if root)
-     * @param userId who initiated this move
+     * @param userId        who initiated this move
      */
     public boolean updateParentId(Long measurableId, Long destinationId, String userId) {
         checkNotNull(measurableId, "Cannot updateParentId a measurable with a null id");
@@ -206,7 +213,7 @@ public class MeasurableService {
     }
 
 
-    private void writeAuditMessage(Long measurableId, String userId, String msg) {
+    public void writeAuditMessage(Long measurableId, String userId, String msg) {
         changeLogService.write(ImmutableChangeLog.builder()
                 .severity(Severity.INFORMATION)
                 .userId(userId)
@@ -216,6 +223,4 @@ public class MeasurableService {
                 .message(msg)
                 .build());
     }
-
-
 }

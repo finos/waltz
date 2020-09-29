@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
@@ -21,6 +20,8 @@ import _ from "lodash";
 
 
 export const lastViewedMeasurableCategoryKey = "main.measurable-category.list.lastCategory";
+export const appLogicalFlowFilterExcludedTagIdsKey = "main.app-view.logical-flow.filter.excludedTagIds";
+export const groupLogicalFlowFilterExcludedTagIdsKey = "main.group-views.logical-flow.filter.excludedTagIds";
 
 
 let preferencePromise = null;

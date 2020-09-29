@@ -55,7 +55,7 @@ public class EmailService {
     @Value("${waltz.email.batchSize:50}")
     private int batchSize;
 
-    @Value("${waltz.base.url}")
+    @Value("${waltz.base.url:localhost}")
     private String baseUrl;
 
 

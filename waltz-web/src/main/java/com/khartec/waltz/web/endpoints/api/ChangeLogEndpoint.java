@@ -25,9 +25,13 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+import java.util.Optional;
+
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 
 @Service
@@ -52,14 +56,24 @@ public class ChangeLogEndpoint implements Endpoint {
                 mkPath(BASE_URL, "user", ":userId"),
                 (request, response) -> service.findByUser(request.params("userId"), getLimit(request)));
 
+        postForList(
+                mkPath(BASE_URL, "summaries", ":kind"),
+                (request, response) -> service.findCountByDateForParentKindBySelector(
+                        getKind(request),
+                        readIdSelectionOptionsFromBody(request),
+                        getLimit(request)));
+
         getForList(
                 mkPath(BASE_URL, ":kind", ":id"),
                 (request, response) -> {
                     EntityReference ref = getEntityReference(request);
+                    Optional<Date> dateParam = getDateParam(request);
+                    Optional<Integer> limitParam = getLimit(request);
+
                     if(ref.kind() == EntityKind.PERSON) {
-                        return service.findByPersonReference(ref, getLimit(request));
+                        return service.findByPersonReference(ref, dateParam, limitParam);
                     } else {
-                        return service.findByParentReference(ref, getLimit(request));
+                        return service.findByParentReference(ref, dateParam, limitParam);
                     }
                 });
 

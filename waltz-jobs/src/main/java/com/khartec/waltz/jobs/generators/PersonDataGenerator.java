@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.Random;
 
 import static com.khartec.waltz.common.RandomUtilities.randomPick;
+import static com.khartec.waltz.schema.Tables.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 
@@ -101,6 +102,7 @@ public class PersonDataGenerator implements SampleDataGenerator {
     @Override
     public boolean remove(ApplicationContext ctx) {
         log("Removing people");
+        getDsl(ctx).deleteFrom(INVOLVEMENT).execute();
         getDsl(ctx).deleteFrom(PERSON).execute();
         return true;
     }
@@ -112,7 +114,7 @@ public class PersonDataGenerator implements SampleDataGenerator {
 
         int nextLevel = level + 1;
 
-        int siblingCount = level == 1 ? SampleData.jobTitles[1].length : rnd.nextInt(7) + 2;
+        int siblingCount = level == 1 ? SampleData.jobTitles[1].length : rnd.nextInt(4) + 2;
 
         for (int i = 0 ; i < siblingCount ; i++) {
             Person person = fairy.person();

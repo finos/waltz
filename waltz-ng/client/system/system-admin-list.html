@@ -19,10 +19,12 @@
 <div>
     <waltz-page-header name="System Admin"
                        icon="wrench">
-        <ol class="waltz-breadcrumbs">
-            <li><a ui-sref="main">Home</a></li>
-            <li>System Admin</li>
-        </ol>
+        <breadcrumbs>
+            <ol class="waltz-breadcrumbs">
+                <li><a ui-sref="main">Home</a></li>
+                <li>System Admin</li>
+            </ol>
+        </breadcrumbs>
 
     </waltz-page-header>
 
@@ -200,6 +202,19 @@
                         </a>
                         <p class="text-muted small">
                             View EUDAs and promote to applications
+                        </p>
+                    </div>
+
+                    <div>
+                        <a ui-sref="main.system.relationship-kinds">
+                            <waltz-icon class='text-muted'
+                                        fixed-width="true"
+                                        name="link">
+                            </waltz-icon>
+                            Relationship Kinds
+                        </a>
+                        <p class="text-muted small">
+                            View and edit relationship kinds
                         </p>
                     </div>
                 </div>

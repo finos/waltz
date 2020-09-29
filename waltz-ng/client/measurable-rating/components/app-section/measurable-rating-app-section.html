@@ -46,7 +46,8 @@
                                                                 starting-category-id="$ctrl.visibility.tab"
                                                                 planned-decommissions="$ctrl.plannedDecommissions"
                                                                 replacing-decommissions="$ctrl.replacingDecommissions"
-                                                                replacement-apps="$ctrl.replacementApps">
+                                                                replacement-apps="$ctrl.replacementApps"
+                                                                application="$ctrl.application">
                             </waltz-measurable-rating-edit-panel>
                         </div>
 
@@ -171,12 +172,13 @@
         <div class="col-sm-12">
             <waltz-measurable-rating-panel measurables="tab.measurables"
                                            ratings="tab.ratings"
-                                           rating-scheme="tab.ratingScheme"
+                                           rating-scheme-items="tab.ratingSchemeItems"
                                            allocations="$ctrl.allocations"
                                            allocation-schemes="tab.allocationSchemes"
                                            planned-decommissions="$ctrl.plannedDecommissions"
                                            replacing-decommissions="$ctrl.replacingDecommissions"
-                                           replacement-apps="$ctrl.replacementApps">
+                                           replacement-apps="$ctrl.replacementApps"
+                                           application="$ctrl.application">
             </waltz-measurable-rating-panel>
         </div>
     </div>

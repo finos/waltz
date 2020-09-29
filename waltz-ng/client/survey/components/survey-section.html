@@ -128,7 +128,7 @@
                             </div>
                         </div>
 
-                        <!-- NAME -->
+                        <!-- DESCRIPTION -->
                         <div class="row">
                             <div class="col-md-3">
                                 <label>
@@ -176,6 +176,34 @@
                                 </waltz-date-picker-form-input>
                                 <div class="small help-block">
                                     When does this survey need to be completed by?
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- OWNERS -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>
+                                    Survey admin role/s
+                                </label>
+                            </div>
+                            <div class="col-md-6">
+                                <div>
+                                    <select ng-model="$ctrl.surveyRunForm.owningRole"
+                                            class="form-control">
+                                        <option ng-repeat="role in $ctrl.customRoles"
+                                                value="{{role.key}}"
+                                                ng-bind="role.name">
+                                        </option>
+                                        <option class="text-muted"
+                                                value=""
+                                                selected>
+                                            Survey Owner only
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="small help-block">
+                                    Select a custom role for adding additional survey owners
                                 </div>
                             </div>
                         </div>

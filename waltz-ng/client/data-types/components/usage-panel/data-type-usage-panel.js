@@ -15,16 +15,16 @@
  * See the License for the specific
  *
  */
-import _ from "lodash";
 import {initialiseData} from "../../../common/index";
-import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./data-type-usage-panel.html";
 import roles from "../../../user/system-roles";
+import {loadUsageData} from "../../data-type-utils";
 
 
 const bindings = {
     parentEntityRef: "<",
+    parentFlow: "<?",
     helpText: "@"
 };
 
@@ -32,6 +32,7 @@ const bindings = {
 const initialState = {
     helpText: null,
     isDirty: false,
+    parentFlow: null,
     visibility: {
         editor: false,
         controls: false
@@ -39,35 +40,12 @@ const initialState = {
 };
 
 
-function controller(notification, serviceBroker, userService) {
+function controller(notification, serviceBroker, userService, $q) {
     const vm = initialiseData(this, initialState);
 
     const reload = (force = false) => {
-        const promise = vm.parentEntityRef.kind === "PHYSICAL_SPECIFICATION"
-            ? serviceBroker
-                .loadViewData(
-                    CORE_API.PhysicalSpecDataTypeStore.findBySpecificationId,
-                    [ vm.parentEntityRef.id ],
-                    { force })
-                .then(r => r.data)
-            : serviceBroker
-                .loadViewData(
-                    CORE_API.LogicalFlowDecoratorStore.findByFlowIdsAndKind,
-                    [ [vm.parentEntityRef.id] ],
-                    { force })
-                .then(r => r.data)
-                .then(decorators => _.map(decorators, d => ({
-                    lastUpdatedAt: d.lastUpdatedAt,
-                    lastUpdatedBy: d.lastUpdatedBy,
-                    provenance: d.provenance,
-                    dataTypeId: d.decoratorEntity.id,
-                    dataFlowId: d.dataFlowId
-                })));
-
-        return promise
-            .then(r => {
-                vm.used = r;
-            });
+        loadUsageData($q, serviceBroker, vm.parentEntityRef, force)
+            .then(usageData => vm.used = usageData);
     };
 
     vm.$onInit = () => {
@@ -78,7 +56,7 @@ function controller(notification, serviceBroker, userService) {
 
     vm.$onChanges = () => {
         if (! vm.parentEntityRef) return;
-        reload();
+        reload(true);
     };
 
     vm.onShowEdit = () => {
@@ -92,6 +70,9 @@ function controller(notification, serviceBroker, userService) {
     vm.onSave = () => {
         if(!vm.isDirty)
             return;
+        if(vm.parentEntityRef.kind === 'PHYSICAL_SPECIFICATION' && !confirm("This will affect all associated physical flows. Do you want to continue?")){
+            return;
+        }
         if (vm.save) {
             vm.save()
                 .then(() => {
@@ -117,7 +98,8 @@ function controller(notification, serviceBroker, userService) {
 controller.$inject = [
     "Notification",
     "ServiceBroker",
-    "UserService"
+    "UserService",
+    "$q"
 ];
 
 

@@ -37,11 +37,11 @@ public interface SampleDataGenerator {
     String SAMPLE_DATA_PROVENANCE = "waltz-sample";
     String SAMPLE_DATA_USER = "admin";
 
-    int NUM_APPS = 500;
-    int NUM_CHANGE_INITIATIVES = 100;
+    int NUM_APPS = 100;
+    int NUM_CHANGE_INITIATIVES = 50;
     int NUM_PROCESS_GROUPS = 3;
     int NUM_PROCESSES_IN_GROUP = 6;
-    int MAX_RATINGS_PER_APP = 12;
+    int MAX_RATINGS_PER_APP = 15;
 
 
     default DSLContext getDsl(ApplicationContext ctx) {

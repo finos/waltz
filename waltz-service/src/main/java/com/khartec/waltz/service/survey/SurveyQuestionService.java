@@ -21,6 +21,7 @@ package com.khartec.waltz.service.survey;
 
 import com.khartec.waltz.data.survey.SurveyQuestionDao;
 import com.khartec.waltz.model.survey.SurveyQuestion;
+import com.khartec.waltz.service.survey.inclusion_evaluator.QuestionPredicateEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,13 +34,16 @@ import static com.khartec.waltz.common.Checks.checkTrue;
 public class SurveyQuestionService {
 
     private final SurveyQuestionDao surveyQuestionDao;
+    private final QuestionPredicateEvaluator evaluator;
 
 
     @Autowired
-    public SurveyQuestionService(SurveyQuestionDao surveyQuestionDao) {
+    public SurveyQuestionService(SurveyQuestionDao surveyQuestionDao,
+                                 QuestionPredicateEvaluator evaluator) {
         checkNotNull(surveyQuestionDao, "surveyQuestionDao cannot be null");
 
         this.surveyQuestionDao = surveyQuestionDao;
+        this.evaluator = evaluator;
     }
 
 
@@ -54,6 +58,11 @@ public class SurveyQuestionService {
 
 
     public List<SurveyQuestion> findForSurveyInstance(long surveyInstanceId) {
+        return evaluator.determineActiveQuestions(surveyInstanceId);
+    }
+
+
+    public List<SurveyQuestion> findForSurveyInstanceOld(long surveyInstanceId) {
         return surveyQuestionDao.findForSurveyInstance(surveyInstanceId);
     }
 

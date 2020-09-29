@@ -21,6 +21,7 @@ package com.khartec.waltz.service.authoritative_source;
 
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
 import com.khartec.waltz.model.authoritativesource.ImmutableAuthoritativeRatingVantagePoint;
@@ -66,6 +67,7 @@ public class AuthoritativeSourceResolverTest {
                 .vantagePoint(vantagePoint)
                 .vantagePointRank(1)
                 .dataTypeCode("TRADE_DATA")
+                .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 10))
                 .dataTypeRank(1)
                 .applicationId(200L)
                 .rating(AuthoritativenessRating.SECONDARY)
@@ -88,6 +90,7 @@ public class AuthoritativeSourceResolverTest {
                 .vantagePoint(vantagePoint)
                 .vantagePointRank(1)
                 .dataTypeCode("REF_DATA")
+                .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 20))
                 .dataTypeRank(1)
                 .applicationId(205L)
                 .rating(AuthoritativenessRating.PRIMARY)
@@ -110,6 +113,7 @@ public class AuthoritativeSourceResolverTest {
                 .vantagePoint(vantagePoint)
                 .vantagePointRank(1)
                 .dataTypeCode("REF_DATA")
+                .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 20))
                 .dataTypeRank(2)
                 .applicationId(205L)
                 .rating(AuthoritativenessRating.PRIMARY)
@@ -120,6 +124,7 @@ public class AuthoritativeSourceResolverTest {
                 .vantagePoint(vantagePoint)
                 .vantagePointRank(2)
                 .dataTypeCode("REF_DATA")
+                .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 20))
                 .dataTypeRank(3)
                 .applicationId(200L)
                 .rating(AuthoritativenessRating.SECONDARY)
@@ -141,6 +146,7 @@ public class AuthoritativeSourceResolverTest {
                 .vantagePoint(vantagePoint)
                 .vantagePointRank(1)
                 .dataTypeCode("REF_DATA")
+                .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 20))
                 .dataTypeRank(2)
                 .applicationId(205L)
                 .rating(AuthoritativenessRating.PRIMARY)

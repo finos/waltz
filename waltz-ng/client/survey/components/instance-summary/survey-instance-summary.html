@@ -17,11 +17,17 @@
   -->
 
 <div>
-    <waltz-section-actions>
+    <waltz-section-actions ng-if="$ctrl.surveyDetails && !$ctrl.surveyDetails.isLatest">
+        <span class="text-muted">Actions only available on latest survey</span>
+    </waltz-section-actions>
+
+    <waltz-section-actions ng-if="$ctrl.surveyDetails.isLatest">
         <span ng-repeat="action in $ctrl.availableStatusActions">
             <a class="btn btn-xs"
-               ng-class="'btn-{{action.severity}}'"
-               ng-click="$ctrl.invokeStatusAction(action)">
+                ng-if="action.type.includes('instance')"
+                ng-class="'btn-{{action.severity}}'"
+                ng-click="$ctrl.invokeStatusAction(action, $ctrl.surveyDetails.instance.id)"
+                >
                 <span ng-bind="action.name"></span>
             </a>
         </span>
@@ -29,10 +35,10 @@
 
     <div class="row">
         <div class="col-sm-12">
-            <waltz-markdown text="$ctrl.surveyRun.description"
+            <waltz-markdown text="$ctrl.description"
                             context="{
-                                instance: $ctrl.surveyInstance,
-                                entity: $ctrl.subject
+                                instance: $ctrl.surveyDetails.instance,
+                                entity: $ctrl.surveyDetails.subject
                             }">
             </waltz-markdown>
         </div>
@@ -47,8 +53,8 @@
 
     <!-- ISSUED / APPROVED -->
     <div class="row waltz-survey-summary-row">
+        <div ng-include="'wsis-issued-by'"></div>
         <div ng-include="'wsis-issued-date'"></div>
-        <div ng-include="'wsis-approval'"></div>
     </div>
 
     <!-- SUBJECT / DUE -->
@@ -66,17 +72,17 @@
     <!-- RECIPIENTS -->
     <div class="row">
         <div class="col-sm-2 waltz-display-field-label">
-            <span ng-bind="$ctrl.surveyRun.issuanceKind | toDisplayName:'issuance'"></span>
+            <span ng-bind="$ctrl.surveyDetails.run.issuanceKind | toDisplayName:'issuance'"></span>
             Recipient/s
         </div>
         <div class="col-sm-4">
             <!-- For groups -->
-            <div ng-if="$ctrl.surveyRun.issuanceKind === 'GROUP'"
+            <div ng-if="$ctrl.surveyDetails.run.issuanceKind === 'GROUP'"
                  ng-include="'wsis-group-recipients'">
             </div>
 
             <!-- For individuals -->
-            <div ng-if="$ctrl.surveyRun.issuanceKind === 'INDIVIDUAL'"
+            <div ng-if="$ctrl.surveyDetails.run.issuanceKind === 'INDIVIDUAL'"
                  ng-include="'wsis-indiv-recipients'">
             </div>
         </div>
@@ -89,15 +95,14 @@
 <!-- GROUP_RECIPIENTS -->
 <script type="text/ng-template"
         id="wsis-group-recipients">
-    <span ng-if="$ctrl.permissions.metaEdit">
+    <span ng-if="$ctrl.surveyDetails.permissions.isMetaEdit">
         <waltz-user-pick-list people="$ctrl.people"
                               can-remove-last="false"
                               on-add="$ctrl.onAddRecipient"
-                              on-remove="$ctrl.onRemoveRecipient"
-                              required-role="SURVEY_ADMIN">
+                              on-remove="$ctrl.onRemoveRecipient">
         </waltz-user-pick-list>
     </span>
-    <span ng-if="!$ctrl.permissions.metaEdit">
+    <span ng-if="!$ctrl.surveyDetails.permissions.isMetaEdit">
         <ul class="list-unstyled list-inline">
             <li ng-repeat="participant in $ctrl.people">
                 <waltz-entity-icon-label entity-ref="participant">
@@ -114,14 +119,14 @@
         id="wsis-indiv-recipients">
     <ul class="list-unstyled list-inline">
         <li ng-repeat="r in $ctrl.recipients | orderBy:'person.name'">
-            <span ng-if="$ctrl.permissions.metaEdit">
+            <span ng-if="$ctrl.surveyDetails.permissions.isMetaEdit">
                 <waltz-editable-field on-save="$ctrl.editRecipient"
                                       field-type="person"
                                       initial-val="r.person"
                                       ctx="r.id">
                 </waltz-editable-field>
             </span>
-            <span ng-if="!$ctrl.permissions.metaEdit">
+            <span ng-if="!$ctrl.surveyDetails.permissions.isMetaEdit">
                 <waltz-entity-icon-label entity-ref="r.person">
                 </waltz-entity-icon-label>
                 <span ng-if="!$last">, </span>
@@ -139,7 +144,7 @@
     </div>
     <div class="col-sm-4">
         <waltz-entity-link tooltip-placement="right"
-                           entity-ref="$ctrl.subject">
+                           entity-ref="$ctrl.surveyDetails.subject">
         </waltz-entity-link>
     </div>
 </script>
@@ -152,16 +157,16 @@
         Due
     </div>
     <div class="col-sm-4">
-        <span ng-if="$ctrl.permissions.metaEdit">
+        <span ng-if="$ctrl.surveyDetails.permissions.isMetaEdit">
             <waltz-editable-field on-save="$ctrl.updateDueDate"
                                   field-type="date"
                                   date-format="yyyy-MM-dd"
-                                  initial-val="$ctrl.surveyInstance.dueDate"
-                                  ctx="$ctrl.surveyInstance.id">
+                                  initial-val="$ctrl.surveyDetails.instance.dueDate"
+                                  ctx="$ctrl.surveyDetails.instance.id">
             </waltz-editable-field>
         </span>
-        <span ng-if="!$ctrl.permissions.metaEdit">
-            <waltz-from-now timestamp="$ctrl.surveyInstance.dueDate"
+        <span ng-if="!$ctrl.surveyDetails.permissions.isMetaEdit">
+            <waltz-from-now timestamp="$ctrl.surveyDetails.instance.dueDate"
                             days-only="true">
             </waltz-from-now>
         </span>
@@ -169,20 +174,25 @@
 </script>
 
 
-<!-- ISSUED DATE -->
+<!-- ISSUED BY -->
 <script type="text/ng-template"
-        id="wsis-issued-date">
+        id="wsis-issued-by">
+
     <div class="col-sm-2 waltz-display-field-label">
-        Issued
+        Issued By
     </div>
     <div class="col-sm-4">
-        <waltz-entity-link entity-ref="$ctrl.owner"
+        <waltz-entity-link entity-ref="$ctrl.surveyDetails.owner"
                            tooltip-placement="right">
         </waltz-entity-link>
-        /
-        <waltz-from-now timestamp="$ctrl.surveyRun.issuedOn"
-                        days-only="true">
-        </waltz-from-now>
+        <span ng-if="$ctrl.surveyDetails.ownerRole">
+            /
+            <span ng-bind="$ctrl.surveyDetails.ownerRole.name"
+                  uib-popover="Admin group for this survey"
+                  popover-trigger="mouseenter"
+                  popover-append-to-body="true">
+            </span>
+        </span>
     </div>
 </script>
 
@@ -194,10 +204,10 @@
         Submitted
     </div>
     <div class="col-sm-4">
-        <waltz-from-now ng-if="$ctrl.surveyInstance.submittedAt"
-                        timestamp="$ctrl.surveyInstance.submittedAt">
+        <waltz-from-now ng-if="$ctrl.surveyDetails.instance.submittedAt"
+                        timestamp="$ctrl.surveyDetails.instance.submittedAt">
         </waltz-from-now>
-        <span ng-if="! $ctrl.surveyInstance.submittedAt">
+        <span ng-if="! $ctrl.surveyDetails.instance.submittedAt">
             -
         </span>
     </div>
@@ -213,10 +223,6 @@
     <div class="col-sm-4">
         <span ng-bind="$ctrl.currentResponseVersion.versionNum">
         </span>
-        <span ng-if="$ctrl.currentResponseVersion.isLatest">
-                -
-            <i>Latest</i>
-            </span>
         <div class="btn-group"
              uib-dropdown
              is-open="status.isopen">
@@ -224,7 +230,7 @@
                     -
                     <a class="clickable"
                        uib-dropdown-toggle>
-                        view a different version
+                        View a different version
                         <span class="caret"></span>
                     </a>
                 </span>
@@ -251,7 +257,7 @@
         Subject External Id
     </div>
     <div class="col-sm-4">
-        <span ng-bind="$ctrl.subject.externalId">
+        <span ng-bind="$ctrl.surveyDetails.subject.externalId">
         </span>
     </div>
 </script>
@@ -264,7 +270,7 @@
         Status
     </div>
     <div class="col-sm-4"
-         ng-bind="$ctrl.surveyInstance.status | toDisplayName:'surveyInstanceStatus'">
+         ng-bind="$ctrl.surveyDetails.instance.status | toDisplayName:'surveyInstanceStatus'">
     </div>
 </script>
 
@@ -277,15 +283,29 @@
     </div>
     <div class="col-sm-4">
         <span ng-if="$ctrl.surveyInstance.approvedBy">
-            <span ng-bind="$ctrl.surveyInstance.approvedBy"></span>
+            <span ng-bind="$ctrl.surveyDetails.instance.approvedBy"></span>
             ,
         </span>
         <waltz-from-now class='text-muted'
                         ng-if="$ctrl.surveyInstance.approvedAt"
-                        timestamp="$ctrl.surveyInstance.approvedAt">
+                        timestamp="$ctrl.surveyDetails.instance.approvedAt">
         </waltz-from-now>
-        <span ng-if="! $ctrl.surveyInstance.approvedAt">
+        <span ng-if="! $ctrl.surveyDetails.instance.approvedAt">
             -
         </span>
+    </div>
+</script>
+
+
+<!-- ISSUED ON -->
+<script type="text/ng-template"
+        id="wsis-issued-date">
+    <div class="col-sm-2 waltz-display-field-label">
+        Issued
+    </div>
+    <div class="col-sm-4">
+        <waltz-from-now timestamp="$ctrl.surveyDetails.run.issuedOn"
+                        days-only="true">
+        </waltz-from-now>
     </div>
 </script>

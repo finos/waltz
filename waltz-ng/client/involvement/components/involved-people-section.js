@@ -77,12 +77,13 @@ const initialState = {
 };
 
 
-function mkGridData(involvements = [], displayNameService) {
+function mkGridData(involvements = [], displayNameService, descriptionService) {
     return _.chain(involvements)
         .map(inv => {
-            const roles = _.map(inv.involvements, ik => ({
-                provenance: ik.provenance,
-                displayName: displayNameService.lookup("involvementKind", ik.kindId)
+            const roles = _.map(inv.involvements, pInv => ({
+                provenance: pInv.provenance,
+                displayName: displayNameService.lookup("involvementKind", pInv.kindId),
+                description: descriptionService.lookup("involvementKind", pInv.kindId)
             }));
 
             const rolesDisplayName = _.chain(roles)
@@ -94,7 +95,7 @@ function mkGridData(involvements = [], displayNameService) {
                 person: inv.person,
                 roles,
                 rolesDisplayName
-            }
+            };
         })
         .sortBy("person.displayName")
         .value();
@@ -127,7 +128,7 @@ function mkCurrentInvolvements(involvements = []) {
 }
 
 
-function controller($q, displayNameService, serviceBroker, involvedSectionService) {
+function controller($q, displayNameService, descriptionService, serviceBroker, involvedSectionService) {
 
     const vm = initialiseData(this, initialState);
 
@@ -155,7 +156,7 @@ function controller($q, displayNameService, serviceBroker, involvedSectionServic
             .all([involvementPromise, peoplePromise, kindPromise])
             .then(([involvements = [], people = [], involvementKinds = []]) => {
                 const aggInvolvements = aggregatePeopleInvolvements(involvements, people);
-                vm.gridData = mkGridData(aggInvolvements, displayNameService);
+                vm.gridData = mkGridData(aggInvolvements, displayNameService, descriptionService);
                 vm.currentInvolvements = mkCurrentInvolvements(aggInvolvements);
                 vm.involvementKinds = involvementKinds;
             });
@@ -196,6 +197,7 @@ function controller($q, displayNameService, serviceBroker, involvedSectionServic
 controller.$inject = [
     "$q",
     "DisplayNameService",
+    "DescriptionService",
     "ServiceBroker",
     "InvolvedSectionService"
 ];

@@ -38,6 +38,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -199,8 +200,7 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
 
     public TaxonomyChangeCommand apply(TaxonomyChangeCommand cmd, String userId) {
         doBasicValidation(cmd);
-        validatePrimaryMeasurable(measurableService, cmd);
-
+        Measurable measurable = validatePrimaryMeasurable(measurableService, cmd);
 
         IdSelectionOptions selectionOptions = mkOpts(cmd.primaryReference(), HierarchyQueryScope.CHILDREN);
 
@@ -210,6 +210,12 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
         removeMeasurables(selectionOptions);
         removeFlowDiagrams(selectionOptions);
         removeEntityRelationshipsDiagrams(selectionOptions);
+        
+        String message = String.format("Measurable %s has been removed", measurable.name());
+        Optional<Long> measurableId = measurable.parentId().isPresent()
+                ? measurable.parentId()
+                : measurable.id();
+        measurableId.ifPresent(id -> measurableService.writeAuditMessage(id, userId, message));
 
         // TODO: entitySvgDiagrams, roadmapScenarios
 

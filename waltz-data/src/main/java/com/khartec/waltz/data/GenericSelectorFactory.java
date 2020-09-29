@@ -24,9 +24,11 @@ import com.khartec.waltz.data.change_initiative.ChangeInitiativeIdSelectorFactor
 import com.khartec.waltz.data.change_unit.ChangeUnitIdSelectorFactory;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.flow_diagram.FlowDiagramIdSelectorFactory;
+import com.khartec.waltz.data.licence.LicenceIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
+import com.khartec.waltz.data.physical_specification.PhysicalSpecificationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
@@ -43,10 +45,12 @@ public class GenericSelectorFactory {
     private final ChangeUnitIdSelectorFactory changeUnitIdSelectorFactory = new ChangeUnitIdSelectorFactory();
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
     private final FlowDiagramIdSelectorFactory flowDiagramIdSelectorFactory = new FlowDiagramIdSelectorFactory();
+    private final LicenceIdSelectorFactory licenceIdSelectorFactory = new LicenceIdSelectorFactory();
     private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
     private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
     private final OrganisationalUnitIdSelectorFactory organisationalUnitIdSelectorFactory = new OrganisationalUnitIdSelectorFactory();
     private final AttestationIdSelectorFactory attestationIdSelectorFactory = new AttestationIdSelectorFactory();
+    private final PhysicalSpecificationIdSelectorFactory specificationIdSelectorFactory = new PhysicalSpecificationIdSelectorFactory();
 
 
     public GenericSelector apply(IdSelectionOptions selectionOptions) {
@@ -107,6 +111,8 @@ public class GenericSelectorFactory {
                 return dataTypeIdSelectorFactory.apply(selectionOptions);
             case FLOW_DIAGRAM:
                 return flowDiagramIdSelectorFactory.apply(selectionOptions);
+            case LICENCE:
+                return licenceIdSelectorFactory.apply(selectionOptions);
             case LOGICAL_DATA_FLOW:
                 return logicalFlowIdSelectorFactory.apply(selectionOptions);
             case MEASURABLE:
@@ -115,6 +121,8 @@ public class GenericSelectorFactory {
                 return organisationalUnitIdSelectorFactory.apply(selectionOptions);
             case ATTESTATION:
                 return attestationIdSelectorFactory.apply(selectionOptions);
+            case PHYSICAL_SPECIFICATION:
+                return specificationIdSelectorFactory.apply(selectionOptions);
             //todo: (KS) Add support for Person
             default:
                 throw new UnsupportedOperationException(String.format("Cannot make generic selector for kind: %s", kind));

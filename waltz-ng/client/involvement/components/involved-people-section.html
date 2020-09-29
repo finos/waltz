@@ -97,17 +97,18 @@
             <thead>
             <tr>
                 <th>Role</th>
-                <th>Provenance</th>
+                <th>Description</th>
             </tr>
             </thead>
 
             <tbody>
                 <tr ng-repeat="role in row.entity.roles">
                     <td>
-                        <span ng-bind="role.displayName"></span>
+                        <div ng-bind="role.displayName"></div>
+                        <div class="small text-muted" ng-bind="role.provenance"></div>
                     </td>
                     <td>
-                        <span ng-bind="role.provenance"></span>
+                        <span ng-bind="role.description"></span>
                     </td>
                 </tr>
             </tbody>

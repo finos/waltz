@@ -112,11 +112,9 @@ function drawPoints(section, points = [], scales) {
         .enter()
         .append("circle")
         .classed("point", true)
-        .attrs({
-            fill: d => variableScale(d.series),
-            opacity: 0.7,
-            r: 0
-        });
+        .attr("fill", d => variableScale(d.series))
+        .attr("opacity", 0.7)
+        .attr("r", 0);
 
     pointSelection
         .exit()
@@ -149,12 +147,10 @@ function drawLines(section, points = [], scales) {
         .enter()
         .append("path")
         .classed("line", true)
-        .attrs({
-            stroke: d => variableScale(d.key),
-            "stroke-width": 1,
-            fill: "none",
-            opacity: 0.7
-        });
+        .attr("stroke", d => variableScale(d.key))
+        .attr("stroke-width", 1)
+        .attr("fill", "none")
+        .attr("opacity", 0.7);
 
     pathSelector
         .exit()
@@ -169,10 +165,8 @@ function drawLines(section, points = [], scales) {
 function adjustSections(sections, dimensions) {
     sections
         .svg
-        .attrs({
-            width: dimensions.width,
-            height: dimensions.height
-        });
+        .attr("width", dimensions.width)
+        .attr("height", dimensions.height);
 
     sections
         .chart
@@ -200,7 +194,8 @@ function drawBands(section,
     const bandWidth = width / numDates;
     const extraHeight = 30;
 
-    const dates = _.chain(points)
+    const dates = _
+        .chain(points)
         .map("date")
         .uniqBy(d => d.getTime())
         .value();
@@ -225,12 +220,10 @@ function drawBands(section,
 
     bands
         .merge(newBands)
-        .attrs({
-            x: d => scales.x(d) - (bandWidth / 2),
-            y: extraHeight / 2 * -1,
-            width: bandWidth,
-            height: scales.y.range()[0] + extraHeight,
-        });
+        .attr("x", d => scales.x(d) - (bandWidth / 2))
+        .attr("y", extraHeight / 2 * -1)
+        .attr("width", bandWidth)
+        .attr("height", scales.y.range()[0] + extraHeight);
 }
 
 

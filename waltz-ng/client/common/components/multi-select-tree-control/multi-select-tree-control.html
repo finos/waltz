@@ -44,15 +44,15 @@
 
     <treecontrol class="tree-light"
                  tree-model="$ctrl.hierarchy"
-                 order-by="'-name'"
+                 order-by="$ctrl.orderByExpression"
                  expanded-nodes="$ctrl.expandedNodes"
                  on-selection="$ctrl.onNodeClick(node)"
                  options="$ctrl.treeOptions">
 
             <span>
-                <span style="font-size: x-large">
+                <span style="font-size: x-large;">
                     <waltz-toggle state="$ctrl.checkedMap[node.id]"
-                                  read-only="node.disable"
+                                  read-only="$ctrl.isDisabled(node)"
                                   icon-on="check-square-o"
                                   icon-off="square-o"
                                   on-toggle="$ctrl.onToggleCheck(node)">

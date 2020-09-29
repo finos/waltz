@@ -1,8 +1,26 @@
 # Release Lifecycle
 
-This document outlines the key activities to be performed on each minor (x.y) release of Waltz.  
+This document outlines how Waltz uses version numbers and outlines the key activities to be 
+performed on each minor (x.y) iteration of Waltz.
 
-## Start
+  
+
+## Versioning Scheme
+
+Waltz is an application, not a library / framework, and therefore versioning schemes 
+like [semver](https://semver.org/) have limited applicability.  Waltz version numbers follow a 
+simple pattern:
+ 
+Release | Pattern | Description
+--- | --- | ---
+Minor | x.**y** | Indicates new features (typically every 6 weeks)
+Patch | x.y.**z** | Used for bug-fix releases
+Major | **x** | So far unused, reserved for major, breaking, changes
+
+----
+
+
+## Iteration Start
 
 At the start of a new release, when development commences the following should be performed (an issue for each should be created).
 

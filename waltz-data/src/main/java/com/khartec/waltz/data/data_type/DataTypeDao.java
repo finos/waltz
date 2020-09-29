@@ -37,6 +37,8 @@ import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
+import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW;
+import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 
 
@@ -80,7 +82,7 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
         checkNotNull(selector, "selector cannot be null");
 
         return dsl
-                .select(DATA_TYPE.ID, DATA_TYPE.CODE, DSL.val(EntityKind.DATA_TYPE.name()))
+                .select(DATA_TYPE.ID, DATA_TYPE.NAME, DSL.val(EntityKind.DATA_TYPE.name()))
                 .from(DATA_TYPE)
                 .where(DATA_TYPE.ID.in(selector))
                 .fetch(TO_ENTITY_REFERENCE);
@@ -108,6 +110,28 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
         return dsl
                 .selectFrom(DATA_TYPE)
                 .where(DATA_TYPE.ID.in(ids))
+                .fetch(TO_DOMAIN);
+    }
+
+
+    public List<DataType> findSuggestedBySourceEntityRef(EntityReference source) {
+
+        Condition isSourceOrTarget = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(source.id())
+                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(source.kind().name()))
+                .or(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(source.id())
+                        .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(source.kind().name())));
+
+        SelectConditionStep<Record1<Long>> logicalFlowsForSource = DSL
+                .select(LOGICAL_FLOW.ID)
+                .from(LOGICAL_FLOW)
+                .where(isSourceOrTarget);
+
+        return dsl
+                .selectDistinct(DATA_TYPE.fields())
+                .from(DATA_TYPE)
+                .innerJoin(LOGICAL_FLOW_DECORATOR).on(DATA_TYPE.ID.eq(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID)
+                        .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
+                .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.in(logicalFlowsForSource))
                 .fetch(TO_DOMAIN);
     }
 }

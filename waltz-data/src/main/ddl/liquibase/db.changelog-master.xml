@@ -99,4 +99,19 @@
     <include file="db.changelog-1.23.xml"
              relativeToChangelogFile="true"/>
 
+    <include file="db.changelog-1.24.xml"
+             relativeToChangelogFile="true"/>
+
+    <include file="db.changelog-1.25.xml"
+             relativeToChangelogFile="true"/>
+
+    <include file="db.changelog-1.26.xml"
+             relativeToChangelogFile="true"/>
+
+    <include file="db.changelog-1.27.xml"
+             relativeToChangelogFile="true"/>
+
+    <include file="db.changelog-1.28.xml"
+             relativeToChangelogFile="true"/>
+
 </databaseChangeLog>

@@ -386,18 +386,14 @@ function drawLabels(section, items = [], scale, anchor = "start", tweakers) {
     newLabels
         .append("text")
         .classed("wsat-icon",true)
-        .attrs({
-            "dx": iconAdjustment,
-            "font-family": "FontAwesome"
-        });
+        .attr("dx", iconAdjustment)
+        .attr("font-family", "FontAwesome");
 
     newLabels
         .append("text")
         .classed("wsat-cuIcon",true)
-        .attrs({
-            "dx": cuIconAdjustment,
-            "font-family": "FontAwesome"
-        });
+        .attr("dx", cuIconAdjustment)
+        .attr("font-family", "FontAwesome");
 
     newLabels
         .append("title");
@@ -457,11 +453,10 @@ function drawArcs(section, model, layoutFn) {
         .classed(styles.ARC, d => d.entityLifecycleStatus === "ACTIVE")
         .classed(styles.ARC_REMOVED, d => d.entityLifecycleStatus === "REMOVED")
         .classed(styles.ARC_PENDING, d => d.entityLifecycleStatus === "PENDING")
-        .attrs({
-            opacity: 0,
-            stroke: d => authoritativeRatingColorScale(d.rating),
-            fill: d => authoritativeRatingColorScale(d.rating).brighter(),
-        });
+        .attr("opacity", 0)
+        .attr("stroke", d => authoritativeRatingColorScale(d.rating))
+        .attr("fill", d => authoritativeRatingColorScale(d.rating).brighter());
+
 
     arcs
         .merge(newArcs)
@@ -494,33 +489,29 @@ function drawTypeBoxes(section, model, scale, dimensions, tweakers) {
         .enter()
         .append("rect")
         .classed("wsat-type-box", true)
-        .attrs({
-            fill: "#fafafa",
-            stroke: "#ccc",
-            y: d => scale(d.id) - dimensions.height - 2,
-            x: dimensions.width / 2 * -1 + 2,
-            opacity: 0
-        });
+        .attr("fill", "#fafafa")
+        .attr("stroke", "#ccc")
+        .attr("y", d => scale(d.id) - dimensions.height - 2)
+        .attr("x", dimensions.width / 2 * -1 + 2)
+        .attr("opacity", 0);
 
     boxes
         .merge(newBoxes)
         .transition()
         .duration(animationDuration)
-        .attrs({
-            x: (d) => {
-                const x = dimensions.width / 2 * -1 + 2;
-                return hasIncoming(d.id)
-                    ? x
-                    : x + 20;
-            },
-            y: d => scale(d.id) - dimensions.height - 2,
-            width: (d) => {
-                const b = dimensions.width - 4;
-                return b - (hasIncoming(d.id) ? 0 : 20) - (hasOutgoing(d.id) ? 0 : 20);
-            },
-            height: dimensions.height + 6,
-            opacity: 1
-        });
+        .attr("x", (d) => {
+            const x = dimensions.width / 2 * -1 + 2;
+            return hasIncoming(d.id)
+                ? x
+                : x + 20;
+        })
+        .attr("y", d => scale(d.id) - dimensions.height - 2)
+        .attr("width", (d) => {
+            const b = dimensions.width - 4;
+            return b - (hasIncoming(d.id) ? 0 : 20) - (hasOutgoing(d.id) ? 0 : 20);
+        })
+        .attr("height", dimensions.height + 6)
+        .attr("opacity", 1);
 
     boxes
         .exit()
@@ -563,19 +554,15 @@ function drawCenterBox(section, dimensions, name = "") {
         .enter()
         .append("rect")
         .classed("center-box", true)
-        .attrs({
-            fill: "#f5f5f5",
-            stroke: "#ddd"
-        });
+        .attr("fill", "#f5f5f5")
+        .attr("stroke", "#ddd");
 
     centerBox
         .merge(newCenterBox)
-        .attrs({
-            x: -90,
-            y: 0,
-            width: 180,
-            height: dimensions.graph.height - dimensions.margin.bottom + 8
-        });
+        .attr("x", -90)
+        .attr("y", 0)
+        .attr("width", 180)
+        .attr("height", dimensions.graph.height - dimensions.margin.bottom + 8);
 
     section.append("text")
         .attr("transform", "translate(0,16)")

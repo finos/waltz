@@ -29,12 +29,15 @@
         <div>
 
             <waltz-logical-flow-diagram data="$ctrl.filteredFlowData"
-                                        tweakers="$ctrl.graphTweakers">
+                                        ng-if="!$ctrl.visibility.loadingFlows"
+                                        tweakers="$ctrl.graphTweakers"
+                                        filter-options="$ctrl.filterOptions">
 
                 <filter-control>
                     <waltz-flow-filter-options visible="$ctrl.optionsVisible"
                                                on-change="$ctrl.filterChanged"
-                                               used-types="$ctrl.usedDataTypes">
+                                               used-types="$ctrl.usedDataTypes"
+                                               used-tags="$ctrl.tags">
                     </waltz-flow-filter-options>
                 </filter-control>
 

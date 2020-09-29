@@ -58,3 +58,15 @@ $invalid-color: #f0ad4e;
 .waltz-survey-summary-row {
     padding-bottom: 6px;
 }
+
+ .waltz-survey-question-section {
+     border: 1px solid #eee;
+     border-radius: 3px;
+     padding: 1em;
+     margin: 1em;
+     background: #fcfcfc;
+
+     &:hover {
+         background: #fafafa;
+     }
+ }

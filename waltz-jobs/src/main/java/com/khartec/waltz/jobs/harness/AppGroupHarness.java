@@ -18,46 +18,30 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.application.ApplicationDao;
+import com.khartec.waltz.common.exception.InsufficientPrivelegeException;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.app_group.AppGroupEntry;
 import com.khartec.waltz.service.DIConfiguration;
+import com.khartec.waltz.service.app_group.FavouritesService;
 import org.jooq.DSLContext;
-import org.jooq.Record1;
-import org.jooq.Select;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.util.List;
-
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
+import java.util.Collection;
 
 
 public class AppGroupHarness {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InsufficientPrivelegeException {
         System.out.println("--- start");
 
         ApplicationIdSelectorFactory appSelectorFactory = new ApplicationIdSelectorFactory();
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
-        ApplicationDao applicationDao = ctx.getBean(ApplicationDao.class);
+        FavouritesService service = ctx.getBean(FavouritesService.class);
 
-        EntityReference grp5 = mkRef(EntityKind.APP_GROUP, 5);
-        Select<Record1<Long>> selector = appSelectorFactory.apply(mkOpts(grp5));
-
-        System.out.println(dsl.render(selector));
-        List<Application> apps = applicationDao.findByAppIdSelector(selector);
-
-        System.out.println(apps.size());
+        Collection<AppGroupEntry> appGroupEntries = service.addApplication("jessica.woodland-scott@db.com", 15792);
 
         System.out.println("--- done");
-
-
-
     }
-
 }

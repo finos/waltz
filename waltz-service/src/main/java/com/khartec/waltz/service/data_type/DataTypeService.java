@@ -20,8 +20,11 @@ package com.khartec.waltz.service.data_type;
 
 import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.data_type.search.DataTypeSearchDao;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -63,6 +66,10 @@ public class DataTypeService {
         return dataTypeDao.getByCode(code);
     }
 
+    public List<EntityReference> findByIdSelector(Select<Record1<Long>> selector) {
+        return dataTypeDao.findByIdSelectorAsEntityReference(selector);
+    }
+
 
     public Collection<DataType> search(EntitySearchOptions options) {
         return searchDao.search(options);
@@ -78,5 +85,10 @@ public class DataTypeService {
                 .stream()
                 .filter(DataType::unknown)
                 .findFirst();
+    }
+
+
+    public Collection<DataType> findSuggestedBySourceEntityRef(EntityReference source){
+        return dataTypeDao.findSuggestedBySourceEntityRef(source);
     }
 }

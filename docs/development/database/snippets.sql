@@ -22,12 +22,24 @@ WHERE
   m.measurable_kind = 'PROCESS'
 ;
 
--- update parent id's based on external parent ids
+-- update parent id's based on external parent ids (mssql)
 UPDATE child
 SET child.parent_id = parent.id
 FROM measurable AS child
   INNER JOIN measurable AS parent ON parent.external_id = child.external_parent_id
-WHERE child.measurable_category_id = 12;
+WHERE child.measurable_category_id = 18;
+
+
+-- update parent id's based on external parent ids (postgres)
+update measurable
+set parent_id = d.pid
+from (
+    select c.id, p.id
+    from measurable c
+    inner join measurable p on p.external_id = c.external_parent_id and p.measurable_category_id = 18
+    where c.measurable_category_id = 18) d (cid, pid)
+where id = d.cid;
+
 
 -- apps in and org unit without any ratings against a measurable category
 select * from application
@@ -181,3 +193,16 @@ where lf.is_removed = 0
       and ( src.organisational_unit_id in (select id from entity_hierarchy where ancestor_id = 4566 and kind = 'ORG_UNIT')
             OR -- 4566 is an OU id
             trg.organisational_unit_id in (select id from entity_hierarchy where ancestor_id = 4566 and kind = 'ORG_UNIT'));
+
+
+-- Query to recover tags of flows that were replaced with new flows
+insert into tag_usage
+select distinct tu.tag_id, ei.entity_id, ei.entity_kind, max(tu.created_at) as 'created_at', tu.created_by, tu.provenance
+from tag t
+inner join tag_usage tu on tu.tag_id = t.id
+inner join physical_flow pf on pf.id = tu.entity_id
+inner join external_identifier ei on ei.external_id = pf.external_id and ei.entity_kind = 'PHYSICAL_FLOW'
+where tu.entity_kind = 'PHYSICAL_FLOW'
+and pf.entity_lifecycle_status = 'REMOVED'
+and not exists (select * from tag_usage tu2 where tu2.tag_id = tu.tag_id and tu2.entity_id = ei.entity_id and tu2.entity_kind = ei.entity_kind)
+group by tu.tag_id, ei.entity_id, ei.entity_kind, tu.created_by, tu.provenance

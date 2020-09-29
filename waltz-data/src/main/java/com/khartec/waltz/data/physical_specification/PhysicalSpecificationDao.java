@@ -216,4 +216,11 @@ public class PhysicalSpecificationDao {
                 .from(PHYSICAL_SPECIFICATION)
                 .where(in);
     }
+
+    public int makeActive(Long specificationId) {
+        return dsl.update(PHYSICAL_SPECIFICATION)
+                .set(PHYSICAL_SPECIFICATION.IS_REMOVED, false)
+                .where(PHYSICAL_SPECIFICATION.ID.eq(specificationId))
+                .execute();
+    }
 }

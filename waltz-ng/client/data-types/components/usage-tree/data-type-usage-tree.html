@@ -19,24 +19,61 @@
 <div class="waltz-data-type-usage-tree">
     <treecontrol class="tree-light"
                  tree-model="$ctrl.hierarchy"
-                 order-by="'-name'"
+                 order-by="'-dataType.name'"
                  expanded-nodes="$ctrl.expandedNodes"
                  options="$ctrl.treeOptions">
-            <span uib-popover="{{node.description}}"
-                  popover-trigger="mouseenter"
-                  popover-popup-delay="400"
-                  popover-append-to-body="true"
-                  class="waltz-visibility-parent"
-                  ng-class="{
-                    'wdtut-implicit' : !node.explicit,
-                    'wdtut-explicit' : node.explicit
-                  }">
-                <span ng-bind="node.name">
-                </span>
+        <span uib-popover-template="'wdtut-popover.html'"
+              popover-trigger="mouseenter"
+              popover-popup-delay="400"
+              popover-append-to-body="true"
+              class="waltz-visibility-parent"
+              ng-class="{
+                'waltz-tree-node-implicit': !node.usage,
+                'waltz-tree-node-explicit': node.usage
+              }">
+            <span ng-bind="node.dataType.name">
+            </span>
+            <span style="position: relative; top: -1px"
+                  class="waltz-visibility-child-30">
+                <waltz-icon name="info-circle"
+                            class="waltz-warning-icon"
+                            ng-if="node.usage.warningMessageForViewers">
+                </waltz-icon>
+                <waltz-icon name="lock"
+                            ng-if="node.usage.readOnly">
+                </waltz-icon>
                 <a class='waltz-visibility-child-30 small'
-                   ui-sref="main.data-type.view ({id: node.id })">
+                   ui-sref="main.data-type.view ({id: node.dataType.id })">
                     (more)
                 </a>
             </span>
+        </span>
     </treecontrol>
 </div>
+
+<script type="text/ng-template"
+        id="wdtut-popover.html">
+    <div class="small">
+        <div ng-bind="node.dataType.description">
+        </div>
+
+        <div ng-if="node.usage.warningMessageForViewers"
+             style="border-top: 1px solid #eee; margin-top: 12px; padding-top: 4px"
+             class="text-muted">
+            <waltz-icon name="info-circle">
+            </waltz-icon>
+            <span ng-bind="node.usage.warningMessageForViewers">
+            </span>
+        </div>
+
+        <div ng-if="node.usage.readOnly"
+             style="border-top: 1px solid #eee; margin-top: 12px; padding-top: 4px"
+             class="text-muted">
+            <waltz-icon name="lock">
+            </waltz-icon>
+            <span>
+                This datatype mapping is locked and cannot be changed within Waltz.
+            </span>
+        </div>
+    </div>
+</script>

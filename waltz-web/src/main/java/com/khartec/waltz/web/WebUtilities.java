@@ -37,11 +37,12 @@ import spark.Response;
 import spark.ResponseTransformer;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.Checks.checkAll;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ObjectUtilities.firstNotNull;
 import static com.khartec.waltz.common.SetUtilities.asSet;
@@ -75,21 +76,10 @@ public class WebUtilities {
 
 
     /**
-     * Given a vararg/array of path segments will join them
-     * to make a string representing the path.  No starting or trailing
-     * slashes are added to the resultant path string.
-     *
-     * @param segs Segments to join
-     * @return String representing the path produced by joining the segments
-     * @throws IllegalArgumentException If any of the segments are null
+     * @see StringUtilities
      */
     public static String mkPath(String... segs) {
-        checkAll(
-                segs,
-                x -> StringUtilities.notEmpty(x),
-                "Cannot convert empty segments to path");
-
-        return String.join("/", segs);
+        return StringUtilities.mkPath(segs);
     }
 
 
@@ -362,6 +352,21 @@ public class WebUtilities {
         return Optional
                 .ofNullable(limitVal)
                 .map(s -> Integer.valueOf(s));
+    }
+
+
+    public static Optional<Date> getDateParam(Request request) {
+        String dateVal = request.queryParams("date");
+        return Optional
+                .ofNullable(dateVal)
+                .map(s -> {
+                    try {
+                        return new SimpleDateFormat("yyyy-MM-dd").parse(s);
+                    } catch (ParseException pe) {
+                        LOG.warn("Could not parse date: " + s);
+                        return null;
+                    }
+                });
     }
 
 

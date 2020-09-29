@@ -50,15 +50,19 @@ public class MeasurableCategoryEndpoint implements Endpoint {
     public void register() {
         String findAllPath = mkPath(BASE_URL, "all");
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
+        String getCategoriesByDirectOrgUnitPath = mkPath(BASE_URL, "direct", "org-unit", ":id");
 
         ListRoute<MeasurableCategory> findAllRoute = (request, response)
                 -> measurableCategoryService.findAll();
 
+        ListRoute<MeasurableCategory> findCategoriesByDirectOrgUnitRoute = (request, response)
+                -> measurableCategoryService.findCategoriesByDirectOrgUnit(getId(request));
 
         DatumRoute<MeasurableCategory> getByIdRoute = (request, response)
                 -> measurableCategoryService.getById(getId(request));
 
         getForList(findAllPath, findAllRoute);
+        getForList(getCategoriesByDirectOrgUnitPath, findCategoriesByDirectOrgUnitRoute);
         getForDatum(getByIdPath, getByIdRoute);
     }
 

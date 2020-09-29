@@ -19,6 +19,7 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
+import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.*;
@@ -52,6 +53,7 @@ public class LogicalFlowExtractor extends DirectQueryBasedDataExtractor {
             newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
 
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
+    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
 
     @Autowired
     public LogicalFlowExtractor(DSLContext dsl) {
@@ -72,6 +74,10 @@ public class LogicalFlowExtractor extends DirectQueryBasedDataExtractor {
     private SelectConditionStep<Record> prepareQuery(DSLContext dsl, IdSelectionOptions options) {
 
         Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(options);
+
+        Condition conditionForDataType = EntityKind.DATA_TYPE.equals(options.entityReference().kind())
+                ? LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeIdSelectorFactory.apply(options))
+                : DSL.trueCondition();
 
         Field<Long> sourceFlowId = LOGICAL_FLOW.ID.as("sourceFlowId");
         Field<Long> targetFlowId = LOGICAL_FLOW.ID.as("targetFlowId");
@@ -142,6 +148,7 @@ public class LogicalFlowExtractor extends DirectQueryBasedDataExtractor {
                     .on(ENUM_VALUE.KEY.eq(LOGICAL_FLOW_DECORATOR.RATING)
                             .and(ENUM_VALUE.TYPE.eq("AuthoritativenessRating")))
                 .where(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name()))
+                .and(conditionForDataType)
                 .and(sourceFlowId.isNotNull()
                         .or(targetFlowId.isNotNull()));
 

@@ -19,11 +19,13 @@
 <waltz-page-header icon="gift"
                    name="{{ $ctrl.softwarePackage.name }}"
                    small="{{ $ctrl.softwarePackage.externalId }}">
-    <ol class="waltz-breadcrumbs">
-        <li><a ui-sref="main">Home</a></li>
-        <li><span>Software</span></li>
-        <li><span ng-bind="$ctrl.softwarePackage.name"></span></li>
-    </ol>
+    <breadcrumbs>
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><span>Software</span></li>
+            <li><span ng-bind="$ctrl.softwarePackage.name"></span></li>
+        </ol>
+    </breadcrumbs>
 </waltz-page-header>
 
 

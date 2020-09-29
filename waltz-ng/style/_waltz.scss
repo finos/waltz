@@ -19,32 +19,33 @@
 @import "breadcrumbs";
 @import "bootstrap-styles";
 @import "grid";
-@import "waltz-field-table";
+@import "util";
 @import "waltz-draft";
+@import "waltz-field-table";
+@import "waltz-icons";
 @import "waltz-inactive";
 @import "waltz-popover-width";
 @import "waltz-scroll-region";
 @import "waltz-tabs";
 @import "waltz-text-muted";
+@import "waltz-tree";
 @import "waltz-visibility";
 
 @import "../client/allocation/components/entity-sub-section/allocation-entity-sub-section";
 @import "../client/applications/components/bulk-application-selector/bulk-application-selector";
+@import "../client/assessments/index";
 @import "../client/asset-cost/components/graph/asset-costs-graph";
 @import "../client/attestation/attestation";
 @import "../client/attestation/components/confirmation/attestation-confirmation";
 @import "../client/auth-sources/components/non-auth-sources-panel/non-auth-sources-panel";
-@import "../client/drill-grid/components/drill-grid-chart/drill-grid-chart";
 @import "../client/auth-sources/components/table/auth-sources-table";
 @import "../client/bookmarks/components/bookmark-kinds/bookmark-kinds";
 @import "../client/change-initiative/directives/change-initiative-selector";
 @import "../client/change-unit/components/data-type-change-panel/data-type-change-panel";
 @import "../client/common/common";
 @import "../client/complexity/components/chart/complexity-bar-chart";
-@import "../client/data-flow/components/application-flow-summary-pane/application-flow-summary-pane";
 @import "../client/data-types/components/usage-count-tree/data-type-usage-count-tree";
 @import "../client/data-types/components/usage-panel/data-type-usage-panel";
-@import "../client/data-types/components/usage-tree/data-type-usage-tree";
 @import "../client/data-type-usage/components/editor/app-data-type-usage-editor";
 @import "../client/data-type-usage/directives/app-data-type-usage-list";
 @import "../client/dynamic-section/components/dynamic-section-navigation/dynamic-section-navigation";
@@ -70,6 +71,7 @@
 @import "../client/measurable-rating/components/tree/measurable-rating-tree";
 @import "../client/measurable-rating/components/browser-tree-panel/measurable-ratings-browser-tree-panel";
 @import "../client/navbar/styles";
+@import "../client/notification/components/notification-panel/outstanding-actions-notification-panel";
 @import "../client/org-units/pages/list-view/list-view";
 @import "../client/playpen/playpen";
 @import "../client/playpen/5/playpen5";
@@ -285,6 +287,7 @@ textarea {
 
 
 .waltz-content {
+    margin-top: 25px;
     margin-bottom: 40px;
 }
 
@@ -306,7 +309,7 @@ textarea {
 
 
 .waltz-side-nav-help {
-    @extend small;
+    @extend small !optional;
     color: $text-muted;
     white-space: normal !important;
 }
@@ -317,7 +320,7 @@ textarea {
     padding: 0 6px 4px 6px;
     border-radius: 3px;
     border: 1px solid $waltz-border-color-lighter;
-    @include box-shadow(4px, 4px, 4px, $waltz-border-color);
+    @include waltz-box-shadow();
 
     .dismiss:hover {
         color: mediumblue;
@@ -356,18 +359,18 @@ a.subtle-link:hover {
 
 
 .waltz-action-link {
-    @extend .clickable;
+    @extend .clickable !optional;
     border-bottom: 1px blue dashed;
 }
 
 
 .waltz-btn-transparent {
-    @extend .btn-default;
+    @extend .btn-default !optional;
     background-color: transparent;
 }
 
 .waltz-error {
-    @extend small;
+    @extend small !optional;
     padding: 2px 4px;
     color: #c7254e;
     background-color: #f4edef;

@@ -19,11 +19,13 @@
 <div>
     <waltz-page-header icon="wpforms"
                        name="Survey Templates">
-        <ol class="waltz-breadcrumbs">
-            <li><a ui-sref="main">Home</a></li>
-            <li><a ui-sref="main.survey.instance.user">Survey</a></li>
-            <li>Templates</li>
-        </ol>
+        <breadcrumbs>
+            <ol class="waltz-breadcrumbs">
+                <li><a ui-sref="main">Home</a></li>
+                <li><a ui-sref="main.survey.instance.user">Survey</a></li>
+                <li>Templates</li>
+            </ol>
+        </breadcrumbs>
     </waltz-page-header>
 
     <div class="waltz-page-summary waltz-page-summary-attach">
@@ -52,8 +54,8 @@
                     <col width="30%">
                     <col width="10%">
                     <col width="10%">
-                    <col width="20%">
-                    <col width="30%">
+                    <col width="15%">
+                    <col width="35%">
                 </colgroup>
                 <thead>
                 <tr>
@@ -82,8 +84,7 @@
                         <span ng-bind="ctrl.owners[template.ownerId].displayName"></span>
                     </td>
                     <td>
-                        <waltz-markdown class='small'
-                                        text="template.description | limitTo:100">
+                        <waltz-markdown text="template.description | limitTo:100">
                         </waltz-markdown>
                         <span ng-if="template.description.length > 100">...</span>
                     </td>

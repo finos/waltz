@@ -20,6 +20,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.tag.Tag;
 import com.khartec.waltz.service.tag.TagService;
 import com.khartec.waltz.web.DatumRoute;
@@ -70,9 +71,16 @@ public class TagEndpoint implements Endpoint {
             return tagService.findTagsForEntityKind(entityKind);
         };
 
+        ListRoute<Tag> findTagsForEntityKindAndTargetSelector = (req, resp) -> {
+            EntityKind entityKind = getKind(req);
+            IdSelectionOptions options = readIdSelectionOptionsFromBody(req);
+            return tagService.findTagsForEntityKindAndTargetSelector(entityKind, options);
+        };
+
         getForDatum(mkPath(BASE_URL, "id", ":id"), getByIdRoute);
         getForList(mkPath(BASE_URL, "entity", ":kind", ":id"), findTagsForEntityReference);
         getForList(mkPath(BASE_URL, "target-kind", ":kind"), findTagsForEntityKind);
+        postForList(mkPath(BASE_URL, "target-kind", ":kind", "target-selector"), findTagsForEntityKindAndTargetSelector);
         postForList(mkPath(BASE_URL, "entity", ":kind", ":id"), updateRoute);
     }
 

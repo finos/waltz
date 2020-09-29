@@ -71,8 +71,8 @@ function mkTabDefinitionsForKind(kind) {
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    const mkSelector = () => {
-        const scope = vm.parentEntityRef.kind === entity.ORG_UNIT.key
+    const mkSelector = (useDefaultScopeForOrgUnit = true) => {
+        const scope = vm.parentEntityRef.kind === entity.ORG_UNIT.key && useDefaultScopeForOrgUnit
             ? hierarchyQueryScope.PARENTS.key
             : determineDownwardsScopeForKind(vm.parentEntityRef.kind);
 
@@ -84,7 +84,7 @@ function controller(serviceBroker) {
     };
 
     const loadNonAuthSources = () => {
-        const selector = mkSelector();
+        const selector = mkSelector(false);
         serviceBroker
             .loadViewData(
                 CORE_API.AuthSourcesStore.findNonAuthSources,

@@ -17,25 +17,31 @@
  */
 
 import angular from "angular";
-import {registerStores} from "../common/module-utils";
+import {registerComponents, registerStores} from "../common/module-utils";
 import changeLogStore from "./services/change-log-store";
-import Routes from './routes';
-import ChangeLogSection from './components/change-log-section';
-import ChangeLogTable from './components/change-log-table';
+import changeLogSummariesStore from "./services/change-log-summaries-store";
+import Routes from "./routes";
+import ChangeLogSection from "./components/change-log-section";
+import ChangeLogTable from "./components/change-log-table";
+import ChangeBreakdownTable from "./components/breakdown-table/change-breakdown-table";
+import ChangeSummariesPanel from "./components/summaries-panel/change-summaries-panel";
 
 export default () => {
-    const module = angular.module('waltz.change.log', []);
+    const module = angular.module("waltz.change.log", []);
 
     module
         .config(Routes);
 
     registerStores(module, [
-        changeLogStore
+        changeLogStore,
+        changeLogSummariesStore
     ]);
 
+    registerComponents(module, [ChangeBreakdownTable, ChangeSummariesPanel]);
+
     module
-        .component('waltzChangeLogSection', ChangeLogSection)
-        .component('waltzChangeLogTable', ChangeLogTable);
+        .component("waltzChangeLogSection", ChangeLogSection)
+        .component("waltzChangeLogTable", ChangeLogTable);
 
     return module.name;
 };

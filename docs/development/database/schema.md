@@ -21,3 +21,13 @@
 - The associated issues should be bubbled up to the relevant release notes
 
 
+## Rollback
+
+Liquibase supports DDL rollback.  As of Waltz 1.25 you may rollback the schema by issuing 
+the `rollback <tagname>` command.  e.g.:
+
+```shell script
+$ ./liquibase-pg.sh rollback v1.25
+```
+
+

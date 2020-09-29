@@ -22,6 +22,7 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
+import com.khartec.waltz.model.assessment_definition.AssessmentVisibility;
 import com.khartec.waltz.model.assessment_rating.*;
 import com.khartec.waltz.service.assessment_definition.AssessmentDefinitionService;
 import com.khartec.waltz.service.assessment_rating.AssessmentRatingService;
@@ -70,10 +71,12 @@ public class AssessmentRatingEndpoint implements Endpoint {
     @Override
     public void register() {
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
+        String findByEntityKindPath = mkPath(BASE_URL, "entity-kind", ":kind");
         String findByTargetKindForRelatedSelectorPath = mkPath(BASE_URL, "target-kind", ":targetKind", "selector");
         String modifyPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId");
 
         getForList(findForEntityPath, this::findForEntityRoute);
+        postForList(findByEntityKindPath, this::findByEntityKindRoute);
         postForList(findByTargetKindForRelatedSelectorPath, this::findByTargetKindForRelatedSelectorRoute);
         postForDatum(modifyPath, this::storeRoute);
         deleteForDatum(modifyPath, this::removeRoute);
@@ -87,7 +90,14 @@ public class AssessmentRatingEndpoint implements Endpoint {
 
 
     private List<AssessmentRating> findForEntityRoute(Request request, Response response) {
+
         return assessmentRatingService.findForEntity(getEntityReference(request));
+    }
+
+
+    private List<AssessmentRating> findByEntityKindRoute(Request request, Response response) throws IOException {
+        List<AssessmentVisibility> visibilities = readList(request, AssessmentVisibility.class);
+        return assessmentRatingService.findByEntityKind(getKind(request, "kind"), visibilities);
     }
 
 

@@ -21,6 +21,7 @@ import {CORE_API} from "../common/services/core-api-utils";
 import {downloadTextFile} from "../common/file-utils";
 
 import template from "./flow-diagram-view.html";
+import {entity} from "../common/services/enums/entity";
 
 const initialState = {
     visibility: {},
@@ -119,7 +120,7 @@ function controller(
             .then(r => r.data);
 
         const physicalSpecDataTypesPromise = serviceBroker
-            .loadViewData(CORE_API.PhysicalSpecDataTypeStore.findBySpecificationSelector, [selector])
+            .loadViewData(CORE_API.DataTypeDecoratorStore.findBySelector, [ selector, entity.PHYSICAL_SPECIFICATION.key ])
             .then(result => result.data);
 
         const logicalFlowPromise = serviceBroker
@@ -135,7 +136,7 @@ function controller(
                             {},
                             psdt,
                             { dataTypeName: displayNameService.lookup("dataType", psdt.dataTypeId) }))
-                        .groupBy("specificationId")
+                        .groupBy("entityReference.id")
                         .value();
                 const enhancedPhysicalFlows = _.map(physicalFlows, pf => Object.assign(
                     {},
@@ -164,10 +165,10 @@ function controller(
         vm.visibility.layers = flowDiagramStateService.getState().visibility.layers;
 
     vm.clickHandlers =  {
-        node: d => $timeout(
+        node: (d) => $timeout(
             () => vm.highlightIds = [d.data.id],
             0),
-        flowBucket: d => $timeout(
+        flowBucket: (d) => $timeout(
             () => vm.highlightIds = [d.data.id],
             0)
     };

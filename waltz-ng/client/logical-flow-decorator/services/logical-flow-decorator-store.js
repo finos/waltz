@@ -24,52 +24,11 @@ export function store($http,
 
     const BASE = `${baseUrl}/logical-flow-decorator`;
 
-    const findBySelectorAndKind = (selector, kind = 'DATA_TYPE') => {
-        checkIsApplicationIdSelector(selector);
-        return $http
-            .post(`${BASE}/selector/kind/${kind}`, selector)
-            .then(result => result.data);
-    };
-
-
-    const findByFlowIdsAndKind = (flowIds = [], kind = 'DATA_TYPE') => {
-        return $http
-            .post(`${BASE}/flow-ids/kind/${kind}`, flowIds)
-            .then(result => result.data);
-    };
-
-
-    const findBySelector = (selector) => {
-        checkIsIdSelector(selector);
-        return $http
-            .post(`${BASE}/selector`, selector)
-            .then(result => result.data);
-    };
-
-
     const findDataTypeStatsForEntity = (selector) => {
         checkIsIdSelector(selector);
         return $http
             .post(`${BASE}/datatype-stats`, selector)
             .then(result => result.data);
-    };
-
-
-    /**
-     * where command like:
-     *    {
-     *      flowId: <number>,
-     *      addedDecorators: [<entityRef>],
-     *      removedDecorators: [<entityRef>]
-     *    }
-     *
-     * @param command
-     * @returns {*|Promise.<FlowDecorator>}
-     */
-    const updateDecorators = (command) => {
-        return $http
-            .post(`${BASE}/update/flow/${command.flowId}`, command)
-            .then(r => r.data);
     };
 
 
@@ -90,7 +49,7 @@ export function store($http,
     };
 
 
-        /**
+    /**
      * Given a selector returns a promising giving results like:
      *
      *      [
@@ -121,11 +80,7 @@ export function store($http,
     };
 
     return {
-        findBySelectorAndKind,
-        findBySelector,
-        findByFlowIdsAndKind,
         findDataTypeStatsForEntity,
-        updateDecorators,
         updateDecoratorsBatch,
         summarizeInboundBySelector,
         summarizeOutboundBySelector,
@@ -143,30 +98,10 @@ export const serviceName = "LogicalFlowDecoratorStore";
 
 
 export const LogicalFlowDecoratorStore_API = {
-    findBySelectorAndKind: {
-        serviceName,
-        serviceFnName: 'findBySelectorAndKind',
-        description: 'executes findBySelectorAndKind'
-    },
-    findBySelector: {
-        serviceName,
-        serviceFnName: 'findBySelector',
-        description: 'executes findBySelector'
-    },
-    findByFlowIdsAndKind: {
-        serviceName,
-        serviceFnName: 'findByFlowIdsAndKind',
-        description: 'executes findByFlowIdsAndKind - arg1: [flowIds], arg2: decoratorKind'
-    },
     findDataTypeStatsForEntity: {
         serviceName,
         serviceFnName: 'findDataTypeStatsForEntity',
         description: 'executes findDataTypeStatsForEntity'
-    },
-    updateDecorators: {
-        serviceName,
-        serviceFnName: 'updateDecorators',
-        description: 'executes updateDecorators'
     },
     updateDecoratorsBatch: {
         serviceName,

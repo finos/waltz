@@ -55,7 +55,6 @@ public class LicenceDao {
                 .name(record.getName())
                 .description(record.getDescription())
                 .externalId(record.getExternalId())
-                .approvalStatus(ApprovalStatus.valueOf(record.getApprovalStatus()))
                 .created(UserTimestamp.mkForUser(record.getCreatedBy(), record.getCreatedAt()))
                 .lastUpdated(UserTimestamp.mkForUser(record.getLastUpdatedBy(), record.getLastUpdatedAt()))
                 .provenance(record.getProvenance())

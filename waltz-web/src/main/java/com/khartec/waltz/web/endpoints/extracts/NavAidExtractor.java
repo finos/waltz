@@ -7,6 +7,7 @@ import com.khartec.waltz.service.measurable.MeasurableService;
 import com.khartec.waltz.service.svg.SvgDiagramService;
 import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +27,7 @@ import static spark.Spark.get;
 @Service
 public class NavAidExtractor extends BinaryDataBasedDataExtractor {
 
-    @Value("${waltz.base.url}")
+    @Value("${waltz.base.url:localhost}")
     private String baseUrl;
 
     private final MeasurableService measurableService;

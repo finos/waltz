@@ -29,10 +29,6 @@ const bindings = {
     small: "@"
 };
 
-
-const transclude = true;
-
-
 const initialState = {
     stickyVisible: false
 };
@@ -83,7 +79,10 @@ const component = {
     bindings,
     template,
     controller,
-    transclude
+    transclude: {
+        "breadcrumbs": "?breadcrumbs",
+        "actions": "?actions"
+    }
 };
 
 export default component;

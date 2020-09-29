@@ -42,15 +42,14 @@
                 <div ng-if="$ctrl.visibility.editor"
                      class="waltz-highlight-if">
                     <waltz-data-type-usage-selector parent-entity-ref="$ctrl.parentEntityRef"
+                                                    parent-flow="$ctrl.parentFlow"
                                                     on-dirty="$ctrl.onDirty"
                                                     on-register-save="$ctrl.registerSaveFn">
                     </waltz-data-type-usage-selector>
                 </div>
             </div>
 
-
-
-
+            <!-- ACTIONS -->
             <div class="waltz-sub-section-controls"
                  waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
                 <span ng-if="!$ctrl.visibility.editor">

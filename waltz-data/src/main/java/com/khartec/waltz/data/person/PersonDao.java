@@ -221,4 +221,13 @@ public class PersonDao {
                 .where(PERSON.ID.in(ids))
                 .fetchSet(personMapper);
     }
+
+    public Set<Person> findByEmployeeIds(Set<String> empIds) {
+
+        return dsl
+                .selectFrom(PERSON)
+                .where(PERSON.EMPLOYEE_ID.in(empIds)
+                        .and(PERSON.IS_REMOVED.isFalse()))
+                .fetchSet(personMapper);
+    }
 }

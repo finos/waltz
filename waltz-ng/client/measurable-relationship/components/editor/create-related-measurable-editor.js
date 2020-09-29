@@ -19,7 +19,7 @@ import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {availableRelationshipKinds} from "./related-measurable-editor-utils";
-import {buildHierarchies, doSearch, prepareSearchNodes} from "../../../common/hierarchy-utils";
+import {doSearch, prepareSearchNodes} from "../../../common/hierarchy-utils";
 import {refToString, toEntityRef} from "../../../common/entity-utils";
 
 import template from "./create-related-measurable-editor.html";
@@ -55,6 +55,7 @@ const initialState = {
         measurableSelector: false
     },
     checkedItemIds: [],
+    disableNode: n => !n.concrete
 };
 
 
@@ -64,13 +65,16 @@ function readCategoryId(compoundId) {
 }
 
 
-function prepareTree(nodes = []) {
-    return buildHierarchies(nodes, false);
-}
-
-
 function controller(notification, serviceBroker) {
     const vm = initialiseData(this, initialState);
+
+     const setDefaultRelationshipKind = (counterpart) => {
+        serviceBroker
+            .loadViewData(
+                CORE_API.RelationshipKindStore.findRelationshipKindsBetweenEntities,
+                [vm.parentEntityRef, counterpart])
+            .then(r => vm.form.relationshipKind = _.first(_.sortBy(r.data, 'position')).code);
+    };
 
     const loadRelationships = (autoExpand = false) => {
 
@@ -107,15 +111,12 @@ function controller(notification, serviceBroker) {
         serviceBroker
             .loadAppData(CORE_API.MeasurableStore.findAll)
             .then(r => {
-                vm.measurables = _
-                    .chain(r.data)
-                    .filter(m => m.categoryId === categoryId)
-                    .map(d => Object.assign({}, d, {disable: !d.concrete}))
-                    .value();
+                vm.measurables = _.filter(r.data, m => m.categoryId === categoryId);
                 vm.measurablesById = _.keyBy(vm.measurables, d => d.id);
                 vm.searchNodes = prepareSearchNodes(vm.measurables);
-                vm.nodes = prepareTree(vm.measurables);
-            });
+                vm.nodes = vm.measurables;
+            })
+            .then(() => setDefaultRelationshipKind(_.first(vm.measurables)));
 
     };
 
@@ -174,10 +175,12 @@ function controller(notification, serviceBroker) {
 
     vm.onAppGroupSelection = (appGroup) => {
         vm.form.counterpart = appGroup;
+        setDefaultRelationshipKind(vm.form.counterpart);
     };
 
     vm.onChangeInitiativeSelection = (changeInitiative) => {
         vm.form.counterpart = changeInitiative;
+        setDefaultRelationshipKind(vm.form.counterpart);
     };
 
     vm.onItemCheck = (node) => {
@@ -228,8 +231,17 @@ function controller(notification, serviceBroker) {
 
 
     vm.searchTermsChanged = (termStr = "") => {
-        vm.nodes = prepareTree(doSearch(termStr, vm.searchNodes));
+        vm.nodes = doSearch(termStr, vm.searchNodes);
+        vm.expandedItemIds = _.map(vm.nodes,n => n.id);
     };
+
+
+    vm.clearSearch = () => {
+        vm.searchTerms = "";
+        vm.nodes = vm.measurables;
+        vm.expandedItemIds = vm.checkedItemIds;
+    };
+
 
     // -- API ---
 

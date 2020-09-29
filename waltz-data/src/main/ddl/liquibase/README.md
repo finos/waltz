@@ -22,26 +22,26 @@ Strictly speaking the date is not required but it helps when searching for chang
 
 ### Sample .bat file (MariaDB)
 ```
-C:/tools/liquibase-3.5.1-bin/liquibase.bat ^
+C:/tools/liquibase-3.5.5-bin/liquibase.bat ^
 --driver=org.mariadb.jdbc.Driver ^
 --classpath=<path to driver>/mariadb-java-client-1.4.6.jar ^
 --changeLogFile=<path to changelog master>/db.changelog-master.xml ^
 --url="jdbc:sqlserver://<host>:<port>;databaseName=<database>" ^
 --username=<user> ^
 --password=<password> ^
-migrate
+update
 ```
 
 ### Sample .bat file (MSSQL)
 ```
-C:/tools/liquibase-3.5.1-bin/liquibase.bat ^
+C:/tools/liquibase-3.5.5-bin/liquibase.bat ^
 --driver=com.microsoft.sqlserver.jdbc.SQLServerDriver ^
 --classpath=<path to driver>/sqljdbc4-4.0.2206.100.jar ^
 --changeLogFile=<path to changelog master>/db.changelog-master.xml ^
 --url="jdbc:sqlserver://<host>:<port>;databaseName=<database>" ^
 --username=<user> ^
 --password=<password> ^
-migrate
+update
 ```
 
 ### Sample .sh file (MariaDB)
@@ -53,7 +53,7 @@ migrate
       --url="jdbc:mysql://<hostname>:<port>/<database>" \
       --username=<user> \
       --password=<password> \
-      migrate
+      update
 ```
 
 ### Sample .sh file (PostgreSQL)
@@ -65,7 +65,7 @@ liquibase --driver=org.postgresql.Driver \
       --url="jdbc:postgresql://<host>:<port>/waltz" \
       --username=<user> \
       --password=<password> \
-      migrate
+      update
 ```
 
 Waltz provides sample files:
@@ -78,7 +78,7 @@ Which you may copy and adapt to your environment.
 
 ### Sample .bat file (MariaDB)
 ```
-C:/tools/liquibase-3.5.1-bin/liquibase.bat ^
+C:/tools/liquibase-3.5.5-bin/liquibase.bat ^
 --driver=org.mariadb.jdbc.Driver ^
 --classpath=<path to driver>/mariadb-java-client-1.4.6.jar ^
 --changeLogFile=<path to changelog master>/db.changelog-master.xml ^
@@ -90,7 +90,7 @@ updateSQL
 
 ### Sample .bat file (MSSQL)
 ```
-C:/tools/liquibase-3.5.1-bin/liquibase.bat ^
+C:/tools/liquibase-3.5.5-bin/liquibase.bat ^
 --driver=com.microsoft.sqlserver.jdbc.SQLServerDriver ^
 --classpath=<path to driver>/sqljdbc4-4.0.2206.100.jar ^
 --changeLogFile=<path to changelog master>/db.changelog-master.xml ^

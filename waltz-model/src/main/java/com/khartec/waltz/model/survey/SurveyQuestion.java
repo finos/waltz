@@ -39,6 +39,7 @@ public abstract class SurveyQuestion implements
     public abstract Optional<String> helpText();
     public abstract SurveyQuestionFieldType fieldType();
     public abstract Optional<String> sectionName();
+    public abstract Optional<String> inclusionPredicate();
 
     @Value.Default
     public Integer position() {

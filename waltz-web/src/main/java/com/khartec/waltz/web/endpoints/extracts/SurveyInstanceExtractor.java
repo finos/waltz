@@ -31,6 +31,8 @@ import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jooq.*;
+import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,6 +53,7 @@ import static com.khartec.waltz.common.ListUtilities.*;
 import static com.khartec.waltz.common.MapUtilities.indexBy;
 import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.common.SetUtilities.fromArray;
+import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.tables.SurveyInstance.SURVEY_INSTANCE;
 import static com.khartec.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
 import static com.khartec.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
@@ -227,7 +230,8 @@ public class SurveyInstanceExtractor implements DataExtractor {
                     "SUBMITTED_AT",
                     "SUBMITTED_BY",
                     "APPROVED_AT",
-                    "APPROVED_BY");
+                    "APPROVED_BY",
+                    "Latest");
 
         List<String> questionHeaders = questions
                 .stream()
@@ -351,10 +355,12 @@ public class SurveyInstanceExtractor implements DataExtractor {
                 .select(sqr.QUESTION_ID, sqr.COMMENT)
                 .select(sqr.STRING_RESPONSE, sqr.NUMBER_RESPONSE, sqr.DATE_RESPONSE, sqr.BOOLEAN_RESPONSE, sqr.LIST_RESPONSE_CONCAT)
                 .select(responseNameField, responseExtIdField)
+                .select(DSL.when(si.ORIGINAL_INSTANCE_ID.isNull(), "Yes").else_("No").as("Latest"))
                 .from(st)
                 .innerJoin(sr).on(sr.SURVEY_TEMPLATE_ID.eq(st.ID))
                 .innerJoin(si).on(si.SURVEY_RUN_ID.eq(sr.ID))
-                .innerJoin(sqr).on(sqr.SURVEY_INSTANCE_ID.eq(si.ID))
+                .innerJoin(sq).on(sq.SURVEY_TEMPLATE_ID.eq(st.ID))
+                .innerJoin(sqr).on(sqr.SURVEY_INSTANCE_ID.eq(si.ID).and(sqr.QUESTION_ID.eq(sq.ID)))
                 .where(condition);
 
         Result<Record> results = extractAnswersQuery.fetch();
@@ -377,6 +383,7 @@ public class SurveyInstanceExtractor implements DataExtractor {
                         reportRow.add(firstAnswer.get(si.SUBMITTED_BY));
                         reportRow.add(firstAnswer.get(si.APPROVED_AT));
                         reportRow.add(firstAnswer.get(si.APPROVED_BY));
+                        reportRow.add(firstAnswer.get("Latest"));
 
                         Map<Long, Record> answersByQuestionId = indexBy(
                                 answersForInstance,
@@ -388,7 +395,7 @@ public class SurveyInstanceExtractor implements DataExtractor {
                                 .forEach(t -> {
                                     reportRow.add(findValueInRecord(t.v1, t.v2));
                                     if (t.v1.allowComment()) {
-                                        reportRow.add(t.v2.get(sqr.COMMENT));
+                                        reportRow.add(getComment(t));
                                     }
                                 });
 
@@ -398,9 +405,16 @@ public class SurveyInstanceExtractor implements DataExtractor {
     }
 
 
+    private String getComment(Tuple2<SurveyQuestion, Record> t) {
+        return (t.v2 == null)
+                ? ""
+                : mkSafe(t.v2.get(sqr.COMMENT));
+    }
+
+
     private Object findValueInRecord(SurveyQuestion q, Record r) {
         if (r == null) {
-            return null;
+            return "";
         }
         switch (q.fieldType()) {
             case NUMBER:

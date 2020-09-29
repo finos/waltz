@@ -19,8 +19,8 @@
 package com.khartec.waltz.data.app_group;
 
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
+import com.khartec.waltz.model.app_group.AppGroupEntry;
+import com.khartec.waltz.model.app_group.ImmutableAppGroupEntry;
 import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.Record;
@@ -39,11 +39,13 @@ import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_
 @Repository
 public class AppGroupEntryDao {
 
-    private static final RecordMapper<Record, EntityReference> appRefMapper = r ->
-            ImmutableEntityReference.builder()
+    private static final RecordMapper<Record, AppGroupEntry> appRefMapper = r ->
+            ImmutableAppGroupEntry.builder()
                     .kind(EntityKind.APPLICATION)
                     .id(r.getValue(APPLICATION.ID))
                     .name(r.getValue(APPLICATION.NAME))
+                    .provenance(r.getValue(APPLICATION_GROUP_ENTRY.PROVENANCE))
+                    .isReadOnly(r.getValue(APPLICATION_GROUP_ENTRY.IS_READONLY))
                     .build();
 
     private final DSLContext dsl;
@@ -55,12 +57,13 @@ public class AppGroupEntryDao {
     }
 
 
-    public List<EntityReference> getEntriesForGroup(long groupId) {
-        return dsl.select(APPLICATION.ID, APPLICATION.NAME)
+    public List<AppGroupEntry> getEntriesForGroup(long groupId) {
+        return dsl
+                .select(APPLICATION.ID, APPLICATION.NAME)
+                .select(APPLICATION_GROUP_ENTRY.IS_READONLY, APPLICATION_GROUP_ENTRY.PROVENANCE)
                 .from(APPLICATION)
-                .where(APPLICATION.ID.in(DSL.select(APPLICATION_GROUP_ENTRY.APPLICATION_ID)
-                        .from(APPLICATION_GROUP_ENTRY)
-                        .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(groupId))))
+                .innerJoin(APPLICATION_GROUP_ENTRY).on(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(APPLICATION.ID))
+                .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(groupId))
                 .and(IS_ACTIVE)
                 .fetch(appRefMapper);
     }
@@ -89,7 +92,8 @@ public class AppGroupEntryDao {
     public int removeApplication(long groupId, long applicationId) {
         return dsl.delete(APPLICATION_GROUP_ENTRY)
                 .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(groupId))
-                .and(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(applicationId))
+                .and(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(applicationId)
+                        .and(APPLICATION_GROUP_ENTRY.IS_READONLY.isFalse()))
                 .execute();
     }
 
@@ -97,7 +101,8 @@ public class AppGroupEntryDao {
     public int removeApplications(long groupId, List<Long> applicationIds) {
         return dsl.delete(APPLICATION_GROUP_ENTRY)
                 .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(groupId))
-                .and(APPLICATION_GROUP_ENTRY.APPLICATION_ID.in(applicationIds))
+                .and(APPLICATION_GROUP_ENTRY.APPLICATION_ID.in(applicationIds)
+                        .and(APPLICATION_GROUP_ENTRY.IS_READONLY.isFalse()))
                 .execute();
     }
 }

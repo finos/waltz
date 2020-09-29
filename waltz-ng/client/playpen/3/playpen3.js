@@ -18,23 +18,27 @@
 
 import {initialiseData} from "../../common/index";
 import template from "./playpen3.html";
-import {CORE_API} from "../../common/services/core-api-utils";
 
 
 const initialState = {
     parentEntityRef: {
-        id: 51,
-        kind: "APPLICATION"
+        id: 95,
+        kind: "ORG_UNIT"
     },
-    schemeId: 2
+    schemeId: 2,
+    selectedDate: null,
 };
 
 function controller($stateParams, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
+    vm.selectedDate = new Date('2020-07-07');
 
+    // serviceBroker.loadViewData(CORE_API.ChangeLogSummariesStore.findSummariesForKindBySelector,
+    //     ['APPLICATION', mkSelectionOptions(vm.parentEntityRef, 'EXACT')])
+    //     .then(r => vm.data = r.data)
+    //     .then(console.log(vm.data));
 }
-
 
 controller.$inject = [
     "$stateParams",
@@ -45,7 +49,7 @@ controller.$inject = [
 const view = {
     template,
     controller,
-    controllerAs: "ctrl",
+    controllerAs: "$ctrl",
     bindToController: true,
     scope: {}
 };

@@ -19,6 +19,7 @@
 package com.khartec.waltz.service.rating_scheme;
 
 import com.khartec.waltz.data.rating_scheme.RatingSchemeDAO;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.rating.RagName;
 import com.khartec.waltz.model.rating.RatingScheme;
 import org.jooq.impl.DSL;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class RatingSchemeService {
@@ -47,5 +49,18 @@ public class RatingSchemeService {
     }
 
     public List<RagName> getAllRatingSchemeItems() {return ratingSchemeDAO.fetchItems(DSL.trueCondition()); }
+
+
+    public List<RagName> findRatingSchemeItemsForEntityAndCategory(EntityReference ref, long measurableCategoryId) {
+        return ratingSchemeDAO.findRatingSchemeItemsForEntityAndCategory(ref, measurableCategoryId);
+    }
+
+    public Set<RagName> findRatingSchemeItemsByIds(Set<Long> ids) {
+        return ratingSchemeDAO.findRatingSchemeItemsByIds(ids);
+    }
+
+
+
+
 
 }

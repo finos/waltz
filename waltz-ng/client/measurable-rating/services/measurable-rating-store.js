@@ -21,6 +21,7 @@ import {checkIsEntityRef, checkIsIdSelector} from "../../common/checks";
 function store($http, baseApiUrl) {
 
     const baseUrl = `${baseApiUrl}/measurable-rating`;
+    const viewBaseUrl = `${baseApiUrl}/measurable-rating-view`;
 
     const findForEntityReference = (ref) => {
         checkIsEntityRef(ref);
@@ -69,10 +70,10 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
-    const save = (ref, measurableId, rating = "Z", description = "") => {
+    const save = (ref, measurableId, rating = "Z", previousRating, description = "") => {
         checkIsEntityRef(ref);
         return $http
-            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/measurable/${measurableId}`, { rating, description })
+            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/measurable/${measurableId}`, { rating, previousRating, description })
             .then(d => d.data);
     };
 

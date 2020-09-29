@@ -24,17 +24,19 @@
     <waltz-page-header name="{{ ctrl.statistic.definition.name }}"
                        small="Indicator"
                        icon="pie-chart">
-        <ol class="waltz-breadcrumbs">
-            <li><a ui-sref="main">Home</a></li>
-            <li>
-                <a ng-click="ctrl.goToParent()"
-                   class="clickable"
-                   ng-bind="ctrl.selectedNavItem.name">
-                </a>
-            </li>
-            <li>Indicators</li>
-            <li ng-bind="ctrl.statistic.definition.name"></li>
-        </ol>
+        <breadcrumbs>
+            <ol class="waltz-breadcrumbs">
+                <li><a ui-sref="main">Home</a></li>
+                <li>
+                    <a ng-click="ctrl.goToParent()"
+                       class="clickable"
+                       ng-bind="ctrl.selectedNavItem.name">
+                    </a>
+                </li>
+                <li>Indicators</li>
+                <li ng-bind="ctrl.statistic.definition.name"></li>
+            </ol>
+        </breadcrumbs>
     </waltz-page-header>
 
     <div class="waltz-page-summary waltz-page-summary-attach">

@@ -54,6 +54,7 @@ public class SurveyQuestionDao {
                 .isMandatory(record.getIsMandatory())
                 .allowComment(record.getAllowComment())
                 .externalId(Optional.ofNullable(record.getExternalId()))
+                .inclusionPredicate(Optional.ofNullable(record.getInclusionPredicate()))
                 .build();
     };
 
@@ -71,6 +72,7 @@ public class SurveyQuestionDao {
         record.setExternalId(question.externalId()
                 .filter(StringUtilities::notEmpty)
                 .orElse(null));
+        record.setInclusionPredicate(question.inclusionPredicate().orElse(null));
         return record;
     };
 

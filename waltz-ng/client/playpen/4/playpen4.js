@@ -17,32 +17,31 @@
  */
 import {initialiseData} from "../../common/index";
 import template from "./playpen4.html";
+import {CORE_API} from "../../common/services/core-api-utils";
 
 const initialState = {
-    parentEntityRef: { kind: "ORG_UNIT", id: 6018 },
-    foo: "baa"
+    parentEntityRef: { kind: "ORG_UNIT", id: 10 }, //10524
 };
 
 
 
-function controller() {
+function controller($q, serviceBroker) {
 
     const vm = initialiseData(this, initialState);
-
-    vm.$onInit = () => {
-    };
 
 }
 
 
 controller.$inject = [
+    "$q",
+    "ServiceBroker"
 ];
 
 
 const view = {
     template,
     controller,
-    controllerAs: "ctrl",
+    controllerAs: "$ctrl",
     bindToController: true,
     scope: {}
 };

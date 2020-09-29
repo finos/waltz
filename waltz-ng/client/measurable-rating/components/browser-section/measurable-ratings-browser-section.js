@@ -36,12 +36,7 @@ const bindings = {
 
 
 const initialState = {
-    hasAllocations: true,
-    visibility: {
-        treeView: true,
-        gridView: false,
-        gridAvailable: false,
-    }
+    hasAllocations: true
 };
 
 
@@ -51,10 +46,6 @@ function controller(serviceBroker) {
 
     vm.$onInit = () => {
         serviceBroker
-            .loadAppData(CORE_API.DrillGridDefinitionStore.findAll)
-            .then(r => vm.visibility.gridAvailable = r.data.length > 0);
-
-        serviceBroker
             .loadAppData(CORE_API.AllocationSchemeStore.findAll)
             .then(r => vm.schemesByCategoryId = _.groupBy(r.data, s => s.measurableCategoryId));
 
@@ -62,16 +53,6 @@ function controller(serviceBroker) {
             undefined,
             undefined,
             vm.filters);
-    };
-
-    vm.showGridView = () => {
-        vm.visibility.gridView = true;
-        vm.visibility.treeView = false;
-    };
-
-    vm.showTreeView = () => {
-        vm.visibility.gridView = false;
-        vm.visibility.treeView = true;
     };
 
     vm.onCategorySelect = (category) => {

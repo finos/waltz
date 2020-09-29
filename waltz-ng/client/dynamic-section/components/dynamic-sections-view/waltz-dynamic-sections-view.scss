@@ -20,8 +20,8 @@
 
 .waltz-dynamic-sections-view {
 
-    $wdsv-background: lighten($waltz-background-color, 4);
-    $wdsv-border: lighten($waltz-background-color, 8);
+    $wdsv-background: darken($waltz-background-color, 4);
+    $wdsv-border: darken($waltz-background-color, 8);
 
     .wdsv-arrow_box {
         border: 3px solid $wdsv-border;

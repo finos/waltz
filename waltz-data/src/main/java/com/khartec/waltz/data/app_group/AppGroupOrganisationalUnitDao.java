@@ -19,10 +19,9 @@
 package com.khartec.waltz.data.app_group;
 
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import org.jooq.*;
-import org.jooq.impl.DSL;
+import com.khartec.waltz.model.app_group.AppGroupEntry;
+import com.khartec.waltz.model.app_group.ImmutableAppGroupEntry;
+import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -40,27 +39,29 @@ public class AppGroupOrganisationalUnitDao {
         this.dsl = dsl;
     }
 
-    public List<EntityReference> getEntriesForGroup(long groupId) {
-        Condition orgUnitsCondition = ORGANISATIONAL_UNIT.ID.in(DSL
-                .select(APPLICATION_GROUP_OU_ENTRY.ORG_UNIT_ID)
-                .from(APPLICATION_GROUP_OU_ENTRY)
-                .where(APPLICATION_GROUP_OU_ENTRY.GROUP_ID.eq(groupId))
-        );
+
+    public List<AppGroupEntry> getEntriesForGroup(long groupId) {
         return dsl
-                .select(
-                        ORGANISATIONAL_UNIT.ID,
+                .select(ORGANISATIONAL_UNIT.ID,
                         ORGANISATIONAL_UNIT.NAME,
                         ORGANISATIONAL_UNIT.DESCRIPTION)
+                .select(APPLICATION_GROUP_OU_ENTRY.PROVENANCE,
+                        APPLICATION_GROUP_OU_ENTRY.IS_READONLY)
                 .from(ORGANISATIONAL_UNIT)
-                .where(orgUnitsCondition)
-                .fetch(r -> ImmutableEntityReference
+                .innerJoin(APPLICATION_GROUP_OU_ENTRY)
+                .on(APPLICATION_GROUP_OU_ENTRY.ORG_UNIT_ID.eq(ORGANISATIONAL_UNIT.ID))
+                .where(APPLICATION_GROUP_OU_ENTRY.GROUP_ID.eq(groupId))
+                .fetch(r -> ImmutableAppGroupEntry
                         .builder()
                         .id(r.getValue(ORGANISATIONAL_UNIT.ID))
                         .name(r.getValue(ORGANISATIONAL_UNIT.NAME))
                         .description(r.getValue(ORGANISATIONAL_UNIT.DESCRIPTION))
-                        .kind(EntityKind.APPLICATION)
+                        .kind(EntityKind.ORG_UNIT)
+                        .isReadOnly(r.getValue(APPLICATION_GROUP_OU_ENTRY.IS_READONLY))
+                        .provenance(r.getValue(APPLICATION_GROUP_OU_ENTRY.PROVENANCE))
                         .build());
     }
+
 
     public int removeOrgUnit(long groupId, long orgUnitId) {
         return dsl.delete(APPLICATION_GROUP_OU_ENTRY)
@@ -68,6 +69,7 @@ public class AppGroupOrganisationalUnitDao {
                 .and(APPLICATION_GROUP_OU_ENTRY.ORG_UNIT_ID.eq(orgUnitId))
                 .execute();
     }
+
 
     public int addOrgUnit(long groupId, long orgUnitId) {
         return dsl.insertInto(APPLICATION_GROUP_OU_ENTRY)

@@ -16,9 +16,11 @@
  *
  */
 
-import { CORE_API } from "../../../common/services/core-api-utils";
-import { initialiseData } from "../../../common";
-import { mkSelectionOptions } from "../../../common/selector-utils";
+import _ from "lodash";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {initialiseData} from "../../../common";
+import {mkSelectionOptions} from "../../../common/selector-utils";
+import {loadAssessmentsBySelector} from "../../../assessments/assessment-utils";
 
 import template from "./licence-section.html";
 
@@ -33,14 +35,27 @@ const initialState = {
 };
 
 
-function controller(serviceBroker) {
+function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = (changes) => {
-        if(changes.parentEntityRef) {
-            serviceBroker
+        if(vm.parentEntityRef) {
+            const licencePromise = serviceBroker
                 .loadViewData(CORE_API.LicenceStore.findBySelector, [mkSelectionOptions(vm.parentEntityRef)])
-                .then(r => vm.licences = r.data);
+                .then(r => r.data);
+
+            $q.all([licencePromise, loadAssessmentsBySelector($q, serviceBroker, "LICENCE", mkSelectionOptions(vm.parentEntityRef), true)])
+                .then(([licences, assessments]) => {
+                    vm.assessmentDefinitions = assessments.definitions;
+                    const assessmentsByLicenceId = assessments.assessmentsByEntityId;
+
+                    vm.licences =_.map(
+                        licences,
+                        l => {
+                            const assessmentsByDefinitionExtId = _.get(assessmentsByLicenceId, l.id, []);
+                            return Object.assign({}, l, assessmentsByDefinitionExtId)
+                        });
+                });
         }
     };
 
@@ -48,6 +63,7 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
+    "$q",
     "ServiceBroker"
 ];
 

@@ -19,10 +19,10 @@
 import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
-import {determineStatMethod} from "../../logical-flow-utils";
 import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 
 import template from "./logical-flows-tabgroup.html";
+import {entity} from "../../../common/services/enums/entity";
 
 
 const bindings = {
@@ -55,8 +55,8 @@ function controller($q,
 
         const decoratorPromise = serviceBroker
             .loadViewData(
-                CORE_API.LogicalFlowDecoratorStore.findBySelector,
-                [ vm.selector ])
+                CORE_API.DataTypeDecoratorStore.findBySelector,
+                [ vm.selector, entity.LOGICAL_DATA_FLOW.key ])
             .then(r => {
                 vm.decorators = r.data;
             });
@@ -72,7 +72,7 @@ function controller($q,
         vm.loadingStats = true;
         serviceBroker
             .loadViewData(
-                determineStatMethod(vm.parentEntityRef.kind),
+                CORE_API.LogicalFlowStore.calculateStats,
                 [ vm.selector ])
             .then(r => {
                 vm.loadingStats = false;

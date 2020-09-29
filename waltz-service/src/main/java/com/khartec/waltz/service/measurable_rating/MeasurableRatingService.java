@@ -19,6 +19,7 @@
 package com.khartec.waltz.service.measurable_rating;
 
 import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableDao;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
@@ -32,9 +33,11 @@ import com.khartec.waltz.model.measurable_rating.MeasurableRating;
 import com.khartec.waltz.model.measurable_rating.MeasurableRatingCommand;
 import com.khartec.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
 import com.khartec.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
+import com.khartec.waltz.model.rating.RagName;
 import com.khartec.waltz.model.tally.MeasurableRatingTally;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.rating_scheme.RatingSchemeService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,8 +46,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.common.Checks.*;
 import static java.lang.String.format;
 
 @Service
@@ -52,8 +54,10 @@ public class MeasurableRatingService {
 
     private final MeasurableRatingDao measurableRatingDao;
     private final MeasurableDao measurableDao;
-    private final ChangeLogService changeLogService;
     private final MeasurableCategoryDao measurableCategoryDao;
+    private final ChangeLogService changeLogService;
+    private final RatingSchemeService ratingSchemeService;
+    private final EntityReferenceNameResolver entityReferenceNameResolver;
 
     private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
@@ -63,16 +67,21 @@ public class MeasurableRatingService {
     public MeasurableRatingService(MeasurableRatingDao measurableRatingDao,
                                    MeasurableDao measurableDao,
                                    MeasurableCategoryDao measurableCategoryDao,
-                                   ChangeLogService changeLogService) {
+                                   ChangeLogService changeLogService,
+                                   RatingSchemeService ratingSchemeService,
+                                   EntityReferenceNameResolver entityReferenceNameResolver) {
         checkNotNull(measurableRatingDao, "measurableRatingDao cannot be null");
         checkNotNull(measurableDao, "measurableDao cannot be null");
         checkNotNull(measurableCategoryDao, "measurableCategoryDao cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
+        checkNotNull(ratingSchemeService, "ratingSchemeService cannot be null");
 
         this.measurableRatingDao = measurableRatingDao;
         this.measurableDao = measurableDao;
         this.measurableCategoryDao = measurableCategoryDao;
         this.changeLogService = changeLogService;
+        this.ratingSchemeService = ratingSchemeService;
+        this.entityReferenceNameResolver = entityReferenceNameResolver;
     }
 
     // -- READ
@@ -101,17 +110,31 @@ public class MeasurableRatingService {
     public Collection<MeasurableRating> save(SaveMeasurableRatingCommand command) {
         checkNotNull(command, "command cannot be null");
 
+        checkRatingIsAllowable(command);
+
         Measurable measurable = measurableDao.getById(command.measurableId());
         checkNotNull(measurable, format("Unknown measurable with id: %d", command.measurableId()));
         checkTrue(measurable.concrete(), "Cannot rate against an abstract measurable");
 
         Operation operationThatWasPerformed = measurableRatingDao.save(command);
 
+        String entityName = getEntityName(command);
+
+        String previousRatingMessage = command.previousRating().isPresent()
+                ? "from " + command.previousRating().get() : "";
+
         writeChangeLogEntry(
                 command,
-                format("Saved: %s with a rating of: %s",
+                format("Saved: %s with a rating of: %s %s for %s",
                         measurable.name(),
-                        command.rating()),
+                        command.rating(),
+                        previousRatingMessage,
+                        entityName),
+                format("Saved: %s has assigned %s with a rating of: %s %s",
+                        entityName,
+                        measurable.name(),
+                        command.rating(),
+                        previousRatingMessage),
                 operationThatWasPerformed);
 
         return findForEntity(command.entityReference());
@@ -144,7 +167,7 @@ public class MeasurableRatingService {
                 .childKind(EntityKind.MEASURABLE)
                 .operation(Operation.REMOVE)
                 .build());
-        
+
         return findForEntity(ref);
     }
 
@@ -156,9 +179,15 @@ public class MeasurableRatingService {
         boolean success = measurableRatingDao.remove(command);
 
         if (success && measurable != null) {
+            String entityName = getEntityName(command);
+
             writeChangeLogEntry(
                     command,
-                    format("Removed: %s",
+                    format("Removed: %s for %s",
+                            measurable.name(),
+                            entityName),
+                    format("Removed: %s for %s",
+                            entityName,
                             measurable.name()),
                     Operation.REMOVE);
 
@@ -186,15 +215,28 @@ public class MeasurableRatingService {
 
     // -- HELPERS --
 
+    private void writeChangeLogEntry(MeasurableRatingCommand command,
+                                     String message1,
+                                     String message2,
+                                     Operation operation) {
 
-    private void writeChangeLogEntry(MeasurableRatingCommand command, String message, Operation operation) {
         changeLogService.write(ImmutableChangeLog.builder()
-                .message(message)
+                .message(message1)
                 .parentReference(command.entityReference())
                 .userId(command.lastUpdate().by())
                 .createdAt(command.lastUpdate().at())
                 .severity(Severity.INFORMATION)
                 .childKind(EntityKind.MEASURABLE)
+                .operation(operation)
+                .build());
+
+        changeLogService.write(ImmutableChangeLog.builder()
+                .message(message2)
+                .parentReference(EntityReference.mkRef(EntityKind.MEASURABLE, command.measurableId()))
+                .userId(command.lastUpdate().by())
+                .createdAt(command.lastUpdate().at())
+                .severity(Severity.INFORMATION)
+                .childKind(command.entityReference().kind())
                 .operation(operation)
                 .build());
     }
@@ -212,4 +254,32 @@ public class MeasurableRatingService {
                 .deleteByMeasurableIdSelector(selector);
     }
 
+    public String getRequiredRatingEditRole(EntityReference ref) {
+        return measurableDao.getRequiredRatingEditRole(ref);
+    }
+
+
+    private String getEntityName(MeasurableRatingCommand command) {
+        EntityReference entityReference = command.entityReference().name().isPresent()
+                ? command.entityReference()
+                : entityReferenceNameResolver.resolve(command.entityReference()).orElse(command.entityReference());
+        return entityReference.name().orElse("");
+    }
+
+
+    private void checkRatingIsAllowable(SaveMeasurableRatingCommand command) {
+
+        long measurableCategory = measurableDao.getById(command.measurableId()).categoryId();
+        EntityReference entityReference = command.entityReference();
+
+        Boolean isRestricted = ratingSchemeService
+                .findRatingSchemeItemsForEntityAndCategory(entityReference, measurableCategory)
+                .stream()
+                .filter(r -> r.rating().equals(command.rating()))
+                .map(RagName::isRestricted)
+                .findFirst()
+                .orElse(false);
+
+        checkFalse(isRestricted, "New rating is restricted, rating not saved");
+    }
 }

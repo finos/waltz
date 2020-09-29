@@ -43,9 +43,9 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
+import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
-import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static java.util.Optional.ofNullable;
 
 
@@ -70,6 +70,7 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .lastUpdatedAt(DateTimeUtilities.toLocalDateTime(r.getLastUpdatedAt()))
                 .lastUpdatedBy(r.getLastUpdatedBy())
                 .entityLifecycleStatus(readEnum(r.getEntityLifecycleStatus(), EntityLifecycleStatus.class, s -> EntityLifecycleStatus.ACTIVE))
+                .organisationalUnitId(r.getOrganisationalUnitId())
                 .build();
     };
 
@@ -159,8 +160,8 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
     }
 
 
-    public boolean create(Measurable measurable) {
-        int rc = dsl.insertInto(MEASURABLE)
+    public Long create(Measurable measurable) {
+        return dsl.insertInto(MEASURABLE)
                 .set(MEASURABLE.MEASURABLE_CATEGORY_ID, measurable.categoryId())
                 .set(MEASURABLE.PARENT_ID, measurable.parentId().orElse(null))
                 .set(MEASURABLE.EXTERNAL_ID, measurable.externalId().orElse(null))
@@ -171,9 +172,9 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .set(MEASURABLE.PROVENANCE, "waltz")
                 .set(MEASURABLE.LAST_UPDATED_BY, measurable.lastUpdatedBy())
                 .set(MEASURABLE.LAST_UPDATED_AT, Timestamp.valueOf(measurable.lastUpdatedAt()))
-                .execute();
-
-        return rc == 1;
+                .returning(MEASURABLE.ID)
+                .fetchOne()
+                .getId();
     }
 
 
@@ -237,4 +238,53 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .fetchMap(MEASURABLE.EXTERNAL_ID, MEASURABLE.ID);
     }
 
+    /**
+     * Allows measurable rating, planned decoms and replacement apps to check for the role
+     * @param reference Entity ref to determine condition
+     * @return 'rating_editor_role'
+     */
+    public String getRequiredRatingEditRole(EntityReference reference) {
+
+        Condition condition = mkCondition(reference);
+
+        Condition measurableToRatingJoinCondition = MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_ID)
+                .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_ID.eq(MEASURABLE_RATING.ENTITY_ID)
+                        .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_KIND.eq(MEASURABLE_RATING.ENTITY_KIND)));
+
+        return dsl
+                .selectDistinct(MEASURABLE_CATEGORY.RATING_EDITOR_ROLE)
+                .from(MEASURABLE_CATEGORY)
+                .innerJoin(MEASURABLE).on(MEASURABLE_CATEGORY.ID.eq(MEASURABLE.MEASURABLE_CATEGORY_ID))
+                .leftJoin(MEASURABLE_RATING).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID))
+                .leftJoin(MEASURABLE_RATING_PLANNED_DECOMMISSION).on(measurableToRatingJoinCondition)
+                .where(condition)
+                .fetchOne()
+                .get(MEASURABLE_CATEGORY.RATING_EDITOR_ROLE);
+    }
+
+
+    private Condition mkCondition(EntityReference reference) {
+        if (reference.kind().equals(EntityKind.MEASURABLE)){
+            return MEASURABLE.ID.eq(reference.id());
+        } else if (reference.kind().equals(EntityKind.MEASURABLE_CATEGORY)){
+            return MEASURABLE_CATEGORY.ID.eq(reference.id());
+        } else {
+            return MEASURABLE_RATING_PLANNED_DECOMMISSION.ID.eq(reference.id());
+        }
+    }
+
+
+    public Collection<Measurable> findByOrgUnitId(Long orgUnitId) {
+
+        SelectConditionStep<Record1<Long>> orgUnitOrChildIds = DSL
+                .select(ENTITY_HIERARCHY.ID)
+                .from(ENTITY_HIERARCHY)
+                .where(ENTITY_HIERARCHY.ANCESTOR_ID.in(orgUnitId)
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name())));
+
+        return dsl
+                .selectFrom(MEASURABLE)
+                .where(MEASURABLE.ORGANISATIONAL_UNIT_ID.in(orgUnitOrChildIds))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
 }

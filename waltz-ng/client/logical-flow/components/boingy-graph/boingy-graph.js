@@ -39,7 +39,9 @@ const DEFAULT_NODE_LIMIT = 500;
 
 const bindings = {
     data: "<", // { decorators: [], entities: [], flows: [] }
-    tweakers: "<"
+    tweakers: "<",
+    filterOptions: "<"
+
 };
 
 const initialState = {
@@ -79,15 +81,17 @@ const actorSymbol = symbol()
 
 
 function mkLinkData(flows = []) {
-    return _.chain(flows)
+    const linkData = _
+        .chain(flows)
         .map(f => ({
-            id: `${ f.source.id }_${ f.target.id }`,
+            id: f.source.id + "_" + f.target.id,
             source: f.source.id,
             target: f.target.id,
             data: f
         }))
-        .uniqBy("id")
+        .uniqBy(d => d.id)
         .value();
+    return linkData;
 }
 
 
@@ -134,7 +138,6 @@ function addNodeCircle(selection) {
         .append("path")
         .attr("class", "wdfd-glyph")
         .attr("d", actorSymbol);
-
 }
 
 
@@ -215,8 +218,8 @@ function drawNodes(nodes,
         return selection;
     };
 
-    allNodes.on("mouseenter.opacityHover",
-        function (d) {
+    allNodes
+        .on("mouseenter.opacityHover", function (d) {
             const selection = select(this);
             setOpacity(selection, 1);
             selection

@@ -17,21 +17,8 @@
   -->
 
 <div>
-
     <waltz-section>
-            <waltz-roadmaps-panel parent-entity-ref="ctrl.parentEntityRef">
-
-            </waltz-roadmaps-panel>
-    </waltz-section>
-
-
-    <waltz-section name="Allocation Panel">
-        <waltz-allocation-entity-panel entity-reference="ctrl.parentEntityRef"
-                                       scheme-id="ctrl.schemeId">
-        </waltz-allocation-entity-panel>
-    </waltz-section>
-
-    <waltz-section name="debug">
-        <pre ng-bind="ctrl.parentEntityRef | json"></pre>
+        <waltz-change-summaries-panel parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-change-summaries-panel>
     </waltz-section>
 </div>

@@ -1,0 +1,153 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.27.xml">
+
+    <changeSet id="20200717-tag"
+               author="davidwatkins73">
+        <tagDatabase tag="v1.26"/> <!-- tag the current db version -->
+    </changeSet>
+    
+    <changeSet id="20200717-4705-1"
+               author="davidwatkins73">
+        <addColumn tableName="survey_question">
+            <column name="inclusion_predicate"
+                    type="${expression.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <!-- 4441: Housekeeping: remove backup tables -->
+    <changeSet id="20200826-4441-1"
+               failOnError="false"
+               author="davidwatkins73">
+        <comment>4441: Housekeeping: remove measurable_1_21 backup table</comment>
+        <dropTable tableName="measurable_1_21"/>
+    </changeSet>
+
+    <changeSet id="20200826-4441-2"
+               failOnError="false"
+               author="davidwatkins73">
+        <comment>4441: Housekeeping: remove attestation_1_11 backup table</comment>
+        <dropTable tableName="attestation_1_11"/>
+    </changeSet>
+
+    <!-- 5036: limiting assessment on measurable category -->
+    <changeSet id="20200824-5036-1"
+               author="woodjes">
+        <addColumn tableName="measurable_category">
+            <column name="assessment_definition_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20191017-5036-2"
+               author="woodjes">
+        <comment>5036: fk between measurable category and assessment definition</comment>
+        <addForeignKeyConstraint baseTableName="measurable_category"
+                                 baseColumnNames="assessment_definition_id"
+                                 constraintName="measurable_category_assessment_def_fk"
+                                 referencedTableName="assessment_definition"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+
+    <!-- 5061: Software Version Vulnerabilities -->
+    <changeSet id="20200902-5061-1"
+               author="kamransaleem">
+        <comment>5061: Vulnerability</comment>
+        <createTable tableName="vulnerability">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="vulnerability_pkey"/>
+            </column>
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="false"
+                             unique="true"
+                             uniqueConstraintName="idx_vulnerability_external_id" />
+            </column>
+            <column name="severity"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="created_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="20200902-5061-2"
+               author="kamransaleem">
+        <comment>5061: software version vulnerability table</comment>
+        <createTable tableName="software_version_vulnerability">
+            <column name="software_version_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="vulnerability_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false" />
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20200902-5061-3"
+               author="kamransaleem">
+        <comment>5061: adding unique index on software version vulnerability (software version id, vulnerability id)</comment>
+        <createIndex tableName="software_version_vulnerability"
+                     unique="true"
+                     indexName="idx_svv_version_vulnerability">
+            <column name="software_version_id"
+                    type="${id.type}" />
+            <column name="vulnerability_id"
+                    type="${id.type}" />
+        </createIndex>
+    </changeSet>
+
+</databaseChangeLog>
