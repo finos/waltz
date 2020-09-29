@@ -51,6 +51,7 @@
             <waltz-data-extract-link name="Download {{$ctrl.exportFlowType | toDisplayName:'entity'}} Attestations"
                                      styling="link"
                                      filename="Attestations.csv"
+                                     year="$ctrl.year"
                                      extract="attestations/{{$ctrl.exportFlowType}}"
                                      method="POST"
                                      request-body="$ctrl.selectionOptions">

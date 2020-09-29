@@ -25,6 +25,7 @@ import {displayError} from "../common/error-utils";
 
 const bindings = {
     name: "@?",
+    year:"<?",
     extract: "@",
     method: "@?",
     format: "@?",
@@ -72,9 +73,9 @@ function controller($http, notification, baseExtractUrl) {
         vm.classes = calcClasses(vm.styling);
     };
 
-    const invokeExport = (format) => {
+    const invokeExport = (format, year) => {
         const options = {
-            params : { format }
+            params : { format,year }
         };
         if (format === "XLSX") {
             options.responseType = "arraybuffer";
@@ -93,18 +94,18 @@ function controller($http, notification, baseExtractUrl) {
         }
     };
 
-    const doExport = (format) => {
+    const doExport = (format,year) => {
         notification.info("Exporting data");
         vm.extracting = true;
-        invokeExport(format)
+        invokeExport(format,year)
             .then(() => notification.success("Data exported"))
             .catch(e => displayError(notification, "Data export failure", e))
             .finally(() => vm.extracting = false);
     };
 
-    vm.exportCsv = () => doExport("CSV");
-    vm.exportXlsx = () => doExport("XLSX");
-    vm.exportAs = (format) => doExport(format);
+    vm.exportCsv = () => doExport("CSV",vm.year);
+    vm.exportXlsx = () => doExport("XLSX",vm.year);
+    vm.exportAs = (format,year) => doExport(format,year);
 }
 
 

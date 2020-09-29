@@ -29,7 +29,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.util.Date;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -68,17 +70,14 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
             IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
             Select<Record1<Long>> appIds = applicationIdSelectorFactory.apply(idSelectionOptions);
             EntityKind kind = getKind(request);
-            String year = request.params("year");
-            Condition yearCondition = (year.equals(null)) ? DSL.trueCondition() :
-               DSL.year(DSL.date(ATTESTATION_INSTANCE.ATTESTED_AT)).eq(new Date(year).getYear());
-
+            String year = request.queryParams("year");
 
             String fileName = String.format("attestations-for-%s-%s-%s",
                     idSelectionOptions.entityReference().kind().name().toLowerCase(),
                     idSelectionOptions.entityReference().id(),
                     kind.name().toLowerCase());
 
-            SelectConditionStep<Record> qry = mkQueryForReportingAttestationsByKindAndSelector(appIds, kind, yearCondition);
+            SelectConditionStep<Record> qry = mkQueryForReportingAttestationsByKindAndSelector(appIds, kind, year);
 
             return writeExtract(
                     fileName,
@@ -89,13 +88,15 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
 
     }
 
-    private SelectConditionStep<Record> mkQueryForReportingAttestationsByKindAndSelector(Select<Record1<Long>> appIds, EntityKind kind, Condition yearCondition) {
+    private SelectConditionStep<Record> mkQueryForReportingAttestationsByKindAndSelector(Select<Record1<Long>> appIds, EntityKind kind, String year) throws ParseException {
 
         AttestationInstance latestAttestationInstance = ATTESTATION_INSTANCE.as("latestAttestationInstance");
         AttestationInstance attestationInstanceForPerson= ATTESTATION_INSTANCE.as("attestationInstanceForPerson");
 
         Field<Long> latestAttestationParentId = latestAttestationInstance.PARENT_ENTITY_ID.as("parent_id");
         Field<Timestamp> latestAttestationAt = DSL.max(latestAttestationInstance.ATTESTED_AT).as("latest_attested_at");
+        DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+
 
         SelectHavingStep<Record2<Long, Timestamp>> latestAttestation = dsl
                 .selectDistinct(
@@ -104,7 +105,6 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
                 .from(latestAttestationInstance)
                 .innerJoin(ATTESTATION_RUN).on(latestAttestationInstance.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID))
                 .where(latestAttestationInstance.PARENT_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                .and(yearCondition)
                 .and(ATTESTATION_RUN.ATTESTED_ENTITY_KIND.eq(kind.name())))
                 .groupBy(latestAttestationInstance.PARENT_ENTITY_ID);
 
@@ -118,6 +118,9 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
                 .innerJoin(latestAttestation).on(attestationInstanceForPerson.PARENT_ENTITY_ID.eq(latestAttestationParentId))
                 .and(attestationInstanceForPerson.ATTESTED_AT.eq(latestAttestationAt));
 
+        Condition yearCondition = (year==null) ? (peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT).isNull()) :
+                DSL.year(DSL.date(peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT))).eq(DSL.year(sdf.parse("01/01/"+year)));
+
         return dsl
                 .select(APPLICATION.NAME.as("Name"),
                         APPLICATION.ASSET_CODE.as("Asset Code"),
@@ -128,7 +131,7 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
                         peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT).as("Last Attested At"))
                 .from(APPLICATION)
                 .leftJoin(peopleToAttest).on(APPLICATION.ID.eq(entityPersonIsAttesting))
-                .where(APPLICATION.ID.in(appIds));
+                .where(APPLICATION.ID.in(appIds)).and(yearCondition);
     }
 
 
