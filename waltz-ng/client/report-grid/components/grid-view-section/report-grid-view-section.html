@@ -1,4 +1,38 @@
 <div>
+    <div class="row"
+         ng-repeat="row in $ctrl.summaryRows">
+        <div ng-repeat="summary in row" class="col-sm-3">
+            <h4 ng-bind="summary.columnEntityReference.name"></h4>
+            <waltz-rag-line></waltz-rag-line>
+            <table class="table table-condensed small">
+                <tbody>
+                <tr ng-repeat="counter in summary.counts"
+                    class="clickable"
+                    ng-class="{ 'waltz-highlighted-row' : $ctrl.selectedCounter == counter.counterId }"
+                    ng-click="$ctrl.onToggleFilter(summary.columnEntityReference, counter)">
+                    <td>
+                        <div style="display: inline-block; height: 10px; width: 10px;"
+                             ng-style="{ 'background-color': counter.rating.color }">
+                        </div>
+                        <span ng-bind="counter.rating.name"></span>
+                    </td>
+                    <td class="text-right"><span ng-bind="counter.count"></span></td>
+                </tr>
+                </tbody>
+                <tbody>
+                <tr>
+                    <td>
+                        <b>Total</b>
+                    </td>
+                    <td class="text-right">
+                        <span ng-bind="summary.total"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
     <waltz-grid-with-search column-defs="$ctrl.columnDefs"
                             entries="$ctrl.tableData"
                             class="small">
