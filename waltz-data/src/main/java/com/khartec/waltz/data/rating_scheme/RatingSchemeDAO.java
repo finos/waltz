@@ -32,10 +32,7 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -137,7 +134,8 @@ public class RatingSchemeDAO {
 
     public RagName getRagNameById(long id){
         checkNotNull(id, "id cannot be null");
-        return dsl.selectFrom(RATING_SCHEME_ITEM)
+        return dsl
+                .selectFrom(RATING_SCHEME_ITEM)
                 .where(RATING_SCHEME_ITEM.ID.eq(id))
                 .fetchOne(TO_ITEM_MAPPER);
     }
@@ -159,5 +157,14 @@ public class RatingSchemeDAO {
                 .leftJoin(CONSTRAINING_RATING).on(CONSTRAINING_RATING.ID.eq(ASSESSMENT_RATING.RATING_ID))
                 .where(MEASURABLE_CATEGORY.ID.eq(measurableCategoryId))
                 .fetch(TO_ITEM_MAPPER);
+    }
+
+
+    public Set<RagName> findRatingSchemeItemsByIds(Set<Long> ids) {
+        checkNotNull(ids, "ids cannot be null");
+        return dsl
+                .selectFrom(RATING_SCHEME_ITEM)
+                .where(RATING_SCHEME_ITEM.ID.in(ids))
+                .fetchSet(TO_ITEM_MAPPER);
     }
 }

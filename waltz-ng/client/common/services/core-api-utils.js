@@ -82,6 +82,7 @@ import {PhysicalSpecDefinitionSampleFileStore_API as PhysicalSpecDefinitionSampl
 import {PhysicalSpecificationStore_API as PhysicalSpecificationStore} from "../../physical-specifications/services/physical-specification-store";
 import {RatingSchemeStore_API as RatingSchemeStore} from "../../ratings/services/rating-scheme-store";
 import {RelationshipKindStore_API as RelationshipKindStore} from "../../entity-relationship/services/relationship-kind-store";
+import {ReportGridStore_API as ReportGridStore} from "../../report-grid/services/report-grid-store";
 import {RoadmapStore_API as RoadmapStore} from "../../roadmap/services/roadmap-store";
 import {ScenarioStore_API as ScenarioStore} from "../../scenario/services/scenario-store";
 import {ServerInfoStore_API as ServerInfoStore} from "../../server-info/services/server-info-store";
@@ -171,6 +172,7 @@ export const CORE_API = {
     PhysicalSpecificationStore,
     RatingSchemeStore,
     RelationshipKindStore,
+    ReportGridStore,
     RoadmapStore,
     ScenarioStore,
     ServerInfoStore,
