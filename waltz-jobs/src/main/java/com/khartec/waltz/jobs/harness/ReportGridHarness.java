@@ -50,8 +50,7 @@ public class ReportGridHarness {
 
         ReportGridDefinition def = FunctionUtilities.time("def", () -> dao.getGridDefinitionById(1));
         System.out.println(def);
-        def.columnEntityReferences().forEach(c -> System.out.println(c.name()));
-
+        
         EntityReference cib = mkRef(EntityKind.APP_GROUP, 11261);
         EntityReference justWaltz = mkRef(EntityKind.APPLICATION, 20506);
         EntityReference justWaltzGroup = mkRef(EntityKind.APP_GROUP, 433);
