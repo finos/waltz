@@ -137,7 +137,7 @@ function controller(uiGridExporterConstants,
             .then(() => {
                 // prepare data
                 const exportColumnHeaders = uiGridExporterService.getColumnHeaders(grid, colVisibility);
-                const exportData = uiGridExporterService.getData(grid, uiGridExporterConstants.VISIBLE, colVisibility);
+                const exportData = uiGridExporterService.getData(grid, rowVisibility, colVisibility);
                 const csvContent = uiGridExporterService.formatAsCsv(exportColumnHeaders, exportData, exportDataSeparator);
 
                 // trigger file download

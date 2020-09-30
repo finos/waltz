@@ -25,7 +25,6 @@ import {entity} from "../../../common/services/enums/entity";
 import {attestationSummaryColumnDefs, mkAttestationSummaryDataForApps} from "../../attestation-utils";
 import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 import * as _ from "lodash";
-import moment from "moment";
 
 
 const initialState = {

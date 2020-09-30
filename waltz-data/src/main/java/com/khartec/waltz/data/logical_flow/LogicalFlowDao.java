@@ -136,10 +136,6 @@ public class LogicalFlowDao {
 
 
     public List<LogicalFlow> findByEntityReference(EntityReference ref) {
-        LOG.debug((baseQuery()
-                .where(isSourceOrTargetCondition(ref))
-                .and(LOGICAL_NOT_REMOVED)
-                .fetch(TO_DOMAIN_MAPPER)).toString());
         return baseQuery()
                 .where(isSourceOrTargetCondition(ref))
                 .and(LOGICAL_NOT_REMOVED)
