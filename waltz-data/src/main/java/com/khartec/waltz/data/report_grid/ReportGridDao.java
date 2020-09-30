@@ -2,13 +2,8 @@ package com.khartec.waltz.data.report_grid;
 
 
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.report_grid.ImmutableReportGridDefinition;
-import com.khartec.waltz.model.report_grid.ImmutableReportGridRatingCell;
-import com.khartec.waltz.model.report_grid.ReportGridDefinition;
-import com.khartec.waltz.model.report_grid.ReportGridRatingCell;
+import com.khartec.waltz.model.report_grid.*;
 import com.khartec.waltz.schema.Tables;
-import com.khartec.waltz.schema.tables.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,15 +22,15 @@ public class ReportGridDao {
 
     private final DSLContext dsl;
 
-    private final Application app = APPLICATION.as("app");
-    private final Measurable m = MEASURABLE.as("m");
-    private final MeasurableRating mr = MEASURABLE_RATING.as("mr");
-    private final MeasurableCategory mc = MEASURABLE_CATEGORY.as("mc");
-    private final ReportGridColumnDefinition rgcd = REPORT_GRID_COLUMN_DEFINITION.as("rgcd");
-    private final ReportGrid rg = Tables.REPORT_GRID.as("rg");
-    private final RatingSchemeItem rsi = RATING_SCHEME_ITEM.as("rsi");
-    private final AssessmentDefinition ad = ASSESSMENT_DEFINITION.as("ad");
-    private final AssessmentRating ar = ASSESSMENT_RATING.as("ar");
+    private final com.khartec.waltz.schema.tables.Application app = APPLICATION.as("app");
+    private final com.khartec.waltz.schema.tables.Measurable m = MEASURABLE.as("m");
+    private final com.khartec.waltz.schema.tables.MeasurableRating mr = MEASURABLE_RATING.as("mr");
+    private final com.khartec.waltz.schema.tables.MeasurableCategory mc = MEASURABLE_CATEGORY.as("mc");
+    private final com.khartec.waltz.schema.tables.ReportGridColumnDefinition rgcd = REPORT_GRID_COLUMN_DEFINITION.as("rgcd");
+    private final com.khartec.waltz.schema.tables.ReportGrid rg = Tables.REPORT_GRID.as("rg");
+    private final com.khartec.waltz.schema.tables.RatingSchemeItem rsi = RATING_SCHEME_ITEM.as("rsi");
+    private final com.khartec.waltz.schema.tables.AssessmentDefinition ad = ASSESSMENT_DEFINITION.as("ad");
+    private final com.khartec.waltz.schema.tables.AssessmentRating ar = ASSESSMENT_RATING.as("ar");
 
 
     @Autowired
@@ -81,43 +76,48 @@ public class ReportGridDao {
                     .provenance(r.get(rg.PROVENANCE))
                     .lastUpdatedAt(toLocalDateTime(r.get(rg.LAST_UPDATED_AT)))
                     .lastUpdatedBy(r.get(rg.LAST_UPDATED_BY))
-                    .columnEntityReferences(getColumns(condition))
+                    .columnDefinitions(getColumns(condition))
                     .build());
     }
 
 
-    private List<EntityReference> getColumns(Condition condition) {
-        SelectConditionStep<Record5<String, Long, String, String, Integer>> assessmentDefinitionColumns = dsl
+    private List<ReportGridColumnDefinition> getColumns(Condition condition) {
+        SelectConditionStep<Record6<String, Long, String, String, Integer, String>> assessmentDefinitionColumns = dsl
                 .select(DSL.coalesce(rgcd.DISPLAY_NAME, ad.NAME).as("name"),
                         rgcd.COLUMN_ENTITY_ID,
                         rgcd.COLUMN_ENTITY_KIND,
                         ad.DESCRIPTION.as("desc"),
-                        rgcd.POSITION.as("pos"))
+                        rgcd.POSITION,
+                        rgcd.COLUMN_USAGE_KIND)
                 .from(rgcd)
                 .innerJoin(ad).on(ad.ID.eq(rgcd.COLUMN_ENTITY_ID).and(rgcd.COLUMN_ENTITY_KIND.eq(EntityKind.ASSESSMENT_DEFINITION.name())))
                 .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
                 .where(condition);
 
-        SelectConditionStep<Record5<String, Long, String, String, Integer>> measurableColumns = dsl
+        SelectConditionStep<Record6<String, Long, String, String, Integer, String>> measurableColumns = dsl
                 .select(DSL.coalesce(rgcd.DISPLAY_NAME, m.NAME).as("name"),
                         rgcd.COLUMN_ENTITY_ID,
                         rgcd.COLUMN_ENTITY_KIND,
                         m.DESCRIPTION.as("desc"),
-                        rgcd.POSITION.as("pos"))
+                        rgcd.POSITION,
+                        rgcd.COLUMN_USAGE_KIND)
                 .from(rgcd)
                 .innerJoin(m).on(m.ID.eq(rgcd.COLUMN_ENTITY_ID).and(rgcd.COLUMN_ENTITY_KIND.eq(EntityKind.MEASURABLE.name())))
                 .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
                 .where(condition);
 
-        List<EntityReference> columns = assessmentDefinitionColumns
+        return assessmentDefinitionColumns
                 .unionAll(measurableColumns)
-                .orderBy(DSL.field("pos"), DSL.field("name"))
-                .fetch(r -> mkRef(
-                        EntityKind.valueOf(r.get(rgcd.COLUMN_ENTITY_KIND)),
-                        r.get(rgcd.COLUMN_ENTITY_ID),
-                        r.get("name", String.class),
-                        r.get("desc", String.class)));
-        return columns;
+                .orderBy(rgcd.POSITION, DSL.field("name"))
+                .fetch(r -> ImmutableReportGridColumnDefinition.builder()
+                        .columnEntityReference(mkRef(
+                                EntityKind.valueOf(r.get(rgcd.COLUMN_ENTITY_KIND)),
+                                r.get(rgcd.COLUMN_ENTITY_ID),
+                                r.get("name", String.class),
+                                r.get("desc", String.class)))
+                        .position(r.get(rgcd.POSITION))
+                        .usageKind(ColumnUsageKind.valueOf(r.get(rgcd.COLUMN_USAGE_KIND)))
+                        .build());
     }
 
 

@@ -164,4 +164,17 @@
     </changeSet>
 
 
+    <changeSet id="20200929-5107-4"
+               author="davidwatkins73">
+        <comment>5107: Report Grid - add column to indicate if column should appear on summary</comment>
+        <addColumn tableName="report_grid_column_definition">
+            <column name="column_usage_kind"
+                    type="${enum.type}"
+                    defaultValue="NONE">  <!-- i.e. SUMMARY | DOMINANT | ... -->
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
 </databaseChangeLog>
