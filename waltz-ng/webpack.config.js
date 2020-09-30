@@ -99,14 +99,14 @@ module.exports = {
                 test: /\.css$/,
                 use: ["style-loader", "css-loader"]
             }, {
-                test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+                test: /\.(ttf|eot|svg|woff(2)?)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
                 loader: "url-loader",
                 options: {
                     limit: 8192
                 }
             }, {
                 test: /\.png$/,
-                loader: "url-loader",
+                loader: "file-loader",
                 options: {
                     mimetype: "image/png",
                     limit: 16384
@@ -115,20 +115,6 @@ module.exports = {
                 test: /\.html?$/,
                 exclude: /node_modules/,
                 loader: "html-loader"
-            }, {
-                test: /\.woff(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-                loader: "url-loader",
-                options: {
-                    mimetype: "application/font-woff",
-                    limit: 8192
-                }
-            }, {
-                test: /\.woff2(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-                loader: "url-loader",
-                options: {
-                    mimetype: "application/font-woff2",
-                    limit: 8192
-                }
             }
         ],
     }
