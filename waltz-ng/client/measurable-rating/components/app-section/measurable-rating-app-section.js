@@ -67,8 +67,9 @@ function controller($q, serviceBroker) {
     };
 
     vm.$onInit = () => loadData()
-        .then(() => serviceBroker.loadViewData(CORE_API.ApplicationStore.getById, [vm.parentEntityRef.id])
-        .then(r => vm.application = r.data));
+        .then(() => serviceBroker.loadViewData(CORE_API.ApplicationStore.getById, [vm.parentEntityRef.id]))
+        .then(r => vm.application = r.data)
+        .then(r => vm.editable=!_.first(vm.ratings).isReadOnly);
 
 
     // -- INTERACT ---
@@ -105,9 +106,11 @@ function controller($q, serviceBroker) {
     vm.onViewRatings = () => {
         vm.visibility.editor = false;
         loadData(true);
+        console.log(vm);
     };
 
     vm.onEditRatings = () => {
+        console.log('editor', vm.visibility.editor);
         vm.visibility.editor = true;
         hideAllocationScheme();
     };

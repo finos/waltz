@@ -74,4 +74,16 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="20200918-5095-1"
+               author="alimuza">
+        <comment>5095: Add is_readonly flag to measurable_rating</comment>
+        <addColumn tableName="measurable_rating">
+            <column name="is_readonly"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
