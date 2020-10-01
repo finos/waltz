@@ -27,10 +27,10 @@
  * @returns {{field: *, displayName: *, cellTemplate: string}}
  */
 export function mkEnumGridCell(columnHeading,
-    entityRefField,
-    enumType,
-    showIcon = false,
-    showPopover = false) {
+                               entityRefField,
+                               enumType,
+                               showIcon = false,
+                               showPopover = false) {
     return {
         field: entityRefField,
         displayName: columnHeading,
@@ -58,9 +58,9 @@ export function mkEnumGridCell(columnHeading,
  * @returns {{field: *, displayName: *, cellTemplate: string}}
  */
 export function mkEntityLinkGridCell(columnHeading,
-    entityRefField,
-    iconPlacement = "left",
-    tooltipPlacement = "top") {
+                                     entityRefField,
+                                     iconPlacement = "left",
+                                     tooltipPlacement = "top") {
     return {
         field: entityRefField + ".name",
         displayName: columnHeading,
@@ -87,9 +87,9 @@ export function mkEntityLinkGridCell(columnHeading,
  * @returns {{field: *, displayName: *, cellTemplate: string}}
  */
 export function mkEntityLabelGridCell(columnHeading,
-    entityRefField,
-    iconPlacement = "left",
-    tooltipPlacement = "top") {
+                                      entityRefField,
+                                      iconPlacement = "left",
+                                      tooltipPlacement = "top") {
     return {
         field: entityRefField + ".name",
         displayName: columnHeading,
@@ -114,10 +114,10 @@ export function mkEntityLabelGridCell(columnHeading,
  * @returns {{field: *, displayName: *, cellTemplate: string}}
  */
 export function mkLinkGridCell(columnHeading,
-    displayField,
-    linkIdField,
-    linkNavViewName,
-    additionalProps = {}) {
+                               displayField,
+                               linkIdField,
+                               linkNavViewName,
+                               additionalProps = {}) {
     return Object.assign({}, additionalProps, {
         field: displayField,
         displayName: columnHeading,
@@ -140,8 +140,8 @@ export function mkLinkGridCell(columnHeading,
  * @returns {{field: *, displayName: *, cellTemplate: string}}
  */
 export function mkDateGridCell(columnHeading,
-    dateField,
-    showIcon = false) {
+                               dateField,
+                               showIcon = false) {
     return {
         field: dateField,
         displayName: columnHeading,
@@ -162,8 +162,9 @@ export function mkDateGridCell(columnHeading,
  * @returns {{field: *, displayName: *, cellTemplate: string}}
  */
 export function mkOnlyDateGridCell(columnHeading,
-    dateField,
-    showIcon = false, onlyDate = true) {
+                                   dateField,
+                                   showIcon = false,
+                                   onlyDate = true) {
     return {
         field: dateField,
         displayName: columnHeading,
