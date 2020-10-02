@@ -39,6 +39,23 @@ public class ReportGridDao {
     }
 
 
+    public Set<ReportGridDefinition> findAll(){
+        return dsl
+                .selectFrom(rg)
+                .fetchSet(r -> ImmutableReportGridDefinition
+                        .builder()
+                        .id(r.get(rg.ID))
+                        .name(r.get(rg.NAME))
+                        .description(r.get(rg.DESCRIPTION))
+                        .externalId(Optional.ofNullable(r.get(rg.EXTERNAL_ID)))
+                        .provenance(r.get(rg.PROVENANCE))
+                        .lastUpdatedAt(toLocalDateTime(r.get(rg.LAST_UPDATED_AT)))
+                        .lastUpdatedBy(r.get(rg.LAST_UPDATED_BY))
+                        .columnDefinitions(getColumns(rgcd.REPORT_GRID_ID.eq(r.get(rg.ID))))
+                        .build());
+    }
+
+
     public Set<ReportGridRatingCell> findCellDataByGridId(long id,
                                                           Select<Record1<Long>> appSelector) {
         return findCellDataByGridCondition(rg.ID.eq(id), appSelector);
