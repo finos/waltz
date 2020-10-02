@@ -20,6 +20,11 @@ function store($http, baseUrl) {
 
     const BASE = `${baseUrl}/report-grid`;
 
+    const findAll = () => {
+        return $http
+            .get(`${BASE}/all`)
+            .then(result => result.data);
+    };
 
     const getViewById = (id, selectionOptions) => {
         return $http
@@ -29,7 +34,7 @@ function store($http, baseUrl) {
 
 
     return {
-
+        findAll,
         getViewById
     };
 }
@@ -45,6 +50,11 @@ const serviceName = "ReportGridStore";
 
 
 export const ReportGridStore_API = {
+    findAll: {
+        serviceName,
+        serviceFnName: "findAll",
+        description: "find all grid definitions"
+    },
     getViewById: {
         serviceName,
         serviceFnName: "getViewById",
