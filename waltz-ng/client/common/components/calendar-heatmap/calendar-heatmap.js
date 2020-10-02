@@ -245,7 +245,7 @@ function draw(rawData, holder, onSelect) {
         .attr("stroke", d => d.count > 0
             ? COLORS.cellBorder
             : COLORS.emptyCellBorder)
-        .on("click", (e, d) => onSelect(d.date.format("YYYY-MM-DD")));
+        .on("click", d => onSelect(d.date.format("YYYY-MM-DD")));
 
     drawMonthLabels(svg, rawData, nestedData);
 }

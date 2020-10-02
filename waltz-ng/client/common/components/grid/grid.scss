@@ -54,7 +54,21 @@
     }
 
     .ui-grid-viewport {
-        overflow-x: auto !important;
-        overflow-y: auto !important;
+        overflow-x: auto;
+        overflow-y: auto;
+    }
+
+    .waltz-grid-color-cell {
+        padding: 5px;
+        margin: 1px;
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        white-space: nowrap;
+        -ms-text-overflow: ellipsis;
+        -o-text-overflow: ellipsis;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        height: 100%;
     }
 }

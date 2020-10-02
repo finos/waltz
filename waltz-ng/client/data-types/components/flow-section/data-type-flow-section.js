@@ -83,19 +83,15 @@ const buildGraphTweakers = (decorators = [],
             update: _.identity
         },
         link : {
-            enter: (selection) => {
-                selection
-                    .attrs({
-                        stroke: (d) => {
-                            const rating = getRatingForLink(d);
-                            return authoritativeRatingColorScale(rating);
-                        },
-                        fill: (d) => {
-                            const rating = getRatingForLink(d);
-                            return authoritativeRatingColorScale(rating).brighter();
-                        }
-                    });
-            },
+            enter: (selection) => selection
+                .attr("stroke", (d) => {
+                    const rating = getRatingForLink(d);
+                    return authoritativeRatingColorScale(rating);
+                })
+                .attr("fill", (d) => {
+                    const rating = getRatingForLink(d);
+                    return authoritativeRatingColorScale(rating).brighter();
+                }),
             exit: _.identity,
             update: _.identity
         }
@@ -218,14 +214,14 @@ function controller($q, $scope, userPreferenceService, serviceBroker) {
     };
 
     vm.showAllTags = () => {
-      vm.filterOptions.selectedTags = vm.tags;
-      vm.filterChanged();
+        vm.filterOptions.selectedTags = vm.tags;
+        vm.filterChanged();
 
-      saveTagFilterPreferences(
-        vm.tags,
-        vm.filterOptions.selectedTags,
-        groupLogicalFlowFilterExcludedTagIdsKey,
-        userPreferenceService);
+        saveTagFilterPreferences(
+            vm.tags,
+            vm.filterOptions.selectedTags,
+            groupLogicalFlowFilterExcludedTagIdsKey,
+            userPreferenceService);
     };
 
     vm.onTagsChange = () => {

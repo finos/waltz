@@ -1,0 +1,18 @@
+Operability	Application messages (debug, notifications, etc)	Has the system been designed to enable information (debug, alerts, information, etc) to be output in a manner that allows the output level and verbosity to be controlled so that system manageability is enhanced?  Is the application output designed to integrate with the System Management framwork?
+Operability	Archive/restore purge	Are strategies in place to manage historical data, and data that must be purged due to regulations or other business requirements?  Do components in the architecture support these strategies?
+Operability	Batch Control	Are the batch jobs of the architecture designed to be managed and scheduled?  Is batch scheduling performed in a robust, operable fashion?
+Operability	Exception handling and resolution	How are business an technical exceptions anticipated and managed by the system?  What exceptions management framework exists covering business and technical issues?
+Operability	Reconciliation	Are processes in place to prove the integrity of the solution: during initial load, during steady state, after a recovery scenario?
+
+Performance	Batch Performance	Is batch performance acceptable and predictable?  Are there likely scalability issues in meeting program needs?
+Performance	Support for capacity planning	Does a BAU capacity planning activity exist?  How do components of the system enable collection of the appropriate data to support capacity planning?
+Performance	User response times	Are user response times acceptable and preserved under load?  Are there likely scalability issues in meeting program needs?
+
+Reliability	Backup / restore	What backup and restore procedures are defined and how do they meet SLAs as defined for program needs?
+Reliability	Data maintenance and usage	Are data read and update transactions defined robustly in data integrity terms?  Does the system correctly support concurrent access to data and data maintenance as required?  ACID properties.
+Reliability	Distributed data integrity	Are procedures in place to ensure integrity of data across components of the solution?
+Reliability	Disaster recovery	What disaster recovery procedures are defined and how do they meet SLAs as defined for program needs?  Is the DR capability proven and regularly retested?
+Reliability	Failover and resilience	Does the system provide failover and resilience at infrastructure and application levels? Can the components of the application be failed over independently?  Would a loss of service for this application cause the loss of service in other applications? Could this application be subject to loss of service due to dependencies on other applications?  Given these dependencies is an SLA / failover approach in place?  How is this managed? Is the application resilient to temporary loss of dependent components, eg middleware messaging or storage.  Does it provide an alert to notify support teams of its retry attempts?
+Reliability	Multi-site availability	Can the system support multi-site availability as defined in the NFRs?
+Reliability	On line day	Can the system support the required on-line day?
+Reliability	Restart procedures	Are restart procedures defined, and do they meet agreed or perceived SLAs?

@@ -99,6 +99,7 @@ import Playpen from "./playpen";
 import Playpen5 from "./playpen/5";
 import Profile from "./profile";
 import Ratings from "./ratings";
+import ReportGrid from "./report-grid";
 import Roadmap from "./roadmap";
 import Role from "./role";
 import Scenario from "./scenario";
@@ -127,6 +128,7 @@ const dependencies = [
     "ui.grid.exporter",
     "ui.grid.resizeColumns",
     "ui.grid.selection",
+    "ui.grid.pinning",
     "ui-notification",
     "ngAnimate",
     "ngSanitize",
@@ -205,6 +207,7 @@ const dependencies = [
     Playpen5(),
     Profile(),
     Ratings(),
+    ReportGrid(),
     Roadmap(),
     Role(),
     Scenario(),

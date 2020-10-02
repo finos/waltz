@@ -79,12 +79,10 @@ function renderChanges(container, yqScale, barScale, changes, selected) {
         .classed('applied', d=> selected && yqToVal(selected) > yqToVal(d))
         .classed('pending', d=> !selected || yqToVal(selected) < yqToVal(d))
         .classed('selected', d => selected && selected.year === d.year && selected.quarter === d.quarter)
-        .attrs({
-            x: d => yqScale(yqToVal(d)),
-            y: d=> barScale(d.size),
-            width: barWidth,
-            height: d => barScale(0) - barScale(d.size)
-        });
+        .attr("x", d => yqScale(yqToVal(d)))
+        .attr("y", d=> barScale(d.size))
+        .attr("width", barWidth)
+        .attr("height", d => barScale(0) - barScale(d.size));
 }
 
 
@@ -124,14 +122,12 @@ function render(svg, data) {
         .enter()
         .append('rect')
         .classed('click-handler', true)
-        .attrs({
-            fill: 'none',
-            'pointer-events': 'visible', // allows clicking on fill:'none'
-            x: d => yqScale(d),
-            y: 0,
-            width: yqScale.rangeBand(),
-            height: height
-        })
+        .attr("fill", "none")
+        .attr("pointer-events", "visible") // allows clicking on fill:'none'
+        .attr("x", d => yqScale(d))
+        .attr("y", 0)
+        .attr("width", yqScale.rangeBand())
+        .attr("height", height)
         .on('click', (d) => {
             data.onSelect({ year: Math.round(d / 10), quarter: d % 10 });
         });

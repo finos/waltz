@@ -19,13 +19,16 @@
 @import "breadcrumbs";
 @import "bootstrap-styles";
 @import "grid";
-@import "waltz-field-table";
+@import "util";
 @import "waltz-draft";
+@import "waltz-field-table";
+@import "waltz-icons";
 @import "waltz-inactive";
 @import "waltz-popover-width";
 @import "waltz-scroll-region";
 @import "waltz-tabs";
 @import "waltz-text-muted";
+@import "waltz-tree";
 @import "waltz-visibility";
 
 @import "../client/allocation/components/entity-sub-section/allocation-entity-sub-section";
@@ -41,10 +44,8 @@
 @import "../client/change-unit/components/data-type-change-panel/data-type-change-panel";
 @import "../client/common/common";
 @import "../client/complexity/components/chart/complexity-bar-chart";
-@import "../client/data-flow/components/application-flow-summary-pane/application-flow-summary-pane";
 @import "../client/data-types/components/usage-count-tree/data-type-usage-count-tree";
 @import "../client/data-types/components/usage-panel/data-type-usage-panel";
-@import "../client/data-types/components/usage-tree/data-type-usage-tree";
 @import "../client/data-type-usage/components/editor/app-data-type-usage-editor";
 @import "../client/data-type-usage/directives/app-data-type-usage-list";
 @import "../client/dynamic-section/components/dynamic-section-navigation/dynamic-section-navigation";
@@ -58,6 +59,7 @@
 @import "../client/entity-svg-diagram/components/viewer/entity-svg-diagram-viewer";
 @import "../client/extensions/extensions";
 @import "../client/flow-diagram/flow-diagram";
+@import "../client/report-grid/components/grid-view-section/report-grid-view-section";
 @import "../client/logical-flow/components/boingy-graph/boingy-graph";
 @import "../client/logical-flow/components/logical-flows-tabgroup/logical-flows-tabgroup";
 @import "../client/logical-flow/components/rated-flow-summary/rated-summary-table";
@@ -308,7 +310,7 @@ textarea {
 
 
 .waltz-side-nav-help {
-    @extend small;
+    @extend small !optional;
     color: $text-muted;
     white-space: normal !important;
 }
@@ -319,7 +321,7 @@ textarea {
     padding: 0 6px 4px 6px;
     border-radius: 3px;
     border: 1px solid $waltz-border-color-lighter;
-    @include box-shadow(4px, 4px, 4px, $waltz-border-color);
+    @include waltz-box-shadow();
 
     .dismiss:hover {
         color: mediumblue;
@@ -358,18 +360,18 @@ a.subtle-link:hover {
 
 
 .waltz-action-link {
-    @extend .clickable;
+    @extend .clickable !optional;
     border-bottom: 1px blue dashed;
 }
 
 
 .waltz-btn-transparent {
-    @extend .btn-default;
+    @extend .btn-default !optional;
     background-color: transparent;
 }
 
 .waltz-error {
-    @extend small;
+    @extend small !optional;
     padding: 2px 4px;
     color: #c7254e;
     background-color: #f4edef;

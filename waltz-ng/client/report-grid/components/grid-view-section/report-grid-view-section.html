@@ -1,0 +1,19 @@
+<div>
+
+    <waltz-report-grid-view-panel parent-entity-ref="$ctrl.parentEntityRef"
+                                  grid-id="$ctrl.gridId">
+    </waltz-report-grid-view-panel>
+
+    <div ng-if="$ctrl.showPicker">
+        <waltz-report-grid-picker on-grid-select="$ctrl.onGridSelect">
+        </waltz-report-grid-picker>
+    </div>
+    <div ng-if="!$ctrl.showPicker" class="small">
+        <a class="clickable"
+           ng-click="$ctrl.showPicker = true">
+            Click here
+        </a>
+        to change report
+    </div>
+</div>
+

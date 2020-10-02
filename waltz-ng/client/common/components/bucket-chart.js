@@ -19,15 +19,15 @@
 
 import _ from "lodash";
 import angular from "angular";
-import {scaleLinear, scaleBand} from 'd3-scale';
-import {axisBottom} from 'd3-axis';
-import {select} from 'd3-selection';
-import 'd3-selection-multi';
+import {scaleLinear, scaleBand} from "d3-scale";
+import {axisBottom} from "d3-axis";
+import {select} from "d3-selection";
+import "d3-selection-multi";
 
 
 const bindings = {
-    buckets: '=',
-    onBucketSelect: '=?'
+    buckets: "=",
+    onBucketSelect: "=?"
 };
 
 
@@ -35,10 +35,8 @@ function render(config, onBucketSelect) {
 
     const { svg, buckets, dimensions } = config;
 
-    svg.attrs({
-        width: dimensions.width,
-        height: dimensions.height
-    });
+    svg.attr("width", dimensions.width)
+        .attr("height", dimensions.height);
 
     const maxBucketSize = _.chain(buckets)
         .map(b => b.size)
@@ -50,59 +48,56 @@ function render(config, onBucketSelect) {
         .range([0, ( dimensions.height / 1.6) / 2]);
 
     const xScale = scaleBand()
-        .domain(_.map(buckets, 'name'))
+        .domain(_.map(buckets, "name"))
         .range([0, dimensions.width], 0.3);
 
     const xAxis = axisBottom()
         .scale(xScale)
         .tickSize(4);
 
-    svg.append('g')
-        .attr('class', 'x axis');
+    svg.append("g")
+        .attr("class", "x axis");
 
-    svg.select('.axis')
-        .attr('transform', `translate(0, ${ dimensions.height - dimensions.margin.bottom } )`)
+    svg.select(".axis")
+        .attr("transform", `translate(0, ${ dimensions.height - dimensions.margin.bottom } )`)
         .call(xAxis);
 
-    const bucketElems = svg.selectAll('.bucket')
+    const bucketElems = svg.selectAll(".bucket")
         .data(buckets);
 
 
     const newBucketElems = bucketElems
         .enter()
-        .append('circle')
-        .classed('bucket', true)
-        .on('click', d => {
+        .append("circle")
+        .classed("bucket", true)
+        .on("click", d => {
             if (onBucketSelect) {
                 onBucketSelect(d);
             }
         });
 
     newBucketElems
-        .append('title')
+        .append("title")
         .text(d => `# = ${d.size}`);
 
     bucketElems
         .merge(newBucketElems)
-        .attrs({
-            r: d => blobScale(d.size),
-            cx: d => xScale(d.name) + xScale.bandwidth() / 2,
-            cy: dimensions.height / 2
-        });
-
+        .attr("r", d => blobScale(d.size))
+        .attr("cx", d => xScale(d.name) + xScale.bandwidth() / 2)
+        .attr("cy", dimensions.height / 2);
 }
 
 
 function controller($window, $element) {
     const vm = this;
-    const vizElem = $element.find('div')[0];
+    const vizElem = $element.find("div")[0];
 
     const draw = () => {
         if (vm.buckets) {
 
             const config = {
                 svg: select(vizElem)
-                    .select('svg'),
+                    .select("svg"),
                 buckets: vm.buckets,
                 dimensions: {
                     width: vizElem.clientWidth,
@@ -122,22 +117,22 @@ function controller($window, $element) {
 
     vm.$onInit = () => angular
         .element($window)
-        .on('resize', debouncedDraw);
+        .on("resize", debouncedDraw);
 
     vm.$onDestroy = () => angular
         .element($window)
-        .off('resize', debouncedDraw);
+        .off("resize", debouncedDraw);
 }
 
 
 controller.$inject = [
-    '$window',
-    '$element'
+    "$window",
+    "$element"
 ];
 
 
 const component = {
-    template: '<div class="wbc"><svg></svg></div>',
+    template: "<div class=\"wbc\"><svg></svg></div>",
     controller,
     bindings
 };

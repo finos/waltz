@@ -21,7 +21,9 @@ package com.khartec.waltz.data.datatype_decorator;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
-import org.jooq.*;
+import com.khartec.waltz.model.datatype.DataTypeUsageCharacteristics;
+import org.jooq.Record1;
+import org.jooq.Select;
 
 import java.util.Collection;
 import java.util.List;
@@ -46,5 +48,7 @@ public abstract class DataTypeDecoratorDao {
     public abstract int[] addDecorators(Collection<DataTypeDecorator> dataTypeDecorators);
 
     public abstract int removeDataTypes(EntityReference associatedEntityRef, Collection<Long> dataTypeIds);
+
+    public abstract List<DataTypeUsageCharacteristics> findDatatypeUsageCharacteristics(EntityReference ref);
 
 }

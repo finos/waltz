@@ -46,7 +46,7 @@ waltz-allocation-entity-sub-section {
         }
 
         .waess-disabled-action {
-            @extend .text-muted;
+            @extend .text-muted !optional;
             padding-left: 20px;
             padding-top: 3px;
             padding-bottom: 3px;

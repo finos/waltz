@@ -49,7 +49,9 @@ public abstract class MeasurableCategory implements
         ExternalIdProvider,
         LastUpdatedProvider,
         RagNamesProvider,
-        EntityKindProvider {
+        EntityKindProvider,
+        WaltzEntity
+{
 
 
     @Value.Default
@@ -92,4 +94,13 @@ public abstract class MeasurableCategory implements
      */
     public abstract Optional<Long> assessmentDefinitionId();
 
+
+    public EntityReference entityReference() {
+        return ImmutableEntityReference.builder()
+                .kind(EntityKind.MEASURABLE_CATEGORY)
+                .id(id().get())
+                .name(name())
+                .description(description())
+                .build();
+    }
 }

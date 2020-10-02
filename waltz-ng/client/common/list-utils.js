@@ -84,7 +84,7 @@ export function move(array, idx, delta) {
     const targetIdx = _.clamp(
         idx + delta,
         0,
-         array.length);
+        array.length);
 
     const itemToMove = array[idx];
     copy.splice(idx , 1);
