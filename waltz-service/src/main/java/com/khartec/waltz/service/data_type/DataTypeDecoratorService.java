@@ -314,18 +314,24 @@ public class DataTypeDecoratorService {
                 break;
             case PHYSICAL_SPECIFICATION:
                 PhysicalSpecification physicalSpecification = physicalSpecificationDao.getById(entityReference.id());
-                String message = String.format("Physical Specification [%s]: Data types changed from [%s] to [%s]",
-                        physicalSpecification,
-                        currentDataTypeNames,
-                        updatedDataTypeNames);
-                audit(message, physicalSpecification.entityReference(), userName);
+                logicalFlowService
+                        .findBySelector(mkOpts(entityReference))
+                        .forEach(lf -> {
+                            String message = String.format("Physical Specification [%s]: Data types changed from [%s] to [%s]",
+                                    physicalSpecification.name(),
+                                    currentDataTypeNames,
+                                    updatedDataTypeNames);
+                            audit(message, physicalSpecification.entityReference(), userName);
+                            audit(message, lf.source(), userName);
+                            audit(message, lf.target(), userName);
+                        });
                 break;
         }
     }
 
 
     private String getAssociatedDatatypeNamesAsCsv(EntityReference entityReference) {
-        IdSelectionOptions idSelectionOptions = IdSelectionOptions.mkOpts(
+        IdSelectionOptions idSelectionOptions = mkOpts(
                 entityReference,
                 HierarchyQueryScope.EXACT);
 
