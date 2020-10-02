@@ -1,0 +1,40 @@
+<div>
+    <div class="row">
+        <div ng-if="$ctrl.grids.length == 0"
+             class="col-sm-6">
+            <waltz-no-data>
+                <message>
+                    You have no report grids.
+                </message>
+            </waltz-no-data>
+        </div>
+        <div ng-if="$ctrl.grids.length > 0"
+             class="col-sm-6">
+            <hr>
+
+            <table class="table table-condensed small">
+                <thead>
+                <tr>
+                    <th>Grid Name</th>
+                    <th>Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="grid in $ctrl.grids"
+                    ng-class="{ 'waltz-highlighted-row' : $ctrl.selectedGridId === grid.id }"
+                    class="clickable"
+                    ng-click="$ctrl.onSelect(grid)">
+                    <td>
+                        <span ng-bind="grid.name">
+                        </span>
+                    </td>
+                    <td>
+                        <span ng-bind="grid.description">
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

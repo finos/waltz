@@ -29,6 +29,7 @@ import spark.Response;
 import java.io.IOException;
 
 import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
 
 @Service
@@ -47,9 +48,12 @@ public class ReportGridEndpoint implements Endpoint {
 
     @Override
     public void register() {
+        String findAllPath = mkPath(BASE_URL, "all");
         String getViewByIdPath = mkPath(BASE_URL, "view", "id", ":id");
 //        String findByExtIdPath = mkPath(BASE_URL, "view", "external-id", ":externalId");
 
+
+        getForDatum(findAllPath, (req, resp) -> reportGridService.findAll());
         postForDatum(getViewByIdPath, this::getViewByIdRoute);
 //        postForDatum(findByExtIdPath, this::getByExtIdRoute);
     }

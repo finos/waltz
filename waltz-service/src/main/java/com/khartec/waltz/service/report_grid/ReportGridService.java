@@ -61,6 +61,11 @@ public class ReportGridService {
     }
 
 
+    public Set<ReportGridDefinition> findAll(){
+        return reportGridDao.findAll();
+    }
+
+
     public ReportGrid getByIdAndSelectionOptions(
             long id,
             IdSelectionOptions idSelectionOptions) {
