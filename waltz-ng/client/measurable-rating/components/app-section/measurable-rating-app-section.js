@@ -52,6 +52,15 @@ const initialState = {
 };
 
 
+function isMeasurableEditable(vm, categoryId) {
+    console.log(vm.ratings, vm.measurables);
+    const editable = !_.chain(vm.ratings)
+        .filter(r => _.filter(vm.measurables, m => m.id === r.measurableId).categoryId === categoryId)
+        .first();
+    console.log(editable);
+    return editable;
+}
+
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
@@ -68,8 +77,11 @@ function controller($q, serviceBroker) {
 
     vm.$onInit = () => loadData()
         .then(() => serviceBroker.loadViewData(CORE_API.ApplicationStore.getById, [vm.parentEntityRef.id]))
-        .then(r => vm.application = r.data)
-        .then(r => vm.editable=!_.first(vm.ratings).isReadOnly);
+        .then(r => vm.application = r.data);
+        // .then(() => vm.editable=!_.filter(r => r.measurableCategoryId === vm.activeAllocationScheme.measurableCategoryId).isReadOnly)
+        // .then(() => vm.editable=isMeasurableEditable(vm))
+        // .then(() => console.log(vm.ratings, vm.editable, vm.activeAllocationScheme.measurableCategoryId));
+
 
 
     // -- INTERACT ---
@@ -117,13 +129,14 @@ function controller($q, serviceBroker) {
 
     vm.onTabChange = (tab) => {
         hideAllocationScheme();
+        console.log('change tab', tab);
 
         serviceBroker
             .loadViewData(CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
                 [vm.parentEntityRef, tab.category.id])
             .then(r => {
                 tab.ratingSchemeItems = r.data;
-            });
+            }).then(() => vm.editable=isMeasurableEditable(vm, tab.category.id));
     };
 
 }
