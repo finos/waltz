@@ -75,7 +75,7 @@ function controller($http, notification, baseExtractUrl) {
 
     const invokeExport = (format, year) => {
         const options = {
-            params : { format,year }
+            params : { format, year }
         };
         if (format === "XLSX") {
             options.responseType = "arraybuffer";
@@ -94,18 +94,18 @@ function controller($http, notification, baseExtractUrl) {
         }
     };
 
-    const doExport = (format,year) => {
+    const doExport = (format, year) => {
         notification.info("Exporting data");
         vm.extracting = true;
-        invokeExport(format,year)
+        invokeExport(format, year)
             .then(() => notification.success("Data exported"))
             .catch(e => displayError(notification, "Data export failure", e))
             .finally(() => vm.extracting = false);
     };
 
-    vm.exportCsv = () => doExport("CSV",vm.year);
-    vm.exportXlsx = () => doExport("XLSX",vm.year);
-    vm.exportAs = (format,year) => doExport(format,year);
+    vm.exportCsv = () => doExport("CSV", vm.year);
+    vm.exportXlsx = () => doExport("XLSX", vm.year);
+    vm.exportAs = (format, year) => doExport(format, year);
 }
 
 

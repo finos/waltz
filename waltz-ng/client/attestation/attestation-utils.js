@@ -19,7 +19,7 @@
 
 import {CORE_API} from "../common/services/core-api-utils";
 import _ from "lodash";
-import {mkOnlyDateGridCell , mkEntityLinkGridCell} from "../common/grid-utils";
+import {mkDateGridCell , mkEntityLinkGridCell} from "../common/grid-utils";
 import {mapToDisplayNames} from "../applications/application-utils";
 import {entity} from "../common/services/enums/entity";
 
@@ -165,5 +165,5 @@ export const attestationSummaryColumnDefs = [
     {field: "application.businessCriticalityDisplay", name: "Business Criticality"},
     {field: "application.lifecyclePhaseDisplay", name: "Lifecycle Phase"},
     {field: "attestation.attestedBy", name: "Last Attested By"},
-    mkOnlyDateGridCell("Last Attested At", "attestation.attestedAt")
+    mkDateGridCell("Last Attested At", "attestation.attestedAt", false, true)
 ];

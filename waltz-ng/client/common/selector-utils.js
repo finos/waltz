@@ -64,7 +64,7 @@ export function determineUpwardsScopeForKind(kind) {
  * @param linkingEntityKind
  * @returns {{entityLifecycleStatuses: string[], entityReference: {kind: *, id: *}, scope: (*|string), filters}}
  */
-export function mkSelectionOptions(entityReference, scope, entityLifecycleStatuses = ["ACTIVE"], filters = {} ) {
+export function mkSelectionOptions(entityReference, scope, entityLifecycleStatuses = ["ACTIVE"], filters = {}) {
     checkIsEntityRef(entityReference);
 
     return {

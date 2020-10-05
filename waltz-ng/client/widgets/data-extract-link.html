@@ -52,7 +52,7 @@
 <div ng-if="$ctrl.format"
      class="btn-group">
     <a ng-class="$ctrl.classes"
-       ng-click="$ctrl.exportAs($ctrl.format,$ctrl.year)">
+       ng-click="$ctrl.exportAs($ctrl.format, $ctrl.year)">
         <waltz-icon ng-if="! $ctrl.extracting" name="cloud-download"></waltz-icon>
         <waltz-icon ng-if="$ctrl.extracting" name="refresh" spin="true"></waltz-icon>
         <span ng-bind="$ctrl.name"></span>

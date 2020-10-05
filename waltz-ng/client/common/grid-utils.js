@@ -141,36 +141,15 @@ export function mkLinkGridCell(columnHeading,
  */
 export function mkDateGridCell(columnHeading,
                                dateField,
-                               showIcon = false) {
+                               showIcon = false,
+                               dateOnly = false) {
     return {
         field: dateField,
         displayName: columnHeading,
         cellTemplate: `
             <div class="ui-grid-cell-contents">
-                <waltz-from-now timestamp="COL_FIELD"></waltz-from-now>
-            </div>`
-    };
-}
-
-/**
- * Creates a column def to render date
- *
- *
- * @param columnHeading  column display name
- * @param entityRefField  field name in grid data that stores the entity ref for which the link needs to be rendered
- * @param showIcon  whether to display the icon or not
- * @returns {{field: *, displayName: *, cellTemplate: string}}
- */
-export function mkOnlyDateGridCell(columnHeading,
-                                   dateField,
-                                   showIcon = false,
-                                   onlyDate = true) {
-    return {
-        field: dateField,
-        displayName: columnHeading,
-        cellTemplate: `
-            <div class="ui-grid-cell-contents">
-                <waltz-from-now timestamp="COL_FIELD" only-date="${onlyDate}"></waltz-from-now>
+                <waltz-from-now ng-if="{{!${dateOnly}}}" timestamp="COL_FIELD"></waltz-from-now>
+                <waltz-from-now ng-if="{{${dateOnly}}}" timestamp="COL_FIELD" date-only="${dateOnly}"></waltz-from-now>
             </div>`
     };
 }
