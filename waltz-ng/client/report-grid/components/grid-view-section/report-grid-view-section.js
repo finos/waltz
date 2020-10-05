@@ -15,7 +15,7 @@ function controller(serviceBroker) {
     const vm = initialiseData(this, initData);
 
     vm.onGridSelect = (grid) => {
-        vm.gridId = grid.id;
+        vm.selectedGrid = grid;
         vm.showPicker = false;
     };
 }
