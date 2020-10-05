@@ -159,11 +159,14 @@ function controller(serviceBroker) {
 
     vm.$onChanges = () => {
         if (! vm.parentEntityRef) return;
+
+        vm.loading = true;
         serviceBroker
             .loadViewData(
                 CORE_API.ReportGridStore.getViewById,
                 [vm.gridId, mkSelectionOptions(vm.parentEntityRef)])
             .then(r => {
+                vm.loading = false;
                 vm.rawGridData = r.data;
                 vm.allTableData = prepareTableData(vm.rawGridData);
                 vm.allColumnDefs = prepareColumnDefs(vm.rawGridData);

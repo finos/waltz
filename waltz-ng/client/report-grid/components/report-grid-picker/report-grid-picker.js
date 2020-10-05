@@ -16,7 +16,7 @@ function controller(serviceBroker) {
 
     vm.$onChanges = () => {
         serviceBroker
-            .loadAppData(CORE_API.ReportGridStore.findAll)
+            .loadViewData(CORE_API.ReportGridStore.findAll)
             .then(r => vm.grids = r.data);
     };
 
