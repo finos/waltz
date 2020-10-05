@@ -1,7 +1,5 @@
 <div>
 
-    <h4 ng-bind="$ctrl.rawGridData.definition.name"></h4>
-
     <!-- NO SUMMARIES -->
     <waltz-no-data class="small"
                    ng-if="$ctrl.chunkedSummaryData.length == 0">
@@ -41,7 +39,7 @@
                 <tbody>
                 <tr ng-repeat="counter in summary.counters"
                     class="clickable"
-                    ng-class="{ 'waltz-highlighted-row' : $ctrl.selectedCounter === counter.counterId }"
+                    ng-class="{ 'waltz-highlighted-row' : $ctrl.isSelectedCounter(counter.counterId) }"
                     ng-click="$ctrl.onToggleFilter(counter)">
                     <td>
                         <div style="display: inline-block; height: 10px; width: 10px;"

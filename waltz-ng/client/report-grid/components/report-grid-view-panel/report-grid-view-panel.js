@@ -14,7 +14,8 @@ const bindings = {
 const initData = {
     categoryExtId: "CLOUD_READINESS",
     selectedCounterId: null,
-    activeSummaryColRefs: []
+    activeSummaryColRefs: [],
+    filters: []
 };
 
 const nameCol = mkLinkGridCell("Name", "application.name", "application.id", "main.app.view", { pinnedLeft:true, width: 200});
@@ -98,7 +99,15 @@ function refreshSummaries(tableData, columnDefinitions, ratingSchemeItems) {
             return {counterId: k, count, colRef, rating: ratingSchemeItemsById[ratingId]};
         })
         .groupBy(d => d.colRef)
-        .map((counters, colRef) => ({ column: columnsByRef[colRef], counters }))
+        .map((counters, colRef) => ({
+            column: columnsByRef[colRef],
+            counters: _.orderBy(
+                counters,
+                [
+                    c => c.rating.position,
+                    c => c.rating.name
+                ])
+        }))
         .orderBy([
             d => d.column.position,
             d => d.column.columnEntityReference.name
@@ -111,7 +120,7 @@ function controller(serviceBroker) {
 
     const vm = initialiseData(this, initData);
 
-    function refresh(filterParams) {
+    function refresh(filters = []) {
         vm.columnDefs = _.map(vm.allColumnDefs, cd => Object.assign(cd, {menuItems: [
             {
                 title: "Add to summary",
@@ -124,11 +133,13 @@ function controller(serviceBroker) {
         ]}));
 
         const rowFilter = td => {
-            const assocRatingIdForRow = _.get(td, [filterParams.propName, "id"], null);
-            return assocRatingIdForRow === filterParams.ratingId;
+            return _.every(filters, f => {
+                const assocRatingIdForRow = _.get(td, [f.propName, "id"], null);
+                return assocRatingIdForRow === f.ratingId;
+            });
         };
 
-        vm.tableData = filterParams
+        vm.tableData = filters.length > 0
             ? _.filter(
                 vm.allTableData,
                 rowFilter)
@@ -166,16 +177,17 @@ function controller(serviceBroker) {
     };
 
     vm.onToggleFilter = (counter) => {
-        if (vm.selectedCounter === counter.counterId) {
-            vm.selectedCounter = null;
-            refresh();
+        if (_.some(vm.filters, f =>f.counterId === counter.counterId)) {
+            vm.filters = _.reject(vm.filters, f =>f.counterId === counter.counterId);
+            refresh(vm.filters);
         } else {
-            vm.selectedCounter = counter.counterId;
-            const filterParams = {
+            const newFilter = {
+                counterId: counter.counterId,
                 propName: counter.colRef,
                 ratingId: counter.rating.id
             };
-            refresh(filterParams);
+            vm.filters = _.concat(vm.filters, [newFilter])
+            refresh(vm.filters);
         }
     };
 
@@ -189,6 +201,10 @@ function controller(serviceBroker) {
         const colRef = mkPropNameForRef(c.columnDef.columnEntityReference);
         vm.activeSummaryColRefs = _.concat(vm.activeSummaryColRefs, [colRef]);
         refresh();
+    };
+
+    vm.isSelectedCounter = (cId) => {
+        return _.some(vm.filters, f =>f.counterId === cId);
     };
 }
 
