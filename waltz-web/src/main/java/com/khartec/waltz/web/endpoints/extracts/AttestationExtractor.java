@@ -32,6 +32,7 @@ import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -70,7 +71,7 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
             IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
             Select<Record1<Long>> appIds = applicationIdSelectorFactory.apply(idSelectionOptions);
             EntityKind kind = getKind(request);
-            String year = request.queryParams("year");
+            Optional<Integer> year = getYearParam(request);
 
             String fileName = String.format("attestations-for-%s-%s-%s",
                     idSelectionOptions.entityReference().kind().name().toLowerCase(),
@@ -88,7 +89,7 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
 
     }
 
-    private SelectConditionStep<Record> mkQueryForReportingAttestationsByKindAndSelector(Select<Record1<Long>> appIds, EntityKind kind, String year) throws ParseException {
+    private SelectConditionStep<Record> mkQueryForReportingAttestationsByKindAndSelector(Select<Record1<Long>> appIds, EntityKind kind, Optional<Integer> year) throws ParseException {
 
         AttestationInstance latestAttestationInstance = ATTESTATION_INSTANCE.as("latestAttestationInstance");
         AttestationInstance attestationInstanceForPerson= ATTESTATION_INSTANCE.as("attestationInstanceForPerson");
@@ -96,7 +97,6 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
         Field<Long> latestAttestationParentId = latestAttestationInstance.PARENT_ENTITY_ID.as("parent_id");
         Field<Timestamp> latestAttestationAt = DSL.max(latestAttestationInstance.ATTESTED_AT).as("latest_attested_at");
         DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-
 
         SelectHavingStep<Record2<Long, Timestamp>> latestAttestation = dsl
                 .selectDistinct(
@@ -118,8 +118,9 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
                 .innerJoin(latestAttestation).on(attestationInstanceForPerson.PARENT_ENTITY_ID.eq(latestAttestationParentId))
                 .and(attestationInstanceForPerson.ATTESTED_AT.eq(latestAttestationAt));
 
-        Condition yearCondition = (year==null) ? (peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT).isNull()) :
-                DSL.year(DSL.date(peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT))).eq(DSL.year(sdf.parse("01/01/"+year)));
+        Condition yearCondition = (year.isPresent()) ?
+                DSL.year(DSL.date(peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT))).eq(DSL.year(sdf.parse("01/01/"+ (year.get()).toString()))) :
+                (peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT).isNull());
 
         return dsl
                 .select(APPLICATION.NAME.as("Name"),
