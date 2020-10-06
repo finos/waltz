@@ -19,7 +19,6 @@
 import _ from "lodash";
 import {initialiseData, invokeFunction, termSearch} from "../../../common";
 import template from "./grid-with-search.html";
-import moment from "moment";
 
 const bindings = {
     columnDefs: "<",
@@ -30,9 +29,7 @@ const bindings = {
     onInitialise: "<?",
     onChange: "<?",
     onRowSelect: "<?",
-    localStorageKey: "@?",
-    selectedFinancialYear: "<?",
-    returnSelectedYear: '&'
+    localStorageKey: "@?"
 };
 
 
@@ -45,29 +42,9 @@ const initialState = {
     searchControlMinRows: 5,
     searchPlaceholderText: "Search...",
     searchQuery: null,
-    financialYearFilter : [
-            'FY-'+moment().year(),
-            'FY-'+(moment().year()-1),
-            'FY-'+(moment().year()-2),
-            'FY-'+(moment().year()-3)
-    ],
-    selectedFinancialYear: 'FY-'+moment().year(),
-    onInitialise: (gridApi) => {filterByYear(gridApi)},
+    onInitialise: (gridApi) => {"Default onInitialise handler for grid-search: ", gridApi},
     onChange: (gridApi) => {}
 };
-
-function filterByYear(gridApi){
-    
-    let year = gridApi.selectedFinancialYear.split('-')[1];
-    if(gridApi.gridApi.grid.options.data[0].isAttested=="ATTESTED"){
-        let temp = gridApi.gridApi.grid.options.data.filter(function(item){
-            return  (''+(moment(item.attestation.attestedAt,"YYYY-MM-DD").year()) == year)
-        });
-        gridApi.gridApi.grid.options.data = temp;
-    }
-    
-}
-
 
 function mkSearchFields(columnDefs = []) {
     return _
@@ -92,22 +69,13 @@ function controller() {
         invokeFunction(vm.onChange, { entriesCount: _.size(vm.filteredEntries) });
     };
 
-    vm.changeYear = (yr)=>{
-        vm.selectedFinancialYear=yr;
-    }
-
-    vm.onReturnYear = (yr)=>{
-        vm.returnSelectedYear({ year: yr });
-    }
-
 }
 
 
 const component = {
     bindings,
     template,
-    controller,
-    transclude:true
+    controller
 };
 
 

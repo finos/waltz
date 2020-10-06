@@ -42,15 +42,33 @@
 <div class="row"
      ng-if="$ctrl.visibility.tableView">
     <div class="col-md-12">
-        <waltz-grid-with-search entries="$ctrl.selectedApps"
-                                column-defs="$ctrl.columnDefs"
-                                return-selected-year="$ctrl.selectedYear(year)">
+        <div ng-class="$ctrl.selectedAppsByYear.length > $ctrl.yearFilterMinRows ? 'col-md-6' : 'col-md-12'" 
+             style="padding-left:0;float: initial;" 
+             ng-if="$ctrl.selectedApps[0].attestation">
+            <div class="input-group">
+                <span>Financial Year:&nbsp;</span>
+                <div class="btn-group" uib-dropdown keyboard-nav dropdown-append-to-body>
+                    <button type="button" class="btn btn-default" uib-dropdown-toggle>
+                    {{$ctrl.selectedYear}} &nbsp;&nbsp; <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" uib-dropdown-menu role="menu">
+                        <li ng-repeat="year in $ctrl.financialYearFilter" role="menuitem">
+                            <a class="clickable" ng-click="$ctrl.changeYear(year)">
+                                {{year}}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <waltz-grid-with-search entries="$ctrl.selectedAppsByYear"
+                                column-defs="$ctrl.columnDefs">
         </waltz-grid-with-search>
         <div class="small pull-right">
             <waltz-data-extract-link name="Download {{$ctrl.exportFlowType | toDisplayName:'entity'}} Attestations"
                                      styling="link"
                                      filename="Attestations.csv"
-                                     year="$ctrl.year"
+                                     year="$ctrl.selectedYear"
                                      extract="attestations/{{$ctrl.exportFlowType}}"
                                      method="POST"
                                      request-body="$ctrl.selectionOptions">

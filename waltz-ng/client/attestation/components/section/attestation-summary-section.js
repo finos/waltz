@@ -25,6 +25,7 @@ import {entity} from "../../../common/services/enums/entity";
 import {attestationSummaryColumnDefs, mkAttestationSummaryDataForApps} from "../../attestation-utils";
 import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 import * as _ from "lodash";
+import moment from "moment";
 
 
 const initialState = {
@@ -32,13 +33,18 @@ const initialState = {
     visibility : {
         tableView: false
     },
-    selectedFlowType: null
+    yearFilterMinRows: 5,
+    selectedFlowType: null,
+    financialYearFilter : [],
+    selectedYear: null,
 };
 
 
 const bindings = {
     parentEntityRef: "<",
-    filters: "<"
+    filters: "<",
+    selectedYear: "<",
+    selectedAppsByYear: "<"
 };
 
 
@@ -47,8 +53,10 @@ function controller($q,
                     displayNameService) {
     const vm = initialiseData(this, initialState);
     
-    vm.selectedYear = (year)=>{
-        (year)? vm.year = year.split('-')[1]:  vm.year = null;
+    vm.changeYear = (year) => {
+        vm.selectedYear = year;
+        vm.selectedAppsByYear = _.filter(vm.selectedApps, app => 
+        ((moment(app.attestation.attestedAt,"YYYY-MM-DD").year()) === +vm.selectedYear) );
     }
 
     const loadData = () => {
@@ -86,6 +94,16 @@ function controller($q,
     };
 
     vm.$onInit = () => {
+
+        vm.financialYearFilter = [
+            moment().year(),
+            (moment().year()-1),
+            (moment().year()-2),
+            (moment().year()-3)
+        ];
+
+        vm.selectedYear = vm.financialYearFilter[0];
+
         vm.config =  {
             logical: Object.assign({}, attestationPieConfig, { onSelect: vm.onSelectLogicalFlow }),
             physical: Object.assign({}, attestationPieConfig, { onSelect: vm.onSelectPhysicalFlow }),
@@ -95,7 +113,11 @@ function controller($q,
     };
 
     const gridSelected = (d, grid) => {
+
         vm.selectedApps = _.filter(grid, app => app.isAttested === d.key);
+        vm.selectedAppsByYear = _.filter(vm.selectedApps, app => (!_.isUndefined(app.attestation)) ?
+        ((moment(app.attestation.attestedAt,"YYYY-MM-DD").year()) === +vm.selectedYear) : true);
+
         vm.exportFlowType = _.find(grid, r => !_.isUndefined(r.attestation)).attestation.attestedEntityKind;
         vm.visibility.tableView = true;
     };
@@ -111,7 +133,6 @@ function controller($q,
     };
 
     vm.$onChanges = (changes) => {
-
         if(changes.filters) {
             loadData();
         }

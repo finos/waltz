@@ -18,7 +18,6 @@
 
 import {initialiseData, invokeFunction} from "../../../common";
 import template from "./grid.html";
-import moment from "moment";
 
 
 const bindings = {
@@ -27,9 +26,7 @@ const bindings = {
     rowTemplate: "<",
     onInitialise: "<?",
     scopeProvider: "<?",
-    onRowSelect: "<",
-    selectedFinancialYear: "<?",
-    returnYear: "&"
+    onRowSelect: "<"
 };
 
 
@@ -42,26 +39,12 @@ const initialState = {
     minRowsToShow: 10,
     rowTemplate: null,
     scopeProvider: null,
-    onInitialise: (gridApi) => {filterByYear(gridApi); },
-    onChange: (gridApi) => {filterByYear(gridApi); }
+    onInitialise: () => {},
+    onChange: () => {}
 };
-
-function filterByYear(gridApi){
-    let year = gridApi.selectedFinancialYear.split('-')[1];
-    if(gridApi.gridApi.grid.options.data[0].isAttested=="ATTESTED"){
-        let temp = gridApi.gridApi.grid.options.data.filter(function(item){
-            return  (''+(moment(item.attestation.attestedAt,"YYYY-MM-DD").year()) == year)
-        });
-        gridApi.gridApi.grid.options.data = temp;
-    }
-}
 function controller(uiGridExporterConstants,
                     uiGridExporterService) {
     const vm = initialiseData(this, initialState);
-
-    vm.getYear = (year)=>{
-        vm.returnYear({year:year});
-    }
 
     vm.$onInit = () => {
 
@@ -81,8 +64,7 @@ function controller(uiGridExporterConstants,
                     vm.onInitialise,
                     {
                         exportFn: vm.exportData,
-                        gridApi: vm.gridApi,
-                        selectedFinancialYear: vm.selectedFinancialYear
+                        gridApi: vm.gridApi
                     });
                    
                     if (vm.onRowSelect) {
@@ -107,11 +89,6 @@ function controller(uiGridExporterConstants,
 
 
     vm.$onChanges = (changes) => {
-        if(vm.rowData && vm.rowData[0].isAttested=="ATTESTED"){
-           vm.getYear(vm.selectedFinancialYear);
-        }else{
-            vm.getYear(null);
-        }
         
         if (! vm.gridOptions) return;
 
@@ -123,8 +100,7 @@ function controller(uiGridExporterConstants,
         invokeFunction(vm.onChange,
             {
                 exportFn: vm.exportData,
-                gridApi: vm.gridApi,
-                selectedFinancialYear: vm.selectedFinancialYear
+                gridApi: vm.gridApi
             });
     };
 
