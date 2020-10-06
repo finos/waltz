@@ -1,19 +1,41 @@
 <div>
 
+    <h4 ng-if="!$ctrl.showPicker">
+        <span ng-bind="$ctrl.selectedGrid.name"></span>
+        <span class="small">
+            <a class="clickable"
+               ng-click="$ctrl.showPicker = true">
+                Change report
+            </a>
+        </span>
+    </h4>
+
+    <!-- PICKER -->
+    <div class="row"
+         ng-if="$ctrl.showPicker"
+         style="margin-bottom: 1em">
+        <div class="col-md-6">
+            <waltz-sub-section name="Report picker">
+                <content>
+                    <div class="waltz-sub-section-content">
+                        <waltz-report-grid-picker on-grid-select="$ctrl.onGridSelect">
+                        </waltz-report-grid-picker>
+                    </div>
+                    <div class="waltz-sub-section-controls">
+                        <a ng-click="$ctrl.showPicker = false"
+                           class="clickable">
+                            Close
+                        </a>
+                     </div>
+                </content>
+            </waltz-sub-section>
+        </div>
+    </div>
+
+    <!-- GRID & FILTERS -->
     <waltz-report-grid-view-panel parent-entity-ref="$ctrl.parentEntityRef"
-                                  grid-id="$ctrl.gridId">
+                                  grid-id="$ctrl.selectedGrid.id">
     </waltz-report-grid-view-panel>
 
-    <div ng-if="$ctrl.showPicker">
-        <waltz-report-grid-picker on-grid-select="$ctrl.onGridSelect">
-        </waltz-report-grid-picker>
-    </div>
-    <div ng-if="!$ctrl.showPicker" class="small">
-        <a class="clickable"
-           ng-click="$ctrl.showPicker = true">
-            Click here
-        </a>
-        to change report
-    </div>
 </div>
 

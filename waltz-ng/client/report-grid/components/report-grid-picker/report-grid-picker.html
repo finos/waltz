@@ -10,9 +10,7 @@
         </div>
         <div ng-if="$ctrl.grids.length > 0"
              class="col-sm-6">
-            <hr>
-
-            <table class="table table-condensed small">
+            <table class="table table-condensed table-hover small">
                 <thead>
                 <tr>
                     <th>Grid Name</th>
@@ -25,8 +23,8 @@
                     class="clickable"
                     ng-click="$ctrl.onSelect(grid)">
                     <td>
-                        <span ng-bind="grid.name">
-                        </span>
+                        <a ng-bind="grid.name">
+                        </a>
                     </td>
                     <td>
                         <span ng-bind="grid.description">

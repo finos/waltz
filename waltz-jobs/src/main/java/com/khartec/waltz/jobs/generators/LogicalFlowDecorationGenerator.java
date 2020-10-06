@@ -88,9 +88,9 @@ public class LogicalFlowDecorationGenerator implements SampleDataGenerator {
     @Override
     public boolean remove(ApplicationContext ctx) {
         getDsl(ctx)
-                .deleteFrom(LOGICAL_FLOW_DECORATOR)
-                //.where(LOGICAL_FLOW_DECORATOR.PROVENANCE.eq(SAMPLE_DATA_PROVENANCE))
-                .execute();
+            .deleteFrom(LOGICAL_FLOW_DECORATOR)
+            .where(LOGICAL_FLOW_DECORATOR.PROVENANCE.eq(SAMPLE_DATA_PROVENANCE))
+            .execute();
         return false;
     }
 }
