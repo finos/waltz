@@ -52,16 +52,6 @@ const initialState = {
 };
 
 
-function isMeasurableEditable(vm, categoryId) {
-    function getMeasurable(r) {
-        return _.first(_.filter(vm.measurables, m => m.id === r.measurableId));
-    }
-
-    const readOnlyRating = _.first(_.filter(vm.ratings,
-                                            r => getMeasurable(r).categoryId === categoryId && r.isReadOnly));
-    return _.isEmpty(readOnlyRating);
-}
-
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
@@ -120,6 +110,14 @@ function controller($q, serviceBroker) {
     vm.onEditRatings = () => {
         vm.visibility.editor = true;
         hideAllocationScheme();
+    };
+
+    const getMeasurableFromRating = (rating) => _.first(_.filter(vm.measurables, m => m.id === rating.measurableId));
+
+    const isMeasurableEditable = (vm, categoryId) => {
+        const readOnlyRating = _.first(_.filter(vm.ratings,
+                                                r => getMeasurableFromRating(r).categoryId === categoryId && r.isReadOnly));
+        return _.isEmpty(readOnlyRating);
     };
 
     vm.onTabChange = (tab) => {
