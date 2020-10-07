@@ -161,16 +161,16 @@ public class ReportGridDao {
 
     private SelectConditionStep<Record4<Long, Long, String, Long>> getAggregatedMeasurableData(Condition gridCondition, Select<Record1<Long>> appSelector) {
 
-        SelectConditionStep<Record1<Long>> startingMeasurableIdsForGrid = DSL.select(rgcd.COLUMN_ENTITY_ID)
+        SelectConditionStep<Record1<Long>> startingMeasurableIdsForGrid = DSL
+                .select(rgcd.COLUMN_ENTITY_ID)
                 .from(rgcd)
                 .innerJoin(rg).on(rgcd.REPORT_GRID_ID.eq(rg.ID))
                 .where(gridCondition
                         .and(rgcd.COLUMN_ENTITY_KIND.eq(EntityKind.MEASURABLE.name())
                                 .and(rgcd.RATING_ROLLUP_RULE.ne(RatingRollupRule.NONE.name()))));
 
-
-        SelectConditionStep<Record4<Long, Long, Long, Integer>> selectRatings = dsl.select(
-                MEASURABLE.ID,
+        SelectConditionStep<Record4<Long, Long, Long, Integer>> selectRatings = dsl
+                .select(MEASURABLE.ID,
                     MEASURABLE_RATING.ENTITY_ID,
                     RATING_SCHEME_ITEM.ID,
                     RATING_SCHEME_ITEM.POSITION)
@@ -248,7 +248,7 @@ public class ReportGridDao {
                 .innerJoin(ASSESSMENT_DEFINITION).on(ar.ASSESSMENT_DEFINITION_ID.eq(ASSESSMENT_DEFINITION.ID))
                 .innerJoin(rgcd).on(ASSESSMENT_DEFINITION.ID.eq(rgcd.COLUMN_ENTITY_ID)
                         .and(rgcd.COLUMN_ENTITY_KIND.eq(EntityKind.ASSESSMENT_DEFINITION.name())))
-                .innerJoin(rg).on(rgcd.ID.eq(rgcd.REPORT_GRID_ID))
+                .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
                 .where(gridCondition
                         .and(ar.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                         .and(ar.ENTITY_ID.in(appSelector)));
