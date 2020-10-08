@@ -12,6 +12,17 @@ public abstract class ReportGridColumnDefinition {
 
     public abstract EntityReference columnEntityReference();
     public abstract long position();
-    public abstract ColumnUsageKind usageKind();
+
+
+    @Value.Default
+    public ColumnUsageKind usageKind() {
+        return ColumnUsageKind.NONE;
+    }
+
+
+    @Value.Default
+    public RatingRollupRule ratingRollupRule() {
+        return RatingRollupRule.NONE;
+    }
 
 }
