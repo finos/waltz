@@ -26,7 +26,6 @@ public class ReportGridDao {
 
     private final com.khartec.waltz.schema.tables.Application app = APPLICATION.as("app");
     private final com.khartec.waltz.schema.tables.Measurable m = MEASURABLE.as("m");
-    private final com.khartec.waltz.schema.tables.Measurable m2 = MEASURABLE.as("m2");
     private final com.khartec.waltz.schema.tables.MeasurableRating mr = MEASURABLE_RATING.as("mr");
     private final com.khartec.waltz.schema.tables.MeasurableCategory mc = MEASURABLE_CATEGORY.as("mc");
     private final com.khartec.waltz.schema.tables.ReportGridColumnDefinition rgcd = REPORT_GRID_COLUMN_DEFINITION.as("rgcd");
@@ -183,8 +182,6 @@ public class ReportGridDao {
                 .innerJoin(apps).on(apps.field(0, Long.class).eq(mr.ENTITY_ID)
                         .and(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .where(mr.MEASURABLE_ID.in(exactMeasurableIds));
-
-        System.out.println(qry);
 
         return qry
                 .fetchSet(r -> ImmutableReportGridRatingCell.builder()
