@@ -88,6 +88,7 @@ public class MeasurableRatingDao {
                 .measurableId(r.getMeasurableId())
                 .lastUpdatedAt(toLocalDateTime(r.getLastUpdatedAt()))
                 .lastUpdatedBy(r.getLastUpdatedBy())
+                .isReadOnly(r.getIsReadonly())
                 .build();
     };
 

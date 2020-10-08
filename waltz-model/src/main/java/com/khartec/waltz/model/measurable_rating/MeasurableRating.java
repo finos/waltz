@@ -38,4 +38,7 @@ public abstract class MeasurableRating implements
     public abstract EntityReference entityReference();
     public abstract long measurableId();
     public abstract char rating();
+
+    @Value.Default
+    public boolean isReadOnly() { return false; }
 }
