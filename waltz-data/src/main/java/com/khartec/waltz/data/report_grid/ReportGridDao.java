@@ -17,7 +17,6 @@ import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
 import static org.jooq.impl.DSL.name;
-import static org.jooq.impl.DSL.select;
 
 @Repository
 public class ReportGridDao {
@@ -143,79 +142,12 @@ public class ReportGridDao {
     private Set<ReportGridRatingCell> findCellDataByGridCondition(Condition gridCondition,
                                                                   Select<Record1<Long>> appSelector) {
 
-        Condition condition = app.ID.in(appSelector)
-                .and(gridCondition);
+        SelectConditionStep<Record4<Long, Long, String, Long>> exactMeasurableData = fetchMeasurableData(gridCondition, appSelector);
+        SelectConditionStep<Record4<Long, Long, String, Long>> assessmentData = fetchAssessmentData(gridCondition, appSelector);
 
-        SelectConditionStep<Record4<Long, Long, String, Long>> exactMeasurableData = dsl
-                .select(app.ID,
-                        rgcd.COLUMN_ENTITY_ID,
-                        DSL.value(EntityKind.MEASURABLE.name()).as("kind"),
-                        rsi.ID)
-                .from(mr)
-                .innerJoin(app).on(app.ID.eq(mr.ENTITY_ID)).and(mr.ENTITY_KIND.eq(DSL.val(EntityKind.APPLICATION.name())))
-                .innerJoin(m).on(m.ID.eq(mr.MEASURABLE_ID))
-                .innerJoin(mc).on(mc.ID.eq(m.MEASURABLE_CATEGORY_ID))
-                .innerJoin(rgcd).on(rgcd.COLUMN_ENTITY_ID.eq(m.ID)).and(rgcd.COLUMN_ENTITY_KIND.eq(DSL.val(EntityKind.MEASURABLE.name())))
-                .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
-                .innerJoin(rsi).on(rsi.CODE.eq(mr.RATING)).and(rsi.SCHEME_ID.eq(mc.RATING_SCHEME_ID))
-                .where(dsl.renderInlined(condition))
-                .and(rgcd.DISPLAY_NAME.ne("agg")); // jOOQ seems very slow when using simple `condition` (esp. for complex conditions). Inlined seems a lot faster
+        SelectOrderByStep<Record4<Long, Long, String, Long>> qry = assessmentData.unionAll(exactMeasurableData);
 
-        SelectConditionStep<Record4<Long, Long, String, Long>> assessmentData = dsl
-                .select(app.ID,
-                        rgcd.COLUMN_ENTITY_ID,
-                        DSL.value(EntityKind.ASSESSMENT_DEFINITION.name()).as("kind"),
-                        rsi.ID)
-                .from(ar)
-                .innerJoin(app).on(app.ID.eq(ar.ENTITY_ID)).and(ar.ENTITY_KIND.eq(DSL.val(EntityKind.APPLICATION.name())))
-                .innerJoin(ad).on(ad.ID.eq(ar.ASSESSMENT_DEFINITION_ID))
-                .innerJoin(rgcd).on(rgcd.COLUMN_ENTITY_ID.eq(ad.ID)).and(rgcd.COLUMN_ENTITY_KIND.eq(DSL.val(EntityKind.ASSESSMENT_DEFINITION.name())))
-                .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
-                .innerJoin(rsi).on(rsi.ID.eq(ar.RATING_ID))
-                .where(dsl.renderInlined(condition));  // jOOQ seems very slow when using simple `condition` (esp. for complex conditions). Inlined seems a lot faster
-
-        SelectConditionStep<Record4<Long, Long, Long, Integer>> selectRatings = select(
-                MEASURABLE.ID,
-                MEASURABLE_RATING.ENTITY_ID,
-                RATING_SCHEME_ITEM.ID,
-                RATING_SCHEME_ITEM.POSITION)
-                .from(MEASURABLE)
-                .innerJoin(ENTITY_HIERARCHY).on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(MEASURABLE.ID)
-                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name())))
-                .innerJoin(MEASURABLE_RATING).on(MEASURABLE_RATING.MEASURABLE_ID.eq(ENTITY_HIERARCHY.ID))
-                .innerJoin(MEASURABLE_CATEGORY).on(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(MEASURABLE_CATEGORY.ID))
-                .innerJoin(RATING_SCHEME_ITEM).on(MEASURABLE_RATING.RATING.eq(RATING_SCHEME_ITEM.CODE)
-                        .and(RATING_SCHEME_ITEM.SCHEME_ID.eq(MEASURABLE_CATEGORY.RATING_SCHEME_ID)))
-                .where(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
-
-        CommonTableExpression<Record4<Long, Long, Long, Integer>> ratings = name("rating")
-                .fields("smid", "eid", "rid", "rp")
-                .as(selectRatings);
-
-        Table<Record4<Long, Long, Long, Integer>> r1 = ratings.as("r1");
-        Table<Record4<Long, Long, Long, Integer>> r2 = ratings.as("r2");
-
-        SelectConditionStep<Record4<Long, Long, String, Long>> aggregatedMeasurableData = dsl
-                .with(ratings)
-                .selectDistinct(
-                        r1.field("eid", Long.class),
-                        r1.field("smid", Long.class),
-                        DSL.val(EntityKind.MEASURABLE.name()),
-                        r1.field("rid", Long.class))
-                .from(r1)
-                .leftJoin(r2).on(r1.field("eid", Long.class).eq(r2.field("eid", Long.class))
-                        .and(r1.field("smid", Long.class).eq(r2.field("smid", Long.class))
-                                .and(r1.field("rp", Integer.class).gt(r2.field("rp", Integer.class)))))
-                .innerJoin(rgcd).on(rgcd.COLUMN_ENTITY_ID.eq(r1.field("smid", Long.class))
-                        .and(rgcd.COLUMN_ENTITY_KIND.eq(DSL.val(EntityKind.MEASURABLE.name()))
-                                .and(rgcd.DISPLAY_NAME.eq("agg"))))
-                .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
-                .where(r2.field("rid", Long.class).isNull()
-                        .and(r1.field("eid", Long.class).in(appSelector)));
-
-        return aggregatedMeasurableData
-                .unionAll(assessmentData)
-                .unionAll(exactMeasurableData)
+        return qry
                 .fetchSet(r -> ImmutableReportGridRatingCell
                         .builder()
                         .applicationId(r.get(0, Long.class))
@@ -223,6 +155,103 @@ public class ReportGridDao {
                         .columnEntityKind(EntityKind.valueOf(r.get(2, String.class)))
                         .ratingId(r.get(3, Long.class))
                         .build());
+
+    }
+
+
+    private SelectConditionStep<Record4<Long, Long, String, Long>> getAggregatedMeasurableData(Condition gridCondition, Select<Record1<Long>> appSelector) {
+
+        SelectConditionStep<Record1<Long>> startingMeasurableIdsForGrid = DSL
+                .select(rgcd.COLUMN_ENTITY_ID)
+                .from(rgcd)
+                .innerJoin(rg).on(rgcd.REPORT_GRID_ID.eq(rg.ID))
+                .where(gridCondition
+                        .and(rgcd.COLUMN_ENTITY_KIND.eq(EntityKind.MEASURABLE.name())
+                                .and(rgcd.RATING_ROLLUP_RULE.ne(RatingRollupRule.NONE.name()))));
+
+        SelectConditionStep<Record4<Long, Long, Long, Integer>> selectRatings = dsl
+                .select(MEASURABLE.ID,
+                    MEASURABLE_RATING.ENTITY_ID,
+                    RATING_SCHEME_ITEM.ID,
+                    RATING_SCHEME_ITEM.POSITION)
+                .from(MEASURABLE)
+                .innerJoin(ENTITY_HIERARCHY).on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(MEASURABLE.ID)
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name())))
+                .innerJoin(MEASURABLE_RATING).on(MEASURABLE_RATING.MEASURABLE_ID.eq(ENTITY_HIERARCHY.ID))
+                .innerJoin(MEASURABLE_CATEGORY).on(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(MEASURABLE_CATEGORY.ID))
+                .innerJoin(RATING_SCHEME_ITEM).on(MEASURABLE_RATING.RATING.eq(RATING_SCHEME_ITEM.CODE)
+                        .and(RATING_SCHEME_ITEM.SCHEME_ID.eq(MEASURABLE_CATEGORY.RATING_SCHEME_ID)))
+                .where(dsl.renderInlined(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                        .and(MEASURABLE.ID.in(startingMeasurableIdsForGrid)
+                                .and(MEASURABLE_RATING.ENTITY_ID.in(appSelector)))));
+
+        CommonTableExpression<Record4<Long, Long, Long, Integer>> ratings;
+        ratings = name("rating")
+                .fields("smid", "eid", "rid", "rp")
+                .as(selectRatings);
+
+        Table<Record4<Long, Long, Long, Integer>> r1 = ratings.as("r1");
+        Table<Record4<Long, Long, Long, Integer>> r2 = ratings.as("r2");
+
+        SelectConditionStep<Record4<Long, Long, String, Long>> where = dsl
+                .with(ratings)
+                .selectDistinct(r1.field("eid", Long.class),
+                        r1.field("smid", Long.class),
+                        DSL.val(EntityKind.MEASURABLE.name()),
+                        r1.field("rid", Long.class))
+                .from(r1)
+                .leftJoin(r2).on(r1.field("eid", Long.class).eq(r2.field("eid", Long.class))
+                        .and(r1.field("smid", Long.class).eq(r2.field("smid", Long.class)))
+                        .and(r1.field("rp", Integer.class).lt(r2.field("rp", Integer.class))))  // TODO: how to dynamically switch the operator (lt, gt) based on RRR
+                .where(dsl.renderInlined(r2.field("rid", Long.class).isNull()
+                        .and(r1.field("eid", Long.class).in(appSelector))));
+        return where;  // don't use condition as we don't have 'app' table alias
+    }
+
+
+    private SelectConditionStep<Record4<Long, Long, String, Long>> fetchMeasurableData(Condition gridCondition, Select<Record1<Long>> appSelector) {
+
+        Condition measurablesForGridCondition = gridCondition
+                .and(rgcd.COLUMN_ENTITY_KIND.eq(EntityKind.MEASURABLE.name()))
+                .and(rgcd.RATING_ROLLUP_RULE.eq(RatingRollupRule.NONE.name()));
+
+        SelectConditionStep<Record1<Long>> measurableIdsForGrid = DSL
+                .select(rgcd.COLUMN_ENTITY_ID)
+                .from(rgcd)
+                .innerJoin(rg).on(rgcd.REPORT_GRID_ID.eq(rg.ID))
+                .where(dsl.renderInlined(measurablesForGridCondition));
+
+        Condition measurableCondition = mr.ENTITY_ID.in(appSelector)
+                .and(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(mr.MEASURABLE_ID.in(measurableIdsForGrid));
+
+        return dsl
+                .select(mr.ENTITY_ID,
+                        mr.MEASURABLE_ID,
+                        DSL.value(EntityKind.MEASURABLE.name()),
+                        rsi.ID)
+                .from(mr)
+                .innerJoin(m).on(m.ID.eq(mr.MEASURABLE_ID))
+                .innerJoin(mc).on(mc.ID.eq(m.MEASURABLE_CATEGORY_ID))
+                .innerJoin(rsi).on(rsi.CODE.eq(mr.RATING)).and(rsi.SCHEME_ID.eq(mc.RATING_SCHEME_ID))
+                .where(dsl.renderInlined(measurableCondition));
+    }
+
+
+    private SelectConditionStep<Record4<Long, Long, String, Long>> fetchAssessmentData(Condition gridCondition, Select<Record1<Long>> appSelector) {
+        return dsl
+                .select(ar.ENTITY_ID,
+                        ar.ASSESSMENT_DEFINITION_ID,
+                        DSL.value(EntityKind.ASSESSMENT_DEFINITION.name()),
+                        ar.RATING_ID)
+                .from(ar)
+                .innerJoin(ASSESSMENT_DEFINITION).on(ar.ASSESSMENT_DEFINITION_ID.eq(ASSESSMENT_DEFINITION.ID))
+                .innerJoin(rgcd).on(ASSESSMENT_DEFINITION.ID.eq(rgcd.COLUMN_ENTITY_ID)
+                        .and(rgcd.COLUMN_ENTITY_KIND.eq(EntityKind.ASSESSMENT_DEFINITION.name())))
+                .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
+                .where(gridCondition
+                        .and(ar.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                        .and(ar.ENTITY_ID.in(appSelector)));
     }
 }
 

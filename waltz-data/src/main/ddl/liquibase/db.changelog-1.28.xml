@@ -176,5 +176,18 @@
         </addColumn>
     </changeSet>
 
+    
+    <changeSet id="2021006-5107-5"
+               author="davidwatkins73">
+        <comment>5107: Report Grid - add column to indicate if/how column should be aggregated (assuming it is a measurable)</comment>
+        <addColumn tableName="report_grid_column_definition">
+            <column name="rating_rollup_rule"
+                    type="${enum.type}"
+                    defaultValue="NONE">  <!-- i.e. PICK_HIGHEST | PICK_LOWEST | ... -->
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 
 </databaseChangeLog>
