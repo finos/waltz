@@ -77,42 +77,91 @@ function prepareTableData(gridData) {
 }
 
 
-function refreshSummaries(tableData, columnDefinitions, ratingSchemeItems) {
-    const ratingSchemeItemsById = _.keyBy(ratingSchemeItems, d => d.id);
-    const columnsByRef = _.keyBy(columnDefinitions, d => mkPropNameForRef(d.columnEntityReference));
+/**
+ * We are not interested in some properties in the table data.
+ * @param k
+ * @returns {boolean}
+ */
+function isSummarisableProperty(k) {
+    return ! (k === "application"
+        || k === "$$hashKey"
+        || k === "visible");
+}
 
-    const accInc = (acc, prop) => _.set(acc, prop, _.get(acc, prop, 0) + 1);
+
+function refreshSummaries(tableData, columnDefinitions, ratingSchemeItems) {
+
+    // increments a pair of counters referenced by `prop` in the object `acc`
+    const accInc = (acc, prop, visible) => {
+        const counts = _.get(acc, prop, {visible: 0, total:  0});
+        counts.total++;
+        if (visible) {
+            counts.visible++;
+        }
+        acc[prop] = counts;
+    };
+
+    // reduce each value in an object representing a row by incrementing counters based on the property / value
     const reducer = (acc, row) => {
         _.forEach(
             row,
-            (v, k) => k === "application" || k === "$$hashKey"
-                ? acc
-                : accInc(acc, k + "#"+ v.id));
+            (v, k) => isSummarisableProperty(k)
+                ? accInc(
+                    acc,
+                    k + "#" + v.id,
+                    _.get(row, ["visible"], true))
+                : acc);
         return acc;
     };
 
+    const ratingSchemeItemsById = _.keyBy(ratingSchemeItems, d => d.id);
+    const columnsByRef = _.keyBy(columnDefinitions, d => mkPropNameForRef(d.columnEntityReference));
+
     return _
         .chain(tableData)
-        .reduce(reducer, {})
-        .map((count, k) => {
+        .reduce(reducer, {})  // transform into a raw summary object for all rows
+        .map((counts, k) => { // convert basic prop-val/count pairs in the summary object into a list of enriched objects
             const [colRef, ratingId] = _.split(k, "#");
-            return {counterId: k, count, colRef, rating: ratingSchemeItemsById[ratingId]};
+            return {counterId: k, counts, colRef, rating: ratingSchemeItemsById[ratingId]};
         })
-        .groupBy(d => d.colRef)
-        .map((counters, colRef) => ({
+        .groupBy(d => d.colRef)  // group by the prop (colRef)
+        .map((counters, colRef) => ({ // convert each prop group into a summary object with the actual column and a sorted set of counters
             column: columnsByRef[colRef],
-            counters: _.orderBy(
+            counters: _.orderBy(  // sort counters according to the rating ordering
                 counters,
                 [
                     c => c.rating.position,
                     c => c.rating.name
-                ])
+                ]),
+            total: _.sumBy(counters, c => c.counts.total),
+            totalVisible: _.sumBy(counters, c => c.counts.visible)
         }))
-        .orderBy([
+        .orderBy([  // order the summaries so they reflect the column order
             d => d.column.position,
             d => d.column.columnEntityReference.name
         ])
         .value();
+}
+
+
+/**
+ * Returns a function which acts as a predicate to test rows against.
+ *
+ * The set of filters is first grouped by the row property they test.
+ * For a row to pass, _at least_ one filter for _each_ group (prop)
+ * needs to pass.
+ *
+ * @param filters
+ * @returns {function(*=): boolean}
+ */
+function mkRowFilter(filters = []) {
+    const filtersByPropName = _.groupBy(filters, f => f.propName);
+    return td => _.every(
+        filtersByPropName,
+        (filtersForProp, prop) => {
+            const propRating = _.get(td, [prop, "id"], null);
+            return _.some(filtersForProp, f => propRating === f.ratingId);
+        });
 }
 
 
@@ -125,28 +174,23 @@ function controller(serviceBroker) {
             {
                 title: "Add to summary",
                 icon: "ui-grid-icon-info-circled",
-                action: function($event) {
+                action: function() {
                     vm.onAddSummary(cd);
                 },
                 context: vm
             }
         ]}));
 
-        const rowFilter = td => {
-            return _.every(filters, f => {
-                const assocRatingIdForRow = _.get(td, [f.propName, "id"], null);
-                return assocRatingIdForRow === f.ratingId;
-            });
-        };
+        const rowFilter = mkRowFilter(filters);
 
-        vm.tableData = filters.length > 0
-            ? _.filter(
-                vm.allTableData,
-                rowFilter)
-            : vm.allTableData;
+        const workingTableData =  _.map(
+            vm.allTableData,
+            d => Object.assign({}, d, { visible: rowFilter(d) }));
+
+        vm.tableData = _.filter(workingTableData, d => d.visible);
 
         const summaries = refreshSummaries(
-            vm.tableData,
+            workingTableData,
             vm.rawGridData.definition.columnDefinitions,
             vm.rawGridData.instance.ratingSchemeItems);
 
@@ -155,6 +199,7 @@ function controller(serviceBroker) {
                 summaries,
                 d => _.includes(vm.activeSummaryColRefs, mkPropNameForRef(d.column.columnEntityReference))),
             4);
+
     }
 
     vm.$onChanges = () => {
@@ -166,6 +211,7 @@ function controller(serviceBroker) {
                 CORE_API.ReportGridStore.getViewById,
                 [vm.gridId, mkSelectionOptions(vm.parentEntityRef)])
             .then(r => {
+                vm.filters = [];
                 vm.loading = false;
                 vm.rawGridData = r.data;
                 vm.allTableData = prepareTableData(vm.rawGridData);
@@ -197,13 +243,15 @@ function controller(serviceBroker) {
     vm.onRemoveSummary = (summary) => {
         const refToRemove = mkPropNameForRef(summary.column.columnEntityReference);
         vm.activeSummaryColRefs = _.reject(vm.activeSummaryColRefs, ref => ref === refToRemove);
-        refresh();
+        // remove any filters which refer to the property used by this summary
+        vm.filters = _.reject(vm.filters, f => f.propName === refToRemove);
+        refresh(vm.filters);
     };
 
     vm.onAddSummary = (c) => {
         const colRef = mkPropNameForRef(c.columnDef.columnEntityReference);
         vm.activeSummaryColRefs = _.concat(vm.activeSummaryColRefs, [colRef]);
-        refresh();
+        refresh(vm.filters);
     };
 
     vm.isSelectedCounter = (cId) => {
