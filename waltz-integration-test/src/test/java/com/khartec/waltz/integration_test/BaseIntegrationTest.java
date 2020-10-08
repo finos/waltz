@@ -22,6 +22,8 @@ import com.khartec.waltz.common.CollectionUtilities;
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.LoggingUtilities;
 import com.khartec.waltz.data.actor.ActorDao;
+import com.khartec.waltz.data.app_group.AppGroupDao;
+import com.khartec.waltz.data.app_group.AppGroupEntryDao;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.measurable_category.MeasurableCategoryDao;
@@ -29,6 +31,9 @@ import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.actor.ImmutableActorCreateCommand;
+import com.khartec.waltz.model.app_group.AppGroup;
+import com.khartec.waltz.model.app_group.AppGroupKind;
+import com.khartec.waltz.model.app_group.ImmutableAppGroup;
 import com.khartec.waltz.model.application.AppRegistrationResponse;
 import com.khartec.waltz.model.application.ApplicationKind;
 import com.khartec.waltz.model.application.ImmutableAppRegistrationRequest;
@@ -45,6 +50,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -90,6 +96,21 @@ public class BaseIntegrationTest {
     }
 
 
+    public Long createOrgUnit(String nameStem, Long parentId) {
+        OrganisationalUnitRecord record = getDsl().newRecord(ORGANISATIONAL_UNIT);
+        record.setId(ctr.incrementAndGet());
+        record.setName(nameStem + "Name");
+        record.setDescription(nameStem + "Desc");
+        record.setParentId(parentId);
+        record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
+        record.setLastUpdatedBy("admin");
+        record.setProvenance("integration-test");
+        record.insert();
+
+        return record.getId();
+    }
+
+
     protected long createMeasurableCategory(String name) {
         MeasurableCategoryDao dao = ctx.getBean(MeasurableCategoryDao.class);
         Set<MeasurableCategory> categories = dao.findByExternalId(name);
@@ -127,6 +148,7 @@ public class BaseIntegrationTest {
                     return record.getId();
                 });
     }
+
 
     protected long createMeasurable(String name, long categoryId) {
         return getDsl()
@@ -192,6 +214,45 @@ public class BaseIntegrationTest {
     }
 
 
+    public Long createAppGroupWithAppRefs(String groupName, Collection<EntityReference> appRefs) {
+        Collection<Long> appIds = CollectionUtilities.map(appRefs, EntityReference::id);
+        return createAppGroupWithAppIds(groupName, appIds);
+    }
+
+
+    public Long createAppGroupWithAppIds(String groupName, Collection<Long> appIds) {
+        AppGroup g = ImmutableAppGroup
+                .builder()
+                .name(groupName)
+                .appGroupKind(AppGroupKind.PUBLIC)
+                .build();
+
+        Long gId = ctx.getBean(AppGroupDao.class)
+                .insert(g);
+
+        ctx.getBean(AppGroupEntryDao.class)
+                .addApplications(gId, appIds);
+
+        return gId;
+    }
+
+
+    public EntityReference createNewApp(String name, Long ouId) {
+        AppRegistrationResponse resp = ctx.getBean(ApplicationDao.class)
+                .registerApp(ImmutableAppRegistrationRequest.builder()
+                        .name(name)
+                        .organisationalUnitId(ouId != null ? ouId : 1L)
+                        .applicationKind(ApplicationKind.IN_HOUSE)
+                        .businessCriticality(Criticality.MEDIUM)
+                        .lifecyclePhase(LifecyclePhase.PRODUCTION)
+                        .overallRating(RagRating.G)
+                        .businessCriticality(Criticality.MEDIUM)
+                        .build());
+
+        return resp.id().map(id -> mkRef(EntityKind.APPLICATION, id)).get();
+    }
+
+
 
     public DSLContext getDsl() {
         return ctx.getBean(DSLContext.class);
@@ -203,22 +264,6 @@ public class BaseIntegrationTest {
         return mkRef(
                 EntityKind.APPLICATION,
                 ctr.incrementAndGet());
-    }
-
-
-    public EntityReference mkNewApp(String name) {
-        AppRegistrationResponse resp = ctx.getBean(ApplicationDao.class)
-                .registerApp(ImmutableAppRegistrationRequest.builder()
-                        .name(name)
-                        .organisationalUnitId(1L)
-                        .applicationKind(ApplicationKind.IN_HOUSE)
-                        .businessCriticality(Criticality.MEDIUM)
-                        .lifecyclePhase(LifecyclePhase.PRODUCTION)
-                        .overallRating(RagRating.G)
-                        .businessCriticality(Criticality.MEDIUM)
-                        .build());
-
-        return resp.id().map(id -> mkRef(EntityKind.APPLICATION, id)).get();
     }
 
 
