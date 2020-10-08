@@ -335,7 +335,7 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
         Condition applicationConditions = mkApplicationConditions(options);
 
         return DSL
-                .select(APPLICATION.ID)
+                .selectDistinct(APPLICATION.ID)
                 .from(APPLICATION)
                 .where(APPLICATION.ORGANISATIONAL_UNIT_ID.in(ouSelector))
                 .and(applicationConditions);
