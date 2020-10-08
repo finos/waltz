@@ -94,10 +94,10 @@ public class MeasurableRatingDaoTest extends BaseIntegrationTest {
         long m1Id = createMeasurable("m1", categoryId);
         long m2Id = createMeasurable("m2", categoryId);
 
-        EntityReference app1Ref = mkNewApp("a1");
+        EntityReference app1Ref = createNewApp("a1", null);
         mkRatings(app1Ref, m1Id, m2Id);
 
-        EntityReference app2Ref = mkNewApp("a2");
+        EntityReference app2Ref = createNewApp("a2", null);
         mkRatings(app2Ref, m1Id);
 
         rebuildHierarachy(EntityKind.MEASURABLE);
@@ -133,7 +133,7 @@ public class MeasurableRatingDaoTest extends BaseIntegrationTest {
         long m1Id = createMeasurable("m1", categoryId);
         long m2Id = createMeasurable("m2", categoryId);
 
-        EntityReference app1Ref = mkNewApp("a1");
+        EntityReference app1Ref = createNewApp("a1", null);
         mkRatings(app1Ref, m1Id, m2Id);
 
         assertEquals(
