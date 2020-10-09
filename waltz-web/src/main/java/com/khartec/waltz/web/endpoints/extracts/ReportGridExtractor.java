@@ -123,9 +123,9 @@ public class ReportGridExtractor implements DataExtractor {
 
     private List<String> mkHeaderStrings(List<ReportGridColumnDefinition> columnDefinitions) {
         List<String> staticHeaders = newArrayList(
-                "APPLICATION ID",
-                "APPLICATION NAME",
-                "APPLICATION ASSET CODE");
+                "Application Id",
+                "Application Name",
+                "Application Asset Code");
 
         List<String> columnHeaders = map(columnDefinitions,
                 r -> r.columnEntityReference().name().get());
@@ -172,11 +172,10 @@ public class ReportGridExtractor implements DataExtractor {
                     //find data for columns
                     columnDefinitions
                             .stream()
-                            .forEach(t -> {
-                                reportRow.add(ratingsByColumnRefForApp.getOrDefault(
-                                        tuple(t.columnEntityReference().id(), t.columnEntityReference().kind()),
-                                        null));
-                            });
+                            .forEach(t -> reportRow.add(
+                                    ratingsByColumnRefForApp.getOrDefault(
+                                            tuple(t.columnEntityReference().id(), t.columnEntityReference().kind()),
+                                            null)));
                     return reportRow;
                 })
                 .sorted((r1, r2) -> {
