@@ -205,6 +205,8 @@ function controller(serviceBroker) {
     vm.$onChanges = () => {
         if (! vm.parentEntityRef) return;
 
+        vm.selectionOptions = mkSelectionOptions(vm.parentEntityRef);
+
         vm.loading = true;
         serviceBroker
             .loadViewData(
@@ -265,7 +267,7 @@ const component = {
     controller,
     bindings,
     template
-}
+};
 
 export default {
     id: "waltzReportGridViewPanel",
