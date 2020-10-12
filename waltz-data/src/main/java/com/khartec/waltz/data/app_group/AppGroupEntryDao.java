@@ -29,6 +29,7 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 
 import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
@@ -77,7 +78,7 @@ public class AppGroupEntryDao {
     }
 
 
-    public int[] addApplications(long groupId, List<Long> applicationIds) {
+    public int[] addApplications(long groupId, Collection<Long> applicationIds) {
         Query[] queries = applicationIds
                 .stream()
                 .map(id -> DSL.insertInto(APPLICATION_GROUP_ENTRY)
