@@ -126,11 +126,18 @@ function controller($q,
                 { force: true })
             .then(r => r.data);
 
+        const permissionGroupPromise = serviceBroker
+            .loadViewData(
+                CORE_API.PermissionGroupStore.findByEntity,
+                [entityReference])
+            .then(r => r.data);
+
         return $q
-            .all([runsPromise, instancesPromise, unattestedChangesPromise])
-            .then(([runs, instances, unattestedChanges]) => {
+            .all([runsPromise, instancesPromise, unattestedChangesPromise, permissionGroupPromise])
+            .then(([runs, instances, unattestedChanges, permissions]) => {
                 vm.attestations = mkAttestationData(runs, instances);
                 vm.attestationSections = mkAttestationSections(baseSections, vm.attestations, unattestedChanges);
+                vm.permissions = permissions
             });
     };
 
@@ -155,6 +162,7 @@ function controller($q,
     };
 
     vm.onInitiateAttestation = (section) => {
+        console.log('onInitiateAttestation - ',section);
         vm.activeAttestationSection = section;
         vm.mode = modes.EDIT;
     };
