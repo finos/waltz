@@ -31,6 +31,8 @@ public class ReportGridDao {
     private final com.khartec.waltz.schema.tables.ReportGridColumnDefinition rgcd = REPORT_GRID_COLUMN_DEFINITION.as("rgcd");
     private final com.khartec.waltz.schema.tables.ReportGrid rg = Tables.REPORT_GRID.as("rg");
     private final com.khartec.waltz.schema.tables.RatingSchemeItem rsi = RATING_SCHEME_ITEM.as("rsi");
+    private final com.khartec.waltz.schema.tables.RatingScheme rs = RATING_SCHEME.as("rs");
+    private final com.khartec.waltz.schema.tables.EntityHierarchy eh = ENTITY_HIERARCHY.as("eh");
     private final com.khartec.waltz.schema.tables.AssessmentDefinition ad = ASSESSMENT_DEFINITION.as("ad");
     private final com.khartec.waltz.schema.tables.AssessmentRating ar = ASSESSMENT_RATING.as("ar");
 
@@ -101,25 +103,27 @@ public class ReportGridDao {
 
 
     private List<ReportGridColumnDefinition> getColumns(Condition condition) {
-        SelectConditionStep<Record6<String, Long, String, String, Integer, String>> assessmentDefinitionColumns = dsl
+        SelectConditionStep<Record7<String, Long, String, String, Integer, String, String>> assessmentDefinitionColumns = dsl
                 .select(DSL.coalesce(rgcd.DISPLAY_NAME, ad.NAME).as("name"),
                         rgcd.COLUMN_ENTITY_ID,
                         rgcd.COLUMN_ENTITY_KIND,
                         ad.DESCRIPTION.as("desc"),
                         rgcd.POSITION,
-                        rgcd.COLUMN_USAGE_KIND)
+                        rgcd.COLUMN_USAGE_KIND,
+                        rgcd.RATING_ROLLUP_RULE)
                 .from(rgcd)
                 .innerJoin(ad).on(ad.ID.eq(rgcd.COLUMN_ENTITY_ID).and(rgcd.COLUMN_ENTITY_KIND.eq(EntityKind.ASSESSMENT_DEFINITION.name())))
                 .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
                 .where(condition);
 
-        SelectConditionStep<Record6<String, Long, String, String, Integer, String>> measurableColumns = dsl
+        SelectConditionStep<Record7<String, Long, String, String, Integer, String, String>> measurableColumns = dsl
                 .select(DSL.coalesce(rgcd.DISPLAY_NAME, m.NAME).as("name"),
                         rgcd.COLUMN_ENTITY_ID,
                         rgcd.COLUMN_ENTITY_KIND,
                         m.DESCRIPTION.as("desc"),
                         rgcd.POSITION,
-                        rgcd.COLUMN_USAGE_KIND)
+                        rgcd.COLUMN_USAGE_KIND,
+                        rgcd.RATING_ROLLUP_RULE)
                 .from(rgcd)
                 .innerJoin(m).on(m.ID.eq(rgcd.COLUMN_ENTITY_ID).and(rgcd.COLUMN_ENTITY_KIND.eq(EntityKind.MEASURABLE.name())))
                 .innerJoin(rg).on(rg.ID.eq(rgcd.REPORT_GRID_ID))
@@ -136,6 +140,7 @@ public class ReportGridDao {
                                 r.get("desc", String.class)))
                         .position(r.get(rgcd.POSITION))
                         .usageKind(ColumnUsageKind.valueOf(r.get(rgcd.COLUMN_USAGE_KIND)))
+                        .ratingRollupRule(RatingRollupRule.valueOf(r.get(rgcd.RATING_ROLLUP_RULE)))
                         .build());
     }
 
@@ -161,9 +166,73 @@ public class ReportGridDao {
                 measurableColumnsByRollupKind.get(RatingRollupRule.NONE),
                 cd -> cd.columnEntityReference().id());
 
+        Set<Long> summaryMeasurableIds = SetUtilities.map(
+                measurableColumnsByRollupKind.get(RatingRollupRule.PICK_HIGHEST),
+                cd -> cd.columnEntityReference().id());
+
         return union(
+            fetchSummaryMeasurableData(appSelector, summaryMeasurableIds),
             fetchAssessmentData(appSelector, requiredAssessmentDefinitions),
             fetchExactMeasurableData(appSelector, exactMeasurableIds));
+    }
+
+
+    private Set<ReportGridRatingCell> fetchSummaryMeasurableData(Select<Record1<Long>> appSelector,
+                                                                 Set<Long> measurableIds) {
+
+        Table<Record4<Long, String, Long, Integer>> ratingSchemeItems = DSL
+                .select(mc.ID.as("mcId"),
+                        rsi.CODE,
+                        rsi.ID.as("rsiId"),
+                        rsi.POSITION)
+                .from(mc)
+                .innerJoin(rsi)
+                .on(rsi.SCHEME_ID.eq(mc.RATING_SCHEME_ID))
+                .asTable("ratingSchemeItems");
+
+        SelectConditionStep<Record4<Long, Long, Long, Integer>> ratingTable = dsl
+                .select(
+                        m.ID,
+                        mr.ENTITY_ID,
+                        ratingSchemeItems.field(2, Long.class),
+                        ratingSchemeItems.field(3, Integer.class))
+                .from(m)
+                .innerJoin(eh)
+                    .on(eh.ANCESTOR_ID.eq(m.ID))
+                    .and(eh.KIND.eq(EntityKind.MEASURABLE.name()))
+                .innerJoin(mr)
+                    .on(mr.MEASURABLE_ID.eq(eh.ID))
+                .innerJoin(ratingSchemeItems)
+                    .on(m.MEASURABLE_CATEGORY_ID.eq(ratingSchemeItems.field(0, Long.class)))
+                    .and(mr.RATING.eq(ratingSchemeItems.field(1, String.class)))
+                .where(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(dsl.renderInlined(mr.ENTITY_ID.in(appSelector).and(m.ID.in(measurableIds))));
+
+        Table<Record4<Long, Long, Long, Integer>> r1 = ratingTable.asTable("r1");
+        Table<Record4<Long, Long, Long, Integer>> r2 = r1.asTable("r2");
+
+        SelectConditionStep<Record3<Long, Long, Long>> qry = dsl
+                .selectDistinct(
+                    r1.field(0, Long.class), // MEASURABLE_ID
+                    r1.field(1, Long.class), // APP_ID
+                    r1.field(2, Long.class)) // RATING_ID
+                .from(r1)
+                .leftJoin(r2)
+                    .on(r1.field(1, Long.class).eq(r2.field(1, Long.class)))
+                    .and(r1.field(3, Integer.class).lt(r2.field(3, Integer.class)))
+                .where(r2.field(1).isNull());
+
+        System.out.println(qry);
+        return dsl
+                .resultQuery(dsl.renderInlined(qry))
+                .fetchSet(r -> ImmutableReportGridRatingCell.builder()
+                        .applicationId(r.get(1, Long.class))
+                        .columnEntityId(r.get(0, Long.class))
+                        .columnEntityKind(EntityKind.MEASURABLE)
+                        .ratingId(r.get(2, Long.class))
+                        .build());
+
+
     }
 
 
