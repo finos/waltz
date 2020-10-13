@@ -21,7 +21,10 @@ package com.khartec.waltz.service.report_grid;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.report_grid.ReportGridDao;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.ImmutableIdSelectionOptions;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.rating.RagName;
 import com.khartec.waltz.model.report_grid.*;
@@ -70,7 +73,17 @@ public class ReportGridService {
             long id,
             IdSelectionOptions idSelectionOptions) {
 
-        ReportGridInstance instance = mkInstance(id, idSelectionOptions);
+        // WARNING:  The grid computation is very slow if given a large person tree.
+        //    Therefore we restrict it to EXACT only behaviour.
+        //    If you are changing this please ensure you have tested with realistic test data.
+
+        IdSelectionOptions opts = idSelectionOptions.entityReference().kind() == EntityKind.PERSON
+                ? ImmutableIdSelectionOptions
+                    .copyOf(idSelectionOptions)
+                    .withScope(HierarchyQueryScope.EXACT)
+                : idSelectionOptions;
+
+        ReportGridInstance instance = mkInstance(id, opts);
         ReportGridDefinition definition = reportGridDao.getGridDefinitionById(id);
 
         return ImmutableReportGrid
@@ -99,6 +112,5 @@ public class ReportGridService {
         return instance;
     }
 
-    // -- READ
 
 }
