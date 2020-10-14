@@ -39,8 +39,7 @@ const initialState = {
     minRowsToShow: 10,
     rowTemplate: null,
     scopeProvider: null,
-    onInitialise: () => {},
-    onChange: () => {}
+    onInitialise: () => {}
 };
 
 function controller(uiGridExporterConstants,
@@ -56,7 +55,9 @@ function controller(uiGridExporterConstants,
             enableGridMenu: false,
             minRowsToShow: vm.minRowsToShow,
             enableRowHeaderSelection: false,
-            enableRowSelection: vm.onRowSelect ? true: false,
+            enableRowSelection: vm.onRowSelect
+                ? true
+                : false,
             onRegisterApi: function(gridApi){
                 vm.gridApi = gridApi;
 
@@ -66,7 +67,7 @@ function controller(uiGridExporterConstants,
                         exportFn: vm.exportData,
                         gridApi: vm.gridApi
                     });
-                   
+
                 if (vm.onRowSelect) {
                     gridApi.selection.setMultiSelect(false);
                     gridApi.selection.toggleRowSelection(true);
@@ -94,7 +95,7 @@ function controller(uiGridExporterConstants,
         if (changes.columnDefs) {
             vm.gridOptions.columnDefs = vm.columnDefs;
         }
-        
+
         vm.gridOptions.minRowsToShow = Math.min(vm.minRowsToShow, vm.rowData.length);
         vm.gridOptions.data = vm.rowData;
     };
@@ -116,9 +117,6 @@ function controller(uiGridExporterConstants,
                 uiGridExporterService.downloadFile(fileName, csvContent, false);
             });
     };
-
-
-
 
 }
 

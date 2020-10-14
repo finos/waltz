@@ -19,7 +19,7 @@
 
 import {CORE_API} from "../common/services/core-api-utils";
 import _ from "lodash";
-import {mkDateGridCell , mkEntityLinkGridCell} from "../common/grid-utils";
+import {mkDateGridCell, mkEntityLinkGridCell} from "../common/grid-utils";
 import {mapToDisplayNames} from "../applications/application-utils";
 import {entity} from "../common/services/enums/entity";
 

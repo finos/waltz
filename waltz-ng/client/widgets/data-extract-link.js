@@ -67,10 +67,9 @@ function getFileNameFromHttpResponse(httpResponse) {
 function controller($http, notification, baseExtractUrl) {
     const vm = initialiseData(this, initialState);
 
-    const trailingSlash = /\/$|\/(?=\?)|\/(?=#)/g;
 
     vm.$onChanges = () => {
-        vm.url = `${baseExtractUrl}/${vm.extract}`.replace(trailingSlash,'');
+        vm.url = `${baseExtractUrl}/${vm.extract}`;
         vm.classes = calcClasses(vm.styling);
     };
 

@@ -20,19 +20,19 @@
     <div class="row"
          ng-if="$ctrl.entries.length >= $ctrl.searchControlMinRows">
         <div class="col-md-6">
-            <waltz-search-control min-characters="3" 
-                                  delay="250" 
+            <waltz-search-control min-characters="3"
+                                  delay="250"
                                   on-query="$ctrl.filterEntries"
-                                  local-storage-key="{{ $ctrl.localStorageKey }}" 
+                                  local-storage-key="{{ $ctrl.localStorageKey }}"
                                   placeholder-text="{{ $ctrl.searchPlaceholderText }}">
             </waltz-search-control>
         </div>
     </div>
-    
-    <waltz-grid column-defs="$ctrl.columnDefs" 
+
+    <waltz-grid column-defs="$ctrl.columnDefs"
                 row-data="$ctrl.filteredEntries"
-                scope-provider="$ctrl.scopeProvider" 
-                on-initialise="$ctrl.onInitialise" 
+                scope-provider="$ctrl.scopeProvider"
+                on-initialise="$ctrl.onInitialise"
                 on-row-select="$ctrl.onRowSelect"
                 class="small">
     </waltz-grid>

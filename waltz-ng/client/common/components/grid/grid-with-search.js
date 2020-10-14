@@ -58,12 +58,13 @@ function mkSearchFields(columnDefs = []) {
 
 function controller() {
     const vm = initialiseData(this, initialState);
-    
+
     vm.$onChanges = (changes) => {
         vm.filterEntries(vm.searchQuery);
         vm.searchFields = mkSearchFields(vm.columnDefs);
         invokeFunction(vm.onChange, { entriesCount: _.size(vm.filteredEntries) });
     };
+
 
     vm.filterEntries = query => {
         vm.searchQuery = query;
