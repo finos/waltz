@@ -370,14 +370,6 @@ public class WebUtilities {
     }
 
     
-    public static Optional<Integer> getYearParam(Request request) {
-        String yearVal = request.params("year");
-        return Optional
-                .ofNullable(yearVal)
-                .map(s -> Integer.valueOf(s));
-    }
-
-
     /**
      * Helper method to flatten a map (m) into a list of Entry's.
      * Typically used when the key (K) is a complex type

@@ -30,13 +30,19 @@ import moment from "moment";
 
 const initialState = {
     columnDefs: attestationSummaryColumnDefs,
+    rawGridData: [],
+    gridDataToDisplay: [],
+
+    selectedFlowType: null,
+    selectedYear: null,
+    selectedSegment: null,
+    selectedAttestationType: null,
+
+    extractUrl: null,
+
     visibility : {
         tableView: false
-    },
-    yearFilterMinRows: 5,
-    selectedFlowType: null,
-    financialYearFilter : [],
-    selectedYear: null,
+    }
 };
 
 
@@ -48,19 +54,47 @@ const bindings = {
 };
 
 
+/**
+ * Constructs an export url
+ * @param attestationType
+ * @param segment (optional)
+ * @param year (optional, but needed if segment is provided)
+ * @returns {string}
+ */
+function mkExtractUrl(attestationType, segment, year) {
+    const yearParam = segment && segment.key  === 'ATTESTED'
+        ? "?year=" + year
+        : "";
+
+    return `attestations/${attestationType}${yearParam}`;
+}
+
+
+function calcGridData(segment, gridData, year) {
+    if (_.isNil(segment)) {
+        // return everything as no segments have been selected (i.e. total was clicked)
+        return gridData;
+    } else if (segment.key === "NEVER_ATTESTED") {
+        // the unattested segment was clicked, so show only rows without an attestation
+        return _.filter(gridData, d => _.isNil(d.attestation));
+    } else {
+        return _
+            .chain(gridData)
+            .filter(d => !_.isNil(d.attestation))  // attestation exists
+            .filter(d => (moment(d.attestation.attestedAt, "YYYY-MM-DD").year()) === year)
+            .value();
+    }
+}
+
+
 function controller($q,
                     serviceBroker,
                     displayNameService) {
     const vm = initialiseData(this, initialState);
-    
-    vm.changeYear = (year) => {
-        vm.selectedYear = year;
-        vm.selectedAppsByYear = _.filter(vm.selectedApps, app => 
-        ((moment(app.attestation.attestedAt,"YYYY-MM-DD").year()) === +vm.selectedYear) );
-    }
+
 
     const loadData = () => {
-       
+
         vm.selectionOptions = mkSelectionOptions(
             vm.parentEntityRef,
             determineDownwardsScopeForKind(vm.parentEntityRef.kind),
@@ -95,43 +129,23 @@ function controller($q,
 
 
     vm.$onInit = () => {
-        vm.financialYearFilter = [
-            moment().year(),
-            (moment().year()-1),
-            (moment().year()-2),
-            (moment().year()-3)
+        const currentYear = moment().year();
+        vm.yearOptions = [
+            currentYear,
+            currentYear - 1,
+            currentYear - 2,
+            currentYear - 3
         ];
-        vm.selectedYear = vm.financialYearFilter[0];
+        vm.selectedYear = currentYear;
 
         vm.config =  {
-            logical: Object.assign({}, attestationPieConfig, { onSelect: vm.onSelectLogicalFlow }),
-            physical: Object.assign({}, attestationPieConfig, { onSelect: vm.onSelectPhysicalFlow }),
+            logical: Object.assign({}, attestationPieConfig, { onSelect: onSelectLogicalFlowSegment }),
+            physical: Object.assign({}, attestationPieConfig, { onSelect: onSelectPhysicalFlowSegment }),
         };
-      
+
         loadData();
     };
 
-    const gridSelected = (d, grid) => {
-        vm.selectedApps = _.filter(grid, app => app.isAttested === d.key);
-        const yearFilter = d.key ? "?yr="+selectedYr: null;
-        vm.extractUrl = `attestations/${vm.exportFlowType}${yearFilter}`;
-        vm.selectedAppsByYear = _.filter(vm.selectedApps, app => (!_.isUndefined(app.attestation)) 
-        ? ((moment(app.attestation.attestedAt,"YYYY-MM-DD").year()) === +vm.selectedYear) 
-        : true);
-
-        vm.exportFlowType = _.find(grid, r => !_.isUndefined(r.attestation)).attestation.attestedEntityKind;
-        vm.visibility.tableView = true;
-    };
-
-    // -- INTERACT ----
-
-    vm.onSelectLogicalFlow = (d) => {
-        gridSelected(d, vm.gridDataByLogicalFlow);
-    };
-
-    vm.onSelectPhysicalFlow = (d) => {
-        gridSelected(d, vm.gridDataByPhysicalFlow)
-    };
 
     vm.$onChanges = (changes) => {
         if(changes.filters) {
@@ -140,6 +154,39 @@ function controller($q,
     };
 
 
+    // -- INTERACT ----
+    function updateGridData() {
+        const segment = vm.selectedSegment;
+        const year = vm.selectedYear;
+        const gridData = vm.rawGridData;
+        const attestationType = vm.selectedAttestationType;
+
+        vm.extractUrl = mkExtractUrl(attestationType, segment, year);
+        vm.gridDataToDisplay = calcGridData(segment, gridData, year);
+        vm.visibility.tableView = true;
+    }
+
+
+    vm.onChangeYear = (year) => {
+        vm.selectedYear = Number(year);
+        updateGridData();
+    };
+
+
+    function onSelectLogicalFlowSegment(segment) {
+        vm.rawGridData = vm.gridDataByLogicalFlow;
+        vm.selectedSegment = segment;
+        vm.selectedAttestationType = "LOGICAL_DATA_FLOW";
+        updateGridData();
+    }
+
+
+    function onSelectPhysicalFlowSegment(segment) {
+        vm.rawGridData = vm.gridDataByPhysicalFlow;
+        vm.selectedSegment = segment;
+        vm.selectedAttestationType = "PHYSICAL_FLOW";
+        updateGridData();
+    }
 }
 
 
