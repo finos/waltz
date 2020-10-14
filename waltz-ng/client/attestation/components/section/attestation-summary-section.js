@@ -113,11 +113,12 @@ function controller($q,
 
     const gridSelected = (d, grid) => {
         vm.selectedApps = _.filter(grid, app => app.isAttested === d.key);
-
+        const yearFilter = d.key ? "?yr="+selectedYr: null;
+        vm.extractUrl = `attestations/${vm.exportFlowType}${yearFilter}`;
         vm.selectedAppsByYear = _.filter(vm.selectedApps, app => (!_.isUndefined(app.attestation)) 
         ? ((moment(app.attestation.attestedAt,"YYYY-MM-DD").year()) === +vm.selectedYear) 
         : true);
-        
+
         vm.exportFlowType = _.find(grid, r => !_.isUndefined(r.attestation)).attestation.attestedEntityKind;
         vm.visibility.tableView = true;
     };
