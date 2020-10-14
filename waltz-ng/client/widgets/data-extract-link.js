@@ -25,13 +25,12 @@ import {displayError} from "../common/error-utils";
 
 const bindings = {
     name: "@?",
-    year:"<?",
     extract: "@",
     method: "@?",
     format: "@?",
     filename: "@?",
     requestBody: "<",
-    styling: "@?", // link | button
+    styling: "@?" // link | button
 };
 
 
@@ -68,14 +67,16 @@ function getFileNameFromHttpResponse(httpResponse) {
 function controller($http, notification, baseExtractUrl) {
     const vm = initialiseData(this, initialState);
 
+    const trailingSlash = /\/$|\/(?=\?)|\/(?=#)/g;
+
     vm.$onChanges = () => {
-        vm.url = `${baseExtractUrl}/${vm.extract}`;
+        vm.url = `${baseExtractUrl}/${vm.extract}`.replace(trailingSlash,'');
         vm.classes = calcClasses(vm.styling);
     };
 
-    const invokeExport = (format, year) => {
+    const invokeExport = (format) => {
         const options = {
-            params : { format, year }
+            params : { format }
         };
         if (format === "XLSX") {
             options.responseType = "arraybuffer";
@@ -94,18 +95,18 @@ function controller($http, notification, baseExtractUrl) {
         }
     };
 
-    const doExport = (format, year) => {
+    const doExport = (format) => {
         notification.info("Exporting data");
         vm.extracting = true;
-        invokeExport(format, year)
+        invokeExport(format)
             .then(() => notification.success("Data exported"))
             .catch(e => displayError(notification, "Data export failure", e))
             .finally(() => vm.extracting = false);
     };
 
-    vm.exportCsv = () => doExport("CSV", vm.year);
-    vm.exportXlsx = () => doExport("XLSX", vm.year);
-    vm.exportAs = (format, year) => doExport(format, year);
+    vm.exportCsv = () => doExport("CSV");
+    vm.exportXlsx = () => doExport("XLSX");
+    vm.exportAs = (format) => doExport(format);
 }
 
 

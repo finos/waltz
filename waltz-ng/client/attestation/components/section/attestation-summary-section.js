@@ -93,15 +93,14 @@ function controller($q,
             });
     };
 
-    vm.$onInit = () => {
 
+    vm.$onInit = () => {
         vm.financialYearFilter = [
             moment().year(),
             (moment().year()-1),
             (moment().year()-2),
             (moment().year()-3)
         ];
-
         vm.selectedYear = vm.financialYearFilter[0];
 
         vm.config =  {
@@ -113,11 +112,12 @@ function controller($q,
     };
 
     const gridSelected = (d, grid) => {
-
         vm.selectedApps = _.filter(grid, app => app.isAttested === d.key);
-        vm.selectedAppsByYear = _.filter(vm.selectedApps, app => (!_.isUndefined(app.attestation)) ?
-        ((moment(app.attestation.attestedAt,"YYYY-MM-DD").year()) === +vm.selectedYear) : true);
 
+        vm.selectedAppsByYear = _.filter(vm.selectedApps, app => (!_.isUndefined(app.attestation)) 
+        ? ((moment(app.attestation.attestedAt,"YYYY-MM-DD").year()) === +vm.selectedYear) 
+        : true);
+        
         vm.exportFlowType = _.find(grid, r => !_.isUndefined(r.attestation)).attestation.attestedEntityKind;
         vm.visibility.tableView = true;
     };

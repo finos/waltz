@@ -42,12 +42,12 @@ const initialState = {
     onInitialise: () => {},
     onChange: () => {}
 };
+
 function controller(uiGridExporterConstants,
                     uiGridExporterService) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-
         vm.gridOptions = {
             appScopeProvider: vm.scopeProvider,
             columnDefs: vm.columnDefs,
@@ -67,7 +67,7 @@ function controller(uiGridExporterConstants,
                         gridApi: vm.gridApi
                     });
                    
-                    if (vm.onRowSelect) {
+                if (vm.onRowSelect) {
                     gridApi.selection.setMultiSelect(false);
                     gridApi.selection.toggleRowSelection(true);
                     gridApi.selection.on.rowSelectionChanged(null, function(row){
@@ -89,20 +89,16 @@ function controller(uiGridExporterConstants,
 
 
     vm.$onChanges = (changes) => {
-        
         if (! vm.gridOptions) return;
 
         if (changes.columnDefs) {
             vm.gridOptions.columnDefs = vm.columnDefs;
         }
+        
         vm.gridOptions.minRowsToShow = Math.min(vm.minRowsToShow, vm.rowData.length);
         vm.gridOptions.data = vm.rowData;
-        invokeFunction(vm.onChange,
-            {
-                exportFn: vm.exportData,
-                gridApi: vm.gridApi
-            });
     };
+
 
     vm.exportData = (fileName = "download.csv") => {
         const grid = vm.gridApi.grid;

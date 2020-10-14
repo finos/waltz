@@ -42,9 +42,10 @@ const initialState = {
     searchControlMinRows: 5,
     searchPlaceholderText: "Search...",
     searchQuery: null,
-    onInitialise: (gridApi) => {"Default onInitialise handler for grid-search: ", gridApi},
+    onInitialise: (gridApi) => console.log("Default onInitialise handler for grid-search: ", gridApi),
     onChange: (gridApi) => {}
 };
+
 
 function mkSearchFields(columnDefs = []) {
     return _
@@ -53,6 +54,7 @@ function mkSearchFields(columnDefs = []) {
         .compact()
         .value();
 }
+
 
 function controller() {
     const vm = initialiseData(this, initialState);
