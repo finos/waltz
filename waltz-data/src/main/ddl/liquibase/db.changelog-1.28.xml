@@ -394,4 +394,14 @@
         </insert>
     </changeSet>
 
+    <changeSet id="20201008-5103-12"
+               author="alimuza">
+        <comment>5103: Added permission group involvement for attestation of logical flow</comment>
+        <insert tableName="permission_group_involvement">
+            <column name="permission_group_id" value="1"/>
+            <column name="subject_kind" value="ATTESTATION"/>
+            <column name="qualifier_kind" value="PHYSICAL_FLOW"/>
+        </insert>
+    </changeSet>
+
 </databaseChangeLog>

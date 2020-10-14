@@ -131,6 +131,7 @@
                         <message>
                             Never attested,
                             <a class="clickable"
+                               ng-if="$ctrl.hasPermissionToAttest(attestationSection.section)"
                                ng-click="$ctrl.onInitiateAttestation(attestationSection.section)">
                                 attest now
                             </a>

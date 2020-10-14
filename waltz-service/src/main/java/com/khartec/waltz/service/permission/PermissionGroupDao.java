@@ -62,6 +62,19 @@ public class PermissionGroupDao {
                 .fetch(TO_MAPPER);
     }
 
+    public List<Permission> getDefaultPermissions() {
+        return dsl.select(PERMISSION_GROUP_INVOLVEMENT.SUBJECT_KIND,
+                PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_KIND,
+                PERMISSION_GROUP_INVOLVEMENT.QUALIFIER_ID,
+                PERMISSION_GROUP.IS_DEFAULT
+        )
+                .from(PERMISSION_GROUP_INVOLVEMENT)
+                .join(PERMISSION_GROUP)
+                .on(PERMISSION_GROUP.ID.eq(PERMISSION_GROUP_INVOLVEMENT.PERMISSION_GROUP_ID))
+                .where(PERMISSION_GROUP.IS_DEFAULT.eq(true))
+                .fetch(TO_MAPPER);
+    }
+
     private SelectConditionStep<Record1<Long>> permissionGroupSelector(EntityReference parentEntityRef) {
         switch(parentEntityRef.kind()) {
             case APPLICATION:

@@ -33,7 +33,7 @@ import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 @Service
 public class PermissionGroupEndpoint implements Endpoint {
 
-    private static final String BASE_URL = mkPath("api", "permission_group");
+    private static final String BASE_URL = mkPath("api", "permission-group");
 
     private final PermissionGroupService permissionGroupService;
 

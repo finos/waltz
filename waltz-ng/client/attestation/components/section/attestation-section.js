@@ -167,6 +167,16 @@ function controller($q,
         vm.mode = modes.EDIT;
     };
 
+    vm.hasPermissionToAttest = (section) => {
+        console.log('hasPermissionToAttest - ', section.type, vm.permissions);
+
+        //{type: "PHYSICAL_FLOW", name: "Physical Flow - latest attestation", actionLabel: "Attest physical flows", typeName: "Physical Flows", unattestedChanges: Array(0)}
+        //attestationSection.section
+        // vm.activeAttestationSection = section;
+        // vm.mode = modes.EDIT;
+        return false;
+    };
+
     vm.onCancelAttestation = () => {
         vm.activeAttestationSection = null;
         vm.mode = modes.VIEW;
