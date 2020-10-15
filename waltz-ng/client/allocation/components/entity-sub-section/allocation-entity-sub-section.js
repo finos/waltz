@@ -31,6 +31,7 @@ const bindings = {
     scheme: "<",
     measurableCategory: "<",
     allocations: "<",
+    isReadOnly: "<",
     onSave: "<",
     onDismiss: "<",
     filters: "<"

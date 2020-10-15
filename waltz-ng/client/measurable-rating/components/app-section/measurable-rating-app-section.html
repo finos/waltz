@@ -57,7 +57,7 @@
                         </div>
                     </div>
 
-                    <span waltz-has-role="RATING_EDITOR" ng-if="$ctrl.editable === true">
+                    <span waltz-has-role="RATING_EDITOR">
                         <div class="waltz-sub-section-controls">
                             <a ng-if="$ctrl.visibility.editor === false"
                                ng-click="$ctrl.onEditRatings()"
@@ -85,6 +85,7 @@
                                                  scheme="$ctrl.activeAllocationScheme"
                                                  measurable-category="$ctrl.activeTab.category"
                                                  allocations="$ctrl.allocations"
+                                                 is-read-only="$ctrl.isReadOnly"
                                                  on-save="$ctrl.onSaveAllocations"
                                                  on-dismiss="$ctrl.onDismissAllocations">
             </waltz-allocation-entity-sub-section>

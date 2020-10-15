@@ -110,7 +110,7 @@ function controller($q,
 
     const getRating = () => _.get(
         vm.selected,
-        ["rating", "rating"]);
+        ["rating", "rating", "isReadOnly"]);
 
     const doRatingSave = (rating, description) => {
         const currentRating = !_.isEmpty(vm.selected.rating) ? vm.selected.rating.rating : null;
@@ -122,7 +122,8 @@ function controller($q,
             .then(() => recalcTabs())
             .then(() => {
                 vm.saveInProgress = false;
-                const newRating = { rating, description };
+                const isReadOnly = vm.selected.rating.isReadOnly;
+                const newRating = { rating, description, isReadOnly };
                 vm.selected = Object.assign({}, vm.selected, { rating: newRating });
             })
             .catch(e => {

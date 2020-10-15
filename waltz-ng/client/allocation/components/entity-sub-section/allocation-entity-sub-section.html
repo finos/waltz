@@ -236,6 +236,7 @@
                                class="form-control input-sm"
                                ng-change="$ctrl.onPercentageChange()"
                                ng-blur="$ctrl.onPercentageFocusLost()"
+                               ng-disabled="$ctrl.isReadOnly(d.measurable.id)"
                                ng-model="d.working.percentage">
                         <span class="glyphicon form-control-feedback"
                               ng-class="{
