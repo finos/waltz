@@ -39,9 +39,8 @@ const initialState = {
     minRowsToShow: 10,
     rowTemplate: null,
     scopeProvider: null,
-    onInitialise: (e) => {}
+    onInitialise: () => {}
 };
-
 
 function controller(uiGridExporterConstants,
                     uiGridExporterService) {
@@ -56,7 +55,9 @@ function controller(uiGridExporterConstants,
             enableGridMenu: false,
             minRowsToShow: vm.minRowsToShow,
             enableRowHeaderSelection: false,
-            enableRowSelection: vm.onRowSelect ? true: false,
+            enableRowSelection: vm.onRowSelect
+                ? true
+                : false,
             onRegisterApi: function(gridApi){
                 vm.gridApi = gridApi;
 
@@ -99,6 +100,7 @@ function controller(uiGridExporterConstants,
         vm.gridOptions.data = vm.rowData;
     };
 
+
     vm.exportData = (fileName = "download.csv") => {
         const grid = vm.gridApi.grid;
         const rowVisibility = uiGridExporterConstants.ALL;
@@ -115,9 +117,6 @@ function controller(uiGridExporterConstants,
                 uiGridExporterService.downloadFile(fileName, csvContent, false);
             });
     };
-
-
-
 
 }
 
