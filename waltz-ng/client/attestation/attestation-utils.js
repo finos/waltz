@@ -8,6 +8,7 @@
  * You may obtain a copy of the License at
  *
  *     http://www.apache.org/licenses/LICENSE-2.0
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -164,5 +165,5 @@ export const attestationSummaryColumnDefs = [
     {field: "application.businessCriticalityDisplay", name: "Business Criticality"},
     {field: "application.lifecyclePhaseDisplay", name: "Lifecycle Phase"},
     {field: "attestation.attestedBy", name: "Last Attested By"},
-    mkDateGridCell("Last Attested At", "attestation.attestedAt")
+    mkDateGridCell("Last Attested At", "attestation.attestedAt", false, true)
 ];
