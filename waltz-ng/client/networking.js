@@ -78,8 +78,8 @@ function setupNetworking(module) {
             ? './'
             : __ENV__ === 'test'
             ? 'http://10.217.34.239:8443/'
-            : 'http://localhost:8443/';
-    //: 'http://192.168.1.147:8443/'  // TODO (if testing IE on Mac) : use ip lookup
+            : 'http://localhost:8443/' 
+          //:'http://192.168.1.147:8443/'  // TODO (if testing IE on Mac) : use ip lookup
 
     module
         .constant('BaseApiUrl', baseUrl + 'api')

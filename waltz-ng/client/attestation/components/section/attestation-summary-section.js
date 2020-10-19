@@ -25,27 +25,73 @@ import {entity} from "../../../common/services/enums/entity";
 import {attestationSummaryColumnDefs, mkAttestationSummaryDataForApps} from "../../attestation-utils";
 import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 import * as _ from "lodash";
+import moment from "moment";
 
 
 const initialState = {
     columnDefs: attestationSummaryColumnDefs,
+    rawGridData: [],
+    gridDataToDisplay: [],
+
+    selectedFlowType: null,
+    selectedYear: null,
+    selectedSegment: null,
+    selectedAttestationType: null,
+
+    extractUrl: null,
+
     visibility : {
         tableView: false
-    },
-    selectedFlowType: null
+    }
 };
 
 
 const bindings = {
     parentEntityRef: "<",
-    filters: "<"
+    filters: "<",
+    selectedYear: "<",
+    selectedAppsByYear: "<"
 };
+
+
+/**
+ * Constructs an export url
+ * @param attestationType
+ * @param segment (optional)
+ * @param year (optional, but needed if segment is provided)
+ * @returns {string}
+ */
+function mkExtractUrl(attestationType, segment, year) {
+    const yearParam = segment && segment.key  === 'ATTESTED'
+        ? "?year=" + year
+        : "";
+
+    return `attestations/${attestationType}${yearParam}`;
+}
+
+
+function calcGridData(segment, gridData, year) {
+    if (_.isNil(segment)) {
+        // return everything as no segments have been selected (i.e. total was clicked)
+        return gridData;
+    } else if (segment.key === "NEVER_ATTESTED") {
+        // the unattested segment was clicked, so show only rows without an attestation
+        return _.filter(gridData, d => _.isNil(d.attestation));
+    } else {
+        return _
+            .chain(gridData)
+            .filter(d => !_.isNil(d.attestation))  // attestation exists
+            .filter(d => (moment(d.attestation.attestedAt, "YYYY-MM-DD").year()) === year)
+            .value();
+    }
+}
 
 
 function controller($q,
                     serviceBroker,
                     displayNameService) {
     const vm = initialiseData(this, initialState);
+
 
     const loadData = () => {
 
@@ -81,30 +127,25 @@ function controller($q,
             });
     };
 
+
     vm.$onInit = () => {
+        const currentYear = moment().year();
+        vm.yearOptions = [
+            currentYear,
+            currentYear - 1,
+            currentYear - 2,
+            currentYear - 3
+        ];
+        vm.selectedYear = currentYear;
+
         vm.config =  {
-            logical: Object.assign({}, attestationPieConfig, { onSelect: vm.onSelectLogicalFlow }),
-            physical: Object.assign({}, attestationPieConfig, { onSelect: vm.onSelectPhysicalFlow }),
+            logical: Object.assign({}, attestationPieConfig, { onSelect: onSelectLogicalFlowSegment }),
+            physical: Object.assign({}, attestationPieConfig, { onSelect: onSelectPhysicalFlowSegment }),
         };
 
         loadData();
     };
 
-    const gridSelected = (d, grid) => {
-        vm.selectedApps = _.filter(grid, app => app.isAttested === d.key);
-        vm.exportFlowType = _.find(grid, r => !_.isUndefined(r.attestation)).attestation.attestedEntityKind;
-        vm.visibility.tableView = true;
-    };
-
-    // -- INTERACT ----
-
-    vm.onSelectLogicalFlow = (d) => {
-        gridSelected(d, vm.gridDataByLogicalFlow);
-    };
-
-    vm.onSelectPhysicalFlow = (d) => {
-        gridSelected(d, vm.gridDataByPhysicalFlow)
-    };
 
     vm.$onChanges = (changes) => {
         if(changes.filters) {
@@ -113,6 +154,39 @@ function controller($q,
     };
 
 
+    // -- INTERACT ----
+    function updateGridData() {
+        const segment = vm.selectedSegment;
+        const year = vm.selectedYear;
+        const gridData = vm.rawGridData;
+        const attestationType = vm.selectedAttestationType;
+
+        vm.extractUrl = mkExtractUrl(attestationType, segment, year);
+        vm.gridDataToDisplay = calcGridData(segment, gridData, year);
+        vm.visibility.tableView = true;
+    }
+
+
+    vm.onChangeYear = (year) => {
+        vm.selectedYear = Number(year);
+        updateGridData();
+    };
+
+
+    function onSelectLogicalFlowSegment(segment) {
+        vm.rawGridData = vm.gridDataByLogicalFlow;
+        vm.selectedSegment = segment;
+        vm.selectedAttestationType = "LOGICAL_DATA_FLOW";
+        updateGridData();
+    }
+
+
+    function onSelectPhysicalFlowSegment(segment) {
+        vm.rawGridData = vm.gridDataByPhysicalFlow;
+        vm.selectedSegment = segment;
+        vm.selectedAttestationType = "PHYSICAL_FLOW";
+        updateGridData();
+    }
 }
 
 

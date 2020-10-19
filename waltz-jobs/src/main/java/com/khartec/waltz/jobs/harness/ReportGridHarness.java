@@ -23,8 +23,6 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.report_grid.ReportGridDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.report_grid.ReportGridDefinition;
 import com.khartec.waltz.model.report_grid.ReportGridRatingCell;
 import com.khartec.waltz.service.DIBaseConfiguration;
 import org.jooq.Record1;
@@ -47,21 +45,21 @@ public class ReportGridHarness {
 
         System.out.println("Starting....");
 
-
-        ReportGridDefinition def = FunctionUtilities.time("def", () -> dao.getGridDefinitionById(1));
-        System.out.println(def);
-        
         EntityReference cib = mkRef(EntityKind.APP_GROUP, 11261);
         EntityReference justWaltz = mkRef(EntityKind.APPLICATION, 20506);
         EntityReference justWaltzGroup = mkRef(EntityKind.APP_GROUP, 433);
         EntityReference orgUnit = mkRef(EntityKind.ORG_UNIT, 95);
         EntityReference flowDiagram = mkRef(EntityKind.FLOW_DIAGRAM, 1);
+        EntityReference mgr = mkRef(EntityKind.PERSON, 1);
 
-        Select<Record1<Long>> selector = new ApplicationIdSelectorFactory().apply(mkOpts(orgUnit, HierarchyQueryScope.CHILDREN));
+        Select<Record1<Long>> selector = new ApplicationIdSelectorFactory().apply(mkOpts(mgr));
 
         System.out.println("Made selector");
 
-        Set<ReportGridRatingCell> data = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(1, selector));
+        Set<ReportGridRatingCell> a = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(5, selector));
+        Set<ReportGridRatingCell> b = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(5, selector));
+        Set<ReportGridRatingCell> c = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(5, selector));
+        Set<ReportGridRatingCell> data = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(5, selector));
         System.out.println(data.size());
         System.out.println(first(data));
     }
