@@ -122,7 +122,9 @@ function controller($q,
             .then(() => recalcTabs())
             .then(() => {
                 vm.saveInProgress = false;
-                const isReadOnly = vm.selected.rating.isReadOnly;
+                const isReadOnly = _.isUndefined(vm.selected.rating)
+                    ? false
+                    : vm.selected.rating.isReadOnly;
                 const newRating = { rating, description, isReadOnly };
                 vm.selected = Object.assign({}, vm.selected, { rating: newRating });
             })
