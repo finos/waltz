@@ -250,8 +250,8 @@
             </div>
 
             <!-- OP CELL -->
-            <div class="col-sm-4 waess-op-cell">
-
+            <div class="col-sm-4 waess-op-cell"
+                 ng-if="!$ctrl.isReadOnly(d.measurable.id)">
                 <div ng-if="$ctrl.editing">
                     <!-- Split button -->
                     <div ng-include="'waess-ops-button'"></div>
