@@ -1,6 +1,5 @@
 <div>
 
-
     <waltz-loading-notification show="$ctrl.loading"
                                 name="Loading grid data">
     </waltz-loading-notification>
@@ -46,7 +45,10 @@
                     <tbody>
                     <tr ng-repeat="counter in summary.counters"
                         class="clickable"
-                        ng-class="{ 'waltz-highlighted-row' : $ctrl.isSelectedCounter(counter.counterId) }"
+                        ng-class="{
+                            'waltz-highlighted-row' : $ctrl.isSelectedCounter(counter.counterId),
+                            'text-muted' : counter.counts.visible === 0
+                         }"
                         ng-click="$ctrl.onToggleFilter(counter)">
                         <td>
                             <div style="display: inline-block; height: 10px; width: 10px;"
@@ -57,18 +59,36 @@
                                   popover-popup-delay="300"
                                   popover-append-to-body="true"
                                   popover-trigger="mouseenter">
-                        </span>
+                            </span>
                         </td>
-                        <td class="text-right"><span ng-bind="counter.count"></span></td>
+                        <!-- COUNTERS -->
+                        <td class="text-right">
+                            <!-- TOTAL COUNTER -->
+                            <span ng-if="counter.counts.total !== counter.counts.visible"
+                                  class="text-muted small">
+                                (
+                                <span ng-bind="counter.counts.total"></span>
+                                )
+                            </span>
+                            <!-- VISIBLE COUNTER -->
+                            <span ng-bind="counter.counts.visible"></span>
+                        </td>
                     </tr>
                     </tbody>
+                    <!-- TOTAL -->
                     <tbody>
                     <tr>
                         <td>
                             <b>Total</b>
                         </td>
                         <td class="text-right">
-                            <span ng-bind="summary.total"></span>
+                            <span ng-if="summary.total !== summary.totalVisible"
+                                  class="text-muted small">
+                                (
+                                <span ng-bind="summary.total"></span>
+                                )
+                            </span>
+                            <span ng-bind="summary.totalVisible"></span>
                         </td>
                     </tr>
                     </tbody>
@@ -78,11 +98,32 @@
 
 
         <!-- GRID -->
-        <waltz-grid-with-search column-defs="$ctrl.columnDefs"
-                                entries="$ctrl.tableData"
-                                class="small">
-        </waltz-grid-with-search>
+        <div ng-if="$ctrl.tableData.length > 0">
+            <waltz-grid-with-search column-defs="$ctrl.columnDefs"
+                                    entries="$ctrl.tableData"
+                                    search-control-min-rows="1"
+                                    class="small">
+            </waltz-grid-with-search>
+        </div>
+
+        <!-- NO DATA -->
+        <waltz-no-data ng-if="$ctrl.tableData.length === 0">
+            <message>
+                <strong>No data</strong>
+                <span ng-if="$ctrl.filters.length > 0">
+                    , filters may be preventing data from being shown.
+                </span>
+            </message>
+        </waltz-no-data>
     </div>
+
+    <waltz-data-extract-link name="Export grid"
+                             styling="link"
+                             filename="report.csv"
+                             extract="report-grid/id/{{$ctrl.gridId}}"
+                             method="POST"
+                             request-body="$ctrl.selectionOptions">
+    </waltz-data-extract-link>
 
 </div>
 

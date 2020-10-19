@@ -39,17 +39,57 @@
     </div>
 </div>
 
+<!-- THE GRID -->
 <div class="row"
      ng-if="$ctrl.visibility.tableView">
     <div class="col-md-12">
-        <waltz-grid-with-search entries="$ctrl.selectedApps"
+        <waltz-grid-with-search entries="$ctrl.gridDataToDisplay"
                                 column-defs="$ctrl.columnDefs">
         </waltz-grid-with-search>
-        <div class="small pull-right">
+    </div>
+</div>
+
+<!-- YEAR && DOWNLOAD -->
+<div class="row"
+     ng-if="$ctrl.visibility.tableView">
+    <div class="col-md-8">
+        <!-- YEAR SELECTION -->
+        <div class="input-group"
+             style="padding-top: 0.5em"
+             ng-if="$ctrl.selectedSegment.key === 'ATTESTED'">
+            <span>Attestation year:&nbsp;</span>
+            <div class="btn-group"
+                 uib-dropdown
+                 keyboard-nav
+                 dropdown-append-to-body>
+                <button type="button"
+                        class="btn btn-default"
+                        uib-dropdown-toggle>
+                    <span ng-bind="$ctrl.selectedYear"></span>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu"
+                    uib-dropdown-menu
+                    role="menu">
+                    <li ng-repeat="year in $ctrl.yearOptions"
+                        role="menuitem">
+                        <a class="clickable"
+                           ng-click="$ctrl.onChangeYear(year)"
+                           ng-bind="year">
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <!-- DOWNLOAD LINK -->
+        <div class="small pull-right"
+             style="padding-top: 0.5em">
             <waltz-data-extract-link name="Download {{$ctrl.exportFlowType | toDisplayName:'entity'}} Attestations"
                                      styling="link"
                                      filename="Attestations.csv"
-                                     extract="attestations/{{$ctrl.exportFlowType}}"
+                                     extract="{{$ctrl.extractUrl}}"
                                      method="POST"
                                      request-body="$ctrl.selectionOptions">
             </waltz-data-extract-link>

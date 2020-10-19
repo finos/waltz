@@ -44,7 +44,6 @@ import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 
 @Repository
 public class DataTypeDao implements FindEntityReferencesByIdSelector {
-
     public final static RecordMapper<Record, DataType> TO_DOMAIN = r -> {
         DataTypeRecord record = r.into(DataTypeRecord.class);
         return ImmutableDataType.builder()

@@ -87,9 +87,9 @@ export function mkEntityLinkGridCell(columnHeading,
  * @returns {{field: *, displayName: *, cellTemplate: string}}
  */
 export function mkEntityLabelGridCell(columnHeading,
-                                     entityRefField,
-                                     iconPlacement = "left",
-                                     tooltipPlacement = "top") {
+                                      entityRefField,
+                                      iconPlacement = "left",
+                                      tooltipPlacement = "top") {
     return {
         field: entityRefField + ".name",
         displayName: columnHeading,
@@ -137,17 +137,20 @@ export function mkLinkGridCell(columnHeading,
  * @param columnHeading  column display name
  * @param entityRefField  field name in grid data that stores the entity ref for which the link needs to be rendered
  * @param showIcon  whether to display the icon or not
+ * @param dateOnly  whether to display the only date or time duration from now
  * @returns {{field: *, displayName: *, cellTemplate: string}}
  */
 export function mkDateGridCell(columnHeading,
                                dateField,
-                               showIcon = false) {
+                               showIcon = false,
+                               dateOnly = false) {
     return {
         field: dateField,
         displayName: columnHeading,
         cellTemplate: `
             <div class="ui-grid-cell-contents">
-                <waltz-from-now timestamp="COL_FIELD"></waltz-from-now>
+                <waltz-from-now ng-if="!${dateOnly}" timestamp="COL_FIELD"></waltz-from-now>
+                <waltz-from-now ng-if="${dateOnly}" timestamp="COL_FIELD" date-only="${dateOnly}"></waltz-from-now>
             </div>`
     };
 }

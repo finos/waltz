@@ -18,7 +18,7 @@
 
 <div>
     <div class="row"
-         ng-if="$ctrl.entries.length > $ctrl.searchControlMinRows">
+         ng-if="$ctrl.entries.length >= $ctrl.searchControlMinRows">
         <div class="col-md-6">
             <waltz-search-control min-characters="3"
                                   delay="250"
@@ -28,8 +28,6 @@
             </waltz-search-control>
         </div>
     </div>
-
-    <br>
 
     <waltz-grid column-defs="$ctrl.columnDefs"
                 row-data="$ctrl.filteredEntries"

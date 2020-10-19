@@ -42,7 +42,7 @@ public class ActorDaoTest extends BaseIntegrationTest {
 
 
     @Test
-    public void actorsCanDeleteIfNotUsed() {
+    public void actorsCanBeDeletedIfNotUsed() {
         ActorDao dao = ctx.getBean(ActorDao.class);
         int preCount = dao.findAll().size();
         Long id = createActor("canBeDeletedTest");
@@ -54,7 +54,7 @@ public class ActorDaoTest extends BaseIntegrationTest {
 
 
     @Test
-    public void actorsCannotDeleteIfUsed() {
+    public void actorsCannotBeDeletedIfUsed() {
         ActorDao dao = ctx.getBean(ActorDao.class);
         Long idA = createActor("cannotBeDeletedActorA");
         Long idB = createActor("cannotBeDeletedActorB");

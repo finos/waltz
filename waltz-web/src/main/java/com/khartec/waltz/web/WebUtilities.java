@@ -369,7 +369,7 @@ public class WebUtilities {
                 });
     }
 
-
+    
     /**
      * Helper method to flatten a map (m) into a list of Entry's.
      * Typically used when the key (K) is a complex type

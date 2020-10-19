@@ -21,14 +21,16 @@ import moment from "moment";
 
 const BINDINGS = {
     timestamp: '<',
-    daysOnly: '<' // boolean
+    daysOnly: '<',//boolean
+    dateOnly: '<?' // boolean
 };
 
 
 const formats = {
     daysAndMinutes: 'ddd Do MMM YYYY - HH:mm:ss',
     daysOnly: 'ddd Do MMM YYYY',
-    parse: 'YYYY-MM-DDThh:mm:ss.SSS'
+    parse: 'YYYY-MM-DDThh:mm:ss.SSS',
+    dateOnly: 'DD-MMM-YYYY'
 };
 
 
@@ -52,6 +54,9 @@ function controller($scope) {
             const current = moment().utc().startOf('day');
             vm.hoverValue = m.format(formats.daysOnly);
             vm.fromNow = Math.round(current.diff(m, 'days', true)) !== 0 ? m.from(current) : 'today';
+        }else if(vm.dateOnly){
+            vm.hoverValue = m.format(formats.dateOnly);
+            vm.fromNow = m.format(formats.dateOnly);
         } else {
             vm.hoverValue = m.local().format(formats.daysAndMinutes);
             vm.fromNow = m.fromNow();
