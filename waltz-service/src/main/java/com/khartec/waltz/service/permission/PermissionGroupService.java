@@ -1,5 +1,6 @@
 package com.khartec.waltz.service.permission;
 
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.involvement.Involvement;
 import com.khartec.waltz.model.permission_group.Permission;
@@ -47,5 +48,11 @@ public class PermissionGroupService {
         }
 
         return permissionGroupDao.getDefaultPermissions();
+    }
+
+    public boolean hasPermission(EntityReference entityReference, EntityKind attestedEntityKind, String username) {
+        return findPermissions(entityReference, username)
+                .stream()
+                .anyMatch(permission -> permission.qualifierKind().equals(attestedEntityKind));
     }
 }

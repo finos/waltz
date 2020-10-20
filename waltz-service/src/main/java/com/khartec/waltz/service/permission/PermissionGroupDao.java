@@ -2,25 +2,15 @@ package com.khartec.waltz.service.permission;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.involvement.ImmutableInvolvement;
-import com.khartec.waltz.model.involvement.Involvement;
 import com.khartec.waltz.model.permission_group.ImmutablePermission;
 import com.khartec.waltz.model.permission_group.Permission;
-import com.khartec.waltz.model.tally.ImmutableMeasurableRatingTally;
-import com.khartec.waltz.model.tally.MeasurableRatingTally;
-import com.khartec.waltz.schema.tables.PermissionGroup;
-import com.khartec.waltz.schema.tables.PermissionGroupInvolvement;
-import com.khartec.waltz.schema.tables.records.InvolvementRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
-import static com.khartec.waltz.common.StringUtilities.firstChar;
 import static com.khartec.waltz.schema.tables.PermissionGroup.PERMISSION_GROUP;
 import static com.khartec.waltz.schema.tables.PermissionGroupEntry.PERMISSION_GROUP_ENTRY;
 import static com.khartec.waltz.schema.tables.PermissionGroupInvolvement.PERMISSION_GROUP_INVOLVEMENT;

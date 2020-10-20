@@ -168,20 +168,9 @@ function controller($q,
     };
 
     vm.hasPermissionToAttest = (entityKind) => {
-        const result = _.isEmpty(vm.permissions)
+        return _.isEmpty(vm.permissions)
             ? false
             : _.some(vm.permissions, p => p.qualifierKind === entityKind);
-
-        console.log("hasPermissionToAttest - ", result, entityKind, vm.permissions);
-        return result;
-        //isDefault: true
-        // qualifierId: null
-        // qualifierKind: "ATTESTATION"
-        // subjectKind: "ATTESTATION"
-        //{type: "PHYSICAL_FLOW", name: "Physical Flow - latest attestation", actionLabel: "Attest physical flows", typeName: "Physical Flows", unattestedChanges: Array(0)}
-        //attestationSection.section
-        // vm.activeAttestationSection = section;
-        // vm.mode = modes.EDIT;
     };
 
     vm.onCancelAttestation = () => {
