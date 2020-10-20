@@ -110,7 +110,7 @@ function controller($q,
 
     const getRating = () => _.get(
         vm.selected,
-        ["rating", "rating", "isReadOnly"]);
+        ["rating", "rating"]);
 
     const doRatingSave = (rating, description) => {
         const currentRating = !_.isEmpty(vm.selected.rating) ? vm.selected.rating.rating : null;
