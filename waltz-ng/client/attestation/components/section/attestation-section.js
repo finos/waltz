@@ -162,7 +162,6 @@ function controller($q,
     };
 
     vm.onInitiateAttestation = (section) => {
-        console.log("onInitiateAttestation - ",section);
         vm.activeAttestationSection = section;
         vm.mode = modes.EDIT;
     };
