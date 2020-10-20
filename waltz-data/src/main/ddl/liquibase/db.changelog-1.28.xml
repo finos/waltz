@@ -394,7 +394,7 @@
         </insert>
     </changeSet>
 
-    <changeSet id="20201008-5103-12"
+    <changeSet id="20201008-5103-13"
                author="alimuza">
         <comment>5103: Added permission group involvement for attestation of logical flow</comment>
         <insert tableName="permission_group_involvement">

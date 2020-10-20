@@ -33,7 +33,7 @@ public class PermissionGroupDao {
     private static final RecordMapper<Record4<String,String,Long,Boolean>, Permission> TO_MAPPER =
             record -> {
         String subjectKind = record.value1();
-        String qualifierKind = record.value1();
+        String qualifierKind = record.value2();
         Long qualifierId = record.value3();
         boolean isDefault = record.value4();
 

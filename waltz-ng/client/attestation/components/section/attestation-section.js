@@ -137,7 +137,7 @@ function controller($q,
             .then(([runs, instances, unattestedChanges, permissions]) => {
                 vm.attestations = mkAttestationData(runs, instances);
                 vm.attestationSections = mkAttestationSections(baseSections, vm.attestations, unattestedChanges);
-                vm.permissions = permissions
+                vm.permissions = permissions;
             });
     };
 
@@ -162,19 +162,26 @@ function controller($q,
     };
 
     vm.onInitiateAttestation = (section) => {
-        console.log('onInitiateAttestation - ',section);
+        console.log("onInitiateAttestation - ",section);
         vm.activeAttestationSection = section;
         vm.mode = modes.EDIT;
     };
 
-    vm.hasPermissionToAttest = (section) => {
-        console.log('hasPermissionToAttest - ', section.type, vm.permissions);
+    vm.hasPermissionToAttest = (entityKind) => {
+        const result = _.isEmpty(vm.permissions)
+            ? false
+            : _.some(vm.permissions, p => p.qualifierKind === entityKind);
 
+        console.log("hasPermissionToAttest - ", result, entityKind, vm.permissions);
+        return result;
+        //isDefault: true
+        // qualifierId: null
+        // qualifierKind: "ATTESTATION"
+        // subjectKind: "ATTESTATION"
         //{type: "PHYSICAL_FLOW", name: "Physical Flow - latest attestation", actionLabel: "Attest physical flows", typeName: "Physical Flows", unattestedChanges: Array(0)}
         //attestationSection.section
         // vm.activeAttestationSection = section;
         // vm.mode = modes.EDIT;
-        return false;
     };
 
     vm.onCancelAttestation = () => {
