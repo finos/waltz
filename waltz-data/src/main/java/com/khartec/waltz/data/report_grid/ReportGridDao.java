@@ -191,6 +191,10 @@ public class ReportGridDao {
                                                                  Set<Long> measurableIdsUsingHighest,
                                                                  Set<Long> measurableIdsUsingLowest) {
 
+        if (measurableIdsUsingHighest.size() == 0 && measurableIdsUsingLowest.size() == 0){
+            return emptySet();
+        }
+
         Table<Record5<Long, String, Long, Integer, String>> ratingSchemeItems = DSL
                 .select(mc.ID.as("mcId"),
                         rsi.CODE.as("rsiCode"),
@@ -269,6 +273,11 @@ public class ReportGridDao {
 
     private Set<ReportGridRatingCell> fetchExactMeasurableData(Select<Record1<Long>> appSelector,
                                                                Set<Long> exactMeasurableIds) {
+
+        if (exactMeasurableIds.size() == 0) {
+            return emptySet();
+        }
+
         SelectConditionStep<Record3<Long, Long, Long>> qry = dsl
                 .select(mr.ENTITY_ID,
                         mr.MEASURABLE_ID,
@@ -293,20 +302,24 @@ public class ReportGridDao {
 
     private Set<ReportGridRatingCell> fetchAssessmentData(Select<Record1<Long>> appSelector,
                                                           Set<Long> requiredAssessmentDefinitionIds) {
-        return dsl
-                .select(ar.ENTITY_ID,
-                        ar.ASSESSMENT_DEFINITION_ID,
-                        ar.RATING_ID)
-                .from(ar)
-                .where(ar.ASSESSMENT_DEFINITION_ID.in(requiredAssessmentDefinitionIds)
-                        .and(ar.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                        .and(ar.ENTITY_ID.in(appSelector)))
-                .fetchSet(r -> ImmutableReportGridRatingCell.builder()
-                        .applicationId(r.get(ar.ENTITY_ID))
-                        .columnEntityId(r.get(ar.ASSESSMENT_DEFINITION_ID))
-                        .columnEntityKind(EntityKind.ASSESSMENT_DEFINITION)
-                        .ratingId(r.get(ar.RATING_ID))
-                        .build());
+        if (requiredAssessmentDefinitionIds.size() == 0) {
+            return emptySet();
+        } else {
+            return dsl
+                    .select(ar.ENTITY_ID,
+                            ar.ASSESSMENT_DEFINITION_ID,
+                            ar.RATING_ID)
+                    .from(ar)
+                    .where(ar.ASSESSMENT_DEFINITION_ID.in(requiredAssessmentDefinitionIds)
+                            .and(ar.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                            .and(ar.ENTITY_ID.in(appSelector)))
+                    .fetchSet(r -> ImmutableReportGridRatingCell.builder()
+                            .applicationId(r.get(ar.ENTITY_ID))
+                            .columnEntityId(r.get(ar.ASSESSMENT_DEFINITION_ID))
+                            .columnEntityKind(EntityKind.ASSESSMENT_DEFINITION)
+                            .ratingId(r.get(ar.RATING_ID))
+                            .build());
+        }
     }
 }
 
