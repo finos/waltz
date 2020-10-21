@@ -178,7 +178,7 @@
                     <div class="col-sm-2 waltz-display-field-label">
                         Planned Retirement:
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-2">
                         <waltz-from-now ng-if="$ctrl.app.plannedRetirementDate"
                                         timestamp="$ctrl.app.plannedRetirementDate"
                                         days-only="true">
@@ -190,12 +190,24 @@
                     <div class="col-sm-2 waltz-display-field-label">
                         Actual Retirement:
                     </div>
-                    <div class="col-sm-4">
+                    <div class="col-sm-2">
                         <waltz-from-now ng-if="$ctrl.app.actualRetirementDate"
                                         timestamp="$ctrl.app.actualRetirementDate"
                                         days-only="true">
                         </waltz-from-now>
                         <span ng-if="! $ctrl.app.actualRetirementDate">
+                            -
+                        </span>
+                    </div>
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Commision:
+                    </div>
+                    <div class="col-sm-2">
+                        <waltz-from-now ng-if="$ctrl.app.commissionDate"
+                                        timestamp="$ctrl.app.commissionDate"
+                                        days-only="true">
+                        </waltz-from-now>
+                        <span ng-if="! $ctrl.app.commissionDate">
                             -
                         </span>
                     </div>

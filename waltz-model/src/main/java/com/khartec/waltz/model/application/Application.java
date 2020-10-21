@@ -52,6 +52,7 @@ public abstract class Application implements
     public abstract RagRating overallRating();
     public abstract Optional<LocalDateTime> plannedRetirementDate();
     public abstract Optional<LocalDateTime> actualRetirementDate();
+    public abstract Optional<LocalDateTime> commissionDate();
 
 
     @Value.Default
