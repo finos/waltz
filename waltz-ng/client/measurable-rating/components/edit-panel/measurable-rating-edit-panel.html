@@ -229,10 +229,18 @@
                 Comments:
             </div>
             <div class="col-sm-9">
-                <waltz-inline-edit-area placeholder='None'
-                                        on-save="$ctrl.onSaveComment"
-                                        value="$ctrl.selected.rating.description">
-                </waltz-inline-edit-area>
+                 <span ng-switch="$ctrl.selected.rating.isReadOnly">
+                     <span ng-switch-when="true"
+                          ng-bind="$ctrl.selected.rating.description"
+                          class="text-muted">
+                     </span>
+                     <span ng-switch-default>
+                        <waltz-inline-edit-area placeholder='None'
+                                                on-save="$ctrl.onSaveComment"
+                                                value="$ctrl.selected.rating.description">
+                        </waltz-inline-edit-area>
+                     </span>
+                 </span>
             </div>
         </div>
 
@@ -244,6 +252,7 @@
                                                on-remove-decommission="$ctrl.onRemoveDecommission"
                                                on-add-replacement-app="$ctrl.onAddReplacementApp"
                                                on-remove-replacement-app="$ctrl.onRemoveReplacementApp"
+                                               selected-rating="$ctrl.selected.rating"
                                                category="$ctrl.activeTab.category"
                                                application="$ctrl.application">
             </waltz-planned-decommission-editor>

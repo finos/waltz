@@ -76,6 +76,7 @@ public class MeasurableRatingPlannedDecommissionService {
 
 
     public MeasurableRatingPlannedDecommission save(EntityReference entityReference, long measurableId, DateFieldChange dateChange, String userName) {
+        measurableRatingService.checkIfReadOnly(entityReference, measurableId,  "DECOM_DATE_SAVE_FAILED");
         Tuple2<Operation, Boolean> operation = measurableRatingPlannedDecommissionDao.save(
                 entityReference,
                 measurableId,
@@ -110,6 +111,10 @@ public class MeasurableRatingPlannedDecommissionService {
 
 
     public Boolean remove(Long id, String username){
+        MeasurableRatingPlannedDecommission measurableRating = measurableRatingPlannedDecommissionDao.getById(id);
+        measurableRatingService.checkIfReadOnly(measurableRating.entityReference(),
+                measurableRating.measurableId(),
+                "DECOM_DATE_REMOVED_FAILED");
 
         Set<String> replacementApps = map(measurableRatingReplacementDao.fetchByDecommissionId(id), r -> r.entityReference().name().get());
 
