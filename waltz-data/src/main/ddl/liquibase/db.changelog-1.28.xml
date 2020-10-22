@@ -203,6 +203,19 @@
     </changeSet>
 
 
+    <!-- 5129: App commision date -->
+    <changeSet id="20201020-5129-1"
+               author="gharvai">
+        <comment>5129: App commision date</comment>
+        <addColumn tableName="application">
+            <column name="commission_date"
+                    type="TIMESTAMP">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
     <changeSet id="20201008-5103-1"
                author="alimuza">
         <comment>5103: Added table for permission group</comment>
