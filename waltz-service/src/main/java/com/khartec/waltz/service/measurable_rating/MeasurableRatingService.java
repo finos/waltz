@@ -19,6 +19,7 @@
 package com.khartec.waltz.service.measurable_rating;
 
 import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.common.exception.UpdateFailedException;
 import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableDao;
@@ -45,6 +46,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.*;
 import static java.lang.String.format;
@@ -210,6 +212,23 @@ public class MeasurableRatingService {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(options);
         return measurableRatingDao.statsByAppSelector(selector);
+    }
+
+    public void checkIfReadOnly(EntityReference entityReference,
+                                Long measurableId,
+                                String errorCode) {
+        Optional<MeasurableRating> rating = measurableRatingDao.findForEntity(entityReference)
+                .stream()
+                .filter(r -> r.measurableId() == measurableId)
+                .findFirst();
+        if(rating.isPresent() && rating.get().isReadOnly()) {
+            throw new UpdateFailedException(
+                   errorCode,
+                    format("Failed to store changes for entity %s:%d and measurable %d: marked as read only",
+                            entityReference.kind(),
+                            entityReference.id(),
+                            measurableId));
+        }
     }
 
 

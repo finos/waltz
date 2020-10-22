@@ -133,13 +133,15 @@ public class MeasurableRatingDao {
     public Operation save(SaveMeasurableRatingCommand command) {
         MeasurableRatingRecord record = TO_RECORD_MAPPER.apply(command);
 
-        boolean exists = dsl.fetchExists(DSL
-                .selectFrom(MEASURABLE_RATING)
+        MeasurableRating existingRating = mkBaseQuery()
                 .where(MEASURABLE_RATING.MEASURABLE_ID.eq(command.measurableId()))
                 .and(MEASURABLE_RATING.ENTITY_ID.eq(command.entityReference().id()))
-                .and(MEASURABLE_RATING.ENTITY_KIND.eq(command.entityReference().kind().name())));
+                .and(MEASURABLE_RATING.ENTITY_KIND.eq(command.entityReference().kind().name()))
+                .fetchOne(TO_DOMAIN_MAPPER);
 
-        if (exists) {
+
+        if (existingRating != null) {
+            record.setIsReadonly(existingRating.isReadOnly());
             if (dsl.executeUpdate(record) == 0) {
                 throw new NotFoundException(
                         "MR_SAVE_UPDATE_FAILED",
