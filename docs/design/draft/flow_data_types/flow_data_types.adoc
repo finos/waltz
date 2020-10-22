@@ -127,6 +127,6 @@ order by lf.id, dt.name
 * [x] Modify DAOs with `is_readonly`
 * [x] Create service/endpoint to find datatypes not on associated physicals
 * [x] Create service/endpoint for whether this datatype can be removed from the logical flow too
-* [ ] Update dataloader jobs with `is_readonly`
-* [ ] Update for existing flows that should be read-only
-* [ ] Decorators that are read-only should not be editable
+* [x] Update dataloader jobs with `is_readonly`
+* [x] Update for existing flows that should be read-only
+* [x] Decorators that are read-only should not be editable
