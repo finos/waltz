@@ -74,6 +74,7 @@ import {MeasurableStore_API as MeasurableStore} from "../../measurable/services/
 import {NotificationStore_API as NotificationStore} from "../../notification/services/notification-store";
 import {OrgUnitStore_API as OrgUnitStore} from "../../org-units/services/org-unit-store";
 import {PersonStore_API as PersonStore} from "../../person/services/person-store";
+import {PermissionGroupStore_API as PermissionGroupStore} from "../../permission-group/services/permission-group-store";
 import {PhysicalFlowStore_API as PhysicalFlowStore} from "../../physical-flows/services/physical-flow-store";
 import {PhysicalFlowParticipantStore_API as PhysicalFlowParticipantStore} from "../../physical-flows/services/physical-flow-participant-store";
 import {PhysicalSpecDefinitionFieldStore_API as PhysicalSpecDefinitionFieldStore} from "../../physical-specifications/services/physical-spec-definition-field-store";
@@ -164,6 +165,7 @@ export const CORE_API = {
     NotificationStore,
     OrgUnitStore,
     PersonStore,
+    PermissionGroupStore,
     PhysicalFlowStore,
     PhysicalFlowParticipantStore,
     PhysicalSpecDefinitionFieldStore,

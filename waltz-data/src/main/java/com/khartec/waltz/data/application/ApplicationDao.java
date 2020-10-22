@@ -69,6 +69,7 @@ public class ApplicationDao {
                 .entityLifecycleStatus(readEnum(appRecord.getEntityLifecycleStatus(), EntityLifecycleStatus.class, s -> EntityLifecycleStatus.ACTIVE))
                 .plannedRetirementDate(ofNullable(appRecord.getPlannedRetirementDate()).map(Timestamp::toLocalDateTime))
                 .actualRetirementDate(ofNullable(appRecord.getActualRetirementDate()).map(Timestamp::toLocalDateTime))
+                .commissionDate(ofNullable(appRecord.getCommissionDate()).map(Timestamp::toLocalDateTime))
                 .provenance(appRecord.getProvenance())
                 .build();
 
