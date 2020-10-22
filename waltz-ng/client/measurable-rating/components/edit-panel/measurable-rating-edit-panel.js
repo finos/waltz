@@ -104,13 +104,9 @@ function controller($q,
         }
     };
 
-    const getDescription = () => _.get(
-        vm.selected,
-        ["rating", "description"]);
+    const getDescription = () => _.get(vm.selected, ["rating", "description"], "");
 
-    const getRating = () => _.get(
-        vm.selected,
-        ["rating", "rating"]);
+    const getRating = () => _.get(vm.selected, ["rating", "rating"]);
 
     const doRatingSave = (rating, description) => {
         const currentRating = !_.isEmpty(vm.selected.rating) ? vm.selected.rating.rating : null;
@@ -122,10 +118,7 @@ function controller($q,
             .then(() => recalcTabs())
             .then(() => {
                 vm.saveInProgress = false;
-                const isReadOnly = _.isUndefined(vm.selected.rating)
-                    ? false
-                    : vm.selected.rating.isReadOnly;
-                const newRating = { rating, description, isReadOnly };
+                const newRating = { rating, description };
                 vm.selected = Object.assign({}, vm.selected, { rating: newRating });
             })
             .catch(e => {
@@ -165,7 +158,6 @@ function controller($q,
 
         vm.selected = Object.assign({}, node, { category, hasWarnings, ratingScheme });
         vm.visibility = Object.assign({}, vm.visibility, {schemeOverview: false, ratingEditor: true});
-
     };
 
     const reloadDecommData = () => {
@@ -343,7 +335,8 @@ function controller($q,
         }
 
         serviceBroker
-            .loadViewData(CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
+            .loadViewData(
+                CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
                 [vm.parentEntityRef, vm.activeTab.category.id])
             .then(r => {
                 vm.activeTab.ratingSchemeItems = r.data;

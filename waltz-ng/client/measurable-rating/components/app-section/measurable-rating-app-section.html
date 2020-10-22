@@ -85,7 +85,6 @@
                                                  scheme="$ctrl.activeAllocationScheme"
                                                  measurable-category="$ctrl.activeTab.category"
                                                  allocations="$ctrl.allocations"
-                                                 is-read-only="$ctrl.isReadOnly"
                                                  on-save="$ctrl.onSaveAllocations"
                                                  on-dismiss="$ctrl.onDismissAllocations">
             </waltz-allocation-entity-sub-section>
@@ -193,7 +192,6 @@
             <span ng-repeat="scheme in tab.allocationSchemes">
                 <a class="clickable"
                    ng-click="$ctrl.onShowAllocationScheme(scheme)">
-                    &nbsp;
                     &nbsp;
                     <span ng-bind="scheme.name"
                           uib-popover-template="'wmras-scheme-popover.html'"

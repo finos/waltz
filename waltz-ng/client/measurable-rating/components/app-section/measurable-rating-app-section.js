@@ -112,18 +112,13 @@ function controller($q, serviceBroker) {
         hideAllocationScheme();
     };
 
-    vm.isReadOnly = (measurableId) => {
-        const rating = _.first(_.filter(vm.ratings,
-                                        r => r.measurableId === measurableId && r.isReadOnly));
-        return !_.isEmpty(rating);
-    };
-
     vm.onTabChange = (tab) => {
         hideAllocationScheme();
 
         serviceBroker
-            .loadViewData(CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
-                          [vm.parentEntityRef, tab.category.id])
+            .loadViewData(
+                CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
+                [vm.parentEntityRef, tab.category.id])
             .then(r => tab.ratingSchemeItems = r.data)
     };
 
