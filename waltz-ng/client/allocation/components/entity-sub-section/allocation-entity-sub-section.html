@@ -213,6 +213,9 @@
             <div class="col-sm-5">
                 <span ng-bind="d.measurable.name"></span>
                 <span ng-if="d.working.dirty">*</span>
+                <waltz-icon name="lock"
+                            ng-if="d.rating.isReadOnly">
+                </waltz-icon>
             </div>
 
             <!-- PERCENT CELL -->
@@ -236,7 +239,7 @@
                                class="form-control input-sm"
                                ng-change="$ctrl.onPercentageChange()"
                                ng-blur="$ctrl.onPercentageFocusLost()"
-                               ng-disabled="$ctrl.isReadOnly(d.measurable.id)"
+                               ng-disabled="d.rating.isReadOnly"
                                ng-model="d.working.percentage">
                         <span class="glyphicon form-control-feedback"
                               ng-class="{
@@ -251,7 +254,7 @@
 
             <!-- OP CELL -->
             <div class="col-sm-4 waess-op-cell"
-                 ng-if="!$ctrl.isReadOnly(d.measurable.id)">
+                 ng-if="!d.rating.isReadOnly">
                 <div ng-if="$ctrl.editing">
                     <!-- Split button -->
                     <div ng-include="'waess-ops-button'"></div>

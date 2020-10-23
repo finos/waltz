@@ -76,8 +76,11 @@
                 </waltz-icon>
                 <span style="position: relative; top: -1px"
                       class="waltz-visibility-child-30">
+                    <waltz-icon name="lock"
+                                ng-if="node.rating.isReadOnly">
+                    </waltz-icon>
                     <waltz-icon name="sticky-note-o"
-                                 ng-if="node.rating.description.length > 0">
+                                ng-if="node.rating.description.length > 0">
                     </waltz-icon>
                     <waltz-icon name="pie-chart"
                                 ng-if="node.allocations.length > 0">
@@ -131,6 +134,14 @@
             <waltz-icon name="pie-chart">
             </waltz-icon>
             This feature has allocations recorded against it
+        </div>
+
+        <div ng-if="node.rating.isReadOnly"
+             style="border-top: 1px solid #eee; margin-top: 12px; padding-top: 4px"
+             class="text-muted">
+            <waltz-icon name="lock">
+            </waltz-icon>
+            This rating is marked as read-only
         </div>
 
         <div ng-if="node.decommission && node.replacementApps.length === 0"

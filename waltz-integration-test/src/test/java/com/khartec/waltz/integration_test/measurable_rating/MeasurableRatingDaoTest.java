@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.integration_test.measurable_rating;
 
+import com.khartec.waltz.common.exception.NotFoundException;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
 import com.khartec.waltz.integration_test.BaseIntegrationTest;
@@ -30,10 +31,13 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static com.khartec.waltz.common.CollectionUtilities.first;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
+import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertThrows;
 
 public class MeasurableRatingDaoTest extends BaseIntegrationTest {
 
@@ -66,6 +70,39 @@ public class MeasurableRatingDaoTest extends BaseIntegrationTest {
 
         assertEquals("Can find rating via app ref", 1, dao.findForEntity(appRef).size());
         assertTrue("Rating is only for the referenced app-ref", dao.findForEntity(mkNewAppRef()).isEmpty());
+    }
+
+
+
+    @Test
+    public void readOnlyRatingsCannotBeSaved() {
+        long categoryId = createMeasurableCategory("mc");
+        long m1Id = createMeasurable("m1", categoryId);
+
+        EntityReference appRef = mkNewAppRef();
+        mkRatings(appRef, m1Id);
+
+        // make the rating read-only
+        getDsl().update(MEASURABLE_RATING)
+                .set(MEASURABLE_RATING.IS_READONLY, true)
+                .where(MEASURABLE_RATING.ENTITY_ID.eq(appRef.id()))
+                .and(MEASURABLE_RATING.MEASURABLE_ID.eq(m1Id))
+                .execute();
+
+        assertThrows(
+                NotFoundException.class,
+                () -> dao.save(
+                    ImmutableSaveMeasurableRatingCommand
+                        .builder()
+                        .measurableId(m1Id)
+                        .previousRating('G')
+                        .rating('R')
+                        .entityReference(appRef)
+                        .lastUpdate(UserTimestamp.mkForUser(LAST_UPDATE_USER))
+                        .build(),
+                    false));
+
+        assertEquals("Rating should not have changed",'G', first(dao.findForEntity(appRef)).rating());
     }
 
 
@@ -127,6 +164,7 @@ public class MeasurableRatingDaoTest extends BaseIntegrationTest {
                 dao.findByMeasurableIdSelector(selectorFactory.apply(m2Opts), m2Opts).size());
     }
 
+
     @Test
     public void ratingsCanBeBulkRemovedByCategoryForAGivenApp() {
         long categoryId = createMeasurableCategory("mc");
@@ -158,7 +196,7 @@ public class MeasurableRatingDaoTest extends BaseIntegrationTest {
                     .provenance(PROVENANCE)
                     .lastUpdate(UserTimestamp.mkForUser(LAST_UPDATE_USER))
                     .description("test")
-                    .build());
+                    .build(), false);
         }
     }
 

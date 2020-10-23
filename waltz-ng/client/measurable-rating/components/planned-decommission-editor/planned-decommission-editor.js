@@ -37,7 +37,6 @@ const bindings = {
     onAddReplacementApp: "<",
     onRemoveReplacementApp: "<",
     category: "<",
-    selectedRating: "<",
     application: "<?"
 };
 
