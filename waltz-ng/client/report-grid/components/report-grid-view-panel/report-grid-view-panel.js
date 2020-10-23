@@ -5,6 +5,8 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import {mkChunks} from "../../../common/list-utils";
+import {determineForegroundColor, lightGrey} from "../../../common/colors";
+import {rgb} from "d3-color";
 
 const bindings = {
     parentEntityRef: "<",
@@ -21,6 +23,15 @@ const initData = {
 const nameCol = mkLinkGridCell("Name", "application.name", "application.id", "main.app.view", { pinnedLeft:true, width: 200});
 const extIdCol = { field: "application.externalId", displayName: "Ext. Id", width: 100, pinnedLeft:true};
 
+const unknownRating = {
+    id: -1,
+    color: lightGrey,
+    description: "This rating has not been provided",
+    name: "Unknown",
+    rating: "Z",
+    position: 0
+};
+
 
 function mkPropNameForRef(ref) {
     return `${ref.kind}_${ref.id}`;
@@ -29,6 +40,17 @@ function mkPropNameForRef(ref) {
 
 function mkPropNameForCellRef(x) {
     return `${x.columnEntityKind}_${x.columnEntityId}`;
+}
+
+
+function initialiseDataForRow(application, columnRefs) {
+    return _.reduce(
+        columnRefs,
+        (acc, c) => {
+            acc[c] = unknownRating;
+            return acc;
+        },
+        {application});
 }
 
 
@@ -45,7 +67,7 @@ function prepareColumnDefs(gridData) {
             cellTemplate: `
             <div class="waltz-grid-color-cell"
                  ng-bind="COL_FIELD.name"
-                 ng-style="{'background-color': COL_FIELD.color}">
+                 ng-style="{'background-color': COL_FIELD.color, 'color': COL_FIELD.fontColor}">
             </div>`,
             sortingAlgorithm: (a, b) => {
                 if (a == null) return 1;
@@ -61,7 +83,18 @@ function prepareColumnDefs(gridData) {
 
 function prepareTableData(gridData) {
     const appsById = _.keyBy(gridData.instance.applications, d => d.id);
-    const ratingSchemeItemsById = _.keyBy(gridData.instance.ratingSchemeItems, d => d.id);
+    const ratingSchemeItemsById = _
+        .chain(gridData.instance.ratingSchemeItems)
+        .map(d => {
+            const c = rgb(d.color);
+            return Object.assign({}, d, { fontColor: determineForegroundColor(c.r, c.g, c.b)})
+        })
+        .keyBy(d => d.id)
+        .value();
+
+    const colDefs = _.get(gridData, ["definition", "columnDefinitions"], []);
+    const columnRefs = _.map(colDefs, c => mkPropNameForRef(c.columnEntityReference));
+
     return _
         .chain(gridData.instance.cellData)
         .groupBy(d => d.applicationId)
@@ -71,7 +104,7 @@ function prepareTableData(gridData) {
                 acc[mkPropNameForCellRef(x)] = ratingSchemeItemsById[x.ratingId];
                 return acc;
             },
-            { application: appsById[k] }))
+            initialiseDataForRow(appsById[k], columnRefs)))
         .orderBy(d => d.application.name)
         .value();
 }
@@ -122,7 +155,7 @@ function refreshSummaries(tableData, columnDefinitions, ratingSchemeItems) {
         .reduce(reducer, {})  // transform into a raw summary object for all rows
         .map((counts, k) => { // convert basic prop-val/count pairs in the summary object into a list of enriched objects
             const [colRef, ratingId] = _.split(k, "#");
-            return {counterId: k, counts, colRef, rating: ratingSchemeItemsById[ratingId]};
+            return {counterId: k, counts, colRef, rating: _.get(ratingSchemeItemsById, ratingId, unknownRating)};
         })
         .groupBy(d => d.colRef)  // group by the prop (colRef)
         .map((counters, colRef) => ({ // convert each prop group into a summary object with the actual column and a sorted set of counters
@@ -237,7 +270,7 @@ function controller(serviceBroker) {
                 propName: counter.colRef,
                 ratingId: counter.rating.id
             };
-            vm.filters = _.concat(vm.filters, [newFilter])
+            vm.filters = _.concat(vm.filters, [newFilter]);
             refresh(vm.filters);
         }
     };
