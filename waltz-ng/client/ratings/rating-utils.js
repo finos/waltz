@@ -19,9 +19,11 @@
 import _ from "lodash";
 
 
-export function mkRatingsKeyHandler(ratings,
-                             selectHandler = () => {},
-                             cancelHandler = () => {}) {
+export function mkRatingsKeyHandler(
+    ratings,
+    selectHandler = () => {},
+    cancelHandler = () => {})
+{
     const ratingsByKey = _.keyBy(ratings, r => r.rating.toUpperCase());
     return (evt) => {
         if (evt.keyCode === 27 /* esc */) {
@@ -123,17 +125,17 @@ export function ragToRatingSchemeItem(code = "Z", schemeName = "base") {
 export function indexRatingSchemes(schemes = []) {
     return _.chain(schemes)
         .map(scheme => Object.assign({}, scheme, {
-            ratingsByCode: _.keyBy(scheme.ratings, "rating"),
-            ratingsById: _.keyBy(scheme.ratings, "id"),
+            ratingsByCode: _.keyBy(scheme.ratings, d => d.rating),
+            ratingsById: _.keyBy(scheme.ratings, d => d.id),
         }))
-        .keyBy("id")
+        .keyBy(d => d.id)
         .value();
 }
 
 export function distinctRatingCodes(schemes = {}) {
     return _.chain(schemes)
-        .flatMap((v,k) => v.ratings)
-        .map("rating")
+        .flatMap((v) => v.ratings)
+        .map(d => d.rating)
         .uniq()
         .value();
 }

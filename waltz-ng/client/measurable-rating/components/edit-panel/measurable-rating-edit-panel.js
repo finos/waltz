@@ -340,12 +340,11 @@ function controller($q,
                 [vm.parentEntityRef, vm.activeTab.category.id])
             .then(r => {
                 vm.activeTab.ratingSchemeItems = r.data;
+                vm.onKeypress = mkRatingsKeyHandler(
+                    vm.activeTab.ratingSchemeItems,
+                    vm.onRatingSelect,
+                    vm.doCancel);
             });
-
-        vm.onKeypress = mkRatingsKeyHandler(
-            vm.activeTab.ratingSchemeItems,
-            vm.onRatingSelect,
-            vm.doCancel);
     };
 
     vm.onShowAllTabs = () => {
