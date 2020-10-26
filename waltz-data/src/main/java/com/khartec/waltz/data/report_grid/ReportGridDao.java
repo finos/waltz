@@ -290,7 +290,8 @@ public class ReportGridDao {
                 .and(mr.ENTITY_ID.in(appSelector))
                 .and(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
-        return qry
+        return  dsl
+                .resultQuery(dsl.renderInlined(qry))
                 .fetchSet(r -> ImmutableReportGridRatingCell.builder()
                         .applicationId(r.get(mr.ENTITY_ID))
                         .columnEntityId(r.get(mr.MEASURABLE_ID))
