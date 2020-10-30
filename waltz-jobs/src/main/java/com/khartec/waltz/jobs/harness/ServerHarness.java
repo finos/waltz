@@ -18,25 +18,57 @@
 
 package com.khartec.waltz.jobs.harness;
 
+import com.khartec.waltz.common.FunctionUtilities;
+import com.khartec.waltz.common.ListUtilities;
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.server_information.ServerInformationDao;
-import com.khartec.waltz.model.server_information.ServerInformation;
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.server_information.ServerInformationService;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.HierarchyQueryScope;
+import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.service.DIBaseConfiguration;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.util.List;
+import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 
 
 public class ServerHarness {
 
     public static void main(String[] args) {
 
-        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-        ServerInformationService serverInfoService = ctx.getBean(ServerInformationService.class);
+        System.out.println("start");
+        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIBaseConfiguration.class);
         ServerInformationDao serverInfoDao = ctx.getBean(ServerInformationDao.class);
 
-        List<ServerInformation> r = serverInfoDao.findByAppId(16695);
-        System.out.println(r);
+
+        IdSelectionOptions mOpts = mkOpts(
+                mkRef(EntityKind.MEASURABLE, 1),
+                HierarchyQueryScope.CHILDREN);
+
+        IdSelectionOptions pOpts = mkOpts(
+                mkRef(EntityKind.PERSON, 2),
+                HierarchyQueryScope.CHILDREN);
+
+        IdSelectionOptions ouOpts = mkOpts(
+                mkRef(EntityKind.ORG_UNIT, 3),
+                HierarchyQueryScope.CHILDREN);
+
+        IdSelectionOptions agOpts = mkOpts(
+                mkRef(EntityKind.APP_GROUP, 4),
+                HierarchyQueryScope.EXACT);
+
+
+        System.out.println("start timer");
+        ListUtilities.asList(mOpts, pOpts, ouOpts, agOpts)
+                .forEach(opts -> {
+                    FunctionUtilities.time("stats: " + opts.entityReference(), () -> {
+                        Select<Record1<Long>> selector = new ApplicationIdSelectorFactory().apply(opts);
+                        return serverInfoDao.calculateStatsForAppSelector(selector);
+                    });
+                });
+        System.out.println("end");
 
     }
 
