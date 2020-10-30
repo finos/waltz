@@ -17,7 +17,6 @@
  */
 
 import _ from "lodash";
-import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
 import {getParents, populateParents, switchToParentIds} from "../../../common/hierarchy-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./org-unit-overview.html";
@@ -61,12 +60,6 @@ function controller(serviceBroker) {
                 CORE_API.AssetCostStore.findTotalCostForAppSelector,
                 [ selector ])
             .then(r => vm.totalCost = r.data);
-
-        serviceBroker
-            .loadViewData(
-                CORE_API.ComplexityStore.findBySelector,
-                [ selector ])
-            .then(r => vm.complexitySummary = calcComplexitySummary(r.data));
 
         serviceBroker
             .loadViewData(
