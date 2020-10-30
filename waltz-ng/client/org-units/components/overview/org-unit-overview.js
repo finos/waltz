@@ -57,12 +57,6 @@ function controller(serviceBroker) {
 
         serviceBroker
             .loadViewData(
-                CORE_API.AssetCostStore.findTotalCostForAppSelector,
-                [ selector ])
-            .then(r => vm.totalCost = r.data);
-
-        serviceBroker
-            .loadViewData(
                 CORE_API.LogicalFlowStore.calculateStats,
                 [ selector ])
             .then(r => vm.flowStats = r.data);
