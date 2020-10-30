@@ -174,7 +174,7 @@ public class ServerInformationDao {
                 .selectDistinct(SERVER_INFORMATION.ID, SERVER_INFORMATION.IS_VIRTUAL)
                 .from(SERVER_INFORMATION)
                 .join(SERVER_USAGE).on(SERVER_USAGE.SERVER_ID.eq(SERVER_INFORMATION.ID))
-                .where(condition)
+                .where(dsl.renderInlined(condition))
                 .fetchGroups(SERVER_INFORMATION.IS_VIRTUAL, r -> 1);
 
         return ImmutableServerSummaryBasicStatistics.builder()
