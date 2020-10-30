@@ -21,10 +21,7 @@ package com.khartec.waltz.data.server_information;
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.LifecycleStatus;
-import com.khartec.waltz.model.server_information.ImmutableServerInformation;
-import com.khartec.waltz.model.server_information.ImmutableServerSummaryStatistics;
-import com.khartec.waltz.model.server_information.ServerInformation;
-import com.khartec.waltz.model.server_information.ServerSummaryStatistics;
+import com.khartec.waltz.model.server_information.*;
 import com.khartec.waltz.model.tally.ImmutableTally;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.ServerInformationRecord;
@@ -46,6 +43,7 @@ import static com.khartec.waltz.data.JooqUtilities.mkEndOfLifeStatusDerivedField
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
 import static com.khartec.waltz.schema.tables.ServerUsage.SERVER_USAGE;
+import static java.util.Collections.emptyList;
 import static org.jooq.impl.DSL.cast;
 import static org.jooq.impl.DSL.when;
 import static org.jooq.lambda.tuple.Tuple.tuple;
@@ -165,6 +163,24 @@ public class ServerInformationDao {
                                     s.externalId().orElse(null)))
                     .collect(Collectors.toList()))
                 .execute();
+    }
+
+
+    public ServerSummaryBasicStatistics calculateBasicStatsForAppSelector(Select<Record1<Long>> appIdSelector) {
+        Condition condition = SERVER_USAGE.ENTITY_ID.in(appIdSelector)
+                .and(SERVER_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+
+        Map<Boolean, List<Integer>> byVirtualOrNot = dsl
+                .selectDistinct(SERVER_INFORMATION.ID, SERVER_INFORMATION.IS_VIRTUAL)
+                .from(SERVER_INFORMATION)
+                .join(SERVER_USAGE).on(SERVER_USAGE.SERVER_ID.eq(SERVER_INFORMATION.ID))
+                .where(condition)
+                .fetchGroups(SERVER_INFORMATION.IS_VIRTUAL, r -> 1);
+
+        return ImmutableServerSummaryBasicStatistics.builder()
+                .physicalCount(byVirtualOrNot.getOrDefault(false, emptyList()).size())
+                .virtualCount(byVirtualOrNot.getOrDefault(true, emptyList()).size())
+                .build();
     }
 
 

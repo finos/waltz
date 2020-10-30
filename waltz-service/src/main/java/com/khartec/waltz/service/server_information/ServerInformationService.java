@@ -25,6 +25,7 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.server_information.ServerInformation;
+import com.khartec.waltz.model.server_information.ServerSummaryBasicStatistics;
 import com.khartec.waltz.model.server_information.ServerSummaryStatistics;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -86,6 +87,10 @@ public class ServerInformationService {
         return serverInformationDao.calculateStatsForAppSelector(selector);
     }
 
+    public ServerSummaryBasicStatistics calculateBasicStatsForAppSelector(IdSelectionOptions options) {
+        Select<Record1<Long>> selector = selectorFactory.apply(options);
+        return serverInformationDao.calculateBasicStatsForAppSelector(selector);
+    }
 
     public List<ServerInformation> search(String query) {
         if (isEmpty(query)) return emptyList();

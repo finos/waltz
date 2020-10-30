@@ -27,6 +27,7 @@ import Routes from './routes';
 import ServerPies from "./components/server-pies/server-pies";
 import ServerOverview from "./components/overview/server-overview";
 import ServerUsagesSection from "./components/usages-section/server-usages-section";
+import ServerBasicInfoTile from "./components/basic-info-tile/server-basic-info-tile";
 
 import ServerView from "./pages/view/server-view";
 
@@ -41,7 +42,8 @@ export default () => {
         ServerPies,
         ServerOverview,
         ServerUsagesSection,
-        ServerView
+        ServerView,
+        ServerBasicInfoTile
     ]);
 
     registerStores(module, [

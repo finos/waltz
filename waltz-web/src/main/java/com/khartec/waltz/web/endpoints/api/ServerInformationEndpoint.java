@@ -19,6 +19,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.server_information.ServerInformation;
+import com.khartec.waltz.model.server_information.ServerSummaryBasicStatistics;
 import com.khartec.waltz.model.server_information.ServerSummaryStatistics;
 import com.khartec.waltz.service.server_information.ServerInformationService;
 import com.khartec.waltz.web.DatumRoute;
@@ -57,6 +58,7 @@ public class ServerInformationEndpoint implements Endpoint {
         String getByExternalIdPath = mkPath(BASE_URL, "external-id", ":externalId");
         String getByHostnamePath = mkPath(BASE_URL, "hostname", ":hostname");
         String calculateStatsForAppSelectorPath = mkPath(BASE_URL, "apps", "stats");
+        String calculateBasicStatsForAppSelectorPath = mkPath(calculateStatsForAppSelectorPath, "basic");
 
         ListRoute<ServerInformation> findByAssetCodeRoute = (request, response)
                 -> serverInformationService.findByAssetCode(request.params("assetCode"));
@@ -76,6 +78,9 @@ public class ServerInformationEndpoint implements Endpoint {
         DatumRoute<ServerSummaryStatistics> calculateStatsForAppSelectorRoute = (request, response)
                 -> serverInformationService.calculateStatsForAppSelector(readIdSelectionOptionsFromBody(request));
 
+        DatumRoute<ServerSummaryBasicStatistics> calculateBasicStatsForAppSelectorRoute = (request, response)
+                -> serverInformationService.calculateBasicStatsForAppSelector(readIdSelectionOptionsFromBody(request));
+
 
         getForList(findByAssetCodePath, findByAssetCodeRoute);
         getForList(findByAppIdPath, findByAppIdRoute);
@@ -83,6 +88,7 @@ public class ServerInformationEndpoint implements Endpoint {
         getForDatum(getByExternalIdPath, getByExternalIdRoute);
         getForDatum(getByHostnamePath, getByHostnameRoute);
         postForDatum(calculateStatsForAppSelectorPath, calculateStatsForAppSelectorRoute);
+        postForDatum(calculateBasicStatsForAppSelectorPath, calculateBasicStatsForAppSelectorRoute);
     }
 
 
