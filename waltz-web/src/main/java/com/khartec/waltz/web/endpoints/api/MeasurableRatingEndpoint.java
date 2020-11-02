@@ -125,7 +125,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
     private Collection<MeasurableRating> saveRoute(Request request, Response z) throws IOException {
         SaveMeasurableRatingCommand command = mkCommand(request);
         requireRole(userRoleService, request, measurableRatingService.getRequiredRatingEditRole(mkRef(EntityKind.MEASURABLE, command.measurableId())));
-        return measurableRatingService.save(command);
+        return measurableRatingService.save(command, false);
     }
 
 

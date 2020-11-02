@@ -130,7 +130,7 @@ public class AllocationHarness {
                 .lastUpdate(UserTimestamp.mkForUser("admin"))
                 .build();
 
-        ratingService.save(command1);
+        ratingService.save(command1, false);
     }
 
     private static void doDiff(DSLContext dsl, Long measurableCategory) {

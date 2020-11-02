@@ -112,22 +112,14 @@ function controller($q, serviceBroker) {
         hideAllocationScheme();
     };
 
-    const getMeasurableFromRating = (rating) => _.first(_.filter(vm.measurables, m => m.id === rating.measurableId));
-
-    const isMeasurableEditable = (vm, categoryId) => {
-        const readOnlyRating = _.first(_.filter(vm.ratings,
-                                                r => getMeasurableFromRating(r).categoryId === categoryId && r.isReadOnly));
-        return _.isEmpty(readOnlyRating);
-    };
-
     vm.onTabChange = (tab) => {
         hideAllocationScheme();
 
         serviceBroker
-            .loadViewData(CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
-                          [vm.parentEntityRef, tab.category.id])
+            .loadViewData(
+                CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
+                [vm.parentEntityRef, tab.category.id])
             .then(r => tab.ratingSchemeItems = r.data)
-            .then(() => vm.editable = isMeasurableEditable(vm, tab.category.id));
     };
 
 }

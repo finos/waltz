@@ -100,7 +100,7 @@ public class BookmarkDaoTest extends BaseIntegrationTest {
 
         ImmutableBookmark updatedBookmark = ImmutableBookmark.copyOf(bookmark)
                 .withTitle("Updated")
-                .withLastUpdatedAt(DateTimeUtilities.nowUtc());
+                .withLastUpdatedAt(DateTimeUtilities.today().atStartOfDay().plusHours(1));
 
         dao.update(updatedBookmark, "admin");
         assertEquals(updatedBookmark, dao.getById(bookmarkId));
@@ -134,6 +134,7 @@ public class BookmarkDaoTest extends BaseIntegrationTest {
                         .parent(entity)
                         .bookmarkKind("DOCUMENTATION")
                         .lastUpdatedBy("admin")
+                        .lastUpdatedAt(DateTimeUtilities.today().atStartOfDay())
                         .build(),
                 "admin");
     }

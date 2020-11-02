@@ -18,7 +18,6 @@
 
 package com.khartec.waltz.data.measurable_rating_replacement;
 
-import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -36,9 +35,9 @@ import java.util.Date;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
-import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
+import static com.khartec.waltz.common.DateTimeUtilities.*;
 import static com.khartec.waltz.common.SetUtilities.asSet;
+import static com.khartec.waltz.data.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionDao.checkIfReadOnly;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.MeasurableRatingPlannedDecommission.MEASURABLE_RATING_PLANNED_DECOMMISSION;
 import static com.khartec.waltz.schema.tables.MeasurableRatingReplacement.MEASURABLE_RATING_REPLACEMENT;
@@ -130,6 +129,8 @@ public class MeasurableRatingReplacementDao {
 
     public Tuple2<Operation, Boolean> save(long decommId, EntityReference entityReference, Date commissionDate, String username) {
 
+        checkIfReadOnly(dsl, decommId);
+
         Condition condition = MEASURABLE_RATING_REPLACEMENT.DECOMMISSION_ID.eq(decommId)
                 .and(MEASURABLE_RATING_REPLACEMENT.ENTITY_ID.eq(entityReference.id())
                         .and(MEASURABLE_RATING_REPLACEMENT.ENTITY_KIND.eq(entityReference.kind().name())));
@@ -143,7 +144,7 @@ public class MeasurableRatingReplacementDao {
                     .update(MEASURABLE_RATING_REPLACEMENT)
                     .set(MEASURABLE_RATING_REPLACEMENT.PLANNED_COMMISSION_DATE, toSqlDate(commissionDate))
                     .set(MEASURABLE_RATING_REPLACEMENT.UPDATED_BY, username)
-                    .set(MEASURABLE_RATING_REPLACEMENT.UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
+                    .set(MEASURABLE_RATING_REPLACEMENT.UPDATED_AT, nowUtcTimestamp())
                     .execute() == 1;
 
             return tuple(Operation.UPDATE, recordsUpdated);
@@ -154,9 +155,9 @@ public class MeasurableRatingReplacementDao {
             replacementRecord.setDecommissionId(decommId);
             replacementRecord.setEntityId(entityReference.id());
             replacementRecord.setEntityKind(entityReference.kind().name());
-            replacementRecord.setCreatedAt(DateTimeUtilities.nowUtcTimestamp());
+            replacementRecord.setCreatedAt(nowUtcTimestamp());
             replacementRecord.setCreatedBy(username);
-            replacementRecord.setUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
+            replacementRecord.setUpdatedAt(nowUtcTimestamp());
             replacementRecord.setUpdatedBy(username);
             replacementRecord.setPlannedCommissionDate(toSqlDate(commissionDate));
 
@@ -168,6 +169,7 @@ public class MeasurableRatingReplacementDao {
 
 
     public boolean remove(long decommId, long replacementId) {
+        checkIfReadOnly(dsl, decommId);
         return dsl
                 .deleteFrom(MEASURABLE_RATING_REPLACEMENT)
                 .where(MEASURABLE_RATING_REPLACEMENT.DECOMMISSION_ID.eq(decommId))

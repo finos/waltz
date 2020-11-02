@@ -38,12 +38,12 @@ const bindings = {
 
 
 const initialState = {
-    scheme: null,
     allocated: [],
-    unallocated: [],
     editing: false,
     saveEnabled: false,
-    showingHelp: false
+    scheme: null,
+    showingHelp: false,
+    unallocated: []
 };
 
 
@@ -77,6 +77,7 @@ function controller($q, notification, serviceBroker) {
             .all([measurablePromise, ratingsPromise])
             .then(([allMeasurables, ratings]) => {
                 const measurablesById = _.keyBy(allMeasurables, "id");
+                const ratingsByMeasurableId = _.keyBy(ratings, "measurableId");
                 const availableMeasurables = findMeasurablesRelatedToScheme(ratings, measurablesById, vm.scheme);
                 const allocationsByMeasurableId = _
                     .chain(vm.allocations)
@@ -96,7 +97,8 @@ function controller($q, notification, serviceBroker) {
                         return {
                             allocation,
                             measurable,
-                            working
+                            working,
+                            rating: ratingsByMeasurableId[measurable.id]
                         };
                     })
                     .value();
@@ -188,7 +190,7 @@ function controller($q, notification, serviceBroker) {
 
         if (currentTotal > 0) {
             let amountGiven = 0;
-            validRecipients.forEach((d, idx) => {
+            validRecipients.forEach((d) => {
                 const amountToGive = Math.floor((amountToDistribute / currentTotal) * d.working.percentage);
                 amountGiven = amountGiven += amountToGive;
                 d.working.percentage += amountToGive;
