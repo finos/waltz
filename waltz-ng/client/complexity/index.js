@@ -19,6 +19,7 @@ import angular from "angular";
 import {registerStores, registerComponents} from "../common/module-utils";
 import * as ComplexityStore from './services/complexity-store';
 import * as ComplexityBarChart from './components/chart/complexity-bar-chart';
+import ComplexityBasicInfoTile from './components/basic-info-tile/complexity-basic-info-tile';
 import * as ComplexitySection from './components/section/complexity-section';
 
 export default () => {
@@ -26,7 +27,10 @@ export default () => {
 
     registerStores(module, [ ComplexityStore ]);
 
-    registerComponents(module, [ComplexityBarChart, ComplexitySection]);
+    registerComponents(module, [
+        ComplexityBarChart,
+        ComplexityBasicInfoTile,
+        ComplexitySection]);
 
     return module.name;
 };

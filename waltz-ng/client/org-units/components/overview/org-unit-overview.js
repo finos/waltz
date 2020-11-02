@@ -17,8 +17,6 @@
  */
 
 import _ from "lodash";
-import {enrichServerStats} from "../../../server-info/services/server-utilities";
-import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
 import {getParents, populateParents, switchToParentIds} from "../../../common/hierarchy-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./org-unit-overview.html";
@@ -59,27 +57,9 @@ function controller(serviceBroker) {
 
         serviceBroker
             .loadViewData(
-                CORE_API.AssetCostStore.findTotalCostForAppSelector,
-                [ selector ])
-            .then(r => vm.totalCost = r.data);
-
-        serviceBroker
-            .loadViewData(
-                CORE_API.ComplexityStore.findBySelector,
-                [ selector ])
-            .then(r => vm.complexitySummary = calcComplexitySummary(r.data));
-
-        serviceBroker
-            .loadViewData(
                 CORE_API.LogicalFlowStore.calculateStats,
                 [ selector ])
             .then(r => vm.flowStats = r.data);
-
-        serviceBroker
-            .loadViewData(
-                CORE_API.TechnologyStatisticsService.findBySelector,
-                [ selector ])
-            .then(r => vm.enrichedServerStats = enrichServerStats(r.data.serverStats));
 
         serviceBroker
             .loadAppData(CORE_API.OrgUnitStore.findAll)

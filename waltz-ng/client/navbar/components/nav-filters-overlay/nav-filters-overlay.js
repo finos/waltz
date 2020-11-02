@@ -148,13 +148,15 @@ function controller($element,
 
 
     vm.filterChanged = () => {
-        const filterOptions = {
-            omitApplicationKinds: _
-                .chain(vm.appKindFilterOptions)
-                .reject(d => d.selected)
-                .map(d => d.kind)
-                .value()
-        };
+        const omitApplicationKinds = _
+            .chain(vm.appKindFilterOptions)
+            .reject(d => d.selected)
+            .map(d => d.kind)
+            .value();
+
+        const filterOptions = _.isEmpty(omitApplicationKinds)
+            ? {}
+            : { omitApplicationKinds };
 
         $rootScope.$broadcast(FILTER_CHANGED_EVENT, filterOptions);
     };

@@ -17,7 +17,6 @@
  */
 
 import _ from "lodash";
-import {enrichServerStats} from "../../../server-info/services/server-utilities";
 import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
@@ -118,12 +117,6 @@ function controller($q, serviceBroker, userService) {
                 CORE_API.ApplicationStore.findBySelector,
                 [ selector ])
             .then(r => vm.applications = r.data);
-
-        serviceBroker
-            .loadViewData(
-                CORE_API.TechnologyStatisticsService.findBySelector,
-                [ selector ])
-            .then(r => vm.enrichedServerStats = enrichServerStats(r.data.serverStats));
 
         vm.onSubscribe = () => {
             serviceBroker

@@ -43,6 +43,13 @@ export function store($http, baseUrl) {
     };
 
 
+    const findBasicStatsForSelector = (selectionOptions) => {
+        return $http
+            .post(`${BASE}/apps/stats/basic`, selectionOptions)
+            .then(result => result.data);
+    };
+
+
     const getById = (serverId) =>
         $http
             .get(`${BASE}/${serverId}`)
@@ -65,6 +72,7 @@ export function store($http, baseUrl) {
         findByAssetCode,
         findByAppId,
         findStatsForSelector,
+        findBasicStatsForSelector,
         getById,
         getByExternalId,
         getByHostname
@@ -95,7 +103,12 @@ export const ServerInfoStore_API = {
     findStatsForSelector: {
         serviceName,
         serviceFnName: "findStatsForSelector",
-        description: "executes findStatsForSelector"
+        description: "executes findStatsForSelector - gives totals and breakdowns by location, opsys and hardware (etc) "
+    },
+    findBasicStatsForSelector: {
+        serviceName,
+        serviceFnName: "findBasicStatsForSelector",
+        description: "executes findBasicStatsForSelector - gives just the total, virtual and physical counts"
     },
     getById: {
         serviceName,
