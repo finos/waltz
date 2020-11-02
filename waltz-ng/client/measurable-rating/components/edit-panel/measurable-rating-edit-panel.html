@@ -33,14 +33,22 @@
         </div>
 
         <!-- EDIT SECTION -->
-        <div ng-if="$ctrl.visibility.ratingEditor"
-             ng-include="'wmrep-rating-editor'">
-        </div>
+        <div ng-if="$ctrl.visibility.ratingEditor">
 
-        <!-- INSTRUCTIONS -->
-        <div class="help-block"
-             ng-if="$ctrl.visibility.instructions"
-             ng-include="'wmrep-instructions'">
+            <span ng-if="$ctrl.selected.rating.isReadOnly">
+                <div>
+                    <b style="font-weight: bolder">
+                        <waltz-icon name="lock"></waltz-icon> Locked
+                    </b>
+                    <p style="padding-top: 1em;">
+                       This rating has been marked as read only and cannot be edited
+                    </p>
+                </div>
+            </span>
+
+            <span ng-if="!$ctrl.selected.rating.isReadOnly"
+                  ng-include="'wmrep-rating-editor'">
+            </span>
         </div>
 
     </div>
@@ -259,6 +267,11 @@
                 &laquo; Back
             </a>
         </div>
+    </div>
+
+    <div class="help-block"
+         ng-if="$ctrl.visibility.instructions"
+         ng-include="'wmrep-instructions'">
     </div>
 </script>
 

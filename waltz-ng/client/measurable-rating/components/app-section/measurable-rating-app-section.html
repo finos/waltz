@@ -57,7 +57,7 @@
                         </div>
                     </div>
 
-                    <span waltz-has-role="RATING_EDITOR" ng-if="$ctrl.editable === true">
+                    <span waltz-has-role="RATING_EDITOR">
                         <div class="waltz-sub-section-controls">
                             <a ng-if="$ctrl.visibility.editor === false"
                                ng-click="$ctrl.onEditRatings()"
@@ -192,7 +192,6 @@
             <span ng-repeat="scheme in tab.allocationSchemes">
                 <a class="clickable"
                    ng-click="$ctrl.onShowAllocationScheme(scheme)">
-                    &nbsp;
                     &nbsp;
                     <span ng-bind="scheme.name"
                           uib-popover-template="'wmras-scheme-popover.html'"

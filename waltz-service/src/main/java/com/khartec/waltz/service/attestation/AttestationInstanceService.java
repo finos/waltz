@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.service.attestation;
 
+import com.khartec.waltz.common.exception.UpdateFailedException;
 import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.attestation.AttestationInstanceDao;
@@ -30,6 +31,7 @@ import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.permission.PermissionGroupService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.slf4j.Logger;
@@ -55,6 +57,7 @@ public class AttestationInstanceService {
     private final ApplicationService applicationService;
     private final PersonDao personDao;
     private final ChangeLogService changeLogService;
+    private final PermissionGroupService permissionGroupService;
 
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
@@ -62,7 +65,8 @@ public class AttestationInstanceService {
     public AttestationInstanceService(AttestationInstanceDao attestationInstanceDao,
                                       AttestationRunService attestationRunService,
                                       ApplicationService applicationService,
-                                      PersonDao personDao, ChangeLogService changeLogService) {
+                                      PersonDao personDao, ChangeLogService changeLogService,
+                                      PermissionGroupService permissionGroupService) {
         checkNotNull(attestationInstanceDao, "attestationInstanceDao cannot be null");
         checkNotNull(attestationRunService, "attestationRunService cannot be null");
         checkNotNull(personDao, "personDao cannot be null");
@@ -73,6 +77,7 @@ public class AttestationInstanceService {
         this.applicationService = applicationService;
         this.personDao = personDao;
         this.changeLogService = changeLogService;
+        this.permissionGroupService = permissionGroupService;
     }
 
 
@@ -156,6 +161,7 @@ public class AttestationInstanceService {
 
 
     public boolean attestForEntity(String username, AttestEntityCommand createCommand) {
+        checkAttestationPermission(username, createCommand);
 
         List<AttestationInstance> instancesForEntityForUser = attestationInstanceDao
                 .findForEntityByRecipient(
@@ -181,6 +187,18 @@ public class AttestationInstanceService {
 
             Long instanceId = getInstanceId(first(findByRunId(runId)));
             return attestInstance(instanceId, username);
+        }
+    }
+
+    private void checkAttestationPermission(String username, AttestEntityCommand createCommand) {
+        boolean hasAttestationPermission = permissionGroupService.hasPermission(
+                createCommand.entityReference(),
+                createCommand.attestedEntityKind(),
+                username);
+
+        if (!hasAttestationPermission) {
+            throw new UpdateFailedException("ATTESTATION_FAILED",
+                    "user does not have permission to attest " + createCommand.attestedEntityKind().prettyName());
         }
     }
 

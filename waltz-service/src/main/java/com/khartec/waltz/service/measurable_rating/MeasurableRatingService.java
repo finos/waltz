@@ -107,7 +107,7 @@ public class MeasurableRatingService {
 
     // -- WRITE
 
-    public Collection<MeasurableRating> save(SaveMeasurableRatingCommand command) {
+    public Collection<MeasurableRating> save(SaveMeasurableRatingCommand command, boolean ignoreReadOnly) {
         checkNotNull(command, "command cannot be null");
 
         checkRatingIsAllowable(command);
@@ -116,7 +116,7 @@ public class MeasurableRatingService {
         checkNotNull(measurable, format("Unknown measurable with id: %d", command.measurableId()));
         checkTrue(measurable.concrete(), "Cannot rate against an abstract measurable");
 
-        Operation operationThatWasPerformed = measurableRatingDao.save(command);
+        Operation operationThatWasPerformed = measurableRatingDao.save(command, false);
 
         String entityName = getEntityName(command);
 

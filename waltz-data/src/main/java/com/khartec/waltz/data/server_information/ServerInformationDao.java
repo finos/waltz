@@ -18,20 +18,20 @@
 
 package com.khartec.waltz.data.server_information;
 
+import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.LifecycleStatus;
-import com.khartec.waltz.model.server_information.ImmutableServerInformation;
-import com.khartec.waltz.model.server_information.ImmutableServerSummaryStatistics;
-import com.khartec.waltz.model.server_information.ServerInformation;
-import com.khartec.waltz.model.server_information.ServerSummaryStatistics;
+import com.khartec.waltz.model.server_information.*;
 import com.khartec.waltz.model.tally.ImmutableTally;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.ServerInformationRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -39,14 +39,14 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
-import static com.khartec.waltz.data.JooqUtilities.calculateStringTallies;
 import static com.khartec.waltz.data.JooqUtilities.mkEndOfLifeStatusDerivedField;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
 import static com.khartec.waltz.schema.tables.ServerUsage.SERVER_USAGE;
-import static java.util.stream.Collectors.counting;
+import static java.util.Collections.emptyList;
 import static org.jooq.impl.DSL.cast;
 import static org.jooq.impl.DSL.when;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
 @Repository
@@ -166,55 +166,133 @@ public class ServerInformationDao {
     }
 
 
+    public ServerSummaryBasicStatistics calculateBasicStatsForAppSelector(Select<Record1<Long>> appIdSelector) {
+        Condition condition = SERVER_USAGE.ENTITY_ID.in(appIdSelector)
+                .and(SERVER_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+
+        Map<Boolean, List<Integer>> byVirtualOrNot = dsl
+                .selectDistinct(SERVER_INFORMATION.ID, SERVER_INFORMATION.IS_VIRTUAL)
+                .from(SERVER_INFORMATION)
+                .join(SERVER_USAGE).on(SERVER_USAGE.SERVER_ID.eq(SERVER_INFORMATION.ID))
+                .where(dsl.renderInlined(condition))
+                .fetchGroups(SERVER_INFORMATION.IS_VIRTUAL, r -> 1);
+
+        return ImmutableServerSummaryBasicStatistics.builder()
+                .physicalCount(byVirtualOrNot.getOrDefault(false, emptyList()).size())
+                .virtualCount(byVirtualOrNot.getOrDefault(true, emptyList()).size())
+                .build();
+    }
+
+
     public ServerSummaryStatistics calculateStatsForAppSelector(Select<Record1<Long>> appIdSelector) {
 
         Field<String> operatingSystemInner = DSL.field("operating_system_inner", String.class);
         Field<String> locationInner = DSL.field("location_inner", String.class);
         Field<String> osEolStatusInner = DSL.field("os_eol_status_inner", String.class);
         Field<String> hwEolStatusInner = DSL.field("hw_eol_status_inner", String.class);
-        Field<Boolean> isVirtualInner = DSL.field("is_virtual_inner", Boolean.class);
+        Field<String> isVirtualInner = DSL.field("is_virtual_inner", String.class);
 
         Condition condition = SERVER_USAGE.ENTITY_ID.in(appIdSelector)
                 .and(SERVER_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
         // de-duplicate host names, as one server can host multiple apps
-        SelectConditionStep<Record6<Long, String, String, String, String, Boolean>> qry = dsl.selectDistinct(
-                SERVER_INFORMATION.ID,
-                SERVER_INFORMATION.OPERATING_SYSTEM.as(operatingSystemInner),
-                SERVER_INFORMATION.LOCATION.as(locationInner),
-                mkEndOfLifeStatusDerivedField(SERVER_INFORMATION.OS_END_OF_LIFE_DATE).as(osEolStatusInner),
-                mkEndOfLifeStatusDerivedField(SERVER_INFORMATION.HW_END_OF_LIFE_DATE).as(hwEolStatusInner),
-                cast(when(SERVER_INFORMATION.IS_VIRTUAL.eq(true), 1).otherwise(0), Boolean.class).as(isVirtualInner))
+        SelectConditionStep<Record6<Long, String, String, String, String, String>> qry = DSL
+                .selectDistinct(
+                    SERVER_INFORMATION.ID,
+                    SERVER_INFORMATION.OPERATING_SYSTEM.as(operatingSystemInner),
+                    SERVER_INFORMATION.LOCATION.as(locationInner),
+                    mkEndOfLifeStatusDerivedField(SERVER_INFORMATION.OS_END_OF_LIFE_DATE).as(osEolStatusInner),
+                    mkEndOfLifeStatusDerivedField(SERVER_INFORMATION.HW_END_OF_LIFE_DATE).as(hwEolStatusInner),
+                    cast(when(SERVER_INFORMATION.IS_VIRTUAL.eq(true), "T").otherwise("F"), String.class).as(isVirtualInner))
                 .from(SERVER_INFORMATION)
                 .join(SERVER_USAGE).on(SERVER_USAGE.SERVER_ID.eq(SERVER_INFORMATION.ID))
                 .where(condition);
 
-        Result<? extends Record> serverInfo = qry.fetch();
+        Result<? extends Record> serverInfo =  dsl
+                .resultQuery(dsl.renderInlined(qry))
+                .fetch();
 
-        Map<Boolean, Long> virtualAndPhysicalCounts = serverInfo.stream()
-                .collect(Collectors.groupingBy(r -> r.getValue(isVirtualInner), counting()));
+        // We want to use offsets as the column lookup by field can be considerably slower (+400ms) when volumes are high
+        List<Tuple2<Field<String>, Integer>> fieldsToTally = ListUtilities.asList(
+                tuple(operatingSystemInner, 1),
+                tuple(locationInner, 2),
+                tuple(osEolStatusInner, 3),
+                tuple(hwEolStatusInner, 4),
+                tuple(isVirtualInner, 5));
 
-        return ImmutableServerSummaryStatistics.builder()
-                .virtualCount(virtualAndPhysicalCounts.getOrDefault(true, 0L))
-                .physicalCount(virtualAndPhysicalCounts.getOrDefault(false, 0L))
-                .environmentCounts(calculateEnvironmentStats(appIdSelector))
-                .operatingSystemCounts(calculateStringTallies(serverInfo, operatingSystemInner))
-                .locationCounts(calculateStringTallies(serverInfo, locationInner))
-                .operatingSystemEndOfLifeStatusCounts(calculateStringTallies(serverInfo, osEolStatusInner))
-                .hardwareEndOfLifeStatusCounts(calculateStringTallies(serverInfo, hwEolStatusInner))
-                .build();
+        Map<Field<String>, Map<String, Long>> rawTallies = prepareRawTallyData(fieldsToTally, serverInfo);
+
+        List<Tally<String>> envStats = calculateEnvironmentStats(appIdSelector);
+
+        return ImmutableServerSummaryStatistics
+            .builder()
+            .virtualCount(rawTallies.getOrDefault(isVirtualInner, new HashMap<>()).getOrDefault("T", 0L))
+            .physicalCount(rawTallies.getOrDefault(isVirtualInner, new HashMap<>()).getOrDefault("F", 0L))
+            .environmentCounts(envStats)
+            .operatingSystemCounts(toTallies(rawTallies, operatingSystemInner))
+            .locationCounts(toTallies(rawTallies, locationInner))
+            .operatingSystemEndOfLifeStatusCounts(toTallies(rawTallies, osEolStatusInner))
+            .hardwareEndOfLifeStatusCounts(toTallies(rawTallies, hwEolStatusInner))
+            .build();
+    }
+
+
+    /**
+     * reduces the results to a map, keyed by fields and then counted by value.
+     * i.e. `{LOCFIELD -> { "LDN" : 3, "NY": 6 }}`
+     *
+     * @param fieldsToTally list of tuples describing field/col name and offset [(field, offset),...]
+     * @param records  raw info from database
+     * @return
+     */
+    private Map<Field<String>, Map<String, Long>> prepareRawTallyData(
+            List<Tuple2<Field<String>, Integer>> fieldsToTally,
+            Result<? extends Record> records)
+    {
+        return records
+                .stream()
+                .reduce(
+                    new HashMap<>(),
+                    (acc, r) -> {
+                        for(Tuple2<Field<String>, Integer> fieldRef: fieldsToTally) {
+                            Map<String, Long> occurrenceCounts = acc.get(fieldRef.v1);
+                            if (occurrenceCounts == null) occurrenceCounts = new HashMap<>();
+                            String tallyKey = r.get(fieldRef.v2, String.class);
+                            Long occurrenceCount = occurrenceCounts.getOrDefault(tallyKey, 0L);
+                            occurrenceCounts.put(tallyKey, occurrenceCount + 1);
+                            acc.put(fieldRef.v1, occurrenceCounts);
+                        }
+                        return acc;
+                    },
+                    (a, b) -> a);
+    }
+
+
+    private List<Tally<String>> toTallies(Map<Field<String>, Map<String, Long>> rawTallies, Field<String> key) {
+        return rawTallies
+                .getOrDefault(key, new HashMap<>())
+                .entrySet()
+                .stream()
+                .map(e -> ImmutableTally.<String>builder()
+                        .id(e.getKey())
+                        .count(e.getValue())
+                        .build())
+                .collect(Collectors.toList());
     }
 
 
     private List<Tally<String>> calculateEnvironmentStats(Select<Record1<Long>> appIdSelector) {
         Field<Integer> countField = DSL.count().as("count");
 
-        return dsl
+        SelectHavingStep<Record2<String, Integer>> qry = DSL
                 .select(SERVER_USAGE.ENVIRONMENT, countField)
                 .from(SERVER_USAGE)
                 .where(SERVER_USAGE.ENTITY_ID.in(appIdSelector))
                 .and(SERVER_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                .groupBy(SERVER_USAGE.ENVIRONMENT)
+                .groupBy(SERVER_USAGE.ENVIRONMENT);
+
+        return dsl
+                .resultQuery(dsl.renderInlined(qry))
                 .fetch()
                 .stream()
                 .map(r -> ImmutableTally.<String>builder()
