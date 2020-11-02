@@ -35,6 +35,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Optional;
+import java.util.OptionalInt;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -111,7 +112,8 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
         Field<Timestamp> latestAttestationAt = DSL.max(latestAttestationInstance.ATTESTED_AT).as("latest_attested_at");
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         Date dateFromYear = null;
-        if(year.isPresent()){
+        Integer defaultYearVal = 0;
+        if(year.isPresent() && !(year.get().equals(defaultYearVal))){
             dateFromYear = sdf.parse("01/01/"+ (year.get()).toString());
         }
         
@@ -136,7 +138,9 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
                 .and(attestationInstanceForPerson.ATTESTED_AT.eq(latestAttestationAt));
 
         Condition yearCondition = year.isPresent()
+                ? !(year.get().equals(defaultYearVal))
                 ? DSL.year(DSL.date(peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT))).eq(DSL.year(dateFromYear))
+                : (peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT).isNotNull())
                 : (peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT).isNull());
 
         return dsl

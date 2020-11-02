@@ -70,13 +70,15 @@ function mkExtractUrl(attestationType, segment, year) {
 }
 
 
-function calcGridData(segment, gridData, year) {
+function calcGridData(segment, gridData, year, defaultYear) {
     if (_.isNil(segment)) {
         // return everything as no segments have been selected (i.e. total was clicked)
         return gridData;
     } else if (segment.key === "NEVER_ATTESTED") {
         // the unattested segment was clicked, so show only rows without an attestation
         return _.filter(gridData, d => _.isNil(d.attestation));
+    } else if(year === defaultYear){
+        return _.filter(gridData, d => !_.isNil(d.attestation));
     } else {
         return _
             .chain(gridData)
@@ -121,8 +123,8 @@ function controller($q,
                 vm.gridDataByPhysicalFlow = mkAttestationSummaryDataForApps(applications, instancesByKind[entity.PHYSICAL_FLOW.key], displayNameService);
 
                 vm.summaryData = {
-                    logical: prepareSummaryData(vm.gridDataByLogicalFlow),
-                    physical: prepareSummaryData(vm.gridDataByPhysicalFlow)
+                    logical: prepareSummaryData(vm.gridDataByLogicalFlow, vm.selectedYear),
+                    physical: prepareSummaryData(vm.gridDataByPhysicalFlow, vm.selectedYear)
                 };
             });
     };
@@ -130,13 +132,15 @@ function controller($q,
 
     vm.$onInit = () => {
         const currentYear = moment().year();
+        vm.defaultYear = 0;
         vm.yearOptions = [
+            vm.defaultYear,
             currentYear,
             currentYear - 1,
             currentYear - 2,
             currentYear - 3
         ];
-        vm.selectedYear = currentYear;
+        vm.selectedYear = vm.defaultYear;
 
         vm.config =  {
             logical: Object.assign({}, attestationPieConfig, { onSelect: onSelectLogicalFlowSegment }),
@@ -160,15 +164,17 @@ function controller($q,
         const year = vm.selectedYear;
         const gridData = vm.rawGridData;
         const attestationType = vm.selectedAttestationType;
-
+        const defaultYear = vm.defaultYear;
+        
         vm.extractUrl = mkExtractUrl(attestationType, segment, year);
-        vm.gridDataToDisplay = calcGridData(segment, gridData, year);
+        vm.gridDataToDisplay = calcGridData(segment, gridData, year, defaultYear);
         vm.visibility.tableView = true;
     }
 
 
     vm.onChangeYear = (year) => {
         vm.selectedYear = Number(year);
+        loadData();
         updateGridData();
     };
 
