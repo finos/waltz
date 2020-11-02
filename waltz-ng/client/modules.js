@@ -92,6 +92,7 @@ import Notification from "./notification";
 import OrgUnits from "./org-units";
 import Orphan from "./orphan";
 import Person from "./person";
+import PermissionGroup from "./permission-group";
 import PhysicalFlows from "./physical-flows";
 import PhysicalSpecifications from "./physical-specifications";
 import PhysicalField from "./physical-field";
@@ -200,6 +201,7 @@ const dependencies = [
     OrgUnits(),
     Orphan(),
     Person(),
+    PermissionGroup(),
     PhysicalFlows(),
     PhysicalSpecifications(),
     PhysicalField(),

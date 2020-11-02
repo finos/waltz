@@ -131,6 +131,7 @@
                         <message>
                             Never attested,
                             <a class="clickable"
+                               ng-if="$ctrl.hasPermissionToAttest(attestationSection.section.type)"
                                ng-click="$ctrl.onInitiateAttestation(attestationSection.section)">
                                 attest now
                             </a>
@@ -192,7 +193,7 @@
 
             </div>
             <div class="waltz-sub-section-controls clickable"
-                 ng-if="attestationSection.latestAttestation">
+                 ng-if="attestationSection.latestAttestation && $ctrl.hasPermissionToAttest(attestationSection.section.type)">
                 <a ng-bind="attestationSection.section.actionLabel"
                    ng-click="$ctrl.onInitiateAttestation(attestationSection.section)">
                 </a>

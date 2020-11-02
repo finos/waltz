@@ -32,8 +32,8 @@
               popover-placement="bottom"
               popover-append-to-body="true"
               ng-class="{
-                'waltz-tree-node-implicit': !node.usage,
-                'waltz-tree-node-explicit': node.usage
+                'waltz-tree-node-implicit': !node.dataType.concrete && !node.usage,
+                'waltz-tree-node-explicit': node.dataType.concrete
               }">
             <span ng-bind="node.dataType.name">
             </span>

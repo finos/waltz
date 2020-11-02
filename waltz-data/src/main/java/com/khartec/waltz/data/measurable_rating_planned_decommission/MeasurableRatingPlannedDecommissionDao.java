@@ -20,6 +20,7 @@ package com.khartec.waltz.data.measurable_rating_planned_decommission;
 
 
 import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.common.exception.ModifyingReadOnlyRecordException;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -38,9 +39,11 @@ import java.util.Collection;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.DateTimeUtilities.*;
+import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static com.khartec.waltz.schema.tables.MeasurableRatingPlannedDecommission.MEASURABLE_RATING_PLANNED_DECOMMISSION;
 import static com.khartec.waltz.schema.tables.MeasurableRatingReplacement.MEASURABLE_RATING_REPLACEMENT;
 
@@ -83,6 +86,21 @@ public class MeasurableRatingPlannedDecommissionDao {
     }
 
 
+    public static void checkIfReadOnly(DSLContext myDsl, long id) {
+        Boolean readOnly = myDsl
+                .select(MEASURABLE_RATING.IS_READONLY)
+                .from(MEASURABLE_RATING)
+                .innerJoin(MEASURABLE_RATING_PLANNED_DECOMMISSION)
+                .on(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_ID.eq(MEASURABLE_RATING.ENTITY_ID))
+                .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_KIND.eq(MEASURABLE_RATING.ENTITY_KIND))
+                .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_ID.eq(MEASURABLE_RATING.MEASURABLE_ID))
+                .where(MEASURABLE_RATING_PLANNED_DECOMMISSION.ID.eq(id))
+                .fetchOne(MEASURABLE_RATING.IS_READONLY);
+        if (readOnly) {
+            throw new ModifyingReadOnlyRecordException("MRPD_READ_ONLY", "Cannot update the measurable rating planned decommission as it is read only");
+        }
+    }
+
 
     public MeasurableRatingPlannedDecommission getById(Long id){
         return dsl
@@ -90,6 +108,18 @@ public class MeasurableRatingPlannedDecommissionDao {
                 .select(NAME_FIELD)
                 .from(MEASURABLE_RATING_PLANNED_DECOMMISSION)
                 .where(MEASURABLE_RATING_PLANNED_DECOMMISSION.ID.eq(id))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
+
+    public MeasurableRatingPlannedDecommission getByEntityAndMeasurable(EntityReference entityReference,
+                                                                        long measurableId) {
+        return dsl
+                .select(MEASURABLE_RATING_PLANNED_DECOMMISSION.fields())
+                .select(NAME_FIELD)
+                .from(MEASURABLE_RATING_PLANNED_DECOMMISSION)
+                .where(mkRefCondition(entityReference)
+                        .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_ID.eq(measurableId)))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
@@ -117,13 +147,12 @@ public class MeasurableRatingPlannedDecommissionDao {
     }
 
 
-    private Condition mkRefCondition(EntityReference ref) {
-        return MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_ID.eq(ref.id())
-                .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_KIND.eq(ref.kind().name()));
-    }
+    public Tuple2<Operation, Boolean> save(EntityReference entityReference,
+                                           long measurableId,
+                                           DateFieldChange dateChange,
+                                           String userName) {
+        checkIfReadOnly(entityReference, measurableId);
 
-
-    public Tuple2<Operation, Boolean> save(EntityReference entityReference, long measurableId, DateFieldChange dateChange, String userName) {
         MeasurableRatingPlannedDecommissionRecord existingRecord = dsl
                 .selectFrom(MEASURABLE_RATING_PLANNED_DECOMMISSION)
                 .where(mkRefCondition(entityReference)
@@ -133,7 +162,6 @@ public class MeasurableRatingPlannedDecommissionDao {
         if (existingRecord != null) {
             updateDecommDateOnRecord(existingRecord, dateChange, userName);
             boolean updatedRecord = existingRecord.update() == 1;
-
             return Tuple.tuple(Operation.UPDATE, updatedRecord);
         } else {
             MeasurableRatingPlannedDecommissionRecord record = dsl.newRecord(MEASURABLE_RATING_PLANNED_DECOMMISSION);
@@ -151,11 +179,36 @@ public class MeasurableRatingPlannedDecommissionDao {
 
 
     public boolean remove(Long id){
+        checkIfReadOnly(dsl, id);
         return dsl
                 .deleteFrom(MEASURABLE_RATING_PLANNED_DECOMMISSION)
                 .where(MEASURABLE_RATING_PLANNED_DECOMMISSION.ID.eq(id))
                 .execute() == 1;
     }
+
+
+    // -- HELPERS ----
+
+    private Condition mkRefCondition(EntityReference ref) {
+        return MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_ID.eq(ref.id())
+                .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_KIND.eq(ref.kind().name()));
+    }
+
+
+    private void checkIfReadOnly(EntityReference entityReference, long measurableId) {
+        Boolean readOnly = dsl
+                .select(MEASURABLE_RATING.IS_READONLY)
+                .from(MEASURABLE_RATING)
+                .where(MEASURABLE_RATING.ENTITY_KIND.eq(entityReference.kind().name()))
+                .and(MEASURABLE_RATING.ENTITY_ID.eq(entityReference.id()))
+                .and(MEASURABLE_RATING.MEASURABLE_ID.eq(measurableId))
+                .fetchOne(MEASURABLE_RATING.IS_READONLY);
+
+        if (readOnly) {
+            throw new ModifyingReadOnlyRecordException("MRPD_READ_ONLY", "Cannot update measurable rating planned decomm date as it is read only");
+        }
+    }
+
 
 
     private void updateDecommDateOnRecord(MeasurableRatingPlannedDecommissionRecord record,
@@ -164,18 +217,6 @@ public class MeasurableRatingPlannedDecommissionDao {
         record.setUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
         record.setUpdatedBy(userName);
         record.setPlannedDecommissionDate(toSqlDate(dateChange.newVal()));
-    }
-
-
-    public MeasurableRatingPlannedDecommission getByEntityAndMeasurable(EntityReference entityReference,
-                                                                        long measurableId) {
-        return dsl
-                .select(MEASURABLE_RATING_PLANNED_DECOMMISSION.fields())
-                .select(NAME_FIELD)
-                .from(MEASURABLE_RATING_PLANNED_DECOMMISSION)
-                .where(mkRefCondition(entityReference)
-                        .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_ID.eq(measurableId)))
-                .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 }

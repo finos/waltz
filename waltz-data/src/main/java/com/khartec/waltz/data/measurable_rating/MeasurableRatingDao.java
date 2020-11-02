@@ -130,20 +130,37 @@ public class MeasurableRatingDao {
 
     // --- save
 
-    public Operation save(SaveMeasurableRatingCommand command) {
+    public Operation save(SaveMeasurableRatingCommand command, boolean ignoreReadOnly) {
         MeasurableRatingRecord record = TO_RECORD_MAPPER.apply(command);
 
-        boolean exists = dsl.fetchExists(DSL
-                .selectFrom(MEASURABLE_RATING)
-                .where(MEASURABLE_RATING.MEASURABLE_ID.eq(command.measurableId()))
-                .and(MEASURABLE_RATING.ENTITY_ID.eq(command.entityReference().id()))
-                .and(MEASURABLE_RATING.ENTITY_KIND.eq(command.entityReference().kind().name())));
+        boolean exists = dsl
+                .fetchExists(DSL
+                    .selectFrom(MEASURABLE_RATING)
+                    .where(MEASURABLE_RATING.MEASURABLE_ID.eq(command.measurableId()))
+                    .and(MEASURABLE_RATING.ENTITY_ID.eq(command.entityReference().id()))
+                    .and(MEASURABLE_RATING.ENTITY_KIND.eq(command.entityReference().kind().name())));
+
 
         if (exists) {
-            if (dsl.executeUpdate(record) == 0) {
+            int updateCount = dsl
+                    .update(MEASURABLE_RATING)
+                    .set(MEASURABLE_RATING.RATING, String.valueOf(command.rating()))
+                    .set(MEASURABLE_RATING.DESCRIPTION, command.description())
+                    .set(MEASURABLE_RATING.LAST_UPDATED_BY, command.lastUpdate().by())
+                    .set(MEASURABLE_RATING.LAST_UPDATED_AT, command.lastUpdate().atTimestamp())
+                    .set(MEASURABLE_RATING.PROVENANCE, command.provenance())
+                    .where(MEASURABLE_RATING.ENTITY_ID.eq(command.entityReference().id()))
+                    .and(MEASURABLE_RATING.ENTITY_KIND.eq(command.entityReference().kind().name()))
+                    .and(MEASURABLE_RATING.MEASURABLE_ID.eq(command.measurableId()))
+                    .and(ignoreReadOnly
+                            ? DSL.trueCondition()
+                            : MEASURABLE_RATING.IS_READONLY.isFalse())
+                    .execute();
+
+            if (updateCount == 0) {
                 throw new NotFoundException(
                         "MR_SAVE_UPDATE_FAILED",
-                        format("Could find associated record to update for rating: %s", command));
+                        format("Could find writable associated record to update for rating: %s", command));
             };
             return Operation.UPDATE;
         } else {
