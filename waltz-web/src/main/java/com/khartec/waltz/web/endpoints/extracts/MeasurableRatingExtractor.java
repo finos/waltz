@@ -34,6 +34,7 @@ import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
+import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static org.jooq.tools.StringUtils.toCamelCase;
 import static spark.Spark.post;
@@ -51,6 +52,7 @@ public class MeasurableRatingExtractor extends DirectQueryBasedDataExtractor {
     private final MeasurableRatingReplacement mrr = MEASURABLE_RATING_REPLACEMENT.as("mrr");
     private final RatingScheme rs = RATING_SCHEME.as("rs");
     private final RatingSchemeItem rsi = RATING_SCHEME_ITEM.as("rsi");
+    private final OrganisationalUnit ou = ORGANISATIONAL_UNIT.as("ou");
     private final Field<String> replacementAppName = InlineSelectFieldFactory.mkNameField(mrr.ENTITY_ID, mrr.ENTITY_KIND, asSet(EntityKind.APPLICATION));
     private final Field<String> replacementAppExtId = InlineSelectFieldFactory.mkExternalIdField(mrr.ENTITY_ID, mrr.ENTITY_KIND, asSet(EntityKind.APPLICATION));
 
@@ -94,7 +96,8 @@ public class MeasurableRatingExtractor extends DirectQueryBasedDataExtractor {
                     .select(mrd.PLANNED_DECOMMISSION_DATE.as("Planned Decommission Date"))
                     .select(replacementAppName.as("Replacement App Name"),
                             replacementAppExtId.as("Replacement External Id"),
-                            mrr.PLANNED_COMMISSION_DATE.as("Replacement Commission Date"));
+                            mrr.PLANNED_COMMISSION_DATE.as("Replacement Commission Date"))
+                    .select(ou.NAME.as("Org Unit Name"));
 
             Condition reportConditions = app.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name())
                     .and(m.MEASURABLE_CATEGORY_ID.eq(categoryId))
@@ -115,6 +118,7 @@ public class MeasurableRatingExtractor extends DirectQueryBasedDataExtractor {
                                 .and(mrd.ENTITY_ID.eq(mr.ENTITY_ID))
                                 .and(mrd.ENTITY_KIND.eq(mr.ENTITY_KIND)))
                     .leftJoin(mrr).on(mrr.DECOMMISSION_ID.eq(mrd.ID))
+                    .leftJoin(ou).on(ou.ID.eq(app.ORGANISATIONAL_UNIT_ID))
                     .where(reportConditions);
 
             String categoryName = dsl.select(mc.NAME).from(mc).where(mc.ID.eq(categoryId)).fetchOne(mc.NAME);
@@ -143,12 +147,14 @@ public class MeasurableRatingExtractor extends DirectQueryBasedDataExtractor {
                     .where(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
                             .and(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId)));
 
-            SelectSeekStep1<Record4<String, String, Long, String>, String> qry = dsl
+            SelectSeekStep1<Record5<String, String, Long, String, String>, String> qry = dsl
                     .selectDistinct(app.NAME.as("App Name"),
                             app.ASSET_CODE.as("App Code"),
                             app.ID.as("App Waltz Id"),
-                            app.KIND.as("App Kind"))
+                            app.KIND.as("App Kind"),
+                            ou.NAME.as("Org Unit Name"))
                     .from(app)
+                    .leftJoin(ou).on(ou.ID.eq(app.ORGANISATIONAL_UNIT_ID))
                     .where(app.ID.in(appIds))
                     .and(app.ID.notIn(appIdsAssignedToAnyMeasurableInTheCategory))
                     .orderBy(app.NAME);
