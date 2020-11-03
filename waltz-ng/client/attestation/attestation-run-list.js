@@ -30,6 +30,58 @@ const initialState = {
     responseSummaries: {}
 };
 
+function mkColumnDefs() {
+    return [
+        {
+            field: 'name',
+            displayName: 'Name',
+            width: '25%',
+            cellTemplate: `
+                <div class="ui-grid-cell-contents">
+                    <a ng-if="row.entity.entityReference.id"
+                       ng-bind="row.entity.parsedFlow.name"
+                       ui-sref="main.physical-flow.view ({ id: row.entity.entityReference.id })"
+                       target="_blank"></a>
+                </div>`
+        }, {
+            field: 'entityKind',
+            displayName: 'Attested Kind',
+            width: '25%',
+            cellTemplate: `<waltz-attested-kind run="row"></waltz-attested-kind>`
+        },
+        {
+            field: 'description',
+            displayName: 'Description',
+            width: '25%',
+            cellTemplate: ``
+        },
+        {
+            field: 'description',
+            displayName: 'Description',
+            width: '25%',
+            cellTemplate: `
+                    <div uib-popover="{{
+                            ctrl.responseSummaries[r.id].completeCount + ' completed'
+                            + ', '
+                            + ctrl.responseSummaries[r.id].pendingCount + ' pending'
+                        }}"
+                         popover-trigger="mouseenter">
+                        <uib-progress max="ctrl.responseSummaries[r.id].completeCount + ctrl.responseSummaries[r.id].pendingCount"
+                                      animate="false">
+                            <uib-bar value="ctrl.responseSummaries[r.id].completeCount"
+                                     ng-bind="ctrl.responseSummaries[r.id].completeCount"
+                                     type="success">
+                            </uib-bar>
+                            <uib-bar value="ctrl.responseSummaries[r.id].pendingCount"
+                                     ng-bind="ctrl.responseSummaries[r.id].pendingCount"
+                                     type="{{ctrl.getPendingBarType(r)}}">
+                            </uib-bar>
+                        </uib-progress>
+                    </div>`
+        }
+    ];
+}
+
 function isOverdue(run = {}) {
     const now = moment();
     const dueDate = moment.utc(run.dueDate, formats.parse);
@@ -38,6 +90,8 @@ function isOverdue(run = {}) {
 
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
+
+    vm.columnDefs = mkColumnDefs();
 
     vm.getPendingBarType = (run) => {
         if(isOverdue(run)) {
@@ -68,7 +122,7 @@ controller.$inject = [
 
 const page = {
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: '$ctrl',
     template
 };
 
