@@ -109,12 +109,9 @@ function controller(serviceBroker, $state) {
 
         serviceBroker
             .loadViewData(
-                CORE_API.TechnologyStatisticsService.findBySelector,
+                CORE_API.ServerInfoStore.findStatsForSelector,
                 [selector])
-            .then(r => {
-                vm.techStats = r.data;
-                vm.enrichedServerStats = enrichServerStats(vm.techStats.serverStats)
-            });
+            .then(r => vm.enrichedServerStats = enrichServerStats(r.data));
 
         serviceBroker
             .loadViewData(
