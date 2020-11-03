@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
@@ -17,6 +16,7 @@
  *
  */
 import _ from 'lodash';
+import {mkSelectionOptions} from "../../common/selector-utils";
 
 
 export function store($http, BaseApiUrl) {
@@ -33,7 +33,8 @@ export function store($http, BaseApiUrl) {
     const findBySelector = (id, kind, scope = 'CHILDREN') => {
         const options = _.isObject(id)
             ? id
-            : {scope, entityReference: {id, kind}};
+            : mkSelectionOptions({id, kind}, scope);
+
 
         return $http
             .post(BASE, options)

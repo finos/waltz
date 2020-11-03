@@ -16,7 +16,6 @@
  *
  */
 
-import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
@@ -72,20 +71,6 @@ function controller(serviceBroker) {
                 [ selector ])
             .then(r => vm.applications = r.data);
 
-
-        serviceBroker
-            .loadViewData(
-                CORE_API.ComplexityStore.findBySelector,
-                [ selector ])
-            .then(r => {
-                vm.complexitySummary = calcComplexitySummary(r.data);
-            });
-
-        serviceBroker
-            .loadViewData(
-                CORE_API.AssetCostStore.findTotalCostForAppSelector,
-                [ selector ])
-            .then(r => vm.totalCost = r.data);
     };
 
 

@@ -58,7 +58,8 @@ const initialState = {
 };
 
 
-function controller($element,
+function controller($q,
+                    $element,
                     $document,
                     $timeout,
                     $state,
@@ -134,19 +135,22 @@ function controller($element,
             return;
         }
 
-        handleSearch(query, entity.APPLICATION.key);
-        handleSearch(query, entity.CHANGE_INITIATIVE.key);
-        handleSearch(query, entity.DATA_TYPE.key);
-        handleSearch(query, entity.PERSON.key);
-        handleSearch(query, entity.MEASURABLE.key);
-        handleSearch(query, entity.ORG_UNIT.key);
-        handleSearch(query, entity.ACTOR.key);
-        handleSearch(query, entity.PHYSICAL_SPECIFICATION.key);
-        handleSearch(query, entity.APP_GROUP.key);
-        handleSearch(query, entity.LOGICAL_DATA_ELEMENT.key);
-        handleSearch(query, entity.ROADMAP.key);
-        handleSearch(query, entity.SERVER.key);
-        handleSearch(query, entity.SOFTWARE.key);
+        $q.all([
+            handleSearch(query, entity.APPLICATION.key),
+            handleSearch(query, entity.PERSON.key),
+            handleSearch(query, entity.APP_GROUP.key),
+            handleSearch(query, entity.CHANGE_INITIATIVE.key),
+            handleSearch(query, entity.ORG_UNIT.key),
+            handleSearch(query, entity.ACTOR.key)
+        ]).then(() => {
+            handleSearch(query, entity.MEASURABLE.key);
+            handleSearch(query, entity.PHYSICAL_SPECIFICATION.key);
+            handleSearch(query, entity.DATA_TYPE.key);
+            handleSearch(query, entity.SERVER.key);
+            handleSearch(query, entity.SOFTWARE.key);
+            handleSearch(query, entity.ROADMAP.key);
+            handleSearch(query, entity.LOGICAL_DATA_ELEMENT.key);
+        });
     };
 
     vm.doSearch = () => doSearch(vm.query);
@@ -195,6 +199,7 @@ function controller($element,
 
 
 controller.$inject = [
+    "$q",
     "$element",
     "$document",
     "$timeout",
