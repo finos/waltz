@@ -1,7 +1,7 @@
 import template from "./complexity-basic-info-tile.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {determineDownwardsScopeForKind} from "../../../common/selector-utils";
+import {determineDownwardsScopeForKind, mkSelectionOptions} from "../../../common/selector-utils";
 import {calcComplexitySummary} from "../../services/complexity-utilities";
 
 
@@ -22,11 +22,12 @@ function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = () => {
-        const selector = {
-            entityReference: vm.parentEntityRef,
-            scope: determineDownwardsScopeForKind(vm.parentEntityRef.kind),
-            filters: vm.filters
-        };
+        const selector = mkSelectionOptions(
+            vm.parentEntityRef,
+            determineDownwardsScopeForKind(vm.parentEntityRef.kind),
+            undefined,
+            vm.filters);
+
 
         serviceBroker
             .loadViewData(
