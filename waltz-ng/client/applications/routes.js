@@ -25,67 +25,66 @@ import AppView from "./pages/view/app-view";
 
 
 const base = {
-    url: 'application'
+    url: "application"
 };
 
 
 const appRegistrationState = {
-    url: '/registration',
-    views: {'content@': AppRegistration }
+    url: "/registration",
+    views: {"content@": AppRegistration }
 };
 
 
 const appViewState = {
-    url: '/{id:int}',
+    url: "/{id:int}",
     reloadOnSearch: false,
     views: {
-        'content@': AppView
+        "content@": AppView
     }
 };
 
 
 const appViewByAssetCodeState = {
-    url: '/asset-code/{assetCode}',
+    url: "/asset-code/{assetCode}",
     views: {
-        'content@': AppViewAssetCode
+        "content@": AppViewAssetCode
     },
     resolve: { resolvedAppsByAssetCode: appByAssetCodeResolver }
 };
 
 
-
 const appViewByExternalIdState = {
-    url: '/external-id/{assetCode}',
+    url: "/external-id/{assetCode}",
     views: {
-        'content@': AppViewAssetCode
+        "content@": AppViewAssetCode
     },
     resolve: { resolvedAppsByAssetCode: appByAssetCodeResolver }
 };
 
 
 const appEditState = {
-    url: '/{id:int}/edit',
+    url: "/{id:int}/edit",
     resolve: {
         app: appResolver,
         orgUnits: orgUnitsResolver
     },
-    views: {'content@': AppEdit}
+    views: {"content@": AppEdit}
 };
 
 
 function setup($stateProvider) {
     $stateProvider
-        .state('main.app', base)
-        .state('main.app.registration', appRegistrationState)
-        .state('main.app.view', appViewState)
-        .state('main.app.asset-code', appViewByAssetCodeState)
-        .state('main.app.external-id', appViewByExternalIdState)
-        .state('main.app.edit', appEditState)
+        .state("main.app", base)
+        .state("main.app.registration", appRegistrationState)
+        .state("main.app.view", appViewState)
+        .state("main.app.asset-code", appViewByAssetCodeState)
+        .state("main.app.external-id", appViewByExternalIdState)
+        .state("main.app.edit", appEditState);
 }
 
 
 setup.$inject = [
-    '$stateProvider'
+    "$stateProvider"
 ];
 
 
