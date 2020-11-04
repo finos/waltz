@@ -26,59 +26,175 @@ import {CORE_API} from "../common/services/core-api-utils";
 
 
 const initialState = {
-    runs: [],
+    entityRuns: [],
+    groupRuns: [],
     responseSummaries: {}
 };
 
-function mkColumnDefs() {
+function mkAttestedKindColumnDef() {
+    return {
+        field: 'entityKind',
+        displayName: 'Attested Kind',
+        width: '10%',
+        cellTemplate: `
+                <div class="ui-grid-cell-contents"
+                     style="vertical-align: baseline;">
+                    <waltz-attested-kind run="row.entity"></waltz-attested-kind>
+                </div>`
+    };
+}
+
+function mkDescriptionColumnDef() {
+    return {
+        field: 'description',
+        displayName: 'Description',
+        width: '20%',
+        cellTemplate: `
+                <div class="ui-grid-cell-contents"
+                     style="vertical-align: baseline;">
+                     <div ng-bind="COL_FIELD | truncate:50"
+                             uib-popover="{{ COL_FIELD }}"
+                             popover-class="waltz-popover-width-500"
+                             popover-append-to-body="true"
+                             popover-placement="right"
+                             popover-trigger="mouseenter">
+                    </div>
+                </div>`
+    };
+}
+
+function mkIssuedByColumnDef() {
+    return {
+            field: 'issuedBy',
+            displayName: 'Issuer',
+            width: '10%',
+        };
+}
+
+function mkIssuedOnColumnDef() {
+        return {
+            field: 'issuedOn',
+            displayName: 'Issued',
+            width: '10%',
+            cellTemplate: `
+                   <div class="ui-grid-cell-contents"
+                        style="vertical-align: baseline;">
+                        <waltz-from-now timestamp="COL_FIELD"
+                                        days-only="true">
+                        </waltz-from-now>
+                    </div>`
+        }
+}
+
+function mkDueDateColumnDef() {
+        return {
+            field: 'dueDate',
+            displayName: 'Due',
+            width: '10%',
+            cellTemplate: `
+                    <div class="ui-grid-cell-contents"
+                         style="vertical-align: baseline;">
+                        <div ng-class="{'text-danger': grid.appScope.isOverdue(row.entity)}">
+                            <waltz-from-now ng-if='COL_FIELD'
+                                            timestamp="COL_FIELD"
+                                            days-only="true">
+                            </waltz-from-now>
+                        </div>
+                    </div>`
+        };
+}
+
+function mkGroupAttestationColumnDefs() {
     return [
         {
             field: 'name',
             displayName: 'Name',
-            width: '25%',
+            width: '30%',
             cellTemplate: `
-                <div class="ui-grid-cell-contents">
-                    <a ng-if="row.entity.entityReference.id"
-                       ng-bind="row.entity.parsedFlow.name"
-                       ui-sref="main.physical-flow.view ({ id: row.entity.entityReference.id })"
-                       target="_blank"></a>
+                <div class="ui-grid-cell-contents"
+                     style="vertical-align: baseline;">
+                        <a ng-bind="COL_FIELD"
+                           class="clickable"
+                           ui-sref="main.attestation.run.view ({id: row.entity.id})">
+                        </a> 
                 </div>`
-        }, {
-            field: 'entityKind',
-            displayName: 'Attested Kind',
-            width: '25%',
-            cellTemplate: `<waltz-attested-kind run="row"></waltz-attested-kind>`
         },
+        mkAttestedKindColumnDef(),
+        mkDescriptionColumnDef(),
         {
-            field: 'description',
-            displayName: 'Description',
-            width: '25%',
-            cellTemplate: ``
-        },
-        {
-            field: 'description',
-            displayName: 'Description',
-            width: '25%',
+            field: 'id',
+            displayName: 'Responses',
+            width: '10%',
             cellTemplate: `
+                <div class="ui-grid-cell-contents"
+                     style="vertical-align: baseline;">
                     <div uib-popover="{{
-                            ctrl.responseSummaries[r.id].completeCount + ' completed'
+                            grid.appScope.responseSummaries[COL_FIELD].completeCount + ' completed'
                             + ', '
-                            + ctrl.responseSummaries[r.id].pendingCount + ' pending'
+                            + grid.appScope.responseSummaries[COL_FIELD].pendingCount + ' pending'
                         }}"
                          popover-trigger="mouseenter">
-                        <uib-progress max="ctrl.responseSummaries[r.id].completeCount + ctrl.responseSummaries[r.id].pendingCount"
+                        <uib-progress max="grid.appScope.responseSummaries[COL_FIELD].completeCount + grid.appScope.responseSummaries[COL_FIELD].pendingCount"
                                       animate="false">
-                            <uib-bar value="ctrl.responseSummaries[r.id].completeCount"
-                                     ng-bind="ctrl.responseSummaries[r.id].completeCount"
+                            <uib-bar value="grid.appScope.responseSummaries[COL_FIELD].completeCount"
+                                     ng-bind="grid.appScope.responseSummaries[COL_FIELD].completeCount"
                                      type="success">
                             </uib-bar>
-                            <uib-bar value="ctrl.responseSummaries[r.id].pendingCount"
-                                     ng-bind="ctrl.responseSummaries[r.id].pendingCount"
-                                     type="{{ctrl.getPendingBarType(r)}}">
+                            <uib-bar value="grid.appScope.responseSummaries[COL_FIELD].pendingCount"
+                                     ng-bind="grid.appScope.responseSummaries[COL_FIELD].pendingCount"
+                                     type="{{grid.appScope.getPendingBarType(row.entity)}}">
                             </uib-bar>
                         </uib-progress>
-                    </div>`
-        }
+                    </div>
+                </div>`
+        },
+        mkIssuedByColumnDef(),
+        mkIssuedOnColumnDef(),
+        mkDueDateColumnDef()
+    ];
+}
+
+function mkEntityAttestationColumnDefs() {
+    return [
+        {
+            field: 'name',
+            displayName: 'Name',
+            width: '10%',
+            cellTemplate: `
+                <div class="ui-grid-cell-contents"
+                     style="vertical-align: baseline;">
+                        <a ng-bind="COL_FIELD"
+                           class="clickable"
+                           ui-sref="main.attestation.run.view ({id: row.entity.id})">
+                        </a> 
+                </div>`
+        },{
+            field: 'selectionOptions.entityReference.name',
+            displayName: 'Entity',
+            width: '20%',
+            cellTemplate: `
+                <div class="ui-grid-cell-contents"
+                     style="vertical-align: baseline;">
+                        <div ng-bind="COL_FIELD"
+                        </div> 
+                </div>`
+        },
+        mkAttestedKindColumnDef(),
+        mkDescriptionColumnDef(),
+        {
+            field: 'id',
+            displayName: 'Responses',
+            width: '10%',
+            cellTemplate: `
+                    <div class="ui-grid-cell-contents"
+                         style="vertical-align: baseline;">
+                         <div ng-bind="{{grid.appScope.responseSummaries[COL_FIELD].pendingCount}} == 0 ? 'Completed' : 'Pending'">
+                         </div>
+                     </div>`
+        },
+        mkIssuedByColumnDef(),
+        mkIssuedOnColumnDef(),
+        mkDueDateColumnDef()
     ];
 }
 
@@ -88,10 +204,12 @@ function isOverdue(run = {}) {
     return now > dueDate;
 }
 
+
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.columnDefs = mkColumnDefs();
+    vm.groupColumnDefs = mkGroupAttestationColumnDefs();
+    vm.entityColumnDefs = mkEntityAttestationColumnDefs();
 
     vm.getPendingBarType = (run) => {
         if(isOverdue(run)) {
@@ -105,7 +223,10 @@ function controller(serviceBroker) {
 
     const loadData = () => {
         serviceBroker.loadViewData(CORE_API.AttestationRunStore.findAll)
-            .then(r => vm.runs = r.data);
+            .then(r => {
+                vm.groupRuns = _.filter(r.data, r => r.name !== 'Entity Attestation');
+                vm.entityRuns = _.filter(r.data, r => r.name === 'Entity Attestation');
+            });
 
         serviceBroker.loadViewData(CORE_API.AttestationRunStore.findResponseSummaries)
             .then(r => vm.responseSummaries = _.keyBy(r.data, 'runId'));
