@@ -297,7 +297,7 @@ public class ServerInformationDao {
                 .stream()
                 .map(r -> ImmutableTally.<String>builder()
                         .id(r.get(SERVER_USAGE.ENVIRONMENT))
-                        .count(r.get(countField))
+                        .count(r.get(countField, Double.class))
                         .build())
                 .collect(Collectors.toList());
 
