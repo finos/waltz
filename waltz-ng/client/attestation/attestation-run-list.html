@@ -52,16 +52,24 @@
                                     entries="$ctrl.groupRuns"
                                     search-placeholder-text="Search attestation runs...">
             </waltz-grid-with-search>
+            <div class="help-block small">
+                <waltz-icon name="info-circle"></waltz-icon>
+                These attestation runs are created using either app groups, organisational units or measurables as a selector for applications.
+            </div>
         </div>
 
         <div ng-if="$ctrl.entityRuns.length > 0">
             <br>
-            <h4>Entity Attestations</h4>
+            <h4>One-Off Entity Attestations</h4>
             <waltz-grid-with-search column-defs="$ctrl.entityColumnDefs"
                                     scope-provider="$ctrl"
                                     entries="$ctrl.entityRuns"
                                     search-placeholder-text="Search entity attestation runs...">
             </waltz-grid-with-search>
+            <div class="help-block small">
+                <waltz-icon name="info-circle"></waltz-icon>
+                These attestation runs are created ad-hoc from an application view in order to attest its physical or logical flows.
+            </div>
         </div>
 
     </div>

@@ -31,8 +31,7 @@ const initialState = {
     responseSummaries: {}
 };
 
-function mkAttestedKindColumnDef() {
-    return {
+const attestedKindColumnDef = {
         field: 'entityKind',
         displayName: 'Attested Kind',
         width: '10%',
@@ -41,11 +40,9 @@ function mkAttestedKindColumnDef() {
                      style="vertical-align: baseline;">
                     <waltz-attested-kind run="row.entity"></waltz-attested-kind>
                 </div>`
-    };
-}
+};
 
-function mkDescriptionColumnDef() {
-    return {
+const descriptionColumnDef = {
         field: 'description',
         displayName: 'Description',
         width: '20%',
@@ -60,19 +57,15 @@ function mkDescriptionColumnDef() {
                              popover-trigger="mouseenter">
                     </div>
                 </div>`
-    };
-}
+};
 
-function mkIssuedByColumnDef() {
-    return {
+const issuedByColumnDef = {
             field: 'issuedBy',
             displayName: 'Issuer',
             width: '10%',
-        };
-}
+};
 
-function mkIssuedOnColumnDef() {
-        return {
+const issuedOnColumnDef = {
             field: 'issuedOn',
             displayName: 'Issued',
             width: '10%',
@@ -83,11 +76,9 @@ function mkIssuedOnColumnDef() {
                                         days-only="true">
                         </waltz-from-now>
                     </div>`
-        }
-}
+};
 
-function mkDueDateColumnDef() {
-        return {
+const dueDateColumnDef = {
             field: 'dueDate',
             displayName: 'Due',
             width: '10%',
@@ -101,8 +92,7 @@ function mkDueDateColumnDef() {
                             </waltz-from-now>
                         </div>
                     </div>`
-        };
-}
+};
 
 function mkGroupAttestationColumnDefs() {
     return [
@@ -119,8 +109,8 @@ function mkGroupAttestationColumnDefs() {
                         </a> 
                 </div>`
         },
-        mkAttestedKindColumnDef(),
-        mkDescriptionColumnDef(),
+        attestedKindColumnDef,
+        descriptionColumnDef,
         {
             field: 'id',
             displayName: 'Responses',
@@ -148,9 +138,9 @@ function mkGroupAttestationColumnDefs() {
                     </div>
                 </div>`
         },
-        mkIssuedByColumnDef(),
-        mkIssuedOnColumnDef(),
-        mkDueDateColumnDef()
+        issuedByColumnDef,
+        issuedOnColumnDef,
+        dueDateColumnDef
     ];
 }
 
@@ -179,8 +169,8 @@ function mkEntityAttestationColumnDefs() {
                         </div> 
                 </div>`
         },
-        mkAttestedKindColumnDef(),
-        mkDescriptionColumnDef(),
+        attestedKindColumnDef,
+        descriptionColumnDef,
         {
             field: 'id',
             displayName: 'Responses',
@@ -192,9 +182,9 @@ function mkEntityAttestationColumnDefs() {
                          </div>
                      </div>`
         },
-        mkIssuedByColumnDef(),
-        mkIssuedOnColumnDef(),
-        mkDueDateColumnDef()
+        issuedByColumnDef,
+        issuedOnColumnDef,
+        dueDateColumnDef
     ];
 }
 
@@ -203,7 +193,6 @@ function isOverdue(run = {}) {
     const dueDate = moment.utc(run.dueDate, formats.parse);
     return now > dueDate;
 }
-
 
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
