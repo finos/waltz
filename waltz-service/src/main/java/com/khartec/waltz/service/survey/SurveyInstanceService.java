@@ -183,11 +183,6 @@ public class SurveyInstanceService {
 
         SurveyInstancePermissions permissions = getPermissions(userName, instanceId);
         SurveyInstanceStatus newStatus = simple(surveyInstance.status()).process(command.action(), permissions, surveyInstance);
-        if (command.action() == SurveyInstanceAction.REOPENING) {
-            long versionedInstanceId = surveyInstanceDao.createPreviousVersion(surveyInstance);
-            surveyQuestionResponseDao.cloneResponses(surveyInstance.id().get(), versionedInstanceId);
-            surveyInstanceDao.clearApproved(instanceId);
-        }
 
         int nbupdates = 0;
         switch (command.action()) {
