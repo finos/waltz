@@ -25,7 +25,6 @@ import com.khartec.waltz.model.application.AppRegistrationResponse;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.application.AssetCodeRelationshipKind;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.tag.Tag;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
@@ -45,7 +44,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 import static java.lang.Long.parseLong;
@@ -176,11 +174,11 @@ public class ApplicationEndpoint implements Endpoint {
                     .getById(parseLong(id));
         };
 
-        ListRoute<Application> findBySelectorRoute = ((request, response)
-                -> appService.findByAppIdSelector(readIdSelectionOptionsFromBody(request)));
+        ListRoute<Application> findBySelectorRoute = (request, response)
+                -> appService.findByAppIdSelector(readIdSelectionOptionsFromBody(request));
 
-        ListRoute<Application> findByAssetCodeRoute = ((request, response)
-                -> appService.findByAssetCode(request.splat()[0]));
+        ListRoute<Application> findByAssetCodeRoute = (request, response)
+                -> appService.findByAssetCode(request.splat()[0]);
 
 
         getForList(mkPath(BASE_URL, "search", ":query"), searchRoute);

@@ -20,32 +20,27 @@
 export function store($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/app`;
 
-
     const getById = (id) => $http
         .get(`${BASE}/id/${id}`)
         .then(result => result.data);
-
 
     const countByOrganisationalUnit = () => $http
         .get(`${BASE}/count-by/org-unit`)
         .then(result => result.data);
 
-
     const registerNewApp = (registrationRequest) => $http
         .post(BASE, registrationRequest)
         .then(x => x.data);
-
 
     const search = (query) => $http
         .get(`${BASE}/search/${query}`)
         .then(x => x.data);
 
-
     const findByIds = (ids) => $http
         .post(`${BASE}/by-ids`, ids)
         .then(x => x.data);
 
-    const findAll = (ids) => $http
+    const findAll = () => $http
         .get(`${BASE}/all`)
         .then(x => x.data);
 
@@ -53,25 +48,21 @@ export function store($http, BaseApiUrl) {
         .post(`${BASE}/${id}`, action)
         .then(x => x.data);
 
-
     const findRelatedById = (id) => $http
         .get(`${BASE}/id/${id}/related`)
         .then(x => x.data);
-
 
     const findBySelector = (options) => $http
         .post(`${BASE}/selector`, options)
         .then(x => x.data);
 
-
     const findByAssetCode = (assetCode) => $http
         .get(`${BASE}/asset-code/${assetCode}`)
-            .then(result => result.data);
+        .then(result => result.data);
 
     const findByExternalId = (extId) => $http
         .get(`${BASE}/external-id/${extId}`)
-            .then(result => result.data);
-
+        .then(result => result.data);
 
     return {
         getById,

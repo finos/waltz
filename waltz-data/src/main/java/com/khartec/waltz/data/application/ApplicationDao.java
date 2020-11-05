@@ -54,7 +54,7 @@ public class ApplicationDao {
 
     public static final RecordMapper<Record, Application> TO_DOMAIN_MAPPER = record -> {
         ApplicationRecord appRecord = record.into(APPLICATION);
-        Application app = ImmutableApplication.builder()
+        return ImmutableApplication.builder()
                 .name(appRecord.getName())
                 .description(appRecord.getDescription())
                 .assetCode(ofNullable(appRecord.getAssetCode()))
@@ -72,8 +72,6 @@ public class ApplicationDao {
                 .commissionDate(ofNullable(appRecord.getCommissionDate()).map(Timestamp::toLocalDateTime))
                 .provenance(appRecord.getProvenance())
                 .build();
-
-        return app;
     };
 
 
@@ -104,6 +102,7 @@ public class ApplicationDao {
                 .where(IS_ACTIVE)
                 .fetch(TO_DOMAIN_MAPPER);
     }
+
 
     public List<Application> findByIds(Collection<Long> ids) {
         return dsl.select()
@@ -140,8 +139,8 @@ public class ApplicationDao {
      *     <li>Any children (direct)</li>
      *     <li>The parent (direct)</li>
      * </ul>
-     * @param appId
-     * @return
+     * @param appId  the application to use as a base
+     * @return  list of related applications
      */
     public List<Application> findRelatedByApplicationId(long appId) {
 
@@ -244,7 +243,7 @@ public class ApplicationDao {
         checkNotNull(externalId, "externalId cannot be null");
 
         return dsl
-                .select(APPLICATION.fields())
+                .selectDistinct(APPLICATION.fields())
                 .from(APPLICATION)
                 .leftJoin(EXTERNAL_IDENTIFIER)
                 .on(EXTERNAL_IDENTIFIER.ENTITY_ID.eq(APPLICATION.ID)

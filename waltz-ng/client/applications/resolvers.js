@@ -22,20 +22,24 @@ import {CORE_API} from "../common/services/core-api-utils";
 
 export function appResolver(serviceBroker, $stateParams) {
     return serviceBroker
-        .loadViewData(CORE_API.ApplicationStore.getById, [ $stateParams.id ])
+        .loadViewData(
+            CORE_API.ApplicationStore.getById,
+            [ $stateParams.id ])
         .then(r => r.data);
 }
 
-appResolver.$inject = ['ServiceBroker', '$stateParams'];
+appResolver.$inject = ["ServiceBroker", "$stateParams"];
 
 
 export function appByAssetCodeResolver(serviceBroker, $stateParams) {
     return serviceBroker
-        .loadViewData(CORE_API.ApplicationStore.findByAssetCode, [ $stateParams.assetCode ])
+        .loadViewData(
+            CORE_API.ApplicationStore.findByAssetCode,
+            [ $stateParams.assetCode ])
         .then(r => r.data);
 }
 
-appByAssetCodeResolver.$inject = ['ServiceBroker', '$stateParams'];
+appByAssetCodeResolver.$inject = ["ServiceBroker", "$stateParams"];
 
 
 // -- OUs --
@@ -45,6 +49,6 @@ export function orgUnitsResolver(serviceBroker) {
         .then(r => r.data);
 }
 
-orgUnitsResolver.$inject = [ 'ServiceBroker' ];
+orgUnitsResolver.$inject = [ "ServiceBroker" ];
 
 
