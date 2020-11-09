@@ -50,7 +50,7 @@ export function prepareSummaryData(applications = [], selectedYear = null) {
     if (selectedYear == null || selectedYear == 0) {
         return toKeyCounts(applications, a => a.isAttested)
     } else if (selectedYear > 0) {
-        let appDataForSummary = _.filter(applications, a => (a.attestation) 
+        const appDataForSummary = _.filter(applications, a => (a.attestation) 
                                                        ? moment(a.attestation.attestedAt, "YYYY-MM-DD").year() === selectedYear 
                                                        : true);
         return toKeyCounts(appDataForSummary, a => a.isAttested)    

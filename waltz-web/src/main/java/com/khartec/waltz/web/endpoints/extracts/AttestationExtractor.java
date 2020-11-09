@@ -110,13 +110,7 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
 
         Field<Long> latestAttestationParentId = latestAttestationInstance.PARENT_ENTITY_ID.as("parent_id");
         Field<Timestamp> latestAttestationAt = DSL.max(latestAttestationInstance.ATTESTED_AT).as("latest_attested_at");
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        Date dateFromYear = null;
-        Integer defaultYearVal = 0;
-        if(year.isPresent() && !(year.get().equals(defaultYearVal))){
-            dateFromYear = sdf.parse("01/01/"+ (year.get()).toString());
-        }
-        
+
         SelectHavingStep<Record2<Long, Timestamp>> latestAttestation = dsl
                 .selectDistinct(
                         latestAttestationParentId,
@@ -137,6 +131,12 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
                 .innerJoin(latestAttestation).on(attestationInstanceForPerson.PARENT_ENTITY_ID.eq(latestAttestationParentId))
                 .and(attestationInstanceForPerson.ATTESTED_AT.eq(latestAttestationAt));
 
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        Date dateFromYear = null;
+        Integer defaultYearVal = 0;
+        if(year.isPresent() && !(year.get().equals(defaultYearVal))){
+            dateFromYear = sdf.parse("01/01/"+ (year.get()).toString());
+        }
         Condition yearCondition = year.isPresent()
                 ? !(year.get().equals(defaultYearVal))
                 ? DSL.year(DSL.date(peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT))).eq(DSL.year(dateFromYear))
