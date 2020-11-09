@@ -1,0 +1,16 @@
+<waltz-basic-info-tile name="Complexity"
+                       description="Derived from functions, connections and servers"
+                       class="clickable"
+                       waltz-jump-to="complexity-section"
+                       icon="rocket">
+    <div style="font-size: x-large;">
+        &Sigma;
+        <span ng-bind="$ctrl.stats.cumulativeScore | toFixed:1">
+        </span>
+    </div>
+    <div class="small text-muted">
+        <span ng-bind="$ctrl.stats.averageScore | toFixed:2">
+        </span>
+        per app
+    </div>
+</waltz-basic-info-tile>

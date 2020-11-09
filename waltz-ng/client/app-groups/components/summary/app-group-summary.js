@@ -17,8 +17,6 @@
  */
 
 import _ from "lodash";
-import {enrichServerStats} from "../../../server-info/services/server-utilities";
-import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
@@ -97,18 +95,6 @@ function controller($q, serviceBroker, userService) {
 
         serviceBroker
             .loadViewData(
-                CORE_API.AssetCostStore.findTotalCostForAppSelector,
-                [ selector ])
-            .then(r => vm.totalCost = r.data);
-
-        serviceBroker
-            .loadViewData(
-                CORE_API.ComplexityStore.findBySelector,
-                [ selector ])
-            .then(r => vm.complexitySummary = calcComplexitySummary(r.data));
-
-        serviceBroker
-            .loadViewData(
                 CORE_API.LogicalFlowStore.calculateStats,
                 [ selector ])
             .then(r => vm.flowStats = r.data);
@@ -118,12 +104,6 @@ function controller($q, serviceBroker, userService) {
                 CORE_API.ApplicationStore.findBySelector,
                 [ selector ])
             .then(r => vm.applications = r.data);
-
-        serviceBroker
-            .loadViewData(
-                CORE_API.TechnologyStatisticsService.findBySelector,
-                [ selector ])
-            .then(r => vm.enrichedServerStats = enrichServerStats(r.data.serverStats));
 
         vm.onSubscribe = () => {
             serviceBroker

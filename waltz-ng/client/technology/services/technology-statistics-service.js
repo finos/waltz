@@ -16,12 +16,10 @@
  *
  */
 import _ from 'lodash';
+import {CORE_API} from "../../common/services/core-api-utils";
 
 
-function service($q,
-                 serverInfoStore,
-                 databaseStore,
-                 softwareCatalogStore) {
+function service($q, serviceBroker) {
 
     const findBySelector = (id, kind, scope = 'CHILDREN') => {
         const options = _.isObject(id)
@@ -29,9 +27,9 @@ function service($q,
             : {scope, entityReference: {id, kind}};
 
         const promises = [
-            serverInfoStore.findStatsForSelector(options),
-            databaseStore.findStatsForSelector(options),
-            softwareCatalogStore.findStatsForSelector(options)
+            serviceBroker.loadViewData(CORE_API.ServerInfoStore.findStatsForSelector, [options]).then(r => r.data),
+            serviceBroker.loadViewData(CORE_API.DatabaseStore.findStatsForSelector, [options]).then(r => r.data),
+            serviceBroker.loadViewData(CORE_API.SoftwareCatalogStore.findStatsForSelector, [options]).then(r => r.data)
         ];
 
         return $q
@@ -55,10 +53,8 @@ function service($q,
 
 
 service.$inject = [
-    '$q',
-    'ServerInfoStore',
-    'DatabaseStore',
-    'SoftwareCatalogStore'
+    "$q",
+    "ServiceBroker"
 ];
 
 

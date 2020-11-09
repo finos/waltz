@@ -16,8 +16,6 @@
  *
  */
 import _ from "lodash";
-import {enrichServerStats} from "../../../server-info/services/server-utilities";
-import {calcComplexitySummary} from "../../../complexity/services/complexity-utilities";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {entity} from "../../../common/services/enums/entity";
 import {getEnumName} from "../../../common/services/enums";
@@ -106,27 +104,6 @@ function controller(serviceBroker, $state) {
                 CORE_API.ApplicationStore.findBySelector,
                 [selector])
             .then(r => vm.applications = r.data);
-
-        serviceBroker
-            .loadViewData(
-                CORE_API.TechnologyStatisticsService.findBySelector,
-                [selector])
-            .then(r => {
-                vm.techStats = r.data;
-                vm.enrichedServerStats = enrichServerStats(vm.techStats.serverStats)
-            });
-
-        serviceBroker
-            .loadViewData(
-                CORE_API.AssetCostStore.findTotalCostForAppSelector,
-                [selector])
-            .then(r => vm.totalCost = r.data);
-
-        serviceBroker
-            .loadViewData(
-                CORE_API.ComplexityStore.findBySelector,
-                [ selector ])
-            .then(r => vm.complexitySummary = calcComplexitySummary(r.data));
 
         serviceBroker
             .loadViewData(

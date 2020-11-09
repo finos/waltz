@@ -74,55 +74,20 @@
 
                     <div class="row">
                         <div class="col-sm-4">
-                            <waltz-basic-info-tile name="Portfolio Cost"
-                                                   description="Cumulative value of infra and app dev costs"
-                                                   class="clickable"
-                                                   waltz-jump-to="asset-costs-section"
-                                                   icon="money">
-                                <span style="font-size: x-large;">
-                                    <waltz-currency-amount amount="$ctrl.totalCost.amount"
-                                                           simplify="true">
-                                    </waltz-currency-amount>
-                                </span>
-                            </waltz-basic-info-tile>
+                            <waltz-complexity-basic-info-tile parent-entity-ref="$ctrl.parentEntityRef"
+                                                              filters="$ctrl.filters">
+                            </waltz-complexity-basic-info-tile>
                         </div>
                         <div class="col-sm-4">
-                            <waltz-basic-info-tile name="Complexity"
-                                                   description="Derived from functions, connections and servers"
-                                                   class="clickable"
-                                                   waltz-jump-to="complexity-section"
-                                                   icon="rocket">
-                                <div style="font-size: x-large;">
-                                    &Sigma;
-                                    <span ng-bind="$ctrl.complexitySummary.cumulativeScore | toFixed:1">
-                                    </span>
-                                </div>
-                                <div class="small text-muted">
-                                    <span ng-bind="$ctrl.complexitySummary.averageScore | toFixed:2">
-                                    </span>
-                                    per app
-                                </div>
-                            </waltz-basic-info-tile>
-
+                            <waltz-server-basic-info-tile parent-entity-ref="$ctrl.parentEntityRef"
+                                                          filters="$ctrl.filters">
+                            </waltz-server-basic-info-tile>
                         </div>
                         <div class="col-sm-4">
-                            <waltz-basic-info-tile name="Servers"
-                                                   class="clickable"
-                                                   waltz-jump-to="technology-summary-section"
-                                                   description="Number of servers supporting this org unit"
-                                                   icon="server">
-                                <div>
-                                    <div style="font-size: x-large;">
-                                        # <span ng-bind="$ctrl.enrichedServerStats.total"></span>
-                                    </div>
-                                    <div class="small text-muted">
-                                        <span ng-bind="$ctrl.enrichedServerStats.virtualPercentage"></span>% virtual
-                                    </div>
-                                </div>
-                            </waltz-basic-info-tile>
-
+                            <waltz-asset-costs-basic-info-tile parent-entity-ref="$ctrl.parentEntityRef"
+                                                               filters="$ctrl.filters">
+                            </waltz-asset-costs-basic-info-tile>
                         </div>
-
                     </div>
                 </div>
 

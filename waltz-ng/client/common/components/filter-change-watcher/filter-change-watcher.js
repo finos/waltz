@@ -26,7 +26,6 @@ const bindings = {
 
 const initialState = {
     filters: {},
-
     onFiltersChanged: (filters) => console.log("wfcw - filters changed: ", filters)
 };
 
@@ -34,15 +33,16 @@ const initialState = {
 function controller($scope) {
     const vm = initialiseData(this, initialState);
 
-    const filterChangedListener = $scope.$on(FILTER_CHANGED_EVENT, (event, data) => {
-        vm.filters = Object.assign({}, data);
-        invokeFunction(vm.onFiltersChanged, vm.filters);
-    });
+    const filterChangedListenerDeregisterFn = $scope.$on(FILTER_CHANGED_EVENT,
+        (event, data) => {
+            vm.filters = Object.assign({}, data);
+            invokeFunction(vm.onFiltersChanged, vm.filters);
+        });
 
 
     vm.$onDestroy = () => {
         // unsubscribe
-        filterChangedListener();
+        filterChangedListenerDeregisterFn();
     };
 }
 
