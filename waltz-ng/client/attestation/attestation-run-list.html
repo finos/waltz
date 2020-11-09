@@ -34,85 +34,43 @@
         <waltz-section-actions>
             <a class="btn btn-primary btn-xs"
                waltz-has-role="ATTESTATION_ADMIN"
-               ui-sref="main.attestation.run.create ({id: ctrl.template.id })">
+               ui-sref="main.attestation.run.create ({id: $ctrl.template.id })">
                 Create
             </a>
         </waltz-section-actions>
 
-        <div>
-            <table class="table table-condensed table-striped">
-                <colgroup>
-                    <col width="20%">
-                    <col width="10%">
-                    <col width="30%">
-                    <col width="10%">
-                    <col width="10%">
-                    <col width="10%">
-                    <col width="10%">
-                </colgroup>
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Attested Kind</th>
-                    <th>Description</th>
-                    <th>Responses</th>
-                    <th>Issuer</th>
-                    <th>Issued</th>
-                    <th>Due</th>
-                </tr>
-                </thead>
-                <tr ng-repeat="r in ctrl.runs">
-                    <td>
-                        <a ng-bind="r.name"
-                           class="clickable"
-                           ui-sref="main.attestation.run.view ({id: r.id})"></a>
-                    </td>
-                    <td>
-                        <waltz-attested-kind run="r"></waltz-attested-kind>
-                    </td>
-                    <td>
-                        <div ng-bind="r.description | truncate:150"
-                             uib-popover="{{ r.description }}"
-                             popover-class="waltz-popover-width-700"
-                             popover-append-to-body="true"
-                             popover-placement="right"
-                             popover-trigger="mouseenter">
-                        </div>
-                    </td>
-                    <td>
-                        <div uib-popover="{{
-                                ctrl.responseSummaries[r.id].completeCount + ' completed'
-                                + ', '
-                                + ctrl.responseSummaries[r.id].pendingCount + ' pending'
-                            }}"
-                             popover-trigger="mouseenter">
-                            <uib-progress max="ctrl.responseSummaries[r.id].completeCount + ctrl.responseSummaries[r.id].pendingCount"
-                                          animate="false">
-                                <uib-bar value="ctrl.responseSummaries[r.id].completeCount"
-                                         ng-bind="ctrl.responseSummaries[r.id].completeCount"
-                                         type="success">
-                                </uib-bar>
-                                <uib-bar value="ctrl.responseSummaries[r.id].pendingCount"
-                                         ng-bind="ctrl.responseSummaries[r.id].pendingCount"
-                                         type="{{ctrl.getPendingBarType(r)}}">
-                                </uib-bar>
-                            </uib-progress>
-                        </div>
-                    </td>
-                    <td><span ng-bind="r.issuedBy"></span></td>
-                    <td>
-                        <waltz-from-now timestamp="r.issuedOn"
-                                        days-only="true">
-                        </waltz-from-now>
-                    </td>
-                    <td ng-class="{'text-danger': ctrl.isOverdue(r)}">
-                        <waltz-from-now ng-if='r.dueDate'
-                                        timestamp="r.dueDate"
-                                        days-only="true">
-                        </waltz-from-now>
-                    </td>
-                </tr>
-            </table>
+        <div ng-if="$ctrl.entityRuns.length == 0 && $ctrl.groupRuns.length == 0">
+            <waltz-no-data>
+                <message>There are no attestation runs</message>
+            </waltz-no-data>
         </div>
+
+        <div ng-if="$ctrl.groupRuns.length > 0">
+            <h4>Attestation Runs</h4>
+            <waltz-grid-with-search column-defs="$ctrl.groupColumnDefs"
+                                    scope-provider="$ctrl"
+                                    entries="$ctrl.groupRuns"
+                                    search-placeholder-text="Search attestation runs...">
+            </waltz-grid-with-search>
+            <div class="help-block small">
+                <waltz-icon name="info-circle"></waltz-icon>
+                These attestation runs are created using either app groups, organisational units or measurables as a selector for applications.
+            </div>
+        </div>
+
+        <div ng-if="$ctrl.entityRuns.length > 0">
+            <br>
+            <h4>One-Off Entity Attestations</h4>
+            <waltz-grid-with-search column-defs="$ctrl.entityColumnDefs"
+                                    scope-provider="$ctrl"
+                                    entries="$ctrl.entityRuns"
+                                    search-placeholder-text="Search entity attestation runs...">
+            </waltz-grid-with-search>
+            <div class="help-block small">
+                <waltz-icon name="info-circle"></waltz-icon>
+                These attestation runs are created ad-hoc from an application view in order to attest its physical or logical flows.
+            </div>
+        </div>
+
     </div>
 </div>
