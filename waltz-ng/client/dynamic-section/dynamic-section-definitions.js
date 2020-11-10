@@ -158,7 +158,7 @@ const entityStatisticSummarySection = {
 
 const measurableRatingExplorerSection = {
     componentId: "measurable-rating-explorer-section",
-    name: "Ratings / Roadmaps",
+    name: "Ratings",
     icon: "star-half-o",
     id: 21
 };
