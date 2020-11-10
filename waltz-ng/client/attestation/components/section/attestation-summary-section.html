@@ -65,9 +65,9 @@
                 <button type="button"
                         class="btn btn-default"
                         uib-dropdown-toggle>
-                    <span ng-if="$ctrl.selectedYear==0">All Years
+                    <span ng-if="$ctrl.selectedYear === 0">All Years
                     </span>
-                    <span ng-if="$ctrl.selectedYear!=0" 
+                    <span ng-if="$ctrl.selectedYear !== 0" 
                           ng-bind="$ctrl.selectedYear">
                     </span>
                     <span class="caret"></span>
@@ -79,12 +79,12 @@
                         role="menuitem">
                         <a class="clickable"
                            ng-click="$ctrl.onChangeYear(year)"
-                           ng-if="year==0">
+                           ng-if="year === 0">
                            All Years
                         </a>
                         <a class="clickable"
                            ng-click="$ctrl.onChangeYear(year)"
-                           ng-if="year!=0"
+                           ng-if="year !== 0"
                            ng-bind="year">
                         </a>
                     </li>
