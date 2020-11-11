@@ -256,6 +256,7 @@ public class AttestationRunService {
     }
 
     private ImmutableAttestationRunCreateCommand mkCreateCommand(AttestEntityCommand createCommand) {
+        //Note: Changing the name of this AttestationRunCreateCommand will cause the attestation-run-list to break see #5159
         return ImmutableAttestationRunCreateCommand.builder()
                 .name("Entity Attestation")
                 .description("Attests that all flows are present and correct for this entity")
