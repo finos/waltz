@@ -116,14 +116,14 @@ const logicalFlowsTabgroupSection = {
 
 const measurableRatingAppSection = {
     componentId: "measurable-rating-app-section",
-    name: "Ratings",
+    name: "Ratings / Roadmaps",
     icon: "puzzle-piece",
     id: 15,
 };
 
 const measurableRatingsBrowserSection = {
     componentId: "measurable-ratings-browser-section",
-    name: "Ratings",
+    name: "Ratings / Roadmaps",
     icon: "star-half-o",
     id: 16,
 };
