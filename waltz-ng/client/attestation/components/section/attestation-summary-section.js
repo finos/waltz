@@ -70,14 +70,14 @@ function mkExtractUrl(attestationType, segment, year) {
 }
 
 
-function calcGridData(segment, gridData, year, defaultYear) {
+function calcGridData(segment, gridData, year, allYears) {
     if (_.isNil(segment)) {
         // return everything as no segments have been selected (i.e. total was clicked)
         return gridData;
     } else if (segment.key === "NEVER_ATTESTED") {
         // the unattested segment was clicked, so show only rows without an attestation
         return _.filter(gridData, d => _.isNil(d.attestation));
-    } else if(year === defaultYear){
+    } else if(year === allYears){
         return _.filter(gridData, d => !_.isNil(d.attestation));
     } else {
         return _
@@ -132,15 +132,15 @@ function controller($q,
 
     vm.$onInit = () => {
         const currentYear = moment().year();
-        vm.defaultYear = 0;
+        vm.allYears = 0;
         vm.yearOptions = [
-            vm.defaultYear,
+            vm.allYears,
             currentYear,
             currentYear - 1,
             currentYear - 2,
             currentYear - 3
         ];
-        vm.selectedYear = vm.defaultYear;
+        vm.selectedYear = vm.allYears;
 
         vm.config =  {
             logical: Object.assign({}, attestationPieConfig, { onSelect: onSelectLogicalFlowSegment }),
@@ -164,10 +164,10 @@ function controller($q,
         const year = vm.selectedYear;
         const gridData = vm.rawGridData;
         const attestationType = vm.selectedAttestationType;
-        const defaultYear = vm.defaultYear;
+        const allYears = vm.allYears;
         
         vm.extractUrl = mkExtractUrl(attestationType, segment, year);
-        vm.gridDataToDisplay = calcGridData(segment, gridData, year, defaultYear);
+        vm.gridDataToDisplay = calcGridData(segment, gridData, year, allYears);
         vm.visibility.tableView = true;
     }
 
