@@ -42,6 +42,7 @@ public class QuestionEntityPredicateNamespace extends QuestionBasePredicateNames
     protected final DSLContext dsl;
     protected final EntityReference subjectRef;
 
+
     public QuestionEntityPredicateNamespace(DSLContext dsl,
                                             EntityReference subjectRef,
                                             List<SurveyQuestion> questions,
@@ -74,6 +75,19 @@ public class QuestionEntityPredicateNamespace extends QuestionBasePredicateNames
         return assessmentRating(name, null);
     }
 
+
+    public boolean hasInvolvement(String name) {
+        return dsl.fetchExists(DSL
+                .select()
+                .from(INVOLVEMENT)
+                .innerJoin(INVOLVEMENT_KIND).on(INVOLVEMENT.KIND_ID.eq(INVOLVEMENT_KIND.ID))
+                .where(INVOLVEMENT_KIND.NAME.equalIgnoreCase(name))
+                .and(INVOLVEMENT.ENTITY_ID.eq(subjectRef.id()))
+                .and(INVOLVEMENT.ENTITY_KIND.eq(subjectRef.kind().name())));
+    }
+
+
+    // --- HELPER ---
 
     protected boolean belongsToOrgUnit(String name,
                                        Table<?> subjectTable,
