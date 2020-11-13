@@ -23,17 +23,13 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.schema.tables.AttestationInstance;
+import com.khartec.waltz.web.json.AttestationStatus;
 import org.jooq.*;
 import org.jooq.impl.DSL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
 import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -50,7 +46,6 @@ import static spark.Spark.post;
 @Service
 public class AttestationExtractor extends DirectQueryBasedDataExtractor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AttestationExtractor.class);
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
 
 
@@ -78,9 +73,11 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
             EntityReference entityReference = idSelectionOptions.entityReference();
             EntityKind kind = getKind(request);
             Optional<Integer> year = getYearParam(request);
+            AttestationStatus status = getStatusParam(request);
 
             String fileName = format(
-                    "attestations-for-%s-%s-%s",
+                    "%s-for-%s-%s-%s",
+                    status,
                     entityReference.kind().name().toLowerCase(),
                     entityReference.id(),
                     kind.name().toLowerCase());
@@ -89,7 +86,8 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
             SelectConditionStep<Record> qry = mkQueryForReportingAttestationsByKindAndSelector(
                     appSelector,
                     kind,
-                    year);
+                    year,
+                    status);
 
             return writeExtract(
                     fileName,
@@ -102,19 +100,15 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
 
     private SelectConditionStep<Record> mkQueryForReportingAttestationsByKindAndSelector(Select<Record1<Long>> appIds,
                                                                                          EntityKind kind,
-                                                                                         Optional<Integer> year) throws ParseException {
+                                                                                         Optional<Integer> year,
+                                                                                         AttestationStatus status) {
 
         AttestationInstance latestAttestationInstance = ATTESTATION_INSTANCE.as("latestAttestationInstance");
         AttestationInstance attestationInstanceForPerson= ATTESTATION_INSTANCE.as("attestationInstanceForPerson");
 
         Field<Long> latestAttestationParentId = latestAttestationInstance.PARENT_ENTITY_ID.as("parent_id");
         Field<Timestamp> latestAttestationAt = DSL.max(latestAttestationInstance.ATTESTED_AT).as("latest_attested_at");
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-        Date dateFromYear = null;
-        if(year.isPresent()){
-            dateFromYear = sdf.parse("01/01/"+ (year.get()).toString());
-        }
-        
+
         SelectHavingStep<Record2<Long, Timestamp>> latestAttestation = dsl
                 .selectDistinct(
                         latestAttestationParentId,
@@ -132,12 +126,17 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
                         attestationInstanceForPerson.ATTESTED_AT,
                         entityPersonIsAttesting)
                 .from(attestationInstanceForPerson)
-                .innerJoin(latestAttestation).on(attestationInstanceForPerson.PARENT_ENTITY_ID.eq(latestAttestationParentId))
+                .innerJoin(latestAttestation)
+                .on(attestationInstanceForPerson.PARENT_ENTITY_ID.eq(latestAttestationParentId))
                 .and(attestationInstanceForPerson.ATTESTED_AT.eq(latestAttestationAt));
 
-        Condition yearCondition = year.isPresent()
-                ? DSL.year(DSL.date(peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT))).eq(DSL.year(dateFromYear))
-                : (peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT).isNull());
+        Condition yearCondition = year
+                .map(y -> DSL.year((peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT))).eq(year.get()))
+                .orElse(DSL.trueCondition());
+
+        Condition statusCondition = status == AttestationStatus.NEVER_ATTESTED
+                ? peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT).isNull()
+                : peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT).isNotNull();
 
         return dsl
                 .select(APPLICATION.NAME.as("Name"),
@@ -148,9 +147,11 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
                 .select(peopleToAttest.field(attestationInstanceForPerson.ATTESTED_BY).as("Last Attested By"),
                         peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT).as("Last Attested At"))
                 .from(APPLICATION)
-                .leftJoin(peopleToAttest).on(APPLICATION.ID.eq(entityPersonIsAttesting))
+                .leftJoin(peopleToAttest)
+                .on(APPLICATION.ID.eq(entityPersonIsAttesting))
                 .where(APPLICATION.ID.in(appIds))
-                .and(yearCondition);
+                .and(yearCondition)
+                .and(statusCondition);
     }
 
 
@@ -206,6 +207,11 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
         return Optional
                 .ofNullable(yearVal)
                 .map(Integer::valueOf);
+    }
+
+
+    private AttestationStatus getStatusParam(Request request) {
+        return AttestationStatus.valueOf(request.queryParams("status"));
     }
 
 }
