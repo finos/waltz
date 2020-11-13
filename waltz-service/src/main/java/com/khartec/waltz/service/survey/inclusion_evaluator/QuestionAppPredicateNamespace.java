@@ -1,14 +1,33 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
+ */
+
 package com.khartec.waltz.service.survey.inclusion_evaluator;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.survey.SurveyQuestion;
 import com.khartec.waltz.model.survey.SurveyQuestionResponse;
-import com.khartec.waltz.schema.tables.*;
+import com.khartec.waltz.schema.tables.Application;
+import com.khartec.waltz.schema.tables.DataType;
+import com.khartec.waltz.schema.tables.DataTypeUsage;
+import com.khartec.waltz.schema.tables.EntityHierarchy;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
-import org.jooq.Record1;
-import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 
 import java.util.List;
@@ -51,28 +70,8 @@ public class QuestionAppPredicateNamespace extends QuestionEntityPredicateNamesp
 
 
     public boolean belongsToOrgUnit(String name) {
-        EntityHierarchy eh = ENTITY_HIERARCHY.as("eh");
         Application app = APPLICATION.as("app");
-        OrganisationalUnit ou = OrganisationalUnit.ORGANISATIONAL_UNIT.as("ou");
-
-        SelectConditionStep<Record1<Long>> qryGivenOrgUnit = DSL
-                .select(ou.ID)
-                .from(ou)
-                .where(ou.NAME.eq(name))
-                .or(ou.EXTERNAL_ID.eq(name));
-
-        Condition appInOrgUnitTree = app.ORGANISATIONAL_UNIT_ID.in(DSL
-                .selectDistinct(eh.ID)
-                .from(eh)
-                .where(eh.ANCESTOR_ID.eq(qryGivenOrgUnit)));
-
-        Condition appMatchesSubject = app.ID.eq(subjectRef.id());
-
-        return dsl.fetchExists(DSL
-                .select(app.ID)
-                .from(app)
-                .where(appMatchesSubject)
-                .and(appInOrgUnitTree));
+        return belongsToOrgUnit(name, app, app.ID, app.ORGANISATIONAL_UNIT_ID);
     }
 
 
