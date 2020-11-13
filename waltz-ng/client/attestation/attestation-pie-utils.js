@@ -18,7 +18,8 @@
 
 import { attestationStatusColorScale } from "../common/colors";
 import { toKeyCounts } from "../common";
-
+import * as _ from "lodash";
+import moment from "moment";
 
 const attestationStatus = {
     ATTESTED: {
@@ -45,8 +46,19 @@ export const attestationPieConfig = {
 
 
 
-export function prepareSummaryData(applications = []) {
-    return toKeyCounts(applications, a => a.isAttested);
+export function prepareSummaryData(applications = [], selectedYear = null) {
+    const ALL_YEARS = 0;
+
+    if (selectedYear === null || selectedYear === ALL_YEARS) {
+        return toKeyCounts(applications, a => a.isAttested)
+    } else if (selectedYear > ALL_YEARS) {
+        const appDataForSummary = _.filter(
+            applications,
+            a => a.attestation
+                ? moment(a.attestation.attestedAt, "YYYY-MM-DD").year() === selectedYear
+                : true);
+        return toKeyCounts(appDataForSummary, a => a.isAttested)
+    }
 }
 
 

@@ -53,6 +53,8 @@ const bindings = {
     selectedAppsByYear: "<"
 };
 
+const ALL_YEARS = 0;
+
 
 /**
  * Constructs an export url
@@ -62,11 +64,12 @@ const bindings = {
  * @returns {string}
  */
 function mkExtractUrl(attestationType, segment, year) {
-    const yearParam = segment && segment.key  === 'ATTESTED'
-        ? "?year=" + year
-        : "";
+    const status = segment.key;
+    const yearParam = status === "NEVER_ATTESTED" || year === ALL_YEARS
+        ? ""
+        : `&year=${year}`;
 
-    return `attestations/${attestationType}${yearParam}`;
+    return `attestations/${attestationType}?status=${status}${yearParam}`;
 }
 
 
@@ -77,6 +80,8 @@ function calcGridData(segment, gridData, year) {
     } else if (segment.key === "NEVER_ATTESTED") {
         // the unattested segment was clicked, so show only rows without an attestation
         return _.filter(gridData, d => _.isNil(d.attestation));
+    } else if(year === ALL_YEARS){
+        return _.filter(gridData, d => !_.isNil(d.attestation));
     } else {
         return _
             .chain(gridData)
@@ -121,8 +126,8 @@ function controller($q,
                 vm.gridDataByPhysicalFlow = mkAttestationSummaryDataForApps(applications, instancesByKind[entity.PHYSICAL_FLOW.key], displayNameService);
 
                 vm.summaryData = {
-                    logical: prepareSummaryData(vm.gridDataByLogicalFlow),
-                    physical: prepareSummaryData(vm.gridDataByPhysicalFlow)
+                    logical: prepareSummaryData(vm.gridDataByLogicalFlow, vm.selectedYear),
+                    physical: prepareSummaryData(vm.gridDataByPhysicalFlow, vm.selectedYear)
                 };
             });
     };
@@ -131,12 +136,13 @@ function controller($q,
     vm.$onInit = () => {
         const currentYear = moment().year();
         vm.yearOptions = [
+            ALL_YEARS,
             currentYear,
             currentYear - 1,
             currentYear - 2,
             currentYear - 3
         ];
-        vm.selectedYear = currentYear;
+        vm.selectedYear = ALL_YEARS;
 
         vm.config =  {
             logical: Object.assign({}, attestationPieConfig, { onSelect: onSelectLogicalFlowSegment }),
@@ -169,6 +175,7 @@ function controller($q,
 
     vm.onChangeYear = (year) => {
         vm.selectedYear = Number(year);
+        loadData();
         updateGridData();
     };
 
