@@ -20,47 +20,61 @@
     style="padding-right: 60px">
 
     <li class="dropdown" uib-dropdown>
+        <!-- drop down trigger button -->
         <a class="clickable"
            uib-dropdown-toggle>
-            <span waltz-if-anonymous="true">
-                <waltz-icon name="user"></waltz-icon>
+            <waltz-icon name="user"></waltz-icon>
+
+            <span ng-if="ctrl.user.userName === 'anonymous'">
                 Anonymous
-                <b class="caret"></b>
             </span>
-            <span waltz-if-anonymous="false">
-                <waltz-icon name="user"></waltz-icon>
+
+            <span ng-if="ctrl.user.userName !== 'anonymous'">
                 Profile
                 <span class="badge wnp-badge"
                       ng-if="ctrl.notificationCountTotal > 0"
                       ng-bind="ctrl.notificationCountTotal">
                 </span>
-                <b class="caret"></b>
             </span>
+
+            <b class="caret"></b>
         </a>
+
+        <!-- drop down items -->
         <ul class="dropdown-menu no-overflow"
             uib-dropdown-menu
             style="width: 250px; margin-right:8px"
             role="menu">
 
-            <li style="margin: 4px"
+            <!-- logged in user -->
+            <li ng-if="ctrl.user.userName !== 'anonymous'"
+                style="margin: 4px"
                 class="no-overflow">
-                <span waltz-if-anonymous="false">
-                    <a ui-sref="main.profile.view ({userId: ctrl.user.userName})"
-                       ng-bind="ctrl.user.userName"></a>
-                </span>
-                <span waltz-if-anonymous="true">Anonymous</span>
+                <a ui-sref="main.profile.view ({userId: ctrl.user.userName})"
+                   ng-bind="ctrl.user.userName">
+                </a>
             </li>
-            <li style="margin: 4px"
-                ng-if="ctrl.allowDirectLogin"
+
+            <!-- anonymous -->
+            <li ng-if="ctrl.user.userName === 'anonymous'"
+                style="margin: 4px">
+                <a>
+                    Anonymous
+                </a>
+            </li>
+
+            <!-- login/logout -->
+            <li ng-if="ctrl.allowDirectLogin"
+                style="margin: 4px"
                 class="no-overflow">
-                <span waltz-if-anonymous="true">
+                <span ng-if="ctrl.user.userName === 'anonymous'">
                     <a class="clickable"
                        ng-click="ctrl.login()">
                         <waltz-icon name="sign-in"></waltz-icon>
                         <span>Login</span>
                     </a>
                 </span>
-                <span waltz-if-anonymous="false">
+                <span ng-if="ctrl.user.userName !== 'anonymous'">
                     <a class="clickable"
                        ng-click="ctrl.logout()">
                         <waltz-icon name="sign-out"></waltz-icon>
@@ -106,7 +120,8 @@
                     <a ui-sref="main.app.registration">
                         <waltz-icon class='text-muted small'
                                     fixed-width="true"
-                                    name="gift"></waltz-icon>
+                                    name="gift">
+                        </waltz-icon>
                         Register App
                     </a>
                 </span>
@@ -118,7 +133,8 @@
                     <a ui-sref="main.roadmap.list">
                         <waltz-icon class='text-muted small'
                                     fixed-width="true"
-                                    name="road"></waltz-icon>
+                                    name="road">
+                        </waltz-icon>
                         Roadmaps
                     </a>
                 </span>
@@ -130,7 +146,8 @@
                     <a ui-sref="main.source-data-ratings">
                         <waltz-icon class='text-muted small'
                                     fixed-width="true"
-                                    name="map-signs"></waltz-icon>
+                                    name="map-signs">
+                        </waltz-icon>
                         Source Data Ratings
                     </a>
                 </span>
@@ -143,7 +160,8 @@
                     <a ui-sref="main.survey.instance.user">
                         <waltz-icon class='text-muted small'
                                     fixed-width="true"
-                                    name="wpforms"></waltz-icon>
+                                    name="wpforms">
+                        </waltz-icon>
                         Surveys
                         <span class="badge wnp-badge"
                               ng-if="ctrl.notificationsCountsByKind['SURVEY_INSTANCE'].count > 0"
@@ -161,7 +179,8 @@
                     <a ui-sref="main.system.list">
                         <waltz-icon class='text-muted small'
                                     fixed-width="true"
-                                    name="wrench"></waltz-icon>
+                                    name="wrench">
+                        </waltz-icon>
                         System Admin
                     </a>
                 </span>
