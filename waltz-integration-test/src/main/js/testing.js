@@ -16,21 +16,25 @@
  *
  */
 
-import {login} from "./utils.js"
+import {gotoOrgUnit, hoistSection, login, openSection} from "./utils.js"
 import * as playwright from "playwright";
 
 (async function(){
     const browser = await playwright.firefox.launch({ headless: false }); // Non-headless mode to feel comfy
     const context = await browser.newContext(); // So much to say, but another time
     const page = await context.newPage(); // Create a new Page instance which handles most of your needs
-
-    console.log("And we're off!")
     await page.goto("http://localhost:8000/home");
 
-    await page.screenshot("foo", "png");
+    await login(page);
+
+    await page.waitForTimeout(200); // Rest your eyes for five seconds
 
     await login(page);
-    await login(page);
+    await page.waitForTimeout(200);
+    await gotoOrgUnit(page, "CIO Office");
+    await openSection(page, "Attestations");
+    await page.waitForTimeout(3000); // Rest your eyes for five seconds
+    await hoistSection(page, "Attestations");
     await page.waitForTimeout(3000); // Rest your eyes for five seconds
     await browser.close(); // Close the browser
 })();

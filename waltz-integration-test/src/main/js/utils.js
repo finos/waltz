@@ -18,7 +18,7 @@
 
 export async function login(page) {
     const menuText = await page.textContent(".waltz-navbar-profile >> a");
-    console.log(menuText, menuText.indexOf("Profile"))
+    console.log(menuText, menuText.indexOf("Anonymous"));
     if (menuText.indexOf("Anonymous") > -1) {
         console.log("Logging in")
         await page.click(".waltz-navbar-profile");
@@ -30,4 +30,21 @@ export async function login(page) {
     } else {
         console.log("Already in")
     }
+}
+
+
+export async function gotoOrgUnit(page, name) {
+    await page.click("#navbar-org-units a");
+    return await page.click(`waltz-entity-link >> '${name}'`);
+}
+
+
+export async function openSection(page, name) {
+    return await page.click(`.wdsn-option >> '${name}'`);
+}
+
+
+export async function hoistSection(page, name) {
+    await openSection(page, name);
+    return await page.click(`waltz-icon[title='Embed section']`);
 }
