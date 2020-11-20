@@ -16,25 +16,28 @@
  *
  */
 
-import {gotoOrgUnit, hoistSection, login, openSection} from "./utils.js"
+import {login, openApplicationViaSearch, openOrgUnitViaList, openSection} from "./utils.js"
 import * as playwright from "playwright";
 
 (async function(){
-    const browser = await playwright.firefox.launch({ headless: false }); // Non-headless mode to feel comfy
+    const browser = await playwright.chromium.launch({ headless: false }); // Non-headless mode to feel comfy
     const context = await browser.newContext(); // So much to say, but another time
     const page = await context.newPage(); // Create a new Page instance which handles most of your needs
-    await page.goto("http://localhost:8000/home");
+    page.setDefaultTimeout(5000);
 
-    await login(page);
+    try {
+        await page.goto("http://localhost:8000/home");
 
-    await page.waitForTimeout(200); // Rest your eyes for five seconds
+        await login(page);
+        await page.waitForTimeout(200);
+        await openOrgUnitViaList(page, "CIO Office");
+        await openSection(page, "Attestations");
+        // await hoistSection(page, "Attestations");
+        await openApplicationViaSearch(page, "Clown Fish - 48");
+        await page.waitForTimeout(1000);
+    } catch (e) {
+        console.log("Error", e.name);
+    }
 
-    await login(page);
-    await page.waitForTimeout(200);
-    await gotoOrgUnit(page, "CIO Office");
-    await openSection(page, "Attestations");
-    await page.waitForTimeout(3000); // Rest your eyes for five seconds
-    await hoistSection(page, "Attestations");
-    await page.waitForTimeout(3000); // Rest your eyes for five seconds
-    await browser.close(); // Close the browser
+    await browser.close();
 })();
