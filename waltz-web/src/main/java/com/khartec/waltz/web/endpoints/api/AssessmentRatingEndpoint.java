@@ -72,11 +72,13 @@ public class AssessmentRatingEndpoint implements Endpoint {
     public void register() {
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findByEntityKindPath = mkPath(BASE_URL, "entity-kind", ":kind");
+        String findByEntityKindAndDefinitionPath = mkPath(BASE_URL, "entity-kind", ":kind", ":assessmentDefinitionId");
         String findByTargetKindForRelatedSelectorPath = mkPath(BASE_URL, "target-kind", ":targetKind", "selector");
         String modifyPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId");
 
         getForList(findForEntityPath, this::findForEntityRoute);
         postForList(findByEntityKindPath, this::findByEntityKindRoute);
+        postForList(findByEntityKindAndDefinitionPath, this::findByEntityKindAndDefinitionIdRoute);
         postForList(findByTargetKindForRelatedSelectorPath, this::findByTargetKindForRelatedSelectorRoute);
         postForDatum(modifyPath, this::storeRoute);
         deleteForDatum(modifyPath, this::removeRoute);
@@ -100,6 +102,12 @@ public class AssessmentRatingEndpoint implements Endpoint {
         return assessmentRatingService.findByEntityKind(getKind(request, "kind"), visibilities);
     }
 
+    private List<AssessmentRating> findByEntityKindAndDefinitionIdRoute(Request request, Response response) throws IOException {
+        List<AssessmentVisibility> visibilities = readList(request, AssessmentVisibility.class);
+        long assessmentDefinitionId = getLong(request, "assessmentDefinitionId");
+        return assessmentRatingService.findByEntityKindAndDefinitionId(
+                getKind(request, "kind"), assessmentDefinitionId, visibilities);
+    }
 
     private boolean storeRoute(Request request, Response z) throws IOException {
         SaveAssessmentRatingCommand command = mkCommand(request);

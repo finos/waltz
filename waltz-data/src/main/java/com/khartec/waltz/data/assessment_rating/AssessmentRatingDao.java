@@ -20,8 +20,10 @@ package com.khartec.waltz.data.assessment_rating;
 
 
 import com.khartec.waltz.data.GenericSelector;
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.assessment_definition.AssessmentVisibility;
 import com.khartec.waltz.model.assessment_rating.AssessmentRating;
 import com.khartec.waltz.model.assessment_rating.ImmutableAssessmentRating;
@@ -29,6 +31,7 @@ import com.khartec.waltz.model.assessment_rating.RemoveAssessmentRatingCommand;
 import com.khartec.waltz.model.assessment_rating.SaveAssessmentRatingCommand;
 import com.khartec.waltz.schema.tables.records.AssessmentRatingRecord;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,17 +43,42 @@ import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.tables.AssessmentDefinition.ASSESSMENT_DEFINITION;
 import static com.khartec.waltz.schema.tables.AssessmentRating.ASSESSMENT_RATING;
+import static java.util.Optional.ofNullable;
 
 @Repository
 public class AssessmentRatingDao {
+
+    private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+            ASSESSMENT_RATING.ENTITY_ID,
+            ASSESSMENT_RATING.ENTITY_KIND,
+            newArrayList(EntityKind.APPLICATION, EntityKind.CHANGE_INITIATIVE));
 
     private static final RecordMapper<? super Record, AssessmentRating> TO_DOMAIN_MAPPER = r -> {
         AssessmentRatingRecord record = r.into(ASSESSMENT_RATING);
         return ImmutableAssessmentRating.builder()
                 .entityReference(EntityReference.mkRef(EntityKind.valueOf(record.getEntityKind()), record.getEntityId()))
+                .assessmentDefinitionId(record.getAssessmentDefinitionId())
+                .ratingId(record.getRatingId())
+                .comment(mkSafe(record.getDescription()))
+                .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
+                .lastUpdatedBy(record.getLastUpdatedBy())
+                .provenance(record.getProvenance())
+                .build();
+    };
+
+    private static final RecordMapper<? super Record, AssessmentRating> TO_DOMAIN_MAPPER_WITH_ENTITY_DETAILS  = r -> {
+        AssessmentRatingRecord record = r.into(ASSESSMENT_RATING);
+        return ImmutableAssessmentRating.builder()
+                .entityReference(EntityReference.mkRef(EntityKind.valueOf(record.getEntityKind()), record.getEntityId()))
+                .entityReference(ImmutableEntityReference.builder()
+                        .kind(EntityKind.valueOf(record.getEntityKind()))
+                        .id(record.getEntityId())
+                        .name(ofNullable(r.getValue(ENTITY_NAME_FIELD)))
+                        .build())
                 .assessmentDefinitionId(record.getAssessmentDefinitionId())
                 .ratingId(record.getRatingId())
                 .comment(mkSafe(record.getDescription()))
@@ -104,6 +132,17 @@ public class AssessmentRatingDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
+
+    public List<AssessmentRating> findByEntityKindAndDefinitionId(EntityKind kind, long definitionId, List<AssessmentVisibility> visibilities) {
+        return dsl.select(ASSESSMENT_RATING.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(ASSESSMENT_RATING)
+                .innerJoin(ASSESSMENT_DEFINITION).on(ASSESSMENT_DEFINITION.ID.eq(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID))
+                .where(ASSESSMENT_RATING.ENTITY_KIND.eq(kind.name()))
+                .and(ASSESSMENT_DEFINITION.ID.eq(definitionId))
+                .and(ASSESSMENT_DEFINITION.VISIBILITY.in(visibilities))
+                .fetch(TO_DOMAIN_MAPPER_WITH_ENTITY_DETAILS);
+    }
 
     public List<AssessmentRating> findByGenericSelector(GenericSelector genericSelector) {
         return dsl

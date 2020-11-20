@@ -17,16 +17,19 @@
  */
 
 import services from "./services";
+import Routes from "./routes";
 import { registerComponents } from "../common/module-utils";
 import AssessmentEditor from "./components/editor/assessment-editor";
 import AssessmentRatingList from "./components/list/assessment-rating-list";
 import AssessmentRatingSubSection from "./components/sub-section/assessment-rating-sub-section";
 import AssessmentRatingSummaryPies from "./components/summary-pies/assessment-rating-summary-pies";
 import AssessmentRatingTrafficLights from "./components/traffic-lights/assessment-rating-traffic-lights";
+import AssessmentRatingTable from "./components/grid/assessment-rating-table";
 
 export default () => {
 
     const module = angular.module("waltz.assessments", []);
+    module.config(Routes);
 
     services(module);
 
@@ -35,7 +38,8 @@ export default () => {
         AssessmentRatingList,
         AssessmentRatingSubSection,
         AssessmentRatingSummaryPies,
-        AssessmentRatingTrafficLights
+        AssessmentRatingTrafficLights,
+        AssessmentRatingTable
     ]);
 
     return module.name;

@@ -1,0 +1,189 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+<div>
+    <waltz-page-header name="{{ ctrl.definition.name }}"
+                       icon="edit"
+                       small="Edit">
+        <breadcrumbs>
+            <ol class="waltz-breadcrumbs">
+                <li><a ui-sref="main">Home</a></li>
+                <li>
+                    <span ng-bind="ctrl.definition.name">
+                    </span>
+                </li>
+                <li>Edit</li>
+            </ol>
+        </breadcrumbs>
+    </waltz-page-header>
+
+
+
+    <waltz-section icon="desktop" name="Ratings In Assessment Definition">
+
+        <div class="row">
+            <div class="col-md-6">
+                <waltz-grid-with-search scope-provider="ctrl"
+                                        ng-if="ctrl.gridData.length > 0"
+                                        entries="ctrl.gridData"
+                                        column-defs="ctrl.columnDefs">
+                </waltz-grid-with-search>
+            </div>
+            <div class="col-md-6">
+
+                <p class="waltz-paragraph">
+                    Use the search box below to locate an application and add it
+                    to the group.
+                </p>
+
+
+                <!-- Selectors -->
+                <uib-tabset>
+                    <uib-tab heading="Single Editor">
+                        <!-- Single Selector -->
+                        <div style="padding: 1em 0">
+                            <span>
+                                Once a selection is made related applications
+                                will also be shown.
+                            </span>
+
+                            <waltz-app-selector model="ctrl.searchedApp">
+                            </waltz-app-selector>
+                        </div>
+                    </uib-tab>
+
+                    <uib-tab heading="Bulk Editor">
+                        <!-- Bulk selector -->
+                        <div style="padding: 1em 0">
+                            <waltz-bulk-application-selector existing-refs="ctrl.applications"
+                                                             on-save="ctrl.saveApplications">
+                            </waltz-bulk-application-selector>
+                        </div>
+                    </uib-tab>
+
+                    <uib-tab heading="Recently Viewed">
+                        <!-- Recent selector -->
+                        <div style="padding: 1em 0">
+                            <ul class="list-unstyled">
+                                <li ng-repeat="app in ctrl.history">
+                                    <span ng-if="!ctrl.isAppInGroup(app.stateParams)"
+                                          class='clickable'
+                                          ng-click="ctrl.addRecentViewed(app)">
+                                        <waltz-icon fixed-width="true"
+                                                    class="text-muted"
+                                                    name="{{ app.kind | toIconName:'entity' }}"></waltz-icon>
+                                        <span ng-bind="::app.name"></span>
+                                    </span>
+                                    <span ng-if="ctrl.isAppInGroup(app.stateParams)"
+                                          class='text-muted'>
+                                        <waltz-icon fixed-width="true"
+                                                    name="{{ app.kind | toIconName:'entity' }}"></waltz-icon>
+                                        <span ng-bind="::app.name"
+                                              style="text-decoration: line-through"></span>
+                                    </span>
+                                </li>
+                                <waltz-no-data ng-if="ctrl.history.length == 0">
+                                    <message>No information for this person</message>
+                                </waltz-no-data>
+                            </ul>
+                        </div>
+                    </uib-tab>
+                </uib-tabset>
+
+                <!-- Focus App -->
+                <div ng-if="ctrl.focusApp">
+                    <hr>
+
+                    <h4>
+                        Focused on:
+                        <span ng-bind="ctrl.focusApp.app.name"></span>
+                    </h4>
+
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h5>Related By Asset Code</h5>
+                            <div class="waltz-scroll-region"
+                                 style="height: 200px">
+                                <waltz-app-group-app-selection-list
+                                    applications="ctrl.focusApp.related"
+                                    is-member="ctrl.isAppInGroup"
+                                    add="ctrl.addToGroup"
+                                    refocus="ctrl.focusOnApp">
+                                </waltz-app-group-app-selection-list>
+
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <h5>
+                                <waltz-icon name="sitemap"></waltz-icon>
+                                Apps in same Org Unit
+                            </h5>
+
+                            <div class="waltz-scroll-region"
+                                 style="height: 200px">
+                                <waltz-app-group-app-selection-list
+                                    applications="ctrl.focusApp.unitMembers"
+                                    is-member="ctrl.isAppInGroup"
+                                    add="ctrl.addToGroup"
+                                    refocus="ctrl.focusOnApp">
+                                </waltz-app-group-app-selection-list>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h5>
+                                <waltz-icon name="arrow-up"></waltz-icon>
+                                Upstream Apps
+                            </h5>
+
+                            <div class="waltz-scroll-region"
+                                 style="height: 200px">
+                                <waltz-app-group-app-selection-list
+                                    applications="ctrl.focusApp.upstream"
+                                    is-member="ctrl.isAppInGroup"
+                                    add="ctrl.addToGroup"
+                                    refocus="ctrl.focusOnApp">
+                                </waltz-app-group-app-selection-list>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6">
+                            <h5>
+                                <waltz-icon name="arrow-down"></waltz-icon>
+                                Downstream Apps
+                            </h5>
+
+                            <div class="waltz-scroll-region"
+                                 style="height: 200px">
+                                <waltz-app-group-app-selection-list
+                                    applications="ctrl.focusApp.downstream"
+                                    is-member="ctrl.isAppInGroup"
+                                    add="ctrl.addToGroup"
+                                    refocus="ctrl.focusOnApp">
+                                </waltz-app-group-app-selection-list>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </waltz-section>
+</div>

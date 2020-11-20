@@ -88,6 +88,13 @@ public class AssessmentRatingService {
     }
 
 
+    public List<AssessmentRating> findByEntityKindAndDefinitionId(EntityKind kind,
+                                                                  long definitionId,
+                                                                  List<AssessmentVisibility> visibilities) {
+
+        return assessmentRatingDao.findByEntityKindAndDefinitionId(kind, definitionId, visibilities);
+    }
+
     public boolean store(SaveAssessmentRatingCommand command, String username) {
         AssessmentDefinition assessmentDefinition = assessmentDefinitionDao.getById(command.assessmentDefinitionId());
         createChangeLogEntry(command, username, assessmentDefinition);
