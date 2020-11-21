@@ -18,7 +18,7 @@
 
 
 import * as playwright from "playwright";
-import {login, openApplicationViaSearch, openSection} from "./utils.js";
+import {beginWithLogin, login, openApplicationViaSearch, openSection} from "./utils.js";
 
 let browser;
 
@@ -45,19 +45,19 @@ afterEach(async () => {
 describe.only("can modify people associated to entities", function () {
     this.timeout(0);
     it("can add person to an app", async () => {
-        await page.goto("http://localhost:8000/home");
-        await page.waitForTimeout(1000);
-        await login(page);
-        await page.waitForTimeout(200);
+        await beginWithLogin(page);
 
         await openApplicationViaSearch(page, "Armadillo - 18");
         await openSection(page, "People")
 
         await page.click("#people-section [data-ux=involvement-edit]");
         await page.click("#people-section .waltz-entity-selector .ui-select-toggle");
-        await page.waitForTimeout(2000);
-        await page.type("Emily");
+        // this is odd!, the ui-select-search moves the input and result elements to the bottom
+        // of the dom - outside the original parent elem!
+        await page.fill(".waltz-entity-selector .ui-select-search", "Emily");
+        await page.click(".waltz-entity-selector .ui-select-choices-row >> 'Emily'");
 
+        // HERE
         await page.waitForTimeout(3000);
     })
 });

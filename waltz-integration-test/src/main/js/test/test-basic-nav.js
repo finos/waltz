@@ -17,7 +17,7 @@
  */
 
 import * as playwright from "playwright";
-import {login, openApplicationViaSearch, openOrgUnitViaList, openSection} from "./utils.js";
+import {beginWithLogin, login, openApplicationViaSearch, openOrgUnitViaList, openSection} from "./utils.js";
 
 let browser;
 
@@ -43,13 +43,15 @@ afterEach(async () => {
 
 describe("can perform basic navigation", function () {
     this.timeout(0);
-    it('should work', async () => {
-        await page.goto("http://localhost:8000/home");
-        await login(page);
-        await page.waitForTimeout(200);
+
+    it('can open org unit page', async () => {
+        await beginWithLogin(page);
         await openOrgUnitViaList(page, "CIO Office");
         await openSection(page, "Attestations");
+    });
+
+    it('can open app page via search', async () => {
+        await beginWithLogin(page);
         await openApplicationViaSearch(page, "Clown Fish - 48");
-        await page.waitForTimeout(1000);
     });
 })

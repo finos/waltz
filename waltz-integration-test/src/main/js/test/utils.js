@@ -43,6 +43,14 @@ export async function login(page) {
 }
 
 
+
+export async function beginWithLogin(page) {
+    await page.goto("http://localhost:8000/home");
+    await page.waitForTimeout(400);
+    await login(page);
+    await page.waitForTimeout(200);
+}
+
 /**
  * Opens an org unit page by navigating to the org unit
  * list page and selecting the named org unit from the
