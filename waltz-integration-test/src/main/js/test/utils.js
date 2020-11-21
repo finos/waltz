@@ -26,9 +26,10 @@
  * @returns {Promise<void>}
  */
 export async function login(page) {
-    console.log("Logging in");
-    const menuText = await page.textContent(".waltz-navbar-profile >> a");
-    if (menuText.indexOf("Anonymous") > -1) {
+    console.log("Login");
+    const menuText = await page.textContent(".waltz-navbar-profile .dropdown-toggle"); // span");
+    console.log("MT", menuText)
+    if (menuText.indexOf("Profile") === -1) {
         console.log("Login required");
         await page.click(".waltz-navbar-profile");
         await page.click(".waltz-navbar-profile >> 'Login'");

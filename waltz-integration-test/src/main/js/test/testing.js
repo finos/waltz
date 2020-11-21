@@ -16,28 +16,40 @@
  *
  */
 
-import {login, openApplicationViaSearch, openOrgUnitViaList, openSection} from "./utils.js"
 import * as playwright from "playwright";
+import {login, openApplicationViaSearch, openOrgUnitViaList, openSection} from "./utils.js";
 
-(async function(){
-    const browser = await playwright.chromium.launch({ headless: false }); // Non-headless mode to feel comfy
-    const context = await browser.newContext(); // So much to say, but another time
-    const page = await context.newPage(); // Create a new Page instance which handles most of your needs
+let browser;
+
+before(async() => {
+    browser = await playwright.chromium.launch({headless: true});
+});
+
+after(async () => {
+    await browser.close();
+});
+
+let page;
+
+beforeEach(async() => {
+    page = await browser.newPage();
     page.setDefaultTimeout(5000);
+});
 
-    try {
+afterEach(async () => {
+    await page.close();
+});
+
+
+describe("can perform basic navigation", function () {
+    this.timeout(0);
+    it('should work', async () => {
         await page.goto("http://localhost:8000/home");
-
         await login(page);
         await page.waitForTimeout(200);
         await openOrgUnitViaList(page, "CIO Office");
         await openSection(page, "Attestations");
-        // await hoistSection(page, "Attestations");
         await openApplicationViaSearch(page, "Clown Fish - 48");
         await page.waitForTimeout(1000);
-    } catch (e) {
-        console.log("Error", e.name);
-    }
-
-    await browser.close();
-})();
+    });
+})
