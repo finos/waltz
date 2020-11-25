@@ -18,6 +18,7 @@
 
 import LicenceList from "./pages/list/licence-list";
 import LicenceView from "./pages/view/licence-view";
+import {CORE_API} from "../common/services/core-api-utils";
 
 
 const baseState = {
@@ -28,6 +29,13 @@ const viewState = {
     url: "licence/{id:int}",
     views: { "content@": LicenceView.id }
 };
+
+
+const viewByExternalIdBouncerState = {
+    url: "licence/external-id/{externalId}",
+    resolve: { externalIdBouncer }
+};
+
 
 const listState = {
     url: "licence",
@@ -41,7 +49,8 @@ function setup($stateProvider) {
     $stateProvider
         .state("main.licence", baseState)
         .state("main.licence.list", listState)
-        .state("main.licence.view", viewState);
+        .state("main.licence.view", viewState)
+        .state("main.licence.external-id", viewByExternalIdBouncerState);
 }
 
 
@@ -49,3 +58,24 @@ setup.$inject = ["$stateProvider"];
 
 
 export default setup;
+
+
+function externalIdBouncer($state, $stateParams, serviceBroker) {
+    const externalId = $stateParams.externalId;
+    serviceBroker
+        .loadViewData(CORE_API.LicenceStore.getByExternalId, [externalId])
+        .then(r => {
+            const element = r.data;
+            if(element) {
+                $state.go("main.licence.view", {id: element.id});
+            } else {
+                console.log(`Cannot find licence corresponding to external id: ${externalId}`);
+            }
+        });
+}
+
+externalIdBouncer.$inject = [
+    "$state",
+    "$stateParams",
+    "ServiceBroker"
+];

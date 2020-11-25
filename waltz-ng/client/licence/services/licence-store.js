@@ -42,12 +42,16 @@ export function store($http, BaseApiUrl) {
         .get(`${BASE}/id/${id}`)
         .then(r => r.data);
 
+    const getByExternalId = (id) => $http
+        .get(`${BASE}/external-id/${id}`)
+        .then(r => r.data);
 
     return {
         countApplications,
         findAll,
         findBySelector,
-        getById
+        getById,
+        getByExternalId
     };
 }
 
@@ -87,5 +91,10 @@ export const LicenceStore_API = {
         serviceName,
         serviceFnName: 'getById',
         description: 'executes getById'
+    },
+    getByExternalId: {
+        serviceName,
+        serviceFnName: 'getByExternalId',
+        description: 'executes getByExternalId'
     },
 };
