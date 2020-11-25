@@ -33,7 +33,7 @@ const initialData = {
 
 
 function controller() {
-    const vm = initialiseData(this, initialData);
+    initialiseData(this, initialData);
 }
 
 
