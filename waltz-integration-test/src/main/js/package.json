@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "main": "test/testing.js",
-    "test": "mocha --report"
+    "e2eTest": "mocha --report"
   },
   "author": "",
   "license": "Apache-2.0",
