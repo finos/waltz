@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import static com.khartec.waltz.schema.tables.Settings.SETTINGS;
 
@@ -38,9 +39,10 @@ public class SettingsDao {
 
     public static final RecordMapper<? super Record, Setting> SETTINGS_MAPPER = r -> {
         SettingsRecord record = r.into(SETTINGS);
-        return ImmutableSetting.builder()
+        return ImmutableSetting
+                .builder()
                 .name(record.getName())
-                .value(record.getValue())
+                .value(Optional.ofNullable(r.getValue(SETTINGS.VALUE)))
                 .restricted(record.getRestricted())
                 .build();
     };
