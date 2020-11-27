@@ -22,6 +22,8 @@ import * as _ from "lodash";
 
 
 const initialState = {
+    qry: '',
+    filteredRatingSchemes: [],
     ratingSchemes: [],
     assessmentDefinitions: [],
     measurableCategories: []
@@ -31,14 +33,16 @@ const initialState = {
 function controller(serviceBroker, $q) {
 
     const vm = initialiseData(this, initialState);
-
+    
     const ratingSchemePromise = serviceBroker
         .loadViewData(
             CORE_API.RatingSchemeStore.findAll)
-        .then(r => vm.ratingSchemes =
-            _.forEach( r.data, d => _.forEach(
-                d.ratings,
-                rating => rating.name = rating.name + " (" + rating.rating + ")")));
+        .then(r => { vm.ratingSchemes =
+            _.forEach( r.data, d => 
+                _.forEach(d.ratings,rating => rating.name = rating.name + " (" + rating.rating + ")")
+                );
+            vm.filteredRatingSchemes = vm.ratingSchemes;
+        });
 
     const assessmentDefinitionPromise = serviceBroker
         .loadViewData(
@@ -74,6 +78,17 @@ function controller(serviceBroker, $q) {
                 ? a.roadmap.ratingSchemeId === vm.selectedRatingScheme.id
                 : a.ratingSchemeId === vm.selectedRatingScheme.id ))
             .value();
+    }
+
+    vm.onQueryStrChange = (qry) => {
+        const qryStr = new RegExp(qry,'i');
+
+        vm.filteredRatingSchemes = _
+            .chain(vm.ratingSchemes)
+            .filter(b => _.isEmpty(qryStr.source)
+                ? true
+                : qryStr.test(b.name) || qryStr.test(b.description))
+        .value();
     }
 }
 
