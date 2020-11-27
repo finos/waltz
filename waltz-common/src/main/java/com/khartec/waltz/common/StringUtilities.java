@@ -147,6 +147,7 @@ public class StringUtilities {
 
         return Stream.of(split)
                 .filter(s -> !s.isEmpty())
+                .map(String::trim)
                 .collect(Collectors.toList());
     }
 
