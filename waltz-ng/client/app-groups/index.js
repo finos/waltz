@@ -17,7 +17,7 @@
  */
 
 import angular from 'angular';
-import AppGroupSummary from './components/summary/app-group-summary'
+import AppGroupOverview from './components/overview/app-group-overview'
 import RelatedAppGroupsSection from './components/related-app-groups-section/related-app-groups-section';
 import SubscriptionButtons from './components/subscription-buttons/subscription-buttons';
 import {registerComponents, registerStores} from "../common/module-utils";
@@ -42,7 +42,7 @@ export default () => {
     registerComponents(module, [
         AppGroupList,
         AppGroupListSection,
-        AppGroupSummary,
+        AppGroupOverview,
         SubscriptionButtons,
         RelatedAppGroupsSection,
         FavouritesPanel ]);

@@ -22,7 +22,7 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 import {hierarchyQueryScope} from "../../../common/services/enums/hierarchy-query-scope";
 import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 
-import template from "./person-summary.html";
+import template from "./person-overview.html";
 
 
 const bindings = {
@@ -96,5 +96,5 @@ const component = {
 
 export default {
     component,
-    id: "waltzPersonSummary"
+    id: "waltzPersonOverview"
 };
