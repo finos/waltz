@@ -60,5 +60,17 @@
     <div class="container-fluid waltz-dynamic-section-body">
         <ng-transclude></ng-transclude>
     </div>
+</div>
 
+<div ng-if="$ctrl.help"
+     class="waltz-dynamic-section-help">
+
+    <div class="help-block">
+        <waltz-icon name="info-circle">
+        </waltz-icon>
+
+        <waltz-markdown text="$ctrl.help"
+                        context="{parentEntityRef: $ctrl.parentEntityRef}">
+        </waltz-markdown>
+    </div>
 </div>

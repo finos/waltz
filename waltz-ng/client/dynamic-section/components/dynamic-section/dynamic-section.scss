@@ -62,3 +62,17 @@
     padding-top: 0;
     margin-bottom: 0;
 }
+
+
+.waltz-dynamic-section-help {
+    border-top: 1px solid #eee;
+    background: linear-gradient(180deg, #fcfcf9 0%, rgba(255,255,255,1) 100%);
+
+    .help-block {
+        padding: 0.4em 1em 0 1em;
+    }
+
+    waltz-markdown {
+        padding-left: 0.3em
+    }
+}
