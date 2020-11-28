@@ -23,7 +23,6 @@ import EditableEnum from "./editable-enum/editable-enum";
 import EditableDropdown from "./editable-dropdown/editable-dropdown";
 import SpreadsheetLoader from "./spreadsheet-loader/spreadsheet-loader";
 import {registerComponents} from "../common/module-utils";
-import ChangeTimeline from "./change-timeline";
 import ExternalLink from "./external-link";
 import FromNow from "./from-now";
 import JumpTo from "./jump-to";
@@ -58,7 +57,6 @@ import Warning from "./warning/warning"
 export default () => {
     const module = angular.module("waltz.widgets", []);
 
-    module.directive("waltzChangeTimeline", ChangeTimeline);
     module.directive("waltzExternalLink", ExternalLink);
     module.directive("waltzFromNow", FromNow);
     module.directive("waltzJumpTo", JumpTo);

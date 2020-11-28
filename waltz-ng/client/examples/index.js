@@ -23,7 +23,6 @@ import Index from "./index.html";
 import Toc from "./toc.html";
 import DemoDirectiveAppSelector from "./demo-directive-app-selector.html";
 import DemoDirectiveBookmarkKindSelect from "./demo-directive-bookmark-kind-select.html";
-import DemoDirectiveChangeTimeline from "./demo-directive-change-timeline.html";
 import DemoDirectiveAppOverview from "./demo-directive-app-overview.html";
 import DemoDirectiveKeywordList from "./demo-directive-keyword-list.html";
 import DemoEndpointApplication from "./demo-endpoint-application.html";
@@ -70,27 +69,6 @@ export default () => {
                         },
                         bindToController: true,
                         controllerAs: "ctrl"
-                    } }
-                })
-                .state("main.examples.directive-change-timeline", {
-                    url: "/directive-change-timeline",
-                    views: { "content@": {
-                        template: DemoDirectiveChangeTimeline,
-                        controller: function() {
-                            this.changes = [
-                                { year: 2016, quarter: 3, size: 1 },
-                                { year: 2016, quarter: 4, size: 2 },
-                                { year: 2018, quarter: 1, size: 4 },
-                                { year: 2018, quarter: 2, size: 3 }
-                            ];
-                            this.selected = { year: 2016, quarter: 3 };
-
-                            this.onSelect = (d) => {
-                                this.selected = d;
-                            };
-                        },
-                        controllerAs: "ctrl",
-                        bindToController: true
                     } }
                 })
                 .state("main.examples.directive-app-overview", {

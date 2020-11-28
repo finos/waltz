@@ -16,7 +16,6 @@
  *
  */
 import BooleanRenderer from "./boolean-renderer";
-import BucketChart from "./bucket-chart";
 import FilterChangedWatcher from "./filter-change-watcher/filter-change-watcher";
 import LastUpdated from "./last-updated/last-updated";
 import MultiSelectTreeControl from "./multi-select-tree-control/multi-select-tree-control";
@@ -37,7 +36,6 @@ export default (module) => {
 
     module
         .component("waltzBooleanRenderer", BooleanRenderer)
-        .component("waltzBucketChart", BucketChart)
         .component("waltzLastUpdated", LastUpdated)
         .component("waltzMultiSelectTreeControl", MultiSelectTreeControl)
         .component("waltzSearchControl", SearchControl)
