@@ -89,13 +89,15 @@ export function mkLineWithArrowPath(x1, y1, x2, y2, arrowLoc = 0.2) {
     const l = Math.sqrt(dx*dx + dy*dy) * arrowLoc - 7;
     const dtxs = x2 - l/2 * Math.cos(theta);  // val is how far 'back'
     const dtys = y2 - l/2 * Math.sin(theta);
+    const arrowBaseWidth = 3;
+    const arrowHeight = 7;
     return `M${x1},${y1}
             l${dx} ${dy}
             M${dtxs},${dtys}
-            l${(3.5 * Math.cos(d90 - theta) - 10 * Math.cos(theta))}
-                ,${(-3.5 * Math.sin(d90 - theta) - 10 * Math.sin(theta))}
-            L${(dtxs - 3.5 * Math.cos(d90 - theta) - 10 * Math.cos(theta))}
-                ,${(dtys + 3.5 * Math.sin(d90 - theta) - 10 * Math.sin(theta))}
+            l${(arrowBaseWidth * Math.cos(d90 - theta) - arrowHeight * Math.cos(theta))}
+                ,${(0 - arrowBaseWidth * Math.sin(d90 - theta) - arrowHeight * Math.sin(theta))}
+            L${(dtxs - arrowBaseWidth * Math.cos(d90 - theta) - arrowHeight * Math.cos(theta))}
+                ,${(dtys + arrowBaseWidth * Math.sin(d90 - theta) - arrowHeight * Math.sin(theta))}
             z`;
 }
 
