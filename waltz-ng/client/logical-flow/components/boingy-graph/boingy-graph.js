@@ -31,8 +31,8 @@ import {refToString} from "../../../common/entity-utils";
 
 import template from "./boingy-graph.html";
 
-const width = 1800;
-const height = 900;
+const width = 1400; // viewbox width
+const height = 800; // viewbox height
 const DEFAULT_NODE_LIMIT = 500;
 
 
@@ -126,21 +126,23 @@ function setup(vizElem) {
         .append("svg")
         .style("min-height", "300px")
         .attr("preserveAspectRatio", "xMinYMin meet")
-        .attr("viewBox", [0, 0, width, height]);
+        .attr("viewBox", [0, 0, width, height])
+        .attr("width", "100%")
+        .attr("height", "800px")
 
-    svg.append('defs')
-        .append('marker')
-        .attr('id', 'wbg-arrowhead')
-        .attr('viewBox', '-0 -5 10 10')
-        .attr('refX', 18)
-        .attr('refY', 0)
-        .attr('orient', 'auto')
-        .attr('markerWidth', 5)
-        .attr('markerHeight', 5)
-        .append('svg:path')
-        .attr('d', 'M 0,-5 L 10 ,0 L 0,5')
-        .attr('fill', '#999')
-        .style('stroke','none');
+    svg.append("defs")
+        .append("marker")
+        .attr("id", "wbg-arrowhead")
+        .attr("viewBox", "-0 -5 10 10")
+        .attr("refX", 18)
+        .attr("refY", 0)
+        .attr("orient", "auto")
+        .attr("markerWidth", 5)
+        .attr("markerHeight", 5)
+        .append("svg:path")
+        .attr("d", "M 0,-5 L 10 ,0 L 0,5")
+        .attr("fill", "#999")
+        .style("stroke","none");
 
     svg.append("g")
         .attr("class", "links");
@@ -170,8 +172,9 @@ function dashUpdate(
 
             const dx = d.source.x - d.target.x;
             const dy = d.source.y - d.target.y;
-            const lineLength = Math.sqrt(dx ** 2 + dy ** 2) - lineLengthCoveredByNode * 2;
-            const stubLength = 20;
+            const hypotenuse = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+            const lineLength = hypotenuse - lineLengthCoveredByNode * 2;
+            const stubLength = 16;
 
             if (lineLength < stubLength * 2) {
                 return "";
@@ -228,7 +231,7 @@ function draw(data = [],
             .append("line")
             .classed("wdfd-link", true)
             .attr("stroke", "#444")
-            .attr('marker-end','url(#wbg-arrowhead)')
+            .attr("marker-end","url(#wbg-arrowhead)")
             .call(linkTweaker.enter);
 
         linkSelection
@@ -245,7 +248,7 @@ function draw(data = [],
         function dragStarted(d) {
             if (!event.active) {
                 simulation
-                    .alphaTarget(0.2)
+                    .alpha(0.2)
                     .restart();
             }
             d.fx = d.x;
