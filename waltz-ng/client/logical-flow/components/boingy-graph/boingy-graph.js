@@ -18,9 +18,9 @@
 
 import {initialiseData} from "../../../common";
 
-import {lineWithArrowPath, responsivefy} from "../../../common/d3-utils";
+import {responsivefy} from "../../../common/d3-utils";
 import {event, select} from "d3-selection";
-import {forceLink, forceManyBody, forceSimulation, forceX, forceY} from "d3-force";
+import {forceCenter, forceLink, forceManyBody, forceSimulation, forceX, forceY} from "d3-force";
 import {drag} from "d3-drag";
 import {symbol, symbolWye} from "d3-shape";
 import {zoom, zoomIdentity} from "d3-zoom";
@@ -32,8 +32,8 @@ import {refToString} from "../../../common/entity-utils";
 
 import template from "./boingy-graph.html";
 
-const width = 900;
-const height = 600;
+const width = 1800;
+const height = 900;
 const DEFAULT_NODE_LIMIT = 500;
 
 
@@ -70,9 +70,11 @@ const DEFAULT_TWEAKER = {
 
 const simulation = forceSimulation()
     .force("link", forceLink().id(d => d.id))
-    .force("charge", forceManyBody().strength(-110).distanceMin(1).distanceMax(400))
+    .force("charge", forceManyBody()
+        .strength(-400))
     .force("x", forceX())
     .force("y", forceY())
+    .force("center", forceCenter(width / 4, height /2))
     .alphaTarget(0);
 
 const actorSymbol = symbol()
@@ -125,15 +127,15 @@ function setup(vizElem) {
         .append("svg")
         .style("min-height", "300px")
         .attr("preserveAspectRatio", "xMinYMin meet")
-        .attr("viewBox", [-width / 2, -height / 2, width, height]);
+        .attr("viewBox", [0, 0, width, height]);
 
     const destroyResizeListener = responsivefy(svg);
 
     svg.append('defs')
         .append('marker')
-        .attr('id', 'arrowhead')
+        .attr('id', 'wbg-arrowhead')
         .attr('viewBox', '-0 -5 10 10')
-        .attr('refX', 15)
+        .attr('refX', 18)
         .attr('refY', 0)
         .attr('orient', 'auto')
         .attr('markerWidth', 5)
@@ -148,7 +150,6 @@ function setup(vizElem) {
 
     svg.append("g")
         .attr("class", "nodes");
-
 
     return { svg, destroyResizeListener };
 }
@@ -230,7 +231,7 @@ function draw(data = [],
             .append("line")
             .classed("wdfd-link", true)
             .attr("stroke", "#444")
-            .attr('marker-end','url(#arrowhead)')
+            .attr('marker-end','url(#wbg-arrowhead)')
             .call(linkTweaker.enter);
 
         linkSelection
