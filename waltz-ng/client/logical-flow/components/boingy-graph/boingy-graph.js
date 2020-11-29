@@ -18,9 +18,8 @@
 
 import {initialiseData} from "../../../common";
 
-import {lineWithArrowPath, responsivefy} from "../../../common/d3-utils";
 import {event, select} from "d3-selection";
-import {forceLink, forceManyBody, forceSimulation, forceX, forceY} from "d3-force";
+import {forceCenter, forceLink, forceManyBody, forceSimulation, forceX, forceY} from "d3-force";
 import {drag} from "d3-drag";
 import {symbol, symbolWye} from "d3-shape";
 import {zoom, zoomIdentity} from "d3-zoom";
@@ -32,8 +31,8 @@ import {refToString} from "../../../common/entity-utils";
 
 import template from "./boingy-graph.html";
 
-const width = 900;
-const height = 600;
+const width = 1800;
+const height = 900;
 const DEFAULT_NODE_LIMIT = 500;
 
 
@@ -70,9 +69,11 @@ const DEFAULT_TWEAKER = {
 
 const simulation = forceSimulation()
     .force("link", forceLink().id(d => d.id))
-    .force("charge", forceManyBody().strength(-110).distanceMin(1).distanceMax(400))
+    .force("charge", forceManyBody()
+        .strength(-400))
     .force("x", forceX())
     .force("y", forceY())
+    .force("center", forceCenter(width / 3, height /2))
     .alphaTarget(0);
 
 const actorSymbol = symbol()
@@ -125,15 +126,13 @@ function setup(vizElem) {
         .append("svg")
         .style("min-height", "300px")
         .attr("preserveAspectRatio", "xMinYMin meet")
-        .attr("viewBox", [-width / 2, -height / 2, width, height]);
-
-    const destroyResizeListener = responsivefy(svg);
+        .attr("viewBox", [0, 0, width, height]);
 
     svg.append('defs')
         .append('marker')
-        .attr('id', 'arrowhead')
+        .attr('id', 'wbg-arrowhead')
         .attr('viewBox', '-0 -5 10 10')
-        .attr('refX', 15)
+        .attr('refX', 18)
         .attr('refY', 0)
         .attr('orient', 'auto')
         .attr('markerWidth', 5)
@@ -149,8 +148,7 @@ function setup(vizElem) {
     svg.append("g")
         .attr("class", "nodes");
 
-
-    return { svg, destroyResizeListener };
+    return svg;
 }
 
 
@@ -196,7 +194,7 @@ function calcNeighborIds(linkData, d) {
 
 
 function draw(data = [],
-              parts,
+              svg,
               tweakers = {},
               onSelectNode = () => {}) {
 
@@ -208,8 +206,8 @@ function draw(data = [],
     const linkData = mkLinkData(data.flows);
     const nodeData = data.entities;
 
-    const linkSelection = drawLinks(linkData, parts.svg.select(".links"));
-    const nodeSelection = drawNodes(nodeData, parts.svg.select(".nodes"));
+    const linkSelection = drawLinks(linkData, svg.select(".links"));
+    const nodeSelection = drawNodes(nodeData, svg.select(".nodes"));
 
     simulation
         .nodes(nodeData)
@@ -230,7 +228,7 @@ function draw(data = [],
             .append("line")
             .classed("wdfd-link", true)
             .attr("stroke", "#444")
-            .attr('marker-end','url(#arrowhead)')
+            .attr('marker-end','url(#wbg-arrowhead)')
             .call(linkTweaker.enter);
 
         linkSelection
@@ -400,17 +398,17 @@ function controller($timeout, $element) {
     const vizElem = select($element[0])
         .select(".viz");
 
-    const parts = setup(vizElem);
+    const svg = setup(vizElem);
 
     const debouncedDraw = _.debounce((data) => {
         const tooManyNodes = !vm.overrideManyNodesWarning && data.entities.length > DEFAULT_NODE_LIMIT ;
         $timeout(() => vm.showManyNodesWarning = tooManyNodes);
 
         if (tooManyNodes) {
-            update = draw({entities: [], flows: []}, parts);
+            update = draw({entities: [], flows: []}, svg);
         } else {
             const enrichedData = enrichData(data);
-            update = draw(enrichedData, parts, vm.tweakers, onSelectNode);
+            update = draw(enrichedData, svg, vm.tweakers, onSelectNode);
             simulation.alpha(0.3).restart();
         }
     }, 250);
@@ -428,7 +426,6 @@ function controller($timeout, $element) {
 
     vm.$onDestroy = () => {
         simulation.stop();
-        parts.destroyResizeListener();
     };
 
     function zoomed() {
