@@ -18,7 +18,6 @@
 
 import {initialiseData} from "../../../common";
 
-import {responsivefy} from "../../../common/d3-utils";
 import {event, select} from "d3-selection";
 import {forceCenter, forceLink, forceManyBody, forceSimulation, forceX, forceY} from "d3-force";
 import {drag} from "d3-drag";
@@ -74,7 +73,7 @@ const simulation = forceSimulation()
         .strength(-400))
     .force("x", forceX())
     .force("y", forceY())
-    .force("center", forceCenter(width / 4, height /2))
+    .force("center", forceCenter(width / 3, height /2))
     .alphaTarget(0);
 
 const actorSymbol = symbol()
@@ -129,8 +128,6 @@ function setup(vizElem) {
         .attr("preserveAspectRatio", "xMinYMin meet")
         .attr("viewBox", [0, 0, width, height]);
 
-    const destroyResizeListener = responsivefy(svg);
-
     svg.append('defs')
         .append('marker')
         .attr('id', 'wbg-arrowhead')
@@ -151,7 +148,7 @@ function setup(vizElem) {
     svg.append("g")
         .attr("class", "nodes");
 
-    return { svg, destroyResizeListener };
+    return svg;
 }
 
 
@@ -197,7 +194,7 @@ function calcNeighborIds(linkData, d) {
 
 
 function draw(data = [],
-              parts,
+              svg,
               tweakers = {},
               onSelectNode = () => {}) {
 
@@ -209,8 +206,8 @@ function draw(data = [],
     const linkData = mkLinkData(data.flows);
     const nodeData = data.entities;
 
-    const linkSelection = drawLinks(linkData, parts.svg.select(".links"));
-    const nodeSelection = drawNodes(nodeData, parts.svg.select(".nodes"));
+    const linkSelection = drawLinks(linkData, svg.select(".links"));
+    const nodeSelection = drawNodes(nodeData, svg.select(".nodes"));
 
     simulation
         .nodes(nodeData)
@@ -401,17 +398,17 @@ function controller($timeout, $element) {
     const vizElem = select($element[0])
         .select(".viz");
 
-    const parts = setup(vizElem);
+    const svg = setup(vizElem);
 
     const debouncedDraw = _.debounce((data) => {
         const tooManyNodes = !vm.overrideManyNodesWarning && data.entities.length > DEFAULT_NODE_LIMIT ;
         $timeout(() => vm.showManyNodesWarning = tooManyNodes);
 
         if (tooManyNodes) {
-            update = draw({entities: [], flows: []}, parts);
+            update = draw({entities: [], flows: []}, svg);
         } else {
             const enrichedData = enrichData(data);
-            update = draw(enrichedData, parts, vm.tweakers, onSelectNode);
+            update = draw(enrichedData, svg, vm.tweakers, onSelectNode);
             simulation.alpha(0.3).restart();
         }
     }, 250);
@@ -429,7 +426,6 @@ function controller($timeout, $element) {
 
     vm.$onDestroy = () => {
         simulation.stop();
-        parts.destroyResizeListener();
     };
 
     function zoomed() {
