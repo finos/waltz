@@ -22,7 +22,7 @@ import {registerComponents, registerStore} from "../common/module-utils";
 import PersonStore from "./services/person-store";
 
 import PersonChangeSetSection from "./components/person-change-set-section/person-change-set-section"
-import PersonSummary from "./components/summary/person-summary";
+import PersonOverview from "./components/overview/person-overview";
 import PersonAppsSection from "./components/person-apps-section/person-apps-section";
 import PersonHierarchySection from "./components/person-hierarchy-section/person-hierarchy-section";
 import PersonLink from "./components/person-link/person-link";
@@ -44,7 +44,7 @@ export default () => {
         PersonAppsSection,
         PersonChangeSetSection,
         PersonHierarchySection,
-        PersonSummary,
+        PersonOverview,
         PersonLink,
         PersonList,
         PersonAppsTable
