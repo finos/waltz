@@ -23,7 +23,7 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 import {hierarchyQueryScope} from "../../../common/services/enums/hierarchy-query-scope";
 import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 
-import template from "./app-group-summary.html";
+import template from "./app-group-overview.html";
 
 
 const bindings = {
@@ -149,5 +149,5 @@ const component = {
 
 export default {
     component,
-    id: "waltzAppGroupSummary"
+    id: "waltzAppGroupOverview"
 }
