@@ -19,7 +19,7 @@
 import {initialiseData} from "../../../common";
 
 import {event, select} from "d3-selection";
-import {forceCenter, forceLink, forceManyBody, forceSimulation, forceX, forceY} from "d3-force";
+import {forceCenter, forceLink, forceManyBody, forceSimulation} from "d3-force";
 import {drag} from "d3-drag";
 import {symbol, symbolWye} from "d3-shape";
 import {zoom, zoomIdentity} from "d3-zoom";
@@ -70,11 +70,10 @@ const DEFAULT_TWEAKER = {
 const simulation = forceSimulation()
     .force("link", forceLink().id(d => d.id))
     .force("charge", forceManyBody()
-        .strength(-400))
-    .force("x", forceX())
-    .force("y", forceY())
-    .force("center", forceCenter(width / 3, height /2))
-    .alphaTarget(0);
+        .strength(-200))
+    .force("center", forceCenter(width / 2.5, height /2))
+    .alphaTarget(0)
+    .alphaDecay(0.08);
 
 const actorSymbol = symbol()
     .size(128)
@@ -154,17 +153,15 @@ function setup(vizElem) {
 }
 
 
-function dashUpdate(
+function drawPartialEdges(
     selection,
     hoveredNode,
-    useStubs = true)
+    useStubs = false)
 {
     const lineLengthCoveredByNode = 5;
     return selection
         .attr("stroke-dasharray", d => {
-            if (! useStubs) {
-                return "";
-            }
+            if (!useStubs) return "";
 
             if (hoveredNode  && (d.source.id === hoveredNode.id || d.target.id === hoveredNode.id)) {
                 return "";
@@ -185,13 +182,13 @@ function dashUpdate(
 }
 
 
-function calcNeighborIds(linkData, d) {
+function calcNeighborIds(linkData, focalNode) {
     return _
         .chain(linkData)
-        .filter(x => x.source.id === d.id || x.target.id === d.id)
+        .filter(x => x.source.id === focalNode.id || x.target.id === focalNode.id)
         .flatMap(x => [x.source.id, x.target.id])
         .uniq()
-        .reject(x => x === d.id)
+        .reject(x => x === focalNode.id)
         .value();
 }
 
@@ -215,6 +212,15 @@ function draw(data = [],
     simulation
         .nodes(nodeData)
         .on("tick", ticked);
+
+    const chargeStrengthScale = scalePow()
+        .domain([0, 400])
+        .range([-300, -100])
+        .clamp(true);
+
+    simulation
+        .force("charge")
+        .strength(chargeStrengthScale(nodeData.length));
 
     simulation
         .force("link")
@@ -248,8 +254,8 @@ function draw(data = [],
         function dragStarted(d) {
             if (!event.active) {
                 simulation
-                    .alpha(0.2)
-                    .restart();
+                     .alpha(0.1)
+                     .restart();
             }
             d.fx = d.x;
             d.fy = d.y;
@@ -325,28 +331,46 @@ function draw(data = [],
 
     function ticked() {
         nodeSelection
-            .attr("transform", d => `translate(${d.x}, ${d.y})`)
-            .attr("opacity", d => {
-                if (!hoveredNode) {
-                    return opacityScale(d.flowCount);
-                } else if (d.id === hoveredNode.id) {
-                    return 1;
-                } else if (_.includes(hoverNeighbors, d.id)) {
-                    return 0.7;
-                } else {
-                    return 0.1;
-                }
+            .attr("transform", d => "translate(" + d.x +", "+ d.y + ")")
+            .each(function(d) {
+                const isNeighbor = hoveredNode && _.includes(hoverNeighbors, d.id);
+                const isFocus = hoveredNode && d.id === hoveredNode.id;
+                const isNotFocus = hoveredNode && d.id !== hoveredNode.id;
+                const isDefault = !hoveredNode;
+
+                select(this)
+                    .attr("opacity", () => {
+                        if (isDefault) { return d.nodeOpacity; }
+                        else if (isFocus) { return 1; }
+                        else if (isNeighbor)  { return 0.7; }
+                        else if (isNotFocus) { return 0.1; }
+                    });
+
+                select(this)
+                    .select("text")
+                    .style("font-weight", () => {
+                        if (isDefault) { return 400; }
+                        else if (isFocus) { return 700; }
+                        else if (isNeighbor)  { return 400; }
+                        else if (isNotFocus) { return 100; }
+                    })
+                    .style("font-size", () => {
+                        if (isDefault) { return "9pt"; }
+                        else if (isFocus) { return "12pt"; }
+                        else if (isNeighbor)  { return "10pt"; }
+                        else if (isNotFocus) { return "7pt"; }
+                    });
             });
 
         nodeSelection
             .select("circle")
             .attr("r", d => {
                 if (!hoveredNode) {
-                    return nodeSizeScale(d.flowCount);
+                    return d.nodeSize;
                 } else {
                     return d.id === hoveredNode.id
-                        ? nodeSizeScale(d.flowCount) + 2
-                        : nodeSizeScale(d.flowCount)
+                        ? d.nodeSize + 2
+                        : d.nodeSize
                 }
             });
 
@@ -361,11 +385,11 @@ function draw(data = [],
                 } else {
                     return d.source.id === hoveredNode.id || d.target.id === hoveredNode.id
                         ? 1
-                        : 0.1;
+                        : 0.15;
                 }
             })
-            .call(dashUpdate, hoveredNode, useStubs);
-    };
+            .call(drawPartialEdges, hoveredNode, useStubs);
+    }
 
     return ticked;
 }
@@ -385,7 +409,18 @@ function enrichData(data = []) {
 
     const enrichedEntities = _
         .chain(data.entities)
-        .map(n => Object.assign(n, { flowCount: flowCounts[refToString(n)]}))
+        .map(n => {
+            const flowCount = flowCounts[refToString(n)];
+            const nodeSize = nodeSizeScale(flowCount);
+            const nodeOpacity = opacityScale(flowCount);
+            return Object.assign({}, n, {
+                flowCount,
+                nodeSize,
+                nodeOpacity,
+                x: Math.random() * width * 0.66 + width / 3,
+                y: Math.random() * height * 0.66 + height / 3
+            });
+        })
         .orderBy(d => d.flowCount)
         .value();
 
