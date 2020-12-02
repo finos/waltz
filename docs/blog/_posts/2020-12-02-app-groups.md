@@ -11,7 +11,7 @@ Application groups are a useful feature to quickly create ad-hoc collections of 
 
 The screencast below shows the fetaure in action.  
 
-[![Waltz: App Groups](http://img.youtube.com/vi/OfpkqNEzVoE/0.jpg)](http://www.youtube.com/watch?v=gHLB1agf3sc)
+[![Waltz: App Groups](http://img.youtube.com/vi/OfpkqNEzVoE/0.jpg)](http://www.youtube.com/watch?v=OfpkqNEzVoE)
 
 
 
