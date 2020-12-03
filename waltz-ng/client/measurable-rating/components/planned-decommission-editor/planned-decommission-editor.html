@@ -85,21 +85,23 @@
                         No replacement applications have been declared.
                     </p>
 
-                    <ul ng-repeat="replacement in $ctrl.replacementApps"
+                    <ul ng-repeat="replacement in $ctrl.replacementApps | orderBy:'entityReference.name' track by replacement.entityReference.id"
                         class="list-unstyled">
-                        <li>
+                        <li class="waltz-visibility-parent">
                             <waltz-entity-icon-label entity-ref="replacement.entityReference">
                             </waltz-entity-icon-label>
-                            <span uib-popover="Remove this replacement application"
+                            <span class="waltz-visibility-child-30 small"
+                                  uib-popover="Remove this replacement application"
                                   popover-trigger="mouseenter"
                                   popover-delay="300"
                                   popover-placement="left"
                                   popover-append-to-body="true">
-                            <a class="clickable"
-                               ng-click="$ctrl.onSelectCandidateForRemoval(replacement)">
-                                <waltz-icon name="trash"></waltz-icon>
-                            </a>
-                        </span>
+                                <a class="clickable"
+                                   ng-click="$ctrl.onSelectCandidateForRemoval(replacement)">
+                                    <waltz-icon name="trash"></waltz-icon>
+                                    Remove
+                                </a>
+                            </span>
                             <div style="margin-left: 0.5em; border-left: 1px solid #ccc; padding-left: 0.7em">
                                 <waltz-editable-field ctx="replacement"
                                                       field-type="date"
