@@ -220,14 +220,14 @@ function controller($q,
             .finally(reloadDecommData);
     };
 
-    vm.onAddReplacementApp = (replacement) => {
+    vm.onSaveReplacementApp = (replacement) => {
         return serviceBroker
             .execute(
                 CORE_API.MeasurableRatingReplacementStore.save,
                 [replacement.decommissionId, replacement])
             .then(r => {
                 vm.selected = Object.assign({}, vm.selected, { replacementApps: r.data });
-                notification.success("Successfully added replacement app")
+                notification.success("Successfully saved replacement app")
             })
             .catch(e  => displayError(notification, "Could not add replacement app", e))
             .finally(reloadDecommData);
