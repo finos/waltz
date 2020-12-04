@@ -129,12 +129,13 @@
                      style="padding-bottom: 2px">
                     <waltz-no-data>
                         <message>
-                            Never attested,
-                            <a class="clickable"
-                               ng-if="$ctrl.hasPermissionToAttest(attestationSection.section.type)"
-                               ng-click="$ctrl.onInitiateAttestation(attestationSection.section)">
-                                attest now
-                            </a>
+                            Never attested
+                            <span ng-if="$ctrl.hasPermissionToAttest(attestationSection.section.type)">,
+                                <a class="clickable"
+                                   ng-click="$ctrl.onInitiateAttestation(attestationSection.section)">
+                                    attest now
+                                </a>
+                            </span>
                         </message>
                     </waltz-no-data>
                 </div>
@@ -173,7 +174,9 @@
                     </tbody>
                 </table>
 
-                <div ng-if="attestationSection.unattestedChanges.length > 0">
+                <div ng-if="attestationSection.unattestedChanges.length > 0"
+                     style="padding-bottom: 2px">
+                    <br>
                     <waltz-warning>
                         <message>Unattested changes detected</message>
                         <content>
