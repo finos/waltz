@@ -130,6 +130,60 @@
                     </waltz-no-data>
                 </div>
 
+                <!-- SOURCE AND TARGET GRAPH -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <strong>Logical Flows</strong>
+                        <waltz-no-data ng-if="$ctrl.logicalFlows.length == 0">
+                            <message>
+                                <strong>
+                                    No Logical Data Flows
+                                </strong>
+                                registered for this application.
+                                <span waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
+                                        Add one
+                                        <a ng-click="$ctrl.visibility.editor.logicalFlow = true"
+                                           class="clickable">
+                                            here.
+                                        </a>
+                                    </span>
+                            </message>
+                        </waltz-no-data>
+
+                        <div ng-if="$ctrl.logicalFlows.length > 0">
+
+                            <waltz-source-and-target-panel entity-ref="$ctrl.parentEntityRef"
+                                                           logical-flows="$ctrl.logicalFlows"
+                                                           decorators="$ctrl.logicalFlowDecorators"
+                                                           physical-flows="$ctrl.physicalFlows"
+                                                           physical-specifications="$ctrl.physicalSpecifications"
+                                                           change-units="$ctrl.changeUnits"
+                                                           tags="$ctrl.tags">
+                            </waltz-source-and-target-panel>
+
+                            <p class="text-muted small">
+                                This diagram shows flows categorized by data type to this application (center)
+                                from sending systems (on the left)
+                                and to the receiving system (on the right).
+                                <span style="color: darkred">Red lines</span>
+                                indicate
+                                <span ng-bind="'DISCOURAGED'|toDisplayName:'AuthoritativenessRating'"></span>
+                                flows.
+
+                                <span style="color: orange">Amber lines</span>
+                                indicate
+                                <span ng-bind="'SECONDARY' |toDisplayName:'AuthoritativenessRating'"></span>
+                                flows and
+
+                                <span style="color: darkgreen">Green Lines</span>
+                                indicate
+                                <span ng-bind="'PRIMARY'|toDisplayName:'AuthoritativenessRating'"></span>
+                                flows.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- DATA TYPE SUMMARY -->
                 <div ng-if="$ctrl.dataTypeUsages.length > 0 || $ctrl.logicalFlows.length > 0">
                     <div class='row'>
@@ -163,59 +217,6 @@
                         </div>
                     </div>
 
-                    <!-- SOURCE AND TARGET GRAPH -->
-                    <div class="row">
-                        <div class="col-md-12">
-                            <strong>Logical Flows</strong>
-                            <waltz-no-data ng-if="$ctrl.logicalFlows.length == 0">
-                                <message>
-                                    <strong>
-                                        No Logical Data Flows
-                                    </strong>
-                                    registered for this application.
-                                    <span waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
-                                        Add one
-                                        <a ng-click="$ctrl.visibility.editor.logicalFlow = true"
-                                           class="clickable">
-                                            here.
-                                        </a>
-                                    </span>
-                                </message>
-                            </waltz-no-data>
-
-                            <div ng-if="$ctrl.logicalFlows.length > 0">
-
-                                <waltz-source-and-target-panel entity-ref="$ctrl.parentEntityRef"
-                                                               logical-flows="$ctrl.logicalFlows"
-                                                               decorators="$ctrl.logicalFlowDecorators"
-                                                               physical-flows="$ctrl.physicalFlows"
-                                                               physical-specifications="$ctrl.physicalSpecifications"
-                                                               change-units="$ctrl.changeUnits"
-                                                               tags="$ctrl.tags">
-                                </waltz-source-and-target-panel>
-
-                                <p class="text-muted small">
-                                    This diagram shows flows categorized by data type to this application (center)
-                                    from sending systems (on the left)
-                                    and to the receiving system (on the right).
-                                    <span style="color: darkred">Red lines</span>
-                                    indicate
-                                    <span ng-bind="'DISCOURAGED'|toDisplayName:'AuthoritativenessRating'"></span>
-                                    flows.
-
-                                    <span style="color: orange">Amber lines</span>
-                                    indicate
-                                    <span ng-bind="'SECONDARY' |toDisplayName:'AuthoritativenessRating'"></span>
-                                    flows and
-
-                                    <span style="color: darkgreen">Green Lines</span>
-                                    indicate
-                                    <span ng-bind="'PRIMARY'|toDisplayName:'AuthoritativenessRating'"></span>
-                                    flows.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 
