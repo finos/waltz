@@ -55,6 +55,12 @@ export function store($http, BaseApiUrl) {
             .then(d => d.data);
     };
 
+    const bulkStore = (assessmentDefinitionId, commands = []) => {
+        return $http
+            .post(`${BASE}/bulk-update/${assessmentDefinitionId}`, commands)
+            .then(d => d.data);
+    };
+
     const remove = (ref, assessmentDefinitionId) => {
         checkIsEntityRef(ref);
         return $http
@@ -68,6 +74,7 @@ export function store($http, BaseApiUrl) {
         findByEntityKindAndAssessmentDefinitionId,
         findByTargetKindForRelatedSelector,
         store,
+        bulkStore,
         remove
     };
 }
@@ -107,6 +114,11 @@ export const AssessmentRatingStore_API = {
         serviceName,
         serviceFnName: "store",
         description: "update or create a rating"
+    },
+    bulkStore: {
+        serviceName,
+        serviceFnName: "bulkStore",
+        description: "update or create ratings in bulk for an assessment definition"
     },
     remove: {
         serviceName,

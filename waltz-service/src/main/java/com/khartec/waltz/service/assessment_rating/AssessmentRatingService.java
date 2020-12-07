@@ -26,9 +26,7 @@ import com.khartec.waltz.data.rating_scheme.RatingSchemeDAO;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
 import com.khartec.waltz.model.assessment_definition.AssessmentVisibility;
-import com.khartec.waltz.model.assessment_rating.AssessmentRating;
-import com.khartec.waltz.model.assessment_rating.RemoveAssessmentRatingCommand;
-import com.khartec.waltz.model.assessment_rating.SaveAssessmentRatingCommand;
+import com.khartec.waltz.model.assessment_rating.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.rating.RagName;
@@ -36,8 +34,11 @@ import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityReference.mkRef;
@@ -148,5 +149,39 @@ public class AssessmentRatingService {
                 .build();
 
         changeLogService.write(logEntry);
+    }
+
+    public boolean bulkStore(BulkAssessmentRatingCommand[] commands, long assessmentDefinitionId, String username) {
+        Set<AssessmentRating> ratingsToAdd = getRatingsFilterByOperation(commands, assessmentDefinitionId, username, Operation.ADD);
+        int addedResult = assessmentRatingDao.add(ratingsToAdd);
+
+        Set<AssessmentRating> ratingsToUpdate = getRatingsFilterByOperation(commands, assessmentDefinitionId, username, Operation.UPDATE);
+        int updateResult = assessmentRatingDao.update(ratingsToUpdate);
+
+        return addedResult + updateResult > 1;
+    }
+
+    private Set<AssessmentRating> getRatingsFilterByOperation(BulkAssessmentRatingCommand[] commands,
+                                                              long assessmentDefinitionId,
+                                                              String username, Operation operation) {
+        return Arrays.stream(commands)
+                .filter(c -> c.operation().equals(operation))
+                .map(command -> getAssessmentRating(command, assessmentDefinitionId, username))
+                .collect(Collectors.toSet());
+    }
+
+    private AssessmentRating getAssessmentRating(BulkAssessmentRatingCommand command,
+                                                 Long assessmentDefinitionId,
+                                                 String username) {
+        UserTimestamp lastUpdate = UserTimestamp.mkForUser(username);
+        return ImmutableAssessmentRating.builder()
+                .assessmentDefinitionId(assessmentDefinitionId)
+                .entityReference(command.entityReference())
+                .ratingId(command.ratingId())
+                .comment(command.comment())
+                .lastUpdatedAt(lastUpdate.at())
+                .lastUpdatedBy(lastUpdate.by())
+                .provenance("waltz")
+                .build();
     }
 }
