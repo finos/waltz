@@ -131,6 +131,20 @@ public class RatingSchemeDAO {
                 .fetch(TO_ITEM_MAPPER);
     }
 
+    public List<RagName> findRatingSchemeItemsForAssessmentDefinition(Long assessmentDefinitionId) {
+        return dsl
+                .select(RATING_SCHEME_ITEM.fields())
+                .from(RATING_SCHEME_ITEM)
+                .leftOuterJoin(RATING_SCHEME)
+                .on(RATING_SCHEME.ID.eq(RATING_SCHEME_ITEM.SCHEME_ID))
+                .where(RATING_SCHEME.ID.in(
+                        DSL.select(ASSESSMENT_DEFINITION.RATING_SCHEME_ID)
+                        .from(ASSESSMENT_DEFINITION)
+                        .where(ASSESSMENT_DEFINITION.ID.eq(assessmentDefinitionId))
+                ))
+                .orderBy(RATING_SCHEME_ITEM.POSITION.asc())
+                .fetch(TO_ITEM_MAPPER);
+    }
 
     public RagName getRagNameById(long id){
         checkNotNull(id, "id cannot be null");

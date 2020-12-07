@@ -50,6 +50,9 @@ public class RatingSchemeService {
 
     public List<RagName> getAllRatingSchemeItems() {return ratingSchemeDAO.fetchItems(DSL.trueCondition()); }
 
+    public List<RagName> findRatingSchemeItemsByAssessmentDefinition(long assessmentDefinitionId) {
+        return ratingSchemeDAO.findRatingSchemeItemsForAssessmentDefinition(assessmentDefinitionId);
+    }
 
     public List<RagName> findRatingSchemeItemsForEntityAndCategory(EntityReference ref, long measurableCategoryId) {
         return ratingSchemeDAO.findRatingSchemeItemsForEntityAndCategory(ref, measurableCategoryId);
