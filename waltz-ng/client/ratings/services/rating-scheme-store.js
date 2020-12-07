@@ -38,8 +38,8 @@ export function store($http, BaseApiUrl) {
         .get(`${base}/items/kind/${ref.kind}/id/${ref.id}/category-id/${categoryId}`)
         .then(d => d.data);
 
-    const findAllRatingsSchemeItems = () => $http
-        .get(`${base}/items`)
+    const findRatingsSchemeItems = (assessmentDefinitionId) => $http
+        .get(`${base}/items/assessmentDefinitionId/${assessmentDefinitionId}`)
         .then(d => d.data);
 
 
@@ -47,7 +47,7 @@ export function store($http, BaseApiUrl) {
         findAll,
         getById,
         findRatingsForEntityAndMeasurableCategory,
-        findAllRatingsSchemeItems
+        findRatingsSchemeItems
     };
 }
 
@@ -72,10 +72,10 @@ export const RatingSchemeStore_API = {
         serviceFnName: 'findRatingsForEntityAndMeasurableCategory',
         description: 'returns list of rating scheme items for entity and measurable category id (ref, categoryId)'
     },
-    findAllRatingsSchemeItems: {
+    findRatingsSchemeItems: {
         serviceName,
-        serviceFnName: 'findAllRatingsSchemeItems',
-        description: 'returns all rating scheme items'
+        serviceFnName: 'findRatingsSchemeItems',
+        description: 'returns all rating scheme items for an assessment definition'
     }
 };
 

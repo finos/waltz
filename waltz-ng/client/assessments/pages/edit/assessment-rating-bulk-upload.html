@@ -38,8 +38,8 @@
         <div class="row">
             <div class="col-md-6">
                 <waltz-grid-with-search scope-provider="ctrl"
-                                        ng-if="ctrl.gridData.length > 0"
-                                        entries="ctrl.gridData"
+                                        ng-if="ctrl.appRatings.length > 0"
+                                        entries="ctrl.appRatings"
                                         column-defs="ctrl.columnDefs">
                 </waltz-grid-with-search>
             </div>
@@ -69,9 +69,11 @@
                     <uib-tab heading="Bulk Editor">
                         <!-- Bulk selector -->
                         <div style="padding: 1em 0">
-                            <waltz-bulk-application-selector existing-refs="ctrl.applications"
-                                                             on-save="ctrl.saveApplications">
-                            </waltz-bulk-application-selector>
+                            <waltz-bulk-assessment-rating-selector existing-refs="ctrl.appRatings"
+                                                                   ratings="ctrl.appRatings"
+                                                                   rating-items="ctrl.ratingItems"
+                                                             on-save="ctrl.saveRatings">
+                            </waltz-bulk-assessment-rating-selector>
                         </div>
                     </uib-tab>
 
