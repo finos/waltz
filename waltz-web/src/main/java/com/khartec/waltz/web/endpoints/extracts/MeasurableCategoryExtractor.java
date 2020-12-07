@@ -30,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.schema.Tables.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.Tables.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
@@ -75,12 +76,17 @@ public class MeasurableCategoryExtractor extends DirectQueryBasedDataExtractor {
                             MEASURABLE.ID.as("Id"),
                             MEASURABLE.PARENT_ID.as("Parent Id"),
                             MEASURABLE.EXTERNAL_ID.as("External Id"),
+                            ENTITY_HIERARCHY.LEVEL.as("Level"),
                             MEASURABLE.NAME.as("Name"),
                             MEASURABLE.DESCRIPTION.as("Description"))
                     .select(INVOLVEMENT_KIND.NAME.as("Role"))
                     .select(PERSON.DISPLAY_NAME.as("Person"),
                             PERSON.EMAIL.as("Email"))
                     .from(MEASURABLE)
+                    .innerJoin(ENTITY_HIERARCHY)
+                        .on(ENTITY_HIERARCHY.ID.eq(MEASURABLE.ID))
+                        .and(ENTITY_HIERARCHY.ANCESTOR_ID.eq(MEASURABLE.ID))
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name()))
                     .leftJoin(INVOLVEMENT)
                         .on(INVOLVEMENT.ENTITY_ID.eq(MEASURABLE.ID).and(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.MEASURABLE.name())))
                     .leftJoin(INVOLVEMENT_KIND)

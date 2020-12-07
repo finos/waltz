@@ -57,6 +57,11 @@ public class LicenceService {
     }
 
 
+    public Licence getByExternalId(String externalId) {
+        return licenceDao.getByExternalId(externalId);
+    }
+
+
     public List<Licence> findBySelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = licenceIdSelectorFactory.apply(options);

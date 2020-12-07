@@ -37,13 +37,24 @@
 
         <div class="col-sm-12">
             <div class="col-sm-8">
+                <div ng-if="$ctrl.ratingSchemes.length > 5">
+
+                    <waltz-search-control min-characters="1"
+                                          delay="250"
+                                          on-query="$ctrl.onQueryStrChange"
+                                          placeholder-text="Search...">
+                    </waltz-search-control>
+    
+                    <br>
+                </div>
                 <table class="table table-condensed table-hover">
                     <thead>
                     <tr>
                         <th>Rating Scheme</th>
                         <th>Description</th>
                     </tr>
-                    <tbody ng-repeat="ratingScheme in $ctrl.ratingSchemes">
+                    <tbody ng-if="$ctrl.filteredRatingSchemes.length > 0" 
+                           ng-repeat="ratingScheme in $ctrl.filteredRatingSchemes | orderBy:'name'">
                     <tr ng-click="$ctrl.selectScheme(ratingScheme)">
                         <td class="col-sm-2 clickable">
                             <span uib-popover-template="'wrl-r-popover.html'"
@@ -66,6 +77,15 @@
                             </span>
                         </td>
                     </tr>
+                    </tbody>
+                    <tbody ng-if="$ctrl.filteredRatingSchemes.length == 0">
+                        <tr class="row">
+                            <td class="col-sm-8">
+                                <span class="force-wrap text-muted text-center">
+                                    No data available
+                                </span>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

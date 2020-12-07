@@ -21,7 +21,7 @@ import MeasurableStore from "./services/measurable-store";
 import MeasurableChangeControl from "./components/change-control/measurable-change-control";
 import MeasurableInfo from "./components/info/measurable-info";
 import MeasurableTree from "./components/tree/measurable-tree";
-import MeasurableSummary from "./components/summary/measurable-summary";
+import MeasurableOverview from "./components/overview/measurable-overview";
 import DirectMeasurables from "./components/org-unit-direct-measurable-section/org-unit-direct-measurable-section";
 import MeasurableOrgUnitRelationshipTree
     from "./components/org-unit-relationship-tree/measurable-org-unit-relationship-tree";
@@ -40,7 +40,7 @@ export default () => {
         MeasurableChangeControl,
         MeasurableInfo,
         MeasurableTree,
-        MeasurableSummary,
+        MeasurableOverview,
         MeasurableOrgUnitRelationshipTree]);
 
     module

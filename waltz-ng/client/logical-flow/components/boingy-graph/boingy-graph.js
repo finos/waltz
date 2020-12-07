@@ -18,9 +18,8 @@
 
 import {initialiseData} from "../../../common";
 
-import {lineWithArrowPath, responsivefy} from "../../../common/d3-utils";
 import {event, select} from "d3-selection";
-import {forceLink, forceManyBody, forceSimulation, forceX, forceY} from "d3-force";
+import {forceCenter, forceLink, forceManyBody, forceSimulation} from "d3-force";
 import {drag} from "d3-drag";
 import {symbol, symbolWye} from "d3-shape";
 import {zoom, zoomIdentity} from "d3-zoom";
@@ -32,8 +31,8 @@ import {refToString} from "../../../common/entity-utils";
 
 import template from "./boingy-graph.html";
 
-const width = 900;
-const height = 600;
+const width = 1400; // viewbox width
+const height = 800; // viewbox height
 const DEFAULT_NODE_LIMIT = 500;
 
 
@@ -70,18 +69,20 @@ const DEFAULT_TWEAKER = {
 
 const simulation = forceSimulation()
     .force("link", forceLink().id(d => d.id))
-    .force("charge", forceManyBody().strength(-110).distanceMin(1).distanceMax(400))
-    .force("x", forceX())
-    .force("y", forceY())
-    .alphaTarget(0);
+    .force("charge", forceManyBody()
+        .strength(-200))
+    .force("center", forceCenter(width / 2.5, height /2))
+    .alphaTarget(0)
+    .alphaDecay(0.08);
 
 const actorSymbol = symbol()
     .size(128)
     .type(symbolWye);
 
+let useStubs = false;
 
 function mkLinkData(flows = []) {
-    const linkData = _
+    return _
         .chain(flows)
         .map(f => ({
             id: f.source.id + "_" + f.target.id,
@@ -91,35 +92,11 @@ function mkLinkData(flows = []) {
         }))
         .uniqBy(d => d.id)
         .value();
-    return linkData;
-}
-
-
-function drawLinks(links = [], holder, tweakers) {
-    const linkSelection = holder
-        .selectAll(".wdfd-link")
-        .data(links, d => d.id);
-
-    const newLinks = linkSelection
-        .enter()
-        .append("path")
-        .classed("wdfd-link", true)
-        .attr("stroke", "#444")
-        .attr("stroke-opacity", 0.6)
-        .call(tweakers.enter);
-
-    linkSelection
-        .exit()
-        .remove();
-
-    return linkSelection
-        .merge(newLinks)
-        .call(tweakers.update);
 }
 
 
 function addNodeLabel(selection) {
-    selection
+    return selection
         .append("text")
         .attr("dx", 9)
         .attr("dy", ".35em")
@@ -138,116 +115,33 @@ function addNodeCircle(selection) {
         .append("path")
         .attr("class", "wdfd-glyph")
         .attr("d", actorSymbol);
-}
 
-
-function drawNodes(nodes,
-                   holder,
-                   tweakers = DEFAULT_TWEAKER,
-                   onSelectNode) {
-
-    function dragStarted(d) {
-        if (!event.active) {
-            simulation
-                .restart();
-        }
-        d.fx = d.x;
-        d.fy = d.y;
-    }
-
-    function dragged(d) {
-        d.fx = event.x;
-        d.fy = event.y;
-    }
-
-    function dragEnded(d) {
-        if (!event.active) {
-            simulation
-                .restart();
-        }
-        d.fx = event.x;
-        d.fy = event.y;
-    }
-
-    const nodeSelection = holder
-        .selectAll(".wdfd-node")
-        .data(nodes, d => d.id);
-
-    const newNodes = nodeSelection
-        .enter()
-        .append("g")
-        .classed("wdfd-node", true)
-        .on("dblclick.unfix", d => { d.fx = null; d.fy = null })
-        .on("click.node-selected", onSelectNode)
-        .call(drag()
-            .on("start", dragStarted)
-            .on("drag", dragged)
-            .on("end", dragEnded));
-
-    newNodes
-        .call(addNodeLabel)
-        .call(addNodeCircle)
-        .call(tweakers.enter);
-
-    nodeSelection
-        .exit()
-        .call(tweakers.exit)
-        .remove();
-
-    const allNodes = nodeSelection
-        .merge(newNodes);
-
-    allNodes
-        .select("text")
-        .attr("opacity", d => opacityScale(d.flowCount));
-
-    allNodes
-        .select("circle")
-        .attr("opacity", d => opacityScale(d.flowCount))
-        .attr("r", d => nodeSizeScale(d.flowCount));
-
-    allNodes
-        .select("path")
-        .attr("opacity", d => opacityScale(d.flowCount))
-        .attr("r", d => nodeSizeScale(d.flowCount));
-
-    const setOpacity = (selection, opacity) => {
-        selection
-            .selectAll("text, circle, path")
-            .attr("opacity", opacity);
-        return selection;
-    };
-
-    allNodes
-        .on("mouseenter.opacityHover", function (d) {
-            const selection = select(this);
-            setOpacity(selection, 1);
-            selection
-                .select("circle")
-                .attr("r", nodeSizeScale(d.flowCount) + 2);
-            return selection;
-        })
-        .on("mouseout.opacityHover", function (d) {
-            const selection = select(this);
-            setOpacity(selection, opacityScale(d.flowCount));
-            selection
-                .select("circle")
-                .attr("r", nodeSizeScale(d.flowCount));
-            return selection;
-        });
-
-    return allNodes;
+    return selection;
 }
 
 
 function setup(vizElem) {
     const svg = vizElem
         .append("svg")
-        .attr("width", width)
-        .attr("height", height)
-        .attr("viewBox", [-width / 2, -height / 2, width, height]);
+        .style("min-height", "300px")
+        .attr("preserveAspectRatio", "xMinYMin meet")
+        .attr("viewBox", [0, 0, width, height])
+        .attr("width", "100%")
+        .attr("height", "800px")
 
-    const destroyResizeListener = responsivefy(svg);
+    svg.append("defs")
+        .append("marker")
+        .attr("id", "wbg-arrowhead")
+        .attr("viewBox", "-0 -5 10 10")
+        .attr("refX", 18)
+        .attr("refY", 0)
+        .attr("orient", "auto")
+        .attr("markerWidth", 5)
+        .attr("markerHeight", 5)
+        .append("svg:path")
+        .attr("d", "M 0,-5 L 10 ,0 L 0,5")
+        .attr("fill", "#999")
+        .style("stroke","none");
 
     svg.append("g")
         .attr("class", "links");
@@ -255,49 +149,249 @@ function setup(vizElem) {
     svg.append("g")
         .attr("class", "nodes");
 
-    return { svg, destroyResizeListener };
+    return svg;
+}
+
+
+function drawPartialEdges(
+    selection,
+    hoveredNode,
+    useStubs = false)
+{
+    const lineLengthCoveredByNode = 5;
+    return selection
+        .attr("stroke-dasharray", d => {
+            if (!useStubs) return "";
+
+            if (hoveredNode  && (d.source.id === hoveredNode.id || d.target.id === hoveredNode.id)) {
+                return "";
+            }
+
+            const dx = d.source.x - d.target.x;
+            const dy = d.source.y - d.target.y;
+            const hypotenuse = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+            const lineLength = hypotenuse - lineLengthCoveredByNode * 2;
+            const stubLength = 16;
+
+            if (lineLength < stubLength * 2) {
+                return "";
+            }
+
+            return `${lineLengthCoveredByNode + stubLength} ${lineLength - stubLength * 2}`;
+        });
+}
+
+
+function calcNeighborIds(linkData, focalNode) {
+    return _
+        .chain(linkData)
+        .filter(x => x.source.id === focalNode.id || x.target.id === focalNode.id)
+        .flatMap(x => [x.source.id, x.target.id])
+        .uniq()
+        .reject(x => x === focalNode.id)
+        .value();
 }
 
 
 function draw(data = [],
-              parts,
+              svg,
               tweakers = {},
               onSelectNode = () => {}) {
 
-    const linkTweakers = _.defaults(tweakers.link, DEFAULT_TWEAKER);
-    const nodeTweakers = _.defaults(tweakers.node, DEFAULT_TWEAKER);
+    let hoveredNode = null;
+    let hoverNeighbors = [];
 
-    const links = mkLinkData(data.flows);
-    const nodes = data.entities;
+    const linkTweaker = _.defaults(tweakers.link, DEFAULT_TWEAKER);
+    const nodeTweaker = _.defaults(tweakers.node, DEFAULT_TWEAKER);
+    const linkData = mkLinkData(data.flows);
+    const nodeData = data.entities;
 
-    const linkSelection = drawLinks(
-        links,
-        parts.svg.select(".links"),
-        linkTweakers);
-
-    const nodeSelection = drawNodes(
-        nodes,
-        parts.svg.select(".nodes"),
-        nodeTweakers,
-        onSelectNode);
-
-    const ticked = () => {
-        nodeSelection
-            .attr("transform", d => `translate(${d.x}, ${d.y})`);
-
-        linkSelection
-            .call(lineWithArrowPath);
-    };
+    const linkSelection = drawLinks(linkData, svg.select(".links"));
+    const nodeSelection = drawNodes(nodeData, svg.select(".nodes"));
 
     simulation
-        .nodes(nodes)
+        .nodes(nodeData)
         .on("tick", ticked);
+
+    const chargeStrengthScale = scalePow()
+        .domain([0, 400])
+        .range([-300, -100])
+        .clamp(true);
+
+    simulation
+        .force("charge")
+        .strength(chargeStrengthScale(nodeData.length));
 
     simulation
         .force("link")
-        .links(links);
+        .links(linkData);
 
-    return simulation;
+
+    function drawLinks(links = [], holder) {
+        const linkSelection = holder
+            .selectAll(".wdfd-link")
+            .data(links, d => d.id);
+
+        const newLinks = linkSelection
+            .enter()
+            .append("line")
+            .classed("wdfd-link", true)
+            .attr("stroke", "#444")
+            .attr("marker-end","url(#wbg-arrowhead)")
+            .call(linkTweaker.enter);
+
+        linkSelection
+            .exit()
+            .remove();
+
+        return linkSelection
+            .merge(newLinks)
+            .call(linkTweaker.update);
+    }
+
+
+    function drawNodes(nodes, holder) {
+        function dragStarted(d) {
+            if (!event.active) {
+                simulation
+                     .alpha(0.1)
+                     .restart();
+            }
+            d.fx = d.x;
+            d.fy = d.y;
+        }
+
+        function dragged(d) {
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+
+        function dragEnded(d) {
+            if (!event.active) {
+                simulation
+                    .restart();
+            }
+            d.fx = event.x;
+            d.fy = event.y;
+        }
+
+        const nodeSelection = holder
+            .selectAll(".wdfd-node")
+            .data(nodes, d => d.id);
+
+        const newNodes = nodeSelection
+            .enter()
+            .append("g")
+            .classed("wdfd-node", true)
+            .on("dblclick.unfix", d => { d.fx = null; d.fy = null })
+            .on("click.node-selected", onSelectNode)
+            .call(drag()
+                .on("start", dragStarted)
+                .on("drag", dragged)
+                .on("end", dragEnded));
+
+        newNodes
+            .call(addNodeLabel)
+            .call(addNodeCircle)
+            .call(nodeTweaker.enter);
+
+        nodeSelection
+            .exit()
+            .call(nodeTweaker.exit)
+            .remove();
+
+        const allNodes = nodeSelection
+            .merge(newNodes);
+
+        allNodes
+            .select("text");
+
+        allNodes
+            .select("circle")
+            .attr("r", d => nodeSizeScale(d.flowCount));
+
+        allNodes
+            .select("path")
+            .attr("r", d => nodeSizeScale(d.flowCount));
+
+        allNodes
+            .on("mouseenter.opacityHover",  (d) => {
+                hoveredNode = d;
+                hoverNeighbors = calcNeighborIds(linkData, d);
+                ticked();
+            })
+            .on("mouseout.opacityHover", (d) => {
+                hoveredNode = null;
+                hoverNeighbors = [];
+                ticked();
+            });
+
+        return allNodes;
+    }
+
+    function ticked() {
+        nodeSelection
+            .attr("transform", d => "translate(" + d.x +", "+ d.y + ")")
+            .each(function(d) {
+                const isNeighbor = hoveredNode && _.includes(hoverNeighbors, d.id);
+                const isFocus = hoveredNode && d.id === hoveredNode.id;
+                const isNotFocus = hoveredNode && d.id !== hoveredNode.id;
+                const isDefault = !hoveredNode;
+
+                select(this)
+                    .attr("opacity", () => {
+                        if (isDefault) { return d.nodeOpacity; }
+                        else if (isFocus) { return 1; }
+                        else if (isNeighbor)  { return 0.7; }
+                        else if (isNotFocus) { return 0.1; }
+                    });
+
+                select(this)
+                    .select("text")
+                    .style("font-weight", () => {
+                        if (isDefault) { return 400; }
+                        else if (isFocus) { return 700; }
+                        else if (isNeighbor)  { return 400; }
+                        else if (isNotFocus) { return 100; }
+                    })
+                    .style("font-size", () => {
+                        if (isDefault) { return "9pt"; }
+                        else if (isFocus) { return "12pt"; }
+                        else if (isNeighbor)  { return "10pt"; }
+                        else if (isNotFocus) { return "7pt"; }
+                    });
+            });
+
+        nodeSelection
+            .select("circle")
+            .attr("r", d => {
+                if (!hoveredNode) {
+                    return d.nodeSize;
+                } else {
+                    return d.id === hoveredNode.id
+                        ? d.nodeSize + 2
+                        : d.nodeSize
+                }
+            });
+
+        linkSelection
+            .attr("x1", d => d.source.x)
+            .attr("y1", d => d.source.y)
+            .attr("x2", d => d.target.x)
+            .attr("y2", d => d.target.y)
+            .style("opacity", d => {
+                if (! hoveredNode) {
+                    return 0.6;
+                } else {
+                    return d.source.id === hoveredNode.id || d.target.id === hoveredNode.id
+                        ? 1
+                        : 0.15;
+                }
+            })
+            .call(drawPartialEdges, hoveredNode, useStubs);
+    }
+
+    return ticked;
 }
 
 
@@ -315,7 +409,18 @@ function enrichData(data = []) {
 
     const enrichedEntities = _
         .chain(data.entities)
-        .map(n => Object.assign(n, { flowCount: flowCounts[refToString(n)]}))
+        .map(n => {
+            const flowCount = flowCounts[refToString(n)];
+            const nodeSize = nodeSizeScale(flowCount);
+            const nodeOpacity = opacityScale(flowCount);
+            return Object.assign({}, n, {
+                flowCount,
+                nodeSize,
+                nodeOpacity,
+                x: Math.random() * width * 0.66 + width / 3,
+                y: Math.random() * height * 0.66 + height / 3
+            });
+        })
         .orderBy(d => d.flowCount)
         .value();
 
@@ -326,20 +431,22 @@ function enrichData(data = []) {
 function controller($timeout, $element) {
     const vm = initialiseData(this, initialState);
 
+    let update = null;
+
     const vizElem = select($element[0])
         .select(".viz");
 
-    const parts = setup(vizElem);
+    const svg = setup(vizElem);
 
     const debouncedDraw = _.debounce((data) => {
         const tooManyNodes = !vm.overrideManyNodesWarning && data.entities.length > DEFAULT_NODE_LIMIT ;
         $timeout(() => vm.showManyNodesWarning = tooManyNodes);
 
         if (tooManyNodes) {
-            draw({entities: [], flows: []}, parts);
+            update = draw({entities: [], flows: []}, svg);
         } else {
             const enrichedData = enrichData(data);
-            draw(enrichedData, parts, vm.tweakers, onSelectNode);
+            update = draw(enrichedData, svg, vm.tweakers, onSelectNode);
             simulation.alpha(0.3).restart();
         }
     }, 250);
@@ -357,7 +464,6 @@ function controller($timeout, $element) {
 
     vm.$onDestroy = () => {
         simulation.stop();
-        parts.destroyResizeListener();
     };
 
     function zoomed() {
@@ -391,6 +497,18 @@ function controller($timeout, $element) {
         vm.zoomEnabled = false;
     };
 
+    vm.disableStubs = () => {
+        useStubs = false;
+        update();
+    };
+
+    vm.enableStubs = () => {
+        useStubs = true;
+        update();
+    };
+
+    vm.stubsEnabled = () => useStubs;
+
     function unPinAll() {
         _.forEach(vm.data.entities, d => {
             d.fx = null;
@@ -408,7 +526,7 @@ function controller($timeout, $element) {
             .duration(750)
             .call(myZoom.transform, zoomIdentity);
 
-        simulation.alpha(1);
+        simulation.alpha(2);
         debouncedDraw(vm.data);
     };
 

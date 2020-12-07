@@ -60,8 +60,15 @@ public class LicenceEndpoint implements Endpoint {
         // read
         getForList(mkPath(BASE_URL, "all"), (request, response) -> service.findAll());
         getForDatum(mkPath(BASE_URL, "id", ":id"), this::getByIdRoute );
+        getForDatum(mkPath(BASE_URL, "external-id", ":externalId"), this::getByExternalIdRoute );
         getForList(mkPath(BASE_URL, "count", "application"), (request, response) -> service.countApplications());
         postForList(mkPath(BASE_URL, "selector"), this::findBySelectorRoute);
+    }
+
+
+    private Licence getByExternalIdRoute(Request request, Response response) {
+        String externalId = request.params("externalId");
+        return service.getByExternalId(externalId);
     }
 
 

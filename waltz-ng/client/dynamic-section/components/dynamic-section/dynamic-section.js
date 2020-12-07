@@ -19,6 +19,7 @@
 import template from "./dynamic-section.html";
 import {initialiseData} from "../../../common/index";
 import {kindToViewState} from "../../../common/link-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
@@ -32,13 +33,15 @@ const initialState = {
     backLink: {
         state: "",
         params: {}
-    }
+    },
+    help: null
 };
 
 
-function controller($state) {
+function controller($state, serviceBroker) {
     const vm = initialiseData(this, initialState);
     vm.embedded = _.startsWith($state.current.name, "embed");
+
 
     vm.$onChanges = () => {
         if (vm.parentEntityRef !== null) {
@@ -46,6 +49,17 @@ function controller($state) {
                 state: kindToViewState(vm.parentEntityRef.kind),
                 params: { id: vm.parentEntityRef.id },
             };
+            serviceBroker
+                .loadAppData(CORE_API.StaticPanelStore.findAll)
+                .then(r => {
+                    const byId = _.keyBy(r.data, d => d.group);
+                    const exact = `SECTION.HELP.${vm.section.componentId}.${vm.parentEntityRef.kind}`;
+                    const vague = `SECTION.HELP.${vm.section.componentId}`;
+                    const panel = byId[exact] || byId[vague] ;
+                    if (panel) {
+                        vm.help = panel.content;
+                    }
+                });
         }
     };
 
@@ -53,7 +67,8 @@ function controller($state) {
 
 
 controller.$inject = [
-    "$state"
+    "$state",
+    "ServiceBroker"
 ];
 
 

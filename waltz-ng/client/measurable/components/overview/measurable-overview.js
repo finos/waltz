@@ -19,7 +19,7 @@ import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {entity} from "../../../common/services/enums/entity";
 import {getEnumName} from "../../../common/services/enums";
-import template from "./measurable-summary.html";
+import template from "./measurable-overview.html";
 import {initialiseData} from "../../../common/index";
 import {findNode, flattenChildren, getParents, populateParents} from "../../../common/hierarchy-utils";
 import {kindToViewState} from "../../../common/link-utils";
@@ -161,5 +161,5 @@ const component = {
 
 export default {
     component,
-    id: "waltzMeasurableSummary"
+    id: "waltzMeasurableOverview"
 };

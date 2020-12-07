@@ -93,6 +93,20 @@ public class LicenceDao {
     }
 
 
+    public Licence getByExternalId(String externalId) {
+        LicenceRecord record = dsl.select(LICENCE.fields())
+                .from(LICENCE)
+                .where(LICENCE.EXTERNAL_ID.eq(externalId))
+                .fetchOneInto(LicenceRecord.class);
+
+        if(record == null) {
+            throw new NoDataFoundException("Could not find Licence record with external Id: " + externalId);
+        }
+
+        return TO_DOMAIN_MAPPER.map(record);
+    }
+
+
     public List<Licence> findBySelector(Select<Record1<Long>> selector) {
         return dsl.select(LICENCE.fields())
                 .from(LICENCE)

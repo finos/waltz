@@ -17,7 +17,8 @@
   -->
 
 <!-- SVG -->
-<div id="waltz-boingy-graph" class="viz">
+<div id="waltz-boingy-graph"
+     class="viz no-text-select">
 </div>
 
 
@@ -129,5 +130,23 @@
             popover-append-to-body="true"
             ng-click="$ctrl.resetSimulation()">
         Reset
+    </button>
+
+    <button class="btn btn-default btn-xs waltz-visibility-child-30"
+            ng-class="{
+                'waltz-visibility-child-30': !$ctrl.stubsEnabled(),
+                'waltz-visibility-child-50': $ctrl.stubsEnabled(),
+                'btn-default': !$ctrl.stubsEnabled(),
+                'btn-success': $ctrl.stubsEnabled()
+            }"
+            uib-popover="Partial Edge Drawing (PED) is a drawing style in which edges are drawn
+                        only partially as pairs of opposing stubs on the respective end-vertices.
+                        By erasing the central parts of edges, the resulting visual clutter is reduced."
+            popover-enable="$ctrl.stubsEnabled"
+            popover-trigger="mouseenter"
+            popover-placement="top"
+            popover-append-to-body="true"
+            ng-click="$ctrl.stubsEnabled() ? $ctrl.disableStubs() : $ctrl.enableStubs()">
+        <span ng-bind="$ctrl.stubsEnabled() ? 'Disable' : 'Enable'"></span> Partial Edges
     </button>
 </div>

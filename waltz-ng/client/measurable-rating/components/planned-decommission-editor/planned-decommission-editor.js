@@ -34,7 +34,7 @@ const bindings = {
     replacementApps: "<?",
     onSaveDecommissionDate: "<",
     onRemoveDecommission: "<",
-    onAddReplacementApp: "<",
+    onSaveReplacementApp: "<",
     onRemoveReplacementApp: "<",
     category: "<",
     application: "<?"
@@ -100,7 +100,7 @@ function controller() {
             replacementApp: vm.candidateApp,
             commissionDate: vm.candidateCommissionDate
         };
-        invokeFunction(vm.onAddReplacementApp, replacement);
+        invokeFunction(vm.onSaveReplacementApp, replacement);
         vm.mode = modes.VIEW;
     };
 
@@ -112,6 +112,16 @@ function controller() {
     vm.onRemoveReplacement = () => {
         invokeFunction(vm.onRemoveReplacementApp, vm.candidateRemoval)
             .then(() => vm.mode = modes.VIEW)
+    };
+
+    vm.onSaveCommissionDate = (newDate, ctx) => {
+        const replacement = {
+            decommissionId: vm.plannedDecommission.id,
+            replacementApp: ctx.entityReference,
+            commissionDate: newDate.newVal
+        };
+        invokeFunction(vm.onSaveReplacementApp, replacement);
+        vm.mode = modes.VIEW;
     };
 }
 

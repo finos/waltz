@@ -79,62 +79,52 @@
         <div class="col-sm-9">
 
             <div ng-switch="$ctrl.mode">
-
-                <!-- VIEW: APP LIST -->
                 <div ng-switch-when="VIEW">
+
                     <p ng-if="$ctrl.replacementApps.length === 0">
                         No replacement applications have been declared.
                     </p>
 
-                    <table style="width: 100%">
-                        <colgroup>
-                            <col width="50%">
-                            <col width="30%">
-                            <col width="20%">
-                        </colgroup>
-                        <tbody>
-                        <tr ng-repeat="replacement in $ctrl.replacementApps">
-                            <td>
-                                <waltz-entity-icon-label entity-ref="replacement.entityReference">
-                                </waltz-entity-icon-label>
-                            </td>
-                            <td>
-                                <span uib-popover="This date represents when the application will take over this {{$ctrl.category.name}}."
-                                      popover-trigger="mouseenter"
-                                      popover-delay="300"
-                                      popover-append-to-body="true"
-                                      ng-bind="replacement.plannedCommissionDate | date:'yyyy-MM-dd'">
-                                </span>
-                            </td>
-                            <td>
-                                <span class="display: inline-block"
-                                      uib-popover="Remove this replacement application"
-                                      popover-trigger="mouseenter"
-                                      popover-delay="300"
-                                      popover-placement="left"
-                                      popover-append-to-body="true">
-                                    <a class="clickable"
-                                       ng-click="$ctrl.onSelectCandidateForRemoval(replacement)">
-                                        <waltz-icon name="trash"></waltz-icon>
-                                    </a>
-                                </span>
-                            </td>
-                        </tr>
-                        </tbody>
-                        <tbody>
-                        <tr>
-                            <td colspan="3">
-                                &nbsp;
-                                <a class="clickable" ng-click="$ctrl.onShowAdd()">
-                                    <waltz-icon name="plus"></waltz-icon>
-                                    Add
+                    <ul ng-repeat="replacement in $ctrl.replacementApps | orderBy:'entityReference.name' track by replacement.entityReference.id"
+                        class="list-unstyled">
+                        <li class="waltz-visibility-parent">
+                            <waltz-entity-icon-label entity-ref="replacement.entityReference">
+                            </waltz-entity-icon-label>
+                            <span class="waltz-visibility-child-30 small"
+                                  uib-popover="Remove this replacement application"
+                                  popover-trigger="mouseenter"
+                                  popover-delay="300"
+                                  popover-placement="left"
+                                  popover-append-to-body="true">
+                                <a class="clickable"
+                                   ng-click="$ctrl.onSelectCandidateForRemoval(replacement)">
+                                    <waltz-icon name="trash"></waltz-icon>
+                                    Remove
                                 </a>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
+                            </span>
+                            <div style="margin-left: 0.5em; border-left: 1px solid #ccc; padding-left: 0.7em">
+                                <waltz-editable-field ctx="replacement"
+                                                      field-type="date"
+                                                      initial-val="replacement.plannedCommissionDate"
+                                                      on-save="$ctrl.onSaveCommissionDate"
+                                                      date-format="yyyy-MM-dd"
+                                                      button-label="Set commission date"
+                                                      empty-label="No planned commission date">
+                                    <inline-help ng-if="replacement.plannedCommissionDate">
+                                        Set the commission date for when this replacement app takes over this
+                                        <span ng-bind="$ctrl.category.name"></span>
+                                    </inline-help>
+                                </waltz-editable-field>
+                            </div>
+                        </li>
+                    </ul>
 
+                    <a class="clickable" ng-click="$ctrl.onShowAdd()">
+                        <waltz-icon name="plus"></waltz-icon>
+                        Add
+                    </a>
+
+                </div>
 
                 <!-- EDIT: APP SELECT -->
                 <div ng-switch-when="SELECT_APP">
@@ -174,7 +164,7 @@
                     </waltz-editable-field>
                     <p class="help-block small">
                         Now select the date this application will take over this
-                        <i ng-bind="$ctrl.category.name"></i>.
+                        <span ng-bind="$ctrl.category.name"></span>.
                         <br>
                         <a class="clickable"
                            ng-click="$ctrl.onCancelAdd()">
@@ -226,7 +216,6 @@
                         </a>
                     </div>
                 </div>
-
             </div>
 
         </div>
