@@ -99,6 +99,13 @@ html {
 }
 
 
+.input-group-btn .btn {
+    // this fixes an annoying off-by-1 alignment issue with
+    // the calendar control button
+    padding-top: 5px;
+}
+
+
 @font-face {
     font-family: "Hind";
     font-weight: normal;
