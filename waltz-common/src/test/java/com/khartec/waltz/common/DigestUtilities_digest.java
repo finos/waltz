@@ -1,0 +1,32 @@
+package com.khartec.waltz.common;
+
+import org.junit.Test;
+
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class DigestUtilities_digest {
+    @Test(expected = NullPointerException.class)
+    public void digestNull() throws NoSuchAlgorithmException {
+        DigestUtilities.digest(null);
+    }
+
+    @Test
+    public void digestSingleByte() throws NoSuchAlgorithmException {
+        byte[] b = {0};
+        String result = DigestUtilities.digest(b);
+        assertNotNull(result);
+        assertEquals( String.class, result.getClass());
+    }
+
+    @Test
+    public void digestMultipleBytes() throws NoSuchAlgorithmException{
+        byte[] b = {0,1,1};
+        String result = DigestUtilities.digest(b);
+        assertNotNull(result);
+        assertEquals( String.class, result.getClass());
+    }
+}

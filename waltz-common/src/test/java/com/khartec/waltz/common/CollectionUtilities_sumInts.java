@@ -4,8 +4,6 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Optional;
 
 import static com.khartec.waltz.common.CollectionUtilities.sumInts;
 import static org.junit.Assert.assertEquals;
