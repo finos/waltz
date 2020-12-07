@@ -151,7 +151,9 @@ public class AttestationRunService {
         // store
         createAttestationInstancesAndRecipients(instanceRecipients);
 
-        emailService.sendEmailNotification(mkRef(EntityKind.ATTESTATION_RUN, runId));
+        if (command.sendEmailNotifications()){
+            emailService.sendEmailNotification(mkRef(EntityKind.ATTESTATION_RUN, runId));
+        }
 
         return ImmutableIdCommandResponse.builder()
                 .id(runId)

@@ -222,11 +222,21 @@ public class PersonDao {
                 .fetchSet(personMapper);
     }
 
+
     public Set<Person> findByEmployeeIds(Set<String> empIds) {
 
         return dsl
                 .selectFrom(PERSON)
                 .where(PERSON.EMPLOYEE_ID.in(empIds)
+                        .and(PERSON.IS_REMOVED.isFalse()))
+                .fetchSet(personMapper);
+    }
+
+
+    public Set<Person> findActivePeopleByEmails(Set<String> emails) {
+        return dsl
+                .selectFrom(PERSON)
+                .where(PERSON.EMAIL.in(emails)
                         .and(PERSON.IS_REMOVED.isFalse()))
                 .fetchSet(personMapper);
     }
