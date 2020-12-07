@@ -24,7 +24,7 @@ import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
 
-public class AliasesTest {
+public class Aliases_register_lookup {
 
     @Test
     public void selfRegistersValues() {
