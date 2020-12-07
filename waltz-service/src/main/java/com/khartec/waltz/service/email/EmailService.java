@@ -18,13 +18,14 @@
 
 package com.khartec.waltz.service.email;
 
-import com.khartec.waltz.data.attestation.AttestationInstanceDao;
 import com.khartec.waltz.data.attestation.AttestationInstanceRecipientDao;
 import com.khartec.waltz.data.attestation.AttestationRunDao;
-import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.attestation.AttestationInstance;
+import com.khartec.waltz.model.NameProvider;
 import com.khartec.waltz.model.attestation.AttestationRun;
+import com.khartec.waltz.model.person.Person;
+import com.khartec.waltz.service.involvement_kind.InvolvementKindService;
+import com.khartec.waltz.service.person.PersonService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +36,14 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.SetUtilities.fromCollection;
 import static com.khartec.waltz.common.StreamUtilities.batchProcessingCollector;
-import static java.util.stream.Collectors.toList;
+import static com.khartec.waltz.common.StringUtilities.mkSafe;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toSet;
 
 
 @Service
@@ -49,8 +54,9 @@ public class EmailService {
 
     private final WaltzEmailer waltzEmailer;
     private final AttestationRunDao attestationRunDao;
-    private final AttestationInstanceDao attestationInstanceDao;
     private final AttestationInstanceRecipientDao attestationInstanceRecipientDao;
+    private final InvolvementKindService involvementKindService;
+    private final PersonService personService;
 
     @Value("${waltz.email.batchSize:50}")
     private int batchSize;
@@ -62,17 +68,20 @@ public class EmailService {
     @Autowired
     public EmailService(WaltzEmailer waltzEmailer,
                         AttestationRunDao attestationRunDao,
-                        AttestationInstanceDao attestationInstanceDao,
-                        AttestationInstanceRecipientDao attestationInstanceRecipientDao) {
+                        AttestationInstanceRecipientDao attestationInstanceRecipientDao,
+                        InvolvementKindService involvementKindService,
+                        PersonService personService) {
         checkNotNull(waltzEmailer, "waltzEmailer cannot be null");
         checkNotNull(attestationRunDao, "attestationRunDao cannot be null");
-        checkNotNull(attestationInstanceDao, "attestationInstanceDao cannot be null");
         checkNotNull(attestationInstanceRecipientDao, "attestationInstanceRecipientDao cannot be null");
+        checkNotNull(involvementKindService, "involvementKindService cannot be null");
+        checkNotNull(personService, "personService cannot be null");
 
         this.waltzEmailer = waltzEmailer;
         this.attestationRunDao = attestationRunDao;
-        this.attestationInstanceDao = attestationInstanceDao;
         this.attestationInstanceRecipientDao = attestationInstanceRecipientDao;
+        this.involvementKindService = involvementKindService;
+        this.personService = personService;
     }
 
 
@@ -95,40 +104,37 @@ public class EmailService {
 
         AttestationRun run = attestationRunDao.getById(ref.id());
         List<String> recipients = attestationInstanceRecipientDao.findRecipientsByRunId(run.id().get());
-        List<AttestationInstance> instances = attestationInstanceDao.findByRunId(ref.id());
 
-        List<String> recipientEmails = recipients.stream()
-                .distinct()
-                .collect(toList());
-
-        List<String> applications = instances
+        String involvements = involvementKindService.findAll()
                 .stream()
-                .map(d -> d.parentEntity())
-                .filter(r -> r.kind().equals(EntityKind.APPLICATION))
-                .map(r -> r.name())
-                .filter(n -> n.isPresent())
-                .map(n -> n.get())
-                .distinct()
-                .collect(toList());
+                .filter(kind -> run.involvementKindIds().contains(kind.id().get()))
+                .map(NameProvider::name)
+                .collect(joining(", "));
+
+        Set<String> validRecipientEmails = personService
+                .findActivePeopleByEmails(fromCollection(recipients))
+                .stream()
+                .map(Person::email)
+                .collect(toSet());
 
         String subject = "Waltz attestation: " + run.name();
 
         String attestationsUrl = baseUrl + "/attestation/instance/user";
-        String body = "You are required to attest correctness of the applications listed below:"
+        String body = "You are required to attest the correctness of one or more applications where you have one of the following involvements:"
                 + MAIL_NEW_LINE
                 + MAIL_NEW_LINE
-                + "<strong>Application(s):</strong> " + String.join(", ", applications)
+                + "<strong>Involvement(s):</strong> " + involvements
                 + MAIL_NEW_LINE
                 + MAIL_NEW_LINE
                 + "<strong>Due Date:</strong> " + run.dueDate().format(DATE_TIME_FORMATTER)
                 + MAIL_NEW_LINE
                 + MAIL_NEW_LINE
-                + run.description()
+                + mkSafe(run.description())
                 + MAIL_NEW_LINE
                 + MAIL_NEW_LINE
                 + "Please use this URL to view your pending attestations: " + attestationsUrl;
 
-        sendEmailNotification(subject, body, recipientEmails);
+        sendEmailNotification(subject, body, validRecipientEmails);
     }
 
 
