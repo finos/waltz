@@ -17,7 +17,14 @@
   -->
 
 <div>
-    <div class="waltz-fade-if">
+    <div ng-if="!$ctrl.hasApps">
+        <waltz-no-data>
+            <message>
+                <strong>No ratings to show</strong> as there are no applications associated to this entity
+            </message>
+        </waltz-no-data>
+    </div>
+    <div ng-if="$ctrl.hasApps">
          <waltz-sub-section name="Ratings">
             <content>
                 <div style="padding:18px">
