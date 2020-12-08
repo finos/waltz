@@ -37,7 +37,9 @@ import spark.Response;
 import spark.Spark;
 
 import java.util.Map;
+import java.util.TimeZone;
 
+import static com.khartec.waltz.common.DateTimeUtilities.UTC;
 import static com.khartec.waltz.web.WebUtilities.reportException;
 import static spark.Spark.*;
 
@@ -60,6 +62,7 @@ public class Main {
 
 
     private void go() {
+        TimeZone.setDefault(TimeZone.getTimeZone(UTC));
         startHttpServer();
     }
 

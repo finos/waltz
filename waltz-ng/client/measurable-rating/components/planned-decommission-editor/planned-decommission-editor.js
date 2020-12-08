@@ -115,13 +115,11 @@ function controller() {
     };
 
     vm.onSaveCommissionDate = (newDate, ctx) => {
-        console.log({newDate});
         const replacement = {
             decommissionId: vm.plannedDecommission.id,
             replacementApp: ctx.entityReference,
             commissionDate: alignDateToUTC(newDate.newVal)
         };
-        console.log(replacement)
         invokeFunction(vm.onSaveReplacementApp, replacement);
         vm.mode = modes.VIEW;
     };
