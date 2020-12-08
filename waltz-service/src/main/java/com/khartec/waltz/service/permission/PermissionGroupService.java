@@ -49,6 +49,10 @@ public class PermissionGroupService {
                         .filter(involvement -> involvement.entityReference().equals(parentEntityRef))
                         .collect(Collectors.toList());
 
+        if (involvements.isEmpty()) {
+            return Collections.emptyList();
+        }
+
         return permissionGroupDao.getDefaultPermissions();
     }
 
