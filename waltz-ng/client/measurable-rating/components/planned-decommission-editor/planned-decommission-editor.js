@@ -18,7 +18,7 @@
 
 import template from "./planned-decommission-editor.html";
 import {initialiseData, invokeFunction} from "../../../common";
-import {getDateAsUtc} from "../../measurable-rating-utils";
+import {alignDateToUTC} from "../../../common/date-utils";
 
 const modes= {
     VIEW: "VIEW",
@@ -91,14 +91,14 @@ function controller() {
 
     vm.onSetCommissionDate = (c) => {
         vm.mode = modes.CONFIRM_ADDITION;
-        vm.candidateCommissionDate = JSON.stringify(getDateAsUtc(c.newVal));
+        vm.candidateCommissionDate = c.newVal;
     };
 
     vm.onAddReplacement = () => {
         const replacement = {
             decommissionId: vm.plannedDecommission.id,
             replacementApp: vm.candidateApp,
-            commissionDate: vm.candidateCommissionDate
+            commissionDate: alignDateToUTC(vm.candidateCommissionDate)
         };
         invokeFunction(vm.onSaveReplacementApp, replacement);
         vm.mode = modes.VIEW;
@@ -115,11 +115,13 @@ function controller() {
     };
 
     vm.onSaveCommissionDate = (newDate, ctx) => {
+        console.log({newDate});
         const replacement = {
             decommissionId: vm.plannedDecommission.id,
             replacementApp: ctx.entityReference,
-            commissionDate: newDate.newVal
+            commissionDate: alignDateToUTC(newDate.newVal)
         };
+        console.log(replacement)
         invokeFunction(vm.onSaveReplacementApp, replacement);
         vm.mode = modes.VIEW;
     };
