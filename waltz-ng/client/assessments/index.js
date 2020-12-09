@@ -24,12 +24,16 @@ import AssessmentRatingList from "./components/list/assessment-rating-list";
 import AssessmentRatingSubSection from "./components/sub-section/assessment-rating-sub-section";
 import AssessmentRatingSummaryPies from "./components/summary-pies/assessment-rating-summary-pies";
 import AssessmentRatingTrafficLights from "./components/traffic-lights/assessment-rating-traffic-lights";
-import AssessmentRatingTable from "./components/grid/assessment-rating-table";
+// import AssessmentRatingTable from "./components/grid/assessment-rating-table";
+import BulkAssessmentRatingSelector from "./components/bulk-assessment-rating-selector/bulk-assessment-rating-selector";
+import AssessmentRatingSelector from "./directives/assessment-rating-selector"
 
 export default () => {
 
     const module = angular.module("waltz.assessments", []);
     module.config(Routes);
+
+    module.directive("waltzAssessmentRatingSelector", AssessmentRatingSelector);
 
     services(module);
 
@@ -39,7 +43,8 @@ export default () => {
         AssessmentRatingSubSection,
         AssessmentRatingSummaryPies,
         AssessmentRatingTrafficLights,
-        AssessmentRatingTable
+        // AssessmentRatingTable,
+        BulkAssessmentRatingSelector
     ]);
 
     return module.name;

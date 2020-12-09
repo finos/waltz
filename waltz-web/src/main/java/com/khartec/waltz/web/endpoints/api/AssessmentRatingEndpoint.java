@@ -76,12 +76,14 @@ public class AssessmentRatingEndpoint implements Endpoint {
         String findByTargetKindForRelatedSelectorPath = mkPath(BASE_URL, "target-kind", ":targetKind", "selector");
         String modifyPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId");
         String bulkUpdatePath = mkPath(BASE_URL, "bulk-update", ":assessmentDefinitionId");
+        String bulkRemovePath = mkPath(BASE_URL, "bulk-remove", ":assessmentDefinitionId");
 
         getForList(findForEntityPath, this::findForEntityRoute);
         postForList(findByEntityKindPath, this::findByEntityKindRoute);
         postForList(findByEntityKindAndDefinitionPath, this::findByEntityKindAndDefinitionIdRoute);
         postForList(findByTargetKindForRelatedSelectorPath, this::findByTargetKindForRelatedSelectorRoute);
         postForDatum(bulkUpdatePath, this::bulkStoreRoute);
+        postForDatum(bulkRemovePath, this::bulkRemoveRoute);
         postForDatum(modifyPath, this::storeRoute);
         deleteForDatum(modifyPath, this::removeRoute);
     }
@@ -124,6 +126,12 @@ public class AssessmentRatingEndpoint implements Endpoint {
         return assessmentRatingService.bulkStore(commands, assessmentDefinitionId, getUsername(request));
     }
 
+    private boolean bulkRemoveRoute(Request request, Response z) throws IOException {
+        long assessmentDefinitionId = getLong(request, "assessmentDefinitionId");
+        verifyCanWrite(request, assessmentDefinitionId);
+        BulkAssessmentRatingCommand[] commands = readBody(request, BulkAssessmentRatingCommand[].class);
+        return assessmentRatingService.bulkDelete(commands, assessmentDefinitionId, getUsername(request));
+    }
 
     private boolean removeRoute(Request request, Response z) throws IOException {
         String username = getUsername(request);

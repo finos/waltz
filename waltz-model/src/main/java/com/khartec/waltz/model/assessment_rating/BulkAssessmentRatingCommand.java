@@ -32,7 +32,7 @@ import org.immutables.value.Value;
 public abstract class BulkAssessmentRatingCommand implements CommentProvider {
 
     public abstract long ratingId();
-    public abstract EntityReference entityReference();
+    public abstract EntityReference entityRef();
     public abstract Operation operation();
 }
 

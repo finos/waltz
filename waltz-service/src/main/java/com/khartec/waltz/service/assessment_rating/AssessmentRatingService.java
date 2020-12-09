@@ -161,6 +161,13 @@ public class AssessmentRatingService {
         return addedResult + updateResult > 1;
     }
 
+    public boolean bulkDelete(BulkAssessmentRatingCommand[] commands, long assessmentDefinitionId, String username) {
+        Set<AssessmentRating> ratingsToRemove = getRatingsFilterByOperation(commands, assessmentDefinitionId, username, Operation.REMOVE);
+        int result = assessmentRatingDao.remove(ratingsToRemove);
+
+        return result  > 1;
+    }
+
     private Set<AssessmentRating> getRatingsFilterByOperation(BulkAssessmentRatingCommand[] commands,
                                                               long assessmentDefinitionId,
                                                               String username, Operation operation) {
@@ -176,7 +183,7 @@ public class AssessmentRatingService {
         UserTimestamp lastUpdate = UserTimestamp.mkForUser(username);
         return ImmutableAssessmentRating.builder()
                 .assessmentDefinitionId(assessmentDefinitionId)
-                .entityReference(command.entityReference())
+                .entityReference(command.entityRef())
                 .ratingId(command.ratingId())
                 .comment(command.comment())
                 .lastUpdatedAt(lastUpdate.at())

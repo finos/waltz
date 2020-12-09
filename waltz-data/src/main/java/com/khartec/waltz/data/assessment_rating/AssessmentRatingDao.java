@@ -75,6 +75,7 @@ public class AssessmentRatingDao {
         record.setEntityKind(r.entityReference().kind().name());
         record.setEntityId(r.entityReference().id());
         record.setRatingId(r.ratingId());
+        record.setDescription(r.comment());
         record.setLastUpdatedAt(Timestamp.valueOf(r.lastUpdatedAt()));
         record.setLastUpdatedBy(r.lastUpdatedBy());
         record.setProvenance(r.provenance());
@@ -201,7 +202,13 @@ public class AssessmentRatingDao {
     public int update(Set<AssessmentRating> assessmentRatings) {
             Set<AssessmentRatingRecord> recordsToUpdate = mkAssessmentRatingRecords(assessmentRatings);
             return dsl.batchUpdate(recordsToUpdate).execute().length;
-            }
+    }
+
+    public int remove(Set<AssessmentRating> assessmentRatings) {
+        Set<AssessmentRatingRecord> ratingsToRemove = mkAssessmentRatingRecords(assessmentRatings);
+        return dsl.batchDelete(ratingsToRemove).execute().length;
+    }
+
 
     private Set<AssessmentRatingRecord> mkAssessmentRatingRecords(Set<AssessmentRating> assessmentRatings) {
         return assessmentRatings

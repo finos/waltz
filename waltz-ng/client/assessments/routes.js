@@ -16,7 +16,7 @@
  *
  */
 
-import ViewPage from "./pages/view/app-group-view";
+// import ViewPage from "./pages/view/app-group-view";
 import EditPage from "./pages/edit/assessment-rating-bulk-upload";
 
 const baseState = {

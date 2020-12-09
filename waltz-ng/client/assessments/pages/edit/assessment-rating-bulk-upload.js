@@ -30,12 +30,6 @@ const initialState = {
     currentOrgUnit: null
 };
 
-const columnDefs = [
-    mkEntityLinkGridCell("Application", "entityReference", "none", "right"),
-    {field: "rating", name: "Assessment Rating"},
-    {field: "operation", name: "Operation"}
-];
-
 function controller($q,
                     $state,
                     $scope,
@@ -75,11 +69,11 @@ function controller($q,
                 const itemsById = _.keyBy(ratingSchemeItems, "id");
                 vm.ratings = _.map(ratings, r => _.extend({rating: itemsById[r.ratingId].name}, r));
                 vm.ratingItems = ratingSchemeItems;
-                // Object.assign({}, r, { type: getEnumName(entity, r.kind) });
                 vm.appRatings = _.map(ratings, r =>
                     Object.assign(r, {
-                        entityReference: r.entityReference,
-                        rating: itemsById[r.ratingId]
+                        entityRef: r.entityReference,
+                        rating: itemsById[r.ratingId],
+                        comment: r.comment
                     }));
             });
     };
@@ -87,7 +81,7 @@ function controller($q,
     loadAll();
 
     vm.columnDefs = [
-        mkEntityLinkGridCell("Application", "entityReference", "none", "right"),
+        mkEntityLinkGridCell("Application", "entityRef", "none", "right"),
         {field: "rating.name", name: "Assessment Rating"},
         {
             name: "Operation",
@@ -112,59 +106,49 @@ function controller($q,
             .value();
 
         const convertToRatingCommand = (r) => Object.assign({}, {
-            entityReference: r.entityRef,
+            entityRef: r.entityRef,
             ratingId: r.rating.id,
             operation: r.action,
             comment: r.comment
         });
-
-        const ratingAddCommands = _.chain(results)
-            .filter(r => r.action === "ADD" || r.action === "UPDATE")
-            .map(r => convertToRatingCommand(r))
-            .value();
 
         const ratingUpdateCommands = _.chain(results)
             .filter(r => r.action === "ADD" || r.action === "UPDATE")
             .map(r => convertToRatingCommand(r))
             .value();
 
-        const appIdsToRemove = _.chain(results)
+        const ratingRemoveCommands = _.chain(results)
             .filter(r => r.action === "REMOVE")
-            .map(r => r.entityRef.id)
+            .map(r => convertToRatingCommand(r))
             .value();
 
-        if (ratingAddCommands.length > 0) {
-            console.log("ADDing new applications ", ratingAddCommands);
+        if (ratingUpdateCommands.length > 0) {
             serviceBroker
-                .execute(CORE_API.AssessmentRatingStore.bulkStore, [definitionId, ratingAddCommands])
+                .execute(CORE_API.AssessmentRatingStore.bulkStore, [definitionId, ratingUpdateCommands])
                 .then(() => loadAll())
-                .then(() => notification.success(`Added/Updated ratings for ${ratingAddCommands.length} applications`))
+                .then(() => notification.success(`Added/Updated ratings for ${ratingUpdateCommands.length} applications`))
                 .catch(e => displayError(notification, "Failed to save", e));
-
         }
 
-
-        if (appIdsToRemove.length > 0) {
-            console.log("Removind new applications ", appIdsToRemove);
-            // serviceBroker
-            //     .execute(CORE_API.AppGroupStore.removeApplications, [id, appIdsToRemove])
-            //     .then(r => r.data)
-            //     .then(apps => vm.applications = apps, e => handleError(e))
-            //     .then(() => notification.success(`Removed ${appIdsToRemove.length} applications`));
+        if (ratingRemoveCommands.length > 0) {
+            serviceBroker
+                .execute(CORE_API.AssessmentRatingStore.bulkRemove, [definitionId, ratingRemoveCommands])
+                .then(() => loadAll())
+                .then(() => notification.success(`Removed ratings for ${ratingRemoveCommands.length} applications`))
+                .catch(e => displayError(notification, "Failed to remove assessment ratings", e));
         }
 
-        if (appIdsToRemove.length === 0 && ratingAddCommands.length === 0){
+        if (ratingRemoveCommands.length === 0 && ratingUpdateCommands.length === 0){
             notification.info("There are no applications to be added or removed");
         }
     };
 
     vm.removeAssessmentRating = (row) => {
-        console.log(row.entityReference.name + " will be removed");
         serviceBroker
-            .loadViewData(CORE_API.AssessmentRatingStore.remove, [row.entityReference, definitionId])
+            .loadViewData(CORE_API.AssessmentRatingStore.remove, [row.entityRef, definitionId])
             .then(r => r.data)
             .then(() => loadAll())
-            .then(() => notification.success("Assessment Rating Removed for application " + row.entityReference.name))
+            .then(() => notification.success("Assessment Rating Removed for application " + row.entityRef.name))
             .catch((e) => {
                 console.log("WAR: Failed to delete assessment rating for application", {error: e});
                 return notification.warning(`Failed to delete assessment rating for application: ${e.data.message}`);
