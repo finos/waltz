@@ -80,9 +80,8 @@ function controller($q, serviceBroker) {
             hideAllocationScheme();
         } else {
             vm.activeAllocationScheme = scheme;
+            vm.activeTab = _.find(vm.tabs, tab => tab.category.id === vm.activeAllocationScheme.measurableCategoryId);
         }
-
-        vm.activeTab = _.find(vm.tabs, tab => tab.category.id === vm.activeAllocationScheme.measurableCategoryId);
     };
 
     vm.onDismissAllocations = () => hideAllocationScheme();
