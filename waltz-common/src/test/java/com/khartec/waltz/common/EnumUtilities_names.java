@@ -24,6 +24,7 @@ import org.junit.runners.MethodSorters;
 
 import static com.khartec.waltz.common.SetUtilities.asSet;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class EnumUtilities_names {
@@ -35,7 +36,6 @@ public class EnumUtilities_names {
         D
     }
 
-
     @Test
     public void namesCanUseVarArgs() {
         assertEquals(asSet("A", "C"), EnumUtilities.names(MyEnum.A, MyEnum.C));
@@ -46,4 +46,15 @@ public class EnumUtilities_names {
     public void namesCanAlsoUseACollection() {
         assertEquals(asSet("A", "D"), EnumUtilities.names(MyEnum.A, MyEnum.D));
     }
+
+    @Test(expected = NullPointerException.class)
+    public void namesWithNullValues() {
+        EnumUtilities.names((Enum) null);
+    }
+
+    @Test
+    public void namesWithNoValues() {
+        assertNotNull(EnumUtilities.names());
+    }
 }
+

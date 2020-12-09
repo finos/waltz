@@ -17,16 +17,18 @@ public class DigestUtilities_digest {
     @Test
     public void digestSingleByte() throws NoSuchAlgorithmException {
         byte[] b = {0};
+        String myHash = "W6k8nbDP+T9StSHXQg5D9u2ieE8=";
         String result = DigestUtilities.digest(b);
         assertNotNull(result);
-        assertEquals( String.class, result.getClass());
+        assertEquals( myHash, result);
     }
 
     @Test
     public void digestMultipleBytes() throws NoSuchAlgorithmException{
         byte[] b = {0,1,1};
+        String myHash = "7uRH7cef6hynx9NORjJhzaS6M54=";
         String result = DigestUtilities.digest(b);
         assertNotNull(result);
-        assertEquals( String.class, result.getClass());
+        assertEquals(myHash, result);
     }
 }
