@@ -25,7 +25,7 @@ const extIdCol = { field: "application.externalId", displayName: "Ext. Id", widt
 
 const unknownRating = {
     id: -1,
-    color: lightGrey,
+    color: lightGrey.toString(),
     description: "This rating has not been provided",
     name: "Unknown",
     rating: "Z",
