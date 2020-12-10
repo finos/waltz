@@ -16,28 +16,28 @@
  *
  */
 
-$waltz-amber: #ff7f0e;
-$waltz-green: #2ca02c;
-$waltz-red: #d62728;
-$waltz-grey: #eee;
-$waltz-dark-grey: #c0b6bc;
-$waltz-blue: #28a1b6;
+$waltz-amber: #D9923F;
+$waltz-green: #5BB65D;
+$waltz-red: #DA524B;
+$waltz-grey: #D1D1D1;
+$waltz-dark-grey: #939393;
+$waltz-blue: #1F7FE0;
 
-$waltz-blue-background: #d4e0f7;
-$waltz-green-background: #dff1d2;
-$waltz-amber-background: #fcf2d7;
-$waltz-red-background: #f2d7d7;
-$waltz-grey-background: #f5f5f5;
-$waltz-actor-background: #ede5ee;
+$waltz-blue-background: #D4E0F7;
+$waltz-green-background: #DFF1D2;
+$waltz-amber-background: #FCF2D7;
+$waltz-red-background: #F2D7D7;
+$waltz-grey-background: #F5F5F5;
+$waltz-actor-background: #EDE5EE;
 
-$waltz-base-background-color: #1f7fe0;
+$waltz-base-background-color: #1F7FE0;
 
 $waltz-background-color: lighten($waltz-base-background-color, 50%);
 $waltz-section-background-color: lighten($waltz-base-background-color, 45%); //#ecf1ff;  // section header bars etc
 
-$waltz-font-color: #332b23;
-$waltz-link-color: #2c369d;
-$waltz-section-font-color: #332b23;
+$waltz-font-color: #332B23;
+$waltz-link-color: #2C369D;
+$waltz-section-font-color: #332B23;
 $waltz-field-label-color: lighten($waltz-font-color, 20%);
 $text-muted: lighten($waltz-font-color, 30%);
 $font-size-base: 14px;

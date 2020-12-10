@@ -22,7 +22,7 @@ import _ from "lodash";
 export const black = rgb("#000");
 export const grey = rgb("#939393");
 export const lightGrey = rgb("#D1D1D1");
-export const blue = rgb("#5271CC");
+export const blue = rgb("#1F7FE0");
 export const green = rgb("#5BB65D");
 export const yellow = rgb("#E0E314");
 export const gold = rgb("#B7A61F");
