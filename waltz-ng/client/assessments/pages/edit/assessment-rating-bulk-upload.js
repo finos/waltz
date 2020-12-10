@@ -82,9 +82,11 @@ function controller($q,
 
     vm.columnDefs = [
         mkEntityLinkGridCell("Application", "entityRef", "none", "right"),
-        {field: "rating.name", name: "Assessment Rating"},
+        {field: "rating.name", name: "Assessment Rating", width: "20%"},
+        {field: "comment", name: "Comment", width: "40%"},
         {
             name: "Operation",
+            width: "10%",
             cellTemplate: "<div class=\"ui-grid-cell-contents\"><a ng-click=\"grid.appScope.removeAssessmentRating(row.entity)\" class=\"clickable\">Remove</a></div>"
         }
     ];
@@ -139,7 +141,7 @@ function controller($q,
         }
 
         if (ratingRemoveCommands.length === 0 && ratingUpdateCommands.length === 0){
-            notification.info("There are no applications to be added or removed");
+            notification.info("There are no rating changes found.");
         }
     };
 

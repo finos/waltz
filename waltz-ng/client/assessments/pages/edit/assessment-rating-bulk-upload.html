@@ -46,26 +46,14 @@
             <div class="col-md-6">
 
                 <p class="waltz-paragraph">
-                    Use the search box below to locate an application and add it
-                    to the group.
+                    Use the text box below to provide assessment ratings for applications as comma or tab separated value
+                    <br/>
+                    e.g. asset-code, rating-name, comments(optional)
                 </p>
 
 
                 <!-- Selectors -->
                 <uib-tabset>
-                    <uib-tab heading="Single Editor">
-                        <!-- Single Selector -->
-                        <div style="padding: 1em 0">
-                            <span>
-                                Once a selection is made related applications
-                                will also be shown.
-                            </span>
-
-                            <waltz-app-selector model="ctrl.searchedApp">
-                            </waltz-app-selector>
-                        </div>
-                    </uib-tab>
-
                     <uib-tab heading="Bulk Editor">
                         <!-- Bulk selector -->
                         <div style="padding: 1em 0">
@@ -74,34 +62,6 @@
                                                                    rating-items="ctrl.ratingItems"
                                                              on-save="ctrl.saveRatings">
                             </waltz-bulk-assessment-rating-selector>
-                        </div>
-                    </uib-tab>
-
-                    <uib-tab heading="Recently Viewed">
-                        <!-- Recent selector -->
-                        <div style="padding: 1em 0">
-                            <ul class="list-unstyled">
-                                <li ng-repeat="app in ctrl.history">
-                                    <span ng-if="!ctrl.isAppInGroup(app.stateParams)"
-                                          class='clickable'
-                                          ng-click="ctrl.addRecentViewed(app)">
-                                        <waltz-icon fixed-width="true"
-                                                    class="text-muted"
-                                                    name="{{ app.kind | toIconName:'entity' }}"></waltz-icon>
-                                        <span ng-bind="::app.name"></span>
-                                    </span>
-                                    <span ng-if="ctrl.isAppInGroup(app.stateParams)"
-                                          class='text-muted'>
-                                        <waltz-icon fixed-width="true"
-                                                    name="{{ app.kind | toIconName:'entity' }}"></waltz-icon>
-                                        <span ng-bind="::app.name"
-                                              style="text-decoration: line-through"></span>
-                                    </span>
-                                </li>
-                                <waltz-no-data ng-if="ctrl.history.length == 0">
-                                    <message>No information for this person</message>
-                                </waltz-no-data>
-                            </ul>
                         </div>
                     </uib-tab>
                 </uib-tabset>

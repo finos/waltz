@@ -27,7 +27,7 @@
         <textarea rows="8"
                   cols="95"
                   style="width:100%;"
-                  placeholder="Please insert application identifiers and assessment ratings as comma separated values split by newline, semi-colon or pipe characters"
+                  placeholder="Please insert application identifiers and assessment ratings as comma or tab separated values split by newline or pipe characters."
                   ng-model="$ctrl.bulkEntriesString"
                   ng-model-options="{debounce: 300}"
                   ng-change="$ctrl.bulkEntriesChanged()">
@@ -76,14 +76,15 @@
                         <th>Identifier</th>
                         <th>Application</th>
                         <th>Rating</th>
+                        <th>Comment</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr ng-repeat="result in $ctrl.filteredSearchResults"
                         ng-class="{
-                                    'text-danger': !result.entityRef,
-                                    'bg-danger': !result.entityRef,
+                                    'text-danger': $ctrl.isUnidentified(result),
+                                    'bg-danger': $ctrl.isUnidentified(result),
                                     'bg-warning': result.action === 'ADD',
                                   }">
                         <td>
@@ -100,7 +101,15 @@
                             </span>
                         </td>
                         <td>
-                            <span ng-bind="result.rating.name">
+                            <span ng-if="result.rating" ng-bind="result.rating.name">
+                            </span>
+                            <span ng-if="!result.rating"
+                                  class="text-danger bg-danger">
+                                Not found
+                            </span>
+                        </td>
+                        <td>
+                            <span ng-bind="result.comment">
                             </span>
                         </td>
                         <td>

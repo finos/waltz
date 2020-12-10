@@ -55,15 +55,16 @@ const initialState = {
 
 
 function mkSummary(searchResults = []) {
+    console.log('check rating ', searchResults);
     return Object.assign(
         { total: searchResults.length },
-        _.countBy(searchResults, r => r.entityRef == null ? 'notFound' : 'found'));
+        _.countBy(searchResults, r => r.entityRef == null || r.rating === undefined ? 'notFound' : 'found'));
 }
 
 
 function determineAction(existingRef, searchedRef) {
     console.log('ABC ', existingRef, searchedRef);
-    if (!searchedRef.entityRef) return;
+    if (!searchedRef.entityRef || !searchedRef.rating) return;
 
 
     if (!existingRef) {
@@ -176,6 +177,10 @@ function controller(serviceBroker) {
         vm.showNotFoundOnly = !vm.showNotFoundOnly;
         vm.filteredSearchResults = filterResults();
     };
+
+    vm.isUnidentified = (result) => {
+        return !result.entityRef || !result.rating;
+    }
 }
 
 
