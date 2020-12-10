@@ -82,8 +82,8 @@ function controller($q,
 
     vm.columnDefs = [
         mkEntityLinkGridCell("Application", "entityRef", "none", "right"),
-        {field: "rating.name", name: "Assessment Rating", width: "20%"},
-        {field: "comment", name: "Comment", width: "40%"},
+        {field: "rating.name", name: "Assessment Rating", width: "15%"},
+        {field: "comment", name: "Comment"},
         {
             name: "Operation",
             width: "10%",

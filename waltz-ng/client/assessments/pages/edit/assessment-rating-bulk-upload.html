@@ -31,8 +31,6 @@
         </breadcrumbs>
     </waltz-page-header>
 
-
-
     <waltz-section icon="desktop" name="Ratings In Assessment Definition">
 
         <div class="row">
@@ -46,7 +44,7 @@
             <div class="col-md-6">
 
                 <p class="waltz-paragraph">
-                    Use the text box below to provide assessment ratings for applications as comma or tab separated value
+                    Use the text box below to provide assessment ratings for application as comma or tab separated value
                     <br/>
                     e.g. asset-code, rating-name, comments(optional)
                 </p>
@@ -66,85 +64,6 @@
                     </uib-tab>
                 </uib-tabset>
 
-                <!-- Focus App -->
-                <div ng-if="ctrl.focusApp">
-                    <hr>
-
-                    <h4>
-                        Focused on:
-                        <span ng-bind="ctrl.focusApp.app.name"></span>
-                    </h4>
-
-
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <h5>Related By Asset Code</h5>
-                            <div class="waltz-scroll-region"
-                                 style="height: 200px">
-                                <waltz-app-group-app-selection-list
-                                    applications="ctrl.focusApp.related"
-                                    is-member="ctrl.isAppInGroup"
-                                    add="ctrl.addToGroup"
-                                    refocus="ctrl.focusOnApp">
-                                </waltz-app-group-app-selection-list>
-
-                            </div>
-                        </div>
-
-                        <div class="col-sm-6">
-                            <h5>
-                                <waltz-icon name="sitemap"></waltz-icon>
-                                Apps in same Org Unit
-                            </h5>
-
-                            <div class="waltz-scroll-region"
-                                 style="height: 200px">
-                                <waltz-app-group-app-selection-list
-                                    applications="ctrl.focusApp.unitMembers"
-                                    is-member="ctrl.isAppInGroup"
-                                    add="ctrl.addToGroup"
-                                    refocus="ctrl.focusOnApp">
-                                </waltz-app-group-app-selection-list>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <h5>
-                                <waltz-icon name="arrow-up"></waltz-icon>
-                                Upstream Apps
-                            </h5>
-
-                            <div class="waltz-scroll-region"
-                                 style="height: 200px">
-                                <waltz-app-group-app-selection-list
-                                    applications="ctrl.focusApp.upstream"
-                                    is-member="ctrl.isAppInGroup"
-                                    add="ctrl.addToGroup"
-                                    refocus="ctrl.focusOnApp">
-                                </waltz-app-group-app-selection-list>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-6">
-                            <h5>
-                                <waltz-icon name="arrow-down"></waltz-icon>
-                                Downstream Apps
-                            </h5>
-
-                            <div class="waltz-scroll-region"
-                                 style="height: 200px">
-                                <waltz-app-group-app-selection-list
-                                    applications="ctrl.focusApp.downstream"
-                                    is-member="ctrl.isAppInGroup"
-                                    add="ctrl.addToGroup"
-                                    refocus="ctrl.focusOnApp">
-                                </waltz-app-group-app-selection-list>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </waltz-section>

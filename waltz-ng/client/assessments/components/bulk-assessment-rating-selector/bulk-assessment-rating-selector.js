@@ -26,22 +26,22 @@ import template from "./bulk-assessment-rating-selector.html";
 
 
 const bindings = {
-    existingRefs: '<',
-    ratingItems: '<',
-    onSave: '<'
+    existingRefs: "<",
+    ratingItems: "<",
+    onSave: "<"
 };
 
 const MODES = {
-    ADD: 'ADD',
-    REPLACE: 'REPLACE'
+    ADD: "ADD",
+    REPLACE: "REPLACE"
 };
 
 const initialState = {
-    bulkEntriesString: '',
+    bulkEntriesString: "",
     existingRefs: [],
     searchResults: [],
     filteredSearchResults: [],
-    mode: 'ADD', //ADD | REPLACE
+    mode: "ADD", //ADD | REPLACE
     removedResults: [],
     searchSummary: {},
     showNotFoundOnly: false,
@@ -50,43 +50,41 @@ const initialState = {
         loading: false
     },
 
-    onSave: (entityRefs) => console.log('default onSave handler for bulk-application-selector: ', entityRefs)
+    onSave: (entityRefs) => console.log("default onSave handler for bulk-assessment-rating-selector: ", entityRefs)
 };
 
 
 function mkSummary(searchResults = []) {
-    console.log('check rating ', searchResults);
     return Object.assign(
         { total: searchResults.length },
-        _.countBy(searchResults, r => r.entityRef == null || r.rating === undefined ? 'notFound' : 'found'));
+        _.countBy(searchResults, r => r.entityRef == null || r.rating === undefined ? "notFound" : "found"));
 }
 
 
 function determineAction(existingRef, searchedRef) {
-    console.log('ABC ', existingRef, searchedRef);
     if (!searchedRef.entityRef || !searchedRef.rating) return;
 
 
     if (!existingRef) {
-        return 'ADD';
+        return "ADD";
     } else if (sameRef(existingRef.entityRef, searchedRef.entityRef)
         && (existingRef.rating.id !== searchedRef.rating.id
             || (searchedRef.comment != null && searchedRef.comment !== existingRef.comment))) {
-        return 'UPDATE';
+        return "UPDATE";
     } else if (sameRef(existingRef.entityRef, searchedRef.entityRef) ) {
-        return 'NO_CHANGE';
+        return "NO_CHANGE";
     }
 }
 
 
 function findMatchedApps(apps = [], identifiers = [], existingRefs = [], ratingItems = []) {
-    const appsByAssetCode = _.keyBy(apps, 'assetCode');
-    const existingRefsById = _.keyBy(existingRefs, 'entityRef.id');
-    const newAndExistingApps = _.chain(identifiers)
+    const appsByAssetCode = _.keyBy(apps, "assetCode");
+    const existingRefsById = _.keyBy(existingRefs, "entityRef.id");
+    return _.chain(identifiers)
         .map(identifier => {
             const app = appsByAssetCode[identifier.appIdentifier];
             const selectedRating = _.find(ratingItems, item => item.name === identifier.rating);
-            const entityRef = app ? toEntityRef(app, 'APPLICATION') : null;
+            const entityRef = app ? toEntityRef(app, "APPLICATION") : null;
             const searchEntity = Object.assign({}, {
                 entityRef: entityRef,
                 rating: selectedRating,
@@ -101,8 +99,6 @@ function findMatchedApps(apps = [], identifiers = [], existingRefs = [], ratingI
             };
         })
         .value();
-
-    return newAndExistingApps;
 }
 
 
@@ -185,7 +181,7 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 
@@ -198,5 +194,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzBulkAssessmentRatingSelector'
+    id: "waltzBulkAssessmentRatingSelector"
 };
