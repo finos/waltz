@@ -40,6 +40,14 @@
                                         entries="ctrl.appRatings"
                                         column-defs="ctrl.columnDefs">
                 </waltz-grid-with-search>
+                <waltz-no-data ng-if="ctrl.appRatings.length == 0">
+                    <message>
+                        <strong>
+                            No assessment ratings
+                        </strong>
+                        have been associated.
+                    </message>
+                </waltz-no-data>
             </div>
             <div class="col-md-6">
 
@@ -48,8 +56,6 @@
                     <br/>
                     e.g. asset-code, rating-name, comments(optional)
                 </p>
-
-
                 <!-- Selectors -->
                 <uib-tabset>
                     <uib-tab heading="Bulk Editor">

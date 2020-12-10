@@ -83,20 +83,18 @@ function findMatchedApps(apps = [], identifiers = [], existingRefs = [], ratingI
     return _.chain(identifiers)
         .map(identifier => {
             const app = appsByAssetCode[identifier.appIdentifier];
-            const selectedRating = _.find(ratingItems, item => item.name === identifier.rating);
+            const selectedRating = _.find(ratingItems,
+                                          item => item.name === identifier.rating
+                                              || item.rating === _.toUpper(identifier.rating));
             const entityRef = app ? toEntityRef(app, "APPLICATION") : null;
             const searchEntity = Object.assign({}, {
                 entityRef: entityRef,
                 rating: selectedRating,
-                comment: identifier.comment
-            });
-            return {
-                identifier: identifier.appIdentifier,
-                entityRef,
-                rating: selectedRating,
                 comment: identifier.comment,
-                action: entityRef ? determineAction(existingRefsById[entityRef.id], searchEntity) : null
-            };
+                identifier: identifier.appIdentifier
+            });
+            const action = entityRef ? determineAction(existingRefsById[entityRef.id], searchEntity) : null;
+            return _.assign(searchEntity , {action: action});
         })
         .value();
 }
