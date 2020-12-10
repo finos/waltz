@@ -3,18 +3,17 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.service.entity_search;
@@ -22,9 +21,7 @@ package com.khartec.waltz.service.entity_search;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.data.SearchUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.WaltzEntity;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.service.actor.ActorService;
 import com.khartec.waltz.service.app_group.AppGroupService;
@@ -38,6 +35,7 @@ import com.khartec.waltz.service.person.PersonService;
 import com.khartec.waltz.service.physical_specification.PhysicalSpecificationService;
 import com.khartec.waltz.service.roadmap.RoadmapService;
 import com.khartec.waltz.service.server_information.ServerInformationService;
+import com.khartec.waltz.service.software_catalog.SoftwareCatalogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -67,6 +65,7 @@ public class EntitySearchService {
     private final PhysicalSpecificationService physicalSpecificationService;
     private final RoadmapService roadmapService;
     private final ServerInformationService serverInformationService;
+    private final SoftwareCatalogService softwareCatalogService;
 
 
     @Autowired
@@ -82,7 +81,8 @@ public class EntitySearchService {
                                PersonService personService,
                                PhysicalSpecificationService physicalSpecificationService,
                                RoadmapService roadmapService,
-                               ServerInformationService serverInformationService) {
+                               ServerInformationService serverInformationService,
+                               SoftwareCatalogService softwareCatalogService) {
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
         checkNotNull(actorService, "actorService cannot be null");
         checkNotNull(applicationService, "applicationService cannot be null");
@@ -96,6 +96,7 @@ public class EntitySearchService {
         checkNotNull(physicalSpecificationService, "physicalSpecificationService cannot be null");
         checkNotNull(roadmapService, "roadmapService cannot be null");
         checkNotNull(serverInformationService, "serverInformationService cannot be null");
+        checkNotNull(softwareCatalogService, "softwareCatalogService cannot be null");
 
         this.actorService = actorService;
         this.dbExecutorPool = dbExecutorPool;
@@ -110,6 +111,7 @@ public class EntitySearchService {
         this.physicalSpecificationService = physicalSpecificationService;
         this.roadmapService = roadmapService;
         this.serverInformationService = serverInformationService;
+        this.softwareCatalogService = softwareCatalogService;
     }
 
 
@@ -121,11 +123,14 @@ public class EntitySearchService {
             return Collections.emptyList();
         }
 
-        List<Future<Collection<? extends WaltzEntity>>> futures = options.entityKinds().stream()
+        List<Future<Collection<? extends WaltzEntity>>> futures = options
+                .entityKinds()
+                .stream()
                 .map(ek -> dbExecutorPool.submit(mkCallable(ek, options)))
                 .collect(toList());
 
-        return futures.stream()
+        return futures
+                .stream()
                 .flatMap(f -> supplier(f::get).get().stream())
                 .map(WaltzEntity::entityReference)
                 .collect(toList());
@@ -159,6 +164,8 @@ public class EntitySearchService {
                 return () -> roadmapService.search(options);
             case SERVER:
                 return () -> serverInformationService.search(options);
+            case SOFTWARE:
+                return () -> softwareCatalogService.search(options);
             default:
                 throw new UnsupportedOperationException("no search service available for: " + entityKind);
         }

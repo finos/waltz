@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.data.data_type;
@@ -25,6 +24,11 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
+import org.jooq.impl.DSL;
+
+import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
+import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
+import static com.khartec.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE;
 
 public class DataTypeIdSelectorFactory extends AbstractIdSelectorFactory {
 
@@ -35,7 +39,33 @@ public class DataTypeIdSelectorFactory extends AbstractIdSelectorFactory {
 
     @Override
     protected Select<Record1<Long>> mkForOptions(IdSelectionOptions options) {
-        throw new UnsupportedOperationException("Cannot create dataType selector from kind: " +
-                options.entityReference().kind());
+        switch (options.entityReference().kind()) {
+            case LOGICAL_DATA_FLOW:
+                return mkForLogicalFlow(options);
+            case PHYSICAL_SPECIFICATION:
+                return mkForPhysicalSpecification(options);
+            default:
+                throw new UnsupportedOperationException("Cannot create dataType selector from kind: " +
+                        options.entityReference().kind());
+        }
+
+    }
+
+
+    private Select<Record1<Long>> mkForLogicalFlow(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        return DSL
+                .selectDistinct(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID)
+                .from(LOGICAL_FLOW_DECORATOR)
+                .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(options.entityReference().id()));
+    }
+
+
+    private Select<Record1<Long>> mkForPhysicalSpecification(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        return DSL
+                .selectDistinct(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID)
+                .from(PHYSICAL_SPEC_DATA_TYPE)
+                .where(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(options.entityReference().id()));
     }
 }

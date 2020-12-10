@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 import _ from "lodash";
 
@@ -26,11 +25,13 @@ import template from "./data-type-usage-tree.html";
 
 
 const bindings = {
-    used: "<"
+    used: "<?"
 };
 
 
-const initialState = {};
+const initialState = {
+    used: []
+};
 
 
 function findParents(dtId, dataTypesById) {
@@ -44,11 +45,14 @@ function findParents(dtId, dataTypesById) {
 }
 
 
-function enrichDataTypeWithExplicitFlag(dataType, explicitIds = []) {
-    return Object.assign(
-        {},
+function enrichDataTypeWithUsage(dataType, usedById = {}) {
+    const usage = _.get(usedById, dataType.id, null);
+    return {
+        id: dataType.id,
+        parentId: dataType.parentId,
         dataType,
-        { explicit: _.includes(explicitIds, dataType.id)});
+        usage
+    };
 }
 
 
@@ -60,16 +64,15 @@ function controller(serviceBroker) {
         serviceBroker
             .loadAppData(CORE_API.DataTypeStore.findAll)
             .then(r => {
-                const dataTypesById = _.keyBy(r.data, "id");
-                const explicitIds = _.map(vm.used, r => r.kind === "DATA_TYPE"
-                        ? r.id
-                        : r.dataTypeId);
+                const dataTypesById = _.keyBy(r.data, d => d.id);
+                const usageById = _.keyBy(vm.used, d => d.dataTypeId);
+
 
                 const requiredDataTypes = _
-                    .chain(explicitIds)
-                    .flatMap(dtId => findParents(dtId, dataTypesById))
-                    .uniqBy("id")
-                    .map(dataType => enrichDataTypeWithExplicitFlag(dataType, explicitIds))
+                    .chain(vm.used)
+                    .flatMap(usage => findParents(usage.dataTypeId, dataTypesById))
+                    .uniqBy(d => d.id)
+                    .map(dataType => enrichDataTypeWithUsage(dataType, usageById))
                     .value();
 
                 const hierarchy = buildHierarchies(requiredDataTypes, false);

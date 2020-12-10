@@ -3,24 +3,27 @@
   ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
   ~ See README.md for more information
   ~
-  ~ This program is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU Lesser General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
   ~
-  ~ This program is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU Lesser General Public License for more details.
+  ~     http://www.apache.org/licenses/LICENSE-2.0
   ~
-  ~ You should have received a copy of the GNU Lesser General Public License
-  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
   -->
 
 <div class="waltz-flow-filter-options">
     <div ng-include="'wffo-scope-options'"></div>
     <hr>
     <div ng-include="'wffo-type-options'"></div>
+    <div ng-if="$ctrl.usedTags.length > 0">
+        <hr>
+        <div ng-include="'wffo-tag-options'"></div>
+    </div>
 </div>
 
 
@@ -65,7 +68,7 @@
 
         Alternatively,
         <a class='clickable'
-           ng-click="$ctrl.onShowAll()">
+           ng-click="$ctrl.onShowAllTypes()">
             show all.
         </a>
     </div>
@@ -129,5 +132,51 @@
                 </span>
             </label>
         </div>
+    </div>
+</script>
+
+
+<!-- TAG_FILTER -->
+<script type="text/ng-template"
+        id="wffo-tag-options">
+    <h5>
+        <waltz-icon name="filter"></waltz-icon>
+        Tags
+        <small>Filter</small>
+    </h5>
+
+    <div class="waltz-paragraph small"
+         style="padding-bottom: 4px;">
+        <span ng-if="$ctrl.selectedTags.length == $ctrl.usedTags.length">
+            All tags included, exclude tags to filter
+        </span>
+        <div ng-if="$ctrl.selectedTags.length < $ctrl.usedTags.length">
+            Filter applied,
+            <span ng-bind="$ctrl.selectedTags.length"></span>
+            of
+            <span ng-bind="$ctrl.usedTags.length"></span>
+            tags included,
+            <a class='clickable'
+               ng-click="$ctrl.showAllTags()">
+                include all
+            </a>
+        </div>
+    </div>
+
+    <div style="width: 380px;">
+        <ui-select multiple="true"
+                   theme="bootstrap"
+                   ng-model="$ctrl.selectedTags"
+                   on-select="$ctrl.onTagsChange()"
+                   on-remove="$ctrl.onTagsChange()">
+            <ui-select-match placeholder="Select tags..."
+                             class="waltz-ui-select-match-multi"
+                             ui-lock-choice="$select.selected.length == 1">
+                <span ng-bind-html="$item.name"></span>
+            </ui-select-match>
+            <ui-select-choices repeat="tag in $ctrl.usedTags | orderBy:'name' | filter: { name: $select.search }">
+                <span ng-bind-html="tag.name | highlight: $select.search"></span>
+            </ui-select-choices>
+        </ui-select>
     </div>
 </script>

@@ -3,18 +3,17 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.jobs.generators;
@@ -24,10 +23,10 @@ import com.khartec.waltz.common.StreamUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.application.LifecyclePhase;
 import com.khartec.waltz.model.change_initiative.ChangeInitiativeKind;
-import com.khartec.waltz.model.entity_relationship.RelationshipKind;
 import com.khartec.waltz.schema.tables.records.ChangeInitiativeRecord;
 import com.khartec.waltz.schema.tables.records.EntityRelationshipRecord;
 import com.khartec.waltz.schema.tables.records.InvolvementRecord;
+import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
@@ -99,8 +98,9 @@ public class ChangeInitiativeGenerator implements SampleDataGenerator {
     }
 
 
-    private static Stream<TableRecord<?>> buildEntityRelationships(List<Long> ciIds,
-                                                                   EntityKind kind,
+    private static Stream<TableRecord<?>> buildEntityRelationships(EntityKind kind,
+                                                                   String relKind,
+                                                                   List<Long> ciIds,
                                                                    List<Long> targetIds,
                                                                    double ratioWithCi,
                                                                    int maxLinks) {
@@ -128,7 +128,7 @@ public class ChangeInitiativeGenerator implements SampleDataGenerator {
                     record.setKindB(EntityKind.CHANGE_INITIATIVE.name());
                     record.setIdB(t.v2);
 
-                    record.setRelationship(RelationshipKind.RELATES_TO.name());
+                    record.setRelationship(relKind);
                     record.setProvenance(SampleDataGenerator.SAMPLE_DATA_PROVENANCE);
 
                     return record;
@@ -176,12 +176,15 @@ public class ChangeInitiativeGenerator implements SampleDataGenerator {
         List<TableRecord<?>> relationships = StreamUtilities
                 .concat(
                         buildPersonLinks(ciIds, employeeIds),
-                        buildEntityRelationships(ciIds, EntityKind.APP_GROUP, groupIds, 0.5, 2),
-                        buildEntityRelationships(ciIds, EntityKind.APPLICATION, appIds, 0.6, 3))
+                        buildEntityRelationships(EntityKind.APP_GROUP, "RELATES_TO", ciIds, groupIds, 0.5, 2),
+                        buildEntityRelationships(EntityKind.APPLICATION, "SUPPORTS", ciIds, appIds, 0.6, 3))
                 .collect(toList());
 
         LOG.info("Storing {} relationships", relationships.size());
         dsl.batchInsert(relationships).execute();
+
+        EntityHierarchyService ehSvc = ctx.getBean(EntityHierarchyService.class);
+        ehSvc.buildFor(EntityKind.CHANGE_INITIATIVE);
 
         return null;
     }

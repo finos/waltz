@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import _ from "lodash";
@@ -23,8 +22,8 @@ import template from "./related-measurables-table.html";
 import {initialiseData} from "../../../common/index";
 import {sameRef} from "../../../common/entity-utils";
 import {downloadTextFile} from "../../../common/file-utils";
-import {getEnumName} from "../../../common/services/enums/index";
-import {relationshipKind} from "../../../common/services/enums/relationship-kind";
+import {mkEntityLinkGridCell} from "../../../common/grid-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
@@ -35,20 +34,24 @@ const bindings = {
 
 
 const columnDefs = [
+    mkEntityLinkGridCell("From", "a"),
     {
-        field: "a.name",
-        name: "From"
-    }, {
         field: "a.type",
         name: "(From Type)"
     }, {
-        field: "relationship.relationship",
-        name: "Relationship",
-        cellFilter: "toDisplayName:'relationshipKind'"
-    }, {
-        field: "b.name",
-        name: "To"
-    }, {
+        field: "relationshipsString",
+        name: "Relationships",
+        cellTemplate:`
+                <div class="ui-grid-cell-contents"
+                     uib-popover-template="'wrmt/relationships-popup.html'"
+                     popover-trigger="mouseenter"
+                     popover-append-to-body="true">
+                    <span ng-bind="COL_FIELD">
+                    </span>
+                </div>`
+    },
+    mkEntityLinkGridCell("To", "b"),
+    {
         field: "b.type",
         name: "(To Type)"
     }
@@ -61,13 +64,13 @@ const initialState = {
 };
 
 
-function mkExportData(rows = []) {
+function mkExportData(rows = [], relKindsByCode) {
     const columnNames = [[
         "From",
         "From type",
         "To",
         "To type",
-        "Relationship",
+        "Relationship Kind",
         "Description",
         "Last Updated At",
         "Last Updated By"
@@ -78,7 +81,7 @@ function mkExportData(rows = []) {
         r.a.type,
         r.b.name,
         r.b.type,
-        getEnumName(relationshipKind, r.relationship.relationship),
+        _.get(relKindsByCode, r.relationship.relationship).name,
         r.relationship.description,
         r.relationship.lastUpdatedAt,
         r.relationship.lastUpdatedBy
@@ -88,9 +91,36 @@ function mkExportData(rows = []) {
 }
 
 
-
-function controller() {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
+
+    vm.loadData = () => {
+        const collectedRels = _.map(vm.rows, r => {
+
+            const relatedKinds = _.chain(vm.rows)
+                .filter(d => d.a.id === r.a.id && d.b.id === r.b.id)
+                .map(rel => _.get(vm.relationshipKindsByCode, rel.relationship.relationship).name)
+                .value();
+
+            const relatedKindsString =  _.join(relatedKinds, ", ");
+
+            return Object.assign({},
+                {
+                    a: r.a,
+                    b: r.b,
+                    relationships: relatedKinds,
+                    relationshipsString: relatedKindsString
+                });
+        });
+
+        vm.data = _.uniqBy(collectedRels, r => JSON.stringify([r.a, r.b, r.relationshipsString]));
+    };
+
+    vm.$onInit = () => {
+        serviceBroker.loadAppData(CORE_API.RelationshipKindStore.findAll)
+            .then(r => vm.relationshipKindsByCode = _.keyBy(r.data, d => d.code))
+            .then(() => vm.loadData())
+    };
 
     vm.isSelected = (row) => {
         if (vm.selectedRow) {
@@ -102,12 +132,22 @@ function controller() {
         }
     };
 
+    vm.$onChanges = (c) => {
+        if (c.rows && vm.relationshipKindsByCode){
+           vm.loadData();
+        }
+    };
 
     vm.export = () => {
-        const data = mkExportData(vm.rows);
+        const data = mkExportData(vm.rows, vm.relationshipKindsByCode);
         downloadTextFile(data, ",", "related_viewpoints.csv");
     };
 }
+
+
+controller.$inject = [
+    "ServiceBroker"
+];
 
 
 const component = {

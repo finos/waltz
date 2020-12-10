@@ -1,20 +1,40 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
 <div>
 
     <!-- HEADER -->
     <waltz-page-header name="{{ ctrl.specification.name }}"
                        small="Physical Specification"
                        icon="file-text">
-        <ol class="waltz-breadcrumbs">
-            <li><a ui-sref="main">Home</a></li>
-            <li>
-                <waltz-entity-link entity-ref="{
+        <breadcrumbs>
+            <ol class="waltz-breadcrumbs">
+                <li><a ui-sref="main">Home</a></li>
+                <li>
+                    <waltz-entity-link entity-ref="{
                         id: ctrl.owningEntity.id,
                         kind: 'APPLICATION',
                         name: ctrl.owningEntity.name }">
-                </waltz-entity-link>
-            </li>
-            <li ng-bind="ctrl.specification.name"></li>
-        </ol>
+                    </waltz-entity-link>
+                </li>
+                <li ng-bind="ctrl.specification.name"></li>
+            </ol>
+        </breadcrumbs>
     </waltz-page-header>
 
 
@@ -67,22 +87,24 @@
             <table class="table table-condensed small">
                 <thead>
                 <tr>
+                    <th>External Id</th>
                     <th>From</th>
                     <th>To</th>
                     <th>Frequency</th>
                     <th>Transport</th>
+                    <th>Comment</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr ng-repeat="flow in ctrl.physicalFlows"
-                    ng-class="{
-                                'waltz-entity-removed':flow.entityLifecycleStatus === 'REMOVED',
-                              }">
+                    ng-class="{ 'waltz-entity-removed':flow.entityLifecycleStatus === 'REMOVED' }">
+                    <td>
+                        <span ng-bind="flow.externalId"></span>
+                    </td>
                     <td>
                         <a ng-bind="ctrl.logicalFlowsById[flow.logicalFlowId].source.name"
                            class="clickable"
                            ui-sref="main.physical-flow.view ({id: flow.id })">
-
                         </a>
                     </td>
                     <td>
@@ -96,6 +118,9 @@
                     </td>
                     <td>
                         <span ng-bind="flow.transport | toDisplayName:'TransportKind'"></span>
+                    </td>
+                    <td>
+                        <span ng-bind="flow.description | truncateMiddle:80"></span>
                     </td>
                 </tr>
                 </tbody>

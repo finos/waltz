@@ -3,23 +3,23 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.server_information.ServerInformation;
+import com.khartec.waltz.model.server_information.ServerSummaryBasicStatistics;
 import com.khartec.waltz.model.server_information.ServerSummaryStatistics;
 import com.khartec.waltz.service.server_information.ServerInformationService;
 import com.khartec.waltz.web.DatumRoute;
@@ -58,6 +58,7 @@ public class ServerInformationEndpoint implements Endpoint {
         String getByExternalIdPath = mkPath(BASE_URL, "external-id", ":externalId");
         String getByHostnamePath = mkPath(BASE_URL, "hostname", ":hostname");
         String calculateStatsForAppSelectorPath = mkPath(BASE_URL, "apps", "stats");
+        String calculateBasicStatsForAppSelectorPath = mkPath(calculateStatsForAppSelectorPath, "basic");
 
         ListRoute<ServerInformation> findByAssetCodeRoute = (request, response)
                 -> serverInformationService.findByAssetCode(request.params("assetCode"));
@@ -77,6 +78,9 @@ public class ServerInformationEndpoint implements Endpoint {
         DatumRoute<ServerSummaryStatistics> calculateStatsForAppSelectorRoute = (request, response)
                 -> serverInformationService.calculateStatsForAppSelector(readIdSelectionOptionsFromBody(request));
 
+        DatumRoute<ServerSummaryBasicStatistics> calculateBasicStatsForAppSelectorRoute = (request, response)
+                -> serverInformationService.calculateBasicStatsForAppSelector(readIdSelectionOptionsFromBody(request));
+
 
         getForList(findByAssetCodePath, findByAssetCodeRoute);
         getForList(findByAppIdPath, findByAppIdRoute);
@@ -84,6 +88,7 @@ public class ServerInformationEndpoint implements Endpoint {
         getForDatum(getByExternalIdPath, getByExternalIdRoute);
         getForDatum(getByHostnamePath, getByHostnameRoute);
         postForDatum(calculateStatsForAppSelectorPath, calculateStatsForAppSelectorRoute);
+        postForDatum(calculateBasicStatsForAppSelectorPath, calculateBasicStatsForAppSelectorRoute);
     }
 
 

@@ -1,27 +1,26 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.data.app_group;
 
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
+import com.khartec.waltz.model.app_group.AppGroupEntry;
+import com.khartec.waltz.model.app_group.ImmutableAppGroupEntry;
 import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.Record;
@@ -30,6 +29,7 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 
 import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
@@ -40,11 +40,13 @@ import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_
 @Repository
 public class AppGroupEntryDao {
 
-    private static final RecordMapper<Record, EntityReference> appRefMapper = r ->
-            ImmutableEntityReference.builder()
+    private static final RecordMapper<Record, AppGroupEntry> appRefMapper = r ->
+            ImmutableAppGroupEntry.builder()
                     .kind(EntityKind.APPLICATION)
                     .id(r.getValue(APPLICATION.ID))
                     .name(r.getValue(APPLICATION.NAME))
+                    .provenance(r.getValue(APPLICATION_GROUP_ENTRY.PROVENANCE))
+                    .isReadOnly(r.getValue(APPLICATION_GROUP_ENTRY.IS_READONLY))
                     .build();
 
     private final DSLContext dsl;
@@ -56,12 +58,13 @@ public class AppGroupEntryDao {
     }
 
 
-    public List<EntityReference> getEntriesForGroup(long groupId) {
-        return dsl.select(APPLICATION.ID, APPLICATION.NAME)
+    public List<AppGroupEntry> getEntriesForGroup(long groupId) {
+        return dsl
+                .select(APPLICATION.ID, APPLICATION.NAME)
+                .select(APPLICATION_GROUP_ENTRY.IS_READONLY, APPLICATION_GROUP_ENTRY.PROVENANCE)
                 .from(APPLICATION)
-                .where(APPLICATION.ID.in(DSL.select(APPLICATION_GROUP_ENTRY.APPLICATION_ID)
-                        .from(APPLICATION_GROUP_ENTRY)
-                        .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(groupId))))
+                .innerJoin(APPLICATION_GROUP_ENTRY).on(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(APPLICATION.ID))
+                .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(groupId))
                 .and(IS_ACTIVE)
                 .fetch(appRefMapper);
     }
@@ -75,7 +78,7 @@ public class AppGroupEntryDao {
     }
 
 
-    public int[] addApplications(long groupId, List<Long> applicationIds) {
+    public int[] addApplications(long groupId, Collection<Long> applicationIds) {
         Query[] queries = applicationIds
                 .stream()
                 .map(id -> DSL.insertInto(APPLICATION_GROUP_ENTRY)
@@ -90,7 +93,8 @@ public class AppGroupEntryDao {
     public int removeApplication(long groupId, long applicationId) {
         return dsl.delete(APPLICATION_GROUP_ENTRY)
                 .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(groupId))
-                .and(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(applicationId))
+                .and(APPLICATION_GROUP_ENTRY.APPLICATION_ID.eq(applicationId)
+                        .and(APPLICATION_GROUP_ENTRY.IS_READONLY.isFalse()))
                 .execute();
     }
 
@@ -98,7 +102,8 @@ public class AppGroupEntryDao {
     public int removeApplications(long groupId, List<Long> applicationIds) {
         return dsl.delete(APPLICATION_GROUP_ENTRY)
                 .where(APPLICATION_GROUP_ENTRY.GROUP_ID.eq(groupId))
-                .and(APPLICATION_GROUP_ENTRY.APPLICATION_ID.in(applicationIds))
+                .and(APPLICATION_GROUP_ENTRY.APPLICATION_ID.in(applicationIds)
+                        .and(APPLICATION_GROUP_ENTRY.IS_READONLY.isFalse()))
                 .execute();
     }
 }

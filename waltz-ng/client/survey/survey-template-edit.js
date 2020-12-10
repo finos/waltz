@@ -3,23 +3,44 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import _ from "lodash";
 import {initialiseData} from "../common/index";
 import template from "./survey-template-edit.html";
+
+/*
+    Note: this list of functions/operators is derived from the capabilities of BigEval and the extension methods
+    in `surveyUtils::mkSurveyExpressionEvaluator`
+*/
+const qInclusionPredicateHelp = `
+The inclusion predicate allows for questions to be conditionally included in a survey depending on the values of other fields.
+See the documentation for a complete list of functions and their arguments.  Below is a selection of the main functions/operators:
+
+* \`< <= > >= == != && || ! \`: logical operators
+* \`isChecked(extId, <defaultValue>)\`: \`true\` if the question with the given ext id is checked, \`false\` if not checked,
+  or \`defaultValue\` if the answer is currently undefined.
+* \`numberValue(extId, <defaultValue>)\`: numeric value of the response for the given ext id (or \`defaultValue\`)
+* \`ditto(extId)\`: evaluates same conditions from a different question.  Useful for repetition of complex predicates.
+* \`val(extId, <defaultValue>)\`: returns the current value
+* \`assessmentRating(name|extId, <defaultValue>)\`: returns code value of the matching rating (returns null if no default given and no assessment found)
+* \`belongsToOrgUnit(name|extId)\`: returns true if the subject app is part of the given org unit tree
+* \`dataTypeUsages(name|extId)\`: returns set of usage kinds for the given data types (use the \`=~\` operator to test for membership)
+* \`isRetiring()\`: (application only) true if app has planned retirement date but no actual retirement date
+* \`hasDataType(name|extId)\`: returns whether the specified datatype (or a descendent) is in use by the app
+* \`hasInvolvement(roleName)\`: returns whether the subject entity has any involvment record with the given role name
+`;
 
 
 const initialState = {
@@ -43,6 +64,9 @@ const initialState = {
         name: "Dropdown",
         value: "DROPDOWN"
     },{
+        name: "Dropdown (Multi-Select)",
+        value: "DROPDOWN_MULTI_SELECT"
+    },{
         name: "Application",
         value: "APPLICATION"
     },{
@@ -58,7 +82,8 @@ const initialState = {
     },{
         name: "Change Initiative",
         value: "CHANGE_INITIATIVE"
-    }]
+    }],
+    qInclusionPredicateHelp
 };
 
 
@@ -87,7 +112,7 @@ function controller($stateParams,
                 description: vm.surveyTemplate.description,
                 targetEntityKind: vm.surveyTemplate.targetEntityKind
             })
-            .then(updateCount => notification.success("Survey template updated successfully"));
+            .then(() => notification.success("Survey template updated successfully"));
     };
 
     vm.showAddQuestionForm = () => {
@@ -103,7 +128,8 @@ function controller($stateParams,
                 isMandatory: false,
                 allowComment: false,
                 position: (currentMaxPos || 0) + 10,
-                externalId: null
+                externalId: null,
+                inclusionPredicate: null
             },
             dropdownEntries: []
         };

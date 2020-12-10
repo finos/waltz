@@ -3,18 +3,17 @@
   ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
   ~ See README.md for more information
   ~
-  ~ This program is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU Lesser General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
   ~
-  ~ This program is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU Lesser General Public License for more details.
+  ~     http://www.apache.org/licenses/LICENSE-2.0
   ~
-  ~ You should have received a copy of the GNU Lesser General Public License
-  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
   -->
 
 <databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -74,7 +73,18 @@
                                columnDataType="${name.type}" />
     </changeSet>
 
+    <changeSet id="20191120-4496-6a"
+               author="davidwatkins73">
+        <comment>4496: preparing table for addition of unique index</comment>
+        <sql>
+            update software_package
+            set external_id = null
+            where external_id = '';
+        </sql>
+    </changeSet>
+
     <changeSet id="20191120-4496-6"
+               failOnError="false"
                author="kamransaleem">
         <comment>4496: adding unique index on software package (ext_id)</comment>
         <createIndex tableName="software_package"
@@ -345,6 +355,7 @@
     </changeSet>
 
     <changeSet id="20191120-4496-21"
+                dbms="mssql,postgresql,h2"
                author="kamransaleem">
         <comment>4496: add release date to software version</comment>
 
@@ -352,6 +363,20 @@
             <column name="releaseDate"
                     type="DATE"
                     defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet id="20191120-4496-21"
+                dbms="mysql"
+                author="kamransaleem">
+        <comment>4496: add release date to software version</comment>
+
+        <addColumn tableName="software_version">
+            <column name="releaseDate"
+                    type="DATE">
                 <constraints nullable="false"/>
             </column>
         </addColumn>
@@ -447,9 +472,9 @@
                               tableName="attestation_instance" />
     </changeSet>
 
-
     <!-- 4565 - rename software version - release date -->
     <changeSet id="20191217-4565-1"
+               failOnError="false"
                author="kamransaleem">
         <comment>4565 - rename software version - release date - drop default value</comment>
         <dropDefaultValue columnDataType="DATE"
@@ -459,6 +484,7 @@
 
 
     <changeSet id="20191217-4565-2"
+               failOnError="false"
                author="kamransaleem">
         <comment>4565 - rename software version - release date</comment>
         <dropNotNullConstraint columnDataType="DATE"
@@ -475,7 +501,247 @@
                       newColumnName="release_date"
                       oldColumnName="releaseDate"
                       tableName="software_version" />
+    </changeSet>
 
+
+    <!-- 4549 - Add column to end user application table for promoting eudas -->
+    <changeSet id="20191212-4549-1"
+               author="woodjes">
+        <comment>4549: Add column to end user application table for promoting eudas</comment>
+        <addColumn tableName="end_user_application">
+            <column name="is_promoted"
+                    defaultValueBoolean="false"
+                    type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <!-- 4498: entity_named_note_type Explicit Order -->
+    <changeSet id="20191217-4498-1"
+               author="rovats">
+        <comment>4498: entity named note positions</comment>
+        <addColumn tableName="entity_named_note_type">
+            <column name="position"
+                    type="${int.type}"
+                    defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <!-- 4592: asset costs table from decimal(10,2) to decimal(16,2) -->
+    <changeSet id="20200109-4592-1"
+               author="woodjes">
+        <modifyDataType tableName="asset_cost"
+                        columnName="amount"
+                        newDataType="DECIMAL(16,2)"/>
+    </changeSet>
+
+
+    <!-- 3842: svg_diagram width/height percentage config -->
+    <changeSet id="20200114-3842-1"
+               author="rovats">
+        <comment>3842: svg diagram width, height percentage config</comment>
+        <addColumn tableName="svg_diagram">
+            <column name="display_width_percent"
+                    type="${int.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="display_height_percent"
+                    type="${int.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <!-- 4396: cleanup/remove perspectives -->
+    <changeSet id="20200125-4396-1"
+               author="davidwatkins73">
+        <comment>4396: cleanup/remove perspectives</comment>
+        <dropTable tableName="perspective_definition"/>
+        <dropTable tableName="perspective_rating"/>
+    </changeSet>
+
+
+    <!-- 4626: involvement: add read-only flag -->
+    <changeSet id="20200124-4626-1"
+               author="kearash1">
+        <comment>4626: involvement: add read-only flag</comment>
+        <addColumn tableName="involvement">
+            <column name="is_readonly"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet id="20200124-4626-2"
+               author="davidwatkins73">
+        <sql>
+            UPDATE involvement
+            SET is_readonly = ${true.value}
+            WHERE provenance != 'waltz'
+        </sql>
+    </changeSet>
+
+  
+    <!-- 4636 - Measurable ratings planned retirement dates and replacement application -->
+    <changeSet id="20200128-4636-1"
+               author="woodjes">
+        <comment>1636: measurable rating planned decommission table</comment>
+        <createTable tableName="measurable_rating_planned_decommission">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="measurable_rating_planned_decommission_pkey"/>
+            </column>
+            <column name="entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="measurable_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="planned_decommission_date"
+                    type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="20200128-4636-2"
+               author="woodjes">
+        <comment>1636: measurable rating planned decommission fk</comment>
+        <addForeignKeyConstraint baseTableName="measurable_rating_planned_decommission"
+                                 baseColumnNames="entity_id,entity_kind,measurable_id"
+                                 constraintName="measurable_rating_planned_decommission_fk"
+                                 referencedTableName="measurable_rating"
+                                 referencedColumnNames="entity_id,entity_kind,measurable_id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+
+    <changeSet id="20200128-4636-3"
+               author="woodjes">
+        <comment>1636: measurable rating replacement table</comment>
+        <createTable tableName="measurable_rating_replacement">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="measurable_rating_replacement_pkey"/>
+            </column>
+            <column name="decommission_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="planned_commission_date"
+                    type="DATE">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="20200128-4636-4"
+               author="woodjes">
+        <comment>1636: measurable rating replacement fk</comment>
+        <addForeignKeyConstraint baseTableName="measurable_rating_replacement"
+                                 baseColumnNames="decommission_id"
+                                 constraintName="measurable_rating_replacement_planned_decommission_fk"
+                                 referencedTableName="measurable_rating_planned_decommission"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint baseTableName="measurable_rating_replacement"
+                                 baseColumnNames="entity_id"
+                                 constraintName="measurable_rating_replacement_application_fk"
+                                 referencedTableName="application"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20200124-4626-3"
+               author="kearash1">
+        <comment>4626: involvement: add read-only flag</comment>
+        <dropDefaultValue tableName="involvement"
+                          columnName="is_readonly"/>
+    </changeSet>
+
+    <changeSet id="20200124-4626-4"
+               author="kearash1">
+        <comment>4626: involvement: add read-only flag</comment>
+        <addDefaultValue tableName="involvement"
+                         columnName="is_readonly"
+                         defaultValueBoolean="true"/>
+    </changeSet>
+
+    <changeSet id="20200124-4626-5"
+               author="kearash1">
+        <sql>
+            UPDATE involvement
+            SET is_readonly = CASE WHEN provenance = 'waltz' THEN ${false.value} ELSE ${true.value}
+            END
+        </sql>
     </changeSet>
 
 </databaseChangeLog>

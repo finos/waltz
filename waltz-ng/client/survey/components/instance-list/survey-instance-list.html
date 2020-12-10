@@ -1,3 +1,21 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
 <div>
     <waltz-no-data ng-if="$ctrl.surveys | isEmpty">
         <message>
@@ -53,18 +71,10 @@
         id="sil-table.html">
     <table class="table table-condensed table-striped small"
            ng-if="surveys.length > 0">
-        <colgroup>
-            <col width="34%">
-            <col width="10%">
-            <col width="8%">
-            <col width="16%">
-            <col width="8%">
-            <col width="16%">
-            <col width="8%">
-        </colgroup>
         <thead>
         <tr>
             <th>Title</th>
+            <th ng-if="$ctrl.visibility.showSurveySubject">Subject</th>
             <th>Status</th>
             <th>Issued On</th>
             <th>Submitted By</th>
@@ -85,9 +95,13 @@
                    class="clickable"
                    ui-sref="main.survey.instance.response.edit ({id: row.surveyInstance.id })"></a>
             </td>
+            <td ng-if="$ctrl.visibility.showSurveySubject">
+                <waltz-entity-link entity-ref="row.surveyInstance.surveyEntity">
+                </waltz-entity-link>
+            </td>
             <td ng-bind="row.surveyInstance.status | toDisplayName:'surveyInstanceStatus'">
             </td>
-            <td ng-bind="row.surveyRun.issuedOn | date:'dd-MM-yyyy'">
+            <td ng-bind="row.surveyRun.issuedOn | date:'yyyy-MM-dd'">
             </td>
             <td>
                 <span ng-if="row.surveyInstance.submittedBy"
@@ -99,7 +113,7 @@
             </td>
             <td>
                 <span ng-if="row.surveyInstance.submittedAt"
-                      ng-bind="row.surveyInstance.submittedAt | date:'dd-MM-yyyy'">
+                      ng-bind="row.surveyInstance.submittedAt | date:'yyyy-MM-dd'">
                 </span>
                 <span ng-if="! row.surveyInstance.submittedAt">
                             -
@@ -116,7 +130,7 @@
             </td>
             <td>
                 <span ng-if="row.surveyInstance.approvedAt"
-                      ng-bind="row.surveyInstance.approvedAt | date:'dd-MM-yyyy'">
+                      ng-bind="row.surveyInstance.approvedAt | date:'yyyy-MM-dd'">
                 </span>
                 <span ng-if="! row.surveyInstance.approvedAt">
                             -

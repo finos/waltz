@@ -3,26 +3,26 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import _ from "lodash";
-import { CORE_API } from "../../../common/services/core-api-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
-import { initialiseData } from "../../../common";
-import { mkLinkGridCell } from "../../../common/grid-utils";
-import { mkSelectionOptions } from "../../../common/selector-utils";
+import {initialiseData} from "../../../common";
+import {mkEntityLinkGridCell, mkLinkGridCell} from "../../../common/grid-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
+import {countByVersionId} from "../../software-catalog-utilities";
 
 import template from "./software-packages-section.html";
 
@@ -34,17 +34,19 @@ const bindings = {
 
 const initialState = {
     softwareCatalog: null,
+    selectedPackage: null,
+    selectedVersion: null
 };
 
 
 function mkColumnDefs() {
     return [
         mkLinkGridCell("Name",
-            "package.name",
-            "package.id",
-            "main.software-package.view"),
+                       "package.name",
+                       "package.id",
+                       "main.software-package.view"),
         { field: "version.externalId", displayName: "External Id" },
-        { field: "version.version", displayName: "Version"},
+        mkEntityLinkGridCell("Version", "version", "none", "right"),
         {
             field: "releaseDate",
             cellTemplate: `
@@ -55,23 +57,29 @@ function mkColumnDefs() {
         },
         { field: "package.description", displayName: "Description" },
         { field: "package.isNotable", displayName: "Notable" },
-        { field: "usageCount", name: "# Applications" }
+        {
+            field: "usageCount",
+            name: "# Applications",
+            cellTemplate: `<div class="ui-grid-cell-contents">
+                               <a class="clickable"
+                                  ng-bind="COL_FIELD"
+                                  ng-click="grid.appScope.onSelectVersion(row.entity)">
+                               </a>
+                           </div>`
+        }
     ]
 }
 
 
 function mkGridData(packages = [], versions = [], usages = []) {
-    const usagesByVersionId = _.groupBy(usages, "softwareVersionId");
-
-    const versionsById = _.keyBy(versions, v => v.id);
+    const countsByVersionId = countByVersionId(usages);
     const packagesById = _.keyBy(packages, v => v.id);
 
-    const gridData = _.map(usages, u => Object.assign(
+    const gridData = _.map(versions, v => Object.assign(
         { },
-        { package: packagesById[u.softwarePackageId] },
-        { version: versionsById[u.softwareVersionId] },
-        { usageCount: _.get(usagesByVersionId, `[${u.softwareVersionId}].length`, 0) })
-    );
+        { package: packagesById[v.softwarePackageId] },
+        { version: v },
+        { usageCount: _.get(countsByVersionId, `[${v.id}]`, 0) }));
 
     return gridData;
 }
@@ -89,9 +97,22 @@ function controller(serviceBroker) {
             .then(r => {
                 vm.softwareCatalog = r.data;
                 vm.columnDefs = mkColumnDefs();
-                vm.gridData = mkGridData(vm.softwareCatalog.packages,
+                vm.gridData = mkGridData(
+                    vm.softwareCatalog.packages,
                     vm.softwareCatalog.versions,
                     vm.softwareCatalog.usages);
+            });
+    };
+
+
+    vm.onSelectVersion = (row) => {
+        vm.selectedPackage = row.package;
+        vm.selectedVersion = row.version;
+        serviceBroker
+            .loadViewData(CORE_API.ApplicationStore.findBySelector, [mkSelectionOptions(vm.selectedVersion)])
+            .then(r => r.data)
+            .then(apps => {
+                vm.selectedApps = apps;
             });
     };
 

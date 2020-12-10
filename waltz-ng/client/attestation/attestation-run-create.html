@@ -1,13 +1,33 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
 <div>
     <waltz-page-header icon="check-square-o"
                        name="Attestation Run"
                        small="create">
-        <ol class="waltz-breadcrumbs">
-            <li><a ui-sref="main">Home</a></li>
-            <li><a ui-sref="main.attestation.instance.user">Attestations</a></li>
-            <li><a ui-sref="main.attestation.run.list">Attestation runs</a></li>
-            <li>Create</li>
-        </ol>
+        <breadcrumbs>
+            <ol class="waltz-breadcrumbs">
+                <li><a ui-sref="main">Home</a></li>
+                <li><a ui-sref="main.attestation.instance.user">Attestations</a></li>
+                <li><a ui-sref="main.attestation.run.list">Attestation runs</a></li>
+                <li>Create</li>
+            </ol>
+        </breadcrumbs>
     </waltz-page-header>
 
     <div class="waltz-page-summary waltz-page-summary-attach">
@@ -64,7 +84,7 @@
                 <div class="form-group">
                     <label for="dueDate"
                            class="col-sm-2 control-label">
-                        Due Date
+                        Due Date <span class="text-danger">*</span>
                     </label>
                     <div class="col-sm-10 col-md-3">
                         <waltz-date-picker-form-input id="dueDate"
@@ -99,6 +119,7 @@
                     </label>
                     <div class="col-sm-10">
                         <waltz-entity-selector current-selection="ctrl.attestationRun.selectorEntity"
+                                               id="selectorEntity"
                                                required="true"
                                                on-select="ctrl.onSelectorEntitySelect"
                                                entity-kinds="[ctrl.attestationRun.selectorEntityKind]">
@@ -156,12 +177,12 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="involmentKinds"
+                    <label for="involvementKinds"
                            class="col-sm-2 control-label">
                         Involvement Kinds <span class="text-danger">*</span>
                     </label>
                     <div class="col-sm-10">
-                        <select id="involmentKinds"
+                        <select id="involvementKinds"
                                 required
                                 type="date"
                                 class="form-control"
@@ -170,6 +191,19 @@
                                 multiple
                                 style="height: 250px;">
                         </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="sendEmail"
+                           class="col-sm-2 control-label">
+                        Send Email Notification
+                    </label>
+                    <div class="col-sm-10">
+                        <input class="checkbox"
+                               type="checkbox"
+                               id="sendEmail"
+                               ng-model="ctrl.attestationRun.sendEmailNotifications"/>
                     </div>
                 </div>
 

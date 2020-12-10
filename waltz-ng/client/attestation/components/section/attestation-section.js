@@ -3,33 +3,44 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import template from "./attestation-section.html";
+import {attest} from "../../attestation-utils";
 
-const initialState = {
-    attestations: [],
-    createType: null,
-};
 
 const bindings = {
     parentEntityRef: "<"
 };
+
+
+const modes = {
+    EDIT: "EDIT",
+    VIEW: "VIEW"
+};
+
+
+const initialState = {
+    attestations: [],
+    attestationSections: [],
+    mode: modes.VIEW,
+    activeAttestationSection: null
+};
+
 
 
 function mkAttestationData(attestationRuns = [], attestationInstances = []){
@@ -45,138 +56,145 @@ function mkAttestationData(attestationRuns = [], attestationInstances = []){
 }
 
 
+function mkAttestationSections(baseSections = [], attestations = [], unattestedChanges = []) {
+    const unattestedChangesByChildKind = _.groupBy(unattestedChanges, d => d.childKind);
+
+    const attestationsByKind = _
+        .chain(attestations)
+        .filter(d => d.instance.attestedAt != null)
+        .sortBy(d => d.instance.attestedAt)
+        .groupBy(d => d.run.attestedEntityKind)
+        .value();
+
+    return _
+        .chain(baseSections)
+        .map(s => {
+            const latestAttestation = _.findLast(attestationsByKind[s.type]);
+            return {
+                section: s,
+                latestAttestation: latestAttestation,
+                unattestedChanges: _.get(unattestedChangesByChildKind, [s.type], [])
+            };
+        })
+        .value();
+}
+
+
 function controller($q,
                     serviceBroker,
                     notification) {
 
     const vm = initialiseData(this, initialState);
+    const today = new Date();
+    const baseSections = [
+        {
+            type: "LOGICAL_DATA_FLOW",
+            name: "Logical Flow - latest attestation",
+            actionLabel:  "Attest logical flows",
+            typeName: "Logical Flows",
+            unattestedChanges: []
+        },
+        {
+            type: "PHYSICAL_FLOW",
+            name: "Physical Flow - latest attestation",
+            actionLabel:  "Attest physical flows",
+            typeName: "Physical Flows",
+            unattestedChanges: []
+        }
+    ];
 
-    const loadData = () => {
 
+    const loadAttestationData = (entityReference) => {
         const runsPromise = serviceBroker
-            .loadViewData(CORE_API.AttestationRunStore.findByEntityRef,
-                [vm.parentEntityRef],
+            .loadViewData(
+                CORE_API.AttestationRunStore.findByEntityRef,
+                [entityReference],
                 { force: true })
             .then(r => r.data);
 
         const instancesPromise = serviceBroker
-            .loadViewData(CORE_API.AttestationInstanceStore.findByEntityRef,
-                [vm.parentEntityRef],
+            .loadViewData(
+                CORE_API.AttestationInstanceStore.findByEntityRef,
+                [entityReference],
                 { force: true })
             .then(r => r.data);
 
-        const logicalFlowsPromise = serviceBroker
-            .loadViewData(CORE_API.LogicalFlowStore.findByEntityReference,
-                [vm.parentEntityRef],
-                {force: true})
+        const unattestedChangesPromise = serviceBroker
+            .loadViewData(
+                CORE_API.ChangeLogStore.findUnattestedChangesByEntityReference,
+                [entityReference],
+                { force: true })
             .then(r => r.data);
 
-        const logicalFlowDecoratorPromise = serviceBroker
-            .loadViewData(CORE_API.LogicalFlowDecoratorStore.findBySelectorAndKind,
-                [{
-                    entityReference: vm.parentEntityRef,
-                    scope: 'EXACT'
-                }, 'DATA_TYPE'])
+        const permissionGroupPromise = serviceBroker
+            .loadViewData(
+                CORE_API.PermissionGroupStore.findByEntity,
+                [entityReference])
             .then(r => r.data);
 
-        const dataTypePromise = serviceBroker
-            .loadViewData(CORE_API.DataTypeStore.findAll)
-            .then(r => r.data);
-
-
-        const sections = [
-            {
-                type: "LOGICAL_DATA_FLOW",
-                name: "Logical Flow - latest attestation",
-                attestMessage:  "Attest logical flows"
-            },
-            {
-                type: "PHYSICAL_FLOW",
-                name: "Physical Flow - latest attestation",
-                attestMessage:  "Attest physical flows"
-            }
-        ];
-
-        return $q.all([runsPromise, instancesPromise, logicalFlowsPromise, logicalFlowDecoratorPromise, dataTypePromise])
-            .then(([runs, instances, logicalFlows, flowDecorators, dataTypes]) => {
-
+        return $q
+            .all([runsPromise, instancesPromise, unattestedChangesPromise, permissionGroupPromise])
+            .then(([runs, instances, unattestedChanges, permissions]) => {
                 vm.attestations = mkAttestationData(runs, instances);
-
-                const attestationsByKind = _
-                    .chain(vm.attestations)
-                    .filter(d => d.instance.attestedAt != null)
-                    .sortBy(d => d.instance.attestedAt)
-                    .groupBy(d => d.run.attestedEntityKind)
-                    .value();
-
-                vm.groupedAttestations = _
-                    .chain(sections)
-                    .map(s => {
-                        const latestAttestation = _.findLast(attestationsByKind[s.type]);
-                        return {
-                            section: s,
-                            latestAttestation: latestAttestation
-                        };
-                    })
-                    .value();
-
-                const upstreamFlowIds = _.chain(logicalFlows)
-                    .filter(flow => flow.target.id === vm.parentEntityRef.id)
-                    .map(flow => flow.id)
-                    .value();
-
-                const unknownOrDeprecatedDatatypeIds = _.chain(dataTypes)
-                    .filter(dt => dt.deprecated === true || dt.unknown === true)
-                    .map(dt => dt.id)
-                    .value();
-
-                vm.upstreamFlowsWithUnknownOrDeprecatedDataTypes = _.filter(flowDecorators,
-                        d =>
-                            _.includes(upstreamFlowIds, d.dataFlowId)
-                            && _.includes(unknownOrDeprecatedDatatypeIds, d.decoratorEntity.id));
-
+                vm.attestationSections = mkAttestationSections(baseSections, vm.attestations, unattestedChanges);
+                vm.permissions = permissions;
             });
     };
 
-    vm.$onInit = () => {
-        loadData();
-    };
 
     vm.$onChanges = () => {
-        if (vm.parentEntityRef) {
-            loadData();
+        if (! vm.parentEntityRef) {
+            return;
         }
+        loadAttestationData(vm.parentEntityRef);
     };
 
-    vm.setCreateType = (type) => vm.createType = type;
 
     vm.attestEntity = () => {
-
-        if(vm.upstreamFlowsWithUnknownOrDeprecatedDataTypes.length !== 0 && vm.createType === 'LOGICAL_DATA_FLOW'){
-            return confirm("This application is connected to unknown and / or deprecated data types, please update these flows before the attestation can be updated.")
-        }
-
         if (confirm("By clicking confirm, you are attesting that all data flows are present and correct for this entity, and thereby accountable for this validation.")){
-            return serviceBroker
-                .execute(CORE_API.AttestationInstanceStore.attestEntityForUser,
-                    [mkCreateCommand(vm.parentEntityRef, vm.createType)])
-                .then(() => notification.success("Attested successfully"))
-                .then(() => loadData())
-                .then(() => vm.setCreateType(null));
+            attest(serviceBroker, vm.parentEntityRef, vm.activeAttestationSection.type)
+                .then(() => {
+                    notification.success("Attested successfully");
+                    loadAttestationData(vm.parentEntityRef);
+                    vm.onCancelAttestation();
+                });
         }
     };
 
-    vm.cancelAttestation = () => {
-        vm.setCreateType(null);
+    vm.onInitiateAttestation = (section) => {
+        vm.activeAttestationSection = section;
+        vm.mode = modes.EDIT;
     };
-}
+
+    vm.hasPermissionToAttest = (entityKind) => {
+        return _.isEmpty(vm.permissions)
+            ? false
+            : _.some(vm.permissions, p => p.qualifierKind === entityKind);
+    };
+
+    vm.onCancelAttestation = () => {
+        vm.activeAttestationSection = null;
+        vm.mode = modes.VIEW;
+    };
 
 
-function mkCreateCommand(parentEntityRef, entityKind){
+    vm.outOfDate = (dueDate) => {
+        const plannedDate = new Date(dueDate);
+        return today > plannedDate;
+    };
 
-    return {
-        entityReference: parentEntityRef,
-        attestedEntityKind: entityKind};
+    vm.determinePopoverText = (attestation) => {
+        const outOfDate = vm.outOfDate(attestation.run.dueDate);
+
+        if (attestation.instance.attestedAt) {
+            return "This attestation has been completed"
+        } else if (outOfDate){
+            return "This attestation has not been completed and is now overdue"
+        } else {
+            return "This attestation has not been completed"
+        }
+    };
+
 }
 
 

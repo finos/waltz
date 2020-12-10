@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.web.endpoints.api;
@@ -31,8 +30,6 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
-
-import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
@@ -67,13 +64,16 @@ public class SurveyRunEndpoint implements Endpoint {
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String findByTemplateIdPath = mkPath(BASE_URL, "template-id", ":id");
         String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
+        String findForRecipientIdPath = mkPath(BASE_URL, "recipient", "id", ":id");
         String surveyRunListForUserPath = mkPath(BASE_URL, "user");
         String surveyRunUpdatePath = mkPath(BASE_URL, ":id");
+        String surveyRunDeletePath = mkPath(BASE_URL, ":id");
         String generateSurveyRunRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
         String createSurveyRunInstancesAndRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
         String createSurveyInstancesPath = mkPath(BASE_URL, ":id", "create-instances");
         String updateSurveyRunStatusPath = mkPath(BASE_URL, ":id", "status");
         String updateSurveyRunDueDatePath = mkPath(BASE_URL, ":id", "due-date");
+        String updateOwningRolePath = mkPath(BASE_URL, ":id", "role");
         String getSurveyRunCompletionRate = mkPath(BASE_URL, ":id", "completion-rate");
 
         DatumRoute<SurveyRun> getByIdRoute = (req, res) ->
@@ -85,6 +85,9 @@ public class SurveyRunEndpoint implements Endpoint {
         ListRoute<SurveyRun> findByEntityRoute = (req, res)
                 -> surveyRunService.findBySurveyInstanceIdSelector(mkOpts(getEntityReference(req), EXACT));
 
+        ListRoute<SurveyRun> findForRecipientIdRoute = (req, res)
+                -> surveyRunService.findForRecipient(getId(req));
+
         ListRoute<SurveyRun> surveyRunListForUserRoute = (req, res)
                 -> surveyRunService.findForRecipient(getUsername(req));
 
@@ -94,6 +97,9 @@ public class SurveyRunEndpoint implements Endpoint {
             return surveyRunService
                     .createSurveyRun(getUsername(req), surveyRunChangeCommand);
         };
+
+        DatumRoute<Boolean> surveyRunDeleteRoute = (req, res) ->
+                surveyRunService.deleteSurveyRun(getUsername(req), getId(req));
 
         DatumRoute<Integer> surveyRunUpdateRoute = (req, res) -> {
             ensureUserHasAdminRights(req);
@@ -124,6 +130,16 @@ public class SurveyRunEndpoint implements Endpoint {
                     command);
         };
 
+        DatumRoute<Integer> surveyRunUpdateOwningRolesRoute = (req, res) -> {
+
+            SurveyInstanceOwningRoleSaveCommand owningRole = readBody(req, SurveyInstanceOwningRoleSaveCommand.class);
+
+            return surveyRunService.updateSurveyInstanceOwningRoles(
+                    getUsername(req),
+                    getId(req),
+                    owningRole);
+        };
+
         ListRoute<SurveyInstanceRecipient> generateSurveyRunRecipientsRoute = (request, response) -> {
             ensureUserHasAdminRights(request);
 
@@ -140,10 +156,13 @@ public class SurveyRunEndpoint implements Endpoint {
 
         DatumRoute<Boolean> createSurveyInstancesRoute = (request, response) -> {
             long runId = getId(request);
-            List<Long> personIds = readIdsFromBody(request);
+
+            SurveyInstanceRecipientsAndOwners recipientsAndOwners = readBody(request, SurveyInstanceRecipientsAndOwners.class);
+
             return surveyRunService.createDirectSurveyInstances(
                     runId,
-                    personIds);
+                    recipientsAndOwners.personIds(),
+                    recipientsAndOwners.owningRole());
         };
 
         DatumRoute<SurveyRunCompletionRate> getSurveyRunCompletionRateRoute = (request, response)
@@ -152,14 +171,17 @@ public class SurveyRunEndpoint implements Endpoint {
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findByTemplateIdPath, findByTemplateIdRoute);
         getForList(findByEntityRefPath, findByEntityRoute);
+        getForList(findForRecipientIdPath, findForRecipientIdRoute);
         getForList(generateSurveyRunRecipientsPath, generateSurveyRunRecipientsRoute);
         getForList(surveyRunListForUserPath, surveyRunListForUserRoute);
         postForDatum(BASE_URL, surveyRunCreateRoute);
+        deleteForDatum(surveyRunDeletePath, surveyRunDeleteRoute);
         putForDatum(surveyRunUpdatePath, surveyRunUpdateRoute);
         postForDatum(createSurveyRunInstancesAndRecipientsPath, createSurveyRunInstancesAndRecipientsRoute);
         postForDatum(createSurveyInstancesPath, createSurveyInstancesRoute);
         putForDatum(updateSurveyRunStatusPath, surveyRunUpdateStatusRoute);
         putForDatum(updateSurveyRunDueDatePath, surveyRunUpdateDueDateRoute);
+        putForDatum(updateOwningRolePath, surveyRunUpdateOwningRolesRoute);
         getForDatum(getSurveyRunCompletionRate, getSurveyRunCompletionRateRoute);
     }
 

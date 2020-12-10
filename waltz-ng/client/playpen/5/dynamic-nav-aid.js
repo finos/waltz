@@ -1,21 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any lat
- * er version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import _ from "lodash";
@@ -25,7 +23,7 @@ import { buildHierarchies } from "../../common/hierarchy-utils";
 import { select } from "d3-selection";
 
 import template from "./dynamic-nav-aid.html";
-import { rgb } from 'd3-color';
+import { rgb } from "d3-color";
 
 
 const bindings = {
@@ -82,10 +80,8 @@ function update(sections,
                 tweakers) {
     redraw = () => update(sections, model, tweakers);
 
-    // drawBlocks(sections.topBlocks, model);
-
     const blocks = sections.topBlocks
-        .selectAll('.dna-block')
+        .selectAll(".dna-block")
         .data(model, d => d.id);
 
     drawNestedBlocks(blocks);
@@ -93,23 +89,23 @@ function update(sections,
 
 
 function drawNestedBlocks(selection) {
-    console.log('drawNestedBlocks: ', selection);
+    console.log("drawNestedBlocks: ", selection);
 
     const newBlockGs = selection
         .enter()
-        .append('g')
-        .classed('dna-block', true)
+        .append("g")
+        .classed("dna-block", true)
         .attr("transform", (d, i) => `translate(${i * 100} 0)`);
 
-    const fill = rgb('#6d84ff');
+    const fill = rgb("#6d84ff");
 
     newBlockGs
-        .append('rect')
+        .append("rect")
         .attrs((d, i) => {
             console.log({d, i});
             return {
                 fill,
-                stroke: '#ccc',
+                stroke: "#ccc",
                 width: 100,
                 height: 100
             }
@@ -117,11 +113,11 @@ function drawNestedBlocks(selection) {
 
 
     newBlockGs
-        .append('rect')
-        .attrs((d, i) => {
+        .append("rect")
+        .attrs(() => {
             return {
                 fill: fill.darker(1.5),
-                stroke: '#ccc',
+                stroke: "#ccc",
                 width: 100,
                 height: 25
             }
@@ -130,7 +126,7 @@ function drawNestedBlocks(selection) {
 
     newBlockGs
         .append("text")
-        .attrs((d,i) => {
+        .attrs(() => {
             return {
                 fill: "#FFF",
                 dy: 12,
@@ -140,56 +136,49 @@ function drawNestedBlocks(selection) {
         .text(d => d.name);
 
     const children = newBlockGs
-        .selectAll('.dna-block')
+        .selectAll(".dna-block")
         .data((d) => d.children, d => d.id)
         .enter();
 
-    // children.each(d => console.log('each: ', d));
-
-    // console.log('children: ', children, children.empty())
     if (!children.empty()) {
-        children.each(d => drawNestedBlocks(d));;
+        children.each(d => drawNestedBlocks(d));
     }
 }
 
 
 function drawBlocks(section, model) {
-    console.log('section: ', section)
-
     const blocks = section
-        .selectAll('.dna-block')
+        .selectAll(".dna-block")
         .data(model, d => d.id);
 
     // enter
     const newBlockGs = blocks
         .enter()
-        .append('g')
-        .classed('dna-block', true)
+        .append("g")
+        .classed("dna-block", true)
         .attr("transform", (d, i) => `translate(${i * 100} 0)`);
 
 
-    const fill = rgb('#6d84ff');
+    const fill = rgb("#6d84ff");
 
-    const blockRects = newBlockGs
-        .append('rect')
-        .attrs((d, i) => {
-            console.log({d, i});
+    newBlockGs
+        .append("rect")
+        .attrs(() => {
             return {
                 fill,
-                stroke: '#ccc',
+                stroke: "#ccc",
                 width: 100,
                 height: 100
             }
         });
 
 
-    const titleRects = newBlockGs
-        .append('rect')
+    newBlockGs
+        .append("rect")
         .attrs((d, i) => {
-            console.log({d, i});
             return {
                 fill: fill.darker(1.5),
-                stroke: '#ccc',
+                stroke: "#ccc",
                 width: 100,
                 height: 25
             }
@@ -198,7 +187,7 @@ function drawBlocks(section, model) {
 
     newBlockGs
         .append("text")
-        .attrs((d,i) => {
+        .attrs(() => {
             return {
                 fill: "#FFF",
                 dy: 12,
@@ -208,23 +197,11 @@ function drawBlocks(section, model) {
         .text(d => d.name);
 
     newBlockGs
-        .selectAll('.dna-block')
+        .selectAll(".dna-block")
         .data((d) => d.children)
         .enter()
-        .append('g')
-        .call((d, i) => {
-            console.log('call child: ', d, i, d.datum());
-            drawBlocks(d)
-        })
-        // .classed('dna-block', true)
-        // .attr("transform", (d, i) => `translate(${i * 100} 0)`);
-
-    // update
-    // TBD - not likely to be needed
-
-
-    // exit
-    // TBD - not likely to be needed
+        .append("g")
+        .call(d => drawBlocks(d));
 }
 
 
@@ -235,47 +212,32 @@ function controller($element, $window, serviceBroker) {
     const svg = select($element.find("svg")[0]);
     const svgSections = prepareGraph(svg);
 
-
     const render = () => {
-        // baseDimensions.graph.width = $element
-        //     .parent()[0]
-        //     .clientWidth;
-        console.log(baseDimensions.graph.width)
-
         svgSections.svg
-            .attr('width', baseDimensions.graph.width)
-            .attr('height', baseDimensions.graph.height);
+            .attr("width", baseDimensions.graph.width)
+            .attr("height", baseDimensions.graph.height);
 
         update(svgSections, vm.dataTypeHierarchy);
     };
 
     const debouncedRender = _.debounce(render, 100);
 
-    const tree = data => d3.tree()
-        .size([2 * Math.PI, radius])
-        .separation((a, b) => (a.parent == b.parent ? 1 : 2) / a.depth)
-        (d3.hierarchy(data))
-
     vm.$onInit = () => {
         serviceBroker
             .loadViewData(CORE_API.DataTypeStore.findAll, [])
             .then(r => vm.dataTypes = r.data)
-            .then(() => vm.dataTypeHierarchy = buildHierarchies(vm.dataTypes, false))
-            .then(() => {
-                console.log(vm.dataTypeHierarchy);
-
-            });
+            .then(() => vm.dataTypeHierarchy = buildHierarchies(vm.dataTypes, false));
 
         angular
             .element($window)
-            .on('resize', debouncedRender);
+            .on("resize", debouncedRender);
     };
 
-    vm.$onChanges = (changes) => debouncedRender();
+    vm.$onChanges = () => debouncedRender();
 
     vm.$onDestroy = () => angular
         .element($window)
-        .off('resize', debouncedRender);
+        .off("resize", debouncedRender);
 }
 
 

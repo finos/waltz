@@ -1,42 +1,47 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import angular from "angular";
-import {registerStores} from "../common/module-utils";
+import {registerComponents, registerStores} from "../common/module-utils";
 import changeLogStore from "./services/change-log-store";
-import Routes from './routes';
-import ChangeLogSection from './components/change-log-section';
-import ChangeLogTable from './components/change-log-table';
+import changeLogSummariesStore from "./services/change-log-summaries-store";
+import Routes from "./routes";
+import ChangeLogSection from "./components/change-log-section";
+import ChangeLogTable from "./components/change-log-table";
+import ChangeBreakdownTable from "./components/breakdown-table/change-breakdown-table";
+import ChangeSummariesPanel from "./components/summaries-panel/change-summaries-panel";
 
 export default () => {
-    const module = angular.module('waltz.change.log', []);
+    const module = angular.module("waltz.change.log", []);
 
     module
         .config(Routes);
 
     registerStores(module, [
-        changeLogStore
+        changeLogStore,
+        changeLogSummariesStore
     ]);
 
+    registerComponents(module, [ChangeBreakdownTable, ChangeSummariesPanel]);
+
     module
-        .component('waltzChangeLogSection', ChangeLogSection)
-        .component('waltzChangeLogTable', ChangeLogTable);
+        .component("waltzChangeLogSection", ChangeLogSection)
+        .component("waltzChangeLogTable", ChangeLogTable);
 
     return module.name;
 };

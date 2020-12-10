@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 import {checkIsEntityRef, checkIsIdSelector} from "../../common/checks";
 
@@ -22,6 +21,7 @@ import {checkIsEntityRef, checkIsIdSelector} from "../../common/checks";
 function store($http, baseApiUrl) {
 
     const baseUrl = `${baseApiUrl}/measurable-rating`;
+    const viewBaseUrl = `${baseApiUrl}/measurable-rating-view`;
 
     const findForEntityReference = (ref) => {
         checkIsEntityRef(ref);
@@ -70,17 +70,10 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
-    const create = (ref, measurableId, rating = "Z", description = "") => {
+    const save = (ref, measurableId, rating = "Z", previousRating, description = "") => {
         checkIsEntityRef(ref);
         return $http
-            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/measurable/${measurableId}`, { rating, description})
-            .then(d => d.data);
-    };
-
-    const update = (ref, measurableId, rating = "Z", description = "") => {
-        checkIsEntityRef(ref);
-        return $http
-            .put(`${baseUrl}/entity/${ref.kind}/${ref.id}/measurable/${measurableId}`, { rating, description })
+            .post(`${baseUrl}/entity/${ref.kind}/${ref.id}/measurable/${measurableId}`, { rating, previousRating, description })
             .then(d => d.data);
     };
 
@@ -106,8 +99,7 @@ function store($http, baseApiUrl) {
         countByMeasurableCategory,
         statsByAppSelector,
         statsForRelatedMeasurables,
-        create,
-        update,
+        save,
         remove,
         removeByCategory
     };
@@ -156,25 +148,20 @@ export const MeasurableRatingStore_API = {
         serviceFnName: "statsForRelatedMeasurables",
         description: "return stats for related measurables"
     },
-    create: {
+    save: {
         serviceName,
-        serviceFnName: "create",
-        description: "create a measurable"
-    },
-    update: {
-        serviceName,
-        serviceFnName: "update",
-        description: "update a measurable"
+        serviceFnName: "save",
+        description: "saves a measurable rating (either creating it or updating it as appropriate)"
     },
     remove: {
         serviceName,
         serviceFnName: "remove",
-        description: "remove a measurable"
+        description: "remove a measurable rating"
     },
     removeByCategory: {
         serviceName,
         serviceFnName: "removeByCategory",
-        description: "remove a measurable"
+        description: "remove all measurable ratings for an entity in a given category [entityRef, categoryId]"
     }
 };
 

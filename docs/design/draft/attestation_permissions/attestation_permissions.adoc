@@ -1,0 +1,149 @@
+= Attestation Permissions
+Jessica Woodland-Scott <jessica.woodland-scott@db.com>
+:version: v0.1
+:modified: 2020-09-25
+:status: DRAFT
+:toc:
+
+<<<
+== Document Info
+
+|===
+| Attribute | Value
+
+| Status
+| {status} {version} ({modified})
+
+| Target Version
+| 1.28
+
+| Lead
+| Jessica Woodland-Scott
+|===
+
+<<<
+
+== Overview
+This design doc discusses ways of implementing involvement-based permissions (as opposed to user roles) on the attestation of an applications flows.
+
+
+Ask:
+Only a Waltz user with direct involvement of the application (as listed within the People section) can attest application logical and physical flows. Attestation is not an option for all other users.
+
+
+Currently attestations can be provided by anyone.
+
+The limitation on the current user_role table is that it cannot be configured on an app-by-app basis or by other selectors.
+Editing permissions for measurable ratings on a specific category is managed by the `rating_editor_role` on a category definition, this is only checked for after a request to the server is made.
+This functionality could overlap slightly with a default group - but the default group would restrict permissions to a role on app rather than any person holding that role.
+
+Should be considered how these rules are compounded
+- for example if LOGICAL_DATA_FLOW_EDITOR user is required *and/or* an involvement is required to provide logical flow attestations.
+
+We also want this to be re-usable across different sections in waltz (like editing ratings/allocations)
+
+<<<
+== Proposal
+
+=== Core Waltz changes
+
+
+Database:
+
+
+- The default is to accept any involvement with the application at all (This covers if no permission group is specified,
+no permission_group_involvement is specified for that subject_kind)
+
+- We need a default group for permissions so that can set application-wide rules for involvement permissions
+(could use a `is_default` column?)
+
+- If we do have a default group then how do we restrict it to only one default group being created?
+
+.permission_group_entry
+|===
+| application_id | permission_group_id
+
+| 1
+| 1
+
+|===
+
+
+.permission_group
+|===
+| id | name | external_id | description | provenance | is_default
+
+| 1
+| Default
+| DEFAULT
+| example description
+| waltz
+| true
+
+| 2
+| Finance Permissions
+| FINANCE
+| example description
+| waltz
+| false
+
+|===
+
+.permission_group_involvement
+|===
+| permission_group_id* | subject_kind* | qualifier_kind | qualifier_id | involvement_group_id
+
+| 1
+| ATTESTATION
+| LOGICAL_DATA_FLOW
+| null
+| 1
+
+| 1
+| MEASURABLE_RATING
+| MEASURABLE_CATEGORY
+| 12
+| 1
+
+|===
+
+.involvement_group_entry
+|===
+| involvement_group_id | involvement_kind_id
+
+| 1
+| 12
+
+| 1
+| 13
+
+|===
+
+.involvement_group
+|===
+| id | name | external_id | provenance
+
+| 1
+| Data Roles
+| DATA
+| waltz
+
+|===
+
+
+Service:
+- hasRequiredInvolvement (like hasRole?) but would need to know the parent app
+
+
+Front-end:
+- Restrict who can select the attest button
+- Do we also need to restrict roles when creating an attestation run?
+
+
+Other:
+- Need a default permission group to maintain waltz-wide rules
+- Need to do an update to set permissions for attestations for apps
+
+<<<
+
+== Appendices

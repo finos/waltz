@@ -1,0 +1,51 @@
+/*!
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
+ */
+
+.woanp-notification {
+    background-color: #fafafa;
+    text-decoration: none;
+    padding: 0.8em 1.5em;
+    position: relative;
+    display: inline-block;
+    border-radius: 2px;
+    border: 2px solid #eee;
+
+    &:hover {
+        background: #f0f0f0;
+    }
+
+    .woanp-badge {
+        @extend .badge !optional;
+        position: absolute;
+        top: -8px;
+        right: -10px;
+    }
+
+    .woanp-count-badge {
+        @extend .woanp-badge;
+        background: #ff7f0e;
+    }
+
+    .woanp-zero-badge {
+        @extend .woanp-badge;
+        background: #e1f5e4;
+        border: 1px solid #bdf3c6;
+        color: #119521
+    }
+}
+

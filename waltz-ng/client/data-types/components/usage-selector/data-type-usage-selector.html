@@ -1,34 +1,118 @@
-<waltz-multi-select-tree-control items="$ctrl.allDataTypes"
-                                 on-click="$ctrl.toggleTypeChecked"
-                                 on-check="$ctrl.typeChecked"
-                                 on-uncheck="$ctrl.typeUnchecked"
-                                 checked-item-ids="$ctrl.checkedItemIds"
-                                 expanded-item-ids="$ctrl.expandedItemIds">
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
 
-        <strong uib-popover-template="'wdtus-popup.html'"
-                popover-trigger="mouseenter"
-                popover-popup-delay="400"
-                popover-append-to-body="true"
-                ng-style="$ctrl.isNonConcreteAndSelected(node) && {'color': 'darkred', 'font-style': 'italic'}"
-                ng-bind="node.name">
-        </strong>
-</waltz-multi-select-tree-control>
+<div>
+    <waltz-multi-select-tree-control items="$ctrl.visibleDataTypes"
+                                     order-by-expression="-dataType.name"
+                                     on-check="$ctrl.typeChecked"
+                                     on-uncheck="$ctrl.typeUnchecked"
+                                     checked-item-ids="$ctrl.checkedItemIds"
+                                     expanded-item-ids="$ctrl.expandedItemIds"
+                                     disable-predicate="$ctrl.disablePredicate"
+                                     is-readonly-predicate="$ctrl.isReadonlyPredicate">
+
+        <span uib-popover-template="'wdtus-popup.html'"
+              popover-trigger="mouseenter"
+              popover-popup-delay="400"
+              popover-placement="bottom"
+              popover-append-to-body="true"
+              ng-class="{
+                'waltz-tree-node-implicit': !node.dataType.concrete && !node.usage,
+                'waltz-tree-node-explicit': node.dataType.concrete
+              }">
+            <span ng-bind="node.dataType.name">
+            </span>
+
+            <span style="position: relative; top: -1px"
+                 class="waltz-visibility-child-30">
+                <waltz-icon name="exclamation-triangle"
+                            class="waltz-error-icon"
+                            ng-if="!node.dataType.concrete && node.usage">
+                </waltz-icon>
+                <waltz-icon name="info-circle"
+                            class="waltz-warning-icon"
+                            ng-if="node.usage.warningMessageForEditors">
+                </waltz-icon>
+                <waltz-icon name="lock"
+                            ng-if="node.usage.readOnly">
+                </waltz-icon>
+            </span>
+        </span>
+    </waltz-multi-select-tree-control>
+
+    <p class="small clickable text text-muted"
+       style="margin-left: 22px"
+       ng-if="!$ctrl.showAllDataTypes">
+        <waltz-icon name="info-circle"></waltz-icon>
+        This is a reduced list of recommended datatypes based on your upstream source
+    </p>
+
+    <a class="small clickable"
+       style="margin-left: 22px">
+        <waltz-icon ng-if="!$ctrl.showAllDataTypes"
+                    name="plus">
+        </waltz-icon>
+        <waltz-icon ng-if="$ctrl.showAllDataTypes"
+                    name="minus">
+        </waltz-icon>
+        <span ng-click="$ctrl.toggleShowAll()"
+              ng-bind="$ctrl.showAllMessage">
+        </span>
+    </a>
+</div>
+
 
 <script type="text/ng-template"
         id="wdtus-popup.html">
-    <strong ng-bind="node.name"></strong>
-    <p class="small text-muted"
-       ng-bind="node.description">
-    </p>
-    <div class="alert alert-warning small" ng-if="!node.concrete">
-        Direct mappings have been disabled for this data type.
-        <span ng-if="$ctrl.checkedItemIds.indexOf(node.id) > -1">
-            <span ng-if="$ctrl.hasAnyChild(node)">
-                Please remove this mapping by selecting a more specific sub type.
+    <div class="small">
+
+        <p ng-bind="node.dataType.description">
+        </p>
+
+        <div ng-if="!node.dataType.concrete && node.usage"
+             style="margin-top: 12px; padding-top: 4px; border-left: 3px solid red; padding-left: 4px; "
+             class="text-muted">
+            <waltz-icon name="exclamation-triangle">
+            </waltz-icon>
+            This mapping is invalid as the datatype has been declared non-concrete.
+            <span ng-if="! node.usage.readOnly">
+                Please select another datatype and replace this mapping.
             </span>
-            <span ng-if="!$ctrl.hasAnyChild(node)">
-                Click to remove this mapping.
+        </div>
+
+        <div ng-if="node.usage.warningMessageForEditors"
+             style="margin-top: 12px; padding-top: 4px; border-left: 3px solid orange; padding-left: 4px; "
+             class="text-muted">
+            <waltz-icon name="info-circle">
+            </waltz-icon>
+            <span ng-bind="node.usage.warningMessageForEditors">
             </span>
-        </span>
+        </div>
+
+        <div ng-if="node.usage.readOnly"
+             style="margin-top: 12px; padding-top: 4px; border-left: 3px solid grey; padding-left: 4px; "
+             class="text-muted">
+            <waltz-icon name="lock">
+            </waltz-icon>
+            <span>
+                This datatype mapping is locked and cannot be changed within Waltz.
+            </span>
+        </div>
     </div>
+
 </script>

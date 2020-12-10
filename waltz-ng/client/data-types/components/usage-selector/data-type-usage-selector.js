@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import _ from "lodash";
@@ -22,195 +21,224 @@ import {initialiseData, notEmpty} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./data-type-usage-selector.html";
-import {enrichDataTypes} from "../../data-type-utils";
+import {loadUsageData} from "../../data-type-utils";
+import {reduceToSelectedNodesOnly} from "../../../common/hierarchy-utils";
 
 
 const bindings = {
     parentEntityRef: "<",
-    onDirty: "<",
-    onRegisterSave: "<"
+    onDirty: "<?",
+    onRegisterSave: "<?"
 };
 
 
 const initialState = {
     dataTypes: [],
-    allDataTypes: [],
+    rawDataTypes: [],
     checkedItemIds: [],
     originalSelectedItemIds: [],
     expandedItemIds: [],
+    disablePredicate: null,
+    suggestedDataTypes: [],
+    showAllDataTypes: false,
     onDirty: (d) => console.log("dtus:onDirty - default impl", d),
     onRegisterSave: (f) => console.log("dtus:onRegisterSave - default impl", f)
 };
 
 
-function mkSelectedTypeIds(dataTypes = []) {
-    return _.map(dataTypes, "dataTypeId");
+function mkSelectedTypeIds(usage = []) {
+    return _.map(usage, d => d.dataTypeId);
 }
 
 
-function mkSpecDataTypeUpdateCommand(specificationId, selectedIds = [], originalIds = []) {
+function mkDataTypeUpdateCommand(entityReference, selectedIds = [], originalIds = []) {
     const addedDataTypeIds = _.difference(selectedIds, originalIds);
     const removedDataTypeIds = _.difference(originalIds, selectedIds);
 
     return {
-        specificationId,
+        entityReference,
         addedDataTypeIds,
         removedDataTypeIds
     };
 }
 
 
-function mkFlowDataTypeDecoratorsUpdateCommand(flowId, selectedIds = [], originalIds = []) {
-    const addedDecorators = _.chain(selectedIds)
-        .difference(originalIds)
-        .map(id => ({kind: "DATA_TYPE", id}))
-        .value();
-
-    const removedDecorators = _.chain(originalIds)
-        .difference(selectedIds)
-        .map(id => ({kind: "DATA_TYPE", id}))
-        .value();
-
+function enrichDataTypeWithUsage(dataType, usageById = {}) {
+    const usage = _.get(usageById, dataType.id, null);
     return {
-        flowId,
-        addedDecorators,
-        removedDecorators
+        id: dataType.id,
+        parentId: dataType.parentId,
+        dataType,
+        usage
     };
 }
 
 
-function controller(serviceBroker) {
+function enrichDataTypes(dataTypes = [], usageCharacteristics = []) {
+    const usageById = _.keyBy(usageCharacteristics, d => d.dataTypeId);
+    return _.map(dataTypes, dt => enrichDataTypeWithUsage(dt, usageById));
+}
+
+
+
+function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    const postLoadActions = () => {
-        const selectedDataTypeIds = mkSelectedTypeIds(vm.dataTypes);
+
+    const loadSuggestedDataTypes = () => {
+        return serviceBroker
+            .loadViewData(
+                CORE_API.DataTypeDecoratorStore.findSuggestedByEntityRef,
+                [vm.parentEntityRef],
+                {force: true})
+            .then(r => _.filter(r.data, dt => !dt.unknown));
+    };
+
+
+    const postLoadActions = (used = [], suggestions = []) => {
+
+        vm.enrichedDataTypes = enrichDataTypes(vm.rawDataTypes, used);
+
+        const selectedDataTypeIds = mkSelectedTypeIds(used);
         vm.checkedItemIds = selectedDataTypeIds;
         vm.originalSelectedItemIds = selectedDataTypeIds;
         vm.expandedItemIds = selectedDataTypeIds;
-        vm.allDataTypes = enrichDataTypes(vm.allDataTypes, vm.checkedItemIds);
-        vm.allDataTypesById = _.keyBy(vm.allDataTypes, "id");
+
+        const suggestedAndSelectedTypes = _.concat(selectedDataTypeIds, _.map(suggestions, d => d.id));
+        vm.enrichedDataTypesById = _.keyBy(vm.enrichedDataTypes, "id");
+
+        vm.visibleDataTypes = vm.showAllDataTypes
+            ? vm.enrichedDataTypes
+            : reduceToSelectedNodesOnly(vm.enrichedDataTypes, suggestedAndSelectedTypes);
     };
 
-    const loadDataTypes = (force = false) => {
-        const selectorOptions = {
-            entityReference: vm.parentEntityRef,
-            scope: "EXACT"
-        };
-        const promise = vm.parentEntityRef.kind == "PHYSICAL_SPECIFICATION"
-            ? serviceBroker
-                .loadViewData(
-                    CORE_API.PhysicalSpecDataTypeStore.findBySpecificationSelector,
-                    [ selectorOptions ],
-                    { force })
-                .then(r => r.data)
-            : serviceBroker
-                .loadViewData(
-                    CORE_API.LogicalFlowDecoratorStore.findByFlowIdsAndKind,
-                    [ [vm.parentEntityRef.id] ],
-                    { force })
-                .then(r => r.data)
-                .then(decorators => _.map(decorators, d => ({
-                    lastUpdatedAt: d.lastUpdatedAt,
-                    lastUpdatedBy: d.lastUpdatedBy,
-                    provenance: d.provenance,
-                    dataTypeId: d.decoratorEntity.id,
-                    dataFlowId: d.dataFlowId
-                })));
+    const doSave = () => {
 
-        return promise.then(result => vm.dataTypes = result);
+        const decoratorUpdateCommand = mkDataTypeUpdateCommand(
+            vm.parentEntityRef,
+            vm.checkedItemIds,
+            vm.originalSelectedItemIds);
+
+        return serviceBroker
+            .execute(
+                CORE_API.DataTypeDecoratorStore.save,
+                [ vm.parentEntityRef, decoratorUpdateCommand ]);
     };
 
-    serviceBroker
-        .loadAppData(CORE_API.DataTypeStore.findAll)
-        .then(result => {
-            vm.allDataTypes = result.data;
-        });
-
-
-    vm.toggleTypeChecked = (id) => {
-        _.some(vm.checkedItemIds, x => x === id)
-            ? vm.typeUnchecked(id)
-            : vm.typeChecked(id);
-    };
-
-    vm.typeUnchecked = (id) => {
-        vm.checkedItemIds = _.without(vm.checkedItemIds, id);
-        vm.onDirty(vm.hasAnyChanges() && vm.anySelected());
-        //set disable flag of selected non concrete to true
-        if(!vm.allDataTypesById[id].concrete) {
-            _.find(vm.allDataTypes, { id: id}).disable = true;
-            vm.allDataTypesById[id].disable = true;
-        }
-    };
-
-    vm.typeChecked = (id) => {
-        // deselect any parents that are non-concrete
-        let dt = vm.allDataTypesById[id];
-        while (dt) {
-            const parent = vm.allDataTypesById[dt.parentId];
-            if (_.get(parent, "concrete", true) === false) {
-                vm.typeUnchecked(parent.id);
-            }
-            dt = parent;
-        }
-        vm.checkedItemIds = _.union(vm.checkedItemIds, [id])
-        vm.onDirty(vm.hasAnyChanges());
-    };
-
-    vm.anySelected = () => {
+    const anySelected = () => {
         return notEmpty(vm.checkedItemIds);
     };
 
-    vm.hasAnyChanges = () => {
+    const hasAnyChanges = () => {
         return !_.isEqual(vm.checkedItemIds.sort(), vm.originalSelectedItemIds.sort());
     };
 
-    vm.$onChanges = () => {
-        loadDataTypes()
-            .then(() => {
-                postLoadActions();
+
+    // -- INTERACT
+
+    vm.typeUnchecked = (id, node) => {
+        vm.checkedItemIds = _.without(vm.checkedItemIds, id);
+        vm.onDirty(hasAnyChanges() && anySelected());
+        node.usage = null;
+    };
+
+    vm.typeChecked = (id, node) => {
+        // deselect any parents that are non-concrete
+        let dt = vm.enrichedDataTypesById[id];
+        while (dt) {
+            const parent = vm.enrichedDataTypesById[dt.parentId];
+            if (_.get(parent, ["dataType", "concrete"], true) === false) {
+                vm.typeUnchecked(parent.id, parent);
+            }
+            dt = parent;
+        }
+
+        vm.checkedItemIds = _
+            .chain(vm.checkedItemIds)
+            .reject(dtId => vm.unknownDataType ? dtId === vm.unknownDataType.id : false)
+            .union([id])
+            .value();
+
+        vm.onDirty(hasAnyChanges());
+    };
+
+    const reload = (force = false) => {
+        serviceBroker
+            .loadAppData(CORE_API.DataTypeStore.findAll)
+            .then(result => {
+                vm.rawDataTypes = result.data;
+                vm.unknownDataType = _.find(vm.rawDataTypes, dt => dt.unknown);
+            });
+
+        const suggestedPromise = loadSuggestedDataTypes();
+        const usagePromise = loadUsageData($q, serviceBroker, vm.parentEntityRef, force);
+
+        return $q
+            .all([usagePromise, suggestedPromise])
+            .then(([usage, suggestions]) => {
+                vm.used = usage;
+                vm.suggestedDataTypes = suggestions;
                 vm.onDirty(false);
+                postLoadActions(usage, suggestions);
             });
     };
 
     vm.save = () => {
-        let promise = null;
-        if(vm.parentEntityRef.kind === "PHYSICAL_SPECIFICATION") {
-            const updateCommand = mkSpecDataTypeUpdateCommand(
-                vm.parentEntityRef.id,
-                vm.checkedItemIds,
-                vm.originalSelectedItemIds);
-
-            promise = serviceBroker
-                .execute(CORE_API.PhysicalSpecDataTypeStore.save, [vm.parentEntityRef.id, updateCommand]);
-        } else if(vm.parentEntityRef.kind === "LOGICAL_DATA_FLOW") {
-            const updateCommand = mkFlowDataTypeDecoratorsUpdateCommand(
-                vm.parentEntityRef.id,
-                vm.checkedItemIds,
-                vm.originalSelectedItemIds);
-
-            promise = serviceBroker
-                .execute(CORE_API.LogicalFlowDecoratorStore.updateDecorators, [updateCommand]);
-        }
-        return promise
-            .then(result => loadDataTypes(true))
-            .then(() => {
-                postLoadActions();
-                vm.onDirty(false);
-            });
+        return doSave()
+            .then(() => reload(true));
     };
+
+    vm.disablePredicate = (node) => {
+        const isAbstract = !node.dataType.concrete;
+        const notUsed = node.usage === null;
+        return isAbstract && notUsed;
+    };
+
+    vm.isReadonlyPredicate = (node) => {
+        if(_.isNull(node.usage)){
+            return false;
+        } else {
+            return (vm.parentEntityRef.kind === "LOGICAL_DATA_FLOW")
+                ? node.usage.readOnly || ! node.usage.isRemovable
+                : node.usage.readOnly;
+        }
+    };
+
+    const determineMessage = () => {
+        vm.showAllMessage = (vm.showAllDataTypes)
+            ? "Show suggested data types"
+            : "Show all data types";
+    };
+
+    vm.toggleShowAll = () => {
+        vm.showAllDataTypes = !vm.showAllDataTypes;
+        postLoadActions(vm.used, vm.suggestedDataTypes);
+        determineMessage();
+    };
+
+    // -- LIFECYCLE
 
     vm.$onInit = () => {
         vm.onDirty(false);
-        vm.onRegisterSave(vm.save);
+        vm.onRegisterSave(vm.save);  // pass the save function out so it can be called (i.e. a save btn)
+        determineMessage();
 
-        loadDataTypes()
-            .then(postLoadActions);
+        reload(true);
     };
+
+    vm.$onChanges = (c) => {
+        if (c.parentEntityRef && vm.parentEntityRef) {
+            reload(true);
+        }
+    };
+
+    vm.dump = d => console.log("dump", d)
+
 }
 
 
 controller.$inject = [
+    "$q",
     "ServiceBroker"
 ];
 

@@ -3,18 +3,17 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.data.licence;
@@ -40,6 +39,9 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static com.khartec.waltz.schema.tables.Licence.LICENCE;
+import static com.khartec.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
+import static com.khartec.waltz.schema.tables.SoftwareVersion.SOFTWARE_VERSION;
+import static com.khartec.waltz.schema.tables.SoftwareVersionLicence.SOFTWARE_VERSION_LICENCE;
 
 
 @Repository
@@ -53,7 +55,6 @@ public class LicenceDao {
                 .name(record.getName())
                 .description(record.getDescription())
                 .externalId(record.getExternalId())
-                .approvalStatus(ApprovalStatus.valueOf(record.getApprovalStatus()))
                 .created(UserTimestamp.mkForUser(record.getCreatedBy(), record.getCreatedAt()))
                 .lastUpdated(UserTimestamp.mkForUser(record.getLastUpdatedBy(), record.getLastUpdatedAt()))
                 .provenance(record.getProvenance())
@@ -92,6 +93,20 @@ public class LicenceDao {
     }
 
 
+    public Licence getByExternalId(String externalId) {
+        LicenceRecord record = dsl.select(LICENCE.fields())
+                .from(LICENCE)
+                .where(LICENCE.EXTERNAL_ID.eq(externalId))
+                .fetchOneInto(LicenceRecord.class);
+
+        if(record == null) {
+            throw new NoDataFoundException("Could not find Licence record with external Id: " + externalId);
+        }
+
+        return TO_DOMAIN_MAPPER.map(record);
+    }
+
+
     public List<Licence> findBySelector(Select<Record1<Long>> selector) {
         return dsl.select(LICENCE.fields())
                 .from(LICENCE)
@@ -104,32 +119,12 @@ public class LicenceDao {
     public List<Tally<Long>> countApplications() {
 
         Field licenceId = DSL.field("licence_id", Long.class);
-        Field appId = DSL.field("app_id", Long.class);
 
-
-        SelectConditionStep<Record2<Long, Long>> appToLicence = DSL.selectDistinct(LICENCE.ID.as(licenceId), APPLICATION.ID.as(appId))
-                .from(ENTITY_RELATIONSHIP)
-                .innerJoin(APPLICATION)
-                    .on(APPLICATION.ID.eq(ENTITY_RELATIONSHIP.ID_A))
-                .innerJoin(LICENCE)
-                    .on(LICENCE.ID.eq(ENTITY_RELATIONSHIP.ID_B))
-                .where(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.APPLICATION.name()))
-                .and(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.LICENCE.name()));
-
-        SelectConditionStep<Record2<Long, Long>> licenceToApp = DSL.selectDistinct(LICENCE.ID.as(licenceId), APPLICATION.ID.as(appId))
-                .from(ENTITY_RELATIONSHIP)
-                .innerJoin(APPLICATION)
-                    .on(APPLICATION.ID.eq(ENTITY_RELATIONSHIP.ID_B))
-                .innerJoin(LICENCE)
-                    .on(LICENCE.ID.eq(ENTITY_RELATIONSHIP.ID_A))
-                .where(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.APPLICATION.name()))
-                .and(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.LICENCE.name()));
-
-
-        Table<Record2<Long, Long>> appLicences = appToLicence
-                .union(licenceToApp)
+        Table<Record2<Long, Long>> appLicences = DSL.selectDistinct(SOFTWARE_USAGE.APPLICATION_ID, SOFTWARE_VERSION_LICENCE.LICENCE_ID)
+                .from(SOFTWARE_VERSION_LICENCE)
+                .innerJoin(SOFTWARE_USAGE)
+                    .on(SOFTWARE_USAGE.SOFTWARE_VERSION_ID.eq(SOFTWARE_VERSION_LICENCE.SOFTWARE_VERSION_ID))
                 .asTable("appLicences");
-
 
         return JooqUtilities.calculateLongTallies(
                 dsl,

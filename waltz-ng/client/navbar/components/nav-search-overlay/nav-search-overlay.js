@@ -3,27 +3,26 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
-import { CORE_API } from "../../../common/services/core-api-utils";
-import { entityLifecycleStatuses, initialiseData } from "../../../common/index";
-import { entity } from "../../../common/services/enums/entity";
-import { isDescendant } from "../../../common/browser-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {entityLifecycleStatuses, initialiseData} from "../../../common/index";
+import {entity} from "../../../common/services/enums/entity";
+import {isDescendant} from "../../../common/browser-utils";
 
 import template from "./nav-search-overlay.html";
-import { kindToViewState } from "../../../common/link-utils";
+import {kindToViewState} from "../../../common/link-utils";
 import _ from "lodash";
 
 const ESCAPE_KEYCODE = 27;
@@ -49,7 +48,8 @@ const initialState = {
         entity.PHYSICAL_SPECIFICATION.key,
         entity.LOGICAL_DATA_ELEMENT.key,
         entity.ROADMAP.key,
-        entity.SERVER.key
+        entity.SERVER.key,
+        entity.SOFTWARE.key
     ],
     selectedCategory: null,
     showActiveOnly: true,
@@ -58,8 +58,8 @@ const initialState = {
 };
 
 
-
-function controller($element,
+function controller($q,
+                    $element,
                     $document,
                     $timeout,
                     $state,
@@ -69,7 +69,7 @@ function controller($element,
     const documentClick = (e) => {
         const element = $element[0];
         if(!isDescendant(element, e.target)) {
-            vm.dismiss();
+            vm.onDismiss();
         }
     };
 
@@ -93,15 +93,7 @@ function controller($element,
         $document.off("click", documentClick);
     };
 
-    vm.dismiss = () => {
-        if (vm.onDismiss) {
-            vm.onDismiss();
-        } else {
-            console.log("No dismiss handler registered");
-        }
-    };
-
-    vm.toggleCategory = (c) => {
+    vm.onToggleCategory = (c) => {
         if ((vm.results[c] || []).length === 0) {
             return;
         }
@@ -114,7 +106,8 @@ function controller($element,
 
 
     // helper fn, to reduce boilerplate
-    const handleSearch = (query, entityKind) => {
+    const handleSearch = (query,
+                          entityKind) => {
         const statuses = vm.showActiveOnly
             ? [entityLifecycleStatuses.ACTIVE, entityLifecycleStatuses.PENDING]
             : [entityLifecycleStatuses.ACTIVE, entityLifecycleStatuses.PENDING, entityLifecycleStatuses.REMOVED];
@@ -142,18 +135,22 @@ function controller($element,
             return;
         }
 
-        handleSearch(query, entity.APPLICATION.key,);
-        handleSearch(query, entity.CHANGE_INITIATIVE.key,);
-        handleSearch(query, entity.DATA_TYPE.key,);
-        handleSearch(query, entity.PERSON.key,);
-        handleSearch(query, entity.MEASURABLE.key,);
-        handleSearch(query, entity.ORG_UNIT.key,);
-        handleSearch(query, entity.ACTOR.key,);
-        handleSearch(query, entity.PHYSICAL_SPECIFICATION.key,);
-        handleSearch(query, entity.APP_GROUP.key,);
-        handleSearch(query, entity.LOGICAL_DATA_ELEMENT.key,);
-        handleSearch(query, entity.ROADMAP.key,);
-        handleSearch(query, entity.SERVER.key,);
+        $q.all([
+            handleSearch(query, entity.APPLICATION.key),
+            handleSearch(query, entity.PERSON.key),
+            handleSearch(query, entity.APP_GROUP.key),
+            handleSearch(query, entity.CHANGE_INITIATIVE.key),
+            handleSearch(query, entity.ORG_UNIT.key),
+            handleSearch(query, entity.ACTOR.key)
+        ]).then(() => {
+            handleSearch(query, entity.MEASURABLE.key);
+            handleSearch(query, entity.PHYSICAL_SPECIFICATION.key);
+            handleSearch(query, entity.DATA_TYPE.key);
+            handleSearch(query, entity.SERVER.key);
+            handleSearch(query, entity.SOFTWARE.key);
+            handleSearch(query, entity.ROADMAP.key);
+            handleSearch(query, entity.LOGICAL_DATA_ELEMENT.key);
+        });
     };
 
     vm.doSearch = () => doSearch(vm.query);
@@ -179,7 +176,7 @@ function controller($element,
             if(vm.query) {
                 vm.clearSearch();
             } else {
-                vm.dismiss();
+                vm.onDismiss();
             }
         }
         evt.stopPropagation();
@@ -190,11 +187,11 @@ function controller($element,
 
     const onOverlayKeypress = (evt) => {
         if(evt.keyCode === ESCAPE_KEYCODE) {
-            vm.dismiss();
+            vm.onDismiss();
         }
     };
 
-    vm.toggleActiveOnly = () => {
+    vm.onToggleActiveOnly = () => {
         vm.showActiveOnly = ! vm.showActiveOnly;
         vm.doSearch();
     };
@@ -202,6 +199,7 @@ function controller($element,
 
 
 controller.$inject = [
+    "$q",
     "$element",
     "$document",
     "$timeout",

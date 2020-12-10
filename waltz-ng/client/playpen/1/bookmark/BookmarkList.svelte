@@ -63,7 +63,7 @@
 
 <div class="row">
 
-    <div class="col-md-3">
+    <div class="col-sm-4">
         <ul class="list-group small">
                 {#each bookmarkKinds as bookmarkKind}
                     <li class="list-group-item"
@@ -85,7 +85,7 @@
     </div>
 
 
-    <div class="col-md-9">
+    <div class="col-sm-8">
         {#await bookmarksPromise}
             Loading
         {:then result}

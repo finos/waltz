@@ -1,3 +1,21 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
 <div class="wmt-search-region">
     <waltz-icon name="search"
                 ng-class="{
@@ -27,13 +45,7 @@
              options="$ctrl.treeOptions"
              expanded-nodes="$ctrl.expandedNodes"
              order-by="'-name'">
-    <span uib-popover-template="'wmt/measurable-popup.html'"
-          popover-append-to-body="true"
-          popover-placement="right"
-          popover-trigger="mouseenter click"
-          popover-enable="node.totalCount > 0 || node.description"
-          popover-popup-delay="200"
-          ng-class="{ 'text-muted': node.rating == null }"
+    <span ng-class="{ 'text-muted': node.rating == null }"
           class="no-overflow">
         <span ng-if="$ctrl.onSelect"
               class="clickable"
@@ -49,20 +61,6 @@
 </treecontrol>
 
 
-<!-- SUB-COMPONENTS -->
-
-<!-- DESCRIPTION POPUP -->
-<script type="text/ng-template"
-        id="wmt/measurable-popup.html">
-    <div class="small">
-        <waltz-markdown text="node.description"></waltz-markdown>
-        <div ng-if="node.totalCount > 0" class="small text-muted">
-            <hr>
-            <span ng-bind="node.totalCount"></span> applications
-        </div>
-    </div>
-</script>
-
 <!-- NODE CONTENT -->
 <script type="text/ng-template"
         id="wmt/measurable-node.html">
@@ -70,9 +68,15 @@
             'italics' : ! node.concrete,
             'wmt-measurable-removed': node.entityLifecycleStatus === 'REMOVED',
             'wmt-measurable-pending': node.entityLifecycleStatus === 'PENDING'
-          }"
-          ng-bind="node.name">
+          }">
+        <waltz-entity-icon-label entity-ref="node"
+                                 additional-display-data="[ { name: 'Number of apps', value: node.totalCount }]"
+                                 icon-placement="none"
+                                 tooltip-placement="right">
+        </waltz-entity-icon-label>
     </span>
+
+
     <span class="wmt-bar-chart"
           ng-if="node.totalCount > 0"
           ng-style="{width: $ctrl.chartScale(node.totalCount) + 'px'}">

@@ -1,0 +1,67 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<div>
+    <h4>Directly related
+        <span ng-bind="$ctrl.selectedCategory.name"></span> items:
+    </h4>
+    <br>
+    <div class="wmt-search-region">
+        <waltz-icon name="search"
+                    ng-class="{
+                    'wmt-search-active' : $ctrl.searchTerms.length > 0,
+                    'wmt-search-inactive' : $ctrl.searchTerms.length == 0
+                }">
+        </waltz-icon>
+        <input type='search'
+               class="form-control"
+               name="searchTerms"
+               autocomplete="off"
+               ng-model="$ctrl.searchTerms"
+               ng-change="$ctrl.searchTermsChanged($ctrl.searchTerms)"
+               ng-model-options="{ debounce: 200 }"
+               placeholder="Search">
+        &nbsp;
+        <waltz-icon name="close"
+                    style="color: darkred"
+                    ng-if="$ctrl.searchTerms.length > 0"
+                    class="clickable"
+                    ng-click="$ctrl.clearSearch()">
+        </waltz-icon>
+    </div>
+    <treecontrol class="tree-light"
+                 tree-model="$ctrl.hierarchy"
+                 options="$ctrl.treeOptions"
+                 expanded-nodes="$ctrl.expandedNodes"
+                 order-by="'-name'">
+        <span class="no-overflow">
+            <a ui-state="$ctrl.linkToState"
+               ui-state-params="{id: node.id }">
+                <span ng-class=" {'italics' : ! node.concrete}">
+                    <waltz-entity-icon-label entity-ref="node"
+                                             additional-display-data="[
+                                             { name:'Org Unit', value: (node.orgUnit != null) ? node.orgUnit.name : 'n/a' }] "
+                                             icon-placement="none"
+                                             tooltip-placement="right"
+                                             ng-style="{ 'font-weight': node.direct ? 'bold' : 'none'}">
+                    </waltz-entity-icon-label>
+                </span>
+            </a>
+        </span>
+    </treecontrol>
+</div>

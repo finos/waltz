@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.data.involvement;
@@ -60,7 +59,7 @@ public class InvolvementDao {
 
     private final DSLContext dsl;
 
-    private final RecordMapper<Record, Involvement> involvementMapper = r -> {
+    private final RecordMapper<Record, Involvement> TO_MODEL_MAPPER = r -> {
         InvolvementRecord involvementRecord = r.into(InvolvementRecord.class);
         return ImmutableInvolvement.builder()
                 .employeeId(involvementRecord.getEmployeeId())
@@ -69,6 +68,7 @@ public class InvolvementDao {
                         .kind(EntityKind.valueOf(involvementRecord.getEntityKind()))
                         .id(involvementRecord.getEntityId())
                         .build())
+                .isReadOnly(involvementRecord.getIsReadonly())
                 .provenance(involvementRecord.getProvenance())
                 .build();
     };
@@ -81,6 +81,7 @@ public class InvolvementDao {
         record.setEmployeeId(inv.employeeId());
         record.setKindId(inv.kindId());
         record.setProvenance(inv.provenance());
+        record.setIsReadonly(inv.isReadOnly());
         return record;
     };
 
@@ -98,7 +99,7 @@ public class InvolvementDao {
                 .from(INVOLVEMENT)
                 .where(INVOLVEMENT.ENTITY_KIND.eq(ref.kind().name()))
                 .and(INVOLVEMENT.ENTITY_ID.eq(ref.id()))
-                .fetch(involvementMapper);
+                .fetch(TO_MODEL_MAPPER);
     }
 
 
@@ -114,7 +115,7 @@ public class InvolvementDao {
                 .selectFrom(INVOLVEMENT)
                 .where(INVOLVEMENT.ENTITY_KIND.eq(genericSelector.kind().name()))
                 .and(INVOLVEMENT.ENTITY_ID.in(genericSelector.selector()))
-                .fetch(involvementMapper);
+                .fetch(TO_MODEL_MAPPER);
     }
 
 
@@ -122,7 +123,17 @@ public class InvolvementDao {
         return dsl.select()
                 .from(INVOLVEMENT)
                 .where(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId))
-                .fetch(involvementMapper);
+                .fetch(TO_MODEL_MAPPER);
+    }
+
+
+    public List<Involvement> findAllByEmployeeId(String employeeId) {
+        return dsl.select()
+                .from(INVOLVEMENT)
+                .innerJoin(PERSON_HIERARCHY).on(INVOLVEMENT.EMPLOYEE_ID.eq(PERSON_HIERARCHY.EMPLOYEE_ID))
+                .where(PERSON_HIERARCHY.MANAGER_ID.eq(employeeId)
+                        .or(INVOLVEMENT.EMPLOYEE_ID.eq(employeeId)))
+                .fetch(TO_MODEL_MAPPER);
     }
 
 
@@ -141,14 +152,15 @@ public class InvolvementDao {
 
     @Deprecated
     public List<Application> findAllApplicationsByEmployeeId(String employeeId) {
-        SelectOrderByStep<Record1<String>> employeeIds = dsl
-                .selectDistinct(PERSON_HIERARCHY.EMPLOYEE_ID)
-                .from(PERSON_HIERARCHY)
-                .where(PERSON_HIERARCHY.MANAGER_ID.eq(employeeId))
-                .union(DSL.select(DSL.value(employeeId))
-                        .from(PERSON_HIERARCHY));
+        SelectOrderByStep<Record1<String>> employeeIds = DSL
+                .selectFrom(DSL
+                    .selectDistinct(PERSON_HIERARCHY.EMPLOYEE_ID)
+                    .from(PERSON_HIERARCHY)
+                    .where(PERSON_HIERARCHY.MANAGER_ID.eq(employeeId))
+                    .union(DSL.select(DSL.value(employeeId))
+                            .from(PERSON_HIERARCHY)).asTable());
 
-        SelectConditionStep<Record1<Long>> applicationIds = dsl
+        SelectConditionStep<Record1<Long>> applicationIds = DSL
                 .selectDistinct(INVOLVEMENT.ENTITY_ID)
                 .from(INVOLVEMENT)
                 .where(INVOLVEMENT.ENTITY_KIND
@@ -175,7 +187,7 @@ public class InvolvementDao {
 
 
     public List<Person> findPeopleByEntityReference(EntityReference ref) {
-        return dsl.selectDistinct()
+        return dsl.selectDistinct(PERSON.fields())
                 .from(PERSON)
                 .innerJoin(INVOLVEMENT)
                 .on(INVOLVEMENT.ENTITY_ID.eq(ref.id()))
@@ -186,7 +198,7 @@ public class InvolvementDao {
 
 
     public List<Person> findPeopleByGenericEntitySelector(GenericSelector selector) {
-        return dsl.selectDistinct()
+        return dsl.selectDistinct(PERSON.fields())
                 .from(PERSON)
                 .innerJoin(INVOLVEMENT)
                 .on(INVOLVEMENT.ENTITY_ID.in(selector.selector()))
@@ -259,7 +271,7 @@ public class InvolvementDao {
                 .and(INVOLVEMENT.ENTITY_ID.eq(involvement.entityReference().id()))
                 .and(INVOLVEMENT.EMPLOYEE_ID.eq(involvement.employeeId()))
                 .and(INVOLVEMENT.KIND_ID.eq(involvement.kindId()))
-                .and(INVOLVEMENT.PROVENANCE.eq(involvement.provenance()));
+                .and(INVOLVEMENT.IS_READONLY.eq(false));
         return condition;
     }
 

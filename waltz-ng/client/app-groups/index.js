@@ -1,33 +1,33 @@
-
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import angular from 'angular';
-import AppGroupSummary from './components/summary/app-group-summary'
+import AppGroupOverview from './components/overview/app-group-overview'
 import RelatedAppGroupsSection from './components/related-app-groups-section/related-app-groups-section';
 import SubscriptionButtons from './components/subscription-buttons/subscription-buttons';
 import {registerComponents, registerStores} from "../common/module-utils";
 import * as AppGroupStore from './services/app-group-store';
 import Routes from './routes';
-import AppGroupList from './directives/app-group-list';
-import AppGroupListSection from './directives/app-group-list-section';
+import AppGroupList from './components/app-group-list/app-group-list';
+import AppGroupListSection from './components/app-group-list-section/app-group-list-section';
 import AppGroupAppSelectionList from './directives/app-group-app-selection-list';
+import FavouritesStore from "./services/favourites-store";
+import FavouritesPanel from "./components/favourites-panel/favourites-panel";
 
 
 export default () => {
@@ -37,16 +37,17 @@ export default () => {
         .config(Routes);
 
     module
-        .directive('waltzAppGroupList', AppGroupList)
-        .directive('waltzAppGroupListSection', AppGroupListSection)
         .directive('waltzAppGroupAppSelectionList', AppGroupAppSelectionList);
 
     registerComponents(module, [
-        AppGroupSummary,
+        AppGroupList,
+        AppGroupListSection,
+        AppGroupOverview,
         SubscriptionButtons,
-        RelatedAppGroupsSection ]);
+        RelatedAppGroupsSection,
+        FavouritesPanel ]);
 
-    registerStores(module, [ AppGroupStore ]);
+    registerStores(module, [ AppGroupStore, FavouritesStore ]);
 
     return module.name;
 

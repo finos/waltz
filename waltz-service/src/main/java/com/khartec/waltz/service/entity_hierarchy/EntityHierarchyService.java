@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.service.entity_hierarchy;
@@ -40,6 +39,7 @@ import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.service.person_hierarchy.PersonHierarchyService;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -50,6 +50,9 @@ import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityKind.PERSON;
+import static com.khartec.waltz.schema.Tables.ENTITY_HIERARCHY;
+import static com.khartec.waltz.schema.Tables.MEASURABLE;
+import static org.jooq.impl.DSL.select;
 
 @Service
 public class EntityHierarchyService {
@@ -142,20 +145,33 @@ public class EntityHierarchyService {
             return rc.length;
         } else {
             Table table = determineTableToRebuild(kind);
-            return buildFor(table, kind);
+            return buildFor(table, kind, DSL.trueCondition(), DSL.trueCondition());
         }
     }
 
 
-    private int buildFor(Table table, EntityKind kind) {
-        Collection<FlatNode<Long, Long>> flatNodes = fetchFlatNodes(table);
-        List<EntityHierarchyItem> hierarchyItems = convertFlatNodesToHierarchyItems(kind, flatNodes);
-
-        return entityHierarchyDao.replaceHierarchy(kind, hierarchyItems);
+    public int buildForMeasurableByCategory(long categoryId) {
+        return buildFor(MEASURABLE,
+                        EntityKind.MEASURABLE,
+                        MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId),
+                        ENTITY_HIERARCHY.ID.in(select(MEASURABLE.ID)
+                                                .from(MEASURABLE)
+                                                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId))));
     }
 
 
-    private List<FlatNode<Long, Long>> fetchFlatNodes(Table table) {
+    private int buildFor(Table table,
+                         EntityKind kind,
+                         Condition selectFilter,
+                         Condition deleteFilter) {
+        Collection<FlatNode<Long, Long>> flatNodes = fetchFlatNodes(table, selectFilter);
+        List<EntityHierarchyItem> hierarchyItems = convertFlatNodesToHierarchyItems(kind, flatNodes);
+
+        return entityHierarchyDao.replaceHierarchy(kind, hierarchyItems, deleteFilter);
+    }
+
+
+    private List<FlatNode<Long, Long>> fetchFlatNodes(Table table, Condition selectFilter) {
         Field<Long> idField = table.field("id", Long.class);
         Field<Long> parentIdField = table.field("parent_id", Long.class);
 
@@ -164,6 +180,7 @@ public class EntityHierarchyService {
 
         return dsl.select(idField, parentIdField)
                 .from(table)
+                .where(selectFilter)
                 .fetch(r -> new FlatNode<>(
                         r.value1(),
                         Optional.ofNullable(r.value2()),
@@ -225,7 +242,7 @@ public class EntityHierarchyService {
             case ENTITY_STATISTIC:
                 return Tables.ENTITY_STATISTIC_DEFINITION;
             case MEASURABLE:
-                return Tables.MEASURABLE;
+                return MEASURABLE;
             case ORG_UNIT:
                 return Tables.ORGANISATIONAL_UNIT;
             default:

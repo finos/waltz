@@ -3,24 +3,24 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import {initialiseData} from "../../../common";
 import template from "./measurable-ratings-browser-section.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
+import * as _ from "lodash";
 
 /**
  * @name waltz-measurable-ratings-browser
@@ -37,12 +37,7 @@ const bindings = {
 
 
 const initialState = {
-    hasAllocations: true,
-    visibility: {
-        treeView: true,
-        gridView: false,
-        gridAvailable: false,
-    }
+    hasAllocations: false
 };
 
 
@@ -51,28 +46,19 @@ function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-        serviceBroker
-            .loadAppData(CORE_API.DrillGridDefinitionStore.findAll)
-            .then(r => vm.visibility.gridAvailable = r.data.length > 0);
-
-        serviceBroker
-            .loadAppData(CORE_API.AllocationSchemeStore.findAll)
-            .then(r => vm.schemesByCategoryId = _.groupBy(r.data, s => s.measurableCategoryId));
 
         vm.selector = mkSelectionOptions(vm.parentEntityRef,
             undefined,
             undefined,
             vm.filters);
-    };
 
-    vm.showGridView = () => {
-        vm.visibility.gridView = true;
-        vm.visibility.treeView = false;
-    };
+        serviceBroker
+            .loadViewData(CORE_API.ApplicationStore.findBySelector, [ vm.selector ])
+            .then(r => vm.hasApps = !_.isEmpty(r.data));
 
-    vm.showTreeView = () => {
-        vm.visibility.gridView = false;
-        vm.visibility.treeView = true;
+        serviceBroker
+            .loadAppData(CORE_API.AllocationSchemeStore.findAll)
+            .then(r => vm.schemesByCategoryId = _.groupBy(r.data, s => s.measurableCategoryId));
     };
 
     vm.onCategorySelect = (category) => {

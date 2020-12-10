@@ -3,30 +3,28 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 import _ from "lodash";
 import "d3-selection-multi";
-import { initialiseData, isEmpty } from "../../../common";
-import { responsivefy } from "../../../common/d3-utils";
-import { scaleBand, scaleLinear } from "d3-scale";
-import { select } from "d3-selection";
-import { extent } from "d3-array";
-import { axisBottom, axisLeft } from "d3-axis";
-import { format } from "d3-format";
+import {initialiseData, isEmpty} from "../../../common";
+import {scaleBand, scaleLinear} from "d3-scale";
+import {select} from "d3-selection";
+import {extent} from "d3-array";
+import {axisBottom, axisLeft} from "d3-axis";
+import {format} from "d3-format";
 import namedSettings from "../../../system/named-settings";
-import { currenciesByCode } from "../../../common/currency-utils";
+import {currenciesByCode} from "../../../common/currency-utils";
 
 
 const template = "<div class='waltz-asset-costs-graph'></div>";
@@ -73,6 +71,7 @@ function processCosts(costs = []) {
         }, {})
         .values()
         .orderBy("total", "desc")
+        .take(10)
         .value();
 }
 
@@ -88,7 +87,8 @@ function drawXAxis(xScale, container, currencyFormat) {
 }
 
 
-function drawYAxis(yScale, container) {
+function drawYAxis(yScale,
+                   container) {
     const yAxis = axisLeft(yScale);
 
     container.append("g")
@@ -97,7 +97,8 @@ function drawYAxis(yScale, container) {
 }
 
 
-function draw(svg, costs = [],
+function draw(svg,
+              costs = [],
               onSelect = _.identity,
               currencyFormat) {
     // remove any previous elements
@@ -128,7 +129,7 @@ function draw(svg, costs = [],
         .enter()
         .append("g")
         .classed("wacg-bar", true)
-        .attr("transform", (d, i) => `translate(0, ${yScale(d.entityRef.name)})`)
+        .attr("transform", (d) => `translate(0, ${yScale(d.entityRef.name)})`)
         .on("click.select", d => onSelect(d));
 
     bars.append("rect")
@@ -136,7 +137,7 @@ function draw(svg, costs = [],
         .attr("y", 0)
         .attr("width", d => xScale(d.total))
         .attr("height", yScale.bandwidth())
-        .attr("fill", (d, i) => colorScale(d.total));
+        .attr("fill", (d) => colorScale(d.total));
 
     bars.append("text")
         .attr("x", 10)
@@ -154,11 +155,11 @@ function controller($element, $scope, settingsService) {
     const holder = $element.find("div")[0];
     const svg = select(holder)
         .append("svg")
-        .attr("id", "waltz-asset-costs-graph");
+        .attr("id", "waltz-asset-costs-graph")
+        .style("min-height", "300px")
+        .attr("preserveAspectRatio", "xMinYMin meet");
 
-    let unregisterResponsivefy = () => {};
     let currencyFormat = null;
-
 
     const refresh = () => {
         if (isEmpty(vm.costs) || ! currencyFormat) {
@@ -169,9 +170,7 @@ function controller($element, $scope, settingsService) {
 
         dimensions.graph.height = 100 + (aggCosts.length * 20);
 
-        svg.attr("width", dimensions.graph.width)
-            .attr("height", dimensions.graph.height)
-            .attr("viewbox", `0 0 ${dimensions.graph.width} ${dimensions.graph.height}`);
+        svg.attr("viewBox", `0 0 ${dimensions.graph.width} ${dimensions.graph.height}`);
 
         draw(
             svg,
@@ -179,12 +178,8 @@ function controller($element, $scope, settingsService) {
             x => $scope.$applyAsync(() => vm.onSelect(x)),
             currencyFormat);
 
-        unregisterResponsivefy();
-        $scope.$applyAsync(() => unregisterResponsivefy = responsivefy(svg, "width-only"));
     };
 
-
-    vm.$onDestroy = () => unregisterResponsivefy();
 
     vm.$onInit = () => {
         settingsService
@@ -193,7 +188,7 @@ function controller($element, $scope, settingsService) {
                 const currency = currenciesByCode[code]
                 currencyFormat = d => `${currency.symbol}${format(",d")(d)}`;
                 refresh();
-            })
+            });
     };
 
     vm.$onChanges = refresh;

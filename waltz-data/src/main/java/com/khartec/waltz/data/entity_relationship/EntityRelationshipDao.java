@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.data.entity_relationship;
@@ -24,7 +23,10 @@ import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.entity_relationship.*;
+import com.khartec.waltz.model.entity_relationship.EntityRelationship;
+import com.khartec.waltz.model.entity_relationship.EntityRelationshipKey;
+import com.khartec.waltz.model.entity_relationship.ImmutableEntityRelationship;
+import com.khartec.waltz.model.entity_relationship.UpdateEntityRelationshipParams;
 import com.khartec.waltz.schema.tables.records.EntityRelationshipRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -81,7 +83,7 @@ public class EntityRelationshipDao {
                         record.getIdB(),
                         r.get(NAME_B)))
                 .provenance(record.getProvenance())
-                .relationship(RelationshipKind.valueOf(record.getRelationship()))
+                .relationship(record.getRelationship())
                 .description(record.getDescription())
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
@@ -91,7 +93,7 @@ public class EntityRelationshipDao {
 
     private static final Function<EntityRelationship, EntityRelationshipRecord> TO_RECORD_MAPPER = rel -> {
         EntityRelationshipRecord record = new EntityRelationshipRecord();
-        record.setRelationship(rel.relationship().name());
+        record.setRelationship(rel.relationship());
         record.setIdA(rel.a().id());
         record.setKindA(rel.a().kind().name());
         record.setIdB(rel.b().id());
@@ -187,7 +189,7 @@ public class EntityRelationshipDao {
                           UpdateEntityRelationshipParams params,
                           String username) {
         return dsl.update(ENTITY_RELATIONSHIP)
-                .set(ENTITY_RELATIONSHIP.RELATIONSHIP, params.relationshipKind().name())
+                .set(ENTITY_RELATIONSHIP.RELATIONSHIP, params.relationshipKind())
                 .set(ENTITY_RELATIONSHIP.DESCRIPTION, params.description())
                 .set(ENTITY_RELATIONSHIP.LAST_UPDATED_BY, username)
                 .set(ENTITY_RELATIONSHIP.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
@@ -251,7 +253,7 @@ public class EntityRelationshipDao {
                 .and(ENTITY_RELATIONSHIP.KIND_A.eq(key.a().kind().name()))
                 .and(ENTITY_RELATIONSHIP.ID_B.eq(key.b().id())
                         .and(ENTITY_RELATIONSHIP.KIND_B.eq(key.b().kind().name())))
-                .and(ENTITY_RELATIONSHIP.RELATIONSHIP.eq(key.relationshipKind().name()));
+                .and(ENTITY_RELATIONSHIP.RELATIONSHIP.eq(key.relationshipKind()));
     }
 
 

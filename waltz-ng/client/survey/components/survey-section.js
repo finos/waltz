@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 import _ from "lodash";
 import {initialiseData} from "../../common/index";
@@ -22,18 +21,21 @@ import {CORE_API} from "../../common/services/core-api-utils";
 import template from "./survey-section.html";
 import {timeFormat} from "d3-time-format";
 import {displayError} from "../../common/error-utils";
+import {isSurveyTargetKind} from "../survey-utils";
 
 
 const initialState = {
     visibility: {
-        mode: "list" // list | issue
+        mode: "list", // list | issue,
+        showIssueSurveyBtn: false
     },
     selectedTemplate: null,
     surveyRunForm: {
         dueDate: null,
         contactEmail: null,
         issuanceKind: "GROUP",
-        recipients: []
+        recipients: [],
+        owningRole: null
     }
 };
 
@@ -91,9 +93,14 @@ function controller(notification, serviceBroker, userService) {
     };
 
     vm.$onInit = () => {
+        serviceBroker.loadAppData(CORE_API.RoleStore.findAllRoles)
+            .then(r => vm.customRoles = _.filter(r.data, d => d.isCustom === true));
+
         userService
             .whoami()
             .then(me => vm.surveyRunForm.contactEmail = me.userName);
+
+        vm.visibility.showIssueSurveyBtn = isSurveyTargetKind(vm.parentEntityRef.kind);
     };
 
     function save () {
@@ -122,7 +129,7 @@ function controller(notification, serviceBroker, userService) {
             .execute(CORE_API.SurveyRunStore.create, [command])
             .then(r => r.data.id)
             .then(runId => serviceBroker
-                .execute(CORE_API.SurveyRunStore.createSurveyInstances, [ runId, recipientIds ])
+                .execute(CORE_API.SurveyRunStore.createSurveyInstances, [ runId, { personIds: recipientIds, owningRole: vm.surveyRunForm.owningRole }])
                 .then(() => runId))
             .then(runId => serviceBroker
                 .execute(CORE_API.SurveyRunStore.updateStatus, [runId, {newStatus: "ISSUED"}]))

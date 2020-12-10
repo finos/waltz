@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import _ from "lodash";
@@ -113,11 +112,9 @@ function drawPoints(section, points = [], scales) {
         .enter()
         .append("circle")
         .classed("point", true)
-        .attrs({
-            fill: d => variableScale(d.series),
-            opacity: 0.7,
-            r: 0
-        });
+        .attr("fill", d => variableScale(d.series))
+        .attr("opacity", 0.7)
+        .attr("r", 0);
 
     pointSelection
         .exit()
@@ -150,12 +147,10 @@ function drawLines(section, points = [], scales) {
         .enter()
         .append("path")
         .classed("line", true)
-        .attrs({
-            stroke: d => variableScale(d.key),
-            "stroke-width": 1,
-            fill: "none",
-            opacity: 0.7
-        });
+        .attr("stroke", d => variableScale(d.key))
+        .attr("stroke-width", 1)
+        .attr("fill", "none")
+        .attr("opacity", 0.7);
 
     pathSelector
         .exit()
@@ -170,10 +165,8 @@ function drawLines(section, points = [], scales) {
 function adjustSections(sections, dimensions) {
     sections
         .svg
-        .attrs({
-            width: dimensions.width,
-            height: dimensions.height
-        });
+        .attr("width", dimensions.width)
+        .attr("height", dimensions.height);
 
     sections
         .chart
@@ -201,7 +194,8 @@ function drawBands(section,
     const bandWidth = width / numDates;
     const extraHeight = 30;
 
-    const dates = _.chain(points)
+    const dates = _
+        .chain(points)
         .map("date")
         .uniqBy(d => d.getTime())
         .value();
@@ -226,12 +220,10 @@ function drawBands(section,
 
     bands
         .merge(newBands)
-        .attrs({
-            x: d => scales.x(d) - (bandWidth / 2),
-            y: extraHeight / 2 * -1,
-            width: bandWidth,
-            height: scales.y.range()[0] + extraHeight,
-        });
+        .attr("x", d => scales.x(d) - (bandWidth / 2))
+        .attr("y", extraHeight / 2 * -1)
+        .attr("width", bandWidth)
+        .attr("height", scales.y.range()[0] + extraHeight);
 }
 
 

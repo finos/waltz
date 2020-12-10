@@ -1,0 +1,56 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<div>
+    <div class="row">
+        <div ng-if="$ctrl.grids.length == 0"
+             class="col-sm-6">
+            <waltz-no-data>
+                <message>
+                    There are no report grids
+                </message>
+            </waltz-no-data>
+        </div>
+        <div ng-if="$ctrl.grids.length > 0"
+             class="col-sm-6">
+            <table class="table table-condensed table-hover small">
+                <thead>
+                <tr>
+                    <th>Grid Name</th>
+                    <th>Description</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="grid in $ctrl.grids"
+                    ng-class="{ 'waltz-highlighted-row' : $ctrl.selectedGridId === grid.id }"
+                    class="clickable"
+                    ng-click="$ctrl.onSelect(grid)">
+                    <td>
+                        <a ng-bind="grid.name">
+                        </a>
+                    </td>
+                    <td>
+                        <span ng-bind="grid.description">
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

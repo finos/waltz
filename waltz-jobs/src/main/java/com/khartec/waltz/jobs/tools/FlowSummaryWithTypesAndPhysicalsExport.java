@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- *  Copyright (C) 2016, 2017 Waltz open source project
- *  See README.md for more information
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU Lesser General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  You should have received a copy of the GNU Lesser General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.jobs.tools;
@@ -22,17 +21,17 @@ package com.khartec.waltz.jobs.tools;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
+import com.khartec.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.NameProvider;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
 import com.khartec.waltz.model.datatype.DataType;
+import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.service.DIConfiguration;
@@ -96,7 +95,7 @@ public class FlowSummaryWithTypesAndPhysicalsExport {
         System.out.println("Loading Logical Flows");
         List<LogicalFlow> logicalFlows = logicalFlowDao.findBySelector(logicalFlowSelector);
         System.out.println("Loading decorators");
-        Collection<LogicalFlowDecorator> decorators = decoratorDao.findByAppIdSelector(appSelector);
+        List<DataTypeDecorator> decorators = decoratorDao.findByAppIdSelector(appSelector);
         System.out.println("Loading phys flows");
         Map<Long, Collection<Tuple7<Long, String, String, String, String, String, String>>> physicalsByLogical = loadPhysicalsByLogical(dsl, logicalFlowSelector);
 
@@ -105,7 +104,7 @@ public class FlowSummaryWithTypesAndPhysicalsExport {
         Map<Optional<Long>, DataType> dataTypesById = indexByOptId(allDataTypes);
         Map<Optional<Long>, OrganisationalUnit> ousById = indexByOptId(allOUs);
 
-        Map<Long, Collection<LogicalFlowDecorator>> decoratorsByLogicalFlowId = groupBy(LogicalFlowDecorator::dataFlowId, decorators);
+        Map<Long, Collection<DataTypeDecorator>> decoratorsByLogicalFlowId = groupBy(DataTypeDecorator::dataFlowId, decorators);
 
         System.out.println("Processing");
         CsvListWriter csvWriter = setupCSVWriter();
@@ -231,9 +230,10 @@ public class FlowSummaryWithTypesAndPhysicalsExport {
                 .where(ENTITY_HIERARCHY.ANCESTOR_ID.eq(ref.id()))
                 .and(ENTITY_HIERARCHY.KIND.eq(ref.kind().name()));
 
-        Select<Record1<Long>> ouSelector = mkOrgUnitSelector.apply(infraRef)
-                .unionAll(mkOrgUnitSelector.apply(entRiskRef))
-                .unionAll(mkOrgUnitSelector.apply(regCtrlRef));
+        Select<Record1<Long>> ouSelector = DSL.selectFrom(
+                mkOrgUnitSelector.apply(infraRef)
+                    .unionAll(mkOrgUnitSelector.apply(entRiskRef))
+                    .unionAll(mkOrgUnitSelector.apply(regCtrlRef)).asTable());
 
         return DSL
                 .select(APPLICATION.ID)

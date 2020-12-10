@@ -3,24 +3,25 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 import _ from "lodash";
 import { indexRatingSchemes } from "../ratings/rating-utils";
 import { nest } from "d3-collection";
 import { grey } from "../common/colors";
 import { refToString } from "../common/entity-utils";
+import {CORE_API} from "../common/services/core-api-utils";
+import {resolveResponses} from "../common/promise-utils";
 
 /**
  * Creates an enriched assessment definition which adds fields for
@@ -116,8 +117,8 @@ export function mkAssessmentSummaries(definitions = [], schemes = [], ratings = 
  * @returns {*}
  */
 export function filterByAssessmentRating(entities = [],
-                                  assessmentRatings = [],
-                                  requiredRating) {
+                                         assessmentRatings = [],
+                                         requiredRating) {
     const assessmentRatingsByRef = _
         .chain(assessmentRatings)
         .filter(d => d.assessmentDefinitionId === requiredRating.assessmentId)
@@ -136,4 +137,97 @@ export function filterByAssessmentRating(entities = [],
             }
         })
         .value();
+}
+
+/**
+ * Loads all assessments for an entity kind and selector, returning the definitions and ratings that for that entity kind.
+ * Returns an object as follows
+ * {
+ *     definitions,
+ *     assessmentsByEntityId //<entity id -> assessment def external id -> assessment>
+ * }
+ * @param $q
+ * @param serviceBroker
+ * @param kind
+ * @param primaryOnly
+ * @returns {*}
+ */
+export function loadAssessmentsBySelector($q, serviceBroker, kind, options, primaryOnly = true) {
+    const ratingsPromise = serviceBroker
+        .loadViewData(
+            CORE_API.AssessmentRatingStore.findByTargetKindForRelatedSelector,
+            [kind, options],
+            {force: true});
+
+    return loadAssessments($q, serviceBroker, kind, ratingsPromise, primaryOnly);
+}
+
+
+/**
+ * Loads all assessments for an entity kind, returning the definitions and ratings that for that entity kind.
+ * Returns an object as follows
+ * {
+ *     definitions,
+ *     assessmentsByEntityId //<entity id -> assessment def external id -> assessment>
+ * }
+ * @param $q
+ * @param serviceBroker
+ * @param kind
+ * @param primaryOnly
+ * @returns {*}
+ */
+export function loadAssessmentsForKind($q, serviceBroker, kind, primaryOnly = true) {
+    const ratingsPromise = serviceBroker
+        .loadViewData(
+            CORE_API.AssessmentRatingStore.findByEntityKind,
+            [kind],
+            {force: true});
+
+    return loadAssessments($q, serviceBroker, kind, ratingsPromise, primaryOnly);
+}
+
+
+/**
+ * loads all assessment for a kind given the rating promise used (by selector or kind)
+ * {
+ *     definitions,
+ *     assessmentsByEntityId //<entity id -> assessment def external id -> assessment>
+ * }
+ * @param $q
+ * @param serviceBroker
+ * @param kind
+ * @param ratingsPromise
+ * @param primaryOnly
+ * @returns {*}
+ */
+function loadAssessments($q, serviceBroker, kind, ratingsPromise, primaryOnly = true) {
+    const definitionsPromise = serviceBroker
+        .loadViewData(
+            CORE_API.AssessmentDefinitionStore.findByKind,
+            [kind]);
+
+    const ratingSchemePromise = serviceBroker
+        .loadViewData(
+            CORE_API.RatingSchemeStore.findAll);
+
+    return $q
+        .all([definitionsPromise, ratingsPromise, ratingSchemePromise])
+        .then(responses => {
+            const [assessmentDefinitions, assessmentRatings, ratingSchemes] = resolveResponses(responses);
+            const ratingsByEntityId = _.groupBy(assessmentRatings, "entityReference.id");
+            const filteredDefinitions = _.filter(assessmentDefinitions, primaryOnly ? d => d.visibility === "PRIMARY" : true);
+            const enrichedByEntityId = _.mapValues(ratingsByEntityId, (v, k) => {
+                const enriched = mkEnrichedAssessmentDefinitions(
+                    filteredDefinitions,
+                    ratingSchemes,
+                    v);
+                return _.keyBy(enriched, e => e.definition.externalId);
+            });
+
+
+            return {
+                definitions: filteredDefinitions,
+                assessmentsByEntityId: enrichedByEntityId // assessmentsByEntityId: entity id -> assessment def external id -> assessment
+            };
+        });
 }

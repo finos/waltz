@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.web.endpoints.api;
@@ -26,9 +25,13 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+import java.util.Optional;
+
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 
 @Service
@@ -48,19 +51,37 @@ public class ChangeLogEndpoint implements Endpoint {
 
     @Override
     public void register() {
+
         getForList(
                 mkPath(BASE_URL, "user", ":userId"),
                 (request, response) -> service.findByUser(request.params("userId"), getLimit(request)));
+
+        postForList(
+                mkPath(BASE_URL, "summaries", ":kind"),
+                (request, response) -> service.findCountByDateForParentKindBySelector(
+                        getKind(request),
+                        readIdSelectionOptionsFromBody(request),
+                        getLimit(request)));
 
         getForList(
                 mkPath(BASE_URL, ":kind", ":id"),
                 (request, response) -> {
                     EntityReference ref = getEntityReference(request);
+                    Optional<Date> dateParam = getDateParam(request);
+                    Optional<Integer> limitParam = getLimit(request);
+
                     if(ref.kind() == EntityKind.PERSON) {
-                        return service.findByPersonReference(ref, getLimit(request));
+                        return service.findByPersonReference(ref, dateParam, limitParam);
                     } else {
-                        return service.findByParentReference(ref, getLimit(request));
+                        return service.findByParentReference(ref, dateParam, limitParam);
                     }
+                });
+
+        getForList(
+                mkPath(BASE_URL, ":kind", ":id", "unattested"),
+                (request, response) -> {
+                    EntityReference ref = getEntityReference(request);
+                    return service.findUnattestedChanges(ref);
                 });
 
 

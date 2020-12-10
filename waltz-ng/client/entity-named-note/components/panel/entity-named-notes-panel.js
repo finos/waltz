@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import _ from "lodash";
@@ -24,13 +23,13 @@ import template from "./entity-named-notes-panel.html";
 
 
 const bindings = {
-    parentEntityRef: '<',
-    notes: '<',
-    allNoteTypes: '<',
-    onSave: '<',
-    onDelete: '<',
-    onEditorDismiss: '<',
-    creatingNote: '<'
+    parentEntityRef: "<",
+    notes: "<",
+    allNoteTypes: "<",
+    onSave: "<",
+    onDelete: "<",
+    onEditorDismiss: "<",
+    creatingNote: "<"
 };
 
 
@@ -39,12 +38,12 @@ const initialState = {
     editingNotes: {},
     expandedNotes: {},
     newNote: {},
-    baseLabelText: 'Show Additional Notes',
-    labelText: 'Show Additional Notes',
+    baseLabelText: "Show Additional Notes",
+    labelText: "Show Additional Notes",
     visibility: {notes: true},
-    onSave: (note) => console.log('entity named notes panel default save handler: ', note),
-    onDelete: (note) => console.log('entity named notes panel default delete handler: ', note),
-    onEditorDismiss: () => console.log('entity named notes panel default dismiss editor handler: ', note),
+    onSave: (note) => console.log("entity named notes panel default save handler: ", note),
+    onDelete: (note) => console.log("entity named notes panel default delete handler: ", note),
+    onEditorDismiss: () => console.log("entity named notes panel default dismiss editor handler: ", note),
 };
 
 
@@ -59,22 +58,26 @@ function controller() {
 
 
     const postLoad = () => {
-        const existingNotesByTypeId = _.keyBy(vm.notes, 'namedNoteTypeId');
+        const existingNotesByTypeId = _.keyBy(vm.notes, "namedNoteTypeId");
 
         vm.creatableNoteTypes = _.chain(vm.allNoteTypes)
             .filter(nt => !nt.isReadOnly)
             .filter(nt => !existingNotesByTypeId[nt.id])
             .filter(nt => nt.applicableEntityKinds.indexOf(vm.parentEntityRef.kind) !== -1)
-            .sortBy('name')
+            .sortBy("name")
             .value();
 
-        vm.noteTypesById = _.keyBy(vm.allNoteTypes, 'id');
+        vm.noteTypesById = _.keyBy(vm.allNoteTypes, "id");
+
+        vm.notes = _.sortBy(vm.notes,
+                            n => [vm.noteTypesById[n.namedNoteTypeId].position,
+                                    vm.noteTypesById[n.namedNoteTypeId].id]);
 
         const noteTitles = _.chain(vm.notes)
             .map(n => vm.noteTypesById[n.namedNoteTypeId])
             .map(nt => nt.name).value();
 
-        vm.labelText = vm.baseLabelText + ': ' + _.truncate(_.join(noteTitles, ', '), {length: 200});
+        vm.labelText = vm.baseLabelText + ": " + _.truncate(_.join(noteTitles, ", "), {length: 200});
 
     };
 
@@ -111,7 +114,7 @@ function controller() {
     };
 
     vm.deleteNote = (note) => {
-        if (confirm('Are you sure you want to delete this note?')) {
+        if (confirm("Are you sure you want to delete this note?")) {
             invokeFunction(vm.onDelete, note);
         }
     };
@@ -134,5 +137,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzEntityNamedNotesPanel'
+    id: "waltzEntityNamedNotesPanel"
 };

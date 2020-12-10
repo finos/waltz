@@ -3,28 +3,27 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.measurable_rating.*;
 import com.khartec.waltz.model.tally.MeasurableRatingTally;
 import com.khartec.waltz.model.tally.Tally;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
@@ -42,6 +41,7 @@ import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.StringUtilities.firstChar;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -103,8 +103,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
         postForList(findByMeasurableSelectorPath, findByMeasurableSelectorRoute);
         postForList(findByAppSelectorPath, findByAppSelectorRoute);
         getForList(findByCategoryPath, findByCategoryRoute);
-        postForList(modifyMeasurableForEntityPath, this::createRoute);
-        putForList(modifyMeasurableForEntityPath, this::updateRoute);
+        postForList(modifyMeasurableForEntityPath, this::saveRoute);
         deleteForList(modifyMeasurableForEntityPath, this::removeRoute);
         deleteForList(modifyCategoryForEntityPath, this::removeCategoryRoute);
         getForList(countByMeasurableCategoryPath, countByMeasurableCategoryRoute);
@@ -113,38 +112,35 @@ public class MeasurableRatingEndpoint implements Endpoint {
     }
 
     private Collection<MeasurableRating> removeCategoryRoute(Request request, Response z) {
-        requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
 
         EntityReference ref = getEntityReference(request);
-        long category = getLong(request, "categoryId");
+        long categoryId = getLong(request, "categoryId");
 
-        return measurableRatingService.removeForCategory(ref, category, getUsername(request));
+        requireRole(userRoleService, request, measurableRatingService.getRequiredRatingEditRole(mkRef(EntityKind.MEASURABLE_CATEGORY, categoryId)));
+
+        return measurableRatingService.removeForCategory(ref, categoryId, getUsername(request));
     }
 
 
-    private Collection<MeasurableRating> updateRoute(Request request, Response z) throws IOException {
-        requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
+    private Collection<MeasurableRating> saveRoute(Request request, Response z) throws IOException {
         SaveMeasurableRatingCommand command = mkCommand(request);
-        return measurableRatingService.update(command);
+        requireRole(userRoleService, request, measurableRatingService.getRequiredRatingEditRole(mkRef(EntityKind.MEASURABLE, command.measurableId())));
+        return measurableRatingService.save(command, false);
     }
 
 
     private Collection<MeasurableRating> removeRoute(Request request, Response z) throws IOException {
-        requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
+        long measurableId = getLong(request, "measurableId");
         String username = getUsername(request);
+
+        requireRole(userRoleService, request, measurableRatingService.getRequiredRatingEditRole(mkRef(EntityKind.MEASURABLE, measurableId)));
+
         RemoveMeasurableRatingCommand command = ImmutableRemoveMeasurableRatingCommand.builder()
                 .entityReference(getEntityReference(request))
-                .measurableId(getLong(request, "measurableId"))
+                .measurableId(measurableId)
                 .lastUpdate(UserTimestamp.mkForUser(username))
                 .build();
         return measurableRatingService.remove(command);
-    }
-
-
-    private Collection<MeasurableRating> createRoute(Request request, Response z) throws IOException {
-        requireRole(userRoleService, request, SystemRole.RATING_EDITOR);
-        SaveMeasurableRatingCommand command = mkCommand(request);
-        return measurableRatingService.create(command);
     }
 
 
@@ -161,6 +157,7 @@ public class MeasurableRatingEndpoint implements Endpoint {
                 .entityReference(getEntityReference(request))
                 .measurableId(getLong(request, "measurableId"))
                 .rating(firstChar(body.getOrDefault("rating", "Z"), 'Z'))
+                .previousRating(firstChar(body.getOrDefault("previousRating", "")))
                 .description(body.getOrDefault("description", ""))
                 .lastUpdate(UserTimestamp.mkForUser(username))
                 .provenance("waltz")

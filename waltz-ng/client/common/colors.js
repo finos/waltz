@@ -3,40 +3,40 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 import {rgb} from "d3-color";
 import {scaleOrdinal, schemeCategory20c} from "d3-scale";
 import _ from "lodash";
 
 export const black = rgb("#000");
-export const amber = rgb("#D9923F");
-export const green = rgb("#5BB65D");
-export const red = rgb("#DA524B");
-export const pink = rgb("#ffcffc");
 export const grey = rgb("#939393");
-export const lightGrey = rgb("#d1d1d1");
-export const blue = rgb("#5271CC");
+export const lightGrey = rgb("#D1D1D1");
+export const blue = rgb("#1F7FE0");
+export const green = rgb("#5BB65D");
+export const yellow = rgb("#E0E314");
+export const gold = rgb("#B7A61F");
+export const amber = rgb("#D9923F");
+export const red = rgb("#DA524B");
+export const pink = rgb("#FFCFFC");
+export const actor = rgb("#D7BBDB");
 export const purple= rgb("#B687CC");
-export const gold = rgb("#b7b04e");
-export const actor = rgb("#d7bbdb");
 
 export const amberBg = rgb("#FCF2D7");
 export const greenBg = rgb("#DFF1D2");
 export const redBg = rgb("#F2D7D7");
 export const greyBg = rgb("#F5F5F5");
-export const actorBg = rgb("#ede5ee");
+export const actorBg = rgb("#EDE5EE");
 
 
 export const ragColorScale = scaleOrdinal()
@@ -134,7 +134,9 @@ const variableColorList = [
             "LATE",
             "BAD",
             "END_OF_LIFE",
-            "NON PAAS"
+            "NON PAAS",
+            "HIGH RISK",
+            "HIGH"
         ]
     }, {
         color: green,
@@ -154,7 +156,9 @@ const variableColorList = [
             "GREEN",
             "GOOD",
             "NOT_END_OF_LIFE",
-            "PAAS"
+            "PAAS",
+            "LOW RISK",
+            "LOW"
         ]
     }, {
         color: amber,
@@ -171,7 +175,9 @@ const variableColorList = [
             "AMBER",
             "YELLOW",
             "OKAY",
-            "PREPROD"
+            "PREPROD",
+            "MEDIUM RISK",
+            "MEDIUM"
         ]
     }, {
         color: blue,
@@ -183,21 +189,13 @@ const variableColorList = [
             "B",
             "NOT_STARTED",
             "BLUE",
-            "MEDIUM",
             "VIRTUAL",
             "DR"
         ]
     }, {
-        color: blue.darker(),
-        keys: ["HIGH"]
-    }, {
-        color: blue.brighter(),
-        keys: ["LOW"]
-    }, {
         color: purple,
         keys: ["OTHER", "UAT"]
     }, {
-    },{
         color: gold,
         keys: [
             "PROD",

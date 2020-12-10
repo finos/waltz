@@ -1,3 +1,21 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
 <div class="waltz-rating-picker"
      tabindex="1"
      ng-keydown="$ctrl.onKeypress($event)"
@@ -8,13 +26,24 @@
         <input type="radio"
                value="{{ option.rating }}"
                ng-model='$ctrl.selected'
-               ng-disabled="$ctrl.editDisabled"
+               ng-disabled="$ctrl.editDisabled || option.isRestricted"
                ng-change="$ctrl.onSelect(option.rating)"
                id="wrp-inp-{{ option.rating }}-{{ $id }}">
         <label for="wrp-inp-{{ option.rating }}-{{ $id }}"
-               ng-style="{ 'background-color': option.color, color: option.foregroundColor }"
-               ng-bind="option.name"
-               class="clickable">
+               ng-style="{
+                    'background-color': option.color,
+                    'color': option.foregroundColor
+               }"
+               class="clickable"
+               uib-popover="This rating is restricted due to an assessment outcome"
+               popover-enable="option.isRestricted"
+               popover-append-to-body="true"
+               popover-popup-delay="300"
+               popover-trigger="mouseenter">
+            <waltz-icon ng-if="option.isRestricted" name="lock" fixed-width="true"></waltz-icon>
+            <waltz-icon ng-if="!option.isRestricted" fixed-width="true"></waltz-icon>
+            <span ng-bind="option.name">
+            </span>
         </label>
         <div class="small text-muted"
              ng-if="option.description"

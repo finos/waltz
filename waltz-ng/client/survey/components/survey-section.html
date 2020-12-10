@@ -1,10 +1,28 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
 <div>
 
     <!-- ACTIONS -->
     <waltz-section-actions>
         <span>
             <a class="btn btn-xs btn-primary"
-               ng-if="$ctrl.visibility.mode == 'list'"
+               ng-if="$ctrl.visibility.showIssueSurveyBtn && $ctrl.visibility.mode == 'list'"
                ng-click="$ctrl.onShowCreateForm()">
                 Issue new survey
             </a>
@@ -13,216 +31,260 @@
 
     <!-- SURVEY ISSUE -->
     <div ng-if="$ctrl.visibility.mode == 'create'">
-        <h4>
-            <span ng-if="$ctrl.selectedTemplate == null">
-                Select Template
-            </span>
-            <span ng-if="$ctrl.selectedTemplate != null"
-                  ng-bind="$ctrl.selectedTemplate.name">
-            </span>
-            <small>Issue Survey</small>
-        </h4>
 
-        <div ng-if="$ctrl.selectedTemplate == null">
-            <div class="help-block">
-                Select the survey template to issue
-            </div>
-            <table class="table table-condensed small">
-                <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Description</th>
-                    <th>Owner</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="template in $ctrl.templates">
-                    <td>
-                        <a ng-click="$ctrl.onSelectTemplate(template)"
-                           class="clickable">
-                            <span ng-bind="template.name"></span>
-                        </a>
-                    </td>
-                    <td>
-                        <span ng-bind="template.description"></span>
-                    </td>
-                    <td>
-                        <waltz-entity-link tooltip-placement="left"
-                                           entity-ref="{ kind: 'PERSON', id: template.ownerId}">
-                        </waltz-entity-link>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-
-            <a ng-click="$ctrl.onDismissCreateForm()"
-               class="clickable">
-                Cancel
-            </a>
-
+        <div ng-if="$ctrl.templates.length == 0">
+            <waltz-no-data>
+                <message>
+                    <div>
+                        <strong>
+                            There are no active survey templates
+                        </strong>
+                    </div>
+                    <a ng-click="$ctrl.onDismissCreateForm()"
+                       class="clickable">
+                        Cancel
+                    </a>
+                </message>
+            </waltz-no-data>
         </div>
 
-        <div ng-if="$ctrl.selectedTemplate != null">
+        <div ng-if="$ctrl.templates.length > 0">
+            <h4>
+                <span ng-if="$ctrl.selectedTemplate == null">
+                    Select Template
+                </span>
+                <span ng-if="$ctrl.selectedTemplate != null"
+                      ng-bind="$ctrl.selectedTemplate.name">
+                </span>
+                <small>Issue Survey</small>
+            </h4>
 
-            <a ng-click="$ctrl.onDeselectTemplate(template)"
-               class="small clickable">
-                <waltz-icon name="back"></waltz-icon>
-                Choose a different template
-            </a>
-
-            <hr>
-
-            <form name="runForm"
-                  ng-submit="$ctrl.submitRun()">
-                <fieldset ng-disabled="$ctrl.surveyRunForm.$submitted">
-
-                    <!-- NAME -->
-                    <div class="row">
-                        <div class="col-md-3">
-                            <label>
-                                Name
-                                <span class="text-danger">*</span>
-                            </label>
-                        </div>
-                        <div class="col-md-6">
-                            <input class="form-control" type="text" ng-model="$ctrl.surveyRunForm.name">
-                            <div class="small help-block">
-                                Title of this survey (defaults to template name)
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- NAME -->
-                    <div class="row">
-                        <div class="col-md-3">
-                            <label>
-                                Description
-                            </label>
-                        </div>
-                        <div class="col-md-6">
-                            <textarea class="form-control" ng-model="$ctrl.surveyRunForm.description"></textarea>
-                            <div class="small help-block">
-                                Describe the purpose of this survey (defaults to template description)
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- CONTACT -->
-                    <div class="row">
-                        <div class="col-md-3">
-                            <label>
-                                Contact email
-                                <span class="text-danger">*</span>
-                            </label>
-                        </div>
-                        <div class="col-md-6">
-                            <input class="form-control" type="text" ng-model="$ctrl.surveyRunForm.contactEmail">
-                            <div class="small help-block">
-                                Contact email for questions recipients may have regarding this survey
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- DUE DATE -->
-                    <div class="row">
-                        <div class="col-md-3">
-                            <label>
-                                Due date
-                                <span class="text-danger">*</span>
-                            </label>
-                        </div>
-                        <div class="col-md-3">
-                            <waltz-date-picker-form-input id="dueDate"
-                                                          required="true"
-                                                          place-holder="yyyy-MM-dd"
-                                                          format="yyyy-MM-dd"
-                                                          model="$ctrl.surveyRunForm.dueDate">
-                            </waltz-date-picker-form-input>
-                            <div class="small help-block">
-                                When does this survey need to be completed by?
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- RECIPIENTS -->
-                    <div class="row">
-                        <div class="col-md-3">
-                            <label>
-                                Recipient/s
-                                <span class="text-danger">*</span>
-                            </label>
-                        </div>
-                        <div class="col-md-6">
-                            <div>
-                                <div ng-if="$ctrl.surveyRunForm.recipients.length === 0">
-                                    No Recipients defined
-                                </div>
-                                <waltz-user-pick-list people="$ctrl.surveyRunForm.recipients"
-                                                      can-remove-last="false"
-                                                      on-add="$ctrl.onAddRecipient"
-                                                      on-remove="$ctrl.onRemoveRecipient">
-                                </waltz-user-pick-list>
-
-                                <div class="small help-block">
-                                    Who should fill in this survey?
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ISSUANCE -->
-                    <div class="row">
-                        <div class="col-md-3">
-                            <label>
-                                Issuance Kind <span class="text-danger">*</span>
-                            </label>
-
-                        </div>
-
-                        <div class="col-md-6">
-                            <label>
-                                <input name="issuanceKind"
-                                       type="radio"
-                                       ng-model="$ctrl.surveyRunForm.issuanceKind"
-                                       value="GROUP"
-                                       checked />
-                                Group
-                            </label>
-                            &nbsp;
-                            <label>
-                                <input name="issuanceKind"
-                                       type="radio"
-                                       ng-model="$ctrl.surveyRunForm.issuanceKind"
-                                       value="INDIVIDUAL" />
-                                Individual
-                            </label>
-
-                            <div class='help-block small'>
-                                <strong>Group</strong> - one survey response per entity.<br/>
-                                <strong>Individual</strong> - one survey response per person, which could result in multiple responses per entity.
-                            </div>
-
-
-                        </div>
-                    </div>
-                </fieldset>
-
-                <hr>
-
-                <button type="submit"
-                        class="btn btn-success">
-                    Issue survey
-                </button>
+            <div ng-if="$ctrl.selectedTemplate == null">
+                <div class="help-block">
+                    Select the survey template to issue
+                </div>
+                <table class="table table-condensed small">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Owner</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="template in $ctrl.templates">
+                        <td>
+                            <a ng-click="$ctrl.onSelectTemplate(template)"
+                               class="clickable">
+                                <span ng-bind="template.name"></span>
+                            </a>
+                        </td>
+                        <td>
+                            <span ng-bind="template.description"></span>
+                        </td>
+                        <td>
+                            <waltz-entity-link tooltip-placement="left"
+                                               entity-ref="{ kind: 'PERSON', id: template.ownerId}">
+                            </waltz-entity-link>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
 
                 <a ng-click="$ctrl.onDismissCreateForm()"
                    class="clickable">
                     Cancel
                 </a>
-            </form>
 
+            </div>
+
+            <div ng-if="$ctrl.selectedTemplate != null">
+
+                <a ng-click="$ctrl.onDeselectTemplate(template)"
+                   class="small clickable">
+                    <waltz-icon name="back"></waltz-icon>
+                    Choose a different template
+                </a>
+
+                <hr>
+
+                <form name="runForm"
+                      ng-submit="$ctrl.submitRun()">
+                    <fieldset ng-disabled="$ctrl.surveyRunForm.$submitted">
+
+                        <!-- NAME -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>
+                                    Name
+                                    <span class="text-danger">*</span>
+                                </label>
+                            </div>
+                            <div class="col-md-6">
+                                <input class="form-control" type="text" ng-model="$ctrl.surveyRunForm.name">
+                                <div class="small help-block">
+                                    Title of this survey (defaults to template name)
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DESCRIPTION -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>
+                                    Description
+                                </label>
+                            </div>
+                            <div class="col-md-6">
+                                <textarea class="form-control" ng-model="$ctrl.surveyRunForm.description"></textarea>
+                                <div class="small help-block">
+                                    Describe the purpose of this survey (defaults to template description)
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CONTACT -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>
+                                    Contact email
+                                    <span class="text-danger">*</span>
+                                </label>
+                            </div>
+                            <div class="col-md-6">
+                                <input class="form-control" type="text" ng-model="$ctrl.surveyRunForm.contactEmail">
+                                <div class="small help-block">
+                                    Contact email for questions recipients may have regarding this survey
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- DUE DATE -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>
+                                    Due date
+                                    <span class="text-danger">*</span>
+                                </label>
+                            </div>
+                            <div class="col-md-3">
+                                <waltz-date-picker-form-input id="dueDate"
+                                                              required="true"
+                                                              place-holder="yyyy-MM-dd"
+                                                              format="yyyy-MM-dd"
+                                                              model="$ctrl.surveyRunForm.dueDate">
+                                </waltz-date-picker-form-input>
+                                <div class="small help-block">
+                                    When does this survey need to be completed by?
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- OWNERS -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>
+                                    Survey admin role/s
+                                </label>
+                            </div>
+                            <div class="col-md-6">
+                                <div>
+                                    <select ng-model="$ctrl.surveyRunForm.owningRole"
+                                            class="form-control">
+                                        <option ng-repeat="role in $ctrl.customRoles"
+                                                value="{{role.key}}"
+                                                ng-bind="role.name">
+                                        </option>
+                                        <option class="text-muted"
+                                                value=""
+                                                selected>
+                                            Survey Owner only
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="small help-block">
+                                    Select a custom role for adding additional survey owners
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- RECIPIENTS -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>
+                                    Recipient/s
+                                    <span class="text-danger">*</span>
+                                </label>
+                            </div>
+                            <div class="col-md-6">
+                                <div>
+                                    <div ng-if="$ctrl.surveyRunForm.recipients.length === 0">
+                                        No Recipients defined
+                                    </div>
+                                    <waltz-user-pick-list people="$ctrl.surveyRunForm.recipients"
+                                                          can-remove-last="false"
+                                                          on-add="$ctrl.onAddRecipient"
+                                                          on-remove="$ctrl.onRemoveRecipient">
+                                    </waltz-user-pick-list>
+
+                                    <div class="small help-block">
+                                        Who should fill in this survey?
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ISSUANCE -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label>
+                                    Issuance Kind <span class="text-danger">*</span>
+                                </label>
+
+                            </div>
+
+                            <div class="col-md-6">
+                                <label>
+                                    <input name="issuanceKind"
+                                           type="radio"
+                                           ng-model="$ctrl.surveyRunForm.issuanceKind"
+                                           value="GROUP"
+                                           checked />
+                                    Group
+                                </label>
+                                &nbsp;
+                                <label>
+                                    <input name="issuanceKind"
+                                           type="radio"
+                                           ng-model="$ctrl.surveyRunForm.issuanceKind"
+                                           value="INDIVIDUAL" />
+                                    Individual
+                                </label>
+
+                                <div class='help-block small'>
+                                    <strong>Group</strong> - one survey response per entity.<br/>
+                                    <strong>Individual</strong> - one survey response per person, which could result in multiple responses per entity.
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <hr>
+
+                    <button type="submit"
+                            class="btn btn-success">
+                        Issue survey
+                    </button>
+
+                    <a ng-click="$ctrl.onDismissCreateForm()"
+                       class="clickable">
+                        Cancel
+                    </a>
+                </form>
+            </div>
         </div>
-
-
     </div>
 
     <!-- SURVEY INSTANCE LIST -->

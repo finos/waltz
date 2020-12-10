@@ -1,25 +1,24 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
-import { perhaps } from "./index";
 import { select } from "d3-selection";
 import _ from "lodash";
+import {tryOrDefault} from "./function-utils";
 
 
 /**
@@ -90,13 +89,15 @@ export function mkLineWithArrowPath(x1, y1, x2, y2, arrowLoc = 0.2) {
     const l = Math.sqrt(dx*dx + dy*dy) * arrowLoc - 7;
     const dtxs = x2 - l/2 * Math.cos(theta);  // val is how far 'back'
     const dtys = y2 - l/2 * Math.sin(theta);
-    return `M${x1},${y1} 
+    const arrowBaseWidth = 3;
+    const arrowHeight = 7;
+    return `M${x1},${y1}
             l${dx} ${dy}
             M${dtxs},${dtys}
-            l${(3.5 * Math.cos(d90 - theta) - 10 * Math.cos(theta))}
-                ,${(-3.5 * Math.sin(d90 - theta) - 10 * Math.sin(theta))}
-            L${(dtxs - 3.5 * Math.cos(d90 - theta) - 10 * Math.cos(theta))}
-                ,${(dtys + 3.5 * Math.sin(d90 - theta) - 10 * Math.sin(theta))}
+            l${(arrowBaseWidth * Math.cos(d90 - theta) - arrowHeight * Math.cos(theta))}
+                ,${(0 - arrowBaseWidth * Math.sin(d90 - theta) - arrowHeight * Math.sin(theta))}
+            L${(dtxs - arrowBaseWidth * Math.cos(d90 - theta) - arrowHeight * Math.cos(theta))}
+                ,${(dtys + arrowBaseWidth * Math.sin(d90 - theta) - arrowHeight * Math.sin(theta))}
             z`;
 }
 
@@ -113,7 +114,7 @@ export function mkCurvedLine(x1, y1, x2, y2, flatness = 3) {
     const dy = y2 - y1;
     const dr = Math.sqrt(dx * dx + dy * dy);
 
-    return `M${x1} ${y1} 
+    return `M${x1} ${y1}
             A${dr * flatness},${dr * flatness} 0 0,1 ${x2},${y2}`;
 }
 
@@ -141,7 +142,7 @@ export function wrapText(selection, width) {
         while (word = words.pop()) {
             line.push(word);
             tspan.text(line.join(" "));
-            const computedLength = perhaps(() => tspan.node().getComputedTextLength(), 150);
+            const computedLength = tryOrDefault(() => tspan.node().getComputedTextLength(), 150);
             if (computedLength > width) {
                 lineNumber++;
                 line.pop();

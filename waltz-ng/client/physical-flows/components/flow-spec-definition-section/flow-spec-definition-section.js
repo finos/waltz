@@ -1,3 +1,21 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
+ */
+
 import template from "./flow-spec-definition-section.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {toEntityRef} from "../../../common/entity-utils";
@@ -55,13 +73,15 @@ function controller($q, notification, serviceBroker) {
                 const specDefFieldPromise = serviceBroker
                     .loadViewData(
                         CORE_API.PhysicalSpecDefinitionFieldStore.findForSpecDefinitionId,
-                        [ vm.selectedSpecDefinition.def.id ])
+                        [ vm.selectedSpecDefinition.def.id ],
+                        { force })
                     .then(r => r.data);
 
                 const specDefSampleFilePromise = serviceBroker
                     .loadViewData(
                         CORE_API.PhysicalSpecDefinitionSampleFileStore.findForSpecDefinitionId,
-                        [vm.selectedSpecDefinition.def.id])
+                        [vm.selectedSpecDefinition.def.id],
+                        { force })
                     .then(r => r.data);
 
                 const selectionOptions = {
@@ -70,7 +90,10 @@ function controller($q, notification, serviceBroker) {
                 };
 
                 const logicalElementsPromise = serviceBroker
-                    .loadViewData(CORE_API.LogicalDataElementStore.findBySelector, [ selectionOptions ], { force })
+                    .loadViewData(
+                        CORE_API.LogicalDataElementStore.findBySelector,
+                        [ selectionOptions ],
+                        { force })
                     .then(r => r.data);
 
                 $q.all([specDefFieldPromise, specDefSampleFilePromise, logicalElementsPromise])
@@ -128,10 +151,10 @@ function controller($q, notification, serviceBroker) {
         }
     };
 
-    vm.updateFieldDescription = (change, fieldId) => {
+    vm.updateFieldDescription = (change, field) => {
         const cmd = { newDescription: change.newVal };
         serviceBroker
-            .execute(CORE_API.PhysicalSpecDefinitionFieldStore.updateDescription, [fieldId, cmd])
+            .execute(CORE_API.PhysicalSpecDefinitionFieldStore.updateDescription, [field.id, cmd])
             .then(result => {
                 if (result) {
                     notification.success("Updated description for field");
@@ -143,10 +166,10 @@ function controller($q, notification, serviceBroker) {
     };
 
 
-    vm.updateLogicalDataElement = (change, fieldId) => {
+    vm.updateLogicalDataElement = (change, field) => {
         const cmd = { newLogicalDataElement: change.newVal };
         serviceBroker
-            .execute(CORE_API.PhysicalSpecDefinitionFieldStore.updateLogicalElement, [fieldId, cmd])
+            .execute(CORE_API.PhysicalSpecDefinitionFieldStore.updateLogicalElement, [field.id, cmd])
             .then(result => {
                 if (result) {
                     notification.success("Updated logical data element for field");

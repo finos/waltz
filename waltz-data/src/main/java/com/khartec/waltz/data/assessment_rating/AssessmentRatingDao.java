@@ -3,18 +3,17 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.data.assessment_rating;
@@ -23,6 +22,7 @@ package com.khartec.waltz.data.assessment_rating;
 import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.assessment_definition.AssessmentVisibility;
 import com.khartec.waltz.model.assessment_rating.AssessmentRating;
 import com.khartec.waltz.model.assessment_rating.ImmutableAssessmentRating;
 import com.khartec.waltz.model.assessment_rating.RemoveAssessmentRatingCommand;
@@ -53,7 +53,7 @@ public class AssessmentRatingDao {
                 .entityReference(EntityReference.mkRef(EntityKind.valueOf(record.getEntityKind()), record.getEntityId()))
                 .assessmentDefinitionId(record.getAssessmentDefinitionId())
                 .ratingId(record.getRatingId())
-                .description(mkSafe(record.getDescription()))
+                .comment(mkSafe(record.getDescription()))
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .provenance(record.getProvenance())
@@ -67,7 +67,7 @@ public class AssessmentRatingDao {
         record.setEntityKind(command.entityReference().kind().name());
         record.setAssessmentDefinitionId(command.assessmentDefinitionId());
         record.setRatingId(command.ratingId());
-        record.setDescription(command.description());
+        record.setDescription(command.comment());
         record.setLastUpdatedAt(Timestamp.valueOf(command.lastUpdatedAt()));
         record.setLastUpdatedBy(command.lastUpdatedBy());
         record.setProvenance(command.provenance());
@@ -95,17 +95,42 @@ public class AssessmentRatingDao {
     }
 
 
-    public boolean update(SaveAssessmentRatingCommand command) {
-        checkNotNull(command, "command cannot be null");
-        AssessmentRatingRecord record = TO_RECORD_MAPPER.apply(command);
-        return dsl.executeUpdate(record) == 1;
+    public List<AssessmentRating> findByEntityKind(EntityKind kind, List<AssessmentVisibility> visibilities) {
+        return dsl.select(ASSESSMENT_RATING.fields())
+                .from(ASSESSMENT_RATING)
+                .innerJoin(ASSESSMENT_DEFINITION).on(ASSESSMENT_DEFINITION.ID.eq(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID))
+                .where(ASSESSMENT_RATING.ENTITY_KIND.eq(kind.name()))
+                .and(ASSESSMENT_DEFINITION.VISIBILITY.in(visibilities))
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
-    public boolean create(SaveAssessmentRatingCommand command) {
+    public List<AssessmentRating> findByGenericSelector(GenericSelector genericSelector) {
+        return dsl
+                .select(ASSESSMENT_RATING.fields())
+                .from(ASSESSMENT_RATING)
+                .innerJoin(ASSESSMENT_DEFINITION)
+                .on(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID.eq(ASSESSMENT_DEFINITION.ID)
+                        .and(ASSESSMENT_DEFINITION.ENTITY_KIND.eq(genericSelector.kind().name())))
+                .where(ASSESSMENT_RATING.ENTITY_KIND.eq(genericSelector.kind().name()))
+                .and(ASSESSMENT_RATING.ENTITY_ID.in(genericSelector.selector()))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public boolean store(SaveAssessmentRatingCommand command) {
         checkNotNull(command, "command cannot be null");
         AssessmentRatingRecord record = TO_RECORD_MAPPER.apply(command);
-        return dsl.executeInsert(record) == 1;
+        EntityReference ref = command.entityReference();
+        boolean isUpdate = dsl.fetchExists(dsl
+                .selectFrom(ASSESSMENT_RATING)
+                .where(ASSESSMENT_RATING.ENTITY_KIND.eq(ref.kind().name()))
+                .and(ASSESSMENT_RATING.ENTITY_ID.eq(ref.id()))
+                .and(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID.eq(command.assessmentDefinitionId())));
+
+        return isUpdate
+                ? dsl.executeUpdate(record) == 1
+                : dsl.executeInsert(record) == 1;
     }
 
 
@@ -115,18 +140,5 @@ public class AssessmentRatingDao {
                 .and(ASSESSMENT_RATING.ENTITY_ID.eq(rating.entityReference().id()))
                 .and(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID.eq(rating.assessmentDefinitionId()))
                 .execute() == 1;
-    }
-
-
-    public List<AssessmentRating> findByGenericSelector(GenericSelector genericSelector) {
-        return dsl
-                .select()
-                .from(ASSESSMENT_RATING)
-                .innerJoin(ASSESSMENT_DEFINITION)
-                .on(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID.eq(ASSESSMENT_DEFINITION.ID)
-                        .and(ASSESSMENT_DEFINITION.ENTITY_KIND.eq(genericSelector.kind().name())))
-                .where(ASSESSMENT_RATING.ENTITY_KIND.eq(genericSelector.kind().name()))
-                .and(ASSESSMENT_RATING.ENTITY_ID.in(genericSelector.selector()))
-                .fetch(TO_DOMAIN_MAPPER);
     }
 }

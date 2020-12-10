@@ -3,18 +3,17 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import _ from "lodash";
@@ -25,6 +24,14 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 
 import template from "./data-type-flow-section.html";
+import {entity} from "../../../common/services/enums/entity";
+import {
+    filterUtils,
+    getSelectedTagsFromPreferences,
+    maybeAddUntaggedFlowsTag,
+    saveTagFilterPreferences
+} from "../../../logical-flow/logical-flow-utils";
+import {groupLogicalFlowFilterExcludedTagIdsKey} from "../../../user/services/user-preference-service";
 
 
 const bindings = {
@@ -39,8 +46,10 @@ const initialState = {
         showPrimary: true,
         showSecondary: true,
         showDiscouraged: false,
-        showNoOpinion: false
-    }
+        showNoOpinion: false,
+        selectedTags: filterUtils.defaultOptions.selectedTags
+    },
+    tags: []
 };
 
 
@@ -74,19 +83,15 @@ const buildGraphTweakers = (decorators = [],
             update: _.identity
         },
         link : {
-            enter: (selection) => {
-                selection
-                    .attrs({
-                        stroke: (d) => {
-                            const rating = getRatingForLink(d);
-                            return authoritativeRatingColorScale(rating);
-                        },
-                        fill: (d) => {
-                            const rating = getRatingForLink(d);
-                            return authoritativeRatingColorScale(rating).brighter();
-                        }
-                    });
-            },
+            enter: (selection) => selection
+                .attr("stroke", (d) => {
+                    const rating = getRatingForLink(d);
+                    return authoritativeRatingColorScale(rating);
+                })
+                .attr("fill", (d) => {
+                    const rating = getRatingForLink(d);
+                    return authoritativeRatingColorScale(rating).brighter();
+                }),
             exit: _.identity,
             update: _.identity
         }
@@ -118,18 +123,21 @@ function filterDecorators(decorators =[],
 
 
 function filterFlows(flows = [],
-                     decorators = []) {
+                     decorators = [],
+                     allTags = [],
+                     selectedTags = []) {
     const flowIds = _.map(decorators, "dataFlowId");
-    return _.filter(flows, f => _.includes(flowIds, f.id));
-
+    const tagFilterFn = filterUtils.mkTagFilterFn(selectedTags, allTags, flows);
+    return _.filter(flows, f => _.includes(flowIds, f.id) && tagFilterFn(f));
 }
 
 
 function filterData(flows = [],
                     decorators = [],
+                    allTags = [],
                     filterOptions) {
     const filteredDecorators = filterDecorators(decorators, filterOptions);
-    const filteredFlows = filterFlows(flows, filteredDecorators);
+    const filteredFlows = filterFlows(flows, filteredDecorators, allTags, filterOptions.selectedTags);
     const filteredEntities = calculateEntities(filteredFlows);
     return {
         entities: filteredEntities,
@@ -139,7 +147,7 @@ function filterData(flows = [],
 }
 
 
-function controller($q, $scope, serviceBroker) {
+function controller($q, $scope, userPreferenceService, serviceBroker) {
     const vm = initialiseData(this, initialState);
     const onAppSelect = (app) => $scope.$applyAsync(() => vm.selectedApp = app);
 
@@ -155,10 +163,11 @@ function controller($q, $scope, serviceBroker) {
                 CORE_API.LogicalFlowStore.findBySelector,
                 [ selector ])
             .then(r => vm.rawFlows = r.data);
+
         const decoratorPromise = serviceBroker
             .loadViewData(
-                CORE_API.LogicalFlowDecoratorStore.findBySelector,
-                [ selector ])
+                CORE_API.DataTypeDecoratorStore.findBySelector,
+                [ selector, entity.LOGICAL_DATA_FLOW.key ])
             .then(r => {
                 vm.rawDecorators = r.data;
                 vm.graphTweakers = buildGraphTweakers(
@@ -166,7 +175,23 @@ function controller($q, $scope, serviceBroker) {
                     onAppSelect);
             });
 
-        $q.all([flowPromise, decoratorPromise])
+        const tagsPromise = serviceBroker
+            .loadViewData(
+                CORE_API.TagStore.findTagsByEntityKindAndTargetSelector,
+                [ entity.LOGICAL_DATA_FLOW.key, selector ])
+            .then(r => {
+                vm.tags = maybeAddUntaggedFlowsTag(r.data);
+
+                return getSelectedTagsFromPreferences(
+                    vm.tags,
+                    groupLogicalFlowFilterExcludedTagIdsKey,
+                    userPreferenceService)
+                    .then(selectedTags => {
+                        vm.filterOptions.selectedTags = selectedTags;
+                    });
+            });
+
+        $q.all([flowPromise, decoratorPromise, tagsPromise])
             .then(() => vm.filterChanged());
     };
 
@@ -175,17 +200,38 @@ function controller($q, $scope, serviceBroker) {
         vm.flowData = filterData(
             vm.rawFlows,
             vm.rawDecorators,
+            vm.tags,
             vm.filterOptions);
     };
 
-    vm.showAll = () => {
-        vm.filterOptions = {
-            showPrimary: true,
-            showSecondary: true,
-            showDiscouraged: true,
-            showNoOpinion: true
-        };
+    vm.showAllRatings = () => {
+        vm.filterOptions.showPrimary = true;
+        vm.filterOptions.showSecondary = true;
+        vm.filterOptions.showDiscouraged = true;
+        vm.filterOptions.showNoOpinion = true;
+
         vm.filterChanged();
+    };
+
+    vm.showAllTags = () => {
+        vm.filterOptions.selectedTags = vm.tags;
+        vm.filterChanged();
+
+        saveTagFilterPreferences(
+            vm.tags,
+            vm.filterOptions.selectedTags,
+            groupLogicalFlowFilterExcludedTagIdsKey,
+            userPreferenceService);
+    };
+
+    vm.onTagsChange = () => {
+        vm.filterChanged();
+
+        saveTagFilterPreferences(
+            vm.tags,
+            vm.filterOptions.selectedTags,
+            groupLogicalFlowFilterExcludedTagIdsKey,
+            userPreferenceService);
     };
 
     vm.refocusApp = app => {
@@ -207,6 +253,7 @@ function controller($q, $scope, serviceBroker) {
 controller.$inject = [
     "$q",
     "$scope",
+    "UserPreferenceService",
     "ServiceBroker"
 ];
 

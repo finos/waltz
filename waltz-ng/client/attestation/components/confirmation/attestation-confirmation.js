@@ -1,46 +1,81 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
-import {initialiseData, invokeFunction} from '../../../common/index';
+import {initialiseData, invokeFunction} from "../../../common/index";
 
-import template from './attestation-confirmation.html';
+import template from "./attestation-confirmation.html";
+import {loadAndCalcUnattestableLogicalFlows} from "../../attestation-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 
 const bindings = {
-    instance: '<',
-    run: '<',
-    attestedEntityRef: '<?',
-    onConfirm: '<',
-    onCancel: '<'
+    attestationKind: "<",
+    parentEntityRef: "<",
+    attestedEntityRef: "<?",
+    onConfirm: "<?",
+    onCancel: "<?"
 };
 
+const unknownOrDeprecatedFlowErrorMessage = "Flows cannot be attested as there unknown and/or deprecated datatype usages. Please amend the flows.";
 
 const initialState = {
-    onConfirm: (attestation) => console.log('default onConfirm handler for attestation-confirmation: '+ instance),
-    onCancel: () => console.log('default onCancel handler for attestation-confirmation')
+    disabled: false,
+    onConfirm: (attestation) => console.log("default onConfirm handler for attestation-confirmation: "+ instance),
+    onCancel: () => console.log("default onCancel handler for attestation-confirmation")
 };
 
 
-function controller() {
+function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
+    function disableSubmission(message) {
+        vm.message = message;
+        vm.disabled = true;
+    }
+
+    function enableSubmission() {
+        vm.message = null;
+        vm.disabled = false;
+    }
+
+    function validateLogicalFlows() {
+        const selector = mkSelectionOptions(vm.parentEntityRef, "EXACT");
+        loadAndCalcUnattestableLogicalFlows($q, serviceBroker, selector)
+            .then(unattestableFlows =>
+                _.isEmpty(unattestableFlows)
+                    ? enableSubmission()
+                    : disableSubmission(unknownOrDeprecatedFlowErrorMessage));
+    }
+
+    vm.$onInit = () => {
+        switch (vm.attestationKind) {
+            case "LOGICAL_DATA_FLOW":
+                validateLogicalFlows();
+                break;
+            default:
+                enableSubmission();
+        }
+    };
+
     vm.confirm = (attestation) => {
+        if (vm.disabled) {
+            return;
+        }
         invokeFunction(vm.onConfirm, attestation);
     };
 
@@ -50,7 +85,10 @@ function controller() {
 }
 
 
-controller.$inject = [];
+controller.$inject = [
+    "$q",
+    "ServiceBroker"
+];
 
 
 const component = {
@@ -63,5 +101,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzAttestationConfirmation'
+    id: "waltzAttestationConfirmation"
 };

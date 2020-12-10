@@ -1,23 +1,43 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
 <div class="container-fluid">
 
     <!-- HEADER -->
     <waltz-page-header name="{{ ctrl.specification.name }}"
                        small="{{ ctrl.logicalFlow.source.name }} {{ ctrl.logicalFlow ? '&rarr;' : '' }} {{ ctrl.logicalFlow.target.name }}"
                        icon="qrcode">
-        <ol class="waltz-breadcrumbs">
-            <li><a ui-sref="main">Home</a></li>
-            <li>Logical Flow</li>
-            <li ng-if="ctrl.logicalFlow">
-                <waltz-entity-link entity-ref="ctrl.logicalFlow.source">
-                </waltz-entity-link>
-            </li>
-            <li ng-if="ctrl.logicalFlow">
-                <waltz-entity-link entity-ref="ctrl.logicalFlow.target">
-                </waltz-entity-link>
-            </li>
-            <li ng-if="!ctrl.logicalFlow">physical Flow</li>
-            <li ng-bind="ctrl.specification.name | truncateMiddle:50"></li>
-        </ol>
+        <breadcrumbs>
+            <ol class="waltz-breadcrumbs">
+                <li><a ui-sref="main">Home</a></li>
+                <li>Logical Flow</li>
+                <li ng-if="ctrl.logicalFlow">
+                    <waltz-entity-link entity-ref="{
+                    kind: 'LOGICAL_DATA_FLOW',
+                    id: ctrl.logicalFlow.id,
+                    name: ctrl.logicalFlow.source.name + ' &raquo; ' + ctrl.logicalFlow.target.name
+                }">
+                    </waltz-entity-link>
+                </li>
+                <li ng-if="!ctrl.logicalFlow">physical Flow</li>
+                <li ng-bind="ctrl.specification.name | truncateMiddle:50"></li>
+            </ol>
+        </breadcrumbs>
     </waltz-page-header>
 
 
@@ -45,23 +65,35 @@
                 </div>
             </waltz-section-actions>
 
+            <!-- CLEANUP DUPE MODE -->
             <div class="row"
                  style="padding-bottom: 12px"
-                 ng-if="ctrl.mode=== 'DUPLICATE'">
+                 ng-if="ctrl.mode === 'DUPLICATE'">
                 <div class="col-md-12"
                      ng-include="'wpfv-dupe-sub-section'">
                 </div>
             </div>
 
+            <!-- VIEW MODE -->
             <div class="row"
-                 ng-if="ctrl.mode==='OVERVIEW'">
+                 ng-if="ctrl.mode === 'OVERVIEW'">
+                <!-- OVERVIEW -->
                 <div class="col-md-7">
                     <div ng-include="'wpfv-overview'"></div>
                 </div>
+
+                <!-- DATA USAGE & ASSESSMENTS -->
                 <div class="col-md-5">
                     <waltz-data-type-usage-panel parent-entity-ref="ctrl.specificationReference"
+                                                 parent-flow="ctrl.physicalFlow"
                                                  help-text="Data types referenced by the specification">
                     </waltz-data-type-usage-panel>
+
+                    <br>
+
+                    <!-- Assessment Ratings -->
+                    <waltz-assessment-rating-sub-section parent-entity-ref="ctrl.parentEntityRef">
+                    </waltz-assessment-rating-sub-section>
                 </div>
             </div>
 

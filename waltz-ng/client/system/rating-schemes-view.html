@@ -3,27 +3,28 @@
   ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
   ~ See README.md for more information
   ~
-  ~ This program is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU Lesser General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
   ~
-  ~ This program is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU Lesser General Public License for more details.
+  ~     http://www.apache.org/licenses/LICENSE-2.0
   ~
-  ~ You should have received a copy of the GNU Lesser General Public License
-  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
   -->
 
 <div>
     <waltz-page-header icon="puzzle-piece" name="Rating Schemes">
-        <ol class="waltz-breadcrumbs">
-            <li><a ui-sref="main">Home</a></li>
-            <li><a ui-sref="main.system.list">System Admin</a></li>
-            <li>Rating Schemes</li>
-        </ol>
+        <breadcrumbs>
+            <ol class="waltz-breadcrumbs">
+                <li><a ui-sref="main">Home</a></li>
+                <li><a ui-sref="main.system.list">System Admin</a></li>
+                <li>Rating Schemes</li>
+            </ol>
+        </breadcrumbs>
     </waltz-page-header>
 
     <div class="col-sm-12 waltz-page-summary waltz-page-summary-attach">
@@ -36,13 +37,24 @@
 
         <div class="col-sm-12">
             <div class="col-sm-8">
+                <div ng-if="$ctrl.ratingSchemes.length > 5">
+
+                    <waltz-search-control min-characters="1"
+                                          delay="250"
+                                          on-query="$ctrl.onQueryStrChange"
+                                          placeholder-text="Search...">
+                    </waltz-search-control>
+    
+                    <br>
+                </div>
                 <table class="table table-condensed table-hover">
                     <thead>
                     <tr>
                         <th>Rating Scheme</th>
                         <th>Description</th>
                     </tr>
-                    <tbody ng-repeat="ratingScheme in $ctrl.ratingSchemes">
+                    <tbody ng-if="$ctrl.filteredRatingSchemes.length > 0" 
+                           ng-repeat="ratingScheme in $ctrl.filteredRatingSchemes | orderBy:'name'">
                     <tr ng-click="$ctrl.selectScheme(ratingScheme)">
                         <td class="col-sm-2 clickable">
                             <span uib-popover-template="'wrl-r-popover.html'"
@@ -65,6 +77,15 @@
                             </span>
                         </td>
                     </tr>
+                    </tbody>
+                    <tbody ng-if="$ctrl.filteredRatingSchemes.length == 0">
+                        <tr class="row">
+                            <td class="col-sm-8">
+                                <span class="force-wrap text-muted text-center">
+                                    No data available
+                                </span>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>

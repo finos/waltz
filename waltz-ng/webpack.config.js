@@ -1,12 +1,28 @@
-var path = require("path");
-var webpack = require("webpack");
-var HtmlWebpackPlugin = require("html-webpack-plugin");
-var Visualizer = require("webpack-visualizer-plugin");
-var git = require("git-rev-sync");
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
+ */
 
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const git = require("git-rev-sync");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
+const path = require("path");
+const webpack = require("webpack");
 
-var basePath = path.resolve(__dirname);
-
+const basePath = path.resolve(__dirname);
 
 module.exports = {
     entry: {
@@ -15,7 +31,6 @@ module.exports = {
     output: {
         path: path.join(basePath, "/dist"),
         filename: "[name].[contenthash].js"
-        //pathinfo: false  // https://webpack.js.org/guides/build-performance/#output-without-path-info
     },
     resolve: {
         symlinks: false,
@@ -50,11 +65,11 @@ module.exports = {
         }
     },
     watchOptions: {
-        ignored: /node_modules/,
-        aggregateTimeout: 800
-        //poll: 1000
+        ignored: /node_modules/,
+        aggregateTimeout: 800
     },
     plugins: [
+        new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             title: "Waltz",
             filename: "index.html",
@@ -65,8 +80,7 @@ module.exports = {
         new webpack.DefinePlugin({
             "__ENV__": JSON.stringify(process.env.BUILD_ENV || "dev"),
             "__REVISION__": JSON.stringify(git.long()),
-        }),
-        new Visualizer()
+        })
     ],
     module: {
         rules: [
@@ -105,14 +119,14 @@ module.exports = {
                 test: /\.css$/,
                 use: ["style-loader", "css-loader"]
             }, {
-                test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+                test: /\.(ttf|eot|svg|woff(2)?)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
                 loader: "url-loader",
                 options: {
                     limit: 8192
                 }
             }, {
                 test: /\.png$/,
-                loader: "url-loader",
+                loader: "file-loader",
                 options: {
                     mimetype: "image/png",
                     limit: 16384
@@ -121,20 +135,6 @@ module.exports = {
                 test: /\.html?$/,
                 exclude: /node_modules/,
                 loader: "html-loader"
-            }, {
-                test: /\.woff(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-                loader: "url-loader",
-                options: {
-                    mimetype: "application/font-woff",
-                    limit: 8192
-                }
-            }, {
-                test: /\.woff2(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-                loader: "url-loader",
-                options: {
-                    mimetype: "application/font-woff2",
-                    limit: 8192
-                }
             }
         ],
     }

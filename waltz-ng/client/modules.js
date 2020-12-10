@@ -1,23 +1,21 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
-import "babel-polyfill";
 import "angular-animate";
 import "angular-loading-bar";
 import "angular-local-storage";
@@ -60,7 +58,6 @@ import DataFlow from "./data-flow";
 import DataTypeUsage from "./data-type-usage";
 import DataTypes from "./data-types";
 import Databases from "./databases";
-import DrillGrid from "./drill-grid";
 import DynamicSection from "./dynamic-section";
 import Embed from "./embed";
 import EndUserApps from "./end-user-apps";
@@ -95,6 +92,7 @@ import Notification from "./notification";
 import OrgUnits from "./org-units";
 import Orphan from "./orphan";
 import Person from "./person";
+import PermissionGroup from "./permission-group";
 import PhysicalFlows from "./physical-flows";
 import PhysicalSpecifications from "./physical-specifications";
 import PhysicalField from "./physical-field";
@@ -102,6 +100,7 @@ import Playpen from "./playpen";
 import Playpen5 from "./playpen/5";
 import Profile from "./profile";
 import Ratings from "./ratings";
+import ReportGrid from "./report-grid";
 import Roadmap from "./roadmap";
 import Role from "./role";
 import Scenario from "./scenario";
@@ -130,6 +129,7 @@ const dependencies = [
     "ui.grid.exporter",
     "ui.grid.resizeColumns",
     "ui.grid.selection",
+    "ui.grid.pinning",
     "ui-notification",
     "ngAnimate",
     "ngSanitize",
@@ -167,7 +167,6 @@ const dependencies = [
     DataTypeUsage(),
     DataTypes(),
     Databases(),
-    DrillGrid(),
     DynamicSection(),
     Embed(),
     EndUserApps(),
@@ -202,6 +201,7 @@ const dependencies = [
     OrgUnits(),
     Orphan(),
     Person(),
+    PermissionGroup(),
     PhysicalFlows(),
     PhysicalSpecifications(),
     PhysicalField(),
@@ -209,6 +209,7 @@ const dependencies = [
     Playpen5(),
     Profile(),
     Ratings(),
+    ReportGrid(),
     Roadmap(),
     Role(),
     Scenario(),

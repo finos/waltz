@@ -3,26 +3,26 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import _ from "lodash";
-import { initialiseData } from "../../../common";
-import { CORE_API } from "../../../common/services/core-api-utils";
+import {initialiseData} from "../../../common";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkLinkGridCell} from "../../../common/grid-utils";
+import {loadAssessmentsForKind} from "../../../assessments/assessment-utils";
 
 import template from "./licence-list.html";
-import { mkLinkGridCell } from "../../../common/grid-utils";
 
 
 const bindings = {
@@ -36,10 +36,15 @@ const nameCol = mkLinkGridCell(
     "main.licence.view",
     { width: "50%" });
 
-const approvalCol = {
-    field: "approvalStatus",
-    name: "Status",
-    cellFilter: "toDisplayName:'ApprovalStatus'"
+const assessmentsCol = {
+    field: "assessments",
+    name: "Assessments",
+    width: "7%",
+    cellTemplate: `
+                <div style="text-align: center">
+                    <waltz-assessment-rating-traffic-lights assessments="COL_FIELD">
+                    </waltz-assessment-rating-traffic-lights>
+                </div>`
 };
 
 const externalIdCol = {
@@ -63,16 +68,33 @@ const lastUpdatedCol = {
 };
 
 
+
 const initialState = {
     licences: [],
-    columnDefs: [
-        nameCol,
-        externalIdCol,
-        approvalCol,
-        usageCol,
-        lastUpdatedCol
-    ]
+    columnDefs: []
 };
+
+
+function mkColumnDefs(assessmentDefs) {
+    const assessmentFields = _.map(assessmentDefs, d => {
+        return {
+            field: `${d.externalId}.ratingItem.name`,
+            displayName: d.name
+        };
+    });
+
+    return _.union(
+        [
+            nameCol,
+            externalIdCol,
+        ],
+        assessmentFields,
+        [
+            usageCol,
+            lastUpdatedCol
+        ]
+    );
+}
 
 
 function controller($q, serviceBroker) {
@@ -87,17 +109,27 @@ function controller($q, serviceBroker) {
             .loadViewData(CORE_API.LicenceStore.countApplications)
             .then(r => _.keyBy(r.data, "id"));
 
-        $q.all([licencePromise, usagePromise])
-            .then(([licences, usageByLicenseId]) => {
-                vm.licences = _.map(licences, d => {
-                    const usageCount = _.get(usageByLicenseId, [d.id, "count"], 0);
+        const assessmentsPromise = loadAssessmentsForKind($q, serviceBroker, "LICENCE");
+
+        $q.all([licencePromise, usagePromise, assessmentsPromise])
+            .then(([licences, usageByLicenseId, assessments]) => {
+                const assessmentDefinitions = assessments.definitions;
+                const assessmentsByLicenceId = assessments.assessmentsByEntityId;
+
+                vm.columnDefs = mkColumnDefs(assessmentDefinitions);
+
+                vm.licences = _.map(licences, l => {
+                    const usageCount = _.get(usageByLicenseId, [l.id, "count"], 0);
                     const usageInfo = usageCount > 0
                         ? `${usageCount} Applications`
                         : "-";
 
-                    return Object.assign({}, d, { usageInfo })
+                    const assessmentsByDefinitionExtId = _.get(assessmentsByLicenceId, l.id, []);
+
+                    return Object.assign({}, l, { usageInfo }, assessmentsByDefinitionExtId)
                 });
             });
+
     };
 
 

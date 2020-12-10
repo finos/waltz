@@ -1,3 +1,21 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
+ */
+
 package com.khartec.waltz.service.taxonomy_management;
 
 import com.khartec.waltz.common.DateTimeUtilities;
@@ -11,6 +29,7 @@ import com.khartec.waltz.model.measurable_category.MeasurableCategory;
 import com.khartec.waltz.model.taxonomy_management.*;
 import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.client_cache_key.ClientCacheKeyService;
+import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import com.khartec.waltz.service.measurable.MeasurableService;
 import com.khartec.waltz.service.measurable_category.MeasurableCategoryService;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -34,6 +53,7 @@ public class TaxonomyChangeService {
     private final UserRoleService userRoleService;
     private final MeasurableCategoryService measurableCategoryService;
     private final MeasurableService measurableService;
+    private final EntityHierarchyService entityHierarchyService;
 
 
     @Autowired
@@ -42,7 +62,8 @@ public class TaxonomyChangeService {
                                  MeasurableCategoryService measurableCategoryService,
                                  UserRoleService userRoleService,
                                  List<TaxonomyCommandProcessor> processors,
-                                 MeasurableService measurableService) {
+                                 MeasurableService measurableService,
+                                 EntityHierarchyService entityHierarchyService) {
         checkNotNull(taxonomyChangeDao, "taxonomyChangeDao cannot be null");
         checkNotNull(clientCacheKeyService, "clientCacheKeyService cannot be null");
         this.clientCacheKeyService = clientCacheKeyService;
@@ -56,6 +77,7 @@ public class TaxonomyChangeService {
                         .map(st -> tuple(st, p)))
                 .collect(toMap(t -> t.v1, t -> t.v2));
         this.measurableService = measurableService;
+        this.entityHierarchyService = entityHierarchyService;
     }
 
 
@@ -105,7 +127,16 @@ public class TaxonomyChangeService {
         TaxonomyCommandProcessor processor = getCommandProcessor(command);
         TaxonomyChangeCommand updatedCommand = processor.apply(command, userId);
         clientCacheKeyService.createOrUpdate("TAXONOMY");
-        return taxonomyChangeDao.update(updatedCommand);
+
+        updatedCommand = taxonomyChangeDao.update(updatedCommand);
+
+        // rebuild measurable hierarchy
+        if (command.changeDomain().kind() == EntityKind.MEASURABLE_CATEGORY
+                && isHierarchyChange(command)) {
+            entityHierarchyService.buildForMeasurableByCategory(command.changeDomain().id());
+        }
+
+        return updatedCommand;
     }
 
 
@@ -161,5 +192,13 @@ public class TaxonomyChangeService {
     private boolean isMovingToANode(TaxonomyChangeCommand command, String destinationId) {
         return command.changeType().equals(TaxonomyChangeType.MOVE) &&
                 StringUtilities.notEmpty(destinationId);
+    }
+
+
+    private boolean isHierarchyChange(TaxonomyChangeCommand command) {
+        return command.changeType() == TaxonomyChangeType.ADD_CHILD
+                || command.changeType() == TaxonomyChangeType.ADD_PEER
+                || command.changeType() == TaxonomyChangeType.REMOVE
+                || command.changeType() == TaxonomyChangeType.MOVE;
     }
 }

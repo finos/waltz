@@ -3,18 +3,17 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.data.tag;
@@ -22,7 +21,9 @@ package com.khartec.waltz.data.tag;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.tag.ImmutableTag;
+import com.khartec.waltz.model.tag.ImmutableTagUsage;
 import com.khartec.waltz.model.tag.Tag;
+import com.khartec.waltz.model.tag.TagUsage;
 import com.khartec.waltz.schema.tables.records.TagRecord;
 import com.khartec.waltz.schema.tables.records.TagUsageRecord;
 import org.jooq.*;
@@ -31,9 +32,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.Tag.TAG;
 import static com.khartec.waltz.schema.tables.TagUsage.TAG_USAGE;
+import static java.util.stream.Collectors.*;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
 @Repository
@@ -77,6 +83,29 @@ public class TagDao {
                 .where(TAG.TARGET_KIND.eq(entityKind.name()))
                 .orderBy(tagUsage.field("usageCount").desc())
                 .fetch(TO_TAG_DOMAIN_MAPPER);
+    }
+
+
+    public List<Tag> findTagsForEntityKindAndTargetSelector(EntityKind targetKind,
+                                                            Select<Record1<Long>> targetEntityIdSelector) {
+        Map<Tag, Set<TagUsage>> tagToUsages = dsl
+                .select(TAG.fields())
+                .select(TAG_USAGE.fields())
+                .from(TAG)
+                .join(TAG_USAGE)
+                .on(TAG_USAGE_JOIN_CONDITION)
+                .where(TAG.TARGET_KIND.eq(targetKind.name()))
+                .and(TAG_USAGE.ENTITY_KIND.eq(targetKind.name()))
+                .and(TAG_USAGE.ENTITY_ID.in(targetEntityIdSelector))
+                .fetch()
+                .stream()
+                .map(r -> tuple(TO_TAG_DOMAIN_MAPPER.map(r), TO_TAG_USAGE_DOMAIN_MAPPER.map(r)))
+                .collect(groupingBy(t -> t.v1(), mapping(t -> t.v2(), toSet())));
+
+        return tagToUsages.entrySet().stream()
+                .map(e -> ImmutableTag.copyOf(e.getKey())
+                        .withTagUsages(e.getValue()))
+                .collect(toList());
     }
 
 
@@ -153,6 +182,19 @@ public class TagDao {
                 .id(record.getId())
                 .name(record.getName())
                 .targetKind(EntityKind.valueOf(record.getTargetKind()))
+                .build();
+    };
+
+
+    private static final RecordMapper<Record, TagUsage> TO_TAG_USAGE_DOMAIN_MAPPER = r -> {
+        TagUsageRecord record = r.into(TagUsageRecord.class);
+
+        return ImmutableTagUsage.builder()
+                .tagId(record.getTagId())
+                .entityReference(mkRef(EntityKind.valueOf(record.getEntityKind()), record.getEntityId()))
+                .createdAt(record.getCreatedAt().toLocalDateTime())
+                .createdBy(record.getCreatedBy())
+                .provenance(record.getProvenance())
                 .build();
     };
 }

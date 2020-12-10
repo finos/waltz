@@ -3,18 +3,17 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import { appResolver, appByAssetCodeResolver, orgUnitsResolver } from "./resolvers";
@@ -26,67 +25,66 @@ import AppView from "./pages/view/app-view";
 
 
 const base = {
-    url: 'application'
+    url: "application"
 };
 
 
 const appRegistrationState = {
-    url: '/registration',
-    views: {'content@': AppRegistration }
+    url: "/registration",
+    views: {"content@": AppRegistration }
 };
 
 
 const appViewState = {
-    url: '/{id:int}',
+    url: "/{id:int}",
     reloadOnSearch: false,
     views: {
-        'content@': AppView
+        "content@": AppView
     }
 };
 
 
 const appViewByAssetCodeState = {
-    url: '/asset-code/{assetCode}',
+    url: "/asset-code/{assetCode}",
     views: {
-        'content@': AppViewAssetCode
+        "content@": AppViewAssetCode
     },
     resolve: { resolvedAppsByAssetCode: appByAssetCodeResolver }
 };
 
 
-
 const appViewByExternalIdState = {
-    url: '/external-id/{assetCode}',
+    url: "/external-id/{assetCode}",
     views: {
-        'content@': AppViewAssetCode
+        "content@": AppViewAssetCode
     },
     resolve: { resolvedAppsByAssetCode: appByAssetCodeResolver }
 };
 
 
 const appEditState = {
-    url: '/{id:int}/edit',
+    url: "/{id:int}/edit",
     resolve: {
         app: appResolver,
         orgUnits: orgUnitsResolver
     },
-    views: {'content@': AppEdit}
+    views: {"content@": AppEdit}
 };
 
 
 function setup($stateProvider) {
     $stateProvider
-        .state('main.app', base)
-        .state('main.app.registration', appRegistrationState)
-        .state('main.app.view', appViewState)
-        .state('main.app.asset-code', appViewByAssetCodeState)
-        .state('main.app.external-id', appViewByExternalIdState)
-        .state('main.app.edit', appEditState)
+        .state("main.app", base)
+        .state("main.app.registration", appRegistrationState)
+        .state("main.app.view", appViewState)
+        .state("main.app.asset-code", appViewByAssetCodeState)
+        .state("main.app.external-id", appViewByExternalIdState)
+        .state("main.app.edit", appEditState);
 }
 
 
 setup.$inject = [
-    '$stateProvider'
+    "$stateProvider"
 ];
 
 

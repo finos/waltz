@@ -1,0 +1,66 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<div>
+    <h3>
+        <waltz-icon name="history"></waltz-icon>
+        Changes
+    </h3>
+
+    <!-- NO GROUP -->
+    <div ng-if="!$ctrl.favouritesGroupRef">
+        <waltz-no-data>
+            <message>
+                You do not currently have a favourite group.
+                <br>
+                You can create one by clicking on the bookmark icon
+                ( <waltz-icon name="bookmark-o"></waltz-icon> ) when viewing
+                applications.
+            </message>
+        </waltz-no-data>
+    </div>
+
+    <!-- HAS GROUP,  but may be empty... -->
+    <div ng-if="$ctrl.favouritesGroupRef">
+        <p>
+            Recent changes to applications in your
+            <a ui-sref="main.app-group.view ({id: $ctrl.favouritesGroupRef.id })">favourite group</a>
+            :
+        </p>
+
+        <waltz-change-summaries-panel parent-entity-ref="$ctrl.favouritesGroupRef">
+            <no-data>
+                <waltz-no-data>
+                    <message>
+                        You have no applications in your favourite group. You can add/remove applications to your favourite group
+                        by either:
+                        <ul>
+                            <li>
+                                Clicking on the bookmark icon ( <waltz-icon name="bookmark-o"></waltz-icon> ) when viewing applications.
+                            </li>
+                            <li>
+                                Add apps (or groups of apps) via the group edit screen.
+                            </li>
+                        </ul>
+                    </message>
+                </waltz-no-data>
+            </no-data>
+        </waltz-change-summaries-panel>
+
+    </div>
+</div>

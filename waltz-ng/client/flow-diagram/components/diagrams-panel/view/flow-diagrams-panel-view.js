@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import _ from "lodash";
@@ -25,14 +24,14 @@ import template from "./flow-diagrams-panel-view.html";
 import {allEntityLifecycleStatuses, initialiseData} from "../../../../common/index";
 import {CORE_API} from "../../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../../common/selector-utils";
-import {dyamicSectionNavigationDefaultOffset} from "../../../../dynamic-section/components/dynamic-section-navigation/dynamic-section-navigation";
+import {dynamicSectionNavigationDefaultOffset} from "../../../../dynamic-section/components/dynamic-section-navigation/dynamic-section-navigation";
 import {pageHeaderDefaultOffset} from "../../../../widgets/page-header/page-header";
 import {displayError} from "../../../../common/error-utils";
 
 const bindings = {
-    parentEntityRef: '<',
-    onEditDiagram: '<',
-    onDismissDiagram: '<'
+    parentEntityRef: "<",
+    onEditDiagram: "<",
+    onDismissDiagram: "<"
 };
 
 
@@ -54,7 +53,7 @@ function determinePopupTopPosition(evt, scrollOffset, elementHeight) {
     // get the width and height of the element
     const navOffset = 60; // the nav bar margin (navbar.html)
     const pageHeaderOffset = scrollOffset > pageHeaderDefaultOffset ? 40 : 0;  // refer to page-header.js
-    const dynamicNavOffset = scrollOffset > dyamicSectionNavigationDefaultOffset ? 40 : 0; // refer to dynamic-section-navigation
+    const dynamicNavOffset = scrollOffset > dynamicSectionNavigationDefaultOffset ? 40 : 0; // refer to dynamic-section-navigation
 
     const halfHeight = elementHeight / 2;
 
@@ -67,8 +66,8 @@ function determinePopupTopPosition(evt, scrollOffset, elementHeight) {
 
 function determinePopupPosition(evt, $window, $element) {
     //get the width and height of the element
-    const elementWidth = _.get($element, '[0].parentElement.clientWidth');
-    const elementHeight = _.get($element, '[0].parentElement.clientHeight');
+    const elementWidth = _.get($element, "[0].parentElement.clientWidth");
+    const elementHeight = _.get($element, "[0].parentElement.clientHeight");
     const scrollOffset = $window.pageYOffset;
     const halfWidth = elementWidth / 2;
 
@@ -159,7 +158,7 @@ function controller($element,
     vm.toggleLayer = (layer) => {
         const currentlyVisible = flowDiagramStateService.getState().visibility.layers[layer];
         const cmd = {
-            command: currentlyVisible ? 'HIDE_LAYER' : 'SHOW_LAYER',
+            command: currentlyVisible ? "HIDE_LAYER" : "SHOW_LAYER",
             payload: layer
         };
         flowDiagramStateService.processCommands([cmd]);
@@ -172,7 +171,7 @@ function controller($element,
         vm.contextPopup.styling = determinePopupPosition(event, $window, $element);
 
         const nodeRef = n.data;
-        if (nodeRef.kind === 'APPLICATION') {
+        if (nodeRef.kind === "APPLICATION") {
             serviceBroker
                 .loadViewData(CORE_API.ApplicationStore.getById, [ nodeRef.id ])
                 .then(r => {
@@ -185,17 +184,17 @@ function controller($element,
         }
     };
 
-    const showFlowBucketDetail = (logicalFlow) => {
+    const showFlowBucketDetail = (logicalFlow, e) => {
         $timeout(() => vm.visibility.contextPopup = false);
         vm.contextPopup.styling = determinePopupPosition(event, $window, $element);
 
         const state = flowDiagramStateService.getState();
-        const physFlowsPath = ['model', 'decorations', logicalFlow.id];
+        const physFlowsPath = ["model", "decorations", logicalFlow.id];
         const physicalFlowIds = _
             .chain(state)
             .get(physFlowsPath)
-            .map('data')
-            .map('id')
+            .map("data")
+            .map("id")
             .value();
 
         const diagramSelector = mkSelectionOptions(vm.parentEntityRef, "EXACT", allEntityLifecycleStatuses);
@@ -220,11 +219,12 @@ function controller($element,
 
         $q.all([flowPromise, specPromise, changeUnitPromise])
             .then(([flows, specs, changeUnits]) => {
-                const flowsById = _.keyBy(flows, 'id');
-                const specsById = _.keyBy(specs, 'id');
+                const flowsById = _.keyBy(flows, "id");
+                const specsById = _.keyBy(specs, "id");
 
                 vm.changeUnits = changeUnits;
-                const changeUnitsByPhysicalFlowId = _.chain(vm.changeUnits)
+                const changeUnitsByPhysicalFlowId = _
+                    .chain(vm.changeUnits)
                     .filter(cu => cu.subjectEntity.kind = "PHYSICAL_FLOW")
                     .keyBy(cu => cu.subjectEntity.id)
                     .value();
@@ -261,13 +261,13 @@ function controller($element,
 
 
 controller.$inject = [
-    '$element',
-    '$q',
-    '$window',
-    '$timeout',
-    'FlowDiagramStateService',
-    'ServiceBroker',
-    'Notification'
+    "$element",
+    "$q",
+    "$window",
+    "$timeout",
+    "FlowDiagramStateService",
+    "ServiceBroker",
+    "Notification"
 ];
 
 
@@ -280,5 +280,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzFlowDiagramsPanelView'
+    id: "waltzFlowDiagramsPanelView"
 };

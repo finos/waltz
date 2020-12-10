@@ -3,26 +3,25 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
-import { initialiseData } from "../../common";
+import {initialiseData} from "../../common";
 import template from "./change-log-table.html";
 
 const bindings = {
     entries: "<",
-    onInitialise: "<"
+    onInitialise: "<?"
 };
 
 
@@ -45,19 +44,33 @@ function controller() {
             field: "message",
             name: "Message",
             width: "70%",
-            cellTemplate: "<div class=\"ui-grid-cell-contents\"><span title=\"{{COL_FIELD}}\" ng-bind=\"COL_FIELD\"></span></div>"
+            cellTemplate: `
+                <div class='ui-grid-cell-contents'>
+                    <span uib-popover='{{COL_FIELD}}'
+                          popover-append-to-body='true'
+                          popover-trigger='mouseenter'
+                          popover-popup-delay="300"
+                          popover-class="waltz-popover-width-500"
+                          ng-bind='COL_FIELD'>
+                    </span>
+                </div>`
         },
         {
             field: "userId",
             name: "User",
             width: "10%",
-            cellTemplate: "<div class=\"ui-grid-cell-contents\"><a ui-sref=\"main.profile.view ({userId: COL_FIELD})\"><span ng-bind=\"COL_FIELD\"></span></a></div>"
+            cellTemplate: `
+                <div class='ui-grid-cell-contents'>
+                    <waltz-person-link tooltip-placement='left'
+                                       user-id='COL_FIELD'>
+                    </waltz-person-link>
+                </div>`
         },
         {
             field: "createdAt",
             name: "Timestamp",
             width: "10%",
-            cellTemplate: "<div class=\"ui-grid-cell-contents\"><waltz-from-now timestamp=\"COL_FIELD\"></waltz-from-now></div>"
+            cellTemplate: "<div class='ui-grid-cell-contents'><waltz-from-now timestamp='COL_FIELD'></waltz-from-now></div>"
         }
     ];
 

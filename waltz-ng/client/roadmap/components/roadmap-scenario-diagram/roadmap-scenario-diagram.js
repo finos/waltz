@@ -1,12 +1,34 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
+ */
+
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
-import {prepareData} from "../../../scenario/components/scenario-diagram/scenario-diagram-data-utils";
+import {
+    getChangeScenarioCommand,
+    prepareData
+} from "../../../scenario/components/scenario-diagram/scenario-diagram-data-utils";
 import {initialiseData} from "../../../common";
 import {event, select, selectAll} from "d3-selection";
 import roles from "../../../user/system-roles";
 
 import template from "./roadmap-scenario-diagram.html";
 import {getDefaultRating} from "../../../ratings/rating-utils";
+import {kindToViewState} from "../../../common/link-utils";
 
 
 const bindings = {
@@ -145,7 +167,9 @@ function controller($q,
                     localStorageService,
                     notification,
                     serviceBroker,
-                    userService) {
+                    userService,
+                    $window,
+                    $state) {
 
     const vm = initialiseData(this, initialState);
 
@@ -220,16 +244,16 @@ function controller($q,
     const removeAction = mkAction(
         "Remove",
         (elm, d) => {
-            const args = [
-                vm.scenarioDefn.scenario.id,
+            const removeRatingScenarioCommand = getChangeScenarioCommand(
+                vm.scenarioDefn,
                 d.node.id,
                 d.domainCoordinates.column.id,
                 d.domainCoordinates.row.id
-            ];
+            );
             serviceBroker
                 .execute(
                     CORE_API.ScenarioStore.removeRating,
-                    args)
+                    [removeRatingScenarioCommand])
                 .then(() => notification.success("Item removed"))
                 .then(() => reload());
         });
@@ -363,12 +387,16 @@ function controller($q,
                 const row = d.domainCoordinates.row.name;
                 const ratingName = _.get(vm, ["ratingsByCode", d.state.rating, "name"], "?");
                 const comment = _.get(d, ["state", "comment"], "- No comment -");
+                const urlEnding = $state.href(kindToViewState( d.node.kind ), { id: d.node.id });
+                const url = $window.location.origin + urlEnding;
 
                 const html = `
                     <table class="table table-condensed small">
                         <thead>
                         <tr>
-                            <th colspan="2">${ name }</th>
+                            <th colspan="2">
+                                <a href="${ url }">${ name }</a>
+                            </th>
                         </tr>
                         </thead>
                         <tbody>
@@ -385,7 +413,7 @@ function controller($q,
                             <td>${ comment }</td>
                         </tr>
                         <tr>
-                            <td>Rating:</td> 
+                            <td>Rating:</td>
                             <td>${ ratingName }</td>
                         </tr>
                         </tbody>
@@ -417,7 +445,10 @@ function controller($q,
             .then( () => serviceBroker.loadAppData(
                 CORE_API.RatingSchemeStore.getById,
                 [ vm.scenarioDefn.roadmap.ratingSchemeId ]))
-            .then(r => vm.ratingsByCode = _.keyBy(r.data.ratings, "rating"));
+            .then(r => {
+                vm.ratingsByCode = _.keyBy(r.data.ratings, "rating");
+                vm.ratingSchemeItems = r.data.ratings;
+            });
 
         $q.all([scenarioPromise, applicationPromise, measurablePromise])
             .then(() => {
@@ -461,18 +492,17 @@ function controller($q,
     vm.onAddApplication = (app) => {
         const lastOrDefaultRating = getLastOrDefaultRating(app);
 
-        const args = [
-            vm.scenarioDefn.scenario.id,
+        const addRatingScenarioCommand = getChangeScenarioCommand(
+            vm.scenarioDefn,
             app.id,
             vm.selectedColumn.id,
             vm.selectedRow.id,
-            lastOrDefaultRating
-        ];
+            lastOrDefaultRating);
 
         serviceBroker
             .execute(
                 CORE_API.ScenarioStore.addRating,
-                args)
+                [addRatingScenarioCommand])
             .then(() => {
                 _.remove(vm.dialog.applicationPickList, a => a.id === app.id);
                 reload();
@@ -480,20 +510,20 @@ function controller($q,
             });
     };
 
-    vm.onSaveCell =(item, column, row, workingState) => {
-        const args = [
-            vm.scenarioDefn.scenario.id,
+    vm.onSaveCell =(item, column, row, workingState, currentRating) => {
+        const changeScenarioCommand = getChangeScenarioCommand(
+            vm.scenarioDefn,
             item.id,
             column.id,
             row.id,
             workingState.rating,
-            workingState.comment
-        ];
+            workingState.comment,
+            currentRating);
 
         serviceBroker
             .execute(
                 CORE_API.ScenarioStore.updateRating,
-                args)
+                [changeScenarioCommand])
             .then(() => {
                 reload();
                 notification.success("Edited rating");
@@ -524,7 +554,9 @@ controller.$inject = [
     "localStorageService",
     "Notification",
     "ServiceBroker",
-    "UserService"
+    "UserService",
+    "$window",
+    "$state"
 ];
 
 

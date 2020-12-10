@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.service.change_unit.processors;
@@ -22,12 +21,13 @@ package com.khartec.waltz.service.change_unit.processors;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.attribute_change.AttributeChange;
 import com.khartec.waltz.model.change_unit.ChangeUnit;
 import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.service.change_unit.AttributeChangeCommandProcessor;
+import com.khartec.waltz.service.data_type.DataTypeDecoratorService;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
-import com.khartec.waltz.service.physical_specification_data_type.PhysicalSpecDataTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -48,17 +48,17 @@ public class DataTypeChangeCommandProcessor implements AttributeChangeCommandPro
     private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
 
     private final PhysicalFlowService physicalFlowService;
-    private final PhysicalSpecDataTypeService physicalSpecDataTypeService;
+    private final DataTypeDecoratorService dataTypeDecoratorService;
 
 
     @Autowired
     public DataTypeChangeCommandProcessor(PhysicalFlowService physicalFlowService,
-                                          PhysicalSpecDataTypeService physicalSpecDataTypeService) {
+                                          DataTypeDecoratorService dataTypeDecoratorService) {
         checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
-        checkNotNull(physicalSpecDataTypeService, "physicalSpecDataTypeService cannot be null");
+        checkNotNull(dataTypeDecoratorService, "dataTypeDecoratorService cannot be null");
 
         this.physicalFlowService = physicalFlowService;
-        this.physicalSpecDataTypeService = physicalSpecDataTypeService;
+        this.dataTypeDecoratorService = dataTypeDecoratorService;
     }
 
 
@@ -83,7 +83,8 @@ public class DataTypeChangeCommandProcessor implements AttributeChangeCommandPro
         Set<Long> oldValues = readValue(attributeChange.oldValue());
         Set<Long> newValues = readValue(attributeChange.newValue());
 
-        Set<Long> existing = physicalSpecDataTypeService.findBySpecificationId(physicalFlow.specificationId())
+        EntityReference specificationEntityRef = EntityReference.mkRef(EntityKind.PHYSICAL_SPECIFICATION, physicalFlow.specificationId());
+        Set<Long> existing = dataTypeDecoratorService.findByEntityId(specificationEntityRef)
                 .stream()
                 .map(a -> a.dataTypeId())
                 .collect(toSet());
@@ -92,10 +93,10 @@ public class DataTypeChangeCommandProcessor implements AttributeChangeCommandPro
         Set<Long> toRemove = minus(oldValues, newValues);
 
 
-        int[] removedCount = physicalSpecDataTypeService.removeDataTypes(userName, physicalFlow.specificationId(), toRemove);
-        int[] addedCount = physicalSpecDataTypeService.addDataTypes(userName, physicalFlow.specificationId(), toAdd);
+        int removedCount = dataTypeDecoratorService.removeDataTypeDecorator(userName, specificationEntityRef, toRemove);
+        int[] addedCount = dataTypeDecoratorService.addDecorators(userName, specificationEntityRef, toAdd);
 
-        return removedCount.length == toRemove.size() && addedCount.length == toAdd.size();
+        return removedCount == toRemove.size() && addedCount.length == toAdd.size();
     }
 
 

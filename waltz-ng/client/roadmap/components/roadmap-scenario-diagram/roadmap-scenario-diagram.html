@@ -1,5 +1,23 @@
 
 
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
 <div>
     <p class="help-block">
         <div ng-if="$ctrl.permissions.edit">
@@ -81,7 +99,7 @@
                     </p>
                     <div class="small">
                         <waltz-rating-picker selected="$ctrl.dialog.workingState.rating"
-                                             scheme-id="$ctrl.scenarioDefn.roadmap.ratingSchemeId"
+                                             rating-scheme-items="$ctrl.ratingSchemeItems"
                                              on-select="$ctrl.onRatingSelect">
                         </waltz-rating-picker>
                     </div>
@@ -103,7 +121,8 @@
                             $ctrl.dialog.data.node,
                             $ctrl.dialog.data.domainCoordinates.column,
                             $ctrl.dialog.data.domainCoordinates.row,
-                            $ctrl.dialog.workingState)"
+                            $ctrl.dialog.workingState,
+                            $ctrl.dialog.data.state.rating)"
                         class="btn btn-primary btn-sm">
                     Save
                 </button>
@@ -153,7 +172,8 @@
                        ng-value="tab.value"
                        name="{{tab.name}}"
                        id="{{tab.id + $id}}">
-                <label for="{{tab.id + $id}}"
+                <label class="wt-label"
+                       for="{{tab.id + $id}}"
                        ng-bind="tab.name"
                        ng-repeat-end>
                 </label>

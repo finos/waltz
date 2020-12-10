@@ -1,0 +1,143 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.26.xml">
+
+    <changeSet id="20200618-tag"
+               author="davidwatkins73">
+        <tagDatabase tag="v1.25"/> <!-- tag the current db version -->
+    </changeSet>
+
+    <!-- 4936: Entity Alias PK -->
+    <changeSet id="20200618-4936-1"
+               author="davidwatkins73">
+        <comment>4936:  Add kind to entity_alias pk (drop existing)</comment>
+        <dropPrimaryKey tableName="entity_alias"/>
+        <rollback>
+            <addPrimaryKey tableName="entity_alias"
+                           columnNames="id,alias"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20200618-4936-2"
+               author="davidwatkins73">
+        <comment>4936:  Add kind to entity_alias pk (add new)</comment>
+        <addPrimaryKey tableName="entity_alias"
+                       columnNames="id,kind,alias"/>
+    </changeSet>
+
+
+    <!-- 4876: Favourites -->
+    <changeSet id="20200630-4876-1"
+               author="davidwatkins73">
+        <comment>4876: Add provenance and is_readonly to app_group_entries</comment>
+        <addColumn tableName="application_group_entry">
+            <column name="is_readonly"
+                       type="boolean"
+                       defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="application_group_entry">
+            <column name="provenance"
+                    type="${provenance.type}"
+                    defaultValue="waltz">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+        <addColumn tableName="application_group_ou_entry">
+            <column name="is_readonly"
+                       type="boolean"
+                       defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="application_group_ou_entry">
+            <column name="provenance"
+                    type="${provenance.type}"
+                    defaultValue="waltz">
+                <constraints nullable="false" />
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20200630-4876-2"
+               author="davidwatkins73">
+    <comment>4876: Add is_favourite_group column to app_group</comment>
+        <addColumn tableName="application_group">
+            <column name="is_favourite_group"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <!-- 4815: insert current year date settings value -->
+    <changeSet id="20200605-4815-1"
+               author="woodjes">
+        <comment>4815: Insert enum values into table</comment>
+        <insert tableName="settings">
+            <column name="name" value="settings.asset-cost.current-year-text"/>
+            <column name="value" value="YTD"/>
+        </insert>
+        <rollback>
+            <delete tableName="settings">
+                <where>name='settings.asset-cost.current-year-text'</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+
+    <!-- 4876: add dedicated news section -->
+    <changeSet id="20200714-4876-1"
+               author="woodjes">
+        <comment>4876: Insert dedicated news section to static panels</comment>
+        <insert tableName="static_panel">
+            <column name="group" value="NEWS"/>
+            <column name="title" value="News"/>
+            <column name="icon" value="bolt"/>
+            <column name="priority" value="0"/>
+            <column name="width" value="12"/>
+            <column name="encoding" value="HTML"/>
+            <column name="content" value="Welcome to the new WIP 1.26 Release of Waltz"/>
+        </insert>
+        <rollback/>
+    </changeSet>
+
+
+    <!-- 4815: insert banner message settings value -->
+    <changeSet id="20200713-4876-1"
+               author="woodjes">
+        <comment>4876: Insert banner message into table</comment>
+        <insert tableName="settings">
+            <column name="name" value="ui.banner.message"/>
+            <column name="value" value="Waltz is optimised for use in Google Chrome, try a different browser for better performance"/>
+        </insert>
+        <rollback>
+            <delete tableName="settings">
+                <where>name='ui.banner.message'</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

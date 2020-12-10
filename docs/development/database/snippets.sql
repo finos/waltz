@@ -22,12 +22,24 @@ WHERE
   m.measurable_kind = 'PROCESS'
 ;
 
--- update parent id's based on external parent ids
+-- update parent id's based on external parent ids (mssql)
 UPDATE child
 SET child.parent_id = parent.id
 FROM measurable AS child
   INNER JOIN measurable AS parent ON parent.external_id = child.external_parent_id
-WHERE child.measurable_category_id = 12;
+WHERE child.measurable_category_id = 18;
+
+
+-- update parent id's based on external parent ids (postgres)
+update measurable
+set parent_id = d.pid
+from (
+    select c.id, p.id
+    from measurable c
+    inner join measurable p on p.external_id = c.external_parent_id and p.measurable_category_id = 18
+    where c.measurable_category_id = 18) d (cid, pid)
+where id = d.cid;
+
 
 -- apps in and org unit without any ratings against a measurable category
 select * from application
@@ -58,7 +70,39 @@ DELETE FROM survey_run;
 DELETE FROM survey_question;
 DELETE FROM survey_template;
 
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
+ */
+
 --[FLOWS]---
+
+-- produce graphviz like output for set of phys flows by assoc tag:
+--   prefix with `digraph G { rankdir=LR;`
+select distinct(concat('"', sa.name, '" -> "', ta.name, '"'))
+from physical_flow pf
+inner join logical_flow lf on pf.logical_flow_id = lf.id
+inner join application sa on sa.id = lf.source_entity_id
+inner join application ta on ta.id = lf.target_entity_id
+inner join tag_usage tu on tu.entity_id = pf.id and tu.entity_kind = 'PHYSICAL_FLOW'
+inner join tag t on t.id = tu.tag_id
+where t.target_kind = 'PHYSICAL_FLOW';
+--   postfix with `}`
+
+
 -- find deleted logical flows which still have remaining physical flows
 select distinct
 	aSource.name,
@@ -149,3 +193,16 @@ where lf.is_removed = 0
       and ( src.organisational_unit_id in (select id from entity_hierarchy where ancestor_id = 4566 and kind = 'ORG_UNIT')
             OR -- 4566 is an OU id
             trg.organisational_unit_id in (select id from entity_hierarchy where ancestor_id = 4566 and kind = 'ORG_UNIT'));
+
+
+-- Query to recover tags of flows that were replaced with new flows
+insert into tag_usage
+select distinct tu.tag_id, ei.entity_id, ei.entity_kind, max(tu.created_at) as 'created_at', tu.created_by, tu.provenance
+from tag t
+inner join tag_usage tu on tu.tag_id = t.id
+inner join physical_flow pf on pf.id = tu.entity_id
+inner join external_identifier ei on ei.external_id = pf.external_id and ei.entity_kind = 'PHYSICAL_FLOW'
+where tu.entity_kind = 'PHYSICAL_FLOW'
+and pf.entity_lifecycle_status = 'REMOVED'
+and not exists (select * from tag_usage tu2 where tu2.tag_id = tu.tag_id and tu2.entity_id = ei.entity_id and tu2.entity_kind = ei.entity_kind)
+group by tu.tag_id, ei.entity_id, ei.entity_kind, tu.created_by, tu.provenance

@@ -1,0 +1,67 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<div>
+    <waltz-no-data ng-if="$ctrl.tabs.length == 0">
+        <message>
+            No viewpoints are directly related to this part of the org unit tree
+        </message>
+    </waltz-no-data>
+
+    <span ng-if="$ctrl.tabs.length > 0">
+        <div class="waltz-tabs col-sm-8">
+            <!-- TAB HEADERS -->
+            <input ng-repeat-start="tab in $ctrl.tabs track by tab.id"
+                   type="radio"
+                   ng-change="$ctrl.onTabChange()"
+                   ng-model="$ctrl.activeTab"
+                   ng-value="tab"
+                   id="{{ tab.id + '_' + $id }}">
+            <label class="wt-label"
+                   for="{{ tab.id + '_' + $id }}"
+                   ng-repeat-end>
+                <span ng-bind="tab.name"></span>
+            </label>
+
+            <div class="wt-tab wt-active"
+                 ng-if="$ctrl.activeTab">
+                <waltz-measurable-org-unit-relationship-tree parent-entity-ref="$ctrl.parentEntityRef"
+                                                             selected-category="$ctrl.activeTab">
+                </waltz-measurable-org-unit-relationship-tree>
+            </div>
+        </div>
+        <div class="col-sm-4">
+            <br>
+            <span class="text-muted">
+                <waltz-icon name="info-circle"></waltz-icon>
+                Viewpoints in <b>bold</b> are directly related to this org unit or one of it's children.
+                Selecting a viewpoint will navigate to the page.
+
+                <br>
+
+                Go to the
+                <a ui-sref="main.measurable-category.list ({id: $ctrl.activeTab.id })"
+                   class="clickable">
+                    <span ng-bind="$ctrl.activeTab.name"></span>
+                </a>
+                viewpoint to see all items.
+
+            </span>
+        </div>
+    </span>
+</div>

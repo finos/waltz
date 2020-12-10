@@ -1,19 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016  Khartec Ltd.
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.jobs.generators;
@@ -36,6 +36,7 @@ import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.ListUtilities.concat;
 import static com.khartec.waltz.common.RandomUtilities.randomPick;
+import static com.khartec.waltz.schema.Tables.MEASURABLE_CATEGORY;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
@@ -66,7 +67,8 @@ public class InvolvementGenerator implements SampleDataGenerator {
                         appRef.id(),
                         randomPick(employeeIds),
                         SAMPLE_DATA_PROVENANCE,
-                        kindId));
+                        kindId,
+                        true));
     }
 
 
@@ -140,7 +142,8 @@ public class InvolvementGenerator implements SampleDataGenerator {
                         id,
                         randomPick(directors),
                         SAMPLE_DATA_PROVENANCE,
-                        Long.valueOf(rnd.nextInt(13) + 1)))
+                        Long.valueOf(rnd.nextInt(13) + 1),
+                        true))
                 .collect(Collectors.toList());
 
         List<InvolvementRecord> ouSponsors = orgUnitIds.stream()
@@ -149,7 +152,22 @@ public class InvolvementGenerator implements SampleDataGenerator {
                         id,
                         randomPick(directors),
                         SAMPLE_DATA_PROVENANCE,
-                        Long.valueOf(rnd.nextInt(13) + 1)))
+                        Long.valueOf(rnd.nextInt(13) + 1),
+                        true))
+                .collect(Collectors.toList());
+
+        List<InvolvementRecord> categoryInvolvements = dsl
+                .select(MEASURABLE_CATEGORY.ID)
+                .from(MEASURABLE_CATEGORY)
+                .fetch(MEASURABLE_CATEGORY.ID)
+                .stream()
+                .map(id -> new InvolvementRecord(
+                        EntityKind.MEASURABLE_CATEGORY.name(),
+                        id,
+                        randomPick(directors),
+                        SAMPLE_DATA_PROVENANCE,
+                        Long.valueOf(rnd.nextInt(13) + 1),
+                        true))
                 .collect(Collectors.toList());
 
         dsl.batchInsert(devInvolvements).execute();
@@ -159,6 +177,7 @@ public class InvolvementGenerator implements SampleDataGenerator {
         dsl.batchInsert(analystInvolvments).execute();
         dsl.batchInsert(ouArchitects).execute();
         dsl.batchInsert(ouSponsors).execute();
+        dsl.batchInsert(categoryInvolvements).execute();
 
 
         System.out.println("Done");

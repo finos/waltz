@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 import _ from "lodash";
 import {initialiseData} from "../../../common";
@@ -35,21 +34,29 @@ import template from "./measurable-rating-panel.html";
 const bindings = {
     allocations: "<",
     allocationSchemes: "<",
-    category: "<",
-    entityReference: "<",
     measurables: "<",
     ratings: "<",
-    ratingScheme: "<"
+    ratingSchemeItems: "<",
+    plannedDecommissions: "<?",
+    replacingDecommissions: "<?",
+    replacementApps: "<?",
+    application: "<"
 };
 
 
 const initialState = {
-    allocations: [],
-    allocationSchemes: [],
-    measurables: [],
-    ratings: [],
-    selected: null
+    selected: null,
+    plannedDecommissions: [],
+    replacingDecommissions: [],
+    replacementApps: []
 };
+
+
+function enrichAllocationsWithScheme(node, allocationSchemesById) {
+    return _.map(
+        node.allocations,
+        a => Object.assign({}, a, {scheme: allocationSchemesById[a.schemeId]}));
+}
 
 
 function controller() {
@@ -62,25 +69,9 @@ function controller() {
         vm.allocationSchemesById = _.keyBy(vm.allocationSchemes, s => s.id);
     };
 
-    vm.onSelect = (measurable, rating) => {
-        const relevantAllocations = _
-            .chain(vm.allocations)
-            .filter(a => a.measurableId === measurable.id)
-            .map(allocation => {
-                const scheme = vm.allocationSchemesById[allocation.schemeId];
-                return scheme
-                    ? Object.assign(allocation, {scheme})
-                    : null;
-            })
-            .compact()
-            .sortBy(a => a.scheme.name)
-            .value();
-
-        vm.selected = {
-            allocations: relevantAllocations,
-            measurable,
-            rating,
-        };
+    vm.onSelect = (node) => {
+        vm.selected = node;
+        vm.selected.allocations = enrichAllocationsWithScheme(node, vm.allocationSchemesById)
     }
 }
 

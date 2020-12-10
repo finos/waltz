@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import _ from "lodash";
@@ -25,6 +24,8 @@ import {mkTweakers} from "../source-and-target-graph/source-and-target-utilities
 import template from "./logical-flow-edit-panel.html";
 import {displayError} from "../../../common/error-utils";
 import {sameRef} from "../../../common/entity-utils";
+import {event} from "d3-selection";
+import {entity} from "../../../common/services/enums/entity";
 
 
 const bindings = {
@@ -82,11 +83,64 @@ function vetoMove(isDirty) {
 }
 
 
-function controller($q,
+
+function scrollIntoView(element, $window) {
+    element.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+    });
+    $window.scrollBy(0, -90);
+}
+
+
+
+function filterByType(typeId, flows = [], decorators = []) {
+    if (typeId === 0) {
+        return {
+            selectedTypeId: 0,
+            decorators,
+            flows
+        };
+    }
+
+    const ds = _.filter(decorators, d => d.decoratorEntity.id === typeId);
+    const dataFlowIds = _.map(ds, "dataFlowId");
+    const fs = _.filter(flows, f => _.includes(dataFlowIds, f.id));
+
+    return {
+        filterApplied: true,
+        decorators: ds,
+        flows: fs
+    };
+}
+
+
+function controller($element,
+                    $q,
                     $scope,
+                    $window,
                     notification,
                     serviceBroker) {
     const vm = initialiseData(this, initialState);
+
+    function applyFilter() {
+        $scope.$applyAsync(() => {
+            const filterFunction = vm.activeFilter || resetFilter;
+            vm.filteredFlowData = filterFunction();
+            scrollIntoView($element[0], $window);
+        });
+    }
+
+    function resetFilter() {
+        return {
+            filterApplied: false,
+            flows: vm.logicalFlows,
+            decorators: vm.logicalFlowDecorators
+        };
+    }
+
+    vm.showAll = () => vm.filteredFlowData = resetFilter();
+
 
     vm.$onChanges = (changes) => {
         if(vm.parentEntityRef) {
@@ -95,13 +149,34 @@ function controller($q,
                     const baseTweakers = {
                         source: {onSelect: a => $scope.$applyAsync(() => selectSource(a))},
                         target: {onSelect: a => $scope.$applyAsync(() => selectTarget(a))},
-                        type: {onSelect: a => $scope.$applyAsync(() => selectType(a))}
+                        type: {
+                            onSelect: d => {
+                                event.stopPropagation();
+                                $scope.$applyAsync(() => selectType(d));
+                                vm.activeFilter = () => filterByType(
+                                    d.id,
+                                    vm.logicalFlows,
+                                    vm.logicalFlowDecorators);
+                                applyFilter();
+                            }
+                        },
+                        typeBlock: {
+                            onSelect: () => {
+                                event.stopPropagation();
+                                if (vm.filteredFlowData.filterApplied) {
+                                    vm.activeFilter = resetFilter;
+                                    applyFilter();
+                                }
+                            }
+                        }
                     };
 
                     vm.flowTweakers = mkTweakers(
                         baseTweakers,
                         vm.physicalFlows,
                         vm.logicalFlows);
+
+                    vm.showAll();
                 });
 
             serviceBroker
@@ -153,8 +228,9 @@ function controller($q,
     function loadLogicalFlowDecorators() {
         return serviceBroker
             .loadViewData(
-                CORE_API.LogicalFlowDecoratorStore.findBySelectorAndKind,
-                [ { entityReference: vm.parentEntityRef, scope: "EXACT" }, "DATA_TYPE" ],
+                CORE_API.DataTypeDecoratorStore.findBySelector,
+                [ { entityReference: vm.parentEntityRef, scope: "EXACT" },
+                    entity.LOGICAL_DATA_FLOW.key ],
                 { force: true })
             .then(r => vm.logicalFlowDecorators = r.data);
     }
@@ -172,12 +248,14 @@ function controller($q,
 
     const reload = () => {
         vm.cancel();
-        return $q.all([
-            loadLogicalFlows(),
-            loadLogicalFlowDecorators(),
-            loadDataTypeUsages(),
-            loadPhysicalFlows()
-        ]);
+        return $q
+            .all([
+                loadLogicalFlows(),
+                loadLogicalFlowDecorators(),
+                loadDataTypeUsages(),
+                loadPhysicalFlows()
+            ])
+            .then(applyFilter);
     };
 
     const selectSource = (selection) => {
@@ -220,8 +298,8 @@ function controller($q,
     const updateDecorators = (command) => {
         return serviceBroker
             .execute(
-                CORE_API.LogicalFlowDecoratorStore.updateDecorators,
-                [command])
+                CORE_API.DataTypeDecoratorStore.save,
+                [vm.parentEntityRef, command])
             .then(reload)
             .then(() => notification.success("Data flow updated"));
     };
@@ -325,8 +403,10 @@ function controller($q,
 
 
 controller.$inject = [
+    "$element",
     "$q",
     "$scope",
+    "$window",
     "Notification",
     "ServiceBroker"
 ];

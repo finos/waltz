@@ -3,23 +3,21 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.data;
 
-import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.model.EndOfLifeStatus;
 import com.khartec.waltz.model.EntityKind;
@@ -29,19 +27,22 @@ import com.khartec.waltz.model.tally.ImmutableOrderedTally;
 import com.khartec.waltz.model.tally.ImmutableTally;
 import com.khartec.waltz.model.tally.OrderedTally;
 import com.khartec.waltz.model.tally.Tally;
+import com.khartec.waltz.schema.tables.records.ChangeLogRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
-import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.DateTimeUtilities.toLocalDate;
+import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.common.SetUtilities.union;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static java.util.stream.Collectors.*;
@@ -146,7 +147,7 @@ public class JooqUtilities {
 
 
     public static List<Tally<String>> calculateStringTallies(
-            Result<? extends Record> records,
+            Collection<? extends Record> records,
             Field<String> fieldToTally) {
 
         return records.stream()
@@ -283,6 +284,33 @@ public class JooqUtilities {
         Function<String, Condition> mapper = (term) -> field.likeIgnoreCase("%"+term+"%");
         BinaryOperator<Condition> combiner = (a, b) -> a.and(b);
         return terms.stream().collect(Collectors.reducing(DSL.trueCondition(), mapper, combiner));
+    }
+
+
+    public static Condition mkDateRangeCondition(TableField<ChangeLogRecord, Timestamp> field, java.sql.Date date) {
+        long time = date.getTime();
+        Timestamp startOfDay = new Timestamp(time);
+
+        long timeAfterDay = getOneDayLater(startOfDay).getTime();
+        Timestamp endOfDay = new Timestamp(timeAfterDay);
+
+        return field.ge(startOfDay).and(field.lt(endOfDay));
+    }
+
+
+    public static Condition mkDateRangeCondition(TableField<ChangeLogRecord, Timestamp> field, java.util.Date date) {
+        long time = date.getTime();
+        Timestamp startOfDay = new Timestamp(time);
+
+        long timeAfterDay = getOneDayLater(startOfDay).getTime();
+        Timestamp endOfDay = new Timestamp(timeAfterDay);
+
+        return field.ge(startOfDay).and(field.lt(endOfDay));
+    }
+
+
+    private static Date getOneDayLater(Timestamp timestamp) {
+        return toSqlDate(toLocalDate(timestamp).plusDays(1));
     }
 
 }

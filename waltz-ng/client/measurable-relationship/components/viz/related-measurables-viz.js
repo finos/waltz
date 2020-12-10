@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import _ from "lodash";
@@ -23,7 +22,6 @@ import {event, select} from "d3-selection";
 import {determineCounterpart, sanitizeRelationships} from "../../measurable-relationship-utils";
 import {initialiseData} from "../../../common";
 import {stopPropagation} from "../../../common/browser-utils";
-import {responsivefy} from "../../../common/d3-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {easeLinear} from "d3-ease";
 import {transition} from "d3-transition";
@@ -104,8 +102,11 @@ const styles = {
 
 function prepareGroups(holder, onCategoryClear) {
     const svg = select(holder)
-        .attr("width", dimensions.width)
-        .attr("height", dimensions.height)
+    svg
+        .style("min-height", "300px")
+        .style("max-height", "800px")
+        .attr("viewBox", `0 0 ${dimensions.width} ${dimensions.height}`)
+        .attr("preserveAspectRatio", "xMinYMin meet")
         .on("click", () => onCategoryClear());
 
     const bridges = svg.append("g").classed(styles.bridges, true);
@@ -274,7 +275,6 @@ function drawBridges(group, categories = [], deltaAngle) {
                 .attr("y2", y);
         });
 
-
     // -- EXIT --
     bridges
         .exit()
@@ -435,17 +435,17 @@ function mkPrimaryEntity(ref, measurables = [], categories = [], serviceBroker) 
             })
     } else if (kind === "APP_GROUP") {
         return serviceBroker
-                .loadViewData(CORE_API.AppGroupStore.getById, [ref.id])
-                .then(r => {
-                    return {
-                        id: ref.id,
-                        kind: ref.kind,
-                        name: r.data.appGroup.name,
-                        category: {
-                            name: "Application Group"
-                        }
-                    };
-                })
+            .loadViewData(CORE_API.AppGroupStore.getById, [ref.id])
+            .then(r => {
+                return {
+                    id: ref.id,
+                    kind: ref.kind,
+                    name: r.data.appGroup.name,
+                    category: {
+                        name: "Application Group"
+                    }
+                };
+            })
     } else {
         return Promise.reject("Cannot handle kind: " + kind);
     }
@@ -477,10 +477,10 @@ function controller($element, $q, $timeout, serviceBroker) {
 
         return $q.all([p1, p2])
             .then(() => mkPrimaryEntity(
-                    vm.parentEntityRef,
-                    vm.measurables,
-                    vm.categories,
-                    serviceBroker))
+                vm.parentEntityRef,
+                vm.measurables,
+                vm.categories,
+                serviceBroker))
             .then(primaryEntity => vm.primaryEntity = primaryEntity);
     };
 
@@ -490,9 +490,9 @@ function controller($element, $q, $timeout, serviceBroker) {
     vm.$onInit = () => {
         initialiseData(vm, initialState);
         const holder = $element.find("svg")[0];
+
         const handlers = mkHandlers(vm, $timeout);
         groups = prepareGroups(holder, handlers.onCategoryClear);
-        destroyResizeListener = responsivefy(groups.svg);
         loadData()
             .then(() => draw(groups, mkData(vm), handlers));
     };

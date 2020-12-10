@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.data.measurable;
@@ -38,14 +37,15 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
+import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
-import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static java.util.Optional.ofNullable;
 
 
@@ -70,6 +70,7 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .lastUpdatedAt(DateTimeUtilities.toLocalDateTime(r.getLastUpdatedAt()))
                 .lastUpdatedBy(r.getLastUpdatedBy())
                 .entityLifecycleStatus(readEnum(r.getEntityLifecycleStatus(), EntityLifecycleStatus.class, s -> EntityLifecycleStatus.ACTIVE))
+                .organisationalUnitId(r.getOrganisationalUnitId())
                 .build();
     };
 
@@ -88,20 +89,6 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
         return dsl
                 .selectFrom(MEASURABLE)
                 .where(MEASURABLE.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))
-                .fetch(TO_DOMAIN_MAPPER);
-    }
-
-
-    public List<Measurable> findMeasuresRelatedToEntity(EntityReference ref) {
-        checkNotNull(ref, "ref cannot be null");
-        return dsl
-                .selectDistinct(MEASURABLE.fields())
-                .from(ENTITY_HIERARCHY)
-                .innerJoin(MEASURABLE_RATING).on(MEASURABLE_RATING.MEASURABLE_ID.eq(ENTITY_HIERARCHY.ID))
-                .innerJoin(MEASURABLE).on(MEASURABLE.ID.eq(ENTITY_HIERARCHY.ANCESTOR_ID))
-                .where(MEASURABLE_RATING.ENTITY_KIND.eq(ref.kind().name()))
-                .and(MEASURABLE_RATING.ENTITY_ID.eq(ref.id()))
-                .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name()))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -173,8 +160,8 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
     }
 
 
-    public boolean create(Measurable measurable) {
-        int rc = dsl.insertInto(MEASURABLE)
+    public Long create(Measurable measurable) {
+        return dsl.insertInto(MEASURABLE)
                 .set(MEASURABLE.MEASURABLE_CATEGORY_ID, measurable.categoryId())
                 .set(MEASURABLE.PARENT_ID, measurable.parentId().orElse(null))
                 .set(MEASURABLE.EXTERNAL_ID, measurable.externalId().orElse(null))
@@ -185,9 +172,9 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .set(MEASURABLE.PROVENANCE, "waltz")
                 .set(MEASURABLE.LAST_UPDATED_BY, measurable.lastUpdatedBy())
                 .set(MEASURABLE.LAST_UPDATED_AT, Timestamp.valueOf(measurable.lastUpdatedAt()))
-                .execute();
-
-        return rc == 1;
+                .returning(MEASURABLE.ID)
+                .fetchOne()
+                .getId();
     }
 
 
@@ -241,4 +228,63 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
+
+    public Map<String, Long> findExternalIdToIdMapByCategoryId(Long categoryId) {
+        return dsl
+                .select(MEASURABLE.EXTERNAL_ID, MEASURABLE.ID)
+                .from(MEASURABLE)
+                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId))
+                .and(MEASURABLE.EXTERNAL_ID.isNotNull())
+                .fetchMap(MEASURABLE.EXTERNAL_ID, MEASURABLE.ID);
+    }
+
+    /**
+     * Allows measurable rating, planned decoms and replacement apps to check for the role
+     * @param reference Entity ref to determine condition
+     * @return 'rating_editor_role'
+     */
+    public String getRequiredRatingEditRole(EntityReference reference) {
+
+        Condition condition = mkCondition(reference);
+
+        Condition measurableToRatingJoinCondition = MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_ID)
+                .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_ID.eq(MEASURABLE_RATING.ENTITY_ID)
+                        .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.ENTITY_KIND.eq(MEASURABLE_RATING.ENTITY_KIND)));
+
+        return dsl
+                .selectDistinct(MEASURABLE_CATEGORY.RATING_EDITOR_ROLE)
+                .from(MEASURABLE_CATEGORY)
+                .innerJoin(MEASURABLE).on(MEASURABLE_CATEGORY.ID.eq(MEASURABLE.MEASURABLE_CATEGORY_ID))
+                .leftJoin(MEASURABLE_RATING).on(MEASURABLE_RATING.MEASURABLE_ID.eq(MEASURABLE.ID))
+                .leftJoin(MEASURABLE_RATING_PLANNED_DECOMMISSION).on(measurableToRatingJoinCondition)
+                .where(condition)
+                .fetchOne()
+                .get(MEASURABLE_CATEGORY.RATING_EDITOR_ROLE);
+    }
+
+
+    private Condition mkCondition(EntityReference reference) {
+        if (reference.kind().equals(EntityKind.MEASURABLE)){
+            return MEASURABLE.ID.eq(reference.id());
+        } else if (reference.kind().equals(EntityKind.MEASURABLE_CATEGORY)){
+            return MEASURABLE_CATEGORY.ID.eq(reference.id());
+        } else {
+            return MEASURABLE_RATING_PLANNED_DECOMMISSION.ID.eq(reference.id());
+        }
+    }
+
+
+    public Collection<Measurable> findByOrgUnitId(Long orgUnitId) {
+
+        SelectConditionStep<Record1<Long>> orgUnitOrChildIds = DSL
+                .select(ENTITY_HIERARCHY.ID)
+                .from(ENTITY_HIERARCHY)
+                .where(ENTITY_HIERARCHY.ANCESTOR_ID.in(orgUnitId)
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name())));
+
+        return dsl
+                .selectFrom(MEASURABLE)
+                .where(MEASURABLE.ORGANISATIONAL_UNIT_ID.in(orgUnitOrChildIds))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
 }

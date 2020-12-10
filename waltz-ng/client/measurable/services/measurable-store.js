@@ -1,22 +1,21 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
-import {checkIsEntityRef, checkIsIdSelector} from "../../common/checks"
+import {checkIsIdSelector} from "../../common/checks"
 
 
 function store($http, baseApiUrl) {
@@ -30,13 +29,6 @@ function store($http, baseApiUrl) {
         .get(`${baseUrl}/id/${id}`)
         .then(d => d.data);
 
-    const findMeasurablesRelatedToPath = (ref) => {
-        checkIsEntityRef(ref);
-        return $http
-            .get(`${baseUrl}/entity/${ref.kind}/${ref.id}`)
-            .then(d => d.data);
-    };
-
     const findByExternalId = (extId) => $http
         .get(`${baseUrl}/external-id/${extId}`)
         .then(d => d.data);
@@ -48,6 +40,12 @@ function store($http, baseApiUrl) {
             .then(d => d.data);
     };
 
+    const findByOrgUnitId = (id) => {
+        return $http
+            .get(`${baseUrl}/org-unit/id/${id}`)
+            .then(d => d.data);
+    };
+
     const search = (query) => $http
         .get(`${baseUrl}/search/${query}`)
         .then(x => x.data);
@@ -55,8 +53,8 @@ function store($http, baseApiUrl) {
     return {
         findAll,
         findByExternalId,
-        findMeasurablesRelatedToPath,
         findMeasurablesBySelector,
+        findByOrgUnitId,
         getById,
         search
     };
@@ -97,14 +95,14 @@ export const MeasurableStore_API = {
         serviceFnName: "search",
         description: "executes search"
     },
-    findMeasurablesRelatedToPath: {
-        serviceName,
-        serviceFnName: "findMeasurablesRelatedToPath",
-        description: "executes findMeasurablesRelatedToPath"
-    },
     findMeasurablesBySelector: {
         serviceName,
         serviceFnName: "findMeasurablesBySelector",
         description: "executes findMeasurablesBySelector"
+    },
+    findByOrgUnitId: {
+        serviceName,
+        serviceFnName: "findByOrgUnitId",
+        description: "measurables directly associated to an org unit or its children"
     }
 };

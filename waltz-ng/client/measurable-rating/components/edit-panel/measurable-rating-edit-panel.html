@@ -1,29 +1,56 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
 <div class="row">
 
+
+    <!-- TABS & TREES -->
+    <div class="col-sm-7">
+        <div ng-include="'wmrep-main-tabs'">
+        </div>
+    </div>
+
     <!-- INSTRUCTIONS / PICKER -->
-    <div class="col-sm-4">
+    <div class="col-sm-5" style="padding-top: 40px">
         <!-- SCHEME OVERVIEW -->
         <div ng-if="$ctrl.visibility.schemeOverview"
              ng-include="'wmrep-rating-scheme-overview'">
         </div>
 
         <!-- EDIT SECTION -->
-        <div ng-if="$ctrl.visibility.ratingPicker"
-             ng-include="'wmrep-rating-picker'">
+        <div ng-if="$ctrl.visibility.ratingEditor">
+
+            <span ng-if="$ctrl.selected.rating.isReadOnly">
+                <div>
+                    <b style="font-weight: bolder">
+                        <waltz-icon name="lock"></waltz-icon> Locked
+                    </b>
+                    <p style="padding-top: 1em;">
+                       This rating has been marked as read only and cannot be edited
+                    </p>
+                </div>
+            </span>
+
+            <span ng-if="!$ctrl.selected.rating.isReadOnly"
+                  ng-include="'wmrep-rating-editor'">
+            </span>
         </div>
 
-        <!-- INSTRUCTIONS -->
-        <div class="help-block"
-             ng-if="$ctrl.visibility.instructions"
-             ng-include="'wmrep-instructions'">
-        </div>
-
-    </div>
-
-    <!-- TABS & TREES -->
-    <div class="col-sm-8">
-         <div ng-include="'wmrep-main-tabs'">
-         </div>
     </div>
 
 </div>
@@ -36,15 +63,16 @@
         id="wmrep-main-tabs">
     <div class="waltz-tabs">
         <!-- TAB HEADERS -->
-        <input type="radio"
-               ng-change="$ctrl.onTabChange(tab.category.id)"
-               ng-repeat-start="tab in $ctrl.tabs track by tab.category.id"
-               ng-model="$ctrl.visibility.tab"
-               ng-value="tab.category.id"
+        <input ng-repeat-start="tab in $ctrl.tabs track by tab.category.id"
+               type="radio"
+               ng-change="$ctrl.onTabChange()"
+               ng-model="$ctrl.activeTab"
+               ng-value="tab"
                ng-disabled="! tab.measurables"
                name="measurable_rating_edit"
                id="{{ tab.category.id + '_' + $id }}">
-        <label for="{{ tab.category.id + '_' + $id }}"
+        <label class="wt-label"
+               for="{{ tab.category.id + '_' + $id }}"
                ng-repeat-end>
             <span ng-bind="tab.category.name"
                   ng-class="{ italics: tab.ratings.length == 0 }">
@@ -57,25 +85,22 @@
         </label>
 
         <!-- SHOW ALL CATEGORIES -->
-        <span ng-if="$ctrl.hasHiddenTabs"
+        <label ng-if="$ctrl.hasHiddenTabs"
               ng-click="$ctrl.onShowAllTabs()"
               uib-popover="Unused categories (those with no mappings to this entity) are hidden by default.  Click here to show them."
               popover-append-to-body="true"
               popover-popup-delay="300"
               popover-trigger="mouseenter"
-              style="padding: 5px 10px;
-                     display: block;
-                     float: left;
-                     cursor: pointer;">
-            <waltz-icon name="plus"></waltz-icon>
-            Show all categories
-        </span>
+              style="padding-left: 1em">
+            <waltz-icon name="plus-circle"></waltz-icon>
+            <a class="clickable">Show all categories</a>
+        </label>
 
-        <!-- TAB CONTENT -->
-        <div ng-repeat="tab in $ctrl.tabs track by tab.category.id"
-             ng-class="{ 'wt-active': tab.category.id == $ctrl.visibility.tab }"
-             class="wt-tab">
-            <div ng-include="'wmrep-tab-content'"></div>
+
+        <div class="wt-tab wt-active"
+             ng-if="$ctrl.activeTab">
+            <div ng-include="'wmrep-tab-content'">
+            </div>
         </div>
 
     </div>
@@ -86,68 +111,109 @@
 <script type="text/ng-template"
         id="wmrep-tab-content">
     <div style="padding-top: 6px">
-        <waltz-measurable-rating-tree ratings="tab.ratings"
-                                      rating-scheme="tab.ratingScheme"
-                                      measurables="tab.measurables"
+        <waltz-measurable-rating-tree ratings="$ctrl.activeTab.ratings"
+                                      allocations="$ctrl.activeTab.allocations"
+                                      rating-scheme-items="$ctrl.activeTab.ratingSchemeItems"
+                                      measurables="$ctrl.activeTab.measurables"
                                       on-keypress="$ctrl.onKeypress"
                                       scroll-height="600"
-                                      on-select="$ctrl.onMeasurableSelect">
+                                      on-select="$ctrl.onMeasurableSelect"
+                                      planned-decommissions="$ctrl.plannedDecommissions"
+                                      replacing-decommissions="$ctrl.replacingDecommissions"
+                                      replacement-apps="$ctrl.replacementApps">
         </waltz-measurable-rating-tree>
     </div>
 
     <br>
     <p class="text-muted small"
-       ng-bind="tab.category.description">
+       ng-bind="$ctrl.activeTab.category.description">
     </p>
 
 
-    <div ng-if="tab.ratings.length > 0">
-        <a ng-click="$ctrl.onRemoveAll(tab.category.id)"
+    <div ng-if="$ctrl.activeTab.ratings.length > 0">
+        <a ng-click="$ctrl.onRemoveAll($ctrl.activeTab.category.id)"
            class="clickable text-danger">
             <waltz-icon name="trash"></waltz-icon>
             Remove all mappings
         </a>
         for this category
-        (<span ng-bind="tab.category.name"></span>)
+        (<span ng-bind="$ctrl.activeTab.category.name"></span>)
     </div>
 </script>
 
 
-<!-- PICKER -->
+<!-- EDITOR -->
 <script type="text/ng-template"
-        id="wmrep-rating-picker">
-    <hr>
-    <b style="font-weight: bolder"
-       ng-bind="$ctrl.selected.measurable.name">
-    </b>
-    <div ng-class="{ 'waltz-scroll-region-100' : $ctrl.selected.measurable.description.length > 300 }">
+        id="wmrep-rating-editor">
+
+    <!-- TITLE -->
+    <div>
+        <b style="font-weight: bolder"
+           ng-bind="$ctrl.selected.measurable.name">
+        </b>
+        <a ng-if="$ctrl.selected.measurable.description"
+           ng-click="$ctrl.visibility.showDescriptionInPicker = ! $ctrl.visibility.showDescriptionInPicker"
+           class="clickable">
+            <span ng-if="!$ctrl.visibility.showDescriptionInPicker">(show description)</span>
+            <span ng-if="$ctrl.visibility.showDescriptionInPicker">(hide description)</span>
+        </a>
+    </div>
+
+    <!-- DESCRIPTION -->
+    <div style="margin-top: 15px"
+         ng-if="$ctrl.visibility.showDescriptionInPicker">
         <div class="text-muted">
             <waltz-markdown text="$ctrl.selected.measurable.description"></waltz-markdown>
         </div>
     </div>
 
-    <br>
-
     <!-- ABSTRACT -->
     <div ng-if="! $ctrl.selected.measurable.concrete">
         <br>
-        <div class="alert alert-warning">
-            <waltz-icon name="info-circle"></waltz-icon>
-            This node is abstract and cannot be given a direct
-            rating.
-        </div>
+        <waltz-warning>
+            <message>
+                This node is abstract and cannot be given a direct rating
+            </message>
+            <content>
+                Abstract nodes cannot be used in mappings as they are not specific
+                enough.
+            </content>
+        </waltz-warning>
     </div>
+
+    <!-- WARNINGS -->
+    <div ng-if="$ctrl.selected.hasWarnings">
+        <br>
+        <waltz-warning ng-if="$ctrl.selected.allocations.length > 0">
+            <message>
+                This item is used in allocations
+            </message>
+            <content>
+                This item is used in allocations. Namely:
+                <table class="table table-condensed small">
+                    <thead>
+                    <tr>
+                        <th>Allocation Scheme</th>
+                        <th>Percentage</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="allocation in $ctrl.selected.allocations">
+                        <td><span ng-bind="$ctrl.allocationSchemesById[allocation.schemeId].name"></span></td>
+                        <td><span ng-bind="allocation.percentage"></span>%</td>
+                    </tr>
+                    </tbody>
+                </table>
+                Removing this item will cause it's allocation to be deleted and the percentage would be
+                returned to the unallocated pool.
+            </content>
+        </waltz-warning>
+    </div>
+
+    <br>
 
     <!-- CONCRETE -->
     <div ng-if="$ctrl.selected.measurable.concrete">
-
-        <!-- NEW -->
-        <div ng-if="! $ctrl.selected.rating">
-            This entity does not currently exhibit this characteristic.
-            To add it, choose a rating and, optionally, provide a comment.
-        </div>
-
-        <br>
 
         <!-- RATING -->
         <div class="row">
@@ -156,7 +222,7 @@
             </div>
             <div class="col-sm-9">
                 <waltz-rating-picker selected="$ctrl.selected.rating.rating"
-                                     scheme-id="$ctrl.selected.ratingScheme.id"
+                                     rating-scheme-items="$ctrl.activeTab.ratingSchemeItems"
                                      edit-disabled="$ctrl.saveInProgress"
                                      on-select="$ctrl.onRatingSelect"
                                      on-keypress="$ctrl.onKeypress">
@@ -166,8 +232,7 @@
 
         <!-- COMMENT -->
         <div class="row"
-             style="padding-top: 8px;"
-             ng-if="$ctrl.selected.rating">
+             style="padding-top: 8px;">
             <div class="col-sm-3">
                 Comments:
             </div>
@@ -179,42 +244,34 @@
             </div>
         </div>
 
-        <!-- WARNINGS -->
-        <div ng-if="$ctrl.selected.hasWarnings"
-             class="alert alert-warning">
-            <div ng-if="$ctrl.selected.allocations.length > 0">
-                <waltz-icon name="warning"></waltz-icon>
-                This item is used in allocations. Namely:
-                <table class="table table-condensed small">
-                    <thead>
-                    <tr>
-                        <th>Allocation Scheme</th>
-                        <th>Percentage</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr ng-repeat="allocation in $ctrl.selected.allocations">
-                        <td><span ng-bind="allocation.scheme.name"></span></td>
-                        <td><span ng-bind="allocation.percentage"></span>%</td>
-                    </tr>
-                    </tbody>
-                </table>
-                Removing this item will cause it's allocation to be deleted and the percentage would be
-                returned to the unallocated pool.
-            </div>
+        <!-- DECOMMISSION -->
+        <div ng-if="$ctrl.selected.rating">
+            <waltz-planned-decommission-editor planned-decommission="$ctrl.selected.decommission"
+                                               replacement-apps="$ctrl.selected.replacementApps"
+                                               on-save-decommission-date="$ctrl.onSaveDecommissionDate"
+                                               on-remove-decommission="$ctrl.onRemoveDecommission"
+                                               on-save-replacement-app="$ctrl.onSaveReplacementApp"
+                                               on-remove-replacement-app="$ctrl.onRemoveReplacementApp"
+                                               category="$ctrl.activeTab.category"
+                                               application="$ctrl.application">
+            </waltz-planned-decommission-editor>
         </div>
+    </div>
 
 
-        <!-- CANCEL -->
-        <div class="row">
-            <div class="col-sm-12">
-                <br>
-                <a class="clickable" ng-click="$ctrl.doCancel()">
-                    &laquo; Back
-                </a>
-            </div>
+    <!-- CANCEL -->
+    <div class="row">
+        <div class="col-sm-12">
+            <br>
+            <a class="clickable" ng-click="$ctrl.doCancel()">
+                &laquo; Back
+            </a>
         </div>
+    </div>
 
+    <div class="help-block"
+         ng-if="$ctrl.visibility.instructions"
+         ng-include="'wmrep-instructions'">
     </div>
 </script>
 

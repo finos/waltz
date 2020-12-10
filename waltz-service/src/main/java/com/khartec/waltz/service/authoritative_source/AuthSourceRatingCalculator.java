@@ -3,32 +3,32 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.service.authoritative_source;
 
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.data.data_type.DataTypeDao;
+import com.khartec.waltz.data.entity_hierarchy.EntityHierarchyDao;
+import com.khartec.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecorator;
 import com.khartec.waltz.model.datatype.DataType;
+import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorRatingsCalculator;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -38,7 +38,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.SetUtilities.fromCollection;
@@ -51,22 +53,25 @@ public class AuthSourceRatingCalculator {
 
     private static final Logger LOG = LoggerFactory.getLogger(AuthSourceRatingCalculator.class);
 
-    private final DataTypeDao dataTypeDao;
     private final ApplicationIdSelectorFactory appIdSelectorFactory = new ApplicationIdSelectorFactory();
+    private final DataTypeDao dataTypeDao;
+    private final EntityHierarchyDao entityHierarchyDao;
     private final LogicalFlowDecoratorDao logicalFlowDecoratorDao;
     private final LogicalFlowDecoratorRatingsCalculator ratingsCalculator;
 
 
     @Autowired
     public AuthSourceRatingCalculator(DataTypeDao dataTypeDao,
+                                      EntityHierarchyDao entityHierarchyDao,
                                       LogicalFlowDecoratorRatingsCalculator ratingsCalculator,
                                       LogicalFlowDecoratorDao logicalFlowDecoratorDao) {
-
         checkNotNull(dataTypeDao, "dataTypeDao cannot be null");
+        checkNotNull(entityHierarchyDao, "entityHierarchyDao cannot be null");
         checkNotNull(ratingsCalculator, "ratingsCalculator cannot be null");
         checkNotNull(logicalFlowDecoratorDao, "logicalFlowDecoratorDao cannot be null");
 
         this.dataTypeDao = dataTypeDao;
+        this.entityHierarchyDao = entityHierarchyDao;
         this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
         this.ratingsCalculator = ratingsCalculator;
     }
@@ -106,19 +111,21 @@ public class AuthSourceRatingCalculator {
 
         IdSelectionOptions selectorOptions = mkOpts(vantageRef, HierarchyQueryScope.CHILDREN);
         Select<Record1<Long>> selector = appIdSelectorFactory.apply(selectorOptions);
-
-        Collection<LogicalFlowDecorator> impactedDecorators = logicalFlowDecoratorDao
-                .findByEntityIdSelectorAndKind(
-                        EntityKind.APPLICATION,
-                        selector,
-                        EntityKind.DATA_TYPE)
+        Set<Long> dataTypeDescendents = entityHierarchyDao
+                .findDesendents(dataType.entityReference())
                 .stream()
-                .filter(decorator -> decorator.decoratorEntity().id() == dataType.id().get())
+                .map(d -> d.id().get())
+                .collect(Collectors.toSet());
+
+        Collection<DataTypeDecorator> impactedDecorators = logicalFlowDecoratorDao
+                .findByEntityIdSelector(selector, Optional.of(EntityKind.APPLICATION))
+                .stream()
+                .filter(decorator -> dataTypeDescendents.contains(decorator.decoratorEntity().id()))
                 .collect(toList());
 
-        Collection<LogicalFlowDecorator> reRatedDecorators = ratingsCalculator.calculate(impactedDecorators);
+        Collection<DataTypeDecorator> reRatedDecorators = ratingsCalculator.calculate(impactedDecorators);
 
-        Set<LogicalFlowDecorator> modifiedDecorators = SetUtilities.minus(
+        Set<DataTypeDecorator> modifiedDecorators = SetUtilities.minus(
                 fromCollection(reRatedDecorators),
                 fromCollection(impactedDecorators));
 
@@ -132,7 +139,7 @@ public class AuthSourceRatingCalculator {
     }
 
 
-    private int[] updateDecorators(Set<LogicalFlowDecorator> decorators) {
+    private int[] updateDecorators(Set<DataTypeDecorator> decorators) {
         checkNotNull(decorators, "decorators cannot be null");
         if (decorators.isEmpty()) return new int[] {};
         return logicalFlowDecoratorDao.updateDecorators(decorators);

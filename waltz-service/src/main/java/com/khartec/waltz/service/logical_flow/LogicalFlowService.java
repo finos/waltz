@@ -3,18 +3,17 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.service.logical_flow;
@@ -23,14 +22,15 @@ import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorDao;
+import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowStatsDao;
+import com.khartec.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.data_flow_decorator.ImmutableLogicalFlowDecorator;
+import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
 import com.khartec.waltz.model.logical_flow.*;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import com.khartec.waltz.model.tally.TallyPack;
@@ -47,6 +47,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
@@ -78,6 +79,7 @@ public class LogicalFlowService {
 
     private final ApplicationIdSelectorFactory appIdSelectorFactory = new ApplicationIdSelectorFactory();
     private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
+    private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
 
 
     @Autowired
@@ -85,15 +87,15 @@ public class LogicalFlowService {
                               DataTypeService dataTypeService,
                               DataTypeUsageService dataTypeUsageService,
                               DBExecutorPoolInterface dbExecutorPool,
-                              LogicalFlowDecoratorDao logicalFlowDecoratorDao,
                               LogicalFlowDao logicalFlowDao,
-                              LogicalFlowStatsDao logicalFlowStatsDao) {
+                              LogicalFlowStatsDao logicalFlowStatsDao,
+                              LogicalFlowDecoratorDao logicalFlowDecoratorDao) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
         checkNotNull(dataTypeService, "dataTypeService cannot be null");
         checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
         checkNotNull(logicalFlowDao, "logicalFlowDao must not be null");
-        checkNotNull(logicalFlowDecoratorDao, "logicalFlowDecoratorDao cannot be null");
+        checkNotNull(logicalFlowDecoratorDao, "logicalFlowDataTypeDecoratorDao cannot be null");
         checkNotNull(logicalFlowStatsDao, "logicalFlowStatsDao cannot be null");
 
         this.changeLogService = changeLogService;
@@ -101,8 +103,8 @@ public class LogicalFlowService {
         this.dataTypeUsageService = dataTypeUsageService;
         this.dbExecutorPool = dbExecutorPool;
         this.logicalFlowDao = logicalFlowDao;
-        this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
         this.logicalFlowStatsDao = logicalFlowStatsDao;
+        this.logicalFlowDecoratorDao = logicalFlowDecoratorDao;
     }
 
 
@@ -160,13 +162,6 @@ public class LogicalFlowService {
     public LogicalFlow addFlow(AddLogicalFlowCommand addCmd, String username) {
         rejectIfSelfLoop(addCmd);
 
-        auditFlowChange(
-                "added",
-                addCmd.source(),
-                addCmd.target(),
-                username,
-                Operation.ADD);
-
         LocalDateTime now = nowUtc();
         LogicalFlow flowToAdd = ImmutableLogicalFlow.builder()
                 .source(addCmd.source())
@@ -179,27 +174,11 @@ public class LogicalFlowService {
         LogicalFlow logicalFlow = logicalFlowDao.addFlow(flowToAdd);
         attemptToAddUnknownDecoration(logicalFlow, username);
 
+        changeLogService.writeChangeLogEntries(logicalFlow, username, "Added", Operation.ADD);
+
         return logicalFlow;
     }
 
-
-    private void attemptToAddUnknownDecoration(LogicalFlow logicalFlow, String username) {
-        dataTypeService
-                .getUnknownDataType()
-                .flatMap(IdProvider::id)
-                .flatMap(unknownDataTypeId -> logicalFlow.id()
-                        .map(flowId -> tuple(
-                                mkRef(DATA_TYPE, unknownDataTypeId),
-                                flowId)))
-                .map(t -> ImmutableLogicalFlowDecorator
-                        .builder()
-                        .decoratorEntity(t.v1)
-                        .dataFlowId(t.v2)
-                        .lastUpdatedBy(username)
-                        .rating(AuthoritativenessRating.DISCOURAGED)
-                        .build())
-                .map(decoration -> logicalFlowDecoratorDao.addDecorators(newArrayList(decoration)));
-    }
 
 
     public List<LogicalFlow> addFlows(List<AddLogicalFlowCommand> addCmds, String username) {
@@ -271,14 +250,11 @@ public class LogicalFlowService {
 
         Set<EntityReference> affectedEntityRefs = SetUtilities.fromArray(logicalFlow.source(), logicalFlow.target());
 
-        auditFlowChange(
-                "removed",
-                logicalFlow.source(),
-                logicalFlow.target(),
-                username,
-                Operation.REMOVE);
-
         dataTypeUsageService.recalculateForApplications(affectedEntityRefs);
+
+        changeLogService.writeChangeLogEntries(logicalFlow, username,
+                "Removed : datatypes [" + getAssociatedDatatypeNamesAsCsv(flowId) + "]",
+                Operation.REMOVE);
 
         return deleted;
     }
@@ -297,6 +273,7 @@ public class LogicalFlowService {
             case ORG_UNIT:
             case PERSON:
             case SCENARIO:
+            case DATA_TYPE:
                 return calculateStatsForAppIdSelector(options);
             default:
                 throw new UnsupportedOperationException("Cannot calculate stats for selector kind: "+ options.entityReference().kind());
@@ -331,27 +308,12 @@ public class LogicalFlowService {
     }
 
 
-    private void auditFlowChange(String verb, EntityReference source, EntityReference target, String username, Operation operation) {
-        ImmutableChangeLog logEntry = ImmutableChangeLog.builder()
-                .parentReference(source)
-                .severity(Severity.INFORMATION)
-                .userId(username)
-                .message(String.format(
-                        "Flow %s between: %s and %s",
-                        verb,
-                        source.name().orElse(Long.toString(source.id())),
-                        target.name().orElse(Long.toString(target.id()))))
-                .childKind(LOGICAL_DATA_FLOW)
-                .operation(operation)
-                .build();
-
-        changeLogService.write(logEntry);
-        changeLogService.write(logEntry.withParentReference(target));
-    }
-
-
     public boolean restoreFlow(long logicalFlowId, String username) {
-        return logicalFlowDao.restoreFlow(logicalFlowId, username);
+        boolean result = logicalFlowDao.restoreFlow(logicalFlowId, username);
+        if (result) {
+            changeLogService.writeChangeLogEntries(mkRef(LOGICAL_DATA_FLOW, logicalFlowId), username, "Restored", Operation.ADD);
+        }
+        return result;
     }
 
 
@@ -374,4 +336,34 @@ public class LogicalFlowService {
     }
 
 
+
+    private void attemptToAddUnknownDecoration(LogicalFlow logicalFlow, String username) {
+        dataTypeService
+                .getUnknownDataType()
+                .flatMap(IdProvider::id)
+                .flatMap(unknownDataTypeId -> logicalFlow.id()
+                        .map(flowId -> tuple(
+                                mkRef(DATA_TYPE, unknownDataTypeId),
+                                flowId)))
+                .map(t -> ImmutableDataTypeDecorator
+                        .builder()
+                        .decoratorEntity(t.v1)
+                        .entityReference(mkRef(DATA_TYPE, t.v2))
+                        .lastUpdatedBy(username)
+                        .rating(AuthoritativenessRating.DISCOURAGED)
+                        .build())
+                .map(decoration -> logicalFlowDecoratorDao.addDecorators(newArrayList(decoration)));
+    }
+
+    private String getAssociatedDatatypeNamesAsCsv(Long flowId) {
+        IdSelectionOptions idSelectionOptions = IdSelectionOptions.mkOpts(
+                mkRef(LOGICAL_DATA_FLOW, flowId),
+                HierarchyQueryScope.EXACT);
+
+        return dataTypeService.findByIdSelector(dataTypeIdSelectorFactory.apply(idSelectionOptions))
+                .stream()
+                .map(EntityReference::name)
+                .map(Optional::get)
+                .collect(Collectors.joining(", "));
+    }
 }

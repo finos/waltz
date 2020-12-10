@@ -3,29 +3,34 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.data.entity_hierarchy;
 
 import com.khartec.waltz.data.JooqUtilities;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.entity_hierarchy.EntityHierarchyItem;
+import com.khartec.waltz.model.entity_hierarchy.ImmutableEntityHierarchyItem;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.EntityHierarchy;
+import com.khartec.waltz.schema.tables.records.ApplicationRecord;
 import com.khartec.waltz.schema.tables.records.EntityHierarchyRecord;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.RecordMapper;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +59,18 @@ public class EntityHierarchyDao {
                     item.parentId().orElse(null),
                     item.level());
 
+    public static final RecordMapper<Record, EntityHierarchyItem> TO_DOMAIN_MAPPER = record -> {
+        EntityHierarchyRecord ehRecord = record.into(ENTITY_HIERARCHY);
+        EntityHierarchyItem item = ImmutableEntityHierarchyItem.builder()
+                .id(ehRecord.getId())
+                .kind(Enum.valueOf(EntityKind.class, ehRecord.getKind()))
+                .parentId(ehRecord.getAncestorId())
+                .level(ehRecord.getLevel())
+                .build();
+
+        return item;
+    };
+
     private final DSLContext dsl;
 
     @Autowired
@@ -64,7 +81,7 @@ public class EntityHierarchyDao {
     }
 
 
-    public int replaceHierarchy(EntityKind kind, List<EntityHierarchyItem> hierarchyItems) {
+    public int replaceHierarchy(EntityKind kind, List<EntityHierarchyItem> hierarchyItems, Condition deleteFilter) {
         checkNotNull(kind, "kind cannot be null");
         checkNotNull(hierarchyItems, "hierarchyItems cannot be null");
 
@@ -75,6 +92,7 @@ public class EntityHierarchyDao {
             DSLContext txDsl = DSL.using(configuration);
             txDsl.deleteFrom(ENTITY_HIERARCHY)
                     .where(ENTITY_HIERARCHY.KIND.eq(kind.name()))
+                    .and(deleteFilter)
                     .execute();
             txDsl.batchInsert(records)
                     .execute();
@@ -97,6 +115,16 @@ public class EntityHierarchyDao {
                         .and(eh.ID.eq(eh.ANCESTOR_ID)))
                 .groupBy(eh.KIND)
                 .fetch(TO_STRING_TALLY);
+    }
+
+
+    public List<EntityHierarchyItem> findDesendents(EntityReference ref) {
+        checkNotNull(ref, "ref cannot be null");
+        return dsl
+                .selectFrom(ENTITY_HIERARCHY)
+                .where(ENTITY_HIERARCHY.KIND.eq(ref.kind().name()))
+                .and(ENTITY_HIERARCHY.ANCESTOR_ID.eq(ref.id()))
+                .fetch(TO_DOMAIN_MAPPER);
     }
 
 }

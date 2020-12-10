@@ -8,3 +8,12 @@ dist
 *.ids
 npm-debug.log
 *.log
+.settings
+*/.classpath
+*/.factorypath
+**/.project
+/docs/development/sample/.asciidoctor/diagram
+/docs/design/draft/taxonomy_mapping/distinct.svg
+/docs/design/draft/taxonomy_mapping/.asciidoctor/diagram/distinct.svg.cache
+/docs/design/draft/taxonomy_mapping/merged.svg
+/docs/design/draft/taxonomy_mapping/.asciidoctor/diagram/merged.svg.cache

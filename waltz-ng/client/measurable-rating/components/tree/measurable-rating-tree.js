@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 import _ from "lodash";
 import {initialiseData} from "../../../common";
@@ -32,22 +31,28 @@ import {truncateMiddle} from "../../../common/string-utils";
  */
 const bindings = {
     allocations: "<?",
+    plannedDecommissions: "<?",
+    replacingDecommissions: "<?",
+    replacementApps: "<?",
     ratings: "<",
-    ratingScheme: "<",
+    ratingSchemeItems: "<",
     measurables: "<",
     onKeypress: "<",
     onSelect: "<",
-    scrollHeight: "@" // should correspond to numeric values in `waltz-scroll-region` classes
+    scrollHeight: "@?" // should correspond to numeric values in `waltz-scroll-region` classes
 };
 
 
 const initialState = {
     allocations: [],
+    plannedDecommissions: [],
+    replacingDecommissions: [],
+    replacementApps: [],
     containerClass: "",
     hierarchy: [],
     measurables: [],
     ratings: [],
-    ratingScheme: null,
+    ratingSchemeItems: [],
     searchTerms: "",
     treeOptions: {
         nodeChildren: "children",
@@ -98,16 +103,36 @@ function controller() {
     vm.$onInit = () => initialiseData(vm, initialState);
 
     vm.$onChanges = (c) => {
-        const toDisplayName = m => truncateMiddle(m.name, 96);
-        const measurables = _.map(vm.measurables, m => Object.assign({}, m, { displayName: toDisplayName(m)}));
-        vm.searchNodes = prepareSearchNodes(measurables);
-        vm.hierarchy = prepareTree(measurables);
-        vm.ratingsByMeasurable = _.keyBy(vm.ratings || [], "measurableId");
-        vm.ratingsByCode = _.keyBy(_.get(vm.ratingScheme, "ratings", []), "rating");
-        vm.allocationsByMeasurable = _.groupBy(vm.allocations, d => d.measurableId);
+        const toDisplayName = m => truncateMiddle(m.name, 70);
 
-        if (_.isEmpty(vm.expandedNodes)) {
-            vm.expandedNodes = calculateExpandedNodes(measurables, vm.ratingsByMeasurable);
+        const ratingsByMeasurable = _.keyBy(vm.ratings || [], "measurableId");
+        const ratingSchemeItemsByCode = _.keyBy(vm.ratingSchemeItems, "rating");
+        const allocationsByMeasurable = _.groupBy(vm.allocations, d => d.measurableId);
+        const decommissionDatesByMeasurable = _.keyBy(vm.plannedDecommissions, d => d.measurableId);
+        const replacementAppsByDecommissionId = _.groupBy(vm.replacementApps, d => d.decommissionId);
+        const replacingDecommissionsByMeasurable = _.groupBy(vm.replacingDecommissions, d => d.measurableId);
+
+        const nodes = _.map(vm.measurables, m => {
+            const rating = ratingsByMeasurable[m.id];
+            return {
+                id: m.id,
+                parentId: m.parentId,
+                displayName: toDisplayName(m),
+                measurable: m,
+                rating,
+                ratingSchemeItem: rating ? ratingSchemeItemsByCode[rating.rating] : null,
+                allocations: allocationsByMeasurable[m.id],
+                decommission: _.get(decommissionDatesByMeasurable, [m.id], null),
+                replacementApps: _.get(replacementAppsByDecommissionId, _.get(decommissionDatesByMeasurable, [m.id, "id"]), []),
+                replacingDecommissions: _.get(replacingDecommissionsByMeasurable, [m.id], [])
+            };
+        });
+
+        vm.searchNodes = prepareSearchNodes(nodes, n => n.measurable.name);
+        vm.hierarchy = prepareTree(nodes);
+
+        if (_.isEmpty(vm.expandedNodes) || c.measurables) {
+            vm.expandedNodes = calculateExpandedNodes(nodes, ratingsByMeasurable);
         }
 
         if (c.scrollHeight) {

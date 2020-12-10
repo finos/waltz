@@ -3,18 +3,17 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.web.endpoints.api;
@@ -23,6 +22,7 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
+import com.khartec.waltz.model.assessment_definition.AssessmentVisibility;
 import com.khartec.waltz.model.assessment_rating.*;
 import com.khartec.waltz.service.assessment_definition.AssessmentDefinitionService;
 import com.khartec.waltz.service.assessment_rating.AssessmentRatingService;
@@ -71,13 +71,14 @@ public class AssessmentRatingEndpoint implements Endpoint {
     @Override
     public void register() {
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
+        String findByEntityKindPath = mkPath(BASE_URL, "entity-kind", ":kind");
         String findByTargetKindForRelatedSelectorPath = mkPath(BASE_URL, "target-kind", ":targetKind", "selector");
         String modifyPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId");
 
         getForList(findForEntityPath, this::findForEntityRoute);
+        postForList(findByEntityKindPath, this::findByEntityKindRoute);
         postForList(findByTargetKindForRelatedSelectorPath, this::findByTargetKindForRelatedSelectorRoute);
-        postForDatum(modifyPath, this::createRoute);
-        putForDatum(modifyPath, this::updateRoute);
+        postForDatum(modifyPath, this::storeRoute);
         deleteForDatum(modifyPath, this::removeRoute);
     }
 
@@ -89,22 +90,23 @@ public class AssessmentRatingEndpoint implements Endpoint {
 
 
     private List<AssessmentRating> findForEntityRoute(Request request, Response response) {
+
         return assessmentRatingService.findForEntity(getEntityReference(request));
     }
 
 
-    private boolean updateRoute(Request request, Response z) throws IOException {
-        SaveAssessmentRatingCommand command = mkCommand(request);
-        verifyCanWrite(request, command.assessmentDefinitionId());
-        return assessmentRatingService.update(command, getUsername(request));
+    private List<AssessmentRating> findByEntityKindRoute(Request request, Response response) throws IOException {
+        List<AssessmentVisibility> visibilities = readList(request, AssessmentVisibility.class);
+        return assessmentRatingService.findByEntityKind(getKind(request, "kind"), visibilities);
     }
 
 
-    private boolean createRoute(Request request, Response z) throws IOException {
+    private boolean storeRoute(Request request, Response z) throws IOException {
         SaveAssessmentRatingCommand command = mkCommand(request);
         verifyCanWrite(request, command.assessmentDefinitionId());
-        return assessmentRatingService.create(command, getUsername(request));
+        return assessmentRatingService.store(command, getUsername(request));
     }
+
 
 
     private boolean removeRoute(Request request, Response z) throws IOException {
@@ -132,7 +134,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
                 .entityReference(getEntityReference(request))
                 .assessmentDefinitionId(getLong(request, "assessmentDefinitionId"))
                 .ratingId(Long.valueOf(body.getOrDefault("ratingId", "").toString()))
-                .description(StringUtilities.mkSafe((String) body.get("description")))
+                .comment(StringUtilities.mkSafe((String) body.get("comment")))
                 .lastUpdatedAt(lastUpdate.at())
                 .lastUpdatedBy(lastUpdate.by())
                 .provenance("waltz")

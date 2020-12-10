@@ -1,47 +1,95 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 
 import template from './related-measurable-item-view.html';
 import {initialiseData} from "../../../common/index";
+import * as _ from "lodash";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
-    item: '<',
+    items: '<',
+    relationshipKinds: '<',
+    onSelect: '<',
     onDismiss: '<',
     onEdit: '<',
-    onRemove: '<'
+    onRemove: '<',
+    onAdd: '<'
 };
 
 
 const initialState = {
-    item: null,
+    selectedItem: null,
+    displayInfo: false,
+    relationshipKinds: [],
     onDismiss: () => console.log('default on dismiss'),
     onEdit: () => console.log('default on edit'),
-    onRemove: () => console.log('default on remove')
+    onRemove: () => console.log('default on remove'),
+    onSelect: () => console.log('default on select'),
+    onAdd: () => console.log('default on add')
 };
 
 
 
-function controller() {
-    initialiseData(this, initialState);
+function controller(serviceBroker) {
+    const vm = initialiseData(this, initialState);
+
+    function enrichItemsWithRelationshipKind() {
+        vm.list = _.map(vm.items, i => Object.assign({},
+            i,
+            {relationshipKind: _.find(vm.allRelationshipKinds,
+                    {'code': i.relationship.relationship,
+                        'kindA': i.a.kind,
+                        'kindB': i.b.kind
+                    })}));
+    }
+
+    vm.$onInit = () => {
+        serviceBroker.loadAppData(CORE_API.RelationshipKindStore.findAll)
+            .then(r => vm.allRelationshipKinds = r.data)
+            .then(() => enrichItemsWithRelationshipKind())
+    };
+
+    vm.$onChanges = (c) => {
+        if(c.items){
+            vm.selectedItem = null;
+            vm.counterpart = _.first(_.map(vm.items, i => (i.outbound) ? i.b : i.a));
+            enrichItemsWithRelationshipKind();
+        }
+    };
+
+    vm.selectItem = (item) => {
+        vm.selectedItem = item;
+        vm.onSelect(item);
+    };
+
+    vm.onAddItem = () => {
+        vm.selectedItem = null;
+        vm.onAdd();
+    };
+
 }
+
+
+controller.$inject = [
+    "ServiceBroker"
+];
 
 
 const component = {

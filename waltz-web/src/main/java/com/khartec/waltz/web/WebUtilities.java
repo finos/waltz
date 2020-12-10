@@ -3,18 +3,17 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.web;
@@ -38,11 +37,12 @@ import spark.Response;
 import spark.ResponseTransformer;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.Checks.checkAll;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ObjectUtilities.firstNotNull;
 import static com.khartec.waltz.common.SetUtilities.asSet;
@@ -76,21 +76,10 @@ public class WebUtilities {
 
 
     /**
-     * Given a vararg/array of path segments will join them
-     * to make a string representing the path.  No starting or trailing
-     * slashes are added to the resultant path string.
-     *
-     * @param segs Segments to join
-     * @return String representing the path produced by joining the segments
-     * @throws IllegalArgumentException If any of the segments are null
+     * @see StringUtilities
      */
     public static String mkPath(String... segs) {
-        checkAll(
-                segs,
-                x -> StringUtilities.notEmpty(x),
-                "Cannot convert empty segments to path");
-
-        return String.join("/", segs);
+        return StringUtilities.mkPath(segs);
     }
 
 
@@ -366,6 +355,21 @@ public class WebUtilities {
     }
 
 
+    public static Optional<Date> getDateParam(Request request) {
+        String dateVal = request.queryParams("date");
+        return Optional
+                .ofNullable(dateVal)
+                .map(s -> {
+                    try {
+                        return new SimpleDateFormat("yyyy-MM-dd").parse(s);
+                    } catch (ParseException pe) {
+                        LOG.warn("Could not parse date: " + s);
+                        return null;
+                    }
+                });
+    }
+
+    
     /**
      * Helper method to flatten a map (m) into a list of Entry's.
      * Typically used when the key (K) is a complex type

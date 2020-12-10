@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.web.endpoints.api;
@@ -40,16 +39,20 @@ import spark.Response;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static java.util.Arrays.asList;
 
 @Service
 public class PhysicalFlowEndpoint implements Endpoint {
 
     private static final Logger LOG = LoggerFactory.getLogger(PhysicalFlowEndpoint.class);
     private static final String BASE_URL = mkPath("api", "physical-flow");
+    private static final Pattern ERROR_PATTERN = Pattern.compile(".*required attributes.*\\[(.*)\\].*");
 
     private final PhysicalFlowService physicalFlowService;
     private final UserRoleService userRoleService;
@@ -266,7 +269,21 @@ public class PhysicalFlowEndpoint implements Endpoint {
         } catch (JsonMappingException ex) {
             Throwable cause = ex.getCause();
             if(cause != null) {
-                throw new IOException(cause.getMessage(), ex);
+
+                String message = cause.getMessage();
+
+                Matcher match = ERROR_PATTERN.matcher(message);
+
+                String errorMsg = (match.find())
+                        ? String.format("Cannot resolve physical flows as the required attributes are missing [%s]", match.group(1))
+                        : message;
+
+                int lineNr = ex.getPath().get(0).getIndex() + 1;
+
+                throw new IOException(String.format("%s in line %d",
+                        errorMsg,
+                        lineNr),
+                        cause);
             }
             throw ex;
         }
@@ -275,7 +292,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
     private List<PhysicalFlowUploadCommandResponse> upload(Request request, Response response) throws IOException, Exception {
         requireRole(userRoleService, request, SystemRole.LOGICAL_DATA_FLOW_EDITOR);
-        List<PhysicalFlowUploadCommand> commands = Arrays.asList(readBody(request, PhysicalFlowUploadCommand[].class));
+        List<PhysicalFlowUploadCommand> commands = asList(readBody(request, PhysicalFlowUploadCommand[].class));
         String username = getUsername(request);
 
         return physicalFlowUploadService.upload(username, commands);

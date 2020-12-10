@@ -3,18 +3,17 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import _ from "lodash";
@@ -38,9 +37,9 @@ const bindings = {
 
 
 const externalIdCellTemplate = `
-    <div class="ui-grid-cell-contents" 
+    <div class="ui-grid-cell-contents"
          style="vertical-align: baseline; ">
-        <waltz-entity-link icon-placement="none" 
+        <waltz-entity-link icon-placement="none"
                            entity-ref="COL_FIELD">
         </waltz-entity-link>
     </div>
@@ -157,32 +156,17 @@ function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     function init() {
-        const enumPromise = serviceBroker
-            .loadAppData(CORE_API.EnumValueStore.findAll)
-            .then(r => {
-                vm.changeInitiativeLifecyclePhaseByKey = _
-                    .chain(r.data)
-                    .filter({ type: "changeInitiativeLifecyclePhase"})
-                    .map(d => ({ key: d.key, name: d.name }))
-                    .keyBy( d => d.key)
-                    .value();
-            });
-
-        const schemePromise = serviceBroker
+        const schemesPromise = serviceBroker
             .loadAppData(CORE_API.RatingSchemeStore.findAll)
             .then(r => vm.ratingSchemes = r.data);
 
-        const assessmentDefinitionPromise = serviceBroker
+        const assessmentDefinitionsPromise = serviceBroker
             .loadAppData(
                 CORE_API.AssessmentDefinitionStore.findByKind,
                 [ "CHANGE_INITIATIVE" ])
             .then(r => vm.assessmentDefinitions = r.data);
 
-        return $q.all([enumPromise, schemePromise, assessmentDefinitionPromise]);
-    }
-
-    vm.$onInit = () => {
-        serviceBroker
+        const enumPromise = serviceBroker
             .loadAppData(CORE_API.EnumValueStore.findAll)
             .then(r => {
                 vm.changeInitiativeLifecyclePhaseByKey = indexByKeyForType(
@@ -190,8 +174,10 @@ function controller($q, serviceBroker) {
                     "changeInitiativeLifecyclePhase");
             });
 
-        init();
-    };
+        return $q
+            .all([schemesPromise, assessmentDefinitionsPromise, enumPromise]);
+    }
+
 
     vm.$onChanges = (changes) => {
         const sameParent = isSameParentEntityRef(changes);
@@ -201,11 +187,8 @@ function controller($q, serviceBroker) {
             const ciPromise = serviceBroker
                 .loadViewData(
                     CORE_API.ChangeInitiativeStore.findHierarchyBySelector,
-                    [ mkSelectionOptions(vm.parentEntityRef) ])
-                .then(r => {
-                    vm.changeInitiatives = r.data;
-                    vm.gridOptions.data = mkTableData(vm.changeInitiatives, vm.changeInitiativeLifecyclePhaseByKey);
-                });
+                    [ selectionOptions ])
+                .then(r => vm.changeInitiatives = r.data);
 
             const assessmentRatingsPromise = serviceBroker
                 .loadViewData(
@@ -214,9 +197,7 @@ function controller($q, serviceBroker) {
                 .then(r => vm.assessmentRatings = r.data);
 
             $q.all([init(), ciPromise, assessmentRatingsPromise])
-                .then(() => {
-                    applyFilters();
-                });
+                .then(() => applyFilters());
         }
     };
 
@@ -243,9 +224,6 @@ function controller($q, serviceBroker) {
                     ratingId: vm.selectedAssessmentRating.rating.id
                 });
 
-        const changeInitiatives = relevantCis;
-        const assessmentRatings = inScopeRatings;
-
         vm.assessmentSummaries = mkAssessmentSummaries(
             vm.assessmentDefinitions,
             vm.ratingSchemes,
@@ -253,7 +231,7 @@ function controller($q, serviceBroker) {
             inScopeCis.length);
 
         vm.gridOptions.data = mkTableData(
-            changeInitiatives,
+            relevantCis,
             vm.changeInitiativeLifecyclePhaseByKey);
 
     }

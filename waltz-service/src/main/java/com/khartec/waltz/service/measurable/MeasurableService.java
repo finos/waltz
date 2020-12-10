@@ -3,18 +3,17 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.service.measurable;
@@ -35,10 +34,7 @@ import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -49,7 +45,7 @@ import static java.util.Optional.ofNullable;
 
 @Service
 public class MeasurableService {
-    
+
     private final MeasurableDao measurableDao;
     private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
     private final MeasurableSearchDao measurableSearchDao;
@@ -79,17 +75,6 @@ public class MeasurableService {
     }
 
 
-    /**
-     * Includes parents, this should probably be deprecated and rolled into findByMeasureableIdSelector
-     * @param ref Entity reference of item to search against
-     * @return List of measurable related to the given entity `ref`
-     */
-    public List<Measurable> findMeasurablesRelatedToEntity(EntityReference ref) {
-        checkNotNull(ref, "ref cannot be null");
-        return measurableDao.findMeasuresRelatedToEntity(ref);
-    }
-
-
     public List<Measurable> findByMeasurableIdSelector(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         Select<Record1<Long>> selector = measurableIdSelectorFactory.apply(options);
@@ -100,6 +85,14 @@ public class MeasurableService {
     public List<Measurable> findByCategoryId(Long categoryId) {
         return measurableDao.findByCategoryId(categoryId);
     }
+
+
+    public Map<String, Long> findExternalIdToIdMapByCategoryId(Long categoryId) {
+        checkNotNull(categoryId, "categoryId cannot be null");
+
+        return measurableDao.findExternalIdToIdMapByCategoryId(categoryId);
+    }
+
 
     public Collection<Measurable> search(String query) {
         if (StringUtilities.isEmpty(query)) {
@@ -121,6 +114,11 @@ public class MeasurableService {
 
     public Measurable getById(long id) {
         return measurableDao.getById(id);
+    }
+
+
+    public Collection<Measurable> findByOrgUnitId(Long id) {
+        return measurableDao.findByOrgUnitId(id);
     }
 
 
@@ -150,7 +148,9 @@ public class MeasurableService {
 
 
     public boolean create(Measurable measurable, String userId) {
-        return measurableDao.create(measurable);
+        Long measurableId = measurableDao.create(measurable);
+        writeAuditMessage(measurableId, userId, String.format("created new measurable %s", measurable.name()));
+        return measurableId > 1;
     }
 
 
@@ -169,7 +169,7 @@ public class MeasurableService {
      *
      * @param measurableId  measurable id of item to move
      * @param destinationId new parent id (or null if root)
-     * @param userId who initiated this move
+     * @param userId        who initiated this move
      */
     public boolean updateParentId(Long measurableId, Long destinationId, String userId) {
         checkNotNull(measurableId, "Cannot updateParentId a measurable with a null id");
@@ -213,7 +213,7 @@ public class MeasurableService {
     }
 
 
-    private void writeAuditMessage(Long measurableId, String userId, String msg) {
+    public void writeAuditMessage(Long measurableId, String userId, String msg) {
         changeLogService.write(ImmutableChangeLog.builder()
                 .severity(Severity.INFORMATION)
                 .userId(userId)
@@ -223,6 +223,4 @@ public class MeasurableService {
                 .message(msg)
                 .build());
     }
-
-
 }

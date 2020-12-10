@@ -1,47 +1,47 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
-import _ from 'lodash';
-import { initialiseData } from '../../../common';
+import _ from "lodash";
+import { initialiseData } from "../../../common";
 
 import { CORE_API } from "../../../common/services/core-api-utils";
-import { findUnknownDataTypeId } from '../../../data-types/data-type-utils';
+import { findUnknownDataTypeId } from "../../../data-types/data-type-utils";
 import { categorizeDirection } from "../../../logical-flow/logical-flow-utils";
 import { nest } from "d3-collection";
 
-import template from './application-flow-summary-pane.html';
+import template from "./application-flow-summary-pane.html";
 import {tallyBy} from "../../../common/tally-utils";
 import {color} from "d3-color";
 import indexByKeyForType from "../../../enum-value/enum-value-utilities";
+import {entity} from "../../../common/services/enums/entity";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
 };
 
 
 const initialState = {
     authoritativeCols: [
-        'PRIMARY',
-        'SECONDARY',
-        'DISCOURAGED',
-        'NO_OPINION'
+        "PRIMARY",
+        "SECONDARY",
+        "DISCOURAGED",
+        "NO_OPINION"
     ],
     visibility: {
         stats: false
@@ -50,19 +50,19 @@ const initialState = {
 
 
 function enrichDecorators(parentEntityRef, unknownDataTypeId, logicalFlows = [], decorators = []) {
-    const logicalFlowsById = _.keyBy(logicalFlows, 'id');
+    const logicalFlowsById = _.keyBy(logicalFlows, "id");
     const isKnownDataType = (decorator) => decorator.decoratorEntity.id !== unknownDataTypeId;
 
     return _
         .chain(decorators)
-        .filter(d => d.decoratorEntity.kind === 'DATA_TYPE')
+        .filter(d => d.decoratorEntity.kind === "DATA_TYPE")
         .map(d => {
             const flow = logicalFlowsById[d.dataFlowId];
             return {
                 decorator: d,
                 logicalFlow: flow,
                 direction: categorizeDirection(flow, parentEntityRef),
-                mappingStatus: isKnownDataType(d) ? 'KNOWN': 'UNKNOWN'
+                mappingStatus: isKnownDataType(d) ? "KNOWN": "UNKNOWN"
             };
         })
         .value();
@@ -111,7 +111,8 @@ function getFreshnessSummaryData(logicalFlows, physicalFlows, enumValues) {
     const producerOrConsumerPhysicalFlows = physicalFlows
         .filter(pf => logicalFlowIds.includes(pf.logicalFlowId));
 
-    const summaryData = tallyBy(producerOrConsumerPhysicalFlows,
+    const summaryData = tallyBy(
+        producerOrConsumerPhysicalFlows,
         "freshnessIndicator");
 
     _.each(summaryData, d => d.color = _.get(enumValues, [d.key, "data", "iconColor"], "none"));
@@ -126,7 +127,7 @@ function controller($q, serviceBroker) {
     const reload = (unknownDataTypeId) => {
         const selector = {
             entityReference: vm.parentEntityRef,
-            scope: 'EXACT'
+            scope: "EXACT"
         };
 
         const logicalFlowPromise = serviceBroker
@@ -137,8 +138,8 @@ function controller($q, serviceBroker) {
 
         const decorationPromise = serviceBroker
             .loadViewData(
-                CORE_API.LogicalFlowDecoratorStore.findBySelectorAndKind,
-                [selector, 'DATA_TYPE'])
+                CORE_API.DataTypeDecoratorStore.findBySelector,
+                [selector, entity.LOGICAL_DATA_FLOW.key ])
             .then(r => r.data);
 
         $q.all([logicalFlowPromise, decorationPromise])
@@ -189,8 +190,8 @@ function controller($q, serviceBroker) {
 
 
 controller.$inject = [
-    '$q',
-    'ServiceBroker',
+    "$q",
+    "ServiceBroker",
 ];
 
 
@@ -203,5 +204,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzApplicationFlowSummaryPane'
+    id: "waltzApplicationFlowSummaryPane"
 };

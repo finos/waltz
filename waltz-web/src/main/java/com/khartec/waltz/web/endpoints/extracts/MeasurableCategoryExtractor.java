@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.web.endpoints.extracts;
@@ -31,6 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.schema.Tables.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.Tables.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
@@ -42,7 +42,7 @@ import static spark.Spark.get;
 
 
 @Service
-public class MeasurableCategoryExtractor extends BaseDataExtractor {
+public class MeasurableCategoryExtractor extends DirectQueryBasedDataExtractor {
 
     private static final Logger LOG = LoggerFactory.getLogger(MeasurableCategoryExtractor.class);
 
@@ -76,12 +76,17 @@ public class MeasurableCategoryExtractor extends BaseDataExtractor {
                             MEASURABLE.ID.as("Id"),
                             MEASURABLE.PARENT_ID.as("Parent Id"),
                             MEASURABLE.EXTERNAL_ID.as("External Id"),
+                            ENTITY_HIERARCHY.LEVEL.as("Level"),
                             MEASURABLE.NAME.as("Name"),
                             MEASURABLE.DESCRIPTION.as("Description"))
                     .select(INVOLVEMENT_KIND.NAME.as("Role"))
                     .select(PERSON.DISPLAY_NAME.as("Person"),
                             PERSON.EMAIL.as("Email"))
                     .from(MEASURABLE)
+                    .innerJoin(ENTITY_HIERARCHY)
+                        .on(ENTITY_HIERARCHY.ID.eq(MEASURABLE.ID))
+                        .and(ENTITY_HIERARCHY.ANCESTOR_ID.eq(MEASURABLE.ID))
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name()))
                     .leftJoin(INVOLVEMENT)
                         .on(INVOLVEMENT.ENTITY_ID.eq(MEASURABLE.ID).and(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.MEASURABLE.name())))
                     .leftJoin(INVOLVEMENT_KIND)

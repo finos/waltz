@@ -1,3 +1,21 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
 <div>
     <!-- ACTIONS -->
     <waltz-section-actions>
@@ -25,7 +43,11 @@
                             <waltz-measurable-rating-edit-panel parent-entity-ref="$ctrl.parentEntityRef"
                                                                 allocations="$ctrl.allocations"
                                                                 allocation-schemes="$ctrl.allocationSchemes"
-                                                                starting-category-id="$ctrl.visibility.tab">
+                                                                starting-category-id="$ctrl.visibility.tab"
+                                                                planned-decommissions="$ctrl.plannedDecommissions"
+                                                                replacing-decommissions="$ctrl.replacingDecommissions"
+                                                                replacement-apps="$ctrl.replacementApps"
+                                                                application="$ctrl.application">
                             </waltz-measurable-rating-edit-panel>
                         </div>
 
@@ -116,16 +138,17 @@
                    ng-repeat-start="tab in $ctrl.tabs"
                    ng-model="$ctrl.visibility.tab"
                    ng-value="tab.category.id"
-                   ng-disabled="tab.ratings.length === 0"
+                   ng-disabled="tab.measurables.length === 0"
                    ng-change="$ctrl.onTabChange(tab)"
                    name="measurable_rating"
                    id="{{ tab.category.id + '_' +$id}}">
-            <label for="{{ tab.category.id + '_' +$id}}"
+            <label class="wt-label"
+                   for="{{ tab.category.id + '_' +$id}}"
                    uib-popover-template="'wmras-tab-popover.html'"
                    popover-trigger="mouseenter"
                    popover-append-to-body="true"
-                   popover-placement="top"
-                   popover-popup-delay="200"
+                   popover-placement="bottom"
+                   popover-popup-delay="300"
                    ng-repeat-end
                    ng-bind="tab.category.name">
             </label>
@@ -147,13 +170,15 @@
     <!-- RATING TREE -->
     <div class="row">
         <div class="col-sm-12">
-            <waltz-measurable-rating-panel category="tab.category"
-                                           entity-reference="$ctrl.parentEntityRef"
-                                           measurables="tab.measurables"
+            <waltz-measurable-rating-panel measurables="tab.measurables"
                                            ratings="tab.ratings"
-                                           rating-scheme="tab.ratingScheme"
+                                           rating-scheme-items="tab.ratingSchemeItems"
                                            allocations="$ctrl.allocations"
-                                           allocation-schemes="tab.allocationSchemes">
+                                           allocation-schemes="tab.allocationSchemes"
+                                           planned-decommissions="$ctrl.plannedDecommissions"
+                                           replacing-decommissions="$ctrl.replacingDecommissions"
+                                           replacement-apps="$ctrl.replacementApps"
+                                           application="$ctrl.application">
             </waltz-measurable-rating-panel>
         </div>
     </div>
@@ -167,7 +192,6 @@
             <span ng-repeat="scheme in tab.allocationSchemes">
                 <a class="clickable"
                    ng-click="$ctrl.onShowAllocationScheme(scheme)">
-                    &nbsp;
                     &nbsp;
                     <span ng-bind="scheme.name"
                           uib-popover-template="'wmras-scheme-popover.html'"

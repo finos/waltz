@@ -3,24 +3,24 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.web;
 
 import com.khartec.waltz.web.endpoints.Endpoint;
-import com.khartec.waltz.web.endpoints.extracts.BaseDataExtractor;
+import com.khartec.waltz.web.endpoints.extracts.DataExtractor;
+import com.khartec.waltz.web.endpoints.extracts.DirectQueryBasedDataExtractor;
 import com.tngtech.archunit.lang.ArchRule;
 import org.junit.Test;
 import org.springframework.stereotype.Service;
@@ -46,7 +46,7 @@ public class EndpointArchitectureCompliance extends BaseArchitectureComplianceCh
         ArchRule rule = classes().that()
                 .areNotInterfaces()
                 .and()
-                .dontHaveSimpleName("StaticResourcesEndpoint")
+                .doNotHaveSimpleName("StaticResourcesEndpoint")
                 .and()
                 .haveNameMatching(".*Endpoint")
                 .should()
@@ -58,9 +58,9 @@ public class EndpointArchitectureCompliance extends BaseArchitectureComplianceCh
     @Test
     public void extractorsNeedServiceAnnotation() {
         ArchRule rule = classes().that()
-                .areAssignableTo(BaseDataExtractor.class)
+                .areAssignableTo(DataExtractor.class)
                 .and()
-                .dontHaveSimpleName("BaseDataExtractor")
+                .doNotHaveSimpleName("DataExtractor")
                 .should()
                 .haveNameMatching(".*Extractor")
                 .andShould()
@@ -74,9 +74,9 @@ public class EndpointArchitectureCompliance extends BaseArchitectureComplianceCh
         ArchRule rule = classes().that()
                 .haveNameMatching(".*Extractor")
                 .and()
-                .dontHaveSimpleName("BaseDataExtractor")
+                .doNotHaveSimpleName("DirectQueryBasedDataExtractor")
                 .should()
-                .beAssignableTo(BaseDataExtractor.class);
+                .beAssignableTo(DirectQueryBasedDataExtractor.class);
         rule.check(waltzOnlyClasses);
     }
 

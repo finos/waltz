@@ -1,61 +1,55 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
-import {select} from 'd3-selection';
-import 'd3-selection-multi';
-
-import { authoritativeSourceColorScale } from '../../common/colors';
+import {select} from "d3-selection";
+import "d3-selection-multi";
+import { authoritativeSourceColorScale } from "../../common/colors";
 
 
 const radius = 8;
 const padding = 3;
 
+
 function link(scope, elem) {
 
-    const data = ['PRIMARY', 'SECONDARY'];
+    const data = ["PRIMARY", "SECONDARY"];
     const svg = select(elem[0]);
 
-    svg.selectAll('circle')
+    svg.selectAll("circle")
         .data(data)
         .enter()
-        .append('circle')
-        .attrs({
-            cx: (d, i) => i * (radius * 2 + padding * 2) + radius + padding / 2,
-            cy: radius + padding / 2,
-            r: radius
-        });
+        .append("circle")
+        .attr("cx", (d, i) => i * (radius * 2 + padding * 2) + radius + padding / 2)
+        .attr("cy", radius + padding / 2)
+        .attr("r", radius);
 
-    scope.$watch('value', (value) => {
-        svg.selectAll('circle')
-            .data(data)
-            .attrs({
-                fill: (d) => ( d === value) ? authoritativeSourceColorScale(d) : '#eee',
-                stroke: (d) => ( d === value) ? authoritativeSourceColorScale(d).darker() : '#ddd'
-            });
-    });
+    scope.$watch("value", (value) => svg
+        .selectAll("circle")
+        .data(data)
+        .attr("fill", (d) => ( d === value) ? authoritativeSourceColorScale(d) : "#eee")
+        .attr("stroke", (d) => ( d === value) ? authoritativeSourceColorScale(d).darker() : "#ddd"));
 }
 
 
 export default () => ({
-    restrict: 'E',
+    restrict: "E",
     replace: true,
     template: `<svg width="${ 3 * ( radius * 2 + padding * 2)}" height="${radius * 2 + padding}"></svg>`,
-    scope: { value: '@'},
+    scope: { value: "@"},
     link
 });

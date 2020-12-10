@@ -1,0 +1,132 @@
+= Flow Datatype Decorators
+Jessica Woodland-Scott <jessica.woodland-scott@db.com>
+:version: v0.1
+:modified: 2020-09-10
+:status: DRAFT
+:toc:
+
+<<<
+== Document Info
+
+|===
+| Attribute | Value
+
+| Status
+| {status} {version} ({modified})
+
+| Target Version
+| 1.28
+
+| Lead
+| Jessica Woodland-Scott
+|===
+
+<<<
+
+== Overview
+This design doc discusses approaches to managing flow datatype decorators.
+The driver behind this enhancement is to ensure data consistency in Waltz.
+
+Waltz captures datatypes as decorators for both logical flows and physical specifications, which relate to a physical flow.
+Logical flows can have many associated physical flows or none.
+
+As it currently stands Waltz only adds logical flow decorators when a datatype is associated to a physical spec.
+Supporting loader jobs may force this alignment leading to confusion if users edit datatypes on a
+logical flow but not a physical spec and these changes are not persisted.
+
+This doc hopes to clarify when these datatypes should be kept in sync and when they should be allowed to diverge.
+
+Answering questions such as:
+
+* Should datatypes on physical flows always be copied up to the parent logical flow
+* Should a logical flow be allowed to own datatypes that do not belong to any of its associated physicals
+* Upon removing a datatype from a physical flow what should happen to the datatype on the logical flow
+* Upon removing a datatype from a logical flow what should happen to the datatypes on associated physical flows.
+
+
+<<<
+== Proposal
+
+=== Core Waltz changes
+
+* Need an 'is_readonly' flag on decorators to prevent users removing those that will reappear due to loader jobs
+** Need an 'is_readonly' flag on flows
+
+* Logical flows should be allowed their own datatypes which are not on physical flows
+
+* Datatypes added to physical flows must copied onto the logical flow (already done).
+
+* Removing a datatype from a physical flow should prompt removal from logical flow  if it's the last underlying physical with that datatype-
+
+* Visual warnings needed when datatypes present on logical flow that are not on an associated physical spec.
+
+* Removing a datatype from a logical flow that is also referenced by a physical should be prevented.
+
+* Maybe bulk editor screen to tick physicals to add datatype to
+
+=== (Optional) Client-site batch job changes
+
+* Need to update datatypes / flows created by automated job/s to be read-only and edit the loader job.
+
+<<<
+
+
+== Appendices
+
+* SQL to find out if a logical flow has any datatypes not belonging to a physical flow
+
+[source, sql]
+---
+select dt.*
+from logical_flow lf
+inner join logical_flow_decorator lfd on lf.id = lfd.logical_flow_id
+inner join data_type dt on lfd.decorator_entity_id = dt.id
+where lfd.decorator_entity_kind = 'DATA_TYPE'
+and lf.id = 14798 -- datatypes on logical flow
+except (
+select dt.*
+from logical_flow lf
+inner join physical_flow pf on lf.id = pf.logical_flow_id
+inner join physical_specification ps on pf.specification_id = ps.id
+inner join physical_spec_data_type psdt on ps.id = psdt.specification_id
+inner join data_type dt on psdt.data_type_id = dt.id
+where lf.id = 14798) -- datatypes on physical specs
+---
+
+
+* SQL to find if removing a datatype from a physical will allow you to remove from the logical too
+** key thing is different specifications - if physical flows share a spec removing the datatype will remove from all
+
+[source, sql]
+---
+select distinct lf.id, pf.id, dt.name, count(pf2.specification_id)
+from physical_flow pf
+inner join physical_specification ps on pf.specification_id = ps.id
+                                and ps.is_removed = 0
+inner join logical_flow lf on pf.logical_flow_id = lf.id
+inner join physical_spec_data_type psdt on ps.id = psdt.specification_id
+inner join data_type dt on psdt.data_type_id = dt.id
+inner join physical_flow pf2 on lf.id = pf2.logical_flow_id
+                                and pf2.is_removed = 0
+                                and pf2.entity_lifecycle_status != 'REMOVED'
+                                and pf2.id != pf.id
+                                and pf.specification_id != pf2.specification_id
+inner join physical_specification ps2 on pf2.specification_id = ps2.id
+                                and ps2.is_removed = 0
+inner join physical_spec_data_type psdt2 on ps2.id = psdt2.specification_id
+inner join data_type dt2 on psdt2.data_type_id = dt2.id
+                                and dt.id = dt2.id
+where pf.is_removed = 0
+and pf.entity_lifecycle_status != 'REMOVED'
+-- and pf.id = 151101
+group by lf.id, pf.id, ps.name, dt.name
+order by lf.id, dt.name
+---
+
+* [x] Add `is_readonly` columns
+* [x] Modify DAOs with `is_readonly`
+* [x] Create service/endpoint to find datatypes not on associated physicals
+* [x] Create service/endpoint for whether this datatype can be removed from the logical flow too
+* [x] Update dataloader jobs with `is_readonly`
+* [x] Update for existing flows that should be read-only
+* [x] Decorators that are read-only should not be editable

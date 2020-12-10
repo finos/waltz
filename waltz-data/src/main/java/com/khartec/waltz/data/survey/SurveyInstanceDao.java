@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.data.survey;
@@ -82,6 +81,8 @@ public class SurveyInstanceDao {
                 .approvedAt(ofNullable(record.getApprovedAt()).map(Timestamp::toLocalDateTime).orElse(null))
                 .approvedBy(record.getApprovedBy())
                 .originalInstanceId(record.getOriginalInstanceId())
+                .ownerId(record.getOwnerId())
+                .owningRole(record.getOwningRole())
                 .build();
     };
 
@@ -139,6 +140,8 @@ public class SurveyInstanceDao {
         record.setEntityId(command.entityReference().id());
         record.setStatus(command.status().name());
         record.setDueDate(command.dueDate().map(Date::valueOf).orElse(null));
+        record.setOwnerId(command.ownerId());
+        record.setOwningRole(command.owningRole());
 
         record.store();
         return record.getId();
@@ -161,6 +164,8 @@ public class SurveyInstanceDao {
                 .map(dt -> Timestamp.valueOf(currentInstance.approvedAt()))
                 .orElse(null));
         record.setApprovedBy(currentInstance.approvedBy());
+        record.setOwnerId(currentInstance.ownerId());
+        record.setOwningRole(currentInstance.owningRole());
 
         record.store();
         return record.getId();
@@ -198,6 +203,14 @@ public class SurveyInstanceDao {
                 .set(SURVEY_INSTANCE.DUE_DATE, toSqlDate(newDueDate))
                 .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
+                .execute();
+    }
+
+
+    public int updateOwningRoleForSurveyRun(long surveyRunId, String role) {
+        return dsl.update(SURVEY_INSTANCE)
+                .set(SURVEY_INSTANCE.OWNING_ROLE, role)
+                .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
                 .execute();
     }
 

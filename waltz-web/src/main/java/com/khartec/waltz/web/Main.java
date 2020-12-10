@@ -3,18 +3,17 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.web;
@@ -22,11 +21,13 @@ package com.khartec.waltz.web;
 import com.khartec.waltz.common.LoggingUtilities;
 import com.khartec.waltz.common.exception.DuplicateKeyException;
 import com.khartec.waltz.common.exception.InsufficientPrivelegeException;
+import com.khartec.waltz.common.exception.NotFoundException;
+import com.khartec.waltz.common.exception.UpdateFailedException;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.settings.SettingsService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.endpoints.api.StaticResourcesEndpoint;
-import com.khartec.waltz.web.endpoints.extracts.BaseDataExtractor;
+import com.khartec.waltz.web.endpoints.extracts.DataExtractor;
 import org.jooq.exception.DataAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,9 @@ import spark.Response;
 import spark.Spark;
 
 import java.util.Map;
+import java.util.TimeZone;
 
+import static com.khartec.waltz.common.DateTimeUtilities.UTC;
 import static com.khartec.waltz.web.WebUtilities.reportException;
 import static spark.Spark.*;
 
@@ -59,6 +62,7 @@ public class Main {
 
 
     private void go() {
+        TimeZone.setDefault(TimeZone.getTimeZone(UTC));
         startHttpServer();
     }
 
@@ -108,7 +112,7 @@ public class Main {
             endpoint.register();
         });
 
-        Map<String, BaseDataExtractor> extractors = ctx.getBeansOfType(BaseDataExtractor.class);
+        Map<String, DataExtractor> extractors = ctx.getBeansOfType(DataExtractor.class);
         extractors.forEach((name, extractor) -> {
             LOG.info("Registering Extractor: {}", name);
             extractor.register();
@@ -127,6 +131,27 @@ public class Main {
 
 
     private void registerExceptionHandlers() {
+
+        exception(NotFoundException.class, (e, req, res) -> {
+            LOG.error(e.getMessage());
+            reportException(
+                    404,
+                    e.getCode(),
+                    e.getMessage(),
+                    res,
+                    LOG);
+        });
+
+        exception(UpdateFailedException.class, (e, req, res) -> {
+            LOG.error(e.getMessage());
+            reportException(
+                    500,
+                    e.getCode(),
+                    e.getMessage(),
+                    res,
+                    LOG);
+        });
+
         exception(WebException.class, (e, req, res) -> {
             LOG.error(e.getMessage());
             reportException(

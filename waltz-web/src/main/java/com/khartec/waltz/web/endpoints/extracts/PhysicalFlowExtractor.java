@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.web.endpoints.extracts;
@@ -34,7 +33,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
+import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.*;
 import static com.khartec.waltz.schema.Tables.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
@@ -44,13 +43,13 @@ import static spark.Spark.post;
 
 
 @Service
-public class PhysicalFlowExtractor extends BaseDataExtractor {
+public class PhysicalFlowExtractor extends DirectQueryBasedDataExtractor {
 
     private final PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory = new PhysicalFlowIdSelectorFactory();
 
-    private static List<Field> RECEIVER_NAME_AND_NAR_FIELDS;
-    private static List<Field> SOURCE_NAME_AND_NAR_FIELDS;
-    private static List<Field> SOURCE_AND_TARGET_NAME_AND_NAR;
+    private static List<Field> RECEIVER_NAME_AND_ASSET_CODE_FIELDS;
+    private static List<Field> SOURCE_NAME_AND_ASSET_CODE_FIELDS;
+    private static List<Field> SOURCE_AND_TARGET_NAME_AND_ASSET_CODE;
 
     static {
         Field<String> SOURCE_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
@@ -64,10 +63,9 @@ public class PhysicalFlowExtractor extends BaseDataExtractor {
                                 .from(APPLICATION)
                                 .where(APPLICATION.ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID)));
 
-        SOURCE_NAME_AND_NAR_FIELDS = ListUtilities.asList(
+        SOURCE_NAME_AND_ASSET_CODE_FIELDS = ListUtilities.asList(
                 SOURCE_NAME_FIELD.as("Source"),
                 sourceAssetCodeField.as("Source Asset Code"));
-
 
         Field<String> TARGET_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
                 LOGICAL_FLOW.TARGET_ENTITY_ID,
@@ -80,12 +78,13 @@ public class PhysicalFlowExtractor extends BaseDataExtractor {
                                 .from(APPLICATION)
                                 .where(APPLICATION.ID.eq(LOGICAL_FLOW.TARGET_ENTITY_ID)));
 
-        RECEIVER_NAME_AND_NAR_FIELDS = ListUtilities.asList(
+        RECEIVER_NAME_AND_ASSET_CODE_FIELDS = ListUtilities.asList(
                 TARGET_NAME_FIELD.as("Receiver"),
                 targetAssetCodeField.as("Receiver Asset Code"));
 
-        SOURCE_AND_TARGET_NAME_AND_NAR = ListUtilities
-                .concat(SOURCE_NAME_AND_NAR_FIELDS, RECEIVER_NAME_AND_NAR_FIELDS);
+        SOURCE_AND_TARGET_NAME_AND_ASSET_CODE = ListUtilities.concat(
+                SOURCE_NAME_AND_ASSET_CODE_FIELDS,
+                RECEIVER_NAME_AND_ASSET_CODE_FIELDS);
     }
 
 
@@ -115,7 +114,7 @@ public class PhysicalFlowExtractor extends BaseDataExtractor {
                     PhysicalFlow.PHYSICAL_FLOW.ID.in(idSelector)
                             .and(physicalFlowIdSelectorFactory.getLifecycleCondition(idSelectionOptions));
             SelectConditionStep<?> qry = getQuery(
-                    SOURCE_AND_TARGET_NAME_AND_NAR,
+                    SOURCE_AND_TARGET_NAME_AND_ASSET_CODE,
                     condition);
             String fileName = String.format("physical-flows-for-%s-%s",
                     idSelectionOptions.entityReference().kind().name().toLowerCase(),
@@ -131,12 +130,14 @@ public class PhysicalFlowExtractor extends BaseDataExtractor {
                 .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(ref.kind().name()));
 
         Condition isSourceCondition = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(ref.id())
-                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(ref.kind().name()))
-                .and(LOGICAL_NOT_REMOVED);
+                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(ref.kind().name()));
 
-        Condition isProduces = isOwnerCondition.or(isSourceCondition);
+        Condition isProduces = isOwnerCondition.or(isSourceCondition)
+                .and(LOGICAL_NOT_REMOVED)
+                .and(PHYSICAL_FLOW_NOT_REMOVED)
+                .and(SPEC_NOT_REMOVED);
 
-        return getQuery(RECEIVER_NAME_AND_NAR_FIELDS, isProduces);
+        return getQuery(RECEIVER_NAME_AND_ASSET_CODE_FIELDS, isProduces);
     }
 
 
@@ -144,17 +145,21 @@ public class PhysicalFlowExtractor extends BaseDataExtractor {
 
         Condition isConsumes = LOGICAL_FLOW.TARGET_ENTITY_ID.eq(ref.id())
                 .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(ref.kind().name()))
-                .and(LOGICAL_NOT_REMOVED);
+                .and(LOGICAL_NOT_REMOVED)
+                .and(PHYSICAL_FLOW_NOT_REMOVED)
+                .and(SPEC_NOT_REMOVED);
 
-        return getQuery(SOURCE_NAME_AND_NAR_FIELDS, isConsumes);
+        return getQuery(SOURCE_NAME_AND_ASSET_CODE_FIELDS, isConsumes);
     }
 
 
     private SelectConditionStep<Record> getQuery(List<Field> senderOrReceiverColumn,
                                                  Condition condition) {
 
-        return dsl.select(PHYSICAL_SPECIFICATION.NAME.as("Name"),
-                PHYSICAL_SPECIFICATION.EXTERNAL_ID.as("External Id"))
+        return dsl
+                .select(
+                        PHYSICAL_SPECIFICATION.NAME.as("Name"),
+                        PHYSICAL_FLOW.EXTERNAL_ID.as("External Id"))
                 .select(senderOrReceiverColumn)
                 .select(
                         PHYSICAL_SPECIFICATION.FORMAT.as("Format"),

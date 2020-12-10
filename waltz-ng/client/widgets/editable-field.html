@@ -3,18 +3,17 @@
   ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
   ~ See README.md for more information
   ~
-  ~ This program is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU Lesser General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
   ~
-  ~ This program is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU Lesser General Public License for more details.
+  ~     http://www.apache.org/licenses/LICENSE-2.0
   ~
-  ~ You should have received a copy of the GNU Lesser General Public License
-  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
   -->
 
 <div class="waltz-visibility-parent">
@@ -52,22 +51,26 @@
         <a ng-click="$ctrl.edit()"
            ng-if="$ctrl.editRole"
            waltz-has-role="{{ $ctrl.editRole }}"
+           style="position: relative; top: -1px"
            class="btn btn-xs waltz-visibility-child-30">
-            <waltz-icon name="pencil"></waltz-icon>
+            <waltz-icon name="pencil">
+            </waltz-icon>
             <span ng-bind="$ctrl.buttonLabel"></span>
         </a>
         <a ng-click="$ctrl.edit()"
            ng-if="! $ctrl.editRole"
-                class="btn btn-xs waltz-visibility-child-30">
-            <waltz-icon name="pencil"></waltz-icon>
+           style="position: relative; top: -1px"
+           class="btn btn-xs waltz-visibility-child-30">
+            <waltz-icon name="pencil">
+            </waltz-icon>
             <span ng-bind="$ctrl.buttonLabel"></span>
         </a>
     </div>
 
     <div ng-if="$ctrl.editing" style="border-radius: 3px; border: 1px solid #eee; background-color: #fafafa; padding: 10px">
 
-        <div ng-if="$ctrl.fieldType === 'text'">
-            <input type="text"
+        <div ng-if="$ctrl.fieldType === 'text' || $ctrl.fieldType === 'number'">
+            <input type="{{ $ctrl.fieldType }}"
                    ng-model="$ctrl.newVal"
                    ng-keydown="$ctrl.onKeyDown($event)"
                    class="form-control input-sm">
@@ -105,11 +108,18 @@
             </waltz-entity-selector>
         </div>
 
+        <!-- DATE -->
         <div ng-if="$ctrl.fieldType === 'date'">
             <waltz-date-picker-form-input place-holder="{{ $ctrl.dateFormat }}"
                                           format="{{ $ctrl.dateFormat }}"
+                                          max-date="$ctrl.maxDate"
                                           model="$ctrl.newVal">
             </waltz-date-picker-form-input>
+        </div>
+
+        <!-- INLINE HELP (common) -->
+        <div class="help-block"
+             ng-transclude="inlineHelp">
         </div>
 
         <div style="margin-top: 4px">

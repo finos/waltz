@@ -1,25 +1,25 @@
 /*
  * Waltz - Enterprise Architecture
- *  Copyright (C) 2016, 2017 Waltz open source project
- *  See README.md for more information
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU Lesser General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  You should have received a copy of the GNU Lesser General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import moment from "moment";
+import {isSurveyTargetKind} from "../../survey-utils";
 
 
 import template from "./survey-instance-list.html";
@@ -33,7 +33,8 @@ const bindings = {
 const initialState = {
     surveys: [],
     visibility: {
-        dataTab: 0
+        dataTab: 0,
+        showSurveySubject: false
     }
 };
 
@@ -69,22 +70,36 @@ function controller($q, serviceBroker) {
 
     vm.$onChanges = () => {
         if (vm.parentEntityRef) {
-            const runsPromise = serviceBroker
-                .loadViewData(
-                    CORE_API.SurveyRunStore.findByEntityReference,
-                    [vm.parentEntityRef],
-                    { force: true })
-                .then(r => r.data);
+            let runsPromise;
+            let instancesPromise;
 
-            const instancesPromise = serviceBroker
-                .loadViewData(
-                    CORE_API.SurveyInstanceStore.findByEntityReference,
-                    [vm.parentEntityRef],
-                    { force: true })
-                .then(r => r.data);
+            if (vm.parentEntityRef.kind === 'PERSON') {
+                runsPromise = serviceBroker.loadViewData(
+                    CORE_API.SurveyRunStore.findForRecipientId,
+                    [vm.parentEntityRef.id],
+                    { force: true });
+
+                instancesPromise = serviceBroker.loadViewData(
+                    CORE_API.SurveyInstanceStore.findForRecipientId,
+                    [vm.parentEntityRef.id],
+                    { force: true });
+            } else {
+                runsPromise = serviceBroker.loadViewData(
+                        CORE_API.SurveyRunStore.findByEntityReference,
+                        [vm.parentEntityRef],
+                        { force: true });
+
+                instancesPromise = serviceBroker.loadViewData(
+                        CORE_API.SurveyInstanceStore.findByEntityReference,
+                        [vm.parentEntityRef],
+                        { force: true });
+            }
+
+            vm.visibility.showSurveySubject = ! isSurveyTargetKind(vm.parentEntityRef.kind);
+
             $q.all([runsPromise, instancesPromise])
-                .then(([runs, instances]) =>
-                    vm.surveys = mkTableData(runs, instances));
+                .then(([runsResult, instancesResult]) =>
+                    vm.surveys = mkTableData(runsResult.data, instancesResult.data));
         }
     };
 

@@ -3,18 +3,17 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.web.endpoints.api;
@@ -26,7 +25,6 @@ import com.khartec.waltz.model.application.AppRegistrationResponse;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.application.AssetCodeRelationshipKind;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.tag.Tag;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
@@ -46,7 +44,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 import static java.lang.Long.parseLong;
@@ -177,11 +174,11 @@ public class ApplicationEndpoint implements Endpoint {
                     .getById(parseLong(id));
         };
 
-        ListRoute<Application> findBySelectorRoute = ((request, response)
-                -> appService.findByAppIdSelector(readIdSelectionOptionsFromBody(request)));
+        ListRoute<Application> findBySelectorRoute = (request, response)
+                -> appService.findByAppIdSelector(readIdSelectionOptionsFromBody(request));
 
-        ListRoute<Application> findByAssetCodeRoute = ((request, response)
-                -> appService.findByAssetCode(request.splat()[0]));
+        ListRoute<Application> findByAssetCodeRoute = (request, response)
+                -> appService.findByAssetCode(request.splat()[0]);
 
 
         getForList(mkPath(BASE_URL, "search", ":query"), searchRoute);

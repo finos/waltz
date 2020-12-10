@@ -1,7 +1,25 @@
+/*!
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
+ */
+
 @import "variables";
 
 $icon-font-path: "../node_modules/bootstrap-sass/assets/fonts/bootstrap/";
- @import "../node_modules/bootstrap-sass/assets/stylesheets/_bootstrap";
+@import "../node_modules/bootstrap-sass/assets/stylesheets/_bootstrap";
 
 
 /* FONT-AWESOME */
@@ -56,4 +74,26 @@ input::-ms-clear {
 /* changes ui-select active row background color */
 .ui-select-bootstrap .ui-select-choices-row.active>span {
     background-color: #e5e5e5;
+    color: #262626;
+}
+
+/* ui-select multiple > ui-select-match fix display issues */
+.ui-select-bootstrap.ui-select-multiple .ui-select-match {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+/* ui-select multiple > ui-select-match overrides */
+.ui-select-bootstrap.ui-select-multiple .ui-select-match.waltz-ui-select-match-multi {
+    .btn {
+        cursor: default;
+    }
+    .btn-primary {
+        color: #333;
+        background-color: #fff;
+        border-color: #ccc;
+    }
+    .btn-primary:hover {
+        background-color: #e6e6e6;
+        border-color: #adadad;
+    }
 }

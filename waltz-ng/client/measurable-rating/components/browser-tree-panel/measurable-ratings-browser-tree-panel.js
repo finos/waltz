@@ -3,24 +3,23 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {mkLinkGridCell} from "../../../common/grid-utils";
-import {mkSelectionOptions} from "../../../common/selector-utils";
+import {mkSelectionOptions, mkSelectionOptionsWithJoiningEntity} from "../../../common/selector-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {indexRatingSchemes} from "../../../ratings/rating-utils";
 
@@ -73,8 +72,8 @@ function prepareColumnDefs(measurableCategory) {
             name: "Rating",
             cellTemplate: `<div class="ui-grid-cell-contents">
                 <waltz-rating-indicator-cell rating="row.entity.rating"
-                                             show-description-popup="true" 
-                                             show-name="true">  
+                                             show-description-popup="true"
+                                             show-name="true">
                 </waltz-rating-indicator-cell></div>`,
             width: "10%"
         },
@@ -141,9 +140,9 @@ function prepareTableData(measurable,
 
 
 function prepareUnmappedTableData(applications = [],
-                                ratings = [],
-                                measurables = [],
-                                categoryId) {
+                                  ratings = [],
+                                  measurables = [],
+                                  categoryId) {
 
     const measurableIdsOfACategory =
         _.chain(measurables)
@@ -222,10 +221,13 @@ function controller($q, serviceBroker) {
     };
 
     const loadBaseData = () => {
-        vm.selector = mkSelectionOptions(vm.parentEntityRef,
+        vm.selector = mkSelectionOptionsWithJoiningEntity(
+            vm.parentEntityRef,
             undefined,
             undefined,
-            vm.filters);
+            vm.filters,
+            "APPLICATION"
+        );
 
         return $q.all([
             loadMeasurableCategories(serviceBroker, vm),
@@ -240,7 +242,8 @@ function controller($q, serviceBroker) {
     const loadRatings = () => {
         clearDetail();
 
-        vm.selector = mkSelectionOptions(vm.parentEntityRef,
+        vm.selector = mkSelectionOptions(
+            vm.parentEntityRef,
             undefined,
             undefined,
             vm.filters);
@@ -281,8 +284,10 @@ function controller($q, serviceBroker) {
     };
 
     vm.onSelectUnmapped = (categoryId) => {
-        vm.selectedMeasurable = { name: "Unmapped Applications",
-            description: "Display applications which do not have any associated measurable rating for this category."};
+        vm.selectedMeasurable = {
+            name: "Unmapped Applications",
+            description: "Display applications which do not have any associated measurable rating for this category."
+        };
         loadUnmappedApplications(vm.measurables, categoryId);
     };
 
@@ -338,7 +343,7 @@ function controller($q, serviceBroker) {
         vm.onMeasurableCategorySelect(c);
     };
 
-    vm.toggleShow = () => vm.showMore = !vm.showMore
+    vm.toggleShow = () => vm.showMore = !vm.showMore;
 }
 
 

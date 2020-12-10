@@ -3,26 +3,24 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.data.measurable_rating;
 
-import com.khartec.waltz.common.EnumUtilities;
+import com.khartec.waltz.common.exception.NotFoundException;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.application.ApplicationKind;
 import com.khartec.waltz.model.measurable_rating.ImmutableMeasurableRating;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
 import com.khartec.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
@@ -40,7 +38,6 @@ import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -53,6 +50,7 @@ import static com.khartec.waltz.data.SelectorUtilities.mkApplicationConditions;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
+import static java.lang.String.format;
 
 @Repository
 public class MeasurableRatingDao {
@@ -90,6 +88,7 @@ public class MeasurableRatingDao {
                 .measurableId(r.getMeasurableId())
                 .lastUpdatedAt(toLocalDateTime(r.getLastUpdatedAt()))
                 .lastUpdatedBy(r.getLastUpdatedBy())
+                .isReadOnly(r.getIsReadonly())
                 .build();
     };
 
@@ -129,17 +128,49 @@ public class MeasurableRatingDao {
         this.dsl = dsl;
     }
 
-    // --- update
+    // --- save
 
-    public boolean create(SaveMeasurableRatingCommand command) {
+    public Operation save(SaveMeasurableRatingCommand command, boolean ignoreReadOnly) {
         MeasurableRatingRecord record = TO_RECORD_MAPPER.apply(command);
-        return dsl.executeInsert(record) == 1;
-    }
+
+        boolean exists = dsl
+                .fetchExists(DSL
+                    .selectFrom(MEASURABLE_RATING)
+                    .where(MEASURABLE_RATING.MEASURABLE_ID.eq(command.measurableId()))
+                    .and(MEASURABLE_RATING.ENTITY_ID.eq(command.entityReference().id()))
+                    .and(MEASURABLE_RATING.ENTITY_KIND.eq(command.entityReference().kind().name())));
 
 
-    public boolean update(SaveMeasurableRatingCommand command) {
-        MeasurableRatingRecord record = TO_RECORD_MAPPER.apply(command);
-        return dsl.executeUpdate(record) == 1;
+        if (exists) {
+            int updateCount = dsl
+                    .update(MEASURABLE_RATING)
+                    .set(MEASURABLE_RATING.RATING, String.valueOf(command.rating()))
+                    .set(MEASURABLE_RATING.DESCRIPTION, command.description())
+                    .set(MEASURABLE_RATING.LAST_UPDATED_BY, command.lastUpdate().by())
+                    .set(MEASURABLE_RATING.LAST_UPDATED_AT, command.lastUpdate().atTimestamp())
+                    .set(MEASURABLE_RATING.PROVENANCE, command.provenance())
+                    .where(MEASURABLE_RATING.ENTITY_ID.eq(command.entityReference().id()))
+                    .and(MEASURABLE_RATING.ENTITY_KIND.eq(command.entityReference().kind().name()))
+                    .and(MEASURABLE_RATING.MEASURABLE_ID.eq(command.measurableId()))
+                    .and(ignoreReadOnly
+                            ? DSL.trueCondition()
+                            : MEASURABLE_RATING.IS_READONLY.isFalse())
+                    .execute();
+
+            if (updateCount == 0) {
+                throw new NotFoundException(
+                        "MR_SAVE_UPDATE_FAILED",
+                        format("Could find writable associated record to update for rating: %s", command));
+            };
+            return Operation.UPDATE;
+        } else {
+            if (dsl.executeInsert(record) != 1) {
+                throw new NotFoundException(
+                        "MR_SAVE_INSERT_FAILED",
+                        format("Creation of record failed: %s", command));
+            };
+            return Operation.ADD;
+        }
     }
 
 

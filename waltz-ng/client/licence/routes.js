@@ -1,24 +1,24 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017, 2018, 2019  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import LicenceList from "./pages/list/licence-list";
 import LicenceView from "./pages/view/licence-view";
+import {CORE_API} from "../common/services/core-api-utils";
 
 
 const baseState = {
@@ -29,6 +29,13 @@ const viewState = {
     url: "licence/{id:int}",
     views: { "content@": LicenceView.id }
 };
+
+
+const viewByExternalIdBouncerState = {
+    url: "licence/external-id/{externalId}",
+    resolve: { externalIdBouncer }
+};
+
 
 const listState = {
     url: "licence",
@@ -42,7 +49,8 @@ function setup($stateProvider) {
     $stateProvider
         .state("main.licence", baseState)
         .state("main.licence.list", listState)
-        .state("main.licence.view", viewState);
+        .state("main.licence.view", viewState)
+        .state("main.licence.external-id", viewByExternalIdBouncerState);
 }
 
 
@@ -50,3 +58,24 @@ setup.$inject = ["$stateProvider"];
 
 
 export default setup;
+
+
+function externalIdBouncer($state, $stateParams, serviceBroker) {
+    const externalId = $stateParams.externalId;
+    serviceBroker
+        .loadViewData(CORE_API.LicenceStore.getByExternalId, [externalId])
+        .then(r => {
+            const element = r.data;
+            if(element) {
+                $state.go("main.licence.view", {id: element.id});
+            } else {
+                console.log(`Cannot find licence corresponding to external id: ${externalId}`);
+            }
+        });
+}
+
+externalIdBouncer.$inject = [
+    "$state",
+    "$stateParams",
+    "ServiceBroker"
+];

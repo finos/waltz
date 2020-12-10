@@ -3,35 +3,34 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.service.usage_info;
 
-import com.khartec.waltz.common.CollectionUtilities;
-import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
+import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.data_type_usage.DataTypeUsageDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.changelog.ChangeLog;
+import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.data_type_usage.DataTypeUsage;
 import com.khartec.waltz.model.system.SystemChangeSet;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.usage_info.UsageInfo;
 import com.khartec.waltz.model.usage_info.UsageKind;
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
@@ -45,7 +44,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
+import static com.khartec.waltz.common.CollectionUtilities.*;
+import static com.khartec.waltz.common.SetUtilities.fromCollection;
 import static com.khartec.waltz.model.usage_info.UsageInfoUtilities.mkChangeSet;
 import static com.khartec.waltz.schema.tables.Actor.ACTOR;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -54,14 +54,22 @@ import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 public class DataTypeUsageService {
 
     private final DataTypeUsageDao dataTypeUsageDao;
+    private final DataTypeDao dataTypeDao;
     private final ApplicationIdSelectorFactory appIdSelectorFactor = new ApplicationIdSelectorFactory();
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
+    private final ChangeLogService changeLogService;
 
 
     @Autowired
-    public DataTypeUsageService(DataTypeUsageDao dataTypeUsageDao) {
+    public DataTypeUsageService(DataTypeUsageDao dataTypeUsageDao,
+                                DataTypeDao dataTypeDao,
+                                ChangeLogService changeLogService) {
         checkNotNull(dataTypeUsageDao, "dataTypeUsageDao cannot be null");
+        checkNotNull(dataTypeDao, "dataTypeDao cannot be null");
+        checkNotNull(changeLogService, "changeLogService cannot be null");
         this.dataTypeUsageDao = dataTypeUsageDao;
+        this.dataTypeDao = dataTypeDao;
+        this.changeLogService = changeLogService;
     }
 
 
@@ -116,19 +124,22 @@ public class DataTypeUsageService {
     public SystemChangeSet<UsageInfo, UsageKind> save(
             EntityReference entityReference,
             Long dataTypeId,
-            List<UsageInfo> usages) {
+            List<UsageInfo> usages,
+            String userId) {
 
-        Collection<UsageInfo> base = CollectionUtilities.map(
+        Collection<UsageInfo> base = map(
                 dataTypeUsageDao.findForEntityAndDataType(entityReference, dataTypeId),
                 DataTypeUsage::usage);
 
         SystemChangeSet<UsageInfo, UsageKind> changeSet = mkChangeSet(
-                SetUtilities.fromCollection(base),
-                SetUtilities.fromCollection(usages));
+                fromCollection(base),
+                fromCollection(usages));
 
         dataTypeUsageDao.insertUsageInfo(entityReference, dataTypeId, changeSet.inserts());
         dataTypeUsageDao.deleteUsageInfo(entityReference, dataTypeId, changeSet.deletes());
         dataTypeUsageDao.updateUsageInfo(entityReference, dataTypeId, changeSet.updates());
+
+        logChanges(userId, entityReference, dataTypeId, changeSet);
 
         return changeSet;
     }
@@ -177,4 +188,61 @@ public class DataTypeUsageService {
                 .where(ACTOR.ID.in(actorIds));
     }
 
+
+    private void logChanges(String user,
+                            EntityReference ref,
+                            Long dataTypeId,
+                            SystemChangeSet<UsageInfo, UsageKind> changes) {
+        String dataTypeName = dataTypeDao.getById(dataTypeId).name();
+
+        maybe(changes.deletes(), deletes -> logDeletes(user, ref, dataTypeName, deletes));
+        maybe(changes.updates(), updates -> logUpdates(user, ref, dataTypeName, updates));
+        maybe(changes.inserts(), inserts -> logInserts(user, ref, dataTypeName, inserts));
+    }
+
+
+    private void logDeletes(String user,
+                            EntityReference ref,
+                            String dataTypeName,
+                            Collection<UsageKind> deletes) {
+        String message = "Removed usage kind/s: " + deletes + " for data type: " + dataTypeName;
+        logChange(user, ref, message);
+    }
+
+
+    private void logInserts(String user,
+                            EntityReference ref,
+                            String dataTypeName,
+                            Collection<UsageInfo> inserts) {
+        Collection<UsageKind> kinds = map(inserts, UsageInfo::kind);
+        String message = "Added usage kind/s: " + kinds + " for data type: " + dataTypeName;
+        logChange(user, ref, message);
+    }
+
+
+    private void logUpdates(String user,
+                            EntityReference ref,
+                            String dataTypeName,
+                            Collection<UsageInfo> updates) {
+        Collection<UsageKind> kinds = map(updates, UsageInfo::kind);
+        String message = "Updated usage kind/s: " + kinds + " for data type: " + dataTypeName;
+        logChange(user, ref, message);
+    }
+
+
+    private void logChange(String userId,
+                           EntityReference ref,
+                           String message) {
+
+        ChangeLog changeLogEntry = ImmutableChangeLog.builder()
+                .parentReference(ref)
+                .message(message)
+                .severity(Severity.INFORMATION)
+                .userId(userId)
+                .childKind(EntityKind.LOGICAL_DATA_FLOW)
+                .operation(Operation.UPDATE)
+                .build();
+
+        changeLogService.write(changeLogEntry);
+    }
 }

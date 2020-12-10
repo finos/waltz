@@ -1,3 +1,21 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
 <div>
     <waltz-page-header name="Change Log"
                        small="{{ ctrl.entityRef.name }}">
@@ -5,19 +23,20 @@
 
     <waltz-section name="Entries">
 
-        <waltz-section-actions>
-            <button ng-click="ctrl.exportChangeLog()"
-                    class="btn btn-xs btn-primary"
-                    ng-if="ctrl.entries.length > 0">
-                <waltz-icon name="cloud-download"></waltz-icon>
-                Export
-            </button>
-        </waltz-section-actions>
-
         <div ng-if="ctrl.entries.length > 0">
             <waltz-change-log-table entries="ctrl.entries"
                                     on-initialise="ctrl.changeLogTableInitialised">
             </waltz-change-log-table>
+
+            <br>
+
+            <div class="pull-right">
+                <waltz-data-extract-link name="Export"
+                                         styling="link"
+                                         extract="change-log/{{ctrl.entityRef.kind}}/{{ctrl.entityRef.id}}"
+                                         method="POST">
+                </waltz-data-extract-link>
+            </div>
         </div>
 
         <div ng-if="ctrl.entries.length == 0">

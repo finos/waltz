@@ -1,26 +1,25 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {availableRelationshipKinds} from "./related-measurable-editor-utils";
-import {buildHierarchies, doSearch, prepareSearchNodes} from "../../../common/hierarchy-utils";
+import {doSearch, prepareSearchNodes} from "../../../common/hierarchy-utils";
 import {refToString, toEntityRef} from "../../../common/entity-utils";
 
 import template from "./create-related-measurable-editor.html";
@@ -31,7 +30,8 @@ const bindings = {
     parentEntityRef: "<",
     type: "<",
     onCancel: "<",
-    onRefresh: "<"
+    onRefresh: "<",
+    onRemove: "<"
 };
 
 
@@ -48,14 +48,14 @@ const initialState = {
     relationshipKindsKey: "",
     onCancel: () => console.log("wcrme: onCancel - default impl"),
     onRefresh: () => console.log("wcrme: onRefresh - default impl"),
-    treeOptions: {
-        isSelectable: node => node.concrete
-    },
+    onRemove: () => console.log("wcrme: onRemove - default impl"),
     visibility: {
         appGroupSelector: false,
         changeInitiativeSelector: false,
         measurableSelector: false
-    }
+    },
+    checkedItemIds: [],
+    disableNode: n => !n.concrete
 };
 
 
@@ -65,23 +65,43 @@ function readCategoryId(compoundId) {
 }
 
 
-function prepareTree(nodes = []) {
-    return buildHierarchies(nodes, false);
-}
-
-
 function controller(notification, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    const loadRelationships = () => {
+     const setDefaultRelationshipKind = (counterpart) => {
+        serviceBroker
+            .loadViewData(
+                CORE_API.RelationshipKindStore.findRelationshipKindsBetweenEntities,
+                [vm.parentEntityRef, counterpart])
+            .then(r => vm.form.relationshipKind = _.first(_.sortBy(r.data, 'position')).code);
+    };
+
+    const loadRelationships = (autoExpand = false) => {
+
         return serviceBroker
-            .loadViewData(CORE_API.MeasurableRelationshipStore.findByEntityReference, [vm.parentEntityRef], { force: true })
+            .loadViewData(
+                CORE_API.MeasurableRelationshipStore.findByEntityReference,
+                [vm.parentEntityRef],
+                { force: true })
             .then(r => {
                 vm.relationships = r.data;
                 vm.relatedEntityMap = _.chain(r.data)
                     .flatMap((rel) => [rel.a, rel.b])
                     .keyBy(ref => refToString(ref))
                     .value();
+                vm.checkedItemIds = _
+                    .chain(vm.relationships)
+                    .flatMap(rel => {
+                        const ids = [];
+                        if (rel.a.kind === "MEASURABLE") ids.push(rel.a.id);
+                        if (rel.b.kind === "MEASURABLE") ids.push(rel.b.id);
+                        return ids;
+                    })
+                    .uniq()
+                    .value();
+            })
+            .then(() => {
+                if (autoExpand) vm.expandedItemIds = _.clone(vm.checkedItemIds);
             });
     };
 
@@ -91,39 +111,18 @@ function controller(notification, serviceBroker) {
         serviceBroker
             .loadAppData(CORE_API.MeasurableStore.findAll)
             .then(r => {
-                vm.measurables = _.filter(r.data, { categoryId });
+                vm.measurables = _.filter(r.data, m => m.categoryId === categoryId);
+                vm.measurablesById = _.keyBy(vm.measurables, d => d.id);
                 vm.searchNodes = prepareSearchNodes(vm.measurables);
-                vm.nodes = prepareTree(vm.measurables);
-            });
+                vm.nodes = vm.measurables;
+            })
+            .then(() => setDefaultRelationshipKind(_.first(vm.measurables)));
 
-
-        // load existing relationships
-        serviceBroker
-            .loadViewData(
-                CORE_API.MeasurableRelationshipStore.findByEntityReference,
-                [vm.parentEntityRef],
-                { force: true })
-            .then(r => {
-                const usedIds = _
-                    .chain(r.data)
-                    .flatMap(rel => {
-                        const ids = [];
-                        if (rel.a.kind === "MEASURABLE") ids.push(rel.a.id);
-                        if (rel.b.kind === "MEASURABLE") ids.push(rel.b.id);
-                        return ids;
-                    })
-                    .uniq()
-                    .value();
-
-                vm.treeOptions.isSelectable = (node) => {
-                    return node.concrete && ! _.includes(usedIds, node.id);
-                };
-            });
     };
 
 
     vm.$onInit = () => {
-        loadRelationships();
+        loadRelationships(true);
 
         const isMeasurable = _.startsWith(vm.type.id, "MEASURABLE");
 
@@ -176,14 +175,39 @@ function controller(notification, serviceBroker) {
 
     vm.onAppGroupSelection = (appGroup) => {
         vm.form.counterpart = appGroup;
+        setDefaultRelationshipKind(vm.form.counterpart);
     };
 
     vm.onChangeInitiativeSelection = (changeInitiative) => {
         vm.form.counterpart = changeInitiative;
+        setDefaultRelationshipKind(vm.form.counterpart);
     };
 
-    vm.onMeasurableSelection = (node) => {
-        vm.form.counterpart = toEntityRef(node, "MEASURABLE");
+    vm.onItemCheck = (node) => {
+
+        const selected = vm.measurablesById[node];
+        vm.form.counterpart = toEntityRef(selected, "MEASURABLE");
+
+        save(vm.form)
+            .then(loadRelationships)
+            .catch(e => displayError(notification, "Could not save because: ", e));
+    };
+
+    vm.onItemUncheck = (node) => {
+
+        const relationshipToRemove = _.find(vm.relationships, d =>
+            (d.a.id === vm.parentEntityRef.id && d.b.id === node)
+            || (d.a.id === node && d.b.id === vm.parentEntityRef.id));
+
+        vm.onRemove(relationshipToRemove)
+            .then(r => notification.warning("Relationship Removed"))
+            .then(() => {
+                loadRelationships();
+                vm.onRefresh();
+            })
+            .catch(e => {
+                displayError(notification, "Could not remove relationship because: ", e);
+            });
     };
 
     vm.onMeasurableCategorySelection = (category) => {
@@ -199,35 +223,44 @@ function controller(notification, serviceBroker) {
 
     vm.submit = () => {
         if (vm.isFormValid()) {
-            const form = vm.form;
-            const submission = {
-                a: vm.parentEntityRef,
-                b: form.counterpart,
-                relationshipKind: form.relationshipKind,
-                description: form.description
-            };
-
-            save(submission)
-                .then(() => {
-                    notification.success("Relationship saved");
-                    vm.onRefresh();
-                })
-                .catch(e => {
-                    displayError(notification, "Could not save because: ", e);
-                });
+            save(vm.form)
+                .catch(e => displayError(notification, "Could not save because: ", e))
+                .finally(() =>  vm.onCancel());
         }
     };
 
 
     vm.searchTermsChanged = (termStr = "") => {
-        vm.nodes = prepareTree(doSearch(termStr, vm.searchNodes));
+        vm.nodes = doSearch(termStr, vm.searchNodes);
+        vm.expandedItemIds = _.map(vm.nodes,n => n.id);
     };
+
+
+    vm.clearSearch = () => {
+        vm.searchTerms = "";
+        vm.nodes = vm.measurables;
+        vm.expandedItemIds = vm.checkedItemIds;
+    };
+
 
     // -- API ---
 
     const save = d => {
+
+        const form = d;
+
+        const submission = {
+            a: vm.parentEntityRef,
+            b: form.counterpart,
+            relationshipKind: form.relationshipKind,
+            description: form.description
+        };
         return serviceBroker
-            .execute(CORE_API.MeasurableRelationshipStore.create, [d]);
+            .execute(CORE_API.MeasurableRelationshipStore.create, [submission])
+            .then(() => {
+                notification.success("Relationship saved");
+                vm.onRefresh();
+            });
     };
 
 }

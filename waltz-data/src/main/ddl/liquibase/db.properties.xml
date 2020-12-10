@@ -4,38 +4,18 @@
   ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
   ~ See README.md for more information
   ~
-  ~ This program is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU Lesser General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
   ~
-  ~ This program is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU Lesser General Public License for more details.
+  ~     http://www.apache.org/licenses/LICENSE-2.0
   ~
-  ~ You should have received a copy of the GNU Lesser General Public License
-  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
   -->
-
-<!--
-  ~ Waltz - Enterprise Architecture
-  ~ Copyright (C) 2016  Khartec Ltd.
-  ~
-  ~ This program is free software: you can redistribute it and/or modify
-  ~ it under the terms of the GNU General Public License as published by
-  ~ the Free Software Foundation, either version 3 of the License, or
-  ~ (at your option) any later version.
-  ~
-  ~ This program is distributed in the hope that it will be useful,
-  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
-  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  ~ GNU General Public License for more details.
-  ~
-  ~ You should have received a copy of the GNU General Public License
-  ~ along with this program.  If not, see <http://www.gnu.org/licenses/>.
-  -->
-
 
 <databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
@@ -62,8 +42,8 @@
 
     <property name="today.value" value="current_date" dbms="oracle"></property>
     <property name="today.value" value="getutcdate()" dbms="mssql"></property>
-    <property name="today.value" value="curdate" dbms="mysql"></property>
-    <property name="today.value" value="current_data" dbms="postgresql"></property>
+    <property name="today.value" value="curdate()" dbms="mysql"></property>
+    <property name="today.value" value="current_date" dbms="postgresql"></property>
 
     <property name="long.type" value="NUMBER(18)" dbms="oracle"></property>
     <property name="long.type" value="BIGINT" dbms="mssql"></property>
@@ -83,6 +63,11 @@
     <property name="longvarchar.type" value="LONGVARCHAR" dbms="mysql"></property>
     <property name="longvarchar.type" value="varchar(4000)" dbms="postgresql"></property>
     <property name="longvarchar.type" value="LONGVARCHAR" dbms="h2"></property>
+
+    <property name="maxvarchar.type" value="nvarchar(max)" dbms="mssql"></property>
+    <property name="maxvarchar.type" value="LONGVARCHAR" dbms="mysql"></property>
+    <property name="maxvarchar.type" value="varchar" dbms="postgresql"></property>
+    <property name="maxvarchar.type" value="LONGVARCHAR" dbms="h2"></property>
 
     <property name="true.value" value="1" dbms="mssql"/>
     <property name="true.value" value="1" dbms="mysql"/>
@@ -116,6 +101,6 @@
     <property name="weight.type" value="${int.type}"></property>
     <property name="url.type" value="VARCHAR(500)"></property>
     <property name="user-agent.type" value="VARCHAR(500)"></property>
-
+    <property name="expression.type" value="VARCHAR(500)"></property>
 
 </databaseChangeLog>

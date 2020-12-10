@@ -1,53 +1,63 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
-import {initialiseData} from "../common";
+import {formats, initialiseData, invokeFunction} from "../common";
 
 import template from "./editable-field.html";
+import moment from "moment";
 
 
 const bindings = {
-    initialVal: "<",
+    initialVal: "<?",
     onSave: "<",  // e.g.: (d, ctx) => console.log(d.newVal, d.oldVal, ctx)
-    fieldType: "@",  // logical-data-element | person | text | textarea | boolean | date | markdown
-    dateFormat: "@",
-    ctx: "<",
+    fieldType: "@",  // logical-data-element | person | text | textarea | boolean | date | markdown | number
+    dateFormat: "@?",
+    ctx: "<?",
     buttonLabel: "@",
     saveLabel: "@?",
     editRole: "@",
-    emptyLabel: "@"
+    emptyLabel: "@?",
+    startInEditMode: "<?",
+    onCancel: "<?",
+    maxDate: "<?",  // only for date fields
+    inlineHelp: "@?"
 };
 
 
 const initialState = {
+    initialVal: null,
+    dateFormat: "yyyy-MM-dd",
+    ctx: null,
     errorMessage: "",
+    emptyLabel: null,
     editing: false,
     saving: false,
     fieldType: "text",
     buttonLabel: "Edit",
     saveLabel:  "Save",
+    startInEditMode: false,
+    onCancel: null,
     onSave: () => console.log("WEF: No on-save method provided")
 };
 
 
 function mkNewVal(initialVal, fieldType) {
     return initialVal && fieldType === "date" ?
-        new Date(initialVal)
+        moment(initialVal, formats.parseDateOnly).toDate()
         : initialVal;
 }
 
@@ -55,8 +65,14 @@ function mkNewVal(initialVal, fieldType) {
 function controller() {
     const vm = initialiseData(this, initialState);
 
-    vm.$onChanges = () => {
-        if (vm.initialVal) {
+    vm.$onInit = () => {
+        if (vm.startInEditMode) {
+            vm.editing = true;
+        }
+    };
+
+    vm.$onChanges = (c) => {
+        if (c.initialVal) {
             vm.newVal = mkNewVal(vm.initialVal, vm.fieldType);
         }
     };
@@ -84,8 +100,9 @@ function controller() {
         const promise = vm.onSave(data, vm.ctx);
 
         if (promise) {
-            promise.then(saveComplete, saveFailed)
-                   .then(() => vm.initialVal = data.newVal);
+            promise
+                .then(saveComplete, saveFailed)
+                .then(() => vm.initialVal = data.newVal);
         } else {
             saveComplete();
         }
@@ -100,6 +117,7 @@ function controller() {
         vm.editing = false;
         vm.saving = false;
         vm.errorMessage = "";
+        invokeFunction(vm.onCancel);
     };
 
     vm.entitySelect = (entity) => {
@@ -121,7 +139,10 @@ controller.$inject = [];
 const component = {
     template,
     bindings,
-    controller
+    controller,
+    transclude: {
+        inlineHelp: "?inlineHelp"
+    }
 };
 
 

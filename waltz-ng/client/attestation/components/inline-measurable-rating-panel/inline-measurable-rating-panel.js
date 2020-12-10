@@ -1,27 +1,25 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017  Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
-import _ from "lodash";
-import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 
 import template from "./inline-measurable-rating-panel.html";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
@@ -42,34 +40,28 @@ const initialState = {
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    const loadData = (force = false) => {
+    const loadData = () => {
+        serviceBroker
+            .loadAppData(CORE_API.MeasurableStore.findAll)
+            .then(r => vm.measurables = _
+                .filter(r.data, d => d.categoryId === vm.measurableCategoryRef.id));
 
-        const ratingsPromise = serviceBroker
-            .loadViewData(CORE_API.MeasurableRatingStore.findForEntityReference, [ vm.parentEntityRef ], { force })
+        serviceBroker
+            .loadViewData(CORE_API.MeasurableRatingStore.findForEntityReference,
+                [vm.parentEntityRef],
+                {force: true})
             .then(r => vm.ratings = r.data);
 
-        const ratingSchemesPromise = serviceBroker
-            .loadAppData(CORE_API.RatingSchemeStore.findAll)
-            .then(r => vm.ratingSchemesById = _.keyBy(r.data, "id"));
-
-        const categoriesPromise = serviceBroker
-            .loadAppData(CORE_API.MeasurableCategoryStore.getById, [vm.measurableCategoryRef.id])
-            .then(r => vm.measurableCategory = r.data);
-
-        const measurablesPromise = serviceBroker
-            .loadViewData(CORE_API.MeasurableStore.findMeasurablesRelatedToPath, [vm.parentEntityRef], { force })
-            .then(r => vm.measurables = _.filter(r.data, m => m.categoryId === vm.measurableCategoryRef.id));
-
-        $q.all([measurablesPromise, ratingSchemesPromise, ratingsPromise, categoriesPromise])
-            .then(() => {
-                vm.ratingScheme = vm.ratingSchemesById[vm.measurableCategory.ratingSchemeId];
-                console.log("got data: ", {parentRef: vm.parentEntityRef, cat: vm.measurableCategory, vm} );
-            });
+        serviceBroker.loadViewData(CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
+            [vm.parentEntityRef, vm.measurableCategoryRef.id])
+            .then(r => vm.ratingSchemeItems = r.data);
     };
 
-    vm.$onInit = () => loadData();
 
     vm.$onChanges = (changes) => {
+        if(vm.parentEntityRef && vm.measurableCategoryRef){
+            loadData();
+        }
     };
 }
 

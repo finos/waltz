@@ -1,11 +1,29 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
 <div>
 
     <div class="row"
-         ng-if="$ctrl.filteredFlows.length > 0">
+         ng-if="$ctrl.flowsByDirection.ALL">
         <div class="col-md-12">
             <strong>
                 <span ng-bind="$ctrl.header"></span>
-                (<span ng-bind="$ctrl.filteredFlows.length"></span>)
+                (<span ng-bind="$ctrl.gridData.length"></span>)
             </strong>
 
             <div class="btn-group pull-right"
@@ -13,6 +31,7 @@
                 <button type="button"
                         class="btn btn-default"
                         uib-btn-radio="'ALL'"
+                        ng-disabled="$ctrl.flowsByDirection.ALL.length === 0"
                         ng-model="$ctrl.selectedFilter"
                         ng-click="$ctrl.changeFilter('ALL')">
                     All
@@ -20,34 +39,36 @@
                 <button
                     type="button"
                     class="btn btn-default"
-                    uib-btn-radio="'PRODUCES'"
+                    uib-btn-radio="'CONSUMES'"
+                    ng-disabled="$ctrl.flowsByDirection.DOWNSTREAM.length === 0"
                     ng-model="$ctrl.selectedFilter"
-                    ng-click="$ctrl.changeFilter('PRODUCES')">
-                    Produces
+                    ng-click="$ctrl.changeFilter('CONSUMES')">
+                    Consumes
                 </button>
                 <button
                     type="button"
                     class="btn btn-default"
-                    uib-btn-radio="'CONSUMES'"
+                    uib-btn-radio="'PRODUCES'"
+                    ng-disabled="$ctrl.flowsByDirection.UPSTREAM.length === 0"
                     ng-model="$ctrl.selectedFilter"
-                    ng-click="$ctrl.changeFilter('CONSUMES')">
-                    Consumes
+                    ng-click="$ctrl.changeFilter('PRODUCES')">
+                    Produces
                 </button>
             </div>
 
             <br><br>
 
             <waltz-grid-with-search column-defs="$ctrl.columnDefs"
-                                    entries="$ctrl.filteredFlows"
-                                    search-control-min-rows="0"
-                                    class="small">
+                                     entries="$ctrl.gridData"
+                                     search-control-min-rows="0"
+                                     class="small">
             </waltz-grid-with-search>
             <hr>
         </div>
     </div>
 
 
-    <waltz-no-data ng-if="$ctrl.produces.length == 0 && $ctrl.consumes.length == 0">
+    <waltz-no-data ng-if="$ctrl.flowsByDirection.ALL.length == 0">
         <message>
             <strong>No Physical Flow</strong> detail available for this
             <span ng-bind="$ctrl.primaryRef.kind | toDisplayName:'entity'">

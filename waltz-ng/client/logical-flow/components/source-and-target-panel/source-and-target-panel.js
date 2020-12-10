@@ -3,28 +3,34 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 import _ from "lodash";
-import { event } from "d3-selection";
-import { initialiseData } from "../../../common";
-import { downloadTextFile } from "../../../common/file-utils";
-import { CORE_API } from "../../../common/services/core-api-utils";
-import { mkTweakers } from "../source-and-target-graph/source-and-target-utilities";
+import {event} from "d3-selection";
+import {initialiseData} from "../../../common";
+import {downloadTextFile} from "../../../common/file-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkTweakers} from "../source-and-target-graph/source-and-target-utilities";
+import {
+    filterUtils,
+    getSelectedTagsFromPreferences,
+    maybeAddUntaggedFlowsTag,
+    saveTagFilterPreferences
+} from "../../logical-flow-utils";
 
 import template from "./source-and-target-panel.html";
 import {sameRef} from "../../../common/entity-utils";
+import {appLogicalFlowFilterExcludedTagIdsKey} from "../../../user/services/user-preference-service";
 
 
 const bindings = {
@@ -33,17 +39,63 @@ const bindings = {
     logicalFlows: "<",
     decorators: "<",
     physicalFlows: "<",
-    physicalSpecifications: "<"
+    physicalSpecifications: "<",
+    tags: "<"
+};
+
+
+const defaultFilterOptions = {
+    typeIds: filterUtils.defaultOptions.typeIds,
+    nodeInfo: "ALL", // {position, entity}
+    selectedTags: filterUtils.defaultOptions.selectedTags
 };
 
 
 const initialState = {
     filteredFlowData: {
-        filterApplied: false,
         flows: [],
         decorators: []
-    }
+    },
+    filterOptions: defaultFilterOptions,
+    filterFlags: {
+        typeFilterApplied: false,
+        nodeFilterApplied: false,
+        tagFilterApplied: false
+    },
+    tags: []
 };
+
+
+function mkNodeFilterFn(nodeInfo) {
+    return f => nodeInfo === "ALL" || sameRef(f[nodeInfo.position], nodeInfo.entity);
+}
+
+
+function buildFlowFilter(filterOptions = defaultFilterOptions,
+                         allFlows = [],
+                         flowDecorators = [],
+                         allTags = []) {
+
+    const typeFilterFn = filterUtils.mkTypeFilterFn(flowDecorators);
+    const nodeFilterFn = mkNodeFilterFn(filterOptions.nodeInfo);
+    const tagFilterFn = filterUtils.mkTagFilterFn(filterOptions.selectedTags, allTags, allFlows);
+    return f => typeFilterFn(f) && nodeFilterFn(f) && tagFilterFn(f);
+}
+
+
+function calculateFlowData(allFlows = [],
+                           allDecorators = [],
+                           allTags = [],
+                           filterOptions = defaultFilterOptions) {
+    // note order is important.  We need to find decorators first
+    const decoratorFilterFn = filterUtils.buildDecoratorFilter(filterOptions.typeIds);
+    const decorators = _.filter(allDecorators, decoratorFilterFn);
+
+    const flowFilterFn = buildFlowFilter(filterOptions, allFlows, decorators, allTags);
+    const flows = _.filter(allFlows, flowFilterFn);
+
+    return {flows, decorators};
+}
 
 
 function calcPhysicalFlows(physicalFlows = [], specifications = [], logicalFlowId) {
@@ -53,27 +105,6 @@ function calcPhysicalFlows(physicalFlows = [], specifications = [], logicalFlowI
         .filter(pf => pf.logicalFlowId === logicalFlowId)
         .map(pf => Object.assign({}, pf, { specification: specsById[pf.specificationId] }))
         .value();
-}
-
-
-function filterByType(typeId, flows = [], decorators = []) {
-    if (typeId === 0) {
-        return {
-            selectedTypeId: 0,
-            decorators,
-            flows
-        };
-    }
-
-    const ds = _.filter(decorators, d => d.decoratorEntity.id === typeId);
-    const dataFlowIds = _.map(ds, "dataFlowId");
-    const fs = _.filter(flows, f => _.includes(dataFlowIds, f.id));
-
-    return {
-        filterApplied: true,
-        decorators: ds,
-        flows: fs
-    };
 }
 
 
@@ -89,6 +120,23 @@ function mkTypeInfo(decorators = [], dataTypes) {
                 name: _.get(dataTypes, x.decoratorEntity.id).name
             };
         }))
+        .value();
+}
+
+// flowId -> [ {id (tagId), name }... ]
+function mkTagInfo(tags = []) {
+    return _.chain(tags)
+        .flatMap(t => {
+            return _.map(t.tagUsages, tu => ({
+                flowId: tu.entityReference.id,
+                tag: {
+                    id: t.id,
+                    name: t.name
+                }
+            }));
+        })
+        .groupBy(ft => ft.flowId)
+        .mapValues(xs => _.map(xs, x => ({ id: x.tag.id, name: x.tag.name })))
         .value();
 }
 
@@ -123,40 +171,50 @@ function scrollIntoView(element, $window) {
 }
 
 
-function controller($element, $timeout, $window, displayNameService, serviceBroker) {
+function controller($element,
+                    $timeout,
+                    $window,
+                    displayNameService,
+                    userPreferenceService,
+                    serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     function applyFilter(fn) {
         $timeout(fn)
             .then(filteredData => {
                 vm.filteredFlowData = filteredData;
-                scrollIntoView($element[0], $window);
             });
     }
 
-    function resetFilter() {
-        return {
-            filterApplied: false,
-            flows: vm.logicalFlows,
-            decorators: vm.decorators
-        };
-    }
+    const filterChanged = (filterOptions = vm.filterOptions) => {
+        vm.filterOptions = filterOptions;
 
-    /**
-     * @param position 'source' or 'target'
-     * @param node  the node to test against either the source or target
-     * @returns {{decorators: *, flows: Array, filterApplied: boolean}}
-     */
-    function filterByNode(position, node) {
-        return {
-            filterApplied: true,
-            decorators: vm.decorators,
-            flows: _.filter(vm.logicalFlows, f => sameRef(f[position], node))
-        };
-    }
+        applyFilter(() => calculateFlowData(
+            vm.logicalFlows,
+            vm.decorators,
+            vm.tags,
+            vm.filterOptions));
 
+        vm.filterFlags = {
+            typeFilterApplied: vm.filterOptions.typeIds !== defaultFilterOptions.typeIds,
+            nodeFilterApplied: vm.filterOptions.nodeInfo !== defaultFilterOptions.nodeInfo,
+            tagFilterApplied: !_.isEmpty(vm.filterOptions.selectedTags) && !_.isEmpty(vm.tags)
+                                && vm.filterOptions.selectedTags.length !== vm.tags.length
+        }
+    };
 
-    vm.showAll = () => vm.filteredFlowData = resetFilter();
+    const resetTypeFilter = () => {
+        if (vm.filterFlags.typeFilterApplied) {
+            vm.filterOptions.typeIds = defaultFilterOptions.typeIds;
+            filterChanged();
+        }
+    };
+
+    vm.resetNodeAndTypeFilter = () => {
+        vm.filterOptions.nodeInfo = defaultFilterOptions.nodeInfo;
+        vm.filterOptions.typeIds = defaultFilterOptions.typeIds;
+        filterChanged();
+    };
 
     vm.$onInit = () => {
         serviceBroker.loadViewData(CORE_API.DataTypeStore.findAll)
@@ -165,7 +223,22 @@ function controller($element, $timeout, $window, displayNameService, serviceBrok
 
     vm.$onChanges = (changes) => {
 
-        if (changes.logicalFlows || changes.decorators) vm.filteredFlowData = vm.showAll();
+        if (changes.logicalFlows || changes.decorators) {
+            vm.resetNodeAndTypeFilter();
+        }
+
+        if (!_.isEmpty(vm.tags)) {
+            vm.tags = maybeAddUntaggedFlowsTag(vm.tags);
+
+            getSelectedTagsFromPreferences(
+                vm.tags,
+                appLogicalFlowFilterExcludedTagIdsKey,
+                userPreferenceService)
+                .then(selectedTags => {
+                    vm.filterOptions.selectedTags = selectedTags;
+                    filterChanged();
+                });
+        }
 
         const keyedLogicalFlows = calculateSourceAndTargetFlowsByEntity(
             vm.entityRef,
@@ -182,6 +255,8 @@ function controller($element, $timeout, $window, displayNameService, serviceBrok
                 .filter(cu => cu.subjectEntity.kind = "PHYSICAL_FLOW")
                 .keyBy(cu => cu.subjectEntity.id)
                 .value();
+            const tagInfoByFlowId = mkTagInfo(vm.tags);
+            const tags = tagInfoByFlowId[logicalFlowId] || [];
 
             return {
                 type,
@@ -191,6 +266,7 @@ function controller($element, $timeout, $window, displayNameService, serviceBrok
                 logicalFlowId,
                 logicalFlow,
                 changeUnitsByPhysicalFlowId,
+                tags,
                 y: evt.layerY
             };
         }
@@ -211,18 +287,15 @@ function controller($element, $timeout, $window, displayNameService, serviceBrok
             type: {
                 onSelect: d => {
                     event.stopPropagation();
-                    applyFilter(() => filterByType(
-                            d.id,
-                            vm.logicalFlows,
-                            vm.decorators));
+                    vm.filterOptions.typeIds = [d.id];
+                    filterChanged();
+                    scrollIntoView($element[0], $window);
                 }
             },
             typeBlock: {
                 onSelect: () => {
                     event.stopPropagation();
-                    if (vm.filteredFlowData.filterApplied) {
-                        applyFilter(resetFilter);
-                    }
+                    resetTypeFilter();
                 }
             }
         };
@@ -235,9 +308,30 @@ function controller($element, $timeout, $window, displayNameService, serviceBrok
     };
 
     vm.focusOnEntity = (selected) => {
-        applyFilter(() => filterByNode(
-            selected.type,
-            selected.entity));
+        vm.filterOptions.nodeInfo = {
+            position: selected.type,
+            entity: selected.entity
+        };
+        filterChanged();
+    };
+
+    vm.onTagsChange = () => {
+        filterChanged();
+        saveTagFilterPreferences(
+            vm.tags,
+            vm.filterOptions.selectedTags,
+            appLogicalFlowFilterExcludedTagIdsKey,
+            userPreferenceService);
+    };
+
+    vm.showAllTags = () => {
+        vm.filterOptions.selectedTags = vm.tags;
+        filterChanged();
+        saveTagFilterPreferences(
+            vm.tags,
+            vm.filterOptions.selectedTags,
+            appLogicalFlowFilterExcludedTagIdsKey,
+            userPreferenceService);
     };
 
     vm.exportLogicalFlowData = () => {
@@ -246,7 +340,8 @@ function controller($element, $timeout, $window, displayNameService, serviceBrok
             "Source code",
             "Target",
             "Target code",
-            "Data Types"
+            "Data Types",
+            "Tags"
         ];
 
         const dataTypesByFlowId = _
@@ -262,6 +357,16 @@ function controller($element, $timeout, $window, displayNameService, serviceBrok
             return _.chain(dts)
                 .map(dt => dt.code)
                 .map(code => displayNameService.lookup("dataType", code))
+                .value()
+                .join("; ");
+        };
+
+        const tagsByFlowId = mkTagInfo(vm.tags);
+        const calcTags = (fId) => {
+            const tags = tagsByFlowId[fId] || [];
+
+            return _.chain(tags)
+                .map(t => t.name)
                 .value()
                 .join("; ");
         };
@@ -292,7 +397,8 @@ function controller($element, $timeout, $window, displayNameService, serviceBrok
                         resolveCode(f.source),
                         f.target.name,
                         resolveCode(f.target),
-                        calcDataTypes(f.id)
+                        calcDataTypes(f.id),
+                        calcTags(f.id)
                     ]
                 });
 
@@ -311,6 +417,7 @@ controller.$inject = [
     "$timeout",
     "$window",
     "DisplayNameService",
+    "UserPreferenceService",
     "ServiceBroker"
 ];
 

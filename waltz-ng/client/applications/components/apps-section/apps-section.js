@@ -3,25 +3,24 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import _ from "lodash";
-import { initialiseData } from "../../../common";
-import { mkSelectionOptions } from "../../../common/selector-utils";
-import { CORE_API } from "../../../common/services/core-api-utils";
-import { entityLifecycleStatus } from "../../../common/services/enums/entity-lifecycle-status";
+import {initialiseData} from "../../../common";
+import {mkSelectionOptions} from "../../../common/selector-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 
 import template from "./apps-section.html";
 
@@ -35,6 +34,10 @@ const bindings = {
 const initialState = {
     apps: [],
     endUserApps: [],
+    combinedCount: 0,
+    visibility:{
+        tab: "SUMMARY"
+    }
 };
 
 
@@ -50,36 +53,35 @@ function combine(apps = [], endUserApps = []) {
 }
 
 
-function controller($scope,
-                    serviceBroker) {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const refresh = () => {
-        vm.combinedApps = combine(vm.apps, vm.endUserApps);
+        vm.combinedCount = _.size(vm.apps) + _.size(vm.endUserApps);
     };
 
     const loadAll = () => {
-        const selectorOptions = mkSelectionOptions(
+        vm.selectorOptions = mkSelectionOptions(
             vm.parentEntityRef,
             undefined,
             [entityLifecycleStatus.ACTIVE.key],
             vm.filters);
 
         serviceBroker
-            .loadViewData(CORE_API.ApplicationStore.findBySelector, [selectorOptions])
+            .loadViewData(CORE_API.ApplicationStore.findBySelector, [vm.selectorOptions])
             .then(r => r.data)
             .then(apps => vm.apps = _.map(
                 apps,
-                a => _.assign(a, { management: "IT" })))
+                a => Object.assign({}, a, {management: "IT"})))
             .then(refresh);
 
         if (vm.parentEntityRef.kind === "ORG_UNIT") {
             serviceBroker
-                .loadViewData(CORE_API.EndUserAppStore.findBySelector, [selectorOptions])
+                .loadViewData(CORE_API.EndUserAppStore.findBySelector, [vm.selectorOptions])
                 .then(r => r.data)
                 .then(endUserApps => vm.endUserApps = _.map(
                     endUserApps,
-                    a => _.assign(a, { platform: a.applicationKind }, DEFAULT_APP_SETTINGS)))
+                    a => Object.assign({}, a, DEFAULT_APP_SETTINGS, { platform: a.applicationKind })))
                 .then(refresh);
         }
     };
@@ -90,21 +92,21 @@ function controller($scope,
     };
 
     vm.$onChanges = (changes) => {
-        vm.combinedApps = combine(vm.apps, vm.endUserApps);
-
         if(changes.filters) {
             loadAll();
         }
     };
 
-    vm.onInitialise = (cfg) => {
-        vm.export = () => cfg.exportFn("apps.csv");
+    vm.onTabSelect = (tabName) => {
+        vm.visibility.tab = tabName;
+        if (tabName === "DETAIL") {
+            vm.combinedApps = combine(vm.apps, vm.endUserApps);
+        }
     };
 }
 
 
 controller.$inject = [
-    "$scope",
     "ServiceBroker"
 ];
 

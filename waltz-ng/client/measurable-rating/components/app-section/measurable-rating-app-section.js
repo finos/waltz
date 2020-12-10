@@ -1,27 +1,26 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 
 import template from "./measurable-rating-app-section.html";
-import {determineStartingTab, mkTabs} from "../../measurable-rating-utils";
+import {determineStartingTab, loadAllData, mkTabs} from "../../measurable-rating-utils";
 
 
 /**
@@ -56,66 +55,20 @@ const initialState = {
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    function loadAllocations() {
-        const allocationsPromise = serviceBroker
-            .loadViewData(
-                CORE_API.AllocationStore.findByEntity,
-                [vm.parentEntityRef],
-                { force: true})
-            .then(r => vm.allocations = r.data);
-
-        allocationsPromise
-            .then(() => vm.allocationTotalsByScheme = _
-                .chain(vm.allocations)
-                .groupBy(d => d.schemeId)
-                .mapValues(xs => _.sumBy(xs, x => x.percentage))
-                .value());
-    }
-
     const loadData = (force = false) => {
-        serviceBroker
-            .loadViewData(
-                CORE_API.RoadmapStore.findRoadmapsAndScenariosByRatedEntity,
-                [ vm.parentEntityRef ])
-            .then(r => vm.roadmapReferences = r.data);
-
-        const ratingsPromise = serviceBroker
-            .loadViewData(CORE_API.MeasurableRatingStore.findForEntityReference, [ vm.parentEntityRef ], { force })
-            .then(r => vm.ratings = r.data);
-
-        const ratingSchemesPromise = serviceBroker
-            .loadAppData(CORE_API.RatingSchemeStore.findAll)
-            .then(r => vm.ratingSchemesById = _.keyBy(r.data, "id"));
-
-        const categoriesPromise = serviceBroker
-            .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
-            .then(r => vm.categories = r.data);
-
-        const measurablesPromise = serviceBroker
-            .loadViewData(CORE_API.MeasurableStore.findMeasurablesRelatedToPath, [vm.parentEntityRef], { force })
-            .then(r => vm.measurables = r.data);
-
-        const allocationSchemesPromise = serviceBroker
-            .loadViewData(CORE_API.AllocationSchemeStore.findAll)
-            .then(r => vm.allocationSchemes = r.data);
-
-        loadAllocations();
-
-        $q.all([measurablesPromise, ratingSchemesPromise, ratingsPromise, categoriesPromise, allocationSchemesPromise])
-            .then(() => {
-                vm.tabs = mkTabs(
-                    vm.categories,
-                    vm.ratingSchemesById,
-                    vm.measurables,
-                    vm.ratings,
-                    vm.allocationSchemes,
-                    false /*include empty */);
+        return loadAllData($q, serviceBroker, vm.parentEntityRef, false, force)
+            .then((r) => {
+                Object.assign(vm, r);
+                vm.tabs = mkTabs(vm, false);
                 const firstNonEmptyTab = determineStartingTab(vm.tabs);
                 vm.visibility.tab = firstNonEmptyTab ? firstNonEmptyTab.category.id : null;
+                vm.onTabChange(firstNonEmptyTab);
             });
     };
 
-    vm.$onInit = () => loadData();
+    vm.$onInit = () => loadData()
+        .then(() => serviceBroker.loadViewData(CORE_API.ApplicationStore.getById, [vm.parentEntityRef.id])
+            .then(r => vm.application = r.data));
 
 
     // -- INTERACT ---
@@ -127,9 +80,8 @@ function controller($q, serviceBroker) {
             hideAllocationScheme();
         } else {
             vm.activeAllocationScheme = scheme;
+            vm.activeTab = _.find(vm.tabs, tab => tab.category.id === vm.activeAllocationScheme.measurableCategoryId);
         }
-
-        vm.activeTab = _.find(vm.tabs, tab => tab.category.id === vm.activeAllocationScheme.measurableCategoryId);
     };
 
     vm.onDismissAllocations = () => hideAllocationScheme();
@@ -139,7 +91,14 @@ function controller($q, serviceBroker) {
             .execute(
                 CORE_API.AllocationStore.updateAllocations,
                 [vm.parentEntityRef, vm.activeAllocationScheme.id, changes])
-            .then(r => { loadAllocations(); return r; });
+            .then(r => {
+                loadAllData($q, serviceBroker, vm.parentEntityRef, false, true)
+                    .then(r => {
+                        Object.assign(vm, r);
+                        mkTabs(vm);
+                    });
+                return r.data;
+            });
     };
 
     vm.onViewRatings = () => {
@@ -154,6 +113,12 @@ function controller($q, serviceBroker) {
 
     vm.onTabChange = (tab) => {
         hideAllocationScheme();
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
+                [vm.parentEntityRef, tab.category.id])
+            .then(r => tab.ratingSchemeItems = r.data)
     };
 
 }

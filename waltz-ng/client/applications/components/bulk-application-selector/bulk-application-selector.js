@@ -1,27 +1,26 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import _ from "lodash";
-import { CORE_API } from "../../../common/services/core-api-utils";
-import { initialiseData } from "../../../common";
-import { invokeFunction } from "../../../common/index";
-import { sameRef, toEntityRef } from '../../../common/entity-utils';
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {initialiseData} from "../../../common";
+import {invokeFunction} from "../../../common/index";
+import {sameRef, toEntityRef} from '../../../common/entity-utils';
 
 import template from "./bulk-application-selector.html";
 
@@ -123,25 +122,28 @@ function controller(serviceBroker) {
 
         return searchRefs(identifiers)
             .then(results => {
-                vm.searchResults = results
+                vm.searchResults = results;
                 vm.filteredSearchResults = filterResults();
                 vm.visibility.loading = false;
                 vm.searchSummary = mkSummary(vm.searchResults);
 
-                const resultsById = _.keyBy(results, 'entityRef.id');
+                const resultsById = _.keyBy(results, "entityRef.id");
                 vm.removedResults = _.chain(vm.existingRefs)
                     .filter(r => !resultsById[r.id])
-                    .map(entityRef => ({entityRef, action: 'REMOVE'}))
+                    .map(entityRef => ({entityRef, action: "REMOVE"}))
                     .value();
             });
     };
 
     vm.save = () => {
-        let selectionResults = _.filter(vm.searchResults, r => r.action === 'ADD');
+        vm.selectionResults = _.filter(vm.searchResults, r => r.action !== "NO_CHANGE");
         if(vm.mode === MODES.REPLACE) {
-            selectionResults = _.concat(selectionResults, vm.removedResults);
+            vm.selectionResults = _.concat(vm.selectionResults, vm.removedResults);
         }
-        invokeFunction(vm.onSave, selectionResults);
+
+        if (!vm.searchSummary.notFound || confirm(`There are {${vm.searchSummary.notFound}} unresolved applications, do you want to proceed?`)){
+            invokeFunction(vm.onSave, vm.selectionResults);
+        }
     };
 
     vm.toggleNotFound = () => {

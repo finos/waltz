@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.data.logical_flow;
@@ -47,6 +46,8 @@ import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.model.EntityLifecycleStatus.ACTIVE;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
+import static com.khartec.waltz.schema.Tables.PHYSICAL_FLOW;
+import static com.khartec.waltz.schema.Tables.PHYSICAL_SPECIFICATION;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.Optional.ofNullable;
@@ -92,6 +93,7 @@ public class LogicalFlowDao {
                 .lastAttestedAt(Optional.ofNullable(record.getLastAttestedAt()).map(ts -> ts.toLocalDateTime()))
                 .created(UserTimestamp.mkForUser(record.getCreatedBy(), record.getCreatedAt()))
                 .provenance(record.getProvenance())
+                .isReadOnly(record.getIsReadonly())
                 .build();
     };
 
@@ -110,6 +112,7 @@ public class LogicalFlowDao {
         record.setEntityLifecycleStatus(flow.entityLifecycleStatus().name());
         record.setCreatedAt(flow.created().map(c -> c.atTimestamp()).orElse(Timestamp.valueOf(flow.lastUpdatedAt())));
         record.setCreatedBy(flow.created().map(c -> c.by()).orElse(flow.lastUpdatedBy()));
+        record.setIsReadonly(flow.isReadOnly());
         return record;
     };
 
@@ -117,6 +120,10 @@ public class LogicalFlowDao {
     public static final Condition LOGICAL_NOT_REMOVED = LOGICAL_FLOW.IS_REMOVED.isFalse()
             .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name()));
 
+    public static final Condition PHYSICAL_FLOW_NOT_REMOVED = PHYSICAL_FLOW.IS_REMOVED.isFalse()
+            .and(PHYSICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name()));
+
+    public static final Condition SPEC_NOT_REMOVED = PHYSICAL_SPECIFICATION.IS_REMOVED.isFalse();
 
     private final DSLContext dsl;
 
@@ -214,7 +221,8 @@ public class LogicalFlowDao {
                 .stream()
                 .map(t -> isSourceCondition(t.source())
                         .and(isTargetCondition(t.target()))
-                        .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.eq(REMOVED.name())))
+                        .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.eq(REMOVED.name())
+                                .or(LOGICAL_FLOW.IS_REMOVED)))
                 .reduce((a, b) -> a.or(b))
                 .get();
 
@@ -413,8 +421,7 @@ public class LogicalFlowDao {
         Condition condition = flows
                 .stream()
                 .map(t -> isSourceCondition(t.source())
-                        .and(isTargetCondition(t.target()))
-                        .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.eq(REMOVED.name())))
+                        .and(isTargetCondition(t.target())))
                 .reduce((a, b) -> a.or(b))
                 .get();
 

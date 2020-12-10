@@ -3,18 +3,17 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.data;
@@ -25,9 +24,11 @@ import com.khartec.waltz.data.change_initiative.ChangeInitiativeIdSelectorFactor
 import com.khartec.waltz.data.change_unit.ChangeUnitIdSelectorFactory;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.flow_diagram.FlowDiagramIdSelectorFactory;
+import com.khartec.waltz.data.licence.LicenceIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
+import com.khartec.waltz.data.physical_specification.PhysicalSpecificationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
@@ -44,10 +45,12 @@ public class GenericSelectorFactory {
     private final ChangeUnitIdSelectorFactory changeUnitIdSelectorFactory = new ChangeUnitIdSelectorFactory();
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
     private final FlowDiagramIdSelectorFactory flowDiagramIdSelectorFactory = new FlowDiagramIdSelectorFactory();
+    private final LicenceIdSelectorFactory licenceIdSelectorFactory = new LicenceIdSelectorFactory();
     private final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
     private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
     private final OrganisationalUnitIdSelectorFactory organisationalUnitIdSelectorFactory = new OrganisationalUnitIdSelectorFactory();
     private final AttestationIdSelectorFactory attestationIdSelectorFactory = new AttestationIdSelectorFactory();
+    private final PhysicalSpecificationIdSelectorFactory specificationIdSelectorFactory = new PhysicalSpecificationIdSelectorFactory();
 
 
     public GenericSelector apply(IdSelectionOptions selectionOptions) {
@@ -108,6 +111,8 @@ public class GenericSelectorFactory {
                 return dataTypeIdSelectorFactory.apply(selectionOptions);
             case FLOW_DIAGRAM:
                 return flowDiagramIdSelectorFactory.apply(selectionOptions);
+            case LICENCE:
+                return licenceIdSelectorFactory.apply(selectionOptions);
             case LOGICAL_DATA_FLOW:
                 return logicalFlowIdSelectorFactory.apply(selectionOptions);
             case MEASURABLE:
@@ -116,6 +121,8 @@ public class GenericSelectorFactory {
                 return organisationalUnitIdSelectorFactory.apply(selectionOptions);
             case ATTESTATION:
                 return attestationIdSelectorFactory.apply(selectionOptions);
+            case PHYSICAL_SPECIFICATION:
+                return specificationIdSelectorFactory.apply(selectionOptions);
             //todo: (KS) Add support for Person
             default:
                 throw new UnsupportedOperationException(String.format("Cannot make generic selector for kind: %s", kind));

@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import {checkIsEntityRef} from "../../common/checks";
@@ -33,6 +32,12 @@ function store($http, baseApiUrl) {
         checkIsEntityRef(ref);
         return $http
             .get(`${base}/entity/${ref.kind}/${ref.id}`)
+            .then(r => r.data);
+    };
+
+    const findForRecipientId = (personId) => {
+        return $http
+            .get(`${base}/recipient/id/${personId}`)
             .then(r => r.data);
     };
 
@@ -63,6 +68,18 @@ function store($http, baseApiUrl) {
     const findResponses = (id) => {
         return $http
             .get(`${base}/${id}/responses`)
+            .then(result => result.data);
+    };
+
+    const findPossibleActions = (id) => {
+        return $http
+            .get(`${base}/${id}/actions`)
+            .then(result => result.data);
+    };
+
+    const getPermissions = (id) => {
+        return $http
+            .get(`${base}/${id}/permissions`)
             .then(result => result.data);
     };
 
@@ -104,18 +121,21 @@ function store($http, baseApiUrl) {
 
     const deleteRecipient = (id, instanceRecipientId) => {
         return $http
-            .delete(`${base}/${id}/recipient/${instanceRecipientId}`,)
+            .delete(`${base}/${id}/recipient/${instanceRecipientId}`)
             .then(result => result.data);
     };
 
     return {
         getById,
+        getPermissions,
         findByEntityReference,
+        findForRecipientId,
         findForUser,
         findForSurveyRun,
         findPreviousVersions,
         findRecipients,
         findResponses,
+        findPossibleActions,
         saveResponse,
         updateStatus,
         updateDueDate,
@@ -147,10 +167,15 @@ export const SurveyInstanceStore_API = {
         serviceFnName: 'findByEntityReference',
         description: 'finds survey instances for a given entity reference'
     },
+    findForRecipientId: {
+        serviceName,
+        serviceFnName: 'findForRecipientId',
+        description: 'finds survey instances for a recipient person id'
+    },
     findForUser: {
         serviceName,
         serviceFnName: 'findForUser',
-        description: 'finds survey instances for a given user id'
+        description: 'finds survey instances for the current logged in user'
     },
     findForSurveyRun: {
         serviceName,
@@ -171,6 +196,16 @@ export const SurveyInstanceStore_API = {
         serviceName,
         serviceFnName: 'findPreviousVersions',
         description: 'finds previouse versions for a given survey instance id'
+    },
+    findPossibleActions: {
+        serviceName,
+        serviceFnName: 'findPossibleActions',
+        description: 'finds all possible action on this survey instance'
+    },
+    getPermissions: {
+        serviceName,
+        serviceFnName: 'getPermissions',
+        description: 'get permissions for this survey instance'
     },
     saveResponse: {
         serviceName,

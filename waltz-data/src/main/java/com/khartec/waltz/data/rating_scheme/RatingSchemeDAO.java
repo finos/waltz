@@ -1,54 +1,64 @@
 /*
  * Waltz - Enterprise Architecture
- *  Copyright (C) 2016, 2017 Waltz open source project
- *  See README.md for more information
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
  *
- *  This program is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU Lesser General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- *  You should have received a copy of the GNU Lesser General Public License
- *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.data.rating_scheme;
 
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.rating.ImmutableRagName;
 import com.khartec.waltz.model.rating.ImmutableRatingScheme;
 import com.khartec.waltz.model.rating.RagName;
 import com.khartec.waltz.model.rating.RatingScheme;
+import com.khartec.waltz.schema.Tables;
+import com.khartec.waltz.schema.tables.RatingSchemeItem;
 import com.khartec.waltz.schema.tables.records.RatingSchemeItemRecord;
 import com.khartec.waltz.schema.tables.records.RatingSchemeRecord;
-import org.jooq.Condition;
-import org.jooq.DSLContext;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.common.StringUtilities.firstChar;
+import static com.khartec.waltz.schema.Tables.ASSESSMENT_DEFINITION;
+import static com.khartec.waltz.schema.Tables.ASSESSMENT_RATING;
+import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
 import static com.khartec.waltz.schema.tables.RatingScheme.RATING_SCHEME;
 import static com.khartec.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM;
 
 @Repository
 public class RatingSchemeDAO {
 
-    private static final RecordMapper<RatingSchemeItemRecord, RagName> TO_ITEM_MAPPER = r ->
-        ImmutableRagName.builder()
+    public static final RatingSchemeItem CONSTRAINING_RATING = Tables.RATING_SCHEME_ITEM.as("constrainingRating");
+
+    public static final Field<Boolean> IS_RESTRICTED_FIELD = DSL.coalesce(
+            DSL.field(Tables.RATING_SCHEME_ITEM.POSITION.lt(CONSTRAINING_RATING.POSITION)), false)
+            .as("isRestricted");
+
+
+    public static final RecordMapper<Record, RagName> TO_ITEM_MAPPER = record -> {
+
+        RatingSchemeItemRecord r = record.into(RATING_SCHEME_ITEM);
+
+        ImmutableRagName.Builder builder = ImmutableRagName.builder()
                 .id(r.getId())
                 .ratingSchemeId(r.getSchemeId())
                 .name(r.getName())
@@ -56,11 +66,17 @@ public class RatingSchemeDAO {
                 .userSelectable(r.getUserSelectable())
                 .color(r.getColor())
                 .position(r.getPosition())
-                .description(r.getDescription())
-                .build();
+                .description(r.getDescription());
+
+        if (record.field(IS_RESTRICTED_FIELD) != null){
+            builder.isRestricted(record.get(IS_RESTRICTED_FIELD));
+        }
+
+        return builder.build();
+    };
 
 
-    private static final RecordMapper<RatingSchemeRecord, RatingScheme> TO_SCHEME_MAPPER = r ->
+    public static final RecordMapper<RatingSchemeRecord, RatingScheme> TO_SCHEME_MAPPER = r ->
         ImmutableRatingScheme.builder()
                 .id(r.getId())
                 .name(r.getName())
@@ -118,10 +134,37 @@ public class RatingSchemeDAO {
 
     public RagName getRagNameById(long id){
         checkNotNull(id, "id cannot be null");
-        return dsl.selectFrom(RATING_SCHEME_ITEM)
+        return dsl
+                .selectFrom(RATING_SCHEME_ITEM)
                 .where(RATING_SCHEME_ITEM.ID.eq(id))
                 .fetchOne(TO_ITEM_MAPPER);
     }
 
 
+    public List<RagName> findRatingSchemeItemsForEntityAndCategory(EntityReference ref, long measurableCategoryId) {
+
+        Condition assessmentDefinitionJoinCondition = ASSESSMENT_DEFINITION.ID.eq(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID)
+                .and(ASSESSMENT_RATING.ENTITY_ID.eq(ref.id())
+                        .and(ASSESSMENT_RATING.ENTITY_KIND.eq(ref.kind().name())));
+
+        return dsl
+                .select(Tables.RATING_SCHEME_ITEM.fields())
+                .select(IS_RESTRICTED_FIELD)
+                .from(Tables.RATING_SCHEME_ITEM)
+                .innerJoin(MEASURABLE_CATEGORY).on(Tables.RATING_SCHEME_ITEM.SCHEME_ID.eq(MEASURABLE_CATEGORY.RATING_SCHEME_ID))
+                .leftJoin(ASSESSMENT_DEFINITION).on(ASSESSMENT_DEFINITION.ID.eq(MEASURABLE_CATEGORY.ASSESSMENT_DEFINITION_ID))
+                .leftJoin(ASSESSMENT_RATING).on(assessmentDefinitionJoinCondition)
+                .leftJoin(CONSTRAINING_RATING).on(CONSTRAINING_RATING.ID.eq(ASSESSMENT_RATING.RATING_ID))
+                .where(MEASURABLE_CATEGORY.ID.eq(measurableCategoryId))
+                .fetch(TO_ITEM_MAPPER);
+    }
+
+
+    public Set<RagName> findRatingSchemeItemsByIds(Set<Long> ids) {
+        checkNotNull(ids, "ids cannot be null");
+        return dsl
+                .selectFrom(RATING_SCHEME_ITEM)
+                .where(RATING_SCHEME_ITEM.ID.in(ids))
+                .fetchSet(TO_ITEM_MAPPER);
+    }
 }

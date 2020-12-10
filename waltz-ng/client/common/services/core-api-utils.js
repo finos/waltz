@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import {ActorStore_API as ActorStore} from "../../actor/services/actor-store";
@@ -33,6 +32,7 @@ import {AuthSourcesStore_API as AuthSourcesStore} from "../../auth-sources/servi
 import {BookmarkStore_API as BookmarkStore} from "../../bookmarks/services/bookmark-store";
 import {ChangeInitiativeStore_API as ChangeInitiativeStore} from "../../change-initiative/services/change-initiative-store";
 import {ChangeLogStore_API as ChangeLogStore} from "../../change-log/services/change-log-store";
+import {ChangeLogSummariesStore_API as ChangeLogSummariesStore} from "../../change-log/services/change-log-summaries-store";
 import {ChangeSetStore_API as ChangeSetStore} from "../../change-set/services/change-set-store";
 import {ChangeUnitStore_API as ChangeUnitStore} from "../../change-unit/services/change-unit-store";
 import {ChangeUnitViewService_API as ChangeUnitViewService} from "../../change-unit/services/change-unit-view-service";
@@ -40,8 +40,8 @@ import {ClientCacheKeyStore_API as ClientCacheKeyStore} from "../../client_cache
 import {ComplexityStore_API as ComplexityStore} from "../../complexity/services/complexity-store";
 import {DatabaseStore_API as DatabaseStore} from "../../databases/services/database-store";
 import {DataTypeStore_API as DataTypeStore} from "../../data-types/services/data-type-store";
+import {DataTypeDecoratorStore_API as DataTypeDecoratorStore} from "../../data-types/services/data-type-decorator-store";
 import {DataTypeUsageStore_API as DataTypeUsageStore} from "../../data-type-usage/services/data-type-usage-store";
-import {DrillGridDefinitionStore_API as DrillGridDefinitionStore} from "../../drill-grid/services/drill-grid-definition-store";
 import {EndUserAppStore_API as EndUserAppStore} from "../../end-user-apps/services/end-user-app-store";
 import {EntityEnumStore_API as EntityEnumStore} from "../../entity-enum/services/entity-enum-store";
 import {EntityNamedNoteStore_API as EntityNamedNoteStore} from "../../entity-named-note/services/entity-named-note-store";
@@ -49,35 +49,41 @@ import {EntityNamedNoteTypeStore_API as EntityNamedNoteTypeStore} from "../../en
 import {EntityRelationshipStore_API as EntityRelationshipStore} from "../../entity-relationship/services/entity-relationship-store";
 import {EntitySearchStore_API as EntitySearchStore} from "../../entity/services/entity-search-store";
 import {EntityStatisticStore_API as EntityStatisticStore} from "../../entity-statistics/services/entity-statistic-store";
-import { TagStore_API as TagStore } from "../../tag/services/tag-store";
+import {TagStore_API as TagStore} from "../../tag/services/tag-store";
 import {EnumValueStore_API as EnumValueStore} from "../../enum-value/services/enum-value-store";
 import {EntitySvgDiagramStore_API as EntitySvgDiagramStore} from "../../entity-svg-diagram/services/entity-svg-diagram-store";
 import {ExternalIdentifierStore_API as ExternalIdentifierStore} from "../../external-identifier/services/external-identifier-store"
 import {FacetStore_API as FacetStore} from "../../facet/services/facet-store";
+import {FavouritesStore_API as FavouritesStore} from "../../app-groups/services/favourites-store";
 import {FlowDiagramStore_API as FlowDiagramStore} from "../../flow-diagram/services/flow-diagram-store";
 import {FlowDiagramAnnotationStore_API as FlowDiagramAnnotationStore} from "../../flow-diagram/services/flow-diagram-annotation-store";
 import {FlowDiagramEntityStore_API as FlowDiagramEntityStore} from "../../flow-diagram/services/flow-diagram-entity-store";
 import {InvolvementStore_API as InvolvementStore} from "../../involvement/services/involvement-store";
 import {InvolvementKindStore_API as InvolvementKindStore} from "../../involvement-kind/services/involvement-kind-store";
+import {InvolvementViewService_API as InvolvementViewService} from "../../involvement/services/involvement-view-service";
 import {LicenceStore_API as LicenceStore} from "../../licence/services/licence-store";
 import {LogicalDataElementStore_API as LogicalDataElementStore} from "../../logical-data-element/services/logical-data-element-store";
 import {LogicalFlowStore_API as LogicalFlowStore} from "../../logical-flow/services/logical-flow-store";
 import {LogicalFlowDecoratorStore_API as LogicalFlowDecoratorStore} from "../../logical-flow-decorator/services/logical-flow-decorator-store";
 import {MeasurableCategoryStore_API as MeasurableCategoryStore} from "../../measurable-category/services/measurable-category-store";
 import {MeasurableRatingStore_API as MeasurableRatingStore} from "../../measurable-rating/services/measurable-rating-store";
+import {MeasurableRatingPlannedDecommissionStore_API as MeasurableRatingPlannedDecommissionStore} from "../../measurable-rating/services/measurable-rating-planned-decommission-store";
+import {MeasurableRatingReplacementStore_API as MeasurableRatingReplacementStore} from "../../measurable-rating/services/measurable-rating-replacement-store";
 import {MeasurableRelationshipStore_API as MeasurableRelationshipStore} from "../../measurable-relationship/services/measurable-relationship-store";
 import {MeasurableStore_API as MeasurableStore} from "../../measurable/services/measurable-store";
 import {NotificationStore_API as NotificationStore} from "../../notification/services/notification-store";
 import {OrgUnitStore_API as OrgUnitStore} from "../../org-units/services/org-unit-store";
 import {PersonStore_API as PersonStore} from "../../person/services/person-store";
+import {PermissionGroupStore_API as PermissionGroupStore} from "../../permission-group/services/permission-group-store";
 import {PhysicalFlowStore_API as PhysicalFlowStore} from "../../physical-flows/services/physical-flow-store";
 import {PhysicalFlowParticipantStore_API as PhysicalFlowParticipantStore} from "../../physical-flows/services/physical-flow-participant-store";
-import {PhysicalSpecDataTypeStore_API as PhysicalSpecDataTypeStore} from "../../physical-specifications/services/physical-spec-data-type-store";
 import {PhysicalSpecDefinitionFieldStore_API as PhysicalSpecDefinitionFieldStore} from "../../physical-specifications/services/physical-spec-definition-field-store";
 import {PhysicalSpecDefinitionStore_API as PhysicalSpecDefinitionStore} from "../../physical-specifications/services/physical-spec-definition-store";
 import {PhysicalSpecDefinitionSampleFileStore_API as PhysicalSpecDefinitionSampleFileStore} from "../../physical-specifications/services/physical-spec-definition-sample-file-store";
 import {PhysicalSpecificationStore_API as PhysicalSpecificationStore} from "../../physical-specifications/services/physical-specification-store";
 import {RatingSchemeStore_API as RatingSchemeStore} from "../../ratings/services/rating-scheme-store";
+import {RelationshipKindStore_API as RelationshipKindStore} from "../../entity-relationship/services/relationship-kind-store";
+import {ReportGridStore_API as ReportGridStore} from "../../report-grid/services/report-grid-store";
 import {RoadmapStore_API as RoadmapStore} from "../../roadmap/services/roadmap-store";
 import {ScenarioStore_API as ScenarioStore} from "../../scenario/services/scenario-store";
 import {ServerInfoStore_API as ServerInfoStore} from "../../server-info/services/server-info-store";
@@ -97,6 +103,7 @@ import {TechnologyStatisticsService_API as TechnologyStatisticsService} from "..
 import {ThumbnailStore_API as ThumbnailStore} from "../../thumbnail/services/thumbnail-store";
 import {UserStore_API as UserStore} from "../../user/services/user-store";
 import {RoleStore_API as RoleStore} from "../../role/services/role-store";
+import {VulnerabilityStore_API as VulnerabilityStore} from "../../software-catalog/services/vulnerability-store";
 
 
 export const CORE_API = {
@@ -116,6 +123,7 @@ export const CORE_API = {
     BookmarkStore,
     ChangeInitiativeStore,
     ChangeLogStore,
+    ChangeLogSummariesStore,
     ChangeSetStore,
     ChangeUnitStore,
     ChangeUnitViewService,
@@ -123,8 +131,8 @@ export const CORE_API = {
     ComplexityStore,
     DatabaseStore,
     DataTypeStore,
+    DataTypeDecoratorStore,
     DataTypeUsageStore,
-    DrillGridDefinitionStore,
     EndUserAppStore,
     EntityEnumStore,
     EntityNamedNoteStore,
@@ -136,31 +144,37 @@ export const CORE_API = {
     EnumValueStore,
     ExternalIdentifierStore,
     FacetStore,
+    FavouritesStore,
     FlowDiagramStore,
     FlowDiagramAnnotationStore,
     FlowDiagramEntityStore,
     EntitySvgDiagramStore,
     InvolvementStore,
     InvolvementKindStore,
+    InvolvementViewService,
     LicenceStore,
     LogicalDataElementStore,
     LogicalFlowStore,
     LogicalFlowDecoratorStore,
     MeasurableCategoryStore,
     MeasurableRatingStore,
+    MeasurableRatingPlannedDecommissionStore,
+    MeasurableRatingReplacementStore,
     MeasurableRelationshipStore,
     MeasurableStore,
     NotificationStore,
     OrgUnitStore,
     PersonStore,
+    PermissionGroupStore,
     PhysicalFlowStore,
     PhysicalFlowParticipantStore,
-    PhysicalSpecDataTypeStore,
     PhysicalSpecDefinitionFieldStore,
     PhysicalSpecDefinitionStore,
     PhysicalSpecDefinitionSampleFileStore,
     PhysicalSpecificationStore,
     RatingSchemeStore,
+    RelationshipKindStore,
+    ReportGridStore,
     RoadmapStore,
     ScenarioStore,
     ServerInfoStore,
@@ -179,7 +193,8 @@ export const CORE_API = {
     TechnologyStatisticsService,
     ThumbnailStore,
     UserStore,
-    RoleStore
+    RoleStore,
+    VulnerabilityStore
 };
 
 

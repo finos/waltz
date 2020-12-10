@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.web.endpoints.api;
@@ -31,11 +30,15 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 @Service
 public class SurveyInstanceEndpoint implements Endpoint {
@@ -59,24 +62,35 @@ public class SurveyInstanceEndpoint implements Endpoint {
     @Override
     public void register() {
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
+        String getPermissionsPath = mkPath(BASE_URL, ":id", "permissions");
         String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
+        String findForRecipientIdPath = mkPath(BASE_URL, "recipient", "id", ":id");
         String findForUserPath = mkPath(BASE_URL, "user");
         String findForSurveyRunPath = mkPath(BASE_URL, "run", ":id");
         String findPreviousVersionsPath = mkPath(BASE_URL, "id", ":id", "previous-versions");
         String findRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
         String findResponsesPath = mkPath(BASE_URL, ":id", "responses");
+        String findPossibleActionsPath = mkPath(BASE_URL, ":id", "actions");
         String saveResponsePath = mkPath(BASE_URL, ":id", "response");
         String updateStatusPath = mkPath(BASE_URL, ":id", "status");
         String updateDueDatePath = mkPath(BASE_URL, ":id", "due-date");
-        String markApprovedPath = mkPath(BASE_URL, ":id", "approval");
         String recipientPath = mkPath(BASE_URL, ":id", "recipient");
         String deleteRecipientPath = mkPath(BASE_URL, ":id", "recipient", ":instanceRecipientId");
 
         DatumRoute<SurveyInstance> getByIdRoute =
                 (req, res) -> surveyInstanceService.getById(getId(req));
 
+        DatumRoute<SurveyInstancePermissions> getPermissionsRoute = (req, res) -> {
+            String userName = getUsername(req);
+            Long instanceId = getId(req);
+            return surveyInstanceService.getPermissions(userName, instanceId);
+        };
+
         ListRoute<SurveyInstance> findByEntityRefRoute = (req, res)
                 -> surveyInstanceService.findBySurveyInstanceIdSelector(mkOpts(getEntityReference(req), EXACT));
+
+        ListRoute<SurveyInstance> findForRecipientIdRoute = (req, res)
+                -> surveyInstanceService.findForRecipient(getId(req));
 
         ListRoute<SurveyInstance> findForUserRoute =
                 (req, res) -> surveyInstanceService.findForRecipient(getUsername(req));
@@ -93,6 +107,9 @@ public class SurveyInstanceEndpoint implements Endpoint {
         ListRoute<SurveyInstance> findPreviousVersionsRoute =
                 (req, res) -> surveyInstanceService.findPreviousVersionsForInstance(getId(req));
 
+        ListRoute<SurveyInstanceAction> findPossibleActionsRoute =
+                (req, res) -> surveyInstanceService.findPossibleActionsForInstance(getUsername(req), getId(req));
+
         DatumRoute<Boolean> saveResponseRoute = (req, res) -> {
             String userName = getUsername(req);
             Long instanceId = getId(req);
@@ -105,13 +122,13 @@ public class SurveyInstanceEndpoint implements Endpoint {
                     userName,
                     instanceId,
                     ImmutableSurveyInstanceStatusChangeCommand.builder()
-                            .newStatus(SurveyInstanceStatus.IN_PROGRESS)
+                            .action(SurveyInstanceAction.SAVING)
                             .build());
 
             return result;
         };
 
-        DatumRoute<Integer> updateStatusRoute =
+        DatumRoute<SurveyInstanceStatus> updateStatusRoute =
                 (req, res) -> {
                     SurveyInstanceStatusChangeCommand command = readBody(req, SurveyInstanceStatusChangeCommand.class);
 
@@ -130,16 +147,6 @@ public class SurveyInstanceEndpoint implements Endpoint {
                     getId(req),
                     command);
         };
-
-        DatumRoute<Integer> markApprovedRoute = (req, res) -> {
-            StringChangeCommand command = readBody(req, StringChangeCommand.class);
-
-            return surveyInstanceService.markApproved(
-                    getUsername(req),
-                    getId(req),
-                    command.newStringVal().orElse(null));
-        };
-
 
         DatumRoute<Boolean> updateRecipientRoute =
                 (req, res) -> {
@@ -161,16 +168,18 @@ public class SurveyInstanceEndpoint implements Endpoint {
 
 
         getForDatum(getByIdPath, getByIdRoute);
+        getForDatum(getPermissionsPath, getPermissionsRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
+        getForList(findForRecipientIdPath, findForRecipientIdRoute);
         getForList(findForUserPath, findForUserRoute);
         getForList(findForSurveyRunPath, findForSurveyRunRoute);
         getForList(findPreviousVersionsPath, findPreviousVersionsRoute);
         getForList(findRecipientsPath, findRecipientsRoute);
         getForList(findResponsesPath, findResponsesRoute);
+        getForList(findPossibleActionsPath, findPossibleActionsRoute);
         putForDatum(saveResponsePath, saveResponseRoute);
         putForDatum(updateStatusPath, updateStatusRoute);
         putForDatum(updateDueDatePath, updateDueDateRoute);
-        putForDatum(markApprovedPath, markApprovedRoute);
         putForDatum(recipientPath, updateRecipientRoute);
         postForDatum(recipientPath, addRecipientRoute);
         deleteForDatum(deleteRecipientPath, deleteRecipientRoute);

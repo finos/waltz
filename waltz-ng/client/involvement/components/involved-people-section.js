@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import _ from "lodash";
@@ -35,14 +34,14 @@ const columnDefs = [
         field: "person.displayName",
         displayName: "Name",
         cellTemplate: `
-                <div class="ui-grid-cell-contents"> 
-                    <waltz-entity-link entity-ref="row.entity.person" 
-                                       tooltip-placement="right" 
-                                       icon-placement="none"></waltz-entity-link> 
+                <div class="ui-grid-cell-contents">
+                    <waltz-entity-link entity-ref="row.entity.person"
+                                       tooltip-placement="right"
+                                       icon-placement="none"></waltz-entity-link>
                     -
                     <a href="mailto:{{row.entity.person.email}}">
                         <waltz-icon name="envelope-o"></waltz-icon>
-                    </a> 
+                    </a>
                 </div>`
     },
     { field: "person.title", displayName: "Title" },
@@ -56,12 +55,12 @@ const columnDefs = [
             return aNames.localeCompare(bNames);
         },
         cellTemplate: `
-                <div class="ui-grid-cell-contents"> 
-                    <span ng-bind="COL_FIELD" 
+                <div class="ui-grid-cell-contents">
+                    <span ng-bind="COL_FIELD"
                           uib-popover-template="'wips/roles-popup.html'"
                           popover-trigger="mouseenter"
                           popover-append-to-body="true">
-                    </span>   
+                    </span>
                 </div>`
     }
 ];
@@ -78,12 +77,13 @@ const initialState = {
 };
 
 
-function mkGridData(involvements = [], displayNameService) {
+function mkGridData(involvements = [], displayNameService, descriptionService) {
     return _.chain(involvements)
         .map(inv => {
-            const roles = _.map(inv.involvements, ik => ({
-                provenance: ik.provenance,
-                displayName: displayNameService.lookup("involvementKind", ik.kindId)
+            const roles = _.map(inv.involvements, pInv => ({
+                provenance: pInv.provenance,
+                displayName: displayNameService.lookup("involvementKind", pInv.kindId),
+                description: descriptionService.lookup("involvementKind", pInv.kindId)
             }));
 
             const rolesDisplayName = _.chain(roles)
@@ -95,7 +95,7 @@ function mkGridData(involvements = [], displayNameService) {
                 person: inv.person,
                 roles,
                 rolesDisplayName
-            }
+            };
         })
         .sortBy("person.displayName")
         .value();
@@ -115,25 +115,29 @@ function mkEntityRef(person) {
 
 
 function mkCurrentInvolvements(involvements = []) {
-    return _.chain(involvements)
-        .flatMap(i => {
+    return _.flatMap(
+        involvements,
+        i => {
             const personEntityRef = mkEntityRef(i.person);
             return _.map(i.involvements, inv => ({
                 entity: personEntityRef,
                 involvement: +inv.kindId,
-                isReadOnly: inv.provenance !== "waltz"
+                isReadOnly: inv.isReadOnly
             }));
-        })
-        .value();
+        });
 }
 
 
-function controller($q, displayNameService, serviceBroker, involvedSectionService) {
+function controller($q, displayNameService, descriptionService, serviceBroker, involvedSectionService) {
 
     const vm = initialiseData(this, initialState);
 
     const refresh = () => {
         const options = mkSelectionOptions(vm.parentEntityRef, determineUpwardsScopeForKind(vm.parentEntityRef.kind));
+        const kindPromise = serviceBroker
+            .loadAppData(CORE_API.InvolvementKindStore.findAll, [])
+            .then(r => r.data);
+
         const involvementPromise = serviceBroker
             .loadViewData(
                 CORE_API.InvolvementStore.findBySelector,
@@ -148,26 +152,21 @@ function controller($q, displayNameService, serviceBroker, involvedSectionServic
                 { force: true })
             .then(r => r.data);
 
-        $q.all([involvementPromise, peoplePromise])
-            .then(([involvements = [], people = []]) => {
+        return $q
+            .all([involvementPromise, peoplePromise, kindPromise])
+            .then(([involvements = [], people = [], involvementKinds = []]) => {
                 const aggInvolvements = aggregatePeopleInvolvements(involvements, people);
-                vm.gridData = mkGridData(aggInvolvements, displayNameService);
+                vm.gridData = mkGridData(aggInvolvements, displayNameService, descriptionService);
                 vm.currentInvolvements = mkCurrentInvolvements(aggInvolvements);
+                vm.involvementKinds = involvementKinds;
             });
     };
 
-
-    vm.$onInit = () => {
-        serviceBroker
-            .loadAppData(CORE_API.InvolvementKindStore.findAll, [])
-            .then(r => vm.involementKinds = r.data);
-    };
 
     vm.$onChanges = (changes) => {
         if (changes.parentEntityRef && vm.parentEntityRef) {
             refresh();
         }
-
 
         vm.allowedInvolvements = _.map(
             displayNameService.getAllByType("involvementKind"),
@@ -198,6 +197,7 @@ function controller($q, displayNameService, serviceBroker, involvedSectionServic
 controller.$inject = [
     "$q",
     "DisplayNameService",
+    "DescriptionService",
     "ServiceBroker",
     "InvolvedSectionService"
 ];

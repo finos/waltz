@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 import _ from "lodash";
@@ -26,11 +25,14 @@ import template from "./multi-select-tree-control.html";
 
 const bindings = {
     items: "<",
-    onClick: "<",
+    onClick: "<?",
     onCheck: "<",
     onUncheck: "<",
+    orderByExpression: '@?',
     checkedItemIds: "<",
-    expandedItemIds: "<"
+    expandedItemIds: "<",
+    disablePredicate: "<?",
+    isReadonlyPredicate: "<?" //overwrites if selected to mark as read only
 };
 
 
@@ -39,11 +41,13 @@ const initialState = {
     expandedNodes: [],
     checkedMap: {},
     hierarchy: [],
-    onCheck: id => console.log("default handler in multi-select-treecontrol for node id check: ", id),
-    onUncheck: id => console.log("default handler in multi-select-treecontrol for node id uncheck: ", id),
-    onClick: node => console.log("default handler in multi-select-treecontrol for node click: ", node)
+    orderByExpression: "-name",
+    onCheck: (id, node) => console.log("default handler in multi-select-treecontrol for node id check: ", id),
+    onUncheck: (id, node) => console.log("default handler in multi-select-treecontrol for node id uncheck: ", id),
+    onClick: (id, node) => console.log("default handler in multi-select-treecontrol for node click: ", node),
+    disablePredicate: node => false,
+    isReadonlyPredicate: node => false
 };
-
 
 function haltEvent() {
     preventDefault(event);
@@ -96,27 +100,25 @@ function controller() {
     };
 
     vm.onNodeClick = (node) => {
-        if (vm.hasAnyChild(node)) {
-            const idx = _.findIndex(vm.expandedNodes, n => n.id === node.id);
-            if (idx === -1) {
-                // add
-                vm.expandedNodes.push(node);
-            } else {
-                // remove
-                vm.expandedNodes.splice(idx, 1);
-            }
-        }
-        invokeFunction(vm.onClick, node.id);
+        invokeFunction(vm.onClick, node.id, node);
     };
 
-    vm.onNodeCheck = (id) => {
-        invokeFunction(vm.onCheck, id);
+    vm.onToggleCheck = (node) => {
+        if (_.includes(vm.checkedItemIds, node.id)) {
+            vm.onNodeUncheck(node.id, node)
+        } else {
+            vm.onNodeCheck(node.id, node)
+        }
+    };
+
+    vm.onNodeCheck = (id, d) => {
+        invokeFunction(vm.onCheck, id, d);
         haltEvent();
     };
 
 
-    vm.onNodeUncheck = (id) => {
-        invokeFunction(vm.onUncheck, id);
+    vm.onNodeUncheck = (id, d) => {
+        invokeFunction(vm.onUncheck, id, d);
         haltEvent();
     };
 
@@ -125,16 +127,25 @@ function controller() {
     };
 
     vm.$onChanges = changes => {
-        if(changes) {
+        if(changes.items) {
             vm.hierarchy = buildHierarchies(vm.items, false);
             vm.searchNodes = prepareSearchNodes(vm.items);
+            vm.expandedNodes = expandSelectedNodes(vm.items, vm.expandedItemIds);
         }
 
-        if(changes.items && changes.expandedItemIds) {
+        if(changes.expandedItemIds) {
             vm.expandedNodes = expandSelectedNodes(vm.items, vm.expandedItemIds);
         }
 
         vm.checkedMap = mkCheckedMap(vm.items, vm.checkedItemIds);
+    };
+
+    vm.$onInit = () => {
+        // determines if a node should be disabled based on the supplied predicate and if the node is not also
+        // currently selected unless it is read only when it should always be disabled
+        vm.isDisabled = (node) =>
+            (vm.disablePredicate(node) && !_.get(vm.checkedMap, node.id, false))
+            || vm.isReadonlyPredicate(node)
     };
 
     vm.searchTermsChanged = (termStr = "") => {

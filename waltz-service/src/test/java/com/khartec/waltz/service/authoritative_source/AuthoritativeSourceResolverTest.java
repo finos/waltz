@@ -1,20 +1,19 @@
 /*
  * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017 Waltz open source project
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.service.authoritative_source;
@@ -22,6 +21,7 @@ package com.khartec.waltz.service.authoritative_source;
 
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
 import com.khartec.waltz.model.authoritativesource.ImmutableAuthoritativeRatingVantagePoint;
@@ -65,8 +65,10 @@ public class AuthoritativeSourceResolverTest {
         List<AuthoritativeRatingVantagePoint> vantagePoints = new ArrayList<>();
         vantagePoints.add(ImmutableAuthoritativeRatingVantagePoint.builder()
                 .vantagePoint(vantagePoint)
-                .rank(1)
+                .vantagePointRank(1)
                 .dataTypeCode("TRADE_DATA")
+                .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 10))
+                .dataTypeRank(1)
                 .applicationId(200L)
                 .rating(AuthoritativenessRating.SECONDARY)
                 .build());
@@ -86,8 +88,10 @@ public class AuthoritativeSourceResolverTest {
         List<AuthoritativeRatingVantagePoint> vantagePoints = new ArrayList<>();
         vantagePoints.add(ImmutableAuthoritativeRatingVantagePoint.builder()
                 .vantagePoint(vantagePoint)
-                .rank(1)
+                .vantagePointRank(1)
                 .dataTypeCode("REF_DATA")
+                .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 20))
+                .dataTypeRank(1)
                 .applicationId(205L)
                 .rating(AuthoritativenessRating.PRIMARY)
                 .build());
@@ -107,8 +111,10 @@ public class AuthoritativeSourceResolverTest {
         List<AuthoritativeRatingVantagePoint> vantagePoints = new ArrayList<>();
         vantagePoints.add(ImmutableAuthoritativeRatingVantagePoint.builder()
                 .vantagePoint(vantagePoint)
-                .rank(1)
+                .vantagePointRank(1)
                 .dataTypeCode("REF_DATA")
+                .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 20))
+                .dataTypeRank(2)
                 .applicationId(205L)
                 .rating(AuthoritativenessRating.PRIMARY)
                 .build());
@@ -116,8 +122,10 @@ public class AuthoritativeSourceResolverTest {
 
         vantagePoints.add(ImmutableAuthoritativeRatingVantagePoint.builder()
                 .vantagePoint(vantagePoint)
-                .rank(2)
+                .vantagePointRank(2)
                 .dataTypeCode("REF_DATA")
+                .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 20))
+                .dataTypeRank(3)
                 .applicationId(200L)
                 .rating(AuthoritativenessRating.SECONDARY)
                 .build());
@@ -134,23 +142,29 @@ public class AuthoritativeSourceResolverTest {
     @Test
     public void getBestRankedIsCorrect() {
 
-        ImmutableAuthoritativeRatingVantagePoint rank1 = ImmutableAuthoritativeRatingVantagePoint.builder()
+        ImmutableAuthoritativeRatingVantagePoint rank12 = ImmutableAuthoritativeRatingVantagePoint.builder()
                 .vantagePoint(vantagePoint)
-                .rank(1)
+                .vantagePointRank(1)
                 .dataTypeCode("REF_DATA")
+                .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 20))
+                .dataTypeRank(2)
                 .applicationId(205L)
                 .rating(AuthoritativenessRating.PRIMARY)
                 .build();
 
 
-        ImmutableAuthoritativeRatingVantagePoint rank2 = rank1.withRank(2);
+        ImmutableAuthoritativeRatingVantagePoint rank22 = rank12.withVantagePointRank(2);
+        ImmutableAuthoritativeRatingVantagePoint rank11 = rank12.withDataTypeRank(1);
 
 
-        Optional<AuthoritativeRatingVantagePoint> bestRanked = AuthoritativeSourceResolver.getBestRanked(ListUtilities.newArrayList(rank1, rank2));
+        Optional<AuthoritativeRatingVantagePoint> bestRankedOrgUnit = AuthoritativeSourceResolver.getMostSpecificRanked(ListUtilities.newArrayList(rank12, rank22));
+        Optional<AuthoritativeRatingVantagePoint> bestRankedDataType = AuthoritativeSourceResolver.getMostSpecificRanked(ListUtilities.newArrayList(rank12, rank11));
 
+        Assert.assertTrue(bestRankedOrgUnit.isPresent());
+        Assert.assertEquals(rank22, bestRankedOrgUnit.get());
 
-        Assert.assertTrue(bestRanked.isPresent());
-        Assert.assertEquals(rank2, bestRanked.get());
+        Assert.assertTrue(bestRankedDataType.isPresent());
+        Assert.assertEquals(rank12, bestRankedDataType.get());
     }
 
 
@@ -158,7 +172,7 @@ public class AuthoritativeSourceResolverTest {
     @Test
     public void getBestRankedWorksWithEmpty() {
 
-        Optional<AuthoritativeRatingVantagePoint> bestRanked = AuthoritativeSourceResolver.getBestRanked(ListUtilities.newArrayList());
+        Optional<AuthoritativeRatingVantagePoint> bestRanked = AuthoritativeSourceResolver.getMostSpecificRanked(ListUtilities.newArrayList());
 
 
         Assert.assertFalse(bestRanked.isPresent());

@@ -1,3 +1,21 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
+ */
+
 package com.khartec.waltz.jobs.generators;
 
 
@@ -167,14 +185,15 @@ public class SurveyRunGenerator implements SampleDataGenerator {
     public Map<String, Integer> create(ApplicationContext ctx) {
         final DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        List<Person> owners = dsl.selectFrom(PERSON)
+        List<Person> owners = dsl
+                .selectFrom(PERSON)
                 .limit(NUMBER_OF_RUNS)
                 .fetch()
                 .map(PersonDao.personMapper);
         checkFalse(isEmpty(owners), "No person found, please generate person data first");
 
         final SurveyTemplateDao surveyTemplateDao = ctx.getBean(SurveyTemplateDao.class);
-        List<SurveyTemplate> surveyTemplates = surveyTemplateDao.findAll(owners.get(0).id().get());
+        List<SurveyTemplate> surveyTemplates = surveyTemplateDao.findAllActive();
         checkFalse(isEmpty(surveyTemplates), "No template found, please generate templates first");
 
         final AppGroupDao appGroupDao = ctx.getBean(AppGroupDao.class);

@@ -1,3 +1,21 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
+ */
+
 package com.khartec.waltz.jobs.tools;
 
 import com.khartec.waltz.common.ListUtilities;
@@ -73,7 +91,7 @@ public class PersonResolver {
         dump("No Org", noOrgSiphon, t -> t.v1);
         dump("No Person", noPersonSiphon, t -> t.v2);
 
-        Set<InvolvementRecord> records = map(orgEmpInvTuples, t -> new InvolvementRecord(EntityKind.ORG_UNIT.name(), t.v1, t.v2, provenance, t.v3));
+        Set<InvolvementRecord> records = map(orgEmpInvTuples, t -> new InvolvementRecord(EntityKind.ORG_UNIT.name(), t.v1, t.v2, provenance, t.v3, true));
         dsl.batchInsert(records).execute();
 
     }

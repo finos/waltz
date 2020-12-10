@@ -3,22 +3,22 @@
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
  *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
  */
 
 package com.khartec.waltz.service.attestation;
 
+import com.khartec.waltz.common.exception.UpdateFailedException;
 import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.attestation.AttestationInstanceDao;
@@ -29,7 +29,9 @@ import com.khartec.waltz.model.attestation.AttestationInstance;
 import com.khartec.waltz.model.attestation.AttestationRun;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.person.Person;
+import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.permission.PermissionGroupService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.slf4j.Logger;
@@ -52,15 +54,19 @@ public class AttestationInstanceService {
 
     private final AttestationInstanceDao attestationInstanceDao;
     private final AttestationRunService attestationRunService;
+    private final ApplicationService applicationService;
     private final PersonDao personDao;
     private final ChangeLogService changeLogService;
+    private final PermissionGroupService permissionGroupService;
 
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
 
 
     public AttestationInstanceService(AttestationInstanceDao attestationInstanceDao,
                                       AttestationRunService attestationRunService,
-                                      PersonDao personDao, ChangeLogService changeLogService) {
+                                      ApplicationService applicationService,
+                                      PersonDao personDao, ChangeLogService changeLogService,
+                                      PermissionGroupService permissionGroupService) {
         checkNotNull(attestationInstanceDao, "attestationInstanceDao cannot be null");
         checkNotNull(attestationRunService, "attestationRunService cannot be null");
         checkNotNull(personDao, "personDao cannot be null");
@@ -68,8 +74,10 @@ public class AttestationInstanceService {
 
         this.attestationInstanceDao = attestationInstanceDao;
         this.attestationRunService = attestationRunService;
+        this.applicationService = applicationService;
         this.personDao = personDao;
         this.changeLogService = changeLogService;
+        this.permissionGroupService = permissionGroupService;
     }
 
 
@@ -135,18 +143,25 @@ public class AttestationInstanceService {
 
     private void logChange (String username, AttestationInstance instance, EntityKind attestedKind) {
 
+        String logMessage = EntityKind.APPLICATION.equals(instance.parentEntity().kind())
+                ? String.format("Attestation of %s for application %s",
+                    attestedKind,
+                    applicationService.getById(instance.parentEntity().id()).assetCode().orElse("UNKNOWN"))
+                : String.format("Attestation of %s ", attestedKind);
+
         changeLogService.write(ImmutableChangeLog.builder()
-                .message(String.format("Attestation of %s", attestedKind))
+                .message(logMessage)
                 .parentReference(instance.parentEntity())
                 .userId(username)
                 .severity(Severity.INFORMATION)
                 .childKind(attestedKind)
-                .operation(Operation.ADD)
+                .operation(Operation.ATTEST)
                 .build());
     }
 
 
     public boolean attestForEntity(String username, AttestEntityCommand createCommand) {
+        checkAttestationPermission(username, createCommand);
 
         List<AttestationInstance> instancesForEntityForUser = attestationInstanceDao
                 .findForEntityByRecipient(
@@ -172,6 +187,18 @@ public class AttestationInstanceService {
 
             Long instanceId = getInstanceId(first(findByRunId(runId)));
             return attestInstance(instanceId, username);
+        }
+    }
+
+    private void checkAttestationPermission(String username, AttestEntityCommand createCommand) {
+        boolean hasAttestationPermission = permissionGroupService.hasPermission(
+                createCommand.entityReference(),
+                createCommand.attestedEntityKind(),
+                username);
+
+        if (!hasAttestationPermission) {
+            throw new UpdateFailedException("ATTESTATION_FAILED",
+                    "user does not have permission to attest " + createCommand.attestedEntityKind().prettyName());
         }
     }
 
