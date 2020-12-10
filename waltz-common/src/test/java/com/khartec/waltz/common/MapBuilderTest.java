@@ -53,4 +53,27 @@ public class MapBuilderTest {
         assertEquals("bob", m.get("b"));
     }
 
+    @Test
+    public void createMapFrom(){
+        Map<String, Integer> m =  new MapBuilder<String, Integer>()
+                .add("a", 1)
+                .build();
+        Map<String, Integer> n = new MapBuilder<String, Integer>().from(m).build();
+        assertEquals(m.size(), n.size());
+        assertEquals(Integer.valueOf(1), n.get("a"));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void createMapFromNullMap(){
+        Map<String, Integer> m =  null;
+        Map<String, Integer> n = new MapBuilder<String, Integer>().from(m).build();
+    }
+
+    @Test
+    public void createEmptyMap(){
+        Map m =  new MapBuilder().build();
+        assertEquals(0, m.size());
+        assertEquals(null, m.getOrDefault(1, null));
+    }
+
 }
