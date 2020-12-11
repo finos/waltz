@@ -36,9 +36,9 @@ export function store($http, BaseApiUrl) {
             .then(d => d.data);
     };
 
-    const findByEntityKindAndAssessmentDefinitionId = (kind, assessmentDefinitionId, visibilites = ["PRIMARY"]) => {
+    const findByAssessmentDefinitionId = (assessmentDefinitionId, visibilites = ["PRIMARY"]) => {
         return $http
-            .post(`${BASE}/entity-kind/${kind}/${assessmentDefinitionId}`, visibilites)
+            .post(`${BASE}/${assessmentDefinitionId}`, visibilites)
             .then(d => d.data);
     };
 
@@ -77,7 +77,7 @@ export function store($http, BaseApiUrl) {
     return {
         findForEntityReference,
         findByEntityKind,
-        findByEntityKindAndAssessmentDefinitionId,
+        findByAssessmentDefinitionId,
         findByTargetKindForRelatedSelector,
         store,
         bulkStore,
@@ -107,10 +107,10 @@ export const AssessmentRatingStore_API = {
         serviceFnName: "findByEntityKind",
         description: "find all assessment ratings for an entity kind"
     },
-    findByEntityKindAndAssessmentDefinitionId: {
+    findByAssessmentDefinitionId: {
         serviceName,
-        serviceFnName: "findByEntityKindAndAssessmentDefinitionId",
-        description: "find all assessment ratings for a particular target kind and an assessment definition id"
+        serviceFnName: "findByAssessmentDefinitionId",
+        description: "find all assessment ratings for an assessment definition id"
     },
     findByTargetKindForRelatedSelector: {
         serviceName,

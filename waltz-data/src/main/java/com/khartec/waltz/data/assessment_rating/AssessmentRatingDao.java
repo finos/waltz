@@ -145,12 +145,11 @@ public class AssessmentRatingDao {
     }
 
 
-    public List<AssessmentRating> findByEntityKindAndDefinitionId(EntityKind kind, long definitionId, List<AssessmentVisibility> visibilities) {
+    public List<AssessmentRating> findByDefinitionId(long definitionId, List<AssessmentVisibility> visibilities) {
         return dsl.select(ASSESSMENT_RATING.fields())
                 .select(ENTITY_NAME_FIELD)
                 .from(ASSESSMENT_RATING)
                 .innerJoin(ASSESSMENT_DEFINITION).on(ASSESSMENT_DEFINITION.ID.eq(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID))
-                .where(ASSESSMENT_RATING.ENTITY_KIND.eq(kind.name()))
                 .and(ASSESSMENT_DEFINITION.ID.eq(definitionId))
                 .and(ASSESSMENT_DEFINITION.VISIBILITY.in(visibilities))
                 .fetch(TO_DOMAIN_MAPPER_WITH_ENTITY_DETAILS);

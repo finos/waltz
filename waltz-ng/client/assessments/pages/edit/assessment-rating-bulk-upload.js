@@ -39,29 +39,24 @@ function controller($q,
                     serviceBroker,
                     userService) {
 
-    console.log($stateParams);
     const {definitionId} = $stateParams;
     const vm = Object.assign(this, initialState);
     userService
         .whoami()
         .then(user => vm.user = user);
 
-    console.log("definition ", definitionId);
-
-
     const loadAll = () => {
         serviceBroker
             .loadViewData(CORE_API.AssessmentDefinitionStore.getById, [definitionId])
-            .then(r => vm.definition = r.data)
-            .then(() => console.log(vm.definition));
+            .then(r => vm.definition = r.data);
 
         const ratingSchemePromise = serviceBroker
             .loadViewData(CORE_API.RatingSchemeStore.findRatingsSchemeItems, [definitionId])
             .then(r => r.data);
 
         const ratingPromise = serviceBroker
-            .loadViewData(CORE_API.AssessmentRatingStore.findByEntityKindAndAssessmentDefinitionId,
-                          ["APPLICATION", definitionId], {force: true})
+            .loadViewData(CORE_API.AssessmentRatingStore.findByAssessmentDefinitionId,
+                          [definitionId], {force: true})
             .then(r => r.data);
 
         $q.all([ratingPromise, ratingSchemePromise])
@@ -81,7 +76,7 @@ function controller($q,
     loadAll();
 
     vm.columnDefs = [
-        mkEntityLinkGridCell("Application", "entityRef", "none", "right"),
+        mkEntityLinkGridCell("Entity", "entityRef", "none", "right"),
         {field: "rating.name", name: "Assessment Rating", width: "15%"},
         {field: "comment", name: "Comment"},
         {

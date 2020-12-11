@@ -88,11 +88,10 @@ public class AssessmentRatingService {
     }
 
 
-    public List<AssessmentRating> findByEntityKindAndDefinitionId(EntityKind kind,
-                                                                  long definitionId,
-                                                                  List<AssessmentVisibility> visibilities) {
+    public List<AssessmentRating> findByDefinitionId(long definitionId,
+                                                     List<AssessmentVisibility> visibilities) {
 
-        return assessmentRatingDao.findByEntityKindAndDefinitionId(kind, definitionId, visibilities);
+        return assessmentRatingDao.findByDefinitionId(definitionId, visibilities);
     }
 
     public boolean store(SaveAssessmentRatingCommand command, String username) {

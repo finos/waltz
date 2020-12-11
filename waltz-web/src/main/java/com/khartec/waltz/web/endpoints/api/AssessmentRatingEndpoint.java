@@ -72,7 +72,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
     public void register() {
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findByEntityKindPath = mkPath(BASE_URL, "entity-kind", ":kind");
-        String findByEntityKindAndDefinitionPath = mkPath(BASE_URL, "entity-kind", ":kind", ":assessmentDefinitionId");
+        String findByDefinitionPath = mkPath(BASE_URL, ":assessmentDefinitionId");
         String findByTargetKindForRelatedSelectorPath = mkPath(BASE_URL, "target-kind", ":targetKind", "selector");
         String modifyPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId");
         String bulkUpdatePath = mkPath(BASE_URL, "bulk-update", ":assessmentDefinitionId");
@@ -80,7 +80,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
 
         getForList(findForEntityPath, this::findForEntityRoute);
         postForList(findByEntityKindPath, this::findByEntityKindRoute);
-        postForList(findByEntityKindAndDefinitionPath, this::findByEntityKindAndDefinitionIdRoute);
+        postForList(findByDefinitionPath, this::findByDefinitionIdRoute);
         postForList(findByTargetKindForRelatedSelectorPath, this::findByTargetKindForRelatedSelectorRoute);
         postForDatum(bulkUpdatePath, this::bulkStoreRoute);
         postForDatum(bulkRemovePath, this::bulkRemoveRoute);
@@ -106,11 +106,10 @@ public class AssessmentRatingEndpoint implements Endpoint {
         return assessmentRatingService.findByEntityKind(getKind(request, "kind"), visibilities);
     }
 
-    private List<AssessmentRating> findByEntityKindAndDefinitionIdRoute(Request request, Response response) throws IOException {
+    private List<AssessmentRating> findByDefinitionIdRoute(Request request, Response response) throws IOException {
         List<AssessmentVisibility> visibilities = readList(request, AssessmentVisibility.class);
         long assessmentDefinitionId = getLong(request, "assessmentDefinitionId");
-        return assessmentRatingService.findByEntityKindAndDefinitionId(
-                getKind(request, "kind"), assessmentDefinitionId, visibilities);
+        return assessmentRatingService.findByDefinitionId(assessmentDefinitionId, visibilities);
     }
 
     private boolean storeRoute(Request request, Response z) throws IOException {

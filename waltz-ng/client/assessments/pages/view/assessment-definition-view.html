@@ -17,8 +17,7 @@
   -->
 <div>
     <waltz-page-header name="{{ ctrl.definition.name }}"
-                       icon="edit"
-                       small="Edit">
+                       icon="puzzle-piece">
         <breadcrumbs>
             <ol class="waltz-breadcrumbs">
                 <li><a ui-sref="main">Home</a></li>
@@ -26,15 +25,24 @@
                     <span ng-bind="ctrl.definition.name">
                     </span>
                 </li>
-                <li>Edit</li>
+                <li>View</li>
             </ol>
         </breadcrumbs>
     </waltz-page-header>
 
-    <waltz-section icon="desktop" name="Ratings In Assessment Definition">
 
+
+    <waltz-section icon="desktop" name="Assessment Ratings">
         <div class="row">
-            <div class="col-md-6">
+
+            <div class="col-md-12">
+                <waltz-section-actions>
+                    <button waltz-has-role="{{ctrl.definition.permittedRole}}"
+                            class="btn btn-xs btn-primary"
+                            ui-sref="main.assessment-definition.edit ({definitionId: ctrl.definition.id})">
+                        Edit
+                    </button>
+                </waltz-section-actions>
                 <waltz-grid-with-search scope-provider="ctrl"
                                         ng-if="ctrl.appRatings.length > 0"
                                         entries="ctrl.appRatings"
@@ -49,33 +57,7 @@
                     </message>
                 </waltz-no-data>
             </div>
-            <div class="col-md-6">
-                <waltz-section-actions>
-                    <button class="btn btn-xs btn-primary"
-                            ui-sref="main.assessment-definition.view ({definitionId: ctrl.definition.id})">
-                        View
-                    </button>
-                </waltz-section-actions>
-                <p class="waltz-paragraph">
-                    Use the text box below to provide assessment ratings for application as comma or tab separated value
-                    <br/>
-                    e.g. asset-code, rating-name, comments(optional)
-                </p>
-                <!-- Selectors -->
-                <uib-tabset>
-                    <uib-tab heading="Bulk Editor">
-                        <!-- Bulk selector -->
-                        <div style="padding: 1em 0">
-                            <waltz-bulk-assessment-rating-selector existing-refs="ctrl.appRatings"
-                                                                   ratings="ctrl.appRatings"
-                                                                   rating-items="ctrl.ratingItems"
-                                                             on-save="ctrl.saveRatings">
-                            </waltz-bulk-assessment-rating-selector>
-                        </div>
-                    </uib-tab>
-                </uib-tabset>
-
-            </div>
         </div>
     </waltz-section>
+
 </div>

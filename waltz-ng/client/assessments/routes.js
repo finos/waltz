@@ -16,31 +16,31 @@
  *
  */
 
-// import ViewPage from "./pages/view/app-group-view";
+import ViewPage from "./pages/view/assessment-definition-view";
 import EditPage from "./pages/edit/assessment-rating-bulk-upload";
 
 const baseState = {
-    url: "assessment-bulk-upload"
+    url: "assessment-definition"
 };
 
 
-// const viewState = {
-//     url: "/{definition-id:int}",
-//     views: { "content@": ViewPage }
-// };
+const viewState = {
+    url: "/{definitionId:int}",
+    views: { "content@": ViewPage }
+};
 
 
 const editState = {
-    url: "/{definitionId:int}/edit",
+    url: "/{definitionId:int}/bulk-edit",
     views: { "content@": EditPage }
 };
 
 
 function setupRoutes($stateProvider) {
     $stateProvider
-        .state("main.assessment-bulk-upload", baseState)
-        // .state("main.assessment-bulk-upload.view", viewState)
-        .state("main.assessment-bulk-upload.edit", editState);
+        .state("main.assessment-definition", baseState)
+        .state("main.assessment-definition.view", viewState)
+        .state("main.assessment-definition.edit", editState);
 }
 
 setupRoutes.$inject = ["$stateProvider"];
