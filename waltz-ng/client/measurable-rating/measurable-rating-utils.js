@@ -70,12 +70,12 @@ export function loadDecommData(
                     const isValid = appRetirementDate > decomDate || sameDate;
 
                     return Object.assign({}, d, { isValid: isValid})
-            });
+                });
 
             return Object.assign({},
-                replacementApps,
-                replacingDecoms,
-                {plannedDecommissions: plannedDecomms});
+                                 replacementApps,
+                                 replacingDecoms,
+                                 {plannedDecommissions: plannedDecomms});
         });
 }
 
@@ -202,9 +202,3 @@ export function determineStartingTab(tabs = []) {
     return _.find(tabs, t => t.ratings.length > 0 ) || tabs[0];
 }
 
-
-export function getDateAsUtc(inputDate) {
-    const inputDateAsMoment = moment(inputDate, formats.parseDateOnly);
-    const finalDate = moment.utc({year: inputDateAsMoment.year(), month: inputDateAsMoment.month(), date: inputDateAsMoment.date()});
-    return finalDate.toISOString();
-}

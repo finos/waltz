@@ -145,6 +145,7 @@ public class MeasurableRatingReplacementDao {
                     .set(MEASURABLE_RATING_REPLACEMENT.PLANNED_COMMISSION_DATE, toSqlDate(commissionDate))
                     .set(MEASURABLE_RATING_REPLACEMENT.UPDATED_BY, username)
                     .set(MEASURABLE_RATING_REPLACEMENT.UPDATED_AT, nowUtcTimestamp())
+                    .where(condition)
                     .execute() == 1;
 
             return tuple(Operation.UPDATE, recordsUpdated);

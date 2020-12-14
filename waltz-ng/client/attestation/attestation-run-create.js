@@ -84,7 +84,8 @@ function mkCreateCommand(attestationRun){
         attestedEntityKind: attestationRun.attestedEntityKind,
         attestedEntityId: attestationRun.attestedEntityId,
         involvementKindIds: involvementKindIds,
-        dueDate: moment(attestationRun.dueDate).format(formats.parseDateOnly)
+        dueDate: moment(attestationRun.dueDate).format(formats.parseDateOnly),
+        sendEmailNotifications: attestationRun.sendEmailNotifications
     };
 }
 

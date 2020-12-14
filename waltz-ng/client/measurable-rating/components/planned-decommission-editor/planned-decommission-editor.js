@@ -18,7 +18,7 @@
 
 import template from "./planned-decommission-editor.html";
 import {initialiseData, invokeFunction} from "../../../common";
-import {getDateAsUtc} from "../../measurable-rating-utils";
+import {alignDateToUTC} from "../../../common/date-utils";
 
 const modes= {
     VIEW: "VIEW",
@@ -34,7 +34,7 @@ const bindings = {
     replacementApps: "<?",
     onSaveDecommissionDate: "<",
     onRemoveDecommission: "<",
-    onAddReplacementApp: "<",
+    onSaveReplacementApp: "<",
     onRemoveReplacementApp: "<",
     category: "<",
     application: "<?"
@@ -91,16 +91,16 @@ function controller() {
 
     vm.onSetCommissionDate = (c) => {
         vm.mode = modes.CONFIRM_ADDITION;
-        vm.candidateCommissionDate = JSON.stringify(getDateAsUtc(c.newVal));
+        vm.candidateCommissionDate = c.newVal;
     };
 
     vm.onAddReplacement = () => {
         const replacement = {
             decommissionId: vm.plannedDecommission.id,
             replacementApp: vm.candidateApp,
-            commissionDate: vm.candidateCommissionDate
+            commissionDate: alignDateToUTC(vm.candidateCommissionDate)
         };
-        invokeFunction(vm.onAddReplacementApp, replacement);
+        invokeFunction(vm.onSaveReplacementApp, replacement);
         vm.mode = modes.VIEW;
     };
 
@@ -112,6 +112,16 @@ function controller() {
     vm.onRemoveReplacement = () => {
         invokeFunction(vm.onRemoveReplacementApp, vm.candidateRemoval)
             .then(() => vm.mode = modes.VIEW)
+    };
+
+    vm.onSaveCommissionDate = (newDate, ctx) => {
+        const replacement = {
+            decommissionId: vm.plannedDecommission.id,
+            replacementApp: ctx.entityReference,
+            commissionDate: alignDateToUTC(newDate.newVal)
+        };
+        invokeFunction(vm.onSaveReplacementApp, replacement);
+        vm.mode = modes.VIEW;
     };
 }
 

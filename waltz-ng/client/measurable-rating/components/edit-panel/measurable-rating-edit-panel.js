@@ -20,11 +20,12 @@ import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 import {kindToViewState} from "../../../common/link-utils";
-import {getDateAsUtc, loadAllData, loadDecommData, mkTabs} from "../../measurable-rating-utils";
+import {loadAllData, loadDecommData, mkTabs} from "../../measurable-rating-utils";
 import {indexRatingSchemes, mkRatingsKeyHandler} from "../../../ratings/rating-utils";
 
 import template from "./measurable-rating-edit-panel.html";
 import {displayError} from "../../../common/error-utils";
+import {alignDateToUTC} from "../../../common/date-utils";
 
 
 const bindings = {
@@ -171,7 +172,7 @@ function controller($q,
             notification.error("Could not save this decommission date. " +
                 "Check the date entered is valid or to remove this decommission date use the 'Revoke' button below");
         } else {
-            dateChange.newVal = getDateAsUtc(dateChange.newVal);
+            dateChange.newVal = alignDateToUTC(dateChange.newVal).toISOString();
 
             serviceBroker
                 .execute(
@@ -220,14 +221,14 @@ function controller($q,
             .finally(reloadDecommData);
     };
 
-    vm.onAddReplacementApp = (replacement) => {
+    vm.onSaveReplacementApp = (replacement) => {
         return serviceBroker
             .execute(
                 CORE_API.MeasurableRatingReplacementStore.save,
                 [replacement.decommissionId, replacement])
             .then(r => {
                 vm.selected = Object.assign({}, vm.selected, { replacementApps: r.data });
-                notification.success("Successfully added replacement app")
+                notification.success("Successfully saved replacement app")
             })
             .catch(e  => displayError(notification, "Could not add replacement app", e))
             .finally(reloadDecommData);

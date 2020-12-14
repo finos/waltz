@@ -115,4 +115,9 @@ public class PersonService {
     public Set<Person> findByEmployeeIds(Set<String> empIds) {
         return personDao.findByEmployeeIds(empIds);
     }
+
+
+    public Set<Person> findActivePeopleByEmails(Set<String> emails){
+        return personDao.findActivePeopleByEmails(emails);
+    }
 }

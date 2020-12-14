@@ -16,6 +16,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.isNull;
+
 @Service
 public class PermissionGroupService {
     private static final Logger LOG = LoggerFactory.getLogger(PermissionGroupService.class);
@@ -36,6 +38,10 @@ public class PermissionGroupService {
     public List<Permission> findPermissions(EntityReference parentEntityRef,
                                             String username) {
         Person person = personService.getPersonByUserId(username);
+
+        if (isNull(person)){
+            return Collections.emptyList();
+        }
 
         List<Involvement> involvements =
                 involvementService.findByEmployeeId(person.employeeId())

@@ -20,6 +20,7 @@ import {initialiseData} from "../../../common";
 import template from "./measurable-ratings-browser-section.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
+import * as _ from "lodash";
 
 /**
  * @name waltz-measurable-ratings-browser
@@ -36,7 +37,7 @@ const bindings = {
 
 
 const initialState = {
-    hasAllocations: true
+    hasAllocations: false
 };
 
 
@@ -45,14 +46,19 @@ function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-        serviceBroker
-            .loadAppData(CORE_API.AllocationSchemeStore.findAll)
-            .then(r => vm.schemesByCategoryId = _.groupBy(r.data, s => s.measurableCategoryId));
 
         vm.selector = mkSelectionOptions(vm.parentEntityRef,
             undefined,
             undefined,
             vm.filters);
+
+        serviceBroker
+            .loadViewData(CORE_API.ApplicationStore.findBySelector, [ vm.selector ])
+            .then(r => vm.hasApps = !_.isEmpty(r.data));
+
+        serviceBroker
+            .loadAppData(CORE_API.AllocationSchemeStore.findAll)
+            .then(r => vm.schemesByCategoryId = _.groupBy(r.data, s => s.measurableCategoryId));
     };
 
     vm.onCategorySelect = (category) => {
