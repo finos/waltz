@@ -19,9 +19,7 @@
 
 import template from "./playpen1.html";
 import {initialiseData} from "../../common";
-import App from "./App.svelte";
 import {mkRef} from "../../common/entity-utils";
-import TestWidget from "./TestWidget.svelte";
 import BookmarkList from "./bookmark/BookmarkList.svelte";
 import {dynamicSections} from "../../dynamic-section/dynamic-section-definitions";
 
@@ -31,36 +29,14 @@ const initData = {
     ref2: mkRef("APPLICATION", 22),
     ref3: mkRef("APPLICATION", 212),
     ref4: mkRef("APPLICATION", 913),
-    testWidget: TestWidget,
     bookmarkList: BookmarkList,
     bookmarksSection: dynamicSections.bookmarksSection,
-    app: App
 };
 
 function controller($element, $q, serviceBroker) {
 
     const vm = initialiseData(this, initData);
 
-    vm.$onInit = () => {
-        setTimeout(() => {
-            const targ = document.querySelector("#svelte-app");
-            console.log({targ});
-            const app = new App({
-                target: targ,
-                props: {
-                    name: "world",
-                    serviceBroker
-                }
-            });
-        }, 10);
-    };
-
-    vm.myVars = {};
-
-    let x = 0;
-    vm.changeVars = () => {
-        vm.myVars = { msg: "Hello " + (x ++ ) };
-    };
 }
 
 controller.$inject = ["$element", "$q", "ServiceBroker"];

@@ -1,50 +1,48 @@
 <script>
-    import Icon from "./Icon.svelte";
-    import BookmarkListItem from "./BookmarkListItem.svelte";
-    import {CORE_API} from "../../../common/services/core-api-utils";
-    import {nestEnums} from "./enum-utils";
-    import {mkBookmarkKinds, nestBookmarks} from "./bookmark-utils";
 
-    export let serviceBroker;
-    export let primaryEntityRef;
+import Icon from "./Icon.svelte";
+import BookmarkListItem from "./BookmarkListItem.svelte";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {nestEnums} from "./enum-utils";
+import {mkBookmarkKinds, nestBookmarks} from "./bookmark-utils";
+import {bookmarks, loadBookmarks} from "./stores";
 
-    let nestedEnums = {};
-    let bookmarkKinds = {};
-    let origBookmarkGroups = [];
-    let bookmarkGroups = [];
+export let serviceBroker;
+export let primaryEntityRef;
 
-    let bookmarksPromise;
-    let selectedKind;
+let nestedEnums = {};
+let bookmarkKinds = {};
+let origBookmarkGroups = [];
+let bookmarkGroups = [];
+let selectedKind = null;
 
-    const load = async (ref, force = false) => {
-        const er = await serviceBroker
-                .loadAppData(CORE_API.EnumValueStore.findAll);
+let enums = [];
 
-        const br = await serviceBroker
-                .loadViewData(CORE_API.BookmarkStore.findByParent, [ref], { force });
+$: load(primaryEntityRef);
+$: nestedEnums = nestEnums(enums);
+$: origBookmarkGroups = nestBookmarks(nestedEnums, $bookmarks);
+$: bookmarkKinds = mkBookmarkKinds(nestedEnums, $bookmarks);
+$: bookmarkGroups = origBookmarkGroups;
 
-        return Promise
-                .all([br, er])
-                .then(() => {
-                    nestedEnums = nestEnums(er.data);
-                    origBookmarkGroups = nestBookmarks(nestedEnums, br.data);
-                    bookmarkKinds = mkBookmarkKinds(nestedEnums, br.data);
-                    bookmarkGroups = origBookmarkGroups;
-                })
-                .catch(e => console.error(e));
-    };
+async function load(ref, force = false) {
+    await serviceBroker
+        .loadAppData(CORE_API.EnumValueStore.findAll)
+        .then(r => enums = r.data);
 
-    function bookmarkKindSelected(bookmarkKind) {
-        if (selectedKind === bookmarkKind) {
-            selectedKind = null;
-            bookmarkGroups = origBookmarkGroups;
-        } else {
-            selectedKind = bookmarkKind;
-            bookmarkGroups = _.filter(origBookmarkGroups, g => g.key === bookmarkKind.key);
-        }
+    loadBookmarks(serviceBroker, ref);
+}
+
+
+
+function bookmarkKindSelected(bookmarkKind) {
+    if (selectedKind === bookmarkKind) {
+        selectedKind = null;
+        bookmarkGroups = origBookmarkGroups;
+    } else {
+        selectedKind = bookmarkKind;
+        bookmarkGroups = _.filter(origBookmarkGroups, g => g.key === bookmarkKind.key);
     }
-
-    $: bookmarksPromise = load(primaryEntityRef);
+}
 
 </script>
 
@@ -62,33 +60,34 @@
 
 
 <div class="row">
+    <span>Bookmarks: {$bookmarks.length}</span>
 
     <div class="col-sm-4">
         <ul class="list-group small">
-                {#each bookmarkKinds as bookmarkKind}
-                    <li class="list-group-item"
-                        class:list-group-item-success={selectedKind === bookmarkKind}
-                        class:clickable={bookmarkKind.count > 0}
-                        class:text-muted={bookmarkKind.count === 0}
-                        on:click={() => bookmarkKind.count > 0 && bookmarkKindSelected(bookmarkKind)}>
-                        <Icon name={bookmarkKind.icon}/>
-                        {bookmarkKind.name}
+            {#each bookmarkKinds as bookmarkKind}
+                <li class="list-group-item"
+                    class:list-group-item-success={selectedKind === bookmarkKind}
+                    class:clickable={bookmarkKind.count > 0}
+                    class:text-muted={bookmarkKind.count === 0}
+                    on:click={() => bookmarkKind.count > 0 && bookmarkKindSelected(bookmarkKind)}>
+                    <Icon name={bookmarkKind.icon}/>
+                    {bookmarkKind.name}
 
-                        {#if selectedKind === bookmarkKind}
-                            <span class="pull-right">
-                                <Icon name="close"/>
-                            </span>
-                        {/if}
-                    </li>
-                {/each}
+                    {#if selectedKind === bookmarkKind}
+                        <span class="pull-right">
+                            <Icon name="close"/>
+                        </span>
+                    {/if}
+                </li>
+            {/each}
         </ul>
     </div>
 
 
     <div class="col-sm-8">
-        {#await bookmarksPromise}
+        {#if !bookmarkGroups}
             Loading
-        {:then result}
+        {:else}
             <ul class="list-unstyled bookmarks">
                 {#each bookmarkGroups as group, idx}
                     {#each group.value as bookmark}
@@ -98,8 +97,7 @@
                     {/each}
                 {/each}
             </ul>
-        {/await}
-
+        {/if}
     </div>
 
 </div>
