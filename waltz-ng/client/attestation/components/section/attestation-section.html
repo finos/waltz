@@ -208,7 +208,7 @@
                        ng-click="$ctrl.onInitiateAttestation(attestationSection.section)"
                        class="clickable">
                     </a>
-                    <span>|</span>
+                    <span ng-if="attestationSection.unattestedChanges.length > 0">|</span>
                 </div>
             </div>
         </content>
