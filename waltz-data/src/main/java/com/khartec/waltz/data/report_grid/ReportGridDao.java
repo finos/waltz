@@ -278,10 +278,11 @@ public class ReportGridDao {
             return emptySet();
         }
 
-        SelectConditionStep<Record3<Long, Long, Long>> qry = dsl
+        SelectConditionStep<Record4<Long, Long, Long, String>> qry = dsl
                 .select(mr.ENTITY_ID,
                         mr.MEASURABLE_ID,
-                        rsi.ID)
+                        rsi.ID,
+                        mr.DESCRIPTION)
                 .from(mr)
                 .innerJoin(m).on(m.ID.eq(mr.MEASURABLE_ID))
                 .innerJoin(mc).on(mc.ID.eq(m.MEASURABLE_CATEGORY_ID))
@@ -297,6 +298,7 @@ public class ReportGridDao {
                         .columnEntityId(r.get(mr.MEASURABLE_ID))
                         .columnEntityKind(EntityKind.MEASURABLE)
                         .ratingId(r.get(rsi.ID))
+                        .comment(r.get(mr.DESCRIPTION))
                         .build());
     }
 
@@ -309,7 +311,8 @@ public class ReportGridDao {
             return dsl
                     .select(ar.ENTITY_ID,
                             ar.ASSESSMENT_DEFINITION_ID,
-                            ar.RATING_ID)
+                            ar.RATING_ID,
+                            ar.DESCRIPTION)
                     .from(ar)
                     .where(ar.ASSESSMENT_DEFINITION_ID.in(requiredAssessmentDefinitionIds)
                             .and(ar.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
@@ -319,6 +322,7 @@ public class ReportGridDao {
                             .columnEntityId(r.get(ar.ASSESSMENT_DEFINITION_ID))
                             .columnEntityKind(EntityKind.ASSESSMENT_DEFINITION)
                             .ratingId(r.get(ar.RATING_ID))
+                            .comment(r.get(ar.DESCRIPTION))
                             .build());
         }
     }
