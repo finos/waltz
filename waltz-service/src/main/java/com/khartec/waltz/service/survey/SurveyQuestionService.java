@@ -83,6 +83,11 @@ public class SurveyQuestionService {
 
 
     public int delete(long questionId) {
-        return surveyQuestionDao.delete(questionId);
+
+        if(!surveyQuestionDao.hasResponses(questionId)){
+            return surveyQuestionDao.delete(questionId);
+        } else {
+            throw new IllegalArgumentException("There are responses to this question so it cannot be deleted");
+        }
     }
 }
