@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.web.endpoints.extracts;
 
+import com.khartec.waltz.data.changelog.ChangeLogDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.schema.tables.ChangeLog;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -28,10 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.util.List;
 
-import static com.khartec.waltz.common.ListUtilities.asList;
-import static com.khartec.waltz.schema.Tables.*;
+import static com.khartec.waltz.schema.Tables.CHANGE_LOG;
+import static com.khartec.waltz.schema.Tables.PERSON;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static java.lang.String.format;
 import static spark.Spark.get;
@@ -104,7 +103,7 @@ public class ChangeLogExtractor extends DirectQueryBasedDataExtractor {
             EntityReference entityRef = getEntityReference(request);
             EntityKind childKind = getKind(request, "childKind");
 
-            SelectSeekStep1<Record4<String, String, String, Timestamp>, Timestamp> qry = mkUnattestedChangesQuery(entityRef, childKind);
+            SelectJoinStep<Record4<String, String, String, Timestamp>> qry = mkUnattestedChangesQuery(entityRef, childKind);
 
             String filename = format("unattested-changes-%s-%d", childKind, entityRef.id());
 
@@ -117,45 +116,22 @@ public class ChangeLogExtractor extends DirectQueryBasedDataExtractor {
     }
 
 
-    private SelectSeekStep1<Record4<String, String, String, Timestamp>, Timestamp> mkUnattestedChangesQuery(EntityReference entityRef, EntityKind childKind) {
+    private SelectJoinStep<Record4<String, String, String, Timestamp>> mkUnattestedChangesQuery(EntityReference entityRef, EntityKind childKind) {
+        com.khartec.waltz.schema.tables.ChangeLog cl = com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG.as("cl");
 
-        List<String> operationKinds = asList(
-                Operation.UPDATE.name(),
-                Operation.ADD.name(),
-                Operation.REMOVE.name());
+        SelectConditionStep<Record> qry = ChangeLogDao.mkUnattestedChangesQuery(entityRef);
 
-        //find latest attestation
-        Field<Timestamp> latestAttestationTime = DSL.max(ATTESTATION_INSTANCE.ATTESTED_AT).as("latestAttestationTime");
+        SelectQuery<Record> selectQuery = dsl
+                .selectQuery(qry
+                        .and(cl.CHILD_KIND.eq(childKind.name())));
 
-        Table<Record4<String, Long, String, Timestamp>> latestAttestation = DSL
-                .select(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND,
-                        ATTESTATION_INSTANCE.PARENT_ENTITY_ID,
-                        ATTESTATION_INSTANCE.ATTESTED_ENTITY_KIND,
-                        latestAttestationTime)
-                .from(ATTESTATION_INSTANCE)
-                .where(ATTESTATION_INSTANCE.PARENT_ENTITY_ID.eq(entityRef.id()))
-                .and(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND.eq(entityRef.kind().name()))
-                .and(ATTESTATION_INSTANCE.ATTESTED_AT.isNotNull())
-                .and(ATTESTATION_INSTANCE.ATTESTED_ENTITY_KIND.eq(childKind.name()))
-                .groupBy(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND,
-                        ATTESTATION_INSTANCE.PARENT_ENTITY_ID,
-                        ATTESTATION_INSTANCE.ATTESTED_ENTITY_KIND)
-                .asTable("latest_attestation");
-
-        //only returns changes that apply to that child kind
         return dsl
-                .select(CHANGE_LOG.SEVERITY.as("Severity"),
-                        CHANGE_LOG.MESSAGE.as("Message"),
-                        CHANGE_LOG.USER_ID.as("User"),
-                        CHANGE_LOG.CREATED_AT.as("Timestamp"))
-                .from(CHANGE_LOG)
-                .innerJoin(latestAttestation)
-                .on(latestAttestation.field(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND).eq(CHANGE_LOG.PARENT_KIND)
-                        .and(latestAttestation.field(ATTESTATION_INSTANCE.PARENT_ENTITY_ID).eq(CHANGE_LOG.PARENT_ID)
-                                .and(latestAttestation.field(ATTESTATION_INSTANCE.ATTESTED_ENTITY_KIND).eq(CHANGE_LOG.CHILD_KIND))))
-                .where(CHANGE_LOG.OPERATION.in(operationKinds))
-                .and(CHANGE_LOG.CREATED_AT.gt(latestAttestation.field(latestAttestationTime)))
-                .orderBy(CHANGE_LOG.CREATED_AT.desc());
+                .select(
+                        selectQuery.field(cl.SEVERITY).as("Severity"),
+                        selectQuery.field(cl.MESSAGE).as("Message"),
+                        selectQuery.field(cl.USER_ID).as("User"),
+                        selectQuery.field(cl.CREATED_AT).as("Timestamp"))
+                .from(selectQuery);
     }
 
 }
