@@ -94,7 +94,8 @@ public class ChangeLogSummariesDao {
 
         Field<Date> date = DSL.date(CHANGE_LOG.CREATED_AT);
 
-        return dsl.select(date, DSL.count(CHANGE_LOG.ID))
+        return dsl
+                .select(date, DSL.count(CHANGE_LOG.ID))
                 .from(CHANGE_LOG)
                 .where(CHANGE_LOG.PARENT_ID.in(selector.selector())
                 .and(CHANGE_LOG.PARENT_KIND.eq(selector.kind().name())))
@@ -120,9 +121,10 @@ public class ChangeLogSummariesDao {
                         CHANGE_LOG.CHILD_KIND,
                         count)
                 .from(CHANGE_LOG)
-                .where(CHANGE_LOG.PARENT_ID.in(genericSelector.selector())
+                .where(dsl
+                        .renderInlined(CHANGE_LOG.PARENT_ID.in(genericSelector.selector())
                         .and(CHANGE_LOG.PARENT_KIND.eq(genericSelector.kind().name()))
-                        .and(dateRangeCondition))
+                        .and(dateRangeCondition)))
                 .groupBy(CHANGE_LOG.PARENT_ID, CHANGE_LOG.PARENT_KIND, CHANGE_LOG.CHILD_KIND)
                 .orderBy(count.desc())
                 .limit(limit.orElse(Integer.MAX_VALUE))
