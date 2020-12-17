@@ -57,9 +57,25 @@
         Description
     </div>
     <div class="col-sm-10">
-        <waltz-markdown ng-if="$ctrl.measurable.description"
-                        text="$ctrl.measurable.description">
-        </waltz-markdown>
+        <div ng-if="$ctrl.measurable.description"
+              ng-class="{'wmi-description': $ctrl.showMore == false && $ctrl.measurable.description.length > 350}">
+             <div ng-class="{'wmi-description-fade': $ctrl.showMore == false && $ctrl.measurable.description.length > 350}">
+             </div>
+             <waltz-markdown text="$ctrl.measurable.description">
+             </waltz-markdown>
+        </div>
+        <div ng-if="$ctrl.measurable.description.length > 350">
+            <a class="clickable small"
+               ng-if="$ctrl.showMore == false"
+               ng-click="$ctrl.showMore = true">
+                Show more
+            </a>
+            <a class="clickable small"
+               ng-if="$ctrl.showMore == true"
+               ng-click="$ctrl.showMore = false">
+                Show less
+            </a>
+        </div>
         <span ng-if="!$ctrl.measurable.description">
             Description not provided
         </span>
