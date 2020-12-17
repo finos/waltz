@@ -195,11 +195,21 @@
                 </div>
 
             </div>
-            <div class="waltz-sub-section-controls clickable"
-                 ng-if="attestationSection.latestAttestation && $ctrl.hasPermissionToAttest(attestationSection.section.type)">
-                <a ng-bind="attestationSection.section.actionLabel"
-                   ng-click="$ctrl.onInitiateAttestation(attestationSection.section)">
-                </a>
+            <div class="waltz-sub-section-controls">
+                <waltz-data-extract-link ng-if="attestationSection.unattestedChanges.length > 0"
+                                         name="Unattested changes"
+                                         styling="link"
+                                         filename="unattested-{{attestationSection.section.type}}-{{$ctrl.parentEntityRef.id}}.csv"
+                                         extract="change-log/unattested-changes/{{attestationSection.section.type}}/{{$ctrl.parentEntityRef.kind}}/{{$ctrl.parentEntityRef.id}}"
+                                         method="GET">
+                </waltz-data-extract-link>
+                <div ng-if="attestationSection.latestAttestation && $ctrl.hasPermissionToAttest(attestationSection.section.type)">
+                    <a ng-bind="attestationSection.section.actionLabel"
+                       ng-click="$ctrl.onInitiateAttestation(attestationSection.section)"
+                       class="clickable">
+                    </a>
+                    <span ng-if="attestationSection.unattestedChanges.length > 0">|</span>
+                </div>
             </div>
         </content>
     </waltz-sub-section>
