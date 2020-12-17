@@ -6,7 +6,6 @@ import org.springframework.core.io.Resource;
 import java.io.IOException;
 
 import static org.junit.Assert.*;
-import static sun.text.normalizer.ICUData.getStream;
 
 public class IOUtilities_getFileResource {
     @Test
