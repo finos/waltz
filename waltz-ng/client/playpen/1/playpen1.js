@@ -24,7 +24,7 @@ import BookmarkList from "./bookmark/BookmarkList.svelte";
 import {dynamicSections} from "../../dynamic-section/dynamic-section-definitions";
 
 const initData = {
-    ref: mkRef("APPLICATION", 913),
+    ref: mkRef("APPLICATION", 10),
     ref1: mkRef("APPLICATION", 12),
     ref2: mkRef("APPLICATION", 22),
     ref3: mkRef("APPLICATION", 212),

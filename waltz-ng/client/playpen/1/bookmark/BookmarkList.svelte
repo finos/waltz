@@ -1,49 +1,47 @@
 <script>
+    import Icon from "./Icon.svelte";
+    import BookmarkListItem from "./BookmarkListItem.svelte";
+    import {CORE_API} from "../../../common/services/core-api-utils";
+    import {nestEnums} from "./enum-utils";
+    import {mkBookmarkKinds, nestBookmarks} from "./bookmark-utils";
+    import {bookmarks, loadBookmarks} from "./stores";
 
-import Icon from "./Icon.svelte";
-import BookmarkListItem from "./BookmarkListItem.svelte";
-import {CORE_API} from "../../../common/services/core-api-utils";
-import {nestEnums} from "./enum-utils";
-import {mkBookmarkKinds, nestBookmarks} from "./bookmark-utils";
-import {bookmarks, loadBookmarks} from "./stores";
+    export let serviceBroker;
+    export let primaryEntityRef;
 
-export let serviceBroker;
-export let primaryEntityRef;
+    let nestedEnums = {};
+    let bookmarkKinds = {};
+    let origBookmarkGroups = [];
+    let bookmarkGroups = [];
+    let selectedKind = null;
 
-let nestedEnums = {};
-let bookmarkKinds = {};
-let origBookmarkGroups = [];
-let bookmarkGroups = [];
-let selectedKind = null;
+    let enums = [];
 
-let enums = [];
+    $: load(primaryEntityRef);
+    $: nestedEnums = nestEnums(enums);
+    $: origBookmarkGroups = nestBookmarks(nestedEnums, $bookmarks);
+    $: bookmarkKinds = mkBookmarkKinds(nestedEnums, $bookmarks);
+    $: bookmarkGroups = origBookmarkGroups;
 
-$: load(primaryEntityRef);
-$: nestedEnums = nestEnums(enums);
-$: origBookmarkGroups = nestBookmarks(nestedEnums, $bookmarks);
-$: bookmarkKinds = mkBookmarkKinds(nestedEnums, $bookmarks);
-$: bookmarkGroups = origBookmarkGroups;
+    async function load(ref, force = false) {
+        await serviceBroker
+            .loadAppData(CORE_API.EnumValueStore.findAll)
+            .then(r => enums = r.data);
 
-async function load(ref, force = false) {
-    await serviceBroker
-        .loadAppData(CORE_API.EnumValueStore.findAll)
-        .then(r => enums = r.data);
-
-    loadBookmarks(serviceBroker, ref);
-}
-
-
-
-function bookmarkKindSelected(bookmarkKind) {
-    if (selectedKind === bookmarkKind) {
-        selectedKind = null;
-        bookmarkGroups = origBookmarkGroups;
-    } else {
-        selectedKind = bookmarkKind;
-        bookmarkGroups = _.filter(origBookmarkGroups, g => g.key === bookmarkKind.key);
+        loadBookmarks(serviceBroker, ref);
     }
-}
 
+
+
+    function bookmarkKindSelected(bookmarkKind) {
+        if (selectedKind === bookmarkKind) {
+            selectedKind = null;
+            bookmarkGroups = origBookmarkGroups;
+        } else {
+            selectedKind = bookmarkKind;
+            bookmarkGroups = _.filter(origBookmarkGroups, g => g.key === bookmarkKind.key);
+        }
+    }
 </script>
 
 

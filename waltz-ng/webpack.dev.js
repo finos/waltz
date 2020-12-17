@@ -24,7 +24,7 @@ const common = require("./webpack.config");
 module.exports = smp.wrap(merge(common, {
     mode: "development",
     //devtool: "inline-source-map",
-    devtool: "cheap-module-eval-source-map",
+    //devtool: "cheap-module-eval-source-map",
     devServer: {
         contentBase: "./dist",
         disableHostCheck: true,
