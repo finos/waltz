@@ -14,7 +14,6 @@
         VIEWING: "VIEWING"
     };
 
-    let hovering = false;
     let mode = modes.EDITING;
 </script>
 
@@ -23,7 +22,7 @@
     <td style="vertical-align: middle">
         <Icon name={bookmark.icon}/>
     </td>
-    <td class:hovering>
+    <td>
         <a href={bookmark.url}>
             {bookmark.title || bookmark.domain}
         </a>
@@ -48,6 +47,11 @@
         {#if mode === modes.EDITING}
             <MiniActions ctx={bookmark}
                          actions={actions}/>
+            <div class="text-muted small">
+                Last updated:
+                {bookmark.lastUpdatedBy},
+                {timeAgo(bookmark.lastUpdatedAt)}
+            </div>
         {:else if mode === modes.VIEWING}
             <div class="text-muted small">
                 Last updated:

@@ -23,4 +23,9 @@
     li + li::before {
         content: "|";
     }
+
+    ul {
+        padding: 0;
+        margin: 0;
+    }
 </style>

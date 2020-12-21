@@ -20,7 +20,7 @@
 import template from "./playpen1.html";
 import {initialiseData} from "../../common";
 import {mkRef} from "../../common/entity-utils";
-import BookmarkList from "./bookmark/BookmarkList.svelte";
+import BookmarkPanel from "./bookmark/BookmarkPanel.svelte";
 import {dynamicSections} from "../../dynamic-section/dynamic-section-definitions";
 
 const initData = {
@@ -29,7 +29,7 @@ const initData = {
     ref2: mkRef("APPLICATION", 22),
     ref3: mkRef("APPLICATION", 212),
     ref4: mkRef("APPLICATION", 913),
-    bookmarkList: BookmarkList,
+    BookmarkPanel,
     bookmarksSection: dynamicSections.bookmarksSection,
 };
 
