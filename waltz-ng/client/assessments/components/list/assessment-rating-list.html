@@ -152,9 +152,10 @@
         <div>
             <div>
                 <strong ng-bind="item.ratingItem.name"></strong>
-                <div class="small"
-                     ng-if="item.ratingItem.description"
-                     ng-bind="item.ratingItem.description">
+                <div ng-if="item.ratingItem.description">
+                    <waltz-markdown class="small"
+                                    text="item.ratingItem.description">
+                    </waltz-markdown>
                 </div>
             </div>
             <hr class="waltz-no-margins"
