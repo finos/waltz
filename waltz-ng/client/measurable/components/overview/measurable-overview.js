@@ -87,6 +87,7 @@ function controller(serviceBroker, $state) {
                             vm.entireHierarchy = all;
                             vm.relevantHierarchy = relevantHierarchy;
                             vm.hierarchy = vm.relevantHierarchy;
+                            vm.expandedNodes = parents;
                         })
                 }
             });

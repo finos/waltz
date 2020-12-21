@@ -92,7 +92,8 @@
 
         <waltz-entity-selector on-select="$ctrl.onEntitySelect"
                                current-selection="$ctrl.currentInvolvement.entity"
-                               entity-kinds="[$ctrl.targetEntityKind]">
+                               entity-kinds="[$ctrl.targetEntityKind]"
+                               entity-lifecycle-statuses='["ACTIVE"]'>
         </waltz-entity-selector>
 
         <br />

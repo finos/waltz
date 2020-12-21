@@ -18,7 +18,7 @@
 
 import template from "./report-grid-view-panel.html";
 import {initialiseData} from "../../../common";
-import {mkLinkGridCell} from "../../../common/grid-utils";
+import {mkEntityLinkGridCell} from "../../../common/grid-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
@@ -38,7 +38,13 @@ const initData = {
     filters: []
 };
 
-const nameCol = mkLinkGridCell("Name", "application.name", "application.id", "main.app.view", { pinnedLeft:true, width: 200});
+const nameCol = mkEntityLinkGridCell(
+    "Name",
+    "application",
+    "none",
+    "right",
+    { pinnedLeft:true, width: 200});
+
 const extIdCol = { field: "application.externalId", displayName: "Ext. Id", width: 100, pinnedLeft:true};
 
 const unknownRating = {
@@ -82,10 +88,20 @@ function prepareColumnDefs(gridData) {
             displayName: c.columnEntityReference.name,
             columnDef: c,
             width: 100,
+            headerTooltip: c.columnEntityReference.description,
             cellTemplate: `
             <div class="waltz-grid-color-cell"
                  ng-bind="COL_FIELD.name"
-                 ng-style="{'background-color': COL_FIELD.color, 'color': COL_FIELD.fontColor}">
+                 uib-popover-html="COL_FIELD.comment"
+                 popover-trigger="mouseenter"
+                 popover-enable="COL_FIELD.comment != null"
+                 popover-popup-delay="500"
+                 popover-append-to-body="true"
+                 popover-placement="left"
+                 ng-style="{
+                    'border-bottom-right-radius': COL_FIELD.comment ? '15% 50%' : 0,
+                    'background-color': COL_FIELD.color, 'color': COL_FIELD.fontColor
+                 }">
             </div>`,
             sortingAlgorithm: (a, b) => {
                 if (a == null) return 1;
@@ -98,6 +114,25 @@ function prepareColumnDefs(gridData) {
     return _.concat([nameCol, extIdCol], measurableCols);
 }
 
+
+function mkPopoverHtml(cellData, ratingSchemeItem) {
+    const comment = cellData.comment;
+    if (_.isEmpty(comment)) {
+        return "";
+    } else {
+        const ratingDesc = ratingSchemeItem.description === ratingSchemeItem.name
+            ? ""
+            : `<div class='help-block'>${ratingSchemeItem.description}</div>`;
+
+        return `
+            <div class='small'>
+                <label>Comment:</label> ${cellData.comment}
+                <hr>
+                <label>Rating:</label> ${ratingSchemeItem.name}
+                ${ratingDesc}
+            </div>`;
+    }
+}
 
 function prepareTableData(gridData) {
     const appsById = _.keyBy(gridData.instance.applications, d => d.id);
@@ -119,7 +154,12 @@ function prepareTableData(gridData) {
         .map((xs, k) => _.reduce(
             xs,
             (acc, x) => {
-                acc[mkPropNameForCellRef(x)] = ratingSchemeItemsById[x.ratingId];
+                const ratingSchemeItem = ratingSchemeItemsById[x.ratingId];
+                const popoverHtml = mkPopoverHtml(x, ratingSchemeItem);
+                acc[mkPropNameForCellRef(x)] = Object.assign(
+                    {},
+                    ratingSchemeItem,
+                    { comment: popoverHtml });
                 return acc;
             },
             initialiseDataForRow(appsById[k], columnRefs)))
