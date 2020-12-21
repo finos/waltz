@@ -22,9 +22,10 @@
     <h4>
         <span ng-bind="$ctrl.assessment.definition.name"></span>
     </h4>
-    <div class="text-muted"
-         ng-bind="$ctrl.assessment.definition.description">
+    <div class="text-muted">
+        <waltz-markdown text="$ctrl.assessment.definition.description"></waltz-markdown>
     </div>
+
     <br>
 
     <!-- EDIT -->
@@ -80,7 +81,8 @@
         <table class="waltz-field-table waltz-field-table-border"
                style="width: 100%">
             <tr>
-                <td class="text-muted">
+                <td class="text-muted"
+                    style="vertical-align: top">
                     Rating
                 </td>
                 <td>
@@ -92,6 +94,11 @@
                     <span ng-if="!$ctrl.assessment.ratingItem">
                         Not provided
                     </span>
+                    <div ng-if="$ctrl.assessment.ratingItem.description">
+                        <waltz-markdown class="small"
+                                        text="$ctrl.assessment.ratingItem.description">
+                        </waltz-markdown>
+                    </div>
                 </td>
             </tr>
             <tr>
