@@ -19,11 +19,8 @@
 import {ascending} from "d3-array";
 import {nest} from "d3-collection";
 import * as enumUtils from "./enum-utils";
+import {toDomain} from "../../../common/string-utils";
 
-
-export function toDomain(url) {
-    return "www.google.com";
-}
 
 
 export function mkBookmarkKinds(nestedEnums, bookmarks = []) {

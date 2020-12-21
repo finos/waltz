@@ -4,7 +4,7 @@
     export let flip;          // 90 | 180 | 270
     export let rotate;       // horizontal | vertical
     export let stack;
-    export let fixedWidth;
+    export let fixedWidth = true;
     export let inverse;
     export let spin;
 

@@ -86,7 +86,6 @@ module.exports = {
         rules: [
             {
                 test: /\.svelte$/,
-                //exclude: /node_modules/,
                 use: [
                     { loader: "babel-loader" },
                     {
@@ -101,8 +100,7 @@ module.exports = {
                     }
                 ],
 
-            },
-            {
+            }, {
                 test: /(\.m?jsx?$)/,
                 use: ["babel-loader"]
             }, {

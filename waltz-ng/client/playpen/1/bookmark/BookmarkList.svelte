@@ -1,101 +1,100 @@
 <script>
-    import Icon from "./Icon.svelte";
     import BookmarkListItem from "./BookmarkListItem.svelte";
     import {CORE_API} from "../../../common/services/core-api-utils";
     import {nestEnums} from "./enum-utils";
     import {mkBookmarkKinds, nestBookmarks} from "./bookmark-utils";
     import {bookmarks, loadBookmarks} from "./stores";
+    import BookmarkCategoryMenu from "./BookmarkCategoryMenu.svelte";
+    import SearchInput from "../common/SearchInput.svelte";
 
     export let serviceBroker;
     export let primaryEntityRef;
 
     let nestedEnums = {};
     let bookmarkKinds = {};
-    let origBookmarkGroups = [];
     let bookmarkGroups = [];
+
     let selectedKind = null;
+    let qry = "";
 
-    let enums = [];
+    $: serviceBroker
+        .loadAppData(CORE_API.EnumValueStore.findAll)
+        .then(r => nestedEnums = nestEnums(r.data));
 
-    $: load(primaryEntityRef);
-    $: nestedEnums = nestEnums(enums);
-    $: origBookmarkGroups = nestBookmarks(nestedEnums, $bookmarks);
+    $: {
+        const xs = _
+            .chain($bookmarks)
+            .filter(selectedKind
+                ? b => b.bookmarkKind === selectedKind.key
+                : () => true)
+            .filter(_.isEmpty(qry)
+                ? () => true
+                : b => _.join([b.title, b.url, b.description]).toLowerCase().indexOf(qry) > -1)
+            .value()
+
+        bookmarkGroups = nestBookmarks(nestedEnums, xs);
+    }
+
     $: bookmarkKinds = mkBookmarkKinds(nestedEnums, $bookmarks);
-    $: bookmarkGroups = origBookmarkGroups;
 
-    async function load(ref, force = false) {
-        await serviceBroker
-            .loadAppData(CORE_API.EnumValueStore.findAll)
-            .then(r => enums = r.data);
+    $: loadBookmarks(serviceBroker, primaryEntityRef);
 
-        loadBookmarks(serviceBroker, ref);
+    function onKindSelect(e) {
+        selectedKind = e.detail.kind;
     }
 
-
-
-    function bookmarkKindSelected(bookmarkKind) {
-        if (selectedKind === bookmarkKind) {
-            selectedKind = null;
-            bookmarkGroups = origBookmarkGroups;
-        } else {
-            selectedKind = bookmarkKind;
-            bookmarkGroups = _.filter(origBookmarkGroups, g => g.key === bookmarkKind.key);
+    const actions = [
+        {
+            icon: "pencil",
+            name: "Edit",
+            isEnabled: (d) => true,
+            handleAction: (d) => console.log("edit", d)
+        }, {
+            icon: "trash",
+            name: "Remove",
+            isEnabled: (d) => true,
+            handleAction: (d) => console.log("remove", d)
         }
-    }
+    ];
 </script>
 
 
-<style>
-    .bookmarks li {
-        border-bottom: 1px solid #eee;
-        padding-bottom: 4px;
-    }
-
-    .bookmarks li:last-child {
-        border-bottom: none;
-    }
-</style>
-
-
 <div class="row">
-    <span>Bookmarks: {$bookmarks.length}</span>
-
     <div class="col-sm-4">
-        <ul class="list-group small">
-            {#each bookmarkKinds as bookmarkKind}
-                <li class="list-group-item"
-                    class:list-group-item-success={selectedKind === bookmarkKind}
-                    class:clickable={bookmarkKind.count > 0}
-                    class:text-muted={bookmarkKind.count === 0}
-                    on:click={() => bookmarkKind.count > 0 && bookmarkKindSelected(bookmarkKind)}>
-                    <Icon name={bookmarkKind.icon}/>
-                    {bookmarkKind.name}
-
-                    {#if selectedKind === bookmarkKind}
-                        <span class="pull-right">
-                            <Icon name="close"/>
-                        </span>
-                    {/if}
-                </li>
-            {/each}
-        </ul>
+        <BookmarkCategoryMenu on:kindSelect={onKindSelect}
+                              bookmarkKinds={bookmarkKinds}/>
     </div>
 
-
     <div class="col-sm-8">
+        {#if $bookmarks.length > 5}
+            <SearchInput bind:value={qry}
+                         placeholder="Search bookmarks..."/>
+            <br>
+        {/if}
+
         {#if !bookmarkGroups}
             Loading
         {:else}
-            <ul class="list-unstyled bookmarks">
-                {#each bookmarkGroups as group, idx}
-                    {#each group.value as bookmark}
-                        <li>
-                            <BookmarkListItem {bookmark}/>
-                        </li>
-                    {/each}
+            <table class="table table-condensed table-hover">
+                <colgroup>
+                    <col width="5%">
+                    <col width="65%">
+                    <col width="30%">
+                </colgroup>
+                {#each bookmarkGroups as group}
+                    <tbody>
+                        {#each group.value as bookmark}
+                            <BookmarkListItem {actions} {bookmark}/>
+                        {/each}
+                    </tbody>
                 {/each}
-            </ul>
+            </table>
         {/if}
     </div>
-
 </div>
+
+
+<style>
+
+</style>
+
