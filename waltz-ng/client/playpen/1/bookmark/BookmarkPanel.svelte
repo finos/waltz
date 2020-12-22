@@ -7,7 +7,7 @@
     import {nestEnums} from "../common/enum-utils";
     import {mkBookmarkKinds, nestBookmarks} from "./bookmark-utils";
     import {mkBookmarkStore} from "./bookmark-store";
-    import {mkUserStore} from "../common/user-store";
+    import {mkUserStore} from "../user/user-store";
 
     import roles from "../../../user/system-roles";
     import NoData from "../common/NoData.svelte";
@@ -81,15 +81,23 @@
     }
 
     function doRemove() {
-        bookmarks
+        return bookmarks
             .remove(removalCandidate)
             .then(() => removalCandidate = null);
     }
 
     function doSave(bookmark) {
-        bookmarks
+        return bookmarks
             .save(bookmark)
             .then(() => editCandidate = null);
+    }
+
+    function onCreate() {
+        editCandidate = {
+            bookmarkKind: _.get(selectedKind, "key"),
+            parent: primaryEntityRef,
+            lastUpdatedBy: "ignored, server will set"
+        };
     }
 
 </script>
@@ -109,6 +117,7 @@
                                           doCancel={() => removalCandidate = null}/>
         {:else if editCandidate}
             <BookmarkEditor bookmark={editCandidate}
+                            kinds={bookmarkKinds}
                             {doSave}
                             doCancel={() => editCandidate = null} />
         {:else}
@@ -127,7 +136,8 @@
                     {#if actions.length > 0}
                         <tr>
                             <td colspan="3">
-                                <button class="btn btn-link">
+                                <button class="btn btn-link"
+                                        on:click={() => onCreate()}>
                                     <Icon name="plus"/>
                                     Add bookmark
                                 </button>

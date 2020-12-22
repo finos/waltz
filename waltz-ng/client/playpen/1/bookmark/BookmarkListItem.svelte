@@ -11,7 +11,7 @@
 </script>
 
 
-<tr>
+<tr class="waltz-visibility-parent">
     <td style="vertical-align: middle">
         <Icon name={bookmark.icon}/>
     </td>
@@ -36,10 +36,12 @@
             {bookmark.description || "No description provided"}
         </div>
     </td>
-    <td>
+    <td style="text-align: right; padding-right: 1em;">
 
-        <MiniActions ctx={bookmark}
-                     actions={actions}/>
+        <div class="waltz-visibility-child-20">
+            <MiniActions ctx={bookmark}
+                         actions={actions}/>
+        </div>
 
         <div class="text-muted small">
             Last updated:

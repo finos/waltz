@@ -37,9 +37,19 @@ export function mkBookmarkStore(serviceBroker) {
         .execute(CORE_API.BookmarkStore.remove, [bookmark.id])
         .then(r => load(bookmark.parent, true));
 
+    const save = (bookmark) => {
+        const strippedBookmark = _.pick(
+            bookmark,
+            ["id", "bookmarkKind", "url", "title", "isRestricted", "parent", "description", "lastUpdatedBy"]);
+        return serviceBroker
+            .execute(CORE_API.BookmarkStore.save, [strippedBookmark])
+            .then(r => load(bookmark.parent, true));
+    }
+
     return {
         load,
         remove,
+        save,
         subscribe
     };
 }
