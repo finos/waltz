@@ -18,9 +18,8 @@
 
 import {ascending} from "d3-array";
 import {nest} from "d3-collection";
-import * as enumUtils from "./enum-utils";
+import * as enumUtils from "../common/enum-utils";
 import {toDomain} from "../../../common/string-utils";
-
 
 
 export function mkBookmarkKinds(nestedEnums, bookmarks = []) {

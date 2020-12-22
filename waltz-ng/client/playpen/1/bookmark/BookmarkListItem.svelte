@@ -1,20 +1,13 @@
 <script>
     import Icon from "../common/Icon.svelte";
-    import moment from "moment";
     import MiniActions from "../common/MiniActions.svelte";
+    import DateTime from "../common/DateTime.svelte";
+
     import _ from "lodash";
+    import LastEdited from "../common/LastEdited.svelte";
 
     export let bookmark;
     export let actions = [];
-
-    const timeAgo = t => moment.utc(t).fromNow();
-
-    const modes = {
-        EDITING: "EDITING",
-        VIEWING: "VIEWING"
-    };
-
-    let mode = modes.EDITING;
 </script>
 
 
@@ -44,22 +37,15 @@
         </div>
     </td>
     <td>
-        {#if mode === modes.EDITING}
-            <MiniActions ctx={bookmark}
-                         actions={actions}/>
-            <div class="text-muted small">
-                Last updated:
-                {bookmark.lastUpdatedBy},
-                {timeAgo(bookmark.lastUpdatedAt)}
-            </div>
-        {:else if mode === modes.VIEWING}
-            <div class="text-muted small">
-                Last updated:
-                <br>
-                {bookmark.lastUpdatedBy},
-                {timeAgo(bookmark.lastUpdatedAt)}
-            </div>
-        {/if}
+
+        <MiniActions ctx={bookmark}
+                     actions={actions}/>
+
+        <div class="text-muted small">
+            Last updated:
+            <LastEdited entity={bookmark}/>
+        </div>
+
     </td>
 </tr>
 

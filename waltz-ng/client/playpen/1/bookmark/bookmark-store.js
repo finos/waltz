@@ -23,15 +23,23 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 export const bookmarks = writable([]);
 
 
-export async function loadBookmarks(
-    serviceBroker,
-    ref,
-    force = false)
-{
-    const r = await serviceBroker
-        .loadViewData(
+export function mkBookmarkStore(serviceBroker) {
+    const { subscribe, set } = writable(0);
+
+    const load = (ref, force = false) => serviceBroker
+        .loadAppData(
             CORE_API.BookmarkStore.findByParent,
             [ref],
             {force})
-    bookmarks.set(r.data);
+        .then(r => set(r.data));
+
+    const remove = (bookmark) => serviceBroker
+        .execute(CORE_API.BookmarkStore.remove, [bookmark.id])
+        .then(r => load(bookmark.parent, true));
+
+    return {
+        load,
+        remove,
+        subscribe
+    };
 }

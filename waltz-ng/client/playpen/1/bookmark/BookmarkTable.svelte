@@ -17,4 +17,6 @@
         {/each}
         </tbody>
     {/each}
+    <slot name="footer">
+    </slot>
 </table>

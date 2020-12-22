@@ -4,18 +4,24 @@
     import SearchInput from "../common/SearchInput.svelte";
 
     import {CORE_API} from "../../../common/services/core-api-utils";
-    import {nestEnums} from "./enum-utils";
+    import {nestEnums} from "../common/enum-utils";
     import {mkBookmarkKinds, nestBookmarks} from "./bookmark-utils";
-    import {bookmarks, loadBookmarks} from "./bookmark-store";
+    import {mkBookmarkStore} from "./bookmark-store";
     import {mkUserStore} from "../common/user-store";
 
     import roles from "../../../user/system-roles";
-    import BookmarkListItem from "./BookmarkListItem.svelte";
+    import NoData from "../common/NoData.svelte";
+
+    import _ from "lodash";
+    import Icon from "../common/Icon.svelte";
+    import BookmarkRemovalConfirmation from "./BookmarkRemovalConfirmation.svelte";
+    import BookmarkEditor from "./BookmarkEditor.svelte";
 
     export let serviceBroker = null;
     export let primaryEntityRef = null;
 
     let user;
+    let bookmarks;
     let nestedEnums = {};
     let bookmarkKinds = {};
     let bookmarkGroups = [];
@@ -45,9 +51,10 @@
             .then(r => nestedEnums = nestEnums(r.data));
 
         user = mkUserStore(serviceBroker);
+        bookmarks = mkBookmarkStore(serviceBroker);
     }
 
-    $: loadBookmarks(serviceBroker, primaryEntityRef);
+    $: bookmarks.load(primaryEntityRef);
 
     $: actions = _.includes($user.roles, roles.BOOKMARK_EDITOR.key)
         ? [editAction, removeAction]
@@ -73,52 +80,65 @@
         selectedKind = e.detail.kind;
     }
 
+    function doRemove() {
+        bookmarks
+            .remove(removalCandidate)
+            .then(() => removalCandidate = null);
+    }
+
+    function doSave(bookmark) {
+        bookmarks
+            .save(bookmark)
+            .then(() => editCandidate = null);
+    }
+
 </script>
 
 
 <div class="row">
     <div class="col-sm-4">
         <BookmarkCategoryMenu on:kindSelect={onKindSelect}
-                              bookmarkKinds={bookmarkKinds}/>
+                               bookmarkKinds={bookmarkKinds}/>
     </div>
 
     <div class="col-sm-8">
 
         {#if removalCandidate}
-            <div class="alert alert-warning removal-warning">
-                <h3>Confirm bookmark removal</h3>
-                Are you sure you want to this bookmark ?
-                <table class="table">
-                    <BookmarkListItem bookmark={removalCandidate}/>
-                </table>
-            </div>
+            <BookmarkRemovalConfirmation bookmark={removalCandidate}
+                                          {doRemove}
+                                          doCancel={() => removalCandidate = null}/>
         {:else if editCandidate}
-            <h1>Edit</h1>
+            <BookmarkEditor bookmark={editCandidate}
+                            {doSave}
+                            doCancel={() => editCandidate = null} />
         {:else}
             {#if $bookmarks.length > 5}
                 <SearchInput bind:value={qry}
                              placeholder="Search bookmarks..."/>
                 <br>
             {/if}
-            {#if !bookmarkGroups}
-                Loading
+            {#if _.isEmpty(bookmarkGroups)}
+                <NoData>
+                    No bookmarks
+                </NoData>
             {:else}
-                <BookmarkTable {bookmarkGroups} {actions}/>
+                <BookmarkTable {bookmarkGroups} {actions}>
+                    <tfoot slot="footer">
+                    {#if actions.length > 0}
+                        <tr>
+                            <td colspan="3">
+                                <button class="btn btn-link">
+                                    <Icon name="plus"/>
+                                    Add bookmark
+                                </button>
+                            </td>
+                        </tr>
+                    {/if}
+                    </tfoot>
+                </BookmarkTable>
             {/if}
         {/if}
 
     </div>
 </div>
-
-
-<style>
-    .removal-warning {
-        background-color: #ffe6ff
-    }
-    .removal-warning table {
-        padding: 1em;
-        border: 1px solid #ccc;
-
-    }
-</style>
 
