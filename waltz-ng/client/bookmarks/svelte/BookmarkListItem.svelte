@@ -1,10 +1,10 @@
 <script>
-    import Icon from "../common/Icon.svelte";
-    import MiniActions from "../common/MiniActions.svelte";
-    import DateTime from "../common/DateTime.svelte";
+    import Icon from "../../common/svelte/Icon.svelte";
+    import MiniActions from "../../common/svelte/MiniActions.svelte";
+    import DateTime from "../../common/svelte/DateTime.svelte";
 
     import _ from "lodash";
-    import LastEdited from "../common/LastEdited.svelte";
+    import LastEdited from "../../common/svelte/LastEdited.svelte";
 
     export let bookmark;
     export let actions = [];

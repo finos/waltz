@@ -1,5 +1,5 @@
 <script>
-    import Icon from '../common/Icon.svelte';
+    import Icon from '../../common/svelte/Icon.svelte';
     import {createEventDispatcher} from "svelte";
 
     export let bookmarkKinds = [];

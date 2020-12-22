@@ -18,8 +18,8 @@
 
 import {ascending} from "d3-array";
 import {nest} from "d3-collection";
-import * as enumUtils from "../common/enum-utils";
-import {toDomain} from "../../../common/string-utils";
+import * as enumUtils from "../../common/svelte/enum-utils";
+import {toDomain} from "../../common/string-utils";
 import _ from "lodash";
 
 

@@ -15,7 +15,7 @@
  * See the License for the specific
  *
  */
-import BookmarkPanel from "../playpen/1/bookmark/BookmarkPanel.svelte";
+import BookmarkPanel from "../bookmarks/svelte/BookmarkPanel.svelte";
 
 
 const appsSection = {

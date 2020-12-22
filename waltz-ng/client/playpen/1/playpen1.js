@@ -20,7 +20,7 @@
 import template from "./playpen1.html";
 import {initialiseData} from "../../common";
 import {mkRef} from "../../common/entity-utils";
-import BookmarkPanel from "./bookmark/BookmarkPanel.svelte";
+import BookmarkPanel from "../../bookmarks/svelte/BookmarkPanel.svelte";
 import {dynamicSections} from "../../dynamic-section/dynamic-section-definitions";
 
 const initData = {

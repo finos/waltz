@@ -3,16 +3,16 @@
     import BookmarkEditor from "./BookmarkEditor.svelte";
     import BookmarkTable from "./BookmarkTable.svelte";
     import BookmarkRemovalConfirmation from "./BookmarkRemovalConfirmation.svelte";
-    import Icon from "../common/Icon.svelte";
-    import NoData from "../common/NoData.svelte";
-    import SearchInput from "../common/SearchInput.svelte";
+    import Icon from "../../common/svelte/Icon.svelte";
+    import NoData from "../../common/svelte/NoData.svelte";
+    import SearchInput from "../../common/svelte/SearchInput.svelte";
 
-    import {CORE_API} from "../../../common/services/core-api-utils";
-    import {nestEnums} from "../common/enum-utils";
+    import {CORE_API} from "../../common/services/core-api-utils";
+    import {nestEnums} from "../../common/svelte/enum-utils";
     import {filterBookmarks, mkBookmarkKinds, nestBookmarks} from "./bookmark-utils";
     import {mkBookmarkStore} from "./bookmark-store";
-    import {mkUserStore} from "../user/user-store";
-    import roles from "../../../user/system-roles";
+    import {mkUserStore} from "../../user/svelte/user-store";
+    import roles from "../../user/system-roles";
 
     import _ from "lodash";
 
