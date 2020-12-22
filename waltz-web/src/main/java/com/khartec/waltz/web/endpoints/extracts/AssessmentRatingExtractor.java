@@ -19,13 +19,14 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
 import com.khartec.waltz.data.InlineSelectFieldFactory;
-import com.khartec.waltz.data.SelectorUtilities;
 import com.khartec.waltz.data.assessment_definition.AssessmentDefinitionDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.LifecycleStatus;
 import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record6;
+import org.jooq.SelectConditionStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,8 @@ import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.WebUtilities.getId;
+import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static spark.Spark.post;
 
 
