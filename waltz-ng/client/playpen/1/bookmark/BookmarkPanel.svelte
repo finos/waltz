@@ -1,21 +1,20 @@
 <script>
-    import BookmarkTable from "./BookmarkTable.svelte";
     import BookmarkCategoryMenu from "./BookmarkCategoryMenu.svelte";
+    import BookmarkEditor from "./BookmarkEditor.svelte";
+    import BookmarkTable from "./BookmarkTable.svelte";
+    import BookmarkRemovalConfirmation from "./BookmarkRemovalConfirmation.svelte";
+    import Icon from "../common/Icon.svelte";
+    import NoData from "../common/NoData.svelte";
     import SearchInput from "../common/SearchInput.svelte";
 
     import {CORE_API} from "../../../common/services/core-api-utils";
     import {nestEnums} from "../common/enum-utils";
-    import {mkBookmarkKinds, nestBookmarks} from "./bookmark-utils";
+    import {filterBookmarks, mkBookmarkKinds, nestBookmarks} from "./bookmark-utils";
     import {mkBookmarkStore} from "./bookmark-store";
     import {mkUserStore} from "../user/user-store";
-
     import roles from "../../../user/system-roles";
-    import NoData from "../common/NoData.svelte";
 
     import _ from "lodash";
-    import Icon from "../common/Icon.svelte";
-    import BookmarkRemovalConfirmation from "./BookmarkRemovalConfirmation.svelte";
-    import BookmarkEditor from "./BookmarkEditor.svelte";
 
     export let serviceBroker = null;
     export let primaryEntityRef = null;
@@ -45,37 +44,6 @@
         handleAction: (d) => removalCandidate = d
     };
 
-    $: {
-        serviceBroker
-            .loadAppData(CORE_API.EnumValueStore.findAll)
-            .then(r => nestedEnums = nestEnums(r.data));
-
-        user = mkUserStore(serviceBroker);
-        bookmarks = mkBookmarkStore(serviceBroker);
-    }
-
-    $: bookmarks.load(primaryEntityRef);
-
-    $: actions = _.includes($user.roles, roles.BOOKMARK_EDITOR.key)
-        ? [editAction, removeAction]
-        : [];
-
-    $: {
-        const xs = _
-            .chain($bookmarks)
-            .filter(selectedKind
-                ? b => b.bookmarkKind === selectedKind.key
-                : () => true)
-            .filter(_.isEmpty(qry)
-                ? () => true
-                : b => _.join([b.title, b.url, b.description]).toLowerCase().indexOf(qry) > -1)
-            .value()
-
-        bookmarkGroups = nestBookmarks(nestedEnums, xs);
-    }
-
-    $: bookmarkKinds = mkBookmarkKinds(nestedEnums, $bookmarks);
-
     function onKindSelect(e) {
         selectedKind = e.detail.kind;
     }
@@ -99,6 +67,27 @@
             lastUpdatedBy: "ignored, server will set"
         };
     }
+
+    $: {
+        serviceBroker
+            .loadAppData(CORE_API.EnumValueStore.findAll)
+            .then(r => nestedEnums = nestEnums(r.data));
+
+        user = mkUserStore(serviceBroker);
+        bookmarks = mkBookmarkStore(serviceBroker);
+    }
+
+    $: bookmarks.load(primaryEntityRef);
+
+    $: actions = _.includes($user.roles, roles.BOOKMARK_EDITOR.key)
+        ? [editAction, removeAction]
+        : [];
+
+    $: bookmarkGroups = nestBookmarks(
+        nestedEnums,
+        filterBookmarks($bookmarks, selectedKind, qry));
+
+    $: bookmarkKinds = mkBookmarkKinds(nestedEnums, $bookmarks);
 
 </script>
 

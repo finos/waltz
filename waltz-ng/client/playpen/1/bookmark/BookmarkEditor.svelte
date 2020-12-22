@@ -41,7 +41,6 @@
         </div>
     </div>
 
-
     <div class="form-group">
         <label for="kind">
             Kind
@@ -55,7 +54,6 @@
             {/each}
         </select>
     </div>
-
 
     <div class="form-group">
         <label for="description">Description</label>

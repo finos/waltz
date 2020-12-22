@@ -20,6 +20,7 @@ import {ascending} from "d3-array";
 import {nest} from "d3-collection";
 import * as enumUtils from "../common/enum-utils";
 import {toDomain} from "../../../common/string-utils";
+import _ from "lodash";
 
 
 export function mkBookmarkKinds(nestedEnums, bookmarks = []) {
@@ -71,4 +72,16 @@ function getIcon(nestedEnums, key) {
 
 function getName(nestedEnums, key) {
     return enumUtils.getName(nestedEnums, "BookmarkKind", key);
+}
+
+export function filterBookmarks(xs, kind, qry) {
+    return _
+        .chain(xs)
+        .filter(kind
+            ? b => b.bookmarkKind === kind.key
+            : () => true)
+        .filter(_.isEmpty(qry)
+            ? () => true
+            : b => _.join([b.title, b.url, b.description]).toLowerCase().indexOf(qry) > -1)
+        .value();
 }
