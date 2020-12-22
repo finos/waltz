@@ -15,6 +15,8 @@
  * See the License for the specific
  *
  */
+import BookmarkPanel from "../playpen/1/bookmark/BookmarkPanel.svelte";
+
 
 const appsSection = {
     componentId: "apps-section",
@@ -42,13 +44,6 @@ const authSourcesSection = {
     name: "Authoritative Sources",
     icon: "shield",
     id: 4,
-};
-
-const bookmarksSection = {
-    componentId: "bookmarks-section",
-    name: "Bookmarks",
-    icon: "rocket",
-    id: 5,
 };
 
 const changeInitiativeSection = {
@@ -316,6 +311,15 @@ const reportGridViewSection = {
     icon: "cloud",
     id: 170
 };
+
+
+const bookmarksSection = {
+    svelteComponent: BookmarkPanel,
+    name: "Bookmarks",
+    icon: "rocket",
+    id: 5,
+};
+
 
 export const dynamicSections = {
     appCostsSection,

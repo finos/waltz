@@ -62,7 +62,7 @@
 
     function onCreate() {
         editCandidate = {
-            bookmarkKind: _.get(selectedKind, "key"),
+            bookmarkKind: _.get(selectedKind, "key", "DOCUMENTATION"),
             parent: primaryEntityRef,
             lastUpdatedBy: "ignored, server will set"
         };
@@ -118,7 +118,17 @@
             {#if _.isEmpty(bookmarkGroups)}
                 <NoData>
                     No bookmarks
+                    {#if actions.length > 0}
+                        <div style="padding-top: 1em;">
+                            <button class="btn btn-sm btn-default"
+                                    on:click={() => onCreate()}>
+                                <Icon name="plus"/>
+                                Add bookmark
+                            </button>
+                        </div>
+                    {/if}
                 </NoData>
+
             {:else}
                 <BookmarkTable {bookmarkGroups} {actions}>
                     <tfoot slot="footer">
