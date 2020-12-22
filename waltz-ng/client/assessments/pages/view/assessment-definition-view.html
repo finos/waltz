@@ -30,8 +30,6 @@
         </breadcrumbs>
     </waltz-page-header>
 
-
-
     <waltz-section icon="desktop" name="Assessment Ratings">
         <div class="row">
 
@@ -42,6 +40,11 @@
                             ui-sref="main.assessment-definition.edit ({definitionId: ctrl.definition.id})">
                         Edit
                     </button>
+                    <waltz-data-extract-link name="Export"
+                                             styling="button"
+                                             extract="assessment-rating/by-definition/{{ctrl.definition.id}}"
+                                             method="POST">
+                    </waltz-data-extract-link>
                 </waltz-section-actions>
                 <waltz-grid-with-search scope-provider="ctrl"
                                         ng-if="ctrl.appRatings.length > 0"
