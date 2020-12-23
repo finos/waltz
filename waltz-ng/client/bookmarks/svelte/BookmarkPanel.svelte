@@ -10,8 +10,8 @@
     import {CORE_API} from "../../common/services/core-api-utils";
     import {nestEnums} from "../../common/svelte/enum-utils";
     import {filterBookmarks, mkBookmarkKinds, nestBookmarks} from "./bookmark-utils";
-    import {mkBookmarkStore} from "./bookmark-store";
-    import {mkUserStore} from "../../user/svelte/user-store";
+    import {mkBookmarkStore} from "../../svelte-stores/bookmark-store";
+    import {mkUserStore} from "../../svelte-stores/user-store";
     import roles from "../../user/system-roles";
 
     import _ from "lodash";
