@@ -62,6 +62,7 @@ function controller($q,
         $q.all([ratingPromise, ratingSchemePromise])
             .then(([ratings, ratingSchemeItems]) => {
                 const itemsById = _.keyBy(ratingSchemeItems, "id");
+                vm.ratingSchemeItems = ratingSchemeItems;
                 vm.appRatings = _.map(ratings, r =>
                     Object.assign(r, {
                         entityRef: r.entityReference,
