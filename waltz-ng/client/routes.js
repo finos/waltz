@@ -18,7 +18,6 @@
 
 import {CORE_API} from "./common/services/core-api-utils";
 import WelcomeJs from "./welcome/welcome.js";
-import WelcomeHtml from "./welcome/welcome.html";
 
 function warmUpCache($q, serviceBroker) {
     return $q
@@ -53,14 +52,14 @@ function configureRoutes($locationProvider, $stateProvider, $urlRouterProvider) 
                 warmUp: warmUpCache
             },
             views: {
-                "header": {template: "<waltz-navbar></waltz-navbar>"},
-                "content": WelcomeJs
+                "header@": {template: "<waltz-navbar></waltz-navbar>"},
+                "content@": WelcomeJs
             }
         })
         .state("main.home", {
             url: "home",
             views: {
-                "content": {template: WelcomeHtml}
+                "content@": WelcomeJs
             }
         });
 
