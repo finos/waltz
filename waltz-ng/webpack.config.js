@@ -40,30 +40,30 @@ module.exports = {
         extensions: [".svelte", ".js"],
         mainFields: ["svelte", "browser", "module", "main"]
     },
-    optimization: {
-        runtimeChunk: "single",
-        splitChunks: {
-            chunks: "all",
-            minSize: 30000,
-            maxSize: 600000,
-            minChunks: 1,
-            maxAsyncRequests: 8,
-            maxInitialRequests: 4,
-            automaticNameDelimiter: "~",
-            name: true,
-            cacheGroups: {
-                vendors: {
-                    test: /[\\/]node_modules[\\/]/,
-                    priority: -10
-                },
-                default: {
-                    minChunks: 2,
-                    priority: -20,
-                    reuseExistingChunk: true
-                }
-            }
-        }
-    },
+    // optimization: {
+    //     runtimeChunk: "single",
+    //     splitChunks: {
+    //         chunks: "all",
+    //         minSize: 30000,
+    //         maxSize: 600000,
+    //         minChunks: 1,
+    //         maxAsyncRequests: 8,
+    //         maxInitialRequests: 4,
+    //         automaticNameDelimiter: "~",
+    //         name: true,
+    //         cacheGroups: {
+    //             vendors: {
+    //                 test: /[\\/]node_modules[\\/]/,
+    //                 priority: -10
+    //             },
+    //             default: {
+    //                 minChunks: 2,
+    //                 priority: -20,
+    //                 reuseExistingChunk: true
+    //             }
+    //         }
+    //     }
+    // },
     watchOptions: {
         ignored: /node_modules/,
         aggregateTimeout: 800

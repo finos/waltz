@@ -20,7 +20,6 @@ import {CORE_API} from "./common/services/core-api-utils";
 import WelcomeJs from "./welcome/welcome.js";
 import WelcomeHtml from "./welcome/welcome.html";
 
-
 function warmUpCache($q, serviceBroker) {
     return $q
         .all([
@@ -42,6 +41,11 @@ function configureRoutes($locationProvider, $stateProvider, $urlRouterProvider) 
 
     $urlRouterProvider.when("", "/home");
 
+    const myComp = {
+        template: "<h1>Hello</h1>",
+        controllerAs: 'ctrl',
+        controller: () => console.log("hello from my component!")
+    }
     $stateProvider
         .state("main", {
             url: "/",
@@ -155,7 +159,7 @@ function configureRouteDebugging($transitions, $trace) {
     });
 
     // UNCOMMENT FOR FINE GRAINED LOGGING
-    // $trace.enable('TRANSITION');
+    $trace.enable('TRANSITION');
 }
 
 configureRouteDebugging.$inject = [
