@@ -8,13 +8,13 @@
     import StaticPanelEditor from "./StaticPanelEditor.svelte";
     import {mkUserStore} from "../../../svelte-stores/user-store";
     import roles from "../../../user/system-roles";
+    import ViewLink from "../../../common/svelte/ViewLink.svelte";
 
     export let serviceBroker;
 
     let panels;
+    let panelList = [];
     let user;
-
-
     let qry = "";
     let selectedPanel = null;
     let canEdit = false;
@@ -67,8 +67,8 @@ Links look like: \[Google\](https://www.google.com)`,
             name="Static Panels">
     <div slot="breadcrumbs">
         <ol class="waltz-breadcrumbs">
-            <li><a ui-sref="main">Home</a></li>
-            <li><a ui-sref="main.system.list">System Admin</a></li>
+            <li><ViewLink state="main">Home</ViewLink></li>
+            <li><ViewLink state="main.system.list">System Admin</ViewLink></li>
             <li>Static Panels</li>
         </ol>
     </div>

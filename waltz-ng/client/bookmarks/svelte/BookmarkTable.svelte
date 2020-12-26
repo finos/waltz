@@ -5,11 +5,6 @@
 </script>
 
 <table class="table table-condensed table-hover">
-    <colgroup>
-        <col width="5%">
-        <col width="65%">
-        <col width="30%">
-    </colgroup>
     {#each bookmarkGroups as group}
         <tbody>
         {#each group.value as bookmark}

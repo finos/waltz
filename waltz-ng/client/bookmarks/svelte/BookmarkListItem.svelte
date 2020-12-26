@@ -36,12 +36,11 @@
             {bookmark.description || "No description provided"}
         </div>
     </td>
-    <td style="text-align: right; padding-right: 1em;">
+    <td class="waltz-visibility-child-20"
+        style="text-align: right; padding-right: 1em;">
 
-        <div class="waltz-visibility-child-20">
-            <MiniActions ctx={bookmark}
-                         actions={actions}/>
-        </div>
+        <MiniActions ctx={bookmark}
+                     actions={actions}/>
 
         <div class="text-muted small">
             Last updated:

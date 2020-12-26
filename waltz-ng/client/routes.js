@@ -40,11 +40,6 @@ function configureRoutes($locationProvider, $stateProvider, $urlRouterProvider) 
 
     $urlRouterProvider.when("", "/home");
 
-    const myComp = {
-        template: "<h1>Hello</h1>",
-        controllerAs: 'ctrl',
-        controller: () => console.log("hello from my component!")
-    }
     $stateProvider
         .state("main", {
             url: "/",

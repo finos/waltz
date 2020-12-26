@@ -6,7 +6,7 @@
 
 <div class="removal-warning">
     <h3>Confirm bookmark removal</h3>
-    Are you sure you want to this bookmark ?
+    Are you sure you want to remove this bookmark ?
 
     <div>
         <b>{bookmark.title}</b>
