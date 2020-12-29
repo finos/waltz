@@ -24,7 +24,7 @@ import static com.khartec.waltz.common.RandomUtilities.randomPick;
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
-public class RandomUtilities_randomPick_array {
+public class RandomUtilities_randomPick {
 
     @Test(expected = IllegalArgumentException.class)
     public void cannotRandomPickFromNothing() {
