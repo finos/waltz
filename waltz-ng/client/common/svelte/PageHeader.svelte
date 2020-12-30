@@ -50,6 +50,12 @@
             <small>{small}</small>
         </h2>
     </div>
+
+    {#if $$slots.summary}
+    <div class="waltz-page-summary waltz-page-summary-attach">
+        <slot name="summary"/>
+    </div>
+    {/if}
 </div>
 
 

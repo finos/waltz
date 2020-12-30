@@ -41,6 +41,8 @@ function setup($stateProvider) {
         .state("main.physical-flow", baseState)
         .state("main.physical-flow.registration", registrationState)
         .state("main.physical-flow.view", viewState);
+
+
 }
 
 

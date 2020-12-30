@@ -1,23 +1,29 @@
 <script>
+    import _ from "lodash";
 
     export let state;
     export let title = null;
+    export let ctx = {};
 
     let path;
 
     const routes = {
         "main": {
-            path: "",
+            path: () => "",
             title: "Home page"
         },
         "main.system.list": {
-            path: "system/list",
+            path: () => "system/list",
             title: "System Administration"
+        },
+        "main.app.view": {
+            path: ctx => `application/${ctx.id}`,
+            title: "Application View"
         }
     };
 
     $: {
-        path = _.get(routes, [state, "path"], "/");
+        path = _.get(routes, [state, "path"], () => "")(ctx);
         title = title || _.get(routes, [state, "title"], state);
     }
 
