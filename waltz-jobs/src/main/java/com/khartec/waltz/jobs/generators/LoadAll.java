@@ -22,7 +22,8 @@ import com.khartec.waltz.common.LoggingUtilities;
 import com.khartec.waltz.service.DIConfiguration;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 
 
@@ -30,43 +31,43 @@ public class LoadAll {
 
     private static final boolean SKIP_SLOW = false;
 
-    private static final SampleDataGenerator[] loaders = new SampleDataGenerator[] {
-            new DemoSettingsGenerator(),
-            new DataTypeGenerator(),
-            new OrgUnitGenerator(),
-            SKIP_SLOW ? null : new PersonDataGenerator(),
-            new AppGenerator(),
-            new AppGroupGenerator(),
-            new AppGroupEntryGenerator(),
-            new BookmarkGenerator(),
-            new ChangeInitiativeGenerator(),
-            new ProcessGenerator(),
-            new MeasurableGenerator("PRODUCT"),
-            new MeasurableGenerator("CAPABILITY"),
-            new MeasurableGenerator("REGULATION"),
-            new MeasurableRatingGenerator(),
-            SKIP_SLOW ? null : new EntityStatisticGenerator(),
-            new AuthSourceGenerator(),
-            new AssessmentGenerator(),
-            new RoadmapGenerator(),
-            SKIP_SLOW ? null : new ServerGenerator(),
-            new LogicalFlowGenerator(),
-            new LogicalFlowDecorationGenerator(),
-            new PhysicalSpecificationGenerator(),
-            new PhysicalFlowGenerator(),
-            new PhysicalFlowParticipantGenerator(),
-            new InvolvementGenerator(),
-            new DatabaseGenerator(),
-            new AssetCostGenerator(),
-            new ChangeLogGenerator(),
-            new EndUserAppGenerator(),
-            new EndUserAppInvolvmentGenerator(),
-            new SurveyTemplateGenerator(),
-            new SurveyRunGenerator(),
-            new ChangeSetGenerator(),
-            new LicenceGenerator(),
-            new ChangeUnitGenerator()
-    };
+    private static final HashMap<String, SampleDataGenerator> generators = new HashMap<String, SampleDataGenerator>() {{
+        put( "DemoSettings", new DemoSettingsGenerator());
+        put( "DataType", new DataTypeGenerator());
+        put("OrgUnit", new OrgUnitGenerator());
+        put( "PersonData", SKIP_SLOW ? null : new PersonDataGenerator());
+        put( "App", new AppGenerator());
+        put( "AppGroup", new AppGroupGenerator());
+        put( "AppGroupEntry",  new AppGroupEntryGenerator());
+        put( "Bookmark",  new BookmarkGenerator());
+        put( "ChangeInitiative",  new ChangeInitiativeGenerator());
+        put( "Process",  new ProcessGenerator());
+        put( "Product",  new MeasurableGenerator("PRODUCT"));
+        put( "Capability",  new MeasurableGenerator("CAPABILITY"));
+        put( "Regulation",  new MeasurableGenerator("REGULATION"));
+        put( "MeasurableRating",  new MeasurableRatingGenerator());
+        put( "EntityStatistic",  SKIP_SLOW ? null : new EntityStatisticGenerator());
+        put( "AuthSource",  new AuthSourceGenerator());
+        put( "Assessment",  new AssessmentGenerator());
+        put( "Roadmap",  new RoadmapGenerator());
+        put( "Server",  SKIP_SLOW ? null : new ServerGenerator());
+        put( "LogicalFlow",  new LogicalFlowGenerator());
+        put( "LogicalFlowDecoration",  new LogicalFlowDecorationGenerator());
+        put( "hysicalSpecification",  new PhysicalSpecificationGenerator());
+        put( "PhysicalFlow",  new PhysicalFlowGenerator());
+        put( "hysicalFlowParticipant",  new PhysicalFlowParticipantGenerator());
+        put( "Involvement",  new InvolvementGenerator());
+        put( "Database",  new DatabaseGenerator());
+        put( "AssetCost",  new AssetCostGenerator());
+        put( "ChangeLog",  new ChangeLogGenerator());
+        put( "EndUserApp",  new EndUserAppGenerator());
+        put( "EndUserAppInvolvment",  new EndUserAppInvolvmentGenerator());
+        put( "SurveyTemplate",  new SurveyTemplateGenerator());
+        put( "SurveyRun",  new SurveyRunGenerator());
+        put( "ChangeSet",  new ChangeSetGenerator());
+        put( "Licence",  new LicenceGenerator());
+        put( "ChangeUnit",  new ChangeUnitGenerator());
+    }};
 
 
     public static void main(String[] args) {
@@ -74,7 +75,21 @@ public class LoadAll {
 
         LoggingUtilities.configureLogging();
 
-        Arrays.stream(loaders)
+
+        ArrayList<SampleDataGenerator> loaders = new ArrayList<SampleDataGenerator>();
+
+        if(args.length > 0) {
+            for (String arg : args) {
+                log("Data to be loaded : %s ", arg);
+                loaders.add(generators.get(arg));
+            }
+        }
+        else {
+            log("ALL Data to be loaded");
+            loaders.addAll(generators.values());
+        }
+
+        loaders.stream()
                 .filter(Objects::nonNull)
                 .forEach(loader -> {
                     log("Starting loader: %s", loader.getClass().getSimpleName());
