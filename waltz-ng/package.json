@@ -18,6 +18,7 @@
     "postinstall": "patch-package"
   },
   "dependencies": {
+    "@babel/polyfill": "7.11.5",
     "@uirouter/angularjs": "1.0.28",
     "angular": "1.8.0",
     "angular-animate": "1.8.0",
@@ -33,6 +34,7 @@
     "api-check": "7.5.5",
     "bootstrap": "3.4.1",
     "bootstrap-sass": "3.4.1",
+    "core-js": "^3.8.1",
     "d3-array": "1.2.4",
     "d3-axis": "1.0.12",
     "d3-collection": "1.0.7",
@@ -60,9 +62,8 @@
     "patch-package": "6.2.2",
     "satellizer": "0.15.5",
     "ui-select": "0.19.8",
-    "xlsx": "0.16.7",
-    "@babel/polyfill": "7.11.5",
-    "core-js": "^3.8.1"
+    "whatwg-fetch": "^3.5.0",
+    "xlsx": "0.16.7"
   },
   "devDependencies": {
     "@babel/core": "7.11.6",

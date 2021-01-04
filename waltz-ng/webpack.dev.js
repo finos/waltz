@@ -30,6 +30,10 @@ module.exports = smp.wrap(merge(common, {
         disableHostCheck: true,
         historyApiFallback: {
             disableDotRule: true
-        }
+        },
+        proxy: [{
+            context: ["/data-extract", "/api"],
+            target: "http://localhost:8443",
+        }]
     }
 }));

@@ -18,18 +18,19 @@
  */
 
 import {checkIsEntityRef} from '../../common/checks';
+import {$http} from "../../common/WaltzHttp";
 
-
-function store($http, baseApiUrl) {
-    const baseUrl = `${baseApiUrl}/bookmarks`;
+function store() {
+    const baseUrl = `api/bookmarks`;
 
     const save = (bookmark) => $http.post(baseUrl, bookmark);
 
     const findByParent = (ref) => {
+        console.log("fbp", ref)
         checkIsEntityRef(ref);
         return $http
             .get(`${baseUrl}/${ref.kind}/${ref.id}`)
-            .then(d => d.data);
+            .then(d => console.log({d}) || d.data);
     };
 
     const remove = (id) => $http.delete(`${baseUrl}/${id}`);
@@ -43,7 +44,7 @@ function store($http, baseApiUrl) {
 }
 
 
-store.$inject = ['$http', 'BaseApiUrl'];
+store.$inject = [];
 
 
 const serviceName = 'BookmarkStore';

@@ -23,26 +23,36 @@ import {CORE_API} from "../common/services/core-api-utils";
 export const bookmarks = writable([]);
 
 
+function stripExtraneousFields(bookmark) {
+    const strippedBookmark = _.pick(
+        bookmark,
+        ["id", "bookmarkKind", "url", "title", "isRestricted", "parent", "description", "lastUpdatedBy"]);
+    return strippedBookmark;
+}
+
+
 export function mkBookmarkStore(serviceBroker) {
     const { subscribe, set } = writable(0);
 
     const load = (ref, force = false) => serviceBroker
-        .loadAppData(
+        .loadViewData(
             CORE_API.BookmarkStore.findByParent,
             [ref],
             {force})
-        .then(r => set(r.data));
+        .then(r => console.log({r}) || set(r.data));
 
     const remove = (bookmark) => serviceBroker
-        .execute(CORE_API.BookmarkStore.remove, [bookmark.id])
+        .execute(
+            CORE_API.BookmarkStore.remove,
+            [bookmark.id])
         .then(r => load(bookmark.parent, true));
 
     const save = (bookmark) => {
-        const strippedBookmark = _.pick(
-            bookmark,
-            ["id", "bookmarkKind", "url", "title", "isRestricted", "parent", "description", "lastUpdatedBy"]);
+        const strippedBookmark = stripExtraneousFields(bookmark);
         return serviceBroker
-            .execute(CORE_API.BookmarkStore.save, [strippedBookmark])
+            .execute(
+                CORE_API.BookmarkStore.save,
+                [strippedBookmark])
             .then(r => load(bookmark.parent, true));
     }
 

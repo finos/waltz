@@ -9,7 +9,7 @@
 
     import {CORE_API} from "../../common/services/core-api-utils";
 
-    import {logicalFlow, physicalSpecification, reset} from "./physical-flow-editor-store";
+    import {logicalFlow, physicalSpecification, physicalFlow, reset} from "./physical-flow-editor-store";
 
     import _ from "lodash";
     import PhysicalSpecificationSelector from "./PhysicalSpecificationSelector.svelte";
@@ -71,6 +71,7 @@
     </div>
 
     <div slot="summary">
+        <!-- ROUTE -->
         <h3>
             <Check selected={$logicalFlow !== null}/>
             Route
@@ -99,11 +100,30 @@
             {/if}
         </div>
 
+        <!-- PHYS FLOW -->
         <h3>
-            <Check selected={false}/>
+            <Check selected={$physicalFlow}/>
             Delivery Characteristics
         </h3>
 
+        <div class="step-body">
+            {#if $physicalFlow}
+                <pre>{JSON.stringify($physicalFlow, "", 2)}</pre>
+
+                <button class="btn btn-link"
+                        on:click={() => $physicalSpecification = null}>
+                    <Icon name="times"/>
+                    Select different specification
+                </button>
+            {:else}
+                <div class="help-block">
+                    Either reuse an existing specification or create a new one using the <em>Add new specification</em> option.
+                </div>
+                <PhysicalSpecificationSelector {specifications}/>
+            {/if}
+        </div>
+
+        <!-- SPEC -->
         <h3>
             <Check selected={$physicalSpecification}/>
             Specification (Payload)
