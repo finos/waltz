@@ -38,7 +38,7 @@ public class MapUtilities_compose {
         assertEquals(0, result.size());
     }
 
-    @Test
+    @Test(expected = NullPointerException.class)
     public void simpleComposeWithNullMap1() {
         Map map1 = null;
         Map map2 = MapUtilities.newHashMap(1,'a',2,'b');
