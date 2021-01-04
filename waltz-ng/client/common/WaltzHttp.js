@@ -23,17 +23,26 @@ export const $http = {
     delete: _delete
 };
 
+
+const bearer = `Bearer ${localStorage.getItem("satellizer_token")}`;
+
+const headers = {
+    "Content-Type": "application/json",
+    "Authorization": bearer
+};
+
 function get(url) {
     const requestOptions = {
-        method: 'GET'
+        method: "GET",
+        headers
     };
     return fetch(url, requestOptions).then(handleResponse);
 }
 
 function post(url, body) {
     const requestOptions = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers,
         body: JSON.stringify(body)
     };
     return fetch(url, requestOptions).then(handleResponse);
@@ -42,7 +51,7 @@ function post(url, body) {
 function put(url, body) {
     const requestOptions = {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify(body)
     };
     return fetch(url, requestOptions).then(handleResponse);
@@ -51,7 +60,8 @@ function put(url, body) {
 // prefixed with underscored because delete is a reserved word in javascript
 function _delete(url) {
     const requestOptions = {
-        method: 'DELETE'
+        method: "DELETE",
+        headers
     };
     return fetch(url, requestOptions).then(handleResponse);
 }
@@ -70,4 +80,3 @@ function handleResponse(response) {
         return {...response, data};
     });
 }
-

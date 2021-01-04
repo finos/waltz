@@ -1,5 +1,4 @@
 <script>
-    import EntityIcon from "./EntityIcon.svelte";
     import ViewLink from "./ViewLink.svelte";
     import EntityLabel from "./EntityLabel.svelte";
 

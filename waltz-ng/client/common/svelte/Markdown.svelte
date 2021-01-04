@@ -3,6 +3,8 @@
 
     export let text = "";
 
+    let html = "";
+
     const converter = new showdown.Converter();
     converter.setFlavor("github")
 

@@ -18,9 +18,9 @@
 
 let loaderPromise = null;
 
-export function store($http, baseUrl) {
+export function store($http) {
 
-    const BASE = `${baseUrl}/source-data-rating`;
+    const BASE = `api/source-data-rating`;
 
     const findAll = (force = false) => {
         if (loaderPromise && ! force) return loaderPromise;
@@ -37,7 +37,7 @@ export function store($http, baseUrl) {
     };
 }
 
-store.$inject = ['$http', 'BaseApiUrl'];
+store.$inject = ['$http'];
 
 
 export const serviceName = 'SourceDataRatingStore';

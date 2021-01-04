@@ -26,7 +26,6 @@ function store() {
     const save = (bookmark) => $http.post(baseUrl, bookmark);
 
     const findByParent = (ref) => {
-        console.log("fbp", ref)
         checkIsEntityRef(ref);
         return $http
             .get(`${baseUrl}/${ref.kind}/${ref.id}`)

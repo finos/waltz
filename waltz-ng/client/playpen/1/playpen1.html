@@ -27,17 +27,26 @@
         </ol>
     </waltz-page-header>
 
-    <waltz-section name="Bookmarks">
-        <waltz-svelte-component component="$ctrl.BookmarkPanel"
-                                 primary-entity-ref="$ctrl.ref">
-        </waltz-svelte-component>
-    </waltz-section>
+    <div class="row">
+        <div class="col-md-6">
+            <!-- NG  BOOKMARKS -->
+            <waltz-dynamic-section-wrapper section="$ctrl.bookmarksSection"
+                                           parent-entity-ref="$ctrl.ref">
+            </waltz-dynamic-section-wrapper>
+        </div>
+        <div class="col-md-6">
+            <!-- NG  BOOKMARKS -->
+            <waltz-dynamic-section-wrapper section="$ctrl.bookmarksSection"
+                                           parent-entity-ref="$ctrl.ref2">
+            </waltz-dynamic-section-wrapper>
+            <hr>
+            <waltz-dynamic-section-wrapper section="$ctrl.bookmarksSection"
+                                           parent-entity-ref="$ctrl.ref2">
+            </waltz-dynamic-section-wrapper>
+        </div>
+    </div>
 
 
-    <!-- NG  BOOKMARKS -->
-    <waltz-dynamic-section-wrapper section="$ctrl.bookmarksSection"
-                                   parent-entity-ref="$ctrl.ref">
-    </waltz-dynamic-section-wrapper>
 
 
 </div>

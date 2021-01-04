@@ -32,7 +32,9 @@
         .orderBy(["group", "title"])
         .value();
 
-    $: canEdit = _.includes($user.roles, roles.ADMIN.key);
+    $: canEdit = _.includes(
+        $user.roles,
+        roles.ADMIN.key);
 
     function onSelectPanel(p) {
         selectedPanel = p;

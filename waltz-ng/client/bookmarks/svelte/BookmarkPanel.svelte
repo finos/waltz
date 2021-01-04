@@ -20,7 +20,6 @@
     export let primaryEntityRef = null;
 
     let user;
-    let bookmarks;
     let nestedEnums = {};
     let bookmarkKinds = {};
     let bookmarkGroups = [];
@@ -49,13 +48,13 @@
     }
 
     function doRemove() {
-        return bookmarks
+        return bookmarkStore
             .remove(removalCandidate)
             .then(() => removalCandidate = null);
     }
 
     function doSave(bookmark) {
-        return bookmarks
+        return bookmarkStore
             .save(bookmark)
             .then(() => editCandidate = null);
     }
@@ -74,10 +73,10 @@
             .then(r => nestedEnums = nestEnums(r.data));
 
         user = mkUserStore(serviceBroker);
-        bookmarks = mkBookmarkStore(serviceBroker);
     }
 
-    $: bookmarks.load(primaryEntityRef);
+    let bookmarkStore = mkBookmarkStore();
+    $: bookmarks = bookmarkStore.load(primaryEntityRef);
 
     $: actions = _.includes($user.roles, roles.BOOKMARK_EDITOR.key)
         ? [editAction, removeAction]
@@ -87,7 +86,9 @@
         nestedEnums,
         filterBookmarks($bookmarks, selectedKind, qry));
 
-    $: bookmarkKinds = mkBookmarkKinds(nestedEnums, $bookmarks);
+    $: bookmarkKinds = mkBookmarkKinds(
+        nestedEnums,
+        $bookmarks);
 
 </script>
 

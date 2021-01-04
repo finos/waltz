@@ -13,6 +13,7 @@
 
     import _ from "lodash";
     import PhysicalSpecificationSelector from "./PhysicalSpecificationSelector.svelte";
+    import {onMount} from "svelte";
 
     export let primaryEntityRef = {};
     export let serviceBroker;
@@ -30,7 +31,9 @@
     let specifications = [];
     let application;
 
-    reset();
+    onMount(() => {
+        reset();
+    });
 
     $: {
         primaryEntityRef && serviceBroker
@@ -157,6 +160,7 @@
 </PageHeader>
 
 {/if}
+
 
 <style>
     .flow-arrow {

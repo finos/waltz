@@ -3,7 +3,7 @@ import {CORE_API} from "../common/services/core-api-utils";
 
 
 export function mkStaticPanelStore(serviceBroker) {
-    const { subscribe, set } = writable(0);
+    const { subscribe, set } = writable([]);
 
     const load = (force = false) => serviceBroker
         .loadAppData(

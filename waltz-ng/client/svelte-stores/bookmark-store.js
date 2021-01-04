@@ -18,10 +18,8 @@
 
 import {writable} from "svelte/store";
 import {CORE_API} from "../common/services/core-api-utils";
-
-
-export const bookmarks = writable([]);
-
+import {$http} from "../common/WaltzHttp";
+import {initRemote} from "./remote";
 
 function stripExtraneousFields(bookmark) {
     const strippedBookmark = _.pick(
@@ -31,35 +29,29 @@ function stripExtraneousFields(bookmark) {
 }
 
 
-export function mkBookmarkStore(serviceBroker) {
-    const { subscribe, set } = writable(0);
+const remote = initRemote("test");
 
-    const load = (ref, force = false) => serviceBroker
-        .loadViewData(
-            CORE_API.BookmarkStore.findByParent,
-            [ref],
-            {force})
-        .then(r => console.log({r}) || set(r.data));
 
-    const remove = (bookmark) => serviceBroker
-        .execute(
-            CORE_API.BookmarkStore.remove,
-            [bookmark.id])
+
+export function mkBookmarkStore() {
+
+    const load = (ref) => remote
+        .fetchViewData("GET", `api/bookmarks/${ref.kind}/${ref.id}`);
+
+    const remove = (bookmark) => $http
+        .delete(`api/bookmarks/${bookmark.id}`)
         .then(r => load(bookmark.parent, true));
 
     const save = (bookmark) => {
         const strippedBookmark = stripExtraneousFields(bookmark);
-        return serviceBroker
-            .execute(
-                CORE_API.BookmarkStore.save,
-                [strippedBookmark])
+        return $http
+            .post("api/bookmarks", strippedBookmark)
             .then(r => load(bookmark.parent, true));
     }
 
     return {
         load,
         remove,
-        save,
-        subscribe
+        save
     };
 }
