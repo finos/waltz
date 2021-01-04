@@ -54,7 +54,7 @@ public class AssessmentRatingDao {
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             ASSESSMENT_RATING.ENTITY_ID,
             ASSESSMENT_RATING.ENTITY_KIND,
-            newArrayList(EntityKind.APPLICATION, EntityKind.CHANGE_INITIATIVE));
+            newArrayList(EntityKind.values()));
 
     private static final RecordMapper<? super Record, AssessmentRating> TO_DOMAIN_MAPPER = r -> {
         AssessmentRatingRecord record = r.into(ASSESSMENT_RATING);

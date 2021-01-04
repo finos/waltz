@@ -36,7 +36,7 @@ export function store($http, BaseApiUrl) {
             .then(d => d.data);
     };
 
-    const findByAssessmentDefinitionId = (assessmentDefinitionId, visibilites = ["PRIMARY"]) => {
+    const findByAssessmentDefinitionId = (assessmentDefinitionId, visibilites = ["PRIMARY", "SECONDARY"]) => {
         return $http
             .post(`${BASE}/${assessmentDefinitionId}`, visibilites)
             .then(d => d.data);

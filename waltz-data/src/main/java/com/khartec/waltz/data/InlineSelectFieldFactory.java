@@ -111,6 +111,7 @@ public class InlineSelectFieldFactory {
         mappings.put(EntityKind.PERSON, tuple(PERSON, PERSON.ID, PERSON.DISPLAY_NAME));
         mappings.put(EntityKind.PHYSICAL_SPECIFICATION, tuple(PHYSICAL_SPECIFICATION, PHYSICAL_SPECIFICATION.ID, PHYSICAL_SPECIFICATION.NAME));
         mappings.put(EntityKind.SERVER, tuple(SERVER_INFORMATION, SERVER_INFORMATION.ID, SERVER_INFORMATION.HOSTNAME));
+        mappings.put(EntityKind.LICENCE, tuple(LICENCE, LICENCE.ID, LICENCE.NAME));
         return mappings;
     }
 

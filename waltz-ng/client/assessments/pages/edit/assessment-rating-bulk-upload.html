@@ -49,7 +49,7 @@
                     </message>
                 </waltz-no-data>
             </div>
-            <div class="col-md-6">
+            <div class="col-md-6" ng-if="ctrl.definition.entityKind === 'APPLICATION'">
                 <waltz-section-actions>
                     <button class="btn btn-xs btn-primary"
                             ui-sref="main.assessment-definition.view ({definitionId: ctrl.definition.id})">

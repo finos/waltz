@@ -141,15 +141,17 @@ function controller($q,
     };
 
     vm.removeAssessmentRating = (row) => {
-        serviceBroker
-            .loadViewData(CORE_API.AssessmentRatingStore.remove, [row.entityRef, definitionId])
-            .then(r => r.data)
-            .then(() => loadAll())
-            .then(() => notification.success("Assessment Rating Removed for application " + row.entityRef.name))
-            .catch((e) => {
-                console.log("WAR: Failed to delete assessment rating for application", {error: e});
-                return notification.warning(`Failed to delete assessment rating for application: ${e.data.message}`);
-            });
+        if (confirm("Are you sure you want to delete this assessment rating ?")) {
+            serviceBroker
+                .loadViewData(CORE_API.AssessmentRatingStore.remove, [row.entityRef, definitionId])
+                .then(r => r.data)
+                .then(() => loadAll())
+                .then(() => notification.success("Assessment Rating Removed for application " + row.entityRef.name))
+                .catch((e) => {
+                    console.log("WAR: Failed to delete assessment rating for application", {error: e});
+                    return notification.warning(`Failed to delete assessment rating for application: ${e.data.message}`);
+                });
+        }
     };
 
 }

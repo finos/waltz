@@ -47,17 +47,17 @@ public class AssessmentRatingExtractor extends DirectQueryBasedDataExtractor {
     private final Field<String> entityNameField = InlineSelectFieldFactory.mkNameField(
             ASSESSMENT_RATING.ENTITY_ID,
             ASSESSMENT_RATING.ENTITY_KIND,
-            asSet(EntityKind.APPLICATION, EntityKind.CHANGE_INITIATIVE));
+            asSet(EntityKind.values()));
 
     private final Field<String> entityExtIdField = InlineSelectFieldFactory.mkExternalIdField(
             ASSESSMENT_RATING.ENTITY_ID,
             ASSESSMENT_RATING.ENTITY_KIND,
-            asSet(EntityKind.APPLICATION, EntityKind.CHANGE_INITIATIVE));
+            asSet(EntityKind.values()));
 
     private final Field<String> entityLifecycleField = InlineSelectFieldFactory.mkEntityLifecycleField(
             ASSESSMENT_RATING.ENTITY_ID,
             ASSESSMENT_RATING.ENTITY_KIND,
-            asSet(EntityKind.APPLICATION, EntityKind.CHANGE_INITIATIVE));
+            asSet(EntityKind.values()));
 
     private final AssessmentDefinitionDao assessmentDefinitionDao;
 
@@ -98,6 +98,7 @@ public class AssessmentRatingExtractor extends DirectQueryBasedDataExtractor {
                 .innerJoin(ASSESSMENT_DEFINITION)
                 .on(ASSESSMENT_DEFINITION.ID.eq(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID))
                 .where(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID.eq(definitionId))
-                .and(entityLifecycleField.ne(EntityLifecycleStatus.REMOVED.name()));
+                .and(ASSESSMENT_RATING.ENTITY_KIND.ne(EntityKind.APPLICATION.name())
+                        .or(entityLifecycleField.ne(EntityLifecycleStatus.REMOVED.name())));
     }
 }
