@@ -16,21 +16,13 @@
  *
  */
 
-import { writable } from 'svelte/store';
-import {CORE_API} from "../common/services/core-api-utils";
+import {remote} from "./remote";
 
-
-export function mkUserStore(serviceBroker) {
-    const { subscribe, set } = writable(0);
-
-    const load = (force = false) => serviceBroker
-        .loadAppData(CORE_API.UserStore.whoami, [], {force})
-        .then(r => set(r.data));
-
-    load();
+export function mkUserStore() {
+    const load = (force = false) => remote
+        .fetchAppDatum("GET", "api/user/whoami", [], {force});
 
     return {
-        subscribe,
-        reload: () => load(true)
+        load
     };
 }

@@ -15,11 +15,14 @@
     import roles from "../../user/system-roles";
 
     import _ from "lodash";
+    import {remote} from "../../svelte-stores/remote";
 
     export let serviceBroker = null;
     export let primaryEntityRef = null;
 
-    let user;
+    let bookmarkStore = mkBookmarkStore(remote);
+    let userStore = mkUserStore(remote);
+
     let nestedEnums = {};
     let bookmarkKinds = {};
     let bookmarkGroups = [];
@@ -72,11 +75,11 @@
             .loadAppData(CORE_API.EnumValueStore.findAll)
             .then(r => nestedEnums = nestEnums(r.data));
 
-        user = mkUserStore(serviceBroker);
     }
 
-    let bookmarkStore = mkBookmarkStore();
+
     $: bookmarks = bookmarkStore.load(primaryEntityRef);
+    $: user = userStore.load();
 
     $: actions = _.includes($user.roles, roles.BOOKMARK_EDITOR.key)
         ? [editAction, removeAction]
@@ -92,19 +95,18 @@
 
 </script>
 
-
 <div class="row">
     <div class="col-sm-4">
         <BookmarkCategoryMenu on:kindSelect={onKindSelect}
-                               bookmarkKinds={bookmarkKinds}/>
+                              bookmarkKinds={bookmarkKinds}/>
     </div>
 
     <div class="col-sm-8">
 
         {#if removalCandidate}
             <BookmarkRemovalConfirmation bookmark={removalCandidate}
-                                          {doRemove}
-                                          doCancel={() => removalCandidate = null}/>
+                                         {doRemove}
+                                         doCancel={() => removalCandidate = null}/>
         {:else if editCandidate}
             <BookmarkEditor bookmark={editCandidate}
                             kinds={bookmarkKinds}
@@ -151,4 +153,5 @@
 
     </div>
 </div>
+
 

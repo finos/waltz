@@ -29,7 +29,7 @@ function store() {
         checkIsEntityRef(ref);
         return $http
             .get(`${baseUrl}/${ref.kind}/${ref.id}`)
-            .then(d => console.log({d}) || d.data);
+            .then(d => d.data);
     };
 
     const remove = (id) => $http.delete(`${baseUrl}/${id}`);
@@ -39,7 +39,6 @@ function store() {
         findByParent,
         remove
     };
-
 }
 
 

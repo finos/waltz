@@ -24,12 +24,17 @@ export const $http = {
 };
 
 
-const bearer = `Bearer ${localStorage.getItem("satellizer_token")}`;
 
 const headers = {
     "Content-Type": "application/json",
-    "Authorization": bearer
+    // "Authorization": bearer
 };
+
+const satellizerToken = localStorage.getItem("satellizer_token");
+if (! _.isEmpty(satellizerToken)) {
+    headers["Authorization"] = `Bearer ${satellizerToken}`;
+}
+
 
 function get(url) {
     const requestOptions = {

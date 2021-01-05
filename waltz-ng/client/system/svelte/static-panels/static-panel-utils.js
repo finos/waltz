@@ -15,25 +15,20 @@
  * See the License for the specific
  *
  */
-const SpeedMeasurePlugin = require("speed-measure-webpack-plugin");
 
-const smp = new SpeedMeasurePlugin();
-const {merge} = require("webpack-merge");
-const common = require("./webpack.config");
+export function mkPlaceholderPanelData() {
+    return {
+        icon: "info",
+        content: `You can use html or markdown. For example:
+# This is a header
+## And a smaller header
 
-module.exports = smp.wrap(merge(common, {
-    mode: "development",
-    //devtool: "inline-source-map",
-    //devtool: "cheap-module-eval-source-map",
-    devServer: {
-        contentBase: "./dist",
-        disableHostCheck: true,
-        historyApiFallback: {
-            disableDotRule: true
-        },
-        proxy: [{
-            context: ["/data-extract", "/api", "/auth"],
-            target: "http://localhost:8443",
-        }]
-    }
-}));
+- lists can be
+- created using hyphens
+  - and indented
+
+Links look like: \[Google\](https://www.google.com)`,
+        width: 12,
+        priority: 1
+    };
+}

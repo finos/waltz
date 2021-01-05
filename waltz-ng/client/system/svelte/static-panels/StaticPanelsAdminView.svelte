@@ -1,28 +1,29 @@
 <script>
+    import _ from "lodash";
+
     import PageHeader from "../../../common/svelte/PageHeader.svelte";
     import SearchInput from "../../../common/svelte/SearchInput.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
+    import StaticPanelEditor from "./StaticPanelEditor.svelte";
+    import ViewLink from "../../../common/svelte/ViewLink.svelte";
 
     import {mkStaticPanelStore} from "../../../svelte-stores/static-panel-store" ;
-    import _ from "lodash";
-    import StaticPanelEditor from "./StaticPanelEditor.svelte";
     import {mkUserStore} from "../../../svelte-stores/user-store";
     import roles from "../../../user/system-roles";
-    import ViewLink from "../../../common/svelte/ViewLink.svelte";
+    import {mkPlaceholderPanelData} from "./static-panel-utils";
 
     export let serviceBroker;
 
-    let panels;
     let panelList = [];
     let user;
     let qry = "";
     let selectedPanel = null;
     let canEdit = false;
+    let panelStore = mkStaticPanelStore();
 
-    $: {
-        panels = mkStaticPanelStore(serviceBroker);
-        user = mkUserStore(serviceBroker);
-    }
+    $: user = mkUserStore(serviceBroker);
+
+    let panels = panelStore.load();
 
     $: panelList = _
         .chain($panels)
@@ -41,24 +42,11 @@
     }
 
     function onAddPanel() {
-        selectedPanel = {
-            icon: "info",
-            content: `You can use html or markdown. For example:
-# This is a header
-## And a smaller header
-
-- lists can be
-- created using hyphens
-  - and indented
-
-Links look like: \[Google\](https://www.google.com)`,
-            width: 12,
-            priority: 1
-        };
+        selectedPanel = mkPlaceholderPanelData();
     }
 
     function doSave(panel) {
-        return panels
+        return panelStore
             .save(panel)
             .then(() => selectedPanel = null);
     }
@@ -89,7 +77,8 @@ Links look like: \[Google\](https://www.google.com)`,
 
             {:else}
 
-                <SearchInput bind:value={qry} placeholder="Search..."/>
+                <SearchInput bind:value={qry}
+                             placeholder="Search..."/>
                 <br>
                 <table class="table table-hover table-condensed">
                     <thead>
