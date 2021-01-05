@@ -122,9 +122,6 @@ public class AssessmentRatingService {
     }
 
     public boolean bulkStore(BulkAssessmentRatingCommand[] commands, long assessmentDefinitionId, String username) {
-//        Map<EntityReference, AssessmentRating> existingRatings = ListUtilities.(
-//                assessmentRatingDao.findByDefinitionId(assessmentDefinitionId),
-//                AssessmentRating::entityReference);
         Set<AssessmentRating> ratingsToAdd = getRatingsFilterByOperation(commands, assessmentDefinitionId, username, Operation.ADD);
         int addedResult = assessmentRatingDao.add(ratingsToAdd);
         createChangeLogs(assessmentDefinitionId, username, ratingsToAdd, Operation.ADD);
