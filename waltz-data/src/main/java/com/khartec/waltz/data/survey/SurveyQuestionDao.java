@@ -34,8 +34,7 @@ import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
-import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
-import static com.khartec.waltz.schema.Tables.SURVEY_RUN;
+import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
 
 @Repository
@@ -138,6 +137,14 @@ public class SurveyQuestionDao {
         return dsl.delete(SURVEY_QUESTION)
                 .where(SURVEY_QUESTION.ID.eq(questionId))
                 .execute();
+    }
+
+
+    public boolean hasResponses(long questionId) {
+        return dsl.fetchExists(DSL
+                .selectFrom(SURVEY_QUESTION_RESPONSE)
+                .where(SURVEY_QUESTION_RESPONSE.QUESTION_ID.eq(questionId))
+        );
     }
 
 

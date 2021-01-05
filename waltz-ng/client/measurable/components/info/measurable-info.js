@@ -17,14 +17,24 @@
  */
 
 import template from "./measurable-info.html";
+import {initialiseData} from "../../../common";
 
 const bindings = {
     measurable: "<",
     owningOrgUnit: "<?"
 };
 
+const initialState = {
+    showMore: false
+};
+
+function controller(){
+    const vm = initialiseData(this, initialState);
+}
+
 const component = {
     template,
+    controller,
     bindings
 };
 

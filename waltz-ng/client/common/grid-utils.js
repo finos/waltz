@@ -60,18 +60,22 @@ export function mkEnumGridCell(columnHeading,
 export function mkEntityLinkGridCell(columnHeading,
                                      entityRefField,
                                      iconPlacement = "left",
-                                     tooltipPlacement = "top") {
-    return {
-        field: entityRefField + ".name",
-        displayName: columnHeading,
-        cellTemplate: `
-            <div class="ui-grid-cell-contents">
-                <waltz-entity-link entity-ref="row.entity.${entityRefField}"
-                                   tooltip-placement="${tooltipPlacement}"
-                                   icon-placement="${iconPlacement}">
-                </waltz-entity-link>
-            </div>`
-    };
+                                     tooltipPlacement = "top",
+                                     additionalProps = {}) {
+    return Object.assign(
+        {},
+        additionalProps,
+        {
+            field: entityRefField + ".name",
+            displayName: columnHeading,
+            cellTemplate: `
+                <div class="ui-grid-cell-contents">
+                    <waltz-entity-link entity-ref="row.entity.${entityRefField}"
+                                       tooltip-placement="${tooltipPlacement}"
+                                       icon-placement="${iconPlacement}">
+                    </waltz-entity-link>
+                </div>`
+        });
 }
 
 

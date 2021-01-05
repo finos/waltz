@@ -19,6 +19,7 @@
 import _ from "lodash";
 import {initialiseData} from "../common/index";
 import template from "./survey-template-edit.html";
+import {displayError} from "../common/error-utils";
 
 /*
     Note: this list of functions/operators is derived from the capabilities of BigEval and the extension methods
@@ -174,7 +175,8 @@ function controller($stateParams,
                     notification.success("Survey question deleted successfully");
                     loadQuestions();
                     vm.cancelQuestionForm();
-                });
+                })
+                .catch(e => displayError(notification, "Survey question was not deleted", e))
         }
     };
 
