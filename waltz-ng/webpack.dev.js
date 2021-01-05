@@ -33,7 +33,12 @@ module.exports = smp.wrap(merge(common, {
         },
         proxy: [{
             context: ["/data-extract", "/api", "/auth"],
-            target: "http://localhost:8443",
+            target: "http://[::1]:8443", // see note [1]
         }]
     }
 }));
+
+/*
+[1] - accessing the server using localhost in a browser seems to incur a significant proxy performance cost
+      this can be mitigated by using loopback address (seen here specified in ipv6 form)
+ */

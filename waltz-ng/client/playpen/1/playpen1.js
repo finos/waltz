@@ -24,9 +24,9 @@ import BookmarkPanel from "../../bookmarks/svelte/BookmarkPanel.svelte";
 import {dynamicSections} from "../../dynamic-section/dynamic-section-definitions";
 
 const initData = {
-    ref: mkRef("APPLICATION", 840),
+    ref: mkRef("APPLICATION", 84),
     ref1: mkRef("APPLICATION", 12),
-    ref2: mkRef("APPLICATION", 842),
+    ref2: mkRef("APPLICATION", 82),
     ref3: mkRef("APPLICATION", 212),
     ref4: mkRef("APPLICATION", 913),
     BookmarkPanel,

@@ -27,7 +27,7 @@ export const $http = {
 
 const headers = {
     "Content-Type": "application/json",
-    // "Authorization": bearer
+    "If-Modified-Since": 0
 };
 
 const satellizerToken = localStorage.getItem("satellizer_token");
