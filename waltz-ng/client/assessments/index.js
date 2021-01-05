@@ -25,6 +25,7 @@ import AssessmentRatingSubSection from "./components/sub-section/assessment-rati
 import AssessmentRatingSummaryPies from "./components/summary-pies/assessment-rating-summary-pies";
 import AssessmentRatingTrafficLights from "./components/traffic-lights/assessment-rating-traffic-lights";
 import BulkAssessmentRatingSelector from "./components/bulk-assessment-rating-selector/bulk-assessment-rating-selector";
+import AssessmentDefinitionOverview from "./components/assessment-definition-overview/assessment-definition-overview";
 import AssessmentRatingSelector from "./directives/assessment-rating-selector"
 
 export default () => {
@@ -42,7 +43,8 @@ export default () => {
         AssessmentRatingSubSection,
         AssessmentRatingSummaryPies,
         AssessmentRatingTrafficLights,
-        BulkAssessmentRatingSelector
+        BulkAssessmentRatingSelector,
+        AssessmentDefinitionOverview
     ]);
 
     return module.name;

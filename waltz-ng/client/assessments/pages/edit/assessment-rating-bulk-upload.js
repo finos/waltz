@@ -95,13 +95,6 @@ function controller($q,
     };
 
     vm.saveRatings = (results) => {
-        console.log("Final results", results);
-
-        const unknownIdentifiers = _.chain(results)
-            .filter(r => r.action == null)
-            .map(r => r.identifier)
-            .value();
-
         const convertToRatingCommand = (r) => Object.assign({}, {
             entityRef: r.entityRef,
             ratingId: r.rating.id,

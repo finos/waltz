@@ -47,8 +47,7 @@ function controller($q,
     const loadAll = () => {
         serviceBroker
             .loadViewData(CORE_API.AssessmentDefinitionStore.getById, [definitionId])
-            .then(r => vm.definition = r.data)
-            .then(() => console.log(vm.definition));
+            .then(r => vm.definition = r.data);
 
         const ratingSchemePromise = serviceBroker
             .loadViewData(CORE_API.RatingSchemeStore.findRatingsSchemeItems, [definitionId])
