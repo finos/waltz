@@ -17,15 +17,23 @@
  */
 
 import {remote} from "./remote";
+import {writable} from "svelte/store";
+import {$http} from "../common/WaltzHttp";
 
-export function mkUserStore() {
-    const load = (force = false) => remote
-        .fetchAppDatum("GET", "api/user/whoami", null, {force});
+export function mkEnumValueStore() {
+    const store = writable([]);
+    const loadOld = (force = false) => remote
+        .fetchAppList("GET", "api/enum-value", null, {force});
+    const load = (force = false) => {
+        $http
+            .get("api/enum-value")
+            .then(r => store.set(r.data));
+        return store;
+    }
 
     return {
-        load
+        load: loadOld
     };
 }
 
-
-export const userStore = mkUserStore();
+export const enumValueStore = mkEnumValueStore();

@@ -53,3 +53,5 @@ export function mkBookmarkStore() {
         save
     };
 }
+
+export const bookmarkStore = mkBookmarkStore();

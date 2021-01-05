@@ -41,12 +41,18 @@ class Cache {
     }
 
     init(key, d) {
-        return this.data.set(key, writable(d))
+        console.log("init", {key, d, c: this})
+        return this.data.set(key, writable({ data: d, status: "loading" }))
     }
 
     set(key, d) {
-        // console.log("set", {key, d})
-        return this.data.get(key).set(d);
+        console.log("set", {key, d, c: this})
+        return this.data.get(key).set({ data: d, status: "loaded" })
+    }
+
+    err(key, e, d) {
+        console.log("err", {key, e, c: this})
+        return this.data.get(key).set({ data: d, error: e, status: "error" })
     }
 
     name() {
@@ -71,8 +77,8 @@ function mkPromise(method, url, data) {
 }
 
 
-function mkKey(method, url, config) {
-    return `${method}_${url}_${stringify(config)}`;
+function mkKey(method, url, data) {
+    return `${method}_${url}_${stringify(data)}`;
 }
 
 
@@ -80,16 +86,22 @@ function _fetchData(cache, method, url, data, init = [], config = { force: false
     const key = mkKey(method, url, data);
     const forcing = _.get(config, "force", false);
 
-    const doFetch = () => mkPromise(method, url, data)
-        .then(r => cache.set(key, r.data));
+    const invokeFetch = () => {
+        console.log("Invoking", url);
+        const p = mkPromise(method, url, data)
+            .then(r => cache.set(key, r.data))
+            .catch(e => cache.err(key, e, init));
+        console.log("Invoked", url);
+        return p;
+    }
 
     if (cache.has(key)) {
         if (forcing) {
-            doFetch()
+            invokeFetch();
         }
     } else {
         cache.init(key, writable(init));
-        doFetch();
+        invokeFetch();
     }
 
     return cache.get(key);
@@ -97,7 +109,7 @@ function _fetchData(cache, method, url, data, init = [], config = { force: false
 
 
 function _execute(method, url, data) {
-    return mkPromise(method, url, data)
+    return mkPromise(method, url, data);
 }
 
 

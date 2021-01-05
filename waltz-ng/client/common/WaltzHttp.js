@@ -41,7 +41,9 @@ function get(url) {
         method: "GET",
         headers
     };
-    return fetch(url, requestOptions).then(handleResponse);
+    const foo = "http://localhost:8443/"+url;
+    console.log("$http Fetching", foo)
+    return fetch(foo, requestOptions).then(r => console.log("$http Response", url, r) || handleResponse(r));
 }
 
 function post(url, body) {
@@ -79,9 +81,9 @@ function handleResponse(response) {
 
         if (!response.ok) {
             const error = (data && data.message) || response.statusText;
-            return Promise.reject(error);
+            return Promise.reject({error, response, text});
         }
 
-        return {...response, data};
+        return { data};
     });
 }

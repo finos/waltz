@@ -31,10 +31,10 @@ module.exports = smp.wrap(merge(common, {
         historyApiFallback: {
             disableDotRule: true
         },
-        proxy: [{
-            context: ["/data-extract", "/api", "/auth"],
-            target: "http://[::1]:8443", // see note [1]
-        }]
+        // proxy: [{
+        //     context: ["/data-extract", "/api", "/auth"],
+        //     target: "http://[::1]:8443", // see note [1]
+        // }]
     }
 }));
 

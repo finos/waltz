@@ -15,9 +15,8 @@
  * See the License for the specific
  *
  */
-
-function store($http, BaseApiUrl) {
-    const BASE = `${BaseApiUrl}/user`;
+function store($http) {
+    const BASE = `api/user`;
 
     const register = (regRequest) => $http.post(`${BASE}/new-user`, regRequest);
     const findAll = () => $http.get(BASE).then(r => r.data);
@@ -48,7 +47,7 @@ function store($http, BaseApiUrl) {
     };
 }
 
-store.$inject = ['$http', 'BaseApiUrl'];
+store.$inject = ['$http'];
 
 
 const serviceName = 'UserStore';

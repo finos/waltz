@@ -6,22 +6,17 @@
     import Icon from "../../common/svelte/Icon.svelte";
     import NoData from "../../common/svelte/NoData.svelte";
     import SearchInput from "../../common/svelte/SearchInput.svelte";
-
-    import {CORE_API} from "../../common/services/core-api-utils";
     import {nestEnums} from "../../common/svelte/enum-utils";
     import {filterBookmarks, mkBookmarkKinds, nestBookmarks} from "./bookmark-utils";
-    import {mkBookmarkStore} from "../../svelte-stores/bookmark-store";
-    import {mkUserStore} from "../../svelte-stores/user-store";
+    import {bookmarkStore} from "../../svelte-stores/bookmark-store";
+    import {enumValueStore} from "../../svelte-stores/enum-value-store";
+    import {userStore} from "../../svelte-stores/user-store";
     import roles from "../../user/system-roles";
 
     import _ from "lodash";
-    import {remote} from "../../svelte-stores/remote";
+    import {anyErrors, anyLoading, mkOverallStatus} from "../../svelte-stores/store-utils";
 
-    export let serviceBroker = null;
     export let primaryEntityRef = null;
-
-    let bookmarkStore = mkBookmarkStore(remote);
-    let userStore = mkUserStore(remote);
 
     let nestedEnums = {};
     let bookmarkKinds = {};
@@ -70,88 +65,93 @@
         };
     }
 
-    $: {
-        serviceBroker
-            .loadAppData(CORE_API.EnumValueStore.findAll)
-            .then(r => nestedEnums = nestEnums(r.data));
 
-    }
+    let bookmarks = bookmarkStore.load(primaryEntityRef);
+    let user = userStore.load();
+    let enums = enumValueStore.load();
 
-
-    $: bookmarks = bookmarkStore.load(primaryEntityRef);
-    $: user = userStore.load();
-
-    $: actions = _.includes($user.roles, roles.BOOKMARK_EDITOR.key)
+    $: nestedEnums = nestEnums($enums.data);
+    $: bookmarkGroups = nestBookmarks(
+        nestedEnums,
+        filterBookmarks($bookmarks.data, selectedKind, qry));
+    $: bookmarkKinds = mkBookmarkKinds(
+        nestedEnums,
+        $bookmarks.data);
+    $: actions = _.includes($user.data.roles, roles.BOOKMARK_EDITOR.key)
         ? [editAction, removeAction]
         : [];
 
-    $: bookmarkGroups = nestBookmarks(
-        nestedEnums,
-        filterBookmarks($bookmarks, selectedKind, qry));
-
-    $: bookmarkKinds = mkBookmarkKinds(
-        nestedEnums,
-        $bookmarks);
+    $: status = mkOverallStatus([$bookmarks])
 
 </script>
 
-<div class="row">
-    <div class="col-sm-4">
-        <BookmarkCategoryMenu on:kindSelect={onKindSelect}
-                              bookmarkKinds={bookmarkKinds}/>
-    </div>
+<pre>{JSON.stringify($enums, "", 2)}</pre>
 
-    <div class="col-sm-8">
+{#if (status.hasErrors)}
+    <h1>Oh no!</h1>
+    <pre>{JSON.stringify(status.errors, "", 2)}</pre>
+{:else if (status.isLoading)}
+    <h2>ZZzzzzz</h2>
+{:else}
+    <div class="row">
+        <div class="col-sm-4">
+            <BookmarkCategoryMenu on:kindSelect={onKindSelect}
+                                  bookmarkKinds={bookmarkKinds}/>
+        </div>
 
-        {#if removalCandidate}
-            <BookmarkRemovalConfirmation bookmark={removalCandidate}
-                                         {doRemove}
-                                         doCancel={() => removalCandidate = null}/>
-        {:else if editCandidate}
-            <BookmarkEditor bookmark={editCandidate}
-                            kinds={bookmarkKinds}
-                            {doSave}
-                            doCancel={() => editCandidate = null} />
-        {:else}
-            {#if $bookmarks.length > 5}
-                <SearchInput bind:value={qry}
-                             placeholder="Search bookmarks..."/>
-                <br>
-            {/if}
-            {#if _.isEmpty(bookmarkGroups)}
-                <NoData>
-                    No bookmarks
-                    {#if actions.length > 0}
-                        <div style="padding-top: 1em;">
-                            <button class="btn btn-sm btn-default"
-                                    on:click={() => onCreate()}>
-                                <Icon name="plus"/>
-                                Add bookmark
-                            </button>
-                        </div>
-                    {/if}
-                </NoData>
+        <div class="col-sm-8">
 
+            {#if removalCandidate}
+                <BookmarkRemovalConfirmation bookmark={removalCandidate}
+                                             {doRemove}
+                                             doCancel={() => removalCandidate = null}/>
+            {:else if editCandidate}
+                <BookmarkEditor bookmark={editCandidate}
+                                kinds={bookmarkKinds}
+                                {doSave}
+                                doCancel={() => editCandidate = null} />
             {:else}
-                <BookmarkTable {bookmarkGroups} {actions}>
-                    <tfoot slot="footer">
-                    {#if actions.length > 0}
-                        <tr>
-                            <td colspan="3">
-                                <button class="btn btn-link"
+                {#if $bookmarks.data.length > 5}
+                    <SearchInput bind:value={qry}
+                                 placeholder="Search bookmarks..."/>
+                    <br>
+                {/if}
+                {#if _.isEmpty(bookmarkGroups)}
+                    <NoData>
+                        No bookmarks
+                        {#if actions.length > 0}
+                            <div style="padding-top: 1em;">
+                                <button class="btn btn-sm btn-default"
                                         on:click={() => onCreate()}>
                                     <Icon name="plus"/>
                                     Add bookmark
                                 </button>
-                            </td>
-                        </tr>
-                    {/if}
-                    </tfoot>
-                </BookmarkTable>
-            {/if}
-        {/if}
+                            </div>
+                        {/if}
+                    </NoData>
 
+                {:else}
+                    <BookmarkTable {bookmarkGroups} {actions}>
+                        <tfoot slot="footer">
+                        {#if actions.length > 0}
+                            <tr>
+                                <td colspan="3">
+                                    <button class="btn btn-link"
+                                            on:click={() => onCreate()}>
+                                        <Icon name="plus"/>
+                                        Add bookmark
+                                    </button>
+                                </td>
+                            </tr>
+                        {/if}
+                        </tfoot>
+                    </BookmarkTable>
+                {/if}
+            {/if}
+
+        </div>
     </div>
-</div>
+
+{/if}
 
 
