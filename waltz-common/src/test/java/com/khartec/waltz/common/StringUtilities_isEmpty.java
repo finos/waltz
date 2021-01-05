@@ -20,6 +20,8 @@ package com.khartec.waltz.common;
 
 import org.junit.Test;
 
+import java.util.Optional;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -43,5 +45,25 @@ public class StringUtilities_isEmpty {
     @Test
     public void falseIfNotEmpty() {
         assertFalse(StringUtilities.isEmpty("  hello  "));
+    }
+
+    @Test
+    public void optionalEmptyStringTab(){
+        assertTrue(StringUtilities.isEmpty(Optional.of("   \t")));
+    }
+
+    @Test
+    public void optionalEmptyStringWhiteSpace(){
+        assertTrue(StringUtilities.isEmpty(Optional.of("")));
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void optionalEmptyTrueIfNull() {
+        assertTrue(StringUtilities.isEmpty(Optional.of(null)));
+    }
+
+    @Test
+    public void optionalEmptyFalseIfNotEmpty() {
+        assertFalse(StringUtilities.isEmpty(Optional.of("  hello  ")));
     }
 }
