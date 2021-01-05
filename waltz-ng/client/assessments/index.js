@@ -26,14 +26,11 @@ import AssessmentRatingSummaryPies from "./components/summary-pies/assessment-ra
 import AssessmentRatingTrafficLights from "./components/traffic-lights/assessment-rating-traffic-lights";
 import BulkAssessmentRatingSelector from "./components/bulk-assessment-rating-selector/bulk-assessment-rating-selector";
 import AssessmentDefinitionOverview from "./components/assessment-definition-overview/assessment-definition-overview";
-import AssessmentRatingSelector from "./directives/assessment-rating-selector"
 
 export default () => {
 
     const module = angular.module("waltz.assessments", []);
     module.config(Routes);
-
-    module.directive("waltzAssessmentRatingSelector", AssessmentRatingSelector);
 
     services(module);
 
