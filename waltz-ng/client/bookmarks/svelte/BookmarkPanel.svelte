@@ -65,7 +65,6 @@
         };
     }
 
-
     let bookmarks = bookmarkStore.load(primaryEntityRef);
     let user = userStore.load();
     let enums = enumValueStore.load();
@@ -82,16 +81,13 @@
         : [];
 
     $: status = mkOverallStatus([$bookmarks])
-
 </script>
 
-<pre>{JSON.stringify($enums, "", 2)}</pre>
-
 {#if (status.hasErrors)}
-    <h1>Oh no!</h1>
+    <h1>Error</h1>
     <pre>{JSON.stringify(status.errors, "", 2)}</pre>
 {:else if (status.isLoading)}
-    <h2>ZZzzzzz</h2>
+    <h2>Loading</h2>
 {:else}
     <div class="row">
         <div class="col-sm-4">

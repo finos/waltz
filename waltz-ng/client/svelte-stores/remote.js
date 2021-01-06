@@ -86,14 +86,9 @@ function _fetchData(cache, method, url, data, init = [], config = { force: false
     const key = mkKey(method, url, data);
     const forcing = _.get(config, "force", false);
 
-    const invokeFetch = () => {
-        console.log("Invoking", url);
-        const p = mkPromise(method, url, data)
+    const invokeFetch = () => mkPromise(method, url, data)
             .then(r => cache.set(key, r.data))
             .catch(e => cache.err(key, e, init));
-        console.log("Invoked", url);
-        return p;
-    }
 
     if (cache.has(key)) {
         if (forcing) {

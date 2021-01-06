@@ -41,9 +41,8 @@ function get(url) {
         method: "GET",
         headers
     };
-    const foo = "http://localhost:8443/"+url;
-    console.log("$http Fetching", foo)
-    return fetch(foo, requestOptions).then(r => console.log("$http Response", url, r) || handleResponse(r));
+    return fetch(url, requestOptions)
+        .then(handleResponse);
 }
 
 function post(url, body) {
@@ -52,7 +51,8 @@ function post(url, body) {
         headers,
         body: JSON.stringify(body)
     };
-    return fetch(url, requestOptions).then(handleResponse);
+    return fetch(url, requestOptions)
+        .then(handleResponse);
 }
 
 function put(url, body) {
@@ -61,7 +61,8 @@ function put(url, body) {
         headers,
         body: JSON.stringify(body)
     };
-    return fetch(url, requestOptions).then(handleResponse);
+    return fetch(url, requestOptions)
+        .then(handleResponse);
 }
 
 // prefixed with underscored because delete is a reserved word in javascript
@@ -70,7 +71,8 @@ function _delete(url) {
         method: "DELETE",
         headers
     };
-    return fetch(url, requestOptions).then(handleResponse);
+    return fetch(url, requestOptions)
+        .then(handleResponse);
 }
 
 // helper functions
