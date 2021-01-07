@@ -16,10 +16,8 @@
  *
  */
 
-package com.khartec.waltz.common.hierarchies;
+package com.khartec.waltz.common.hierarchy;
 
-import com.khartec.waltz.common.hierarchy.Forest;
-import com.khartec.waltz.common.hierarchy.HierarchyUtilities;
 import org.junit.Test;
 
 import static org.junit.Assert.assertFalse;

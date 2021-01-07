@@ -2,7 +2,6 @@ package com.khartec.waltz.common;
 
 import org.junit.Test;
 
-import java.util.Collection;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
