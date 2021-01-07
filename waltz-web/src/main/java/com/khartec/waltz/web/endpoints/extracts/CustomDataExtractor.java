@@ -18,23 +18,13 @@
 
 package com.khartec.waltz.web.endpoints.extracts;
 
-import com.khartec.waltz.common.ListUtilities;
-import com.khartec.waltz.data.InlineSelectFieldFactory;
-import com.khartec.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.schema.tables.PhysicalFlow;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.jooq.*;
-import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple3;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
@@ -42,20 +32,14 @@ import org.supercsv.prefs.CsvPreference;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.khartec.waltz.common.ListUtilities.*;
-import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.*;
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
-import static com.khartec.waltz.web.WebUtilities.*;
-import static java.util.stream.Collectors.toList;
+import static com.khartec.waltz.common.ListUtilities.map;
 import static org.jooq.lambda.fi.util.function.CheckedConsumer.unchecked;
 import static org.jooq.lambda.tuple.Tuple.tuple;
-import static spark.Spark.post;
 
 
 @Service

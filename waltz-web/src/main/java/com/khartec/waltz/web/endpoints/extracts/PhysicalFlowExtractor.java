@@ -69,8 +69,7 @@ public class PhysicalFlowExtractor extends CustomDataExtractor {
             "Frequency",
             "Criticality",
             "Freshness Indicator",
-            "Description",
-            "Tags");
+            "Description");
 
     static {
         Field<String> SOURCE_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
@@ -118,16 +117,14 @@ public class PhysicalFlowExtractor extends CustomDataExtractor {
     public void register() {
         post(mkPath("data-extract", "physical-flows", "produces", ":kind", ":id"), (request, response) -> {
             EntityReference ref = getEntityReference(request);
-            SelectConditionStep<Record> qry = prepareProducesQuery(ref);
             String fileName = "physical-flows-produces-" + ref.id();
-            Map<Long, List<String>> tags = getTagsMap();
             return writeReportResults(
                     response,
-                    prepareInstancesOfRun(
-                            qry,
+                    preparePhysicalFlows(
+                            prepareProducesQuery(ref),
                             parseExtractFormat(request),
                             fileName,
-                            tags));
+                            getTagsMap()));
         });
 
         post(mkPath("data-extract", "physical-flows", "consumes", ":kind", ":id"), (request, response) -> {
@@ -137,7 +134,7 @@ public class PhysicalFlowExtractor extends CustomDataExtractor {
             Map<Long, List<String>> tags = getTagsMap();
             return writeReportResults(
                     response,
-                    prepareInstancesOfRun(
+                    preparePhysicalFlows(
                             qry,
                             parseExtractFormat(request),
                             fileName,
@@ -159,7 +156,7 @@ public class PhysicalFlowExtractor extends CustomDataExtractor {
 
             return writeReportResults(
                     response,
-                    prepareInstancesOfRun(
+                    preparePhysicalFlows(
                             qry,
                             parseExtractFormat(request),
                             fileName,
@@ -228,10 +225,10 @@ public class PhysicalFlowExtractor extends CustomDataExtractor {
                 .where(condition);
     }
 
-    private Tuple3<ExtractFormat, String, byte[]> prepareInstancesOfRun(SelectConditionStep<Record> query,
-                                                                        ExtractFormat format,
-                                                                        String reportName,
-                                                                        Map<Long, List<String>> tags) throws IOException {
+    private Tuple3<ExtractFormat, String, byte[]> preparePhysicalFlows(SelectConditionStep<Record> query,
+                                                                       ExtractFormat format,
+                                                                       String reportName,
+                                                                       Map<Long, List<String>> tags) throws IOException {
 
         List<List<Object>> reportRows = prepareReportRows(query, tags);
 
@@ -239,7 +236,7 @@ public class PhysicalFlowExtractor extends CustomDataExtractor {
                 format,
                 reportName,
                 reportRows,
-                staticHeaders
+                ListUtilities.append(staticHeaders, "Tags")
         );
     }
 
@@ -251,15 +248,7 @@ public class PhysicalFlowExtractor extends CustomDataExtractor {
                 .stream()
                 .map(row -> {
                     ArrayList<Object> reportRow = new ArrayList<>();
-                    reportRow.add(row.get("Name"));
-                    reportRow.add(row.get("External Id"));
-                    SOURCE_AND_TARGET_NAME_AND_ASSET_CODE.forEach(c -> reportRow.add(row.get(c)));
-                    reportRow.add(row.get("Format"));
-                    reportRow.add(row.get("Transport"));
-                    reportRow.add(row.get("Frequency"));
-                    reportRow.add(row.get("Criticality"));
-                    reportRow.add(row.get("Freshness Indicator"));
-                    reportRow.add(row.get("Description"));
+                    staticHeaders.forEach(h -> reportRow.add(row.get(h)));
                     Long physicalFlowId = row.get(PHYSICAL_FLOW.ID);
                     List<String> physicalFlowTags = tags.get(physicalFlowId);
                     reportRow.add(isEmpty(physicalFlowTags)
