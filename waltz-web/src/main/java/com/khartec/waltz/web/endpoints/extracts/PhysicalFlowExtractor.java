@@ -27,29 +27,50 @@ import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.schema.tables.PhysicalFlow;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import static com.khartec.waltz.common.ListUtilities.isEmpty;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.*;
-import static com.khartec.waltz.schema.Tables.PHYSICAL_FLOW;
+import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static com.khartec.waltz.web.WebUtilities.*;
+import static java.util.stream.Collectors.toList;
 import static spark.Spark.post;
 
 
 @Service
-public class PhysicalFlowExtractor extends DirectQueryBasedDataExtractor {
+public class PhysicalFlowExtractor extends CustomDataExtractor {
 
+    private DSLContext dsl;
     private final PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory = new PhysicalFlowIdSelectorFactory();
 
     private static List<Field> RECEIVER_NAME_AND_ASSET_CODE_FIELDS;
     private static List<Field> SOURCE_NAME_AND_ASSET_CODE_FIELDS;
     private static List<Field> SOURCE_AND_TARGET_NAME_AND_ASSET_CODE;
+    private static List<String> staticHeaders = newArrayList(
+            "Name",
+            "External Id",
+            "Source",
+            "Source Asset Code",
+            "Receiver",
+            "Receiver Asset Code",
+            "Format",
+            "Transport",
+            "Frequency",
+            "Criticality",
+            "Freshness Indicator",
+            "Description",
+            "Tags");
 
     static {
         Field<String> SOURCE_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
@@ -90,21 +111,37 @@ public class PhysicalFlowExtractor extends DirectQueryBasedDataExtractor {
 
     @Autowired
     public PhysicalFlowExtractor(DSLContext dsl) {
-        super(dsl);
+        this.dsl = dsl;
     }
 
     @Override
     public void register() {
         post(mkPath("data-extract", "physical-flows", "produces", ":kind", ":id"), (request, response) -> {
             EntityReference ref = getEntityReference(request);
-            SelectConditionStep<?> qry = prepareProducesQuery(ref);
-            return writeExtract("physical-flows-produces-" + ref.id(), qry, request, response);
+            SelectConditionStep<Record> qry = prepareProducesQuery(ref);
+            String fileName = "physical-flows-produces-" + ref.id();
+            Map<Long, List<String>> tags = getTagsMap();
+            return writeReportResults(
+                    response,
+                    prepareInstancesOfRun(
+                            qry,
+                            parseExtractFormat(request),
+                            fileName,
+                            tags));
         });
 
         post(mkPath("data-extract", "physical-flows", "consumes", ":kind", ":id"), (request, response) -> {
             EntityReference ref = getEntityReference(request);
-            SelectConditionStep<?> qry = prepareConsumesQuery(ref);
-            return writeExtract("physical-flows-consumes-" + ref.id(), qry, request, response);
+            String fileName = "physical-flows-consumes-" + ref.id();
+            SelectConditionStep<Record> qry = prepareConsumesQuery(ref);
+            Map<Long, List<String>> tags = getTagsMap();
+            return writeReportResults(
+                    response,
+                    prepareInstancesOfRun(
+                            qry,
+                            parseExtractFormat(request),
+                            fileName,
+                            tags));
         });
 
         post(mkPath("data-extract", "physical-flows", "by-selector"), (request, response) -> {
@@ -113,18 +150,34 @@ public class PhysicalFlowExtractor extends DirectQueryBasedDataExtractor {
             Condition condition =
                     PhysicalFlow.PHYSICAL_FLOW.ID.in(idSelector)
                             .and(physicalFlowIdSelectorFactory.getLifecycleCondition(idSelectionOptions));
-            SelectConditionStep<?> qry = getQuery(
-                    SOURCE_AND_TARGET_NAME_AND_ASSET_CODE,
-                    condition);
+            SelectConditionStep<Record> qry = getQuery(condition);
+            Map<Long, List<String>> tags = getTagsMap();
+
             String fileName = String.format("physical-flows-for-%s-%s",
                     idSelectionOptions.entityReference().kind().name().toLowerCase(),
                     idSelectionOptions.entityReference().id());
-            return writeExtract(fileName, qry, request, response);
+
+            return writeReportResults(
+                    response,
+                    prepareInstancesOfRun(
+                            qry,
+                            parseExtractFormat(request),
+                            fileName,
+                            tags));
         });
     }
 
+    private Map<Long, List<String>> getTagsMap() {
+        return dsl.select(TAG_USAGE.ENTITY_ID, TAG.NAME)
+                .from(TAG_USAGE)
+                .leftOuterJoin(TAG)
+                .on(TAG.ID.eq(TAG_USAGE.TAG_ID))
+                .where(TAG_USAGE.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name()))
+                .fetchGroups(TAG_USAGE.ENTITY_ID, TAG.NAME);
+    }
 
-    private SelectConditionStep<?> prepareProducesQuery(EntityReference ref) {
+
+    private SelectConditionStep<Record> prepareProducesQuery(EntityReference ref) {
 
         Condition isOwnerCondition = PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID.eq(ref.id())
                 .and(PHYSICAL_SPECIFICATION.OWNING_ENTITY_KIND.eq(ref.kind().name()));
@@ -137,11 +190,11 @@ public class PhysicalFlowExtractor extends DirectQueryBasedDataExtractor {
                 .and(PHYSICAL_FLOW_NOT_REMOVED)
                 .and(SPEC_NOT_REMOVED);
 
-        return getQuery(RECEIVER_NAME_AND_ASSET_CODE_FIELDS, isProduces);
+        return getQuery(isProduces);
     }
 
 
-    private SelectConditionStep<?> prepareConsumesQuery(EntityReference ref) {
+    private SelectConditionStep<Record> prepareConsumesQuery(EntityReference ref) {
 
         Condition isConsumes = LOGICAL_FLOW.TARGET_ENTITY_ID.eq(ref.id())
                 .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(ref.kind().name()))
@@ -149,24 +202,23 @@ public class PhysicalFlowExtractor extends DirectQueryBasedDataExtractor {
                 .and(PHYSICAL_FLOW_NOT_REMOVED)
                 .and(SPEC_NOT_REMOVED);
 
-        return getQuery(SOURCE_NAME_AND_ASSET_CODE_FIELDS, isConsumes);
+        return getQuery(isConsumes);
     }
 
 
-    private SelectConditionStep<Record> getQuery(List<Field> senderOrReceiverColumn,
-                                                 Condition condition) {
-
+    private SelectConditionStep<Record> getQuery(Condition condition) {
         return dsl
                 .select(
+                        PHYSICAL_FLOW.ID,
                         PHYSICAL_SPECIFICATION.NAME.as("Name"),
                         PHYSICAL_FLOW.EXTERNAL_ID.as("External Id"))
-                .select(senderOrReceiverColumn)
+                .select(SOURCE_AND_TARGET_NAME_AND_ASSET_CODE)
                 .select(
                         PHYSICAL_SPECIFICATION.FORMAT.as("Format"),
                         PHYSICAL_FLOW.TRANSPORT.as("Transport"),
                         PHYSICAL_FLOW.FREQUENCY.as("Frequency"),
                         PHYSICAL_FLOW.CRITICALITY.as("Criticality"),
-                        PHYSICAL_FLOW.FRESHNESS_INDICATOR.as("Observed"),
+                        PHYSICAL_FLOW.FRESHNESS_INDICATOR.as("Freshness Indicator"),
                         PHYSICAL_SPECIFICATION.DESCRIPTION.as("Description")
                 ).from(PHYSICAL_SPECIFICATION)
                 .join(PHYSICAL_FLOW)
@@ -174,5 +226,48 @@ public class PhysicalFlowExtractor extends DirectQueryBasedDataExtractor {
                 .join(LOGICAL_FLOW)
                 .on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
                 .where(condition);
+    }
+
+    private Tuple3<ExtractFormat, String, byte[]> prepareInstancesOfRun(SelectConditionStep<Record> query,
+                                                                        ExtractFormat format,
+                                                                        String reportName,
+                                                                        Map<Long, List<String>> tags) throws IOException {
+
+        List<List<Object>> reportRows = prepareReportRows(query, tags);
+
+        return formatReport(
+                format,
+                reportName,
+                reportRows,
+                staticHeaders
+        );
+    }
+
+    private List<List<Object>> prepareReportRows(SelectConditionStep<Record> qry,
+                                                 Map<Long, List<String>> tags) {
+        Result<Record> results = qry.fetch();
+
+        return results
+                .stream()
+                .map(row -> {
+                    ArrayList<Object> reportRow = new ArrayList<>();
+                    reportRow.add(row.get("Name"));
+                    reportRow.add(row.get("External Id"));
+                    SOURCE_AND_TARGET_NAME_AND_ASSET_CODE.forEach(c -> reportRow.add(row.get(c)));
+                    reportRow.add(row.get("Format"));
+                    reportRow.add(row.get("Transport"));
+                    reportRow.add(row.get("Frequency"));
+                    reportRow.add(row.get("Criticality"));
+                    reportRow.add(row.get("Freshness Indicator"));
+                    reportRow.add(row.get("Description"));
+                    Long physicalFlowId = row.get(PHYSICAL_FLOW.ID);
+                    List<String> physicalFlowTags = tags.get(physicalFlowId);
+                    reportRow.add(isEmpty(physicalFlowTags)
+                            ? ""
+                            : String.join(",", physicalFlowTags));
+
+                    return reportRow;
+                })
+                .collect(toList());
     }
 }
