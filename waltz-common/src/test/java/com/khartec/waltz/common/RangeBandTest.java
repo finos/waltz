@@ -20,11 +20,17 @@ package com.khartec.waltz.common;
 
 import org.junit.Test;
 
+import java.util.Optional;
+
 import static org.junit.Assert.*;
 
 public class RangeBandTest {
 
     public static final RangeBand<Integer> range10_20 = new RangeBand<>(10, 20);
+    public static final RangeBand<Integer> anotherRange10_20 = new RangeBand<>(10, 20);
+    public static final RangeBand<Integer> range20_30 = new RangeBand<>(20, 30);
+    public static final RangeBand<Integer> rangeNull_20 = new RangeBand<>(null, 20);
+    public static final RangeBand<Integer> range10_Null = new RangeBand<>(10, null);
 
     @Test(expected = IllegalArgumentException.class)
     public void lowAndHighCannotBeNull() {
@@ -57,12 +63,85 @@ public class RangeBandTest {
     }
 
     @Test
+    public void testReturnsTrueIfWithinRange() {
+        assertTrue(range10_20.test(15));
+    }
+
+    @Test
+    public void testReturnsTrueIfOnUpperBound() {
+        assertTrue(range10_20.test(20));
+    }
+
+    @Test
+    public void testReturnsTrueIfOnLowerBound() {
+        assertTrue(range10_20.test(10));
+    }
+
+    @Test
+    public void testReturnsFalseIfBelowLowBound() {
+        assertFalse(range10_20.test(9));
+    }
+
+    @Test
+    public void testReturnsFalseIfAboveHighBound() {
+        assertFalse(range10_20.test(21));
+    }
+
+    @Test
+    public void simpleGetLow(){
+        assertEquals(Optional.of(10), Optional.of(range10_20.getLow()));
+    }
+
+    @Test
+    public void simpleGetHigh(){
+        assertEquals(Optional.of(20),Optional.of(range10_20.getHigh()));
+    }
+
+    @Test
+    public void simpleEqualsTrue(){
+        assertTrue(range10_20.equals(anotherRange10_20));
+    }
+
+    @Test
+    public void simpleEqualsFalse(){
+        assertFalse(range10_20.equals(range20_30));
+    }
+
+    @Test
+    public void simpleEqualsWithLowNull(){
+        assertFalse(range10_20.equals(rangeNull_20));
+    }
+
+    @Test
+    public void simpleEqualsWithHighNull(){
+        assertFalse(range10_20.equals(range10_Null));
+    }
+
+    @Test
+    public void simpleHashCode(){
+        assertEquals(330, range10_20.hashCode());
+    }
+
+    @Test
+    public void simpleHashCodeWithLowNull(){
+        assertEquals(20, rangeNull_20.hashCode());
+    }
+
+    @Test
+    public void simpleHashCodeWithHighNull(){
+        assertEquals(310, range10_Null.hashCode());
+    }
+
+    @Test
     public void ifNoLowerBoundSpecifiedAssumeNoLowerLimit() {
         RangeBand<Integer> noLowBound = new RangeBand<>(null, 10);
 
         assertTrue(noLowBound.contains(-10));
         assertTrue(noLowBound.contains(10));
         assertFalse(noLowBound.contains(11));
+        assertTrue(noLowBound.test(-10));
+        assertTrue(noLowBound.test(10));
+        assertFalse(noLowBound.test(11));
     }
 
     @Test
@@ -72,6 +151,9 @@ public class RangeBandTest {
         assertTrue(noHighBound.contains(100000));
         assertTrue(noHighBound.contains(0));
         assertFalse(noHighBound.contains(-1));
+        assertTrue(noHighBound.test(100000));
+        assertTrue(noHighBound.test(0));
+        assertFalse(noHighBound.test(-1));
     }
 
     @Test(expected = IllegalArgumentException.class)

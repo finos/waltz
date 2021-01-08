@@ -16,32 +16,26 @@
  *
  */
 
-package com.khartec.waltz.common;
+package com.khartec.waltz.common.hierarchy;
 
 import org.junit.Test;
 
-import static com.khartec.waltz.common.RandomUtilities.randomPick;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-public class RandomUtilities_randomPick_array {
 
-    @Test(expected = IllegalArgumentException.class)
-    public void cannotRandomPickFromNothing() {
-        randomPick();
-    }
-
+public class HierarchyUtilities_hasCycle {
 
     @Test
-    public void randomPickFromPoolOfOneReturnsThatOne() {
-        assertEquals("a", randomPick("a"));
+    public void noCycles() {
+        Forest<Void, String> forest = HierarchyUtilities.toForest(SampleData.TWO_TREES);
+        assertFalse(HierarchyUtilities.hasCycle(forest));
     }
 
-
     @Test
-    public void randomPickFromPoolIsMemberOfPool() {
-        assertTrue(SetUtilities.fromArray("a", "b")
-                .contains(randomPick("a", "b")));
+    public void withCycles() {
+        Forest<Void, String> forest = HierarchyUtilities.toForest(SampleData.CIRCULAR);
+        assertTrue(HierarchyUtilities.hasCycle(forest));
     }
 
 }
