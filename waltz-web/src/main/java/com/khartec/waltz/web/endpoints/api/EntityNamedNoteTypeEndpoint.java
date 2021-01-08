@@ -76,6 +76,7 @@ public class EntityNamedNoteTypeEndpoint implements Endpoint {
             EntityNamedNoteTypeChangeCommand command = readBody(req, EntityNamedNoteTypeChangeCommand.class);
             return entityNamedNoteTypeService.update(getId(req), command, getUsername(req));
         };
+
         DatumRoute<Boolean> removeRoute = (req, res) -> {
             ensureUserHasAdminRights(req);
             return entityNamedNoteTypeService.removeById(getId(req), getUsername(req));

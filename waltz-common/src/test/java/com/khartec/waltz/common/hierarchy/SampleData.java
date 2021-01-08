@@ -16,10 +16,9 @@
  *
  */
 
-package com.khartec.waltz.common.hierarchies;
+package com.khartec.waltz.common.hierarchy;
 
 import com.khartec.waltz.common.ListUtilities;
-import com.khartec.waltz.common.hierarchy.FlatNode;
 
 import java.util.List;
 
@@ -28,6 +27,8 @@ import static java.util.Optional.of;
 
 
 public class SampleData {
+
+    public static List<FlatNode<Void, String>> EMPTY_TREE = ListUtilities.newArrayList();
 
     public static List<FlatNode<Void, String>> TWO_TREES = ListUtilities.newArrayList(
             new FlatNode<>("a", empty(), null),
