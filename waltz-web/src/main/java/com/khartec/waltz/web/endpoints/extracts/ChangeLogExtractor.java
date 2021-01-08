@@ -18,6 +18,8 @@
 
 package com.khartec.waltz.web.endpoints.extracts;
 
+import com.khartec.waltz.data.changelog.ChangeLogDao;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.schema.tables.ChangeLog;
 import org.jooq.*;
@@ -29,8 +31,9 @@ import java.sql.Timestamp;
 
 import static com.khartec.waltz.schema.Tables.CHANGE_LOG;
 import static com.khartec.waltz.schema.Tables.PERSON;
-import static com.khartec.waltz.web.WebUtilities.getEntityReference;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.*;
+import static java.lang.String.format;
+import static spark.Spark.get;
 import static spark.Spark.post;
 
 
@@ -45,6 +48,7 @@ public class ChangeLogExtractor extends DirectQueryBasedDataExtractor {
     @Override
     public void register() {
         registerExtractForApp(mkPath("data-extract", "change-log", ":kind", ":id"));
+        registerExtractUnattestedChangesForApp(mkPath("data-extract", "change-log", "unattested-changes", ":childKind", ":kind", ":id"));
     }
 
 
@@ -90,6 +94,44 @@ public class ChangeLogExtractor extends DirectQueryBasedDataExtractor {
             default:
                 return byParentRef;
         }
+    }
+
+
+    private void registerExtractUnattestedChangesForApp(String path) {
+        get(path, (request, response) -> {
+
+            EntityReference entityRef = getEntityReference(request);
+            EntityKind childKind = getKind(request, "childKind");
+
+            SelectJoinStep<Record4<String, String, String, Timestamp>> qry = mkUnattestedChangesQuery(entityRef, childKind);
+
+            String filename = format("unattested-changes-%s-%d", childKind, entityRef.id());
+
+            return writeExtract(
+                    filename,
+                    qry,
+                    request,
+                    response);
+        });
+    }
+
+
+    private SelectJoinStep<Record4<String, String, String, Timestamp>> mkUnattestedChangesQuery(EntityReference entityRef, EntityKind childKind) {
+        com.khartec.waltz.schema.tables.ChangeLog cl = com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG.as("cl");
+
+        SelectConditionStep<Record> qry = ChangeLogDao.mkUnattestedChangesQuery(entityRef);
+
+        SelectQuery<Record> selectQuery = dsl
+                .selectQuery(qry
+                        .and(cl.CHILD_KIND.eq(childKind.name())));
+
+        return dsl
+                .select(
+                        selectQuery.field(cl.SEVERITY).as("Severity"),
+                        selectQuery.field(cl.MESSAGE).as("Message"),
+                        selectQuery.field(cl.USER_ID).as("User"),
+                        selectQuery.field(cl.CREATED_AT).as("Timestamp"))
+                .from(selectQuery);
     }
 
 }

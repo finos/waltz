@@ -16,11 +16,8 @@
  *
  */
 
-package com.khartec.waltz.common.hierarchies;
+package com.khartec.waltz.common.hierarchy;
 
-import com.khartec.waltz.common.hierarchy.Forest;
-import com.khartec.waltz.common.hierarchy.HierarchyUtilities;
-import com.khartec.waltz.common.hierarchy.Node;
 import org.junit.Test;
 
 import java.util.Collection;
