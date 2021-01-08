@@ -20,10 +20,7 @@ package com.khartec.waltz.model.entity_named_note;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.DescriptionProvider;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.IdProvider;
-import com.khartec.waltz.model.NameProvider;
+import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
 import java.util.Set;
@@ -34,7 +31,8 @@ import java.util.Set;
 public abstract class EntityNamedNodeType implements
         IdProvider,
         NameProvider,
-        DescriptionProvider
+        DescriptionProvider,
+        ExternalIdProvider
 {
     public abstract Set<EntityKind> applicableEntityKinds();
     public abstract boolean isReadOnly();

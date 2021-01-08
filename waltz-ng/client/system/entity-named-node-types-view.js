@@ -56,6 +56,11 @@ function controller($q,
         return update(type, { name: change.newVal });
     };
 
+    vm.updateExternalId = (change, type) => {
+        if (_.isNil(change.newVal) || change.newVal === "") return $q.reject("Too short");
+        return update(type, { externalId: change.newVal });
+    };
+
     vm.updateDescription = (change, type) => {
         if (_.isNil(change.newVal) || change.newVal === "") return $q.reject("Too short");
         return update(type, { description: change.newVal });
@@ -85,7 +90,8 @@ function controller($q,
             description: vm.newNoteType.description,
             applicableEntityKinds: splitEntityKinds(vm.newNoteType.applicableEntityKinds),
             isReadOnly: vm.newNoteType.isReadOnly,
-            position: vm.newNoteType.position
+            position: vm.newNoteType.position,
+            externalId: vm.newNoteType.externalId
         }];
 
         return serviceBroker
