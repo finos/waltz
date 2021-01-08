@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -60,6 +61,7 @@ public class EntityNamedNoteTypeDao {
                 .addAllApplicableEntityKinds(applicableEntityKinds)
                 .isReadOnly(r.getIsReadonly())
                 .position(r.getPosition())
+                .externalId(Optional.ofNullable(r.getExternalId()))
                 .build();
     };
 
@@ -117,6 +119,7 @@ public class EntityNamedNoteTypeDao {
 
         EntityNamedNoteTypeRecord record = dsl.newRecord(ENTITY_NAMED_NOTE_TYPE);
         record.setName(name);
+        record.setExternalId(command.externalId().orElse(""));
         record.setDescription(command.description().orElse(""));
         record.setApplicableEntityKinds(kinds);
         record.setIsReadonly(command.isReadOnly().orElse(false));
@@ -134,15 +137,17 @@ public class EntityNamedNoteTypeDao {
         record.changed(ENTITY_NAMED_NOTE_TYPE.ID, false);
 
         command.name()
-                .ifPresent(name -> record.setName(name));
+                .ifPresent(record::setName);
+        command.externalId()
+                .ifPresent(record::setExternalId);
         command.description()
-                .ifPresent(desc -> record.setDescription(desc));
+                .ifPresent(record::setDescription);
         command.applicableEntityKinds()
                 .ifPresent(kinds -> record.setApplicableEntityKinds(join(kinds, SEPARATOR)));
         command.isReadOnly()
-                .ifPresent(readOnly -> record.setIsReadonly(readOnly));
+                .ifPresent(record::setIsReadonly);
         command.position()
-                .ifPresent(position -> record.setPosition(position));
+                .ifPresent(record::setPosition);
 
         return dsl.executeUpdate(record) == 1;
     }

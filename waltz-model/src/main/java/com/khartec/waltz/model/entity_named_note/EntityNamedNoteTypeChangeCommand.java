@@ -37,4 +37,5 @@ public abstract class EntityNamedNoteTypeChangeCommand implements Command {
     public abstract Optional<String> description();
     public abstract Optional<Boolean> isReadOnly();
     public abstract Optional<Integer> position();
+    public abstract Optional<String> externalId();
 }

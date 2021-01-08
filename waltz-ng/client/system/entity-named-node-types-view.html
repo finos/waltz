@@ -40,8 +40,9 @@
         <div class="waltz-user-admin-scroll">
             <table class="table table-condensed">
                 <colgroup>
+                    <col width="15%">
+                    <col width="10%">
                     <col width="20%">
-                    <col width="25%">
                     <col width="25%">
                     <col width="10%">
                     <col width="10%">
@@ -50,6 +51,7 @@
                 <thead>
                 <tr>
                     <th>Name</th>
+                    <th>External Id</th>
                     <th>Description</th>
                     <th>Applicable Entity Kinds</th>
                     <th>Read Only</th>
@@ -64,6 +66,14 @@
                         <waltz-editable-field on-save="ctrl.updateName"
                                               field-type="text"
                                               initial-val="noteType.name"
+                                              ctx="noteType">
+                        </waltz-editable-field>
+                    </td>
+                    <td>
+                        <waltz-editable-field on-save="ctrl.updateExternalId"
+                                              empty-label="-"
+                                              field-type="text"
+                                              initial-val="noteType.externalId"
                                               ctx="noteType">
                         </waltz-editable-field>
                     </td>
@@ -104,7 +114,7 @@
                     </td>
                 </tr>
                 <tr ng-if="ctrl.creatingNoteType === false">
-                    <td colspan="5">
+                    <td colspan="7">
                         <button class="btn btn-primary btn-sm"
 
                                 ng-click="ctrl.startNewNoteType()">
@@ -116,6 +126,11 @@
                     <td>
                         <input type="text"
                                ng-model="ctrl.newNoteType.name"
+                               class="form-control input-sm">
+                    </td>
+                    <td>
+                        <input type="text"
+                               ng-model="ctrl.newNoteType.externalId"
                                class="form-control input-sm">
                     </td>
                     <td>

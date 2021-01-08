@@ -28,7 +28,9 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableEntityNamedNote.class)
 @JsonDeserialize(as = ImmutableEntityNamedNote.class)
-public abstract class EntityNamedNote implements ProvenanceProvider, LastUpdatedProvider {
+public abstract class EntityNamedNote implements
+        ProvenanceProvider,
+        LastUpdatedProvider {
 
     public abstract EntityReference entityReference();
     public abstract long namedNoteTypeId();
