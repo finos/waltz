@@ -31,7 +31,6 @@ import userPickList from "./components/user-pick-list/user-pick-list";
 import hasRole from "./directives/has-role";
 import hasRoleForEntityKind from "./directives/has-role-for-entity-kind";
 import unlessRole from "./directives/unless-role";
-import ifAnonymous from "./directives/if-anonymous";
 import Routes from "./routes";
 
 
@@ -54,7 +53,6 @@ export default () => {
         .directive("waltzHasRole", hasRole)
         .directive("waltzHasRoleForEntityKind", hasRoleForEntityKind)
         .directive("waltzUnlessRole", unlessRole)
-        .directive("waltzIfAnonymous", ifAnonymous);
 
     return module.name;
 };
