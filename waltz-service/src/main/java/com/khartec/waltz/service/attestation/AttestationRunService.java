@@ -292,12 +292,12 @@ public class AttestationRunService {
                         .stream())
                 .collect(toList());
 
-        attestationRunDao.updateStatusByIds(runsBeingIssued, ISSUING);
+        attestationRunDao.updateStatusForRunIds(runsBeingIssued, ISSUING);
 
         if(!isEmpty(instanceRecipients)){
             createAttestationInstancesAndRecipients(instanceRecipients);
         }
 
-        return attestationRunDao.updateStatusByIds(runsBeingIssued, ISSUED);
+        return attestationRunDao.updateStatusForRunIds(runsBeingIssued, ISSUED);
     }
 }

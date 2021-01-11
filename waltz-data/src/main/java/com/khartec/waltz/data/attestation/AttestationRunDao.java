@@ -152,7 +152,7 @@ public class AttestationRunDao {
                 .select(ENTITY_NAME_FIELD)
                 .select(ATTESTED_ENTITY_NAME_FIELD)
                 .from(ATTESTATION_RUN)
-                .leftJoin(ATTESTATION_INSTANCE)
+                .innerJoin(ATTESTATION_INSTANCE)
                     .on(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID))
                 .innerJoin(ATTESTATION_INSTANCE_RECIPIENT)
                     .on(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(ATTESTATION_INSTANCE.ID))
@@ -240,7 +240,7 @@ public class AttestationRunDao {
     }
 
 
-    public int updateStatusByIds(Set<Long> runIds, AttestationStatus status) {
+    public int updateStatusForRunIds(Set<Long> runIds, AttestationStatus status) {
         return dsl
                 .update(ATTESTATION_RUN)
                 .set(ATTESTATION_RUN.STATUS, status.name())
