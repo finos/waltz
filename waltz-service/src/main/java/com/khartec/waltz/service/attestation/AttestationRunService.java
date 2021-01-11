@@ -285,9 +285,9 @@ public class AttestationRunService {
         List<AttestationInstanceRecipient> instanceRecipients = pendingRuns
                 .stream()
                 .flatMap(run -> generateAttestationInstanceRecipients(
-                        run.id().get(),
-                        run.attestedEntityKind(),
-                        "admin")
+                            run.id().get(),
+                            run.attestedEntityKind(),
+                            "admin")
                         .stream())
                 .collect(toList());
 
