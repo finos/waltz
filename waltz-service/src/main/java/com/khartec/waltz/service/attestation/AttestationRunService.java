@@ -42,6 +42,7 @@ import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.asList;
+import static com.khartec.waltz.common.ListUtilities.isEmpty;
 import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.model.EntityReference.mkRef;
@@ -230,9 +231,6 @@ public class AttestationRunService {
 
     private void createAttestationInstancesAndRecipients(List<AttestationInstanceRecipient> instanceRecipients) {
 
-        Set<Long> runsBeingIssued = map(instanceRecipients, d -> d.attestationInstance().attestationRunId());
-        attestationRunDao.updateStatusByIds(runsBeingIssued, ISSUING);
-
         Map<AttestationInstance, List<AttestationInstanceRecipient>> instancesAndRecipientsToSave = instanceRecipients
                 .stream()
                 .collect(groupingBy(
@@ -251,8 +249,6 @@ public class AttestationRunService {
                     v.forEach(r -> attestationInstanceRecipientDao.create(instanceId, r.userId()));
                 }
         );
-
-        attestationRunDao.updateStatusByIds(runsBeingIssued, ISSUED);
     }
 
 
@@ -285,6 +281,7 @@ public class AttestationRunService {
     public int issueInstancesForPendingRuns() {
 
         Set<AttestationRun> pendingRuns = attestationRunDao.findPendingRuns();
+        Set<Long> runsBeingIssued = map(pendingRuns, d -> d.id().get());
 
         List<AttestationInstanceRecipient> instanceRecipients = pendingRuns
                 .stream()
@@ -295,8 +292,12 @@ public class AttestationRunService {
                         .stream())
                 .collect(toList());
 
-        createAttestationInstancesAndRecipients(instanceRecipients);
+        attestationRunDao.updateStatusByIds(runsBeingIssued, ISSUING);
 
-        return pendingRuns.size();
+        if(!isEmpty(instanceRecipients)){
+            createAttestationInstancesAndRecipients(instanceRecipients);
+        }
+
+        return attestationRunDao.updateStatusByIds(runsBeingIssued, ISSUED);
     }
 }
