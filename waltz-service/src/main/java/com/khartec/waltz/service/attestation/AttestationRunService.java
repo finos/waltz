@@ -44,11 +44,11 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.asList;
 import static com.khartec.waltz.common.ListUtilities.isEmpty;
 import static com.khartec.waltz.common.SetUtilities.asSet;
-import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static com.khartec.waltz.model.attestation.AttestationStatus.ISSUED;
 import static com.khartec.waltz.model.attestation.AttestationStatus.ISSUING;
+import static com.khartec.waltz.model.utils.IdUtilities.toIds;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -281,7 +281,6 @@ public class AttestationRunService {
     public int issueInstancesForPendingRuns() {
 
         Set<AttestationRun> pendingRuns = attestationRunDao.findPendingRuns();
-        Set<Long> runsBeingIssued = map(pendingRuns, d -> d.id().get());
 
         List<AttestationInstanceRecipient> instanceRecipients = pendingRuns
                 .stream()
@@ -292,6 +291,7 @@ public class AttestationRunService {
                         .stream())
                 .collect(toList());
 
+        Set<Long> runsBeingIssued = toIds(pendingRuns);
         attestationRunDao.updateStatusForRunIds(runsBeingIssued, ISSUING);
 
         if(!isEmpty(instanceRecipients)){
