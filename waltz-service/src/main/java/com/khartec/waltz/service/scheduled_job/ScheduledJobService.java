@@ -23,6 +23,7 @@ import com.khartec.waltz.data.scheduled_job.ScheduledJobDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.scheduled_job.JobKey;
 import com.khartec.waltz.model.scheduled_job.JobLifecycleStatus;
+import com.khartec.waltz.service.attestation.AttestationRunService;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService;
 import com.khartec.waltz.service.complexity.ComplexityRatingService;
 import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
@@ -51,6 +52,7 @@ public class ScheduledJobService {
     private final LogicalFlowService logicalFlowService;
     private final PhysicalSpecDataTypeService physicalSpecDataTypeService;
     private final ScheduledJobDao scheduledJobDao;
+    private final AttestationRunService attestationRunService;
 
 
     @Autowired
@@ -60,13 +62,15 @@ public class ScheduledJobService {
                                EntityHierarchyService entityHierarchyService,
                                LogicalFlowService logicalFlowService,
                                PhysicalSpecDataTypeService physicalSpecDataTypeService,
-                               ScheduledJobDao scheduledJobDao) {
+                               ScheduledJobDao scheduledJobDao,
+                               AttestationRunService attestationRunService) {
         checkNotNull(authoritativeSourceService, "authoritativeSourceService cannot be null");
         checkNotNull(complexityRatingService, "complexityRatingService cannot be null");
         checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
         checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
         checkNotNull(physicalSpecDataTypeService, "physicalSpecDataTypeService cannot be null");
         checkNotNull(scheduledJobDao, "scheduledJobDao cannot be null");
+        checkNotNull(attestationRunService, "attestationRunService cannot be null");
 
         this.authoritativeSourceService = authoritativeSourceService;
         this.complexityRatingService = complexityRatingService;
@@ -75,6 +79,7 @@ public class ScheduledJobService {
         this.logicalFlowService = logicalFlowService;
         this.physicalSpecDataTypeService = physicalSpecDataTypeService;
         this.scheduledJobDao = scheduledJobDao;
+        this.attestationRunService = attestationRunService;
     }
 
 
@@ -113,6 +118,9 @@ public class ScheduledJobService {
 
         runIfNeeded(JobKey.LOGICAL_FLOW_CLEANUP_ORPHANS,
                 (jk) -> logicalFlowService.cleanupOrphans());
+
+        runIfNeeded(JobKey.ATTESTATION_ISSUE_INSTANCES,
+                (jk) -> attestationRunService.issueInstancesForPendingRuns());
     }
 
 
