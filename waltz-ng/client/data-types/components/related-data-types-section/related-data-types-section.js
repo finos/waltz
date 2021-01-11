@@ -60,9 +60,9 @@ function controller(serviceBroker, notification) {
                 vm.relatedDataTypes = _
                     .chain(r.data)
                     .filter(rel => rel.b.kind === "DATA_TYPE")
-                    .map(rel => Object.assign({}, dataTypesById[rel.b.id]))
+                    .map(rel => Object.assign({}, dataTypesById[rel.b.id], {dataTypeId: rel.b.id}))
                     .sortBy("name")
-                    .value()
+                    .value();
             });
     }
 
