@@ -32,4 +32,89 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="20210112-5241-1"
+               author="davidwatkins73">
+        <comment>Costs: add cost_kind table #5241</comment>
+        <createTable tableName="cost_kind">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="cost_kind_pkey"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true" />
+            </column>
+            <column name="is_default"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="20210112-5241-2"
+               author="davidwatkins73">
+        <comment>Costs: add cost table #5241</comment>
+        <createTable tableName="cost">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="cost_pkey"/>
+            </column>
+            <column name="cost_kind_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="year" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="amount" type="DECIMAL(16,2)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}"
+                    defaultValue="waltz">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20210112-5241-3"
+               author="davidwatkins73">
+        <comment>Costs: add fk relationship between cost_kind and cost tables #5241</comment>
+        <addForeignKeyConstraint baseTableName="cost"
+                                 baseColumnNames="cost_kind_id"
+                                 constraintName="cost_to_cost_kind_id_fk"
+                                 referencedTableName="cost_kind"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
 </databaseChangeLog>
