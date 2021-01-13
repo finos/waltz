@@ -42,9 +42,13 @@ import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.asList;
+import static com.khartec.waltz.common.ListUtilities.isEmpty;
 import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
+import static com.khartec.waltz.model.attestation.AttestationStatus.ISSUED;
+import static com.khartec.waltz.model.attestation.AttestationStatus.ISSUING;
+import static com.khartec.waltz.model.utils.IdUtilities.toIds;
 import static java.util.Optional.empty;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
@@ -226,6 +230,7 @@ public class AttestationRunService {
 
 
     private void createAttestationInstancesAndRecipients(List<AttestationInstanceRecipient> instanceRecipients) {
+
         Map<AttestationInstance, List<AttestationInstanceRecipient>> instancesAndRecipientsToSave = instanceRecipients
                 .stream()
                 .collect(groupingBy(
@@ -270,5 +275,29 @@ public class AttestationRunService {
                 .issuedOn(LocalDate.now())
                 .dueDate(LocalDate.now().plusMonths(6))
                 .build();
+    }
+
+
+    public int issueInstancesForPendingRuns() {
+
+        Set<AttestationRun> pendingRuns = attestationRunDao.findPendingRuns();
+
+        List<AttestationInstanceRecipient> instanceRecipients = pendingRuns
+                .stream()
+                .flatMap(run -> generateAttestationInstanceRecipients(
+                            run.id().get(),
+                            run.attestedEntityKind(),
+                            "admin")
+                        .stream())
+                .collect(toList());
+
+        Set<Long> runsBeingIssued = toIds(pendingRuns);
+        attestationRunDao.updateStatusForRunIds(runsBeingIssued, ISSUING);
+
+        if(!isEmpty(instanceRecipients)){
+            createAttestationInstancesAndRecipients(instanceRecipients);
+        }
+
+        return attestationRunDao.updateStatusForRunIds(runsBeingIssued, ISSUED);
     }
 }
