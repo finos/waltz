@@ -33,8 +33,10 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.DateTimeUtilities.toLocalDate;
 import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.StringUtilities.join;
@@ -96,10 +98,12 @@ public class AttestationRunDao {
                         ID_SEPARATOR,
                         Long::valueOf))
                 .issuedBy(record.getIssuedBy())
-                .issuedOn(record.getIssuedOn().toLocalDate())
-                .dueDate(record.getDueDate().toLocalDate())
+                .issuedOn(toLocalDate(record.getIssuedOn()))
+                .dueDate(toLocalDate(record.getDueDate()))
                 .attestedEntityKind(EntityKind.valueOf(record.getAttestedEntityKind()))
                 .attestedEntityRef(attestedEntityRef)
+                .status(AttestationStatus.valueOf(record.getStatus()))
+                .provenance(record.getProvenance())
                 .build();
     };
 
@@ -222,5 +226,25 @@ public class AttestationRunDao {
         return dsl.select(entityCount)
                 .from(idSelector)
                 .fetchOne(r -> r.get(entityCount));
+    }
+
+
+    public Set<AttestationRun> findPendingRuns() {
+        return dsl
+                .select(ATTESTATION_RUN.fields())
+                .select(ENTITY_NAME_FIELD)
+                .select(ATTESTED_ENTITY_NAME_FIELD)
+                .from(ATTESTATION_RUN)
+                .where(ATTESTATION_RUN.STATUS.eq(AttestationStatus.PENDING.name()))
+                .fetchSet(TO_DOMAIN_MAPPER);
+    }
+
+
+    public int updateStatusForRunIds(Set<Long> runIds, AttestationStatus status) {
+        return dsl
+                .update(ATTESTATION_RUN)
+                .set(ATTESTATION_RUN.STATUS, status.name())
+                .where(ATTESTATION_RUN.ID.in(runIds))
+                .execute();
     }
 }

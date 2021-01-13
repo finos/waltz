@@ -32,4 +32,46 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="20210108-5244-1"
+               author="woodjes">
+        <comment>5244: Make issued_on and issued_by nullable</comment>
+        <dropNotNullConstraint columnDataType="DATE"
+                               columnName="issued_on"
+                               tableName="attestation_run"/>
+        <dropNotNullConstraint columnDataType="${name.type}"
+                               columnName="issued_by"
+                               tableName="attestation_run"/>
+    </changeSet>
+
+    <changeSet id="20210108-5244-2"
+               author="woodjes">
+        <comment>5244: Drop invalidated_at column</comment>
+        <dropColumn tableName="attestation_run"
+                    columnName="invalidated_at"/>
+    </changeSet>
+
+    <changeSet id="20210108-5244-3"
+               author="woodjes">
+        <comment>5244: Add status column</comment>
+        <addColumn tableName="attestation_run">
+            <column name="status"
+                    type="${enum.type}"
+                    defaultValue="ISSUED">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20210108-5244-4"
+               author="woodjes">
+        <comment>5244: Add provenance column</comment>
+        <addColumn tableName="attestation_run">
+            <column name="provenance"
+                    type="${provenance.type}"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

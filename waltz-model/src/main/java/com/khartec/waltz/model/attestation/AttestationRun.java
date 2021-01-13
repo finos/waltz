@@ -41,15 +41,19 @@ public abstract class AttestationRun implements IdProvider, NameProvider, Descri
     public abstract EntityKind attestedEntityKind();
     public abstract Optional<EntityReference> attestedEntityRef();
 
+    @Nullable
     public abstract String issuedBy();
 
-    @Value.Default
-    public LocalDate issuedOn() {
-        return LocalDate.now();
-    }
+    @Nullable
+    public abstract LocalDate issuedOn();
 
     public abstract LocalDate dueDate();
 
+    @Value.Default
+    public AttestationStatus status(){ return AttestationStatus.ISSUED; };
+
+    @Value.Default
+    public String provenance(){ return "waltz"; };
 
     @Override
     @Value.Default
