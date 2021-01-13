@@ -18,7 +18,9 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.cost.EntityCost;
 import com.khartec.waltz.service.cost.CostService;
 import com.khartec.waltz.web.ListRoute;
@@ -26,9 +28,9 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.web.WebUtilities.getEntityReference;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 
 @Service
@@ -49,13 +51,30 @@ public class CostEndpoint implements Endpoint {
     public void register() {
 
         String findByEntityReferencePath = mkPath(BASE_URL, "entity", "kind", ":kind", "id", ":id");
+        String findByCostKindAndSelectorPath = mkPath(BASE_URL, "cost-kind", ":id", "target-kind", ":kind");
+        String findBySelectorPath = mkPath(BASE_URL, "target-kind", ":kind");
 
         ListRoute<EntityCost> findByEntityReferenceRoute = (request, response) -> {
             EntityReference ref = getEntityReference(request);
             return costService.findByEntityReference(ref);
         };
 
+        ListRoute<EntityCost> findByCostKindAndSelectorRoute = (request, response) -> {
+            IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
+            long costKindId = getId(request);
+            EntityKind targetKind = getKind(request);
+            return costService.findByCostKindAndSelector(costKindId, idSelectionOptions, targetKind);
+        };
+
+        ListRoute<EntityCost> findBySelectorRoute = (request, response) -> {
+            IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
+            EntityKind targetKind = getKind(request);
+            return costService.findBySelector(idSelectionOptions, targetKind);
+        };
+
         getForList(findByEntityReferencePath, findByEntityReferenceRoute);
+        postForList(findByCostKindAndSelectorPath, findByCostKindAndSelectorRoute);
+        postForList(findBySelectorPath, findBySelectorRoute);
     }
 
 }

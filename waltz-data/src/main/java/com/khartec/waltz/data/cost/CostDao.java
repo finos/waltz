@@ -31,7 +31,6 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -76,18 +75,18 @@ public class CostDao {
     }
 
 
-    public List<EntityCost> findByCostKindAndSelector(GenericSelector genericSelector,
-                                                      int year){
+    public Set<EntityCost> findBySelectorForYear(GenericSelector genericSelector,
+                                                 int year){
         return dsl
                 .selectFrom(COST)
                 .where(COST.ENTITY_ID.in(genericSelector.selector())
                         .and(COST.ENTITY_KIND.eq(genericSelector.kind().name())))
                 .and(COST.YEAR.eq(year))
-                .fetch(TO_COST_MAPPER);
+                .fetchSet(TO_COST_MAPPER);
     }
 
 
-    public List<EntityCost> findByCostKindAndSelectorForYear(long costKindId,
+    public Set<EntityCost> findByCostKindIdAndSelectorForYear(long costKindId,
                                                              GenericSelector genericSelector,
                                                              int year){
         return dsl
@@ -96,7 +95,7 @@ public class CostDao {
                         .and(COST.ENTITY_KIND.eq(genericSelector.kind().name())))
                 .and(COST.COST_KIND_ID.eq(costKindId))
                 .and(COST.YEAR.eq(year))
-                .fetch(TO_COST_MAPPER);
+                .fetchSet(TO_COST_MAPPER);
     }
 
 
