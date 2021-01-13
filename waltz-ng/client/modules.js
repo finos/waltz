@@ -51,6 +51,7 @@ import ChangeInitiative from "./change-initiative";
 import ClientCacheKey from "./client_cache_key";
 import Complexity from "./complexity";
 import Common_Module from "./common/module";
+import Cost from "./cost"
 import ChangeLog from "./change-log";
 import ChangeSet from "./change-set";
 import ChangeUnit from "./change-unit";
@@ -159,6 +160,7 @@ const dependencies = [
     ChangeInitiative(),
     ClientCacheKey(),
     Complexity(),
+    Cost(),
     Common_Module(),
     ChangeLog(),
     ChangeSet(),
