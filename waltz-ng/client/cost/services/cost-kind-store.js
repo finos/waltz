@@ -28,3 +28,8 @@ export const CostKindStore_API = {
         description: 'executes findAll'
     },
 };
+
+export default {
+    serviceName,
+    store
+}

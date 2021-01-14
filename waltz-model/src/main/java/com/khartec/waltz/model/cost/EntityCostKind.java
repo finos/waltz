@@ -20,17 +20,18 @@ package com.khartec.waltz.model.cost;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.DescriptionProvider;
-import com.khartec.waltz.model.IdProvider;
-import com.khartec.waltz.model.NameProvider;
+import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableEntityCostKind.class)
 @JsonDeserialize(as = ImmutableEntityCostKind.class)
-public abstract class EntityCostKind implements IdProvider, NameProvider, DescriptionProvider {
+public abstract class EntityCostKind implements IdProvider, NameProvider, DescriptionProvider, EntityKindProvider {
 
     public abstract boolean isDefault();
+
+    @Value.Default
+    public EntityKind kind() { return EntityKind.COST_KIND; }
 
 }

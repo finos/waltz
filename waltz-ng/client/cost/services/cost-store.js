@@ -50,3 +50,8 @@ export const CostStore_API = {
         description: 'executes findByCostKindAndSelector [costKindId, targetKind, selectionOptions]'
     },
 };
+
+export default {
+    serviceName,
+    store
+}

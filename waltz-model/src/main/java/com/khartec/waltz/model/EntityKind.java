@@ -34,6 +34,8 @@ public enum EntityKind {
     CHANGE_INITIATIVE("Change initiative"),
     CHANGE_SET("Change set"),
     CHANGE_UNIT("Change unit"),
+    COST("Cost"),
+    COST_KIND("Cost Kind"),
     DATABASE("Database"),
     DATA_TYPE("Datatype"),
     END_USER_APPLICATION("End user application"),
