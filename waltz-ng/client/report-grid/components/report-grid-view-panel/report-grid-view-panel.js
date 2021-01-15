@@ -7,6 +7,8 @@ import _ from "lodash";
 import {mkChunks} from "../../../common/list-utils";
 import {determineForegroundColor, lightGrey} from "../../../common/colors";
 import {rgb} from "d3-color";
+import {scaleLinear} from "d3-scale";
+import extent from "d3-array/src/extent";
 
 const bindings = {
     parentEntityRef: "<",
@@ -70,11 +72,13 @@ function prepareColumnDefs(gridData) {
                     allowSummary: false,
                     cellTemplate:`
                     <div class="waltz-grid-color-cell"
-                         ng-bind="COL_FIELD.value"
+                    style="text-align: right"
                          ng-style="{
-                            'background-color': COL_FIELD.color, 
+                            'background-color': COL_FIELD.color,
                             'color': COL_FIELD.fontColor}">
-                    </div>`};
+                            <waltz-currency-amount amount="COL_FIELD.value"></waltz-currency-amount>
+                    </div>`
+                };
             default:
                 return {
                     allowSummary: true,
@@ -135,6 +139,7 @@ function mkPopoverHtml(cellData, ratingSchemeItem) {
     }
 }
 
+
 function prepareTableData(gridData) {
     const appsById = _.keyBy(gridData.instance.applications, d => d.id);
     const ratingSchemeItemsById = _
@@ -149,11 +154,21 @@ function prepareTableData(gridData) {
     const colDefs = _.get(gridData, ["definition", "columnDefinitions"], []);
     const columnRefs = _.map(colDefs, c => mkPropNameForRef(c.columnEntityReference));
 
+    const costColorScalesByColumnEntityId = _
+        .chain(gridData.instance.cellData)
+        .filter(d => d.columnEntityKind === 'COST_KIND')
+        .groupBy(d => d.columnEntityId)
+        .mapValues(v => scaleLinear()
+            .domain(extent(v, d => d.value))
+            .range(["#e2f5ff", "#86e4ff"]))
+        .value();
+
     function mkTableCell(x) {
         switch(x.columnEntityKind) {
             case 'COST_KIND':
+                const color = costColorScalesByColumnEntityId[x.columnEntityId](x.value);
                 return {
-                    color: 'pink',
+                    color: color,
                     value: x.value };
             default:
                 const ratingSchemeItem = ratingSchemeItemsById[x.ratingId];
