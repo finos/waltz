@@ -14,5 +14,5 @@ import java.util.Set;
 public abstract class ReportGridInstance {
     public abstract Set<Application> applications();  // rows
     public abstract Set<RagName> ratingSchemeItems();  // color scheme
-    public abstract Set<ReportGridRatingCell> cellData();  // raw cell data
+    public abstract Set<ReportGridCell> cellData();  // raw cell data
 }
