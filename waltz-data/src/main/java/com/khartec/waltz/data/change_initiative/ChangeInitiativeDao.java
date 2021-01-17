@@ -122,4 +122,10 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
                 .where(CHANGE_INITIATIVE.EXTERNAL_ID.eq(externalId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
+
+    public Collection<ChangeInitiative> findAll() {
+        return dsl
+                .selectFrom(CHANGE_INITIATIVE)
+                .fetch(TO_DOMAIN_MAPPER);
+    }
 }

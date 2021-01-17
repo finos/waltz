@@ -113,6 +113,15 @@ export function store($http, BaseApiUrl) {
         .delete(`${BASE}/id/${groupId}/change-initiatives/${changeInitiativeId}`)
         .then(result => result.data);
 
+    const addChangeInitiatives = (groupId, changeInitiativeIds) => $http
+        .post(`${BASE}/id/${groupId}/change-initiatives/list`, changeInitiativeIds)
+        .then(result => result.data);
+
+
+    const removeChangeInitiatives = (groupId, changeInitiativeIds) => $http
+        .delete(`${BASE}/id/${groupId}/change-initiatives/list/remove`, changeInitiativeIds)
+        .then(result => result.data);
+
 
     const updateGroupOverview = (groupId, data) => $http
         .post(`${BASE}/id/${groupId}`, data)
@@ -155,6 +164,10 @@ export function store($http, BaseApiUrl) {
 
         addChangeInitiative,
         removeChangeInitiative,
+
+        addChangeInitiatives,
+        removeChangeInitiatives,
+
         addOrganisationalUnit,
         removeOrganisationalUnit,
         search
@@ -277,6 +290,16 @@ export const AppGroupStore_API = {
         serviceName,
         serviceFnName: 'removeChangeInitiative',
         description: 'executes removeChangeInitiative'
+    },
+    addChangeInitiatives: {
+        serviceName,
+        serviceFnName: 'addChangeInitiatives',
+        description: 'executes addChangeInitiatives'
+    },
+    removeChangeInitiatives: {
+        serviceName,
+        serviceFnName: 'removeChangeInitiatives',
+        description: 'executes removeChangeInitiatives'
     },
     search: {
         serviceName,

@@ -125,8 +125,59 @@
                 <span>
                     Use the search box below to find and associate change initiatives to this group.
                 </span>
-                <waltz-change-initiative-selector model="ctrl.selectedChangeInitiative">
-                </waltz-change-initiative-selector>
+                
+                <!-- Selectors -->
+                <uib-tabset>
+                    <uib-tab heading="Single Editor">
+                        <!-- Single Selector -->
+                        <div style="padding: 1em 0">
+                            <span>
+                                Once a selection is made related applications
+                                will also be shown.
+                            </span>
+
+                            <waltz-change-initiative-selector model="ctrl.selectedChangeInitiative">
+                            </waltz-change-initiative-selector>
+                        </div>
+                    </uib-tab>
+
+                    <uib-tab heading="Bulk Editor">
+                        <!-- Bulk selector -->
+                        <div style="padding: 1em 0">
+                            <waltz-bulk-change-initiative-selector existing-refs="ctrl.changeInitiatives"
+                                                                   on-save="ctrl.saveChangeInitiatives">
+                            </waltz-bulk-change-initiative-selector>
+                        </div>
+                    </uib-tab>
+
+                    <uib-tab heading="Recently Viewed">
+                         <!-- Recent selector -->
+                        <div style="padding: 1em 0">
+                            <ul class="list-unstyled">
+                                <li ng-repeat="ci in ctrl.changeInitiativeHistory">
+                                    <span ng-if="!ctrl.isChangeInitiativeInGroup(ci.stateParams)"
+                                          class='clickable'
+                                          ng-click="ctrl.addRecentViewedChangeInitiative(ci)">
+                                        <waltz-icon fixed-width="true"
+                                                    class="text-muted"
+                                                    name="{{ ci.kind | toIconName:'entity' }}"></waltz-icon>
+                                        <span ng-bind="::ci.name"></span>
+                                    </span>
+                                    <span ng-if="ctrl.isChangeInitiativeInGroup(ci.stateParams)"
+                                          class='text-muted'>
+                                        <waltz-icon fixed-width="true"
+                                                    name="{{ ci.kind | toIconName:'entity' }}"></waltz-icon>
+                                        <span ng-bind="::ci.name"
+                                              style="text-decoration: line-through"></span>
+                                    </span>
+                                </li>
+                                <waltz-no-data ng-if="ctrl.changeInitiativeHistory.length == 0">
+                                    <message>No information for this person</message>
+                                </waltz-no-data>
+                            </ul>
+                        </div>
+                    </uib-tab>
+                </uib-tabset>
             </div>
         </div>
 

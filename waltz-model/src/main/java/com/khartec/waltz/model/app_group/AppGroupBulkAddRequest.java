@@ -13,6 +13,7 @@ import java.util.List;
 public abstract class AppGroupBulkAddRequest {
 
     public abstract List<Long> applicationIds();
+    public abstract List<Long> changeInitiativeIds();
     public abstract List<String> unknownIdentifiers();
 
 }
