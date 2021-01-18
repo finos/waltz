@@ -18,30 +18,47 @@
 
 import {initialiseData} from "../../common/index";
 import template from "./playpen3.html";
+import {CORE_API} from "../../common/services/core-api-utils";
+import {mkSelectionOptions} from "../../common/selector-utils";
 
 
 const initialState = {
     parentEntityRef: {
-        id: 95,
+        id: 10524,
         kind: "ORG_UNIT"
     },
     schemeId: 2,
     selectedDate: null,
 };
 
-function controller($stateParams, serviceBroker) {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.selectedDate = new Date('2020-07-07');
+    
+    const opts = mkSelectionOptions(vm.parentEntityRef);
+    
+    serviceBroker
+        .loadViewData(CORE_API.CostKindStore.findAll)
+        .then(r => vm.costKinds = r.data)
+        .then(() => console.log(vm.costKinds));
 
-    // serviceBroker.loadViewData(CORE_API.ChangeLogSummariesStore.findSummariesForKindBySelector,
-    //     ['APPLICATION', mkSelectionOptions(vm.parentEntityRef, 'EXACT')])
-    //     .then(r => vm.data = r.data)
-    //     .then(console.log(vm.data));
+    serviceBroker
+        .loadViewData(CORE_API.CostStore.findByEntityReference, [ vm.parentEntityRef ])
+        .then(r => vm.costs = r.data)
+        .then(() => console.log(vm.costs));
+
+    serviceBroker
+        .loadViewData(CORE_API.CostStore.findBySelector, [ 'APPLICATION', opts ])
+        .then(r => vm.costsForEntity = r.data)
+        .then(() => console.log(vm.costsForEntity));
+
+    serviceBroker
+        .loadViewData(CORE_API.CostStore.findByCostKindAndSelector, [ 1, 'APPLICATION', opts ])
+        .then(r => vm.costsOfKindForEntity = r.data)
+        .then(() => console.log(vm.costsOfKindForEntity));
 }
 
 controller.$inject = [
-    "$stateParams",
     "ServiceBroker"
 ];
 

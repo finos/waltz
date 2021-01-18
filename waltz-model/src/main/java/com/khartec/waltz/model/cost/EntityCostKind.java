@@ -16,32 +16,21 @@
  *
  */
 
-const BINDINGS = {
-    shouldBeAnonymous: '=waltzIfAnonymous'
-};
+package com.khartec.waltz.model.cost;
 
-function controller(UserService) {
-    const vm = this;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.DescriptionProvider;
+import com.khartec.waltz.model.IdProvider;
+import com.khartec.waltz.model.NameProvider;
+import org.immutables.value.Value;
 
-    UserService
-        .whoami()
-        .then(user => vm.show = vm.shouldBeAnonymous
-            ? user.userName === 'anonymous'
-            : user.userName != 'anonymous');
 
-    vm.show = false;
+@Value.Immutable
+@JsonSerialize(as = ImmutableEntityCostKind.class)
+@JsonDeserialize(as = ImmutableEntityCostKind.class)
+public abstract class EntityCostKind implements IdProvider, NameProvider, DescriptionProvider {
+
+    public abstract boolean isDefault();
+
 }
-
-controller.$inject = ['UserService'];
-
-
-export default () => ({
-    replace: true,
-    restrict: 'A',
-    transclude: true,
-    scope: {},
-    bindToController: BINDINGS,
-    controllerAs: 'ctrl',
-    template: '<span ng-show="ctrl.show"><ng-transclude></ng-transclude></span>',
-    controller
-});
