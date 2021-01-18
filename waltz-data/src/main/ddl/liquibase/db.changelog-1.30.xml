@@ -159,4 +159,71 @@
         </addColumn>
     </changeSet>
 
+    <!-- 5241: add different cost kinds -->
+    <changeSet id="20210108-5241-1"
+               author="woodjes">
+        <comment>5241: Add ext id to cost kind table</comment>
+        <addColumn tableName="cost_kind">
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20210118-5241-2"
+               author="woodjes">
+        <comment>5241: Add different cost kinds</comment>
+        <sql>
+            INSERT INTO cost_kind (name, description, external_id)
+            SELECT DISTINCT ev.display_name, ev.description, ac.kind
+            FROM asset_cost ac
+            INNER JOIN enum_value ev ON ac.kind = ev.${key.col}
+            AND ev.type = 'CostKind'
+        </sql>
+    </changeSet>
+
+    <changeSet id="20210118-5241-3"
+               author="woodjes">
+        <comment>5241: Add different cost kinds</comment>
+        <insert tableName="cost_kind">
+            <column name="name" value="TCO"></column>
+            <column name="description" value="Total Cost of Ownership is a sum of RTB, CTB and Amortisation values for an entity"></column>
+            <column name="external_id" value="TCO"></column>
+            <column name="is_default" valueBoolean="true"></column>
+        </insert>
+    </changeSet>
+
+    <changeSet id="20210118-5241-4"
+               author="woodjes">
+        <comment>5241: Add different cost kinds</comment>
+        <sql>
+            INSERT INTO cost (cost_kind_id, entity_id, entity_kind, year, amount, last_updated_by, provenance)
+            SELECT ck.id, a.id, 'APPLICATION', ac.year, ac.amount, 'admin', ac.provenance
+            FROM asset_cost ac
+            INNER JOIN application a ON ac.asset_code = a.asset_code
+            INNER JOIN enum_value ev ON ac.kind = ev.${key.col} AND ev.type = 'CostKind'
+            INNER JOIN cost_kind ck ON ev.display_name = ck.name
+        </sql>
+    </changeSet>
+
+    <changeSet id="20210118-5241-5"
+               author="woodjes">
+        <comment>5241: Add different cost kinds</comment>
+        <sql>
+            INSERT INTO cost (cost_kind_id, entity_id, entity_kind, year, amount, last_updated_by, provenance)
+            SELECT (SELECT id FROM cost_kind WHERE name = 'TCO'),
+            a.id,
+            'APPLICATION',
+            ac.year,
+            SUM(ac.amount),
+            'admin',
+            'dbApptio'
+            FROM asset_cost ac
+            INNER JOIN application a ON ac.asset_code = a.asset_code
+            WHERE ac.kind IN ('RTB', 'CTB', 'AMORTISATION')
+            GROUP BY a.id, ac.year, ac.provenance
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>
