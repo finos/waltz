@@ -48,6 +48,8 @@ function controller($filter, settingsService) {
             } else {
                 vm.currencyStr = $filter('currency')(vm.amount, currency.symbol, currency.fraction)
             }
+        } else {
+            vm.currencyStr = initialState.currencyStr;
         }
     };
 

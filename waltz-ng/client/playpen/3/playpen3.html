@@ -18,7 +18,7 @@
 
 <div>
     <waltz-section>
-        <pre ng-bind="$ctrl.costKinds | json"></pre>
-        <pre ng-bind="$ctrl.costs | json"></pre>
+        <waltz-entity-costs-section parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-entity-costs-section>
     </waltz-section>
 </div>
