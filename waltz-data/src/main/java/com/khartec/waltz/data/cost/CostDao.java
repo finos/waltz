@@ -19,12 +19,14 @@
 package com.khartec.waltz.data.cost;
 
 import com.khartec.waltz.data.GenericSelector;
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.cost.EntityCost;
 import com.khartec.waltz.model.cost.ImmutableEntityCost;
 import com.khartec.waltz.schema.tables.records.CostRecord;
 import org.jooq.DSLContext;
+import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.jooq.impl.DSL;
@@ -35,6 +37,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.COST;
 
@@ -44,9 +47,15 @@ public class CostDao {
 
     private final DSLContext dsl;
 
+    private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+            COST.ENTITY_ID,
+            COST.ENTITY_KIND,
+            newArrayList(EntityKind.APPLICATION))
+            .as("entity_name");
+
     private RecordMapper<Record, EntityCost> TO_COST_MAPPER = r -> {
         CostRecord record = r.into(COST);
-        EntityReference ref = mkRef(EntityKind.valueOf(record.getEntityKind()), record.getEntityId());
+        EntityReference ref = mkRef(EntityKind.valueOf(record.getEntityKind()), record.getEntityId(), r.getValue(ENTITY_NAME_FIELD));
         return ImmutableEntityCost.builder()
                 .id(record.getId())
                 .costKindId(record.getCostKindId())
@@ -68,7 +77,9 @@ public class CostDao {
 
     public Set<EntityCost> findByEntityReference(EntityReference ref){
         return dsl
-                .selectFrom(COST)
+                .select(ENTITY_NAME_FIELD)
+                .select(COST.fields())
+                .from(COST)
                 .where(COST.ENTITY_ID.eq(ref.id())
                         .and(COST.ENTITY_KIND.eq(ref.kind().name())))
                 .fetchSet(TO_COST_MAPPER);
@@ -78,7 +89,9 @@ public class CostDao {
     public Set<EntityCost> findBySelectorForYear(GenericSelector genericSelector,
                                                  int year){
         return dsl
-                .selectFrom(COST)
+                .select(ENTITY_NAME_FIELD)
+                .select(COST.fields())
+                .from(COST)
                 .where(COST.ENTITY_ID.in(genericSelector.selector())
                         .and(COST.ENTITY_KIND.eq(genericSelector.kind().name())))
                 .and(COST.YEAR.eq(year))
@@ -90,7 +103,9 @@ public class CostDao {
                                                              GenericSelector genericSelector,
                                                              int year){
         return dsl
-                .selectFrom(COST)
+                .select(ENTITY_NAME_FIELD)
+                .select(COST.fields())
+                .from(COST)
                 .where(COST.ENTITY_ID.in(genericSelector.selector())
                         .and(COST.ENTITY_KIND.eq(genericSelector.kind().name())))
                 .and(COST.COST_KIND_ID.eq(costKindId))

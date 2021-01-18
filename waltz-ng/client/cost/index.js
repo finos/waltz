@@ -17,17 +17,19 @@
  */
 
 import angular from "angular";
-import * as CostKindStore from './services/cost-kind-store';
-import * as CostStore from './services/cost-store';
+import CostKindStore from './services/cost-kind-store';
+import CostStore from './services/cost-store';
+import EntityCostsSection from './components/entity-costs-section/entity-costs-section';
 
 
-import {registerStores} from "../common/module-utils";
+import {registerComponents, registerStores} from "../common/module-utils";
 
 
 function setup() {
     const module = angular.module("waltz.cost", []);
 
     registerStores(module, [ CostKindStore, CostStore ]);
+    registerComponents(module, [ EntityCostsSection ]);
 
     return module.name;
 }

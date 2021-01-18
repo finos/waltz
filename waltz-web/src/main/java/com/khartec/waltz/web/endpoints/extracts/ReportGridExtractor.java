@@ -23,9 +23,9 @@ import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.rating.RagName;
 import com.khartec.waltz.model.report_grid.ReportGrid;
+import com.khartec.waltz.model.report_grid.ReportGridCell;
 import com.khartec.waltz.model.report_grid.ReportGridColumnDefinition;
 import com.khartec.waltz.model.report_grid.ReportGridDefinition;
-import com.khartec.waltz.model.report_grid.ReportGridRatingCell;
 import com.khartec.waltz.service.report_grid.ReportGridService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
@@ -125,12 +125,12 @@ public class ReportGridExtractor implements DataExtractor {
 
     private List<Tuple2<Application, ArrayList<RagName>>> prepareReportRows(ReportGrid reportGrid) {
 
-        Set<ReportGridRatingCell> tableData = reportGrid.instance().cellData();
+        Set<ReportGridCell> tableData = reportGrid.instance().cellData();
 
         Map<Long, Application> applicationsById = indexBy(reportGrid.instance().applications(), d -> d.entityReference().id());
         Map<Long, RagName> ratingsById = indexBy(reportGrid.instance().ratingSchemeItems(), d -> d.id().get());
 
-        Map<Long, Collection<ReportGridRatingCell>> tableDataByAppId = groupBy(tableData, ReportGridRatingCell::applicationId);
+        Map<Long, Collection<ReportGridCell>> tableDataByAppId = groupBy(tableData, ReportGridCell::applicationId);
 
         return tableDataByAppId
                 .entrySet()

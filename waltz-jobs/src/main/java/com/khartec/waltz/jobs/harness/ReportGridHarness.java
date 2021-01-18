@@ -23,7 +23,7 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.report_grid.ReportGridDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.report_grid.ReportGridRatingCell;
+import com.khartec.waltz.model.report_grid.ReportGridCell;
 import com.khartec.waltz.service.DIBaseConfiguration;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -56,10 +56,10 @@ public class ReportGridHarness {
 
         System.out.println("Made selector");
 
-        Set<ReportGridRatingCell> a = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(5, selector));
-        Set<ReportGridRatingCell> b = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(5, selector));
-        Set<ReportGridRatingCell> c = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(5, selector));
-        Set<ReportGridRatingCell> data = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(5, selector));
+        Set<ReportGridCell> a = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(5, selector));
+        Set<ReportGridCell> b = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(5, selector));
+        Set<ReportGridCell> c = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(5, selector));
+        Set<ReportGridCell> data = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(5, selector));
         System.out.println(data.size());
         System.out.println(first(data));
     }
