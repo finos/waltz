@@ -7,6 +7,8 @@ import _ from "lodash";
 import {mkChunks} from "../../../common/list-utils";
 import {determineForegroundColor, lightGrey} from "../../../common/colors";
 import {rgb} from "d3-color";
+import {scaleLinear} from "d3-scale";
+import extent from "d3-array/src/extent";
 
 const bindings = {
     parentEntityRef: "<",
@@ -63,37 +65,58 @@ function initialiseDataForRow(application, columnRefs) {
 function prepareColumnDefs(gridData) {
     const colDefs = _.get(gridData, ["definition", "columnDefinitions"], []);
 
-    const measurableCols = _
+    const mkColumnCustomProps = (c) =>  {
+        switch (c.columnEntityReference.kind) {
+            case 'COST_KIND':
+                return {
+                    allowSummary: false,
+                    cellTemplate:`
+                    <div class="waltz-grid-color-cell"
+                    style="text-align: right"
+                         ng-style="{
+                            'background-color': COL_FIELD.color,
+                            'color': COL_FIELD.fontColor}">
+                            <waltz-currency-amount amount="COL_FIELD.value"></waltz-currency-amount>
+                    </div>`
+                };
+            default:
+                return {
+                    allowSummary: true,
+                    cellTemplate:
+                        `<div class="waltz-grid-color-cell"
+                              ng-bind="COL_FIELD.name"
+                              uib-popover-html="COL_FIELD.comment"
+                              popover-trigger="mouseenter"
+                              popover-enable="COL_FIELD.comment != null"
+                              popover-popup-delay="500"
+                              popover-append-to-body="true"
+                              popover-placement="left"
+                              ng-style="{
+                                'border-bottom-right-radius': COL_FIELD.comment ? '15% 50%' : 0,
+                                'background-color': COL_FIELD.color, 
+                                'color': COL_FIELD.fontColor}">
+                        </div>`}
+        }
+    };
+
+
+    const additionalColumns = _
         .chain(colDefs)
-        .map(c => ({
-            field: mkPropNameForRef(c.columnEntityReference),
-            displayName: c.columnEntityReference.name,
-            columnDef: c,
-            width: 100,
-            headerTooltip: c.columnEntityReference.description,
-            cellTemplate: `
-            <div class="waltz-grid-color-cell"
-                 ng-bind="COL_FIELD.name"
-                 uib-popover-html="COL_FIELD.comment"
-                 popover-trigger="mouseenter"
-                 popover-enable="COL_FIELD.comment != null"
-                 popover-popup-delay="500"
-                 popover-append-to-body="true"
-                 popover-placement="left"
-                 ng-style="{
-                    'border-bottom-right-radius': COL_FIELD.comment ? '15% 50%' : 0,
-                    'background-color': COL_FIELD.color, 'color': COL_FIELD.fontColor
-                 }">
-            </div>`,
-            sortingAlgorithm: (a, b) => {
-                if (a == null) return 1;
-                if (b == null) return -1;
-                return a.position - b.position;
-            }
-        }))
+        .map(c => {
+            return Object.assign(
+                mkColumnCustomProps(c),
+                {
+                    field: mkPropNameForRef(c.columnEntityReference),
+                    displayName: c.columnEntityReference.name,
+                    columnDef: c,
+                    width: 100,
+                    headerTooltip: c.columnEntityReference.description,
+                    enableSorting: false
+                })
+        })
         .value();
 
-    return _.concat([nameCol, extIdCol], measurableCols);
+    return _.concat([nameCol, extIdCol], additionalColumns);
 }
 
 
@@ -116,6 +139,7 @@ function mkPopoverHtml(cellData, ratingSchemeItem) {
     }
 }
 
+
 function prepareTableData(gridData) {
     const appsById = _.keyBy(gridData.instance.applications, d => d.id);
     const ratingSchemeItemsById = _
@@ -130,18 +154,36 @@ function prepareTableData(gridData) {
     const colDefs = _.get(gridData, ["definition", "columnDefinitions"], []);
     const columnRefs = _.map(colDefs, c => mkPropNameForRef(c.columnEntityReference));
 
+    const costColorScalesByColumnEntityId = _
+        .chain(gridData.instance.cellData)
+        .filter(d => d.columnEntityKind === 'COST_KIND')
+        .groupBy(d => d.columnEntityId)
+        .mapValues(v => scaleLinear()
+            .domain(extent(v, d => d.value))
+            .range(["#e2f5ff", "#86e4ff"]))
+        .value();
+
+    function mkTableCell(x) {
+        switch(x.columnEntityKind) {
+            case 'COST_KIND':
+                const color = costColorScalesByColumnEntityId[x.columnEntityId](x.value);
+                return {
+                    color: color,
+                    value: x.value };
+            default:
+                const ratingSchemeItem = ratingSchemeItemsById[x.ratingId];
+                const popoverHtml = mkPopoverHtml(x, ratingSchemeItem);
+
+                return Object.assign({}, ratingSchemeItem, { comment: popoverHtml });
+        }}
+
     return _
         .chain(gridData.instance.cellData)
         .groupBy(d => d.applicationId)
         .map((xs, k) => _.reduce(
             xs,
             (acc, x) => {
-                const ratingSchemeItem = ratingSchemeItemsById[x.ratingId];
-                const popoverHtml = mkPopoverHtml(x, ratingSchemeItem);
-                acc[mkPropNameForCellRef(x)] = Object.assign(
-                    {},
-                    ratingSchemeItem,
-                    { comment: popoverHtml });
+                acc[mkPropNameForCellRef(x)] = mkTableCell(x);
                 return acc;
             },
             initialiseDataForRow(appsById[k], columnRefs)))
@@ -158,7 +200,8 @@ function prepareTableData(gridData) {
 function isSummarisableProperty(k) {
     return ! (k === "application"
         || k === "$$hashKey"
-        || k === "visible");
+        || k === "visible"
+        || k === _.startsWith("COST_KIND"));
 }
 
 
@@ -243,16 +286,22 @@ function controller(serviceBroker) {
     const vm = initialiseData(this, initData);
 
     function refresh(filters = []) {
-        vm.columnDefs = _.map(vm.allColumnDefs, cd => Object.assign(cd, {menuItems: [
-            {
-                title: "Add to summary",
-                icon: "ui-grid-icon-info-circled",
-                action: function() {
-                    vm.onAddSummary(cd);
-                },
-                context: vm
+        vm.columnDefs = _.map(vm.allColumnDefs, cd => {
+            if (cd.allowSummary){
+                return Object.assign(cd, { menuItems: [
+                    {
+                        title: "Add to summary",
+                        icon: "ui-grid-icon-info-circled",
+                        action: function() {
+                            vm.onAddSummary(cd);
+                        },
+                        context: vm
+                    }
+                ]})
+            } else {
+                return cd;
             }
-        ]}));
+        });
 
         const rowFilter = mkRowFilter(filters);
 

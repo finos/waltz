@@ -96,14 +96,14 @@ public class ReportGridService {
 
     private ReportGridInstance mkInstance(long id, IdSelectionOptions idSelectionOptions) {
         Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(idSelectionOptions);
-        Set<ReportGridRatingCell> cellData = reportGridDao.findCellDataByGridId(id, appSelector);
+        Set<ReportGridCell> cellData = reportGridDao.findCellDataByGridId(id, appSelector);
         List<Application> apps = applicationDao.findByAppIdSelector(appSelector);
 
         Set<RagName> ratingSchemeItems = ratingSchemeService.findRatingSchemeItemsByIds(map(
                 cellData,
-                ReportGridRatingCell::ratingId));
+                ReportGridCell::ratingId));
 
-        ReportGridInstance instance= ImmutableReportGridInstance
+        ReportGridInstance instance = ImmutableReportGridInstance
                 .builder()
                 .applications(apps)
                 .cellData(cellData)
