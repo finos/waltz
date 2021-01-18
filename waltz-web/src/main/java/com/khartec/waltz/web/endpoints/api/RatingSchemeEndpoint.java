@@ -49,7 +49,7 @@ public class RatingSchemeEndpoint implements Endpoint {
         String findAllPath = BASE_URL;
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String findRatingSchemeItemsForEntityAndCategoryPath = mkPath(BASE_URL, "items", "kind", ":kind", "id", ":id", "category-id", ":categoryId");
-        String findRatingSchemeItemsPath = mkPath(BASE_URL, "items", "assessmentDefinitionId", ":id");
+        String findRatingSchemeItemsPath = mkPath(BASE_URL, "items", "assessment-definition-id", ":id");
 
         ListRoute<RagName> findRatingSchemeItemsForEntityAndCategoryRoute = (request, response) -> {
             EntityReference ref = getEntityReference(request);

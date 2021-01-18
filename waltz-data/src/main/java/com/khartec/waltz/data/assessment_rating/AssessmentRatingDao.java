@@ -85,7 +85,6 @@ public class AssessmentRatingDao {
     private static final RecordMapper<? super Record, AssessmentRating> TO_DOMAIN_MAPPER_WITH_ENTITY_DETAILS  = r -> {
         AssessmentRatingRecord record = r.into(ASSESSMENT_RATING);
         return ImmutableAssessmentRating.builder()
-                .entityReference(EntityReference.mkRef(EntityKind.valueOf(record.getEntityKind()), record.getEntityId()))
                 .entityReference(ImmutableEntityReference.builder()
                         .kind(EntityKind.valueOf(record.getEntityKind()))
                         .id(record.getEntityId())

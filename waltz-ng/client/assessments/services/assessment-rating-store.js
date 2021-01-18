@@ -38,7 +38,7 @@ export function store($http, BaseApiUrl) {
 
     const findByAssessmentDefinitionId = (assessmentDefinitionId, visibilites = ["PRIMARY", "SECONDARY"]) => {
         return $http
-            .post(`${BASE}/${assessmentDefinitionId}`, visibilites)
+            .post(`${BASE}/definition-id/${assessmentDefinitionId}`, visibilites)
             .then(d => d.data);
     };
 

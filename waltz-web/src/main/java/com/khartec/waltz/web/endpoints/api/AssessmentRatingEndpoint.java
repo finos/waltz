@@ -72,7 +72,7 @@ public class AssessmentRatingEndpoint implements Endpoint {
     public void register() {
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findByEntityKindPath = mkPath(BASE_URL, "entity-kind", ":kind");
-        String findByDefinitionPath = mkPath(BASE_URL, ":assessmentDefinitionId");
+        String findByDefinitionPath = mkPath(BASE_URL, "definition-id", ":assessmentDefinitionId");
         String findByTargetKindForRelatedSelectorPath = mkPath(BASE_URL, "target-kind", ":targetKind", "selector");
         String modifyPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId");
         String bulkUpdatePath = mkPath(BASE_URL, "bulk-update", ":assessmentDefinitionId");

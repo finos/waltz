@@ -135,13 +135,11 @@ public class RatingSchemeDAO {
         return dsl
                 .select(RATING_SCHEME_ITEM.fields())
                 .from(RATING_SCHEME_ITEM)
-                .leftOuterJoin(RATING_SCHEME)
+                .innerJoin(RATING_SCHEME)
                 .on(RATING_SCHEME.ID.eq(RATING_SCHEME_ITEM.SCHEME_ID))
-                .where(RATING_SCHEME.ID.in(
-                        DSL.select(ASSESSMENT_DEFINITION.RATING_SCHEME_ID)
-                        .from(ASSESSMENT_DEFINITION)
-                        .where(ASSESSMENT_DEFINITION.ID.eq(assessmentDefinitionId))
-                ))
+                .innerJoin(ASSESSMENT_DEFINITION)
+                .on(ASSESSMENT_DEFINITION.RATING_SCHEME_ID.eq(RATING_SCHEME.ID))
+                .where(ASSESSMENT_DEFINITION.ID.eq(assessmentDefinitionId))
                 .orderBy(RATING_SCHEME_ITEM.POSITION.asc())
                 .fetch(TO_ITEM_MAPPER);
     }

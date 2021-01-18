@@ -39,7 +39,7 @@ export function store($http, BaseApiUrl) {
         .then(d => d.data);
 
     const findRatingsSchemeItems = (assessmentDefinitionId) => $http
-        .get(`${base}/items/assessmentDefinitionId/${assessmentDefinitionId}`)
+        .get(`${base}/items/assessment-definition-id/${assessmentDefinitionId}`)
         .then(d => d.data);
 
 

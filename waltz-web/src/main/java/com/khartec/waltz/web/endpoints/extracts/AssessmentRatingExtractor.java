@@ -23,14 +23,13 @@ import com.khartec.waltz.data.assessment_definition.AssessmentDefinitionDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
-import org.jooq.DSLContext;
-import org.jooq.Field;
-import org.jooq.Record6;
-import org.jooq.SelectConditionStep;
+import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.sql.Timestamp;
 
 import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.schema.Tables.*;
@@ -82,7 +81,7 @@ public class AssessmentRatingExtractor extends DirectQueryBasedDataExtractor {
     }
 
 
-    private SelectConditionStep<Record6<Long, String, String, String, String, String>> prepareExtractQuery(Long definitionId) {
+    private SelectConditionStep<Record9<Long, String, String, String, String, String, Timestamp, String, String>> prepareExtractQuery(Long definitionId) {
 
         return dsl
                 .selectDistinct(
@@ -91,6 +90,9 @@ public class AssessmentRatingExtractor extends DirectQueryBasedDataExtractor {
                         entityNameField.as("Name"),
                         RATING_SCHEME_ITEM.CODE.as("Code"),
                         RATING_SCHEME_ITEM.NAME.as("Rating Name"),
+                        RATING_SCHEME_ITEM.DESCRIPTION.as("Comment"),
+                        ASSESSMENT_RATING.LAST_UPDATED_AT.as("Last Updated At"),
+                        ASSESSMENT_RATING.LAST_UPDATED_BY.as("Last Updated By"),
                         ASSESSMENT_DEFINITION.NAME.as("Definition Name"))
                 .from(ASSESSMENT_RATING)
                 .innerJoin(RATING_SCHEME_ITEM)
