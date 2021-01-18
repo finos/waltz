@@ -18,15 +18,23 @@
 
 package com.khartec.waltz.web.endpoints.extracts;
 
+import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import static com.khartec.waltz.common.ListUtilities.isEmpty;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.InlineSelectFieldFactory.mkNameField;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
@@ -36,11 +44,12 @@ import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
+import static java.util.stream.Collectors.toList;
 import static spark.Spark.post;
 
 
 @Service
-public class LogicalFlowExtractor extends DirectQueryBasedDataExtractor {
+public class LogicalFlowExtractor extends CustomDataExtractor {
 
     private static final Field<String> SOURCE_NAME_FIELD = mkNameField(
             LOGICAL_FLOW.SOURCE_ENTITY_ID,
@@ -52,12 +61,24 @@ public class LogicalFlowExtractor extends DirectQueryBasedDataExtractor {
             LOGICAL_FLOW.TARGET_ENTITY_KIND,
             newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
 
+    private static List<String> staticHeaders = newArrayList(
+            "Source",
+            "Source Asset Code",
+            "Source Org Unit",
+            "Target",
+            "Target Asset Code",
+            "Target Org Unit",
+            "Data Type",
+            "Authoritativeness");
+
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
 
+    private final DSLContext dsl;
+
     @Autowired
     public LogicalFlowExtractor(DSLContext dsl) {
-        super(dsl);
+        this.dsl = dsl;
     }
 
 
@@ -65,8 +86,14 @@ public class LogicalFlowExtractor extends DirectQueryBasedDataExtractor {
     public void register() {
         post(mkPath("data-extract", "logical-flows"), (request, response) -> {
             IdSelectionOptions options = readIdSelectionOptionsFromBody(request);
-            SelectConditionStep<Record> qry = prepareQuery(dsl, options);
-            return writeExtract("logical-flows", qry, request, response);
+
+            return writeReportResults(
+                    response,
+                    prepareFlows(
+                            prepareQuery(dsl, options),
+                            parseExtractFormat(request),
+                            "logical-flows",
+                            getTagsMap()));
         });
     }
 
@@ -133,6 +160,7 @@ public class LogicalFlowExtractor extends DirectQueryBasedDataExtractor {
                         targetOrgUnitNameField.as("Target Org Unit"))
                 .select(DATA_TYPE.NAME.as("Data Type"))
                 .select(ENUM_VALUE.DISPLAY_NAME.as("Authoritativeness"))
+                .select(LOGICAL_FLOW.ID)
                 .from(LOGICAL_FLOW)
                 .leftJoin(sourceAppFlows)
                     .on(sourceFlowId.eq(LOGICAL_FLOW.ID))
@@ -151,7 +179,51 @@ public class LogicalFlowExtractor extends DirectQueryBasedDataExtractor {
                 .and(conditionForDataType)
                 .and(sourceFlowId.isNotNull()
                         .or(targetFlowId.isNotNull()));
-
     }
 
+    private Tuple3<ExtractFormat, String, byte[]> prepareFlows(SelectConditionStep<Record> query,
+                                                               ExtractFormat format,
+                                                               String reportName,
+                                                               Map<Long, List<String>> tags) throws IOException {
+
+        List<List<Object>> reportRows = prepareReportRows(query, tags);
+        return formatReport(
+                format,
+                reportName,
+                reportRows,
+                ListUtilities.append(staticHeaders, "Tags")
+        );
+    }
+
+    private List<List<Object>> prepareReportRows(SelectConditionStep<Record> qry,
+                                                 Map<Long, List<String>> tags) {
+        Result<Record> results = qry.fetch();
+
+        return results
+                .stream()
+                .map(row -> {
+                    ArrayList<Object> reportRow = new ArrayList<>();
+                    staticHeaders.forEach(h -> reportRow.add(row.get(h)));
+
+                    Long logicalFlowId = row.get(LOGICAL_FLOW.ID);
+                    List<String> logicalFlowTags = tags.get(logicalFlowId);
+                    reportRow.add(isEmpty(logicalFlowTags)
+                            ? ""
+                            : String.join(",", logicalFlowTags));
+
+                    return reportRow;
+                })
+                .collect(toList());
+    }
+
+    private Map<Long, List<String>> getTagsMap() {
+        return dsl.select(PHYSICAL_FLOW.LOGICAL_FLOW_ID, TAG.NAME)
+                .from(TAG_USAGE)
+                .join(TAG)
+                .on(TAG.ID.eq(TAG_USAGE.TAG_ID))
+                .join(PHYSICAL_FLOW)
+                .on(TAG_USAGE.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name())
+                        .and(PHYSICAL_FLOW.ID.eq(TAG_USAGE.ENTITY_ID)))
+                .fetchGroups(PHYSICAL_FLOW.LOGICAL_FLOW_ID, TAG.NAME);
+    }
 }
