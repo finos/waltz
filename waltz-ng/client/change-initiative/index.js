@@ -39,9 +39,7 @@ function setup() {
 
     module
         .directive("waltzChangeInitiativeSelector", changeInitiativeSelector);
-    /* module
-        .component("waltBulkChangeInitiativeSelecto", BulkChangeInitiativeSelector) */
-    
+        
     registerComponents(module, [
         changeInitiativeSection,
         changeInitiativeTree,
