@@ -91,7 +91,7 @@ public class ReportGridExtractor implements DataExtractor {
 
         ReportGrid reportGrid = reportGridService.getByIdAndSelectionOptions(gridId, selectionOptions);
 
-        List<Tuple2<Application, ArrayList<RagName>>> reportRows = prepareReportRows(reportGrid);
+        List<Tuple2<Application, ArrayList<Object>>> reportRows = prepareReportRows(reportGrid);
 
         return formatReport(
                 format,
@@ -123,7 +123,7 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private List<Tuple2<Application, ArrayList<RagName>>> prepareReportRows(ReportGrid reportGrid) {
+    private List<Tuple2<Application, ArrayList<Object>>> prepareReportRows(ReportGrid reportGrid) {
 
         Set<ReportGridCell> tableData = reportGrid.instance().cellData();
 
@@ -139,30 +139,44 @@ public class ReportGridExtractor implements DataExtractor {
                     Long appId = r.getKey();
                     Application app = applicationsById.getOrDefault(appId, null);
 
-                    ArrayList<RagName> reportRow = new ArrayList<>();
+                    ArrayList<Object> reportRow = new ArrayList<>();
 
-                    Map<Tuple2<Long, EntityKind>, RagName> ratingsByColumnRefForApp = indexBy(r.getValue(),
+                    Map<Tuple2<Long, EntityKind>, Object> callValuesByColumnRefForApp = indexBy(r.getValue(),
                             k -> tuple(k.columnEntityId(), k.columnEntityKind()),
-                            v -> ratingsById.getOrDefault(v.ratingId(), null));
+                            v -> getValueFromReportRow(ratingsById, v));
 
                     //find data for columns
                     reportGrid.definition().columnDefinitions()
                             .stream()
-                            .forEach(t -> reportRow.add(
-                                    ratingsByColumnRefForApp.getOrDefault(
-                                            tuple(t.columnEntityReference().id(), t.columnEntityReference().kind()),
+                            .forEach(colDef -> reportRow.add(
+                                    callValuesByColumnRefForApp.getOrDefault(
+                                            tuple(colDef.columnEntityReference().id(), colDef.columnEntityReference().kind()),
                                             null)));
                     return tuple(app, reportRow);
                 })
-                .sorted(Comparator.comparing(t2 -> t2.v1.name()))
+                .sorted(Comparator.comparing(t -> t.v1.name()))
                 .collect(toList());
+    }
+
+
+    private Object getValueFromReportRow(Map<Long, RagName> ratingsById, ReportGridCell reportGridCell) {
+        switch (reportGridCell.columnEntityKind()){
+            case COST_KIND:
+                return reportGridCell.value();
+            case MEASURABLE:
+            case ASSESSMENT_DEFINITION:
+                RagName ragName = ratingsById.getOrDefault(reportGridCell.ratingId(), null);
+                return (ragName != null) ? ragName.name() : null;
+            default:
+                throw new IllegalArgumentException("This report does not support export with column of type: " + reportGridCell.columnEntityKind().name());
+        }
     }
 
 
     private Tuple3<ExtractFormat, String, byte[]> formatReport(ExtractFormat format,
                                                                String reportName,
                                                                List<ReportGridColumnDefinition> columnDefinitions,
-                                                               List<Tuple2<Application, ArrayList<RagName>>> reportRows) throws IOException {
+                                                               List<Tuple2<Application, ArrayList<Object>>> reportRows) throws IOException {
         switch (format) {
             case XLSX:
                 return tuple(format, reportName, mkExcelReport(reportName, columnDefinitions, reportRows));
@@ -175,7 +189,7 @@ public class ReportGridExtractor implements DataExtractor {
 
 
     private byte[] mkCSVReport(List<ReportGridColumnDefinition> columnDefinitions,
-                               List<Tuple2<Application, ArrayList<RagName>>> reportRows) throws IOException {
+                               List<Tuple2<Application, ArrayList<Object>>> reportRows) throws IOException {
         List<String> headers = mkHeaderStrings(columnDefinitions);
 
         StringWriter writer = new StringWriter();
@@ -189,16 +203,15 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private List<Object> simplify(Tuple2<Application, ArrayList<RagName>> row) {
+    private List<Object> simplify(Tuple2<Application, ArrayList<Object>> row) {
 
         long appId = row.v1.entityReference().id();
         String appName = row.v1.name();
         Optional<String> assetCode = row.v1.assetCode();
 
-        List<String> ratings = map(row.v2, r -> (r == null) ? null : r.name());
         List<Object> appInfo = asList(appId, appName, assetCode);
 
-        return map(concat(appInfo, ratings), value -> {
+        return map(concat(appInfo, row.v2), value -> {
             if (value == null) return null;
             if (value instanceof Optional) {
                 return ((Optional<?>) value).orElse(null);
@@ -209,7 +222,9 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private byte[] mkExcelReport(String reportName, List<ReportGridColumnDefinition> columnDefinitions, List<Tuple2<Application, ArrayList<RagName>>> reportRows) throws IOException {
+    private byte[] mkExcelReport(String reportName,
+                                 List<ReportGridColumnDefinition> columnDefinitions,
+                                 List<Tuple2<Application, ArrayList<Object>>> reportRows) throws IOException {
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet(sanitizeSheetName(reportName));
 
@@ -231,7 +246,7 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private int writeExcelBody(List<Tuple2<Application, ArrayList<RagName>>> reportRows, XSSFSheet sheet) {
+    private int writeExcelBody(List<Tuple2<Application, ArrayList<Object>>> reportRows, XSSFSheet sheet) {
         AtomicInteger rowNum = new AtomicInteger(1);
         reportRows.forEach(r -> {
 
@@ -239,10 +254,9 @@ public class ReportGridExtractor implements DataExtractor {
             String appName = r.v1.name();
             Optional<String> assetCode = r.v1.assetCode();
 
-            List<String> ratings = map(r.v2, d -> (d == null) ? null : d.name());
             List<Object> appInfo = asList(appId, appName, assetCode);
 
-            List<Object> values = concat(appInfo, ratings);
+            List<Object> values = concat(appInfo, r.v2);
 
             Row row = sheet.createRow(rowNum.getAndIncrement());
             AtomicInteger colNum = new AtomicInteger(0);
