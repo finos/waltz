@@ -21,7 +21,7 @@ import {initialiseData, isEmpty} from "../../../common";
 import {scaleBand, scaleLinear} from "d3-scale";
 import {select} from "d3-selection";
 import {extent} from "d3-array";
-import {axisBottom, axisLeft} from "d3-axis";
+import {axisLeft} from "d3-axis";
 import {format} from "d3-format";
 import namedSettings from "../../../system/named-settings";
 import {currenciesByCode} from "../../../common/currency-utils";
@@ -58,36 +58,29 @@ const dimensions = {
 };
 
 
-function drawXAxis(xScale, container, currencyFormat) {
-    const xAxis = axisBottom(xScale)
-        .tickFormat(currencyFormat)
-        .ticks(5);
-
-    container
-        .append("g")
-        .attr("transform", `translate(0, ${dimensions.graph.height - (dimensions.margin.top + dimensions.margin.bottom)})`)
-        .call(xAxis);
-}
-
-
 function drawYAxis(yScale,
-                   container) {
-    const yAxis = axisLeft(yScale);
+                   container,
+                   refsById) {
+
+    const yAxis = axisLeft(yScale)
+        .tickFormat(d => truncateMiddle(
+            _.get(refsById, [ d, 'name'], 'Unknown'),
+            25));
 
     container
-        .append("g")
-        .attr("transform", `translate(${dimensions.margin.left}, ${dimensions.margin.top})`)
         .call(yAxis);
+
+    container
+        .selectAll('.tick')
+        .append('title')
+        .text(d => _.get(refsById, [d, 'name'], ''));
 }
 
 
-function draw(svg,
+function draw(chartBody,
+              chartAxis,
               costs = [],
               currencyFormat) {
-    // remove any previous elements
-    svg
-        .selectAll("*")
-        .remove();
 
     const totalExtent = extent(costs, c => c.amount);
 
@@ -95,10 +88,8 @@ function draw(svg,
         .range([0, dimensions.graph.width - dimensions.margin.left - dimensions.margin.right])
         .domain([0, totalExtent[1]]);
 
-    const nameArray = _.map(costs, c => truncateMiddle(c.entityReference.name, 25));
-
     const yScale = scaleBand()
-        .domain(nameArray)
+        .domain(_.map(costs, c => c.entityReference.id))
         .range([0, dimensions.graph.height - (dimensions.margin.top + dimensions.margin.bottom)])
         .padding(0.2);
 
@@ -106,32 +97,59 @@ function draw(svg,
         .domain(totalExtent)
         .range([startColor, endColor]);
 
-    const g = svg
-        .append("g")
-        .attr("transform", `translate(${dimensions.margin.left},${dimensions.margin.top})`);
-
-    const bars = g
+    const bars = chartBody
+        .attr("transform", `translate(${dimensions.margin.left},${dimensions.margin.top})`)
         .selectAll(".wacg-bar")
-        .data(costs, d => d.entityReference.id)
+        .data(costs, d => d.entityReference.id);
+
+    bars
+        .exit()
+        .remove();
+
+    const newBars = bars
         .enter()
         .append("g")
         .classed("wacg-bar", true)
-        .attr("transform", (d) => `translate(0, ${yScale(truncateMiddle(d.entityReference.name, 25))})`)
+        .attr("transform", (d) => `translate(0, ${yScale(d.entityReference.id)})`);
 
-    bars.append("rect")
+    newBars
+        .append("rect")
         .attr("x", 0)
-        .attr("y", 0)
+        .attr("y", 0);
+
+    newBars
+        .append("text")
+        .attr("x", 10);
+
+    const transitionDuration = 1000;
+
+    const allBars = bars
+        .merge(newBars);
+
+    allBars
+        .select("rect")
+        .transition()
+        .duration(transitionDuration)
         .attr("width", d => xScale(d.amount))
         .attr("height", yScale.bandwidth())
         .attr("fill", (d) => colorScale(d.amount));
 
-    bars.append("text")
-        .attr("x", 10)
+    allBars
+        .select("text")
         .attr("y", yScale.bandwidth() / 2 + 3)  // middle of the bar
         .text(d => currencyFormat(d.amount));
 
-    drawXAxis(xScale, g, currencyFormat);
-    drawYAxis(yScale, svg);
+    allBars
+        .transition()
+        .duration(transitionDuration)
+        .attr("transform", (d) => `translate(0, ${yScale(d.entityReference.id)})`);
+
+    const refsById = _.chain(costs)
+        .map(d => d.entityReference)
+        .keyBy(d => d.id)
+        .value();
+
+    drawYAxis(yScale, chartAxis, refsById);
 }
 
 
@@ -145,6 +163,13 @@ function controller($element, $scope, settingsService) {
         .style("min-height", "300px")
         .attr("preserveAspectRatio", "xMinYMin meet");
 
+    const chartBody = svg
+        .append("g");
+
+    const chartAxis = svg
+        .append("g")
+        .attr("transform", `translate(${dimensions.margin.left}, ${dimensions.margin.top})`);
+
     let currencyFormat = null;
 
     const refresh = () => {
@@ -157,8 +182,9 @@ function controller($element, $scope, settingsService) {
         svg.attr("viewBox", `0 0 ${dimensions.graph.width} ${dimensions.graph.height}`);
 
         draw(
-            svg,
-            vm.costs,
+            chartBody,
+            chartAxis,
+            _.orderBy(vm.costs, d => d.amount * -1),
             currencyFormat);
 
     };

@@ -8,9 +8,15 @@ export function store($http, BaseApiUrl) {
             .get(`${BASE}`)
             .then(r => r.data);
 
+    const findExistingBySelector = (targetKind, selector) =>
+        $http
+            .post(`${BASE}/target-kind/${targetKind}/selector`, selector)
+            .then(r => r.data);
+
 
     return {
-        findAll
+        findAll,
+        findExistingBySelector
     };
 }
 
@@ -26,6 +32,11 @@ export const CostKindStore_API = {
         serviceName,
         serviceFnName: 'findAll',
         description: 'executes findAll'
+    },
+    findExistingBySelector: {
+        serviceName,
+        serviceFnName: 'findExistingBySelector',
+        description: 'executes findExistingBySelector, [targetKind, selector]'
     },
 };
 

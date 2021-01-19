@@ -101,7 +101,8 @@ function controller($q, serviceBroker, uiGridConstants) {
 
     function loadCostKinds() {
         return serviceBroker
-            .loadAppData(CORE_API.CostKindStore.findAll)
+            .loadAppData(CORE_API.CostKindStore.findExistingBySelector,
+                [vm.targetEntityKind, vm.selector])
             .then(r => {
                 vm.costKinds = r.data;
                 vm.costKindsById = _.keyBy(vm.costKinds, d => d.id);
@@ -141,8 +142,10 @@ function controller($q, serviceBroker, uiGridConstants) {
     };
 
     vm.$onChanges = () => {
-        loadCostKinds()
-            .then(() => loadTopCostsByIdAndSelector())
+        if (vm.selector){
+            loadCostKinds()
+                .then(() => loadTopCostsByIdAndSelector())
+        }
     };
 
     vm.refresh = () => {
@@ -174,5 +177,5 @@ const component = {
 
 export default {
     component,
-    id: "waltzSummaryCostsSection"
+    id: "waltzAppCostsSummarySection"
 };

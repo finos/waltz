@@ -20,7 +20,7 @@ import angular from "angular";
 import CostKindStore from './services/cost-kind-store';
 import CostStore from './services/cost-store';
 import EntityCostsSection from './components/entity-costs-section/entity-costs-section';
-import SummaryCostsSection from './components/app-costs-summary-section/app-costs-summary-section';
+import AppCostsSummarySection from './components/app-costs-summary-section/app-costs-summary-section';
 import EntityCostsGraph from './components/graph/entity-costs-graph';
 
 
@@ -33,7 +33,7 @@ function setup() {
     registerStores(module, [ CostKindStore, CostStore ]);
     registerComponents(module,
         [ EntityCostsSection,
-            SummaryCostsSection,
+            AppCostsSummarySection,
             EntityCostsGraph ]);
 
     return module.name;

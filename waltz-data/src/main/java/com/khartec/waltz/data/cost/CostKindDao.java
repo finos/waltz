@@ -18,17 +18,18 @@
 
 package com.khartec.waltz.data.cost;
 
+import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.model.cost.EntityCostKind;
 import com.khartec.waltz.model.cost.ImmutableEntityCostKind;
 import com.khartec.waltz.schema.tables.records.CostKindRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
+import static com.khartec.waltz.schema.Tables.COST;
 import static com.khartec.waltz.schema.Tables.COST_KIND;
 
 
@@ -58,6 +59,23 @@ public class CostKindDao {
     public Set<EntityCostKind> findAll(){
         return dsl
                 .selectFrom(COST_KIND)
+                .fetchSet(TO_COST_KIND_MAPPER);
+    }
+
+
+    public Set<EntityCostKind> findExistingCostKindsBySelector(GenericSelector genericSelector){
+
+        SelectJoinStep<Record1<Integer>> latestYear = DSL
+                .select(DSL.max(COST.YEAR))
+                .from(COST);
+
+        return dsl
+                .select()
+                .from(COST_KIND)
+                .innerJoin(COST).on(COST_KIND.ID.eq(COST.COST_KIND_ID))
+                .where(COST.ENTITY_ID.in(genericSelector.selector())
+                        .and(COST.ENTITY_KIND.eq(genericSelector.kind().name()))
+                        .and(COST.YEAR.eq(latestYear)))
                 .fetchSet(TO_COST_KIND_MAPPER);
     }
 
