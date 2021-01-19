@@ -201,6 +201,11 @@ public class ReportGridDao {
         if (requiredCostKinds.size() == 0) {
             return emptySet();
         } else {
+
+            SelectJoinStep<Record1<Integer>> latestYear = DSL
+                    .select(DSL.max(COST.YEAR))
+                    .from(COST);
+
             return dsl
                     .select(c.ENTITY_ID,
                             c.ENTITY_KIND,
@@ -209,7 +214,8 @@ public class ReportGridDao {
                     .from(c)
                     .where(c.COST_KIND_ID.in(requiredCostKinds)
                             .and(c.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                            .and(c.ENTITY_ID.in(appSelector)))
+                            .and(c.ENTITY_ID.in(appSelector))
+                            .and(c.YEAR.eq(latestYear)))
                     .fetchSet(r -> ImmutableReportGridCell.builder()
                             .applicationId(r.get(c.ENTITY_ID))
                             .columnEntityId(r.get(c.COST_KIND_ID))
