@@ -18,6 +18,8 @@
 
 package com.khartec.waltz.service.assessment_rating;
 
+import com.khartec.waltz.common.MapUtilities;
+import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.assessment_definition.AssessmentDefinitionDao;
@@ -26,9 +28,7 @@ import com.khartec.waltz.data.rating_scheme.RatingSchemeDAO;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
 import com.khartec.waltz.model.assessment_definition.AssessmentVisibility;
-import com.khartec.waltz.model.assessment_rating.AssessmentRating;
-import com.khartec.waltz.model.assessment_rating.RemoveAssessmentRatingCommand;
-import com.khartec.waltz.model.assessment_rating.SaveAssessmentRatingCommand;
+import com.khartec.waltz.model.assessment_rating.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.rating.RagName;
@@ -36,8 +36,8 @@ import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityReference.mkRef;
@@ -88,6 +88,12 @@ public class AssessmentRatingService {
     }
 
 
+    public List<AssessmentRating> findByDefinitionId(long definitionId,
+                                                     List<AssessmentVisibility> visibilities) {
+
+        return assessmentRatingDao.findByDefinitionId(definitionId, visibilities);
+    }
+
     public boolean store(SaveAssessmentRatingCommand command, String username) {
         AssessmentDefinition assessmentDefinition = assessmentDefinitionDao.getById(command.assessmentDefinitionId());
         createChangeLogEntry(command, username, assessmentDefinition);
@@ -113,6 +119,26 @@ public class AssessmentRatingService {
         changeLogService.write(logEntry);
 
         return assessmentRatingDao.remove(command);
+    }
+
+    public boolean bulkStore(BulkAssessmentRatingCommand[] commands, long assessmentDefinitionId, String username) {
+        Set<AssessmentRating> ratingsToAdd = getRatingsFilterByOperation(commands, assessmentDefinitionId, username, Operation.ADD);
+        int addedResult = assessmentRatingDao.add(ratingsToAdd);
+        createChangeLogs(assessmentDefinitionId, username, ratingsToAdd, Operation.ADD);
+
+        Set<AssessmentRating> ratingsToUpdate = getRatingsFilterByOperation(commands, assessmentDefinitionId, username, Operation.UPDATE);
+        int updateResult = assessmentRatingDao.update(ratingsToUpdate);
+        createChangeLogs(assessmentDefinitionId, username, ratingsToUpdate, Operation.ADD);
+
+        return addedResult + updateResult > 1;
+    }
+
+    public boolean bulkDelete(BulkAssessmentRatingCommand[] commands, long assessmentDefinitionId, String username) {
+        Set<AssessmentRating> ratingsToRemove = getRatingsFilterByOperation(commands, assessmentDefinitionId, username, Operation.REMOVE);
+        createChangeLogs(assessmentDefinitionId, username, ratingsToRemove, Operation.REMOVE);
+        int result = assessmentRatingDao.remove(ratingsToRemove);
+
+        return result  > 1;
     }
 
     private void createChangeLogEntry(SaveAssessmentRatingCommand command, String username, AssessmentDefinition assessmentDefinition) {
@@ -141,5 +167,60 @@ public class AssessmentRatingService {
                 .build();
 
         changeLogService.write(logEntry);
+    }
+
+    private void createChangeLogs(long assessmentDefinitionId,
+                                  String username,
+                                  Set<AssessmentRating> ratingsToAdd,
+                                  Operation operation) {
+
+        String messagePrefix = operation.equals(Operation.REMOVE) ? "Removed" : "Added";
+
+        AssessmentDefinition assessmentDefinition = assessmentDefinitionDao.getById(assessmentDefinitionId);
+        Map<Long, RagName> ratingItems = MapUtilities.indexBy(
+                ratingSchemeDAO.findRatingSchemeItemsForAssessmentDefinition(assessmentDefinitionId),
+                r -> r.id().orElse(0L));
+
+        Set<ChangeLog> logs = ratingsToAdd.stream()
+                .map(r ->
+                        ImmutableChangeLog.builder()
+                                .message(messagePrefix + format(
+                                        " assessment %s as [%s - %s] for %s",
+                                        assessmentDefinition.name(),
+                                        ratingItems.get(r.ratingId()).name(),
+                                        StringUtilities.ifEmpty(r.comment(),""),
+                                        r.entityReference().name().orElse("")))
+                                .parentReference(r.entityReference())
+                                .userId(username)
+                                .severity(Severity.INFORMATION)
+                                .operation(operation)
+                                .build())
+                .collect(Collectors.toSet());
+
+        changeLogService.write(logs);
+    }
+
+    private Set<AssessmentRating> getRatingsFilterByOperation(BulkAssessmentRatingCommand[] commands,
+                                                              long assessmentDefinitionId,
+                                                              String username, Operation operation) {
+        return Arrays.stream(commands)
+                .filter(c -> c.operation().equals(operation))
+                .map(command -> getAssessmentRating(command, assessmentDefinitionId, username))
+                .collect(Collectors.toSet());
+    }
+
+    private AssessmentRating getAssessmentRating(BulkAssessmentRatingCommand command,
+                                                 Long assessmentDefinitionId,
+                                                 String username) {
+        UserTimestamp lastUpdate = UserTimestamp.mkForUser(username);
+        return ImmutableAssessmentRating.builder()
+                .assessmentDefinitionId(assessmentDefinitionId)
+                .entityReference(command.entityRef())
+                .ratingId(command.ratingId())
+                .comment(command.comment())
+                .lastUpdatedAt(lastUpdate.at())
+                .lastUpdatedBy(lastUpdate.by())
+                .provenance("waltz")
+                .build();
     }
 }
