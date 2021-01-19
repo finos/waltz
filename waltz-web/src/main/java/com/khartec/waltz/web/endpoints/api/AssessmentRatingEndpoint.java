@@ -72,12 +72,18 @@ public class AssessmentRatingEndpoint implements Endpoint {
     public void register() {
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findByEntityKindPath = mkPath(BASE_URL, "entity-kind", ":kind");
+        String findByDefinitionPath = mkPath(BASE_URL, "definition-id", ":assessmentDefinitionId");
         String findByTargetKindForRelatedSelectorPath = mkPath(BASE_URL, "target-kind", ":targetKind", "selector");
         String modifyPath = mkPath(BASE_URL, "entity", ":kind", ":id", ":assessmentDefinitionId");
+        String bulkUpdatePath = mkPath(BASE_URL, "bulk-update", ":assessmentDefinitionId");
+        String bulkRemovePath = mkPath(BASE_URL, "bulk-remove", ":assessmentDefinitionId");
 
         getForList(findForEntityPath, this::findForEntityRoute);
         postForList(findByEntityKindPath, this::findByEntityKindRoute);
+        postForList(findByDefinitionPath, this::findByDefinitionIdRoute);
         postForList(findByTargetKindForRelatedSelectorPath, this::findByTargetKindForRelatedSelectorRoute);
+        postForDatum(bulkUpdatePath, this::bulkStoreRoute);
+        postForDatum(bulkRemovePath, this::bulkRemoveRoute);
         postForDatum(modifyPath, this::storeRoute);
         deleteForDatum(modifyPath, this::removeRoute);
     }
@@ -100,6 +106,11 @@ public class AssessmentRatingEndpoint implements Endpoint {
         return assessmentRatingService.findByEntityKind(getKind(request, "kind"), visibilities);
     }
 
+    private List<AssessmentRating> findByDefinitionIdRoute(Request request, Response response) throws IOException {
+        List<AssessmentVisibility> visibilities = readList(request, AssessmentVisibility.class);
+        long assessmentDefinitionId = getLong(request, "assessmentDefinitionId");
+        return assessmentRatingService.findByDefinitionId(assessmentDefinitionId, visibilities);
+    }
 
     private boolean storeRoute(Request request, Response z) throws IOException {
         SaveAssessmentRatingCommand command = mkCommand(request);
@@ -107,7 +118,19 @@ public class AssessmentRatingEndpoint implements Endpoint {
         return assessmentRatingService.store(command, getUsername(request));
     }
 
+    private boolean bulkStoreRoute(Request request, Response z) throws IOException {
+        long assessmentDefinitionId = getLong(request, "assessmentDefinitionId");
+        verifyCanWrite(request, assessmentDefinitionId);
+        BulkAssessmentRatingCommand[] commands = readBody(request, BulkAssessmentRatingCommand[].class);
+        return assessmentRatingService.bulkStore(commands, assessmentDefinitionId, getUsername(request));
+    }
 
+    private boolean bulkRemoveRoute(Request request, Response z) throws IOException {
+        long assessmentDefinitionId = getLong(request, "assessmentDefinitionId");
+        verifyCanWrite(request, assessmentDefinitionId);
+        BulkAssessmentRatingCommand[] commands = readBody(request, BulkAssessmentRatingCommand[].class);
+        return assessmentRatingService.bulkDelete(commands, assessmentDefinitionId, getUsername(request));
+    }
 
     private boolean removeRoute(Request request, Response z) throws IOException {
         String username = getUsername(request);

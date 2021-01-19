@@ -1,0 +1,68 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+<div>
+    <waltz-page-header name="{{ ctrl.definition.name }}"
+                       icon="puzzle-piece">
+        <breadcrumbs>
+            <ol class="waltz-breadcrumbs">
+                <li><a ui-sref="main">Home</a></li>
+                <li>
+                    <span ng-bind="ctrl.definition.name">
+                    </span>
+                </li>
+                <li>View</li>
+            </ol>
+        </breadcrumbs>
+    </waltz-page-header>
+
+    <waltz-assessment-definition-overview definition="ctrl.definition"
+                                          rating-scheme-items="ctrl.ratingSchemeItems">
+    </waltz-assessment-definition-overview>
+
+    <waltz-section icon="desktop" name="Assessment Ratings">
+        <div class="row">
+            <div class="col-md-12">
+                <waltz-section-actions>
+                    <button waltz-has-role="{{ctrl.definition.permittedRole}}"
+                            class="btn btn-xs btn-primary"
+                            ui-sref="main.assessment-definition.edit ({definitionId: ctrl.definition.id})">
+                        Edit
+                    </button>
+                    <waltz-data-extract-link name="Export"
+                                             styling="button"
+                                             extract="assessment-rating/by-definition/{{ctrl.definition.id}}"
+                                             method="POST">
+                    </waltz-data-extract-link>
+                </waltz-section-actions>
+                <waltz-grid-with-search scope-provider="ctrl"
+                                        ng-if="ctrl.appRatings.length > 0"
+                                        entries="ctrl.appRatings"
+                                        column-defs="ctrl.columnDefs">
+                </waltz-grid-with-search>
+                <waltz-no-data ng-if="ctrl.appRatings.length == 0">
+                    <message>
+                        <strong>
+                            No assessment ratings
+                        </strong>
+                        have been associated.
+                    </message>
+                </waltz-no-data>
+            </div>
+        </div>
+    </waltz-section>
+</div>

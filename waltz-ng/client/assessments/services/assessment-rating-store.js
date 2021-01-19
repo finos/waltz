@@ -36,6 +36,12 @@ export function store($http, BaseApiUrl) {
             .then(d => d.data);
     };
 
+    const findByAssessmentDefinitionId = (assessmentDefinitionId, visibilites = ["PRIMARY", "SECONDARY"]) => {
+        return $http
+            .post(`${BASE}/definition-id/${assessmentDefinitionId}`, visibilites)
+            .then(d => d.data);
+    };
+
     const findByTargetKindForRelatedSelector = (targetKind, selector) => {
         return $http
             .post(`${BASE}/target-kind/${targetKind}/selector`, selector)
@@ -49,6 +55,18 @@ export function store($http, BaseApiUrl) {
             .then(d => d.data);
     };
 
+    const bulkStore = (assessmentDefinitionId, commands = []) => {
+        return $http
+            .post(`${BASE}/bulk-update/${assessmentDefinitionId}`, commands)
+            .then(d => d.data);
+    };
+
+    const bulkRemove = (assessmentDefinitionId, commands = []) => {
+        return $http
+            .post(`${BASE}/bulk-remove/${assessmentDefinitionId}`, commands)
+            .then(d => d.data);
+    };
+
     const remove = (ref, assessmentDefinitionId) => {
         checkIsEntityRef(ref);
         return $http
@@ -59,8 +77,11 @@ export function store($http, BaseApiUrl) {
     return {
         findForEntityReference,
         findByEntityKind,
+        findByAssessmentDefinitionId,
         findByTargetKindForRelatedSelector,
         store,
+        bulkStore,
+        bulkRemove,
         remove
     };
 }
@@ -86,6 +107,11 @@ export const AssessmentRatingStore_API = {
         serviceFnName: "findByEntityKind",
         description: "find all assessment ratings for an entity kind"
     },
+    findByAssessmentDefinitionId: {
+        serviceName,
+        serviceFnName: "findByAssessmentDefinitionId",
+        description: "find all assessment ratings for an assessment definition id"
+    },
     findByTargetKindForRelatedSelector: {
         serviceName,
         serviceFnName: "findByTargetKindForRelatedSelector",
@@ -95,6 +121,16 @@ export const AssessmentRatingStore_API = {
         serviceName,
         serviceFnName: "store",
         description: "update or create a rating"
+    },
+    bulkStore: {
+        serviceName,
+        serviceFnName: "bulkStore",
+        description: "update or create ratings in bulk for an assessment definition"
+    },
+    bulkRemove: {
+        serviceName,
+        serviceFnName: "bulkRemove",
+        description: "remove ratings in bulk for an assessment definition"
     },
     remove: {
         serviceName,
