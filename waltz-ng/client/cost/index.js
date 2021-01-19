@@ -20,6 +20,8 @@ import angular from "angular";
 import CostKindStore from './services/cost-kind-store';
 import CostStore from './services/cost-store';
 import EntityCostsSection from './components/entity-costs-section/entity-costs-section';
+import SummaryCostsSection from './components/app-costs-summary-section/app-costs-summary-section';
+import EntityCostsGraph from './components/graph/entity-costs-graph';
 
 
 import {registerComponents, registerStores} from "../common/module-utils";
@@ -29,7 +31,10 @@ function setup() {
     const module = angular.module("waltz.cost", []);
 
     registerStores(module, [ CostKindStore, CostStore ]);
-    registerComponents(module, [ EntityCostsSection ]);
+    registerComponents(module,
+        [ EntityCostsSection,
+            SummaryCostsSection,
+            EntityCostsGraph ]);
 
     return module.name;
 }

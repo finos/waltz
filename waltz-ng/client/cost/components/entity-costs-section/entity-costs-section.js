@@ -120,7 +120,7 @@ function controller($q, serviceBroker, uiGridConstants) {
 
     vm.$onInit = () => {
         loadCostInfo();
-        vm.entityCostColumnDefs = mkColumnDefs(uiGridConstants);;
+        vm.entityCostColumnDefs = mkColumnDefs(uiGridConstants);
 
     };
 

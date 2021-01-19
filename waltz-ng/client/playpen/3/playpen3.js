@@ -23,8 +23,8 @@ import template from "./playpen3.html";
 const initialState = {
     parentEntityRef: {
         // id: 20506,
-        id: 128196001,
-        kind: "APPLICATION",
+        id: 11524,
+        kind: "ORG_UNIT",
         name: "Texy"
     },
     // schemeId: 2,
