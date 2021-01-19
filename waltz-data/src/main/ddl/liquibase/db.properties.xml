@@ -81,6 +81,10 @@
     <property name="false.value" value="false" dbms="h2"></property>
 
 
+    <!-- COLUMN NAME OVERRIDES (to support reserved words in col name) -->
+    <property name="key.col" value="[key]" dbms="mssql"/>
+    <property name="key.col" value="key" dbms="mysql,oracle,postgresql,h2"/>
+
     <!-- DICTIONARY -->
     <property name="assetcode.type" value="VARCHAR(255)"></property>
     <property name="code.type" value="VARCHAR(128)"></property>

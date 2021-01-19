@@ -27,7 +27,7 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableEntityCostKind.class)
 @JsonDeserialize(as = ImmutableEntityCostKind.class)
-public abstract class EntityCostKind implements IdProvider, NameProvider, DescriptionProvider, EntityKindProvider {
+public abstract class EntityCostKind implements IdProvider, NameProvider, DescriptionProvider, ExternalIdProvider, EntityKindProvider {
 
     public abstract boolean isDefault();
 

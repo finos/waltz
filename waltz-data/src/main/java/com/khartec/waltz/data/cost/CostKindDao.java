@@ -43,6 +43,7 @@ public class CostKindDao {
                 .id(record.getId())
                 .name(record.getName())
                 .description(record.getDescription())
+                .externalId(record.getExternalId())
                 .isDefault(record.getIsDefault())
                 .build();
     };
