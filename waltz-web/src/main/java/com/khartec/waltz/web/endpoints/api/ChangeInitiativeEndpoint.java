@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
 import com.khartec.waltz.model.entity_relationship.EntityRelationship;
 import com.khartec.waltz.model.entity_relationship.EntityRelationshipChangeCommand;
@@ -60,6 +61,7 @@ public class ChangeInitiativeEndpoint implements Endpoint {
         String findHierarchyForSelectorPath = mkPath(BASE_URL, "hierarchy", "selector");
         String searchPath = mkPath(BASE_URL, "search", ":query");
         String changeEntityRelationshipPath = mkPath(BASE_URL, "id", ":id", "entity-relationship");
+        String findAllPath = mkPath(BASE_URL, "all");
 
         DatumRoute<ChangeInitiative> getByIdRoute = (request, response) ->
                 service.getById(getId(request));
@@ -79,6 +81,8 @@ public class ChangeInitiativeEndpoint implements Endpoint {
         ListRoute<ChangeInitiative> searchRoute = (request, response) ->
                 service.search(request.params("query"));
 
+        ListRoute<ChangeInitiative> findAllRoute = (req, res) -> service.findAll();
+
         DatumRoute<Boolean> changeEntityRelationshipRoute = (request, response) -> changeEntityRelationship(request);
 
 
@@ -87,6 +91,7 @@ public class ChangeInitiativeEndpoint implements Endpoint {
         getForList(searchPath, searchRoute);
         postForList(findForSelectorPath, findForSelectorRoute);
         getForList(findByExternalIdPath, findByExternalIdRoute);
+        getForList(findAllPath, findAllRoute);
         postForList(findHierarchyForSelectorPath, findHierarchyForSelectorRoute);
         postForDatum(changeEntityRelationshipPath, changeEntityRelationshipRoute);
     }

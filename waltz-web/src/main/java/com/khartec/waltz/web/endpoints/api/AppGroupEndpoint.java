@@ -84,6 +84,8 @@ public class AppGroupEndpoint implements Endpoint {
 
         String addChangeInitiativePath = mkPath(idPath, "change-initiatives");
         String removeChangeInitiativePath = mkPath(idPath, "change-initiatives", ":changeInitiativeId");
+        String changeInitiativeListPath = mkPath(idPath, "change-initiatives", "list");
+        String deleteChangeInitiativeListPath = mkPath(idPath, "change-initiatives", "list", "remove");
 
         String searchPath = mkPath(BASE_URL, "search");
 
@@ -230,6 +232,27 @@ public class AppGroupEndpoint implements Endpoint {
             return appGroupService.removeChangeInitiative(getUsername(request), groupId, changeInitiativeId);
         };
 
+
+        ListRoute<ChangeInitiative> addChangeInitiativeListRoute = (request, response) -> {
+            long groupId = getId(request);
+            AppGroupBulkAddRequest appGroupBulkAddRequest = readBody(request, AppGroupBulkAddRequest.class);
+            LOG.info("Adding change initiatives: {}, to group: {} ", appGroupBulkAddRequest.changeInitiativeIds(),  groupId);
+            String userId = getUsername(request);
+            return appGroupService.addChangeInitiatives(
+                    userId,
+                    groupId,
+                    appGroupBulkAddRequest.changeInitiativeIds());
+        };
+
+        ListRoute<ChangeInitiative> removeChangeInitiativeListRoute = (request, response) -> {
+            long groupId = getId(request);
+            List<Long> changeInitiativeIds = readIdsFromBody(request);
+            LOG.info("Removing change initiatives: {}, from group: {} ", changeInitiativeIds,  groupId);
+            String userId = getUsername(request);
+            return appGroupService.removeChangeInitiatives(userId, groupId, changeInitiativeIds);
+        };
+
+
         ListRoute<AppGroup> searchRoute = (request, response) ->
                 appGroupService.search(mkForEntity(EntityKind.APP_GROUP, readBody(request, String.class)));
 
@@ -257,6 +280,9 @@ public class AppGroupEndpoint implements Endpoint {
 
         postForList(addChangeInitiativePath, addChangeInitiativeRoute);
         deleteForList(removeChangeInitiativePath, removeChangeInitiativeRoute);
+
+        postForList(changeInitiativeListPath, addChangeInitiativeListRoute);
+        postForList(deleteChangeInitiativeListPath, removeChangeInitiativeListRoute);
 
         deleteForList(deleteGroupPath, deleteGroupRoute);
         postForDatum(updateGroupOverviewPath, updateGroupOverviewRoute);

@@ -68,6 +68,10 @@ function store($http, BaseApiUrl) {
             .then(r => r.data);
     };
 
+    const findAll = () => $http
+        .get(`${BASE}/all`)
+        .then(x => x.data);
+
 
     return {
         findBySelector,
@@ -76,7 +80,8 @@ function store($http, BaseApiUrl) {
         findRelatedForId,
         getById,
         search,
-        changeRelationship
+        changeRelationship,
+        findAll
     }
 }
 
@@ -121,6 +126,12 @@ export const ChangeInitiativeStore_API = {
         serviceName,
         serviceFnName: "changeRelationship",
         description: "change relationship between a change initiative and entity reference"
+    },
+    findAll: {
+        serviceName,
+        serviceFnName: "findAll",
+        description: "find all change initiatives"
+
     }
 };
 

@@ -19,6 +19,7 @@
 package com.khartec.waltz.service.app_group;
 
 import com.khartec.waltz.common.Checks;
+import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.exception.InsufficientPrivelegeException;
 import com.khartec.waltz.data.app_group.AppGroupDao;
 import com.khartec.waltz.data.app_group.AppGroupEntryDao;
@@ -38,8 +39,11 @@ import com.khartec.waltz.model.entity_relationship.ImmutableEntityRelationship;
 import com.khartec.waltz.model.entity_relationship.RelationshipKind;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
+import com.khartec.waltz.schema.tables.records.EntityRelationshipRecord;
 import com.khartec.waltz.service.change_initiative.ChangeInitiativeService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.jooq.Query;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -54,7 +58,10 @@ import static com.khartec.waltz.common.ListUtilities.append;
 import static com.khartec.waltz.common.MapUtilities.indexBy;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
+import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static java.lang.String.format;
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toList;
 
 @Service
 public class AppGroupService {
@@ -379,6 +386,54 @@ public class AppGroupService {
                 format("Removed associated change initiative: %d", changeInitiativeId),
                 EntityKind.CHANGE_INITIATIVE,
                 Operation.REMOVE);
+
+        return changeInitiativeService.findForSelector(mkOpts(
+                mkRef(EntityKind.APP_GROUP, groupId),
+                HierarchyQueryScope.EXACT));
+    }
+
+    public Collection<ChangeInitiative> addChangeInitiatives(String userId, long groupId,
+                                                             List<Long> changeInitiativeIds) throws InsufficientPrivelegeException {
+        verifyUserCanUpdateGroup(userId, groupId);
+
+        entityRelationshipDao.saveAll(userId, groupId, changeInitiativeIds);
+
+        List<ChangeLog> changeInitiativeChangeLogs = changeInitiativeIds
+        .stream()
+        .map(ci -> ImmutableChangeLog.builder()
+                .message(format("Associated change initiative: %d", ci))
+                .userId(userId)
+                .parentReference(ImmutableEntityReference.builder().id(groupId).kind(EntityKind.APP_GROUP).build())
+                .childKind(Optional.ofNullable(EntityKind.CHANGE_INITIATIVE))
+                .operation(Operation.ADD)
+                .build())
+        .collect(Collectors.toList());
+        changeLogService.write(changeInitiativeChangeLogs);
+
+        return changeInitiativeService.findForSelector(mkOpts(
+                mkRef(EntityKind.APP_GROUP, groupId),
+                HierarchyQueryScope.EXACT));
+    }
+
+    public Collection<ChangeInitiative> removeChangeInitiatives(String userId,
+                                                       long groupId,
+                                                       List<Long> changeInitiativeIds) throws InsufficientPrivelegeException {
+        verifyUserCanUpdateGroup(userId, groupId);
+
+        entityRelationshipDao.removeAll(groupId, changeInitiativeIds);
+
+        List<ChangeLog> changeInitiativeChangeLogs = changeInitiativeIds
+                .stream()
+                .map(ci -> ImmutableChangeLog.builder()
+                        .message(format("Removed associated change initiative: %d", ci))
+                        .userId(userId)
+                        .parentReference(ImmutableEntityReference.builder().id(groupId).kind(EntityKind.APP_GROUP).build())
+                        .childKind(Optional.ofNullable(EntityKind.CHANGE_INITIATIVE))
+                        .operation(Operation.REMOVE)
+                        .build())
+                .collect(Collectors.toList());
+
+        changeLogService.write(changeInitiativeChangeLogs);
 
         return changeInitiativeService.findForSelector(mkOpts(
                 mkRef(EntityKind.APP_GROUP, groupId),
