@@ -1,0 +1,148 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<div>
+
+    <waltz-section-actions>
+        <button class="btn btn-xs waltz-btn-transparent"
+                ng-click="$ctrl.sourceDataOverlay = ! $ctrl.sourceDataOverlay">
+            <waltz-icon name="map-signs"></waltz-icon>
+        </button>
+    </waltz-section-actions>
+
+    <waltz-source-data-overlay visible="$ctrl.sourceDataOverlay"
+                               entities="['ASSET_COST']">
+    </waltz-source-data-overlay>
+
+    <div class="row"
+         ng-if="$ctrl.costKinds.length == 0">
+        <div class="col-sm-12">
+            <waltz-no-data>
+                <message>
+                    <strong>No {{$ctrl.targetEntityKind | toDisplayName:'entity'}} costs found.</strong>
+                </message>
+            </waltz-no-data>
+        </div>
+    </div>
+
+    <div ng-if="$ctrl.costKinds.length > 0">
+        <div class="row">
+            <div class="col-sm-12"
+                 ng-if="$ctrl.selectedKind">
+                <h4>
+                    <span ng-bind="$ctrl.targetEntityKind | toDisplayName:'entity'"></span>
+                    <span ng-bind="$ctrl.selectedKind.name"></span>
+                    costs:
+                </h4>
+                <a class="clickable"
+                   ng-if="!$ctrl.visibility.selectKind"
+                   ng-click="$ctrl.visibility.selectKind = true">Change cost kind
+                </a>
+
+                <div ng-if="$ctrl.visibility.selectKind">
+                    <select ng-model="$ctrl.selectedKind"
+                            ng-change="$ctrl.refresh()"
+                            ng-options="kind as kind.name for kind in $ctrl.costKinds"
+                            id="selectedKind"
+                            class="form-control">
+                    </select>
+                </div>
+
+                <div style="padding-top: 10px">
+                    <div class="row">
+                        <div class="col-sm-8">
+                            <waltz-entity-costs-graph costs="$ctrl.topCosts"
+                                                      on-select="$ctrl.onSelect"
+                                                      style="max-width: 95%">
+                            </waltz-entity-costs-graph>
+                        </div>
+                        <div class="col-sm-4">
+                            <waltz-static-panels group-key='SECTION.ASSET_COSTS.ABOUT'
+                                                 class="small"
+                                                 render-mode="minimal-border"
+                                                 ng-if="!$ctrl.selectedEntity">
+                            </waltz-static-panels>
+                            <div ng-if="$ctrl.selectedEntity">
+                                <waltz-sub-section name="Selected Entity">
+                                    <content>
+                                        <div class="waltz-sub-section-content">
+                                            <h4>
+                                                <waltz-entity-link entity-ref="$ctrl.selectedEntity.entityReference">
+                                                </waltz-entity-link>
+                                            </h4>
+                                            <h4>
+                                                <waltz-currency-amount amount="$ctrl.selectedEntity.amount">
+                                                </waltz-currency-amount>
+                                            </h4>
+                                            <div ng-bind="$ctrl.selectedKind.description"></div>
+                                            <div class="text-muted small" style="padding-bottom: 5px">
+                                                <waltz-icon name="info-circle"></waltz-icon>
+                                                These are
+                                                <span ng-bind="$ctrl.selectedEntity.year"></span>
+                                                costs. For historical costs visit the cost section on the
+                                                <span ng-bind="$ctrl.selectedEntity.entityReference.kind | toDisplayName:'entity'"></span>.
+                                            </div>
+                                        </div>
+                                    </content>
+                                </waltz-sub-section>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <a class="clickable"
+                   ng-click="$ctrl.showAllCosts()"
+                   ng-bind="$ctrl.visibility.allCosts ? 'Hide all costs' : 'Show all costs'">
+                </a>
+            </div>
+        </div>
+
+        <div class="row"
+             ng-if="$ctrl.visibility.allCosts">
+            <div class="col-sm-12">
+                <hr>
+                <h4>All <span ng-bind="$ctrl.targetEntityKind | toDisplayName:'entity'"></span> costs:
+                </h4>
+                <waltz-loading-notification show="$ctrl.visibility.loading"
+                                            style="padding-top: 54px;"
+                                            name="Loading">
+                </waltz-loading-notification>
+                <div ng-if="!$ctrl.visibility.loading">
+                    <waltz-grid-with-search column-defs="$ctrl.entityCostColumnDefs"
+                                            ng-if="$ctrl.costInfo.length > 0"
+                                            entries="$ctrl.costInfo"
+                                            search-placeholder-text="Search costs...">
+                    </waltz-grid-with-search>
+                    <waltz-data-extract-link name="Export"
+                                             extract="cost/target-kind/{{$ctrl.targetEntityKind}}/selector"
+                                             method="POST"
+                                             styling="link"
+                                             request-body="$ctrl.selector"
+                                             style="padding-top: 5px;"
+                                             class="pull-right">
+                    </waltz-data-extract-link>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

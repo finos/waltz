@@ -18,6 +18,8 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.cost.EntityCostKind;
 import com.khartec.waltz.service.cost_kind.CostKindService;
 import com.khartec.waltz.web.ListRoute;
@@ -25,8 +27,9 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 
 @Service
@@ -47,10 +50,18 @@ public class CostKindEndpoint implements Endpoint {
     public void register() {
 
         String findAllPath = mkPath(BASE_URL);
+        String findExistingBySelectorPath = mkPath(BASE_URL, "target-kind", ":kind", "selector");
 
         ListRoute<EntityCostKind> findAllRoute = (request, response) -> costKindService.findAll();
 
+        ListRoute<EntityCostKind> findExistingBySelectorRoute = (request, response) -> {
+            EntityKind targetKind = getKind(request);
+            IdSelectionOptions selectionOptions = readIdSelectionOptionsFromBody(request);
+            return costKindService.findExistingCostIdsBySelectorRoute(targetKind, selectionOptions);
+        };
+
         getForList(findAllPath, findAllRoute);
+        postForList(findExistingBySelectorPath, findExistingBySelectorRoute);
     }
 
 }

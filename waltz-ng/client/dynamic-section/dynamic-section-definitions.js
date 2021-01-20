@@ -317,9 +317,17 @@ const reportGridViewSection = {
     id: 170
 };
 
+const appCostsSummarySection = {
+    componentId: "app-costs-summary-section",
+    name: "Application Costs",
+    icon: "money",
+    id: 180
+};
+
 export const dynamicSections = {
     appCostsSection,
     appsSection,
+    appCostsSummarySection,
     assetCostsSection,
     attestationSummarySection,
     authSourcesSection,
@@ -416,7 +424,7 @@ export const dynamicSectionsByKind = {
     ],
     "ORG_UNIT": [
         pack(appsSection,
-            [assetCostsSection, complexitySection, entityStatisticSummarySection, technologySummarySection]),
+            [assetCostsSection, complexitySection, entityStatisticSummarySection, technologySummarySection, appCostsSummarySection]),
         measurableRatingsBrowserSection,
         reportGridViewSection,
         pack(logicalFlowsTabgroupSection,
@@ -473,7 +481,7 @@ export const dynamicSectionsByKind = {
     ],
     "APP_GROUP": [
         pack(appsSection,
-            [assetCostsSection, complexitySection, entityStatisticSummarySection, technologySummarySection]),
+            [assetCostsSection, complexitySection, entityStatisticSummarySection, technologySummarySection, appCostsSummarySection]),
         pack(logicalFlowsTabgroupSection,
             [authSourcesSection]),
         attestationSummarySection,
