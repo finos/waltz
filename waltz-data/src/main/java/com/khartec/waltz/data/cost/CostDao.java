@@ -87,6 +87,8 @@ public class CostDao {
         SelectHavingStep<Record2<Long, Integer>> cost_kind_latest_year = DSL
                 .select(COST.COST_KIND_ID, DSL.max(COST.YEAR).as("latest_year"))
                 .from(COST)
+                .where(COST.ENTITY_ID.in(genericSelector.selector())
+                        .and(COST.ENTITY_KIND.eq(genericSelector.kind().name())))
                 .groupBy(COST.COST_KIND_ID);
 
         Condition latest_year_for_kind = COST.COST_KIND_ID.eq(cost_kind_latest_year.field(COST.COST_KIND_ID))
@@ -110,7 +112,9 @@ public class CostDao {
         SelectConditionStep<Record1<Integer>> latestYear = DSL
                 .select(DSL.max(COST.YEAR).as("latest_year"))
                 .from(COST)
-                .where(COST.COST_KIND_ID.eq(costKindId));
+                .where(COST.COST_KIND_ID.eq(costKindId))
+                .and(COST.ENTITY_ID.in(genericSelector.selector())
+                        .and(COST.ENTITY_KIND.eq(genericSelector.kind().name())));
 
         return dsl
                 .select(ENTITY_NAME_FIELD)
