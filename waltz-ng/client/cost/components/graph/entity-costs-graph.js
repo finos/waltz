@@ -32,11 +32,13 @@ const template = "<div class='waltz-asset-costs-graph'></div>";
 
 const bindings = {
     costs: "<",
+    onSelect: "<?"
 };
 
 
 const initialState = {
     costs: [],
+    onSelect: d => console.log("Default entity-cost-graph on-select handler", d)
 };
 
 
@@ -80,6 +82,7 @@ function drawYAxis(yScale,
 function draw(chartBody,
               chartAxis,
               costs = [],
+              onSelect,
               currencyFormat) {
 
     const totalExtent = extent(costs, c => c.amount);
@@ -110,7 +113,8 @@ function draw(chartBody,
         .enter()
         .append("g")
         .classed("wacg-bar", true)
-        .attr("transform", (d) => `translate(0, ${yScale(d.entityReference.id)})`);
+        .attr("transform", (d) => `translate(0, ${yScale(d.entityReference.id)})`)
+        .on("click.select", d => onSelect(d));
 
     newBars
         .append("rect")
@@ -185,6 +189,7 @@ function controller($element, $scope, settingsService) {
             chartBody,
             chartAxis,
             _.orderBy(vm.costs, d => d.amount * -1),
+            x => $scope.$applyAsync(() => vm.onSelect(x)),
             currencyFormat);
 
     };

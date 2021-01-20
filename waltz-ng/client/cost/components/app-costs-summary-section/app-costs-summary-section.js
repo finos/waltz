@@ -36,7 +36,8 @@ const initialState = {
         selectKind: false,
         allCosts: false,
         loading: false
-    }
+    },
+    selectedEntity: null
 };
 
 
@@ -156,8 +157,20 @@ function controller($q, serviceBroker, uiGridConstants) {
     vm.showAllCosts = () =>  {
         vm.loadAllCosts();
         vm.visibility.allCosts = !vm.visibility.allCosts;
-    }
+    };
 
+    vm.onSelect = (d) => {
+
+        if (vm.selectedEntity && vm.selectedEntity.entityReference.id === d.entityReference.id){
+            vm.onClearSelectedEntity();
+        } else {
+            vm.selectedEntity = d;
+        }
+    };
+
+    vm.onClearSelectedEntity = () => {
+        vm.selectedEntity = null;
+    }
 }
 
 
