@@ -67,7 +67,7 @@ public class CostKindDao {
     }
 
 
-    public Set<Tuple2<EntityCostKind, Integer>> findExistingCostKindsAndYearBySelector(GenericSelector genericSelector){
+    public Set<Tuple2<EntityCostKind, Integer>> findCostKindsBySelector(GenericSelector genericSelector){
 
         return dsl
                 .select(COST_KIND.fields())

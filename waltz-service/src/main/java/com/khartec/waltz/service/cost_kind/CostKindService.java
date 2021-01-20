@@ -32,8 +32,8 @@ public class CostKindService {
     }
 
 
-    public Set<Tuple2<EntityCostKind, Integer>> findExistingCostKindsAndYearBySelectorRoute(EntityKind targetKind, IdSelectionOptions selectionOptions) {
+    public Set<Tuple2<EntityCostKind, Integer>> findCostKindsSelectorRoute(EntityKind targetKind, IdSelectionOptions selectionOptions) {
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, selectionOptions);
-        return costKindDao.findExistingCostKindsAndYearBySelector(genericSelector);
+        return costKindDao.findCostKindsBySelector(genericSelector);
     }
 }

@@ -51,18 +51,18 @@ public class CostKindEndpoint implements Endpoint {
     public void register() {
 
         String findAllPath = mkPath(BASE_URL);
-        String findExistingCostKindsAndYearBySelectorPath = mkPath(BASE_URL, "target-kind", ":kind", "selector");
+        String findCostKindsBySelectorPath = mkPath(BASE_URL, "target-kind", ":kind", "selector");
 
         ListRoute<EntityCostKind> findAllRoute = (request, response) -> costKindService.findAll();
 
-        ListRoute<Tuple2<EntityCostKind, Integer>> findExistingCostKindsAndYearBySelectorRoute = (request, response) -> {
+        ListRoute<Tuple2<EntityCostKind, Integer>> findCostKindsBySelectorRoute = (request, response) -> {
             EntityKind targetKind = getKind(request);
             IdSelectionOptions selectionOptions = readIdSelectionOptionsFromBody(request);
-            return costKindService.findExistingCostKindsAndYearBySelectorRoute(targetKind, selectionOptions);
+            return costKindService.findCostKindsSelectorRoute(targetKind, selectionOptions);
         };
 
         getForList(findAllPath, findAllRoute);
-        postForList(findExistingCostKindsAndYearBySelectorPath, findExistingCostKindsAndYearBySelectorRoute);
+        postForList(findCostKindsBySelectorPath, findCostKindsBySelectorRoute);
     }
 
 }

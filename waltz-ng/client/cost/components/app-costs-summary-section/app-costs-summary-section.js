@@ -102,7 +102,7 @@ function controller($q, serviceBroker, uiGridConstants) {
 
     function loadCostKinds() {
         return serviceBroker
-            .loadAppData(CORE_API.CostKindStore.findExistingBySelector,
+            .loadAppData(CORE_API.CostKindStore.findBySelector,
                 [vm.targetEntityKind, vm.selector])
             .then(r => {
                 vm.costKinds = _.map(r.data, d => d.v1);
