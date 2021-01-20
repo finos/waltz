@@ -23,10 +23,7 @@ import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.entity_relationship.EntityRelationship;
-import com.khartec.waltz.model.entity_relationship.EntityRelationshipKey;
-import com.khartec.waltz.model.entity_relationship.ImmutableEntityRelationship;
-import com.khartec.waltz.model.entity_relationship.UpdateEntityRelationshipParams;
+import com.khartec.waltz.model.entity_relationship.*;
 import com.khartec.waltz.schema.tables.records.EntityRelationshipRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -267,4 +264,36 @@ public class EntityRelationshipDao {
         return matchesA.or(matchesB);
     }
 
+    public int[] saveAll(String userId, long groupId, List<Long> changeInitiativeIds) {
+        checkNotNull(userId, "userId cannot be null");
+        checkNotNull(groupId, "groupId cannot be null");
+        checkNotNull(changeInitiativeIds, "changeInitiativeIds cannot be null");
+        
+        Query[] queries  = changeInitiativeIds
+                .stream()
+                .map(ci -> DSL.insertInto(ENTITY_RELATIONSHIP)
+                        .set(ENTITY_RELATIONSHIP.KIND_A, EntityKind.APP_GROUP.name())
+                        .set(ENTITY_RELATIONSHIP.ID_A, groupId)
+                        .set(ENTITY_RELATIONSHIP.KIND_B, EntityKind.CHANGE_INITIATIVE.name())
+                        .set(ENTITY_RELATIONSHIP.ID_B, ci)
+                        .set(ENTITY_RELATIONSHIP.RELATIONSHIP, RelationshipKind.RELATES_TO.name())
+                        .set(ENTITY_RELATIONSHIP.PROVENANCE, "waltz")
+                        .set(ENTITY_RELATIONSHIP.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
+                        .set(ENTITY_RELATIONSHIP.LAST_UPDATED_BY, "admin")
+                        .onDuplicateKeyUpdate()
+                        .set(ENTITY_RELATIONSHIP.ID_B, ci)
+                        .set(ENTITY_RELATIONSHIP.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp()))
+                .toArray(Query[]::new);
+        return dsl.batch(queries).execute();
+    }
+
+    public int removeAll(long groupId, List<Long> changeInitiativeIds) {
+        checkNotNull(groupId, "groupId cannot be null");
+        checkNotNull(changeInitiativeIds, "changeInitiativeIds cannot be null");
+
+        return dsl.delete(ENTITY_RELATIONSHIP)
+                .where(ENTITY_RELATIONSHIP.ID_A.eq(groupId))
+                .and(ENTITY_RELATIONSHIP.ID_B.in(changeInitiativeIds))
+                .execute();
+    }
 }

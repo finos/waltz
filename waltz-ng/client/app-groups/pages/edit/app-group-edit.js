@@ -29,6 +29,7 @@ const initialState = {
     editor: "SINGLE",
     canDelete: false,
     history: [],
+    changeInitiativeHistory: [],
     organisationalUnits: [],
     currentOrgUnit: null
 };
@@ -103,6 +104,7 @@ function controller($q,
                     $scope,
                     $stateParams,
                     appStore,
+                    changeInitiativeStore,
                     historyStore,
                     logicalFlowStore,
                     localStorageService,
@@ -139,6 +141,14 @@ function controller($q,
             .then(() => notification.success("Added: " + app.name));
     };
 
+    vm.addToCIGroup = (ci) => {
+        serviceBroker
+            .execute(CORE_API.AppGroupStore.addChangeInitiative, [id, ci.id])
+            .then(r => r.data)
+            .then(cis => vm.changeInitiatives = cis, e => handleError(e))
+            .then(() => notification.success("Added: " + ci.name));
+    };
+
 
     vm.removeFromGroup = (app) => {
         serviceBroker
@@ -168,6 +178,10 @@ function controller($q,
 
     vm.isAppInGroup = (app) => {
         return _.some(vm.applications, a => app.id === a.id);
+    };
+
+    vm.isChangeInitiativeInGroup = (ci) => {
+        return _.some(vm.changeInitiatives, c => ci.id === c.id);
     };
 
     vm.onOrgUnitSelect = (entity) => {
@@ -229,6 +243,37 @@ function controller($q,
             })
             .then(() => vm.focusApp = focusApp);
     };
+
+    vm.focusOnCI = (ci) => {
+        const focusCI = {};
+
+        changeInitiativeStore.getById(ci.id)
+            .then(changeInitiative => {
+                focusCI.ci = changeInitiative;
+                const promises = [
+                    changeInitiativeStore.findRelatedForId(changeInitiative.id),
+                    logicalFlowStore.findByEntityReference("CHANGE_INITIATIVE", changeInitiative.id),
+                    changeInitiativeStore.findBySelector({ entityReference: { id: changeInitiative.organisationalUnitId, kind: "ORG_UNIT"}, scope: "EXACT"})
+                ];
+                return $q.all(promises);
+            })
+            .then(([ related, flows, unitMembers]) => {
+                focusCI.related = _.flatten(_.values(related));
+                focusCI.unitMembers = _.reject(unitMembers, m => m.id === ci.id);
+                focusCI.upstream = _.chain(flows)
+                    .map(f => f.source)
+                    .uniqBy(source => source.id)
+                    .reject(source => source.id === ci.id)
+                    .value();
+                focusCI.downstream = _.chain(flows)
+                    .map(f => f.target)
+                    .uniqBy(target => target.id)
+                    .reject(target => target.id === ci.id)
+                    .value();
+            })
+            .then(() => vm.focusCI = focusCI);
+    };
+
     vm.showSingleEditor = () => {
         vm.editor = "SINGLE"
     };
@@ -304,11 +349,20 @@ function controller($q,
     //add app via recently viewed
     vm.history = localStorageService
         .get("history_2").filter(r => r.kind === "APPLICATION") || [];
+    
+    vm.changeInitiativeHistory = localStorageService
+        .get("history_2").filter(r => r.kind === "CHANGE_INITIATIVE") || [];
 
     vm.addRecentViewed = (app) => {
         app.id = app.stateParams.id;
         vm.addToGroup(app);
         vm.focusOnApp(app);
+    };
+
+    vm.addRecentViewedChangeInitiative = (ci) => {
+        ci.id = ci.stateParams.id;
+        vm.addToCIGroup(ci);
+        vm.focusOnCI(ci);
     };
 
     $scope.$watch(
@@ -330,6 +384,40 @@ function controller($q,
         .then(cis => vm.changeInitiatives = cis)
         .then(() => notification.warning("Removed Change Initiative: " + changeInitiative.name));
 
+    vm.saveChangeInitiatives = (results) => {
+
+            const changeInitiativeIdsToAdd = _.chain(results)
+                .filter(r => r.action === "ADD")
+                .map(r => r.entityRef.id)
+                .value();
+    
+            const changeInitiativeIdsToRemove = _.chain(results)
+                .filter(r => r.action === "REMOVE")
+                .map(r => r.entityRef.id)
+                .value();
+    
+            if (changeInitiativeIdsToAdd.length > 0) {
+                serviceBroker
+                    .execute(CORE_API.AppGroupStore.addChangeInitiatives,
+                        [id, Object.assign({}, {changeInitiativeIds: changeInitiativeIdsToAdd})])
+                    .then(r => r.data)
+                    .then(changeInitiatives => vm.changeInitiatives = changeInitiatives, e => handleError(e))
+                    .then(() => notification.success(`Added ${changeInitiativeIdsToAdd.length} change initiatives`));
+            }
+    
+            if (changeInitiativeIdsToRemove.length > 0) {
+                serviceBroker
+                    .execute(CORE_API.AppGroupStore.removeChangeInitiatives, [id, changeInitiativeIdsToRemove])
+                    .then(r => r.data)
+                    .then(changeInitiatives => vm.changeInitiatives = changeInitiatives, e => handleError(e))
+                    .then(() => notification.success(`Removed ${changeInitiativeIdsToRemove.length} change initiatives`));
+            }
+    
+            if (changeInitiativeIdsToAdd.length === 0 && changeInitiativeIdsToRemove.length === 0){
+                notification.info("There are no change initiatives to be added or removed");
+            }
+        };
+
     serviceBroker
         .loadViewData(
             CORE_API.ChangeInitiativeStore.findBySelector,
@@ -344,6 +432,7 @@ controller.$inject = [
     "$scope",
     "$stateParams",
     "ApplicationStore",
+    "ChangeInitiativeStore",
     "HistoryStore",
     "LogicalFlowStore",
     "localStorageService",
