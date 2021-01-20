@@ -69,6 +69,7 @@
                         <thead>
                         <tr>
                             <th>Type</th>
+                            <th>Year</th>
                             <th>Cost</th>
                         </tr>
                         </thead>
@@ -78,6 +79,9 @@
                                 <waltz-entity-icon-label entity-ref="cost.costKind"
                                                          icon-placement="none">
                                 </waltz-entity-icon-label>
+                            </td>
+                            <td>
+                                <span ng-bind="cost.year"></span>
                             </td>
                             <td>
                                 <waltz-currency-amount amount="cost.amount"></waltz-currency-amount>

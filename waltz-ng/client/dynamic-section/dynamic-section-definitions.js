@@ -324,6 +324,13 @@ const appCostsSummarySection = {
     id: 180
 };
 
+const entityCostsSection = {
+    componentId: "entity-costs-section",
+    name: "Costs",
+    icon: "money",
+    id: 190
+};
+
 export const dynamicSections = {
     appCostsSection,
     appsSection,
@@ -391,6 +398,7 @@ export const dynamicSectionsByKind = {
         dataFlowSection,
         technologySection,
         appCostsSection,
+        entityCostsSection,
         entityStatisticSection,
         surveySection,
         changeLogSection
