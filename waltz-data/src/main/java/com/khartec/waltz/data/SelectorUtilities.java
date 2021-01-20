@@ -46,12 +46,19 @@ public class SelectorUtilities {
      * @return
      */
     public static Condition mkApplicationConditions(IdSelectionOptions options) {
-        Set<ApplicationKind> applicationKinds = minus(
-                asSet(ApplicationKind.values()),
-                options.filters().omitApplicationKinds());
 
-        return APPLICATION.KIND.in(applicationKinds)
-                .and(APPLICATION.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses()));
+        Condition cond = APPLICATION.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
+
+        if(options.filters().omitApplicationKinds().isEmpty()){
+            return cond;
+        } else {
+            Set<ApplicationKind> applicationKinds = minus(
+                    asSet(ApplicationKind.values()),
+                    options.filters().omitApplicationKinds());
+
+            return cond.and(APPLICATION.KIND.in(applicationKinds));
+        }
+
     }
 
 }

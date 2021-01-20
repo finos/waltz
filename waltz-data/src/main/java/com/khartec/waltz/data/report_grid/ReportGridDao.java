@@ -202,9 +202,15 @@ public class ReportGridDao {
             return emptySet();
         } else {
 
-            SelectJoinStep<Record1<Integer>> latestYear = DSL
-                    .select(DSL.max(COST.YEAR))
-                    .from(COST);
+            SelectHavingStep<Record2<Long, Integer>> costKindLastestYear = dsl
+                    .select(COST.COST_KIND_ID, DSL.max(COST.YEAR).as("latest_year"))
+                    .from(COST)
+                    .where(dsl.renderInlined(COST.ENTITY_ID.in(appSelector)
+                            .and(COST.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))))
+                    .groupBy(COST.COST_KIND_ID);
+
+            Condition latestYearForKind = c.COST_KIND_ID.eq(costKindLastestYear.field(COST.COST_KIND_ID))
+                    .and(c.YEAR.eq(costKindLastestYear.field("latest_year", Integer.class)));
 
             return dsl
                     .select(c.ENTITY_ID,
@@ -212,10 +218,10 @@ public class ReportGridDao {
                             c.COST_KIND_ID,
                             c.AMOUNT)
                     .from(c)
-                    .where(c.COST_KIND_ID.in(requiredCostKinds)
+                    .innerJoin(costKindLastestYear).on(latestYearForKind)
+                    .where(dsl.renderInlined(c.COST_KIND_ID.in(requiredCostKinds)
                             .and(c.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                            .and(c.ENTITY_ID.in(appSelector))
-                            .and(c.YEAR.eq(latestYear)))
+                            .and(c.ENTITY_ID.in(appSelector))))
                     .fetchSet(r -> ImmutableReportGridCell.builder()
                             .applicationId(r.get(c.ENTITY_ID))
                             .columnEntityId(r.get(c.COST_KIND_ID))
