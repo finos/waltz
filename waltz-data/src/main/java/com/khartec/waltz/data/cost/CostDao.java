@@ -100,8 +100,9 @@ public class CostDao {
 
 
     public Set<EntityCost> findByCostKindIdAndSelectorForYear(long costKindId,
-                                                             GenericSelector genericSelector,
-                                                             int year){
+                                                              GenericSelector genericSelector,
+                                                              int year,
+                                                              int limit){
         return dsl
                 .select(ENTITY_NAME_FIELD)
                 .select(COST.fields())
@@ -110,6 +111,8 @@ public class CostDao {
                         .and(COST.ENTITY_KIND.eq(genericSelector.kind().name())))
                 .and(COST.COST_KIND_ID.eq(costKindId))
                 .and(COST.YEAR.eq(year))
+                .orderBy(COST.AMOUNT.desc())
+                .limit(limit)
                 .fetchSet(TO_COST_MAPPER);
     }
 

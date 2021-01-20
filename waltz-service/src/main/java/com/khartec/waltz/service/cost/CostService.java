@@ -34,18 +34,6 @@ public class CostService {
     }
 
 
-    public Set<EntityCost> findBySelector(Long costKindId,
-                                          IdSelectionOptions selectionOptions,
-                                          EntityKind targetKind){
-
-        GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, selectionOptions);
-
-        return costDao.findLatestYear()
-                .map(year -> costDao.findByCostKindIdAndSelectorForYear(costKindId, genericSelector,  year))
-                .orElse(emptySet());
-    }
-
-
     public Set<EntityCost> findBySelector(IdSelectionOptions selectionOptions,
                                           EntityKind targetKind){
 
@@ -59,12 +47,13 @@ public class CostService {
 
     public Set<EntityCost> findByCostKindAndSelector(Long costKindId,
                                                      IdSelectionOptions selectionOptions,
-                                                     EntityKind targetKind){
+                                                     EntityKind targetKind,
+                                                     int limit){
 
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, selectionOptions);
 
         return costDao.findLatestYear()
-                .map(year -> costDao.findByCostKindIdAndSelectorForYear(costKindId, genericSelector,  year))
+                .map(year -> costDao.findByCostKindIdAndSelectorForYear(costKindId, genericSelector, year, limit))
                 .orElse(emptySet());
     }
 }
