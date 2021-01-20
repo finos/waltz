@@ -105,9 +105,15 @@ function controller($q, serviceBroker, uiGridConstants) {
             .loadAppData(CORE_API.CostKindStore.findExistingBySelector,
                 [vm.targetEntityKind, vm.selector])
             .then(r => {
-                vm.costKinds = r.data;
+                vm.costKinds = _.map(r.data, d => d.v1);
                 vm.costKindsById = _.keyBy(vm.costKinds, d => d.id);
-                vm.selectedKind = _.find(vm.costKinds, d => d.isDefault)
+                vm.latestYearByKindId = _
+                    .chain(r.data)
+                    .keyBy(d => d.v1.id)
+                    .mapValues(d => d.v2)
+                    .value();
+                const defaultKind = _.find(vm.costKinds, d => d.isDefault);
+                vm.selectedKind = (defaultKind) ? defaultKind : _.first(vm.costKinds);
             });
     }
 
@@ -152,6 +158,7 @@ function controller($q, serviceBroker, uiGridConstants) {
     vm.refresh = () => {
         vm.visibility.selectKind = false;
         loadTopCostsByIdAndSelector();
+        vm.onClearSelectedEntity();
     };
 
     vm.showAllCosts = () =>  {
