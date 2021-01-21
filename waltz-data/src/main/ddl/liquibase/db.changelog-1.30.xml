@@ -226,4 +226,15 @@
         </sql>
     </changeSet>
 
+    <changeSet id="20210120-5241-1"
+               author="woodjes">
+        <comment>5241: Add cost kind id index on cost</comment>
+        <createIndex tableName="cost"
+                     unique="false"
+                     indexName="idx_cost_cost_kind">
+            <column name="cost_kind_id"
+                    type="${id.type}" />
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>

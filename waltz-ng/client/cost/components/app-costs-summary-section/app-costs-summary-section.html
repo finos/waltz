@@ -47,7 +47,9 @@
                 <h4>
                     <span ng-bind="$ctrl.targetEntityKind | toDisplayName:'entity'"></span>
                     <span ng-bind="$ctrl.selectedKind.name"></span>
-                    costs:
+                    costs (
+                    <span ng-bind="$ctrl.latestYearByKindId[$ctrl.selectedKind.id]"></span>
+                    ):
                 </h4>
                 <a class="clickable"
                    ng-if="!$ctrl.visibility.selectKind"

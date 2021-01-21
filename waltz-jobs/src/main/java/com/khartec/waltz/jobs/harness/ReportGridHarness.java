@@ -46,20 +46,22 @@ public class ReportGridHarness {
         System.out.println("Starting....");
 
         EntityReference cib = mkRef(EntityKind.APP_GROUP, 11261);
+        EntityReference infra = mkRef(EntityKind.ORG_UNIT, 6811);
         EntityReference justWaltz = mkRef(EntityKind.APPLICATION, 20506);
         EntityReference justWaltzGroup = mkRef(EntityKind.APP_GROUP, 433);
         EntityReference orgUnit = mkRef(EntityKind.ORG_UNIT, 95);
+        EntityReference everythingGroup = mkRef(EntityKind.APP_GROUP, 20827);
         EntityReference flowDiagram = mkRef(EntityKind.FLOW_DIAGRAM, 1);
         EntityReference mgr = mkRef(EntityKind.PERSON, 1);
 
-        Select<Record1<Long>> selector = new ApplicationIdSelectorFactory().apply(mkOpts(mgr));
+        Select<Record1<Long>> selector = new ApplicationIdSelectorFactory().apply(mkOpts(infra));
 
         System.out.println("Made selector");
 
-        Set<ReportGridCell> a = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(5, selector));
-        Set<ReportGridCell> b = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(5, selector));
-        Set<ReportGridCell> c = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(5, selector));
-        Set<ReportGridCell> data = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(5, selector));
+        Set<ReportGridCell> a = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(3, selector));
+        Set<ReportGridCell> b = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(3, selector));
+        Set<ReportGridCell> c = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(3, selector));
+        Set<ReportGridCell> data = FunctionUtilities.time("getCellData", () -> dao.findCellDataByGridId(3, selector));
         System.out.println(data.size());
         System.out.println(first(data));
     }

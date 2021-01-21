@@ -7,6 +7,7 @@ import com.khartec.waltz.data.cost.CostKindDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.cost.EntityCostKind;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,8 +32,8 @@ public class CostKindService {
     }
 
 
-    public Set<EntityCostKind> findExistingCostIdsBySelectorRoute(EntityKind targetKind, IdSelectionOptions selectionOptions) {
+    public Set<Tuple2<EntityCostKind, Integer>> findCostKindsSelectorRoute(EntityKind targetKind, IdSelectionOptions selectionOptions) {
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, selectionOptions);
-        return costKindDao.findExistingCostKindsBySelector(genericSelector);
+        return costKindDao.findCostKindsBySelector(genericSelector);
     }
 }
