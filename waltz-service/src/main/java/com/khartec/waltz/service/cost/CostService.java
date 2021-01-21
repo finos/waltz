@@ -13,8 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
-import static java.util.Collections.emptySet;
-
 @Service
 public class CostService {
 
@@ -39,9 +37,7 @@ public class CostService {
 
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, selectionOptions);
 
-        return costDao.findLatestYear()
-                .map(year -> costDao.findBySelectorForYear(genericSelector, year))
-                .orElse(emptySet());
+        return costDao.findBySelectorForYear(genericSelector);
     }
 
 
@@ -52,8 +48,6 @@ public class CostService {
 
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, selectionOptions);
 
-        return costDao.findLatestYear()
-                .map(year -> costDao.findByCostKindIdAndSelectorForYear(costKindId, genericSelector, year, limit))
-                .orElse(emptySet());
+        return costDao.findByCostKindIdAndSelector(costKindId, genericSelector, limit);
     }
 }

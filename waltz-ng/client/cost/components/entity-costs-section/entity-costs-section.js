@@ -33,13 +33,13 @@ const initialState = {
 function mkColumnDefs(uiGridConstants){
     return [
         {
-            field: 'costKind',
+            field: 'costKind.name',
             displayName: 'Kind',
             width: '25%',
             cellTemplate:`
             <div class="ui-grid-cell-contents">
-                 <span ng-bind="COL_FIELD.name"
-                 uib-popover="{{COL_FIELD.description}}"
+                 <span ng-bind="row.entity.costKind.name"
+                 uib-popover="{{row.entity.costKind.description}}"
                  popover-append-to-body="true"
                  popover-placement="top"
                  popover-popup-delay="300"
@@ -99,21 +99,20 @@ function controller($q, serviceBroker, uiGridConstants) {
                     d,
                     {costKind: _.get(costKindsById, d.costKindId, 'Unknown')}));
 
-                const latestYear = _
-                    .chain(vm.costInfo)
-                    .filter(d => d.costKind.isDefault)
-                    .map(d => d.year)
-                    .max()
-                    .value();
+                const noDefault = _.isUndefined(_.find(vm.costInfo, d => d.costKind.isDefault));
 
                 vm.displayCost = _
                     .chain(vm.costInfo)
-                    .filter(d => d.costKind.isDefault && d.year === latestYear)
-                    .first()
+                    .filter(d => noDefault || d.costKind.isDefault)
+                    .maxBy(d => d.year)
                     .value();
 
-                vm.yearlyCostInfo = _.filter(vm.costInfo,
-                        d => d.year === latestYear && !d.costKind.isDefault);
+                vm.yearlyCostInfo = _.chain(vm.costInfo)
+                    .filter(d => !d.costKind.isDefault)
+                    .groupBy(d => d.costKindId)
+                    .flatMap((costs, k) => _.maxBy(costs, c => c.year))
+                    .orderBy(d => d.year, "desc")
+                    .value();
 
             });
     }

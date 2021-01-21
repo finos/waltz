@@ -22,10 +22,15 @@ import template from "./playpen3.html";
 
 const initialState = {
     parentEntityRef: {
-        // id: 20506,
-        id: 11524,
+        id: 2732,
         kind: "ORG_UNIT",
-        name: "Texy"
+        name: "A Group"
+    },
+    parentEntityRef2: {
+        // id: 20506,
+        id: 20506,
+        kind: "APPLICATION",
+        name: "An app"
     },
     // schemeId: 2,
     // selectedDate: null,
