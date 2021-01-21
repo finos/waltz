@@ -488,7 +488,7 @@ export const dynamicSectionsByKind = {
     ],
     "APP_GROUP": [
         pack(appsSection,
-            [complexitySection, entityStatisticSummarySection, technologySummarySection, appCostsSummarySection]),
+            [appCostsSummarySection, complexitySection, entityStatisticSummarySection, technologySummarySection]),
         pack(logicalFlowsTabgroupSection,
             [authSourcesSection]),
         attestationSummarySection,
