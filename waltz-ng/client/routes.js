@@ -74,7 +74,7 @@ configureRoutes.$inject = [
 // -- SCROLLER ---
 
 function configureScrollToTopOnChange($doc, $transitions) {
-    $transitions.onSuccess({}, (transition) => {
+    $transitions.onSuccess({}, () => {
         $doc[0].body.scrollTop = 0;
         $doc[0].documentElement.scrollTop = 0;
     });
@@ -94,7 +94,7 @@ function configureBetaNagMessageNotification($transitions,
                                              notification) {
 
     const nagFunction = (message = "") => {
-        $transitions.onSuccess({}, (transition) => {
+        $transitions.onSuccess({}, () => {
             notification.info(message);
         });
     };
@@ -113,7 +113,7 @@ configureBetaNagMessageNotification.$inject = [
 // -- STATE CHANGE ---
 
 function configureStateChangeListener($transitions, $window, accessLogStore, dynamicSectionManager) {
-    $transitions.onExit({}, (transition) => dynamicSectionManager.clear());
+    $transitions.onExit({}, () => dynamicSectionManager.clear());
 
     $transitions.onSuccess({}, (transition) => {
         const {name} = transition.to();
@@ -127,7 +127,7 @@ function configureStateChangeListener($transitions, $window, accessLogStore, dyn
                         info,
                         "client: ",
                         __REVISION__);
-                    $window.location.reload()
+                    $window.location.reload();
                 }
             })
         }
@@ -181,7 +181,7 @@ function configureInactivityTimer($timeout, $transitions, $window, settingsServi
                 console.log("Configuring inactivity timer for " + inactivityTime + " ms");
                 let timeoutPromise = $timeout(reloadPage, inactivityTime);
 
-                $transitions.onSuccess({}, (transition) => {
+                $transitions.onSuccess({}, () => {
                     //if existing timeout promise, then cancel
                     if (timeoutPromise) {
                         $timeout.cancel(timeoutPromise);
