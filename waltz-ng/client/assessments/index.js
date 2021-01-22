@@ -18,9 +18,10 @@
 
 import services from "./services";
 import Routes from "./routes";
-import { registerComponents } from "../common/module-utils";
+import {registerComponents} from "../common/module-utils";
 import AssessmentEditor from "./components/editor/assessment-editor";
 import AssessmentRatingList from "./components/list/assessment-rating-list";
+import AssessmentRatingSection from "./components/section/assessment-rating-section";
 import AssessmentRatingSubSection from "./components/sub-section/assessment-rating-sub-section";
 import AssessmentRatingSummaryPies from "./components/summary-pies/assessment-rating-summary-pies";
 import AssessmentRatingTrafficLights from "./components/traffic-lights/assessment-rating-traffic-lights";
@@ -41,7 +42,8 @@ export default () => {
         AssessmentRatingSummaryPies,
         AssessmentRatingTrafficLights,
         BulkAssessmentRatingSelector,
-        AssessmentDefinitionOverview
+        AssessmentDefinitionOverview,
+        AssessmentRatingSection
     ]);
 
     return module.name;

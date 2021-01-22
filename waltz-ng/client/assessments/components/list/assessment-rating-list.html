@@ -27,31 +27,20 @@
                 </message>
             </waltz-no-data>
 
-            <div ng-class="{ 'waltz-scroll-region-200' : $ctrl.assessmentsWithRatings.length > 7}">
-                <table class="waltz-field-table waltz-field-table-border"
-                       style="width: 100%">
-                    <colgroup>
-                        <col width="30%">
-                        <col width="70%">
-                    </colgroup>
-                    <tbody ng-if="$ctrl.assessmentsWithRatings.length > 0"
-                           ng-include="'warl-list-with-ratings'">
-                    </tbody>
-                    <tbody ng-if="$ctrl.assessmentsWithoutRatings.length > 0"
-                           style="border-top: 1px solid #eee;"
-                           ng-include="'warl-list-without-ratings'">
-                    </tbody>
-                </table>
-            </div>
-
-            <div ng-if="$ctrl.visibility.showPrimaryToggle">
-                <waltz-toggle class="pull-right"
-                              state="$ctrl.showPrimaryOnly"
-                              on-toggle="$ctrl.togglePrimaryOnly()"
-                              label-on="Primary only"
-                              label-off="Primary only">
-                </waltz-toggle>
-            </div>
+            <table class="waltz-field-table waltz-field-table-border"
+                   style="width: 100%">
+                <colgroup>
+                    <col width="30%">
+                    <col width="70%">
+                </colgroup>
+                <tbody ng-if="$ctrl.assessmentsWithRatings.length > 0"
+                       ng-include="'warl-list-with-ratings'">
+                </tbody>
+                <tbody ng-if="$ctrl.assessmentsWithoutRatings.length > 0"
+                       style="border-top: 1px solid #eee;"
+                       ng-include="'warl-list-without-ratings'">
+                </tbody>
+            </table>
 
         </div>
     </div>
@@ -111,7 +100,7 @@
 <script type="text/ng-template"
         id="warl-rating-name">
     <span uib-popover-template="'warl-rating-popover.html'"
-          popover-placement="left"
+          popover-placement="bottom"
           popover-trigger="mouseenter"
           popover-popup-delay="300"
           popover-class="waltz-popover-width-500"
@@ -131,7 +120,7 @@
 <script type="text/ng-template"
         id="warl-definition-name">
     <span uib-popover-template="'warl-desc-popover.html'"
-          popover-placement="bottom"
+          popover-placement="right"
           popover-enable="item.definition.description"
           popover-trigger="mouseenter"
           popover-popup-delay="300"

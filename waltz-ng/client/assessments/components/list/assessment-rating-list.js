@@ -16,14 +16,15 @@
  *
  */
 
-import { initialiseData } from "../../../common";
+import {initialiseData} from "../../../common";
 import _ from "lodash";
 import template from "./assessment-rating-list.html";
 
 
 const bindings = {
     assessments: "<",
-    onSelect: "<"
+    onSelect: "<",
+    showPrimaryOnly: "<?"
 };
 
 
@@ -31,9 +32,6 @@ const initialState = {
     assessmentsWithRatings: [],
     assessmentsWithoutRatings: [],
     showPrimaryOnly: true,
-    visibility: {
-        showPrimaryToggle: false
-    }
 };
 
 
@@ -60,12 +58,6 @@ function controller() {
     };
 
     vm.$onChanges = () => {
-        vm.visibility.showPrimaryToggle = _.some(vm.assessments, a => !isPrimary(a));
-        filterAssessments(vm.showPrimaryOnly);
-    };
-
-    vm.togglePrimaryOnly = () => {
-        vm.showPrimaryOnly = !vm.showPrimaryOnly;
         filterAssessments(vm.showPrimaryOnly);
     };
 
