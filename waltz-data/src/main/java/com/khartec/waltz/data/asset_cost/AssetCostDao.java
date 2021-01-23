@@ -180,10 +180,9 @@ public class AssetCostDao {
 
 
     public Optional<Integer> findLatestYear() {
-        Integer year = dsl
+        return dsl
                 .select(DSL.max(ASSET_COST.YEAR).as("latest"))
                 .from(ASSET_COST)
-                .fetchOne("latest", Integer.class);
-        return Optional.ofNullable(year);
+                .fetchOptional("latest", Integer.class);
     }
 }

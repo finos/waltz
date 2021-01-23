@@ -28,7 +28,6 @@ import org.jooq.impl.DSL;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static com.khartec.waltz.schema.Tables.*;
 
@@ -54,7 +53,7 @@ public class QuestionEntityPredicateNamespace extends QuestionBasePredicateNames
 
 
     public String assessmentRating(String name, String defaultVal) {
-        String result = dsl
+        return dsl
                 .select(RATING_SCHEME_ITEM.CODE)
                 .from(ASSESSMENT_DEFINITION)
                 .innerJoin(ASSESSMENT_RATING).on(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID.eq(ASSESSMENT_DEFINITION.ID))
@@ -63,10 +62,7 @@ public class QuestionEntityPredicateNamespace extends QuestionBasePredicateNames
                 .where(ASSESSMENT_DEFINITION.EXTERNAL_ID.eq(name).or(ASSESSMENT_DEFINITION.NAME.eq(name)))
                 .and(ASSESSMENT_RATING.ENTITY_KIND.eq(subjectRef.kind().name()))
                 .and(ASSESSMENT_RATING.ENTITY_ID.eq(subjectRef.id()))
-                .fetchOne(RATING_SCHEME_ITEM.CODE);
-
-        return Optional
-                .ofNullable(result)
+                .fetchOptional(RATING_SCHEME_ITEM.CODE)
                 .orElse(defaultVal);
     }
 
