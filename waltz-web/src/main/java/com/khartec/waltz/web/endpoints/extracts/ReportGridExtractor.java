@@ -15,7 +15,6 @@
  * See the License for the specific
  *
  */
-
 package com.khartec.waltz.web.endpoints.extracts;
 
 import com.khartec.waltz.model.EntityKind;
@@ -91,7 +90,9 @@ public class ReportGridExtractor implements DataExtractor {
                                                                 long gridId,
                                                                 IdSelectionOptions selectionOptions) throws IOException {
 
-        ReportGrid reportGrid = reportGridService.getByIdAndSelectionOptions(gridId, selectionOptions);
+        ReportGrid reportGrid = reportGridService.getByIdAndSelectionOptions(
+                gridId,
+                selectionOptions);
 
         List<Tuple2<Application, ArrayList<Object>>> reportRows = prepareReportRows(reportGrid);
 
@@ -117,7 +118,9 @@ public class ReportGridExtractor implements DataExtractor {
                 "Application Name",
                 "Application Asset Code");
 
-        List<String> columnHeaders = map(columnDefinitions, r -> r.columnEntityReference().name().get());
+        List<String> columnHeaders = map(
+                columnDefinitions,
+                r -> r.columnEntityReference().name().get());
 
         return concat(
                 staticHeaders,
@@ -132,7 +135,9 @@ public class ReportGridExtractor implements DataExtractor {
         Map<Long, Application> applicationsById = indexById(reportGrid.instance().applications());
         Map<Long, RagName> ratingsById = indexById(reportGrid.instance().ratingSchemeItems());
 
-        Map<Long, Collection<ReportGridCell>> tableDataByAppId = groupBy(tableData, ReportGridCell::applicationId);
+        Map<Long, Collection<ReportGridCell>> tableDataByAppId = groupBy(
+                tableData,
+                ReportGridCell::applicationId);
 
         return tableDataByAppId
                 .entrySet()
@@ -143,7 +148,8 @@ public class ReportGridExtractor implements DataExtractor {
 
                     ArrayList<Object> reportRow = new ArrayList<>();
 
-                    Map<Tuple2<Long, EntityKind>, Object> callValuesByColumnRefForApp = indexBy(r.getValue(),
+                    Map<Tuple2<Long, EntityKind>, Object> callValuesByColumnRefForApp = indexBy(
+                            r.getValue(),
                             k -> tuple(k.columnEntityId(), k.columnEntityKind()),
                             v -> getValueFromReportRow(ratingsById, v));
 
@@ -152,7 +158,9 @@ public class ReportGridExtractor implements DataExtractor {
                             .columnDefinitions()
                             .forEach(colDef -> reportRow.add(
                                     callValuesByColumnRefForApp.getOrDefault(
-                                              tuple(colDef.columnEntityReference().id(), colDef.columnEntityReference().kind()),
+                                            tuple(
+                                                colDef.columnEntityReference().id(),
+                                                colDef.columnEntityReference().kind()),
                                             null)));
                     return tuple(app, reportRow);
                 })
@@ -161,7 +169,8 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private Object getValueFromReportRow(Map<Long, RagName> ratingsById, ReportGridCell reportGridCell) {
+    private Object getValueFromReportRow(Map<Long, RagName> ratingsById,
+                                         ReportGridCell reportGridCell) {
         switch (reportGridCell.columnEntityKind()){
             case COST_KIND:
                 return reportGridCell.value();
