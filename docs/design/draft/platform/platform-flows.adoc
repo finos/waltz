@@ -1,0 +1,222 @@
+= Approaches to representing Platform Flows
+David Watkins<david.watkins@db.com>;
+Mark Guerriero<mark.guerriero@db.com>;
+:toc:
+
+== Overview
+
+Challenges today around representing flows to platforms
+
+* Lineage
+* Accountability
+** Ownership record
+** Attestation
+* ...
+
+
+== Representing Platforms
+
+This documen
+
+* _Infrastructure_ platforms, hold or forward the data to the recipient without altering the data content.
+* _Enrichment_ platforms, which may blend data from several sources before it reaches the recipients
+* _Dual_ platforms which can operate as both infrastructure and enrichment platforms (e.g. CCO)
+
+
+== Overview of current model
+
+The diagram below shows the current model used by Waltz to represent flows.
+
+We can see that a _logical flow_ connects two endpoints which are typically applications.
+Logical flows can be decorated with _data types_ (not shown).
+
+Each logical flow may have _physical flows_ associated with it.
+Physical flows have _physical specifications_, these describe the content of the data.
+Physical specifications can be reused across physical flows.
+
+
+.Current flow model
+[graphviz, merged, svg]
+----
+digraph B {
+    app1[label="Source\nApplication", color="green"];
+    app2[label="Target\nApplication", color="green"];
+
+    lf1_2[label="App1 &raquo; App2\nLogical Flow", shape=box, color=darkgreen, style=solid];
+
+    pf1[label="0839_LS2_CON.dat\nPhysical Flow", shape=box, style=solid, color=darkblue];
+    pf2[label="0840_LS2_CON.dat\nPhysical Flow", shape=box, style=solid, color=darkblue];
+
+    ps[label="XXX_LS2_CON.dat\nPhysical Spec", shape=box, style=dashed, color=blue];
+
+    app1 -> lf1_2 -> app2;
+
+    lf1_2-> pf1;
+    lf1_2 -> pf2;
+
+    pf1 -> ps;
+    pf2 -> ps;
+
+    {rank = same; app1; app2; lf1_2}
+}
+----
+
+<<<
+
+
+
+== Flow representation
+
+=== Direct routing
+
+This is the way that flows are currently expressed in Waltz.
+We do expect each part of the flow to be documented can only see multi-hop flows via other mechanisms such as flow diagrams or by extracting the raw topology information into tools like Solidatus.
+footnote:[link to Solidatus, TBC]
+
+.Platforms using existing model
+[graphviz, direct, svg]
+----
+digraph B {
+    plat[label="Platform", color="orange"];
+    app1[label="App1", color="green"];
+    app2[label="App2", color="green"];
+
+    lf1[label="App1 &raquo; Plat\nLogical Flow", shape=box, color=darkgreen, style=solid];
+    lf2[label="Plat &raquo; App2\nLogical Flow", shape=box, color=darkgreen, style=solid];
+
+    app1 -> lf1 -> plat -> lf2 -> app2;
+
+    app1 -> app2 [style=dotted]
+    {rank = same; app1; app2; lf1; lf2, plat}
+}
+----
+
+|===
+|Pros |Cons
+
+| Closely resembles actual topology
+| Lineage is harder, cannot represent the intended recipient of the flow from App1 is App2.
+This can be mitigated using flow diagrams to explicitly depict multi-hop lineage
+
+| Conceptually simple
+| -
+
+| -
+| -
+|===
+
+<<<
+
+
+
+=== 'Via' routing
+
+In this approach the flow of data between `App1` and `App2`
+
+
+.Platforms using physical routing
+[graphviz, via, svg]
+----
+digraph B {
+    app1[label="App1", color="green"];
+    app2[label="App2", color="green"];
+    plat[label="Platform", color="orange"];
+
+    lf1[label="App1 &raquo; App2\nLogical Flow", shape=box, color=darkgreen, style=solid];
+
+    pf1[label="Physical Flow", shape=box, style=solid, color=darkblue];
+
+    app1 -> lf1 -> app2;
+
+    lf1 -> pf1;
+
+    pf1 -> plat [label="via"];
+
+    {rank = same; app1; app2; lf1}
+
+}
+----
+
+
+|===
+|Pros |Cons
+
+| Simplifies basic lineage
+| Multi hop _via_ routes difficult to express
+
+| -
+| Inconsistency of recording.
+If App1 does not know, or particularly care about, App2 (or vice versa)
+
+| Intuitive understanding
+| -
+
+| -
+| -
+|===
+
+<<<
+
+
+=== 'Ultimate Recipient' routing
+
+A variation of _via routing_ is to store the intended recipient as an optional (list?) attribute on the physical flow.
+
+
+.Platforms using physical routing
+[graphviz, ultimate, svg]
+----
+digraph B {
+    app1[label="App1", color="green"];
+    app2[label="App2", color="green"];
+    plat[label="Platform", color="orange"];
+
+    lf1[label="App1 &raquo; App2\nLogical Flow", shape=box, color=darkgreen, style=solid];
+
+    pf1[label="Physical Flow", shape=box, style=solid, color=darkblue];
+
+    app1 -> lf1 -> plat;
+
+    lf1 -> pf1;
+
+    pf1 -> app2 [label="ultimate recipient"];
+
+    {rank = same; app1; plat; lf1}
+}
+----
+
+
+|===
+|Pros |Cons
+
+| Simplifies basic lineage
+| Multi-hop _via_ cannot be expressed
+
+| -
+| Inconsistency of recording.
+If App1 does not know, or particularly care about, App2 (or vice versa)
+
+| Intuitive understanding
+| -
+
+| -
+| -
+|===
+
+
+
+
+
+== Appendix: Waltz terminology
+
+This section defines what specific terms mean in this document
+
+* *Logical Flow*, abstractly describes all flows between two entities (typically apps)
+* *Physical Flow*, a specific instance of a _logical flow_
+* *Physical Specification*, details of what is being transferred in a _physical flow_
+* *Data Types*, hierarchical structure representing all types of data within the organization
+* *Measurable Category*, (aka _Taxonomy_)
+* *Measurables*, hierarchical structure representing items in a _measurable category_
+* *Rating Scheme / Item*, used to describe the relationship between entities (typically apps) and _measurables_
+* *Measurable Rating*, the actual linkage of an entity to a _measurable_ using a _rating scheme item_
+
