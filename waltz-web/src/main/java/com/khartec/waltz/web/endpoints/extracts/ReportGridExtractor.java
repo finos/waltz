@@ -49,6 +49,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.khartec.waltz.common.ListUtilities.*;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.common.MapUtilities.indexBy;
+import static com.khartec.waltz.model.utils.IdUtilities.indexById;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
@@ -72,6 +73,7 @@ public class ReportGridExtractor implements DataExtractor {
     public void register() {
         registerGridViewExtract();
     }
+
 
     private void registerGridViewExtract() {
         post(mkPath(BASE_URL, "id", ":id"),
@@ -127,8 +129,8 @@ public class ReportGridExtractor implements DataExtractor {
 
         Set<ReportGridCell> tableData = reportGrid.instance().cellData();
 
-        Map<Long, Application> applicationsById = indexBy(reportGrid.instance().applications(), d -> d.entityReference().id());
-        Map<Long, RagName> ratingsById = indexBy(reportGrid.instance().ratingSchemeItems(), d -> d.id().get());
+        Map<Long, Application> applicationsById = indexById(reportGrid.instance().applications());
+        Map<Long, RagName> ratingsById = indexById(reportGrid.instance().ratingSchemeItems());
 
         Map<Long, Collection<ReportGridCell>> tableDataByAppId = groupBy(tableData, ReportGridCell::applicationId);
 
@@ -146,11 +148,11 @@ public class ReportGridExtractor implements DataExtractor {
                             v -> getValueFromReportRow(ratingsById, v));
 
                     //find data for columns
-                    reportGrid.definition().columnDefinitions()
-                            .stream()
+                    reportGrid.definition()
+                            .columnDefinitions()
                             .forEach(colDef -> reportRow.add(
                                     callValuesByColumnRefForApp.getOrDefault(
-                                            tuple(colDef.columnEntityReference().id(), colDef.columnEntityReference().kind()),
+                                              tuple(colDef.columnEntityReference().id(), colDef.columnEntityReference().kind()),
                                             null)));
                     return tuple(app, reportRow);
                 })
@@ -163,6 +165,8 @@ public class ReportGridExtractor implements DataExtractor {
         switch (reportGridCell.columnEntityKind()){
             case COST_KIND:
                 return reportGridCell.value();
+            case INVOLVEMENT_KIND:
+                return reportGridCell.text();
             case MEASURABLE:
             case ASSESSMENT_DEFINITION:
                 RagName ragName = ratingsById.getOrDefault(reportGridCell.ratingId(), null);
