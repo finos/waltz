@@ -89,7 +89,7 @@ function prepareColumnDefs(gridData) {
                 return {
                     allowSummary: false,
                     cellTemplate:`
-                        <div class="waltz-grid-color-cell"
+                        <div class="waltz-grid-report-cell"
                              style="text-align: right"
                              ng-style="{
                                 'background-color': COL_FIELD.color,
@@ -103,8 +103,7 @@ function prepareColumnDefs(gridData) {
                     width: 150,
                     toSearchTerm: d => _.get(d, [mkPropNameForRef(c.columnEntityReference), "text"], ""),
                     cellTemplate:`
-                        <div class="waltz-grid-color-cell"
-                             style="text-align: right">
+                        <div class="waltz-grid-report-cell">
                             <span ng-bind="COL_FIELD.text"></span>
                         </div>`
                 };
@@ -113,7 +112,7 @@ function prepareColumnDefs(gridData) {
                     allowSummary: true,
                     toSearchTerm: d => _.get(d, [mkPropNameForRef(c.columnEntityReference), "name"], ""),
                     cellTemplate:
-                        `<div class="waltz-grid-color-cell"
+                        `<div class="waltz-grid-report-cell"
                               ng-bind="COL_FIELD.name"
                               uib-popover-html="COL_FIELD.comment"
                               popover-trigger="mouseenter"

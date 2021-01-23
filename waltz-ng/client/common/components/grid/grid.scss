@@ -58,8 +58,10 @@
         overflow-y: auto;
     }
 
-    .waltz-grid-color-cell {
-        padding: 5px;
+    .waltz-grid-report-cell {
+        padding-left: 5px;
+        padding-right: 5px;
+        padding-top: 8px;
         margin: 1px;
         -moz-box-sizing: border-box;
         -webkit-box-sizing: border-box;
