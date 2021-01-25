@@ -1,3 +1,21 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
+ */
+
 package com.khartec.waltz.data.report_grid;
 
 
@@ -25,6 +43,7 @@ import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.common.SetUtilities.union;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
+import static com.khartec.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
 import static java.util.Collections.emptySet;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
@@ -44,6 +63,9 @@ public class ReportGridDao {
     private final com.khartec.waltz.schema.tables.AssessmentRating ar = ASSESSMENT_RATING.as("ar");
     private final com.khartec.waltz.schema.tables.CostKind ck = COST_KIND.as("ck");
     private final com.khartec.waltz.schema.tables.Cost c = COST.as("c");
+    private final com.khartec.waltz.schema.tables.Involvement inv = INVOLVEMENT.as("inv");
+    private final com.khartec.waltz.schema.tables.InvolvementKind ik  = INVOLVEMENT_KIND.as("ik");
+    private final com.khartec.waltz.schema.tables.Person p = PERSON.as("p");
 
 
     @Autowired
@@ -91,9 +113,9 @@ public class ReportGridDao {
     }
 
 
-    private List<ReportGridColumnDefinition> getColumns(Condition condition) {
+    private List<ReportGridColumnDefinition> getColumnDefinitions(Condition condition) {
 
-        SelectConditionStep<Record7<String, Long, String, String, Integer, String, String>> measurableColumns = mkColumnQuery(
+        SelectConditionStep<Record7<String, Long, String, String, Integer, String, String>> measurableColumns = mkColumnDefinitionQuery(
                 EntityKind.MEASURABLE,
                 m,
                 m.ID,
@@ -101,7 +123,7 @@ public class ReportGridDao {
                 m.DESCRIPTION,
                 condition);
 
-        SelectConditionStep<Record7<String, Long, String, String, Integer, String, String>> assessmentDefinitionColumns = mkColumnQuery(
+        SelectConditionStep<Record7<String, Long, String, String, Integer, String, String>> assessmentDefinitionColumns = mkColumnDefinitionQuery(
                 EntityKind.ASSESSMENT_DEFINITION,
                 ad,
                 ad.ID,
@@ -109,7 +131,7 @@ public class ReportGridDao {
                 ad.DESCRIPTION,
                 condition);
 
-        SelectConditionStep<Record7<String, Long, String, String, Integer, String, String>> costKindColumns = mkColumnQuery(
+        SelectConditionStep<Record7<String, Long, String, String, Integer, String, String>> costKindColumns = mkColumnDefinitionQuery(
                 EntityKind.COST_KIND,
                 ck,
                 ck.ID,
@@ -117,9 +139,18 @@ public class ReportGridDao {
                 ck.DESCRIPTION,
                 condition);
 
+        SelectConditionStep<Record7<String, Long, String, String, Integer, String, String>> involvementKindColumns = mkColumnDefinitionQuery(
+                EntityKind.INVOLVEMENT_KIND,
+                ik,
+                ik.ID,
+                ik.NAME,
+                ik.DESCRIPTION,
+                condition);
+
         return assessmentDefinitionColumns
                 .unionAll(measurableColumns)
                 .unionAll(costKindColumns)
+                .unionAll(involvementKindColumns)
                 .orderBy(rgcd.POSITION, DSL.field("name"))
                 .fetch(r -> ImmutableReportGridColumnDefinition.builder()
                         .columnEntityReference(mkRef(
@@ -133,12 +164,12 @@ public class ReportGridDao {
                         .build());
     }
 
-    private SelectConditionStep<Record7<String, Long, String, String, Integer, String, String>> mkColumnQuery(EntityKind entityKind,
-                                                                                                              Table t,
-                                                                                                              TableField<? extends Record, Long> ID,
-                                                                                                              TableField<? extends Record, String> NAME,
-                                                                                                              TableField<? extends Record, String> DESCRIPTION,
-                                                                                                              Condition reportCondition) {
+    private SelectConditionStep<Record7<String, Long, String, String, Integer, String, String>> mkColumnDefinitionQuery(EntityKind entityKind,
+                                                                                                                        Table<?> t,
+                                                                                                                        TableField<? extends Record, Long> ID,
+                                                                                                                        TableField<? extends Record, String> NAME,
+                                                                                                                        TableField<? extends Record, String> DESCRIPTION,
+                                                                                                                        Condition reportCondition) {
         return dsl
                     .select(DSL.coalesce(rgcd.DISPLAY_NAME, NAME).as("name"),
                             rgcd.COLUMN_ENTITY_ID,
@@ -188,15 +219,49 @@ public class ReportGridDao {
                 colsByKind.getOrDefault(EntityKind.COST_KIND, emptySet()),
                 cd -> cd.columnEntityReference().id());
 
+        Set<Long> requiredInvolvementKinds = map(
+                colsByKind.getOrDefault(EntityKind.INVOLVEMENT_KIND, emptySet()),
+                cd -> cd.columnEntityReference().id());
+
+
         return union(
                 fetchSummaryMeasurableData(appSelector, summaryMeasurableIdsUsingHighest, summaryMeasurableIdsUsingLowest),
                 fetchAssessmentData(appSelector, requiredAssessmentDefinitions),
                 fetchExactMeasurableData(appSelector, exactMeasurableIds),
-                fetchCostData(appSelector, requiredCostKinds));
+                fetchCostData(appSelector, requiredCostKinds),
+                fetchInvolvementData(appSelector, requiredInvolvementKinds));
     }
 
 
-    private Set<ReportGridCell> fetchCostData(Select<Record1<Long>> appSelector, Set<Long> requiredCostKinds) {
+    private Set<ReportGridCell> fetchInvolvementData(Select<Record1<Long>> appSelector,
+                                                     Set<Long> requiredInvolvementKinds) {
+        if (requiredInvolvementKinds.size() == 0) {
+            return emptySet();
+        } else {
+            return dsl
+                    .select(
+                        inv.ENTITY_ID,
+                        inv.KIND_ID,
+                        p.EMAIL)
+                    .from(inv)
+                    .innerJoin(p).on(p.EMPLOYEE_ID.eq(inv.EMPLOYEE_ID))
+                    .where(inv.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                    .and(inv.ENTITY_ID.in(appSelector))
+                    .and(inv.KIND_ID.in(requiredInvolvementKinds))
+                    .and(p.IS_REMOVED.isFalse())
+                    .fetchSet(r -> ImmutableReportGridCell
+                            .builder()
+                            .applicationId(r.get(inv.ENTITY_ID))
+                            .columnEntityId(r.get(inv.KIND_ID))
+                            .columnEntityKind(EntityKind.INVOLVEMENT_KIND)
+                            .text(r.get(p.EMAIL))
+                            .build());
+        }
+    }
+
+
+    private Set<ReportGridCell> fetchCostData(Select<Record1<Long>> appSelector,
+                                              Set<Long> requiredCostKinds) {
 
         if (requiredCostKinds.size() == 0) {
             return emptySet();
@@ -214,7 +279,6 @@ public class ReportGridDao {
 
             return dsl
                     .select(c.ENTITY_ID,
-                            c.ENTITY_KIND,
                             c.COST_KIND_ID,
                             c.AMOUNT)
                     .from(c)
@@ -373,7 +437,8 @@ public class ReportGridDao {
     }
 
 
-    private ImmutableReportGridDefinition mkReportGridDefinition(Condition condition, ReportGridRecord r) {
+    private ImmutableReportGridDefinition mkReportGridDefinition(Condition condition,
+                                                                 ReportGridRecord r) {
         return ImmutableReportGridDefinition
                 .builder()
                 .id(r.get(rg.ID))
@@ -383,7 +448,7 @@ public class ReportGridDao {
                 .provenance(r.get(rg.PROVENANCE))
                 .lastUpdatedAt(toLocalDateTime(r.get(rg.LAST_UPDATED_AT)))
                 .lastUpdatedBy(r.get(rg.LAST_UPDATED_BY))
-                .columnDefinitions(getColumns(condition))
+                .columnDefinitions(getColumnDefinitions(condition))
                 .build();
     }
 }

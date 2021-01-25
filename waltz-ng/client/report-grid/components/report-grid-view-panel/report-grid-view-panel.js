@@ -1,3 +1,21 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
+ */
+
 import template from "./report-grid-view-panel.html";
 import {initialiseData} from "../../../common";
 import {mkEntityLinkGridCell} from "../../../common/grid-utils";
@@ -71,19 +89,30 @@ function prepareColumnDefs(gridData) {
                 return {
                     allowSummary: false,
                     cellTemplate:`
-                    <div class="waltz-grid-color-cell"
-                    style="text-align: right"
-                         ng-style="{
-                            'background-color': COL_FIELD.color,
-                            'color': COL_FIELD.fontColor}">
-                            <waltz-currency-amount amount="COL_FIELD.value"></waltz-currency-amount>
-                    </div>`
+                        <div class="waltz-grid-report-cell"
+                             style="text-align: right"
+                             ng-style="{
+                                'background-color': COL_FIELD.color,
+                                'color': COL_FIELD.fontColor}">
+                                <waltz-currency-amount amount="COL_FIELD.value"></waltz-currency-amount>
+                        </div>`
+                };
+            case 'INVOLVEMENT_KIND':
+                return {
+                    allowSummary: false,
+                    width: 150,
+                    toSearchTerm: d => _.get(d, [mkPropNameForRef(c.columnEntityReference), "text"], ""),
+                    cellTemplate:`
+                        <div class="waltz-grid-report-cell">
+                            <span ng-bind="COL_FIELD.text"></span>
+                        </div>`
                 };
             default:
                 return {
                     allowSummary: true,
+                    toSearchTerm: d => _.get(d, [mkPropNameForRef(c.columnEntityReference), "name"], ""),
                     cellTemplate:
-                        `<div class="waltz-grid-color-cell"
+                        `<div class="waltz-grid-report-cell"
                               ng-bind="COL_FIELD.name"
                               uib-popover-html="COL_FIELD.comment"
                               popover-trigger="mouseenter"
@@ -93,18 +122,17 @@ function prepareColumnDefs(gridData) {
                               popover-placement="left"
                               ng-style="{
                                 'border-bottom-right-radius': COL_FIELD.comment ? '15% 50%' : 0,
-                                'background-color': COL_FIELD.color, 
+                                'background-color': COL_FIELD.color,
                                 'color': COL_FIELD.fontColor}">
-                        </div>`}
+                        </div>`
+                };
         }
     };
-
 
     const additionalColumns = _
         .chain(colDefs)
         .map(c => {
             return Object.assign(
-                mkColumnCustomProps(c),
                 {
                     field: mkPropNameForRef(c.columnEntityReference),
                     displayName: c.columnEntityReference.name,
@@ -112,7 +140,8 @@ function prepareColumnDefs(gridData) {
                     width: 100,
                     headerTooltip: c.columnEntityReference.description,
                     enableSorting: false
-                })
+                },
+                mkColumnCustomProps(c));
         })
         .value();
 
@@ -170,6 +199,9 @@ function prepareTableData(gridData) {
                 return {
                     color: color,
                     value: x.value };
+            case 'INVOLVEMENT_KIND':
+                return {
+                    text: x.text };
             default:
                 const ratingSchemeItem = ratingSchemeItemsById[x.ratingId];
                 const popoverHtml = mkPopoverHtml(x, ratingSchemeItem);
