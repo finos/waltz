@@ -20,35 +20,17 @@
     <div class="waltz-section">
 
         <div class="waltz-section-header">
-
             <div class="waltz-visibility-parent waltz-section-header-title">
+                <waltz-icon name="{{ $ctrl.icon }}"></waltz-icon>
+                <span ng-bind="$ctrl.name"></span>
 
-                <waltz-twistie ng-if="$ctrl.collapsible"
-                               collapsed="$ctrl.collapsed"
-                               toggle-expansion="$ctrl.expand">
-                </waltz-twistie>
-
-                <span ng-if="! $ctrl.collapsible"
-                      class="text-muted">
-                    <waltz-icon fixed-width="true"></waltz-icon>
-                </span>
-
-                <span ng-click="$ctrl.collapsible && $ctrl.expand(!$ctrl.collapsed)"
-                      ng-class="{ clickable: $ctrl.collapsible }">
-                    <waltz-icon name="{{ $ctrl.icon }}"></waltz-icon>
-                    <span ng-bind="$ctrl.name"></span>
-
-                    <small>
-                        <span ng-bind="$ctrl.small"></span>
-                    </small>
-                </span>
+                <small>
+                    <span ng-bind="$ctrl.small"></span>
+                </small>
             </div>
-
         </div>
 
-
-        <div class="container-fluid waltz-section-body animate-if"
-             ng-if="! $ctrl.collapsed">
+        <div class="container-fluid waltz-section-body animate-if">
             <ng-transclude></ng-transclude>
         </div>
     </div>

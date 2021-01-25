@@ -20,6 +20,7 @@ import services from "./services";
 import Routes from "./routes";
 import {registerComponents} from "../common/module-utils";
 import AssessmentEditor from "./components/editor/assessment-editor";
+import AssessmentRatingFavouritesList from "./components/favourites-list/assessment-rating-favourites-list";
 import AssessmentRatingList from "./components/list/assessment-rating-list";
 import AssessmentRatingSection from "./components/section/assessment-rating-section";
 import AssessmentRatingSubSection from "./components/sub-section/assessment-rating-sub-section";
@@ -37,6 +38,7 @@ export default () => {
 
     registerComponents(module, [
         AssessmentEditor,
+        AssessmentRatingFavouritesList,
         AssessmentRatingList,
         AssessmentRatingSubSection,
         AssessmentRatingSummaryPies,

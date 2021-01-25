@@ -30,7 +30,7 @@ import {
 
 import template from "./source-and-target-panel.html";
 import {sameRef} from "../../../common/entity-utils";
-import {appLogicalFlowFilterExcludedTagIdsKey} from "../../../user/services/user-preference-service";
+import {appLogicalFlowFilterExcludedTagIdsKey} from "../../../user";
 
 
 const bindings = {
@@ -175,7 +175,6 @@ function controller($element,
                     $timeout,
                     $window,
                     displayNameService,
-                    userPreferenceService,
                     serviceBroker) {
     const vm = initialiseData(this, initialState);
 
@@ -217,7 +216,8 @@ function controller($element,
     };
 
     vm.$onInit = () => {
-        serviceBroker.loadViewData(CORE_API.DataTypeStore.findAll)
+        serviceBroker
+            .loadViewData(CORE_API.DataTypeStore.findAll)
             .then(r => vm.dataTypes = _.keyBy(r.data, dt => dt.id));
     };
 
@@ -233,7 +233,7 @@ function controller($element,
             getSelectedTagsFromPreferences(
                 vm.tags,
                 appLogicalFlowFilterExcludedTagIdsKey,
-                userPreferenceService)
+                serviceBroker)
                 .then(selectedTags => {
                     vm.filterOptions.selectedTags = selectedTags;
                     filterChanged();
@@ -321,7 +321,7 @@ function controller($element,
             vm.tags,
             vm.filterOptions.selectedTags,
             appLogicalFlowFilterExcludedTagIdsKey,
-            userPreferenceService);
+            serviceBroker);
     };
 
     vm.showAllTags = () => {
@@ -331,7 +331,7 @@ function controller($element,
             vm.tags,
             vm.filterOptions.selectedTags,
             appLogicalFlowFilterExcludedTagIdsKey,
-            userPreferenceService);
+            serviceBroker);
     };
 
     vm.exportLogicalFlowData = () => {
@@ -417,7 +417,6 @@ controller.$inject = [
     "$timeout",
     "$window",
     "DisplayNameService",
-    "UserPreferenceService",
     "ServiceBroker"
 ];
 

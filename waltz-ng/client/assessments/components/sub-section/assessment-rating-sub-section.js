@@ -21,7 +21,6 @@ import {initialiseData} from "../../../common";
 import template from "./assessment-rating-sub-section.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkEnrichedAssessmentDefinitions} from "../../assessment-utils";
-import {displayError} from "../../../common/error-utils";
 import {resolveResponses} from "../../../common/promise-utils";
 
 
@@ -29,16 +28,7 @@ const bindings = {
     parentEntityRef: "<",
 };
 
-
-const modes = {
-    LIST: "LIST",
-    VIEW: "VIEW"
-};
-
-
-const initialState = {
-    mode: modes.LIST,
-};
+const initialState = {};
 
 
 function controller($q, notification, serviceBroker) {
@@ -82,50 +72,6 @@ function controller($q, notification, serviceBroker) {
 
     vm.$onInit = () => {
         loadAll();
-    };
-
-
-    // INTERACT
-
-    vm.onSelect = (def) => {
-        vm.selectedAssessment = def;
-        vm.mode = modes.VIEW;
-    };
-
-
-    vm.onClose = () => {
-        vm.selectedAssessment = null;
-        vm.mode = modes.LIST;
-        loadAll();
-    };
-
-
-    vm.onRemove = (ctx) => {
-        if (! confirm("Are yo sure you want to remove this assessment ?")) {
-            return;
-        }
-        return serviceBroker
-            .execute(CORE_API.AssessmentRatingStore.remove, [ vm.parentEntityRef, ctx.definition.id ])
-            .then(() => {
-                vm.onClose();
-                notification.warning("Assessment removed");
-            })
-            .catch(e => {
-                displayError(notification, "Failed to remove", e);
-            });
-    };
-
-
-    vm.onSave = (definitionId, ratingId, comments) => {
-        return serviceBroker
-            .execute(
-                CORE_API.AssessmentRatingStore.store,
-                [vm.parentEntityRef, definitionId, ratingId, comments])
-            .then(d => {
-                loadAll();
-                notification.success("Assessment saved");
-            })
-            .catch(e => displayError(notification, "Failed to save", e));
     };
 
 

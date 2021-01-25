@@ -20,22 +20,10 @@
 <div class="row">
     <div class="col-sm-12" style="padding: 5px 0">
         <div class="col-sm-6">
-            <h4>
-                <span ng-bind="$ctrl.showPrimaryOnly ? 'Primary' : 'All'"></span>
-                Assessments:
-            </h4>
+            <h4>All Assessments:</h4>
             <waltz-assessment-rating-list assessments="$ctrl.assessments"
-                                          on-select="$ctrl.onSelect"
-                                          show-primary-only="$ctrl.showPrimaryOnly">
+                                          on-select="$ctrl.onSelect">
             </waltz-assessment-rating-list>
-            <div ng-if="$ctrl.visibility.showPrimaryToggle">
-                <waltz-toggle class="pull-right"
-                              state="$ctrl.showPrimaryOnly"
-                              on-toggle="$ctrl.togglePrimaryOnly()"
-                              label-on="Primary only"
-                              label-off="Primary only">
-                </waltz-toggle>
-            </div>
         </div>
         <div class="col-sm-6">
             <div class="text-muted"

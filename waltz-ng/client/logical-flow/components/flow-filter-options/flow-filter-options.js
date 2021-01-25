@@ -21,7 +21,7 @@ import {buildHierarchies} from "../../../common/hierarchy-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./flow-filter-options.html";
 import {getSelectedTagsFromPreferences, saveTagFilterPreferences} from "../../logical-flow-utils";
-import {groupLogicalFlowFilterExcludedTagIdsKey} from "../../../user/services/user-preference-service";
+import {groupLogicalFlowFilterExcludedTagIdsKey} from "../../../user";
 
 const bindings = {
     onChange: "<",
@@ -51,7 +51,7 @@ function buildHierarchyWithUsageEnrichment(vm) {
 }
 
 
-function controller(userPreferenceService, serviceBroker) {
+function controller(serviceBroker) {
     const vm = _.defaults(this, initialState);
 
     function loadDataTypes() {
@@ -82,7 +82,7 @@ function controller(userPreferenceService, serviceBroker) {
             vm.usedTags,
             vm.selectedTags,
             groupLogicalFlowFilterExcludedTagIdsKey,
-            userPreferenceService);
+            serviceBroker);
     };
 
     vm.showAllTags = () => {
@@ -93,7 +93,7 @@ function controller(userPreferenceService, serviceBroker) {
             vm.usedTags,
             vm.selectedTags,
             groupLogicalFlowFilterExcludedTagIdsKey,
-            userPreferenceService);
+            serviceBroker);
     };
 
     vm.$onChanges = () => {
@@ -110,7 +110,7 @@ function controller(userPreferenceService, serviceBroker) {
             getSelectedTagsFromPreferences(
                 vm.usedTags,
                 groupLogicalFlowFilterExcludedTagIdsKey,
-                userPreferenceService)
+                serviceBroker)
                 .then(selectedTags => {
                     vm.selectedTags = selectedTags;
                     vm.notifyChanges();
@@ -133,7 +133,6 @@ function controller(userPreferenceService, serviceBroker) {
 
 
 controller.$inject = [
-    "UserPreferenceService",
     "ServiceBroker"
 ];
 

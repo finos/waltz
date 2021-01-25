@@ -18,14 +18,13 @@
 
 import {initialiseData} from "../../../common";
 import _ from "lodash";
-import template from "./assessment-rating-list.html";
+import template from "./assessment-rating-favourites-list.html";
 import {favouriteAssessmentDefinitionIdsKey} from "../../../user";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
-    assessments: "<",
-    onSelect: "<",
+    assessments: "<"
 };
 
 
@@ -46,6 +45,7 @@ function getFavouriteAssessmentDefnIds(preferences, defaultList = []) {
             .value();
 }
 
+
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
@@ -56,8 +56,9 @@ function controller(serviceBroker) {
     const filterAssessments = () => {
         if (vm.assessments) {
 
-            const filtered = _.chain(vm.assessments)
-                .map(a => Object.assign({}, a, { isFavourite: isFavourite(a.definition.id)}))
+            const filtered = _
+                .chain(vm.assessments)
+                .filter(a => isFavourite(a.definition.id))
                 .value();
 
             const valuePartitioned = _.partition(
@@ -78,23 +79,9 @@ function controller(serviceBroker) {
             .value();
 
         serviceBroker
-            .loadAppData(CORE_API.UserPreferenceStore.findAllForUser,[],  {force: true})
+            .loadAppData(CORE_API.UserPreferenceStore.findAllForUser, [], {force: true})
             .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(r.data, vm.defaultPrimaryList))
             .then(() => filterAssessments());
-    };
-
-    vm.toggleFavourite = (assessmentRatingId) => {
-
-        const newFavouritesList = (isFavourite(assessmentRatingId))
-            ? _.without(vm.favouriteAssessmentDefnIds, assessmentRatingId)
-            : _.concat(vm.favouriteAssessmentDefnIds, assessmentRatingId);
-
-        serviceBroker
-            .execute(CORE_API.UserPreferenceStore.saveForUser,
-                [{key: favouriteAssessmentDefinitionIdsKey, value: newFavouritesList.toString()}])
-            .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(r.data, vm.defaultPrimaryList))
-            .then(() => filterAssessments())
-
     };
 }
 
@@ -113,5 +100,5 @@ const component = {
 
 export default {
     component,
-    id: "waltzAssessmentRatingList"
+    id: "waltzAssessmentRatingFavouritesList"
 };

@@ -32,10 +32,6 @@ const bindings = {
 
 
 const initialState = {
-    showPrimaryOnly: true,
-    visibility: {
-        showPrimaryToggle: true,
-    }
 };
 
 
@@ -67,8 +63,6 @@ function controller($q, notification, serviceBroker) {
                     vm.assessmentDefinitions,
                     vm.ratingSchemes,
                     vm.assessmentRatings);
-
-                vm.visibility.showPrimaryToggle = _.some(vm.assessments, a => a.definition.visibility !== "PRIMARY");
 
                 if (vm.selectedAssessment) {
                     // re-find the selected assessment
@@ -124,11 +118,6 @@ function controller($q, notification, serviceBroker) {
                 notification.success("Assessment saved");
             })
             .catch(e => displayError(notification, "Failed to save", e));
-    };
-
-
-    vm.togglePrimaryOnly = () => {
-        vm.showPrimaryOnly = !vm.showPrimaryOnly;
     };
 
 }

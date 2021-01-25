@@ -16,8 +16,6 @@
  *
  */
 
-import {initialiseData} from "../common";
-import {stringToBoolean} from "../common/string-utils";
 import template from './section.html';
 
 
@@ -26,57 +24,12 @@ const bindings = {
     icon: '@',
     small: '@',
     id: '@',
-    collapsible: '<'
 };
-
-
-const initialState = {
-    collapsed: false,
-    collapsible: true
-};
-
-
-function buildPreferenceKey(state, widgetId, keyName) {
-    return `${state.name}.section.${widgetId}.${keyName}`;
-}
-
-
-function controller($state,
-                    userPreferenceService) {
-    const vm = initialiseData(this, initialState);
-
-    if(vm.id) {
-        userPreferenceService.loadPreferences()
-            .then(preferences => {
-                const preferenceKey = buildPreferenceKey($state.current, vm.id, 'collapsed');
-                if(preferences[preferenceKey]) {
-                    const keyValue = stringToBoolean(preferences[preferenceKey].value)
-                    vm.collapsed = keyValue;
-                }
-
-            });
-    }
-
-
-    vm.expand = (collapsed) => {
-        vm.collapsed = collapsed;
-        if(vm.id) {
-            userPreferenceService.savePreference(buildPreferenceKey($state.current, vm.id, 'collapsed'), collapsed);
-        }
-    }
-}
-
-
-controller.$inject = [
-    '$state',
-    'UserPreferenceService'
-];
 
 
 const component = {
     template,
     bindings,
-    controller,
     transclude: true
 };
 
