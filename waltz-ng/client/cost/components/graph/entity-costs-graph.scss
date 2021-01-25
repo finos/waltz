@@ -18,41 +18,22 @@
 
 @import "../../../../style/variables";
 
-.waltz-asset-costs-graph {
-    .wacg-bar {
-        rect {
-            transition: opacity 0.2s linear;
-            transition: fill 0.2s linear;
-            opacity: 0.75;
-            cursor: pointer;
-        }
+.waltz-entity-costs-graph {
 
-        text {
-            transition: fill 0.2s linear;
-            fill: lighten($waltz-font-color, 20);
-            font-size: 0.75em;
-            cursor: pointer;
-        }
+    path.domain {
+        stroke: none;
     }
 
     .wacg-bar:hover {
-        rect {
-            opacity: 1;
-            fill: rgb(198, 220, 249);
-        }
-
-        text {
-            fill: $waltz-font-color;
-            opacity: 1;
-        }
-    }
-
-    path.domain {
-        stroke: #ccc;
+        cursor: pointer;
     }
 
     .tick line{
-        stroke: #ccc;
+        stroke: none;
+    }
+
+    .wacg-bar text {
+        fill: #555;
     }
 }
 

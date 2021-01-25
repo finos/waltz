@@ -19,6 +19,25 @@
 import _ from "lodash";
 import { dynamicSections, dynamicSectionsByKind } from "../dynamic-section-definitions";
 
+
+/**
+ * Finds a section from a given list
+ * The each item in the list may contain
+ * some children (not recursive)
+ *
+ * @param sections
+ * @param id
+ * @returns {*}
+ */
+function findSection(sections = [], id) {
+    return _
+        .chain(sections)
+        .flatMap(s => _.concat([s], s.children || []))
+        .find(s => s.id === id)
+        .value();
+}
+
+
 const sectionManagerSvc = {
     serviceName: "DynamicSectionManager",
     service: ($location, $state, $stateParams, accessLogStore, localStorageService) => {
@@ -29,7 +48,6 @@ const sectionManagerSvc = {
         function mkStorageKey() {
             return `waltz-user-section-ids-${kind}`;
         }
-
 
         /* Sort list of sections, ensuring 'change log' is the last one */
         function sortList(list) {
@@ -66,7 +84,8 @@ const sectionManagerSvc = {
             kind = newKind;
             blat(available, sortList(dynamicSectionsByKind[kind]));
 
-            const previousViaParam = _.chain($location.search())
+            const previousViaParam = _
+                .chain($location.search())
                 .get("sections", "")
                 .split(";")
                 .map(s => Number(s))
@@ -77,7 +96,7 @@ const sectionManagerSvc = {
             const toActivate = _
                 .chain(previousViaParam)
                 .concat(previousViaLocalHistory)
-                .map(sId => _.find(available, { id: sId }))
+                .map(sId => findSection(available, sId))
                 .uniq()
                 .compact()
                 .take(3)
