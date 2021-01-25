@@ -21,6 +21,7 @@ import _ from "lodash";
 import template from "./assessment-rating-list.html";
 import {favouriteAssessmentDefinitionIdsKey} from "../../../user";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import {displayError} from "../../../common/error-utils";
 
 
 const bindings = {
@@ -46,7 +47,7 @@ function getFavouriteAssessmentDefnIds(preferences, defaultList = []) {
             .value();
 }
 
-function controller(serviceBroker) {
+function controller(serviceBroker, notification) {
     const vm = initialiseData(this, initialState);
 
     function isFavourite(id) {
@@ -85,22 +86,28 @@ function controller(serviceBroker) {
 
     vm.toggleFavourite = (assessmentRatingId) => {
 
-        const newFavouritesList = (isFavourite(assessmentRatingId))
+        const alreadyFavourite = isFavourite(assessmentRatingId);
+
+        const newFavouritesList = (alreadyFavourite)
             ? _.without(vm.favouriteAssessmentDefnIds, assessmentRatingId)
             : _.concat(vm.favouriteAssessmentDefnIds, assessmentRatingId);
+
+        const message = (alreadyFavourite)? "Removed from favourite assessments" : "Added to favourite assessments";
 
         serviceBroker
             .execute(CORE_API.UserPreferenceStore.saveForUser,
                 [{key: favouriteAssessmentDefinitionIdsKey, value: newFavouritesList.toString()}])
             .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(r.data, vm.defaultPrimaryList))
             .then(() => filterAssessments())
-
+            .then(() => notification.info(message))
+            .catch(e => displayError(notification, "Could not modify favourite assessment list", e))
     };
 }
 
 
 controller.$inject = [
-    "ServiceBroker"
+    "ServiceBroker",
+    "Notification"
 ];
 
 
