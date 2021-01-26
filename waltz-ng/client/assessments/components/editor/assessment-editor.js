@@ -18,6 +18,7 @@
 
 import {initialiseData} from "../../../common";
 import template from "./assessment-editor.html";
+import * as _ from "lodash";
 
 
 const bindings = {

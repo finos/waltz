@@ -31,8 +31,9 @@ const bindings = {
 
 
 const initialState = {
-    assessmentsWithRatings: [],
-    assessmentsWithoutRatings: [],
+    assessmentsList: [],
+    assessmentsNotProvided: [],
+    expandNotProvided: false
 };
 
 
@@ -63,10 +64,10 @@ function controller(serviceBroker, notification) {
 
             const valuePartitioned = _.partition(
                 filtered,
-                assessment => _.isNil(assessment.rating));
+                assessment => _.isNil(assessment.rating) && !vm.expandNotProvided);
 
-            vm.assessmentsWithoutRatings = _.sortBy(valuePartitioned[0], d => d.definition.name);
-            vm.assessmentsWithRatings = _.sortBy(valuePartitioned[1], d => d.definition.name);
+            vm.assessmentsNotProvided = _.sortBy(valuePartitioned[0], d => d.definition.name);
+            vm.assessmentsList = _.sortBy(valuePartitioned[1], d => d.definition.name);
         }
     };
 
@@ -102,6 +103,11 @@ function controller(serviceBroker, notification) {
             .then(() => notification.info(message))
             .catch(e => displayError(notification, "Could not modify favourite assessment list", e))
     };
+
+    vm.toggleExpandNotProvided = () => {
+        vm.expandNotProvided = !vm.expandNotProvided;
+        filterAssessments();
+    }
 }
 
 
