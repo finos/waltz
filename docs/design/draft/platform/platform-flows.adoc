@@ -5,18 +5,16 @@ Mark Guerriero<mark.guerriero@db.com>;
 
 == Overview
 
-* Lineage
-* Ownership
-** Accountability / Attestation
-* ...
+This document looks at how Waltz could be adapted to enhance it's support for _platform_ applications.
+It looks at how flows are represented, how lineage can be achieved and how attestations are used.
 
+== High Level Recommendations
 
-== Types of Platforms
-
-
-* _Infrastructure_ platforms, hold or forward the data to the recipient without altering the data content.
-* _Enrichment_ platforms, which may blend data from several sources before it reaches the recipients
-* _Multitenancy_ platforms
+* Adopt attestation exclusion mechanism for platform
+** Obligation for attestation moves to providers of data to platforms
+* Invest in lineage interop with external tooling
+** Enhance flow diagrams / waltz support for 'first pass' lineage
+* Altering flow representation (i.e. 'via' attributes will complicate solution for little incremental value)
 
 <<<
 
@@ -124,7 +122,7 @@ Often the platform owners are not in a position to be able to accurately perform
 ----
 digraph B {
 
-    plat[label="Platform\n???", color="orange"];
+    plat[label="Platform\n:(", color="orange"];
     app1[label="App1", color="green"];
     app2[label="App2", color="green"];
     app3[label="App3", color="green"];
@@ -298,7 +296,7 @@ digraph B {
 
     lf1 -> pf1;
 
-    pf1 -> app2 [label="ultimate recipient"];
+    pf1 -> app2 [label="  ultimate recipient"];
 
     {rank = same; app1; plat; lf1}
 }
@@ -308,28 +306,23 @@ digraph B {
 |===
 |Pros |Cons
 
-| Simplifies basic lineage
+| Simplifies extension to current model
 | Multi-hop _via_ cannot be expressed
 
-| -
-| Inconsistency of recording.
-If App1 does not know, or particularly care about, App2 (or vice versa)
+| Can be incrementally/partially adopted
+| Yet another way to represent lineage
 
-| Intuitive understanding
-| -
-
-| -
-| -
 |===
 
 <<<
 
 === Layers
 
-This approach proposes additional layers of flows.  We currently have
+This approach proposes additional layers of flows.
+Waltz currently has two layers of flows; logical and physical.
+Additional layers could be introduced which allow for different views of data movement.
+An example could be a 'Data at rest' layer which omits all processing-only nodes
 
-* logical
-* physical
 
 
 
