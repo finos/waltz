@@ -17,7 +17,7 @@
  */
 
 import _ from "lodash";
-import { dynamicSections, dynamicSectionsByKind } from "../dynamic-section-definitions";
+import {dynamicSections, dynamicSectionsByKind} from "../dynamic-section-definitions";
 
 
 /**

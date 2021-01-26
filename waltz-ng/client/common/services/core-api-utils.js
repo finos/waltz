@@ -104,6 +104,7 @@ import {TaxonomyManagementStore_API as TaxonomyManagementStore} from "../../taxo
 import {TechnologyStatisticsService_API as TechnologyStatisticsService} from "../../technology/services/technology-statistics-service";
 import {ThumbnailStore_API as ThumbnailStore} from "../../thumbnail/services/thumbnail-store";
 import {UserStore_API as UserStore} from "../../user/services/user-store";
+import {UserPreferenceStore_API as UserPreferenceStore} from "../../user/services/user-preference-store";
 import {RoleStore_API as RoleStore} from "../../role/services/role-store";
 import {VulnerabilityStore_API as VulnerabilityStore} from "../../software-catalog/services/vulnerability-store";
 
@@ -197,6 +198,7 @@ export const CORE_API = {
     TechnologyStatisticsService,
     ThumbnailStore,
     UserStore,
+    UserPreferenceStore,
     RoleStore,
     VulnerabilityStore
 };

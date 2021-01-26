@@ -56,7 +56,7 @@ function controller(notification, userService) {
                 vm.assessment.definition.id,
                 vm.working.ratingId,
                 vm.working.comment)
-            .then(() => vm.onClose());
+            .then(() => vm.onCancelEdit());
     };
 
 
@@ -70,7 +70,7 @@ function controller(notification, userService) {
     };
 
 
-    vm.$onInit = () => {
+    vm.$onChanges = () => {
         const definition = vm.assessment.definition;
         const readOnly = definition.isReadOnly;
 
@@ -101,6 +101,9 @@ function controller(notification, userService) {
                     vm.readOnlyReason = null;
                 }
             });
+
+            vm.mode = modes.VIEW;
+
     }
 
 }

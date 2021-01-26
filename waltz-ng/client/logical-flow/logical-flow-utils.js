@@ -125,17 +125,20 @@ export function maybeAddUntaggedFlowsTag(allTags = []) {
  * @param allTags
  * @param selectedTags
  * @param preferenceKey either app-level or group-level view key
- * @param userPreferenceService
+ * @param serviceBroker
  */
 export function saveTagFilterPreferences(allTags = [],
                                          selectedTags = [],
                                          preferenceKey = "",
-                                         userPreferenceService) {
+                                         serviceBroker) {
     const allTagIds = _.map(allTags, "id");
     const selectedTagIds = _.map(selectedTags, "id");
     const excludedTagIds = _.difference(allTagIds, selectedTagIds);
 
-    userPreferenceService.savePreference(preferenceKey, _.join(excludedTagIds, ";"));
+    serviceBroker
+        .execute(
+            CORE_API.UserPreferenceStore.saveForUser,
+            [{key: preferenceKey, value: _.join(excludedTagIds, ";")}]);
 }
 
 
@@ -143,16 +146,16 @@ export function saveTagFilterPreferences(allTags = [],
  * Filters excluded tags from allTags based on stored user preferences
  * @param allTags
  * @param preferenceKey
- * @param userPreferenceService
+ * @param serviceBroker
  */
 export function getSelectedTagsFromPreferences(allTags = [],
                                                preferenceKey,
-                                               userPreferenceService) {
-    return userPreferenceService.loadPreferences()
+                                               serviceBroker) {
+    return serviceBroker
+        .loadAppData(CORE_API.UserPreferenceStore.findAllForUser)
         .then(preferences => {
-            const excludedTagIdsStr = preferences[preferenceKey]
-                ? preferences[preferenceKey].value
-                : "";
+            const preference = _.find(preferences, p => p.key === preferenceKey);
+            const excludedTagIdsStr = _.get(preference, ["value"], "");
 
             if (!_.isEmpty(excludedTagIdsStr)) {
                 const excludedTagIds = _.map(
@@ -218,4 +221,4 @@ export const filterUtils = {
 
         return f => true;
     }
-}
+};

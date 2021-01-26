@@ -33,8 +33,8 @@
         <table class="waltz-field-table waltz-field-table-border"
                style="width: 100%">
             <colgroup>
-                <col width="30%">
-                <col width="70%">
+                <col width="20%">
+                <col width="60%">
             </colgroup>
             <tr>
                 <td class="text-muted">
@@ -52,7 +52,10 @@
             <tr>
                 <td class="text-muted">Comment</td>
                 <td>
-                    <textarea ng-model="$ctrl.working.comment"></textarea>
+                    <textarea class="form-control"
+                              rows="6"
+                              placeholder="This comment supports markdown"
+                              ng-model="$ctrl.working.comment"></textarea>
                 </td>
             </tr>
             <tfoot>
@@ -80,6 +83,10 @@
     <div ng-if="$ctrl.mode === 'VIEW'">
         <table class="waltz-field-table waltz-field-table-border"
                style="width: 100%">
+            <colgroup>
+                <col width="20%">
+                <col width="60%">
+            </colgroup>
             <tr>
                 <td class="text-muted"
                     style="vertical-align: top">
@@ -110,7 +117,7 @@
             </tr>
             <tfoot>
             <tr>
-                <td/>
+                <td></td>
                 <td>
                     <span ng-if="$ctrl.isEditable">
                         <a ng-click="$ctrl.onEdit($ctrl.assessment)"
@@ -138,7 +145,6 @@
                         <waltz-icon name="close"></waltz-icon>
                         Close
                     </a>
-
                 </td>
             </tr>
             </tfoot>

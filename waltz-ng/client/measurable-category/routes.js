@@ -19,20 +19,21 @@
 import _ from "lodash";
 import ListView from "./pages/list/measurable-category-list.js";
 import EditView from "./pages/edit/measurable-category-edit.js";
-import {lastViewedMeasurableCategoryKey} from "../user/services/user-preference-service";
+import {lastViewedMeasurableCategoryKey} from "../user";
+import {CORE_API} from "../common/services/core-api-utils";
 
 
 const baseState = {};
 
 
-function bouncer($state, $stateParams, userPreferenceService, settingsService) {
+function bouncer($state, $stateParams, settingsService, serviceBroker) {
     const go = id => $state.go("main.measurable-category.list", { id }, { location: "replace" });
 
-    const attemptToRouteViaLastVisited = () => userPreferenceService
-        .loadPreferences(true)
+    const attemptToRouteViaLastVisited = () => serviceBroker
+        .loadViewData(CORE_API.UserPreferenceStore.findAllForUser, [], {force: true})
         .then(prefs => {
-            const lastCategory = prefs[lastViewedMeasurableCategoryKey];
-            if (_.get(lastCategory, "value", 0) > 0) {
+            const lastCategory = _.find(prefs, p => p.key === lastViewedMeasurableCategoryKey);
+            if (_.get(lastCategory, ["value"], 0) > 0) {
                 go(lastCategory.value);
             } else {
                 attemptToRouteViaServerSetting();
@@ -52,7 +53,7 @@ function bouncer($state, $stateParams, userPreferenceService, settingsService) {
     attemptToRouteViaLastVisited();
 }
 
-bouncer.$inject = ["$state", "$stateParams", "UserPreferenceService", "SettingsService"];
+bouncer.$inject = ["$state", "$stateParams", "SettingsService", "ServiceBroker"];
 
 
 const bouncerState = {

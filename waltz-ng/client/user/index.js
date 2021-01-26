@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
@@ -18,14 +17,12 @@
  */
 
 import angular from "angular";
-import {registerComponents, registerStore} from "../common/module-utils";
+import {registerComponents, registerStores} from "../common/module-utils";
 
 import userAgentInfoStore from "./services/user-agent-info-store";
 import userService from "./services/user-service";
 import userStore from "./services/user-store";
 import userPreferenceStore from "./services/user-preference-store";
-import userPreferenceService from "./services/user-preference-service";
-
 import userPickList from "./components/user-pick-list/user-pick-list";
 
 import hasRole from "./directives/has-role";
@@ -34,25 +31,29 @@ import unlessRole from "./directives/unless-role";
 import Routes from "./routes";
 
 
+export const lastViewedMeasurableCategoryKey = "main.measurable-category.list.lastCategory";
+export const appLogicalFlowFilterExcludedTagIdsKey = "main.app-view.logical-flow.filter.excludedTagIds";
+export const groupLogicalFlowFilterExcludedTagIdsKey = "main.group-views.logical-flow.filter.excludedTagIds";
+export const favouriteAssessmentDefinitionIdsKey = "main.app-view.assessment-rating.favouriteAssessmentDefnIds";
+
+
 export default () => {
     const module = angular.module("waltz.user", []);
 
     module
         .config(Routes);
 
-    registerStore(module, userStore);
-    registerComponents(module, [userPickList])
+    registerStores(module, [userStore, userPreferenceStore]);
+    registerComponents(module, [userPickList]);
 
     module
         .service("UserAgentInfoStore", userAgentInfoStore)
-        .service("UserService", userService)
-        .service("UserPreferenceStore", userPreferenceStore)
-        .service("UserPreferenceService", userPreferenceService);
+        .service("UserService", userService);
 
     module
         .directive("waltzHasRole", hasRole)
         .directive("waltzHasRoleForEntityKind", hasRoleForEntityKind)
-        .directive("waltzUnlessRole", unlessRole)
+        .directive("waltzUnlessRole", unlessRole);
 
     return module.name;
 };

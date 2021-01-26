@@ -19,23 +19,29 @@
 function store($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/user-preference`;
 
-    const findAllForUser = () => $http.get(`${BASE}`).then(r => r.data);
+    const findAllForUser = () => $http
+        .get(`${BASE}`)
+        .then(r => r.data);
 
     /**
      * preference -> [ preferences... ]
      * @param preference
      */
-    const saveForUser = (preference) => $http.post(`${BASE}/save`, preference)
+    const saveForUser = (preference) => $http
+        .post(`${BASE}/save`, preference)
         .then(r => r.data);
 
     /**
      * [ preferences ... ] -> [ preferences... ]
      * @param preferences
      */
-    const saveAllForUser = (preferences) => $http.post(`${BASE}/save-all`, preferences)
+    const saveAllForUser = (preferences) => $http
+        .post(`${BASE}/save-all`, preferences)
         .then(r => r.data);
 
-    const deleteForUser = () => $http.delete(`${BASE}/clear`).then(r => r.data);
+    const deleteForUser = () => $http
+        .delete(`${BASE}/clear`)
+        .then(r => r.data);
 
     return {
         findAllForUser,
@@ -47,5 +53,33 @@ function store($http, BaseApiUrl) {
 
 store.$inject = ['$http', 'BaseApiUrl'];
 
+const serviceName = "UserPreferenceStore";
 
-export default store;
+export default {
+    store,
+    serviceName
+}
+
+export const UserPreferenceStore_API = {
+    findAllForUser: {
+        serviceName,
+        serviceFnName: "findAllForUser",
+        description: "executes findAllForUser"
+    },
+    saveForUser: {
+        serviceName,
+        serviceFnName:"saveForUser",
+        description: "executes saveForUser"
+    },
+    saveAllForUser: {
+        serviceName,
+        serviceFnName: "saveAllForUser",
+        description: "executes saveAllForUser"
+    },
+    deleteForUser: {
+        serviceName,
+        serviceFnName:"deleteForUser",
+        description: "executes deleteForUser"
+    }
+};
+

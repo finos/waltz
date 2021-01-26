@@ -19,7 +19,7 @@ import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./measurable-category-list.html";
-import {lastViewedMeasurableCategoryKey} from "../../../user/services/user-preference-service";
+import {lastViewedMeasurableCategoryKey} from "../../../user";
 import roles from "../../../user/system-roles";
 import {dynamicSections} from "../../../dynamic-section/dynamic-section-definitions";
 import {toEntityRef} from "../../../common/entity-utils";
@@ -38,7 +38,6 @@ function controller($q,
                     $state,
                     $stateParams,
                     serviceBroker,
-                    userPreferenceService,
                     userService) {
 
     const vm = initialiseData(this, initialState);
@@ -51,8 +50,10 @@ function controller($q,
 
     vm.$onInit = () => {
 
-        userPreferenceService
-            .savePreference(lastViewedMeasurableCategoryKey, categoryId);
+        serviceBroker
+            .execute(
+                CORE_API.UserPreferenceStore.saveForUser,
+                [{key: lastViewedMeasurableCategoryKey, value: categoryId}]);
 
         const measurablePromise = serviceBroker
             .loadAppData(CORE_API.MeasurableStore.findAll)
@@ -126,7 +127,6 @@ controller.$inject = [
     "$state",
     "$stateParams",
     "ServiceBroker",
-    "UserPreferenceService",
     "UserService"
 ];
 
