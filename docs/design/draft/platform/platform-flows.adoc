@@ -13,6 +13,7 @@ Mark Guerriero<mark.guerriero@db.com>;
 
 == Types of Platforms
 
+
 * _Infrastructure_ platforms, hold or forward the data to the recipient without altering the data content.
 * _Enrichment_ platforms, which may blend data from several sources before it reaches the recipients
 * _Multitenancy_ platforms
@@ -57,17 +58,13 @@ digraph B {
 }
 ----
 
-<<<
+Waltz's flow database is made up from numerous point to point logical flows and their physical counterparts. The totality of those flows represents the known flow network and can be represented as a directed graph.
 
+=== Lineage
 
-== Flow representation
+Lineage can be thought of as a pathway taken though the logical flow directed graph.  Starting from a source node, traversing logical flows, to reach a target node.
 
-=== Direct routing
-
-This is the way that flows are currently expressed in Waltz.
-We do expect each part of the flow to be documented can only see multi-hop flows via other mechanisms such as flow diagrams or by extracting the raw topology information into tools like Solidatus.
-
-.Platforms using existing model
+.Lineage using the existing Waltz model
 [graphviz, direct, svg]
 ----
 digraph B {
@@ -85,24 +82,23 @@ digraph B {
 }
 ----
 
-|===
-|Pros |Cons
+In Waltz there are limited ways to express indirect flow relationships such as `App 1` -> `App 2` in the diagram above (shown with the dotted arc).
+To show lineage users have a choice:
 
-| Closely resembles actual topology
-| Lineage is hard, cannot represent that the intended recipient of the flow from App1 is App2.
-In Waltz this is mitigated by using flow diagrams to explicitly depict multi-hop lineage.
+* Use **Waltz's Flow Diagram** capabilities which allow users to quickly draw a route through the network (by using an editor constrained by the underlying graph).
+* Use **physical flow tagging** to associated flows.
+  This is conceptually similar to the diagrams mentioned above, but some users prefer this basic approach.
+* **Export the flows and use tools** such as Solidatus to represent a more detailed view of lineage
 
-| Conceptually simple
-| -
 
-|===
+<<<
 
-==== Attestation
+=== Attestation
 In the current model we view the **consuming application as the owner of the flow**.
 The reasoning behind this is based on a simple belief that the consumer is more likely to be aware of the flow than the producer.
 
 For simple app-to-app flows systems this model works well and attestation is straightforward; the consumer should attest all inbound flows.
-This is depicted in the figure below (App C must attest to the accuracy of the flows from A and B).
+This is depicted in the figure below (`App C` must attest to the accuracy of the flows from `A` and `B`).
 
 .Example of attestation scope for simple apps
 [graphviz, direct-att-simple, svg]
@@ -120,7 +116,7 @@ digraph B {
 ----
 
 However, when we have aggregation/distribution platforms the **attestation burden falls upon the platform**.
-Often the platform owners are not in a position to be able to accurately perform the required attestation, especially in mulit-tenancy situations.
+Often the platform owners are not in a position to be able to accurately perform the required attestation, especially in multi-tenancy situations.
 
 
 .Direct attestation for platforms
@@ -157,7 +153,9 @@ digraph B {
 
 This is depicted in the following figure, the green flows show a large volume of inbound flows to the platform which may have little knowledge of their content and/or accuracy.
 
-===== Attestation Enhancements
+<<<
+
+==== Attestation Enhancements
 
 To overcome this situation we could:
 
@@ -197,7 +195,6 @@ digraph B {
 }
 ----
 
-
 [CAUTION]
 ====
 We would need to consider what happens when/if platforms exchange data.
@@ -222,21 +219,20 @@ digraph B {
 ----
 ====
 
-**_Option 2:_ Declate attestation obligations on a per flow basis**, this would be at the physical flow and/or logical flow level.
+**_Option 2:_ Declare attestation obligations on a per flow basis**, this would be at the physical flow and/or logical flow level.
 These obligations will inform the ui who is responsible for each attestation.
 
 Whilst the second option will give more accurate results and handles more situations, we believe the development effort and associated runtime attestation effort will outstrip this gain.
 
 
-
-
 <<<
 
-
+== Alternative flow representations
 
 === 'Via' routing
 
-In this approach the flow of data between `App1` and `App2`
+In this approach the flow of data is recorded between `App1` and `App2`.
+The platform in between them is recorded as a detail on the physical flow.
 
 
 .Platforms using physical routing
@@ -255,7 +251,7 @@ digraph B {
 
     lf1 -> pf1;
 
-    pf1 -> plat [label="via"];
+    pf1 -> plat [label=" 'via'"];
 
     {rank = same; app1; app2; lf1}
 
@@ -267,14 +263,14 @@ digraph B {
 |Pros |Cons
 
 | Simplifies basic lineage
-| Multi hop _via_ routes difficult to express
-
-| -
-| Inconsistency of recording.
-If App1 does not know, or particularly care about, App2 (or vice versa)
+| Multi-hop _via_ routes difficult to express (ordering etc)
 
 | Intuitive understanding
-| -
+| Usage of platforms more difficult to understand as may be via a direct flow or an indirect detail on the physical flow.
+
+| Somewhat solves the attestation problem as the flow is now between apps.
+| By omitting the platform from the main flow all recipients must know about, and record, `App 1` as the originator.
+
 
 |===
 
