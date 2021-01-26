@@ -56,7 +56,9 @@
                                         <waltz-rating-indicator-cell rating="rating"
                                                                      show-name="true">
                                         </waltz-rating-indicator-cell>
-                                        <span class="wric-name" >:: (<span ng-bind="rating.rating"></span>)</span>
+                                        <span class="wric-name">
+                                            <code ng-bind="rating.rating"></code>
+                                        </span>
                                         <waltz-markdown style="display: block; padding-left: 10px; margin-bottom: 4px"
                                                         class="small text-muted"
                                                         ng-if="rating.description"

@@ -22,25 +22,45 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./assessment-rating-bulk-upload.html";
 import {mkEntityLinkGridCell} from "../../../common/grid-utils";
 import {displayError} from "../../../common/error-utils";
+import {initialiseData} from "../../../common";
+
+
+const ratingCellTemplate = `
+    <div class="ui-grid-cell-contents">
+        <waltz-rating-indicator-cell rating="COL_FIELD"
+                                     show-name="true">
+        </waltz-rating-indicator-cell>
+    </div>`;
 
 
 const initialState = {
-    editor: "SINGLE",
-    canDelete: false,
-    currentOrgUnit: null
+    columnDefs: [
+        mkEntityLinkGridCell("Entity", "entityRef", "none", "right"),
+        {
+            field: "rating",
+            width: "30%",
+            name: "Assessment Rating",
+            cellTemplate: ratingCellTemplate,
+        },
+        {field: "comment", name: "Comment"},
+        {
+            name: "Operation",
+            width: "10%",
+            cellTemplate: "<div class=\"ui-grid-cell-contents\"><a ng-click=\"grid.appScope.removeAssessmentRating(row.entity)\" class=\"clickable\">Remove</a></div>"
+        }
+    ]
 };
 
+
 function controller($q,
-                    $state,
-                    $scope,
                     $stateParams,
-                    appStore,
                     notification,
                     serviceBroker,
                     userService) {
 
     const {definitionId} = $stateParams;
-    const vm = Object.assign(this, initialState);
+    const vm = initialiseData(this, initialState);
+
     userService
         .whoami()
         .then(user => vm.user = user);
@@ -75,16 +95,6 @@ function controller($q,
 
     loadAll();
 
-    vm.columnDefs = [
-        mkEntityLinkGridCell("Entity", "entityRef", "none", "right"),
-        {field: "rating.name", name: "Assessment Rating", width: "15%"},
-        {field: "comment", name: "Comment"},
-        {
-            name: "Operation",
-            width: "10%",
-            cellTemplate: "<div class=\"ui-grid-cell-contents\"><a ng-click=\"grid.appScope.removeAssessmentRating(row.entity)\" class=\"clickable\">Remove</a></div>"
-        }
-    ];
 
     vm.showSingleEditor = () => {
         vm.editor = "SINGLE"
@@ -136,14 +146,17 @@ function controller($q,
     vm.removeAssessmentRating = (row) => {
         if (confirm("Are you sure you want to delete this assessment rating ?")) {
             serviceBroker
-                .loadViewData(CORE_API.AssessmentRatingStore.remove, [row.entityRef, definitionId])
+                .loadViewData(
+                    CORE_API.AssessmentRatingStore.remove,
+                    [row.entityRef, definitionId])
                 .then(r => r.data)
                 .then(() => loadAll())
                 .then(() => notification.success("Assessment Rating Removed for application " + row.entityRef.name))
-                .catch((e) => {
-                    console.log("WAR: Failed to delete assessment rating for application", {error: e});
-                    return notification.warning(`Failed to delete assessment rating for application: ${e.data.message}`);
-                });
+                .catch((e) =>
+                    displayError(
+                        notification,
+                        `Failed to delete assessment rating for application: ${e.data.message}`,
+                        e));
         }
     };
 
@@ -151,10 +164,7 @@ function controller($q,
 
 controller.$inject = [
     "$q",
-    "$state",
-    "$scope",
     "$stateParams",
-    "ApplicationStore",
     "Notification",
     "ServiceBroker",
     "UserService"

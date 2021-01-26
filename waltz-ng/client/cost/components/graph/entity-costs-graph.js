@@ -71,6 +71,8 @@ function drawYAxis(yScale,
             25));
 
     container
+        .transition()
+        .duration(transitionDuration)
         .call(yAxis);
 
     container
