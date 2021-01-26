@@ -331,10 +331,18 @@ const entityCostsSection = {
     id: 190
 };
 
+const assessmentRatingSection = {
+    componentId: "assessment-rating-section",
+    name: "Assessment Ratings",
+    icon: "puzzle-piece",
+    id: 190
+};
+
 export const dynamicSections = {
     appCostsSection,
     appCostsSummarySection,
     appsSection,
+    assessmentRatingSection,
     assetCostsSection,
     attestationSummarySection,
     authSourcesSection,
@@ -388,18 +396,20 @@ function pack(section, children = []) {
 
 export const dynamicSectionsByKind = {
     "APPLICATION": [
-        measurableRatingAppSection,
-        entityNamedNotesSection,
+        appCostsSection,
+        assessmentRatingSection,
         bookmarksSection,
         changeInitiativeSection,
         changeSetSection,
-        involvedPeopleSection,
-        entityDiagramsSection,
         dataFlowSection,
-        technologySection,
         entityCostsSection,
+        entityDiagramsSection,
+        entityNamedNotesSection,
         entityStatisticSection,
+        involvedPeopleSection,
+        measurableRatingAppSection,
         surveySection,
+        technologySection,
         changeLogSection
     ],
     "ACTOR": [

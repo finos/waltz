@@ -18,17 +18,21 @@
 
 import {initialiseData} from "../../../common";
 
-import template from "./assessment-rating-sub-section.html";
+import template from "./assessment-rating-section.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkEnrichedAssessmentDefinitions} from "../../assessment-utils";
+import {displayError} from "../../../common/error-utils";
 import {resolveResponses} from "../../../common/promise-utils";
+import _ from "lodash";
 
 
 const bindings = {
     parentEntityRef: "<",
 };
 
-const initialState = {};
+
+const initialState = {
+};
 
 
 function controller($q, notification, serviceBroker) {
@@ -75,6 +79,47 @@ function controller($q, notification, serviceBroker) {
     };
 
 
+    // INTERACT
+
+    vm.onSelect = (def) => {
+        vm.selectedAssessment = def;
+    };
+
+
+    vm.onClose = () => {
+        vm.selectedAssessment = null;
+        loadAll();
+    };
+
+
+    vm.onRemove = (ctx) => {
+        if (! confirm("Are you sure you want to remove this assessment ?")) {
+            return;
+        }
+        return serviceBroker
+            .execute(CORE_API.AssessmentRatingStore.remove, [ vm.parentEntityRef, ctx.definition.id ])
+            .then(() => {
+                vm.onClose();
+                notification.warning("Assessment removed");
+            })
+            .catch(e => {
+                displayError(notification, "Failed to remove", e);
+            });
+    };
+
+
+    vm.onSave = (definitionId, ratingId, comments) => {
+        return serviceBroker
+            .execute(
+                CORE_API.AssessmentRatingStore.store,
+                [vm.parentEntityRef, definitionId, ratingId, comments])
+            .then(d => {
+                loadAll();
+                notification.success("Assessment saved");
+            })
+            .catch(e => displayError(notification, "Failed to save", e));
+    };
+
 }
 
 
@@ -94,5 +139,5 @@ const component = {
 
 export default {
     component,
-    id: "waltzAssessmentRatingSubSection"
+    id: "waltzAssessmentRatingSection"
 };

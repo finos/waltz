@@ -31,7 +31,7 @@ import {
     maybeAddUntaggedFlowsTag,
     saveTagFilterPreferences
 } from "../../../logical-flow/logical-flow-utils";
-import {groupLogicalFlowFilterExcludedTagIdsKey} from "../../../user/services/user-preference-service";
+import {groupLogicalFlowFilterExcludedTagIdsKey} from "../../../user";
 
 
 const bindings = {
@@ -147,7 +147,7 @@ function filterData(flows = [],
 }
 
 
-function controller($q, $scope, userPreferenceService, serviceBroker) {
+function controller($q, $scope, serviceBroker) {
     const vm = initialiseData(this, initialState);
     const onAppSelect = (app) => $scope.$applyAsync(() => vm.selectedApp = app);
 
@@ -185,7 +185,7 @@ function controller($q, $scope, userPreferenceService, serviceBroker) {
                 return getSelectedTagsFromPreferences(
                     vm.tags,
                     groupLogicalFlowFilterExcludedTagIdsKey,
-                    userPreferenceService)
+                    serviceBroker)
                     .then(selectedTags => {
                         vm.filterOptions.selectedTags = selectedTags;
                     });
@@ -221,7 +221,7 @@ function controller($q, $scope, userPreferenceService, serviceBroker) {
             vm.tags,
             vm.filterOptions.selectedTags,
             groupLogicalFlowFilterExcludedTagIdsKey,
-            userPreferenceService);
+            serviceBroker);
     };
 
     vm.onTagsChange = () => {
@@ -231,7 +231,7 @@ function controller($q, $scope, userPreferenceService, serviceBroker) {
             vm.tags,
             vm.filterOptions.selectedTags,
             groupLogicalFlowFilterExcludedTagIdsKey,
-            userPreferenceService);
+            serviceBroker);
     };
 
     vm.refocusApp = app => {
@@ -253,7 +253,6 @@ function controller($q, $scope, userPreferenceService, serviceBroker) {
 controller.$inject = [
     "$q",
     "$scope",
-    "UserPreferenceService",
     "ServiceBroker"
 ];
 
@@ -265,7 +264,7 @@ const component = {
 };
 
 
-const id = "waltzDataTypeFlowSection"
+const id = "waltzDataTypeFlowSection";
 
 export default {
     component,
