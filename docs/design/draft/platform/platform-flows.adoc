@@ -66,7 +66,6 @@ digraph B {
 
 This is the way that flows are currently expressed in Waltz.
 We do expect each part of the flow to be documented can only see multi-hop flows via other mechanisms such as flow diagrams or by extracting the raw topology information into tools like Solidatus.
-footnote:[link to Solidatus, TBC]
 
 .Platforms using existing model
 [graphviz, direct, svg]
@@ -99,7 +98,7 @@ In Waltz this is mitigated by using flow diagrams to explicitly depict multi-hop
 |===
 
 ==== Attestation
-In the current model we view the consuming application as being the owner of the flow.
+In the current model we view the **consuming application as the owner of the flow**.
 The reasoning behind this is based on a simple belief that the consumer is more likely to be aware of the flow than the producer.
 
 For simple app-to-app flows systems this model works well and attestation is straightforward; the consumer should attest all inbound flows.
@@ -111,19 +110,18 @@ This is depicted in the figure below (App C must attest to the accuracy of the f
 digraph B {
     A[label="App A", color="green"];
     B[label="App B", color="green"];
-    C[label="App C"];
+    C[label="App C", color="blue"];
     D[label="App C"];
 
-    A->C[color=green];
-    B->C[color=green];
-    C->D;
+    A->C[color=blue];
+    B->C[color=blue];
+    C->D[color=balck];
 }
 ----
 
-However, when we have aggregation/distribution platforms the attestation burden falls upon the platform.
+However, when we have aggregation/distribution platforms the **attestation burden falls upon the platform**.
 Often the platform owners are not in a position to be able to accurately perform the required attestation, especially in mulit-tenancy situations.
 
-This is depicted in the following figure, the green flows show a large volume of inbound flows to the platform which may have little knowledge of their contents.
 
 .Direct attestation for platforms
 [graphviz, direct-att-complex, svg]
@@ -131,6 +129,48 @@ This is depicted in the following figure, the green flows show a large volume of
 digraph B {
 
     plat[label="Platform\n???", color="orange"];
+    app1[label="App1", color="green"];
+    app2[label="App2", color="green"];
+    app3[label="App3", color="green"];
+    app4[label="App4", color="green"];
+    app5[label="App5", color="green"];
+    appN[label="...", color="green"];
+    app6[label="App6"];
+    app7[label="App7"];
+    app8[label="App8"];
+    app9[label="App9"];
+    appNN[label="..."];
+
+    app1 -> plat [color="orange"];
+    app2 -> plat [color="orange"];
+    app3 -> plat [color="orange"];
+    app4 -> plat [color="orange"];
+    app5 -> plat [color="orange"];
+    appN -> plat [style="dashed"; color="orange"];
+    plat -> app6 [color="grey"];
+    plat -> app7 [color="grey"];
+    plat -> app8 [color="grey"];
+    plat -> app9 [color="grey"];
+    plat -> appNN [style="dashed"; color="grey"];
+}
+----
+
+This is depicted in the following figure, the green flows show a large volume of inbound flows to the platform which may have little knowledge of their content and/or accuracy.
+
+===== Attestation Enhancements
+
+To overcome this situation we could:
+
+**_Option 1:_ Exempt platform _applications_** from flow attestations.
+This could be achieved via a simple flag, assessment or membership of a group.
+To ensure the flows are attested, the obligation to attest would move to the providers of data to a platform.
+
+.Exempting platforms
+[graphviz, direct-att-complex-option-1, svg]
+----
+digraph B {
+
+    plat[label="Platform\n:)", color="orange"];
     app1[label="App1", color="green"];
     app2[label="App2", color="green"];
     app3[label="App3", color="green"];
@@ -156,6 +196,38 @@ digraph B {
     plat -> appNN [style="dashed"; color="grey"];
 }
 ----
+
+
+[CAUTION]
+====
+We would need to consider what happens when/if platforms exchange data.
+If they are exempt who has the attestation obligation ?
+
+.Platform to platform flows, who attests ?
+[graphviz, direct-att-complex-edge-case, svg]
+----
+digraph B {
+
+    plat1[label="Platform 1", color="orange"];
+    plat2[label="Platform 2", color="orange"];
+    app1[label="App1", color="green"];
+    app2[label="App2", color="green"];
+
+    app1 -> plat1 [color="green"];
+    plat1 -> plat2 [color="red"];
+    plat2 -> app2 [color="green"];
+
+    {rank = same; app1; app2; plat1; plat2}
+}
+----
+====
+
+**_Option 2:_ Declate attestation obligations on a per flow basis**, this would be at the physical flow and/or logical flow level.
+These obligations will inform the ui who is responsible for each attestation.
+
+Whilst the second option will give more accurate results and handles more situations, we believe the development effort and associated runtime attestation effort will outstrip this gain.
+
+
 
 
 <<<
