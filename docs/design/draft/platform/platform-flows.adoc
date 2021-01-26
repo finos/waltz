@@ -1,37 +1,33 @@
-= Approaches to representing Platform Flows
+= Approaches to Platform Flows
 David Watkins<david.watkins@db.com>;
 Mark Guerriero<mark.guerriero@db.com>;
 :toc:
 
 == Overview
 
-Challenges today around representing flows to platforms
-
 * Lineage
-* Accountability
-** Ownership record
-** Attestation
+* Ownership
+** Accountability / Attestation
 * ...
 
 
-== Representing Platforms
-
-This documen
+== Types of Platforms
 
 * _Infrastructure_ platforms, hold or forward the data to the recipient without altering the data content.
 * _Enrichment_ platforms, which may blend data from several sources before it reaches the recipients
-* _Dual_ platforms which can operate as both infrastructure and enrichment platforms (e.g. CCO)
+* _Multitenancy_ platforms
 
+<<<
 
 == Overview of current model
 
-The diagram below shows the current model used by Waltz to represent flows.
+The diagram below shows a simplified version of the model used by Waltz to represent flows.
 
-We can see that a _logical flow_ connects two endpoints which are typically applications.
-Logical flows can be decorated with _data types_ (not shown).
+_Logical flows_ connect two endpoints, which are typically applications.
+The logical flows can be decorated with _data types_ (not shown).
 
 Each logical flow may have _physical flows_ associated with it.
-Physical flows have _physical specifications_, these describe the content of the data.
+Each physical flows has a _physical specification_ which describes the content of the data.
 Physical specifications can be reused across physical flows.
 
 
@@ -64,7 +60,6 @@ digraph B {
 <<<
 
 
-
 == Flow representation
 
 === Direct routing
@@ -95,15 +90,73 @@ digraph B {
 |Pros |Cons
 
 | Closely resembles actual topology
-| Lineage is harder, cannot represent the intended recipient of the flow from App1 is App2.
-This can be mitigated using flow diagrams to explicitly depict multi-hop lineage
+| Lineage is hard, cannot represent that the intended recipient of the flow from App1 is App2.
+In Waltz this is mitigated by using flow diagrams to explicitly depict multi-hop lineage.
 
 | Conceptually simple
 | -
 
-| -
-| -
 |===
+
+==== Attestation
+In the current model we view the consuming application as being the owner of the flow.
+The reasoning behind this is based on a simple belief that the consumer is more likely to be aware of the flow than the producer.
+
+For simple app-to-app flows systems this model works well and attestation is straightforward; the consumer should attest all inbound flows.
+This is depicted in the figure below (App C must attest to the accuracy of the flows from A and B).
+
+.Example of attestation scope for simple apps
+[graphviz, direct-att-simple, svg]
+----
+digraph B {
+    A[label="App A", color="green"];
+    B[label="App B", color="green"];
+    C[label="App C"];
+    D[label="App C"];
+
+    A->C[color=green];
+    B->C[color=green];
+    C->D;
+}
+----
+
+However, when we have aggregation/distribution platforms the attestation burden falls upon the platform.
+Often the platform owners are not in a position to be able to accurately perform the required attestation, especially in mulit-tenancy situations.
+
+This is depicted in the following figure, the green flows show a large volume of inbound flows to the platform which may have little knowledge of their contents.
+
+.Direct attestation for platforms
+[graphviz, direct-att-complex, svg]
+----
+digraph B {
+
+    plat[label="Platform\n???", color="orange"];
+    app1[label="App1", color="green"];
+    app2[label="App2", color="green"];
+    app3[label="App3", color="green"];
+    app4[label="App4", color="green"];
+    app5[label="App5", color="green"];
+    appN[label="...", color="green"];
+    app6[label="App6"];
+    app7[label="App7"];
+    app8[label="App8"];
+    app9[label="App9"];
+    appNN[label="..."];
+
+    app1 -> plat [color="green"];
+    app2 -> plat [color="green"];
+    app3 -> plat [color="green"];
+    app4 -> plat [color="green"];
+    app5 -> plat [color="green"];
+    appN -> plat [style="dashed"; color="green"];
+    plat -> app6 [color="grey"];
+    plat -> app7 [color="grey"];
+    plat -> app8 [color="grey"];
+    plat -> app9 [color="grey"];
+    plat -> appNN [style="dashed"; color="grey"];
+}
+----
+
 
 <<<
 
@@ -151,8 +204,6 @@ If App1 does not know, or particularly care about, App2 (or vice versa)
 | Intuitive understanding
 | -
 
-| -
-| -
 |===
 
 <<<
@@ -203,8 +254,19 @@ If App1 does not know, or particularly care about, App2 (or vice versa)
 | -
 |===
 
+<<<
+
+=== Layers
+
+This approach proposes additional layers of flows.  We currently have
+
+* logical
+* physical
 
 
+
+
+<<<
 
 
 == Appendix: Waltz terminology
