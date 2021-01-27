@@ -24,7 +24,8 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
-    assessments: "<"
+    assessments: "<",
+    parentEntityRef: "<"
 };
 
 
@@ -34,8 +35,8 @@ const initialState = {
 };
 
 
-function getFavouriteAssessmentDefnIds(preferences, defaultList = []) {
-    const favouritesString = _.find(preferences, d => d.key === favouriteAssessmentDefinitionIdsKey, null);
+function getFavouriteAssessmentDefnIds(key, preferences, defaultList = []) {
+    const favouritesString = _.find(preferences, d => d.key === key, null);
     return _.isNull(favouritesString) || _.isEmpty(favouritesString)
         ? defaultList
         : _
@@ -78,9 +79,11 @@ function controller(serviceBroker) {
             .map(r => r.definition.id)
             .value();
 
+        const favouritesKey = favouriteAssessmentDefinitionIdsKey + _.camelCase(vm.parentEntityRef.kind);
+
         serviceBroker
             .loadAppData(CORE_API.UserPreferenceStore.findAllForUser, [], {force: true})
-            .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(r.data, vm.defaultPrimaryList))
+            .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(favouritesKey, r.data, vm.defaultPrimaryList))
             .then(() => filterAssessments());
     };
 }

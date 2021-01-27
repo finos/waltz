@@ -26,6 +26,7 @@ import {displayError} from "../../../common/error-utils";
 
 const bindings = {
     assessments: "<",
+    parentEntityRef: "<",
     onSelect: "<",
 };
 
@@ -37,8 +38,8 @@ const initialState = {
 };
 
 
-function getFavouriteAssessmentDefnIds(preferences, defaultList = []) {
-    const favouritesString = _.find(preferences, d => d.key === favouriteAssessmentDefinitionIdsKey, null);
+function getFavouriteAssessmentDefnIds(key, preferences, defaultList = []) {
+    const favouritesString = _.find(preferences, d => d.key === key, null);
     return _.isNull(favouritesString) || _.isEmpty(favouritesString)
         ? defaultList
         : _
@@ -77,9 +78,11 @@ function controller(serviceBroker, notification) {
             .map(r => r.definition.id)
             .value();
 
+        vm.favouritesKey = favouriteAssessmentDefinitionIdsKey + _.camelCase(vm.parentEntityRef.kind);
+
         serviceBroker
             .loadAppData(CORE_API.UserPreferenceStore.findAllForUser,[],  {force: true})
-            .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(r.data, vm.defaultPrimaryList))
+            .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(vm.favouritesKey, r.data, vm.defaultPrimaryList))
             .then(() => partitionAssessments());
     };
 
@@ -95,8 +98,8 @@ function controller(serviceBroker, notification) {
 
         serviceBroker
             .execute(CORE_API.UserPreferenceStore.saveForUser,
-                [{key: favouriteAssessmentDefinitionIdsKey, value: newFavouritesList.toString()}])
-            .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(r.data, vm.defaultPrimaryList))
+                [{key: vm.favouritesKey, value: newFavouritesList.toString()}])
+            .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(vm.favouritesKey, r.data, vm.defaultPrimaryList))
             .then(() => partitionAssessments())
             .then(() => notification.info(message))
             .catch(e => displayError(notification, "Could not modify favourite assessment list", e))
