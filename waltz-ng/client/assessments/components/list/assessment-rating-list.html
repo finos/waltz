@@ -40,15 +40,15 @@
                 <colgroup>
                     <col width="5%">
                     <col width="40%">
-                    <col width="60%">
+                    <col width="50%">
                     <col width="5%">
                 </colgroup>
-                <tbody ng-if="$ctrl.assessmentsWithRatings.length > 0"
-                       ng-include="'warl-list-with-ratings'">
+                <tbody ng-if="$ctrl.assessmentsList.length > 0"
+                       ng-include="'warl-ratings-list'">
                 </tbody>
             </table>
             <table class="waltz-field-table waltz-field-table-border"
-                   ng-if="$ctrl.assessmentsWithoutRatings.length > 0"
+                   ng-if="$ctrl.assessmentsNotProvided.length > 0"
                    style="width: 100%">
                 <colgroup>
                     <col width="5%">
@@ -56,7 +56,7 @@
                     <col width="55%">
                 </colgroup>
                 <tbody style="border-top: 1px solid #eee;"
-                       ng-include="'warl-list-without-ratings'">
+                       ng-include="'warl-not-provided-ratings-summary'">
                 </tbody>
             </table>
 
@@ -67,17 +67,23 @@
 
 <!-- WITHOUT RATINGS -->
 <script type="text/ng-template"
-        id="warl-list-without-ratings">
+        id="warl-not-provided-ratings-summary">
     <tr style="vertical-align: top">
         <td></td>
         <td>
-            <span class="wft-label">
+            <a class="clickable"
+               ng-click="$ctrl.toggleExpandNotProvided()"
+               uib-popover="Click to expand assessments with no rating provided"
+               popover-append-to-body="true"
+               popover-popup-delay="300"
+               popover-placement="right"
+               popover-trigger="mouseenter">
                 Not Provided
-            </span>
+            </a>
         </td>
         <td>
             <ul class="text-muted list-inline">
-                <li ng-repeat="item in $ctrl.assessmentsWithoutRatings">
+                <li ng-repeat="item in $ctrl.assessmentsNotProvided">
                     <span ng-if="item.definition.isReadOnly">
                         <waltz-icon name="lock"></waltz-icon>
                         <span ng-include="'warl-definition-name'"></span>
@@ -97,12 +103,17 @@
 
 <!-- WITH RATINGS -->
 <script type="text/ng-template"
-        id="warl-list-with-ratings">
-    <tr ng-repeat="item in $ctrl.assessmentsWithRatings"
+        id="warl-ratings-list">
+    <tr ng-repeat="item in $ctrl.assessmentsList"
         ng-click="$ctrl.onSelect(item)"
         class="clickable">
         <td>
-            <a class="clickable">
+            <a class="clickable"
+               uib-popover="Click to add or remove an assessment from your favourites. These appear in the overview at the top of the page."
+               popover-append-to-body="true"
+               popover-popup-delay="300"
+               popover-placement="right"
+               popover-trigger="mouseenter">
                 <waltz-icon name="star"
                             size="lg"
                             ng-if="item.isFavourite"
@@ -116,14 +127,20 @@
             </a>
         </td>
         <!-- definition name -->
-        <td class="">
-            <span ng-include="'warl-definition-name'"></span>
+        <td class="wft-label">
+            <span ng-include="'warl-definition-name'">
+            </span>
         </td>
         <!-- rating -->
         <td>
-            <a class="clickable">
+            <a class="clickable"
+               ng-if="item.rating">
                 <span ng-include="'warl-rating-name'"></span>
             </a>
+            <span ng-if="!item.rating"
+                  class="text-muted italics">
+                Not Provided
+            </span>
         </td>
         <td class="pull-right">
             <waltz-icon name="lock"
@@ -131,6 +148,21 @@
                         ng-if="item.definition.isReadOnly">
             </waltz-icon>
         </td>
+    </tr>
+    <tr ng-if="$ctrl.expandNotProvided">
+        <td></td>
+        <td>
+            <a class="clickable"
+               ng-click="$ctrl.toggleExpandNotProvided()"
+               uib-popover="Click to collapse assessments with no rating provided"
+               popover-append-to-body="true"
+               popover-popup-delay="300"
+               popover-placement="right"
+               popover-trigger="mouseenter">
+                Collapse Not Provided
+            </a>
+        </td>
+        <td></td>
     </tr>
 </script>
 
@@ -166,9 +198,7 @@
           popover-popup-delay="300"
           popover-class="waltz-popover-width-400"
           popover-append-to-body="true">
-        <span style="align-content: baseline;"
-              ng-bind="item.definition.name">
-        </span>
+        <span ng-bind="item.definition.name"></span>
     </span>
 </script>
 

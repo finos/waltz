@@ -24,7 +24,8 @@
                 </waltz-assessment-rating-favourites-list>
             </div>
         </div>
-        <div class="waltz-sub-section-controls">
+        <div class="waltz-sub-section-controls"
+             ng-if="$ctrl.assessments.length > 0">
             <a class="clickable pull-right"
                ng-if="!$ctrl.useExternalEditorPage"
                waltz-jump-to="assessment-rating-section">

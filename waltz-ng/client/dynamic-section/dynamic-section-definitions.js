@@ -397,7 +397,6 @@ function pack(section, children = []) {
 
 export const dynamicSectionsByKind = {
     "APPLICATION": [
-        appCostsSection,
         assessmentRatingSection,
         bookmarksSection,
         changeInitiativeSection,

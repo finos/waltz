@@ -31,8 +31,9 @@ const bindings = {
 
 
 const initialState = {
-    assessmentsWithRatings: [],
-    assessmentsWithoutRatings: [],
+    assessmentsList: [],
+    assessmentsNotProvided: [],
+    expandNotProvided: false
 };
 
 
@@ -54,19 +55,17 @@ function controller(serviceBroker, notification) {
         return _.includes(vm.favouriteAssessmentDefnIds, id);
     }
 
-    const filterAssessments = () => {
+    const partitionAssessments = () => {
         if (vm.assessments) {
 
-            const filtered = _.chain(vm.assessments)
+            const valuePartitioned = _
+                .chain(vm.assessments)
                 .map(a => Object.assign({}, a, { isFavourite: isFavourite(a.definition.id)}))
+                .partition(assessment => _.isNil(assessment.rating) && !vm.expandNotProvided)
                 .value();
 
-            const valuePartitioned = _.partition(
-                filtered,
-                assessment => _.isNil(assessment.rating));
-
-            vm.assessmentsWithoutRatings = _.sortBy(valuePartitioned[0], d => d.definition.name);
-            vm.assessmentsWithRatings = _.sortBy(valuePartitioned[1], d => d.definition.name);
+            vm.assessmentsNotProvided = _.sortBy(valuePartitioned[0], d => d.definition.name);
+            vm.assessmentsList = _.sortBy(valuePartitioned[1], d => d.definition.name);
         }
     };
 
@@ -81,7 +80,7 @@ function controller(serviceBroker, notification) {
         serviceBroker
             .loadAppData(CORE_API.UserPreferenceStore.findAllForUser,[],  {force: true})
             .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(r.data, vm.defaultPrimaryList))
-            .then(() => filterAssessments());
+            .then(() => partitionAssessments());
     };
 
     vm.toggleFavourite = (assessmentRatingId) => {
@@ -98,10 +97,15 @@ function controller(serviceBroker, notification) {
             .execute(CORE_API.UserPreferenceStore.saveForUser,
                 [{key: favouriteAssessmentDefinitionIdsKey, value: newFavouritesList.toString()}])
             .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(r.data, vm.defaultPrimaryList))
-            .then(() => filterAssessments())
+            .then(() => partitionAssessments())
             .then(() => notification.info(message))
             .catch(e => displayError(notification, "Could not modify favourite assessment list", e))
     };
+
+    vm.toggleExpandNotProvided = () => {
+        vm.expandNotProvided = !vm.expandNotProvided;
+        partitionAssessments();
+    }
 }
 
 
