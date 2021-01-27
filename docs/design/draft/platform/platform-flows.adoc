@@ -14,7 +14,7 @@ It looks at how flows are represented, how lineage can be achieved and how attes
 ** Obligation for attestation moves to providers of data to platforms
 * Invest in lineage interop with external tooling
 ** Enhance flow diagrams / waltz support for 'first pass' lineage
-* Altering flow representation (i.e. 'via' attributes will complicate solution for little incremental value)
+* Altering flow representation (e.g. 'via' attributes) will complicate solution for little incremental value
 
 <<<
 
