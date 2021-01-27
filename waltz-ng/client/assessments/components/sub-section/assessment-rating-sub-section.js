@@ -25,10 +25,12 @@ import {resolveResponses} from "../../../common/promise-utils";
 
 
 const bindings = {
-    parentEntityRef: "<",
+    parentEntityRef: "<"
 };
 
-const initialState = {};
+const initialState = {
+    useExternalEditorPage: false
+};
 
 
 function controller($q, notification, serviceBroker) {
@@ -72,6 +74,7 @@ function controller($q, notification, serviceBroker) {
 
     vm.$onInit = () => {
         loadAll();
+        vm.useExternalEditorPage = _.includes(['CHANGE_UNIT'], vm.parentEntityRef.kind);
     };
 
 

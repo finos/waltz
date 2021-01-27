@@ -335,7 +335,7 @@ const assessmentRatingSection = {
     componentId: "assessment-rating-section",
     name: "Assessment Ratings",
     icon: "puzzle-piece",
-    id: 190
+    id: 200
 };
 
 export const dynamicSections = {
@@ -354,6 +354,7 @@ export const dynamicSections = {
     dataFlowSection,
     dataTypeFlowSection,
     dataTypeOriginatorsSection,
+    entityCostsSection,
     entityDiagramsSection,
     entityNamedNotesSection,
     entityStatisticSection,
@@ -425,6 +426,7 @@ export const dynamicSectionsByKind = {
         changeLogSection
     ],
     "CHANGE_INITIATIVE": [
+        assessmentRatingSection,
         bookmarksSection,
         changeSetSection,
         entityNamedNotesSection,
@@ -533,6 +535,7 @@ export const dynamicSectionsByKind = {
         entityNamedNotesSection
     ],
     "PHYSICAL_FLOW": [
+        assessmentRatingSection,
         bookmarksSection,
         changeLogSection,
         entityDiagramsSection,

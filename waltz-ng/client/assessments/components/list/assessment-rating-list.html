@@ -27,6 +27,14 @@
                 </message>
             </waltz-no-data>
 
+            <waltz-no-data ng-if="$ctrl.assessments.length > 0 && $ctrl.assessmentsWithRatings.length === 0">
+                <message>
+                    <strong>
+                        There are no assessments with ratings
+                    </strong>
+                </message>
+            </waltz-no-data>
+
             <table class="waltz-field-table waltz-field-table-border table-hover"
                    style="width: 100%">
                 <colgroup>
@@ -108,7 +116,7 @@
             </a>
         </td>
         <!-- definition name -->
-        <td class="wft-label">
+        <td class="">
             <span ng-include="'warl-definition-name'"></span>
         </td>
         <!-- rating -->
@@ -158,7 +166,9 @@
           popover-popup-delay="300"
           popover-class="waltz-popover-width-400"
           popover-append-to-body="true">
-        <span ng-bind="item.definition.name"></span>
+        <span style="align-content: baseline;"
+              ng-bind="item.definition.name">
+        </span>
     </span>
 </script>
 
