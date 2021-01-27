@@ -62,7 +62,7 @@ public class CostEndpoint implements Endpoint {
         ListRoute<EntityCost> findByCostKindAndSelectorRoute = (request, response) -> {
             IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
             long costKindId = getId(request);
-            Integer limit = getLimit(request).orElse(10);
+            Integer limit = getLimit(request).orElse(15);
             EntityKind targetKind = getKind(request);
             return costService.findByCostKindAndSelector(costKindId, idSelectionOptions, targetKind, limit);
         };

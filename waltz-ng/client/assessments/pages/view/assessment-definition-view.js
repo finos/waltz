@@ -21,25 +21,39 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./assessment-definition-view.html";
 import {mkEntityLinkGridCell} from "../../../common/grid-utils";
+import {initialiseData} from "../../../common";
+
+
+const ratingCellTemplate = `
+    <div class="ui-grid-cell-contents">
+        <waltz-rating-indicator-cell rating="COL_FIELD"
+                                     show-name="true">
+        </waltz-rating-indicator-cell>
+    </div>`;
 
 
 const initialState = {
-    editor: "SINGLE",
-    canDelete: false,
-    currentOrgUnit: null
+    columnDefs: [
+        mkEntityLinkGridCell("Entity", "entityRef", "none", "right"),
+        {
+            field: "rating",
+            width: "30%",
+            name: "Assessment Rating",
+            cellTemplate: ratingCellTemplate,
+        },
+        {field: "comment", name: "Comment"}
+    ]
 };
 
+
 function controller($q,
-                    $state,
-                    $scope,
                     $stateParams,
-                    appStore,
-                    notification,
                     serviceBroker,
                     userService) {
 
     const {definitionId} = $stateParams;
-    const vm = Object.assign(this, initialState);
+    const vm = initialiseData(this, initialState);
+
     userService
         .whoami()
         .then(user => vm.user = user);
@@ -72,22 +86,11 @@ function controller($q,
     };
 
     loadAll();
-
-    vm.columnDefs = [
-        mkEntityLinkGridCell("Entity", "entityRef", "none", "right"),
-        {field: "rating.name", name: "Assessment Rating", width: "15%"},
-        {field: "comment", name: "Comment"}
-    ];
-
 }
 
 controller.$inject = [
     "$q",
-    "$state",
-    "$scope",
     "$stateParams",
-    "ApplicationStore",
-    "Notification",
     "ServiceBroker",
     "UserService"
 ];

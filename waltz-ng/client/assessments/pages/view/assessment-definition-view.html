@@ -25,7 +25,6 @@
                     <span ng-bind="ctrl.definition.name">
                     </span>
                 </li>
-                <li>View</li>
             </ol>
         </breadcrumbs>
     </waltz-page-header>
@@ -34,14 +33,17 @@
                                           rating-scheme-items="ctrl.ratingSchemeItems">
     </waltz-assessment-definition-overview>
 
-    <waltz-section icon="desktop" name="Assessment Ratings">
+    <br>
+
+    <waltz-section icon="desktop"
+                   name="Assessment Ratings">
         <div class="row">
             <div class="col-md-12">
                 <waltz-section-actions>
                     <button waltz-has-role="{{ctrl.definition.permittedRole}}"
                             class="btn btn-xs btn-primary"
                             ui-sref="main.assessment-definition.edit ({definitionId: ctrl.definition.id})">
-                        Edit
+                        Bulk Edit
                     </button>
                     <waltz-data-extract-link name="Export"
                                              styling="button"
