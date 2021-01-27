@@ -105,7 +105,7 @@ digraph B {
     A[label="App A", color="green"];
     B[label="App B", color="green"];
     C[label="App C", color="blue"];
-    D[label="App C"];
+    D[label="App D"];
 
     A->C[color=blue];
     B->C[color=blue];
