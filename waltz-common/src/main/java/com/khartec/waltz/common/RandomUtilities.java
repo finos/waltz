@@ -86,6 +86,27 @@ public class RandomUtilities {
     }
 
 
+    public static <T> List<T> randomPickSome(Collection<? extends T> choices,
+                                             double proportion) {
+
+        if (isEmpty(choices) || proportion <= 0) {
+            return Collections.emptyList();
+        }
+
+        List<T> shuffled = new ArrayList<>(choices);
+        Collections.shuffle(shuffled);
+
+        if (proportion >= 1) {
+            return shuffled;
+        }
+
+        return shuffled
+                .stream()
+                .limit((int) (shuffled.size() * proportion))
+                .collect(Collectors.toList());
+    }
+
+
     @SafeVarargs
     public static <T> T randomPick(T... ts) {
         Checks.checkNotEmpty(ts, "Cannot take random pick from an empty array");

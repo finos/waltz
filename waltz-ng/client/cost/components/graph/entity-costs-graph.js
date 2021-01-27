@@ -55,8 +55,7 @@ const dimensions = {
         left: 150,
         right: 50,
         bottom: 10
-    },
-    circleSize: 24
+    }
 };
 
 
@@ -97,7 +96,7 @@ function draw(chartBody,
     const yScale = scaleBand()
         .domain(_.map(costs, c => c.entityReference.id))
         .range([0, dimensions.graph.height - (dimensions.margin.top + dimensions.margin.bottom)])
-        .padding(0.2);
+        .padding(0.3);
 
     const colorScale = scaleLinear()
         .domain(totalExtent)
@@ -187,7 +186,7 @@ function controller($element, $scope, settingsService) {
             return;
         }
 
-        dimensions.graph.height = 100 + (vm.costs.length * 20);
+        dimensions.graph.height = 20 + (vm.costs.length * 20);
 
         svg.attr("viewBox", `0 0 ${dimensions.graph.width} ${dimensions.graph.height}`);
 
