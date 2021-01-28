@@ -28,6 +28,7 @@ const bindings = {
 
 const initialState = {
     appsSection: dynamicSections.appsSection,
+    assessmentRatingSection: dynamicSections.assessmentRatingSection,
     bookmarkSection: dynamicSections.bookmarksSection,
     changeLogSection: dynamicSections.changeLogSection,
     entityNamedNotesSection: dynamicSections.entityNamedNotesSection,

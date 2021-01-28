@@ -41,7 +41,8 @@ const initialState = {
     },
     bookmarksSection: dynamicSections.bookmarksSection,
     entityDiagramsSection: dynamicSections.entityDiagramsSection,
-    changeLogSection: dynamicSections.changeLogSection
+    changeLogSection: dynamicSections.changeLogSection,
+    assessmentRatingSection: dynamicSections.assessmentRatingSection
 };
 
 

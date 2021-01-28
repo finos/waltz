@@ -16,8 +16,8 @@
  *
  */
 
-import { initialiseData } from "../../../common";
-import { dynamicSections } from "../../../dynamic-section/dynamic-section-definitions";
+import {initialiseData} from "../../../common";
+import {dynamicSections} from "../../../dynamic-section/dynamic-section-definitions";
 
 import template from "./change-set-view.html";
 
@@ -27,6 +27,7 @@ const bindings = {
 
 
 const initialState = {
+    assessmentRatingSection: dynamicSections.assessmentRatingSection,
     bookmarkSection: dynamicSections.bookmarksSection,
     changeLogSection: dynamicSections.changeLogSection,
     involvedPeopleSection: dynamicSections.involvedPeopleSection,
