@@ -425,6 +425,7 @@ export const dynamicSectionsByKind = {
         changeLogSection
     ],
     "CHANGE_INITIATIVE": [
+        assessmentRatingSection,
         bookmarksSection,
         changeSetSection,
         entityNamedNotesSection,
@@ -533,6 +534,7 @@ export const dynamicSectionsByKind = {
         entityNamedNotesSection
     ],
     "PHYSICAL_FLOW": [
+        assessmentRatingSection,
         bookmarksSection,
         changeLogSection,
         entityDiagramsSection,

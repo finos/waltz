@@ -39,6 +39,7 @@ const addToHistory = (historyStore, licence) => {
 
 const initialState = {
     appsSection: dynamicSections.appsSection,
+    assessmentRatingSection: dynamicSections.assessmentRatingSection,
     bookmarkSection: dynamicSections.bookmarksSection,
     changeLogSection: dynamicSections.changeLogSection,
     entityNamedNotesSection: dynamicSections.entityNamedNotesSection,

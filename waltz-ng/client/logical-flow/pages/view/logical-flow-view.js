@@ -26,6 +26,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 
 const initialState = {
     logicalFlow: null,
+    assessmentRatingSection: dynamicSections.assessmentRatingSection,
     bookmarksSection: dynamicSections.bookmarksSection,
     changeLogSection: dynamicSections.changeLogSection,
     entityNamedNotesSection: dynamicSections.entityNamedNotesSection,
