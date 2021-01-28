@@ -34,12 +34,13 @@ const bindings = {
 const initialState = {
     assessmentsList: [],
     assessmentsNotProvided: [],
-    expandNotProvided: false
+    expandNotProvided: false,
+    favouritesKey: null,
 };
 
 
-function getFavouriteAssessmentDefnIds(entityRef, preferences, defaultList = []) {
-    const favouritesString = _.find(preferences, d => d.key === mkAssessmentDefinitionsIdsKey(entityRef), null);
+function getFavouriteAssessmentDefnIds(key, preferences, defaultList = []) {
+    const favouritesString = _.find(preferences, d => d.key === key, null);
     return _.isNull(favouritesString) || _.isEmpty(favouritesString)
         ? defaultList
         : _
@@ -70,8 +71,11 @@ function controller(serviceBroker, notification) {
         }
     };
 
-    vm.$onChanges = () => {
+    vm.$onInit = () => {
+        vm.favouritesKey = mkAssessmentDefinitionsIdsKey(vm.parentEntityRef);
+    };
 
+    vm.$onChanges = () => {
         vm.defaultPrimaryList = _
             .chain(vm.assessments)
             .filter(a => a.definition.visibility === "PRIMARY")
@@ -80,7 +84,7 @@ function controller(serviceBroker, notification) {
 
         serviceBroker
             .loadAppData(CORE_API.UserPreferenceStore.findAllForUser,[],  {force: true})
-            .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(vm.parentEntityRef, r.data, vm.defaultPrimaryList))
+            .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(vm.favouritesKey, r.data, vm.defaultPrimaryList))
             .then(() => partitionAssessments());
     };
 
@@ -96,8 +100,8 @@ function controller(serviceBroker, notification) {
 
         serviceBroker
             .execute(CORE_API.UserPreferenceStore.saveForUser,
-                [{key:  mkAssessmentDefinitionsIdsKey(vm.parentEntityRef), value: newFavouritesList.toString()}])
-            .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(vm.parentEntityRef, r.data, vm.defaultPrimaryList))
+                [{key:  vm.favouritesKey, value: newFavouritesList.toString()}])
+            .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(vm.favouritesKey, r.data, vm.defaultPrimaryList))
             .then(() => partitionAssessments())
             .then(() => notification.info(message))
             .catch(e => displayError(notification, "Could not modify favourite assessment list", e))

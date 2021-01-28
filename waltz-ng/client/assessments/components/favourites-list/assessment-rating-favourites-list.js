@@ -35,8 +35,8 @@ const initialState = {
 };
 
 
-function getFavouriteAssessmentDefnIds(entityReference, preferences, defaultList = []) {
-    const favouritesString = _.find(preferences, d => d.key === mkAssessmentDefinitionsIdsKey(entityReference), null);
+function getFavouriteAssessmentDefnIds(key, preferences, defaultList = []) {
+    const favouritesString = _.find(preferences, d => d.key === key, null);
     return _.isNull(favouritesString) || _.isEmpty(favouritesString)
         ? defaultList
         : _
@@ -82,7 +82,7 @@ function controller(serviceBroker) {
         serviceBroker
             .loadAppData(CORE_API.UserPreferenceStore.findAllForUser, [], {force: true})
             .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(
-                vm.parentEntityRef,
+                mkAssessmentDefinitionsIdsKey(vm.parentEntityRef),
                 r.data,
                 vm.defaultPrimaryList))
             .then(() => filterAssessments());
