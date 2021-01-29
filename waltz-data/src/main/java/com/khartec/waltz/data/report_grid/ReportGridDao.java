@@ -19,6 +19,7 @@
 package com.khartec.waltz.data.report_grid;
 
 
+import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.report_grid.*;
@@ -45,6 +46,8 @@ import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
 import static java.util.Collections.emptySet;
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
@@ -238,11 +241,11 @@ public class ReportGridDao {
         if (requiredInvolvementKinds.size() == 0) {
             return emptySet();
         } else {
-            return dsl
+            return SetUtilities.fromCollection(dsl
                     .select(
-                        inv.ENTITY_ID,
-                        inv.KIND_ID,
-                        p.EMAIL)
+                            inv.ENTITY_ID,
+                            inv.KIND_ID,
+                            p.EMAIL)
                     .from(inv)
                     .innerJoin(p).on(p.EMPLOYEE_ID.eq(inv.EMPLOYEE_ID))
                     .where(inv.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
@@ -255,7 +258,17 @@ public class ReportGridDao {
                             .columnEntityId(r.get(inv.KIND_ID))
                             .columnEntityKind(EntityKind.INVOLVEMENT_KIND)
                             .text(r.get(p.EMAIL))
-                            .build());
+                            .build())
+                    // we now convert to a map so we can merge text values of cells with the same coordinates (appId, entId)
+                    .stream()
+                    .collect(toMap(
+                            c -> tuple(c.applicationId(), c.columnEntityId()),
+                            identity(),
+                            (a, b) -> ImmutableReportGridCell
+                                    .copyOf(a)
+                                    .withText(a.text() + "; " + b.text())))
+                    // and then we simply return the values of that temporary map.
+                    .values());
         }
     }
 
