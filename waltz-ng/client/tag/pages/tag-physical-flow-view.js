@@ -19,11 +19,11 @@
 import template from "./tag-physical-flow-view.html";
 import {initialiseData} from "../../common";
 import {CORE_API} from "../../common/services/core-api-utils";
-import {columnDef} from "../../physical-flow/physical-flow-table-utilities";
 import {dynamicSections} from "../../dynamic-section/dynamic-section-definitions";
 
 const initialState = {
     bookmarksSection: dynamicSections.bookmarksSection,
+    physicalFlowSection: dynamicSections.physicalFlowSection
 };
 
 function controller($stateParams, serviceBroker) {
@@ -38,16 +38,6 @@ function controller($stateParams, serviceBroker) {
                 CORE_API.TagStore.getTagById,
                 [id])
             .then(r => vm.tag = r.data);
-
-        vm.physicalFlowColumnDefs = [
-            columnDef.name,
-            columnDef.source,
-            columnDef.target,
-            columnDef.extId,
-            columnDef.observation,
-            columnDef.frequency,
-            columnDef.description
-        ];
     };
 }
 

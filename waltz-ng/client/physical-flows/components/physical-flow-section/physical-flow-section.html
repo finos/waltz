@@ -15,6 +15,10 @@
   ~ See the License for the specific
   ~
   -->
-
-<waltz-physical-flow-table parent-entity-ref="$ctrl.parentEntityRef">
+<p>This
+    <span ng-bind="$ctrl.parentEntityRef.kind | toDisplayName: 'entity'"></span>
+    is associated to the following physical flows:
+</p>
+<waltz-physical-flow-table parent-entity-ref="$ctrl.parentEntityRef"
+                           optional-column-defs="$ctrl.columnDefs">
 </waltz-physical-flow-table>

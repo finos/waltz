@@ -19,7 +19,6 @@
 import _ from "lodash";
 
 import {initialiseData} from "../common";
-import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 
 import template from "./physical-specification-view.html";
 
@@ -39,10 +38,6 @@ const initialState = {
     specDefinitionCreate: {
         creating: false
     },
-    bookmarksSection: dynamicSections.bookmarksSection,
-    entityDiagramsSection: dynamicSections.entityDiagramsSection,
-    changeLogSection: dynamicSections.changeLogSection,
-    assessmentRatingSection: dynamicSections.assessmentRatingSection
 };
 
 
@@ -80,6 +75,7 @@ function loadFlowDiagrams(specId, $q, flowDiagramStore, flowDiagramEntityStore) 
 
 function controller($q,
                     $stateParams,
+                    dynamicSectionManager,
                     applicationStore,
                     flowDiagramStore,
                     flowDiagramEntityStore,
@@ -97,43 +93,52 @@ function controller($q,
         id: specId
     };
 
-    vm.entityReference = ref;
+    vm.$onInit = () => {
 
-    // -- LOAD ---
+        dynamicSectionManager.initialise("PHYSICAL_SPECIFICATION");
 
-    physicalSpecificationStore
-        .getById(specId)
-        .then(spec => vm.specification = spec)
-        .then(spec => applicationStore.getById(spec.owningEntity.id))
-        .then(app => vm.owningEntity = app)
-        .then(app => orgUnitStore.getById(app.organisationalUnitId))
-        .then(ou => vm.organisationalUnit = ou)
-        .then(() => vm.entityReference = Object.assign({}, vm.entityReference, { name: vm.specification.name }))
-        .then(() => addToHistory(historyStore, vm.specification));
+        vm.entityReference = ref;
 
-    physicalFlowStore
-        .findBySpecificationId(specId)
-        .then(physicalFlows => vm.physicalFlows = physicalFlows);
+        // -- LOAD ---
+        physicalSpecificationStore
+            .getById(specId)
+            .then(spec => vm.specification = spec)
+            .then(spec => applicationStore.getById(spec.owningEntity.id))
+            .then(app => vm.owningEntity = app)
+            .then(app => orgUnitStore.getById(app.organisationalUnitId))
+            .then(ou => vm.organisationalUnit = ou)
+            .then(() => vm.entityReference = Object.assign({}, vm.entityReference, { name: vm.specification.name }))
+            .then(() => addToHistory(historyStore, vm.specification));
 
-    logicalFlowStore
-        .findBySelector({ entityReference: ref, scope: "EXACT"})
-        .then(logicalFlows => {
-            vm.logicalFlows = logicalFlows;
-            vm.logicalFlowsById = _.keyBy(logicalFlows, "id")
-        });
+        physicalFlowStore
+            .findBySpecificationId(specId)
+            .then(physicalFlows => vm.physicalFlows = physicalFlows);
 
-    vm.loadFlowDiagrams = () => {
-        loadFlowDiagrams(specId, $q, flowDiagramStore, flowDiagramEntityStore)
-            .then(r => Object.assign(vm, r));
+        logicalFlowStore
+            .findBySelector({ entityReference: ref, scope: "EXACT"})
+            .then(logicalFlows => {
+                vm.logicalFlows = logicalFlows;
+                vm.logicalFlowsById = _.keyBy(logicalFlows, "id")
+            });
+
+        vm.loadFlowDiagrams();
     };
 
-    vm.loadFlowDiagrams();
+    vm.loadFlowDiagrams = () => {
+        loadFlowDiagrams(
+            vm.entityReference.id,
+            $q,
+            flowDiagramStore,
+            flowDiagramEntityStore)
+            .then(r => Object.assign(vm, r));
+    };
 }
 
 
 controller.$inject = [
     "$q",
     "$stateParams",
+    "DynamicSectionManager",
     "ApplicationStore",
     "FlowDiagramStore",
     "FlowDiagramEntityStore",

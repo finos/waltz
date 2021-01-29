@@ -352,6 +352,13 @@ const changeUnitSection = {
     id: 220
 };
 
+const specificationDefinitionSection = {
+    componentId: "physical-spec-definition-section",
+    name: "Specification Definitions",
+    icon: "file-code-o",
+    id: 230
+};
+
 export const dynamicSections = {
     appCostsSection,
     appCostsSummarySection,
@@ -398,6 +405,7 @@ export const dynamicSections = {
     relatedPhysicalFieldSection,
     softwarePackagesSection,
     softwarePackageVersions,
+    specificationDefinitionSection,
     surveySection,
     technologySection,
     technologySummarySection
@@ -591,5 +599,13 @@ export const dynamicSectionsByKind = {
         entityStatisticSection,
         licenceSection,
         softwarePackageVersions
+    ],
+    "PHYSICAL_SPECIFICATION": [
+        assessmentRatingSection,
+        bookmarksSection,
+        changeLogSection,
+        entityDiagramsSection,
+        physicalFlowSection,
+        specificationDefinitionSection
     ]
 };

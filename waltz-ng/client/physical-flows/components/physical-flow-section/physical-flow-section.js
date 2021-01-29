@@ -17,15 +17,55 @@
  */
 
 import template from "./physical-flow-section.html";
+import {initialiseData} from "../../../common";
+import {columnDef} from "../../../physical-flow/physical-flow-table-utilities";
 
 
 const bindings = {
     parentEntityRef: "<",
 };
 
+const initialState = {
+    columnDefs: []
+};
+
+function determineColumnDefs(entityKind) {
+    switch (entityKind) {
+        case "PHYSICAL_SPECIFICATION":
+            return [
+                columnDef.extId,
+                columnDef.source,
+                columnDef.target,
+                columnDef.frequency,
+                columnDef.transport,
+                columnDef.description];
+        case "TAG":
+            return [
+                columnDef.name,
+                columnDef.source,
+                columnDef.target,
+                columnDef.extId,
+                columnDef.observation,
+                columnDef.frequency,
+                columnDef.description];
+        default:
+            return initialState.columnDefs;
+
+    }
+}
+
+function controller(){
+    const vm = initialiseData(this, initialState);
+
+    vm.$onInit = () => {
+        vm.columnDefs = determineColumnDefs(vm.parentEntityRef.kind);
+    }
+}
+
 
 const component = {
     template,
+    controller,
     bindings,
 };
 
