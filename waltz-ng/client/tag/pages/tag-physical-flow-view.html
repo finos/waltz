@@ -29,10 +29,13 @@
 
     <div class="row">
         <div class="col-md-12">
-            <waltz-physical-flow-section
-                    parent-entity-ref="ctrl.entityReference"
-                    optional-column-defs="ctrl.physicalFlowColumnDefs">
-            </waltz-physical-flow-section>
+            <waltz-section name="Physical Flows"
+                           icon="qrcode"
+                           id="physical-flow-tag-section">
+                <waltz-physical-flow-table parent-entity-ref="ctrl.entityReference"
+                                           optional-column-defs="ctrl.physicalFlowColumnDefs">
+                </waltz-physical-flow-table>
+            </waltz-section>
         </div>
     </div>
 

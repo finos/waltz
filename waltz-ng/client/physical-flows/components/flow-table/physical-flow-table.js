@@ -25,12 +25,13 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 
 const bindings = {
     parentEntityRef: "<",
-    optionalColumnDefs: "<"
+    optionalColumnDefs: "<?"
 };
 
 
 const initialState = {
-    tableData: []
+    tableData: [],
+    optionalColumnDefs: []
 };
 
 
@@ -48,11 +49,12 @@ function controller($q, serviceBroker) {
         columnDef.description
     ];
 
-    vm.columnDefs = vm.optionalColumnDefs == null
-        ? defaultColumnDefs
-        : vm.optionalColumnDefs;
-
     vm.$onInit = () => {
+
+        vm.columnDefs = _.isEmpty(vm.optionalColumnDefs)
+            ? defaultColumnDefs
+            : vm.optionalColumnDefs;
+
         vm.tableData = fetchData(vm.parentEntityRef, $q, serviceBroker)
             .then(data => vm.tableData = data);
 

@@ -73,37 +73,20 @@
         <waltz-no-data ng-if="!ctrl.logicalFlow">
             <message>No information for this logical flow</message>
         </waltz-no-data>
+        <br>
 
     </div>
     <div ng-if="ctrl.logicalFlow">
+        <!-- NAVIGATION -->
+        <div class="waltz-page-summary waltz-page-summary-attach">
+            <waltz-dynamic-section-navigation>
+            </waltz-dynamic-section-navigation>
+        </div>
+
         <br>
-        <!--Entity Named Notes-->
-        <waltz-dynamic-section-wrapper section="ctrl.entityNamedNotesSection"
-                                       parent-entity-ref="ctrl.entityReference">
-        </waltz-dynamic-section-wrapper>
 
+        <waltz-dynamic-sections-view parent-entity-ref="ctrl.entityReference">
+        </waltz-dynamic-sections-view>
 
-        <waltz-physical-flow-section parent-entity-ref="ctrl.entityReference">
-        </waltz-physical-flow-section>
-
-
-        <waltz-dynamic-section-wrapper section="ctrl.entityDiagramsSection"
-                                       parent-entity-ref="ctrl.entityReference">
-        </waltz-dynamic-section-wrapper>
-
-
-        <waltz-dynamic-section-wrapper section="ctrl.assessmentRatingSection"
-                                       parent-entity-ref="ctrl.entityReference">
-        </waltz-dynamic-section-wrapper>
-
-
-        <waltz-dynamic-section-wrapper section="ctrl.bookmarksSection"
-                                       parent-entity-ref="ctrl.entityReference">
-        </waltz-dynamic-section-wrapper>
-
-
-        <waltz-dynamic-section-wrapper section="ctrl.changeLogSection"
-                                       parent-entity-ref="ctrl.entityReference">
-        </waltz-dynamic-section-wrapper>
     </div>
 </div>

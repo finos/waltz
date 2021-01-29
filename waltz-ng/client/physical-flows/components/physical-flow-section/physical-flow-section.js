@@ -21,7 +21,6 @@ import template from "./physical-flow-section.html";
 
 const bindings = {
     parentEntityRef: "<",
-    optionalColumnDefs: "<"
 };
 
 

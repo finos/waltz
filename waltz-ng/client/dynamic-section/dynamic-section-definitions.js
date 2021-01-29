@@ -338,6 +338,20 @@ const assessmentRatingSection = {
     id: 200
 };
 
+const physicalFlowSection = {
+    componentId: "physical-flow-section",
+    name: "Physical Flows",
+    icon: "qrcode",
+    id: 210
+};
+
+const changeUnitSection = {
+    componentId: "change-unit-section",
+    name: "Change Units",
+    icon: "hourglass-2",
+    id: 220
+};
+
 export const dynamicSections = {
     appCostsSection,
     appCostsSummarySection,
@@ -350,6 +364,7 @@ export const dynamicSections = {
     changeInitiativeSection,
     changeLogSection,
     changeSetSection,
+    changeUnitSection,
     complexitySection,
     dataFlowSection,
     dataTypeFlowSection,
@@ -373,6 +388,7 @@ export const dynamicSections = {
     personChangeSetSection,
     personMeasurableInvolvementsSection,
     personHierarchySection,
+    physicalFlowSection,
     physicalFlowParticipantsSection,
     relatedAppGroupsSection,
     relatedAppsSection,
@@ -542,5 +558,38 @@ export const dynamicSectionsByKind = {
         flowSpecDefinitionSection,
         involvedPeopleSection,
         physicalFlowParticipantsSection
+    ],
+    "LOGICAL_DATA_FLOW": [
+        assessmentRatingSection,
+        bookmarksSection,
+        changeLogSection,
+        entityDiagramsSection,
+        entityNamedNotesSection,
+        physicalFlowSection
+    ],
+    "CHANGE_SET": [
+        assessmentRatingSection,
+        bookmarksSection,
+        changeLogSection,
+        changeUnitSection,
+        involvedPeopleSection
+    ],
+    "LICENCE": [
+        appsSection,
+        assessmentRatingSection,
+        bookmarksSection,
+        changeLogSection,
+        entityNamedNotesSection,
+        softwarePackagesSection
+    ],
+    "SOFTWARE_PACKAGE": [
+        appsSection,
+        assessmentRatingSection,
+        bookmarksSection,
+        changeLogSection,
+        entityNamedNotesSection,
+        entityStatisticSection,
+        licenceSection,
+        softwarePackageVersions
     ]
 };
