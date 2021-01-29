@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
@@ -56,7 +55,7 @@ function controller(serviceBroker) {
         });
 
     serviceBroker.loadViewData(CORE_API.RoleStore.findAllRoles, [])
-        .then(result => vm.roles = result.data);
+        .then(result => vm.roles = _.orderBy(result.data, d => d.name));
 
     const refresh = () => {
         vm.filteredUsers=[] = filterUsers(vm.users, vm.qry);
