@@ -1,3 +1,21 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019, 2020, 2021 Waltz open source project
+ * See README.md for more information
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
+ */
+
 package com.khartec.waltz.service.cost;
 
 import com.khartec.waltz.data.GenericSelector;
@@ -10,6 +28,7 @@ import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.cost.EntityCost;
 import com.khartec.waltz.model.cost.EntityCostsSummary;
 import com.khartec.waltz.model.cost.ImmutableEntityCostsSummary;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -67,15 +86,18 @@ public class CostService {
                 .map(EntityCost::year)
                 .orElse(LocalDate.now().getYear());
 
-        costDao.getMappedAndMissingCountsForKindAndYearBySelector(costKindId, year, genericSelector);
+        Tuple2<Integer, Integer> mappedAndMissingCounts = costDao.getMappedAndMissingCountsForKindAndYearBySelector(
+                costKindId,
+                year,
+                genericSelector);
 
         return ImmutableEntityCostsSummary.builder()
                 .costKind(costKindDao.getById(costKindId))
                 .year(year)
                 .total(costDao.getTotalForKindAndYearBySelector(costKindId, year, genericSelector))
                 .topCosts(topCosts)
-                .mappedCount(70)
-                .missingCount(3)
+                .mappedCount(mappedAndMissingCounts.v1)
+                .missingCount(mappedAndMissingCounts.v2)
                 .build();
     }
 }

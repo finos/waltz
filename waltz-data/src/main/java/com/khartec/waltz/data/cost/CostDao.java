@@ -27,7 +27,6 @@ import com.khartec.waltz.model.cost.ImmutableEntityCost;
 import com.khartec.waltz.schema.tables.records.CostRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
-import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -39,6 +38,7 @@ import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.COST;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
 @Repository
@@ -151,6 +151,32 @@ public class CostDao {
     public Tuple2<Integer, Integer> getMappedAndMissingCountsForKindAndYearBySelector(Long costKindId,
                                                                                       Integer year,
                                                                                       GenericSelector genericSelector) {
-        return Tuple.tuple(20,20);
+        CommonTableExpression<Record1<Long>> appIds = DSL
+                .name("apps")
+                .fields("id")
+                .as(genericSelector.selector());
+
+        CommonTableExpression<Record1<Long>> appsWithCosts = DSL
+                .name("apps_with_costs")
+                .fields("id")
+                .as(DSL
+                    .select(COST.ENTITY_ID)
+                    .from(COST)
+                    .where(COST.COST_KIND_ID.eq(costKindId))
+                    .and(COST.YEAR.eq(year))
+                    .and(COST.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                    .and(COST.ENTITY_ID.in(DSL.select(appIds.field(0, Long.class)).from(appIds))));
+
+        return dsl
+                .with(appIds)
+                .with(appsWithCosts)
+                .select(DSL.count(),
+                        DSL.count(appsWithCosts.field(0)))
+                .from(appIds)
+                .leftJoin(appsWithCosts)
+                .on(appIds.field(0, Long.class).eq(appsWithCosts.field(0, Long.class)))
+                .fetchOne(r -> tuple(
+                        r.get(0, Integer.class),
+                        r.get(0, Integer.class) - r.get(1, Integer.class)));
     }
 }
