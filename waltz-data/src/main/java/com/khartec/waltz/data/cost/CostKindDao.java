@@ -80,4 +80,11 @@ public class CostKindDao {
                 .fetchSet(r -> tuple(TO_COST_KIND_MAPPER.map(r), r.get(DSL.max(COST.YEAR))));
     }
 
+
+    public EntityCostKind getById(Long costKindId) {
+        return dsl
+                .selectFrom(COST_KIND)
+                .where(COST_KIND.ID.eq(costKindId))
+                .fetchOne(TO_COST_KIND_MAPPER);
+    }
 }

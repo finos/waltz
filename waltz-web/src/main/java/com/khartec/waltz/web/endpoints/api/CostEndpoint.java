@@ -22,15 +22,16 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.cost.EntityCost;
+import com.khartec.waltz.model.cost.EntityCostsSummary;
 import com.khartec.waltz.service.cost.CostService;
+import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
@@ -51,20 +52,20 @@ public class CostEndpoint implements Endpoint {
     public void register() {
 
         String findByEntityReferencePath = mkPath(BASE_URL, "entity", "kind", ":kind", "id", ":id");
-        String findByCostKindAndSelectorPath = mkPath(BASE_URL, "cost-kind", ":id", "target-kind", ":kind");
         String findBySelectorPath = mkPath(BASE_URL, "target-kind", ":kind");
+        String summariseByCostKindAndSelectorPath = mkPath(BASE_URL, "cost-kind", ":id", "target-kind", ":kind", "summary");
 
         ListRoute<EntityCost> findByEntityReferenceRoute = (request, response) -> {
             EntityReference ref = getEntityReference(request);
             return costService.findByEntityReference(ref);
         };
 
-        ListRoute<EntityCost> findByCostKindAndSelectorRoute = (request, response) -> {
+        DatumRoute<EntityCostsSummary> summariseByCostKindAndSelectorRoute = (request, response) -> {
             IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
             long costKindId = getId(request);
             Integer limit = getLimit(request).orElse(15);
             EntityKind targetKind = getKind(request);
-            return costService.findByCostKindAndSelector(costKindId, idSelectionOptions, targetKind, limit);
+            return costService.summariseByCostKindAndSelector(costKindId, idSelectionOptions, targetKind, limit);
         };
 
         ListRoute<EntityCost> findBySelectorRoute = (request, response) -> {
@@ -74,7 +75,7 @@ public class CostEndpoint implements Endpoint {
         };
 
         getForList(findByEntityReferencePath, findByEntityReferenceRoute);
-        postForList(findByCostKindAndSelectorPath, findByCostKindAndSelectorRoute);
+        postForDatum(summariseByCostKindAndSelectorPath, summariseByCostKindAndSelectorRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
     }
 

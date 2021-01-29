@@ -27,9 +27,12 @@ import com.khartec.waltz.model.cost.ImmutableEntityCost;
 import com.khartec.waltz.schema.tables.records.CostRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
@@ -105,9 +108,9 @@ public class CostDao {
     }
 
 
-    public Set<EntityCost> findByCostKindIdAndSelector(long costKindId,
-                                                       GenericSelector genericSelector,
-                                                       int limit){
+    public Set<EntityCost> findTopCostsForCostKindAndSelector(long costKindId,
+                                                              GenericSelector genericSelector,
+                                                              int limit){
 
         SelectConditionStep<Record1<Integer>> latestYear = DSL
                 .select(DSL.max(COST.YEAR).as("latest_year"))
@@ -129,4 +132,25 @@ public class CostDao {
                 .fetchSet(TO_COST_MAPPER);
     }
 
+
+    public BigDecimal getTotalForKindAndYearBySelector(long costKindId,
+                                                       Integer year,
+                                                       GenericSelector selector) {
+        Field<BigDecimal> total = DSL.sum(COST.AMOUNT).as("total");
+        return dsl
+                .select(total)
+                .from(COST)
+                .where(COST.COST_KIND_ID.eq(costKindId))
+                .and(COST.YEAR.eq(year))
+                .and(COST.ENTITY_KIND.eq(selector.kind().name()))
+                .and(COST.ENTITY_ID.in(selector.selector()))
+                .fetchOne(total);
+    }
+
+
+    public Tuple2<Integer, Integer> getMappedAndMissingCountsForKindAndYearBySelector(Long costKindId,
+                                                                                      Integer year,
+                                                                                      GenericSelector genericSelector) {
+        return Tuple.tuple(20,20);
+    }
 }
