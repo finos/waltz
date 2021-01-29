@@ -170,6 +170,7 @@ function controller($element, $scope, settingsService) {
         .append("svg")
         .attr("id", "waltz-entity-costs-graph")
         .style("min-height", "300px")
+        .style("max-height", "500px")
         .attr("preserveAspectRatio", "xMinYMin meet");
 
     const chartBody = svg

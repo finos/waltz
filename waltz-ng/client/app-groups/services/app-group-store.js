@@ -119,7 +119,7 @@ export function store($http, BaseApiUrl) {
 
 
     const removeChangeInitiatives = (groupId, changeInitiativeIds) => $http
-        .delete(`${BASE}/id/${groupId}/change-initiatives/list/remove`, changeInitiativeIds)
+        .post(`${BASE}/id/${groupId}/change-initiatives/list/remove`, changeInitiativeIds)
         .then(result => result.data);
 
 

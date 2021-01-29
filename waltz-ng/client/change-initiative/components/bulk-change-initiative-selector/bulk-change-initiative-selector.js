@@ -99,9 +99,6 @@ function controller(serviceBroker) {
             .loadViewData(CORE_API.ChangeInitiativeStore.findAll)
             .then(r => {
                 const allChangeInitiatives = r.data;
-                console.log(allChangeInitiatives)
-                console.log(identifiers)
-                console.log(vm.existingRefs)
                 return findMatchedApps(allChangeInitiatives, identifiers, vm.existingRefs);
             });
     };
