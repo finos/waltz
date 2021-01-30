@@ -313,4 +313,12 @@ public class JooqUtilities {
         return toSqlDate(toLocalDate(timestamp).plusDays(1));
     }
 
+    public static CommonTableExpression<Record1<Long>> selectorToCTE(String name,
+                                                                     GenericSelector genericSelector) {
+        return DSL
+                .name(name)
+                .fields("id")
+                .as(genericSelector.selector());
+    }
+
 }

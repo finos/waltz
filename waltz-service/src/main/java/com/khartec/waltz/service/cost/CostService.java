@@ -25,6 +25,7 @@ import com.khartec.waltz.data.cost.CostKindDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.cost.EntityCost;
 import com.khartec.waltz.model.cost.EntityCostsSummary;
 import com.khartec.waltz.model.cost.ImmutableEntityCostsSummary;
@@ -66,7 +67,7 @@ public class CostService {
 
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, selectionOptions);
 
-        return costDao.findBySelectorForYear(genericSelector);
+        return costDao.findBySelector(genericSelector);
     }
 
 
@@ -99,5 +100,19 @@ public class CostService {
                 .mappedCount(mappedAndMissingCounts.v1)
                 .missingCount(mappedAndMissingCounts.v2)
                 .build();
+    }
+
+
+    public Set<Application> findApplicationsWithoutCostsForKindAndYearBySelector(Long costKindId,
+                                                                                 Integer year,
+                                                                                 IdSelectionOptions selectionOptions) {
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(
+                EntityKind.APPLICATION,
+                selectionOptions);
+
+        return costDao.findApplicationsWithoutCostsForKindAndYearBySelector(
+                costKindId,
+                year,
+                genericSelector.selector());
     }
 }

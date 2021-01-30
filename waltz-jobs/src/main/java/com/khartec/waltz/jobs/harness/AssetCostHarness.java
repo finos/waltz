@@ -18,21 +18,14 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.asset_cost.AssetCostDao;
-import com.khartec.waltz.data.asset_cost.AssetCostStatsDao;
+import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.asset_cost.AssetCostService;
-import org.jooq.DSLContext;
-import org.jooq.lambda.tuple.Tuple2;
+import com.khartec.waltz.service.cost.CostService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import java.math.BigDecimal;
-import java.util.List;
 
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 
@@ -42,34 +35,21 @@ public class AssetCostHarness {
     public static void main(String[] args) {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-        DSLContext dsl = ctx.getBean(DSLContext.class);
-
-        AssetCostService service = ctx.getBean(AssetCostService.class);
-        AssetCostStatsDao statsDao = ctx.getBean(AssetCostStatsDao.class);
-        AssetCostDao costDao = ctx.getBean(AssetCostDao.class);
-        ApplicationIdSelectorFactory selectorFactory = new ApplicationIdSelectorFactory();
-
-
-        long st = System.currentTimeMillis();
-        System.out.println("-- start");
+        CostService svc = ctx.getBean(CostService.class);
 
         IdSelectionOptions options = mkOpts(
                 ImmutableEntityReference.builder()
-                        .id(5600)
+                        .id(260)
                         .kind(EntityKind.ORG_UNIT)
                         .build(),
                 HierarchyQueryScope.CHILDREN);
 
-
-        List<Tuple2<Long, BigDecimal>> costs = service.calculateCombinedAmountsForSelector(options);
-        System.out.println("-- end, dur: " + (System.currentTimeMillis() - st));
-
-
-        System.out.println(costs);
-        System.out.println(costs.size());
+        FunctionUtilities.time("missing costs", () -> svc
+                .findApplicationsWithoutCostsForKindAndYearBySelector(
+                        5L,
+                        2021,
+                        options))
+                .forEach(System.out::println);
     }
-
-
-
 
 }
