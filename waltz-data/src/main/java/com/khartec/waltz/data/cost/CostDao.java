@@ -20,10 +20,8 @@ package com.khartec.waltz.data.cost;
 
 import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
-import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.cost.EntityCost;
 import com.khartec.waltz.model.cost.ImmutableEntityCost;
 import com.khartec.waltz.schema.tables.records.CostRecord;
@@ -40,7 +38,6 @@ import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.JooqUtilities.selectorToCTE;
 import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.schema.Tables.APPLICATION;
 import static com.khartec.waltz.schema.Tables.COST;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
@@ -49,7 +46,6 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 public class CostDao {
 
     private final DSLContext dsl;
-    private final ApplicationDao applicationDao;
 
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             COST.ENTITY_ID,
@@ -74,9 +70,8 @@ public class CostDao {
 
 
     @Autowired
-    public CostDao(DSLContext dsl, ApplicationDao applicationDao) {
+    public CostDao(DSLContext dsl) {
         this.dsl = dsl;
-        this.applicationDao = applicationDao;
     }
 
 
@@ -178,23 +173,6 @@ public class CostDao {
                         r.get(0, Integer.class),
                         r.get(0, Integer.class) - r.get(1, Integer.class)));
     }
-
-
-    public Set<Application> findApplicationsWithoutCostsForKindAndYearBySelector(long costKindId,
-                                                                                 int year,
-                                                                                 Select<Record1<Long>> selector) {
-        return dsl
-                .selectFrom(APPLICATION)
-                .where(APPLICATION.ID.in(selector))
-                .and(APPLICATION.ID.notIn(DSL
-                        .select(COST.ENTITY_ID)
-                        .from(COST)
-                        .where(COST.COST_KIND_ID.eq(costKindId))
-                        .and(COST.YEAR.eq(year))
-                        .and(COST.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))))
-                .fetchSet(ApplicationDao.TO_DOMAIN_MAPPER);
-    }
-
 
 
     // -- HELPERS -------------
