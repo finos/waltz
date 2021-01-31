@@ -165,6 +165,8 @@ public class CostDao {
                 .with(appIds)
                 .with(appsWithCosts)
                 .select(DSL.count(),
+                        // the second count (apps without costs) relies on the sql count function omitting
+                        // nulls - in this case the failed left join to an actual cost
                         DSL.count(appsWithCosts.field(0)))
                 .from(appIds)
                 .leftJoin(appsWithCosts)
