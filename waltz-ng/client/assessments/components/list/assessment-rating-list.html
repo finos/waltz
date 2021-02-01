@@ -27,7 +27,7 @@
                 </message>
             </waltz-no-data>
 
-            <waltz-no-data ng-if="$ctrl.assessments.length > 0 && $ctrl.assessmentsList.length === 0">
+            <waltz-no-data ng-if="$ctrl.assessments.length > 0 && $ctrl.assessmentsProvided.length === 0">
                 <message>
                     <strong>
                         There are no assessments with ratings
@@ -40,11 +40,16 @@
                 <colgroup>
                     <col width="5%">
                     <col width="40%">
-                    <col width="50%">
-                    <col width="5%">
+                    <col width="55%">
                 </colgroup>
-                <tbody ng-if="$ctrl.assessmentsList.length > 0"
-                       ng-include="'warl-ratings-list'">
+                <tbody ng-if="$ctrl.assessmentsProvided.length > 0"
+                       ng-include="'warl-with-ratings-rows'">
+                </tbody>
+                <tbody style="border-top: 1px solid #eee;"
+                       ng-include="'warl-toggler'">
+                </tbody>
+                <tbody ng-if="$ctrl.expandNotProvided"
+                       ng-include="'warl-expanded-rows'">
                 </tbody>
             </table>
             <table class="waltz-field-table waltz-field-table-border"
@@ -55,9 +60,6 @@
                     <col width="40%">
                     <col width="55%">
                 </colgroup>
-                <tbody style="border-top: 1px solid #eee;"
-                       ng-include="'warl-not-provided-ratings-summary'">
-                </tbody>
             </table>
 
         </div>
@@ -65,10 +67,30 @@
 </div>
 
 
-<!-- WITHOUT RATINGS -->
+<!-- EXPAND / COLLAPSE TOGGLE ROW -->
 <script type="text/ng-template"
-        id="warl-not-provided-ratings-summary">
-    <tr style="vertical-align: top">
+        id="warl-toggler">
+    <tr ng-if="$ctrl.expandNotProvided">
+        <td></td>
+        <td>
+            <a class="clickable"
+               ng-click="$ctrl.toggleExpandNotProvided()"
+               uib-popover="Click to collapse assessments with no rating provided"
+               popover-append-to-body="true"
+               popover-popup-delay="300"
+               popover-placement="right"
+               popover-trigger="mouseenter">
+                <waltz-icon ng-if="$ctrl.expandNotProvided"
+                            name="caret-down"
+                            fixed-width="true">
+                </waltz-icon>
+                Not Provided
+            </a>
+        </td>
+        <td></td>
+    </tr>
+    <tr ng-if="!$ctrl.expandNotProvided"
+        style="vertical-align: top">
         <td></td>
         <td>
             <a class="clickable"
@@ -78,6 +100,8 @@
                popover-popup-delay="300"
                popover-placement="right"
                popover-trigger="mouseenter">
+                <waltz-icon name="caret-right"
+                            fixed-width="true"></waltz-icon>
                 Not Provided
             </a>
         </td>
@@ -101,12 +125,12 @@
 </script>
 
 
-<!-- WITH RATINGS -->
+<!-- WITHOUT RATINGS -->
 <script type="text/ng-template"
-        id="warl-ratings-list">
-    <tr ng-repeat="item in $ctrl.assessmentsList"
+        id="warl-expanded-rows">
+    <tr ng-repeat="item in $ctrl.assessmentsNotProvided track by item.definition.id"
         ng-click="$ctrl.onSelect(item)"
-        class="clickable">
+        class="clickable waltz-animate-repeat">
         <td>
             <a class="clickable"
                uib-popover="Click to add or remove an assessment from your favourites. These appear in the overview at the top of the page."
@@ -128,8 +152,16 @@
         </td>
         <!-- definition name -->
         <td class="wft-label">
+            <waltz-icon name="lock"
+                        fixed-width="true"
+                        ng-if="item.definition.isReadOnly">
+            </waltz-icon>
+            <waltz-icon name="fw"
+                        ng-if="! item.definition.isReadOnly">
+            </waltz-icon>
             <span ng-include="'warl-definition-name'">
             </span>
+
         </td>
         <!-- rating -->
         <td>
@@ -142,28 +174,61 @@
                 Not Provided
             </span>
         </td>
-        <td class="pull-right">
-            <waltz-icon name="lock"
-                        size="lg"
-                        ng-if="item.definition.isReadOnly">
-            </waltz-icon>
-        </td>
     </tr>
-    <tr ng-if="$ctrl.expandNotProvided">
-        <td></td>
+</script>
+
+
+<!-- WITH RATINGS -->
+<script type="text/ng-template"
+        id="warl-with-ratings-rows">
+    <tr ng-repeat="item in $ctrl.assessmentsProvided track by item.definition.id"
+        ng-click="$ctrl.onSelect(item)"
+        class="clickable waltz-animate-repeat">
         <td>
             <a class="clickable"
-               ng-click="$ctrl.toggleExpandNotProvided()"
-               uib-popover="Click to collapse assessments with no rating provided"
+               uib-popover="Click to add or remove an assessment from your favourites. These appear in the overview at the top of the page."
                popover-append-to-body="true"
                popover-popup-delay="300"
                popover-placement="right"
                popover-trigger="mouseenter">
-                Collapse Not Provided
+                <waltz-icon name="star"
+                            size="lg"
+                            ng-if="item.isFavourite"
+                            ng-click="$ctrl.toggleFavourite(item.definition.id)">
+                </waltz-icon>
+                <waltz-icon name="star-o"
+                            size="lg"
+                            ng-if="!item.isFavourite"
+                            ng-click="$ctrl.toggleFavourite(item.definition.id)">
+                </waltz-icon>
             </a>
         </td>
-        <td></td>
+        <!-- definition name -->
+        <td class="wft-label">
+            <waltz-icon name="lock"
+                        fixed-width="true"
+                        ng-if="item.definition.isReadOnly">
+            </waltz-icon>
+            <waltz-icon name="fw"
+                        fixed-width="true"
+                        ng-if="! item.definition.isReadOnly">
+            </waltz-icon>
+            <span ng-include="'warl-definition-name'">
+            </span>
+        </td>
+        <!-- rating -->
+        <td>
+            <span class="clickable"
+                  ng-if="item.rating">
+                <span ng-include="'warl-rating-name'"></span>
+            </span>
+            <span ng-if="!item.rating"
+                  class="text-muted italics">
+                Not Provided
+            </span>
+        </td>
     </tr>
+
 </script>
 
 

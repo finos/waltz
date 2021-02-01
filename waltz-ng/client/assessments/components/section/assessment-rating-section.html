@@ -33,12 +33,13 @@
                 <waltz-icon name="info-circle"></waltz-icon>
                 Select a rating for more information or to edit
             </div>
-            <waltz-assessment-editor assessment="$ctrl.selectedAssessment"
-                                     on-save="$ctrl.onSave"
-                                     on-close="$ctrl.onClose"
-                                     on-remove="$ctrl.onRemove"
-                                     ng-if="$ctrl.selectedAssessment">
-            </waltz-assessment-editor>
+            <div ng-if="$ctrl.selectedAssessment">
+                <waltz-assessment-editor assessment="$ctrl.selectedAssessment"
+                                         on-save="$ctrl.onSave"
+                                         on-close="$ctrl.onClose"
+                                         on-remove="$ctrl.onRemove">
+                </waltz-assessment-editor>
+            </div>
         </div>
     </div>
 </div>

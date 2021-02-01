@@ -85,14 +85,10 @@
         <td>
             <ul class="text-muted list-inline">
                 <li ng-repeat="item in $ctrl.assessmentsWithoutRatings">
-                    <span ng-if="item.definition.isReadOnly">
-                        <waltz-icon name="lock"></waltz-icon>
-                        <span ng-include="'warfl-definition-name'"></span>
-                    </span>
-                    <a ng-if="!item.definition.isReadOnly"
-                       class="clickable">
-                        <span ng-include="'warfl-definition-name'"></span>
-                    </a>
+                    <waltz-icon ng-if="item.definition.isReadOnly"
+                                name="lock">
+                    </waltz-icon>
+                    <span ng-include="'warfl-definition-name'"></span>
                     <span ng-if="!$last">, </span>
                 </li>
             </ul>
@@ -114,9 +110,7 @@
         </td>
         <!-- rating -->
         <td>
-            <a class="clickable">
-                <span ng-include="'warfl-rating-name'"></span>
-            </a>
+            <span ng-include="'warfl-rating-name'"></span>
         </td>
     </tr>
 </script>
@@ -126,7 +120,7 @@
 <script type="text/ng-template"
         id="warfl-rating-name">
     <span uib-popover-template="'warfl-rating-popover.html'"
-          popover-placement="bottom"
+          popover-placement="left"
           popover-trigger="mouseenter"
           popover-popup-delay="300"
           popover-class="waltz-popover-width-500"
@@ -147,7 +141,7 @@
 <script type="text/ng-template"
         id="warfl-definition-name">
     <span uib-popover-template="'warfl-desc-popover.html'"
-          popover-placement="right"
+          popover-placement="left"
           popover-enable="item.definition.description"
           popover-trigger="mouseenter"
           popover-popup-delay="300"
