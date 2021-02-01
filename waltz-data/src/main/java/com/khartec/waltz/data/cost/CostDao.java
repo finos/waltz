@@ -129,6 +129,12 @@ public class CostDao {
     }
 
 
+    /**
+     * @param costKindId  which cost to sum
+     * @param year  which year to sum
+     * @param selector  which entities to include in sum
+     * @return  null if no costs, otherwise the total
+     */
     public BigDecimal getTotalForKindAndYearBySelector(long costKindId,
                                                        Integer year,
                                                        GenericSelector selector) {

@@ -32,11 +32,12 @@ import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.CollectionUtilities.first;
+import static com.khartec.waltz.common.CollectionUtilities.maybeFirst;
 import static java.util.Optional.ofNullable;
 
 @Service
@@ -82,9 +83,11 @@ public class CostService {
                 genericSelector,
                 limit);
 
-        Integer year = ofNullable(first(topCosts))
+        Integer year = maybeFirst(topCosts)
                 .map(EntityCost::year)
                 .orElse(LocalDate.now().getYear());
+
+        BigDecimal totalCost = costDao.getTotalForKindAndYearBySelector(costKindId, year, genericSelector);
 
         Tuple2<Integer, Integer> mappedAndMissingCounts = costDao.getMappedAndMissingCountsForKindAndYearBySelector(
                 costKindId,
@@ -94,7 +97,7 @@ public class CostService {
         return ImmutableEntityCostsSummary.builder()
                 .costKind(costKindDao.getById(costKindId))
                 .year(year)
-                .total(costDao.getTotalForKindAndYearBySelector(costKindId, year, genericSelector))
+                .total(ofNullable(totalCost).orElse(BigDecimal.ZERO))
                 .topCosts(topCosts)
                 .mappedCount(mappedAndMissingCounts.v1)
                 .missingCount(mappedAndMissingCounts.v2)
