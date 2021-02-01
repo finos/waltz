@@ -88,7 +88,7 @@ function controller(dynamicSectionManager,
         const sectionOffset = vm.activeSections.indexOf(section);
         const color = sectionOffset > -1
             ? rgb(colorScale(sectionOffset))
-            : rgb(255,255,255);
+            : "none";
 
         return {
             "border-bottom" : `2px solid ${color.toString()}`

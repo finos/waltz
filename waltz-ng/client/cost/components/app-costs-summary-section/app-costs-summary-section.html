@@ -32,7 +32,7 @@
     </waltz-section-actions>
 
     <waltz-source-data-overlay visible="$ctrl.sourceDataOverlay"
-                               entities="['ASSET_COST']">
+                               entities="['ASSET_COST', 'COST']">
     </waltz-source-data-overlay>
 
     <div class="row"
@@ -77,21 +77,52 @@
 
     <div class="row">
         <div class="col-sm-8">
-            <waltz-entity-costs-graph costs="$ctrl.topCosts"
+            <waltz-entity-costs-graph costs="$ctrl.costKindSummary.topCosts"
                                       on-select="$ctrl.onSelect"
                                       style="max-width: 95%">
             </waltz-entity-costs-graph>
         </div>
         <div class="col-sm-4">
-            <waltz-static-panels group-key='SECTION.ASSET_COSTS.ABOUT'
-                                 class="small"
-                                 render-mode="minimal-border"
-                                 ng-if="!$ctrl.selectedEntity">
-            </waltz-static-panels>
-            <div ng-if="$ctrl.selectedEntity">
-                <waltz-sub-section name="Selected Entity">
-                    <content>
-                        <div class="waltz-sub-section-content">
+            <div ng-if="!$ctrl.selectedEntity">
+                <waltz-static-panels group-key='SECTION.ASSET_COSTS.ABOUT'
+                                     class="small"
+                                     render-mode="minimal-border">
+                </waltz-static-panels>
+            </div>
+
+            <waltz-sub-section ng-if="$ctrl.costKindSummary"
+                               name="{{$ctrl.costKindSummary.costKind.name}}">
+                <content>
+                    <div class="waltz-sub-section-content">
+                        <div class="help-block"
+                             ng-bind="$ctrl.costKindSummary.costKind.description">
+                        </div>
+                        <h4>
+                            <waltz-currency-amount amount="$ctrl.costKindSummary.total"></waltz-currency-amount>
+                        </h4>
+                        <p>
+                            Total for
+                            <span ng-bind="$ctrl.costKindSummary.mappedCount"></span>
+                            applications.
+                        </p>
+                        <p class="help-block">
+                            <waltz-icon name="info-circle"></waltz-icon>
+                            These are
+                            <span ng-bind="$ctrl.costKindSummary.year"></span>
+                            costs. For historical costs visit the cost section on the
+                            <span ng-bind="$ctrl.selectedEntity.entityReference.kind | toDisplayName:'entity'"></span>.
+                        </p>
+                        <p class="help-block"
+                           ng-if="$ctrl.costKindSummary.missingCount > 0">
+                            <waltz-icon name="warning" style="color: orange"></waltz-icon>
+                            There are
+                            <span ng-bind="$ctrl.costKindSummary.missingCount"></span>
+                            apps with no associated costs.
+                        </p>
+
+                        <div ng-if="$ctrl.selectedEntity"
+                             style="padding-bottom: 1em;">
+                            <hr>
                             <h4>
                                 <waltz-entity-link tooltip-placement="left"
                                                    entity-ref="$ctrl.selectedEntity.entityReference">
@@ -101,27 +132,19 @@
                                 <waltz-currency-amount amount="$ctrl.selectedEntity.amount">
                                 </waltz-currency-amount>
                             </h4>
-                            <div ng-bind="$ctrl.selectedKind.description"></div>
-                            <div class="text-muted small" style="padding-bottom: 5px">
-                                <waltz-icon name="info-circle"></waltz-icon>
-                                These are
-                                <span ng-bind="$ctrl.selectedEntity.year"></span>
-                                costs. For historical costs visit the cost section on the
-                                <span ng-bind="$ctrl.selectedEntity.entityReference.kind | toDisplayName:'entity'"></span>.
-                            </div>
                         </div>
-                    </content>
-                </waltz-sub-section>
-            </div>
-        </div>
-    </div>
+                    </div>
 
-    <div class="row">
-        <div class="col-sm-12">
-            <a class="clickable"
-               ng-click="$ctrl.showAllCosts()"
-               ng-bind="$ctrl.visibility.allCosts ? 'Hide all costs' : 'Show all costs'">
-            </a>
+                    <div class="waltz-sub-section-controls">
+                        <a class="clickable"
+                           ng-click="$ctrl.showAllCosts()"
+                           ng-bind="$ctrl.visibility.allCosts ? 'Hide all costs' : 'Show all costs'">
+                        </a>
+                    </div>
+
+                </content>
+            </waltz-sub-section>
+            <br>
         </div>
     </div>
 

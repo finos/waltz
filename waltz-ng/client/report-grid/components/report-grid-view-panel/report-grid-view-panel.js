@@ -104,7 +104,9 @@ function prepareColumnDefs(gridData) {
                     toSearchTerm: d => _.get(d, [mkPropNameForRef(c.columnEntityReference), "text"], ""),
                     cellTemplate:`
                         <div class="waltz-grid-report-cell">
-                            <span ng-bind="COL_FIELD.text"></span>
+                            <span ng-bind="COL_FIELD.text"
+                                  ng-attr-title="{{COL_FIELD.text}}">
+                            </span>
                         </div>`
                 };
             default:

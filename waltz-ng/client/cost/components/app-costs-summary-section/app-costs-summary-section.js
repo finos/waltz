@@ -49,7 +49,7 @@ function mkColumnDefs(uiGridConstants){
             width: '30%',
             cellTemplate:`
             <div class="ui-grid-cell-contents">
-                 <waltz-entity-link entity-ref="row.entity.entityReference" 
+                 <waltz-entity-link entity-ref="row.entity.entityReference"
                                     icon-placement="right">
                  </waltz-entity-link>
             </div>`
@@ -81,7 +81,7 @@ function mkColumnDefs(uiGridConstants){
             width: '20%',
             headerCellClass: 'waltz-grid-header-right',
             cellTemplate:`
-            <div class="ui-grid-cell-contents" 
+            <div class="ui-grid-cell-contents"
             style="padding-right: 2em">
                  <span class="pull-right">
                     <waltz-currency-amount amount="COL_FIELD">
@@ -96,6 +96,51 @@ function mkColumnDefs(uiGridConstants){
 }
 
 
+/**
+ * Determines the default cost kind by either finding a
+ * cost kind flagged as the default or falling back to the
+ * first cost kind if none are flagged.
+ *
+ * @param costKinds
+ * @returns {unknown}
+ */
+function findDefaultKind(costKinds = []) {
+    const defaultKind = _.find(costKinds, d => d.isDefault);
+    return defaultKind
+        ? defaultKind
+        : _.first(costKinds);
+}
+
+
+function mkKindToLatestYearMap(tuples) {
+    return _
+        .chain(tuples)
+        .keyBy(d => d.v1.id)
+        .mapValues(d => d.v2)
+        .value();
+}
+
+
+function extractOrderedListOfKinds(tuples) {
+    return _
+        .chain(tuples)
+        .map(d => d.v1)
+        .orderBy(d => d.name)
+        .value();
+}
+
+
+function enrichCostsWithKind(costs, costKinds) {
+    const costKindsById = _.keyBy(costKinds, d => d.id);
+    return _.map(
+        costs,
+        d => Object.assign(
+            {},
+            d,
+            {costKind: _.get(costKindsById, [d.costKindId], 'Unknown')}));
+}
+
+
 function controller($q, serviceBroker, uiGridConstants) {
 
     const vm = initialiseData(this, initialState);
@@ -105,37 +150,30 @@ function controller($q, serviceBroker, uiGridConstants) {
             .loadAppData(CORE_API.CostKindStore.findBySelector,
                 [vm.targetEntityKind, vm.selector])
             .then(r => {
-                vm.costKinds = _.map(r.data, d => d.v1);
-                vm.costKindsById = _.keyBy(vm.costKinds, d => d.id);
-                vm.latestYearByKindId = _
-                    .chain(r.data)
-                    .keyBy(d => d.v1.id)
-                    .mapValues(d => d.v2)
-                    .value();
-                const defaultKind = _.find(vm.costKinds, d => d.isDefault);
-                vm.selectedKind = (defaultKind) ? defaultKind : _.first(vm.costKinds);
+                // result is tuple of (v1:costKind, v2:latestYear)
+                vm.costKinds = extractOrderedListOfKinds(r.data);
+                vm.latestYearByKindId = mkKindToLatestYearMap(r.data);
+                vm.selectedKind = findDefaultKind(vm.costKinds);
             });
     }
 
-    function loadTopCostsByIdAndSelector(){
+    function loadSummaryForCostKind(){
         return serviceBroker
-            .loadViewData(CORE_API.CostStore.findByCostKindAndSelector,
+            .loadViewData(
+                CORE_API.CostStore.summariseByCostKindAndSelector,
                 [vm.selectedKind.id, vm.targetEntityKind, vm.selector],
                 { force: true })
-            .then(r => vm.topCosts = r.data);
+            .then(r => vm.costKindSummary = r.data);
     }
 
     vm.loadAllCosts = () => {
         vm.visibility.loading = true;
         serviceBroker
-            .loadViewData(CORE_API.CostStore.findBySelector,
+            .loadViewData(
+                CORE_API.CostStore.findBySelector,
                 [vm.targetEntityKind, mkSelectionOptions(vm.parentEntityRef)])
             .then(r => {
-                vm.costInfo = _.map(r.data,
-                    d => Object.assign(
-                        {},
-                        d,
-                        {costKind: _.get(vm.costKindsById, d.costKindId, 'Unknown')}));
+                vm.costInfo = enrichCostsWithKind(r.data, vm.costKinds);
                 vm.visibility.loading = false;
             });
     };
@@ -145,19 +183,19 @@ function controller($q, serviceBroker, uiGridConstants) {
         vm.selector = mkSelectionOptions(vm.parentEntityRef);
 
         loadCostKinds()
-            .then(() => loadTopCostsByIdAndSelector());
+            .then(() => loadSummaryForCostKind());
     };
 
     vm.$onChanges = () => {
         if (vm.selector){
             loadCostKinds()
-                .then(() => loadTopCostsByIdAndSelector())
+                .then(() => loadSummaryForCostKind())
         }
     };
 
     vm.refresh = () => {
         vm.visibility.selectKind = false;
-        loadTopCostsByIdAndSelector();
+        loadSummaryForCostKind();
         vm.onClearSelectedEntity();
     };
 
@@ -167,7 +205,6 @@ function controller($q, serviceBroker, uiGridConstants) {
     };
 
     vm.onSelect = (d) => {
-
         if (vm.selectedEntity && vm.selectedEntity.entityReference.id === d.entityReference.id){
             vm.onClearSelectedEntity();
         } else {
@@ -177,7 +214,7 @@ function controller($q, serviceBroker, uiGridConstants) {
 
     vm.onClearSelectedEntity = () => {
         vm.selectedEntity = null;
-    }
+    };
 }
 
 

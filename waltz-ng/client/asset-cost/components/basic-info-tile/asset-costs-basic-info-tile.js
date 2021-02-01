@@ -27,11 +27,14 @@ function controller(serviceBroker) {
             filters: vm.filters
         };
 
-        serviceBroker
-            .loadViewData(
-                CORE_API.AssetCostStore.findTotalCostForAppSelector,
-                [ selector ])
-            .then(r => vm.totalCost = r.data);
+        serviceBroker.loadAppData(CORE_API.CostKindStore.findAll)
+            .then(r => r.data)
+            .then(xs => _.find(xs, x => x.isDefault) || _.first(xs))
+            .then(ck => serviceBroker
+                .loadViewData(
+                    CORE_API.CostStore.summariseByCostKindAndSelector,
+                    [ ck.id, 'APPLICATION', selector ]))
+            .then(r => vm.costSummary = r.data);
 
     };
 
