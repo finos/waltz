@@ -20,17 +20,11 @@ import {initialiseData} from "../../../common/index";
 
 
 import template from "./logical-flow-view.html";
-import {dynamicSections} from "../../../dynamic-section/dynamic-section-definitions";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const initialState = {
     logicalFlow: null,
-    assessmentRatingSection: dynamicSections.assessmentRatingSection,
-    bookmarksSection: dynamicSections.bookmarksSection,
-    changeLogSection: dynamicSections.changeLogSection,
-    entityNamedNotesSection: dynamicSections.entityNamedNotesSection,
-    entityDiagramsSection: dynamicSections.entityDiagramsSection
 };
 
 
@@ -72,25 +66,31 @@ function controller($state,
                     $stateParams,
                     historyStore,
                     notification,
-                    serviceBroker)
+                    serviceBroker,
+                    dynamicSectionManager)
 {
     const vm = initialiseData(this, initialState);
 
-    const flowId = $stateParams.id;
-    vm.entityReference = {
-        id: flowId,
-        kind: "LOGICAL_DATA_FLOW"
+
+    vm.$onInit = () => {
+
+        const flowId = $stateParams.id;
+        vm.entityReference = {
+            id: flowId,
+            kind: "LOGICAL_DATA_FLOW"
+        };
+
+        dynamicSectionManager.initialise("LOGICAL_DATA_FLOW");
+
+        // -- LOAD ---
+
+        serviceBroker
+            .loadViewData(
+                CORE_API.LogicalFlowStore.getById,
+                [ flowId ])
+            .then(r => vm.logicalFlow = r.data);
+
     };
-
-
-    // -- LOAD ---
-
-    serviceBroker
-        .loadViewData(
-            CORE_API.LogicalFlowStore.getById,
-            [ flowId ])
-        .then(r => vm.logicalFlow = r.data);
-
 
     const deleteLogicalFlow = () => {
         return serviceBroker
@@ -129,6 +129,7 @@ controller.$inject = [
     "HistoryStore",
     "Notification",
     "ServiceBroker",
+    "DynamicSectionManager"
 ];
 
 
