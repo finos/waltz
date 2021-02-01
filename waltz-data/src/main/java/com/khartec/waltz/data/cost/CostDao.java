@@ -129,7 +129,6 @@ public class CostDao {
     }
 
 
-
     public BigDecimal getTotalForKindAndYearBySelector(long costKindId,
                                                        Integer year,
                                                        GenericSelector selector) {
@@ -161,19 +160,22 @@ public class CostDao {
                     .and(COST.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                     .and(COST.ENTITY_ID.in(DSL.select(appIds.field(0, Long.class)).from(appIds))));
 
+        Field<Integer> appCount = DSL.count().as("app_count");
+        // the second count (apps with costs) relies on the sql count function omitting
+        // nulls - in this case the failed left join to an actual cost
+        Field<Integer> appsWithCostsCount = DSL.count(appsWithCosts.field(0)).as("apps_with_costs_count");
+
         return dsl
                 .with(appIds)
                 .with(appsWithCosts)
-                .select(DSL.count(),
-                        // the second count (apps without costs) relies on the sql count function omitting
-                        // nulls - in this case the failed left join to an actual cost
-                        DSL.count(appsWithCosts.field(0)))
+                .select(appCount,
+                        appsWithCostsCount)
                 .from(appIds)
                 .leftJoin(appsWithCosts)
                 .on(appIds.field(0, Long.class).eq(appsWithCosts.field(0, Long.class)))
                 .fetchOne(r -> tuple(
-                        r.get(0, Integer.class),
-                        r.get(0, Integer.class) - r.get(1, Integer.class)));
+                        r.get(appsWithCostsCount),
+                        r.get(appCount) - r.get(appsWithCostsCount)));
     }
 
 

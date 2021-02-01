@@ -90,7 +90,8 @@
                 </waltz-static-panels>
             </div>
 
-            <waltz-sub-section name="{{$ctrl.costKindSummary.costKind.name}}">
+            <waltz-sub-section ng-if="$ctrl.costKindSummary"
+                               name="{{$ctrl.costKindSummary.costKind.name}}">
                 <content>
                     <div class="waltz-sub-section-content">
                         <div class="help-block"

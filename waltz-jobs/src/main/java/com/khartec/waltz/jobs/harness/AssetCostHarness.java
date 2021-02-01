@@ -18,7 +18,6 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
@@ -44,12 +43,6 @@ public class AssetCostHarness {
                         .build(),
                 HierarchyQueryScope.CHILDREN);
 
-        FunctionUtilities.time("missing costs", () -> svc
-                .findApplicationsWithoutCostsForKindAndYearBySelector(
-                        5L,
-                        2021,
-                        options))
-                .forEach(System.out::println);
     }
 
 }
