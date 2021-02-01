@@ -157,7 +157,7 @@ public class CostDao {
                     .from(COST)
                     .where(COST.COST_KIND_ID.eq(costKindId))
                     .and(COST.YEAR.eq(year))
-                    .and(COST.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                    .and(COST.ENTITY_KIND.eq(genericSelector.kind().name()))
                     .and(COST.ENTITY_ID.in(DSL.select(appIds.field(0, Long.class)).from(appIds))));
 
         Field<Integer> appCount = DSL.count().as("app_count");
