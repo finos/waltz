@@ -16,8 +16,7 @@
  *
  */
 
-import { initialiseData } from "../../../common";
-import { dynamicSections } from "../../../dynamic-section/dynamic-section-definitions";
+import {initialiseData} from "../../../common";
 
 import template from "./change-set-view.html";
 
@@ -27,13 +26,10 @@ const bindings = {
 
 
 const initialState = {
-    bookmarkSection: dynamicSections.bookmarksSection,
-    changeLogSection: dynamicSections.changeLogSection,
-    involvedPeopleSection: dynamicSections.involvedPeopleSection,
 };
 
 
-function controller($stateParams) {
+function controller($stateParams, dynamicSectionManager) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
@@ -43,12 +39,15 @@ function controller($stateParams) {
             id: vm.changeSetId
         };
 
+        dynamicSectionManager.initialise("CHANGE_SET");
+
     };
 }
 
 
 controller.$inject = [
-    "$stateParams"
+    "$stateParams",
+    "DynamicSectionManager"
 ];
 
 

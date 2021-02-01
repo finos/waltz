@@ -19,12 +19,13 @@
 import {initialiseData} from "../../../common";
 import _ from "lodash";
 import template from "./assessment-rating-favourites-list.html";
-import {favouriteAssessmentDefinitionIdsKey} from "../../../user";
+import {mkAssessmentDefinitionsIdsKey} from "../../../user";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
-    assessments: "<"
+    assessments: "<",
+    parentEntityRef: "<"
 };
 
 
@@ -34,8 +35,8 @@ const initialState = {
 };
 
 
-function getFavouriteAssessmentDefnIds(preferences, defaultList = []) {
-    const favouritesString = _.find(preferences, d => d.key === favouriteAssessmentDefinitionIdsKey, null);
+function getFavouriteAssessmentDefnIds(key, preferences, defaultList = []) {
+    const favouritesString = _.find(preferences, d => d.key === key, null);
     return _.isNull(favouritesString) || _.isEmpty(favouritesString)
         ? defaultList
         : _
@@ -80,7 +81,10 @@ function controller(serviceBroker) {
 
         serviceBroker
             .loadAppData(CORE_API.UserPreferenceStore.findAllForUser, [], {force: true})
-            .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(r.data, vm.defaultPrimaryList))
+            .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(
+                mkAssessmentDefinitionsIdsKey(vm.parentEntityRef),
+                r.data,
+                vm.defaultPrimaryList))
             .then(() => filterAssessments());
     };
 }

@@ -17,7 +17,6 @@
  */
 
 import {initialiseData} from "../../../common";
-import {dynamicSections} from "../../../dynamic-section/dynamic-section-definitions";
 
 import template from "./licence-view.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
@@ -38,15 +37,10 @@ const addToHistory = (historyStore, licence) => {
 
 
 const initialState = {
-    appsSection: dynamicSections.appsSection,
-    bookmarkSection: dynamicSections.bookmarksSection,
-    changeLogSection: dynamicSections.changeLogSection,
-    entityNamedNotesSection: dynamicSections.entityNamedNotesSection,
-    softwarePackagesSection: dynamicSections.softwarePackagesSection,
 };
 
 
-function controller($stateParams, historyStore, serviceBroker) {
+function controller($stateParams, historyStore, serviceBroker, dynamicSectionManager) {
     const vm = initialiseData(this, initialState);
 
     const loadLicence = () => {
@@ -65,6 +59,8 @@ function controller($stateParams, historyStore, serviceBroker) {
             id: vm.licenceId
         };
 
+        dynamicSectionManager.initialise("LICENCE");
+
         loadLicence()
             .then(() => addToHistory(historyStore, vm.licence));
     };
@@ -74,7 +70,8 @@ function controller($stateParams, historyStore, serviceBroker) {
 controller.$inject = [
     "$stateParams",
     "HistoryStore",
-    "ServiceBroker"
+    "ServiceBroker",
+    "DynamicSectionManager"
 ];
 
 

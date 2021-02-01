@@ -17,7 +17,6 @@
  */
 
 import {initialiseData} from "../../../common";
-import {dynamicSections} from "../../../dynamic-section/dynamic-section-definitions";
 
 import template from "./software-package-view.html";
 
@@ -27,17 +26,10 @@ const bindings = {
 
 
 const initialState = {
-    appsSection: dynamicSections.appsSection,
-    bookmarkSection: dynamicSections.bookmarksSection,
-    changeLogSection: dynamicSections.changeLogSection,
-    entityNamedNotesSection: dynamicSections.entityNamedNotesSection,
-    entityStatisticSection: dynamicSections.entityStatisticSection,
-    licenceSection: dynamicSections.licenceSection,
-    softwarePackageVersions: dynamicSections.softwarePackageVersions
 };
 
 
-function controller($stateParams) {
+function controller($stateParams, dynamicSectionManager) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
@@ -47,12 +39,14 @@ function controller($stateParams) {
             id: vm.packageId
         };
 
+        dynamicSectionManager.initialise("SOFTWARE_PACKAGE");
     };
 }
 
 
 controller.$inject = [
-    "$stateParams"
+    "$stateParams",
+    "DynamicSectionManager"
 ];
 
 

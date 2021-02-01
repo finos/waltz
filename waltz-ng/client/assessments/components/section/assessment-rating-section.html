@@ -22,12 +22,14 @@
         <div class="col-sm-6">
             <h4>All Assessments:</h4>
             <waltz-assessment-rating-list assessments="$ctrl.assessments"
+                                          parent-entity-ref="$ctrl.parentEntityRef"
                                           on-select="$ctrl.onSelect">
             </waltz-assessment-rating-list>
         </div>
         <div class="col-sm-6">
             <div class="text-muted"
-                  ng-if="!$ctrl.selectedAssessment" style="padding-top: 30px">
+                 ng-if="$ctrl.assessments.length > 0 && !$ctrl.selectedAssessment"
+                 style="padding-top: 30px">
                 <waltz-icon name="info-circle"></waltz-icon>
                 Select a rating for more information or to edit
             </div>
