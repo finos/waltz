@@ -23,7 +23,7 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import {mkChunks} from "../../../common/list-utils";
-import {determineForegroundColor, lightGrey} from "../../../common/colors";
+import {determineForegroundColor} from "../../../common/colors";
 import {rgb} from "d3-color";
 import {scaleLinear} from "d3-scale";
 import extent from "d3-array/src/extent";
@@ -51,7 +51,7 @@ const extIdCol = { field: "application.externalId", displayName: "Ext. Id", widt
 
 const unknownRating = {
     id: -1,
-    color: lightGrey.toString(),
+    color: '#f7f9f9',
     description: "This rating has not been provided",
     name: "Unknown",
     rating: "Z",
@@ -103,8 +103,10 @@ function prepareColumnDefs(gridData) {
                     width: 150,
                     toSearchTerm: d => _.get(d, [mkPropNameForRef(c.columnEntityReference), "text"], ""),
                     cellTemplate:`
-                        <div class="waltz-grid-report-cell">
-                            <span ng-bind="COL_FIELD.text"
+                        <div class="waltz-grid-report-cell"
+                             ng-class="{'wgrc-involvement-cell': COL_FIELD.text,
+                                        'wgrc-no-data-cell': !COL_FIELD.text}"
+                            <span ng-bind="COL_FIELD.text || '-'"
                                   ng-attr-title="{{COL_FIELD.text}}">
                             </span>
                         </div>`
