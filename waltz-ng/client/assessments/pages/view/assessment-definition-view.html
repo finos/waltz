@@ -21,6 +21,7 @@
         <breadcrumbs>
             <ol class="waltz-breadcrumbs">
                 <li><a ui-sref="main">Home</a></li>
+                <li><a ui-sref="main.assessment-definition.list">Assessment Definitions</a></li>
                 <li>
                     <span ng-bind="ctrl.definition.name">
                     </span>
@@ -42,7 +43,7 @@
                 <waltz-section-actions>
                     <button waltz-has-role="{{ctrl.definition.permittedRole}}"
                             class="btn btn-xs btn-primary"
-                            ui-sref="main.assessment-definition.edit ({definitionId: ctrl.definition.id})">
+                            ui-sref="main.assessment-definition.edit ({id: ctrl.definition.id})">
                         Bulk Edit
                     </button>
                     <waltz-data-extract-link name="Export"
