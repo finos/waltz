@@ -142,10 +142,10 @@ public class CostDao {
         return dsl
                 .select(total)
                 .from(COST)
-                .where(COST.COST_KIND_ID.eq(costKindId))
+                .where(dsl.renderInlined(COST.COST_KIND_ID.eq(costKindId)
                 .and(COST.YEAR.eq(year))
                 .and(COST.ENTITY_KIND.eq(selector.kind().name()))
-                .and(COST.ENTITY_ID.in(selector.selector()))
+                .and(COST.ENTITY_ID.in(selector.selector()))))
                 .fetchOne(total);
     }
 
@@ -177,8 +177,8 @@ public class CostDao {
                 .select(appCount,
                         appsWithCostsCount)
                 .from(appIds)
-                .leftJoin(appsWithCosts)
-                .on(appIds.field(0, Long.class).eq(appsWithCosts.field(0, Long.class)))
+                .leftJoin(dsl.renderInlined(appsWithCosts))
+                .on(dsl.renderInlined(appIds.field(0, Long.class).eq(appsWithCosts.field(0, Long.class))))
                 .fetchOne(r -> tuple(
                         r.get(appsWithCostsCount),
                         r.get(appCount) - r.get(appsWithCostsCount)));
