@@ -22,8 +22,9 @@
         <breadcrumbs>
             <ol class="waltz-breadcrumbs">
                 <li><a ui-sref="main">Home</a></li>
+                <li><a ui-sref="main.assessment-definition.list">Assessment Definitions</a></li>
                 <li>
-                    <a ui-sref="main.assessment-definition.view ({definitionId: ctrl.definition.id})">
+                    <a ui-sref="main.assessment-definition.view ({id: ctrl.definition.id})">
                         <span ng-bind="ctrl.definition.name"></span>
                     </a>
                 </li>

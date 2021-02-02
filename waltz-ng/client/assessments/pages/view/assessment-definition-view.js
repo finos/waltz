@@ -51,7 +51,7 @@ function controller($q,
                     serviceBroker,
                     userService) {
 
-    const {definitionId} = $stateParams;
+    const definitionId = $stateParams.id;
     const vm = initialiseData(this, initialState);
 
     userService
