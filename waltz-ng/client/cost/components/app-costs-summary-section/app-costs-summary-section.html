@@ -75,16 +75,15 @@
     </div>
 
 
-    <div class="row">
+    <div class="row"
+         ng-if="$ctrl.costKindSummary">
         <div class="col-sm-8">
             <waltz-entity-costs-graph costs="$ctrl.costKindSummary.topCosts"
-                                      on-select="$ctrl.onSelect"
-                                      style="max-width: 95%">
+                                      on-select="$ctrl.onSelect" style="max-width: 95%">
             </waltz-entity-costs-graph>
         </div>
         <div class="col-sm-4">
-            <waltz-sub-section ng-if="$ctrl.costKindSummary"
-                               name="{{$ctrl.costKindSummary.costKind.name}}">
+            <waltz-sub-section name="{{$ctrl.costKindSummary.costKind.name}}">
                 <content>
                     <div class="waltz-sub-section-content">
                         <div class="help-block"
