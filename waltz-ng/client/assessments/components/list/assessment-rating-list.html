@@ -45,7 +45,8 @@
                 <tbody ng-if="$ctrl.assessmentsProvided.length > 0"
                        ng-include="'warl-with-ratings-rows'">
                 </tbody>
-                <tbody style="border-top: 1px solid #eee;"
+                <tbody ng-if="$ctrl.assessmentsNotProvided.length > 0"
+                       style="border-top: 1px solid #eee;"
                        ng-include="'warl-toggler'">
                 </tbody>
                 <tbody ng-if="$ctrl.expandNotProvided"

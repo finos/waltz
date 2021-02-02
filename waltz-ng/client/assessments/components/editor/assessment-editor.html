@@ -20,9 +20,17 @@
     <waltz-sub-section name="{{$ctrl.assessment.definition.name}}">
         <content>
             <div style="padding: 1em">
-                <div class="text-muted">
+                <p class="help-block"
+                   ng-if="$ctrl.assessment.definition.isReadOnly">
+                    <waltz-icon name="lock"
+                                size="lg"
+                                style="color: orange">
+                    </waltz-icon>
+                    This rating is read only
+                </p>
+                <p class="help-block">
                     <waltz-markdown text="$ctrl.assessment.definition.description"></waltz-markdown>
-                </div>
+                </p>
 
                 <br>
 
@@ -82,7 +90,7 @@
                             Not provided
                         </span>
                                 <div ng-if="$ctrl.assessment.ratingItem.description">
-                                    <waltz-markdown class="small"
+                                    <waltz-markdown class="text-muted"
                                                     text="$ctrl.assessment.ratingItem.description">
                                     </waltz-markdown>
                                 </div>
@@ -93,6 +101,14 @@
                             <td>
                                 <waltz-markdown text="$ctrl.assessment.rating.comment">
                                 </waltz-markdown>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="text-muted">Last updated by</td>
+                            <td>
+                                <waltz-last-updated entity="$ctrl.assessment.rating"
+                                                    show-label="false">
+                                </waltz-last-updated>
                             </td>
                         </tr>
                     </table>
