@@ -27,13 +27,6 @@
                 </message>
             </waltz-no-data>
 
-            <waltz-no-data ng-if="$ctrl.assessments.length > 0 && $ctrl.assessmentsProvided.length === 0">
-                <message>
-                    <strong>
-                        There are no assessments with ratings
-                    </strong>
-                </message>
-            </waltz-no-data>
 
             <table class="waltz-field-table waltz-field-table-border table-hover"
                    style="width: 100%">
@@ -42,6 +35,15 @@
                     <col width="40%">
                     <col width="55%">
                 </colgroup>
+                <tbody ng-if="$ctrl.assessments.length > 0 && $ctrl.assessmentsProvided.length === 0">
+                    <tr>
+                        <td></td>
+                        <td colspan="2">
+                            <waltz-icon name="warning" style="color: orange" fixed-width="true"></waltz-icon>
+                            There are no assessments with ratings
+                        </td>
+                    </tr>
+                </tbody>
                 <tbody ng-if="$ctrl.assessmentsProvided.length > 0"
                        ng-include="'warl-with-ratings-rows'">
                 </tbody>
@@ -85,7 +87,7 @@
                             name="caret-down"
                             fixed-width="true">
                 </waltz-icon>
-                Not Provided
+                Not Rated
             </a>
         </td>
         <td></td>
@@ -103,7 +105,7 @@
                popover-trigger="mouseenter">
                 <waltz-icon name="caret-right"
                             fixed-width="true"></waltz-icon>
-                Not Provided
+                Not Rated
             </a>
         </td>
         <td>
