@@ -1,4 +1,9 @@
 
+<style>
+    .waltz-grid {
+        height: 500px;
+    }
+</style>
 <waltz-page-header icon="puzzle-piece"
                    name="Assessment Definitions">
     <breadcrumbs>
@@ -10,22 +15,8 @@
 </waltz-page-header>
 
 <div class="waltz-page-summary waltz-page-summary-attach">
-    <table class="table table-hover">
-        <thead>
-        <tr>
-            <th>Target Entity Kind</th>
-            <th>Name</th>
-            <th>Description</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr ng-repeat="def in $ctrl.definitions">
-            <td><span ng-bind="def.entityKind | toDisplayName:'entity'"></span></td>
-            <td><a ng-bind="def.name"
-                   class="clickable"
-                   ui-sref="main.assessment-definition.view ({id: def.id})"></a></td>
-            <td><span ng-bind="def.description"></span></td>
-        </tr>
-        </tbody>
-    </table>
+    <waltz-grid-with-search column-defs="$ctrl.columnDefs"
+                            style="min-height: 1600px"
+                            entries="$ctrl.definitions">
+    </waltz-grid-with-search>
 </div>
