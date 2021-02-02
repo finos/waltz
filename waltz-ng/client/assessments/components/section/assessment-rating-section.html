@@ -20,25 +20,33 @@
 <div class="row">
     <div class="col-sm-12" style="padding: 5px 0">
         <div class="col-sm-6">
-            <h4>All Assessments:</h4>
             <waltz-assessment-rating-list assessments="$ctrl.assessments"
                                           parent-entity-ref="$ctrl.parentEntityRef"
                                           on-select="$ctrl.onSelect">
             </waltz-assessment-rating-list>
+            <p class="help-block"
+               style="padding-top: 1em">
+                Assessments associated to this:
+                <span ng-bind="$ctrl.parentEntityRef.kind | toDisplayName:'entity'"></span>.
+                Click the stars in the first column to configure which assessments appear at the top of the screen for all
+                <span ng-bind="$ctrl.parentEntityRef.kind | toDisplayName:'entity'"></span>
+                pages.
+
+            </p>
         </div>
         <div class="col-sm-6">
             <div class="text-muted"
-                 ng-if="$ctrl.assessments.length > 0 && !$ctrl.selectedAssessment"
-                 style="padding-top: 30px">
+                 ng-if="$ctrl.assessments.length > 0 && !$ctrl.selectedAssessment">
                 <waltz-icon name="info-circle"></waltz-icon>
                 Select a rating for more information or to edit
             </div>
-            <waltz-assessment-editor assessment="$ctrl.selectedAssessment"
-                                     on-save="$ctrl.onSave"
-                                     on-close="$ctrl.onClose"
-                                     on-remove="$ctrl.onRemove"
-                                     ng-if="$ctrl.selectedAssessment">
-            </waltz-assessment-editor>
+            <div ng-if="$ctrl.selectedAssessment">
+                <waltz-assessment-editor assessment="$ctrl.selectedAssessment"
+                                         on-save="$ctrl.onSave"
+                                         on-close="$ctrl.onClose"
+                                         on-remove="$ctrl.onRemove">
+                </waltz-assessment-editor>
+            </div>
         </div>
     </div>
 </div>

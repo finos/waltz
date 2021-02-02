@@ -32,7 +32,7 @@ const bindings = {
 
 
 const initialState = {
-    assessmentsList: [],
+    assessmentsProvided: [],
     assessmentsNotProvided: [],
     expandNotProvided: false,
     favouritesKey: null,
@@ -59,15 +59,15 @@ function controller(serviceBroker, notification) {
 
     const partitionAssessments = () => {
         if (vm.assessments) {
-
-            const valuePartitioned = _
+            const [notProvided, provided] = _
                 .chain(vm.assessments)
+                .sortBy(d => d.definition.name)
                 .map(a => Object.assign({}, a, { isFavourite: isFavourite(a.definition.id)}))
-                .partition(assessment => _.isNil(assessment.rating) && !vm.expandNotProvided)
+                .partition(assessment => _.isNil(assessment.rating))
                 .value();
 
-            vm.assessmentsNotProvided = _.sortBy(valuePartitioned[0], d => d.definition.name);
-            vm.assessmentsList = _.sortBy(valuePartitioned[1], d => d.definition.name);
+            vm.assessmentsNotProvided = notProvided;
+            vm.assessmentsProvided = provided;
         }
     };
 
@@ -85,7 +85,7 @@ function controller(serviceBroker, notification) {
         serviceBroker
             .loadAppData(CORE_API.UserPreferenceStore.findAllForUser,[],  {force: true})
             .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(vm.favouritesKey, r.data, vm.defaultPrimaryList))
-            .then(() => partitionAssessments());
+            .then(partitionAssessments);
     };
 
     vm.toggleFavourite = (assessmentRatingId) => {
@@ -109,8 +109,7 @@ function controller(serviceBroker, notification) {
 
     vm.toggleExpandNotProvided = () => {
         vm.expandNotProvided = !vm.expandNotProvided;
-        partitionAssessments();
-    }
+    };
 }
 
 
