@@ -83,13 +83,6 @@
             </waltz-entity-costs-graph>
         </div>
         <div class="col-sm-4">
-            <div ng-if="!$ctrl.selectedEntity">
-                <waltz-static-panels group-key='SECTION.ASSET_COSTS.ABOUT'
-                                     class="small"
-                                     render-mode="minimal-border">
-                </waltz-static-panels>
-            </div>
-
             <waltz-sub-section ng-if="$ctrl.costKindSummary"
                                name="{{$ctrl.costKindSummary.costKind.name}}">
                 <content>
@@ -110,7 +103,7 @@
                             These are
                             <span ng-bind="$ctrl.costKindSummary.year"></span>
                             costs. For historical costs visit the cost section on the
-                            <span ng-bind="$ctrl.selectedEntity.entityReference.kind | toDisplayName:'entity'"></span>.
+                            <span ng-bind="$ctrl.targetEntityKind | toDisplayName:'entity'"></span>.
                         </p>
                         <p class="help-block"
                            ng-if="$ctrl.costKindSummary.missingCount > 0">
