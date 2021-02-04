@@ -18,52 +18,51 @@
 
 package com.khartec.waltz.jobs.generators;
 
+import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.RandomUtilities;
-import com.khartec.waltz.model.cost.ImmutableAssetCost;
-import com.khartec.waltz.model.cost.ImmutableAssetCost;
-import com.khartec.waltz.model.cost.ImmutableCost;
-import com.khartec.waltz.schema.tables.records.AssetCostRecord;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.schema.tables.records.CostRecord;
 import com.khartec.waltz.service.application.ApplicationService;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.tables.AssetCost.ASSET_COST;
+import static com.khartec.waltz.common.RandomUtilities.randomPickSome;
+import static com.khartec.waltz.jobs.WaltzUtilities.getOrCreateCostKind;
+import static com.khartec.waltz.schema.Tables.COST;
 
 
 public class AssetCostGenerator implements SampleDataGenerator {
 
     private static final Random rnd = RandomUtilities.getRandom();
 
-    private static final int year = 2017;
+    private static final int year = LocalDate.now().getYear();
 
 
 
-    private static List<AssetCostRecord> generateRecords(ApplicationService applicationService, String costKind, int mean) {
-        return applicationService.findAll()
+    private static List<CostRecord> generateRecords(List<Application> apps,
+                                                    long costKind,
+                                                    int mean) {
+        return apps
                     .stream()
-                    .filter(a -> a.assetCode().isPresent())
-                    .map(a -> ImmutableAssetCost.builder()
-                            .assetCode(a.assetCode().get())
-                            .cost(ImmutableCost.builder()
-                                    .amount(generateAmount(mean))
-                                    .year(year)
-                                    .costKind(costKind)
-                                    .build())
-                            .build())
-                    .map(c -> {
-                        AssetCostRecord record = new AssetCostRecord();
-                        record.setAssetCode(c.assetCode());
-                        record.setAmount(c.cost().amount());
-                        record.setKind(c.cost().costKind());
-                        record.setYear(c.cost().year());
+                    .map(a -> {
+                        CostRecord record = new CostRecord();
+                        record.setEntityId(a.id().get());
+                        record.setEntityKind(EntityKind.APPLICATION.name());
+                        record.setAmount(generateAmount(mean));
+                        record.setCostKindId(costKind);
+                        record.setYear(year);
                         record.setProvenance(SAMPLE_DATA_PROVENANCE);
+                        record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
+                        record.setLastUpdatedBy("admin");
                         return record;
                     })
                     .collect(Collectors.toList());
@@ -85,21 +84,47 @@ public class AssetCostGenerator implements SampleDataGenerator {
 
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        List<AssetCostRecord> appDevCosts = generateRecords(applicationService, "APPLICATION_DEVELOPMENT", 70_0000);
-        List<AssetCostRecord> infraCosts = generateRecords(applicationService, "INFRASTRUCTURE", 5_000);
+        dsl.transaction(c -> {
+            DSLContext tx = c.dsl();
+
+            List<Application> apps = applicationService.findAll();
+
+            List<CostRecord> appDevCosts = generateRecords(
+                    apps,
+                    getOrCreateCostKind(tx, "Application Development", "APPLICATION_DEVELOPMENT"),
+                    900_000);
+
+            List<CostRecord> infraCosts = generateRecords(
+                    apps,
+                    getOrCreateCostKind(tx, "Infrastructure", "INFRASTRUCTURE"),
+                    50_000);
+
+            List<CostRecord> cloudMigrationCosts = generateRecords(
+                    randomPickSome(apps, 0.4),
+                    getOrCreateCostKind(tx, "Cloud Migration", "CLOUD"),
+                    200_000);
+
+            List<CostRecord> depreciationCosts = generateRecords(
+                    randomPickSome(apps, 0.6),
+                    getOrCreateCostKind(tx, "Depreciation", "DEPRECIATION"),
+                    100_000);
+
+            tx.batchInsert(appDevCosts).execute();
+            tx.batchInsert(infraCosts).execute();
+            tx.batchInsert(cloudMigrationCosts).execute();
+            tx.batchInsert(depreciationCosts).execute();
+        });
 
 
-        dsl.batchInsert(appDevCosts).execute();
-        dsl.batchInsert(infraCosts).execute();
         return null;
     }
 
     @Override
     public boolean remove(ApplicationContext ctx) {
         getDsl(ctx)
-                .deleteFrom(ASSET_COST)
-                .where(ASSET_COST.YEAR.eq(year))
-                .and(ASSET_COST.PROVENANCE.eq(SAMPLE_DATA_PROVENANCE))
+                .deleteFrom(COST)
+                .where(COST.YEAR.eq(year))
+                .and(COST.PROVENANCE.eq(SAMPLE_DATA_PROVENANCE))
                 .execute();
         return true;
     }

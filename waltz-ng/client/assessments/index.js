@@ -19,6 +19,7 @@
 import services from "./services";
 import Routes from "./routes";
 import {registerComponents} from "../common/module-utils";
+import AssessmentDefinitionList from "./pages/list/assessment-definition-list";
 import AssessmentEditor from "./components/editor/assessment-editor";
 import AssessmentRatingFavouritesList from "./components/favourites-list/assessment-rating-favourites-list";
 import AssessmentRatingList from "./components/list/assessment-rating-list";
@@ -29,6 +30,8 @@ import AssessmentRatingTrafficLights from "./components/traffic-lights/assessmen
 import BulkAssessmentRatingSelector from "./components/bulk-assessment-rating-selector/bulk-assessment-rating-selector";
 import AssessmentDefinitionOverview from "./components/assessment-definition-overview/assessment-definition-overview";
 
+
+
 export default () => {
 
     const module = angular.module("waltz.assessments", []);
@@ -37,6 +40,7 @@ export default () => {
     services(module);
 
     registerComponents(module, [
+        AssessmentDefinitionList,
         AssessmentEditor,
         AssessmentRatingFavouritesList,
         AssessmentRatingList,

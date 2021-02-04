@@ -19,25 +19,13 @@
 <waltz-change-set-overview parent-entity-ref="$ctrl.parentEntityRef">
 </waltz-change-set-overview>
 
-<br>
-
-<waltz-change-unit-section parent-entity-ref="$ctrl.parentEntityRef">
-</waltz-change-unit-section>
-
-<br>
-
-<waltz-dynamic-section-wrapper section="$ctrl.involvedPeopleSection"
-                               parent-entity-ref="$ctrl.parentEntityRef">
-</waltz-dynamic-section-wrapper>
+<div class="waltz-page-summary waltz-page-summary-attach">
+    <waltz-dynamic-section-navigation>
+    </waltz-dynamic-section-navigation>
+</div>
 
 <br>
 
-<waltz-dynamic-section-wrapper section="$ctrl.bookmarkSection"
-                               parent-entity-ref="$ctrl.parentEntityRef">
-</waltz-dynamic-section-wrapper>
+<waltz-dynamic-sections-view parent-entity-ref="$ctrl.parentEntityRef">
+</waltz-dynamic-sections-view>
 
-<br>
-
-<waltz-dynamic-section-wrapper section="$ctrl.changeLogSection"
-                               parent-entity-ref="$ctrl.parentEntityRef">
-</waltz-dynamic-section-wrapper>

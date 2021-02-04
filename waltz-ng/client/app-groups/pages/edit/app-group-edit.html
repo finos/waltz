@@ -36,12 +36,17 @@
 
     <div class="waltz-page-summary waltz-page-summary-attach">
         <waltz-section-actions>
-            <div ng-if="ctrl.canDelete">
+            <span ng-if="ctrl.canDelete">
                 <button class="btn btn-xs btn-danger"
                         ng-click="ctrl.deleteGroup()">
+                    <waltz-icon name="trash"></waltz-icon>
                     Delete
                 </button>
-            </div>
+            </span>
+            <a class="btn btn-xs btn-primary clickable"
+                    ui-sref="main.app-group.view ({id: ctrl.appGroup.id })">
+                View
+            </a>
         </waltz-section-actions>
         <div class="waltz-paragraph"
              style="padding: 6px; border-bottom: 1px dotted #eee;">
@@ -125,7 +130,7 @@
                 <span>
                     Use the search box below to find and associate change initiatives to this group.
                 </span>
-                
+
                 <!-- Selectors -->
                 <uib-tabset>
                     <uib-tab heading="Single Editor">

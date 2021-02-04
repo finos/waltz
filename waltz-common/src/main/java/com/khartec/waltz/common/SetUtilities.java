@@ -40,7 +40,7 @@ public class SetUtilities {
         return new HashSet<>(Arrays.asList(ts));
     }
 
-    public static <T> Set<T> fromCollection(Collection<T> ts) {
+    public static <T> Set<T> fromCollection(Collection<? extends T> ts) {
         if (ts == null || ts.isEmpty()) return new HashSet<>();
 
         return new HashSet<>(ts);

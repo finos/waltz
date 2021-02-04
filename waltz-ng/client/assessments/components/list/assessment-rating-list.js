@@ -19,26 +19,28 @@
 import {initialiseData} from "../../../common";
 import _ from "lodash";
 import template from "./assessment-rating-list.html";
-import {favouriteAssessmentDefinitionIdsKey} from "../../../user";
+import {mkAssessmentDefinitionsIdsKey} from "../../../user";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {displayError} from "../../../common/error-utils";
 
 
 const bindings = {
     assessments: "<",
+    parentEntityRef: "<",
     onSelect: "<",
 };
 
 
 const initialState = {
-    assessmentsList: [],
+    assessmentsProvided: [],
     assessmentsNotProvided: [],
-    expandNotProvided: false
+    expandNotProvided: false,
+    favouritesKey: null,
 };
 
 
-function getFavouriteAssessmentDefnIds(preferences, defaultList = []) {
-    const favouritesString = _.find(preferences, d => d.key === favouriteAssessmentDefinitionIdsKey, null);
+function getFavouriteAssessmentDefnIds(key, preferences, defaultList = []) {
+    const favouritesString = _.find(preferences, d => d.key === key, null);
     return _.isNull(favouritesString) || _.isEmpty(favouritesString)
         ? defaultList
         : _
@@ -57,20 +59,23 @@ function controller(serviceBroker, notification) {
 
     const partitionAssessments = () => {
         if (vm.assessments) {
-
-            const valuePartitioned = _
+            const [notProvided, provided] = _
                 .chain(vm.assessments)
+                .sortBy(d => d.definition.name)
                 .map(a => Object.assign({}, a, { isFavourite: isFavourite(a.definition.id)}))
-                .partition(assessment => _.isNil(assessment.rating) && !vm.expandNotProvided)
+                .partition(assessment => _.isNil(assessment.rating))
                 .value();
 
-            vm.assessmentsNotProvided = _.sortBy(valuePartitioned[0], d => d.definition.name);
-            vm.assessmentsList = _.sortBy(valuePartitioned[1], d => d.definition.name);
+            vm.assessmentsNotProvided = notProvided;
+            vm.assessmentsProvided = provided;
         }
     };
 
-    vm.$onChanges = () => {
+    vm.$onInit = () => {
+        vm.favouritesKey = mkAssessmentDefinitionsIdsKey(vm.parentEntityRef);
+    };
 
+    vm.$onChanges = () => {
         vm.defaultPrimaryList = _
             .chain(vm.assessments)
             .filter(a => a.definition.visibility === "PRIMARY")
@@ -79,8 +84,8 @@ function controller(serviceBroker, notification) {
 
         serviceBroker
             .loadAppData(CORE_API.UserPreferenceStore.findAllForUser,[],  {force: true})
-            .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(r.data, vm.defaultPrimaryList))
-            .then(() => partitionAssessments());
+            .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(vm.favouritesKey, r.data, vm.defaultPrimaryList))
+            .then(partitionAssessments);
     };
 
     vm.toggleFavourite = (assessmentRatingId) => {
@@ -95,8 +100,8 @@ function controller(serviceBroker, notification) {
 
         serviceBroker
             .execute(CORE_API.UserPreferenceStore.saveForUser,
-                [{key: favouriteAssessmentDefinitionIdsKey, value: newFavouritesList.toString()}])
-            .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(r.data, vm.defaultPrimaryList))
+                [{key:  vm.favouritesKey, value: newFavouritesList.toString()}])
+            .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(vm.favouritesKey, r.data, vm.defaultPrimaryList))
             .then(() => partitionAssessments())
             .then(() => notification.info(message))
             .catch(e => displayError(notification, "Could not modify favourite assessment list", e))
@@ -104,8 +109,7 @@ function controller(serviceBroker, notification) {
 
     vm.toggleExpandNotProvided = () => {
         vm.expandNotProvided = !vm.expandNotProvided;
-        partitionAssessments();
-    }
+    };
 }
 
 

@@ -29,6 +29,8 @@ import hasRole from "./directives/has-role";
 import hasRoleForEntityKind from "./directives/has-role-for-entity-kind";
 import unlessRole from "./directives/unless-role";
 import Routes from "./routes";
+import * as _ from "lodash";
+import {checkIsEntityRef} from "../common/checks";
 
 
 export const lastViewedMeasurableCategoryKey = "main.measurable-category.list.lastCategory";
@@ -36,6 +38,10 @@ export const appLogicalFlowFilterExcludedTagIdsKey = "main.app-view.logical-flow
 export const groupLogicalFlowFilterExcludedTagIdsKey = "main.group-views.logical-flow.filter.excludedTagIds";
 export const favouriteAssessmentDefinitionIdsKey = "main.app-view.assessment-rating.favouriteAssessmentDefnIds";
 
+export function mkAssessmentDefinitionsIdsKey(entityReference) {
+    checkIsEntityRef(entityReference);
+    return favouriteAssessmentDefinitionIdsKey + _.camelCase(entityReference.kind);
+}
 
 export default () => {
     const module = angular.module("waltz.user", []);

@@ -23,6 +23,7 @@ import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.schema.tables.records.CostKindRecord;
 import com.khartec.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
 import com.khartec.waltz.schema.tables.records.LogicalFlowRecord;
 import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
+import static com.khartec.waltz.schema.Tables.COST_KIND;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
 
@@ -116,4 +118,22 @@ public class WaltzUtilities {
         return record;
     }
 
+
+    public static long getOrCreateCostKind(DSLContext dsl,
+                                           String name,
+                                           String externalId) {
+        return dsl
+                .select(COST_KIND.ID)
+                .from(COST_KIND)
+                .where(COST_KIND.EXTERNAL_ID.eq(externalId))
+                .fetchOptional(COST_KIND.ID)
+                .orElseGet(() -> {
+                    CostKindRecord r = dsl.newRecord(COST_KIND);
+                    r.setName(name);
+                    r.setDescription(name);
+                    r.setExternalId(externalId);
+                    r.store();
+                    return r.getId();
+                });
+    }
 }

@@ -20,16 +20,28 @@
     <content>
         <div class="waltz-sub-section-content">
             <div style="padding: 5px 0">
-                <waltz-assessment-rating-favourites-list assessments="$ctrl.assessments">
+                <waltz-assessment-rating-favourites-list assessments="$ctrl.assessments"
+                                                         parent-entity-ref="$ctrl.parentEntityRef">
                 </waltz-assessment-rating-favourites-list>
             </div>
         </div>
         <div class="waltz-sub-section-controls"
              ng-if="$ctrl.assessments.length > 0">
-            <a class="clickable pull-right"
-               waltz-jump-to="assessment-rating-section">
-                Edit
-            </a>
+            <span uib-popover="Opens section to view/edit all assessments"
+                  popover-placement="left"
+                  popover-trigger="mouseenter"
+                  popover-popup-delay="300">
+                <a class="clickable pull-right"
+                   ng-if="!$ctrl.useExternalEditorPage"
+                   waltz-jump-to="assessment-rating-section">
+                    More
+                </a>
+                <a class="clickable pull-right"
+                   ng-if="$ctrl.useExternalEditorPage"
+                   ui-sref="embed.internal ({kind: $ctrl.parentEntityRef.kind, id: $ctrl.parentEntityRef.id, sectionId: 200})">
+                    More
+                </a>
+            </span>
         </div>
     </content>
 </waltz-sub-section>

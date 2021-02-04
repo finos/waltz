@@ -36,8 +36,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.DateTimeUtilities.toLocalDate;
-import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
+import static com.khartec.waltz.common.DateTimeUtilities.*;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.StringUtilities.join;
 import static com.khartec.waltz.common.StringUtilities.splitThenMap;
@@ -240,11 +239,23 @@ public class AttestationRunDao {
     }
 
 
-    public int updateStatusForRunIds(Set<Long> runIds, AttestationStatus status) {
-        return dsl
-                .update(ATTESTATION_RUN)
-                .set(ATTESTATION_RUN.STATUS, status.name())
-                .where(ATTESTATION_RUN.ID.in(runIds))
-                .execute();
+    public int updateStatusForRunIds(Set<Long> runIds, AttestationStatus newStatus) {
+
+        if (AttestationStatus.ISSUED.equals(newStatus)){
+            return dsl
+                    .update(ATTESTATION_RUN)
+                    .set(ATTESTATION_RUN.STATUS, newStatus.name())
+                    .set(ATTESTATION_RUN.ISSUED_BY, "admin")
+                    .set(ATTESTATION_RUN.ISSUED_ON, toSqlDate(nowUtcTimestamp()))
+                    .where(ATTESTATION_RUN.ID.in(runIds))
+                    .execute();
+        } else {
+            return dsl
+                    .update(ATTESTATION_RUN)
+                    .set(ATTESTATION_RUN.STATUS, newStatus.name())
+                    .where(ATTESTATION_RUN.ID.in(runIds))
+                    .execute();
+        }
+
     }
 }

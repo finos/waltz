@@ -54,7 +54,7 @@ public class MeasurableCategoryDao {
                 .lastUpdatedAt(r.getLastUpdatedAt().toLocalDateTime())
                 .editable(r.getEditable())
                 .ratingEditorRole(r.getRatingEditorRole())
-                .assessmentDefinitionId(Optional.ofNullable(r.getAssessmentDefinitionId()))
+                .constrainingAssessmentDefinitionId(Optional.ofNullable(r.getConstrainingAssessmentDefinitionId()))
                 .build();
     };
 

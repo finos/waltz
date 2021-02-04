@@ -108,6 +108,13 @@ export const entity = {
         description: null,
         position: 95
     },
+    CHANGE_UNIT: {
+        key: "CHANGE_UNIT",
+        name: "Change Unit",
+        icon: "hourglass-2",
+        description: null,
+        position: 96
+    },
     DATABASE: {
         key: "DATABASE",
         name: "Database",

@@ -338,6 +338,27 @@ const assessmentRatingSection = {
     id: 200
 };
 
+const physicalFlowSection = {
+    componentId: "physical-flow-section",
+    name: "Physical Flows",
+    icon: "qrcode",
+    id: 210
+};
+
+const changeUnitSection = {
+    componentId: "change-unit-section",
+    name: "Change Units",
+    icon: "hourglass-2",
+    id: 220
+};
+
+const specificationDefinitionSection = {
+    componentId: "physical-spec-definition-section",
+    name: "Specification Definitions",
+    icon: "file-code-o",
+    id: 230
+};
+
 export const dynamicSections = {
     appCostsSection,
     appCostsSummarySection,
@@ -350,6 +371,7 @@ export const dynamicSections = {
     changeInitiativeSection,
     changeLogSection,
     changeSetSection,
+    changeUnitSection,
     complexitySection,
     dataFlowSection,
     dataTypeFlowSection,
@@ -373,6 +395,7 @@ export const dynamicSections = {
     personChangeSetSection,
     personMeasurableInvolvementsSection,
     personHierarchySection,
+    physicalFlowSection,
     physicalFlowParticipantsSection,
     relatedAppGroupsSection,
     relatedAppsSection,
@@ -382,6 +405,7 @@ export const dynamicSections = {
     relatedPhysicalFieldSection,
     softwarePackagesSection,
     softwarePackageVersions,
+    specificationDefinitionSection,
     surveySection,
     technologySection,
     technologySummarySection
@@ -425,6 +449,7 @@ export const dynamicSectionsByKind = {
         changeLogSection
     ],
     "CHANGE_INITIATIVE": [
+        assessmentRatingSection,
         bookmarksSection,
         changeSetSection,
         entityNamedNotesSection,
@@ -533,6 +558,7 @@ export const dynamicSectionsByKind = {
         entityNamedNotesSection
     ],
     "PHYSICAL_FLOW": [
+        assessmentRatingSection,
         bookmarksSection,
         changeLogSection,
         entityDiagramsSection,
@@ -540,5 +566,46 @@ export const dynamicSectionsByKind = {
         flowSpecDefinitionSection,
         involvedPeopleSection,
         physicalFlowParticipantsSection
+    ],
+    "LOGICAL_DATA_FLOW": [
+        assessmentRatingSection,
+        bookmarksSection,
+        changeLogSection,
+        entityDiagramsSection,
+        entityNamedNotesSection,
+        physicalFlowSection
+    ],
+    "CHANGE_SET": [
+        assessmentRatingSection,
+        bookmarksSection,
+        changeLogSection,
+        changeUnitSection,
+        involvedPeopleSection
+    ],
+    "LICENCE": [
+        appsSection,
+        assessmentRatingSection,
+        bookmarksSection,
+        changeLogSection,
+        entityNamedNotesSection,
+        softwarePackagesSection
+    ],
+    "SOFTWARE_PACKAGE": [
+        appsSection,
+        assessmentRatingSection,
+        bookmarksSection,
+        changeLogSection,
+        entityNamedNotesSection,
+        entityStatisticSection,
+        licenceSection,
+        softwarePackageVersions
+    ],
+    "PHYSICAL_SPECIFICATION": [
+        assessmentRatingSection,
+        bookmarksSection,
+        changeLogSection,
+        entityDiagramsSection,
+        physicalFlowSection,
+        specificationDefinitionSection
     ]
 };

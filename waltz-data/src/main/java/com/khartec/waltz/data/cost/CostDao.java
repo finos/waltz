@@ -27,15 +27,19 @@ import com.khartec.waltz.model.cost.ImmutableEntityCost;
 import com.khartec.waltz.schema.tables.records.CostRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.data.JooqUtilities.selectorToCTE;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.COST;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
 @Repository
@@ -82,39 +86,34 @@ public class CostDao {
     }
 
 
-    public Set<EntityCost> findBySelectorForYear(GenericSelector genericSelector){
+    public Set<EntityCost> findBySelector(GenericSelector genericSelector){
 
-        SelectHavingStep<Record2<Long, Integer>> cost_kind_latest_year = DSL
+        SelectHavingStep<Record2<Long, Integer>> latestYearForCostKindSelector = DSL
                 .select(COST.COST_KIND_ID, DSL.max(COST.YEAR).as("latest_year"))
                 .from(COST)
                 .where(COST.ENTITY_ID.in(genericSelector.selector())
                         .and(COST.ENTITY_KIND.eq(genericSelector.kind().name())))
                 .groupBy(COST.COST_KIND_ID);
 
-        Condition latest_year_for_kind = COST.COST_KIND_ID.eq(cost_kind_latest_year.field(COST.COST_KIND_ID))
-                .and(COST.YEAR.eq(cost_kind_latest_year.field("latest_year", Integer.class)));
+        Condition latestYearForCostKind = COST.COST_KIND_ID.eq(latestYearForCostKindSelector.field(COST.COST_KIND_ID))
+                .and(COST.YEAR.eq(latestYearForCostKindSelector.field("latest_year", Integer.class)));
 
         return dsl
                 .select(ENTITY_NAME_FIELD)
                 .select(COST.fields())
                 .from(COST)
-                .innerJoin(cost_kind_latest_year).on(dsl.renderInlined(latest_year_for_kind))
+                .innerJoin(latestYearForCostKindSelector).on(dsl.renderInlined(latestYearForCostKind))
                 .where(COST.ENTITY_ID.in(genericSelector.selector())
                         .and(COST.ENTITY_KIND.eq(genericSelector.kind().name())))
                 .fetchSet(TO_COST_MAPPER);
     }
 
 
-    public Set<EntityCost> findByCostKindIdAndSelector(long costKindId,
-                                                       GenericSelector genericSelector,
-                                                       int limit){
+    public Set<EntityCost> findTopCostsForCostKindAndSelector(long costKindId,
+                                                              GenericSelector genericSelector,
+                                                              int limit){
 
-        SelectConditionStep<Record1<Integer>> latestYear = DSL
-                .select(DSL.max(COST.YEAR).as("latest_year"))
-                .from(COST)
-                .where(COST.COST_KIND_ID.eq(costKindId))
-                .and(COST.ENTITY_ID.in(genericSelector.selector())
-                        .and(COST.ENTITY_KIND.eq(genericSelector.kind().name())));
+        SelectConditionStep<Record1<Integer>> latestYear = mkLatestYearSelector(costKindId, genericSelector);
 
         return dsl
                 .select(ENTITY_NAME_FIELD)
@@ -127,6 +126,75 @@ public class CostDao {
                 .orderBy(COST.AMOUNT.desc())
                 .limit(limit)
                 .fetchSet(TO_COST_MAPPER);
+    }
+
+
+    /**
+     * @param costKindId  which cost to sum
+     * @param year  which year to sum
+     * @param selector  which entities to include in sum
+     * @return  null if no costs, otherwise the total
+     */
+    public BigDecimal getTotalForKindAndYearBySelector(long costKindId,
+                                                       Integer year,
+                                                       GenericSelector selector) {
+        Field<BigDecimal> total = DSL.sum(COST.AMOUNT).as("total");
+        return dsl
+                .select(total)
+                .from(COST)
+                .where(dsl.renderInlined(COST.COST_KIND_ID.eq(costKindId)
+                .and(COST.YEAR.eq(year))
+                .and(COST.ENTITY_KIND.eq(selector.kind().name()))
+                .and(COST.ENTITY_ID.in(selector.selector()))))
+                .fetchOne(total);
+    }
+
+
+    public Tuple2<Integer, Integer> getMappedAndMissingCountsForKindAndYearBySelector(Long costKindId,
+                                                                                      Integer year,
+                                                                                      GenericSelector genericSelector) {
+        CommonTableExpression<Record1<Long>> appIds = selectorToCTE("app_ids", genericSelector);
+
+        CommonTableExpression<Record1<Long>> appsWithCosts = DSL
+                .name("apps_with_costs")
+                .fields("id")
+                .as(DSL
+                    .select(COST.ENTITY_ID)
+                    .from(COST)
+                    .where(COST.COST_KIND_ID.eq(costKindId))
+                    .and(COST.YEAR.eq(year))
+                    .and(COST.ENTITY_KIND.eq(genericSelector.kind().name()))
+                    .and(COST.ENTITY_ID.in(DSL.select(appIds.field(0, Long.class)).from(appIds))));
+
+        Field<Integer> appCount = DSL.count().as("app_count");
+        // the second count (apps with costs) relies on the sql count function omitting
+        // nulls - in this case the failed left join to an actual cost
+        Field<Integer> appsWithCostsCount = DSL.count(appsWithCosts.field(0)).as("apps_with_costs_count");
+
+        return dsl
+                .with(appIds)
+                .with(appsWithCosts)
+                .select(appCount,
+                        appsWithCostsCount)
+                .from(appIds)
+                .leftJoin(dsl.renderInlined(appsWithCosts))
+                .on(dsl.renderInlined(appIds.field(0, Long.class).eq(appsWithCosts.field(0, Long.class))))
+                .fetchOne(r -> tuple(
+                        r.get(appsWithCostsCount),
+                        r.get(appCount) - r.get(appsWithCostsCount)));
+    }
+
+
+    // -- HELPERS -------------
+
+    private SelectConditionStep<Record1<Integer>> mkLatestYearSelector(long costKindId,
+                                                                       GenericSelector genericSelector) {
+        return DSL
+                .select(DSL.max(COST.YEAR).as("latest_year"))
+                .from(COST)
+                .where(COST.COST_KIND_ID.eq(costKindId))
+                .and(COST.ENTITY_ID.in(genericSelector.selector())
+                        .and(COST.ENTITY_KIND.eq(genericSelector.kind().name())));
     }
 
 }

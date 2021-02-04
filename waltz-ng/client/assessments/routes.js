@@ -18,6 +18,7 @@
 
 import ViewPage from "./pages/view/assessment-definition-view";
 import EditPage from "./pages/edit/assessment-rating-bulk-upload";
+import ListPage from "./pages/list/assessment-definition-list";
 
 const baseState = {
     url: "assessment-definition"
@@ -25,20 +26,27 @@ const baseState = {
 
 
 const viewState = {
-    url: "/{definitionId:int}",
+    url: "/{id:int}",
     views: { "content@": ViewPage }
 };
 
 
 const editState = {
-    url: "/{definitionId:int}/bulk-edit",
+    url: "/{id:int}/bulk-edit",
     views: { "content@": EditPage }
+};
+
+
+const listState = {
+    url: "/",
+    views: { "content@": ListPage.id }
 };
 
 
 function setupRoutes($stateProvider) {
     $stateProvider
         .state("main.assessment-definition", baseState)
+        .state("main.assessment-definition.list", listState)
         .state("main.assessment-definition.view", viewState)
         .state("main.assessment-definition.edit", editState);
 }

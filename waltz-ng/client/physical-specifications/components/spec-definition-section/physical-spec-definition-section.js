@@ -50,9 +50,6 @@ function controller($q,
 
     const vm = initialiseData(this, initialState);
 
-    vm.$onInit = () => {
-    };
-
     vm.$onChanges = (changes) => {
         if(vm.parentEntityRef) {
             serviceBroker

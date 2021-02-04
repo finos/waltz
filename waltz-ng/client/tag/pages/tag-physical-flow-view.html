@@ -27,13 +27,10 @@
         </breadcrumbs>
     </waltz-page-header>
 
-    <div class="row">
-        <div class="col-md-12">
-            <waltz-physical-flow-section
-                    parent-entity-ref="ctrl.entityReference"
-                    optional-column-defs="ctrl.physicalFlowColumnDefs">
-            </waltz-physical-flow-section>
-        </div>
+    <div>
+        <waltz-dynamic-section-wrapper section="ctrl.physicalFlowSection"
+                                       parent-entity-ref="ctrl.entityReference">
+        </waltz-dynamic-section-wrapper>
     </div>
 
     <div class="row">
