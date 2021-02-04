@@ -92,7 +92,7 @@ public abstract class MeasurableCategory implements
      *
      * @return id which links to a {@link AssessmentDefinition}
      */
-    public abstract Optional<Long> assessmentDefinitionId();
+    public abstract Optional<Long> constrainingAssessmentDefinitionId();
 
 
     public EntityReference entityReference() {
