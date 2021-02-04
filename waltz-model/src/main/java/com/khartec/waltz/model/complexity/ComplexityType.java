@@ -16,36 +16,13 @@
  *
  */
 
+package com.khartec.waltz.model.complexity;
 
-export function store($http, BaseApiUrl) {
+public enum ComplexityType {
 
-    const BASE = `${BaseApiUrl}/complexity`;
+    CONNECTION,
+    MEASURABLE,
+    SERVER,
+    TOTAL
 
-    const findByEntityReference = (ref) => {
-        return $http
-            .get(`${BASE}/entity/kind/${ref.kind}/id/${ref.id}`)
-            .then(result => result.data);
-    };
-
-
-    return {
-        findByEntityReference,
-    };
 }
-
-store.$inject = [
-    '$http',
-    'BaseApiUrl',
-];
-
-export const serviceName = 'ComplexityStore';
-
-export const ComplexityStore_API = {
-    findByEntityReference: {
-        serviceName,
-        serviceFnName: 'findByEntityReference',
-        description: 'executes findByEntityReference (ref) '
-    }
-};
-
-

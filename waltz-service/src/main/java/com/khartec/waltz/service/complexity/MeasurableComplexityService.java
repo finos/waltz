@@ -19,8 +19,8 @@
 package com.khartec.waltz.service.complexity;
 
 import com.khartec.waltz.data.complexity.MeasurableComplexityDao;
-import com.khartec.waltz.model.complexity.ComplexityKind;
 import com.khartec.waltz.model.complexity.ComplexityScore;
+import com.khartec.waltz.model.complexity.ComplexityType;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,7 +56,7 @@ public class MeasurableComplexityService {
         return measurableComplexityDao.findScoresForAppIdSelector(idSelector)
                 .stream()
                 .map(tally -> tallyToComplexityScore(
-                        ComplexityKind.MEASURABLE,
+                        ComplexityType.MEASURABLE,
                         tally,
                         baseline))
                 .collect(Collectors.toList());
