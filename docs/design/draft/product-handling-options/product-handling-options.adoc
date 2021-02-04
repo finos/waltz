@@ -1,0 +1,101 @@
+= Approaches for handling Product Options
+David Watkins <david.watkins@db.com>
+:version: v0.1
+:modified: 2021-01
+:status: DRAFT
+:toc:
+
+<<<
+== Document Info
+
+|===
+| Attribute | Value
+
+| Status
+| {status} {version} ({modified})
+
+| Target Version
+| 1.3x
+
+| Lead
+| Dave Watkins
+|===
+
+<<<
+== Overview
+
+=== Approaches
+
+This document discusses three approaches to modelling product options within Waltz.
+They are:
+
+* Use **measurables**, this approach has already been used with some success.
+However, numerous deficiencies would need to be addressed to fully support the requirements.
+* Use **applications**, enrich the application entity,  adding features needed to support product option requirements.
+* Add a **new core entity** to Waltz which directly represents product options.
+
+=== Requirements
+
+
+=== Comparison of approaches
+
+.Approaches to requirements
+|===
+| Requirement/Issue | Measurable Approach | Application Approach | New Entity Approach
+
+| **Product identification**
+| Simple, has it's own measurable category
+| Complex, blurred boundaries between apps and products
+| Simple, segregated by entity type
+
+| **Hierarchies** (family, product, option)
+| Already supports
+| Difficult to retrofit to existing application model.
+  Limited applicability outside this particular domain (e.g. non-product apps have no hierarchy)
+| -
+
+| **Lifecycle statuses** (e.g. buy, sell, hold)
+| Add assessment rating
+| Add assessment rating
+| Add assessment rating
+
+| **Overall Commission / Decommission dates**
+| No support, outside of simple deprecation status
+| -
+| -
+
+| **Alignment to Change Initiatives**
+| Supported (via spindle)
+| Already supports
+| Need adding (low complexity)
+
+| **IT Asset alignment**
+| Alignment via 'implements' relationships between products and applications (assets)
+| -
+| -
+
+| **Intra Product dependencies**
+| Already supported via 'the spindle'
+| New concept - currently only flows are intra-app (medium complexity)
+| New concept (medium complexity)
+
+| **Alignment to taxonomies** (Tech Function Taxonomy)
+| Could be done via spindle.
+  Alternatively, look to allow taxonomy items to have ratings on other taxonomy items (medium complexity).
+| Already supports via ratings
+| -
+
+| **Major Tech Version and Product alignment** (don't understand this requirement - what is a major tech version)
+| ?
+| ?
+| ?
+
+| **Alignment to regions/hosting venues**
+| -
+| -
+| -
+
+| **Tech Function Commission / Decommission dates**
+| -
+| -
+| -
