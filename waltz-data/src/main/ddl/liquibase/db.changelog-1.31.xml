@@ -47,15 +47,15 @@
             </column>
             <column name="name"
                     type="${name.type}">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
             <column name="description"
                     type="${description.type}">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
             <column name="external_id"
                     type="${external-id.type}">
-                <constraints nullable="true" />
+                <constraints nullable="true"/>
             </column>
             <column name="is_default"
                     type="boolean"
@@ -104,7 +104,7 @@
             <column name="provenance"
                     type="${provenance.type}"
                     defaultValue="waltz">
-                <constraints nullable="false" />
+                <constraints nullable="false"/>
             </column>
         </createTable>
     </changeSet>
