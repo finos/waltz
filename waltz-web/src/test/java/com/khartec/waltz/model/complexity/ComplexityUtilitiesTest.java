@@ -35,26 +35,26 @@ public class ComplexityUtilitiesTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void mustSupplyATally() {
-        tallyToComplexityScore(ComplexityKind.CONNECTION, null, 10);
+        tallyToComplexityScore(ComplexityType.CONNECTION, null, 10);
     }
 
 
     @Test(expected = IllegalArgumentException.class)
     public void negativeMaximumsAreIllegal() {
-        tallyToComplexityScore(ComplexityKind.CONNECTION, tally, -1);
+        tallyToComplexityScore(ComplexityType.CONNECTION, tally, -1);
     }
 
 
     @Test
     public void maxOfZeroGivesAComplexityOfZero() {
-        ComplexityScore complexityScore = tallyToComplexityScore(ComplexityKind.CONNECTION, tally, 0);
+        ComplexityScore complexityScore = tallyToComplexityScore(ComplexityType.CONNECTION, tally, 0);
         assertEquals(0, complexityScore.score(), 0);
     }
 
 
     @Test
     public void aTallyEqualToMaxShouldGiveComplexityScoreOfOne() {
-        ComplexityScore complexityScore = tallyToComplexityScore(ComplexityKind.CONNECTION, tally, 10);
+        ComplexityScore complexityScore = tallyToComplexityScore(ComplexityType.CONNECTION, tally, 10);
         assertEquals(1, complexityScore.score(), 0);
     }
 
@@ -62,7 +62,7 @@ public class ComplexityUtilitiesTest {
     @Test
     public void aTallyEqualToHalfOfMaxShouldGiveComplexityScoreOfPointFive() {
         ComplexityScore complexityScore = tallyToComplexityScore(
-                ComplexityKind.CONNECTION,
+                ComplexityType.CONNECTION,
                 tally,
                 20);
         assertEquals(0.5, complexityScore.score(), 0);
@@ -72,7 +72,7 @@ public class ComplexityUtilitiesTest {
     @Test
     public void negativeCountGivesNegativeScore() {
         Tally<Long> negativeTally = ImmutableTally.<Long>builder().id(1L).count(-10).build();
-        ComplexityScore complexityScore = tallyToComplexityScore(ComplexityKind.CONNECTION, negativeTally, 10);
+        ComplexityScore complexityScore = tallyToComplexityScore(ComplexityType.CONNECTION, negativeTally, 10);
         assertEquals(-1, complexityScore.score(), 0);
     }
 

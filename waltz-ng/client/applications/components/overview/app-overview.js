@@ -76,7 +76,7 @@ function controller($state, serviceBroker, notification) {
     function loadComplexity() {
         serviceBroker
             .loadViewData(
-                CORE_API.ComplexityStore.findBySelector,
+                CORE_API.ComplexityScoreStore.findBySelector,
                 [{ entityReference: vm.parentEntityRef, scope: "EXACT" }])
             .then(r => vm.complexity = _.get(r.data, "[0]"));
     }

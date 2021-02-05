@@ -41,7 +41,7 @@ public abstract class ComplexityScore {
     public abstract double score();
 
 
-    public abstract ComplexityKind kind();
+    public abstract ComplexityType kind();
 
 
 }

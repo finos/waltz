@@ -19,8 +19,8 @@
 package com.khartec.waltz.service.complexity;
 
 import com.khartec.waltz.data.complexity.ServerComplexityDao;
-import com.khartec.waltz.model.complexity.ComplexityKind;
 import com.khartec.waltz.model.complexity.ComplexityScore;
+import com.khartec.waltz.model.complexity.ComplexityType;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.model.complexity.ComplexityUtilities.tallyToComplexityScore;
 
+@Deprecated
 @Service
 public class ServerComplexityService {
 
@@ -54,7 +55,7 @@ public class ServerComplexityService {
         return serverComplexityDao.findCountsByAppIdSelector(idSelector)
                 .stream()
                 .map(tally -> tallyToComplexityScore(
-                        ComplexityKind.SERVER,
+                        ComplexityType.SERVER,
                         tally,
                         baseline,
                         Math::log))
