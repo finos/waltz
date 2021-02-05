@@ -18,7 +18,9 @@
 import _ from 'lodash';
 import {mkSelectionOptions} from "../../common/selector-utils";
 
-
+/**
+ * Deprecated - To be removed in 1.32
+**/
 export function store($http, BaseApiUrl) {
 
     const BASE = `${BaseApiUrl}/complexity-score`;
@@ -31,6 +33,7 @@ export function store($http, BaseApiUrl) {
     };
 
     const findBySelector = (id, kind, scope = 'CHILDREN') => {
+        console.log('DEPRECATED (1.32) - complexity-score-store:findBySelector');
         const options = _.isObject(id)
             ? id
             : mkSelectionOptions({id, kind}, scope);
@@ -41,10 +44,12 @@ export function store($http, BaseApiUrl) {
             .then(result => result.data);
     };
 
-    const recalculateAll = () =>
+    const recalculateAll = () => {
+        console.log('DEPRECATED (1.32) - complexity-score-store:recalculateAll');
         $http
             .get(`${BASE}/rebuild`)
             .then(r => r.data);
+    };
 
 
     return {

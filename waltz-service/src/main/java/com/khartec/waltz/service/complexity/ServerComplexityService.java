@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.model.complexity.ComplexityUtilities.tallyToComplexityScore;
 
+@Deprecated
 @Service
 public class ServerComplexityService {
 

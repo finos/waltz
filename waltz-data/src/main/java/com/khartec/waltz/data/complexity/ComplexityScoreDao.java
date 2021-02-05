@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 import static com.khartec.waltz.schema.tables.ComplexityScore.COMPLEXITY_SCORE;
 import static java.util.Collections.emptyList;
 
+@Deprecated
 @Repository
 public class ComplexityScoreDao {
 

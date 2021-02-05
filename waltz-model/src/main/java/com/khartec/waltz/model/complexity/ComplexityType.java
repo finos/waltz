@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.model.complexity;
 
+@Deprecated
 public enum ComplexityType {
 
     CONNECTION,

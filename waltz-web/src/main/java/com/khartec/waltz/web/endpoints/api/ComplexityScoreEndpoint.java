@@ -30,7 +30,7 @@ import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
-
+@Deprecated
 @Service
 public class ComplexityScoreEndpoint implements Endpoint {
 

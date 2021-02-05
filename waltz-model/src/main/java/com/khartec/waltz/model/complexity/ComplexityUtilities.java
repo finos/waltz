@@ -25,7 +25,10 @@ import java.util.function.Function;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
 
-
+/**
+ * To be removed in 1.32
+ */
+@Deprecated
 public class ComplexityUtilities {
 
     public static ComplexityScore tallyToComplexityScore(ComplexityType kind,

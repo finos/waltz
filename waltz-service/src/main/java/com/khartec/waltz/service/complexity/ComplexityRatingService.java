@@ -43,6 +43,7 @@ import static com.khartec.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 
 
+@Deprecated
 @Service
 public class ComplexityRatingService {
 
