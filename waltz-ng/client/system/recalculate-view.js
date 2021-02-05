@@ -21,7 +21,7 @@ import template from './recalculate-view.html';
 
 function controller(notification,
                     authSourceStore,
-                    complexityStore,
+                    complexityScoreStore,
                     dataTypeUsageStore) {
     const vm = this;
 
@@ -42,7 +42,7 @@ function controller(notification,
 
     vm.recalcComplexity = () => {
         notification.info('Complexity recalculation requested');
-        complexityStore
+        complexityScoreStore
             .recalculateAll()
             .then(() => notification.success('Complexity recalculated'));
     };
@@ -52,7 +52,7 @@ function controller(notification,
 controller.$inject = [
     'Notification',
     'AuthSourcesStore',
-    'ComplexityStore',
+    'ComplexityScoreStore',
     'DataTypeUsageStore'
 ];
 

@@ -22,9 +22,9 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.complexity.ComplexityScoreDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.complexity.ComplexityKind;
 import com.khartec.waltz.model.complexity.ComplexityRating;
 import com.khartec.waltz.model.complexity.ComplexityScore;
+import com.khartec.waltz.model.complexity.ComplexityType;
 import com.khartec.waltz.schema.tables.records.ComplexityScoreRecord;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -43,6 +43,7 @@ import static com.khartec.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 
 
+@Deprecated
 @Service
 public class ComplexityRatingService {
 
@@ -104,9 +105,9 @@ public class ComplexityRatingService {
         List<ComplexityScore> measurableScores = measurableComplexityService.findByAppIdSelector(appIdSelector);
 
         List<ComplexityScoreRecord> records = ListUtilities.concat(
-                map(serverScores, r -> buildComplexityScoreRecord(r, ComplexityKind.SERVER)),
-                map(connectionScores, r -> buildComplexityScoreRecord(r, ComplexityKind.CONNECTION)),
-                map(measurableScores, r -> buildComplexityScoreRecord(r, ComplexityKind.MEASURABLE)));
+                map(serverScores, r -> buildComplexityScoreRecord(r, ComplexityType.SERVER)),
+                map(connectionScores, r -> buildComplexityScoreRecord(r, ComplexityType.CONNECTION)),
+                map(measurableScores, r -> buildComplexityScoreRecord(r, ComplexityType.MEASURABLE)));
 
         LOG.info("Scrubbing existing complexity score table");
         complexityScoreDao.deleteAll();
@@ -119,7 +120,7 @@ public class ComplexityRatingService {
     }
 
 
-    private static ComplexityScoreRecord buildComplexityScoreRecord(ComplexityScore r, ComplexityKind kind) {
+    private static ComplexityScoreRecord buildComplexityScoreRecord(ComplexityScore r, ComplexityType kind) {
         ComplexityScoreRecord record = new ComplexityScoreRecord();
         record.setEntityKind(EntityKind.APPLICATION.name());
         record.setEntityId(r.id());

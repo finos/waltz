@@ -37,7 +37,9 @@ import {ChangeSetStore_API as ChangeSetStore} from "../../change-set/services/ch
 import {ChangeUnitStore_API as ChangeUnitStore} from "../../change-unit/services/change-unit-store";
 import {ChangeUnitViewService_API as ChangeUnitViewService} from "../../change-unit/services/change-unit-view-service";
 import {ClientCacheKeyStore_API as ClientCacheKeyStore} from "../../client_cache_key/services/client-cache-key-store";
+import {ComplexityScoreStore_API as ComplexityScoreStore} from "../../complexity/services/complexity-score-store";
 import {ComplexityStore_API as ComplexityStore} from "../../complexity/services/complexity-store";
+import {ComplexityKindStore_API as ComplexityKindStore} from "../../complexity/services/complexity-kind-store";
 import {CostKindStore_API as CostKindStore} from "../../cost/services/cost-kind-store";
 import {CostStore_API as CostStore} from "../../cost/services/cost-store";
 import {DatabaseStore_API as DatabaseStore} from "../../databases/services/database-store";
@@ -131,7 +133,9 @@ export const CORE_API = {
     ChangeUnitStore,
     ChangeUnitViewService,
     ClientCacheKeyStore,
+    ComplexityScoreStore, //TODO: Deprecated - remove in 1.32
     ComplexityStore,
+    ComplexityKindStore,
     CostKindStore,
     CostStore,
     DatabaseStore,

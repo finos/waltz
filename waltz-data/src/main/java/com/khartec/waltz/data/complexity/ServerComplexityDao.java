@@ -33,6 +33,7 @@ import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
 import static com.khartec.waltz.schema.tables.ServerUsage.SERVER_USAGE;
 
+@Deprecated
 @Repository
 public class ServerComplexityDao {
 

@@ -36,13 +36,14 @@ import java.util.stream.Collectors;
 import static com.khartec.waltz.schema.tables.ComplexityScore.COMPLEXITY_SCORE;
 import static java.util.Collections.emptyList;
 
+@Deprecated
 @Repository
 public class ComplexityScoreDao {
 
     private static final Function<Record, ComplexityScore> TO_COMPLEXITY_SCORE_MAPPER = r -> {
         ComplexityScoreRecord record = r.into(COMPLEXITY_SCORE);
         return ImmutableComplexityScore.builder()
-                .kind(ComplexityKind.valueOf(record.getComplexityKind()))
+                .kind(ComplexityType.valueOf(record.getComplexityKind()))
                 .id(record.getEntityId())
                 .score(record.getScore().doubleValue())
                 .build();
