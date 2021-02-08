@@ -15,7 +15,13 @@
   ~ See the License for the specific
   ~
   -->
-
+<style>
+    .wacss-form-control-inline {
+        min-width: 0;
+        width: auto;
+        display: inline;
+    }
+</style>
 <div>
     <waltz-section-actions>
         <button class="btn btn-xs waltz-btn-transparent"
@@ -57,7 +63,7 @@
                                 ng-change="$ctrl.refresh()"
                                 ng-options="kind as kind.name for kind in $ctrl.complexityKinds"
                                 id="selectedKind"
-                                class="form-control">
+                                class="form-control wacss-form-control-inline">
                         </select>
                     </span>
                 </small>
