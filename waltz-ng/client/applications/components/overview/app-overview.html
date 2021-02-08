@@ -156,15 +156,19 @@
                         Complexity Rating:
                     </div>
                     <div class="col-sm-4">
-            <span class='waltz-clickable-definition'
-                  popover-trigger="focus"
-                  tabindex="99"
-                  popover-placement="right"
-                  popover-animation="true"
-                  popover-title="Application Complexity Rating"
-                  uib-popover-template="'popup-app-complexity.html'">
-                <span ng-bind="$ctrl.overviewComplexity.score | toFixed:2"></span>
-            </span>
+                        <span ng-if="$ctrl.complexities.length > 0"
+                              class='waltz-clickable-definition'
+                              popover-trigger="focus"
+                              tabindex="99"
+                              popover-placement="right"
+                              popover-animation="true"
+                              popover-title="Application Complexity Rating"
+                              uib-popover-template="'popup-app-complexity.html'">
+                            <span ng-bind="$ctrl.overviewComplexity.score | toFixed:2"></span>
+                        </span>
+                        <span ng-if="$ctrl.complexities.length == 0">
+                            -
+                        </span>
                     </div>
                     <div class="col-sm-2 waltz-display-field-label">
                         Business Criticality
