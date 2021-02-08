@@ -199,7 +199,7 @@ The component in turn consists of a bindings (passed in params), controller and 
 Angular provides dependency injection services, so we wire any required services to the controller 'constructor' (lines 30 and 14).
 
 NOTE: We do not rely on name introspection to provide the injected services as the minification build step breaks this mechanism.
-We explicitly switch this off in `waltz-ng/index.ejs`, see the `ng-strict-di` directive.
+We explicitly switch this off in `waltz-ng/index.ejs` via usage of the `ng-strict-di` directive.
 
 By convention, we use the `vm` variable to refer to the component instance and initialise it with any sensible defaults (line 15).
 Since the attributes of this vm variable are not be formally declared (e.g. with `let` or `const`) we strongly encourage variables to be defined in the `initialState` object (line 10).
