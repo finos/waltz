@@ -21,6 +21,7 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./app-complexity-summary-section.html";
+import {enrichComplexitiesWithKind, findDefaultComplexityKind} from "../../services/complexity-utilities";
 
 
 const bindings = {
@@ -86,18 +87,6 @@ const complexityColumnDefs = [
     }];
 
 
-function enrichComplexitiesWithKind(complexities, complexityKinds) {
-    const complexityKindsById = _.keyBy(complexityKinds, d => d.id);
-    return _.map(
-        complexities,
-        d => Object.assign(
-            {},
-            d,
-            {complexityKind: _.get(complexityKindsById, [d.complexityKindId], 'Unknown')}));
-}
-
-
-
 function controller($q, serviceBroker) {
 
     const vm = initialiseData(this, initialState);
@@ -120,8 +109,7 @@ function controller($q, serviceBroker) {
                 CORE_API.ComplexityKindStore.findBySelector, [vm.targetEntityKind, vm.selector])
             .then(r => {
                 vm.complexityKinds = r.data;
-                const defaultKind = _.find(vm.complexityKinds, d => d.isDefault);
-                return vm.selectedKind = (defaultKind) ? defaultKind : _.first(vm.complexityKinds);
+                return vm.selectedKind = findDefaultComplexityKind(vm.complexityKinds);
             });
     }
 

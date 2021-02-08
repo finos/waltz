@@ -163,7 +163,7 @@
                   popover-animation="true"
                   popover-title="Application Complexity Rating"
                   uib-popover-template="'popup-app-complexity.html'">
-                <span ng-bind="$ctrl.complexity.overallScore | toFixed:2"></span>
+                <span ng-bind="$ctrl.overviewComplexity.score | toFixed:2"></span>
             </span>
                     </div>
                     <div class="col-sm-2 waltz-display-field-label">
@@ -273,22 +273,19 @@
         <script type='text/ng-template' id='popup-app-complexity.html'>
             <div>
                 <table class="table small">
-                    <tr>
-                        <td>Characteristic Complexity</td>
+                    <tr ng-repeat="complexity in $ctrl.complexities">
+                        <td ng-bind="complexity.complexityKind.name"></td>
                         <td>
-                            <span ng-bind="$ctrl.complexity.measurableComplexity.score | toFixed:2"></span>
+                            <span ng-bind="complexity.score | toFixed:2"></span>
                         </td>
-                    </tr>
-                    <tr>
-                        <td>Connection Complexity</td>
                         <td>
-                            <span ng-bind="$ctrl.complexity.connectionComplexity.score | toFixed:2"></span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Server Complexity</td>
-                        <td>
-                            <span ng-bind="$ctrl.complexity.serverComplexity.score | toFixed:2"></span>
+                            <waltz-icon name="star"
+                                        ng-if="complexity.complexityKindId === $ctrl.overviewComplexity.complexityKindId"
+                                        uib-popover="This complexity is shown on the overview by default."
+                                        popover-append-to-body="true"
+                                        popover-popup-delay="300"
+                                        popover-trigger="mouseenter">
+                            </waltz-icon>
                         </td>
                     </tr>
                 </table>
@@ -297,7 +294,6 @@
                     Complexity scores are re-calculated periodically against a baseline measurement.  The
                     scores should fall between 0 and 1, indicating their proximity to the baseline.
                 </div>
-
             </div>
 
         </script>

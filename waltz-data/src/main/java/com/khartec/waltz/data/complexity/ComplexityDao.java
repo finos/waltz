@@ -77,7 +77,9 @@ public class ComplexityDao {
 
     public Set<Complexity> findByEntityReference(EntityReference ref){
         return dsl
-                .selectFrom(COMPLEXITY)
+                .select(COMPLEXITY.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(COMPLEXITY)
                 .where(COMPLEXITY.ENTITY_ID.eq(ref.id())
                         .and(COMPLEXITY.ENTITY_KIND.eq(ref.kind().name())))
                 .fetchSet(TO_COMPLEXITY_MAPPER);
@@ -142,8 +144,6 @@ public class ComplexityDao {
                         .and(COMPLEXITY.ENTITY_ID.in(DSL.select(entityIds.field(0, Long.class)).from(entityIds))));
 
         Field<Integer> entityCount = DSL.count().as("entity_count");
-        // the second count (apps with costs) relies on the sql count function omitting
-        // nulls - in this case the failed left join to an actual cost
         Field<Integer> entityWithCostsCount = DSL.count(entityWithCosts.field(0)).as("entity_with_complexity_count");
 
         return dsl
