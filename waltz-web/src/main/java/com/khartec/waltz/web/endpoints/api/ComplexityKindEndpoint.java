@@ -25,8 +25,9 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 
 @Service
@@ -48,7 +49,9 @@ public class ComplexityKindEndpoint implements Endpoint {
     public void register() {
 
         ListRoute<ComplexityKind> findAllRoute = (request, response) -> complexityKindService.findAll();
+        ListRoute<ComplexityKind> findBySelectorRoute = (request, response) -> complexityKindService.findBySelector(getKind(request), readIdSelectionOptionsFromBody(request));
 
         getForList(BASE_URL, findAllRoute);
+        postForList(mkPath(BASE_URL, "target-kind", ":kind", "selector"), findBySelectorRoute);
     }
 }
