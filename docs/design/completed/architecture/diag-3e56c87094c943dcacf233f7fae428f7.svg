@@ -1,0 +1,192 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' contentScriptType='application/ecmascript' contentStyleType='text/css' height='479px' preserveAspectRatio='none' style='width:890px;height:479px;' version='1.1' viewBox='0 0 890 479' width='890px' zoomAndPan='magnify'>
+  <defs>
+    <filter height='300%' id='f3740h7ak0vrk' width='300%' x='-1' y='-1'>
+      <feGaussianBlur result='blurOut' stdDeviation='2.0'/>
+      <feColorMatrix in='blurOut' result='blurOut2' type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0'/>
+      <feOffset dx='4.0' dy='4.0' in='blurOut2' result='blurOut3'/>
+      <feBlend in='SourceGraphic' in2='blurOut3' mode='normal'/>
+    </filter>
+  </defs>
+  <g>
+    <!--MD5=[979da56a7f83e2393dc758167ae295d0]
+cluster Server-->
+    <polygon fill='#FFFFFF' filter='url(#f3740h7ak0vrk)' points='22,115,32,105,868,105,868,254,858,264,22,264,22,115' style='stroke: #000000; stroke-width: 1.5;'/>
+    <line style='stroke: #000000; stroke-width: 1.5;' x1='858' x2='867' y1='115' y2='106'/>
+    <line style='stroke: #000000; stroke-width: 1.5;' x1='22' x2='858' y1='115' y2='115'/>
+    <line style='stroke: #000000; stroke-width: 1.5;' x1='858' x2='858' y1='115' y2='264'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' font-weight='bold' lengthAdjust='spacingAndGlyphs' textLength='53' x='414.5' y='130.9951'>
+      Server
+    </text>
+    <!--MD5=[2c12a1bb7869f144ed41754d65db6915]
+cluster Endpoint Layer-->
+    <polygon fill='#FFFFFF' filter='url(#f3740h7ak0vrk)' points='707,153,834,153,841,175.2969,844,175.2969,844,240,707,240,707,153' style='stroke: #000000; stroke-width: 1.5;'/>
+    <line style='stroke: #000000; stroke-width: 1.5;' x1='707' x2='841' y1='175.2969' y2='175.2969'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' font-weight='bold' lengthAdjust='spacingAndGlyphs' textLength='121' x='711' y='167.9951'>
+      Endpoint Layer
+    </text>
+    <!--MD5=[167559344b6808c6e7281c72e5103d8e]
+cluster Service Layer-->
+    <polygon fill='#FFFFFF' filter='url(#f3740h7ak0vrk)' points='559,153,673,153,680,175.2969,683,175.2969,683,240,559,240,559,153' style='stroke: #000000; stroke-width: 1.5;'/>
+    <line style='stroke: #000000; stroke-width: 1.5;' x1='559' x2='680' y1='175.2969' y2='175.2969'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' font-weight='bold' lengthAdjust='spacingAndGlyphs' textLength='108' x='563' y='167.9951'>
+      Service Layer
+    </text>
+    <!--MD5=[2ab3fffbcd341c33602284e46c4199aa]
+cluster Data Access Layer-->
+    <polygon fill='#FFFFFF' filter='url(#f3740h7ak0vrk)' points='375,153,525,153,532,175.2969,535,175.2969,535,240,375,240,375,153' style='stroke: #000000; stroke-width: 1.5;'/>
+    <line style='stroke: #000000; stroke-width: 1.5;' x1='375' x2='532' y1='175.2969' y2='175.2969'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' font-weight='bold' lengthAdjust='spacingAndGlyphs' textLength='144' x='379' y='167.9951'>
+      Data Access Layer
+    </text>
+    <!--MD5=[936e5de464582fe7378cd5bd7c11c256]
+cluster Model & Utilities-->
+    <polygon fill='#FFFFFF' filter='url(#f3740h7ak0vrk)' points='46,153,186,153,193,175.2969,351,175.2969,351,240,46,240,46,153' style='stroke: #000000; stroke-width: 1.5;'/>
+    <line style='stroke: #000000; stroke-width: 1.5;' x1='46' x2='193' y1='175.2969' y2='175.2969'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' font-weight='bold' lengthAdjust='spacingAndGlyphs' textLength='134' x='50' y='167.9951'>
+      Model &amp; Utilities
+    </text>
+    <!--MD5=[a5ecdbc522db2b9334ca2873082df9cf]
+cluster Waltz Database-->
+    <path d='M402,298 C402,288 489.5,288 489.5,288 C489.5,288 577,288 577,298 L577,457 C577,467 489.5,467 489.5,467 C489.5,467 402,467 402,457 L402,298 ' fill='#FFFFFF' filter='url(#f3740h7ak0vrk)' style='stroke: #000000; stroke-width: 1.5;'/>
+    <path d='M402,298 C402,308 489.5,308 489.5,308 C489.5,308 577,308 577,298 ' fill='none' style='stroke: #000000; stroke-width: 1.5;'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' font-weight='bold' lengthAdjust='spacingAndGlyphs' textLength='123' x='428' y='322.9951'>
+      Waltz Database
+    </text>
+    <!--MD5=[2a2a8d2ba04784418e2bae827ce87a78]
+cluster Waltz Schema-->
+    <polygon fill='#FFFFFF' filter='url(#f3740h7ak0vrk)' points='426,346,543,346,550,368.2969,553,368.2969,553,443,426,443,426,346' style='stroke: #000000; stroke-width: 1.5;'/>
+    <line style='stroke: #000000; stroke-width: 1.5;' x1='426' x2='550' y1='368.2969' y2='368.2969'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' font-weight='bold' lengthAdjust='spacingAndGlyphs' textLength='111' x='430' y='360.9951'>
+      Waltz Schema
+    </text>
+    <!--MD5=[a08b6ada277d3635d238da73539b2f19]
+entity Endpoints-->
+    <rect fill='#FEFECE' filter='url(#f3740h7ak0vrk)' height='36.2969' style='stroke: #A80036; stroke-width: 1.5;' width='90' x='723' y='188'/>
+    <rect fill='#FEFECE' height='5' style='stroke: #A80036; stroke-width: 1.5;' width='10' x='718' y='193'/>
+    <rect fill='#FEFECE' height='5' style='stroke: #A80036; stroke-width: 1.5;' width='10' x='718' y='214.2969'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='70' x='733' y='210.9951'>
+      Endpoints
+    </text>
+    <!--MD5=[3ab6bc66408bc465e62c4c0dcccb802d]
+entity Services-->
+    <rect fill='#FEFECE' filter='url(#f3740h7ak0vrk)' height='36.2969' style='stroke: #A80036; stroke-width: 1.5;' width='80' x='581' y='188'/>
+    <rect fill='#FEFECE' height='5' style='stroke: #A80036; stroke-width: 1.5;' width='10' x='576' y='193'/>
+    <rect fill='#FEFECE' height='5' style='stroke: #A80036; stroke-width: 1.5;' width='10' x='576' y='214.2969'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='60' x='591' y='210.9951'>
+      Services
+    </text>
+    <!--MD5=[40717e9a209d8a86eea00c96e8d9ffed]
+entity DAOs-->
+    <rect fill='#FEFECE' filter='url(#f3740h7ak0vrk)' height='36.2969' style='stroke: #A80036; stroke-width: 1.5;' width='59' x='459.5' y='188'/>
+    <rect fill='#FEFECE' height='5' style='stroke: #A80036; stroke-width: 1.5;' width='10' x='454.5' y='193'/>
+    <rect fill='#FEFECE' height='5' style='stroke: #A80036; stroke-width: 1.5;' width='10' x='454.5' y='214.2969'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='39' x='469.5' y='210.9951'>
+      DAOs
+    </text>
+    <!--MD5=[174befece0db3a46b1e5fcd59cdad0fe]
+entity Model Classes-->
+    <rect fill='#FEFECE' filter='url(#f3740h7ak0vrk)' height='36.2969' style='stroke: #A80036; stroke-width: 1.5;' width='120' x='215' y='188'/>
+    <rect fill='#FEFECE' height='5' style='stroke: #A80036; stroke-width: 1.5;' width='10' x='210' y='193'/>
+    <rect fill='#FEFECE' height='5' style='stroke: #A80036; stroke-width: 1.5;' width='10' x='210' y='214.2969'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='100' x='225' y='210.9951'>
+      Model Classes
+    </text>
+    <!--MD5=[cfbce143176900d994555bd2b7233c06]
+entity Utility Classes-->
+    <rect fill='#FEFECE' filter='url(#f3740h7ak0vrk)' height='36.2969' style='stroke: #A80036; stroke-width: 1.5;' width='117' x='62.5' y='188'/>
+    <rect fill='#FEFECE' height='5' style='stroke: #A80036; stroke-width: 1.5;' width='10' x='57.5' y='193'/>
+    <rect fill='#FEFECE' height='5' style='stroke: #A80036; stroke-width: 1.5;' width='10' x='57.5' y='214.2969'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='97' x='72.5' y='210.9951'>
+      Utility Classes
+    </text>
+    <!--MD5=[61cd25fba67235613b8afc34aee24c96]
+entity Tables-->
+    <rect fill='#FEFECE' filter='url(#f3740h7ak0vrk)' height='46.2969' style='stroke: #000000; stroke-width: 1.5;' width='87' x='445.5' y='381'/>
+    <path d='M474.5,382 L474.5,386 L467.5,393 L445.5,393 ' fill='none' style='stroke: #000000; stroke-width: 1.5;'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='47' x='460.5' y='413.9951'>
+      Tables
+    </text>
+    <!--MD5=[fee662a292a0353a69bd162820bae93b]
+entity User-->
+    <ellipse cx='678' cy='17.5' fill='#FEFECE' filter='url(#f3740h7ak0vrk)' rx='8' ry='8' style='stroke: #A80036; stroke-width: 1.5;'/>
+    <path d='M678,25.5 L678,52.5 M665,33.5 L691,33.5 M678,52.5 L665,67.5 M678,52.5 L691,67.5 ' fill='none' filter='url(#f3740h7ak0vrk)' style='stroke: #A80036; stroke-width: 1.5;'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='32' x='662' y='85.9951'>
+      User
+    </text>
+    <!--MD5=[e9dede37b31fdda9664526f66258b036]
+entity Browser-->
+    <rect fill='#FEFECE' filter='url(#f3740h7ak0vrk)' height='36.2969' style='stroke: #A80036; stroke-width: 1.5;' width='78' x='729' y='30.5'/>
+    <text fill='#000000' font-family='sans-serif' font-size='14' lengthAdjust='spacingAndGlyphs' textLength='58' x='739' y='53.4951'>
+      Browser
+    </text>
+    <!--MD5=[ec4c93e45963a154c97e3947d19a9663]
+link User to Browser-->
+    <path d='M694.17,48.5 C704,48.5 713.82,48.5 723.64,48.5 ' fill='none' id='User-&gt;Browser' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <polygon fill='#A80036' points='728.78,48.5,719.78,44.5,723.78,48.5,719.78,52.5,728.78,48.5' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <!--MD5=[fc1a18efdecfb52b6b3521f4cb92c8ed]
+link Browser to Endpoints-->
+    <path d='M768,66.74 C768,94.99 768,151.15 768,182.51 ' fill='none' id='Browser-&gt;Endpoints' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <polygon fill='#A80036' points='768,187.69,772,178.69,768,182.69,764,178.69,768,187.69' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <!--MD5=[62114ab6d69c24351f57922ebd4d0c7e]
+link Endpoints to Services-->
+    <path d='M722.94,206 C704.13,206 685.32,206 666.5,206 ' fill='none' id='Endpoints-&gt;Services' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <polygon fill='#A80036' points='661.2,206,670.2,210,666.2,206,670.2,202,661.2,206' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <!--MD5=[cff5b57a7e1d66f676f3587ef0659288]
+link Services to DAOs-->
+    <path d='M580.62,206 C561.74,206 542.86,206 523.97,206 ' fill='none' id='Services-&gt;DAOs' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <polygon fill='#A80036' points='518.65,206,527.65,210,523.65,206,527.65,202,518.65,206' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <!--MD5=[e42190518f30e033de29f05a4002e889]
+link DAOs to Tables-->
+    <path d='M489,224.05 C489,258.08 489,334.67 489,375.75 ' fill='none' id='DAOs-&gt;Tables' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <polygon fill='#A80036' points='489,380.82,493,371.82,489,375.82,485,371.82,489,380.82' style='stroke: #A80036; stroke-width: 1.0;'/>
+    <!--MD5=[85e8c69e231bb91c54c23d3ad35df357]
+@startuml
+actor User
+
+agent Browser
+
+node Server {
+    package "Endpoint Layer" {
+        [Endpoints]
+    }
+
+    package "Service Layer" {
+        [Services]
+    }
+
+    package "Data Access Layer" {
+        [DAOs]
+    }
+
+    package "Model & Utilities" {
+        [Model Classes]
+        [Utility Classes]
+    }
+}
+
+database "Waltz Database" {
+    folder "Waltz Schema" {
+        frame Tables
+    }
+}
+
+[User] -> [Browser]
+[Browser] - -> [Endpoints]
+[Endpoints] -> [Services]
+[Services] -> [DAOs]
+[DAOs] - -> [Tables]
+@enduml
+
+PlantUML version 1.2020.06(Sun Apr 05 13:38:32 BST 2020)
+(APACHE source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.9+11-b944.49
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: GB
+-->
+  </g>
+</svg>
