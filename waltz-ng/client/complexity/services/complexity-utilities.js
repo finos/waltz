@@ -40,10 +40,12 @@ export function findDefaultComplexityKind(complexityKinds = []) {
 
 export function enrichComplexitiesWithKind(complexities, complexityKinds) {
     const complexityKindsById = _.keyBy(complexityKinds, d => d.id);
-    return _.map(
-        complexities,
-        d => Object.assign(
+    return _
+        .chain(complexities)
+        .map(d => Object.assign(
             {},
             d,
-            {complexityKind: _.get(complexityKindsById, [d.complexityKindId], 'Unknown')}));
+            {complexityKind: _.get(complexityKindsById, [d.complexityKindId], 'Unknown')}))
+        .orderBy(d => d.complexityKind.name)
+        .value();
 }

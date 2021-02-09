@@ -86,6 +86,8 @@ public class MeasurableComplexityDao {
                 .innerJoin(ENTITY_HIERARCHY)
                 .on(ENTITY_HIERARCHY.ID.eq(MEASURABLE_RATING.MEASURABLE_ID))
                 .where(condition)
+                .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name())
+                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .groupBy(MEASURABLE_RATING.ENTITY_ID);
     }
 

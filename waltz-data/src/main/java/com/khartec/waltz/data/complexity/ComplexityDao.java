@@ -133,7 +133,7 @@ public class ComplexityDao {
 
         CommonTableExpression<Record1<Long>> entityIds = selectorToCTE("entity_ids", genericSelector);
 
-        CommonTableExpression<Record1<Long>> entityWithCosts = DSL
+        CommonTableExpression<Record1<Long>> entityWithComplexity = DSL
                 .name("entity_with_complexity_scores")
                 .fields("id")
                 .as(DSL
@@ -144,18 +144,18 @@ public class ComplexityDao {
                         .and(COMPLEXITY.ENTITY_ID.in(DSL.select(entityIds.field(0, Long.class)).from(entityIds))));
 
         Field<Integer> entityCount = DSL.count().as("entity_count");
-        Field<Integer> entityWithCostsCount = DSL.count(entityWithCosts.field(0)).as("entity_with_complexity_count");
+        Field<Integer> entityWithComplexityCount = DSL.count(entityWithComplexity.field(0)).as("entity_with_complexity_count");
 
         return dsl
                 .with(entityIds)
-                .with(entityWithCosts)
+                .with(entityWithComplexity)
                 .select(entityCount,
-                        entityWithCostsCount)
+                        entityWithComplexityCount)
                 .from(entityIds)
-                .leftJoin(dsl.renderInlined(entityWithCosts))
-                .on(dsl.renderInlined(entityIds.field(0, Long.class).eq(entityWithCosts.field(0, Long.class))))
+                .leftJoin(dsl.renderInlined(entityWithComplexity))
+                .on(dsl.renderInlined(entityIds.field(0, Long.class).eq(entityWithComplexity.field(0, Long.class))))
                 .fetchOne(r -> tuple(
-                        r.get(entityWithCostsCount),
-                        r.get(entityCount) - r.get(entityWithCostsCount)));
+                        r.get(entityWithComplexityCount),
+                        r.get(entityCount) - r.get(entityWithComplexityCount)));
     }
 }
