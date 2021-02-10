@@ -23,6 +23,9 @@ import * as ComplexityKindStore from './services/complexity-kind-store';
 import * as ComplexityBarChart from './components/chart/complexity-bar-chart';
 import ComplexityBasicInfoTile from './components/basic-info-tile/complexity-basic-info-tile';
 import * as ComplexitySection from './components/section/complexity-section';
+import * as AppComplexitySummarySection
+    from './components/app-complexity-summary-section/app-complexity-summary-section'
+import ComplexityGraph from './components/graph/complexity-graph'
 
 export default () => {
     const module = angular.module('waltz.complexity', []);
@@ -35,7 +38,9 @@ export default () => {
     registerComponents(module, [
         ComplexityBarChart,
         ComplexityBasicInfoTile,
-        ComplexitySection]);
+        ComplexitySection,
+        AppComplexitySummarySection,
+        ComplexityGraph]);
 
     return module.name;
 };

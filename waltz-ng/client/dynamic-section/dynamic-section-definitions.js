@@ -359,9 +359,17 @@ const specificationDefinitionSection = {
     id: 230
 };
 
+const appComplexitySummarySection = {
+    componentId: "app-complexity-summary-section",
+    name: "Application Complexity",
+    icon: "sort-numeric-asc",
+    id: 240
+};
+
 export const dynamicSections = {
     appCostsSection,
     appCostsSummarySection,
+    appComplexitySummarySection,
     appsSection,
     assessmentRatingSection,
     assetCostsSection,
@@ -456,7 +464,7 @@ export const dynamicSectionsByKind = {
         involvedPeopleSection,
         relatedMeasurablesSection,
         pack(relatedAppsSection,
-            [appCostsSummarySection, complexitySection, entityStatisticSummarySection, technologySummarySection]),
+            [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
         relatedAppGroupsSection,
         relatedDataTypesSection,
         surveySection,
@@ -466,7 +474,7 @@ export const dynamicSectionsByKind = {
     ],
     "ORG_UNIT": [
         pack(appsSection,
-            [appCostsSummarySection, complexitySection, entityStatisticSummarySection, technologySummarySection]),
+            [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
         measurableRatingsBrowserSection,
         reportGridViewSection,
         pack(logicalFlowsTabgroupSection,
@@ -481,7 +489,7 @@ export const dynamicSectionsByKind = {
     ],
     "MEASURABLE": [
         pack(appsSection,
-            [appCostsSummarySection, complexitySection, entityStatisticSummarySection, technologySummarySection]),
+            [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
         entityNamedNotesSection,
         measurableRatingExplorerSection,
         reportGridViewSection,
@@ -497,7 +505,7 @@ export const dynamicSectionsByKind = {
     "PERSON": [
         personHierarchySection,
         pack(personAppsSection,
-            [appCostsSummarySection, complexitySection, entityStatisticSummarySection, technologySummarySection]),
+            [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
         attestationSummarySection,
         bookmarksSection,
         changeInitiativeSection,
@@ -523,7 +531,7 @@ export const dynamicSectionsByKind = {
     ],
     "APP_GROUP": [
         pack(appsSection,
-            [appCostsSummarySection, complexitySection, entityStatisticSummarySection, technologySummarySection]),
+            [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
         pack(logicalFlowsTabgroupSection,
             [authSourcesSection]),
         attestationSummarySection,
@@ -543,14 +551,14 @@ export const dynamicSectionsByKind = {
         changeInitiativeSection,
         logicalFlowsTabgroupSection,
         pack(appsSection,
-            [appCostsSummarySection, complexitySection, entityStatisticSummarySection, technologySummarySection]),
+            [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
         bookmarksSection,
         entityNamedNotesSection,
         changeLogSection
     ],
     "FLOW_DIAGRAM": [
         pack(appsSection,
-            [appCostsSummarySection, complexitySection, entityStatisticSummarySection, technologySummarySection]),
+            [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
         bookmarksSection,
         changeLogSection,
         measurableRatingsBrowserSection,

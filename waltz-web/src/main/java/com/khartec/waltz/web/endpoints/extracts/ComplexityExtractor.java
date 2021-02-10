@@ -19,6 +19,9 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
 
+import com.khartec.waltz.data.GenericSelector;
+import com.khartec.waltz.data.GenericSelectorFactory;
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
@@ -29,10 +32,10 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.schema.Tables.APPLICATION;
-import static com.khartec.waltz.schema.Tables.COMPLEXITY_SCORE;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.schema.Tables.*;
+import static com.khartec.waltz.web.WebUtilities.*;
+import static java.lang.String.format;
 import static spark.Spark.post;
 
 
@@ -40,6 +43,13 @@ import static spark.Spark.post;
 public class ComplexityExtractor extends DirectQueryBasedDataExtractor {
 
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
+    private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
+
+    private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+            COMPLEXITY.ENTITY_ID,
+            COMPLEXITY.ENTITY_KIND,
+            newArrayList(EntityKind.APPLICATION))
+            .as("entity_name");
 
 
     @Autowired
@@ -53,6 +63,8 @@ public class ComplexityExtractor extends DirectQueryBasedDataExtractor {
     public void register() {
 
         String path = mkPath("data-extract", "complexity", "all");
+        String findBySelectorPath = mkPath("data-extract", "complexity", "target-kind", ":kind", "selector");
+
         post(path, (request, response) -> {
             IdSelectionOptions applicationIdSelectionOptions = readIdSelectionOptionsFromBody(request);
             Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(applicationIdSelectionOptions);
@@ -75,6 +87,35 @@ public class ComplexityExtractor extends DirectQueryBasedDataExtractor {
                     request,
                     response);
         });
+
+        post(findBySelectorPath, (request, response) -> {
+            IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
+            EntityKind targetKind = getKind(request);
+            GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, idSelectionOptions);
+
+            SelectConditionStep<Record> qry = dsl
+                    .select(ENTITY_NAME_FIELD.as("Entity Name"))
+                    .select(COMPLEXITY.ENTITY_ID)
+                    .select(COMPLEXITY_KIND.NAME.as("Complexity Kind"))
+                    .select(COMPLEXITY.PROVENANCE)
+                    .from(COMPLEXITY)
+                    .innerJoin(COMPLEXITY_KIND).on(COMPLEXITY.COMPLEXITY_KIND_ID.eq(COMPLEXITY_KIND.ID))
+                    .where(COMPLEXITY.ENTITY_ID.in(genericSelector.selector())
+                            .and(COMPLEXITY.ENTITY_KIND.eq(genericSelector.kind().name())));
+
+            return writeExtract(
+                    mkFilename(idSelectionOptions),
+                    qry,
+                    request,
+                    response
+            );
+
+        });
+    }
+
+
+    private String mkFilename(IdSelectionOptions idSelectionOptions) {
+        return format("%s-%d-complexity-scores", idSelectionOptions.entityReference().kind(), idSelectionOptions.entityReference().id());
     }
 
 }
