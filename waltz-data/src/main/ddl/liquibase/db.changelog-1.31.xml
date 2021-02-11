@@ -175,4 +175,17 @@
         </sql>
     </changeSet>
 
+    <!--5302: add index on physical flow (ext id and provenance)-->
+    <changeSet id="20210211-5302-1"
+               author="woodjes">
+        <comment>5302: adding index on physical flow (external_id, provenance)</comment>
+        <createIndex tableName="physical_flow"
+                     indexName="idx_pf_ext_id_provenance">
+            <column name="external_id"
+                    type="${external-id.type}"/>
+            <column name="provenance"
+                    type="${provenance.type}"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
