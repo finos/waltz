@@ -1,0 +1,96 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg height='226pt' preserveAspectRatio='xMidYMid meet' viewBox='0.00 0.00 671.00 226.00' width='671pt' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns='http://www.w3.org/2000/svg'>
+<g class='graph' id='graph0' transform='scale(1 1) rotate(0) translate(4 222)'>
+<title>ERD</title>
+<polygon fill='white' points='-4,4 -4,-222 667,-222 667,4 -4,4' stroke='transparent'/>
+
+<g class='node' id='node1'>
+<title>MRPD</title>
+<polygon fill='none' points='0,-0.5 0,-76.5 311,-76.5 311,-0.5 0,-0.5' stroke='black'/>
+<text font-family='Times New Roman,serif' font-size='14.00' text-anchor='middle' x='155.5' y='-61.3'>MEASURABLE_RATING_PLANNED_DECOMM</text>
+<polyline fill='none' points='0,-53.5 311,-53.5 ' stroke='black'/>
+<text font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='8' y='-38.3'>MEASURABLE_RATING_ID </text>
+<text font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='8' y='-23.3'> EVENT_DATE </text>
+<text font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='8' y='-8.3'> DESCRIPTION </text>
+</g>
+
+<g class='node' id='node5'>
+<title>MR</title>
+<polygon fill='none' points='347,-24.5 347,-116.5 517,-116.5 517,-24.5 347,-24.5' stroke='black'/>
+<text font-family='Times New Roman,serif' font-size='14.00' text-anchor='middle' x='432' y='-101.3'>MEASURABLE_RATING</text>
+<polyline fill='none' points='347,-93.5 517,-93.5 ' stroke='black'/>
+<text font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='355' y='-78.3'>ID </text>
+<polyline fill='none' points='347,-70.5 517,-70.5 ' stroke='black'/>
+<text font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='355' y='-55.3'>MEASURABLE_ID </text>
+<polyline fill='none' points='347,-47.5 517,-47.5 ' stroke='black'/>
+<text font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='355' y='-32.3'>APPLICATION_ID </text>
+</g>
+
+<g class='edge' id='edge3'>
+<title>MRPD:MRID&#45;&gt;MR:ID</title>
+<path d='M311,-26.5C336.43,-26.5 322.89,-67.86 337.35,-79.49' fill='none' stroke='black'/>
+<polygon fill='black' points='336.41,-82.86 347,-82.5 338.5,-76.18 336.41,-82.86' stroke='black'/>
+</g>
+
+<g class='node' id='node2'>
+<title>MRPC</title>
+<polygon fill='none' points='2,-95.5 2,-217.5 309,-217.5 309,-95.5 2,-95.5' stroke='green'/>
+<text fill='darkgreen' font-family='Times New Roman,serif' font-size='14.00' text-anchor='middle' x='155.5' y='-202.3'>MEASURABLE_RATING_PLANNED_CHANGE</text>
+<polyline fill='none' points='2,-194.5 309,-194.5 ' stroke='green'/>
+<text fill='darkgreen' font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='10' y='-179.3'>MEASURABLE_ID </text>
+<polyline fill='none' points='2,-171.5 309,-171.5 ' stroke='green'/>
+<text fill='darkgreen' font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='10' y='-156.3'>APPLICATION_ID </text>
+<polyline fill='none' points='2,-148.5 309,-148.5 ' stroke='green'/>
+<text fill='darkgreen' font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='10' y='-133.3'>RATING_ID </text>
+<text fill='darkgreen' font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='10' y='-118.3'> EVENT_DATE </text>
+<text fill='darkgreen' font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='10' y='-103.3'> DESCRIPTION </text>
+</g>
+
+<g class='node' id='node3'>
+<title>M</title>
+<polygon fill='none' points='553,-122.5 553,-206.5 663,-206.5 663,-122.5 553,-122.5' stroke='black'/>
+<text font-family='Times New Roman,serif' font-size='14.00' text-anchor='middle' x='608' y='-191.3'>MEASURABLE</text>
+<polyline fill='none' points='553,-183.5 663,-183.5 ' stroke='black'/>
+<text font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='561' y='-168.3'>ID </text>
+<polyline fill='none' points='553,-160.5 663,-160.5 ' stroke='black'/>
+<text font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='561' y='-145.3'>NAME </text>
+<text font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='561' y='-130.3'> CATEGORY </text>
+</g>
+
+<g class='edge' id='edge4'>
+<title>MRPC:MID&#45;&gt;M:ID</title>
+<path d='M310.5,-183.5C414.91,-183.5 443.3,-173.2 542.82,-172.53' fill='none' stroke='black'/>
+<polygon fill='black' points='543.01,-176.03 553,-172.5 542.99,-169.03 543.01,-176.03' stroke='black'/>
+</g>
+
+<g class='node' id='node4'>
+<title>A</title>
+<polygon fill='none' points='578,-23 578,-92 638,-92 638,-23 578,-23' stroke='black'/>
+<text font-family='Times New Roman,serif' font-size='14.00' text-anchor='middle' x='608' y='-76.8'>APP</text>
+<polyline fill='none' points='578,-69 638,-69 ' stroke='black'/>
+<text font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='586' y='-53.8'>ID </text>
+<polyline fill='none' points='578,-46 638,-46 ' stroke='black'/>
+<text font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='586' y='-30.8'>NAME </text>
+</g>
+
+<g class='edge' id='edge5'>
+<title>MRPC:AID&#45;&gt;A:ID</title>
+<path d='M310.5,-160.5C403.59,-160.5 435.66,-170.77 517,-125.5 548.92,-107.74 539.16,-66.32 567.05,-58.71' fill='none' stroke='black'/>
+<polygon fill='black' points='567.5,-62.18 577,-57.5 566.65,-55.24 567.5,-62.18' stroke='black'/>
+</g>
+
+<g class='edge' id='edge1'>
+<title>MR:MID&#45;&gt;M:ID</title>
+<path d='M517,-58.5C566.19,-58.5 509.62,-156.21 543.11,-170.71' fill='none' stroke='black'/>
+<polygon fill='black' points='542.54,-174.16 553,-172.5 543.78,-167.27 542.54,-174.16' stroke='black'/>
+</g>
+
+<g class='edge' id='edge2'>
+<title>MR:AID&#45;&gt;A:ID</title>
+<path d='M517,-35.5C541.63,-35.5 547.3,-52.04 566.9,-56.44' fill='none' stroke='black'/>
+<polygon fill='black' points='566.69,-59.94 577,-57.5 567.42,-52.97 566.69,-59.94' stroke='black'/>
+</g>
+</g>
+</svg>
