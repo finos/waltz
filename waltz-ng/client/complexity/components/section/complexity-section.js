@@ -72,7 +72,7 @@ function controller($q, serviceBroker) {
 
         const complexityPromise = serviceBroker
             .loadViewData(
-                CORE_API.ComplexityStore.findBySelector,
+                CORE_API.ComplexityScoreStore.findBySelector,
                 [ vm.selector ])
             .then(r => vm.complexity = r.data);
 

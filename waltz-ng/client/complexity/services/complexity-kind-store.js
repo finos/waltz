@@ -19,17 +19,17 @@
 
 export function store($http, BaseApiUrl) {
 
-    const BASE = `${BaseApiUrl}/complexity`;
+    const BASE = `${BaseApiUrl}/complexity-kind`;
 
-    const findByEntityReference = (ref) => {
+    const findAll = () => {
         return $http
-            .get(`${BASE}/entity/kind/${ref.kind}/id/${ref.id}`)
+            .get(BASE)
             .then(result => result.data);
     };
 
 
     return {
-        findByEntityReference,
+        findAll,
     };
 }
 
@@ -38,13 +38,13 @@ store.$inject = [
     'BaseApiUrl',
 ];
 
-export const serviceName = 'ComplexityStore';
+export const serviceName = 'ComplexityKindStore';
 
-export const ComplexityStore_API = {
-    findByEntityReference: {
+export const ComplexityKindStore_API = {
+    findAll: {
         serviceName,
-        serviceFnName: 'findByEntityReference',
-        description: 'executes findByEntityReference (ref) '
+        serviceFnName: 'findAll',
+        description: 'executes findAll '
     }
 };
 

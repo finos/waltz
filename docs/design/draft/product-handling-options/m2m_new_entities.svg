@@ -1,0 +1,63 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg height='234pt' preserveAspectRatio='xMidYMid meet' viewBox='0.00 0.00 499.00 234.00' width='499pt' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns='http://www.w3.org/2000/svg'>
+<g class='graph' id='graph0' transform='scale(1 1) rotate(0) translate(4 230)'>
+<title>ERD</title>
+<polygon fill='white' points='-4,4 -4,-230 495,-230 495,4 -4,4' stroke='transparent'/>
+
+<g class='node' id='node1'>
+<title>MLE</title>
+<polygon fill='none' points='0,-126.5 0,-225.5 345,-225.5 345,-126.5 0,-126.5' stroke='green'/>
+<text fill='darkgreen' font-family='Times New Roman,serif' font-size='14.00' text-anchor='middle' x='172.5' y='-210.3'>MEASURABLE_LIFECYCLE_EVENT</text>
+<polyline fill='none' points='0,-202.5 345,-202.5 ' stroke='green'/>
+<text fill='darkgreen' font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='8' y='-187.3'>MEASURABLE_ID </text>
+<polyline fill='none' points='0,-179.5 345,-179.5 ' stroke='green'/>
+<text fill='darkgreen' font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='8' y='-164.3'>EVENT_TYPE (eg COMMISSION | DECOMMISSION) </text>
+<text fill='darkgreen' font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='8' y='-149.3'> EVENT_DATE </text>
+<text fill='darkgreen' font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='8' y='-134.3'> DESCRIPTION </text>
+</g>
+
+<g class='node' id='node3'>
+<title>M</title>
+<polygon fill='none' points='381,-23 381,-107 491,-107 491,-23 381,-23' stroke='black'/>
+<text font-family='Times New Roman,serif' font-size='14.00' text-anchor='middle' x='436' y='-91.8'>MEASURABLE</text>
+<polyline fill='none' points='381,-84 491,-84 ' stroke='black'/>
+<text font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='389' y='-68.8'>ID </text>
+<polyline fill='none' points='381,-61 491,-61 ' stroke='black'/>
+<text font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='389' y='-45.8'>NAME </text>
+<text font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='389' y='-30.8'> CATEGORY </text>
+</g>
+
+<g class='edge' id='edge3'>
+<title>MLE:MID&#45;&gt;M:ID</title>
+<path d='M345,-191C395.76,-191 336.4,-89.87 370.81,-74.85' fill='none' stroke='black'/>
+<polygon fill='black' points='371.79,-78.23 381,-73 370.54,-71.35 371.79,-78.23' stroke='black'/>
+</g>
+
+<g class='node' id='node2'>
+<title>M2MT</title>
+<polygon fill='none' points='14,-0.5 14,-107.5 331,-107.5 331,-0.5 14,-0.5' stroke='green'/>
+<text fill='darkgreen' font-family='Times New Roman,serif' font-size='14.00' text-anchor='middle' x='172.5' y='-92.3'>MEASURABLE_TO_MEASURABLE_TRANSFER</text>
+<polyline fill='none' points='14,-84.5 331,-84.5 ' stroke='green'/>
+<text fill='darkgreen' font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='22' y='-69.3'>SOURCE_MEASURABLE </text>
+<polyline fill='none' points='14,-61.5 331,-61.5 ' stroke='green'/>
+<text fill='darkgreen' font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='22' y='-46.3'>TARGET_MEASURABLE </text>
+<polyline fill='none' points='14,-38.5 331,-38.5 ' stroke='green'/>
+<text fill='darkgreen' font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='22' y='-23.3'>AVAILABILITY_DATE (optional) </text>
+<text fill='darkgreen' font-family='Times New Roman,serif' font-size='14.00' text-anchor='start' x='22' y='-8.3'> DESCRIPTION </text>
+</g>
+
+<g class='edge' id='edge1'>
+<title>M2MT:SRC&#45;&gt;M:ID</title>
+<path d='M332.5,-73C350.18,-73 356.99,-73 370.76,-73' fill='none' stroke='black'/>
+<polygon fill='black' points='371,-76.5 381,-73 371,-69.5 371,-76.5' stroke='black'/>
+</g>
+
+<g class='edge' id='edge2'>
+<title>M2MT:TRG&#45;&gt;M:ID</title>
+<path d='M332.5,-50C352.44,-50 356.26,-66.07 370.92,-71.35' fill='none' stroke='black'/>
+<polygon fill='black' points='370.57,-74.83 381,-73 371.7,-67.93 370.57,-74.83' stroke='black'/>
+</g>
+</g>
+</svg>

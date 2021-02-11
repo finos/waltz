@@ -31,7 +31,7 @@ function controller(serviceBroker) {
 
         serviceBroker
             .loadViewData(
-                CORE_API.ComplexityStore.findBySelector,
+                CORE_API.ComplexityScoreStore.findBySelector,
                 [ selector ])
             .then(r => vm.stats = calcComplexitySummary(r.data));
     };

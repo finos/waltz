@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+
+<svg height='44pt' preserveAspectRatio='xMidYMid meet' viewBox='0.00 0.00 267.49 44.00' width='267pt' xmlns:xlink='http://www.w3.org/1999/xlink' xmlns='http://www.w3.org/2000/svg'>
+<g class='graph' id='graph0' transform='scale(1 1) rotate(0) translate(4 40)'>
+<title>A</title>
+<polygon fill='white' points='-4,4 -4,-40 263.49,-40 263.49,4 -4,4' stroke='transparent'/>
+
+<g class='node' id='node1'>
+<title>Family</title>
+<ellipse cx='35.1' cy='-18' fill='none' rx='35.19' ry='18' stroke='#666666'/>
+<text fill='#666666' font-family='Times New Roman,serif' font-size='14.00' text-anchor='middle' x='35.1' y='-14.3'>Family</text>
+</g>
+
+<g class='node' id='node2'>
+<title>Product</title>
+<ellipse cx='128.1' cy='-18' fill='none' rx='40.09' ry='18' stroke='#333333'/>
+<text fill='#333333' font-family='Times New Roman,serif' font-size='14.00' text-anchor='middle' x='128.1' y='-14.3'>Product</text>
+</g>
+
+<g class='edge' id='edge1'>
+<title>Family:&#45;&gt;Product:</title>
+<path d='M70.34,-18C72.66,-18 74.98,-18 77.3,-18' fill='none' stroke='#666666'/>
+<polygon fill='#666666' points='77.48,-21.5 87.48,-18 77.48,-14.5 77.48,-21.5' stroke='#666666'/>
+</g>
+
+<g class='node' id='node3'>
+<title>Option</title>
+<ellipse cx='223.1' cy='-18' fill='none' rx='36.29' ry='18' stroke='black'/>
+<text font-family='Times New Roman,serif' font-size='14.00' text-anchor='middle' x='223.1' y='-14.3'>Option</text>
+</g>
+
+<g class='edge' id='edge2'>
+<title>Product:&#45;&gt;Option:</title>
+<path d='M168.55,-18C171.16,-18 173.77,-18 176.38,-18' fill='none' stroke='#333333'/>
+<polygon fill='#333333' points='176.45,-21.5 186.45,-18 176.45,-14.5 176.45,-21.5' stroke='#333333'/>
+</g>
+</g>
+</svg>

@@ -18,39 +18,37 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.complexity.Complexity;
-import com.khartec.waltz.service.complexity.ComplexityService;
+import com.khartec.waltz.model.complexity.ComplexityKind;
+import com.khartec.waltz.service.complexity_kind.ComplexityKindService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.web.WebUtilities.getEntityReference;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 
 
 @Service
-public class ComplexityEndpoint implements Endpoint {
+public class ComplexityKindEndpoint implements Endpoint {
 
-    private static final String BASE_URL = mkPath("api", "complexity");
+    private static final String BASE_URL = mkPath("api", "complexity-kind");
 
-    private final ComplexityService complexityService;
+    private final ComplexityKindService complexityKindService;
 
 
     @Autowired
-    public ComplexityEndpoint(ComplexityService complexityService) {
-        this.complexityService = complexityService;
+    public ComplexityKindEndpoint(ComplexityKindService complexityKindService) {
+        this.complexityKindService = complexityKindService;
     }
 
 
     @Override
+
     public void register() {
-        String findByEntityRefPath = mkPath(BASE_URL, "entity", "kind", ":kind", "id", ":id");
 
-        ListRoute<Complexity> findByEntityRefRoute = (request, response) -> complexityService
-                .findByEntityReference(getEntityReference(request));
+        ListRoute<ComplexityKind> findAllRoute = (request, response) -> complexityKindService.findAll();
 
-        getForList(findByEntityRefPath, findByEntityRefRoute);
+        getForList(BASE_URL, findAllRoute);
     }
 }

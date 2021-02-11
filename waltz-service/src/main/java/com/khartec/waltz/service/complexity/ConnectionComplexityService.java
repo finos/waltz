@@ -19,8 +19,8 @@
 package com.khartec.waltz.service.complexity;
 
 import com.khartec.waltz.data.complexity.ConnectionComplexityDao;
-import com.khartec.waltz.model.complexity.ComplexityKind;
 import com.khartec.waltz.model.complexity.ComplexityScore;
+import com.khartec.waltz.model.complexity.ComplexityType;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +31,7 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.model.complexity.ComplexityUtilities.tallyToComplexityScore;
 
+@Deprecated
 @Service
 public class ConnectionComplexityService {
 
@@ -61,7 +62,7 @@ public class ConnectionComplexityService {
     public List<ComplexityScore> findByAppIdSelector(Select<Record1<Long>> idSelector, int baseline) {
         return connectionComplexityDao.findCounts(idSelector)
                 .stream()
-                .map(tally -> tallyToComplexityScore(ComplexityKind.CONNECTION, tally, baseline, Math::log))
+                .map(tally -> tallyToComplexityScore(ComplexityType.CONNECTION, tally, baseline, Math::log))
                 .collect(Collectors.toList());
     }
 

@@ -32,6 +32,7 @@ import java.util.List;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 
+@Deprecated
 @Repository
 public class MeasurableComplexityDao {
 
