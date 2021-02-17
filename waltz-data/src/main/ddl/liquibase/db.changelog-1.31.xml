@@ -175,4 +175,19 @@
         </sql>
     </changeSet>
 
+    <!-- 5304: insert disable cost exports settings value -->
+    <changeSet id="20210217-5304-1"
+               author="woodjes">
+        <comment>5304: Insert enum values into table</comment>
+        <insert tableName="settings">
+            <column name="name" value="feature.data-extractor.entity-cost.enabled"/>
+            <column name="value" value="true"/>
+        </insert>
+        <rollback>
+            <delete tableName="settings">
+                <where>name='feature.data-extractor.entity-cost.enabled'</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
 </databaseChangeLog>
