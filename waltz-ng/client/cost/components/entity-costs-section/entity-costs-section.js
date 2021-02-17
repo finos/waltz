@@ -20,6 +20,7 @@ import {initialiseData} from "../../../common";
 import template from "./entity-costs-section.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import * as _ from "lodash";
+import namedSettings from "../../../system/named-settings"
 
 
 const bindings = {
@@ -27,6 +28,7 @@ const bindings = {
 };
 
 const initialState = {
+    exportAllowed: true
 };
 
 
@@ -75,7 +77,7 @@ function mkColumnDefs(uiGridConstants){
 }
 
 
-function controller($q, serviceBroker, uiGridConstants) {
+function controller($q, serviceBroker, uiGridConstants, settingsService) {
 
     const vm = initialiseData(this, initialState);
 
@@ -117,7 +119,16 @@ function controller($q, serviceBroker, uiGridConstants) {
             });
     }
 
+    function allowCostExport() {
+        settingsService
+            .findOrDefault(namedSettings.costExportEnabled, true)
+            .then(exportAllowed => {
+                vm.exportAllowed = !(exportAllowed === 'false');
+            });
+    }
+
     vm.$onInit = () => {
+        allowCostExport();
         loadCostInfo();
         vm.entityCostColumnDefs = mkColumnDefs(uiGridConstants);
 
@@ -132,7 +143,8 @@ function controller($q, serviceBroker, uiGridConstants) {
 controller.$inject = [
     "$q",
     "ServiceBroker",
-    "uiGridConstants"
+    "uiGridConstants",
+    "SettingsService"
 ];
 
 

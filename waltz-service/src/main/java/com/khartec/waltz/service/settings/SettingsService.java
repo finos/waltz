@@ -38,6 +38,8 @@ public class SettingsService {
     private final SettingsDao settingsDao;
 
     public static final String DEFAULT_ROLES_KEY = "server.authentication.roles.default";
+    public static final String ALLOW_COST_EXPORTS_KEY = "feature.data-extractor.entity-cost.enabled";
+
     private final Map<String, Setting> overridesByName;
 
 

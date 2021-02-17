@@ -25,5 +25,6 @@ export default {
     betaNagMessage: "web.beta.nag-message",
     defaultCurrency: "settings.asset-cost.default-currency",
     currentYearText: "settings.asset-cost.current-year-text",
-    avatarTemplateUrl: "ui.avatar.template.url"
+    avatarTemplateUrl: "ui.avatar.template.url",
+    costExportEnabled: "feature.data-extractor.entity-cost.enabled"
 };
