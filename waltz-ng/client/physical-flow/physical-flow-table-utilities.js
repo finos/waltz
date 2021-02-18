@@ -30,10 +30,51 @@ export const columnDef = {
     frequency: { field: "physicalFlow.frequency", displayName: "Frequency", cellFilter: "toDisplayName:\"frequencyKind\"" },
     criticality: { field: "physicalFlow.criticality", displayName: "Criticality", cellFilter: "toDisplayName:\"physicalFlowCriticality\"" },
     description: { field: "specification.description", displayName: "Description"},
-    source: mkLinkGridCell("Source App", "logicalFlow.source.name", "logicalFlow.source.id", "main.app.view"),
-    target: mkLinkGridCell("Target App", "logicalFlow.target.name", "logicalFlow.target.id", "main.app.view"),
+    source: mkSourceColumnDef(),
+    target: mkTargetColumnDef(),
     basisOffset: { field: "physicalFlow.basisOffset", displayName: "Basis", cellFilter: "toBasisOffset" }
 };
+
+
+function mkSourceColumnDef(){
+    return {
+        field: "logicalFlow.source.name",
+        displayName: "Source",
+        cellTemplate: `
+            <div class="ui-grid-cell-contents">
+                <a ng-if="row.entity.logicalFlow.source.kind === 'ACTOR'"
+                   ui-sref="main.actor.view ({ id: row.entity.logicalFlow.source.id })"
+                   ng-bind="COL_FIELD">
+                </a>
+                <a ng-if="row.entity.logicalFlow.source.kind === 'APPLICATION'"
+                   ui-sref="main.app.view ({ id: row.entity.logicalFlow.source.id })"
+                   ng-bind="COL_FIELD">
+                </a>
+            </div>`
+    };
+}
+
+
+function mkTargetColumnDef(){
+    return {
+        field: "logicalFlow.target.name",
+        displayName: "Target",
+        cellTemplate: `
+            <div ng-if="row.entity.logicalFlow.target.kind === 'ACTOR'"
+            class="ui-grid-cell-contents">
+                <a ui-sref="main.actor.view ({ id: row.entity.logicalFlow.target.id })"
+                   ng-bind="COL_FIELD">
+                </a>
+            </div>
+            <div ng-if="row.entity.logicalFlow.target.kind === 'APPLICATION'"
+            class="ui-grid-cell-contents">
+                <a ui-sref="main.app.view ({ id: row.entity.logicalFlow.target.id })"
+                   ng-bind="COL_FIELD">
+                </a>
+            </div>`
+    };
+}
+
 
 export function withWidth(name, width) {
     return Object.assign(name, { width: width})
