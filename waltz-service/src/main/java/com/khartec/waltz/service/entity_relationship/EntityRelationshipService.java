@@ -51,6 +51,11 @@ public class EntityRelationshipService {
     }
 
 
+    public EntityRelationship getById(Long id){
+        return entityRelationshipDao.getById(id);
+    }
+
+
     public Collection<EntityRelationship> findForEntity(EntityReference ref,
                                                         Directionality directionality,
                                                         List<RelationshipKind> relationshipKinds) {

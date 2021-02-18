@@ -188,4 +188,49 @@
         </createIndex>
     </changeSet>
 
+    <!--5306: add id to entity relationship -->
+    <changeSet id="20210217-5306-1"
+               author="woodjes">
+        <comment>5306: adding id to entity_relationship (drop existing)</comment>
+        <dropPrimaryKey tableName="entity_relationship"/>
+        <rollback>
+            <addPrimaryKey columnNames="kind_a, id_a, kind_b, id_b, relationship"
+                           constraintName="entity_relationship_pkey"
+                           tableName="entity_relationship"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20210217-5306-2"
+               author="woodjes">
+        <comment>5306: adding id to entity_relationship- create unique index from old pk</comment>
+        <createIndex indexName="idx_er_ida_ka_idb_kb_rel"
+                     tableName="entity_relationship"
+                     unique="true">
+            <column name="kind_a"/>
+            <column name="id_a"/>
+            <column name="kind_b"/>
+            <column name="id_b"/>
+            <column name="relationship"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20210217-5306-3"
+               author="woodjes">
+        <comment>5306: adding id to entity_relationship</comment>
+        <addColumn tableName="entity_relationship">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20210217-5306-4"
+               author="woodjes">
+        <comment>5306: adding id to entity_relationship</comment>
+        <addPrimaryKey columnNames="id"
+                       constraintName="entity_relationship_pkey"
+                       tableName="entity_relationship"/>
+    </changeSet>
+
 </databaseChangeLog>
