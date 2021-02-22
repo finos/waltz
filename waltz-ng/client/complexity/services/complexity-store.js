@@ -27,9 +27,22 @@ export function store($http, BaseApiUrl) {
             .then(result => result.data);
     };
 
+    const findBySelector = (targetKind, selectionOptions) => {
+        return $http
+            .post(`${BASE}/target-kind/${targetKind}`, selectionOptions)
+            .then(r => r.data);
+    };
+
+    const findByTopCostsSummaryByTargetKindAndSelector = (complexityKindId, targetKind, selectionOptions) => {
+        return $http
+            .post(`${BASE}/complexity-kind/${complexityKindId}/target-kind/${targetKind}`, selectionOptions)
+            .then(r => r.data);
+    };
 
     return {
         findByEntityReference,
+        findBySelector,
+        findByTopCostsSummaryByTargetKindAndSelector
     };
 }
 
@@ -45,6 +58,16 @@ export const ComplexityStore_API = {
         serviceName,
         serviceFnName: 'findByEntityReference',
         description: 'executes findByEntityReference (ref) '
+    },
+    findBySelector: {
+        serviceName,
+        serviceFnName: 'findBySelector',
+        description: 'executes findBySelector (targetKind, selectionOptions) '
+    },
+    findByTopCostsSummaryByTargetKindAndSelector: {
+        serviceName,
+        serviceFnName: 'findByTopCostsSummaryByTargetKindAndSelector',
+        description: 'executes findByTopCostsSummaryByTargetKindAndSelector (complexityKindId, targetKind, selectionOptions) '
     }
 };
 

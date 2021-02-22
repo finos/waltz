@@ -1,0 +1,164 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+<style>
+    .wacss-form-control-inline {
+        min-width: 0;
+        width: auto;
+        display: inline;
+    }
+</style>
+<div>
+    <waltz-section-actions>
+        <button class="btn btn-xs waltz-btn-transparent"
+                ng-click="$ctrl.sourceDataOverlay = ! $ctrl.sourceDataOverlay">
+            <waltz-icon name="map-signs"></waltz-icon>
+        </button>
+    </waltz-section-actions>
+
+    <waltz-source-data-overlay visible="$ctrl.sourceDataOverlay"
+                               entities="['COMPLEXITY']">
+    </waltz-source-data-overlay>
+
+    <div class="row"
+         ng-if="$ctrl.complexityKinds.length == 0">
+        <div class="col-sm-12">
+            <waltz-no-data>
+                <message>
+                    <strong>No {{$ctrl.targetEntityKind | toDisplayName:'entity'}} complexity scores found.</strong>
+                </message>
+            </waltz-no-data>
+        </div>
+    </div>
+
+    <div class="row" ng-if="$ctrl.complexityKinds.length > 0">
+        <div class="col-sm-12"
+             ng-if="$ctrl.selectedKind">
+            <h4 style="min-height: 2em; vertical-align: center">
+                <span ng-bind="$ctrl.targetEntityKind | toDisplayName:'entity'"></span>
+                <span ng-bind="$ctrl.selectedKind.name"></span>
+                complexity:
+                <small>
+                    <a class="clickable"
+                       ng-if="!$ctrl.visibility.selectKind"
+                       ng-click="$ctrl.visibility.selectKind = true">Change complexity kind
+                    </a>
+
+                    <span ng-if="$ctrl.visibility.selectKind">
+                        <select ng-model="$ctrl.selectedKind"
+                                ng-change="$ctrl.refresh()"
+                                ng-options="kind as kind.name for kind in $ctrl.complexityKinds"
+                                id="selectedKind"
+                                class="form-control wacss-form-control-inline">
+                        </select>
+                    </span>
+                </small>
+            </h4>
+        </div>
+    </div>
+
+
+    <div class="row"
+         ng-if="$ctrl.complexitySummary">
+        <div class="col-sm-8">
+            <waltz-complexity-graph complexities="$ctrl.complexitySummary.topComplexityScores"
+                                    on-select="$ctrl.onSelect">
+            </waltz-complexity-graph>
+        </div>
+        <div class="col-sm-4">
+            <waltz-sub-section name="{{$ctrl.complexitySummary.complexityKind.name}}">
+                <content>
+                    <div class="waltz-sub-section-content">
+                        <div class="help-block"
+                             ng-bind="$ctrl.complexitySummary.complexityKind.description">
+                        </div>
+
+                        <h4>&Sigma;<span ng-bind="$ctrl.complexitySummary.total"></span></h4>
+
+                        <p>
+                            Total complexity over
+                            <span ng-bind="$ctrl.complexitySummary.mappedCount"></span>
+                            <span ng-bind="$ctrl.targetEntityKind | toDisplayName:'entity'"></span>s.
+                        </p>
+                        <p>
+                            The average complexity is
+                            <span ng-bind="$ctrl.complexitySummary.average"></span>
+                        </p>
+
+                        <p class="help-block"
+                           ng-if="$ctrl.complexitySummary.missingCount > 0">
+                            <waltz-icon name="warning" style="color: orange"></waltz-icon>
+                            There are
+                            <span ng-bind="$ctrl.complexitySummary.missingCount"></span>
+                            apps with no associated
+                            <span ng-bind="$ctrl.complexitySummary.complexityKind.name"></span> complexity scores.
+                        </p>
+
+
+                        <div ng-if="$ctrl.selectedEntity"
+                             style="padding-bottom: 1em;">
+                            <hr>
+                            <h4>
+                                <waltz-entity-link tooltip-placement="left"
+                                                   entity-ref="$ctrl.selectedEntity.entityReference">
+                                </waltz-entity-link>
+                            </h4>
+                            <h4>
+                                <span ng-bind="$ctrl.complexitySummary.complexityKind.name"></span>
+                                complexity: <span ng-bind="$ctrl.selectedEntity.score"></span>
+                            </h4>
+                        </div>
+                    </div>
+
+                    <div class="waltz-sub-section-controls">
+                        <a class="clickable"
+                           ng-click="$ctrl.showAllComplexities()"
+                           ng-bind="$ctrl.visibility.allComplexities ? 'Hide all complexity scores' : 'Show all complexity scores'">
+                        </a>
+                    </div>
+
+                </content>
+            </waltz-sub-section>
+            <br>
+        </div>
+    </div>
+
+    <div class="row"
+         ng-if="$ctrl.visibility.allComplexities">
+        <div class="col-sm-12">
+            <hr>
+            <waltz-loading-notification show="$ctrl.visibility.loading"
+                                        style="padding-top: 54px;"
+                                        name="Loading">
+            </waltz-loading-notification>
+            <div ng-if="!$ctrl.visibility.loading">
+                <waltz-grid-with-search column-defs="$ctrl.complexityColumnDefs"
+                                        ng-if="$ctrl.allComplexities.length > 0"
+                                        entries="$ctrl.allComplexities"
+                                        search-placeholder-text="Search complexity scores...">
+                </waltz-grid-with-search>
+                <waltz-data-extract-link name="Export complexities"
+                                         extract="complexity/target-kind/{{$ctrl.targetEntityKind}}/selector"
+                                         method="POST"
+                                         styling="link"
+                                         request-body="$ctrl.selector"
+                                         style="padding-top: 5px;"
+                                         class="pull-right">
+                </waltz-data-extract-link>
+            </div>
+        </div>
+    </div>

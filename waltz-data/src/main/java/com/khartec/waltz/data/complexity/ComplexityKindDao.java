@@ -19,6 +19,7 @@
 package com.khartec.waltz.data.complexity;
 
 import com.khartec.waltz.common.Checks;
+import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.model.complexity.ComplexityKind;
 import com.khartec.waltz.model.complexity.ImmutableComplexityKind;
 import com.khartec.waltz.schema.tables.records.ComplexityKindRecord;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
+import static com.khartec.waltz.schema.Tables.COMPLEXITY;
 import static com.khartec.waltz.schema.Tables.COMPLEXITY_KIND;
 
 @Repository
@@ -59,6 +61,25 @@ public class ComplexityKindDao {
     public Set<ComplexityKind> findAll(){
         return dsl
                 .selectFrom(COMPLEXITY_KIND)
+                .fetchSet(TO_COMPLEXITY_KIND_MAPPER);
+    }
+
+
+    public ComplexityKind getById(Long complexityKindId) {
+        return dsl
+                .selectFrom(COMPLEXITY_KIND)
+                .where(COMPLEXITY_KIND.ID.eq(complexityKindId))
+                .fetchOne(TO_COMPLEXITY_KIND_MAPPER);
+    }
+
+
+    public Set<ComplexityKind> findBySelector(GenericSelector genericSelector) {
+        return dsl
+                .select(COMPLEXITY_KIND.fields())
+                .from(COMPLEXITY_KIND)
+                .innerJoin(COMPLEXITY).on(COMPLEXITY_KIND.ID.eq(COMPLEXITY.COMPLEXITY_KIND_ID))
+                .where(COMPLEXITY.ENTITY_ID.in(genericSelector.selector())
+                        .and(COMPLEXITY.ENTITY_KIND.eq(genericSelector.kind().name())))
                 .fetchSet(TO_COMPLEXITY_KIND_MAPPER);
     }
 }

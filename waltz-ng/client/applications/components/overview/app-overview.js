@@ -23,6 +23,8 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./app-overview.html";
 import {displayError} from "../../../common/error-utils";
+import {enrichComplexitiesWithKind, findDefaultComplexityKind} from "../../../complexity/services/complexity-utilities";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 
 const bindings = {
@@ -73,12 +75,18 @@ function controller($state, serviceBroker, notification) {
             .then(r => vm.tags = r.data);
     }
 
-    function loadComplexity() {
-        serviceBroker
-            .loadViewData(
-                CORE_API.ComplexityScoreStore.findBySelector,
-                [{ entityReference: vm.parentEntityRef, scope: "EXACT" }])
-            .then(r => vm.complexity = _.get(r.data, "[0]"));
+    function loadComplexities() {
+        return serviceBroker
+            .loadViewData(CORE_API.ComplexityKindStore.findBySelector,
+            ['APPLICATION', mkSelectionOptions(vm.parentEntityRef)])
+            .then(r => vm.complexityKinds = r.data)
+            .then(() => serviceBroker
+                .loadViewData(CORE_API.ComplexityStore.findByEntityReference, [vm.parentEntityRef])
+                .then(r => {
+                    const defaultKindId = _.get(findDefaultComplexityKind(vm.complexityKinds), 'id', null);
+                    vm.complexities = enrichComplexitiesWithKind(r.data, vm.complexityKinds);
+                    vm.overviewComplexity = _.find(vm.complexities, d => d.complexityKindId === defaultKindId);
+                }))
     }
 
     function loadOrganisationalUnit() {
@@ -107,7 +115,7 @@ function controller($state, serviceBroker, notification) {
 
     vm.$onInit = () => {
         loadApp()
-            .then(() => loadComplexity())
+            .then(() => loadComplexities())
             .then(() => loadOrganisationalUnit());
         loadAliases();
         loadTags();
