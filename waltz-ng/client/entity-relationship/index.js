@@ -16,17 +16,21 @@
  *
  */
 
-import angular from 'angular';
-
 import * as EntityRelationshipStore from './services/entity-relationship-store';
 import * as RelationshipKindStore from './services/relationship-kind-store';
-import {registerStores} from "../common/module-utils";
+import EntityRelationshipView from './pages/view/entity-relationship-view'
+import EntityRelationshipOverview from './components/overview/entity-relationship-overview'
+import {registerComponents, registerStores} from "../common/module-utils";
+import Routes from './routes'
 
 
 export default () => {
 
     const module = angular.module('waltz.entity-relationship', []);
 
+    module.config(Routes);
+
+    registerComponents(module, [EntityRelationshipView, EntityRelationshipOverview]);
     registerStores(module, [ EntityRelationshipStore, RelationshipKindStore]);
 
     return module.name;

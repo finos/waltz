@@ -615,5 +615,12 @@ export const dynamicSectionsByKind = {
         entityDiagramsSection,
         physicalFlowSection,
         specificationDefinitionSection
+    ],
+    "ENTITY_RELATIONSHIP": [
+        assessmentRatingSection,
+        bookmarksSection,
+        changeLogSection,
+        entityNamedNotesSection,
+        involvedPeopleSection
     ]
 };
