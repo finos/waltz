@@ -71,6 +71,7 @@ public class EntityRelationshipDao {
     private static final RecordMapper<Record, EntityRelationship> TO_DOMAIN_MAPPER = r -> {
         EntityRelationshipRecord record = r.into(ENTITY_RELATIONSHIP);
         return ImmutableEntityRelationship.builder()
+                .id(record.getId())
                 .a(mkRef(
                         EntityKind.valueOf(record.getKindA()),
                         record.getIdA(),
@@ -145,6 +146,16 @@ public class EntityRelationshipDao {
                         r -> EntityKind.valueOf(r.get(0, String.class)),
                         r -> r.get(1, Integer.class),
                         (a, b) -> a + b));
+    }
+
+
+    public EntityRelationship getById(Long id){
+        return dsl
+                .select(ENTITY_RELATIONSHIP.fields())
+                .select(NAME_A, NAME_B)
+                .from(ENTITY_RELATIONSHIP)
+                .where(ENTITY_RELATIONSHIP.ID.eq(id))
+                .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 

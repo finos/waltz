@@ -1,0 +1,121 @@
+<waltz-page-header icon="link"
+                   name="{{ $ctrl.relationship.a.name }} - {{$ctrl.relationship.relationshipKind.name}} - {{$ctrl.relationship.b.name}}">
+    <breadcrumbs>
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li ng-if="$ctrl.relationship">
+                <waltz-entity-link tooltip-placement="bottom"
+                                   entity-ref="$ctrl.relationship.a">
+                </waltz-entity-link>
+            </li>
+            <li ng-if="!$ctrl.relationship">
+                Entity Relationship
+            </li>
+            <li ng-if="$ctrl.relationship">
+                <waltz-entity-link tooltip-placement="bottom"
+                                   entity-ref="$ctrl.relationship.b">
+                </waltz-entity-link>
+            </li>
+        </ol>
+    </breadcrumbs>
+</waltz-page-header>
+
+
+<div class="waltz-page-summary waltz-page-summary-attach">
+
+    <!-- NO DATA -->
+    <waltz-no-data ng-if="!$ctrl.relationship">
+        <message>
+            <strong>No Entity Relationship</strong> found.
+        </message>
+    </waltz-no-data>
+
+    <div class="waltz-display-section"
+         ng-if="$ctrl.relationship">
+        <div class="row">
+            <div class="col-sm-8">
+                <div class="row">
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Source:
+                    </div>
+                    <div class="col-sm-4">
+                        <waltz-entity-link tooltip-placement="bottom"
+                                           entity-ref="$ctrl.relationship.a">
+                        </waltz-entity-link>
+                    </div>
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Target:
+                    </div>
+                    <div class="col-sm-4">
+                        <waltz-entity-link tooltip-placement="bottom"
+                                           entity-ref="$ctrl.relationship.b">
+                        </waltz-entity-link>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Relationship Kind:
+                    </div>
+                    <div class="col-sm-10">
+                        <span uib-popover-template="'wero-rel-kind-desc-popover.html'"
+                              popover-append-to-body="true"
+                              popover-placement="right"
+                              popover-popup-delay="300"
+                              popover-trigger="mouseenter"
+                              ng-bind="$ctrl.relationship.relationshipKind.name">
+                        </span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-2 waltz-display-field-label">
+                        Description:
+                    </div>
+                    <div class="col-sm-10">
+                        <waltz-markdown ng-if="$ctrl.relationship.description"
+                                        text="$ctrl.relationship.description">
+                        </waltz-markdown>
+                        <span class="text-muted"
+                              ng-if="!$ctrl.relationship.description">
+                            None Provided
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <waltz-assessment-rating-sub-section parent-entity-ref="$ctrl.parentEntityRef">
+                </waltz-assessment-rating-sub-section>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/ng-template"
+        id="wero-rel-kind-desc-popover.html">
+    <div class="small">
+        <span ng-bind="$ctrl.relationship.relationshipKind.name"></span>
+        <table class="table table-condensed small">
+            <tbody>
+            <tr>
+                <td>Reverse Name</td>
+                <td ng-bind="$ctrl.relationship.relationshipKind.reverseName"></td>
+            </tr>
+            <tr>
+                <td>Code</td>
+                <td ng-bind="$ctrl.relationship.relationshipKind.code"></td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td>
+                    <waltz-markdown ng-if="$ctrl.relationship.relationshipKind.description"
+                                    text="$ctrl.relationship.relationshipKind.description">
+                    </waltz-markdown>
+                    <span class="text-muted"
+                          ng-if="!$ctrl.relationship.relationshipKind.description">
+                            None Provided
+                    </span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</script>

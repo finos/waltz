@@ -21,6 +21,13 @@ export function store($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/entity-relationship`;
 
 
+    const getById = (id) => {
+        return $http
+            .get(`${BASE}/id/${id}`)
+            .then(r => r.data);
+    };
+
+
     const remove = (rel) => {
         const url = `${BASE}/relationship/${rel.a.kind}/${rel.a.id}/${rel.b.kind}/${rel.b.id}/${rel.relationship}`;
         return $http
@@ -70,6 +77,7 @@ export function store($http, BaseApiUrl) {
     };
 
     return {
+        getById,
         findBetweenEntities,
         findForEntity,
         remove,
@@ -89,6 +97,11 @@ export const serviceName = "EntityRelationshipStore";
 
 
 export const EntityRelationshipStore_API = {
+    getById: {
+        serviceName,
+        serviceFnName: "getById",
+        description: "getById"
+    },
     findBetweenEntities: {
         serviceName,
         serviceFnName: "findBetweenEntities",
