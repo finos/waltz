@@ -22,6 +22,8 @@ import playpenView1 from "./1/playpen1";
 import playpenView2 from "./2/playpen2";
 import playpenView3 from "./3/playpen3";
 import playpenView4 from "./4/playpen4";
+import Stacker from "./2/stacker/stacker"
+import StackerList from "./2/stacker-list/stacker-list"
 
 import {registerComponents} from "../common/module-utils";
 import list from "./list.html";
@@ -61,7 +63,7 @@ export default () => {
         }
     ]);
 
-    registerComponents(module, []);
+    registerComponents(module, [Stacker, StackerList]);
     return module.name;
 
 };
