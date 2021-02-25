@@ -33,8 +33,20 @@
     </waltz-page-header>
 
 
-    <waltz-section name="Physical Flow Uploader">
-        <waltz-stacker-list raw-data="$ctrl.rawData"></waltz-stacker-list>
+    <waltz-section name="New">
+        <div class="row">
+            <div class="col-md-12">
+                <waltz-milestone-chart raw-data="$ctrl.rawData"></waltz-milestone-chart>
+            </div>
+        </div>
+    </waltz-section>
+
+    <waltz-section name="Old">
+        <div class="row">
+            <div class="col-md-12">
+                <waltz-stacker-list raw-data="$ctrl.rawData"></waltz-stacker-list>
+            </div>
+        </div>
     </waltz-section>
 
 </div>

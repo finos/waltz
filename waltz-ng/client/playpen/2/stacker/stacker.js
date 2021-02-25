@@ -63,9 +63,7 @@ function controller($element) {
     const svg = setup(root);
 
     vm.$onChanges = () => {
-        console.log({raw: vm.rawData});
         const series = stacker(vm.rawData);
-        console.log({series});
 
         const y  = scaleLinear()
             .domain([0, max(series, d => max(d, d => d[1]))]).nice()
@@ -78,11 +76,6 @@ function controller($element) {
         const x = scaleUtc()
             .domain(extent(vm.rawData, d => d.k))
             .range([margin.left, width - margin.right])
-
-        console.log({x, y});
-        global.scales = {x,y};
-        global.rawData = vm.rawData;
-        global.series = series;
 
         const areaFn = area()
             .x(d => x(d.data.k))
