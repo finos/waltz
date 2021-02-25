@@ -1,6 +1,6 @@
 import template from "./milestone-chart.html";
 import {initialiseData} from "../../../common";
-import {toStackData} from "../milestone-utils";
+import {calcDateExtent, toStackData} from "../milestone-utils";
 import {select} from "d3-selection";
 import {scaleBand, scaleLinear, scaleOrdinal, scaleUtc} from "d3-scale";
 import {area, stack} from "d3-shape";
@@ -33,8 +33,38 @@ const chartWidth = 800;
 const subChartMargin = 10;
 const subChartWidth = chartWidth - (2 * subChartMargin);
 
+const color = scaleOrdinal()
+    .domain(['r', 'a', 'g'])
+    .range(["#fd4d4d", "#eeb65f", "#a8e761"]);
 
 function setup(root, dimensions) {
+    const grads = root
+        .select("defs")
+        .selectAll("linearGradient")
+        .data(color.domain())
+        .enter()
+        .append("linearGradient")
+        .attr("id", d => `grad_${d}`)
+        .attr("x1", "0%")
+        .attr("y1", "0%")
+        .attr("x2", "100%")
+        .attr("y2", "0%");
+
+    grads.append("stop")
+        .attr("offset", "0%")
+        .style("stop-color", d => color(d))
+        .style("stop-opacity", "1");
+
+    grads.append("stop")
+        .attr("offset", "50%")
+        .style("stop-color", d => color(d))
+        .style("stop-opacity", "1");
+
+    grads.append("stop")
+        .attr("offset", "100%")
+        .style("stop-color", "#fff")
+        .style("stop-opacity", "1");
+
     return root
         .select(".milestone-chart")
         .attr("viewBox", `0 0 ${dimensions.width + margin.left + margin.right} ${dimensions.height + margin.top + margin.bottom}`)
@@ -44,9 +74,6 @@ function setup(root, dimensions) {
 }
 
 
-const color = scaleOrdinal()
-    .domain(['r', 'a', 'g'])
-    .range(["#fd4d4d", "#eeb65f", "#a8e761"]);
 
 
 const stacker = stack()
@@ -54,7 +81,7 @@ const stacker = stack()
     .value((d, k) => d.values[k].length)
 
 
-function setupSubCharts(root, height) {
+function setupSubCharts(root, height, dateScale) {
     const subChart = root
         .append("g")
         .classed("sub-chart-body", true)
@@ -79,18 +106,10 @@ function setupSubCharts(root, height) {
             .domain([0, max(series, d => max(d, d => d[1]))]).nice()
             .range([height - margin.bottom, margin.top]);
 
-        const x = scaleUtc()
-            .domain(extent(d.stackData, d => d.k))
-            .range([margin.left, subChartWidth - margin.right])
-
-        const areaFn = area()
-            .x(d => x(d.data.k))
-            .y0(d => y(d[0]))
-            .y1(d => y(d[1]));
 
         const xAxis = g => g
             .attr("transform", `translate(0,${height - margin.bottom})`)
-            .call(axisBottom(x)
+            .call(axisBottom(dateScale)
                 .ticks(subChartWidth / 80)
                 .tickSizeOuter(0));
 
@@ -100,15 +119,29 @@ function setupSubCharts(root, height) {
             .call(g => g.select(".domain").remove());
 
         const elem = select(this);
+
         elem.select("g.chart")
-            .selectAll("path")
+            .selectAll("g")
             .data(series)
             .enter()
-            .append("path")
-            .attr("fill", (d) => color(d.key))
-            .attr("stroke", "#555")
+            .append("g")
+            .selectAll("rect")
+            .data(d => d)
+            .enter()
+            .append("rect")
+            .attr("stroke", "none")
             .attr("stroke-width", 0.5)
-            .attr("d", areaFn)
+            .attr("x", d => dateScale(d.data.s))
+            .attr("y", d => y(d[1]))
+            .attr("height", d => y(d[0]) - y(d[1]))
+            .attr("width", d => dateScale(d.data.e || dateScale.domain()[1]) - dateScale(d.data.s))
+            .classed("fade-out", d => _.isUndefined(d.data.e))
+            .attr("fill", function (d)  {
+                const p = select(this.parentNode).datum();
+                return _.isUndefined(d.data.e)
+                    ? `url(#grad_${p.key})`
+                    : color(p.key);
+            })
         // .append("title")
         // .text(({key}) => keyNames[key]);
 
@@ -125,10 +158,10 @@ function setupSubCharts(root, height) {
 }
 
 
-function drawSubCharts(selection, height) {
+function drawSubCharts(selection, height, dateScale) {
 
     const subCharts = selection
-        .call(setupSubCharts, height);
+        .call(setupSubCharts, height, dateScale);
 
     // subCharts
     //     .append("rect")
@@ -159,6 +192,10 @@ function controller($element) {
         const root = select($element[0]);
         const svg = setup(root, dimensions);
 
+        const dateScale = scaleUtc()
+            .domain(calcDateExtent(vm.rawData, 30 * 12))
+            .range([margin.left, subChartWidth - margin.right])
+
         const subChartVerticalScale = scaleBand()
             .range([0, dimensions.height])
             .domain(_.map(stacks, s => s.k))
@@ -173,7 +210,7 @@ function controller($element) {
             .classed("sub-chart", true)
             .attr("transform", d => `translate(${subChartMargin} ${subChartVerticalScale(d.k)})`);
 
-        subCharts.call(drawSubCharts, subChartVerticalScale.bandwidth());
+        subCharts.call(drawSubCharts, subChartVerticalScale.bandwidth(), dateScale);
 
 
     }
