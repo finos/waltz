@@ -64,7 +64,7 @@ function preparePie(ratings = [],
         .map(schemeItem => ({
             key: schemeItem.rating,
             count: counts[schemeItem.rating] || 0
-        }))
+        })).orderBy('count','asc')
         .value();
 
     return {
