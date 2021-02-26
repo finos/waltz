@@ -37,19 +37,19 @@ public class DemoSettingsGenerator implements SampleDataGenerator {
         DSLContext dsl = getDsl(ctx);
 
         List<SettingsRecord> records = newArrayList(
-                mkSetting(SettingsService.DEFAULT_ROLES_KEY, SystemRole.BOOKMARK_EDITOR.name()),
-                mkSetting("web.authentication", "waltz"),
-                mkSetting("ui.avatar.template.url", "https://gravatar.com/avatar/${id}?s=200&d=robohash&r=pg"),
-                mkSetting("ui.logo.overlay.text", "Demo"),
-                mkSetting("ui.logo.overlay.color", "#9c9"));
+                mkSetting(SettingsService.DEFAULT_ROLES_KEY, SystemRole.BOOKMARK_EDITOR.name(), null),
+                mkSetting("web.authentication", "waltz", null),
+                mkSetting("ui.avatar.template.url", "https://gravatar.com/avatar/${id}?s=200&d=robohash&r=pg", null),
+                mkSetting("ui.logo.overlay.text", "Demo", null),
+                mkSetting("ui.logo.overlay.color", "#9c9", null));
 
         dsl.batchInsert(records).execute();
 
         return null;
     }
 
-    private SettingsRecord mkSetting(String defaultRolesKey, String name) {
-        return new SettingsRecord(defaultRolesKey, name, false);
+    private SettingsRecord mkSetting(String defaultRolesKey, String name, String description) {
+        return new SettingsRecord(defaultRolesKey, name, false, description);
     }
 
     @Override
