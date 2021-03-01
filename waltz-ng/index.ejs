@@ -2,16 +2,13 @@
 <html lang="en">
 
 <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=10,9" >
+    <meta http-equiv="X-UA-Compatible" content="IE=11" >
     <meta charset="utf-8">
     <base href="/" />
     <title><%=htmlWebpackPlugin.options.title || 'Waltz'%></title>
-    <!-- ie9 support for window.atob() required by satellizer -->
-    <!--[if lte IE 9]>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/Base64/0.3.0/base64.min.js"></script>
-    <![endif]-->
     <!--<% if (htmlWebpackPlugin.files.favicon) { %>-->
     <link rel="icon" href="<%=htmlWebpackPlugin.files.favicon%>">
+
     <!--<% } %>-->
 
     <style type="text/css">

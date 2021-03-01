@@ -16,8 +16,11 @@
  *
  */
 
-export function store($http, base) {
-    const baseUrl = `${base}/static-panel`;
+import {$http} from "../../common/WaltzHttp";
+
+
+export function store() {
+    const baseUrl = `api/static-panel`;
 
     const findByGroups = (groups = []) => {
         return $http
@@ -44,13 +47,6 @@ export function store($http, base) {
         save
     };
 }
-
-
-store.$inject = [
-    '$http',
-    'BaseApiUrl'
-];
-
 
 
 export const serviceName = 'StaticPanelStore';

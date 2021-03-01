@@ -24,12 +24,9 @@ function controller($http, $q) {
     const vm = Object.assign(this, {});
 
     vm.$onInit = () => {
-        const promises = [
-            $http.get("http://localhost:8443/api/enum-value").then(r => console.log("ev", r.data) || r.data),
-            $http.get("http://localhost:8443/api/bookmarks/APPLICATION/840").then(r => console.log("b1", r.data) || r.data),
-            $http.get("http://localhost:8443/api/bookmarks/APPLICATION/841").then(r => console.log("b2", r.data) || r.data)
-        ];
-        $q.all(promises)
+        $q.all([$http.get("api/enum-value").then(r => console.log("ev", r.data) || r.data),
+                $http.get("api/bookmarks/APPLICATION/840").then(r => console.log("b1", r.data) || r.data),
+                $http.get("api/bookmarks/APPLICATION/841").then(r => console.log("b2", r.data) || r.data)])
             .then(([p1, p2, p3]) => {
                 console.log({p1, p2, p3})
             });

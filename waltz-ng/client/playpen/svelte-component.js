@@ -16,61 +16,59 @@
  *
  */
 
-import {initialiseData, isEmpty} from "../../../common";
-import template from "./bookmark-form.html";
+import {initialiseData} from "../common";
 
 
 const bindings = {
-    bookmark: "<",
-    onSubmit: "<",
-    onCancel: "<",
-    confirmLabel: "@?"
+    component: "<",
+    primaryEntityRef: "<"
 };
 
 
 const initialState = {
-    confirmLabel: "Save",
-    submitDisabled: true
+
 };
 
 
-function controller() {
-
+function controller($element,
+                    serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    vm.onKindSelect = (code) => {
-        vm.bookmark.bookmarkKind = code;
-    };
+    let comp = null;
 
-    vm.togglePrimary = () => {
-        vm.bookmark.isPrimary = !vm.bookmark.isPrimary;
-    };
-
-    vm.toggleRestricted = () => {
-        vm.bookmark.isRestricted = !vm.bookmark.isRestricted;
-    };
-
-    vm.onFormChange = () => {
-        const { url } = vm.bookmark;
-        vm.submitDisabled = isEmpty(url);
+    vm.$onInit = () => {
+        comp = new vm.component({
+            target: $element[0],
+            props: {
+                serviceBroker,
+                primaryEntityRef: vm.primaryEntityRef
+            }
+        });
     };
 
     vm.$onChanges = () => {
-        vm.onFormChange();
-    };
+        if (comp && vm.primaryEntityRef) {
+            comp.$set({
+                primaryEntityRef: vm.primaryEntityRef
+            });
+        }
+    }
 }
 
-controller.$inject = [];
+
+controller.$inject = [
+    "$element",
+    "ServiceBroker"
+];
 
 
 const component = {
-    template,
     controller,
-    bindings
+    bindings,
+    template: ""
 };
 
-
 export default {
-    component,
-    id: "waltzBookmarkForm"
+    id: "waltzSvelteComponent",
+    component
 }

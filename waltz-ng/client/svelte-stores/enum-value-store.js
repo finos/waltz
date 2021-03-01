@@ -1,4 +1,4 @@
-/*!
+/*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
@@ -16,33 +16,24 @@
  *
  */
 
-.waltz-bookmark-kinds {
-    border: 1px solid #ddd;
+import {remote} from "./remote";
+import {writable} from "svelte/store";
+import {$http} from "../common/WaltzHttp";
 
-    > div:not(:first-child) {
-        border-top: 1px dotted #ddd;
+export function mkEnumValueStore() {
+    const store = writable([]);
+    const loadOld = (force = false) => remote
+        .fetchAppList("GET", "api/enum-value", null, {force});
+    const load = (force = false) => {
+        $http
+            .get("api/enum-value")
+            .then(r => store.set(r.data));
+        return store;
     }
 
-    > div {
-        padding: 10px;
-        vertical-align: middle;
-        text-align: left;
-        transition: background-color 300ms;
-    }
-
-    .wbk-no-bookmarks {
-        @extend .small !optional;
-        color: #ddd;
-        padding-top: 5px;
-        padding-bottom: 5px;
-    }
-
-    .wbk-has-bookmarks {
-        color: #5BB65D;
-    }
-
-    .wbk-selected {
-        background-color: $waltz-selected-item-bg-color;
-    }
-
+    return {
+        load: loadOld
+    };
 }
+
+export const enumValueStore = mkEnumValueStore();

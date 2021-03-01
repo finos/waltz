@@ -18,10 +18,10 @@
  */
 
 import {checkIsEntityRef} from '../../common/checks';
+import {$http} from "../../common/WaltzHttp";
 
-
-function store($http, baseApiUrl) {
-    const baseUrl = `${baseApiUrl}/bookmarks`;
+function store() {
+    const baseUrl = `api/bookmarks`;
 
     const save = (bookmark) => $http.post(baseUrl, bookmark);
 
@@ -39,11 +39,10 @@ function store($http, baseApiUrl) {
         findByParent,
         remove
     };
-
 }
 
 
-store.$inject = ['$http', 'BaseApiUrl'];
+store.$inject = [];
 
 
 const serviceName = 'BookmarkStore';
