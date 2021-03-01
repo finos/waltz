@@ -23,6 +23,8 @@ export function mkPlaceholderPanelData() {
 # This is a header
 ## And a smaller header
 
+Use underscores for _italics_ and stars for **bold**
+
 - lists can be
 - created using hyphens
   - and indented
