@@ -30,46 +30,38 @@ const findComparison = (stackedData, lowestDate, highestDate) => {
     const earliest = Date.parse(lowestDate);
     const latest = Date.parse(highestDate);
 
-    const finding = _
+    return _
         .chain(stackedData)
         .map(d => {
 
-            console.log(d);
-
             const firstStackedValues = _.find(d.stackData, s => s.s < earliest && s.e > earliest);
-            const latestStackedValues = _.find(d.stackData, s => s.s < latest && s.e > latest);
+            const latestStackedValues = _.find(d.stackData, s => s.s < latest && (s.e > latest || _.isUndefined(s.e)));
+
+            const empty = {a: [], g: [], r:[] };
 
             const before = (!_.isUndefined(firstStackedValues))
                 ? firstStackedValues.values
-                : [];
+                : empty;
             const after = (!_.isUndefined(latestStackedValues))
                 ? latestStackedValues.values
-                : [];
+                : empty;
 
-            if(!_.isUndefined(firstStackedValues) && !_.isUndefined(latestStackedValues)){
+            console.log(before);
 
-                const newR = _.difference(latestStackedValues.values.r, firstStackedValues.values.r);
-                const newA = _.difference(latestStackedValues.values.a, firstStackedValues.values.a);
-                const newG = _.difference(latestStackedValues.values.g, firstStackedValues.values.g);
-                const lostR = _.difference(firstStackedValues.values.r, latestStackedValues.values.r);
-                const lostA = _.difference(firstStackedValues.values.a, latestStackedValues.values.a);
-                const lostG = _.difference(firstStackedValues.values.g, latestStackedValues.values.g);
 
-                console.log("new and lost");
-                console.log( {newR, newA, newG, lostR, lostA, lostG});
-            }
+            const newR = _.difference(after.r, before.r);
+            const newA = _.difference(after.a, before.a);
+            const newG = _.difference(after.g, before.g);
+            const lostR = _.difference(before.r, after.r);
+            const lostA = _.difference(before.a, after.a);
+            const lostG = _.difference(before.g, after.g);
 
-            // console.log({f: firstStackedValues, l: latestStackedValues});
-            return { k: d.k, before, after }
+            console.log("new and lost");
+            console.log( {newR, newA, newG, lostR, lostA, lostG});
+            return { k: d.k, before, after, diff: {newR, newA, newG, lostR, lostA, lostG} }
+
         })
         .value();
-
-    return finding;
-
-    console.log({finding: finding});
-
-
-
 };
 
 
@@ -103,7 +95,6 @@ function controller() {
             }
 
         };
-        console.log(vm.dateExtent);
     }
 }
 
