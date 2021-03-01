@@ -25,6 +25,8 @@ import playpenView4 from "./4/playpen4";
 import MilestoneChart from "./2/milestone-chart/milestone-chart";
 import Stacker from "./2/stacker/stacker"
 import StackerList from "./2/stacker-list/stacker-list"
+import StackedChartList from "./2/stacked-chart-list/stacked-chart-list"
+import StackedBarChart from "./2/stacked-bar-chart/stacked-bar-chart"
 
 import {registerComponents} from "../common/module-utils";
 import list from "./list.html";
@@ -64,7 +66,13 @@ export default () => {
         }
     ]);
 
-    registerComponents(module, [Stacker, StackerList, MilestoneChart]);
+    registerComponents(module,
+        [Stacker,
+            StackerList,
+            MilestoneChart,
+            StackedChartList,
+            StackedBarChart]);
+
     return module.name;
 
 };

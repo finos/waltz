@@ -20,18 +20,15 @@ import template from "./playpen2.html";
 import data from "./test-data.js";
 
 
-
-
-function controller() {
+function controller(serviceBroker) {
 
     const vm = Object.assign(this, {});
-
 
     vm.rawData = data;
 }
 
 
-controller.$inject = [];
+controller.$inject = ["ServiceBroker"];
 
 
 const view = {

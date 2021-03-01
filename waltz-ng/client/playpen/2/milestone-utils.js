@@ -53,8 +53,6 @@ export function toStackData(data) {
     const dates = _.map(groupedByDate, d => d.k);
     const durations = _.zip(dates, _.tail(dates));
 
-
-
     let xs = [];
     let acc = {r: [], a: [], g: []};
     _.each(
@@ -64,7 +62,7 @@ export function toStackData(data) {
             xs.push({k: d.k, s: durations[i][0], e: durations[i][1], values: acc});
         });
 
-    console.log("lol", {xs})
+    console.log("lol", {xs});
 
     return xs;
 }
