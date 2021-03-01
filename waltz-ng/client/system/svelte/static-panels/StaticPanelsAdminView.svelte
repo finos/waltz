@@ -7,26 +7,22 @@
     import StaticPanelEditor from "./StaticPanelEditor.svelte";
     import ViewLink from "../../../common/svelte/ViewLink.svelte";
 
-    import {mkStaticPanelStore} from "../../../svelte-stores/static-panel-store" ;
-    import {mkUserStore} from "../../../svelte-stores/user-store";
+    import {mkStaticPanelStore} from "../../../svelte-stores/static-panel-store";
+    import {userStore} from "../../../svelte-stores/user-store";
     import roles from "../../../user/system-roles";
     import {mkPlaceholderPanelData} from "./static-panel-utils";
 
-    export let serviceBroker;
-
     let panelList = [];
-    let user;
     let qry = "";
     let selectedPanel = null;
     let canEdit = false;
     let panelStore = mkStaticPanelStore();
 
-    $: user = mkUserStore(serviceBroker);
-
+    let user = userStore.load();
     let panels = panelStore.load();
 
     $: panelList = _
-        .chain($panels)
+        .chain($panels.data)
         .filter(p => _.isEmpty(qry)
             ? true
             : _.toLower(p.group + p.title).indexOf(_.toLower(qry)) > -1)
@@ -34,7 +30,7 @@
         .value();
 
     $: canEdit = _.includes(
-        $user.roles,
+        $user.data.roles,
         roles.ADMIN.key);
 
     function onSelectPanel(p) {

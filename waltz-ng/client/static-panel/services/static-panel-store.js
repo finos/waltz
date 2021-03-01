@@ -16,10 +16,7 @@
  *
  */
 
-import {$http} from "../../common/WaltzHttp";
-
-
-export function store() {
+export function store($http) {
     const baseUrl = `api/static-panel`;
 
     const findByGroups = (groups = []) => {
@@ -48,6 +45,7 @@ export function store() {
     };
 }
 
+store.$inject = ["$http"];
 
 export const serviceName = 'StaticPanelStore';
 
