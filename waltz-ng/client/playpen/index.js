@@ -27,6 +27,7 @@ import Stacker from "./2/stacker/stacker"
 import StackerList from "./2/stacker-list/stacker-list"
 import StackedChartList from "./2/stacked-chart-list/stacked-chart-list"
 import StackedBarChart from "./2/stacked-bar-chart/stacked-bar-chart"
+import SvelteComponent from "./svelte-component"
 
 import {registerComponents} from "../common/module-utils";
 import list from "./list.html";
@@ -71,7 +72,9 @@ export default () => {
             StackerList,
             MilestoneChart,
             StackedChartList,
-            StackedBarChart]);
+            StackedBarChart,
+            SvelteComponent
+        ]);
 
     return module.name;
 

@@ -32,6 +32,16 @@
         </breadcrumbs>
     </waltz-page-header>
 
+
+    <waltz-section name="svelte">
+        <div class="row">
+            <div class="col-md-12">
+            <waltz-svelte-component component="$ctrl.MilestoneViewer">
+            </waltz-svelte-component>
+            </div>
+        </div>
+    </waltz-section>
+
     <waltz-section name="New Old">
         <div class="row">
             <div class="col-md-12">
@@ -40,20 +50,6 @@
         </div>
     </waltz-section>
 
-    <waltz-section name="New">
-        <div class="row">
-            <div class="col-md-12">
-                <waltz-milestone-chart raw-data="$ctrl.rawData"></waltz-milestone-chart>
-            </div>
-        </div>
-    </waltz-section>
-
-    <waltz-section name="Old">
-        <div class="row">
-            <div class="col-md-12">
-                <waltz-stacker-list raw-data="$ctrl.rawData"></waltz-stacker-list>
-            </div>
-        </div>
-    </waltz-section>
+=
 
 </div>

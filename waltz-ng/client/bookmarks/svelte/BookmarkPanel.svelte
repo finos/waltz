@@ -92,7 +92,7 @@
     <div class="row">
         <div class="col-sm-4">
             <BookmarkCategoryMenu on:kindSelect={onKindSelect}
-                                  bookmarkKinds={bookmarkKinds}/>
+                                  bookmarkKinds={bookmarkKinds} />
         </div>
 
         <div class="col-sm-8">
@@ -100,12 +100,14 @@
             {#if removalCandidate}
                 <BookmarkRemovalConfirmation bookmark={removalCandidate}
                                              {doRemove}
-                                             doCancel={() => removalCandidate = null}/>
+                                             doCancel={()=> removalCandidate = null}>
+                </BookmarkRemovalConfirmation>
             {:else if editCandidate}
                 <BookmarkEditor bookmark={editCandidate}
                                 kinds={bookmarkKinds}
                                 {doSave}
-                                doCancel={() => editCandidate = null} />
+                                doCancel={()=> editCandidate = null} >
+                </BookmarkEditor>
             {:else}
                 {#if $bookmarks.data.length > 5}
                     <SearchInput bind:value={qry}
@@ -118,7 +120,7 @@
                         {#if actions.length > 0}
                             <div style="padding-top: 1em;">
                                 <button class="btn btn-sm btn-default"
-                                        on:click={() => onCreate()}>
+                                        on:click={()=> onCreate()}>
                                     <Icon name="plus"/>
                                     Add bookmark
                                 </button>
@@ -133,7 +135,7 @@
                             <tr>
                                 <td colspan="3">
                                     <button class="btn btn-link"
-                                            on:click={() => onCreate()}>
+                                            on:click={()=> onCreate()}>
                                         <Icon name="plus"/>
                                         Add bookmark
                                     </button>
