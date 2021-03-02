@@ -1,4 +1,4 @@
-/*
+/*!
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
@@ -15,35 +15,26 @@
  * See the License for the specific
  *
  */
-import {initialiseData} from "../../common/index";
-import template from "./playpen4.html";
 
-const initialState = {
-    parentEntityRef: { kind: "ORG_UNIT", id: 2216 }, //10524
-};
+@import "../../../../style/variables";
 
+.waltz-complexity-graph {
 
+    path.domain {
+        stroke: none;
+    }
 
-function controller($q, serviceBroker) {
+    .wcg-bar:hover {
+        cursor: pointer;
+    }
 
-    const vm = initialiseData(this, initialState);
+    .tick line{
+        stroke: none;
+    }
 
+    .wcg-bar text {
+        fill: #555;
+        font-size: smaller;
+    }
 }
 
-
-controller.$inject = [
-    "$q",
-    "ServiceBroker"
-];
-
-
-const view = {
-    template,
-    controller,
-    controllerAs: "$ctrl",
-    bindToController: true,
-    scope: {}
-};
-
-
-export default view;

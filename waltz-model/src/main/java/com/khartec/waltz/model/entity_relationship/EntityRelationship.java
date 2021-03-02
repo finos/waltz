@@ -21,10 +21,7 @@ package com.khartec.waltz.model.entity_relationship;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.DescriptionProvider;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.LastUpdatedProvider;
-import com.khartec.waltz.model.ProvenanceProvider;
+import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
 import static com.khartec.waltz.model.entity_relationship.RelationshipKind.HAS;
@@ -32,7 +29,7 @@ import static com.khartec.waltz.model.entity_relationship.RelationshipKind.HAS;
 @Value.Immutable
 @JsonSerialize(as = ImmutableEntityRelationship.class)
 @JsonDeserialize(as = ImmutableEntityRelationship.class)
-public abstract class EntityRelationship implements ProvenanceProvider, LastUpdatedProvider, DescriptionProvider {
+public abstract class EntityRelationship implements IdProvider, ProvenanceProvider, LastUpdatedProvider, DescriptionProvider {
 
     public abstract EntityReference a();
     public abstract EntityReference b();

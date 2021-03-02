@@ -136,6 +136,13 @@ export const entity = {
         description: null,
         position: 120
     },
+    ENTITY_RELATIONSHIP: {
+        key: "ENTITY_RELATIONSHIP",
+        name: "Entity Relationship",
+        icon: "link",
+        description: null,
+        position: 125
+    },
     ENTITY_STATISTIC: {
         key: "ENTITY_STATISTIC",
         name: "Statistic",

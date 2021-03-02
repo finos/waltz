@@ -18,16 +18,19 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.complexity.Complexity;
+import com.khartec.waltz.model.complexity.ComplexitySummary;
 import com.khartec.waltz.service.complexity.ComplexityService;
+import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.web.WebUtilities.getEntityReference;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
@@ -47,10 +50,27 @@ public class ComplexityEndpoint implements Endpoint {
     @Override
     public void register() {
         String findByEntityRefPath = mkPath(BASE_URL, "entity", "kind", ":kind", "id", ":id");
+        String findBySelectorPath = mkPath(BASE_URL, "target-kind", ":kind");
+        String findComplexitySummaryForSelectorPath = mkPath(BASE_URL, "complexity-kind", ":id", "target-kind", ":kind");
 
         ListRoute<Complexity> findByEntityRefRoute = (request, response) -> complexityService
                 .findByEntityReference(getEntityReference(request));
 
+        ListRoute<Complexity> findBySelectorRoute = (request, response) -> complexityService
+                .findBySelector(getKind(request), readIdSelectionOptionsFromBody(request));
+
+        DatumRoute<ComplexitySummary> findComplexitySummaryForSelectorRoute = (request, response) -> {
+            long costKindId = getId(request);
+            EntityKind targetKind = getKind(request);
+            IdSelectionOptions selectionOptions = readIdSelectionOptionsFromBody(request);
+            Integer limit = getLimit(request).orElse(15);
+
+            return complexityService
+                    .findComplexitySummaryForSelector(costKindId, targetKind, selectionOptions, limit);
+        };
+
         getForList(findByEntityRefPath, findByEntityRefRoute);
+        postForList(findBySelectorPath, findBySelectorRoute);
+        postForDatum(findComplexitySummaryForSelectorPath, findComplexitySummaryForSelectorRoute);
     }
 }

@@ -15,35 +15,31 @@
  * See the License for the specific
  *
  */
-import {initialiseData} from "../../common/index";
-import template from "./playpen4.html";
+import EntityRelationshipView from "./pages/view/entity-relationship-view";
 
-const initialState = {
-    parentEntityRef: { kind: "ORG_UNIT", id: 2216 }, //10524
+
+const base = {
+    url: "entity-relationship"
 };
 
 
+const entityRelationshipViewState = {
+    url: "/{id:int}",
+    views: {
+        "content@": EntityRelationshipView.id
+    }
+};
 
-function controller($q, serviceBroker) {
-
-    const vm = initialiseData(this, initialState);
-
+function setup($stateProvider) {
+    $stateProvider
+        .state("main.entity-relationship", base)
+        .state("main.entity-relationship.view", entityRelationshipViewState)
 }
 
 
-controller.$inject = [
-    "$q",
-    "ServiceBroker"
+setup.$inject = [
+    "$stateProvider"
 ];
 
 
-const view = {
-    template,
-    controller,
-    controllerAs: "$ctrl",
-    bindToController: true,
-    scope: {}
-};
-
-
-export default view;
+export default setup;
