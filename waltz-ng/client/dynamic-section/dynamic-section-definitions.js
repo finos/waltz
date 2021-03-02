@@ -15,6 +15,8 @@
  * See the License for the specific
  *
  */
+import BookmarkPanel from "../bookmarks/svelte/BookmarkPanel.svelte";
+
 
 const appsSection = {
     componentId: "apps-section",
@@ -44,8 +46,10 @@ const authSourcesSection = {
     id: 4,
 };
 
+
+
 const bookmarksSection = {
-    componentId: "bookmarks-section",
+    svelteComponent: BookmarkPanel,
     name: "Bookmarks",
     icon: "rocket",
     id: 5,
@@ -316,6 +320,7 @@ const reportGridViewSection = {
     icon: "cloud",
     id: 170
 };
+
 
 const appCostsSummarySection = {
     componentId: "app-costs-summary-section",

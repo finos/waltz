@@ -17,16 +17,8 @@
  */
 
 import angular from "angular";
-
-import {registerComponents, registerStores} from "../common/module-utils";
-
+import {registerStores} from "../common/module-utils";
 import bookmarkStore from "./services/bookmark-store";
-import bookmarkKindSelect from "./components/bookmark-kind-select/bookmark-kind-select";
-import bookmarksSection from "./components/bookmarks-section/bookmarks-section";
-import bookmarkKinds from "./components/bookmark-kinds/bookmark-kinds";
-import bookmarksViewPanel from "./components/bookmarks-view-panel/bookmarks-view-panel";
-import bookmarksEditPanel from "./components/bookmarks-edit-panel/bookmarks-edit-panel";
-import bookmarkForm from "./components/form/bookmark-form";
 
 
 export default () => {
@@ -34,14 +26,6 @@ export default () => {
     const module = angular.module("waltz.bookmarks", []);
 
     registerStores(module, [bookmarkStore]);
-
-    registerComponents(module, [
-        bookmarkForm,
-        bookmarkKinds,
-        bookmarkKindSelect,
-        bookmarksSection,
-        bookmarksEditPanel,
-        bookmarksViewPanel]);
 
     return module.name;
 };
