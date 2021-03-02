@@ -27,9 +27,16 @@ export function store($http, BaseApiUrl) {
             .then(result => result.data);
     };
 
+    const findBySelector = (targetKind, selector) => {
+        return $http
+            .post(`${BASE}/target-kind/${targetKind}/selector`, selector)
+            .then(result => result.data);
+    };
+
 
     return {
         findAll,
+        findBySelector
     };
 }
 
@@ -44,7 +51,12 @@ export const ComplexityKindStore_API = {
     findAll: {
         serviceName,
         serviceFnName: 'findAll',
-        description: 'executes findAll '
+        description: 'executes findAll'
+    },
+    findBySelector: {
+        serviceName,
+        serviceFnName: 'findBySelector',
+        description: 'executes findBySelector'
     }
 };
 

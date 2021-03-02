@@ -31,3 +31,21 @@ export function calcComplexitySummary(complexity = []) {
     };
 }
 
+export function findDefaultComplexityKind(complexityKinds = []) {
+    const defaultKind = _.find(complexityKinds, d => d.isDefault);
+    return defaultKind
+        ? defaultKind
+        : _.first(complexityKinds);
+}
+
+export function enrichComplexitiesWithKind(complexities, complexityKinds) {
+    const complexityKindsById = _.keyBy(complexityKinds, d => d.id);
+    return _
+        .chain(complexities)
+        .map(d => Object.assign(
+            {},
+            d,
+            {complexityKind: _.get(complexityKindsById, [d.complexityKindId], 'Unknown')}))
+        .orderBy(d => d.complexityKind.name)
+        .value();
+}

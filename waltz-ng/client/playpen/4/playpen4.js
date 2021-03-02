@@ -17,10 +17,9 @@
  */
 import {initialiseData} from "../../common/index";
 import template from "./playpen4.html";
-import {CORE_API} from "../../common/services/core-api-utils";
 
 const initialState = {
-    parentEntityRef: { kind: "ORG_UNIT", id: 10 }, //10524
+    parentEntityRef: { kind: "ORG_UNIT", id: 2216 }, //10524
 };
 
 

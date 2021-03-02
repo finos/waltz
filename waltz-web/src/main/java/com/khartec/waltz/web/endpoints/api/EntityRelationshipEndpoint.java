@@ -55,6 +55,7 @@ public class EntityRelationshipEndpoint implements Endpoint {
 
     @Override
     public void register() {
+        String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String findForEntityPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String exactMatchPath = mkPath(BASE_URL, "relationship", ":aKind", ":aId", ":bKind", ":bId", ":relationshipKind");
 
@@ -96,6 +97,9 @@ public class EntityRelationshipEndpoint implements Endpoint {
             return entityRelationshipService.createRelationship(entityRelationship);
         };
 
+        DatumRoute<EntityRelationship> getByIdRoute = (req, resp) -> entityRelationshipService.getById(getId(req));;
+
+        getForDatum(getByIdPath, getByIdRoute);
         getForList(findForEntityPath, findForEntityRoute);
         deleteForDatum(exactMatchPath, removeRelationshipRoute);
         postForDatum(exactMatchPath, createRelationshipRoute);

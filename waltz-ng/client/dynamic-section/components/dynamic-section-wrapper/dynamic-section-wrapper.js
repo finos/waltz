@@ -48,9 +48,11 @@ function controller($element, $compile, $scope) {
         vm.sectionScope.onRemove = vm.onRemove;
         vm.sectionScope.canRemove = vm.canRemove;
 
-        const linkFn = $compile(sectionToTemplate(vm.section, vm.renderMode));
-        const content = linkFn(vm.sectionScope);
-        $element.append(content);
+        if (vm.section.componentId) {
+            const linkFn = $compile(sectionToTemplate(vm.section, vm.renderMode));
+            const content = linkFn(vm.sectionScope);
+            $element.append(content);
+        }
     };
 }
 

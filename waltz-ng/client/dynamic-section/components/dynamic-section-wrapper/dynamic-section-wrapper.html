@@ -16,3 +16,13 @@
   ~
   -->
 
+<!-- if we are rendering a svelte component -->
+<waltz-dynamic-section ng-if="$ctrl.section.svelteComponent"
+                       parent-entity-ref="$ctrl.parentEntityRef"
+                       class="waltz-dynamic-section waltz-dynamic-section-render-mode-standard waltz-dynamic-section-${section.id}"
+                       section="$ctrl.section"
+                       on-remove="$ctrl.onRemove">
+    <waltz-svelte-component component="$ctrl.section.svelteComponent"
+                            primary-entity-ref="$ctrl.parentEntityRef">
+    </waltz-svelte-component>
+</waltz-dynamic-section>
