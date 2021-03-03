@@ -28,6 +28,11 @@
 
 {#if !selectedRow}
     <table class="table table-condensed small">
+        <colgroup>
+            <col width="25%">
+            <col width="25%">
+            <col width="50%">
+        </colgroup>
         <thead>
         <th>From</th>
         <th>To</th>
@@ -35,7 +40,8 @@
         </thead>
         <tbody>
         {#each report.diff as row}
-            <tr on:click={() => showRow(row)}>
+            <tr on:click={() => showRow(row)}
+                class="clickable">
                 <td class={`rating-${row.r1}`}>
                     {niceName[row.r1] || "-" }
                 </td>
@@ -51,10 +57,16 @@
     </table>
 {:else}
     <table class="table table-condensed small">
-        <thead on:click={() => showSummary()}>
+        <colgroup>
+            <col width="25%">
+            <col width="25%">
+            <col width="50%">
+        </colgroup>
+        <thead class="clickable"
+               on:click={() => showSummary()}>
             <th>From</th>
             <th>To</th>
-            <th>Thing</th>
+            <th>Technology Product</th>
         </thead>
         <tbody>
         {#each selectedRow.changes as change }
@@ -72,7 +84,6 @@
         {/each}
         </tbody>
     </table>
-    <h3>Row</h3>
 {/if}
 
 

@@ -33,12 +33,12 @@
 
         const svg = select(el);
 
-        svg.select("rect.background")
-            .on("click.select", d => {
-                const mousePosition = mouse(svg.node())[0];
-                const selectedDate = x.invert(mousePosition);
-                dynamicDate.set(selectedDate);
-            });
+        // svg.select("rect.background")
+        //     .on("click.select", d => {
+        //         const mousePosition = mouse(svg.node())[0];
+        //         const selectedDate = x.invert(mousePosition);
+        //         dynamicDate.set(selectedDate);
+        //     });
 
 
         const y  = $useCommonYScale
@@ -54,10 +54,12 @@
         const xAxis = g => g
             .attr("transform", `translate(0 ${height})`)
             .call(axisBottom(x).ticks(width / 80).tickSize(3))
+            .call(g => g.selectAll(".tick text").style("fill", "#aaa"))
             .call(g => g.select(".domain").remove());
 
         const yAxis = g => g
             .call(axisLeft(y).ticks(height / 20).tickSize(3))
+            .call(g => g.selectAll(".tick text").style("fill", "#aaa"))
             .call(g => g.select(".domain").remove());
 
         const ratingBands = svg
@@ -124,11 +126,11 @@
     <g class="x-axis"></g>
     <g class="y-axis"></g>
 
-    <text dy="5" dx="20" class="subchart-title">
+    <text dx={width} text-anchor="end" class="subchart-title">
         {subChartName}
     </text>
 
-    <rect class="background" {width} {height} style="fill: none"></rect>
+<!--    <rect class="background" {width} {height} style="fill: none"></rect>-->
 </g>
 
 <style>

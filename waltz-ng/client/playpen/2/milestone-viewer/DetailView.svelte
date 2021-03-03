@@ -7,7 +7,6 @@
     export let measurablesById;
 </script>
 
-<h3>Detail</h3>
 
 {#if ($fixedDate && $dynamicDate)}
     <DiffDetailView {data}
@@ -20,7 +19,7 @@
         Now pick a comparison point
     </div>
 {:else}
-    Instructions
+    <h2>Instructions</h2>
     <p>
         blah de blah de blah
         blah de blah de blah

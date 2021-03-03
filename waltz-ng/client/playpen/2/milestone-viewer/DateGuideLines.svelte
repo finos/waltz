@@ -30,7 +30,7 @@
 
 
 <g class="today"
-   transform="translate({dateScale(today.getTime())} 0)">
+   transform="translate({dateScale(today.getTime())} 10)">
     <path d={cross} />
     <circle class="hitbox"
             r="10"
@@ -40,14 +40,14 @@
 
 <line x1={dateScale(today.getTime())}
       x2={dateScale(today.getTime())}
-      y1="10"
+      y1="20"
       y2={height - 45}
       class="today"/>
 
 
 {#if $dynamicDate}
     <g class="fix"
-       transform="translate({dateScale($dynamicDate?.getTime())} 0)">
+       transform="translate({dateScale($dynamicDate?.getTime())} 10)">
         <path d={cross} ></path>
         <circle class="hitbox"
                 r="10"
@@ -56,7 +56,7 @@
     </g>
     <line x1={dateScale($dynamicDate?.getTime())}
           x2={dateScale($dynamicDate?.getTime())}
-          y1="10"
+          y1="20"
           y2={height - 45}
           class="dynamic"/>
 {/if}
@@ -64,7 +64,7 @@
 
 {#if $fixedDate}
     <g class="remove"
-       transform="translate({dateScale($fixedDate?.getTime())} 0)">
+       transform="translate({dateScale($fixedDate?.getTime())} 10)">
         <path d={cross} on:click={() => clearFixed()}></path>
         <circle class="hitbox"
                 r="10"
@@ -73,13 +73,9 @@
     </g>
     <line x1={dateScale($fixedDate?.getTime())}
           x2={dateScale($fixedDate?.getTime())}
-          y1="10"
+          y1="20"
           y2={height - 45}
           class="fixed"/>
-    <g class="remove"
-       transform="translate({dateScale($fixedDate?.getTime())} {height - 30})">
-        <path d={cross} on:click={() => clearFixed()}></path>
-    </g>
 {/if}
 
 <style>
@@ -96,18 +92,18 @@
 
     line.dynamic {
         stroke: #888;
-        opacity: 0.05;
+        opacity: 0.1;
     }
 
     line.today {
-        stroke: #ccc;
+        stroke: #aaa;
         stroke-dasharray: 2,1;
-        opacity: 0.05;
+        opacity: 0.1;
     }
 
     line.fixed {
         stroke: #ee3f3f;
-        opacity: 0.05;
+        opacity: 0.1;
     }
 
     .hitbox {

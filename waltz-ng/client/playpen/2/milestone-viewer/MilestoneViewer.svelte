@@ -1,6 +1,7 @@
 <script>
 
     import {scaleBand, scaleOrdinal, scaleSqrt, scaleUtc} from "d3-scale";
+    import {select} from "d3-selection";
     import TestData from "../test-data";
 
     import Defs from "./Defs.svelte"
@@ -12,15 +13,10 @@
 
     import {greenBg, amber, amberBg, green, red, redBg} from "../../../common/colors";
     import {measurableStore} from "./stores/measurables";
-
-
-    let measurables = measurableStore.loadAll();
-
-    $: measurablesById = _.keyBy($measurables.data, d => d.id);
+    import {mouse} from "d3-selection";
+    import {dynamicDate} from "./stores/selected-dates";
 
     const width = 400, height = 600;
-
-
     const margin = {
         left: 60,
         right: 20,
@@ -28,13 +24,27 @@
         bottom: 20
     };
 
+    const color = {
+        bg: scaleOrdinal()
+            .domain(['r', 'a', 'g'])
+            .range([redBg, amberBg, greenBg]),
+        fg: scaleOrdinal()
+            .domain(['r', 'a', 'g'])
+            .range([red, amber, green])
+    };
 
-    let el;
+    let measurables = measurableStore.loadAll();
+
+    let measurablesById;
+    let hitbox;
     let svg;
     let data = TestData;
     let dateScale;
     let stacks = [];
     let commonYScale;
+
+
+    $: measurablesById = _.keyBy($measurables.data, d => d.id);
 
     $: {
         const groupedByVenue = _.groupBy(
@@ -46,19 +56,10 @@
             (v, k) => ({k, stackData: toStackData(v)}));
     }
 
-    const color = {
-        bg: scaleOrdinal()
-            .domain(['r', 'a', 'g'])
-            .range([redBg, amberBg, greenBg]),
-        fg: scaleOrdinal()
-            .domain(['r', 'a', 'g'])
-            .range([red, amber, green])
-    };
-
     $: y = scaleBand()
         .domain(_.map(stacks, d => d.k))
         .range([0, height - (margin.top + margin.bottom)])
-        .padding(0.3);
+        .padding(0.4);
 
     $: {
         const maxY = _
@@ -73,22 +74,30 @@
             .domain([0, maxY]).nice();
 
         dateScale = scaleUtc()
-            .domain(calcDateExtent(data, 30 * 12));
+            .domain(calcDateExtent(data, 30 * 12))
+            .range([0, width - (margin.left + margin.right)])
+
+
+        const hb = select(hitbox);
+        hb.on("click.select", d => {
+                const mousePosition = mouse(hb.node())[0];
+                const selectedDate = dateScale.invert(mousePosition);
+                dynamicDate.set(selectedDate);
+            });
     }
+
 
 </script>
 
 <div class="row">
     <div class="col-md-12">
-        <h4>Controls</h4>
         <Controls/>
     </div>
 </div>
 
 <div class="row">
     <div class="col-sm-7">
-        <svg bind:this={el}
-             viewBox="0 0 {width} {height}">
+        <svg viewBox="0 0 {width} {height}">
             <Defs colors={color} />
 
             <g transform="translate({margin.left} {margin.top})">
@@ -102,12 +111,19 @@
                                   {commonYScale}
                                   {measurablesById}/>
                     </g>
-                    <DateGuideLines {dateScale}
-                                    height={height}
-                                    width={width - (margin.left + margin.right)}/>
                 {:else}
                     <text dy="50" dx="10">No Data</text>
                 {/each}
+                <rect bind:this={hitbox}
+                      width={width - (margin.left + margin.right)}
+                      height={height - (margin.top + margin.bottom)}
+                      fill="none"
+                      pointer-events="all"/>
+                <DateGuideLines {dateScale}
+                                height={height}
+                                width={width - (margin.left + margin.right)}/>
+
+
             </g>
         </svg>
     </div>
