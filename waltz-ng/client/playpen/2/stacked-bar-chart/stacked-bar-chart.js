@@ -96,8 +96,6 @@ function controller($element, $scope) {
 
     vm.$onChanges = () => {
 
-        console.log({rsbcd: vm.rawData});
-
         const series = stacker(vm.rawData);
 
         const y  = scaleLinear()

@@ -1,5 +1,6 @@
 import _ from "lodash";
 import {extent} from "d3-array";
+import {timeFormat} from "d3-time-format";
 
 function removeFromAcc(id, acc) {
     return {
@@ -62,7 +63,34 @@ export function toStackData(data) {
             xs.push({k: d.k, s: durations[i][0], e: durations[i][1], values: acc});
         });
 
-    console.log("lol", {xs});
-
     return xs;
+}
+
+
+
+const dateFormat = timeFormat("%B %d, %Y");
+
+export function prettyDate(d) {
+    return dateFormat(d);
+}
+
+
+function findStratum(stackData, t) {
+    return _.find(
+        stackData,
+        d => d.s < t && (d.e > t || _.isUndefined(d.e)));
+}
+
+
+export function findStrata(xs, t) {
+    return _
+        .chain(xs)
+        .map(d => {
+            return {
+                k: d.k,
+                stratum: findStratum(d.stackData, t)
+            }
+        })
+        .orderBy(d => d.k)
+        .value();
 }
