@@ -1,6 +1,7 @@
 <script>
     import {dynamicDate, fixedDate} from "./stores/selected-dates";
     import {findStrata, prettyDate} from "../milestone-utils";
+    import DiffDetailReport from "./DiffDetailReport.svelte";
 
     export let data;
     export let measurablesById;
@@ -33,7 +34,7 @@
         const bMap = invertRatings(b);
 
         const moversAndLeavers = _.chain(aMap)
-            .map((v, k) => ({ k: Number(k), r1: v, r2: bMap[k] || null}))
+            .map((v, k) => ({k: Number(k), r1: v, r2: bMap[k] || null}))
             .filter(d => d.r1 !== d.r2)
             .value();
 
@@ -76,62 +77,18 @@
             (d1, d2) => ({
                 m: measurablesById[Number(d1.k)],
                 t1: d1.stratum?.values,
-                t2: d2.stratum?.values}));
-
-        console.log({zipped, t1Strata, t2Strata});
+                t2: d2.stratum?.values
+            }));
 
         diffReports = _.map(zipped, d => Object.assign({}, d, {diff: mkDiff(d.t1, d.t2)}));
     }
-
-    const niceName = {
-        g: "Buy",
-        r: "Sell",
-        a: "Hold"
-    };
 </script>
+
 
 <h3>{prettyDate(t1)} &raquo; {prettyDate(t2)}</h3>
 
 {#each diffReports as summary}
     <h4>{summary.m.name}</h4>
 
-    <table class="table table-condensed small">
-        <thead>
-        <th>From</th>
-        <th>To</th>
-        <th>Count</th>
-        </thead>
-        <tbody>
-        {#each summary.diff as row}
-        <tr>
-            <td class={`rating-${row.r1}`}>
-                {niceName[row.r1] || "-" }
-            </td>
-            <td class={`rating-${row.r2}`}>
-                {niceName[row.r2] || "-" }
-            </td>
-            <td>
-                {row.changes.length}
-            </td>
-        </tr>
-        {/each}
-        </tbody>
-    </table>
+    <DiffDetailReport report={summary} {measurablesById} />
 {/each}
-
-
-
-
-
-<style type="text/scss">
-    @import "../../../../style/variables";
-    .rating-a {
-        background: $waltz-amber-background;
-    }
-    .rating-r {
-        background: $waltz-red-background;
-    }
-    .rating-g {
-        background: $waltz-green-background;
-    }
-</style>
