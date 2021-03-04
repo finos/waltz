@@ -16,6 +16,7 @@
  *
  */
 import BookmarkPanel from "../bookmarks/svelte/BookmarkPanel.svelte";
+import MilestoneViewer from "../milestones/svelte/milestone-viewer/MilestoneViewer.svelte";
 
 
 const appsSection = {
@@ -169,28 +170,28 @@ const measurableRatingExplorerSection = {
 
 const relatedMeasurablesSection = {
     componentId: "related-measurables-section",
-    name: "Related Viewpoints",
+    name: "Viewpoints",
     icon: "link",
     id: 22
 };
 
 const relatedDataTypesSection = {
     componentId: "related-data-type-section",
-    name: "Related Types",
+    name: "Types",
     icon: "qrcode",
     id: 23
 };
 
 const relatedAppsSection = {
     componentId: "related-apps-section",
-    name: "Related Apps",
+    name: "Apps",
     icon: "desktop",
     id: 24
 };
 
 const relatedAppGroupsSection = {
     componentId: "related-app-groups-section",
-    name: "Related Groups",
+    name: "Groups",
     icon: "object-group",
     id: 25
 };
@@ -371,6 +372,13 @@ const appComplexitySummarySection = {
     id: 240
 };
 
+const milestoneViewerSection = {
+    svelteComponent: MilestoneViewer,
+    name: "Milestone Viewer",
+    icon: "rocket",
+    id: 250,
+};
+
 export const dynamicSections = {
     appCostsSection,
     appCostsSummarySection,
@@ -505,6 +513,7 @@ export const dynamicSectionsByKind = {
         pack(logicalFlowsTabgroupSection,
             [authSourcesSection]),
         entityDiagramsSection,
+        milestoneViewerSection,
         changeLogSection
     ],
     "PERSON": [
