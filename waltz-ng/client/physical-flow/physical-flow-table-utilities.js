@@ -17,7 +17,7 @@
  */
 
 import _ from "lodash";
-import {mkEnumGridCell, mkLinkGridCell} from "../common/grid-utils";
+import {mkEntityLinkGridCell, mkEnumGridCell, mkLinkGridCell} from "../common/grid-utils";
 import {CORE_API} from "../common/services/core-api-utils";
 
 
@@ -30,10 +30,11 @@ export const columnDef = {
     frequency: { field: "physicalFlow.frequency", displayName: "Frequency", cellFilter: "toDisplayName:\"frequencyKind\"" },
     criticality: { field: "physicalFlow.criticality", displayName: "Criticality", cellFilter: "toDisplayName:\"physicalFlowCriticality\"" },
     description: { field: "specification.description", displayName: "Description"},
-    source: mkLinkGridCell("Source App", "logicalFlow.source.name", "logicalFlow.source.id", "main.app.view"),
-    target: mkLinkGridCell("Target App", "logicalFlow.target.name", "logicalFlow.target.id", "main.app.view"),
+    source: mkEntityLinkGridCell("Source", "logicalFlow.source"),
+    target: mkEntityLinkGridCell("Target", "logicalFlow.target"),
     basisOffset: { field: "physicalFlow.basisOffset", displayName: "Basis", cellFilter: "toBasisOffset" }
 };
+
 
 export function withWidth(name, width) {
     return Object.assign(name, { width: width})
