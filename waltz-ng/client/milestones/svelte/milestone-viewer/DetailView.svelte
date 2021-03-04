@@ -1,5 +1,5 @@
 <script>
-    import {fixedDate, dynamicDate} from "./stores/selected-dates";
+    import {dynamicDate, fixedDate} from "./stores/selected-dates";
     import PointInTimeDetailView from "./PointInTimeDetailView.svelte";
     import DiffDetailView from "./DiffDetailView.svelte";
 
@@ -12,6 +12,7 @@
 
 {#if ($fixedDate && $dynamicDate)}
     <DiffDetailView {data}
+                    {color}
                     {measurablesById} />
 {:else if $dynamicDate}
     <PointInTimeDetailView {data}

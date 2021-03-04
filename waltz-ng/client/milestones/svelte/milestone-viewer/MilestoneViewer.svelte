@@ -1,8 +1,8 @@
 <script>
 
-    import {color, hsl} from "d3-color";
+    import {hsl} from "d3-color";
     import {scaleBand, scaleOrdinal, scaleSqrt, scaleUtc} from "d3-scale";
-    import {select} from "d3-selection";
+    import {mouse, select} from "d3-selection";
     import TestData from "../../test-data";
 
     import Defs from "./Defs.svelte"
@@ -11,11 +11,8 @@
     import {calcDateExtent, toStackData} from "../../milestone-utils";
     import DateGuideLines from "./DateGuideLines.svelte";
     import DetailView from "./DetailView.svelte";
-
-    import {greenBg, amber, amberBg, green, red, redBg} from "../../../common/colors";
     import {measurableStore} from "../../../svelte-stores/measurables";
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
-    import {mouse} from "d3-selection";
     import {dynamicDate} from "./stores/selected-dates";
 
     const width = 400, height = 600;
@@ -41,10 +38,12 @@
     $: colors = {
             bg: scaleOrdinal()
                 .domain(_.map($ratingScheme.data.ratings, d => d.rating.toLowerCase()))
-                .range(_.map($ratingScheme.data.ratings, d => hsl(d.color).brighter(1.1))),
+                .range(_.map($ratingScheme.data.ratings, d => hsl(d.color).brighter(1.1)))
+                .unknown("#eee"),
             fg: scaleOrdinal()
                 .domain(_.map($ratingScheme.data.ratings, d => d.rating.toLowerCase()))
                 .range(_.map($ratingScheme.data.ratings, d => hsl(d.color)))
+                .unknown("#eee")
     };
 
     $: measurablesById = _.keyBy(

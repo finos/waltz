@@ -52,8 +52,8 @@
     <tbody>
         <tr class="clickable">
             <td style="background-color:{color.bg('g')}">{countFor(data.stratum, "g")}</td>
-            <td class="rating-r">{countFor(data.stratum, "r")}</td>
-            <td class="rating-a">{countFor(data.stratum, "a")}</td>
+            <td style="background-color:{color.bg('r')}">{countFor(data.stratum, "r")}</td>
+            <td style="background-color:{color.bg('a')}">{countFor(data.stratum, "a")}</td>
             <td><b>{countFor(data.stratum, "a") + countFor(data.stratum, "g") + countFor(data.stratum, "r")}</b></td>
         </tr>
     </tbody>
@@ -74,7 +74,7 @@
                 <th>Rating</th>
             </thead>
             {#each rows as row}
-            <tr class="rating-{row.rating}">
+            <tr style="background-color:{color.bg(row.rating)}">
                 <td>{row.measurable.name}</td>
                 <td>{niceName[row.rating] || "?"}</td>
             </tr>
@@ -86,17 +86,6 @@
 
 
 <style type="text/scss">
-    @import "../../../../style/variables";
-    .rating-a {
-        background: $waltz-amber-background;
-    }
-    .rating-r {
-        background: $waltz-red-background;
-    }
-    .rating-g {
-        background: $waltz-green-background;
-    }
-
     .fake-region {
         border: 1px solid #ddd;
         padding: 0.4em;

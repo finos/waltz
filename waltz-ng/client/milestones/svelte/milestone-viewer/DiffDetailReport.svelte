@@ -1,6 +1,7 @@
 <script>
     export let report;
     export let measurablesById;
+    export let color;
 
     const niceName = {
         g: "Buy",
@@ -42,10 +43,10 @@
         {#each report.diff as row}
             <tr on:click={() => showRow(row)}
                 class="clickable">
-                <td class={`rating-${row.r1}`}>
+                <td style="background-color:{color.bg(`${row.r1}`)}">
                     {niceName[row.r1] || "-" }
                 </td>
-                <td class={`rating-${row.r2}`}>
+                <td style="background-color:{color.bg(`${row.r2}`)}">
                     {niceName[row.r2] || "-" }
                 </td>
                 <td>
@@ -71,10 +72,10 @@
         <tbody>
         {#each selectedRow.changes as change }
             <tr>
-                <td class={`rating-${selectedRow.r1}`}>
+                <td style="background-color:{color.bg(`${selectedRow.r1}`)}">
                     {niceName[selectedRow.r1] || "-" }
                 </td>
-                <td class={`rating-${selectedRow.r2}`}>
+                <td style="background-color:{color.bg(`${selectedRow.r2}`)}">
                     {niceName[selectedRow.r2] || "-" }
                 </td>
                 <td>
@@ -85,17 +86,3 @@
         </tbody>
     </table>
 {/if}
-
-
-<style type="text/scss">
-    @import "../../../../style/variables";
-    .rating-a {
-        background: $waltz-amber-background;
-    }
-    .rating-r {
-        background: $waltz-red-background;
-    }
-    .rating-g {
-        background: $waltz-green-background;
-    }
-</style>

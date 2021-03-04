@@ -5,6 +5,7 @@
 
     export let data;
     export let measurablesById;
+    export let color;
 
     /**
      * Takes a stack summary and returns an inverted map
@@ -90,5 +91,7 @@
 {#each diffReports as summary}
     <h4>{summary.m.name}</h4>
 
-    <DiffDetailReport report={summary} {measurablesById} />
+    <DiffDetailReport report={summary}
+                      {color}
+                      {measurablesById} />
 {/each}
