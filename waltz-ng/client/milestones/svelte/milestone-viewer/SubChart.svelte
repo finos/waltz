@@ -1,45 +1,51 @@
 <script>
     import {useCommonYScale} from "./stores/decorators";
-    import {dynamicDate} from "./stores/selected-dates";
     import {scaleLinear} from "d3-scale";
     import {max} from "d3-array";
     import {axisBottom, axisLeft} from "d3-axis";
     import _ from "lodash";
-    import {mouse, select} from "d3-selection";
+    import {select} from "d3-selection";
     import {stack} from "d3-shape";
 
 
     const ANIMATION_DURATION = 400;
-    const stacker = stack()
-        .keys(['r', 'a', 'g'])
-        .value((d, k) => d.values[k].length)
 
 
     export let data;
-    export let dateScale;
-    export let color;
     export let height = 100;
     export let width = 100;
-    export let commonYScale;
-    export let measurablesById;
+    export let config;
+
+    let commonYScale;
+    let measurablesById;
+    let dateScale;
+    let color;
+    let ratings
+
+    $: measurablesById = config.measurablesById;
+    $: commonYScale = config.commonYScale;
+    $: dateScale = config.dateScale;
+    $: color = config.color;
+    $: ratings = config.ratingSchemeItems;
+
+    $: console.log({ratings});
 
     let el;
 
+    $: keys = _.map(ratings, d => d.id);
     $: subChartName = measurablesById[data?.k]?.name || "-";
+
     $: {
         const {k, stackData} = data;
+
+        const stacker = stack()
+            .keys(_.map(ratings, d => d.id))
+            .value((d, k) => _.size(d.values[k]))
+
         const series = stacker(stackData);
 
 
         const svg = select(el);
-
-        // svg.select("rect.background")
-        //     .on("click.select", d => {
-        //         const mousePosition = mouse(svg.node())[0];
-        //         const selectedDate = x.invert(mousePosition);
-        //         dynamicDate.set(selectedDate);
-        //     });
-
 
         const y  = $useCommonYScale
             ? commonYScale
@@ -115,6 +121,7 @@
         svg.select("g.y-axis")
             .call(yAxis);
     }
+
 </script>
 
 <g class="subChart"

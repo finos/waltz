@@ -4,10 +4,11 @@
     import PointInTimeStratumSummary from "./PointInTimeStratumSummary.svelte";
 
     export let data;
-    export let measurablesById;
-    export let color;
+    export let config;
 
     let strata = null;
+
+    $: measurablesById = config.measurablesById;
 
     $: strata = findStrata(data, $dynamicDate.getTime());
 
@@ -18,8 +19,7 @@
 {#each strata as stratum}
     <h4>{measurablesById[Number(stratum.k)]?.name}</h4>
     <PointInTimeStratumSummary data={stratum}
-                               {color}
-                               {measurablesById}/>
+                               {config}/>
 {/each}
 
 

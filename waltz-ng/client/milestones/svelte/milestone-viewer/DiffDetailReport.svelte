@@ -1,13 +1,15 @@
 <script>
-    export let report;
-    export let measurablesById;
-    export let color;
+    import {toMap} from "../../../common/map-utils";
 
-    const niceName = {
-        g: "Buy",
-        r: "Sell",
-        a: "Hold"
-    };
+    export let report;
+    export let config;
+
+    let ratings;
+    let niceName;
+
+    $: color = config.color;
+    $: ratings = config.ratingSchemeItems;
+    $: niceName = toMap(ratings, d => d.id, d => d.name);
 
     let selectedRow = null;
 
@@ -15,7 +17,6 @@
     let detail = [];
 
     function showRow(row) {
-        console.log({row})
         selectedRow = row;
     }
 
@@ -24,38 +25,45 @@
     }
 
     $: console.log({report})
+
 </script>
 
 
 {#if !selectedRow}
-    <table class="table table-condensed small">
-        <colgroup>
-            <col width="25%">
-            <col width="25%">
-            <col width="50%">
-        </colgroup>
-        <thead>
-        <th>From</th>
-        <th>To</th>
-        <th>Count</th>
-        </thead>
-        <tbody>
-        {#each report.diff as row}
-            <tr on:click={() => showRow(row)}
-                class="clickable">
-                <td style="background-color:{color.bg(`${row.r1}`)}">
-                    {niceName[row.r1] || "-" }
-                </td>
-                <td style="background-color:{color.bg(`${row.r2}`)}">
-                    {niceName[row.r2] || "-" }
-                </td>
-                <td>
-                    {row.changes.length}
-                </td>
-            </tr>
-        {/each}
-        </tbody>
-    </table>
+    {#if report.diff.length > 0}
+        <table class="table table-condensed small">
+            <colgroup>
+                <col width="25%">
+                <col width="25%">
+                <col width="50%">
+            </colgroup>
+            <thead>
+            <th>From</th>
+            <th>To</th>
+            <th>Count</th>
+            </thead>
+            <tbody>
+            {#each report.diff as row}
+                <tr on:click={() => showRow(row)}
+                    class="clickable">
+                    <td style="background-color:{color.bg(`${row.r1}`)}">
+                        {niceName[row.r1] || "-" }
+                    </td>
+                    <td style="background-color:{color.bg(`${row.r2}`)}">
+                        {niceName[row.r2] || "-" }
+                    </td>
+                    <td>
+                        {row.changes.length}
+                    </td>
+                </tr>
+            {/each}
+            </tbody>
+        </table>
+    {:else}
+        <div class="alert alert-info">
+            There are no changes over this date selection
+        </div>
+    {/if}
 {:else}
     <table class="table table-condensed small">
         <colgroup>

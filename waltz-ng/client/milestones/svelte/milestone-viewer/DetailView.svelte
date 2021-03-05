@@ -4,20 +4,17 @@
     import DiffDetailView from "./DiffDetailView.svelte";
 
     export let data;
-    export let measurablesById;
-    export let color;
+    export let config;
 
 </script>
 
 
 {#if ($fixedDate && $dynamicDate)}
     <DiffDetailView {data}
-                    {color}
-                    {measurablesById} />
+                    {config} />
 {:else if $dynamicDate}
     <PointInTimeDetailView {data}
-                           {color}
-                           {measurablesById}/>
+                           {config}/>
 {:else if $fixedDate}
     <div class="alert alert-info">
         Now pick a comparison point

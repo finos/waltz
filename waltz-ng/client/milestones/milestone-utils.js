@@ -3,29 +3,23 @@ import {extent} from "d3-array";
 import {timeFormat} from "d3-time-format";
 
 function removeFromAcc(id, acc) {
-    return {
-        a: _.without(acc.a, id),
-        r: _.without(acc.r, id),
-        g: _.without(acc.g, id)
-    };
+
+    _.each(acc, (v, k) => {
+        acc[k] = _.without(v, id);
+    });
+
+    return acc;
 }
 
 
-function categorizeBucket(acc, d) {
+function bucketItemByRating(acc, d) {
     const accNext = removeFromAcc(d.id_a, acc);
-    if (d.milestone_name === 'Launch Date') {
-        accNext.g.push(d.id_a);
-        return accNext;
+    if (d.rating_id){
+        accNext[d.rating_id] = _.concat(
+            (accNext[d.rating_id] || []),
+            [d.id_a]);
     }
-    if (d.milestone_name === 'Hold Date') {
-        accNext.a.push(d.id_a);
-        return accNext;
-    }
-    if (d.milestone_name === 'Sell Date') {
-        accNext.r.push(d.id_a);
-        return accNext;
-    }
-    return accNext;
+    return Object.assign({}, accNext);
 }
 
 
@@ -57,13 +51,13 @@ export function toStackData(data) {
     const durations = _.zip(dates, _.tail(dates));
 
     let xs = [];
-    let acc = {r: [], a: [], g: []};
+    let acc = {};
     _.each(
         groupedByDate,
         (d, i) => {
             acc = _.reduce(
                 d.v,
-                categorizeBucket,
+                bucketItemByRating,
                 acc);
             xs.push({
                 k: d.k,

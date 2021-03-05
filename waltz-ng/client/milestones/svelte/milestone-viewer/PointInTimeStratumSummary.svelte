@@ -1,10 +1,15 @@
 <script>
+    import {toMap} from "../../../common/map-utils";
+
     export let data;
-    export let color;
-    export let measurablesById;
+    export let config;
 
     let showingAll = false;
     let rows = [];
+
+    $: color = config.color;
+    $: measurablesById = config.measurablesById;
+    $: ratings = config.ratingSchemeItems;
 
     $: rows = _
         .chain(data.stratum?.values)
@@ -18,43 +23,49 @@
 
 
 
-    function countFor(stratum, ratingCode) {
-        return _.size(stratum?.values[ratingCode]);
+    function countFor(stratum, ratingId) {
+        return _.size(stratum?.values[ratingId]);
     }
 
     function toggleShowAll() {
         showingAll = ! showingAll;
     }
 
-    const niceName = {
-        g: "Buy",
-        r: "Sell",
-        a: "Hold"
-    };
+    function getTotalForStratum(stratum) {
+        return _
+            .chain(ratings)
+            .map(d => countFor(stratum, d.id))
+            .sum()
+            .value()
+    }
+
+    $: niceName = toMap(ratings, d => d.id, d => d.name);
+
+    $: colWidth = 100 / (_.size(ratings) + 1);
 
 </script>
 
 {#if !showingAll}
 <table class="table table-condensed">
     <colgroup>
-        <col width="25%">
-        <col width="25%">
-        <col width="25%">
-        <col width="25%">
+        {#each ratings as rating}
+        <col width="{colWidth}%">
+        {/each}
+        <col width="{colWidth}%">
     </colgroup>
     <thead class="clickable"
            on:click={() => toggleShowAll()}>
-        <th>Buy</th>
-        <th>Sell</th>
-        <th>Hold</th>
+        {#each ratings as rating}
+            <th>{rating.name}</th>
+        {/each}
         <th>Total</th>
     </thead>
     <tbody>
         <tr class="clickable">
-            <td style="background-color:{color.bg('g')}">{countFor(data.stratum, "g")}</td>
-            <td style="background-color:{color.bg('r')}">{countFor(data.stratum, "r")}</td>
-            <td style="background-color:{color.bg('a')}">{countFor(data.stratum, "a")}</td>
-            <td><b>{countFor(data.stratum, "a") + countFor(data.stratum, "g") + countFor(data.stratum, "r")}</b></td>
+            {#each ratings as rating}
+            <td style="background-color:{color.bg(rating.id)}">{countFor(data.stratum, rating.id)}</td>
+            {/each}
+            <td><b>{getTotalForStratum(data.stratum)}</b></td>
         </tr>
     </tbody>
 </table>

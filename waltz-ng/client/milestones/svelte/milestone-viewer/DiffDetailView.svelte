@@ -4,8 +4,7 @@
     import DiffDetailReport from "./DiffDetailReport.svelte";
 
     export let data;
-    export let measurablesById;
-    export let color;
+    export let config;
 
     /**
      * Takes a stack summary and returns an inverted map
@@ -60,9 +59,15 @@
         return groupedChanges;
     }
 
+    let measurablesById;
     let strata = null;
     let t1;
     let t2;
+    let t1Strata;
+    let t2Strata;
+
+    $: color = config.color;
+    $: measurablesById = config.measurablesById;
 
     $: [t1, t2] = _.orderBy([$fixedDate, $dynamicDate], t => t.getTime());
 
@@ -92,6 +97,5 @@
     <h4>{summary.m.name}</h4>
 
     <DiffDetailReport report={summary}
-                      {color}
-                      {measurablesById} />
+                      {config} />
 {/each}

@@ -34,14 +34,25 @@
     let stacks = [];
     let commonYScale;
     let colors = null;
+    let chartConfig;
+
+    $: chartConfig = {
+        color: colors,
+        measurablesById,
+        dateScale,
+        commonYScale,
+        ratingSchemeItems: $ratingScheme.data.ratings
+
+    }
+
 
     $: colors = {
             bg: scaleOrdinal()
-                .domain(_.map($ratingScheme.data.ratings, d => d.rating.toLowerCase()))
+                .domain(_.map($ratingScheme.data.ratings, d => d.id))
                 .range(_.map($ratingScheme.data.ratings, d => hsl(d.color).brighter(1.1)))
                 .unknown("#eee"),
             fg: scaleOrdinal()
-                .domain(_.map($ratingScheme.data.ratings, d => d.rating.toLowerCase()))
+                .domain(_.map($ratingScheme.data.ratings, d => d.id))
                 .range(_.map($ratingScheme.data.ratings, d => hsl(d.color)))
                 .unknown("#eee")
     };
@@ -91,11 +102,13 @@
     }
 
     $: console.log({
-        r: $ratingScheme,
-        fgr: colors.fg.range(),
-        fgd: colors.fg.domain(),
-        bgr: colors.bg.range(),
-        bgd: colors.bg.domain()});
+        chartConfig
+    })
+        // <!--r: $ratingScheme,-->
+        // <!--fgr: colors.fg.range(),-->
+        // <!--fgd: colors.fg.domain(),-->
+        // bgr: colors.bg.range(),
+        // bgd: colors.bg.domain()});
 
 </script>
 
@@ -115,12 +128,9 @@
                     {#each stacks as subChart}
                         <g transform="translate(0 {y(subChart.k)})">
                             <SubChart data={subChart}
-                                      color={colors}
-                                      {dateScale}
                                       width={width - (margin.left + margin.right)}
                                       height={y.bandwidth()}
-                                      {commonYScale}
-                                      {measurablesById}/>
+                                      config={chartConfig}/>
                         </g>
                     {:else}
                         <text dy="50" dx="10">No Data</text>
@@ -141,8 +151,7 @@
     </div>
     <div class="col-sm-5">
         <DetailView data={stacks}
-                    color={colors}
-                    {measurablesById}/>
+                    config={chartConfig}/>
     </div>
 </div>
 
