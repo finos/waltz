@@ -1,23 +1,23 @@
 <script>
     import {toMap} from "../../../common/map-utils";
     import {backgroundColors} from "./stores/decorators";
+    import {measurablesById} from "./stores/measurables";
+    import {ratingSchemeItems} from "./stores/ratings";
 
     export let data;
-    export let config;
 
     let showingAll = false;
+    let ratings;
     let rows = [];
 
-    $: color = config.color;
-    $: measurablesById = config.measurablesById;
-    $: ratings = config.ratingSchemeItems;
+    $: ratings = $ratingSchemeItems;
 
     $: rows = _
         .chain(data.stratum?.values)
         .flatMap((ids, rating) => _.map(
             ids,
             id => ({
-                measurable: measurablesById[id],
+                measurable: $measurablesById[id],
                 rating
             })))
         .value();

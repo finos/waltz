@@ -6,6 +6,8 @@
     import _ from "lodash";
     import {select} from "d3-selection";
     import {stack} from "d3-shape";
+    import {measurablesById} from "./stores/measurables";
+    import {ratingSchemeItems} from "./stores/ratings";
 
 
     const ANIMATION_DURATION = 400;
@@ -14,24 +16,16 @@
     export let data;
     export let height = 100;
     export let width = 100;
-    export let config;
-
-    let measurablesById;
-    let ratings
-
-    $: measurablesById = config.measurablesById;
-    $: ratings = config.ratingSchemeItems;
 
     let el;
 
-    $: keys = _.map(ratings, d => d.id);
-    $: subChartName = measurablesById[data?.k]?.name || "-";
+    $: subChartName = $measurablesById[data?.k]?.name || "-";
 
     $: {
         const {k, stackData} = data;
 
         const stacker = stack()
-            .keys(_.map(ratings, d => d.id))
+            .keys(_.map($ratingSchemeItems, d => d.id))
             .value((d, k) => _.size(d.values[k]))
 
         const series = stacker(stackData);

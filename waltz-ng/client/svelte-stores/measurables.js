@@ -1,4 +1,5 @@
 import {remote} from "./remote";
+import {checkIsIdSelector} from "../common/checks";
 
 
 export function mkMeasurableStore() {
@@ -9,9 +10,22 @@ export function mkMeasurableStore() {
             null,
             {force});
 
+    const findMeasurablesBySelector = (options, force = false) => {
+        checkIsIdSelector(options);
+        return remote
+            .fetchViewList(
+                "POST",
+                `api/measurable/measurable-selector`,
+                options,
+                {force});
+    };
+
     return {
-        loadAll
+        loadAll,
+        findMeasurablesBySelector
     };
 }
+
+
 
 export const measurableStore = mkMeasurableStore();

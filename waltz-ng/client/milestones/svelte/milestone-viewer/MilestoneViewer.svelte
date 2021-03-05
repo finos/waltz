@@ -15,6 +15,11 @@
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
     import {dynamicDate} from "./stores/selected-dates";
     import {backgroundColors, commonYScale, dateScale, foregroundColors} from "./stores/decorators";
+    import {mkSelectionOptions} from "../../../common/selector-utils";
+    import {measurablesById} from "./stores/measurables";
+    import {ratingSchemeItems} from "./stores/ratings";
+
+    export let primaryEntityRef = null;
 
     const width = 400, height = 600;
     const margin = {
@@ -25,23 +30,22 @@
     };
 
     let measurables = measurableStore.loadAll();
+    let otherMeasurables = measurableStore
+        .findMeasurablesBySelector(mkSelectionOptions(primaryEntityRef, 'CHILDREN'));
     let ratingScheme = ratingSchemeStore.getById(47);
 
-    let measurablesById;
     let hitbox;
     let svg;
     let data = TestData;
     let stacks = [];
-    let chartConfig;
+    let measurablesWithChildren;
 
-    $: measurablesById = _.keyBy(
-        $measurables.data,
-        d => d.id);
+    $: measurablesById
+        .set(_.keyBy($measurables.data, d => d.id));
 
-    $: chartConfig = {
-        measurablesById,
-        ratingSchemeItems: $ratingScheme.data.ratings
-    }
+    $: measurablesWithChildren = $otherMeasurables.data;
+
+    $: ratingSchemeItems.set($ratingScheme.data.ratings);
 
     $: {
         const groupedByVenue = _.groupBy(
@@ -89,21 +93,12 @@
                 .unknown("#eee"));
 
         const hb = select(hitbox);
-        hb.on("click.select", d => {
+        hb.on("click.select", () => {
                 const mousePosition = mouse(hb.node())[0];
                 const selectedDate = $dateScale.invert(mousePosition);
                 dynamicDate.set(selectedDate);
             });
     }
-
-    $: console.log({
-        chartConfig,
-    })
-        // <!--r: $ratingScheme,-->
-        // <!--fgr: colors.fg.range(),-->
-        // <!--fgd: colors.fg.domain(),-->
-        // bgr: colors.bg.range(),
-        // bgd: colors.bg.domain()});
 
 </script>
 
@@ -124,8 +119,7 @@
                         <g transform="translate(0 {y(subChart.k)})">
                             <SubChart data={subChart}
                                       width={width - (margin.left + margin.right)}
-                                      height={y.bandwidth()}
-                                      config={chartConfig}/>
+                                      height={y.bandwidth()}/>
                         </g>
                     {:else}
                         <text dy="50" dx="10">No Data</text>
@@ -143,8 +137,7 @@
         </svg>
     </div>
     <div class="col-sm-5">
-        <DetailView data={stacks}
-                    config={chartConfig}/>
+        <DetailView data={stacks}/>
     </div>
 </div>
 

@@ -1,18 +1,15 @@
 <script>
     import {toMap} from "../../../common/map-utils";
     import {backgroundColors} from "./stores/decorators";
+    import {ratingSchemeItems} from "./stores/ratings";
 
     export let report;
-    export let config;
 
-    let ratings;
     let niceName;
-
-    $: ratings = config.ratingSchemeItems;
-    $: niceName = toMap(ratings, d => d.id, d => d.name);
-
     let selectedRow = null;
     let detail = [];
+
+    $: niceName = toMap($ratingSchemeItems, d => d.id, d => d.name);
 
     function showRow(row) {
         selectedRow = row;
