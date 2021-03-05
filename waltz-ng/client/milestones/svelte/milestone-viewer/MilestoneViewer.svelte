@@ -34,13 +34,14 @@
     let stacks = [];
     let chartConfig;
 
-    $: chartConfig = {
-        ratingSchemeItems: $ratingScheme.data.ratings
-    }
-
     $: measurablesById = _.keyBy(
         $measurables.data,
         d => d.id);
+
+    $: chartConfig = {
+        measurablesById,
+        ratingSchemeItems: $ratingScheme.data.ratings
+    }
 
     $: {
         const groupedByVenue = _.groupBy(
