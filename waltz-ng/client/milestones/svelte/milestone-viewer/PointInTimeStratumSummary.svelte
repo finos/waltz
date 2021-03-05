@@ -1,5 +1,6 @@
 <script>
     import {toMap} from "../../../common/map-utils";
+    import {backgroundColors} from "./stores/decorators";
 
     export let data;
     export let config;
@@ -63,7 +64,7 @@
     <tbody>
         <tr class="clickable">
             {#each ratings as rating}
-            <td style="background-color:{color.bg(rating.id)}">{countFor(data.stratum, rating.id)}</td>
+            <td style="background-color:{$backgroundColors(rating.id)}">{countFor(data.stratum, rating.id)}</td>
             {/each}
             <td><b>{getTotalForStratum(data.stratum)}</b></td>
         </tr>
@@ -85,7 +86,7 @@
                 <th>Rating</th>
             </thead>
             {#each rows as row}
-            <tr style="background-color:{color.bg(row.rating)}">
+            <tr style="background-color:{$backgroundColors(row.rating)}">
                 <td>{row.measurable.name}</td>
                 <td>{niceName[row.rating] || "?"}</td>
             </tr>

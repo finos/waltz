@@ -1,5 +1,5 @@
 <script>
-    import {useCommonYScale} from "./stores/decorators";
+    import {backgroundColors, commonYScale, dateScale, foregroundColors, useCommonYScale} from "./stores/decorators";
     import {scaleLinear} from "d3-scale";
     import {max} from "d3-array";
     import {axisBottom, axisLeft} from "d3-axis";
@@ -16,19 +16,11 @@
     export let width = 100;
     export let config;
 
-    let commonYScale;
     let measurablesById;
-    let dateScale;
-    let color;
     let ratings
 
     $: measurablesById = config.measurablesById;
-    $: commonYScale = config.commonYScale;
-    $: dateScale = config.dateScale;
-    $: color = config.color;
     $: ratings = config.ratingSchemeItems;
-
-    $: console.log({ratings});
 
     let el;
 
@@ -44,18 +36,15 @@
 
         const series = stacker(stackData);
 
-
         const svg = select(el);
 
-        const y  = $useCommonYScale
-            ? commonYScale
-                .range([height, 0])
+        const y = $useCommonYScale
+            ? $commonYScale
             : scaleLinear()
                 .domain([0, max(series, d => max(d, d => d[1])) + 2]).nice()
                 .range([height, 0]);
 
-        const x = dateScale
-            .range([0, width]);
+        const x = $dateScale;
 
         const xAxis = g => g
             .attr("transform", `translate(0 ${height})`)
@@ -106,13 +95,13 @@
                 const p = select(this.parentNode).datum();
                 return _.isUndefined(d.data.e)
                     ? `url(#gradient-bg-${p.key})`
-                    : color.bg(p.key);
+                    : $backgroundColors(p.key);
             })
             .attr("stroke", function (d)  {
                 const p = select(this.parentNode).datum();
                 return _.isUndefined(d.data.e)
                     ? `url(#gradient-fg-${p.key})`
-                    : color.fg(p.key);
+                    : $foregroundColors(p.key);
             });
 
         svg.select("g.x-axis")
@@ -137,7 +126,6 @@
         {subChartName}
     </text>
 
-<!--    <rect class="background" {width} {height} style="fill: none"></rect>-->
 </g>
 
 <style>

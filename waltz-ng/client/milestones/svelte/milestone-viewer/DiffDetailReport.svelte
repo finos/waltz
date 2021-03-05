@@ -1,5 +1,6 @@
 <script>
     import {toMap} from "../../../common/map-utils";
+    import {backgroundColors} from "./stores/decorators";
 
     export let report;
     export let config;
@@ -7,13 +8,10 @@
     let ratings;
     let niceName;
 
-    $: color = config.color;
     $: ratings = config.ratingSchemeItems;
     $: niceName = toMap(ratings, d => d.id, d => d.name);
 
     let selectedRow = null;
-
-
     let detail = [];
 
     function showRow(row) {
@@ -23,8 +21,6 @@
     function showSummary() {
         selectedRow = null;
     }
-
-    $: console.log({report})
 
 </script>
 
@@ -46,10 +42,10 @@
             {#each report.diff as row}
                 <tr on:click={() => showRow(row)}
                     class="clickable">
-                    <td style="background-color:{color.bg(`${row.r1}`)}">
+                    <td style="background-color:{$backgroundColors(row.r1)}">
                         {niceName[row.r1] || "-" }
                     </td>
-                    <td style="background-color:{color.bg(`${row.r2}`)}">
+                    <td style="background-color:{$backgroundColors(row.r2)}">
                         {niceName[row.r2] || "-" }
                     </td>
                     <td>
@@ -80,10 +76,10 @@
         <tbody>
         {#each selectedRow.changes as change }
             <tr>
-                <td style="background-color:{color.bg(`${selectedRow.r1}`)}">
+                <td style="background-color:{$backgroundColors(selectedRow.r1)}">
                     {niceName[selectedRow.r1] || "-" }
                 </td>
-                <td style="background-color:{color.bg(`${selectedRow.r2}`)}">
+                <td style="background-color:{$backgroundColors(selectedRow.r2)}">
                     {niceName[selectedRow.r2] || "-" }
                 </td>
                 <td>

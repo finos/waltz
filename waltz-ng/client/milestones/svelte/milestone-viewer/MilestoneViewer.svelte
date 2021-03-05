@@ -14,6 +14,7 @@
     import {measurableStore} from "../../../svelte-stores/measurables";
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
     import {dynamicDate} from "./stores/selected-dates";
+    import {backgroundColors, commonYScale, dateScale, foregroundColors} from "./stores/decorators";
 
     const width = 400, height = 600;
     const margin = {
@@ -30,32 +31,12 @@
     let hitbox;
     let svg;
     let data = TestData;
-    let dateScale;
     let stacks = [];
-    let commonYScale;
-    let colors = null;
     let chartConfig;
 
     $: chartConfig = {
-        color: colors,
-        measurablesById,
-        dateScale,
-        commonYScale,
         ratingSchemeItems: $ratingScheme.data.ratings
-
     }
-
-
-    $: colors = {
-            bg: scaleOrdinal()
-                .domain(_.map($ratingScheme.data.ratings, d => d.id))
-                .range(_.map($ratingScheme.data.ratings, d => hsl(d.color).brighter(1.1)))
-                .unknown("#eee"),
-            fg: scaleOrdinal()
-                .domain(_.map($ratingScheme.data.ratings, d => d.id))
-                .range(_.map($ratingScheme.data.ratings, d => hsl(d.color)))
-                .unknown("#eee")
-    };
 
     $: measurablesById = _.keyBy(
         $measurables.data,
@@ -85,24 +66,37 @@
             .max()
             .value();
 
-        commonYScale = scaleSqrt()
-            .domain([0, maxY]).nice();
+        commonYScale
+            .set(scaleSqrt()
+                .domain([0, maxY]).nice()
+                .range([y.bandwidth(), 0]));
 
-        dateScale = scaleUtc()
+        dateScale.set(scaleUtc()
             .domain(calcDateExtent(data, 30 * 12))
-            .range([0, width - (margin.left + margin.right)])
+            .range([0, width - (margin.left + margin.right)]))
 
+        backgroundColors
+            .set(scaleOrdinal()
+                .domain(_.map($ratingScheme.data.ratings, d => d.id))
+                .range(_.map($ratingScheme.data.ratings, d => hsl(d.color).brighter(1.1)))
+                .unknown("#eee"));
+
+        foregroundColors
+            .set(scaleOrdinal()
+                .domain(_.map($ratingScheme.data.ratings, d => d.id))
+                .range(_.map($ratingScheme.data.ratings, d => hsl(d.color)))
+                .unknown("#eee"));
 
         const hb = select(hitbox);
         hb.on("click.select", d => {
                 const mousePosition = mouse(hb.node())[0];
-                const selectedDate = dateScale.invert(mousePosition);
+                const selectedDate = $dateScale.invert(mousePosition);
                 dynamicDate.set(selectedDate);
             });
     }
 
     $: console.log({
-        chartConfig
+        chartConfig,
     })
         // <!--r: $ratingScheme,-->
         // <!--fgr: colors.fg.range(),-->
@@ -121,8 +115,8 @@
 <div class="row">
     <div class="col-sm-7">
         <svg viewBox="0 0 {width} {height}">
-            {#if (colors)}
-                <Defs {colors} />
+            {#if $backgroundColors && $foregroundColors}
+                <Defs />
 
                 <g transform="translate({margin.left} {margin.top})">
                     {#each stacks as subChart}
@@ -140,9 +134,7 @@
                           height={height - (margin.top + margin.bottom)}
                           fill="none"
                           pointer-events="all"/>
-                    <DateGuideLines {dateScale}
-                                    height={height}
-                                    width={width - (margin.left + margin.right)}/>
+                    <DateGuideLines height={height} />
 
 
                 </g>
