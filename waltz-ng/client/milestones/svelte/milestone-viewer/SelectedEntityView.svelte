@@ -1,9 +1,9 @@
 <script>
 
     import {measurablesById, selectedMeasurable} from "./stores/measurables";
+    import ViewLink from "../../../common/svelte/ViewLink.svelte";
 
     export let data;
-    export let primaryEntityRef = null;
 
     let values;
 
@@ -27,7 +27,9 @@
 
 
 <h4>
-    <a href="">{$selectedMeasurable.name}</a>
+    <ViewLink ctx={$selectedMeasurable} state="main.measurable.view">
+        {$selectedMeasurable.name}
+    </ViewLink>
 </h4>
 <table class="table table-condensed small">
     <thead>

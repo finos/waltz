@@ -19,26 +19,6 @@
     import {ratingSchemeItems} from "./stores/ratings";
     import SelectedEntityView from "./SelectedEntityView.svelte";
 
-    import {onDestroy, onMount} from 'svelte'
-
-    // function reset() {
-    //     console.log("start reset")
-    //     measurablesById.set(null);
-    //     selectedMeasurable.set(null);
-    //     dateScale.set(null);
-    //     commonYScale.set(null);
-    //     useCommonYScale.set(false);
-    //     dynamicDate.set(null);
-    //     fixedDate.set(null);
-    //     backgroundColors.set(null)
-    //     foregroundColors.set(null)
-    //     ratingSchemeItems.set(null);
-    //     console.log("end reset")
-    // }
-
-    onMount(() => console.log("onMount"))
-    onDestroy(() => console.log("onDestroy"))
-
     export let primaryEntityRef = null;
 
     const width = 400, height = 600;
@@ -50,20 +30,15 @@
     };
 
     let measurables = measurableStore.loadAll();
-    // let otherMeasurables = measurableStore
-    //     .findMeasurablesBySelector(mkSelectionOptions(primaryEntityRef, 'CHILDREN'));
     let ratingScheme = ratingSchemeStore.getById(47);
 
     let hitbox;
     let svg;
     let data = TestData;
     let stacks = [];
-    // let measurablesWithChildren;
 
     $: measurablesById
         .set(_.keyBy($measurables.data, d => d.id));
-
-    // $: measurablesWithChildren = $otherMeasurables.data;
 
     $: ratingSchemeItems.set($ratingScheme.data.ratings);
 
@@ -161,7 +136,7 @@
     </div>
     {#if $selectedMeasurable}
         <div class="col-sm-5">
-            <SelectedEntityView {data} {primaryEntityRef}/>
+            <SelectedEntityView {data}/>
         </div>
     {/if}
 </div>

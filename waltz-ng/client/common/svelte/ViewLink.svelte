@@ -19,6 +19,10 @@
         "main.app.view": {
             path: ctx => `application/${ctx.id}`,
             title: "Application View"
+        },
+        "main.measurable.view": {
+            path: ctx => `measurable/${ctx.id}`,
+            title: "Measurable View"
         }
     };
 
