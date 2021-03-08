@@ -1,7 +1,7 @@
 <script>
     import {toMap} from "../../../common/map-utils";
     import {backgroundColors} from "./stores/decorators";
-    import {measurablesById} from "./stores/measurables";
+    import {measurablesById, selectedMeasurable} from "./stores/measurables";
     import {ratingSchemeItems} from "./stores/ratings";
 
     export let data;
@@ -9,6 +9,7 @@
     let showingAll = false;
     let ratings;
     let rows = [];
+    let selectedEntity = null;
 
     $: ratings = $ratingSchemeItems;
 
@@ -23,13 +24,12 @@
         .value();
 
 
-
     function countFor(stratum, ratingId) {
         return _.size(stratum?.values[ratingId]);
     }
 
     function toggleShowAll() {
-        showingAll = ! showingAll;
+        showingAll = !showingAll;
     }
 
     function getTotalForStratum(stratum) {
@@ -38,6 +38,13 @@
             .map(d => countFor(stratum, d.id))
             .sum()
             .value()
+    }
+
+    function selectEntity(row) {
+        console.log("HIIII");
+        console.log({row});
+        selectedMeasurable.set(row.measurable);
+
     }
 
     $: niceName = toMap(ratings, d => d.id, d => d.name);
@@ -86,7 +93,8 @@
                 <th>Rating</th>
             </thead>
             {#each rows as row}
-            <tr style="background-color:{$backgroundColors(row.rating)}">
+            <tr style="background-color:{$backgroundColors(row.rating)}"
+                on:click={() => selectEntity(row)}>
                 <td>{row.measurable.name}</td>
                 <td>{niceName[row.rating] || "?"}</td>
             </tr>

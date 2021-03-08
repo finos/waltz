@@ -1,3 +1,4 @@
 import {writable} from "svelte/store";
 
-export const measurablesById = writable(false);
+export const measurablesById = writable(null);
+export const selectedMeasurable = writable(null);
