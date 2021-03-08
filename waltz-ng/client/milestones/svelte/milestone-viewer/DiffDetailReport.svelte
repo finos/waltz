@@ -1,20 +1,17 @@
 <script>
+    import {toMap} from "../../../common/map-utils";
+    import {backgroundColors} from "./stores/decorators";
+    import {ratingSchemeItems} from "./stores/ratings";
+
     export let report;
-    export let measurablesById;
 
-    const niceName = {
-        g: "Buy",
-        r: "Sell",
-        a: "Hold"
-    };
-
+    let niceName;
     let selectedRow = null;
-
-
     let detail = [];
 
+    $: niceName = toMap($ratingSchemeItems, d => d.id, d => d.name);
+
     function showRow(row) {
-        console.log({row})
         selectedRow = row;
     }
 
@@ -22,39 +19,44 @@
         selectedRow = null;
     }
 
-    $: console.log({report})
 </script>
 
 
 {#if !selectedRow}
-    <table class="table table-condensed small">
-        <colgroup>
-            <col width="25%">
-            <col width="25%">
-            <col width="50%">
-        </colgroup>
-        <thead>
-        <th>From</th>
-        <th>To</th>
-        <th>Count</th>
-        </thead>
-        <tbody>
-        {#each report.diff as row}
-            <tr on:click={() => showRow(row)}
-                class="clickable">
-                <td class={`rating-${row.r1}`}>
-                    {niceName[row.r1] || "-" }
-                </td>
-                <td class={`rating-${row.r2}`}>
-                    {niceName[row.r2] || "-" }
-                </td>
-                <td>
-                    {row.changes.length}
-                </td>
-            </tr>
-        {/each}
-        </tbody>
-    </table>
+    {#if report.diff.length > 0}
+        <table class="table table-condensed small">
+            <colgroup>
+                <col width="25%">
+                <col width="25%">
+                <col width="50%">
+            </colgroup>
+            <thead>
+            <th>From</th>
+            <th>To</th>
+            <th>Count</th>
+            </thead>
+            <tbody>
+            {#each report.diff as row}
+                <tr on:click={() => showRow(row)}
+                    class="clickable">
+                    <td style="background-color:{$backgroundColors(row.r1)}">
+                        {niceName[row.r1] || "-" }
+                    </td>
+                    <td style="background-color:{$backgroundColors(row.r2)}">
+                        {niceName[row.r2] || "-" }
+                    </td>
+                    <td>
+                        {row.changes.length}
+                    </td>
+                </tr>
+            {/each}
+            </tbody>
+        </table>
+    {:else}
+        <div class="alert alert-info">
+            There are no changes over this date selection
+        </div>
+    {/if}
 {:else}
     <table class="table table-condensed small">
         <colgroup>
@@ -71,10 +73,10 @@
         <tbody>
         {#each selectedRow.changes as change }
             <tr>
-                <td class={`rating-${selectedRow.r1}`}>
+                <td style="background-color:{$backgroundColors(selectedRow.r1)}">
                     {niceName[selectedRow.r1] || "-" }
                 </td>
-                <td class={`rating-${selectedRow.r2}`}>
+                <td style="background-color:{$backgroundColors(selectedRow.r2)}">
                     {niceName[selectedRow.r2] || "-" }
                 </td>
                 <td>
@@ -85,17 +87,3 @@
         </tbody>
     </table>
 {/if}
-
-
-<style type="text/scss">
-    @import "../../../../style/variables";
-    .rating-a {
-        background: $waltz-amber-background;
-    }
-    .rating-r {
-        background: $waltz-red-background;
-    }
-    .rating-g {
-        background: $waltz-green-background;
-    }
-</style>

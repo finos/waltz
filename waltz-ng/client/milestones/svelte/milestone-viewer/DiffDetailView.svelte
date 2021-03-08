@@ -2,9 +2,9 @@
     import {dynamicDate, fixedDate} from "./stores/selected-dates";
     import {findStrata, prettyDate} from "../../milestone-utils";
     import DiffDetailReport from "./DiffDetailReport.svelte";
+    import {measurablesById} from "./stores/measurables";
 
     export let data;
-    export let measurablesById;
 
     /**
      * Takes a stack summary and returns an inverted map
@@ -52,16 +52,19 @@
             .map((v, k) => ({
                 r1: v[0].r1,
                 r2: v[0].r2,
-                changes: _.map(v, d => measurablesById[d.k])
+                changes: _.map(v, d => $measurablesById[d.k])
             }))
             .value();
 
         return groupedChanges;
     }
 
+    // let measurablesById;
     let strata = null;
     let t1;
     let t2;
+    let t1Strata;
+    let t2Strata;
 
     $: [t1, t2] = _.orderBy([$fixedDate, $dynamicDate], t => t.getTime());
 
@@ -75,7 +78,7 @@
             t1Strata,
             t2Strata,
             (d1, d2) => ({
-                m: measurablesById[Number(d1.k)],
+                m: $measurablesById[Number(d1.k)],
                 t1: d1.stratum?.values,
                 t2: d2.stratum?.values
             }));
@@ -90,5 +93,5 @@
 {#each diffReports as summary}
     <h4>{summary.m.name}</h4>
 
-    <DiffDetailReport report={summary} {measurablesById} />
+    <DiffDetailReport report={summary}/>
 {/each}

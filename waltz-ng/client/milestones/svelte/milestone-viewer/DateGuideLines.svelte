@@ -1,15 +1,13 @@
 <script>
     import {dynamicDate, fixedDate} from "./stores/selected-dates";
     import {symbol, symbolCross} from "d3-shape";
+    import {dateScale} from "./stores/decorators";
 
-    export let dateScale;
-    export let width;
     export let height = 100;
 
     const today = new Date();
     const cross = symbol().type(symbolCross).size(30)();
 
-    $: dateScale.range([0, width]);
 
     function clearFixed() {
         fixedDate.set(null);
@@ -30,7 +28,7 @@
 
 
 <g class="today"
-   transform="translate({dateScale(today.getTime())} 10)">
+   transform="translate({$dateScale(today.getTime())} 10)">
     <path d={cross} />
     <circle class="hitbox"
             r="10"
@@ -38,8 +36,8 @@
             on:click={() => selectToday()}/>
 </g>
 
-<line x1={dateScale(today.getTime())}
-      x2={dateScale(today.getTime())}
+<line x1={$dateScale(today.getTime())}
+      x2={$dateScale(today.getTime())}
       y1="20"
       y2={height - 45}
       class="today"/>
@@ -47,15 +45,15 @@
 
 {#if $dynamicDate}
     <g class="fix"
-       transform="translate({dateScale($dynamicDate?.getTime())} 10)">
+       transform="translate({$dateScale($dynamicDate?.getTime())} 10)">
         <path d={cross} ></path>
         <circle class="hitbox"
                 r="10"
                 pointer-events="all"
                 on:click={() => mkFixed()}/>
     </g>
-    <line x1={dateScale($dynamicDate?.getTime())}
-          x2={dateScale($dynamicDate?.getTime())}
+    <line x1={$dateScale($dynamicDate?.getTime())}
+          x2={$dateScale($dynamicDate?.getTime())}
           y1="20"
           y2={height - 45}
           class="dynamic"/>
@@ -64,15 +62,15 @@
 
 {#if $fixedDate}
     <g class="remove"
-       transform="translate({dateScale($fixedDate?.getTime())} 10)">
+       transform="translate({$dateScale($fixedDate?.getTime())} 10)">
         <path d={cross} on:click={() => clearFixed()}></path>
         <circle class="hitbox"
                 r="10"
                 pointer-events="all"
                 on:click={() => clearFixed()}/>
     </g>
-    <line x1={dateScale($fixedDate?.getTime())}
-          x2={dateScale($fixedDate?.getTime())}
+    <line x1={$dateScale($fixedDate?.getTime())}
+          x2={$dateScale($fixedDate?.getTime())}
           y1="20"
           y2={height - 45}
           class="fixed"/>

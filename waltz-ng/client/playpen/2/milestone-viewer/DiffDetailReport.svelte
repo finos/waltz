@@ -1,6 +1,5 @@
 <script>
     export let report;
-    export let measurablesById;
 
     const niceName = {
         g: "Buy",

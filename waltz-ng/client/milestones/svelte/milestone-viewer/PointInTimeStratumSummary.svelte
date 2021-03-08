@@ -1,60 +1,76 @@
 <script>
+    import {toMap} from "../../../common/map-utils";
+    import {backgroundColors} from "./stores/decorators";
+    import {measurablesById, selectedMeasurable} from "./stores/measurables";
+    import {ratingSchemeItems} from "./stores/ratings";
+
     export let data;
-    export let color;
-    export let measurablesById;
 
     let showingAll = false;
+    let ratings;
     let rows = [];
+    let selectedEntity = null;
+
+    $: ratings = $ratingSchemeItems;
 
     $: rows = _
         .chain(data.stratum?.values)
         .flatMap((ids, rating) => _.map(
             ids,
             id => ({
-                measurable: measurablesById[id],
+                measurable: $measurablesById[id],
                 rating
             })))
         .value();
 
 
-
-    function countFor(stratum, ratingCode) {
-        return _.size(stratum?.values[ratingCode]);
+    function countFor(stratum, ratingId) {
+        return _.size(stratum?.values[ratingId]);
     }
 
     function toggleShowAll() {
-        showingAll = ! showingAll;
+        showingAll = !showingAll;
     }
 
-    const niceName = {
-        g: "Buy",
-        r: "Sell",
-        a: "Hold"
-    };
+    function getTotalForStratum(stratum) {
+        return _
+            .chain(ratings)
+            .map(d => countFor(stratum, d.id))
+            .sum()
+            .value()
+    }
+
+    function selectEntity(row) {
+        selectedMeasurable.set(row.measurable);
+    }
+
+    $: niceName = toMap(ratings, d => d.id, d => d.name);
+
+    $: colWidth = 100 / (_.size(ratings) + 1);
 
 </script>
 
 {#if !showingAll}
 <table class="table table-condensed">
     <colgroup>
-        <col width="25%">
-        <col width="25%">
-        <col width="25%">
-        <col width="25%">
+        {#each ratings as rating}
+        <col width="{colWidth}%">
+        {/each}
+        <col width="{colWidth}%">
     </colgroup>
     <thead class="clickable"
            on:click={() => toggleShowAll()}>
-        <th>Buy</th>
-        <th>Sell</th>
-        <th>Hold</th>
+        {#each ratings as rating}
+            <th>{rating.name}</th>
+        {/each}
         <th>Total</th>
     </thead>
     <tbody>
         <tr class="clickable">
-            <td style="background-color:{color.bg('g')}">{countFor(data.stratum, "g")}</td>
-            <td class="rating-r">{countFor(data.stratum, "r")}</td>
-            <td class="rating-a">{countFor(data.stratum, "a")}</td>
-            <td><b>{countFor(data.stratum, "a") + countFor(data.stratum, "g") + countFor(data.stratum, "r")}</b></td>
+            {#each ratings as rating}
+            <td style="background-color:{$backgroundColors(rating.id)}">{countFor(data.stratum, rating.id)}</td>
+            {/each}
+            <td><b>{getTotalForStratum(data.stratum)}</b></td>
         </tr>
     </tbody>
 </table>
@@ -74,7 +90,8 @@
                 <th>Rating</th>
             </thead>
             {#each rows as row}
-            <tr class="rating-{row.rating}">
+            <tr style="background-color:{$backgroundColors(row.rating)}"
+                on:click={() => selectEntity(row)}>
                 <td>{row.measurable.name}</td>
                 <td>{niceName[row.rating] || "?"}</td>
             </tr>
@@ -86,17 +103,6 @@
 
 
 <style type="text/scss">
-    @import "../../../../style/variables";
-    .rating-a {
-        background: $waltz-amber-background;
-    }
-    .rating-r {
-        background: $waltz-red-background;
-    }
-    .rating-g {
-        background: $waltz-green-background;
-    }
-
     .fake-region {
         border: 1px solid #ddd;
         padding: 0.4em;

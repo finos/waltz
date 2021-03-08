@@ -1,22 +1,16 @@
 <script>
-    import {fixedDate, dynamicDate} from "./stores/selected-dates";
+    import {dynamicDate, fixedDate} from "./stores/selected-dates";
     import PointInTimeDetailView from "./PointInTimeDetailView.svelte";
     import DiffDetailView from "./DiffDetailView.svelte";
 
     export let data;
-    export let measurablesById;
-    export let color;
-
 </script>
 
 
 {#if ($fixedDate && $dynamicDate)}
-    <DiffDetailView {data}
-                    {measurablesById} />
+    <DiffDetailView {data}/>
 {:else if $dynamicDate}
-    <PointInTimeDetailView {data}
-                           {color}
-                           {measurablesById}/>
+    <PointInTimeDetailView {data}/>
 {:else if $fixedDate}
     <div class="alert alert-info">
         Now pick a comparison point
