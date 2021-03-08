@@ -82,6 +82,11 @@
         .range([0, height - (margin.top + margin.bottom)])
         .padding(0.4);
 
+    $dateScale = scaleUtc()
+        .domain(calcDateExtent(data, 30 * 12))
+        .range([0, width - (margin.left + margin.right)]);
+
+
     $: {
         const maxY = _
             .chain(stacks)
@@ -91,27 +96,22 @@
             .max()
             .value();
 
-        commonYScale
-            .set(scaleSqrt()
+        $commonYScale = scaleSqrt()
                 .domain([0, maxY]).nice()
-                .range([y.bandwidth(), 0]));
+                .range([y.bandwidth(), 0]);
 
-        dateScale.set(scaleUtc()
-            .domain(calcDateExtent(data, 30 * 12))
-            .range([0, width - (margin.left + margin.right)]))
+        $backgroundColors = scaleOrdinal()
+            .domain(_.map($ratingSchemeItems, d => d.id))
+            .range(_.map($ratingSchemeItems, d => hsl(d.color).brighter(1.1)))
+            .unknown("#eee");
 
-        backgroundColors
-            .set(scaleOrdinal()
-                .domain(_.map($ratingScheme.data.ratings, d => d.id))
-                .range(_.map($ratingScheme.data.ratings, d => hsl(d.color).brighter(1.1)))
-                .unknown("#eee"));
+        $foregroundColors = scaleOrdinal()
+            .domain(_.map($ratingSchemeItems, d => d.id))
+            .range(_.map($ratingSchemeItems, d => hsl(d.color)))
+            .unknown("#eee");
+    }
 
-        foregroundColors
-            .set(scaleOrdinal()
-                .domain(_.map($ratingScheme.data.ratings, d => d.id))
-                .range(_.map($ratingScheme.data.ratings, d => hsl(d.color)))
-                .unknown("#eee"));
-
+    $: {
         const hb = select(hitbox);
         hb.on("click.select", () => {
             const mousePosition = mouse(hb.node())[0];
@@ -161,7 +161,7 @@
     </div>
     {#if $selectedMeasurable}
         <div class="col-sm-5">
-            <SelectedEntityView {data} />
+            <SelectedEntityView {data} {primaryEntityRef}/>
         </div>
     {/if}
 </div>

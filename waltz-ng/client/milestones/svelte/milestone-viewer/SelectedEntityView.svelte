@@ -3,6 +3,7 @@
     import {measurablesById, selectedMeasurable} from "./stores/measurables";
 
     export let data;
+    export let primaryEntityRef = null;
 
     let values;
 
