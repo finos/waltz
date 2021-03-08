@@ -23,6 +23,10 @@
     $: console.log($selectedMeasurable);
     $: console.log({data});
 
+    function clearSelected() {
+        $selectedMeasurable = null;
+    }
+
 </script>
 
 
@@ -30,6 +34,10 @@
     <ViewLink ctx={$selectedMeasurable} state="main.measurable.view">
         {$selectedMeasurable.name}
     </ViewLink>
+    <a class="pull-right clickable"
+       on:click={() => clearSelected()}>
+        (x)
+    </a>
 </h4>
 <table class="table table-condensed small">
     <thead>

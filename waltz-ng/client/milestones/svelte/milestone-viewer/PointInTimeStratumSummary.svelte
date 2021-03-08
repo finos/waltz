@@ -41,10 +41,7 @@
     }
 
     function selectEntity(row) {
-        console.log("HIIII");
-        console.log({row});
         selectedMeasurable.set(row.measurable);
-
     }
 
     $: niceName = toMap(ratings, d => d.id, d => d.name);

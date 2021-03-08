@@ -126,7 +126,6 @@
                           pointer-events="all"/>
                     <DateGuideLines height={height} />
 
-
                 </g>
             {/if}
         </svg>
