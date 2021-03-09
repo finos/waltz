@@ -233,4 +233,14 @@
                        tableName="entity_relationship"/>
     </changeSet>
 
+    <changeSet id="20210226-5248-1"
+               author="gharvai">
+        <comment>5248: adding description to settings</comment>
+        <addColumn tableName="settings">
+            <column name="description"
+                    type="${description.type}">
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
