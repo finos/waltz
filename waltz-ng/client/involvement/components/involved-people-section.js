@@ -23,6 +23,7 @@ import template from "./involved-people-section.html";
 import {CORE_API} from "../../common/services/core-api-utils";
 import {aggregatePeopleInvolvements} from "../involvement-utils";
 import {determineUpwardsScopeForKind, mkSelectionOptions} from "../../common/selector-utils";
+import {entityLifecycleStatus as EntityLifecycleStatus} from "../../common/services/enums/entity-lifecycle-status";
 
 
 const bindings = {
@@ -35,7 +36,7 @@ const columnDefs = [
         displayName: "Name",
         cellTemplate: `
                 <div class="ui-grid-cell-contents">
-                    <waltz-entity-link entity-ref="row.entity.person"
+                    <waltz-entity-link entity-ref="row.entity.personRef"
                                        tooltip-placement="right"
                                        icon-placement="none"></waltz-entity-link>
                     -
@@ -93,6 +94,7 @@ function mkGridData(involvements = [], displayNameService, descriptionService) {
 
             return {
                 person: inv.person,
+                personRef: mkEntityRef(inv.person),
                 roles,
                 rolesDisplayName
             };
@@ -107,7 +109,8 @@ function mkEntityRef(person) {
         return {
             id: person.id,
             name: person.displayName,
-            kind: "PERSON"
+            kind: "PERSON",
+            entityLifecycleStatus: person.isRemoved ? EntityLifecycleStatus.REMOVED.key : EntityLifecycleStatus.ACTIVE.key
         };
     }
     return person;
