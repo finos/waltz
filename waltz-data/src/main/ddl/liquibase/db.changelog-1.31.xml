@@ -236,17 +236,19 @@
             <column name="id"
                     type="${id.type}"
                     autoIncrement="true">
+                <constraints primaryKey="true"
+                             primaryKeyName="entity_relationship_pkey"/>
             </column>
         </addColumn>
     </changeSet>
 
-    <changeSet id="20210217-5306-4"
-               author="woodjes">
-        <comment>5306: adding id to entity_relationship</comment>
-        <addPrimaryKey columnNames="id"
-                       constraintName="entity_relationship_pkey"
-                       tableName="entity_relationship"/>
-    </changeSet>
+<!--    <changeSet id="20210217-5306-4"-->
+<!--               author="woodjes">-->
+<!--        <comment>5306: adding id to entity_relationship</comment>-->
+<!--        <addPrimaryKey columnNames="id"-->
+<!--                       constraintName="entity_relationship_pkey"-->
+<!--                       tableName="entity_relationship"/>-->
+<!--    </changeSet>-->
 
     <changeSet id="20210226-5248-1"
                author="gharvai">
