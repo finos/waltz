@@ -21,6 +21,7 @@ package com.khartec.waltz.model.actor;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.DescriptionProvider;
+import com.khartec.waltz.model.ExternalIdProvider;
 import com.khartec.waltz.model.NameProvider;
 import com.khartec.waltz.model.command.Command;
 import org.immutables.value.Value;
@@ -29,7 +30,7 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableActorCreateCommand.class)
 @JsonDeserialize(as = ImmutableActorCreateCommand.class)
-public abstract class ActorCreateCommand implements Command, NameProvider, DescriptionProvider {
+public abstract class ActorCreateCommand implements Command, NameProvider, DescriptionProvider, ExternalIdProvider {
 
     public abstract boolean isExternal();
 }
