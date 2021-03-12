@@ -49,14 +49,14 @@
     </div>
 </div>
 
-<!-- YEAR && DOWNLOAD -->
+<!-- YEAR, LIFECYCLE && DOWNLOAD -->
 <div class="row"
      ng-if="$ctrl.visibility.tableView">
-    <div class="col-md-8">
+    <div class="col-md-2"
+         ng-if="$ctrl.selectedSegment.key === 'ATTESTED'">
         <!-- YEAR SELECTION -->
         <div class="input-group"
-             style="padding-top: 0.5em"
-             ng-if="$ctrl.selectedSegment.key === 'ATTESTED'">
+             style="padding-top: 0.5em">
             <span>Attestation year:&nbsp;</span>
             <div class="btn-group"
                  uib-dropdown
@@ -93,7 +93,47 @@
             </div>
         </div>
     </div>
-    <div class="col-md-4">
+    <div class="col-md-2">
+        <!-- LIFECYCLE SELECTION -->
+        <div class="input-group"
+             style="padding-top: 0.5em">
+            <span>Lifecycle Phase:&nbsp;</span>
+            <div class="btn-group"
+                 uib-dropdown
+                 keyboard-nav
+                 dropdown-append-to-body>
+                <button type="button"
+                        class="btn btn-default"
+                        uib-dropdown-toggle>
+                    <span ng-if="$ctrl.selectedLifecycle === 0">
+                        All Lifecycles
+                    </span>
+                    <span ng-if="$ctrl.selectedLifecycle !== 0"
+                          ng-bind="$ctrl.selectedLifecycle | toDisplayName:'lifecyclePhase'">
+                    </span>
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu"
+                    uib-dropdown-menu
+                    role="menu">
+                    <li ng-repeat="lifecycle in $ctrl.lifecycleOptions"
+                        role="menuitem">
+                        <a class="clickable"
+                           ng-click="$ctrl.onChangeLifecycle(lifecycle)"
+                           ng-if="lifecycle === 0">
+                           All Lifecycles
+                        </a>
+                        <a class="clickable"
+                           ng-click="$ctrl.onChangeLifecycle(lifecycle)"
+                           ng-if="lifecycle !== 0"
+                           ng-bind="lifecycle | toDisplayName:'lifecyclePhase'">
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
         <!-- DOWNLOAD LINK -->
         <div class="small pull-right"
              style="padding-top: 0.5em">

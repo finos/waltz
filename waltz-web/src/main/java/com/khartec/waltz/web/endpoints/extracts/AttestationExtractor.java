@@ -73,6 +73,7 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
             EntityReference entityReference = idSelectionOptions.entityReference();
             EntityKind kind = getKind(request);
             Optional<Integer> year = getYearParam(request);
+            Optional<String> lifecycle = getLifecycleParam(request);
             AttestationStatus status = getStatusParam(request);
 
             String fileName = format(
@@ -87,6 +88,7 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
                     appSelector,
                     kind,
                     year,
+                    lifecycle,
                     status);
 
             return writeExtract(
@@ -101,6 +103,7 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
     private SelectConditionStep<Record> mkQueryForReportingAttestationsByKindAndSelector(Select<Record1<Long>> appIds,
                                                                                          EntityKind kind,
                                                                                          Optional<Integer> year,
+                                                                                         Optional<String> lifecycle,
                                                                                          AttestationStatus status) {
 
         AttestationInstance latestAttestationInstance = ATTESTATION_INSTANCE.as("latestAttestationInstance");
@@ -134,6 +137,10 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
                 .map(y -> DSL.year((peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT))).eq(year.get()))
                 .orElse(DSL.trueCondition());
 
+        Condition lifecycleCondition = lifecycle
+                .map(l -> APPLICATION.LIFECYCLE_PHASE.eq(lifecycle.get()))
+                .orElse(DSL.trueCondition());
+
         Condition statusCondition = status == AttestationStatus.NEVER_ATTESTED
                 ? peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT).isNull()
                 : peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT).isNotNull();
@@ -150,6 +157,7 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
                 .leftJoin(peopleToAttest)
                 .on(APPLICATION.ID.eq(entityPersonIsAttesting))
                 .where(APPLICATION.ID.in(appIds))
+                .and(lifecycleCondition)
                 .and(yearCondition)
                 .and(statusCondition);
     }
@@ -207,6 +215,13 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
         return Optional
                 .ofNullable(yearVal)
                 .map(Integer::valueOf);
+    }
+
+    private Optional<String> getLifecycleParam(Request request) {
+        String lifecycleVal = request.queryParams("lifecycle");
+        return Optional
+                .ofNullable(lifecycleVal)
+                .map(String::valueOf);
     }
 
 
