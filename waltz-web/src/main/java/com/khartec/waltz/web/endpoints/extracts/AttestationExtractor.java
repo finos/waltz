@@ -217,6 +217,7 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
                 .map(Integer::valueOf);
     }
 
+
     private Optional<String> getLifecycleParam(Request request) {
         String lifecycleVal = request.queryParams("lifecycle");
         return Optional
