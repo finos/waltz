@@ -25,7 +25,6 @@ import {entity} from "../../../common/services/enums/entity";
 import {attestationSummaryColumnDefs, mkAttestationSummaryDataForApps} from "../../attestation-utils";
 import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 import {lifecyclePhase} from "../../../common/services/enums/lifecycle-phase";
-
 import * as _ from "lodash";
 import moment from "moment";
 
@@ -92,13 +91,13 @@ function calcGridData(segment, gridData, year, lifecycle) {
     } else if (segment.key === "NEVER_ATTESTED" && lifecycle !== 0) {
         // the unattested segment was clicked, so show only rows without an attestation and with selected lifecycle phase
         return _.filter(gridData, d => _.isNil(d.attestation) && d.application.lifecyclePhase === lifecycle);
-    } else if(year === ALL_YEARS && lifecycle === 0){
+    } else if (year === ALL_YEARS && lifecycle === 0){
         // the attested segment was clicked, so show only rows with an attestation and with all lifecycle phasea
         return _.filter(gridData, d => !_.isNil(d.attestation));
-    } else if(year === ALL_YEARS && lifecycle !== 0){
+    } else if (year === ALL_YEARS && lifecycle !== 0){
         // the attested segment was clicked, so show only rows with an attestation and with selected lifecycle phase
         return _.filter(gridData, d => !_.isNil(d.attestation) && d.application.lifecyclePhase === lifecycle);
-    } else if(lifecycle === 0){
+    } else if (lifecycle === 0){
         // the attested segment was clicked, so show only rows with an attestation and attestation date in year and with all lifecycle phases
         return _
             .chain(gridData)
