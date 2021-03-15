@@ -317,7 +317,7 @@ public class LogicalFlowDao {
 
     public List<LogicalFlow> findBySelector(Select<Record1<Long>> flowIdSelector) {
         return baseQuery()
-                .where(LOGICAL_FLOW.ID.in(flowIdSelector))
+                .where(dsl.renderInlined(LOGICAL_FLOW.ID.in(flowIdSelector)))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -339,7 +339,8 @@ public class LogicalFlowDao {
         Condition requiringCleanup = notRemoved
                 .and(sourceAppNotFound.or(targetAppNotFound));
 
-        List<Long> flowIds = dsl.select(LOGICAL_FLOW.ID)
+        List<Long> flowIds = dsl
+                .select(LOGICAL_FLOW.ID)
                 .from(LOGICAL_FLOW)
                 .where(requiringCleanup)
                 .fetch(LOGICAL_FLOW.ID);
