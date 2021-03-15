@@ -171,8 +171,6 @@ function controller($q,
         vm.lifecycleOptions = _.concat(ALL_LIFECYCLES, _.values(_.mapValues(lifecyclePhase, function(l) { return l.key })));
         vm.selectedLifecycle = ALL_LIFECYCLES;
 
-        console.log(vm.lifecycleOptions);
-
         vm.config =  {
             logical: Object.assign({}, attestationPieConfig, { onSelect: onSelectLogicalFlowSegment }),
             physical: Object.assign({}, attestationPieConfig, { onSelect: onSelectPhysicalFlowSegment }),
