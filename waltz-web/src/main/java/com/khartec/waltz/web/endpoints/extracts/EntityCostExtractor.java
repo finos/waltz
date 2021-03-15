@@ -24,6 +24,7 @@ import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.service.settings.SettingsService;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -44,6 +45,8 @@ import static spark.Spark.post;
 public class EntityCostExtractor extends DirectQueryBasedDataExtractor {
 
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
+    private final SettingsService settingsService;
+
 
     private static final Logger LOG = LoggerFactory.getLogger(EntityCostExtractor.class);
 
@@ -54,9 +57,9 @@ public class EntityCostExtractor extends DirectQueryBasedDataExtractor {
             .as("entity_name");
 
     @Autowired
-    public EntityCostExtractor(DSLContext dsl) {
-
+    public EntityCostExtractor(DSLContext dsl, SettingsService settingsService) {
         super(dsl);
+        this.settingsService = settingsService;
     }
 
 
@@ -65,9 +68,15 @@ public class EntityCostExtractor extends DirectQueryBasedDataExtractor {
         String costsForEntityPath = mkPath("data-extract", "cost", "kind", ":kind", "id", ":id");
         String costsForSelectorPath = mkPath("data-extract", "cost", "target-kind", ":kind", "selector");
 
+        String costExportsAllowedSetting = getCostExportsAllowedSetting();
 
-        registerCostsForEntity(costsForEntityPath);
-        registerCostsForSelector(costsForSelectorPath);
+        if(Boolean.valueOf(costExportsAllowedSetting)){
+            registerCostsForEntity(costsForEntityPath);
+            registerCostsForSelector(costsForSelectorPath);
+        } else {
+            LOG.info(format("EntityCostExtractor not registered - %s: %s", SettingsService.ALLOW_COST_EXPORTS_KEY, costExportsAllowedSetting));
+        };
+
     }
 
 
@@ -139,5 +148,8 @@ public class EntityCostExtractor extends DirectQueryBasedDataExtractor {
         return format("%s-%d-cost-info", ref.kind(), ref.id());
     }
 
+    private String getCostExportsAllowedSetting() {
+        return settingsService.getValue(SettingsService.ALLOW_COST_EXPORTS_KEY).orElse("true");
+    }
 
 }

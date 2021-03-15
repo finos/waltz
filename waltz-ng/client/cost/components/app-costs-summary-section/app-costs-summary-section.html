@@ -154,7 +154,8 @@
                                         entries="$ctrl.costInfo"
                                         search-placeholder-text="Search costs...">
                 </waltz-grid-with-search>
-                <waltz-data-extract-link name="Export"
+                <waltz-data-extract-link ng-if="$ctrl.exportAllowed"
+                                         name="Export"
                                          extract="cost/target-kind/{{$ctrl.targetEntityKind}}/selector"
                                          method="POST"
                                          styling="link"
