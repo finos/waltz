@@ -30,6 +30,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.asList;
 import static com.khartec.waltz.schema.Tables.*;
 
 
@@ -57,7 +58,7 @@ public class NotificationDao {
 
 
     public List<NotificationSummary> findNotificationsByUserId(String userId) {
-        Select<Record2<String, Integer>> attestationCount = dsl
+        Select<Record2<String, Integer>> attestationCount = DSL
                 .select(DSL.val(EntityKind.ATTESTATION.name()).as("kind"), COUNT)
                 .from(ATTESTATION_INSTANCE)
                 .innerJoin(ATTESTATION_INSTANCE_RECIPIENT)
@@ -65,7 +66,7 @@ public class NotificationDao {
                 .where(ATTESTATION_INSTANCE_RECIPIENT.USER_ID.eq(userId))
                 .and(ATTESTATION_INSTANCE.ATTESTED_AT.isNull());
 
-        Select<Record2<String, Integer>> surveyCount = dsl
+        Select<Record2<String, Integer>> surveyCount = DSL
                 .select(DSL.val(EntityKind.SURVEY_INSTANCE.name()).as("kind"), COUNT)
                 .from(SURVEY_INSTANCE)
                 .innerJoin(SURVEY_INSTANCE_RECIPIENT)
@@ -74,11 +75,15 @@ public class NotificationDao {
                 .on(PERSON.ID.eq(SURVEY_INSTANCE_RECIPIENT.PERSON_ID))
                 .where(PERSON.EMAIL.eq(userId))
                 .and(SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.isNull())
-                .and(SURVEY_INSTANCE.STATUS.eq(SurveyInstanceStatus.NOT_STARTED.name())
-                        .or(SURVEY_INSTANCE.STATUS.eq(SurveyInstanceStatus.IN_PROGRESS.name())));
+                .and(SURVEY_INSTANCE.STATUS.in(asList(
+                        SurveyInstanceStatus.NOT_STARTED.name(),
+                        SurveyInstanceStatus.IN_PROGRESS.name())));
 
-        return attestationCount
-                .union(surveyCount)
+        Select<Record2<String, Integer>> qry = attestationCount
+                .unionAll(surveyCount);
+
+        return dsl
+                .resultQuery(dsl.renderInlined(qry))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 }
