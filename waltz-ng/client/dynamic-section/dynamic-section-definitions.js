@@ -16,7 +16,6 @@
  *
  */
 import BookmarkPanel from "../bookmarks/svelte/BookmarkPanel.svelte";
-import MilestoneViewer from "../milestones/svelte/milestone-viewer/MilestoneViewer.svelte";
 
 
 const appsSection = {
@@ -372,12 +371,6 @@ const appComplexitySummarySection = {
     id: 240
 };
 
-const milestoneViewerSection = {
-    svelteComponent: MilestoneViewer,
-    name: "Milestone Viewer",
-    icon: "rocket",
-    id: 250,
-};
 
 export const dynamicSections = {
     appCostsSection,
@@ -513,7 +506,6 @@ export const dynamicSectionsByKind = {
         pack(logicalFlowsTabgroupSection,
             [authSourcesSection]),
         entityDiagramsSection,
-        milestoneViewerSection,
         changeLogSection
     ],
     "PERSON": [

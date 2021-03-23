@@ -18,12 +18,10 @@
 
 import template from "./playpen2.html";
 import data from "./test-data.js";
-import MilestoneViewer from "./milestone-viewer/MilestoneViewer.svelte"
 
 function controller(serviceBroker) {
 
     const vm = Object.assign(this, {
-        MilestoneViewer,
         parentEntityRef: {id: 20506, kind: 'APPLICATION'}});
 
     vm.rawData = data;
