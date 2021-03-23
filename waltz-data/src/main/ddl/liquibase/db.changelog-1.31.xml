@@ -270,4 +270,15 @@
         </addColumn>
     </changeSet>
 
+
+    <changeSet id="20210312-5334-1"
+               author="woodjes">
+        <comment>5334: adding index to person</comment>
+        <createIndex indexName="idx_person_email"
+                     tableName="person"
+                     unique="false">
+            <column name="email" type="VARCHAR(255)"/>
+        </createIndex>
+    </changeSet>
+
 </databaseChangeLog>
