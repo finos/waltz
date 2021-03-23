@@ -221,6 +221,7 @@
             <column name="id"
                     type="${id.type}"
                     autoIncrement="true">
+                <constraints primaryKey="true"/>
             </column>
         </addColumn>
     </changeSet>

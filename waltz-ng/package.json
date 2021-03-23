@@ -46,6 +46,7 @@
     "d3-format": "1.0.2",
     "d3-interpolate": "1.1.6",
     "d3-path": "1.0.9",
+    "d3-sankey": "0.12.3",
     "d3-scale": "1.0.7",
     "d3-selection": "1.0.6",
     "d3-selection-multi": "1.0.1",

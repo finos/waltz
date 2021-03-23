@@ -3,7 +3,6 @@
     import {hsl} from "d3-color";
     import {scaleBand, scaleOrdinal, scaleSqrt, scaleUtc} from "d3-scale";
     import {mouse, select} from "d3-selection";
-    import TestData from "../../test-data";
 
     import Defs from "./Defs.svelte"
     import SubChart from "./SubChart.svelte";
@@ -18,6 +17,10 @@
     import {measurablesById, selectedMeasurable} from "./stores/measurables";
     import {ratingSchemeItems} from "./stores/ratings";
     import SelectedEntityView from "./SelectedEntityView.svelte";
+    import Sankey from "./Sankey.svelte";
+
+    import TestData from "../../test-data";
+    import mkData from "./sankey-test-data";
 
     export let primaryEntityRef = null;
 
@@ -72,8 +75,8 @@
             .value();
 
         $commonYScale = scaleSqrt()
-                .domain([0, maxY]).nice()
-                .range([y.bandwidth(), 0]);
+            .domain([0, maxY]).nice()
+            .range([y.bandwidth(), 0]);
 
         $backgroundColors = scaleOrdinal()
             .domain(_.map($ratingSchemeItems, d => d.id))

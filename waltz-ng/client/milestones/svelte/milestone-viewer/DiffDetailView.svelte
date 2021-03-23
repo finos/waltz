@@ -3,6 +3,8 @@
     import {findStrata, prettyDate} from "../../milestone-utils";
     import DiffDetailReport from "./DiffDetailReport.svelte";
     import {measurablesById} from "./stores/measurables";
+    import Sankey from "./Sankey.svelte";
+    import mkData from "./sankey-test-data";
 
     export let data;
 
@@ -85,6 +87,8 @@
 
         diffReports = _.map(zipped, d => Object.assign({}, d, {diff: mkDiff(d.t1, d.t2)}));
     }
+
+    $: console.log({data, td: mkData(), diffReports})
 </script>
 
 
@@ -93,5 +97,10 @@
 {#each diffReports as summary}
     <h4>{summary.m.name}</h4>
 
-    <DiffDetailReport report={summary}/>
+    <div style="display: inline-block; vertical-align: top; padding-top: 2em">
+        <Sankey data={mkData()}/>
+    </div>
+    <div style="display: inline-block; width: 70%">
+        <DiffDetailReport report={summary}/>
+    </div>
 {/each}
