@@ -35,14 +35,16 @@
         <table class="table table-striped">
             <thead>
             <tr>
-                <th>Name</th>
-                <th>Value</th>
+                <th class="col-md-2">Name</th>
+                <th class="col-md-4">Value</th>
+                <th class="col-md-6">Description</th>
             </tr>
             </thead>
             <tbody>
             <tr ng-repeat="setting in ctrl.settings | orderBy:'name'">
                 <td><span ng-bind="setting.name"></span></td>
                 <td><span ng-bind="setting.value"></span></td>
+                <td><span ng-bind="setting.description"></span></td>
             </tr>
             <tr ng-if="ctrl.settings.length == 0">
                 <td colspan="2">

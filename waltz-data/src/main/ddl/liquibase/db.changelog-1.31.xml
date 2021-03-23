@@ -188,6 +188,21 @@
         </createIndex>
     </changeSet>
 
+    <!-- 5304: insert disable cost exports settings value -->
+    <changeSet id="20210217-5304-1"
+               author="woodjes">
+        <comment>5304: Insert enum values into table</comment>
+        <insert tableName="settings">
+            <column name="name" value="feature.data-extractor.entity-cost.enabled"/>
+            <column name="value" value="true"/>
+        </insert>
+        <rollback>
+            <delete tableName="settings">
+                <where>name='feature.data-extractor.entity-cost.enabled'</where>
+            </delete>
+        </rollback>
+    </changeSet>
+
     <!--5306: add id to entity relationship -->
     <changeSet id="20210217-5306-1"
                author="woodjes">
@@ -215,7 +230,23 @@
     </changeSet>
 
     <changeSet id="20210217-5306-3"
-               author="woodjes">
+               author="woodjes"
+               dbms="!h2">
+        <comment>5306: adding id to entity_relationship</comment>
+        <addColumn tableName="entity_relationship">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints primaryKey="true"
+                             primaryKeyName="entity_relationship_pkey"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet id="20210217-5306-3"
+               author="woodjes"
+               dbms="h2">
         <comment>5306: adding id to entity_relationship</comment>
         <addColumn tableName="entity_relationship">
             <column name="id"
@@ -223,14 +254,20 @@
                     autoIncrement="true">
             </column>
         </addColumn>
-    </changeSet>
-
-    <changeSet id="20210217-5306-4"
-               author="woodjes">
-        <comment>5306: adding id to entity_relationship</comment>
         <addPrimaryKey columnNames="id"
                        constraintName="entity_relationship_pkey"
                        tableName="entity_relationship"/>
+    </changeSet>
+
+
+    <changeSet id="20210226-5248-1"
+               author="gharvai">
+        <comment>5248: adding description to settings</comment>
+        <addColumn tableName="settings">
+            <column name="description"
+                    type="${description.type}">
+            </column>
+        </addColumn>
     </changeSet>
 
 </databaseChangeLog>

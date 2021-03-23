@@ -19,7 +19,8 @@
 <div>
 
     <waltz-section-actions>
-        <waltz-data-extract-link name="Export"
+        <waltz-data-extract-link ng-if="$ctrl.exportAllowed"
+                                 name="Export"
                                  extract="cost/kind/{{$ctrl.parentEntityRef.kind}}/id/{{$ctrl.parentEntityRef.id}}"
                                  method="GET"
                                  styling="link">
@@ -43,74 +44,63 @@
     </div>
 
     <div ng-if="$ctrl.costInfo.length > 0">
-        <div class="col-sm-8">
 
-            <div class="row">
-
-                <div class="col-sm-4">
-                    <h3>{{$ctrl.displayCost.costKind.name}} Cost:</h3>
-                    <h2>
-                        <waltz-currency-amount amount="$ctrl.displayCost.amount">
-                        </waltz-currency-amount>
-                    </h2>
-                    <div ng-bind="$ctrl.displayCost.year"></div>
-                    <br>
-                    <a class="clickable"
-                       ng-init="$ctrl.showHistorical = false"
-                       ng-click="$ctrl.showHistorical = !$ctrl.showHistorical">
-                        <waltz-icon name="history"></waltz-icon>
-                        Show historical costs
-                    </a>
-                </div>
-
-                <div class="col-sm-8">
-                    <br>
-                    <table class="table small table-condensed">
-                        <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>Year</th>
-                            <th>Cost</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        <tr ng-repeat="cost in $ctrl.yearlyCostInfo">
-                            <td>
-                                <waltz-entity-icon-label entity-ref="cost.costKind"
-                                                         icon-placement="none">
-                                </waltz-entity-icon-label>
-                            </td>
-                            <td>
-                                <span ng-bind="cost.year"></span>
-                            </td>
-                            <td>
-                                <waltz-currency-amount amount="cost.amount"></waltz-currency-amount>
-                            </td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-
+        <div class="row">
+            <div class="col-sm-4">
+                <h3>{{$ctrl.displayCost.costKind.name}} Cost:</h3>
+                <h2>
+                    <waltz-currency-amount amount="$ctrl.displayCost.amount">
+                    </waltz-currency-amount>
+                </h2>
+                <div ng-bind="$ctrl.displayCost.year"></div>
+                <br>
+                <a class="clickable"
+                   ng-init="$ctrl.showHistorical = false"
+                   ng-click="$ctrl.showHistorical = !$ctrl.showHistorical">
+                    <waltz-icon name="history"></waltz-icon>
+                    Show historical costs
+                </a>
             </div>
 
-            <div ng-if="$ctrl.showHistorical"
-                 class="row">
-                <div class="col-sm-12">
-                    <br>
-                    <h4>Historical Costs:</h4>
-                    <waltz-grid-with-search column-defs="$ctrl.entityCostColumnDefs"
-                                            entries="$ctrl.costInfo"
-                                            search-placeholder-text="Search costs...">
-                    </waltz-grid-with-search>
-                </div>
+            <div class="col-sm-8">
+                <br>
+                <table class="table small table-condensed">
+                    <thead>
+                    <tr>
+                        <th>Type</th>
+                        <th>Year</th>
+                        <th>Cost</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr ng-repeat="cost in $ctrl.yearlyCostInfo">
+                        <td>
+                            <waltz-entity-icon-label entity-ref="cost.costKind"
+                                                     icon-placement="none">
+                            </waltz-entity-icon-label>
+                        </td>
+                        <td>
+                            <span ng-bind="cost.year"></span>
+                        </td>
+                        <td>
+                            <waltz-currency-amount amount="cost.amount"></waltz-currency-amount>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
 
-        <div class="col-sm-4">
-            <waltz-static-panels group-key='SECTION.ASSET_COSTS.ABOUT'
-                                 class="small"
-                                 render-mode="minimal-border">
-            </waltz-static-panels>
+        <div ng-if="$ctrl.showHistorical"
+             class="row">
+            <div class="col-sm-12">
+                <br>
+                <h4>Historical Costs:</h4>
+                <waltz-grid-with-search column-defs="$ctrl.entityCostColumnDefs"
+                                        entries="$ctrl.costInfo"
+                                        search-placeholder-text="Search costs...">
+                </waltz-grid-with-search>
+            </div>
         </div>
     </div>
 

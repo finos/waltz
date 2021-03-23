@@ -44,6 +44,7 @@ public class SettingsDao {
                 .name(record.getName())
                 .value(Optional.ofNullable(r.getValue(SETTINGS.VALUE)))
                 .restricted(record.getRestricted())
+                .description(record.getDescription())
                 .build();
     };
 

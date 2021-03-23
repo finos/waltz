@@ -65,6 +65,7 @@ function preparePie(ratings = [],
             key: schemeItem.rating,
             count: counts[schemeItem.rating] || 0
         }))
+        .orderBy('count','asc')
         .value();
 
     return {

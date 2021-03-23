@@ -21,6 +21,7 @@ import template from "./app-costs-summary-section.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import * as _ from "lodash";
 import {mkSelectionOptions} from "../../../common/selector-utils";
+import namedSettings from "../../../system/named-settings";
 
 
 const bindings = {
@@ -37,7 +38,8 @@ const initialState = {
         allCosts: false,
         loading: false
     },
-    selectedEntity: null
+    selectedEntity: null,
+    exportAllowed: true,
 };
 
 
@@ -141,9 +143,17 @@ function enrichCostsWithKind(costs, costKinds) {
 }
 
 
-function controller($q, serviceBroker, uiGridConstants) {
+function controller($q, serviceBroker, uiGridConstants, settingsService) {
 
     const vm = initialiseData(this, initialState);
+
+    function allowCostExport() {
+        settingsService
+            .findOrDefault(namedSettings.costExportEnabled, true)
+            .then(exportAllowed => {
+                vm.exportAllowed = !(exportAllowed === 'false');
+            });
+    }
 
     function loadCostKinds() {
         return serviceBroker
@@ -179,6 +189,7 @@ function controller($q, serviceBroker, uiGridConstants) {
     };
 
     vm.$onInit = () => {
+        allowCostExport();
         vm.entityCostColumnDefs = mkColumnDefs(uiGridConstants);
         vm.selector = mkSelectionOptions(vm.parentEntityRef);
 
@@ -221,7 +232,8 @@ function controller($q, serviceBroker, uiGridConstants) {
 controller.$inject = [
     "$q",
     "ServiceBroker",
-    "uiGridConstants"
+    "uiGridConstants",
+    "SettingsService"
 ];
 
 
