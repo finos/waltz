@@ -45,6 +45,7 @@ import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.Actor.ACTOR;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
+import static java.util.Optional.ofNullable;
 
 @Repository
 public class ActorDao {
@@ -62,6 +63,7 @@ public class ActorDao {
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .isExternal(record.getIsExternal())
                 .provenance(record.getProvenance())
+                .externalId(ofNullable(record.getExternalId()))
                 .build();
     };
 
@@ -76,6 +78,7 @@ public class ActorDao {
         record.setIsExternal(actor.isExternal());
         record.setProvenance(actor.provenance());
         actor.id().ifPresent(record::setId);
+        actor.externalId().ifPresent(record::setExternalId);
 
         return record;
     };
@@ -124,6 +127,7 @@ public class ActorDao {
         record.setIsExternal(command.isExternal());
         record.setLastUpdatedBy(username);
         record.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
+        command.externalId().ifPresent(record::setExternalId);
         record.setProvenance(PROVENANCE);
         record.store();
 
@@ -142,6 +146,7 @@ public class ActorDao {
         command.name().ifPresent(change -> record.setName(change.newVal()));
         command.description().ifPresent(change -> record.setDescription(change.newVal()));
         command.isExternal().ifPresent(change -> record.setIsExternal(change.newVal()));
+        command.externalId().ifPresent(change -> record.setExternalId(change.newVal()));
 
         UserTimestamp lastUpdate = command.lastUpdate().get();
         record.setLastUpdatedAt(Timestamp.valueOf(lastUpdate.at()));

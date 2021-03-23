@@ -62,7 +62,7 @@ function mkNewVal(initialVal, fieldType) {
 }
 
 
-function controller() {
+function controller($element, $timeout) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
@@ -111,6 +111,10 @@ function controller() {
     vm.edit = () => {
         vm.editing = true;
         vm.newVal = mkNewVal(vm.initialVal, vm.fieldType);
+        const tagType = vm.fieldType === "textarea" || vm.fieldType === "markdown"
+            ? "textarea"
+            : "input";
+        $timeout(() => $element.find(tagType)[0]?.focus());
     };
 
     vm.cancel = () => {
@@ -133,7 +137,7 @@ function controller() {
 }
 
 
-controller.$inject = [];
+controller.$inject = ["$element", "$timeout"];
 
 
 const component = {
