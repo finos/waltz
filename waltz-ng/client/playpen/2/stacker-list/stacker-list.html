@@ -1,0 +1,6 @@
+<div class="row" ng-repeat="stack in $ctrl.stacks">
+    <div class="col-md-12">
+        <h3><span ng-bind="stack.k"></span></h3>
+        <waltz-stacker raw-data="stack.stackData"></waltz-stacker>
+    </div>
+</div>
