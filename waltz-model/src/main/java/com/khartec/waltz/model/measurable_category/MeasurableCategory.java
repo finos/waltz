@@ -48,7 +48,6 @@ public abstract class MeasurableCategory implements
         DescriptionProvider,
         ExternalIdProvider,
         LastUpdatedProvider,
-        RagNamesProvider,
         EntityKindProvider,
         WaltzEntity
 {

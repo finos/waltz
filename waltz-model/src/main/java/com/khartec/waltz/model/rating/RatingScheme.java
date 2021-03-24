@@ -38,11 +38,11 @@ public abstract class RatingScheme implements
         DescriptionProvider {
 
     @Value.Default
-    public List<RagName> ratings() {
+    public List<RatingSchemeItem> ratings() {
         return toList();
     }
 
-    private static final RagName dfltR = ImmutableRagName.builder()
+    private static final RatingSchemeItem dfltR = ImmutableRatingSchemeItem.builder()
             .ratingSchemeId(1)
             .rating('R')
             .name("dflt - Disinvest")
@@ -52,7 +52,7 @@ public abstract class RatingScheme implements
             .build();
 
 
-    private static final RagName dfltA = ImmutableRagName.builder()
+    private static final RatingSchemeItem dfltA = ImmutableRatingSchemeItem.builder()
             .ratingSchemeId(1)
             .rating('A')
             .name("dflt - Maintain")
@@ -62,7 +62,7 @@ public abstract class RatingScheme implements
             .build();
 
 
-    private static final RagName dfltG = ImmutableRagName.builder()
+    private static final RatingSchemeItem dfltG = ImmutableRatingSchemeItem.builder()
             .ratingSchemeId(1)
             .rating('G')
             .name("dflt - Invest")
@@ -71,7 +71,7 @@ public abstract class RatingScheme implements
             .position(30)
             .build();
 
-    private static final RagName dfltT = ImmutableRagName.builder()
+    private static final RatingSchemeItem dfltT = ImmutableRatingSchemeItem.builder()
             .ratingSchemeId(1)
             .rating('F')
             .name("dflt - Future")
@@ -82,7 +82,7 @@ public abstract class RatingScheme implements
 
 
 
-    private static final RagName dfltZ = ImmutableRagName.builder()
+    private static final RatingSchemeItem dfltZ = ImmutableRatingSchemeItem.builder()
             .ratingSchemeId(1)
             .rating('Z')
             .name("dflt - Unknown")
@@ -93,7 +93,7 @@ public abstract class RatingScheme implements
             .build();
 
 
-    private static final RagName dfltX = ImmutableRagName.builder()
+    private static final RatingSchemeItem dfltX = ImmutableRatingSchemeItem.builder()
             .ratingSchemeId(1)
             .rating('X')
             .name("dflt - Not Applicable")
@@ -104,7 +104,7 @@ public abstract class RatingScheme implements
 
 
     @Deprecated
-    public static List<RagName> toList() {
+    public static List<RatingSchemeItem> toList() {
         return newArrayList(
                 dfltT,
                 dfltR,

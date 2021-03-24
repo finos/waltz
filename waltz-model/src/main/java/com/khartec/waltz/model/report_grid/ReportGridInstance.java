@@ -3,7 +3,7 @@ package com.khartec.waltz.model.report_grid;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.rating.RagName;
+import com.khartec.waltz.model.rating.RatingSchemeItem;
 import org.immutables.value.Value;
 
 import java.util.Set;
@@ -13,6 +13,6 @@ import java.util.Set;
 @JsonDeserialize(as = ImmutableReportGridInstance.class)
 public abstract class ReportGridInstance {
     public abstract Set<Application> applications();  // rows
-    public abstract Set<RagName> ratingSchemeItems();  // color scheme
+    public abstract Set<RatingSchemeItem> ratingSchemeItems();  // color scheme
     public abstract Set<ReportGridCell> cellData();  // raw cell data
 }

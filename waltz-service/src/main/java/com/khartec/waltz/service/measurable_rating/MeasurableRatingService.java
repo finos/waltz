@@ -33,7 +33,7 @@ import com.khartec.waltz.model.measurable_rating.MeasurableRating;
 import com.khartec.waltz.model.measurable_rating.MeasurableRatingCommand;
 import com.khartec.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
 import com.khartec.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
-import com.khartec.waltz.model.rating.RagName;
+import com.khartec.waltz.model.rating.RatingSchemeItem;
 import com.khartec.waltz.model.tally.MeasurableRatingTally;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.service.changelog.ChangeLogService;
@@ -276,7 +276,7 @@ public class MeasurableRatingService {
                 .findRatingSchemeItemsForEntityAndCategory(entityReference, measurableCategory)
                 .stream()
                 .filter(r -> r.rating().equals(command.rating()))
-                .map(RagName::isRestricted)
+                .map(RatingSchemeItem::isRestricted)
                 .findFirst()
                 .orElse(false);
 

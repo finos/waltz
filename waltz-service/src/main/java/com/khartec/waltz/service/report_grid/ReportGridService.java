@@ -26,7 +26,7 @@ import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.ImmutableIdSelectionOptions;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.rating.RagName;
+import com.khartec.waltz.model.rating.RatingSchemeItem;
 import com.khartec.waltz.model.report_grid.*;
 import com.khartec.waltz.service.rating_scheme.RatingSchemeService;
 import org.jooq.Record1;
@@ -99,7 +99,7 @@ public class ReportGridService {
         Set<ReportGridCell> cellData = reportGridDao.findCellDataByGridId(id, appSelector);
         List<Application> apps = applicationDao.findByAppIdSelector(appSelector);
 
-        Set<RagName> ratingSchemeItems = ratingSchemeService.findRatingSchemeItemsByIds(map(
+        Set<RatingSchemeItem> ratingSchemeItems = ratingSchemeService.findRatingSchemeItemsByIds(map(
                 cellData,
                 ReportGridCell::ratingId));
 

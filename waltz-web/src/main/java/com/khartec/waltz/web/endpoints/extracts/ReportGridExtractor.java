@@ -19,8 +19,9 @@ package com.khartec.waltz.web.endpoints.extracts;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.NameProvider;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.rating.RagName;
+import com.khartec.waltz.model.rating.RatingSchemeItem;
 import com.khartec.waltz.model.report_grid.ReportGrid;
 import com.khartec.waltz.model.report_grid.ReportGridCell;
 import com.khartec.waltz.model.report_grid.ReportGridColumnDefinition;
@@ -46,8 +47,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.khartec.waltz.common.ListUtilities.*;
-import static com.khartec.waltz.common.MapUtilities.groupBy;
-import static com.khartec.waltz.common.MapUtilities.indexBy;
+import static com.khartec.waltz.common.MapUtilities.*;
 import static com.khartec.waltz.model.utils.IdUtilities.indexById;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static java.lang.String.format;
@@ -133,7 +133,7 @@ public class ReportGridExtractor implements DataExtractor {
         Set<ReportGridCell> tableData = reportGrid.instance().cellData();
 
         Map<Long, Application> applicationsById = indexById(reportGrid.instance().applications());
-        Map<Long, RagName> ratingsById = indexById(reportGrid.instance().ratingSchemeItems());
+        Map<Long, RatingSchemeItem> ratingsById = indexById(reportGrid.instance().ratingSchemeItems());
 
         Map<Long, Collection<ReportGridCell>> tableDataByAppId = groupBy(
                 tableData,
@@ -169,7 +169,7 @@ public class ReportGridExtractor implements DataExtractor {
     }
 
 
-    private Object getValueFromReportRow(Map<Long, RagName> ratingsById,
+    private Object getValueFromReportRow(Map<Long, RatingSchemeItem> ratingsById,
                                          ReportGridCell reportGridCell) {
         switch (reportGridCell.columnEntityKind()){
             case COST_KIND:
@@ -178,8 +178,9 @@ public class ReportGridExtractor implements DataExtractor {
                 return reportGridCell.text();
             case MEASURABLE:
             case ASSESSMENT_DEFINITION:
-                RagName ragName = ratingsById.getOrDefault(reportGridCell.ratingId(), null);
-                return (ragName != null) ? ragName.name() : null;
+                return maybeGet(ratingsById, reportGridCell.ratingId())
+                        .map(NameProvider::name)
+                        .orElse(null);
             default:
                 throw new IllegalArgumentException("This report does not support export with column of type: " + reportGridCell.columnEntityKind().name());
         }

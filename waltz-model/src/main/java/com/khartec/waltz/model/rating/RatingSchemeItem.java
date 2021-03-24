@@ -25,9 +25,9 @@ import org.immutables.value.Value;
 
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableRagName.class)
-@JsonDeserialize(as = ImmutableRagName.class)
-public abstract class RagName implements
+@JsonSerialize(as = ImmutableRatingSchemeItem.class)
+@JsonDeserialize(as = ImmutableRatingSchemeItem.class)
+public abstract class RatingSchemeItem implements
         IdProvider,
         NameProvider,
         DescriptionProvider,
