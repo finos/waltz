@@ -38,4 +38,6 @@ public abstract class ActorChangeCommand implements EntityChangeCommand {
 
     public abstract Optional<FieldChange<Boolean>> isExternal();
 
+    public abstract Optional<FieldChange<String>> externalId();
+
  }

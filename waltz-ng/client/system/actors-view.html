@@ -49,6 +49,7 @@
                                 <th>Actor</th>
                                 <th>Description</th>
                                 <th>External?</th>
+                                <th>External Id</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -59,7 +60,7 @@
                                         <a ng-bind="actor.name"></a>
                                     </span>
                                 </td>
-                                <td class="col-sm-9 clickable">
+                                <td class="col-sm-6 clickable">
                                     <span class="force-wrap"
                                           ng-if="actor.description"
                                           ng-bind="actor.description">
@@ -72,6 +73,10 @@
                                 <td class="col-sm-1 clickable">
                                     <span class="force-wrap"
                                           ng-bind="actor.isExternal">
+                                    </span>
+                                </td>
+                                <td class="col-sm-3">
+                                    <span ng-bind="actor.externalId">
                                     </span>
                                 </td>
                             </tr>
@@ -113,6 +118,16 @@
                                                       on-save="$ctrl.updateIsExternal"
                                                       field-type="boolean"
                                                       initial-val="$ctrl.selectedActor.isExternal"
+                                                      ctx="$ctrl.selectedActor">
+                                </waltz-editable-field>
+
+                                <br>
+                                <span>External Id:</span>
+                                <waltz-editable-field class="text-muted"
+                                                      on-save="$ctrl.updateExternalId"
+                                                      empty-label="-"
+                                                      field-type="text"
+                                                      initial-val="$ctrl.selectedActor.externalId"
                                                       ctx="$ctrl.selectedActor">
                                 </waltz-editable-field>
 

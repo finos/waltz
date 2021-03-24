@@ -269,5 +269,33 @@
             </column>
         </addColumn>
     </changeSet>
+    
+    <changeSet id="20210310-5330-1"
+               author="davidwatkins73">
+        <comment>5330: add external id to actor table</comment>
+        <addColumn tableName="actor">
+            <column name="external_id"
+                    type="${external-id.type}"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20210310-5330-2"
+               author="davidwatkins73">
+        <comment>5330: add external id to actor table</comment>
+        <addUniqueConstraint columnNames="external_id"
+                             constraintName="unique_actor_ext_id"
+                             tableName="actor"/>
+    </changeSet>
+
+
+    <changeSet id="20210312-5334-1"
+               author="woodjes">
+        <comment>5334: adding index to person</comment>
+        <createIndex indexName="idx_person_email"
+                     tableName="person"
+                     unique="false">
+            <column name="email" type="VARCHAR(255)"/>
+        </createIndex>
+    </changeSet>
 
 </databaseChangeLog>

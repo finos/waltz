@@ -19,6 +19,7 @@
 import _ from "lodash";
 import {initialiseData} from "../common";
 import template from "./actors-view.html";
+import {displayError} from "../common/error-utils";
 
 const initialState = {
     actors: [],
@@ -55,6 +56,13 @@ function controller($q,
         if(change.newVal === null) return $q.reject("No value provided");
         return update(actor, { isExternal: change })
             .then(() => _.find(vm.actors, {"id": actor.id}).isExternal = change.newVal);
+    };
+
+    vm.updateExternalId = (change, actor) => {
+        if(change.newVal === null) return $q.reject("No value provided");
+        return update(actor, { externalId: change })
+            .then(() => _.find(vm.actors, {"id": actor.id}).externalId = change.newVal)
+            .catch(e => displayError(notification, "Failed to save external id", e));
     };
 
 
