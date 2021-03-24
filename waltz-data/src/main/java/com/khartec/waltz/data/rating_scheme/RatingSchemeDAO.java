@@ -43,6 +43,7 @@ import static com.khartec.waltz.schema.Tables.ASSESSMENT_RATING;
 import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
 import static com.khartec.waltz.schema.tables.RatingScheme.RATING_SCHEME;
 import static com.khartec.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM;
+import static java.util.Optional.ofNullable;
 
 @Repository
 public class RatingSchemeDAO {
@@ -66,7 +67,9 @@ public class RatingSchemeDAO {
                 .userSelectable(r.getUserSelectable())
                 .color(r.getColor())
                 .position(r.getPosition())
-                .description(r.getDescription());
+                .description(r.getDescription())
+                .externalId(ofNullable(r.getExternalId()));
+
 
         if (record.field(IS_RESTRICTED_FIELD) != null){
             builder.isRestricted(record.get(IS_RESTRICTED_FIELD));

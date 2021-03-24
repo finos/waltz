@@ -269,7 +269,7 @@
             </column>
         </addColumn>
     </changeSet>
-    
+
     <changeSet id="20210310-5330-1"
                author="davidwatkins73">
         <comment>5330: add external id to actor table</comment>
@@ -297,5 +297,18 @@
             <column name="email" type="VARCHAR(255)"/>
         </createIndex>
     </changeSet>
+
+
+    <changeSet id="20210310-5321-1"
+               author="davidwatkins73">
+        <comment>5321: add external id to rating_scheme_item table</comment>
+        <addColumn tableName="rating_scheme_item">
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
 
 </databaseChangeLog>
