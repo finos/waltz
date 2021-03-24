@@ -31,7 +31,7 @@ import com.khartec.waltz.model.assessment_definition.AssessmentVisibility;
 import com.khartec.waltz.model.assessment_rating.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.rating.RagName;
+import com.khartec.waltz.model.rating.RatingSchemeItem;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -51,6 +51,7 @@ public class AssessmentRatingService {
     private final RatingSchemeDAO ratingSchemeDAO;
     private final ChangeLogService changeLogService;
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
+
 
     @Autowired
     public AssessmentRatingService(
@@ -121,7 +122,9 @@ public class AssessmentRatingService {
         return assessmentRatingDao.remove(command);
     }
 
-    public boolean bulkStore(BulkAssessmentRatingCommand[] commands, long assessmentDefinitionId, String username) {
+    public boolean bulkStore(BulkAssessmentRatingCommand[] commands,
+                             long assessmentDefinitionId,
+                             String username) {
         Set<AssessmentRating> ratingsToAdd = getRatingsFilterByOperation(commands, assessmentDefinitionId, username, Operation.ADD);
         int addedResult = assessmentRatingDao.add(ratingsToAdd);
         createChangeLogs(assessmentDefinitionId, username, ratingsToAdd, Operation.ADD);
@@ -133,7 +136,9 @@ public class AssessmentRatingService {
         return addedResult + updateResult > 1;
     }
 
-    public boolean bulkDelete(BulkAssessmentRatingCommand[] commands, long assessmentDefinitionId, String username) {
+    public boolean bulkDelete(BulkAssessmentRatingCommand[] commands,
+                              long assessmentDefinitionId,
+                              String username) {
         Set<AssessmentRating> ratingsToRemove = getRatingsFilterByOperation(commands, assessmentDefinitionId, username, Operation.REMOVE);
         createChangeLogs(assessmentDefinitionId, username, ratingsToRemove, Operation.REMOVE);
         int result = assessmentRatingDao.remove(ratingsToRemove);
@@ -141,13 +146,15 @@ public class AssessmentRatingService {
         return result  > 1;
     }
 
-    private void createChangeLogEntry(SaveAssessmentRatingCommand command, String username, AssessmentDefinition assessmentDefinition) {
-        Optional<AssessmentRating> previousRating = assessmentRatingDao.findForEntity(command.entityReference())
+    private void createChangeLogEntry(SaveAssessmentRatingCommand command,
+                                      String username,
+                                      AssessmentDefinition assessmentDefinition) {
+        Optional<AssessmentRating>  previousRating = assessmentRatingDao.findForEntity(command.entityReference())
                 .stream()
                 .filter(r -> r.assessmentDefinitionId() == command.assessmentDefinitionId())
                 .findAny();
-        Optional<RagName> previousRatingName = previousRating.map(assessmentRating -> ratingSchemeDAO.getRagNameById(assessmentRating.ratingId()));
-        Optional<String> messagePostfix = previousRatingName
+        Optional<RatingSchemeItem> previousRatingSchemeItem = previousRating.map(assessmentRating -> ratingSchemeDAO.getRatingSchemeItemById(assessmentRating.ratingId()));
+        Optional<String> messagePostfix = previousRatingSchemeItem
                 .map(rn -> format(" from assessment %s as [%s - %s]",
                         assessmentDefinition.name(),
                         rn.name(),
@@ -157,7 +164,7 @@ public class AssessmentRatingService {
                 .message(format(
                         "Storing assessment %s as [%s - %s]%s",
                         assessmentDefinition.name(),
-                        ratingSchemeDAO.getRagNameById(command.ratingId()).name(),
+                        ratingSchemeDAO.getRatingSchemeItemById(command.ratingId()).name(),
                         command.comment(),
                         messagePostfix.orElse("")))
                 .parentReference(mkRef(command.entityReference().kind(), command.entityReference().id()))
@@ -177,7 +184,7 @@ public class AssessmentRatingService {
         String messagePrefix = operation.equals(Operation.REMOVE) ? "Removed" : "Added";
 
         AssessmentDefinition assessmentDefinition = assessmentDefinitionDao.getById(assessmentDefinitionId);
-        Map<Long, RagName> ratingItems = MapUtilities.indexBy(
+        Map<Long, RatingSchemeItem> ratingItems = MapUtilities.indexBy(
                 ratingSchemeDAO.findRatingSchemeItemsForAssessmentDefinition(assessmentDefinitionId),
                 r -> r.id().orElse(0L));
 
