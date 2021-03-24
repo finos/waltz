@@ -30,5 +30,5 @@ import org.immutables.value.Value;
 public abstract class NotificationSummary {
 
     public abstract EntityKind kind();
-    public abstract int count();
+    public abstract Integer count();
 }

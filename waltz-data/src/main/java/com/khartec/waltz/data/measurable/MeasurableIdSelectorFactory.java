@@ -109,7 +109,8 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                                 .innerJoin(APPLICATION).on(APPLICATION.ID.eq(MEASURABLE_RATING.ENTITY_ID))
                                 .innerJoin(INVOLVEMENT).on(APPLICATION.ID.eq(INVOLVEMENT.ENTITY_ID)
                                         .and(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
-                                .where(condition);
+                                .where(condition)
+                                .and(mkLifecycleCondition(options));
                     } else {
                         throw new UnsupportedOperationException(format(
                                 "Cannot create measurable selector for people via entity kind: %s",
@@ -121,8 +122,8 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                         .from(MEASURABLE)
                         .innerJoin(INVOLVEMENT).on(MEASURABLE.ID.eq(INVOLVEMENT.ENTITY_ID)
                                 .and(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.MEASURABLE.name())))
-                        .where(INVOLVEMENT.EMPLOYEE_ID.in(reporteeIds)
-                                .or(INVOLVEMENT.EMPLOYEE_ID.eq(emp))));
+                        .where(INVOLVEMENT.EMPLOYEE_ID.in(reporteeIds).or(INVOLVEMENT.EMPLOYEE_ID.eq(emp)))
+                        .and(mkLifecycleCondition(options)));
     }
 
 
@@ -131,7 +132,8 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
         return DSL
                 .select(MEASURABLE.ID)
                 .from(MEASURABLE)
-                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(options.entityReference().id()));
+                .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(options.entityReference().id()))
+                .and(mkLifecycleCondition(options));
     }
 
 
@@ -150,7 +152,8 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
         return mkBaseRatingBasedSelector()
                 .innerJoin(APPLICATION)
                 .on(APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitSelector)
-                        .and(MEASURABLE_RATING.ENTITY_ID.eq(APPLICATION.ID)));
+                        .and(MEASURABLE_RATING.ENTITY_ID.eq(APPLICATION.ID)))
+                .and(mkLifecycleCondition(options));
     }
 
 
@@ -195,7 +198,8 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                 .innerJoin(ENTITY_HIERARCHY)
                 .on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(MEASURABLE.ID)
                         .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name())))
-                .where(ENTITY_HIERARCHY.ID.in(measurablesViaRatings.union(measurablesViaReplacements)));
+                .where(ENTITY_HIERARCHY.ID.in(measurablesViaRatings.union(measurablesViaReplacements)))
+                .and(mkLifecycleCondition(options));
     }
 
 
@@ -206,13 +210,16 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                 .innerJoin(FLOW_DIAGRAM_ENTITY)
                 .on(FLOW_DIAGRAM_ENTITY.ENTITY_ID.eq(MEASURABLE_RATING.ENTITY_ID)
                         .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(MEASURABLE_RATING.ENTITY_KIND)))
-                .where(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId));
+                .where(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId))
+                .and(mkLifecycleCondition(options));
 
         Select<Record1<Long>> viaDirectRelationship = DSL
                 .select(FLOW_DIAGRAM_ENTITY.ENTITY_ID)
                 .from(FLOW_DIAGRAM_ENTITY)
+                .innerJoin(MEASURABLE).on(MEASURABLE.ID.eq(FLOW_DIAGRAM_ENTITY.ENTITY_ID))
                 .where(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.MEASURABLE.name()))
-                .and(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId));
+                .and(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId))
+                .and(mkLifecycleCondition(options));
 
         return DSL.selectFrom(viaAppRatings.union(viaDirectRelationship).asTable());
     }
@@ -245,20 +252,33 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                 selector = DSL.select(DSL.val(options.entityReference().id()));
                 break;
             case CHILDREN:
-                selector = DSL.select(ENTITY_HIERARCHY.ID)
+                selector = DSL
+                        .select(ENTITY_HIERARCHY.ID)
                         .from(ENTITY_HIERARCHY)
+                        .innerJoin(MEASURABLE).on(MEASURABLE.ID.eq(ENTITY_HIERARCHY.ID))
                         .where(ENTITY_HIERARCHY.ANCESTOR_ID.eq(options.entityReference().id()))
-                        .and(isMeasurable);
+                        .and(isMeasurable)
+                        .and(mkLifecycleCondition(options));
                 break;
             case PARENTS:
-                selector = DSL.select(ENTITY_HIERARCHY.ANCESTOR_ID)
+                selector = DSL
+                        .select(ENTITY_HIERARCHY.ANCESTOR_ID)
                         .from(ENTITY_HIERARCHY)
+                        .innerJoin(MEASURABLE).on(MEASURABLE.ID.eq(ENTITY_HIERARCHY.ANCESTOR_ID))
                         .where(ENTITY_HIERARCHY.ID.eq(options.entityReference().id()))
-                        .and(isMeasurable);
+                        .and(isMeasurable)
+                        .and(mkLifecycleCondition(options));
                 break;
         }
 
+        System.out.println(selector);
+
         return selector;
+    }
+
+
+    private Condition mkLifecycleCondition(IdSelectionOptions options) {
+        return MEASURABLE.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
     }
 
 }
