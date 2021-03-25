@@ -16,6 +16,10 @@
  *
  */
 
+export function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 export function isPromise(obj) {
     return !!obj && (typeof obj === "object" || typeof obj === "function") && typeof obj.then === "function";
 }

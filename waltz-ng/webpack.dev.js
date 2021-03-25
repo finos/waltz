@@ -24,12 +24,21 @@ const common = require("./webpack.config");
 module.exports = smp.wrap(merge(common, {
     mode: "development",
     //devtool: "inline-source-map",
-    devtool: "cheap-module-eval-source-map",
+    //devtool: "cheap-module-eval-source-map",
     devServer: {
         contentBase: "./dist",
         disableHostCheck: true,
         historyApiFallback: {
             disableDotRule: true
-        }
+        },
+        proxy: [{
+            context: ["/data-extract", "/api", "/auth"],
+            target: "http://[::1]:8443", // see note [1]
+        }]
     }
 }));
+
+/*
+[1] - accessing the server using localhost in a browser seems to incur a significant proxy performance cost
+      this can be mitigated by using loopback address (seen here specified in ipv6 form)
+ */

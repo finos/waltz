@@ -16,145 +16,151 @@
   ~
   -->
 
-<div>
-    <!-- HEADER -->
-    <waltz-page-header name="Register new Physical Flow"
-                       small="From: {{ ctrl.sourceEntity.name }}"
-                       icon="dot-circle-o">
-        <breadcrumbs>
-            <ol class="waltz-breadcrumbs">
-                <li><a ui-sref="main">Home</a></li>
-                <li>
-                    <waltz-entity-link entity-ref="ctrl.sourceEntity"></waltz-entity-link>
-                </li>
-                <li>Register Physical Flow</li>
-            </ol>
-        </breadcrumbs>
-    </waltz-page-header>
+<div class="row">
+
+<!--    <div class="col-md-7">-->
+<!--        <waltz-svelte-component primary-entity-ref="ctrl.sourceEntity"-->
+<!--                                component="ctrl.PhysicalFlowRegistrationView"/>-->
+<!--    </div>-->
+    <div class="col-md-12">
+        <!-- HEADER -->
+        <waltz-page-header name="Register new Physical Flow"
+                           small="From: {{ ctrl.sourceEntity.name }}"
+                           icon="dot-circle-o">
+            <breadcrumbs>
+                <ol class="waltz-breadcrumbs">
+                    <li><a ui-sref="main">Home</a></li>
+                    <li>
+                        <waltz-entity-link entity-ref="ctrl.sourceEntity"></waltz-entity-link>
+                    </li>
+                    <li>Register Physical Flow</li>
+                </ol>
+            </breadcrumbs>
+        </waltz-page-header>
 
 
-    <div class="waltz-page-summary waltz-page-summary-attach">
+        <div class="waltz-page-summary waltz-page-summary-attach">
 
-        <!-- DIAGRAM -->
-        <div>
-            <waltz-physical-flow-edit-overview source-entity="ctrl.sourceEntity"
-                                               specification="ctrl.specification"
-                                               target-logical-flow="ctrl.targetLogicalFlow"
-                                               flow-attributes="ctrl.flowAttributes"
-                                               on-specification-focus="ctrl.focusSpecification"
-                                               on-flow-attributes-focus="ctrl.focusFlowAttributes"
-                                               on-target-focus="ctrl.focusTarget"
-                                               on-clone="ctrl.focusClone">
-            </waltz-physical-flow-edit-overview>
-        </div>
+            <!-- DIAGRAM -->
+            <div>
+                <waltz-physical-flow-edit-overview source-entity="ctrl.sourceEntity"
+                                                   specification="ctrl.specification"
+                                                   target-logical-flow="ctrl.targetLogicalFlow"
+                                                   flow-attributes="ctrl.flowAttributes"
+                                                   on-specification-focus="ctrl.focusSpecification"
+                                                   on-flow-attributes-focus="ctrl.focusFlowAttributes"
+                                                   on-target-focus="ctrl.focusTarget"
+                                                   on-clone="ctrl.focusClone">
+                </waltz-physical-flow-edit-overview>
+            </div>
 
-        <hr>
+            <hr>
 
-        <!-- DYNAMIC SECTIONS -->
+            <!-- DYNAMIC SECTIONS -->
 
-        <waltz-physical-flow-attribute-editor ng-if="ctrl.visibility.editor === 'FLOW-ATTRIBUTES'"
-                                              current="ctrl.flowAttributes"
-                                              on-change="ctrl.attributesChanged"
-                                              on-dismiss="ctrl.editorDismiss">
-        </waltz-physical-flow-attribute-editor>
+            <waltz-physical-flow-attribute-editor ng-if="ctrl.visibility.editor === 'FLOW-ATTRIBUTES'"
+                                                  current="ctrl.flowAttributes"
+                                                  on-change="ctrl.attributesChanged"
+                                                  on-dismiss="ctrl.editorDismiss">
+            </waltz-physical-flow-attribute-editor>
 
 
-        <waltz-physical-flow-edit-target-logical-flow ng-if="ctrl.visibility.editor === 'TARGET-LOGICAL-FLOW'"
-                                                      outbound-logical-flows="ctrl.outboundLogicalFlows"
-                                                      on-change="ctrl.targetChanged">
-        </waltz-physical-flow-edit-target-logical-flow>
+            <waltz-physical-flow-edit-target-logical-flow ng-if="ctrl.visibility.editor === 'TARGET-LOGICAL-FLOW'"
+                                                          outbound-logical-flows="ctrl.outboundLogicalFlows"
+                                                          on-change="ctrl.targetChanged">
+            </waltz-physical-flow-edit-target-logical-flow>
 
-        <waltz-physical-flow-edit-specification ng-if="ctrl.visibility.editor === 'SPECIFICATION'"
-                                                owning-entity="ctrl.sourceEntity"
-                                                candidates="ctrl.existingSpecifications"
-                                                current="ctrl.specification"
+            <waltz-physical-flow-edit-specification ng-if="ctrl.visibility.editor === 'SPECIFICATION'"
+                                                    owning-entity="ctrl.sourceEntity"
+                                                    candidates="ctrl.existingSpecifications"
+                                                    current="ctrl.specification"
+                                                    on-dismiss="ctrl.editorDismiss"
+                                                    on-change="ctrl.specificationChanged">
+            </waltz-physical-flow-edit-specification>
+
+            <waltz-physical-flow-clone-selector ng-if="ctrl.visibility.editor === 'CLONE'"
+                                                on-clone="ctrl.onClone"
                                                 on-dismiss="ctrl.editorDismiss"
-                                                on-change="ctrl.specificationChanged">
-        </waltz-physical-flow-edit-specification>
-
-        <waltz-physical-flow-clone-selector ng-if="ctrl.visibility.editor === 'CLONE'"
-                                            on-clone="ctrl.onClone"
-                                            on-dismiss="ctrl.editorDismiss"
-                                            parent-entity-ref="ctrl.sourceEntity">
-        </waltz-physical-flow-clone-selector>
+                                                parent-entity-ref="ctrl.sourceEntity">
+            </waltz-physical-flow-clone-selector>
 
 
-        <div ng-if="ctrl.visibility.editor == '' && ctrl.similarFlows.length === 0">
-            <div class="row">
-
-
-                <!-- SAVE/CANCEL -->
-                <div class="col-md-offset-6 col-md-2">
-                    <button class="btn btn-success"
-                            ng-click="ctrl.doSave()"
-                            ng-disabled="!ctrl.validation.canSave">
-                        <waltz-icon name="check"></waltz-icon>
-                        Save
-                    </button>
-                    &nbsp;
-                    <a ng-href="{{ ctrl.cancelLink }}"
-                       class="clickable">
-                        Cancel
-                    </a>
-
-                </div>
-                <!-- MESSAGES -->
-                <div class="col-md-2">
-
-                    <ul class="list-unstyled small text-muted">
-                        <li ng-repeat="message in ctrl.validation.messages">
-                            <span ng-bind="message" class="error"></span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-        </div>
-
-
-        <!-- SIMILAR FLOWS CONFIRMATION -->
-        <div ng-if="ctrl.visibility.editor == '' && ctrl.similarFlows.length > 0">
-            <div class="row"
-                 ng-hide="ctrl.visibility.similarFlows">
-                <div class="col-md-offset-8 col-md-2">
-                    <strong class="text-warning">Similar flows exist!</strong>
-                    <button class="btn btn-warning"
-                            ng-click="ctrl.visibility.similarFlows = true">
-                        Show
-                    </button>
-                </div>
-            </div>
-
-            <div ng-if="ctrl.visibility.similarFlows">
-                <h4>
-                    Existing flows from
-                    <waltz-entity-icon-label entity-ref="ctrl.sourceEntity"></waltz-entity-icon-label>
-                    to
-                    <waltz-entity-icon-label entity-ref="ctrl.targetEntity"></waltz-entity-icon-label>
-                </h4>
-                <waltz-grid column-defs="ctrl.similarFlowDefs"
-                            row-data="ctrl.similarFlows"
-                            class="small">
-                </waltz-grid>
+            <div ng-if="ctrl.visibility.editor == '' && ctrl.similarFlows.length === 0">
                 <div class="row">
-                    <div class="col-md-offset-8 col-md-2">
+
+
+                    <!-- SAVE/CANCEL -->
+                    <div class="col-md-offset-6 col-md-2">
                         <button class="btn btn-success"
                                 ng-click="ctrl.doSave()"
                                 ng-disabled="!ctrl.validation.canSave">
                             <waltz-icon name="check"></waltz-icon>
-                            Save anyway
+                            Save
                         </button>
                         &nbsp;
                         <a ng-href="{{ ctrl.cancelLink }}"
                            class="clickable">
                             Cancel
                         </a>
+
+                    </div>
+                    <!-- MESSAGES -->
+                    <div class="col-md-2">
+
+                        <ul class="list-unstyled small text-muted">
+                            <li ng-repeat="message in ctrl.validation.messages">
+                                <span ng-bind="message" class="error"></span>
+                            </li>
+                        </ul>
                     </div>
                 </div>
+
             </div>
 
-        </div>
 
+            <!-- SIMILAR FLOWS CONFIRMATION -->
+            <div ng-if="ctrl.visibility.editor == '' && ctrl.similarFlows.length > 0">
+                <div class="row"
+                     ng-hide="ctrl.visibility.similarFlows">
+                    <div class="col-md-offset-8 col-md-2">
+                        <strong class="text-warning">Similar flows exist!</strong>
+                        <button class="btn btn-warning"
+                                ng-click="ctrl.visibility.similarFlows = true">
+                            Show
+                        </button>
+                    </div>
+                </div>
+
+                <div ng-if="ctrl.visibility.similarFlows">
+                    <h4>
+                        Existing flows from
+                        <waltz-entity-icon-label entity-ref="ctrl.sourceEntity"></waltz-entity-icon-label>
+                        to
+                        <waltz-entity-icon-label entity-ref="ctrl.targetEntity"></waltz-entity-icon-label>
+                    </h4>
+                    <waltz-grid column-defs="ctrl.similarFlowDefs"
+                                row-data="ctrl.similarFlows"
+                                class="small">
+                    </waltz-grid>
+                    <div class="row">
+                        <div class="col-md-offset-8 col-md-2">
+                            <button class="btn btn-success"
+                                    ng-click="ctrl.doSave()"
+                                    ng-disabled="!ctrl.validation.canSave">
+                                <waltz-icon name="check"></waltz-icon>
+                                Save anyway
+                            </button>
+                            &nbsp;
+                            <a ng-href="{{ ctrl.cancelLink }}"
+                               class="clickable">
+                                Cancel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
     </div>
 
 </div>

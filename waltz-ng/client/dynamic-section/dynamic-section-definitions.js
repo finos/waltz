@@ -15,6 +15,8 @@
  * See the License for the specific
  *
  */
+import BookmarkPanel from "../bookmarks/svelte/BookmarkPanel.svelte";
+
 
 const appsSection = {
     componentId: "apps-section",
@@ -44,8 +46,10 @@ const authSourcesSection = {
     id: 4,
 };
 
+
+
 const bookmarksSection = {
-    componentId: "bookmarks-section",
+    svelteComponent: BookmarkPanel,
     name: "Bookmarks",
     icon: "rocket",
     id: 5,
@@ -165,28 +169,28 @@ const measurableRatingExplorerSection = {
 
 const relatedMeasurablesSection = {
     componentId: "related-measurables-section",
-    name: "Related Viewpoints",
+    name: "Viewpoints",
     icon: "link",
     id: 22
 };
 
 const relatedDataTypesSection = {
     componentId: "related-data-type-section",
-    name: "Related Types",
+    name: "Types",
     icon: "qrcode",
     id: 23
 };
 
 const relatedAppsSection = {
     componentId: "related-apps-section",
-    name: "Related Apps",
+    name: "Apps",
     icon: "desktop",
     id: 24
 };
 
 const relatedAppGroupsSection = {
     componentId: "related-app-groups-section",
-    name: "Related Groups",
+    name: "Groups",
     icon: "object-group",
     id: 25
 };
@@ -317,6 +321,7 @@ const reportGridViewSection = {
     id: 170
 };
 
+
 const appCostsSummarySection = {
     componentId: "app-costs-summary-section",
     name: "Application Costs",
@@ -365,6 +370,7 @@ const appComplexitySummarySection = {
     icon: "sort-numeric-asc",
     id: 240
 };
+
 
 export const dynamicSections = {
     appCostsSection,
