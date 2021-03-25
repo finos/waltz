@@ -57,4 +57,14 @@ public class AssessmentDefinitionService {
     public List<AssessmentDefinition> findByEntityKind(EntityKind kind) {
         return assessmentDefinitionDao.findByEntityKind(kind);
     }
+
+
+    public boolean save(AssessmentDefinition def) {
+        return assessmentDefinitionDao.save(def) == 1;
+    }
+
+
+    public boolean remove(long definitionId) {
+        return assessmentDefinitionDao.remove(definitionId) == 1;
+    }
 }

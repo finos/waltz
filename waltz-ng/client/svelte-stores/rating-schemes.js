@@ -9,8 +9,16 @@ export function mkStore() {
             null,
             {force});
 
+    const loadAll = (force) => remote
+        .fetchViewList(
+            "GET",
+            `api/rating-scheme`,
+            null,
+            {force});
+
     return {
-        getById
+        getById,
+        loadAll
     };
 }
 

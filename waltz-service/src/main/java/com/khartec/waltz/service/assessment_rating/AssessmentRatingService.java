@@ -27,7 +27,6 @@ import com.khartec.waltz.data.assessment_rating.AssessmentRatingDao;
 import com.khartec.waltz.data.rating_scheme.RatingSchemeDAO;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
-import com.khartec.waltz.model.assessment_definition.AssessmentVisibility;
 import com.khartec.waltz.model.assessment_rating.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
@@ -77,8 +76,8 @@ public class AssessmentRatingService {
     }
 
 
-    public List<AssessmentRating> findByEntityKind(EntityKind targetKind, List<AssessmentVisibility> visibilities) {
-        return assessmentRatingDao.findByEntityKind(targetKind, visibilities);
+    public List<AssessmentRating> findByEntityKind(EntityKind targetKind) {
+        return assessmentRatingDao.findByEntityKind(targetKind);
     }
 
 
@@ -89,10 +88,9 @@ public class AssessmentRatingService {
     }
 
 
-    public List<AssessmentRating> findByDefinitionId(long definitionId,
-                                                     List<AssessmentVisibility> visibilities) {
+    public List<AssessmentRating> findByDefinitionId(long definitionId) {
 
-        return assessmentRatingDao.findByDefinitionId(definitionId, visibilities);
+        return assessmentRatingDao.findByDefinitionId(definitionId);
     }
 
     public boolean store(SaveAssessmentRatingCommand command, String username) {
