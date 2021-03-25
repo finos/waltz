@@ -30,7 +30,7 @@ import com.khartec.waltz.model.change_unit.PhysicalFlowChangeUnitViewItem;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
-import com.khartec.waltz.model.rating.RagName;
+import com.khartec.waltz.model.rating.RatingSchemeItem;
 import com.khartec.waltz.service.assessment_rating.AssessmentRatingService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
@@ -98,7 +98,7 @@ public class ChangeUnitViewService {
         Collection<LogicalFlow> logicalFlows = logicalFlowService.findAllByFlowIds(map(physicalFlows, PhysicalFlow::logicalFlowId));
         List<AssessmentRating> assessmentRatings = assessmentRatingService.findByTargetKindForRelatedSelector(EntityKind.CHANGE_UNIT, idSelectionOptions);
 
-        Map<Long, RagName> ratingSchemeItemsById = indexBy(ratingSchemeService.getAllRatingSchemeItems(), item -> item.id().get());
+        Map<Long, RatingSchemeItem> ratingSchemeItemsById = indexBy(ratingSchemeService.getAllRatingSchemeItems(), item -> item.id().get());
         Map<Long, PhysicalFlow> physicalFlowsById = indexBy(physicalFlows, flow -> flow.id().get());
         Map<Long, LogicalFlow> logicalFlowsById = indexBy(logicalFlows, flow -> flow.id().get());
         Map<Long, PhysicalSpecification> specsById = indexBy(physicalSpecs, spec -> spec.id().get());
@@ -135,7 +135,7 @@ public class ChangeUnitViewService {
     }
 
 
-    private AssessmentRatingDetail mkAssessmentDefinitionDetail(AssessmentRating assessmentRating, RagName ratingDefinition) {
+    private AssessmentRatingDetail mkAssessmentDefinitionDetail(AssessmentRating assessmentRating, RatingSchemeItem ratingDefinition) {
         return ImmutableAssessmentRatingDetail
                 .builder()
                 .assessmentRating(assessmentRating)

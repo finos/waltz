@@ -20,7 +20,7 @@ package com.khartec.waltz.service.scenario;
 
 import com.khartec.waltz.data.scenario.ScenarioRatingItemDao;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.rating.RagName;
+import com.khartec.waltz.model.rating.RatingSchemeItem;
 import com.khartec.waltz.model.scenario.ChangeScenarioCommand;
 import com.khartec.waltz.model.scenario.Scenario;
 import com.khartec.waltz.model.scenario.ScenarioRatingItem;
@@ -111,7 +111,7 @@ public class ScenarioRatingItemService {
         String message;
         Application application = applicationService.getById(command.appId());
         Scenario scenario = scenarioService.getById(command.scenarioId());
-        List<RagName> ratings = ratingSchemeService.getById(command.ratingSchemeId()).ratings();
+        List<RatingSchemeItem> ratings = ratingSchemeService.getById(command.ratingSchemeId()).ratings();
         message = String.format(
                 "Application %s (%s), moved from %s to %s for %s",
                 application.assetCode().orElse("Unknown"),
@@ -134,8 +134,8 @@ public class ScenarioRatingItemService {
         changeLogService.write(mkBasicLogEntry(command.scenarioId(), message, userId));
     }
 
-    private String getRatingName(List<RagName> ratings, char rating) {
-        Optional<RagName> ratingOptional = ratings.stream().filter(r -> r.rating() == rating).findFirst();
+    private String getRatingName(List<RatingSchemeItem> ratings, char rating) {
+        Optional<RatingSchemeItem> ratingOptional = ratings.stream().filter(r -> r.rating() == rating).findFirst();
         return ratingOptional.isPresent() ? ratingOptional.get().name() : "Unknown";
     }
 }

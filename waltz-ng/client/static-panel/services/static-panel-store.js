@@ -16,8 +16,8 @@
  *
  */
 
-export function store($http, base) {
-    const baseUrl = `${base}/static-panel`;
+export function store($http) {
+    const baseUrl = `api/static-panel`;
 
     const findByGroups = (groups = []) => {
         return $http
@@ -45,13 +45,7 @@ export function store($http, base) {
     };
 }
 
-
-store.$inject = [
-    '$http',
-    'BaseApiUrl'
-];
-
-
+store.$inject = ["$http"];
 
 export const serviceName = 'StaticPanelStore';
 

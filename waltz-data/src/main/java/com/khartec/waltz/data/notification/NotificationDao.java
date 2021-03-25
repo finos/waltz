@@ -37,14 +37,17 @@ import static com.khartec.waltz.schema.Tables.*;
 @Repository
 public class NotificationDao {
 
-    private final DSLContext dsl;
-
     private static final Field<Integer> COUNT = DSL.count().as("count");
 
+    private final DSLContext dsl;
+
+
     private static final RecordMapper<Record, NotificationSummary> TO_DOMAIN_MAPPER = r -> {
-        return ImmutableNotificationSummary.builder()
+        Integer c = r.get("count", Integer.class);
+        return ImmutableNotificationSummary
+                .builder()
                 .kind(EntityKind.valueOf(r.get("kind", String.class)))
-                .count(r.get(COUNT))
+                .count(c)
                 .build();
     };
 
@@ -52,14 +55,14 @@ public class NotificationDao {
     @Autowired
     public NotificationDao(DSLContext dsl) {
         checkNotNull(dsl, "dsl cannot be null");
-
         this.dsl = dsl;
     }
 
 
     public List<NotificationSummary> findNotificationsByUserId(String userId) {
         Select<Record2<String, Integer>> attestationCount = DSL
-                .select(DSL.val(EntityKind.ATTESTATION.name()).as("kind"), COUNT)
+                .select(DSL.val(EntityKind.ATTESTATION.name()).as("kind"),
+                        COUNT)
                 .from(ATTESTATION_INSTANCE)
                 .innerJoin(ATTESTATION_INSTANCE_RECIPIENT)
                 .on(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(ATTESTATION_INSTANCE.ID))
@@ -67,7 +70,8 @@ public class NotificationDao {
                 .and(ATTESTATION_INSTANCE.ATTESTED_AT.isNull());
 
         Select<Record2<String, Integer>> surveyCount = DSL
-                .select(DSL.val(EntityKind.SURVEY_INSTANCE.name()).as("kind"), COUNT)
+                .select(DSL.val(EntityKind.SURVEY_INSTANCE.name()).as("kind"),
+                        COUNT)
                 .from(SURVEY_INSTANCE)
                 .innerJoin(SURVEY_INSTANCE_RECIPIENT)
                 .on(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))

@@ -19,7 +19,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.rating.RagName;
+import com.khartec.waltz.model.rating.RatingSchemeItem;
 import com.khartec.waltz.service.rating_scheme.RatingSchemeService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -51,7 +51,7 @@ public class RatingSchemeEndpoint implements Endpoint {
         String findRatingSchemeItemsForEntityAndCategoryPath = mkPath(BASE_URL, "items", "kind", ":kind", "id", ":id", "category-id", ":categoryId");
         String findRatingSchemeItemsPath = mkPath(BASE_URL, "items", "assessment-definition-id", ":id");
 
-        ListRoute<RagName> findRatingSchemeItemsForEntityAndCategoryRoute = (request, response) -> {
+        ListRoute<RatingSchemeItem> findRatingSchemeItemsForEntityAndCategoryRoute = (request, response) -> {
             EntityReference ref = getEntityReference(request);
             long categoryId = getLong(request, "categoryId");
 

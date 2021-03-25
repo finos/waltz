@@ -19,12 +19,10 @@
 package com.khartec.waltz.data.rating_scheme;
 
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.rating.ImmutableRagName;
-import com.khartec.waltz.model.rating.ImmutableRatingScheme;
-import com.khartec.waltz.model.rating.RagName;
-import com.khartec.waltz.model.rating.RatingScheme;
+import com.khartec.waltz.model.rating.*;
+import com.khartec.waltz.model.rating.ImmutableRatingSchemeItem;
+import com.khartec.waltz.model.rating.RatingSchemeItem;
 import com.khartec.waltz.schema.Tables;
-import com.khartec.waltz.schema.tables.RatingSchemeItem;
 import com.khartec.waltz.schema.tables.records.RatingSchemeItemRecord;
 import com.khartec.waltz.schema.tables.records.RatingSchemeRecord;
 import org.jooq.*;
@@ -43,22 +41,23 @@ import static com.khartec.waltz.schema.Tables.ASSESSMENT_RATING;
 import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
 import static com.khartec.waltz.schema.tables.RatingScheme.RATING_SCHEME;
 import static com.khartec.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM;
+import static java.util.Optional.ofNullable;
 
 @Repository
 public class RatingSchemeDAO {
 
-    public static final RatingSchemeItem CONSTRAINING_RATING = Tables.RATING_SCHEME_ITEM.as("constrainingRating");
+    public static final com.khartec.waltz.schema.tables.RatingSchemeItem CONSTRAINING_RATING = Tables.RATING_SCHEME_ITEM.as("constrainingRating");
 
     public static final Field<Boolean> IS_RESTRICTED_FIELD = DSL.coalesce(
             DSL.field(Tables.RATING_SCHEME_ITEM.POSITION.lt(CONSTRAINING_RATING.POSITION)), false)
             .as("isRestricted");
 
 
-    public static final RecordMapper<Record, RagName> TO_ITEM_MAPPER = record -> {
+    public static final RecordMapper<Record, RatingSchemeItem> TO_ITEM_MAPPER = record -> {
 
         RatingSchemeItemRecord r = record.into(RATING_SCHEME_ITEM);
 
-        ImmutableRagName.Builder builder = ImmutableRagName.builder()
+        ImmutableRatingSchemeItem.Builder builder = ImmutableRatingSchemeItem.builder()
                 .id(r.getId())
                 .ratingSchemeId(r.getSchemeId())
                 .name(r.getName())
@@ -66,7 +65,9 @@ public class RatingSchemeDAO {
                 .userSelectable(r.getUserSelectable())
                 .color(r.getColor())
                 .position(r.getPosition())
-                .description(r.getDescription());
+                .description(r.getDescription())
+                .externalId(ofNullable(r.getExternalId()));
+
 
         if (record.field(IS_RESTRICTED_FIELD) != null){
             builder.isRestricted(record.get(IS_RESTRICTED_FIELD));
@@ -94,7 +95,7 @@ public class RatingSchemeDAO {
 
 
     public Collection<RatingScheme> findAll() {
-        Map<Long, Collection<RagName>> itemsByScheme = groupBy(
+        Map<Long, Collection<RatingSchemeItem>> itemsByScheme = groupBy(
                 d -> d.ratingSchemeId(),
                 fetchItems(DSL.trueCondition()));
 
@@ -113,7 +114,7 @@ public class RatingSchemeDAO {
 
     public RatingScheme getById(long id) {
         Condition itemCondition = RATING_SCHEME_ITEM.SCHEME_ID.eq(id);
-        List<RagName> items = fetchItems(itemCondition);
+        List<RatingSchemeItem> items = fetchItems(itemCondition);
         return ImmutableRatingScheme
                 .copyOf(dsl
                     .selectFrom(RATING_SCHEME)
@@ -123,7 +124,7 @@ public class RatingSchemeDAO {
     }
 
 
-    public List<RagName> fetchItems(Condition itemCondition) {
+    public List<RatingSchemeItem> fetchItems(Condition itemCondition) {
         return dsl
                 .selectFrom(RATING_SCHEME_ITEM)
                 .where(itemCondition)
@@ -131,7 +132,7 @@ public class RatingSchemeDAO {
                 .fetch(TO_ITEM_MAPPER);
     }
 
-    public List<RagName> findRatingSchemeItemsForAssessmentDefinition(Long assessmentDefinitionId) {
+    public List<RatingSchemeItem> findRatingSchemeItemsForAssessmentDefinition(Long assessmentDefinitionId) {
         return dsl
                 .select(RATING_SCHEME_ITEM.fields())
                 .from(RATING_SCHEME_ITEM)
@@ -144,7 +145,7 @@ public class RatingSchemeDAO {
                 .fetch(TO_ITEM_MAPPER);
     }
 
-    public RagName getRagNameById(long id){
+    public RatingSchemeItem getRatingSchemeItemById(long id){
         checkNotNull(id, "id cannot be null");
         return dsl
                 .selectFrom(RATING_SCHEME_ITEM)
@@ -153,7 +154,7 @@ public class RatingSchemeDAO {
     }
 
 
-    public List<RagName> findRatingSchemeItemsForEntityAndCategory(EntityReference ref, long measurableCategoryId) {
+    public List<RatingSchemeItem> findRatingSchemeItemsForEntityAndCategory(EntityReference ref, long measurableCategoryId) {
 
         Condition assessmentDefinitionJoinCondition = ASSESSMENT_DEFINITION.ID.eq(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID)
                 .and(ASSESSMENT_RATING.ENTITY_ID.eq(ref.id())
@@ -172,7 +173,7 @@ public class RatingSchemeDAO {
     }
 
 
-    public Set<RagName> findRatingSchemeItemsByIds(Set<Long> ids) {
+    public Set<RatingSchemeItem> findRatingSchemeItemsByIds(Set<Long> ids) {
         checkNotNull(ids, "ids cannot be null");
         return dsl
                 .selectFrom(RATING_SCHEME_ITEM)

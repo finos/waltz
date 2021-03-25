@@ -29,7 +29,7 @@ import com.khartec.waltz.model.AxisOrientation;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.measurable.Measurable;
-import com.khartec.waltz.model.rating.RagName;
+import com.khartec.waltz.model.rating.RatingSchemeItem;
 import com.khartec.waltz.model.rating.RatingScheme;
 import com.khartec.waltz.model.roadmap.Roadmap;
 import com.khartec.waltz.model.scenario.Scenario;
@@ -127,7 +127,7 @@ public class ScenarioRatingImporter {
             // get rating scheme
             RatingScheme ratingScheme = ratingSchemeDao.getById(roadmap.ratingSchemeId());
             checkNotNull(ratingScheme, "ratingScheme cannot be null");
-            Map<String, RagName> ratingsByName = indexBy(r -> lower(r.name()), ratingScheme.ratings());
+            Map<String, RatingSchemeItem> ratingsByName = indexBy(r -> lower(r.name()), ratingScheme.ratings());
 
             // index available scenarios
             Map<String, Scenario> scenariosByName = indexBy(s -> lower(s.name()), scenarioDao.findForRoadmapId(roadmap.id().get()));
@@ -142,7 +142,7 @@ public class ScenarioRatingImporter {
 
     private void updateRatingsForScenario(List<Measurable> measurables,
                                           Roadmap roadmap,
-                                          Map<String, RagName> ratingsByName,
+                                          Map<String, RatingSchemeItem> ratingsByName,
                                           List<ScenarioRatingRow> rows,
                                           Map<String, Scenario> scenariosByName,
                                           String scenarioName) {
@@ -242,7 +242,7 @@ public class ScenarioRatingImporter {
 
 
     private List<ScenarioRatingItemRecord> mkScenarioRatingRecords(List<Measurable> measurables,
-                                                                   Map<String, RagName> ratingsByName,
+                                                                   Map<String, RatingSchemeItem> ratingsByName,
                                                                    List<ScenarioRatingRow> rows,
                                                                    Scenario scenario) {
         Collection<ScenarioAxisItem> scenarioAxes = scenarioAxisItemDao.findForScenarioId(scenario.id().get());
@@ -264,7 +264,7 @@ public class ScenarioRatingImporter {
                     Application app = assetCodeToApplicationMap.get(r.assetCode());
                     checkNotNull(app, String.format("Application with asset code[%s] cannot be null", r.assetCode()));
 
-                    RagName rating = ratingsByName.get(lower(r.rating()));
+                    RatingSchemeItem rating = ratingsByName.get(lower(r.rating()));
                     checkNotNull(rating, String.format("rating [%s] cannot be null", r.rating()));
 
                     ScenarioRatingItemRecord record = new ScenarioRatingItemRecord();
