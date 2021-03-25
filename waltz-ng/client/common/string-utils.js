@@ -118,6 +118,10 @@ export function stringToBoolean(str){
  * @returns {*}
  */
 export function toDomain(url) {
+    if (_.isEmpty(url)) {
+        return "";
+    }
+
     let domain;
     //find & remove protocol (http, ftp, etc.) and get domain
     if (url.indexOf("://") > -1) {

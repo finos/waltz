@@ -21,22 +21,32 @@
     <waltz-page-header name="Playpen"
                        small="1"
                        icon="rocket">
-        <breadcrumbs>
-            <ol class="waltz-breadcrumbs">
-                <li><a ui-sref="main">Home</a></li>
-                <li>Playpen</li>
-            </ol>
-        </breadcrumbs>
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li>Playpen</li>
+        </ol>
     </waltz-page-header>
 
+    <div class="row">
+        <div class="col-md-6">
+            <!-- NG  BOOKMARKS -->
+            <waltz-dynamic-section-wrapper section="$ctrl.bookmarksSection"
+                                           parent-entity-ref="$ctrl.ref">
+            </waltz-dynamic-section-wrapper>
+        </div>
+        <div class="col-md-6">
+            <!-- NG  BOOKMARKS -->
+            <waltz-dynamic-section-wrapper section="$ctrl.bookmarksSection"
+                                           parent-entity-ref="$ctrl.ref2">
+            </waltz-dynamic-section-wrapper>
+            <hr>
+            <waltz-dynamic-section-wrapper section="$ctrl.bookmarksSection"
+                                           parent-entity-ref="$ctrl.ref2">
+            </waltz-dynamic-section-wrapper>
+        </div>
+    </div>
 
-    <waltz-section name="Real Data">
-        <waltz-grid-with-search column-defs="$ctrl.columnDefs"
-                                entries="$ctrl.tableData"
-                                class="small">
-        </waltz-grid-with-search>
-    </waltz-section>
 
-    <waltz-measurable-rating-grid-view parent-entity-ref="$ctrl.parentEntityRef"></waltz-measurable-rating-grid-view>
+
 
 </div>
