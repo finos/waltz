@@ -2,20 +2,40 @@
     import PageHeader from "../../../common/svelte/PageHeader.svelte";
     import ViewLink from "../../../common/svelte/ViewLink.svelte";
     import SearchInput from "../../../common/svelte/SearchInput.svelte";
+    import RatingSchemePreviewBar from "./RatingSchemePreviewBar.svelte";
 
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
     import {termSearch} from "../../../common";
-    import RatingSchemePreviewBar from "./RatingSchemePreviewBar.svelte";
+    import Icon from "../../../common/svelte/Icon.svelte";
+    import RatingSchemeEditor from "./RatingSchemeEditor.svelte";
+
+
+    const Modes = {
+        LIST: "list",
+        EDIT: "edit",
+        DELETE: "delete"
+    };
 
     const loadSchemeCall = ratingSchemeStore.loadAll();
+
+    let qry;
+    let activeMode = Modes.LIST;
+    let activeScheme = null;
 
     $: ratingSchemes = _
         .chain(termSearch($loadSchemeCall.data, qry, ["name", "description"]))
         .orderBy("name")
         .value();
 
-    let qry;
+    function onEdit(scheme) {
+        activeScheme = scheme;
+        activeMode = Modes.EDIT;
+    }
 
+    function onCancel() {
+        activeScheme = null;
+        activeMode = Modes.LIST;
+    }
 </script>
 
 <PageHeader icon="puzzle-piece"
@@ -41,16 +61,20 @@
         </div>
     </div>
 
+    {#if activeMode === Modes.EDIT}
+        <RatingSchemeEditor scheme={activeScheme} doCancel={onCancel}/>
+    {:else if activeMode === Modes.LIST}
     <div class="row">
         <div class="col-md-12">
             <SearchInput bind:value={qry}/>
-            <table class="table table-condensed table-striped"
+            <table class="table table-condensed table-striped table-hover"
                    style="table-layout: fixed">
                 <thead>
                 <tr>
-                    <th style="width:40%">Name</th>
+                    <th style="width:25%">Name</th>
+                    <th style="width:25%">Ratings</th>
                     <th style="width:25%">Description</th>
-                    <th style="width:35%">Operations</th>
+                    <th style="width:25%">Operations</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -60,13 +84,20 @@
                             <span title={scheme.description}>
                                 {scheme.name}
                             </span>
+                        </td>
+                        <td>
                             <RatingSchemePreviewBar {scheme}/>
                         </td>
                         <td>
                             {scheme.description}
                         </td>
                         <td>
-
+                            <button class="btn-link"
+                                    aria-label="Edit {scheme.name}"
+                                    on:click={() => onEdit(scheme)}>
+                                <Icon name="edit"/>
+                                Edit
+                            </button>
                         </td>
                     </tr>
                 {/each}
@@ -74,13 +105,9 @@
             </table>
         </div>
     </div>
+    {/if}
 </div>
 
 
 <style>
-    .rating-square {
-        width: 1em;
-        height: 1em;
-        display: inline-block;
-    }
 </style>

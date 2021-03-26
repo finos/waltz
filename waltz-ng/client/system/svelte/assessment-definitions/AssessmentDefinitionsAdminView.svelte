@@ -190,9 +190,4 @@
 </div>
 
 <style>
-    .rating-square {
-        width: 1em;
-        height: 1em;
-        display: inline-block;
-    }
 </style>
