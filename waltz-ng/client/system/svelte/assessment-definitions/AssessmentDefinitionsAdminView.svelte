@@ -99,6 +99,17 @@
 
 <div class="waltz-page-summary waltz-page-summary-attach">
     <div class="row">
+        <div class="col-md-12">
+            <p class="help-block">
+                Assessment definitions are used to collect additional ratings about entities.
+                The possible values each rating are determined by the associated <i>Rating Scheme</i>.
+                Assessment definitions are applicable to a wide range of Waltz entities and are often used
+                  in conjunction with <i>Report Grids</i> and for ad-hoc data capture and reporting.
+            </p>
+        </div>
+    </div>
+
+    <div class="row">
         {#if selectedDefinition}
         <div class="col-md-12">
             {#if activeMode === Modes.EDIT}
