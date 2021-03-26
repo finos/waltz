@@ -16,6 +16,11 @@
   ~
   -->
 
+<waltz-svelte-component component="$ctrl.RatingSchemesAdminView"></waltz-svelte-component>
+<hr>
+<hr>
+<hr>
+<hr>
 <div>
     <waltz-page-header icon="puzzle-piece" name="Rating Schemes">
         <breadcrumbs>
@@ -44,7 +49,7 @@
                                           on-query="$ctrl.onQueryStrChange"
                                           placeholder-text="Search...">
                     </waltz-search-control>
-    
+
                     <br>
                 </div>
                 <table class="table table-condensed table-hover">
@@ -53,7 +58,7 @@
                         <th>Rating Scheme</th>
                         <th>Description</th>
                     </tr>
-                    <tbody ng-if="$ctrl.filteredRatingSchemes.length > 0" 
+                    <tbody ng-if="$ctrl.filteredRatingSchemes.length > 0"
                            ng-repeat="ratingScheme in $ctrl.filteredRatingSchemes | orderBy:'name'">
                     <tr ng-click="$ctrl.selectScheme(ratingScheme)">
                         <td class="col-sm-2 clickable">

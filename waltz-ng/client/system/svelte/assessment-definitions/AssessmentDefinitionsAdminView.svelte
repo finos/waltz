@@ -10,6 +10,7 @@
     import {assessmentDefinitionStore} from "../../../svelte-stores/assessment-definition.js";
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
     import AssessmentDefinitionRemovalConfirmation from "./AssessmentDefinitionRemovalConfirmation.svelte";
+    import RatingSchemePreviewBar from "../ratings-schemes/RatingSchemePreviewBar.svelte";
 
     const definitions = assessmentDefinitionStore.loadAll();
     const ratingSchemes = ratingSchemeStore.loadAll();
@@ -129,9 +130,10 @@
                    style="table-layout: fixed">
                 <thead>
                     <tr>
-                        <th style="width:40%">Name</th>
-                        <th style="width:25%">Applicable Kind</th>
-                        <th style="width:35%">Operations</th>
+                        <th style="width:25%">Name</th>
+                        <th style="width:25%">Rating Scheme</th>
+                        <th style="width:20%">Applicable Kind</th>
+                        <th style="width:30%">Operations</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -146,16 +148,10 @@
                                     <Icon name="lock"/>
                                 </span>
                             {/if}
-                            <ul class="list-inline">
-                                {#each ratingSchemesById[def.ratingSchemeId]?.ratings || [] as rating}
-                                    <li>
-                                        <div class="rating-square"
-                                             title={ rating.name }
-                                             style="background-color: {rating.color}">
-                                        </div>
-                                    </li>
-                                {/each}
-                            </ul>
+
+                        </td>
+                        <td>
+                            <RatingSchemePreviewBar scheme={ratingSchemesById[def.ratingSchemeId]}/>
                         </td>
                         <td>
                             <EntityIcon kind={def.entityKind}/>

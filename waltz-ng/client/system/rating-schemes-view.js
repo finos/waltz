@@ -15,6 +15,7 @@
  * See the License for the specific
  *
  */
+import RatingSchemesAdminView from "./svelte/ratings-schemes/RatingSchemesAdminView.svelte";
 import template from "./rating-schemes-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
 import {initialiseData} from "../common";
@@ -22,6 +23,7 @@ import * as _ from "lodash";
 
 
 const initialState = {
+    RatingSchemesAdminView,
     qry: '',
     filteredRatingSchemes: [],
     ratingSchemes: [],
@@ -33,12 +35,12 @@ const initialState = {
 function controller(serviceBroker, $q) {
 
     const vm = initialiseData(this, initialState);
-    
+
     const ratingSchemePromise = serviceBroker
         .loadViewData(
             CORE_API.RatingSchemeStore.findAll)
         .then(r => { vm.ratingSchemes =
-            _.forEach( r.data, d => 
+            _.forEach( r.data, d =>
                 _.forEach(d.ratings,rating => rating.name = rating.name + " (" + rating.rating + ")")
                 );
             vm.filteredRatingSchemes = vm.ratingSchemes;
