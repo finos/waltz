@@ -311,4 +311,16 @@
     </changeSet>
 
 
+    <changeSet id="20210310-5350-1"
+               author="davidwatkins73">
+        <comment>5350: add fk from assessment def to ratings</comment>
+        <addForeignKeyConstraint constraintName="assessment_rating_to_definition_fk"
+                                 baseTableName="assessment_rating"
+                                 referencedTableName="assessment_definition"
+                                 baseColumnNames="assessment_definition_id"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+
 </databaseChangeLog>
