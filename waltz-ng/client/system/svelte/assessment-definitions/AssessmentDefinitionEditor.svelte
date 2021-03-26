@@ -1,7 +1,11 @@
 <script>
     import _ from "lodash";
-    import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
+
     import Icon from "../../../common/svelte/Icon.svelte";
+
+    import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
+    import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating";
+
 
     export let doCancel;
     export let doSave;
@@ -30,8 +34,13 @@
 
     const ratingSchemes = ratingSchemeStore.loadAll();
 
+    let hasRatings = false;
     let workingCopy = _.cloneDeep(definition);
     let savePromise = null;
+
+    $: ratingCall = assessmentRatingStore.findByDefinitionId(definition.id);
+    $: ratings = $ratingCall.data;
+    $: hasRatings = ratings.length > 0;
 
     $: possibleRatingSchemes = _.sortBy($ratingSchemes.data, d => d.name);
 
@@ -75,6 +84,7 @@
                     <small class="text-muted">(required)</small>
                 </label>
                 <select id="ratingScheme"
+                        disabled={hasRatings}
                         bind:value={workingCopy.ratingSchemeId}>
                     {#each possibleRatingSchemes as r}
                         <option value={r.id}>
@@ -84,8 +94,11 @@
                 </select>
                 <div class="help-block">
                     The rating scheme determines the possible values this assessment can have.
-                    Changing ratings on an existing assessment should be treated with <i>extreme</i> caution
-                    as existing mappings will become invalid.
+                    {#if hasRatings}
+                        <br>
+                        <Icon name="warning"/>
+                        The rating scheme for this definition cannot be changed as ratings already exist.
+                    {/if}
                 </div>
 
                 <!-- ENTITY KIND -->
@@ -94,6 +107,7 @@
                     <small class="text-muted">(required)</small>
                 </label>
                 <select id="entityKind"
+                        disabled={hasRatings}
                         bind:value={workingCopy.entityKind}>
                     {#each possibleEntityKinds as k}
                         <option value={k.value}>
@@ -102,7 +116,13 @@
                     {/each}
                 </select>
                 <div class="help-block">
-                    Determines which classes of entity this assessment is applicable for
+                    Determines which classes of entity this assessment is applicable for.
+                    {#if hasRatings}
+                        <br>
+                        <Icon name="warning"/>
+                        The associated entity kind for this definition cannot be changed as ratings already exist.
+                    {/if}
+
                 </div>
 
 

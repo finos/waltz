@@ -3,14 +3,12 @@
     import ViewLink from "../../../common/svelte/ViewLink.svelte";
     import EntityIcon from "../../../common/svelte/EntityIcon.svelte";
     import SearchInput from "../../../common/svelte/SearchInput.svelte";
-    import MiniActions from "../../../common/svelte/MiniActions.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
     import AssessmentDefinitionEditor from "./AssessmentDefinitionEditor.svelte";
 
     import {termSearch} from "../../../common";
     import {assessmentDefinitionStore} from "../../../svelte-stores/assessment-definition.js";
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
-    import AssessmentDefinitionRemover from "./AssessmentDefinitionRemovalConfirmation.svelte";
     import AssessmentDefinitionRemovalConfirmation from "./AssessmentDefinitionRemovalConfirmation.svelte";
 
     const definitions = assessmentDefinitionStore.loadAll();
@@ -79,6 +77,7 @@
             lastUpdatedBy: "temp-will-be-overwritten-by-server",
             visibility: "SECONDARY"
         };
+        activeMode = Modes.EDIT;
     }
 
     $: console.log({d: $definitions, r: ratingSchemesById});
