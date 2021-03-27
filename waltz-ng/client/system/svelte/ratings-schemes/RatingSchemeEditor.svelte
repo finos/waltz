@@ -6,6 +6,7 @@
 
     export let doCancel;
     export let scheme;
+    export let doSave;
 
     function getRequiredFields(d) {
         return [d.name, d.description];
@@ -17,7 +18,7 @@
     $: invalid = _.some(getRequiredFields(workingCopy), v => _.isEmpty(v));
 
     function save() {
-        console.log("Save", scheme);
+        doSave(workingCopy);
     }
 </script>
 
@@ -29,35 +30,36 @@
               on:submit|preventDefault={save}>
             <h3>{scheme.name || "NEW"}</h3>
 
-            <!-- NAME -->
-            <label for="name">
-                Name
-                <small class="text-muted">(required)</small>
-            </label>
-            <input class="form-control"
-                   id="name"
-                   required="required"
-                   placeholder="Name of scheme"
-                   bind:value={workingCopy.name}>
-            <div class="help-block">
-                Short name which describes this rating scheme
-            </div>
+            <div class="form-group">
+                <!-- NAME -->
+                <label for="name">
+                    Name
+                    <small class="text-muted">(required)</small>
+                </label>
+                <input class="form-control"
+                       id="name"
+                       required="required"
+                       placeholder="Name of scheme"
+                       bind:value={workingCopy.name}>
+                <div class="help-block">
+                    Short name which describes this rating scheme
+                </div>
 
-            <!-- DESCRIPTION -->
-            <label for="description">
-                Description
-                <small class="text-muted">(required)</small>
-            </label>
-            <textarea id="description"
-                      class="form-control"
-                      rows="12"
-                      style="width: 100%"
-                      required="required"
-                      bind:value={workingCopy.description}/>
-            <div class="help-block">
-                HTML or markdown code, any paths should be absolute
+                <!-- DESCRIPTION -->
+                <label for="description">
+                    Description
+                    <small class="text-muted">(required)</small>
+                </label>
+                <textarea id="description"
+                          class="form-control"
+                          rows="12"
+                          style="width: 100%"
+                          required="required"
+                          bind:value={workingCopy.description}/>
+                <div class="help-block">
+                    HTML or markdown code, any paths should be absolute
+                </div>
             </div>
-
 
             <button type="submit"
                     class="btn btn-success"
@@ -124,6 +126,10 @@
                             Remove
                         </button>
                     </td>
+                </tr>
+            {:else}
+                <tr>
+                    <td colspan="4">No ratings yet</td>
                 </tr>
             {/each}
             </tbody>

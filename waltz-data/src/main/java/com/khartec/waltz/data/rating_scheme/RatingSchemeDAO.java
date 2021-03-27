@@ -96,7 +96,7 @@ public class RatingSchemeDAO {
 
     public Collection<RatingScheme> findAll() {
         Map<Long, Collection<RatingSchemeItem>> itemsByScheme = groupBy(
-                d -> d.ratingSchemeId(),
+                RatingSchemeItem::ratingSchemeId,
                 fetchItems(DSL.trueCondition()));
 
         return dsl
@@ -179,5 +179,20 @@ public class RatingSchemeDAO {
                 .selectFrom(RATING_SCHEME_ITEM)
                 .where(RATING_SCHEME_ITEM.ID.in(ids))
                 .fetchSet(TO_ITEM_MAPPER);
+    }
+
+
+    public Boolean save(RatingScheme scheme) {
+        RatingSchemeRecord r = dsl.newRecord(RATING_SCHEME);
+        r.setName(scheme.name());
+        r.setDescription(scheme.description());
+
+        return scheme.id()
+            .map(id -> {
+                r.setId(id);
+                r.changed(RATING_SCHEME.ID, false);
+                return r.update() == 1;
+            })
+            .orElseGet(() -> r.insert() == 1);
     }
 }

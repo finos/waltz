@@ -3,11 +3,11 @@
     import ViewLink from "../../../common/svelte/ViewLink.svelte";
     import SearchInput from "../../../common/svelte/SearchInput.svelte";
     import RatingSchemePreviewBar from "./RatingSchemePreviewBar.svelte";
+    import RatingSchemeEditor from "./RatingSchemeEditor.svelte";
 
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
     import {termSearch} from "../../../common";
     import Icon from "../../../common/svelte/Icon.svelte";
-    import RatingSchemeEditor from "./RatingSchemeEditor.svelte";
 
 
     const Modes = {
@@ -32,10 +32,30 @@
         activeMode = Modes.EDIT;
     }
 
+    function doSchemeSave(scheme) {
+        return ratingSchemeStore
+            .save(scheme)
+            .then(() => {
+                activeScheme = null;
+                activeMode = Modes.LIST;
+                ratingSchemeStore.loadAll(true);
+            });
+    }
+
     function onCancel() {
         activeScheme = null;
         activeMode = Modes.LIST;
     }
+
+    function mkNew() {
+        activeScheme = {
+            name: null,
+            description: null,
+            ratings: []
+        };
+        activeMode = Modes.EDIT;
+    }
+
 </script>
 
 <PageHeader icon="puzzle-piece"
@@ -62,7 +82,9 @@
     </div>
 
     {#if activeMode === Modes.EDIT}
-        <RatingSchemeEditor scheme={activeScheme} doCancel={onCancel}/>
+        <RatingSchemeEditor scheme={activeScheme}
+                            doCancel={onCancel}
+                            doSave={doSchemeSave}/>
     {:else if activeMode === Modes.LIST}
     <div class="row">
         <div class="col-md-12">
@@ -103,6 +125,11 @@
                 {/each}
                 </tbody>
             </table>
+            <button class="btn-link"
+                    on:click={mkNew}>
+                <Icon name="plus"/>
+                Add new rating scheme
+            </button>
         </div>
     </div>
     {/if}

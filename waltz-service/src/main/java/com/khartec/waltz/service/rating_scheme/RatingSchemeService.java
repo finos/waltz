@@ -63,7 +63,7 @@ public class RatingSchemeService {
     }
 
 
-
-
-
+    public Boolean save(RatingScheme scheme) {
+        return ratingSchemeDAO.save(scheme);
+    }
 }

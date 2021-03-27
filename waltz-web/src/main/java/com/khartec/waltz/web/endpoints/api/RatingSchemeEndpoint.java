@@ -19,30 +19,42 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.rating.RatingScheme;
 import com.khartec.waltz.model.rating.RatingSchemeItem;
+import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.rating_scheme.RatingSchemeService;
+import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
+import spark.Response;
+
+import java.io.IOException;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
 public class RatingSchemeEndpoint implements Endpoint {
 
     private static final String BASE_URL = mkPath("api", "rating-scheme");
+
     private final RatingSchemeService ratingSchemeService;
+    private final UserRoleService userRoleService;
+
 
     @Autowired
-    public RatingSchemeEndpoint(RatingSchemeService ratingSchemeService) {
+    public RatingSchemeEndpoint(RatingSchemeService ratingSchemeService,
+                                UserRoleService userRoleService) {
         checkNotNull(ratingSchemeService, "ratingSchemeService cannot be null");
         this.ratingSchemeService = ratingSchemeService;
+        this.userRoleService = userRoleService;
     }
+
 
     @Override
     public void register() {
@@ -62,5 +74,16 @@ public class RatingSchemeEndpoint implements Endpoint {
         getForList(findRatingSchemeItemsForEntityAndCategoryPath, findRatingSchemeItemsForEntityAndCategoryRoute);
         getForList(findRatingSchemeItemsPath, (req, resp) -> ratingSchemeService.findRatingSchemeItemsByAssessmentDefinition(getId(req)));
         getForDatum(getByIdPath, (req, resp) -> ratingSchemeService.getById(getId(req)));
+        putForDatum(BASE_URL, this::save);
     }
+
+    private Boolean save(Request request, Response response) throws IOException {
+        ensureUserHasEditRights(request);
+        return ratingSchemeService.save(readBody(request, RatingScheme.class));
+    }
+
+    private void ensureUserHasEditRights(Request request) {
+        requireRole(userRoleService, request, SystemRole.ADMIN);
+    }
+
 }
