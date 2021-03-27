@@ -2,7 +2,7 @@
     import _ from "lodash";
 
     import Icon from "../../../common/svelte/Icon.svelte";
-
+    import RatingSchemeItemsEditor from "./RatingSchemeItemsEditor.svelte";
 
     export let doCancel;
     export let scheme;
@@ -20,11 +20,12 @@
     function save() {
         doSave(workingCopy);
     }
+
 </script>
 
 
 <div class="row">
-    <div class="col-md-6">
+    <div class="col-sm-6">
 
         <form autocomplete="off"
               on:submit|preventDefault={save}>
@@ -90,58 +91,8 @@
             {/if}
         </form>
     </div>
-    <div class="col-md-6">
-        <h3>Ratings</h3>
-        <table class="table table-condensed">
-            <thead>
-            <tr>
-                <th width="20%">Rating</th>
-                <th width="15%">Color</th>
-                <th width="35%">Description</th>
-                <th width="30%">Operations</th>
-            </tr>
-            </thead>
-            <tbody>
-            {#each scheme.ratings as rating}
-                <tr>
-                    <td>{rating.name}</td>
-                    <td>
-                        <div class="rating-square"
-                             style="background-color: {rating.color}" />
-                        {rating.color}
-                    </td>
-                    <td>
-                        {rating.description}
-                    </td>
-                    <td>
-                        <button class="btn-link"
-                                aria-label="Edit rating {rating.name}">
-                            <Icon name="edit"/>
-                            Edit
-                        </button>
-                        |
-                        <button class="btn-link"
-                                aria-label="Remove rating {rating.name}">
-                            <Icon name="trash"/>
-                            Remove
-                        </button>
-                    </td>
-                </tr>
-            {:else}
-                <tr>
-                    <td colspan="4">No ratings yet</td>
-                </tr>
-            {/each}
-            </tbody>
-        </table>
+    <div class="col-sm-6">
+        <RatingSchemeItemsEditor ratings={scheme.ratings}/>
     </div>
 </div>
 
-
-<style>
-    .rating-square {
-        display: inline-block;
-        width: 1em;
-        height: 1em;
-    }
-</style>
