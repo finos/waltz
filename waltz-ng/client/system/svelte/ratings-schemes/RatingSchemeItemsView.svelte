@@ -1,7 +1,7 @@
 <script>
     import Icon from "../../../common/svelte/Icon.svelte";
-    import ColorPicker from "./ColorPicker.svelte";
-    import {greyHex, lightGreyHex, yellowHex, goldHex, purpleHex, pinkHex, redHex, amberHex, greenHex, blueHex} from "../../../common/colors";
+
+    import RatingSchemeItemEditor from "./RatingSchemeItemEditor.svelte";
 
     export let ratings = [];
     export let doSave = (s) => console.log("RSI: doSave", s)
@@ -32,25 +32,17 @@
         activeMode = Modes.LIST;
     }
 
+    function save() {
+        console.log("Not yet done!")
+    }
+
 </script>
 
 
 <h3>Ratings</h3>
 
 {#if activeMode === Modes.EDIT}
-    <h4>
-        <div class="rating-square"
-             style="background-color: {activeItem.color}"/>
-        Edit {activeItem.name}
-    </h4>
-
-    <ColorPicker startColor={activeItem.color}
-                 predefinedColors={[greyHex, lightGreyHex, redHex, pinkHex, yellowHex, goldHex, amberHex, greenHex, blueHex, purpleHex]}/>
-
-    <button class="btn-link"
-            on:click={onCancel}>
-        Cancel
-    </button>
+   <RatingSchemeItemEditor item={activeItem}/>
 {/if}
 
 {#if activeMode === Modes.LIST}

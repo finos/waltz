@@ -2,7 +2,7 @@
     import _ from "lodash";
 
     import Icon from "../../../common/svelte/Icon.svelte";
-    import RatingSchemeItemsEditor from "./RatingSchemeItemsEditor.svelte";
+    import RatingSchemeItemsView from "./RatingSchemeItemsView.svelte";
 
     export let doCancel;
     export let scheme;
@@ -92,7 +92,7 @@
         </form>
     </div>
     <div class="col-sm-6">
-        <RatingSchemeItemsEditor ratings={scheme.ratings}/>
+        <RatingSchemeItemsView ratings={scheme.ratings}/>
     </div>
 </div>
 

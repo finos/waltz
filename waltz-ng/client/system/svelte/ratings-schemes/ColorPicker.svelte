@@ -20,14 +20,19 @@
     <label for="custom">Custom</label>
 
     <div class="predefined-colors">
+        Predefined:
         {#each predefinedColors as predefinedColor }
             <button class="color-box"
                     on:click={() => selectedColor = predefinedColor}
                     style="background-color:{predefinedColor}">
             </button>
         {/each}
-        <br>
-        Predefined
+
+        Original:
+        <button class="color-box"
+                on:click={() => selectedColor = startColor}
+                style="background-color:{startColor}">
+        </button>
     </div>
 
 </div>
@@ -41,12 +46,13 @@
     .predefined-colors {
         alignment: center;
         background-color: #fafafa;
-        margin-top: 0.5em;
+        padding-top: 0.5em;
+        padding-left: 0.5em;
     }
 
     input {
-        padding: 0.4em;
-        margin: 10px;
+        margin-top: 1em;
+        margin-left: 1em;
         box-sizing: content-box;
         border: 1px solid #ccc;
         border-radius: 2px;
