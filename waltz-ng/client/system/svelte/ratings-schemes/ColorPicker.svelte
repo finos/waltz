@@ -12,12 +12,12 @@
 </script>
 
 
-<div class="color-picker">
-
+<div>
+    <label class="custom-label"
+           for="custom">Custom:</label>
     <input type="color"
            id="custom"
            bind:value={selectedColor}>
-    <label for="custom">Custom</label>
 
     <div class="predefined-colors">
         Predefined:
@@ -39,19 +39,18 @@
 
 
 <style>
-    .color-picker {
-        border: 1px solid #eee;
+    .custom-label {
+        font-weight: lighter;
     }
 
     .predefined-colors {
+        display: inline-block;
         alignment: center;
-        background-color: #fafafa;
         padding-top: 0.5em;
         padding-left: 0.5em;
     }
 
     input {
-        margin-top: 1em;
         margin-left: 1em;
         box-sizing: content-box;
         border: 1px solid #ccc;
