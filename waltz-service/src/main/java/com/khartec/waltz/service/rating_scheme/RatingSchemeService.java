@@ -66,4 +66,8 @@ public class RatingSchemeService {
     public Boolean save(RatingScheme scheme) {
         return ratingSchemeDAO.save(scheme);
     }
+
+    public Boolean saveRatingItem(long schemeId, RatingSchemeItem item) {
+        return ratingSchemeDAO.saveRatingItem(schemeId, item);
+    }
 }

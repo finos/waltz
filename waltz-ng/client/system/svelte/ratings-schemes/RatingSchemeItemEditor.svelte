@@ -25,7 +25,8 @@
 </script>
 <h4>
     <div class="rating-square"
-         style="background-color: {workingItem.color}"/>
+         style="background-color: {workingItem.color}">
+    </div>
     Edit {workingItem.name}
 </h4>
 

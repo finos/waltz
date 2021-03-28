@@ -59,6 +59,8 @@ public class RatingSchemeEndpoint implements Endpoint {
     @Override
     public void register() {
         String findAllPath = BASE_URL;
+        String saveSchemePath = BASE_URL;
+        String saveRatingItemPath = mkPath(BASE_URL, "id", ":id", "rating-item");
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String findRatingSchemeItemsForEntityAndCategoryPath = mkPath(BASE_URL, "items", "kind", ":kind", "id", ":id", "category-id", ":categoryId");
         String findRatingSchemeItemsPath = mkPath(BASE_URL, "items", "assessment-definition-id", ":id");
@@ -74,10 +76,21 @@ public class RatingSchemeEndpoint implements Endpoint {
         getForList(findRatingSchemeItemsForEntityAndCategoryPath, findRatingSchemeItemsForEntityAndCategoryRoute);
         getForList(findRatingSchemeItemsPath, (req, resp) -> ratingSchemeService.findRatingSchemeItemsByAssessmentDefinition(getId(req)));
         getForDatum(getByIdPath, (req, resp) -> ratingSchemeService.getById(getId(req)));
-        putForDatum(BASE_URL, this::save);
+        putForDatum(saveSchemePath, this::saveScheme);
+        putForDatum(saveRatingItemPath, this::saveRatingItem);
     }
 
-    private Boolean save(Request request, Response response) throws IOException {
+
+    private Boolean saveRatingItem(Request request, Response response) throws IOException {
+        ensureUserHasEditRights(request);
+        long schemeId = getId(request);
+        return ratingSchemeService.saveRatingItem(
+                schemeId,
+                readBody(request, RatingSchemeItem.class));
+    }
+
+
+    private Boolean saveScheme(Request request, Response response) throws IOException {
         ensureUserHasEditRights(request);
         return ratingSchemeService.save(readBody(request, RatingScheme.class));
     }

@@ -19,8 +19,9 @@
 package com.khartec.waltz.data.rating_scheme;
 
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.rating.*;
+import com.khartec.waltz.model.rating.ImmutableRatingScheme;
 import com.khartec.waltz.model.rating.ImmutableRatingSchemeItem;
+import com.khartec.waltz.model.rating.RatingScheme;
 import com.khartec.waltz.model.rating.RatingSchemeItem;
 import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.records.RatingSchemeItemRecord;
@@ -31,7 +32,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
@@ -41,7 +41,9 @@ import static com.khartec.waltz.schema.Tables.ASSESSMENT_RATING;
 import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
 import static com.khartec.waltz.schema.tables.RatingScheme.RATING_SCHEME;
 import static com.khartec.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 
 @Repository
 public class RatingSchemeDAO {
@@ -95,8 +97,8 @@ public class RatingSchemeDAO {
 
 
     public Collection<RatingScheme> findAll() {
-        Map<Long, Collection<RatingSchemeItem>> itemsByScheme = groupBy(
-                RatingSchemeItem::ratingSchemeId,
+        Map<Optional<Long>, Collection<RatingSchemeItem>> itemsByScheme = groupBy(
+                rsi -> Optional.of(rsi.ratingSchemeId()),
                 fetchItems(DSL.trueCondition()));
 
         return dsl
@@ -106,9 +108,9 @@ public class RatingSchemeDAO {
                 .map(s -> ImmutableRatingScheme
                         .copyOf(s)
                         .withRatings(itemsByScheme.getOrDefault(
-                                s.id().get(),
-                                Collections.emptyList())))
-                .collect(Collectors.toList());
+                                s.id(),
+                                emptyList())))
+                .collect(toList());
     }
 
 
@@ -195,4 +197,11 @@ public class RatingSchemeDAO {
             })
             .orElseGet(() -> r.insert() == 1);
     }
+
+
+    public Boolean saveRatingItem(long schemeId, RatingSchemeItem item) {
+        //TODO: 5350: wip
+        return false;
+    }
+
 }
