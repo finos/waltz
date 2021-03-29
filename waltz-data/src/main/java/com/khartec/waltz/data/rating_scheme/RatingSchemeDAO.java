@@ -18,11 +18,9 @@
 
 package com.khartec.waltz.data.rating_scheme;
 
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.rating.ImmutableRatingScheme;
-import com.khartec.waltz.model.rating.ImmutableRatingSchemeItem;
-import com.khartec.waltz.model.rating.RatingScheme;
-import com.khartec.waltz.model.rating.RatingSchemeItem;
+import com.khartec.waltz.model.rating.*;
 import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.records.RatingSchemeItemRecord;
 import com.khartec.waltz.schema.tables.records.RatingSchemeRecord;
@@ -52,6 +50,7 @@ public class RatingSchemeDAO {
     public static final Field<Boolean> IS_RESTRICTED_FIELD = DSL.coalesce(
             DSL.field(Tables.RATING_SCHEME_ITEM.POSITION.lt(CONSTRAINING_RATING.POSITION)), false)
             .as("isRestricted");
+
 
 
     public static final RecordMapper<Record, RatingSchemeItem> TO_ITEM_MAPPER = record -> {
@@ -219,4 +218,61 @@ public class RatingSchemeDAO {
                 .orElseGet(() -> r.insert() == 1);
     }
 
+
+    public Boolean removeRatingItem(long itemId) {
+        return dsl
+                .deleteFrom(RATING_SCHEME_ITEM)
+                .where(RATING_SCHEME_ITEM.ID.eq(itemId))
+                .execute() == 1;
+    }
+
+
+    public List<RatingSchemeItemUsageCount> calcRatingUsageStats() {
+
+        com.khartec.waltz.schema.tables.RatingSchemeItem rsi = RATING_SCHEME_ITEM.as("rsi");
+        com.khartec.waltz.schema.tables.RatingScheme rs = RATING_SCHEME.as("rs");
+        com.khartec.waltz.schema.tables.AssessmentRating ar = ASSESSMENT_RATING.as("ar");
+        com.khartec.waltz.schema.tables.MeasurableRating mr = MEASURABLE_RATING.as("mr");
+        com.khartec.waltz.schema.tables.Measurable m = MEASURABLE.as("m");
+        com.khartec.waltz.schema.tables.MeasurableCategory mc = MEASURABLE_CATEGORY.as("mc");
+        com.khartec.waltz.schema.tables.ScenarioRatingItem sri = SCENARIO_RATING_ITEM.as("sri");
+        com.khartec.waltz.schema.tables.Scenario s = SCENARIO.as("s");
+        com.khartec.waltz.schema.tables.Roadmap r = ROADMAP.as("r");
+
+        SelectHavingStep<Record3<Long, String, Integer>> assessmentCounts = dsl
+                .select(rsi.ID, DSL.val("ASSESSMENT_RATING"), DSL.count())
+                .from(ar)
+                .innerJoin(rsi).on(rsi.ID.eq(ar.RATING_ID))
+                .groupBy(rsi.ID);
+
+        SelectHavingStep<Record3<Long, String, Integer>> measurableCounts = dsl
+                .select(rsi.ID, DSL.val("MEASURABLE_RATING"), DSL.count())
+                .from(mr)
+                .innerJoin(m).on(m.ID.eq(mr.MEASURABLE_ID))
+                .innerJoin(mc).on(mc.ID.eq(m.MEASURABLE_CATEGORY_ID))
+                .innerJoin(rs).on(rs.ID.eq(mc.RATING_SCHEME_ID))
+                .innerJoin(rsi).on(rsi.CODE.eq(mr.RATING)).and(rsi.SCHEME_ID.eq(rs.ID))
+                .groupBy(rsi.ID);
+
+        SelectHavingStep<Record3<Long, String, Integer>> scenarioCounts = dsl
+                .select(rsi.ID, DSL.val("SCENARIO"), DSL.count())
+                .from(sri)
+                .innerJoin(s).on(s.ID.eq(sri.SCENARIO_ID))
+                .innerJoin(r).on(r.ID.eq(s.ROADMAP_ID))
+                .innerJoin(rs).on(rs.ID.eq(r.RATING_SCHEME_ID))
+                .innerJoin(rsi).on(rsi.CODE.eq(sri.RATING)).and(rsi.SCHEME_ID.eq(rs.ID))
+                .groupBy(rsi.ID);
+
+        return assessmentCounts
+                .union(measurableCounts)
+                .union(scenarioCounts)
+                .fetch(res -> ImmutableRatingSchemeItemUsageCount
+                        .builder()
+                        .ratingId(res.get(0, Long.class))
+                        .usageKind(EntityKind.valueOf(res.get(1, String.class)))
+                        .count(res.get(2, Integer.class))
+                        .build());
+
+
+    }
 }

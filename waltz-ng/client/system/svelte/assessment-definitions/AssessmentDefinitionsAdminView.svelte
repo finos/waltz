@@ -158,7 +158,7 @@
 
                         </td>
                         <td>
-                            <RatingSchemePreviewBar scheme={ratingSchemesById[def.ratingSchemeId]}/>
+                            <RatingSchemePreviewBar items={ratingSchemesById[def.ratingSchemeId]?.ratings}/>
                         </td>
                         <td>
                             <EntityIcon kind={def.entityKind}/>

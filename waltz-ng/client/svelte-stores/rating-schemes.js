@@ -46,11 +46,25 @@ export function mkStore() {
             `api/rating-scheme/id/${ratingSchemeItem.ratingSchemeId}/rating-item`,
             ratingSchemeItem);
 
+    const removeItem = (itemId) => remote
+        .execute(
+            "DELETE",
+            `api/rating-scheme/items/id/${itemId}`);
+
+    const calcRatingUsageStats = (force) => remote
+        .fetchViewList(
+            "GET",
+            "api/rating-scheme/items/usage",
+            null,
+            {force});
+
     return {
+        calcRatingUsageStats,
         getById,
         loadAll,
         save,
-        saveItem
+        saveItem,
+        removeItem
     };
 }
 

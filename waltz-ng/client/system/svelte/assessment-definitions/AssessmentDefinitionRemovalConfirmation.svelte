@@ -5,7 +5,9 @@
     export let doCancel;
     export let doRemove;
 
+    let ratingCall, ratings;
     let canRemove = false;
+
 
     $: ratingCall = assessmentRatingStore.findByDefinitionId(definition.id);
     $: ratings = $ratingCall.data;

@@ -64,6 +64,8 @@ public class RatingSchemeEndpoint implements Endpoint {
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String findRatingSchemeItemsForEntityAndCategoryPath = mkPath(BASE_URL, "items", "kind", ":kind", "id", ":id", "category-id", ":categoryId");
         String findRatingSchemeItemsPath = mkPath(BASE_URL, "items", "assessment-definition-id", ":id");
+        String calcRatingUsageStatsPath = mkPath(BASE_URL, "items", "usage");
+        String removeRatingItemPath = mkPath(BASE_URL, "items", "id", ":id");
 
         ListRoute<RatingSchemeItem> findRatingSchemeItemsForEntityAndCategoryRoute = (request, response) -> {
             EntityReference ref = getEntityReference(request);
@@ -78,6 +80,14 @@ public class RatingSchemeEndpoint implements Endpoint {
         getForDatum(getByIdPath, (req, resp) -> ratingSchemeService.getById(getId(req)));
         putForDatum(saveSchemePath, this::saveScheme);
         putForDatum(saveRatingItemPath, this::saveRatingItem);
+        getForList(calcRatingUsageStatsPath, (req, resp) -> ratingSchemeService.calcRatingUsageStats());
+        deleteForDatum(removeRatingItemPath, this::removeRatingItem);
+    }
+
+
+    private Boolean removeRatingItem(Request request, Response response) {
+        ensureUserHasEditRights(request);
+        return ratingSchemeService.removeRatingItem(getId(request));
     }
 
 

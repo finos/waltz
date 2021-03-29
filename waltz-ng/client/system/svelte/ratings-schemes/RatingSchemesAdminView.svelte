@@ -66,6 +66,15 @@
     }
 
 
+    function doRemoveItem(itemId) {
+        return ratingSchemeStore
+            .removeItem(itemId)
+            .then(() => {
+                ratingSchemeStore.loadAll(true);
+            });
+    }
+
+
     function onCancel() {
         activeScheme = null;
         activeMode = Modes.LIST;
@@ -116,6 +125,7 @@
         <ItemsView scheme={activeScheme}
                    ratings={sortItems(activeScheme.ratings)}
                    doCancel={onCancel}
+                   doRemove={doRemoveItem}
                    doSave={doSaveItem}/>
 
     {:else if activeMode === Modes.LIST}

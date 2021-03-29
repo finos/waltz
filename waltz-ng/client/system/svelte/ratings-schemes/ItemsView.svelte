@@ -5,7 +5,10 @@
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
     import {blueHex} from "../../../common/colors";
 
+    import ItemRemovalConfirmation from "./ItemRemovalConfirmation.svelte";
+
     export let doSave;
+    export let doRemove;
     export let doCancel;
     export let ratings;
     export let scheme;
@@ -16,8 +19,19 @@
         DELETE: "delete"
     };
 
+    const usageCall = ratingSchemeStore.calcRatingUsageStats();
+
     let activeMode = Modes.LIST;
     let activeItem = null;
+
+    $: usageData = $usageCall.data;
+    $: usageCountsByRatingId = _.reduce(
+        usageData,
+        (acc, d) => {
+            acc[d.ratingId] = (acc[d.ratingId] || 0) + d.count;
+            return acc;
+        },
+        {});
 
 
     function mkNew() {
@@ -37,6 +51,12 @@
     }
 
 
+    function onDelete(item) {
+        activeItem = Object.assign({}, item);
+        activeMode = Modes.DELETE;
+    }
+
+
     function onCancel() {
         activeItem = null;
         activeMode = Modes.LIST;
@@ -51,8 +71,13 @@
             });
     }
 
-
-    $: console.log({ratings})
+    function onRemove(itemId) {
+        doRemove(itemId)
+            .then(() => {
+                activeItem = null;
+                activeMode = Modes.LIST;
+            });
+    }
 
 </script>
 
@@ -65,14 +90,21 @@
                            doCancel={onCancel} />
 {/if}
 
+{#if activeMode === Modes.DELETE}
+   <ItemRemovalConfirmation item={activeItem}
+                            doRemove={onRemove}
+                            doCancel={onCancel} />
+{/if}
+
 {#if activeMode === Modes.LIST}
     <table class="table table-striped table-hover table-condensed">
         <thead>
         <tr>
-            <th width="25%">Rating</th>
-            <th width="25%">Color</th>
-            <th width="25%">Description</th>
-            <th width="25%">Operations</th>
+            <th width="20%">Rating</th>
+            <th width="20%">Color</th>
+            <th width="20%">Description</th>
+            <th width="20%">Usages</th>
+            <th width="20%">Operations</th>
         </tr>
         </thead>
         <tbody>
@@ -81,11 +113,15 @@
                 <td>{rating.name}</td>
                 <td>
                     <div class="rating-square"
-                         style="background-color: {rating.color}" />
+                         style="background-color: {rating.color}">
+                    </div>
                     {rating.color}
                 </td>
                 <td>
                     {rating.description}
+                </td>
+                <td>
+                    {usageCountsByRatingId[rating.id] || "-"}
                 </td>
                 <td>
                     <button class="btn-link"
@@ -96,6 +132,8 @@
                     </button>
                     |
                     <button class="btn-link"
+                            on:click={() => onDelete(rating)}
+                            disabled={usageCountsByRatingId[rating.id] || 0 > 0}
                             aria-label="Remove rating {rating.name}">
                         <Icon name="trash"/>
                         Remove
@@ -104,13 +142,13 @@
             </tr>
         {:else}
             <tr>
-                <td colspan="4">No ratings yet</td>
+                <td colspan="5">No ratings yet</td>
             </tr>
         {/each}
         </tbody>
         <tfoot>
             <tr>
-                <td colspan="4">
+                <td colspan="5">
                     <button class="btn-link"
                             on:click={mkNew}>
                         <Icon name="plus"/>
@@ -133,5 +171,13 @@
         display: inline-block;
         width: 1em;
         height: 1em;
+    }
+
+    button:disabled {
+        color: #999
+    }
+
+    button:disabled:hover {
+        cursor: not-allowed;
     }
 </style>

@@ -22,6 +22,7 @@ import com.khartec.waltz.data.rating_scheme.RatingSchemeDAO;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.rating.RatingSchemeItem;
 import com.khartec.waltz.model.rating.RatingScheme;
+import com.khartec.waltz.model.rating.RatingSchemeItemUsageCount;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -67,7 +68,18 @@ public class RatingSchemeService {
         return ratingSchemeDAO.save(scheme);
     }
 
+
     public Boolean saveRatingItem(long schemeId, RatingSchemeItem item) {
         return ratingSchemeDAO.saveRatingItem(schemeId, item);
+    }
+
+
+    public Boolean removeRatingItem(long itemId) {
+        return ratingSchemeDAO.removeRatingItem(itemId);
+    }
+
+
+    public List<RatingSchemeItemUsageCount> calcRatingUsageStats() {
+        return ratingSchemeDAO.calcRatingUsageStats();
     }
 }
