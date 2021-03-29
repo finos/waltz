@@ -23,7 +23,7 @@
         Predefined:
         {#each predefinedColors as predefinedColor }
             <button class="color-box"
-                    on:click={() => selectedColor = predefinedColor}
+                    on:click|preventDefault={() => selectedColor = predefinedColor}
                     style="background-color:{predefinedColor}">
             </button>
         {/each}

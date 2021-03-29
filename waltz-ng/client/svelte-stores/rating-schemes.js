@@ -40,10 +40,17 @@ export function mkStore() {
             `api/rating-scheme`,
             scheme);
 
+    const saveItem = (ratingSchemeItem) => remote
+        .execute(
+            "PUT",
+            `api/rating-scheme/id/${ratingSchemeItem.ratingSchemeId}/rating-item`,
+            ratingSchemeItem);
+
     return {
         getById,
         loadAll,
-        save
+        save,
+        saveItem
     };
 }
 

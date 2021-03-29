@@ -2,11 +2,10 @@
     import _ from "lodash";
 
     import Icon from "../../../common/svelte/Icon.svelte";
-    import RatingSchemeItemsView from "./RatingSchemeItemsView.svelte";
 
-    export let doCancel;
     export let scheme;
-    export let doSave;
+    export let doCancel;
+    export let doSaveScheme;
 
     function getRequiredFields(d) {
         return [d.name, d.description];
@@ -17,19 +16,18 @@
 
     $: invalid = _.some(getRequiredFields(workingCopy), v => _.isEmpty(v));
 
-    function save() {
-        doSave(workingCopy);
+    function saveScheme() {
+        doSaveScheme(workingCopy);
     }
 
 </script>
 
 
 <div class="row">
-    <div class="col-sm-6">
-
+    <div class="col-sm-12">
         <form autocomplete="off"
-              on:submit|preventDefault={save}>
-            <h3>{scheme.name || "NEW"}</h3>
+              on:submit|preventDefault={saveScheme}>
+            <h3>Scheme <small>{scheme?.name || "NEW"}</small></h3>
 
             <div class="form-group">
                 <!-- NAME -->
@@ -91,8 +89,8 @@
             {/if}
         </form>
     </div>
-    <div class="col-sm-6">
-        <RatingSchemeItemsView ratings={scheme.ratings}/>
-    </div>
 </div>
+
+<style>
+</style>
 

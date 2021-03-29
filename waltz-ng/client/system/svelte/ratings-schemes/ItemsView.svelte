@@ -1,10 +1,14 @@
 <script>
     import Icon from "../../../common/svelte/Icon.svelte";
 
-    import RatingSchemeItemEditor from "./RatingSchemeItemEditor.svelte";
+    import RatingSchemeItemEditor from "./ItemEditor.svelte";
+    import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
+    import {blueHex} from "../../../common/colors";
 
-    export let ratings = [];
-    export let doSave = (s) => console.log("RSI: doSave", s)
+    export let doSave;
+    export let doCancel;
+    export let ratings;
+    export let scheme;
 
     const Modes = {
         LIST: "list",
@@ -15,44 +19,60 @@
     let activeMode = Modes.LIST;
     let activeItem = null;
 
+
     function mkNew() {
         activeItem = {
-            name: "NEW"
+            position: 0,
+            ratingSchemeId: scheme.id,
+            color: blueHex,
+            userSelectable: true
         };
         activeMode = Modes.EDIT;
     }
+
 
     function onEdit(item) {
         activeItem = Object.assign({}, item);
         activeMode = Modes.EDIT;
     }
 
+
     function onCancel() {
         activeItem = null;
         activeMode = Modes.LIST;
     }
 
-    function save() {
-        console.log("Not yet done!")
+
+    function onSave(item) {
+        doSave(item)
+            .then(() => {
+                activeItem = null;
+                activeMode = Modes.LIST;
+            });
     }
+
+
+    $: console.log({ratings})
 
 </script>
 
 
-<h3>Ratings</h3>
+<h3>Ratings <small>{scheme.name}</small></h3>
 
 {#if activeMode === Modes.EDIT}
-   <RatingSchemeItemEditor item={activeItem}/>
+   <RatingSchemeItemEditor item={activeItem}
+                           doSave={onSave}
+                           doCancel={onCancel} />
 {/if}
 
 {#if activeMode === Modes.LIST}
-    <table class="table table-condensed">
+    <table class="table table-striped table-hover table-condensed">
         <thead>
         <tr>
-            <th width="20%">Rating</th>
-            <th width="15%">Color</th>
-            <th width="35%">Description</th>
-            <th width="30%">Operations</th>
+            <th width="25%">Rating</th>
+            <th width="25%">Color</th>
+            <th width="25%">Description</th>
+            <th width="25%">Operations</th>
         </tr>
         </thead>
         <tbody>
@@ -88,13 +108,25 @@
             </tr>
         {/each}
         </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="4">
+                    <button class="btn-link"
+                            on:click={mkNew}>
+                        <Icon name="plus"/>
+                        Add new rating scheme item
+                    </button>
+                </td>
+            </tr>
+        </tfoot>
     </table>
-    <button class="btn-link"
-            on:click={mkNew}>
-        <Icon name="plus"/>
-        Add new rating scheme item
+
+    <button class="btn btn-link"
+            on:click={doCancel}>
+        Cancel
     </button>
 {/if}
+
 
 <style>
     .rating-square {

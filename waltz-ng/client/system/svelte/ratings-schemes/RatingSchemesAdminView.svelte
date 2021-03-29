@@ -2,17 +2,20 @@
     import PageHeader from "../../../common/svelte/PageHeader.svelte";
     import ViewLink from "../../../common/svelte/ViewLink.svelte";
     import SearchInput from "../../../common/svelte/SearchInput.svelte";
-    import RatingSchemePreviewBar from "./RatingSchemePreviewBar.svelte";
-    import RatingSchemeEditor from "./RatingSchemeEditor.svelte";
+    import ItemPreviewBar from "./ItemPreviewBar.svelte";
+    import SchemeEditor from "./SchemeEditor.svelte";
+    import ItemsView from "./ItemsView.svelte";
+    import Icon from "../../../common/svelte/Icon.svelte";
 
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
     import {termSearch} from "../../../common";
-    import Icon from "../../../common/svelte/Icon.svelte";
+    import {sortItems} from "./rating-scheme-utils";
 
 
     const Modes = {
         LIST: "list",
-        EDIT: "edit",
+        EDIT_SCHEME: "edit_scheme",
+        EDIT_RATINGS: "edit_ratings",
         DELETE: "delete"
     };
 
@@ -27,12 +30,23 @@
         .orderBy("name")
         .value();
 
-    function onEdit(scheme) {
+    $: activeScheme = activeScheme
+        ? _.find(ratingSchemes, ({id: activeScheme.id}))
+        : null;
+
+
+    function onEditScheme(scheme) {
         activeScheme = scheme;
-        activeMode = Modes.EDIT;
+        activeMode = Modes.EDIT_SCHEME;
     }
 
-    function doSchemeSave(scheme) {
+    function onEditRatings(scheme) {
+        activeScheme = scheme;
+        activeMode = Modes.EDIT_RATINGS;
+    }
+
+
+    function doSaveScheme(scheme) {
         return ratingSchemeStore
             .save(scheme)
             .then(() => {
@@ -41,6 +55,16 @@
                 ratingSchemeStore.loadAll(true);
             });
     }
+
+
+    function doSaveItem(item) {
+        return ratingSchemeStore
+            .saveItem(item)
+            .then(() => {
+                ratingSchemeStore.loadAll(true);
+            });
+    }
+
 
     function onCancel() {
         activeScheme = null;
@@ -53,7 +77,7 @@
             description: null,
             ratings: []
         };
-        activeMode = Modes.EDIT;
+        activeMode = Modes.EDIT_SCHEME;
     }
 
 </script>
@@ -81,10 +105,19 @@
         </div>
     </div>
 
-    {#if activeMode === Modes.EDIT}
-        <RatingSchemeEditor scheme={activeScheme}
+    {#if activeMode === Modes.EDIT_SCHEME}
+
+        <SchemeEditor scheme={activeScheme}
                             doCancel={onCancel}
-                            doSave={doSchemeSave}/>
+                            {doSaveScheme}/>
+
+    {:else if activeMode === Modes.EDIT_RATINGS}
+
+        <ItemsView scheme={activeScheme}
+                   ratings={sortItems(activeScheme.ratings)}
+                   doCancel={onCancel}
+                   doSave={doSaveItem}/>
+
     {:else if activeMode === Modes.LIST}
     <div class="row">
         <div class="col-md-12">
@@ -108,7 +141,7 @@
                             </span>
                         </td>
                         <td>
-                            <RatingSchemePreviewBar {scheme}/>
+                            <ItemPreviewBar items={sortItems(scheme.ratings)}/>
                         </td>
                         <td>
                             {scheme.description}
@@ -116,20 +149,33 @@
                         <td>
                             <button class="btn-link"
                                     aria-label="Edit {scheme.name}"
-                                    on:click={() => onEdit(scheme)}>
+                                    on:click={() => onEditScheme(scheme)}>
                                 <Icon name="edit"/>
-                                Edit
+                                Edit Scheme
+                            </button>
+                            |
+                            <button class="btn-link"
+                                    aria-label="Edit {scheme.name}"
+                                    on:click={() => onEditRatings(scheme)}>
+                                <Icon name="edit"/>
+                                Edit Ratings
                             </button>
                         </td>
                     </tr>
                 {/each}
                 </tbody>
+                <tfoot>
+                <tr>
+                    <td colspan="4">
+                        <button class="btn-link"
+                                on:click={mkNew}>
+                            <Icon name="plus"/>
+                            Add new rating scheme
+                        </button>
+                    </td>
+                </tr>
+                </tfoot>
             </table>
-            <button class="btn-link"
-                    on:click={mkNew}>
-                <Icon name="plus"/>
-                Add new rating scheme
-            </button>
         </div>
     </div>
     {/if}

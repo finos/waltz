@@ -1,10 +1,11 @@
 <script>
-    export let scheme;
+    export let items;
+
 </script>
 
-{#if scheme}
+{#if items}
 <ul class="list-inline">
-    {#each scheme.ratings || [] as rating}
+    {#each items || [] as rating}
         <li>
             <div class="rating-square"
                  title={ rating.name }

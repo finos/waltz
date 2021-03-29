@@ -10,7 +10,7 @@
     import {assessmentDefinitionStore} from "../../../svelte-stores/assessment-definition.js";
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
     import AssessmentDefinitionRemovalConfirmation from "./AssessmentDefinitionRemovalConfirmation.svelte";
-    import RatingSchemePreviewBar from "../ratings-schemes/RatingSchemePreviewBar.svelte";
+    import RatingSchemePreviewBar from "../ratings-schemes/ItemPreviewBar.svelte";
 
     const definitions = assessmentDefinitionStore.loadAll();
     const ratingSchemes = ratingSchemeStore.loadAll();
@@ -107,6 +107,13 @@
                 Assessment definitions are applicable to a wide range of Waltz entities and are often used
                   in conjunction with <i>Report Grids</i> and for ad-hoc data capture and reporting.
             </p>
+
+            <div class="alert alert-warning">
+                Please note you cannot change the associate rating scheme items (e.g. names and colors) from this page.
+                Rating schemes are shared across multiple assessments and measurable ratings.
+                <br>
+                To edit them use the <a href="system/rating-schemes">Rating schemes admin page</a>.
+            </div>
         </div>
     </div>
 
