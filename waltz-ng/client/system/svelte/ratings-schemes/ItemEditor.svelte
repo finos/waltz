@@ -33,9 +33,10 @@
     ];
 
     let workingCopy = Object.assign({}, item);
+    let savePromise = null;
 
     function save() {
-        doSave(workingCopy);
+        savePromise = doSave(workingCopy);
     }
 
     function onSelectColor(evt) {
@@ -169,6 +170,23 @@
             on:click={doCancel}>
         Cancel
     </button>
+
+    {#if savePromise}
+        {#await savePromise}
+            Saving...
+        {:then r}
+            Saved!
+        {:catch e}
+            <span class="alert alert-warning">
+                Failed to save rating item. Reason: {e.error}
+                <button class="btn-link"
+                        on:click={() => savePromise = null}>
+                    <Icon name="check"/>
+                    Okay
+                </button>
+            </span>
+        {/await}
+    {/if}
 </form>
 
 

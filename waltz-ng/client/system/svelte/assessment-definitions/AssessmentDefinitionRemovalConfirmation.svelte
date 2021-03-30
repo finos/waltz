@@ -1,4 +1,6 @@
 <script>
+    import Icon from "../../../common/svelte/Icon.svelte";
+
     import {assessmentRatingStore} from "../../../svelte-stores/assessment-rating";
 
     export let definition;
@@ -7,14 +9,14 @@
 
     let ratingCall, ratings;
     let canRemove = false;
-
+    let removePromise = null;
 
     $: ratingCall = assessmentRatingStore.findByDefinitionId(definition.id);
     $: ratings = $ratingCall.data;
     $: canRemove = ratings.length === 0;
 
     function onRemove() {
-        doRemove(definition.id);
+        removePromise = doRemove(definition.id);
     }
 </script>
 
@@ -72,6 +74,24 @@
                 on:click={() => doCancel()}>
             Cancel
         </button>
+
+
+        {#if removePromise}
+            {#await removePromise}
+                Removing...
+            {:then r}
+                Removed!
+            {:catch e}
+            <span class="alert alert-warning">
+                Failed to remove assessment definition. Reason: {e.error}
+                <button class="btn-link"
+                        on:click={() => removePromise = null}>
+                    <Icon name="check"/>
+                    Okay
+                </button>
+            </span>
+            {/await}
+        {/if}
     </div>
 {/if}
 

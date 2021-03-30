@@ -96,7 +96,7 @@ public class AssessmentDefinitionEndpoint implements Endpoint {
 
 
     private void ensureUserHasEditRights(Request request) {
-        requireRole(userRoleService, request, SystemRole.ADMIN);
+        requireAnyRole(userRoleService, request, SystemRole.ASSESSMENT_DEFINITION_ADMIN, SystemRole.ADMIN);
     }
 
 

@@ -64,7 +64,7 @@
 
 
     function onSave(item) {
-        doSave(item)
+        return doSave(item)
             .then(() => {
                 activeItem = null;
                 activeMode = Modes.LIST;
@@ -72,7 +72,7 @@
     }
 
     function onRemove(itemId) {
-        doRemove(itemId)
+        return doRemove(itemId)
             .then(() => {
                 activeItem = null;
                 activeMode = Modes.LIST;

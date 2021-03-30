@@ -323,4 +323,25 @@
     </changeSet>
 
 
+    <changeSet id="20210310-5350-2"
+               author="davidwatkins73">
+        <comment>5350: add fk from assessment def to ratings</comment>
+
+        <insert tableName="role">
+            <column name="name" value="Rating Scheme Admin"/>
+            <column name="key" value="RATING_SCHEME_ADMIN"/>
+            <column name="description" value="Can modify rating schemes"/>
+            <column name="is_custom" valueBoolean="false"/>
+        </insert>
+
+        <insert tableName="role">
+            <column name="name" value="Assessment Definition Admin"/>
+            <column name="key" value="ASSESSMENT_DEFINITION_ADMIN"/>
+            <column name="description" value="Can modify assessment definitions"/>
+            <column name="is_custom" valueBoolean="false"/>
+        </insert>
+
+    </changeSet>
+
+
 </databaseChangeLog>

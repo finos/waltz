@@ -1,10 +1,13 @@
 <script>
+    import Icon from "../../../common/svelte/Icon.svelte";
     export let item;
     export let doCancel;
     export let doRemove;
 
+    let removePromise = null;
+
     function onRemove() {
-        doRemove(item.id);
+        removePromise = doRemove(item.id);
     }
 </script>
 
@@ -26,6 +29,23 @@
             on:click={() => doCancel()}>
         Cancel
     </button>
+
+    {#if removePromise}
+        {#await removePromise}
+            Removing...
+        {:then r}
+            Removed!
+        {:catch e}
+            <span class="alert alert-warning">
+                Failed to remove rating item. Reason: {e.error}
+                <button class="btn-link"
+                        on:click={() => removePromise = null}>
+                    <Icon name="check"/>
+                    Okay
+                </button>
+            </span>
+        {/await}
+    {/if}
 </div>
 
 <style>

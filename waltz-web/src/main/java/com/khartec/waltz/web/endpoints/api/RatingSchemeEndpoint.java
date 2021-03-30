@@ -116,7 +116,7 @@ public class RatingSchemeEndpoint implements Endpoint {
     }
 
     private void ensureUserHasEditRights(Request request) {
-        requireRole(userRoleService, request, SystemRole.ADMIN);
+        requireAnyRole(userRoleService, request, SystemRole.RATING_SCHEME_ADMIN, SystemRole.ADMIN);
     }
 
 }

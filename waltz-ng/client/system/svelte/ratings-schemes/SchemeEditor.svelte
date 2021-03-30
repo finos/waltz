@@ -17,7 +17,7 @@
     $: invalid = _.some(getRequiredFields(workingCopy), v => _.isEmpty(v));
 
     function saveScheme() {
-        doSaveScheme(workingCopy);
+        savePromise = doSaveScheme(workingCopy);
     }
 
 </script>
@@ -77,14 +77,14 @@
                 {:then r}
                     Saved!
                 {:catch e}
-            <span class="alert alert-warning">
-                Failed to save assessment definition. Reason: {e.error}
-                <button class="btn-link"
-                        on:click={() => savePromise = null}>
-                    <Icon name="check"/>
-                    Okay
-                </button>
-            </span>
+                    <span class="alert alert-warning">
+                        Failed to save scheme. Reason: {e.error}
+                        <button class="btn-link"
+                                on:click={() => savePromise = null}>
+                            <Icon name="check"/>
+                            Okay
+                        </button>
+                    </span>
                 {/await}
             {/if}
         </form>
