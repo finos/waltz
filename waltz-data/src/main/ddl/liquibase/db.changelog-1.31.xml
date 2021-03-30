@@ -280,7 +280,8 @@
     </changeSet>
 
     <changeSet id="20210310-5330-2"
-               author="davidwatkins73">
+               author="davidwatkins73"
+               dbms="postgresql">
         <comment>5330: add external id to actor table</comment>
         <addUniqueConstraint columnNames="external_id"
                              constraintName="unique_actor_ext_id"
