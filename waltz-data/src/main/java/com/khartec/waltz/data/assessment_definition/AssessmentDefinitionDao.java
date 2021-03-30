@@ -19,6 +19,7 @@
 package com.khartec.waltz.data.assessment_definition;
 
 
+import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
 import com.khartec.waltz.model.assessment_definition.AssessmentVisibility;
@@ -30,6 +31,7 @@ import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
@@ -90,4 +92,40 @@ public class AssessmentDefinitionDao {
                 .fetch(TO_DOMAIN);
     }
 
+
+    public int save(AssessmentDefinition def) {
+        AssessmentDefinitionRecord r = dsl.newRecord(ASSESSMENT_DEFINITION);
+
+        r.setName(def.name());
+        r.setEntityKind(def.entityKind().name());
+        r.setRatingSchemeId(def.ratingSchemeId());
+
+        r.setExternalId(def.externalId().orElse(null));
+        r.setDescription(def.description());
+        r.setVisibility(def.visibility().name());
+
+        r.setIsReadonly(def.isReadOnly());
+        r.setPermittedRole(def.permittedRole().orElse(null));
+
+        r.setLastUpdatedAt(Timestamp.valueOf(def.lastUpdatedAt()));
+        r.setLastUpdatedBy(def.lastUpdatedBy());
+        r.setProvenance(StringUtilities.ifEmpty(def.provenance(), "waltz"));
+
+        def.id().ifPresent(r::setId);
+
+        if (r.getId() == null) {
+            return r.insert();
+        } else {
+            r.changed(ASSESSMENT_DEFINITION.ID, false);
+            return r.update();
+        }
+
+    }
+
+    public int remove(long definitionId) {
+        return dsl
+                .deleteFrom(ASSESSMENT_DEFINITION)
+                .where(ASSESSMENT_DEFINITION.ID.eq(definitionId))
+                .execute();
+    }
 }

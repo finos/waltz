@@ -24,7 +24,6 @@ import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.assessment_definition.AssessmentVisibility;
 import com.khartec.waltz.model.assessment_rating.AssessmentRating;
 import com.khartec.waltz.model.assessment_rating.ImmutableAssessmentRating;
 import com.khartec.waltz.model.assessment_rating.RemoveAssessmentRatingCommand;
@@ -134,23 +133,21 @@ public class AssessmentRatingDao {
     }
 
 
-    public List<AssessmentRating> findByEntityKind(EntityKind kind, List<AssessmentVisibility> visibilities) {
+    public List<AssessmentRating> findByEntityKind(EntityKind kind) {
         return dsl.select(ASSESSMENT_RATING.fields())
                 .from(ASSESSMENT_RATING)
                 .innerJoin(ASSESSMENT_DEFINITION).on(ASSESSMENT_DEFINITION.ID.eq(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID))
                 .where(ASSESSMENT_RATING.ENTITY_KIND.eq(kind.name()))
-                .and(ASSESSMENT_DEFINITION.VISIBILITY.in(visibilities))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
-    public List<AssessmentRating> findByDefinitionId(long definitionId, List<AssessmentVisibility> visibilities) {
+    public List<AssessmentRating> findByDefinitionId(long definitionId) {
         return dsl.select(ASSESSMENT_RATING.fields())
                 .select(ENTITY_NAME_FIELD)
                 .from(ASSESSMENT_RATING)
                 .innerJoin(ASSESSMENT_DEFINITION).on(ASSESSMENT_DEFINITION.ID.eq(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID))
                 .and(ASSESSMENT_DEFINITION.ID.eq(definitionId))
-                .and(ASSESSMENT_DEFINITION.VISIBILITY.in(visibilities))
                 .fetch(TO_DOMAIN_MAPPER_WITH_ENTITY_DETAILS);
     }
 
