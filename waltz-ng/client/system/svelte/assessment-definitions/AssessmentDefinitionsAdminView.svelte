@@ -177,7 +177,7 @@
                                 Delete
                             </button>
                             |
-                            <a href="../../assessment-definition/{def.id}">
+                            <a href="assessment-definition/{def.id}">
                                 <Icon name="table"/>
                                 View Data
                             </a>
