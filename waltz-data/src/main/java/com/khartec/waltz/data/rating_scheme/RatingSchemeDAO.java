@@ -55,7 +55,7 @@ public class RatingSchemeDAO {
 
     public static final RecordMapper<Record, RatingSchemeItem> TO_ITEM_MAPPER = record -> {
 
-        RatingSchemeItemRecord r = record.into(com.khartec.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM);
+        RatingSchemeItemRecord r = record.into(RATING_SCHEME_ITEM);
 
         ImmutableRatingSchemeItem.Builder builder = ImmutableRatingSchemeItem.builder()
                 .id(r.getId())
@@ -113,7 +113,7 @@ public class RatingSchemeDAO {
 
 
     public RatingScheme getById(long id) {
-        Condition itemCondition = com.khartec.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM.SCHEME_ID.eq(id);
+        Condition itemCondition = RATING_SCHEME_ITEM.SCHEME_ID.eq(id);
         List<RatingSchemeItem> items = fetchItems(itemCondition);
         return ImmutableRatingScheme
                 .copyOf(dsl
@@ -126,30 +126,30 @@ public class RatingSchemeDAO {
 
     public List<RatingSchemeItem> fetchItems(Condition itemCondition) {
         return dsl
-                .selectFrom(com.khartec.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM)
+                .selectFrom(RATING_SCHEME_ITEM)
                 .where(itemCondition)
-                .orderBy(com.khartec.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM.POSITION.asc())
+                .orderBy(RATING_SCHEME_ITEM.POSITION.asc())
                 .fetch(TO_ITEM_MAPPER);
     }
 
     public List<RatingSchemeItem> findRatingSchemeItemsForAssessmentDefinition(Long assessmentDefinitionId) {
         return dsl
-                .select(com.khartec.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM.fields())
-                .from(com.khartec.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM)
+                .select(RATING_SCHEME_ITEM.fields())
+                .from(RATING_SCHEME_ITEM)
                 .innerJoin(RATING_SCHEME)
-                .on(RATING_SCHEME.ID.eq(com.khartec.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM.SCHEME_ID))
+                .on(RATING_SCHEME.ID.eq(RATING_SCHEME_ITEM.SCHEME_ID))
                 .innerJoin(ASSESSMENT_DEFINITION)
                 .on(ASSESSMENT_DEFINITION.RATING_SCHEME_ID.eq(RATING_SCHEME.ID))
                 .where(ASSESSMENT_DEFINITION.ID.eq(assessmentDefinitionId))
-                .orderBy(com.khartec.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM.POSITION.asc())
+                .orderBy(RATING_SCHEME_ITEM.POSITION.asc())
                 .fetch(TO_ITEM_MAPPER);
     }
 
     public RatingSchemeItem getRatingSchemeItemById(long id){
         checkNotNull(id, "id cannot be null");
         return dsl
-                .selectFrom(com.khartec.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM)
-                .where(com.khartec.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM.ID.eq(id))
+                .selectFrom(RATING_SCHEME_ITEM)
+                .where(RATING_SCHEME_ITEM.ID.eq(id))
                 .fetchOne(TO_ITEM_MAPPER);
     }
 
@@ -176,8 +176,8 @@ public class RatingSchemeDAO {
     public Set<RatingSchemeItem> findRatingSchemeItemsByIds(Set<Long> ids) {
         checkNotNull(ids, "ids cannot be null");
         return dsl
-                .selectFrom(com.khartec.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM)
-                .where(com.khartec.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM.ID.in(ids))
+                .selectFrom(RATING_SCHEME_ITEM)
+                .where(RATING_SCHEME_ITEM.ID.in(ids))
                 .fetchSet(TO_ITEM_MAPPER);
     }
 
