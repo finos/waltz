@@ -16,7 +16,6 @@
  *
  */
 import RatingSchemesAdminView from "./svelte/ratings-schemes/RatingSchemesAdminView.svelte";
-import template from "./rating-schemes-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
 import {initialiseData} from "../common";
 import * as _ from "lodash";
@@ -115,7 +114,7 @@ controller.$inject = [
 
 
 export default {
-    template,
+    template: `<waltz-svelte-component component="$ctrl.RatingSchemesAdminView"></waltz-svelte-component>`,
     controller,
     controllerAs: "$ctrl",
     bindToController: true,

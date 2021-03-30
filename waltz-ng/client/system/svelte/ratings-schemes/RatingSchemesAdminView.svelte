@@ -84,6 +84,8 @@
         return ratingSchemeStore
             .removeScheme(schemeId)
             .then(() => {
+                activeScheme = null;
+                activeMode = Modes.LIST;
                 ratingSchemeStore.loadAll(true);
             });
     }
