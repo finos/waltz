@@ -22,95 +22,17 @@ import * as _ from "lodash";
 
 
 const initialState = {
-    RatingSchemesAdminView,
-    qry: '',
-    filteredRatingSchemes: [],
-    ratingSchemes: [],
-    assessmentDefinitions: [],
-    measurableCategories: []
+    RatingSchemesAdminView
 };
 
 
-function controller(serviceBroker, $q) {
+function controller() {
 
     const vm = initialiseData(this, initialState);
-
-    const ratingSchemePromise = serviceBroker
-        .loadViewData(
-            CORE_API.RatingSchemeStore.findAll)
-        .then(r => { vm.ratingSchemes =
-            _.forEach( r.data, d =>
-                _.forEach(d.ratings,rating => rating.name = rating.name + " (" + rating.rating + ")")
-                );
-            vm.filteredRatingSchemes = vm.ratingSchemes;
-        });
-
-    const assessmentDefinitionPromise = serviceBroker
-        .loadViewData(
-            CORE_API.AssessmentDefinitionStore.findAll)
-        .then(r => vm.assessmentDefinitions = r.data);
-
-    const measurableCategoryPromise = serviceBroker
-        .loadViewData(
-            CORE_API.MeasurableCategoryStore.findAll)
-        .then(r => vm.measurableCategories = r.data);
-
-    const roadmapsPromise = serviceBroker
-        .loadViewData(
-            CORE_API.RoadmapStore.findAllRoadmapsAndScenarios)
-        .then(r => vm.roadmapsAndScenarios = r.data);
-
-    $q.all([ratingSchemePromise, assessmentDefinitionPromise, measurableCategoryPromise, roadmapsPromise])
-        .then(([ratingSchemes, assessmentDefinitions, measurableCategories, roadmaps]) => {
-            vm.assessmentsKey = _.map(assessmentDefinitions, r => Object.assign({}, r, {type: "ASSESSMENT", icon: getIcon(r.entityKind)}));
-            vm.measurablesKey = _.map(measurableCategories, r => Object.assign({}, r, {type: "MEASURABLE", icon: "puzzle-piece"}));
-            vm.roadmapsKey = _.map(roadmaps, r => Object.assign({}, r, {type: "ROADMAP", icon: "road"}));
-
-            vm.rateableEntities = _.concat(vm.assessmentsKey, vm.measurablesKey, vm.roadmapsKey)
-        });
-
-    vm.selectScheme = (ratingScheme) => {
-
-        ratingScheme.ratings = _.orderBy(ratingScheme.ratings, ["position", "name"]);
-        vm.selectedRatingScheme = ratingScheme;
-
-        vm.usages = _.chain(vm.rateableEntities)
-            .filter(a => ((a.type === "ROADMAP")
-                ? a.roadmap.ratingSchemeId === vm.selectedRatingScheme.id
-                : a.ratingSchemeId === vm.selectedRatingScheme.id ))
-            .value();
-    }
-
-    vm.onQueryStrChange = (qry) => {
-        const qryStr = new RegExp(qry,'i');
-
-        vm.filteredRatingSchemes = _
-            .chain(vm.ratingSchemes)
-            .filter(b => _.isEmpty(qryStr.source)
-                ? true
-                : qryStr.test(b.name) || qryStr.test(b.description))
-        .value();
-    }
 }
 
 
-function getIcon(entityKind) {
-    switch(entityKind) {
-        case "APPLICATION":
-            return "desktop";
-        case "CHANGE_INITIATIVE":
-            return "paper-plane-o";
-        case "CHANGE_UNIT":
-            return "hourglass";
-        default:
-            return null;
-    }
-}
-
-controller.$inject = [
-    "ServiceBroker",
-    "$q"
-];
+controller.$inject = [];
 
 
 export default {
