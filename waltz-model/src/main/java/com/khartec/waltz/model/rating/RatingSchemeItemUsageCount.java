@@ -8,6 +8,7 @@ import org.immutables.value.Value;
 @JsonSerialize(as = ImmutableRatingSchemeItemUsageCount.class)
 public abstract class RatingSchemeItemUsageCount {
 
+    public abstract long schemeId();
     public abstract long ratingId();
     public abstract EntityKind usageKind();
     public abstract int count();

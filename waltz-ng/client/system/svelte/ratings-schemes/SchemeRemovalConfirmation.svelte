@@ -1,20 +1,20 @@
 <script>
-    export let item;
+    export let scheme;
     export let doCancel;
     export let doRemove;
 
     function onRemove() {
-        doRemove(item.id);
+        doRemove(scheme.id);
     }
 </script>
 
 <div class="removal-box removal-warning">
-    <h3>Confirm rating item removal</h3>
-    Are you sure you want to remove this rating scheme item ?
+    <h3>Confirm rating scheme removal</h3>
+    Are you sure you want to remove this rating scheme ?
 
     <div>
-        <h4>{item.name}</h4>
-        <p>{item.description}</p>
+        <h4>{scheme.name}</h4>
+        <p>{scheme.description}</p>
     </div>
 
     <button class="btn btn-danger"

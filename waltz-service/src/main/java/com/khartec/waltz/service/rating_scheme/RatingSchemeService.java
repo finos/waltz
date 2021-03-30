@@ -82,4 +82,8 @@ public class RatingSchemeService {
     public List<RatingSchemeItemUsageCount> calcRatingUsageStats() {
         return ratingSchemeDAO.calcRatingUsageStats();
     }
+
+    public Boolean removeRatingScheme(long id) {
+        return ratingSchemeDAO.removeRatingScheme(id);
+    }
 }

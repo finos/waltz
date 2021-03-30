@@ -6,3 +6,14 @@ export function sortItems(items = []) {
         items,
         ["position", "name"])
 }
+
+export function countUsageStatsBy(usageData, accessor) {
+    return _.reduce(
+        usageData,
+        (acc, d) => {
+            const k = accessor(d)
+            acc[k] = (acc[k] || 0) + d.count;
+            return acc;
+        },
+        {});
+}

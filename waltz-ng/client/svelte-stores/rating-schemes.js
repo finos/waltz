@@ -51,6 +51,11 @@ export function mkStore() {
             "DELETE",
             `api/rating-scheme/items/id/${itemId}`);
 
+    const removeScheme = (schemeId) => remote
+        .execute(
+            "DELETE",
+            `api/rating-scheme/id/${schemeId}`);
+
     const calcRatingUsageStats = (force) => remote
         .fetchViewList(
             "GET",
@@ -64,7 +69,8 @@ export function mkStore() {
         loadAll,
         save,
         saveItem,
-        removeItem
+        removeItem,
+        removeScheme
     };
 }
 

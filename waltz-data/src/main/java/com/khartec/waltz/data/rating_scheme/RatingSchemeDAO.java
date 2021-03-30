@@ -227,6 +227,20 @@ public class RatingSchemeDAO {
     }
 
 
+    public Boolean removeRatingScheme(long id) {
+        return dsl
+            .transactionResult(ctx -> {
+                DSLContext tx = ctx.dsl();
+                tx.deleteFrom(RATING_SCHEME_ITEM)
+                        .where(RATING_SCHEME_ITEM.SCHEME_ID.eq(id))
+                        .execute();
+                return tx.deleteFrom(RATING_SCHEME)
+                        .where(RATING_SCHEME.ID.eq(id))
+                        .execute() == 1;
+            });
+    }
+
+
     public List<RatingSchemeItemUsageCount> calcRatingUsageStats() {
 
         com.khartec.waltz.schema.tables.RatingSchemeItem rsi = RATING_SCHEME_ITEM.as("rsi");
@@ -239,14 +253,14 @@ public class RatingSchemeDAO {
         com.khartec.waltz.schema.tables.Scenario s = SCENARIO.as("s");
         com.khartec.waltz.schema.tables.Roadmap r = ROADMAP.as("r");
 
-        SelectHavingStep<Record3<Long, String, Integer>> assessmentCounts = dsl
-                .select(rsi.ID, DSL.val("ASSESSMENT_RATING"), DSL.count())
+        SelectHavingStep<Record4<Long, Long, String, Integer>> assessmentCounts = dsl
+                .select(rsi.SCHEME_ID, rsi.ID, DSL.val("ASSESSMENT_RATING"), DSL.count())
                 .from(ar)
                 .innerJoin(rsi).on(rsi.ID.eq(ar.RATING_ID))
                 .groupBy(rsi.ID);
 
-        SelectHavingStep<Record3<Long, String, Integer>> measurableCounts = dsl
-                .select(rsi.ID, DSL.val("MEASURABLE_RATING"), DSL.count())
+        SelectHavingStep<Record4<Long, Long, String, Integer>> measurableCounts = dsl
+                .select(rsi.SCHEME_ID, rsi.ID, DSL.val("MEASURABLE_RATING"), DSL.count())
                 .from(mr)
                 .innerJoin(m).on(m.ID.eq(mr.MEASURABLE_ID))
                 .innerJoin(mc).on(mc.ID.eq(m.MEASURABLE_CATEGORY_ID))
@@ -254,8 +268,8 @@ public class RatingSchemeDAO {
                 .innerJoin(rsi).on(rsi.CODE.eq(mr.RATING)).and(rsi.SCHEME_ID.eq(rs.ID))
                 .groupBy(rsi.ID);
 
-        SelectHavingStep<Record3<Long, String, Integer>> scenarioCounts = dsl
-                .select(rsi.ID, DSL.val("SCENARIO"), DSL.count())
+        SelectHavingStep<Record4<Long, Long, String, Integer>> scenarioCounts = dsl
+                .select(rsi.SCHEME_ID, rsi.ID, DSL.val("SCENARIO"), DSL.count())
                 .from(sri)
                 .innerJoin(s).on(s.ID.eq(sri.SCENARIO_ID))
                 .innerJoin(r).on(r.ID.eq(s.ROADMAP_ID))
@@ -268,11 +282,12 @@ public class RatingSchemeDAO {
                 .union(scenarioCounts)
                 .fetch(res -> ImmutableRatingSchemeItemUsageCount
                         .builder()
-                        .ratingId(res.get(0, Long.class))
-                        .usageKind(EntityKind.valueOf(res.get(1, String.class)))
-                        .count(res.get(2, Integer.class))
+                        .schemeId(res.get(0, Long.class))
+                        .ratingId(res.get(1, Long.class))
+                        .usageKind(EntityKind.valueOf(res.get(2, String.class)))
+                        .count(res.get(3, Integer.class))
                         .build());
-
-
     }
+
+
 }

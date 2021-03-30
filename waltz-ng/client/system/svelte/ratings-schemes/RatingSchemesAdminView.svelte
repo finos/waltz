@@ -9,7 +9,8 @@
 
     import {ratingSchemeStore} from "../../../svelte-stores/rating-schemes";
     import {termSearch} from "../../../common";
-    import {sortItems} from "./rating-scheme-utils";
+    import {countUsageStatsBy, sortItems} from "./rating-scheme-utils";
+    import SchemeRemovalConfirmation from "./SchemeRemovalConfirmation.svelte";
 
 
     const Modes = {
@@ -20,6 +21,9 @@
     };
 
     const loadSchemeCall = ratingSchemeStore.loadAll();
+    const usageCall = ratingSchemeStore.calcRatingUsageStats();
+
+    $: usageCountsBySchemeId = countUsageStatsBy($usageCall.data, d => d.schemeId);
 
     let qry;
     let activeMode = Modes.LIST;
@@ -29,6 +33,7 @@
         .chain(termSearch($loadSchemeCall.data, qry, ["name", "description"]))
         .orderBy("name")
         .value();
+
 
     $: activeScheme = activeScheme
         ? _.find(ratingSchemes, ({id: activeScheme.id}))
@@ -75,9 +80,23 @@
     }
 
 
+    function doRemoveScheme(schemeId) {
+        return ratingSchemeStore
+            .removeScheme(schemeId)
+            .then(() => {
+                ratingSchemeStore.loadAll(true);
+            });
+    }
+
+
     function onCancel() {
         activeScheme = null;
         activeMode = Modes.LIST;
+    }
+
+    function onRemoveScheme(scheme) {
+        activeScheme = scheme;
+        activeMode = Modes.DELETE;
     }
 
     function mkNew() {
@@ -120,6 +139,11 @@
                             doCancel={onCancel}
                             {doSaveScheme}/>
 
+    {:else if activeMode === Modes.DELETE}
+        <SchemeRemovalConfirmation scheme={activeScheme}
+                                   doCancel={onCancel}
+                                   doRemove={doRemoveScheme}/>
+
     {:else if activeMode === Modes.EDIT_RATINGS}
 
         <ItemsView scheme={activeScheme}
@@ -136,10 +160,11 @@
                    style="table-layout: fixed">
                 <thead>
                 <tr>
-                    <th style="width:25%">Name</th>
-                    <th style="width:25%">Ratings</th>
-                    <th style="width:25%">Description</th>
-                    <th style="width:25%">Operations</th>
+                    <th style="width:20%">Name</th>
+                    <th style="width:20%">Ratings</th>
+                    <th style="width:20%">Description</th>
+                    <th style="width:10%">Usages</th>
+                    <th style="width:30%">Operations</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -157,6 +182,9 @@
                             {scheme.description}
                         </td>
                         <td>
+                            {usageCountsBySchemeId[scheme.id] || "-"}
+                        </td>
+                        <td>
                             <button class="btn-link"
                                     aria-label="Edit {scheme.name}"
                                     on:click={() => onEditScheme(scheme)}>
@@ -170,13 +198,21 @@
                                 <Icon name="edit"/>
                                 Edit Ratings
                             </button>
+                            |
+                            <button class="btn-link"
+                                    aria-label="Remove"
+                                    disabled={usageCountsBySchemeId[scheme.id]||0 > 0}
+                                    on:click={() => onRemoveScheme(scheme)}>
+                                <Icon name="trash"/>
+                                Remove
+                            </button>
                         </td>
                     </tr>
                 {/each}
                 </tbody>
                 <tfoot>
                 <tr>
-                    <td colspan="4">
+                    <td colspan="5">
                         <button class="btn-link"
                                 on:click={mkNew}>
                             <Icon name="plus"/>
@@ -193,4 +229,10 @@
 
 
 <style>
+    button:disabled {
+        color: #999;
+    }
+    button:disabled:hover {
+        cursor: not-allowed;
+    }
 </style>
