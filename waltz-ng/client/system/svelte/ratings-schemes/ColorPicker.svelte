@@ -30,7 +30,7 @@
 
         Original:
         <button class="color-box"
-                on:click={() => selectedColor = startColor}
+                on:click|preventDefault={() => selectedColor = startColor}
                 style="background-color:{startColor}">
         </button>
     </div>
