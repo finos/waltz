@@ -19,23 +19,39 @@ import {rgb} from "d3-color";
 import {scaleOrdinal, schemeCategory20c} from "d3-scale";
 import _ from "lodash";
 
-export const black = rgb("#000");
-export const grey = rgb("#939393");
-export const lightGrey = rgb("#D1D1D1");
-export const blue = rgb("#1F7FE0");
-export const green = rgb("#5BB65D");
-export const yellow = rgb("#E0E314");
-export const gold = rgb("#B7A61F");
-export const amber = rgb("#D9923F");
-export const red = rgb("#DA524B");
-export const pink = rgb("#FFCFFC");
-export const actor = rgb("#D7BBDB");
-export const purple= rgb("#B687CC");
+export const blackHex = "#000000";
+export const greyHex = "#939393";
+export const lightGreyHex = "#D1D1D1";
+export const blueHex = "#1F7FE0";
+export const greenHex = "#5BB65D";
+export const yellowHex = "#E0E314";
+export const goldHex = "#B7A61F";
+export const amberHex = "#D9923F";
+export const redHex = "#DA524B";
+export const purpleHex = "#B687CC";
+export const pinkHex = "#FFCFFC";
+export const greyBgHex = "#F5F5F5";
+export const amberBgHex = "#FCF2D7";
+export const greenBgHex = "#DFF1D2";
+export const redBgHex = "#F2D7D7";
 
-export const amberBg = rgb("#FCF2D7");
-export const greenBg = rgb("#DFF1D2");
-export const redBg = rgb("#F2D7D7");
-export const greyBg = rgb("#F5F5F5");
+export const black = rgb(blackHex);
+export const grey = rgb(greyHex);
+export const lightGrey = rgb(lightGreyHex);
+export const blue = rgb(blueHex);
+export const green = rgb(greenHex);
+export const yellow = rgb(yellowHex);
+export const gold = rgb(goldHex);
+export const amber = rgb(amberHex);
+export const red = rgb(redHex);
+export const pink = rgb(pinkHex);
+export const purple= rgb(purpleHex);
+export const actor = rgb("#D7BBDB");
+
+export const amberBg = rgb(amberBgHex);
+export const greenBg = rgb(greenBgHex);
+export const redBg = rgb(redBgHex);
+export const greyBg = rgb(greyBgHex);
 export const actorBg = rgb("#EDE5EE");
 
 

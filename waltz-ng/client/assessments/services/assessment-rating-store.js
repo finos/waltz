@@ -30,15 +30,15 @@ export function store($http, BaseApiUrl) {
             .then(d => d.data);
     };
 
-    const findByEntityKind = (kind, visibilites = ["PRIMARY"]) => {
+    const findByEntityKind = (kind) => {
         return $http
-            .post(`${BASE}/entity-kind/${kind}`, visibilites)
+            .get(`${BASE}/entity-kind/${kind}`)
             .then(d => d.data);
     };
 
-    const findByAssessmentDefinitionId = (assessmentDefinitionId, visibilites = ["PRIMARY", "SECONDARY"]) => {
+    const findByAssessmentDefinitionId = (assessmentDefinitionId) => {
         return $http
-            .post(`${BASE}/definition-id/${assessmentDefinitionId}`, visibilites)
+            .get(`${BASE}/definition-id/${assessmentDefinitionId}`)
             .then(d => d.data);
     };
 

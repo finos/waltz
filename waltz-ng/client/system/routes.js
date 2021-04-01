@@ -18,10 +18,6 @@
  *
  */
 
-const baseState = {
-    url: "system"
-};
-
 
 import SystemAdminList from "./system-admin-list";
 import SettingsView from "./settings-view";
@@ -32,9 +28,16 @@ import ActorsView from "./actors-view";
 import EntityNamedNoteTypesView from "./entity-named-node-types-view";
 import InvolvementKindsView from "./involvement-kinds-view";
 import StaticPanelsView from "./static-panels-view";
+import AssessmentDefinitionsView from "./assessment-defintions-view";
 import RatingSchemesView from "./rating-schemes-view";
 import EudaListView from "./euda-list-view";
 import RelationshipKindsView from "./relationship-kinds-view";
+
+
+const baseState = {
+    url: "system"
+};
+
 
 const listViewState = {
     url: "/list",
@@ -89,6 +92,11 @@ const staticPanelsState = {
     views: { "content@": StaticPanelsView }
 };
 
+const assessmentDefintionsState = {
+    url: "/assessment-definitions",
+    views: { "content@": AssessmentDefinitionsView }
+};
+
 
 const ratingSchemesState = {
     url: "/rating-schemes",
@@ -118,6 +126,7 @@ function setupRoutes($stateProvider) {
         .state("main.system.actors", actorsState)
         .state("main.system.entity-named-note-types", entityNamedNodeTypesState)
         .state("main.system.involvement-kinds", involvementKindsState)
+        .state("main.system.assessment-definitions", assessmentDefintionsState)
         .state("main.system.static-panels", staticPanelsState)
         .state("main.system.rating-schemes", ratingSchemesState)
         .state("main.system.euda-list", eudaListState)

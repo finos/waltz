@@ -15,29 +15,26 @@
  * See the License for the specific
  *
  */
-import RatingSchemesAdminView from "./svelte/ratings-schemes/RatingSchemesAdminView.svelte";
-import {CORE_API} from "../common/services/core-api-utils";
-import {initialiseData} from "../common";
-import * as _ from "lodash";
+
+import AssessmentDefinitionsAdminView from "./svelte/assessment-definitions/AssessmentDefinitionsAdminView.svelte";
+import {initialiseData} from '../common';
+
 
 
 const initialState = {
-    RatingSchemesAdminView
+    AssessmentDefinitionsAdminView
 };
 
 
 function controller() {
-
-    const vm = initialiseData(this, initialState);
+    initialiseData(this, initialState);
 }
 
-
-controller.$inject = [];
-
-
-export default {
-    template: `<waltz-svelte-component component="$ctrl.RatingSchemesAdminView"></waltz-svelte-component>`,
+const page = {
     controller,
-    controllerAs: "$ctrl",
-    bindToController: true,
+    template: `<waltz-svelte-component component="$ctrl.AssessmentDefinitionsAdminView"></waltz-svelte-component>`,
+    controllerAs: '$ctrl'
 };
+
+
+export default page;

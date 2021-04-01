@@ -22,7 +22,6 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
-import com.khartec.waltz.model.assessment_definition.AssessmentVisibility;
 import com.khartec.waltz.model.assessment_rating.*;
 import com.khartec.waltz.service.assessment_definition.AssessmentDefinitionService;
 import com.khartec.waltz.service.assessment_rating.AssessmentRatingService;
@@ -79,8 +78,8 @@ public class AssessmentRatingEndpoint implements Endpoint {
         String bulkRemovePath = mkPath(BASE_URL, "bulk-remove", ":assessmentDefinitionId");
 
         getForList(findForEntityPath, this::findForEntityRoute);
-        postForList(findByEntityKindPath, this::findByEntityKindRoute);
-        postForList(findByDefinitionPath, this::findByDefinitionIdRoute);
+        getForList(findByEntityKindPath, this::findByEntityKindRoute);
+        getForList(findByDefinitionPath, this::findByDefinitionIdRoute);
         postForList(findByTargetKindForRelatedSelectorPath, this::findByTargetKindForRelatedSelectorRoute);
         postForDatum(bulkUpdatePath, this::bulkStoreRoute);
         postForDatum(bulkRemovePath, this::bulkRemoveRoute);
@@ -101,15 +100,13 @@ public class AssessmentRatingEndpoint implements Endpoint {
     }
 
 
-    private List<AssessmentRating> findByEntityKindRoute(Request request, Response response) throws IOException {
-        List<AssessmentVisibility> visibilities = readList(request, AssessmentVisibility.class);
-        return assessmentRatingService.findByEntityKind(getKind(request, "kind"), visibilities);
+    private List<AssessmentRating> findByEntityKindRoute(Request request, Response response) {
+        return assessmentRatingService.findByEntityKind(getKind(request, "kind"));
     }
 
-    private List<AssessmentRating> findByDefinitionIdRoute(Request request, Response response) throws IOException {
-        List<AssessmentVisibility> visibilities = readList(request, AssessmentVisibility.class);
+    private List<AssessmentRating> findByDefinitionIdRoute(Request request, Response response) {
         long assessmentDefinitionId = getLong(request, "assessmentDefinitionId");
-        return assessmentRatingService.findByDefinitionId(assessmentDefinitionId, visibilities);
+        return assessmentRatingService.findByDefinitionId(assessmentDefinitionId);
     }
 
     private boolean storeRoute(Request request, Response z) throws IOException {

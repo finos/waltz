@@ -28,7 +28,6 @@ class Cache {
     }
 
     clear() {
-        console.log("Clear", this.name)
         this.data.clear();
     }
 
@@ -41,17 +40,14 @@ class Cache {
     }
 
     init(key, d) {
-        console.log("init", {key, d, c: this})
         return this.data.set(key, writable({ data: d, status: "loading" }))
     }
 
     set(key, d) {
-        console.log("set", {key, d, c: this})
         return this.data.get(key).set({ data: d, status: "loaded" })
     }
 
     err(key, e, d) {
-        console.log("err", {key, e, c: this})
         return this.data.get(key).set({ data: d, error: e, status: "error" })
     }
 
@@ -84,7 +80,7 @@ function mkKey(method, url, data) {
 
 function _fetchData(cache, method, url, data, init = [], config = { force: false }) {
     const key = mkKey(method, url, data);
-    const forcing = _.get(config, "force", false);
+    const forcing = _.get(config, ["force"], false);
 
     const invokeFetch = () => mkPromise(method, url, data)
             .then(r => cache.set(key, r.data))
