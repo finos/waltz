@@ -16,6 +16,8 @@
  *
  */
 
+import _ from "lodash";
+
 /**
  * Truncate a string
  *
