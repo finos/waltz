@@ -30,9 +30,12 @@ const headers = {
     "If-Modified-Since": 0
 };
 
-const satellizerToken = localStorage.getItem("satellizer_token");
-if (! _.isEmpty(satellizerToken)) {
-    headers["Authorization"] = `Bearer ${satellizerToken}`;
+if (typeof window !== 'undefined') {
+    const satellizerToken = localStorage.getItem("satellizer_token");
+
+    if (!_.isEmpty(satellizerToken)) {
+        headers["Authorization"] = `Bearer ${satellizerToken}`;
+    }
 }
 
 
