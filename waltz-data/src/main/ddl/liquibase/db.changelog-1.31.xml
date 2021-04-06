@@ -344,5 +344,16 @@
 
     </changeSet>
 
+    <changeSet id="20210405-5336-1"
+               author="gharvai">
+        <comment>5336: add external id to survey_template table</comment>
+        <addColumn tableName="survey_template">
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="true" />
+            </column>
+        </addColumn>
+    </changeSet>
+
 
 </databaseChangeLog>
