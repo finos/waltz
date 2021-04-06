@@ -3,6 +3,17 @@
 
 name: Java CI with Maven
 
+uses: Harmon758/postgresql-action@v1.0.0
+  with:
+    # Version of PostgreSQL to use
+    # POSTGRES_DB - name for the default database that is created
+    postgresql db: waltz
+    # POSTGRES_USER - create the specified user with superuser power
+    postgresql user: postgres
+    # POSTGRES_PASSWORD - superuser password
+    postgresql password: 
+    
+    
 on:
   push:
     branches: [ master ]
