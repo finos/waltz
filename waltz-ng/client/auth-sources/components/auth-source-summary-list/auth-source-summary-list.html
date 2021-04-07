@@ -1,0 +1,41 @@
+<waltz-section icon='shield'
+               name="Authoritative Sources">
+
+    <waltz-static-panels render-mode='minimal-border'
+                         group-key='SECTION.AUTH_SOURCES.ABOUT'>
+    </waltz-static-panels>
+    <br>
+
+    <div ng-if="$ctrl.visibility.list">
+        <waltz-auth-sources-table auth-sources="$ctrl.authSources"
+                                  on-select="$ctrl.onSelectAuthSource">
+        </waltz-auth-sources-table>
+    </div>
+
+    <div ng-if="$ctrl.visibility.detail">
+        <waltz-svelte-component component="$ctrl.authSummarySection"
+                                primary-entity-ref="$ctrl.parentEntityRef"
+                                do-update="$ctrl.doUpdate">
+        </waltz-svelte-component>
+    </div>
+
+    <div ng-if="$ctrl.visibility.create">
+        <waltz-svelte-component component="$ctrl.createAuthSourceSection"
+                                primary-entity-ref="$ctrl.parentEntityRef"
+                                do-save="$ctrl.doSave">
+        </waltz-svelte-component>
+    </div>
+
+    <button class="btn-link"
+            ng-click="$ctrl.create()"
+            ng-if="!$ctrl.visibility.create">
+        <waltz-icon name="plus"></waltz-icon> Add new Authoritative Source
+    </button>
+    <span ng-if="$ctrl.visibility.detail">|</span>
+    <button class="btn-link"
+            ng-click="$ctrl.cancel()"
+            ng-if="!$ctrl.visibility.list">
+        Cancel
+    </button>
+
+</waltz-section>

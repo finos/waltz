@@ -74,43 +74,7 @@
         </div>
     </div>
 
-    <!-- AUTH SOURCES -->
-    <waltz-section icon='shield'
-                   ng-init="ctrl.visibility.editor = false"
-                   name="Authoritative Sources">
-
-        <waltz-section-actions>
-            <span waltz-has-role="AUTHORITATIVE_SOURCE_EDITOR">
-                <a ng-click="ctrl.editAuthSources()"
-                   ng-if="!ctrl.visibility.editor"
-                   class="btn btn-xs btn-primary">
-                    Edit
-                </a>
-            </span>
-            <span waltz-has-role="AUTHORITATIVE_SOURCE_EDITOR">
-                <a ng-click="ctrl.showAuthSources()"
-                   ng-if="ctrl.visibility.editor"
-                   class="btn btn-xs btn-primary">
-                    View
-                </a>
-            </span>
-        </waltz-section-actions>
-
-        <waltz-static-panels render-mode='minimal-border'
-                             group-key='SECTION.AUTH_SOURCES.ABOUT'>
-        </waltz-static-panels>
-        <br>
-
-        <div ng-if="!ctrl.visibility.editor">
-            <waltz-auth-sources-table auth-sources="ctrl.authSources">
-            </waltz-auth-sources-table>
-        </div>
-
-        <div ng-if="ctrl.visibility.editor">
-            <waltz-auth-source-editor-panel>
-            </waltz-auth-source-editor-panel>
-        </div>
-
-    </waltz-section>
+    <waltz-auth-source-summary-list>
+    </waltz-auth-source-summary-list>
 
 </div>

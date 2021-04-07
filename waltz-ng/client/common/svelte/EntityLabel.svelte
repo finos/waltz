@@ -4,5 +4,5 @@
     export let ref;
 
 </script>
-<EntityIcon kind="APPLICATION"/>
+<EntityIcon kind={ref.kind}/>
 {ref.name}

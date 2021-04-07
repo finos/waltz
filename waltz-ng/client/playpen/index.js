@@ -23,6 +23,7 @@ import playpenView2 from "./2/playpen2";
 import playpenView3 from "./3/playpen3";
 import playpenView4 from "./4/playpen4";
 import SvelteComponent from "./svelte-component"
+import NewSvelteComponent from "./new-svelte-component";
 
 import {registerComponents} from "../common/module-utils";
 import list from "./list.html";
@@ -66,6 +67,10 @@ export default () => {
         [
             SvelteComponent
         ]);
+
+
+    module
+        .directive("waltzSvelteComponent", NewSvelteComponent);
 
     return module.name;
 

@@ -21,12 +21,12 @@ import {initialiseData} from "../common";
 
 const bindings = {
     component: "<",
-    primaryEntityRef: "<"
+    primaryEntityRef: "<?"
 };
 
 
 const initialState = {
-
+    primaryEntityRef: null
 };
 
 
@@ -69,6 +69,6 @@ const component = {
 };
 
 export default {
-    id: "waltzSvelteComponent",
+    id: "waltzOldSvelteComponent",
     component
 }
