@@ -96,7 +96,13 @@
             Basis Offset:
         </div>
         <div class="col-sm-10">
-            <span ng-bind="$ctrl.physicalFlow.basisOffset | toBasisOffset"></span>
+            <span uib-popover-template="'wpfasd-popover.html'"
+                    popover-trigger="mouseenter"
+                    popover-popup-delay="300"
+                    popover-append-to-body="true"
+                    popover-placement="top">
+                <span ng-bind="$ctrl.physicalFlow.basisOffset | toBasisOffset"></span>
+            </span>
         </div>
     </div>
 
@@ -160,3 +166,11 @@
     </div>
 </div>
 
+<!-- POPUP -->
+<script type="text/ng-template"
+        id="wpfasd-popover.html">
+    <div>
+        <waltz-markdown text="$ctrl.physicalFlow.basisOffsetDescription">
+        </waltz-markdown>
+    </div>
+</script>
