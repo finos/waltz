@@ -61,10 +61,12 @@ export function determineUpwardsScopeForKind(kind) {
  * @param scope
  * @param entityLifecycleStatuses
  * @param filters
- * @param linkingEntityKind
  * @returns {{entityLifecycleStatuses: string[], entityReference: {kind: *, id: *}, scope: (*|string), filters}}
  */
-export function mkSelectionOptions(entityReference, scope, entityLifecycleStatuses = ["ACTIVE"], filters = {}) {
+export function mkSelectionOptions(entityReference,
+                                   scope,
+                                   entityLifecycleStatuses = ["ACTIVE"],
+                                   filters = {}) {
     checkIsEntityRef(entityReference);
 
     return {
@@ -76,7 +78,11 @@ export function mkSelectionOptions(entityReference, scope, entityLifecycleStatus
 }
 
 
-export function mkSelectionOptionsWithJoiningEntity(entityReference, scope, entityLifecycleStatuses = ["ACTIVE"], filters = {}, joiningEntityKind = null) {
+export function mkSelectionOptionsWithJoiningEntity(entityReference,
+                                                    scope,
+                                                    entityLifecycleStatuses = ["ACTIVE"],
+                                                    filters = {},
+                                                    joiningEntityKind = null) {
     checkIsEntityRef(entityReference);
 
     return {
@@ -88,23 +94,3 @@ export function mkSelectionOptionsWithJoiningEntity(entityReference, scope, enti
     };
 }
 
-
-/**
- * @deprecated use mkSelectionOptions instead, this method now  just calls that one.
- * TODO: Remove in 1.23
- *
- * @param entityReference
- * @param scope
- * @param entityLifecycleStatuses
- * @param filters
- * @returns {{entityLifecycleStatuses: string[], entityReference: {kind: *, id: *}, scope: (*|string), filters}}
- */
-export function mkApplicationSelectionOptions(entityReference,
-                                              scope,
-                                              entityLifecycleStatuses = ["ACTIVE"],
-                                              filters = {}) {
-
-    console.log("Calls to mkApplicationSelectionOptions are deprecated, calling mkSelectionOptions instead");
-    // debugger;
-    return mkSelectionOptions(entityReference, scope, entityLifecycleStatuses, filters);
-}
