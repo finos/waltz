@@ -54,11 +54,11 @@
     </div>
 {/if}
 
-<button class="btn-link"
+<button class="btn btn-success"
         on:click={editAuthSource}>
     Edit
 </button>
-<button class="btn-link"
+<button class="btn btn-danger"
         on:click={deleteAuthSource}>
     Delete
 </button>

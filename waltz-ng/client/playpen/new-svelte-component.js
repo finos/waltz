@@ -35,8 +35,6 @@ const directive = function() {
                     {})
                 .value();
 
-            console.log({scope, elem, attrs, props})
-
             new props.component({
                 target: elem[0],
                 props
