@@ -1,5 +1,5 @@
 <script>
-    import {entitySearchStore} from "../../../svelte-stores/entity-search-store";
+    import {entitySearchStore} from "../../svelte-stores/entity-search-store";
     import AutoComplete from "simple-svelte-autocomplete";
     import {createEventDispatcher} from "svelte";
 

@@ -1,5 +1,5 @@
 <script>
-    import EntitySearchSelector from "./EntitySearchSelector.svelte";
+    import EntitySearchSelector from "../../../common/svelte/EntitySearchSelector.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
     import {mode, Modes, selectedAuthSource} from "./editingAuthSources";
     import EntityLabel from "../../../common/svelte/EntityLabel.svelte";
