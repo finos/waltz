@@ -35,7 +35,7 @@
         };
 
         savePromise = doSave(cmd);
-    };
+    }
 
     function submitUpdate() {
         const cmd = {
@@ -44,9 +44,8 @@
             id: workingCopy.id
         };
 
+        $selectedAuthSource = workingCopy;
         savePromise = doUpdate(cmd);
-        selectedAuthSource.set(workingCopy);
-        mode.set(Modes.DETAIL)
     }
 
     function onSelectSource(evt) {
@@ -63,7 +62,7 @@
 
     function cancel() {
         if (workingCopy.id){
-            mode.set(Modes.DETAIL);
+            $mode = Modes.DETAIL;
         }
         else {
             doCancel();
@@ -101,11 +100,18 @@
         <p class="small text-muted">Start typing to select the selector for applications this authority statement will apply to</p>
     </div>
 {:else }
-    <h3>{workingCopy.app.name}
-        <span class="text-muted small">({workingCopy.appOrgUnit.name} - {workingCopy.appOrgUnit.id})</span>
+
+    <h3>
+        <span>
+            <Icon name="desktop"/>
+            {workingCopy.app.name}
+            <span class="text-muted small">({workingCopy.appOrgUnit.name} - {workingCopy.appOrgUnit.id})</span>
+        </span>
     </h3>
 
-    <h4>{workingCopy.dataType.name}</h4>
+    <h4>
+        {workingCopy.dataType.name}
+    </h4>
 
     <div>
         <strong>Scope:</strong>
@@ -135,7 +141,7 @@
 </div>
 
 <div class="form-group">
-    <label for="description">Note:</label>
+    <label for="description">Notes:</label>
     <textarea class="form-control"
               id="description"
               bind:value={workingCopy.description}/>
@@ -158,13 +164,13 @@
     {:then r}
         Saved!
     {:catch e}
-            <span class="alert alert-warning">
-                Failed to save authority statement. Reason: {e.error}
+            <div class="alert alert-warning">
+                Failed to save authority statement. Reason: {e.data.message}
                 <button class="btn-link"
                         on:click={() => savePromise = null}>
                     <Icon name="check"/>
                     Okay
                 </button>
-            </span>
+            </div>
     {/await}
 {/if}

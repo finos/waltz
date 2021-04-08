@@ -15,7 +15,7 @@
     }
 
     function editAuthSource() {
-        mode.set(Modes.EDIT);
+        $mode = Modes.EDIT;
     }
 
     function deleteAuthSource() {
@@ -25,8 +25,12 @@
 </script>
 
 {#if $mode === Modes.DETAIL}
-    <h3>{$selectedAuthSource.app.name}
-        <span class="text-muted small">({$selectedAuthSource.appOrgUnit.name} - {$selectedAuthSource.appOrgUnit.id})</span>
+    <h3>
+        <span>
+            <Icon name="desktop"/>
+            {$selectedAuthSource.app.name}
+            <span class="text-muted small">({$selectedAuthSource.appOrgUnit.name} - {$selectedAuthSource.appOrgUnit.id})</span>
+        </span>
     </h3>
 
     <h4>{$selectedAuthSource.dataType.name}</h4>
@@ -70,13 +74,14 @@
     {:then r}
         Deleted!
     {:catch e}
-            <span class="alert alert-warning">
-                Failed to delete authority statement. Reason: {e.error}
+            <div class="alert alert-warning">
+                Failed to delete authority statement. Reason: {e.data.message}
                 <button class="btn-link"
-                        on:click={() => deletePromise = null}>
+                        on:click={() => {
+                            deletePromise = null}}>
                     <Icon name="check"/>
                     Okay
                 </button>
-            </span>
+            </div>
     {/await}
 {/if}

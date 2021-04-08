@@ -63,6 +63,7 @@ function controller(serviceBroker, $scope){
             .execute(CORE_API.AuthSourcesStore.update, [cmd])
             .then(() => {
                 loadAuthSources();
+                mode.set("DETAIL");
             })
     }
 
