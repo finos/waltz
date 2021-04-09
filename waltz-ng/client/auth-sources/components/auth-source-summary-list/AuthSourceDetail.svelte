@@ -26,11 +26,8 @@
 
 {#if $mode === Modes.DETAIL}
     <h3>
-        <span>
-            <Icon name="desktop"/>
-            {$selectedAuthSource.app.name}
-            <span class="text-muted">({$selectedAuthSource.appOrgUnit.name} - {$selectedAuthSource.appOrgUnit.id})</span>
-        </span>
+        <Icon name="desktop"/>
+        {$selectedAuthSource.app.name}
     </h3>
 
     <h4>{$selectedAuthSource.dataType.name}</h4>

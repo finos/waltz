@@ -130,11 +130,8 @@
     {:else }
 
         <h3>
-            <span>
-                <Icon name="desktop"/>
-                {workingCopy.app.name}
-                <span class="text-muted small">({workingCopy.appOrgUnit.name} - {workingCopy.appOrgUnit.id})</span>
-            </span>
+            <Icon name="desktop"/>
+            {workingCopy.app.name}
         </h3>
 
         <h4>{workingCopy.dataType.name}</h4>
