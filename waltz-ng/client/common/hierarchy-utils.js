@@ -27,16 +27,12 @@ export function prepareSearchNodes(nodes = [],
                                    attr = "name",
                                    parentKey = "parentId") {
 
-    console.log({nodes, attr, parentKey});
     const nodesById = _.keyBy(nodes, "id");
 
     const attrFn = _.isString(attr)
         ? n => n[attr]
         : attr;
 
-    console.log({nodesById})
-
-    // return [];
     return _.map(nodes, n => {
         let ptr = n;
         let searchStr = "";
