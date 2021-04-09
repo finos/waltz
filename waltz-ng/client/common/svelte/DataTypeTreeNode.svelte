@@ -28,12 +28,15 @@
 
 
 {#if !isRoot}
-    <span class:expandable={node.children}
-          class="clickable"
+    <span class="clickable"
           on:click={toggleExpanded}>
         <Icon size="lg" name={expanded ? "caret-down" : "caret-right"}/>
     </span>
     <span class="clickable"
+          class:concrete={node.concrete}
+          class:abstract={!node.concrete}
+          class:unknown={node.unknown}
+          class:deprecated={node.deprecated}
           on:click={() => selectNode(node)}>
         {node.name}
     </span>
@@ -47,6 +50,10 @@
                     <svelte:self on:select node={childNode} childNodes={childNode.children}/>
                 {:else}
                     <span class="clickable"
+                          class:concrete={childNode.concrete}
+                          class:abstract={!childNode.concrete}
+                          class:unknown={childNode.unknown}
+                          class:deprecated={childNode.deprecated}
                           on:click={() => selectNode(childNode)}>
                         <Icon size="lg" name="fw"/>
                         {childNode.name}
@@ -58,10 +65,22 @@
 {/if}
 
 <style>
-    .expandable{
-        xxcolor: red;
+
+    .concrete {
+
     }
 
+    .abstract {
+        font-style: italic;
+    }
+
+    .deprecated {
+        color: darkred;
+    }
+
+    .unknown {
+        color: gray;
+    }
 
     ul {
         padding: 0.2em 0 0 0.5em;
