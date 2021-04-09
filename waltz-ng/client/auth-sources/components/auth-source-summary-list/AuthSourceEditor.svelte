@@ -4,6 +4,7 @@
     import {mode, Modes, selectedAuthSource} from "./editingAuthSources";
     import EntityLabel from "../../../common/svelte/EntityLabel.svelte";
     import _ from "lodash";
+    import DataTypeTreeSelector from "../../../common/svelte/DataTypeTreeSelector.svelte";
 
     export let doSave;
     export let doUpdate;
@@ -22,7 +23,7 @@
     }
 
     $: invalid = (workingCopy.id)
-        ? ! fieldChanged(workingCopy)
+        ? !fieldChanged(workingCopy)
         : _.some(getRequiredFields(workingCopy), v => _.isNil(v));
 
     function onUpdateRating(event) {
@@ -74,12 +75,15 @@
     }
 
     function cancel() {
-        if (workingCopy.id){
+        if (workingCopy.id) {
             $mode = Modes.DETAIL;
-        }
-        else {
+        } else {
             doCancel();
         }
+    }
+
+    function clearDataType() {
+        workingCopy.dataType = null;
     }
 
 </script>
@@ -96,16 +100,23 @@
                                       entityKinds={['APPLICATION']}>
                 </EntitySearchSelector>
             </div>
-            <p class="small text-muted">Start typing to select the source application</p>
+            <p class="text-muted">Start typing to select the source application</p>
         </div>
         <div class="form-group">
             <label for="datatype">Datatype:</label>
             <div id="datatype">
-                <EntitySearchSelector on:select={onSelectDatatype}
-                                      entityKinds={['DATA_TYPE']}>
-                </EntitySearchSelector>
+                {#if workingCopy.dataType}
+                    <span>{workingCopy.dataType.name}</span>
+                    <button class="btn-link"
+                            on:click={clearDataType}>
+                        <Icon name="close"/>
+                    </button>
+                    <p class="text-muted">Datatype for which this application is authoritative</p>
+                {:else}
+                    <DataTypeTreeSelector on:select={onSelectDatatype}/>
+                    <p class="text-muted">Select the datatype for which this application is an authoritative source</p>
+                {/if}
             </div>
-            <p class="small text-muted">Start typing to select the datatype for which this application is an authoritative source</p>
         </div>
         <div class="form-group">
             <label for="scope">Scope:</label>
@@ -114,7 +125,7 @@
                                       entityKinds={['APPLICATION', 'ORG_UNIT']}>
                 </EntitySearchSelector>
             </div>
-            <p class="small text-muted">Start typing to select the selector for applications this authority statement will apply to</p>
+            <p class="text-muted">Start typing to select the selector for applications this authority statement will apply to</p>
         </div>
     {:else }
 
@@ -132,7 +143,7 @@
             <strong>Scope:</strong>
             <EntityLabel ref={workingCopy.declaringOrgUnit}></EntityLabel>
         </div>
-        <p class="small text-muted">The selector for applications this authority statement applies to</p>
+        <p class="text-muted">The selector for applications this authority statement applies to</p>
     {/if}
 
     <label for="rating">Rating:</label>
@@ -152,7 +163,7 @@
                    value={'SECONDARY'}>
             Non-RAS
         </label>
-        <p class="small text-muted">Select an authority statement for this source</p>
+        <p class="text-muted">Select an authority statement for this source</p>
     </div>
 
     <div class="form-group">
@@ -161,7 +172,7 @@
                   id="description"
                   bind:value={workingCopy.description}/>
     </div>
-    <p class="small text-muted">Additional notes</p>
+    <p class="text-muted">Additional notes</p>
 
 
     <button class="btn btn-success"

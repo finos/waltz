@@ -29,11 +29,12 @@
 
 {#if !isRoot}
     <span class:expandable={node.children}
-          on:click={() => {
-                toggleExpanded();
-                selectNode(node);
-          }}>
+          class="clickable"
+          on:click={toggleExpanded}>
         <Icon size="lg" name={expanded ? "caret-down" : "caret-right"}/>
+    </span>
+    <span class="clickable"
+          on:click={() => selectNode(node)}>
         {node.name}
     </span>
 {/if}
@@ -45,7 +46,8 @@
                 {#if childNode.children.length > 0}
                     <svelte:self on:select node={childNode} childNodes={childNode.children}/>
                 {:else}
-                    <span on:click={() => selectNode(childNode)}>
+                    <span class="clickable"
+                          on:click={() => selectNode(childNode)}>
                         <Icon size="lg" name="fw"/>
                         {childNode.name}
                     </span>
@@ -58,8 +60,17 @@
 <style>
     .expandable{
         xxcolor: red;
-}
+    }
+
+
     ul {
+        padding: 0.2em 0 0 0.5em;
+        margin: 0 0 0 0.5em;
         list-style: none;
+        border-left: 1px solid #eee;
+    }
+
+    li {
+        padding: 0.2em 0;
     }
 </style>

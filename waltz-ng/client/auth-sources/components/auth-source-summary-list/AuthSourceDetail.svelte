@@ -29,7 +29,7 @@
         <span>
             <Icon name="desktop"/>
             {$selectedAuthSource.app.name}
-            <span class="text-muted small">({$selectedAuthSource.appOrgUnit.name} - {$selectedAuthSource.appOrgUnit.id})</span>
+            <span class="text-muted">({$selectedAuthSource.appOrgUnit.name} - {$selectedAuthSource.appOrgUnit.id})</span>
         </span>
     </h3>
 
@@ -39,18 +39,18 @@
         <strong>Scope:</strong>
         <EntityLabel ref={$selectedAuthSource?.declaringOrgUnit}></EntityLabel>
     </div>
-    <p class="small text-muted">The selector for applications this authority statement will apply to</p>
+    <p class="text-muted">The selector for applications this authority statement will apply to</p>
 
     <div>
             <strong>Rating:</strong>
             <span>{selected?.rating === 'PRIMARY' ? 'RAS' : 'Non RAS' }</span>
-            <p class="small text-muted">{$selectedAuthSource?.ratingValue.description}</p>
+            <p class="text-muted">{$selectedAuthSource?.ratingValue.description}</p>
     </div>
 
     <div>
             <strong>Notes:</strong>
             <span>{selected?.description || "None provided"}</span>
-            <p class="small text-muted">Additional notes</p>
+            <p class="text-muted">Additional notes</p>
     </div>
 {/if}
 

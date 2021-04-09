@@ -9,10 +9,9 @@
     let expanded = true;
     let qry = "";
     let searchNodes = [];
-    let wibble = [];
+    let dataTypes = [];
 
     function calcDisplayHierarchy(nodes, query) {
-        console.log(nodes, query);
         const searchResult = _.map(
             doSearch(query, nodes),
             d => Object.assign(
@@ -24,12 +23,10 @@
         return buildHierarchies(searchResult, false);
     }
 
-    $: wibble = $dataTypesCall.data;
-
-    $: searchNodes = prepareSearchNodes(wibble);
+    $: dataTypes = $dataTypesCall.data;
+    $: searchNodes = prepareSearchNodes(dataTypes);
     $: displayedHierarchy = calcDisplayHierarchy(searchNodes, qry);
 
-    $: console.log({HI: "hi", wibble, dataTypeStore, qry, searchNodes})
 
 </script>
 <SearchInput bind:value={qry}></SearchInput>
