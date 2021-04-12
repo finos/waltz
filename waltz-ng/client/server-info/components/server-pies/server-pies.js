@@ -70,6 +70,12 @@ function controller() {
         },
         hardwareEndOfLifeStatus: {
             config: EOL_STATUS_CONFIG
+        },
+        country: {
+            config: {
+                size: PIE_SIZE,
+                colorProvider: (d) => variableScale(d.key)
+            }
         }
     };
 
@@ -82,6 +88,7 @@ function controller() {
         vm.pie.location.data = toKeyCounts(servers, d => d.location);
         vm.pie.operatingSystemEndOfLifeStatus.data = toKeyCounts(servers, d => d.operatingSystemEndOfLifeStatus);
         vm.pie.hardwareEndOfLifeStatus.data = toKeyCounts(servers, d => d.hardwareEndOfLifeStatus);
+        vm.pie.country.data = toKeyCounts(servers, d => d.country);
 
         vm.environmentDescription = serverUsages.length > servers.length
             ? multiEnvServerDescription
