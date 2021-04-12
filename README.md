@@ -85,7 +85,7 @@ Individual and organisational contributors are listed in [the contributors file]
 
 ## License
 
-Copyright (C) 2020 Waltz open source project
+Copyright (C) 2021 Waltz open source project
 
 Distributed under the [Apache License, Version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
