@@ -14,7 +14,8 @@
     import roles from "../../user/system-roles";
 
     import _ from "lodash";
-    import {anyErrors, anyLoading, mkOverallStatus} from "../../svelte-stores/store-utils";
+    import {mkOverallStatus} from "../../svelte-stores/store-utils";
+    import LoadingPlaceholder from "../../common/svelte/LoadingPlaceholder.svelte";
 
     export let primaryEntityRef = null;
 
@@ -76,7 +77,7 @@
     $: bookmarkKinds = mkBookmarkKinds(
         nestedEnums,
         $bookmarks.data);
-    $: actions = _.includes($user.data.roles, roles.BOOKMARK_EDITOR.key)
+    $: actions = _.includes($user.data?.roles, roles.BOOKMARK_EDITOR.key)
         ? [editAction, removeAction]
         : [];
 
@@ -87,7 +88,9 @@
     <h1>Error</h1>
     <pre>{JSON.stringify(status.errors, "", 2)}</pre>
 {:else if (status.isLoading)}
-    <h2>Loading</h2>
+    <LoadingPlaceholder>
+        Loading bookmarks...
+    </LoadingPlaceholder>
 {:else}
     <div class="row">
         <div class="col-sm-4">

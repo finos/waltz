@@ -22,6 +22,7 @@ import preventNavigationService from "./prevent-navigation-service";
 import serviceBroker from "./service-broker";
 import {CORE_API} from "./core-api-utils";
 import {toMap} from "../map-utils";
+import {remote} from "../../svelte-stores/remote";
 
 
 const displayNameService = new BaseLookupService();
@@ -118,6 +119,7 @@ export default (module) => {
     function configServiceBroker($transitions, serviceBroker) {
         $transitions.onBefore({}, (transition, state, opts) => {
 
+            remote.clear();
             const promise = serviceBroker
                 .loadViewData(CORE_API.ClientCacheKeyStore.findAll)
                 .then(r => r.data)
