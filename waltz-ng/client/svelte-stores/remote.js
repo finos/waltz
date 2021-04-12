@@ -91,7 +91,7 @@ function _fetchData(cache, method, url, data, init = [], config = { force: false
             invokeFetch();
         }
     } else {
-        cache.init(key, writable(init));
+        cache.init(key, init);
         invokeFetch();
     }
 

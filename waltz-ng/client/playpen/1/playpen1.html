@@ -27,24 +27,14 @@
         </ol>
     </waltz-page-header>
 
-    <div class="row">
-        <div class="col-md-6">
-            <!-- NG  BOOKMARKS -->
-            <waltz-dynamic-section-wrapper section="$ctrl.bookmarksSection"
-                                           parent-entity-ref="$ctrl.ref">
-            </waltz-dynamic-section-wrapper>
+    <waltz-section>
+        <div class="row">
+            <div class="col-md-12">
+                <waltz-svelte-component component="$ctrl.Wrapper">
+                </waltz-svelte-component>
+            </div>
         </div>
-        <div class="col-md-6">
-            <!-- NG  BOOKMARKS -->
-            <waltz-dynamic-section-wrapper section="$ctrl.bookmarksSection"
-                                           parent-entity-ref="$ctrl.ref2">
-            </waltz-dynamic-section-wrapper>
-            <hr>
-            <waltz-dynamic-section-wrapper section="$ctrl.bookmarksSection"
-                                           parent-entity-ref="$ctrl.ref2">
-            </waltz-dynamic-section-wrapper>
-        </div>
-    </div>
+    </waltz-section>
 
 
 

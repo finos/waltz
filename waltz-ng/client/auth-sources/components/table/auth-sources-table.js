@@ -25,13 +25,15 @@ import template from "./auth-sources-table.html";
 
 const bindings = {
     parentEntityRef: "<",
-    authSources: "<"
+    authSources: "<",
+    onSelect: "<?"
 };
 
 
 const initialState = {
     consumersByAuthSourceId: {},
-    columnDefs: null
+    columnDefs: null,
+    onSelect: () => console.log("Default onSelect for auth sources table")
 };
 
 
@@ -138,6 +140,7 @@ function controller($q, serviceBroker, enumValueService) {
         vm.gridData = _.map(vm.authSources, d => {
             const authoritativenessRatingEnum = vm.enums.AuthoritativenessRating[d.rating];
             return {
+                id: d.id,
                 app: d.applicationReference,
                 dataType: dataTypesByCode[d.dataType],
                 appOrgUnit: d.appOrgUnitReference,
