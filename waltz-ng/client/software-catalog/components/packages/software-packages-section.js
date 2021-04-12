@@ -95,7 +95,7 @@ function controller(serviceBroker) {
                 CORE_API.SoftwareCatalogStore.findBySelector,
                 [options])
             .then(r => {
-                vm.softwareCatalog = r.data;
+                vm.softwareCatalog = _.head(r.data);
                 vm.columnDefs = mkColumnDefs();
                 vm.gridData = mkGridData(
                     vm.softwareCatalog.packages,

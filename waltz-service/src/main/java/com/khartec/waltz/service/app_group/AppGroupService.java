@@ -19,7 +19,6 @@
 package com.khartec.waltz.service.app_group;
 
 import com.khartec.waltz.common.Checks;
-import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.exception.InsufficientPrivelegeException;
 import com.khartec.waltz.data.app_group.AppGroupDao;
 import com.khartec.waltz.data.app_group.AppGroupEntryDao;
@@ -39,11 +38,8 @@ import com.khartec.waltz.model.entity_relationship.ImmutableEntityRelationship;
 import com.khartec.waltz.model.entity_relationship.RelationshipKind;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
-import com.khartec.waltz.schema.tables.records.EntityRelationshipRecord;
 import com.khartec.waltz.service.change_initiative.ChangeInitiativeService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
-import org.jooq.Query;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,10 +54,7 @@ import static com.khartec.waltz.common.ListUtilities.append;
 import static com.khartec.waltz.common.MapUtilities.indexBy;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
-import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static java.lang.String.format;
-import static java.util.stream.Collectors.collectingAndThen;
-import static java.util.stream.Collectors.toList;
 
 @Service
 public class AppGroupService {
@@ -112,7 +105,7 @@ public class AppGroupService {
     public AppGroupDetail getGroupDetailById(long groupId) {
         return ImmutableAppGroupDetail.builder()
                 .appGroup(appGroupDao.getGroup(groupId))
-                .applications(appGroupEntryDao.getEntriesForGroup(groupId))
+                .applications(appGroupEntryDao.findEntriesForGroup(groupId))
                 .members(appGroupMemberDao.getMembers(groupId))
                 .organisationalUnits(appGroupOrganisationalUnitDao.getEntriesForGroup(groupId))
                 .build();
@@ -202,7 +195,7 @@ public class AppGroupService {
             audit(groupId, userId, format("Added application %s to group", app.name()), EntityKind.APPLICATION, Operation.ADD);
         }
 
-        return appGroupEntryDao.getEntriesForGroup(groupId);
+        return appGroupEntryDao.findEntriesForGroup(groupId);
     }
 
 
@@ -241,7 +234,7 @@ public class AppGroupService {
 
         changeLogService.write(changeLogs);
 
-        return appGroupEntryDao.getEntriesForGroup(groupId);
+        return appGroupEntryDao.findEntriesForGroup(groupId);
     }
 
 
@@ -256,7 +249,7 @@ public class AppGroupService {
                         : applicationId),
                 EntityKind.APPLICATION,
                 Operation.REMOVE);
-        return appGroupEntryDao.getEntriesForGroup(groupId);
+        return appGroupEntryDao.findEntriesForGroup(groupId);
     }
 
     public List<AppGroupEntry> addOrganisationalUnit(String userId, long groupId, long orgUnitId) throws InsufficientPrivelegeException {
@@ -295,7 +288,7 @@ public class AppGroupService {
                 .collect(Collectors.toList());
         changeLogService.write(changeLogs);
 
-        return appGroupEntryDao.getEntriesForGroup(groupId);
+        return appGroupEntryDao.findEntriesForGroup(groupId);
     }
 
 

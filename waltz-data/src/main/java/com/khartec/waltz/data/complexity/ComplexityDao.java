@@ -113,7 +113,7 @@ public class ComplexityDao {
     }
 
 
-    public Tuple2<BigDecimal, BigDecimal> findAverageAndTotalScoreByKindAndSelector(Long complexityKindId, GenericSelector genericSelector) {
+    public Tuple2<BigDecimal, BigDecimal> getAverageAndTotalScoreforKindAndSelector(Long complexityKindId, GenericSelector genericSelector) {
         AggregateFunction<BigDecimal> total_complexity = DSL.sum(COMPLEXITY.SCORE);
         Field<BigDecimal> average_complexity = total_complexity.divide(DSL.countDistinct(COMPLEXITY.ENTITY_ID)).as("average_complexity");
         return dsl

@@ -42,6 +42,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static java.util.Optional.ofNullable;
 
 
+
 public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
 
     protected DSLContext dsl;

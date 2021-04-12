@@ -22,6 +22,7 @@ import com.tngtech.archunit.lang.ArchRule;
 import org.junit.Test;
 import org.springframework.stereotype.Repository;
 
+import static com.tngtech.archunit.core.domain.JavaModifier.ABSTRACT;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
 public class DaoArchitectureCompliance extends BaseArchitectureComplianceCheck {
@@ -31,6 +32,8 @@ public class DaoArchitectureCompliance extends BaseArchitectureComplianceCheck {
     public void daosNeedRepositoryAnnotation() {
         ArchRule rule = classes().that()
                 .areNotInterfaces()
+                .and()
+                .doNotHaveModifier(ABSTRACT)
                 .and()
                 .resideInAPackage("..khartec..")
                 .and()

@@ -58,7 +58,7 @@ public class AppGroupEntryDao {
     }
 
 
-    public List<AppGroupEntry> getEntriesForGroup(long groupId) {
+    public List<AppGroupEntry> findEntriesForGroup(long groupId) {
         return dsl
                 .select(APPLICATION.ID, APPLICATION.NAME)
                 .select(APPLICATION_GROUP_ENTRY.IS_READONLY, APPLICATION_GROUP_ENTRY.PROVENANCE)

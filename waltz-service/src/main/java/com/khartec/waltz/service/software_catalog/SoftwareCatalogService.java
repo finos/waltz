@@ -38,6 +38,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.asList;
 import static com.khartec.waltz.schema.tables.SoftwarePackage.SOFTWARE_PACKAGE;
 
 @Service
@@ -140,13 +141,13 @@ public class SoftwareCatalogService {
     }
 
 
-    public SoftwareCatalog findBySelector(IdSelectionOptions options) {
+    public List<SoftwareCatalog> findBySelector(IdSelectionOptions options) {
         //todo: build out selector logic
         switch (options.entityReference().kind()) {
             case SOFTWARE:
-                return getByPackageId(options.entityReference().id());
+                return asList(getByPackageId(options.entityReference().id()));
             case LICENCE:
-                return getByLicenceId(options.entityReference().id());
+                return asList(getByLicenceId(options.entityReference().id()));
             default:
                 throw new UnsupportedOperationException("Cannot create Software Catalog from options: " + options);
         }

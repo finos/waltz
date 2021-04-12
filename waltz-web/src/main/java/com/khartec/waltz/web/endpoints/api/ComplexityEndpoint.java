@@ -51,7 +51,7 @@ public class ComplexityEndpoint implements Endpoint {
     public void register() {
         String findByEntityRefPath = mkPath(BASE_URL, "entity", "kind", ":kind", "id", ":id");
         String findBySelectorPath = mkPath(BASE_URL, "target-kind", ":kind");
-        String findComplexitySummaryForSelectorPath = mkPath(BASE_URL, "complexity-kind", ":id", "target-kind", ":kind");
+        String getComplexitySummaryForSelectorPath = mkPath(BASE_URL, "complexity-kind", ":id", "target-kind", ":kind");
 
         ListRoute<Complexity> findByEntityRefRoute = (request, response) -> complexityService
                 .findByEntityReference(getEntityReference(request));
@@ -59,18 +59,18 @@ public class ComplexityEndpoint implements Endpoint {
         ListRoute<Complexity> findBySelectorRoute = (request, response) -> complexityService
                 .findBySelector(getKind(request), readIdSelectionOptionsFromBody(request));
 
-        DatumRoute<ComplexitySummary> findComplexitySummaryForSelectorRoute = (request, response) -> {
+        DatumRoute<ComplexitySummary> getComplexitySummaryForSelectorRoute = (request, response) -> {
             long costKindId = getId(request);
             EntityKind targetKind = getKind(request);
             IdSelectionOptions selectionOptions = readIdSelectionOptionsFromBody(request);
             Integer limit = getLimit(request).orElse(15);
 
             return complexityService
-                    .findComplexitySummaryForSelector(costKindId, targetKind, selectionOptions, limit);
+                    .getComplexitySummaryForSelector(costKindId, targetKind, selectionOptions, limit);
         };
 
         getForList(findByEntityRefPath, findByEntityRefRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
-        postForDatum(findComplexitySummaryForSelectorPath, findComplexitySummaryForSelectorRoute);
+        postForDatum(getComplexitySummaryForSelectorPath, getComplexitySummaryForSelectorRoute);
     }
 }

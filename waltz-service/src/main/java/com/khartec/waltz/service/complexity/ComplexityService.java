@@ -51,16 +51,16 @@ public class ComplexityService {
     }
 
 
-    public ComplexitySummary findComplexitySummaryForSelector(Long complexityKindId,
-                                                              EntityKind targetKind,
-                                                              IdSelectionOptions options,
-                                                              int limit){
+    public ComplexitySummary getComplexitySummaryForSelector(Long complexityKindId,
+                                                             EntityKind targetKind,
+                                                             IdSelectionOptions options,
+                                                             int limit){
 
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, options);
 
         Set<Complexity> topComplexities = complexityDao.findTopComplexityScoresForKindAndSelector(complexityKindId, genericSelector, limit);
 
-        Tuple2<BigDecimal, BigDecimal> averageAndTotalScore = complexityDao.findAverageAndTotalScoreByKindAndSelector(complexityKindId, genericSelector);
+        Tuple2<BigDecimal, BigDecimal> averageAndTotalScore = complexityDao.getAverageAndTotalScoreforKindAndSelector(complexityKindId, genericSelector);
 
         Tuple2<Integer, Integer> mappedAndMissingCountsForKindBySelector = complexityDao.getMappedAndMissingCountsForKindBySelector(complexityKindId, genericSelector);
 
