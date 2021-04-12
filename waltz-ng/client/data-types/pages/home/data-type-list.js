@@ -25,9 +25,6 @@ import template from './data-type-list.html';
 
 
 const initialState = {
-    visibility: {
-        editor: false
-    }
 };
 
 
@@ -36,19 +33,10 @@ function controller($state,
 
     const vm = initialiseData(this, initialState);
 
-    const loadAuthSources = ()  => {
-        serviceBroker
-            .loadViewData(CORE_API.AuthSourcesStore.findAll)
-            .then(r => vm.authSources = r.data);
-    };
-
     vm.$onInit = () => {
         serviceBroker
             .loadAppData(CORE_API.SvgDiagramStore.findByGroup, ['DATA_TYPE'])
             .then(r => vm.diagrams = r.data);
-
-        loadAuthSources();
-
     };
 
     vm.nodeSelected = (node) => vm.selectedNode = node;
@@ -56,15 +44,6 @@ function controller($state,
     vm.blockProcessor = b => {
         b.block.onclick = () => $state.go('main.data-type.code', { code: b.value });
         angular.element(b.block).addClass('clickable');
-    };
-
-    vm.showAuthSources = () => {
-        vm.visibility.editor = false;
-        loadAuthSources();
-    };
-
-    vm.editAuthSources = () => {
-        vm.visibility.editor = true;
     };
 }
 

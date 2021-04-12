@@ -35,7 +35,7 @@ const initialState = {
 
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
-
+    
     vm.$onChanges = () => {
         if (vm.physicalFlow) {
             serviceBroker

@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
@@ -21,6 +20,7 @@ import angular from 'angular';
 import * as authSourcesStore from './services/auth-sources-store';
 import * as AuthSourceEditorPanel from './components/editor/auth-source-editor-panel';
 import * as AuthSourcesTable from './components/table/auth-sources-table';
+import AuthSourceSummaryList from './components/auth-source-summary-list/auth-source-summary-list'
 import * as NonAuthSourcesPanel from './components/non-auth-sources-panel/non-auth-sources-panel';
 import * as AuthSourcesSection from './components/section/auth-sources-section';
 import * as AuthSourcesSummaryPanel from './components/summary-panel/auth-sources-summary-panel';
@@ -44,6 +44,7 @@ export default () => {
         module,
         [
             AuthSourceEditorPanel,
+            AuthSourceSummaryList,
             AuthSourcesTable,
             AuthSourcesSection,
             AuthSourcesSummaryPanel,

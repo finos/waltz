@@ -21,7 +21,8 @@
         <div class="col-md-12">
             <div ng-if="$ctrl.gridData.length > 0">
                 <waltz-grid-with-search column-defs="$ctrl.columnDefs"
-                                        entries="$ctrl.gridData">
+                                        entries="$ctrl.gridData"
+                                        on-row-select="$ctrl.onSelect">
                 </waltz-grid-with-search>
             </div>
         </div>
