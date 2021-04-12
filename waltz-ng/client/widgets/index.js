@@ -52,6 +52,7 @@ import SimpleStackChart from "./simple-stack-chart";
 import Toggle from "./toggle";
 import Twistie from "./twistie";
 import Warning from "./warning/warning"
+import SvelteComponent from "./svelte-component";
 
 
 export default () => {
@@ -68,6 +69,8 @@ export default () => {
     module.directive("waltzSearch", Search);
     module.directive("waltzSectionActions", SectionActions);
     module.directive("waltzStepCount", StepCount);
+    module.directive("waltzSvelteComponent", SvelteComponent);
+
     module
         .component("waltzBasicInfoTile", BasicInfoTile)
         .component("waltzDataExtractLink", DataExtractLink)

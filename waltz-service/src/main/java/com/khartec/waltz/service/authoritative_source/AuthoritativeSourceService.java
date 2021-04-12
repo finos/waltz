@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.service.authoritative_source;
 
+import com.khartec.waltz.common.exception.NotFoundException;
 import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.application.ApplicationDao;
@@ -25,8 +26,8 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
 import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
-import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
+import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.authoritativesource.*;
@@ -143,8 +144,12 @@ public class AuthoritativeSourceService {
 
     public int remove(long id, String username) {
 
-        logRemoval(id, username);
         AuthoritativeSource authSourceToDelete = getById(id);
+
+        if(authSourceToDelete == null){
+            throw new NotFoundException("ASRM-NF", "Authoritative source not found");
+        }
+        logRemoval(id, username);
         int deletedCount = authoritativeSourceDao.remove(id);
         ratingCalculator.update(authSourceToDelete.dataType(), authSourceToDelete.parentReference());
         return deletedCount;

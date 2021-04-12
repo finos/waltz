@@ -21,7 +21,8 @@ import template from "./playpen1.html";
 import {initialiseData} from "../../common";
 import {mkRef} from "../../common/entity-utils";
 import BookmarkPanel from "../../bookmarks/svelte/BookmarkPanel.svelte";
-import {dynamicSections} from "../../dynamic-section/dynamic-section-definitions";
+import DatatypeTreeSelector from "../../common/svelte/DataTypeTreeSelector.svelte"
+import Wrapper from "./Wrapper.svelte"
 
 const initData = {
     ref: mkRef("APPLICATION", 840),
@@ -30,13 +31,15 @@ const initData = {
     ref3: mkRef("APPLICATION", 212),
     ref4: mkRef("APPLICATION", 913),
     BookmarkPanel,
-    bookmarksSection: dynamicSections.bookmarksSection,
+    DatatypeTreeSelector,
+    Wrapper
 };
 
 
 function controller($element, $q, serviceBroker) {
 
     const vm = initialiseData(this, initData);
+
 
 }
 
