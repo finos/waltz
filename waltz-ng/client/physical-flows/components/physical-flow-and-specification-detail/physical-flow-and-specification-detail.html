@@ -96,9 +96,8 @@
             Basis Offset:
         </div>
         <div class="col-sm-10">
-            <span uib-popover-template="'wpfasd-popover.html'"
+            <span uib-popover="Offset basis refers to the age of the data. T (or 0) is the same day, +1 is one day old etc."
                     popover-trigger="mouseenter"
-                    popover-popup-delay="300"
                     popover-append-to-body="true"
                     popover-placement="top">
                 <span ng-bind="$ctrl.physicalFlow.basisOffset | toBasisOffset"></span>
@@ -165,12 +164,3 @@
         </div>
     </div>
 </div>
-
-<!-- POPUP -->
-<script type="text/ng-template"
-        id="wpfasd-popover.html">
-    <div>
-        <waltz-markdown text="$ctrl.physicalFlow.basisOffsetDescription">
-        </waltz-markdown>
-    </div>
-</script>

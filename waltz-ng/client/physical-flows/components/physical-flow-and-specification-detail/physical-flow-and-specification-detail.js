@@ -35,10 +35,9 @@ const initialState = {
 
 function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
-    const basisOffsetDescription = "Offset basis refers to the age of the data. T (or 0) is the same day, +1 is one day old etc.";
+    
     vm.$onChanges = () => {
         if (vm.physicalFlow) {
-            vm.physicalFlow.basisOffsetDescription = basisOffsetDescription;
             serviceBroker
                 .loadViewData(
                     CORE_API.TagStore.findTagsByEntityRef,
