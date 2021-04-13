@@ -17,22 +17,13 @@
  */
 
 import {remote} from "./remote";
-import {writable} from "svelte/store";
-import {$http} from "../common/WaltzHttp";
 
 export function mkEnumValueStore() {
-    const store = writable([]);
-    const loadOld = (force = false) => remote
+    const load = (force = false) => remote
         .fetchAppList("GET", "api/enum-value", null, {force});
-    const load = (force = false) => {
-        $http
-            .get("api/enum-value")
-            .then(r => store.set(r.data));
-        return store;
-    }
 
     return {
-        load: loadOld
+        load
     };
 }
 

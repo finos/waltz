@@ -1,18 +1,22 @@
 <script>
+    import _ from "lodash";
+
     import EntitySearchSelector from "../../../common/svelte/EntitySearchSelector.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
-    import {mode, Modes, selectedAuthSource} from "./editingAuthSources";
     import EntityLabel from "../../../common/svelte/EntityLabel.svelte";
-    import _ from "lodash";
     import DataTypeTreeSelector from "../../../common/svelte/DataTypeTreeSelector.svelte";
+
+    import {mode, Modes, selectedAuthSource} from "./editingAuthSourcesState";
+    import {enumValueStore} from "../../../svelte-stores/enum-value-store";
 
     export let doSave;
     export let doUpdate;
     export let doCancel;
 
     let savePromise;
-
     let workingCopy = Object.assign({}, $selectedAuthSource);
+
+    const enumCall = enumValueStore.load();
 
     function getRequiredFields(d) {
         return [d.rating, d.app, d.orgUnit, d.dataType];
@@ -25,10 +29,6 @@
     $: invalid = (workingCopy.id)
         ? !fieldChanged(workingCopy)
         : _.some(getRequiredFields(workingCopy), v => _.isNil(v));
-
-    function onUpdateRating(event) {
-        workingCopy.rating = event.currentTarget.value;
-    }
 
     function save() {
         if (workingCopy.id) {
@@ -86,6 +86,12 @@
         workingCopy.dataType = null;
     }
 
+    $: ratingsByKey = _
+        .chain($enumCall.data)
+        .filter(d => d.type === "AuthoritativenessRating")
+        .keyBy(d => d.key)
+        .value();
+
 </script>
 
 
@@ -97,6 +103,7 @@
             <label for="source">Source:</label>
             <div id="source">
                 <EntitySearchSelector on:select={onSelectSource}
+                                      placeholder="Search for source"
                                       entityKinds={['APPLICATION']}>
                 </EntitySearchSelector>
             </div>
@@ -122,7 +129,8 @@
             <label for="scope">Scope:</label>
             <div id="scope">
                 <EntitySearchSelector on:select={onSelectScope}
-                                      entityKinds={['APPLICATION', 'ORG_UNIT']}>
+                                      placeholder="Search for scope"
+                                      entityKinds={['ORG_UNIT']}>
                 </EntitySearchSelector>
             </div>
             <p class="text-muted">Start typing to select the selector for applications this authority statement will apply to</p>
@@ -138,7 +146,7 @@
 
         <div>
             <strong>Scope:</strong>
-            <EntityLabel ref={workingCopy.declaringOrgUnit}></EntityLabel>
+            <EntityLabel ref={workingCopy.declaringOrgUnit}/>
         </div>
         <p class="text-muted">The selector for applications this authority statement applies to</p>
     {/if}
@@ -148,17 +156,15 @@
          class="form-group">
         <label>
             <input type=radio
-                   checked={workingCopy.rating==='PRIMARY'}
-                   on:change={onUpdateRating}
-                   value={'PRIMARY'}>
-            RAS
+                   bind:group={workingCopy.rating}
+                   value='PRIMARY'>
+            {_.get(ratingsByKey, ["PRIMARY", "name"], "-")}
         </label>
         <label>
             <input type=radio
-                   checked={workingCopy.rating==='SECONDARY'}
-                   on:change={onUpdateRating}
-                   value={'SECONDARY'}>
-            Non-RAS
+                   bind:group={workingCopy.rating}
+                   value='SECONDARY'>
+            {_.get(ratingsByKey, ["SECONDARY", "name"], "-")}
         </label>
         <p class="text-muted">Select an authority statement for this source</p>
     </div>

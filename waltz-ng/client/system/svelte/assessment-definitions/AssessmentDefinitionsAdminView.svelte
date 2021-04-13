@@ -12,8 +12,8 @@
     import AssessmentDefinitionRemovalConfirmation from "./AssessmentDefinitionRemovalConfirmation.svelte";
     import RatingSchemePreviewBar from "../ratings-schemes/ItemPreviewBar.svelte";
 
-    const definitions = assessmentDefinitionStore.loadAll();
-    const ratingSchemes = ratingSchemeStore.loadAll();
+    const definitionsCall = assessmentDefinitionStore.loadAll();
+    const ratingSchemesCall = ratingSchemeStore.loadAll();
 
     const Modes = {
         LIST: "list",
@@ -26,11 +26,11 @@
     let activeMode = "list"; // edit | delete
 
     $: definitionList = _
-        .chain(termSearch($definitions.data, qry, ["name", "entityKind"]))
+        .chain(termSearch($definitionsCall.data, qry, ["name", "entityKind"]))
         .orderBy("name")
         .value();
 
-    $: ratingSchemesById = _.keyBy($ratingSchemes.data, "id");
+    $: ratingSchemesById = _.keyBy($ratingSchemesCall.data, "id");
 
 
     function onEdit(def) {
@@ -81,10 +81,8 @@
         activeMode = Modes.EDIT;
     }
 
-    $: console.log({d: $definitions, r: ratingSchemesById});
-
-
 </script>
+
 
 <PageHeader icon="puzzle-piece"
             name="Assessment Definitions">
