@@ -31,7 +31,6 @@
 
 </script>
 
-
 <SearchInput bind:value={qry}/>
 
 <div class="waltz-scroll-region-250">

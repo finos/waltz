@@ -20,9 +20,17 @@
             path: ctx => `application/${ctx.id}`,
             title: "Application View"
         },
+        "main.data-type.view": {
+            path: ctx => `data-types/${ctx.id}`,
+            title: "DataType View"
+        },
         "main.measurable.view": {
             path: ctx => `measurable/${ctx.id}`,
             title: "Measurable View"
+        },
+        "main.org-unit.view": {
+            path: ctx => `org-units/${ctx.id}`,
+            title: "Org Unit View"
         }
     };
 

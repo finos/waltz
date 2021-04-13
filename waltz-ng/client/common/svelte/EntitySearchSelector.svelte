@@ -5,6 +5,7 @@
 
     let selectedItem;
     export let entityKinds;
+    export let placeholder = "Search..."
 
     const dispatch = createEventDispatcher();
 
@@ -21,4 +22,5 @@
 <AutoComplete searchFunction={search}
               labelFieldName="name"
               valueFieldName="id"
+              {placeholder}
               bind:selectedItem={selectedItem} />

@@ -2,17 +2,20 @@ import template from "./auth-source-summary-list.html"
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import AuthSourceDetail from "./AuthSourceDetail.svelte";
-import AuthSourceCreate from "./AuthSourceEditor.svelte";
-import {mode, selectedAuthSource} from "./editingAuthSources";
-
+import AuthSourceEditor from "./AuthSourceEditor.svelte";
+import {mode, selectedAuthSource} from "./editingAuthSourcesState";
+import roles from "../../../user/system-roles";
 
 const bindings = {}
 
 const initialState = {
-    viewMode: "LIST"
-}
+    viewMode: "LIST",
+    AuthSourceDetail,
+    AuthSourceEditor,
+    canEdit: false
+};
 
-function controller(serviceBroker, $scope){
+function controller(serviceBroker, userService, $scope){
 
     const loadAuthSources = ()  => {
         serviceBroker
@@ -24,8 +27,9 @@ function controller(serviceBroker, $scope){
 
     vm.$onInit = () => {
         loadAuthSources();
-        vm.authSummarySection = AuthSourceDetail;
-        vm.createAuthSourceSection = AuthSourceCreate;
+        userService
+            .whoami()
+            .then(user => vm.canEdit = userService.hasRole(user, roles.AUTHORITATIVE_SOURCE_EDITOR));
     };
 
     vm.onSelectAuthSource = (authSource) => {
@@ -38,7 +42,7 @@ function controller(serviceBroker, $scope){
             orgUnit: null,
             app: null,
             description: null,
-            dataType: null, 
+            dataType: null,
             rating: "SECONDARY"
         })
         mode.set("EDIT");
@@ -64,7 +68,7 @@ function controller(serviceBroker, $scope){
             .then(() => {
                 loadAuthSources();
                 mode.set("DETAIL");
-            })
+            });
     }
 
     vm.doDelete = (id) => {
@@ -74,7 +78,7 @@ function controller(serviceBroker, $scope){
                 .then(() => {
                     loadAuthSources();
                     vm.cancel();
-                })
+                });
         }
     }
 
@@ -86,6 +90,7 @@ function controller(serviceBroker, $scope){
 
 controller.$inject = [
     "ServiceBroker",
+    "UserService",
     "$scope"
 ]
 

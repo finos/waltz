@@ -13,15 +13,16 @@
     </div>
 
     <div ng-if="$ctrl.viewMode==='DETAIL'">
-        <waltz-svelte-component component="$ctrl.authSummarySection"
+        <waltz-svelte-component component="$ctrl.AuthSourceDetail"
                                 primary-entity-ref="$ctrl.parentEntityRef"
+                                can-edit="$ctrl.canEdit"
                                 do-delete="$ctrl.doDelete"
                                 do-cancel="$ctrl.cancel">
         </waltz-svelte-component>
     </div>
 
     <div ng-if="$ctrl.viewMode==='EDIT'">
-        <waltz-svelte-component component="$ctrl.createAuthSourceSection"
+        <waltz-svelte-component component="$ctrl.AuthSourceEditor"
                                 primary-entity-ref="$ctrl.parentEntityRef"
                                 do-save="$ctrl.doSave"
                                 do-update="$ctrl.doUpdate"
@@ -29,10 +30,12 @@
         </waltz-svelte-component>
     </div>
 
-    <button class="btn-link"
-            ng-click="$ctrl.create()"
-            ng-if="$ctrl.viewMode==='LIST'">
-        <waltz-icon name="plus"></waltz-icon> Add new Authoritative Source
-    </button>
+    <div ng-if="$ctrl.viewMode==='LIST' && $ctrl.canEdit">
+        <button class="btn-link"
+                ng-click="$ctrl.create()">
+            <waltz-icon name="plus"></waltz-icon>
+            Add new Authoritative Source
+        </button>
+    </div>
 
 </waltz-section>

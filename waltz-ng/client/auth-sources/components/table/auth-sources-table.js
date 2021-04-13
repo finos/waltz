@@ -19,7 +19,7 @@
 import _ from "lodash";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {mkEntityLinkGridCell} from "../../../common/grid-utils";
+import {mkEntityLabelGridCell} from "../../../common/grid-utils";
 import template from "./auth-sources-table.html";
 
 
@@ -97,9 +97,9 @@ function mkColumnDefs(parentRef) {
     };
 
     return _.compact([
-        mkEntityLinkGridCell("Data Type", "dataType", "none", "right"),
-        mkEntityLinkGridCell("Declaring Org Unit", "declaringOrgUnit", "none"),
-        mkEntityLinkGridCell("Application", "app", "none", "right"),
+        mkEntityLabelGridCell("Data Type", "dataType", "none", "right"),
+        mkEntityLabelGridCell("Declaring Org Unit", "declaringOrgUnit", "none"),
+        mkEntityLabelGridCell("Application", "app", "none", "right"),
         consumerCell,
         ratingCell,
         notesCell
