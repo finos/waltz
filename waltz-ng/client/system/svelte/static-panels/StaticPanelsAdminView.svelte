@@ -7,7 +7,7 @@
     import StaticPanelEditor from "./StaticPanelEditor.svelte";
     import ViewLink from "../../../common/svelte/ViewLink.svelte";
 
-    import {mkStaticPanelStore} from "../../../svelte-stores/static-panel-store";
+    import {staticPanelStore} from "../../../svelte-stores/static-panel-store";
     import {userStore} from "../../../svelte-stores/user-store";
     import roles from "../../../user/system-roles";
     import {mkPlaceholderPanelData} from "./static-panel-utils";
@@ -16,13 +16,12 @@
     let qry = "";
     let selectedPanel = null;
     let canEdit = false;
-    let panelStore = mkStaticPanelStore();
 
-    let user = userStore.load();
-    let panels = panelStore.load();
+    let userCall = userStore.load();
+    let panelsCall = staticPanelStore.load();
 
     $: panelList = _
-        .chain($panels.data)
+        .chain($panelsCall.data)
         .filter(p => _.isEmpty(qry)
             ? true
             : _.toLower(p.group + p.title).indexOf(_.toLower(qry)) > -1)
@@ -30,7 +29,7 @@
         .value();
 
     $: canEdit = _.includes(
-        $user.data.roles,
+        $userCall.data?.roles,
         roles.ADMIN.key);
 
     function onSelectPanel(p) {
@@ -42,7 +41,7 @@
     }
 
     function doSave(panel) {
-        return panelStore
+        return staticPanelStore
             .save(panel)
             .then(() => selectedPanel = null);
     }

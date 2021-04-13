@@ -66,22 +66,22 @@
         };
     }
 
-    let bookmarks = bookmarkStore.load(primaryEntityRef);
-    let user = userStore.load();
-    let enums = enumValueStore.load();
+    let bookmarksCall = bookmarkStore.load(primaryEntityRef);
+    let userCall = userStore.load();
+    let enumsCall = enumValueStore.load();
 
-    $: nestedEnums = nestEnums($enums.data);
+    $: nestedEnums = nestEnums($enumsCall.data);
     $: bookmarkGroups = nestBookmarks(
         nestedEnums,
-        filterBookmarks($bookmarks.data, selectedKind, qry));
+        filterBookmarks($bookmarksCall.data, selectedKind, qry));
     $: bookmarkKinds = mkBookmarkKinds(
         nestedEnums,
-        $bookmarks.data);
-    $: actions = _.includes($user.data?.roles, roles.BOOKMARK_EDITOR.key)
+        $bookmarksCall.data);
+    $: actions = _.includes($userCall.data?.roles, roles.BOOKMARK_EDITOR.key)
         ? [editAction, removeAction]
         : [];
 
-    $: status = mkOverallStatus([$bookmarks])
+    $: status = mkOverallStatus([$bookmarksCall])
 </script>
 
 {#if (status.hasErrors)}
@@ -112,7 +112,7 @@
                                 doCancel={()=> editCandidate = null} >
                 </BookmarkEditor>
             {:else}
-                {#if $bookmarks.data.length > 5}
+                {#if $bookmarksCall.data.length > 5}
                     <SearchInput bind:value={qry}
                                  placeholder="Search bookmarks..."/>
                     <br>

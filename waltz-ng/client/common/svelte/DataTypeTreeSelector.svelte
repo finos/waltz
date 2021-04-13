@@ -5,11 +5,7 @@
     import SearchInput from "./SearchInput.svelte";
     import _ from "lodash";
 
-    let dataTypesCall = dataTypeStore.findAll();
-    let expanded = true;
-    let qry = "";
-    let searchNodes = [];
-    let dataTypes = [];
+    const root = {name: "Root"};
 
     function calcDisplayHierarchy(nodes, query) {
         const searchResult = _.map(
@@ -23,21 +19,28 @@
         return buildHierarchies(searchResult, false);
     }
 
+    let dataTypesCall = dataTypeStore.findAll();
+    let expanded = true;
+    let qry = "";
+    let searchNodes = [];
+    let dataTypes = [];
+
     $: dataTypes = $dataTypesCall.data;
     $: searchNodes = prepareSearchNodes(dataTypes);
     $: displayedHierarchy = calcDisplayHierarchy(searchNodes, qry);
 
-
 </script>
-<SearchInput bind:value={qry}></SearchInput>
+
+
+<SearchInput bind:value={qry}/>
+
 <div class="waltz-scroll-region-250">
     <DataTypeTreeNode isRoot={true}
-                      node={{name: "Root"}}
+                      node={root}
                       childNodes={displayedHierarchy}
                       expanded={expanded}
                       on:select>
     </DataTypeTreeNode>
 
 </div>
-<!--<pre>{JSON.stringify(displayedHierarchy, null, 2)}</pre>-->
 

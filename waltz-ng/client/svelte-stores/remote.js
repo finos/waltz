@@ -24,31 +24,31 @@ import {writable} from "svelte/store";
 class Cache {
     constructor(name) {
         this.name = name;
-        this.data = new Map();
+        this.cacheData = new Map();
     }
 
     clear() {
-        this.data.clear();
+        this.cacheData.clear();
     }
 
     get(key) {
-        return this.data.get(key);
+        return this.cacheData.get(key);
     }
 
     has(key) {
-        return this.data.has(key);
+        return this.cacheData.has(key);
     }
 
     init(key, d) {
-        return this.data.set(key, writable({ data: d, status: "loading" }))
+        return this.cacheData.set(key, writable({ data: d, error: null, status: "loading" }))
     }
 
     set(key, d) {
-        return this.data.get(key).set({ data: d, status: "loaded" })
+        return this.cacheData.get(key).set({ data: d, error: null, status: "loaded" })
     }
 
     err(key, e, d) {
-        return this.data.get(key).set({ data: d, error: e, status: "error" })
+        return this.cacheData.get(key).set({ data: d, error: e, status: "error" })
     }
 
     name() {
