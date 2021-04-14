@@ -190,9 +190,8 @@ function controller($q, serviceBroker) {
 
     vm.disablePredicate = (node) => {
         const isAbstract = !node.dataType.concrete;
-        const isDeprecated = node.deprecated;
         const notUsed = node.usage === null;
-        return (isAbstract || isDeprecated) && notUsed;
+        return isAbstract && notUsed;
     };
 
     vm.isReadonlyPredicate = (node) => {
