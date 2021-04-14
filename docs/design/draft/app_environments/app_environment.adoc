@@ -34,7 +34,7 @@ How is this different from the environment field on server_usage/database_inform
 
 * Can give custom/multiple environment names = e.g. 'INT-1', 'INT-2'.
 * Can show that servers/databases on used by other applications are a key part of the application environment
-
+* For user organisation rather than from authoritative system
 
 Changes:
 
@@ -64,30 +64,34 @@ app-server information - one server information record can be linked to many app
 
 If we're using server_usage though it will need an id...
 
-Although think UAT and Dev2 same server... could just apply two tags to same server?
-But say that server was also used by another app... does that matter... surely we want to link the
-specific app server to show what is part of the env?
+[NOTE]
+====
+If a server is used by multiple apps (hundreds sometimes), we want to show which usage on that
+server is important to the environment we are focused on.
+====
 
 - Could offer warnings where an environment is constructed with servers both from dev and from prod?
+- Could use owning entity to suggest likely environment tags you might want (from other usages)
 
 Possible tables:
 
-.app_environment_tag:
+.custom_environment:
 |===
-| id | application_id | name | description | external_id
+| id | owning_entity_id | owning_entity_kind | name | description | external_id
 
 | 1
 | 12345
+| APPLICATION
 | INT-1
 | Second development environment without nightly database restore
 | WALTZ_INT
 |===
 
 
-.app_environment_tag_usage:
+.custom_environment_usage:
 
 |===
-|tag_id|entity_id|entity_kind|created_at|created_by|provenance
+| custom_environment_id | entity_id | entity_kind | created_at | created_by | provenance
 
 |1
 |678
