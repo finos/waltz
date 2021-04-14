@@ -20,19 +20,14 @@ package com.khartec.waltz.web;
 
 import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.endpoints.extracts.DataExtractor;
-import com.tngtech.archunit.base.DescribedPredicate;
-import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.lang.ArchRule;
 import org.junit.Test;
 import org.springframework.stereotype.Service;
 
-import static com.tngtech.archunit.core.domain.JavaClass.Predicates.implement;
 import static com.tngtech.archunit.core.domain.JavaModifier.ABSTRACT;
-import static com.tngtech.archunit.core.domain.properties.HasModifiers.Predicates.modifier;
-import static com.tngtech.archunit.core.domain.properties.HasName.Predicates.nameMatching;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
-public class EndpointArchitectureCompliance extends BaseArchitectureComplianceCheck {
+public class EndpointArchitectureComplianceTest extends BaseArchitectureComplianceTest {
 
     @Test
     public void endpointsNeedMarkerInterface() {
@@ -77,18 +72,15 @@ public class EndpointArchitectureCompliance extends BaseArchitectureComplianceCh
 
 
     @Test
-    public void extractorsExtendBaseExtractor() {
-
-        DescribedPredicate<JavaClass> baseExtractors = implement(DataExtractor.class)
-                .and(modifier(ABSTRACT))
-                .and(nameMatching(".*Extractor"));
+    public void extractorsImplementDataExtractor() {
 
         ArchRule rule = classes().that()
                 .haveNameMatching(".*Extractor")
                 .and()
-                .doNotHaveModifier(ABSTRACT)
+                .areNotInterfaces()
                 .should()
-                .beAssignableTo(baseExtractors);
+                .implement(DataExtractor.class);
+
         rule.check(waltzOnlyClasses);
     }
 

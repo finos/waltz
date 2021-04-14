@@ -19,34 +19,35 @@
 package com.khartec.waltz.web;
 
 import org.junit.Test;
-import org.slf4j.LoggerFactory;
-import spark.RequestResponseFactory;
-import spark.Response;
 
-import javax.servlet.http.HttpServletResponse;
+import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static org.junit.Assert.assertEquals;
 
-public class WebUtilities_attemptRender {
+public class WebUtilities_mkPathTest {
 
-    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(WebUtilities_attemptRender.class);
-
-    private Response resp = RequestResponseFactory.create((HttpServletResponse) null);
-
-
-    @Test(expected = IllegalArgumentException.class)
-    public void mustProvideResponseObj() {
-        WebUtilities.attemptRender(null, "foo", LOG);
+    @Test
+    public void oneSegment() {
+        assertEquals("bob", mkPath("bob"));
     }
 
-
-    @Test(expected = IllegalArgumentException.class)
-    public void mustProvideObjToRender() {
-        WebUtilities.attemptRender(resp, null, LOG);
+    @Test
+    public void zeroSegments() {
+        assertEquals("", mkPath());
     }
 
+    @Test
+    public void multipleSegments() {
+        assertEquals("ay/bee/cee", mkPath("ay", "bee", "cee"));
+    }
 
     @Test(expected = IllegalArgumentException.class)
-    public void mustProvideLogger() {
-        WebUtilities.attemptRender(resp, "foo", null);
+    public void emptySegmentsThrowException() {
+        mkPath("ay", "", "cee");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void cannotMkPathIfItContainsNullSegments() {
+        mkPath("bob", null, "jones");
     }
 
 }
