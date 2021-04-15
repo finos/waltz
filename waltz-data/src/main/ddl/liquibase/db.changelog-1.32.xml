@@ -27,7 +27,8 @@
                author="gharvai">
         <comment>5296: add unique index on report grid col def</comment>
         <createIndex tableName="report_grid_column_definition"
-                     indexName="idx_rgcd_entity_ref_report_grid_id">
+                     indexName="idx_rgcd_entity_ref_report_grid_id"
+                     unique="true">
             <column name="report_grid_id"
                     type="BIGINT(19)"/>
             <column name="column_entity_kind"
