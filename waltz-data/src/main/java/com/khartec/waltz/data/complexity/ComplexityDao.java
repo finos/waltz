@@ -24,7 +24,9 @@ import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.complexity.Complexity;
+import com.khartec.waltz.model.complexity.ComplexityTotal;
 import com.khartec.waltz.model.complexity.ImmutableComplexity;
+import com.khartec.waltz.model.complexity.ImmutableComplexityTotal;
 import com.khartec.waltz.schema.tables.records.ComplexityRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -40,6 +42,7 @@ import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.JooqUtilities.selectorToCTE;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.COMPLEXITY;
+import static com.khartec.waltz.schema.Tables.COMPLEXITY_KIND;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
@@ -113,7 +116,7 @@ public class ComplexityDao {
     }
 
 
-    public Tuple2<BigDecimal, BigDecimal> findAverageAndTotalScoreByKindAndSelector(Long complexityKindId, GenericSelector genericSelector) {
+    public Tuple2<BigDecimal, BigDecimal> getAverageAndTotalScoreByKindAndSelector(Long complexityKindId, GenericSelector genericSelector) {
         AggregateFunction<BigDecimal> total_complexity = DSL.sum(COMPLEXITY.SCORE);
         Field<BigDecimal> average_complexity = total_complexity.divide(DSL.countDistinct(COMPLEXITY.ENTITY_ID)).as("average_complexity");
         return dsl
@@ -125,6 +128,33 @@ public class ComplexityDao {
                                 .and(COMPLEXITY.ENTITY_KIND.eq(genericSelector.kind().name()))))
                 .groupBy(COMPLEXITY.COMPLEXITY_KIND_ID)
                 .fetchOne(r -> tuple(r.get(average_complexity), r.get(total_complexity)));
+    }
+
+
+    public Set<ComplexityTotal> findTotalsByGenericSelector(GenericSelector genericSelector) {
+
+        AggregateFunction<BigDecimal> total_complexity = DSL.sum(COMPLEXITY.SCORE);
+        Field<BigDecimal> average_complexity = total_complexity.divide(DSL.countDistinct(COMPLEXITY.ENTITY_ID)).as("average_complexity");
+        SelectHavingStep<Record3<Long, BigDecimal, BigDecimal>> totalsAndAverages = DSL
+                .select( COMPLEXITY.COMPLEXITY_KIND_ID, total_complexity, average_complexity)
+                .from(COMPLEXITY)
+                .where(COMPLEXITY.ENTITY_ID.in(genericSelector.selector())
+                        .and(COMPLEXITY.ENTITY_KIND.eq(genericSelector.kind().name())))
+                .groupBy(COMPLEXITY.COMPLEXITY_KIND_ID);
+
+        SelectOnConditionStep<Record> qry = dsl
+                .select(totalsAndAverages.fields())
+                .select(COMPLEXITY_KIND.fields())
+                .from(totalsAndAverages)
+                .innerJoin(COMPLEXITY_KIND).on(COMPLEXITY_KIND.ID.eq(totalsAndAverages.field(COMPLEXITY.COMPLEXITY_KIND_ID)));
+
+        return qry
+            .fetchSet(r -> ImmutableComplexityTotal
+                    .builder()
+                    .average(r.get(totalsAndAverages.field(average_complexity)))
+                    .total(r.get(totalsAndAverages.field(total_complexity)))
+                    .complexityKind(ComplexityKindDao.TO_COMPLEXITY_KIND_MAPPER.map(r))
+                    .build());
     }
 
 
@@ -158,4 +188,5 @@ public class ComplexityDao {
                         r.get(entityWithComplexityCount),
                         r.get(entityCount) - r.get(entityWithComplexityCount)));
     }
+
 }

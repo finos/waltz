@@ -69,13 +69,6 @@ const changeLogSection = {
     id: 7,
 };
 
-const complexitySection = {
-    componentId: "complexity-section",
-    icon: "sort-numeric-asc",
-    name: "Complexity",
-    id: 8,
-};
-
 const dataFlowSection = {
     componentId: "data-flow-section",
     name: "Data Flows",
@@ -386,7 +379,6 @@ export const dynamicSections = {
     changeLogSection,
     changeSetSection,
     changeUnitSection,
-    complexitySection,
     dataFlowSection,
     dataTypeFlowSection,
     dataTypeOriginatorsSection,

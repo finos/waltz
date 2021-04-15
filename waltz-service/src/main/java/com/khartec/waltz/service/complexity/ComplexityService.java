@@ -7,10 +7,7 @@ import com.khartec.waltz.data.complexity.ComplexityDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.complexity.Complexity;
-import com.khartec.waltz.model.complexity.ComplexityKind;
-import com.khartec.waltz.model.complexity.ComplexitySummary;
-import com.khartec.waltz.model.complexity.ImmutableComplexitySummary;
+import com.khartec.waltz.model.complexity.*;
 import com.khartec.waltz.service.complexity_kind.ComplexityKindService;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,16 +48,16 @@ public class ComplexityService {
     }
 
 
-    public ComplexitySummary findComplexitySummaryForSelector(Long complexityKindId,
-                                                              EntityKind targetKind,
-                                                              IdSelectionOptions options,
-                                                              int limit){
+    public ComplexitySummary getComplexitySummaryForSelector(Long complexityKindId,
+                                                             EntityKind targetKind,
+                                                             IdSelectionOptions options,
+                                                             int limit){
 
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, options);
 
         Set<Complexity> topComplexities = complexityDao.findTopComplexityScoresForKindAndSelector(complexityKindId, genericSelector, limit);
 
-        Tuple2<BigDecimal, BigDecimal> averageAndTotalScore = complexityDao.findAverageAndTotalScoreByKindAndSelector(complexityKindId, genericSelector);
+        Tuple2<BigDecimal, BigDecimal> averageAndTotalScore = complexityDao.getAverageAndTotalScoreByKindAndSelector(complexityKindId, genericSelector);
 
         Tuple2<Integer, Integer> mappedAndMissingCountsForKindBySelector = complexityDao.getMappedAndMissingCountsForKindBySelector(complexityKindId, genericSelector);
 
@@ -76,4 +73,11 @@ public class ComplexityService {
                 .build();
     }
 
+
+    public Set<ComplexityTotal> findTotalsByTargetKindAndSelector(EntityKind targetKind,
+                                                                  IdSelectionOptions selectionOptions) {
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, selectionOptions);
+
+        return complexityDao.findTotalsByGenericSelector(genericSelector);
+    }
 }
