@@ -37,7 +37,7 @@ import static com.khartec.waltz.schema.Tables.COMPLEXITY_KIND;
 @Repository
 public class ComplexityKindDao {
 
-    private static final RecordMapper<Record, ComplexityKind> TO_COMPLEXITY_KIND_MAPPER = r -> {
+    public static final RecordMapper<Record, ComplexityKind> TO_COMPLEXITY_KIND_MAPPER = r -> {
         ComplexityKindRecord record = r.into(COMPLEXITY_KIND);
         return ImmutableComplexityKind.builder()
                 .id(record.getId())

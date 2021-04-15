@@ -25,15 +25,17 @@ import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
-import org.jooq.*;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record;
+import org.jooq.SelectConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.schema.Tables.*;
+import static com.khartec.waltz.schema.Tables.COMPLEXITY;
+import static com.khartec.waltz.schema.Tables.COMPLEXITY_KIND;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static java.lang.String.format;
 import static spark.Spark.post;
@@ -62,31 +64,7 @@ public class ComplexityExtractor extends DirectQueryBasedDataExtractor {
     @Override
     public void register() {
 
-        String path = mkPath("data-extract", "complexity", "all");
         String findBySelectorPath = mkPath("data-extract", "complexity", "target-kind", ":kind", "selector");
-
-        post(path, (request, response) -> {
-            IdSelectionOptions applicationIdSelectionOptions = readIdSelectionOptionsFromBody(request);
-            Select<Record1<Long>> selector = applicationIdSelectorFactory.apply(applicationIdSelectionOptions);
-
-            SelectConditionStep<Record4<String, String, String, BigDecimal>> qry = dsl
-                    .select(APPLICATION.NAME.as("Application Name"),
-                            APPLICATION.ASSET_CODE.as("Asset Code"),
-                            COMPLEXITY_SCORE.COMPLEXITY_KIND.as("Complexity Kind"),
-                            COMPLEXITY_SCORE.SCORE.as("Score"))
-                    .from(COMPLEXITY_SCORE)
-                    .innerJoin(APPLICATION)
-                    .on(APPLICATION.ID.eq(COMPLEXITY_SCORE.ENTITY_ID))
-                    .where(COMPLEXITY_SCORE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                    .and(COMPLEXITY_SCORE.ENTITY_ID.in(selector));
-
-
-            return writeExtract(
-                    "complexity",
-                    qry,
-                    request,
-                    response);
-        });
 
         post(findBySelectorPath, (request, response) -> {
             IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
@@ -97,6 +75,7 @@ public class ComplexityExtractor extends DirectQueryBasedDataExtractor {
                     .select(ENTITY_NAME_FIELD.as("Entity Name"))
                     .select(COMPLEXITY.ENTITY_ID)
                     .select(COMPLEXITY_KIND.NAME.as("Complexity Kind"))
+                    .select(COMPLEXITY.SCORE.as("Score"))
                     .select(COMPLEXITY.PROVENANCE)
                     .from(COMPLEXITY)
                     .innerJoin(COMPLEXITY_KIND).on(COMPLEXITY.COMPLEXITY_KIND_ID.eq(COMPLEXITY_KIND.ID))

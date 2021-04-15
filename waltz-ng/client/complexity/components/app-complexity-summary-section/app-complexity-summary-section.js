@@ -76,7 +76,7 @@ const complexityColumnDefs = [
         cellTemplate:`
             <div class="ui-grid-cell-contents"
             style="padding-right: 2em">
-                 <span class="pull-right" 
+                 <span class="pull-right"
                        ng-bind="COL_FIELD">
                 </span>
             </div>`
@@ -92,9 +92,13 @@ function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     function loadTopComplexityScores() {
+        if (_.isNil(vm.selectedKind)) {
+            // Returning empty array of scores as we have no selected complexity kind
+            return Promise.resolve([]);
+        }
         return serviceBroker
             .loadViewData(
-                CORE_API.ComplexityStore.findByTopCostsSummaryByTargetKindAndSelector,
+                CORE_API.ComplexityStore.findByTopComplexitiesSummaryByTargetKindAndSelector,
                 [
                     vm.selectedKind.id,
                     vm.targetEntityKind,
@@ -106,7 +110,8 @@ function controller($q, serviceBroker) {
     function loadComplexityKinds() {
         return serviceBroker
             .loadViewData(
-                CORE_API.ComplexityKindStore.findBySelector, [vm.targetEntityKind, vm.selector])
+                CORE_API.ComplexityKindStore.findBySelector,
+                [vm.targetEntityKind, vm.selector])
             .then(r => {
                 vm.complexityKinds = r.data;
                 return vm.selectedKind = findDefaultComplexityKind(vm.complexityKinds);

@@ -25,7 +25,6 @@ import com.khartec.waltz.model.scheduled_job.JobKey;
 import com.khartec.waltz.model.scheduled_job.JobLifecycleStatus;
 import com.khartec.waltz.service.attestation.AttestationRunService;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService;
-import com.khartec.waltz.service.complexity.ComplexityRatingService;
 import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import com.khartec.waltz.service.physical_specification_data_type.PhysicalSpecDataTypeService;
@@ -46,7 +45,6 @@ public class ScheduledJobService {
     private static final Logger LOG = LoggerFactory.getLogger(ScheduledJobService.class);
 
     private final AuthoritativeSourceService authoritativeSourceService;
-    private final ComplexityRatingService complexityRatingService;
     private final DataTypeUsageService dataTypeUsageService;
     private final EntityHierarchyService entityHierarchyService;
     private final LogicalFlowService logicalFlowService;
@@ -57,7 +55,6 @@ public class ScheduledJobService {
 
     @Autowired
     public ScheduledJobService(AuthoritativeSourceService authoritativeSourceService,
-                               ComplexityRatingService complexityRatingService,
                                DataTypeUsageService dataTypeUsageService,
                                EntityHierarchyService entityHierarchyService,
                                LogicalFlowService logicalFlowService,
@@ -65,7 +62,6 @@ public class ScheduledJobService {
                                ScheduledJobDao scheduledJobDao,
                                AttestationRunService attestationRunService) {
         checkNotNull(authoritativeSourceService, "authoritativeSourceService cannot be null");
-        checkNotNull(complexityRatingService, "complexityRatingService cannot be null");
         checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
         checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
         checkNotNull(physicalSpecDataTypeService, "physicalSpecDataTypeService cannot be null");
@@ -73,7 +69,6 @@ public class ScheduledJobService {
         checkNotNull(attestationRunService, "attestationRunService cannot be null");
 
         this.authoritativeSourceService = authoritativeSourceService;
-        this.complexityRatingService = complexityRatingService;
         this.dataTypeUsageService = dataTypeUsageService;
         this.entityHierarchyService = entityHierarchyService;
         this.logicalFlowService = logicalFlowService;
@@ -109,9 +104,6 @@ public class ScheduledJobService {
 
         runIfNeeded(JobKey.DATA_TYPE_USAGE_RECALC_APPLICATION,
                 (jk) -> dataTypeUsageService.recalculateForAllApplications());
-
-        runIfNeeded(JobKey.COMPLEXITY_REBUILD,
-                (jk) -> complexityRatingService.rebuild());
 
         runIfNeeded(JobKey.AUTH_SOURCE_RECALC_FLOW_RATINGS,
                 (jk) -> authoritativeSourceService.fastRecalculateAllFlowRatings());

@@ -12,7 +12,8 @@ const bindings = {
 
 
 const initialState = {
-    filters: {}
+    filters: {},
+    stats: []
 };
 
 
@@ -31,9 +32,14 @@ function controller(serviceBroker) {
 
         serviceBroker
             .loadViewData(
-                CORE_API.ComplexityScoreStore.findBySelector,
-                [ selector ])
-            .then(r => vm.stats = calcComplexitySummary(r.data));
+                CORE_API.ComplexityStore.findTotalsByTargetKindAndSelector,
+                [ "APPLICATION", selector ])
+            .then(r => vm.stats = _.orderBy(
+                r.data,
+                [
+                    d => d.complexityKind.isDefault,
+                    d => d.complexityKind.name
+                ]));
     };
 
 }
