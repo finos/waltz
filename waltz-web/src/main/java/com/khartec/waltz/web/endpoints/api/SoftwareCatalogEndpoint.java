@@ -30,10 +30,10 @@ import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
-import java.util.List;
 
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
 
 @Service
 public class SoftwareCatalogEndpoint implements Endpoint {
@@ -65,7 +65,7 @@ public class SoftwareCatalogEndpoint implements Endpoint {
         getForDatum(mkPath(BASE_URL, "package-id", ":id"), this::getByPackageIdRoute);
         getForDatum(mkPath(BASE_URL, "version-id", ":id"), this::getByVersionIdRoute);
         getForDatum(mkPath(BASE_URL, "licence-id", ":id"), this::getByLicenceIdRoute);
-        postForList(mkPath(BASE_URL, "selector"), this::findBySelectorRoute);
+        postForDatum(mkPath(BASE_URL, "selector"), this::getBySelectorRoute);
         postForDatum(makeCatalogForAppIdsPath, makeCatalogForAppIdsRoute);
         postForDatum(calculateStatsForAppIdSelectorPath, calculateStatsForAppIdSelectorRoute);
 
@@ -90,9 +90,9 @@ public class SoftwareCatalogEndpoint implements Endpoint {
     }
 
 
-    private List<SoftwareCatalog> findBySelectorRoute(Request request, Response response) throws IOException {
+    private SoftwareCatalog getBySelectorRoute(Request request, Response response) throws IOException {
         IdSelectionOptions options = readIdSelectionOptionsFromBody(request);
-        return service.findBySelector(options);
+        return service.getBySelector(options);
     }
 
 }

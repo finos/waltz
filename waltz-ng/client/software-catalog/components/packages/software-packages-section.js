@@ -92,10 +92,10 @@ function controller(serviceBroker) {
         const options = mkSelectionOptions(vm.parentEntityRef);
         return serviceBroker
             .loadViewData(
-                CORE_API.SoftwareCatalogStore.findBySelector,
+                CORE_API.SoftwareCatalogStore.getBySelector,
                 [options])
             .then(r => {
-                vm.softwareCatalog = _.head(r.data);
+                vm.softwareCatalog = r.data;
                 vm.columnDefs = mkColumnDefs();
                 vm.gridData = mkGridData(
                     vm.softwareCatalog.packages,
