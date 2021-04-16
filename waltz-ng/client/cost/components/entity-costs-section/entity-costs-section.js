@@ -99,7 +99,7 @@ function controller($q, serviceBroker, uiGridConstants, settingsService) {
                 vm.costInfo = _.map(costs, d => Object.assign(
                     {},
                     d,
-                    {costKind: _.get(costKindsById, d.costKindId, 'Unknown')}));
+                    {costKind: _.get(costKindsById, d.costKindId, "Unknown")}));
 
                 const noDefault = _.isUndefined(_.find(vm.costInfo, d => d.costKind.isDefault));
 
