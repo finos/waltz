@@ -40,7 +40,7 @@ import static com.khartec.waltz.common.LoggingUtilities.configureLogging;
  * It is advisable to add a rule into your logback config to switch
  * logger `com.tngtech` to `WARN` as it is very chatty.
  */
-public class BaseArchitectureComplianceCheck {
+public class BaseArchitectureComplianceTest {
 
     static JavaClasses waltzAndJavaUtilClasses = null;
     static JavaClasses waltzOnlyClasses = null;

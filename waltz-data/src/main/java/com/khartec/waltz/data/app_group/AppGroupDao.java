@@ -103,7 +103,7 @@ public class AppGroupDao {
     }
 
 
-    public AppGroup findFavouritesGroupByOwner(String userId) {
+    public AppGroup getFavouritesGroupForOwner(String userId) {
         SelectConditionStep<Record1<Long>> groupIds = getPrivateGroupIdByOwner(userId);
 
         return dsl.select(APPLICATION_GROUP.fields())

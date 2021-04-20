@@ -23,7 +23,7 @@ import org.junit.Test;
 
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 
-public class ArchitectureCompliance extends BaseArchitectureComplianceCheck {
+public class ArchitectureComplianceTest extends BaseArchitectureComplianceTest {
 
     @Test
     public void noJavaUtilLogging() {

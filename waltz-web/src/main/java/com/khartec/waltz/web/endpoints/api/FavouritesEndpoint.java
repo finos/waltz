@@ -59,8 +59,8 @@ public class FavouritesEndpoint implements Endpoint {
         DatumRoute<AppGroup> getFavouriteGroupRoute = (request, response) ->
                 favouritesService.getFavouritesGroup(getUsername(request));
 
-        ListRoute<AppGroupEntry> getFavouriteGroupEntriesRoute = (request, response) ->
-                favouritesService.getFavouriteGroupEntries(getUsername(request));
+        ListRoute<AppGroupEntry> findFavouriteGroupEntriesRoute = (request, response) ->
+                favouritesService.findFavouriteGroupEntries(getUsername(request));
 
         ListRoute<AppGroupEntry> addApplicationRoute = (request, response) -> {
             long applicationId = getId(request);
@@ -76,7 +76,7 @@ public class FavouritesEndpoint implements Endpoint {
 
         postForList(addApplicationPath, addApplicationRoute);
         deleteForList(removeApplicationPath, removeApplicationRoute);
-        getForList(getFavouriteGroupEntriesPath, getFavouriteGroupEntriesRoute);
+        getForList(getFavouriteGroupEntriesPath, findFavouriteGroupEntriesRoute);
         getForDatum(getFavouriteGroupPath, getFavouriteGroupRoute);
 
     }

@@ -140,7 +140,7 @@ public class SoftwareCatalogService {
     }
 
 
-    public SoftwareCatalog findBySelector(IdSelectionOptions options) {
+    public SoftwareCatalog getBySelector(IdSelectionOptions options) {
         //todo: build out selector logic
         switch (options.entityReference().kind()) {
             case SOFTWARE:
