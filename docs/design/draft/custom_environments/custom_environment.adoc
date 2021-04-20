@@ -72,11 +72,17 @@ server is important to the environment we are focused on.
 - Could use owning entity to suggest likely environment tags you might want (from other usages)?
 - Could offer warnings where an environment is constructed with servers both from dev and from prod?
 
+
+
+==== Feedback
+
+Would like to be able to group custom environments - i.e. ISO-UAT, ISO-SIT grouped by 'ISO'
+
 ==== Proposed tables:
 
 .custom_environment:
 |===
-| id | owning_entity_id | owning_entity_kind | name | description | external_id
+| id | owning_entity_id | owning_entity_kind | name | description | external_id | group
 
 | 1
 | 12345
@@ -84,6 +90,7 @@ server is important to the environment we are focused on.
 | INT-1
 | Second development environment without nightly database restore
 | WALTZ_INT
+| WALTZ
 |===
 
 
