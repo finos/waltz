@@ -27,6 +27,7 @@ import {loadAssessmentsBySelector} from "../../../assessments/assessment-utils";
 
 import template from "./technology-section.html";
 import {tryOrDefault} from "../../../common/function-utils";
+import CustomEnvironmentPanel from "../../svelte/custom-environment-panel/CustomEnvironmentPanel.svelte"
 
 
 const bindings = {
@@ -35,7 +36,8 @@ const bindings = {
 
 const initialState = {
     activeTabIndex: 0,
-    repeatedPackages: []
+    repeatedPackages: [],
+    CustomEnvironmentPanel
 };
 
 

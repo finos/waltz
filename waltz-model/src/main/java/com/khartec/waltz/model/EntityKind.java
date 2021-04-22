@@ -69,6 +69,7 @@ public enum EntityKind {
     ROADMAP("Roadmap"),
     SCENARIO("Scenario"),
     SERVER("Server"),
+    SERVER_USAGE("Server usage"),
     SOFTWARE("Software"),
     SOFTWARE_VERSION("Software version"),
     SURVEY_INSTANCE("Survey instance"),

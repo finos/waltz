@@ -93,12 +93,12 @@
     </LoadingPlaceholder>
 {:else}
     <div class="row">
-        <div class="col-sm-4">
+        <div class="col-sm-3">
             <BookmarkCategoryMenu on:kindSelect={onKindSelect}
                                   bookmarkKinds={bookmarkKinds} />
         </div>
 
-        <div class="col-sm-8">
+        <div class="col-sm-9">
 
             {#if removalCandidate}
                 <BookmarkRemovalConfirmation bookmark={removalCandidate}

@@ -118,6 +118,17 @@
                     </div>
                 </div>
             </uib-tab>
+
+            <uib-tab heading="Environments"
+                     select="showEnvironmentDetail = true"
+                     disable="false">
+                <div ng-if="showEnvironmentDetail">
+                    <br>
+                    <waltz-svelte-component component="$ctrl.CustomEnvironmentPanel"
+                                            primary-entity-ref="$ctrl.parentEntityRef">
+                    </waltz-svelte-component>
+                </div>
+            </uib-tab>
         </uib-tabset>
 
     </div>
