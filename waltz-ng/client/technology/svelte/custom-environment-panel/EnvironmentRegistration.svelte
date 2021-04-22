@@ -18,8 +18,6 @@
 
     function saveEnvironment() {
 
-        console.log({primaryEntityRef, workingCopy});
-
         const unformattedExtId = `${refToString(primaryEntityRef)}_${workingCopy.name.toUpperCase()}`;
         const externalId = _.toUpper(_.replace(unformattedExtId, /\s+/g, "_"));
 

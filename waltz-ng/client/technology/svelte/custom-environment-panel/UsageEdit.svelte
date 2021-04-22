@@ -69,7 +69,6 @@
         {
             icon: 'plus',
             handleAction: (application) => {
-                console.log("clicking database", application);
                 showSearch = true;
                 searchApplication = application;
             },

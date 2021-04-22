@@ -1,6 +1,5 @@
 package com.khartec.waltz.service.custom_environment;
 
-import com.khartec.waltz.data.custom_environment.CustomEnvironmentDao;
 import com.khartec.waltz.data.custom_environment.CustomEnvironmentUsageDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.custom_environment.CustomEnvironmentUsage;
@@ -13,13 +12,10 @@ import java.util.Set;
 @Service
 public class CustomEnvironmentUsageService {
 
-    private final CustomEnvironmentDao customEnvironmentDao;
     private final CustomEnvironmentUsageDao customEnvironmentUsageDao;
 
     @Autowired
-    public CustomEnvironmentUsageService(CustomEnvironmentDao customEnvironmentDao,
-                                         CustomEnvironmentUsageDao customEnvironmentUsageDao){
-        this.customEnvironmentDao = customEnvironmentDao;
+    public CustomEnvironmentUsageService(CustomEnvironmentUsageDao customEnvironmentUsageDao){
         this.customEnvironmentUsageDao = customEnvironmentUsageDao;
     }
 

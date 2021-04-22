@@ -31,14 +31,11 @@ public class CustomEnvironmentService {
 
 
     public Boolean create(CustomEnvironment env, String username) {
-        //change logs for creating new env
         return customEnvironmentDao.create(env);
     }
 
 
     public Boolean remove(Long envId, String username) {
-        //maybe front end warn that if this env is to be deleted will cascade and remove all usages
-        //change logs for deleting env (+ usages?)
         return customEnvironmentDao.remove(envId);
     }
 

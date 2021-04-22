@@ -62,7 +62,6 @@
     }
 
     function doRemove(environment) {
-        console.log(environment)
         return customEnvironmentStore.remove(environment);
     }
 
