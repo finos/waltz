@@ -56,7 +56,7 @@ public class CustomEnvironmentEndpoint implements Endpoint {
 
         ListRoute<CustomEnvironment> findAllRoute = (request, response) -> customEnvironmentService.findAll();
 
-        DatumRoute<Boolean> createRoute = (request, response) -> {
+        DatumRoute<Long> createRoute = (request, response) -> {
 //            requireAnyRole(userRoleService, request, SystemRole.USER_ADMIN, SystemRole.ADMIN);
             CustomEnvironment env = readBody(request, CustomEnvironment.class);
             String username = getUsername(request);

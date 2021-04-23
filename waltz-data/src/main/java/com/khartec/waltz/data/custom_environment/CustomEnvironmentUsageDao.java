@@ -33,6 +33,7 @@ import com.khartec.waltz.schema.tables.records.CustomEnvironmentUsageRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
+import org.jooq.SelectOnConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -145,7 +146,7 @@ public class CustomEnvironmentUsageDao {
                 .set(CUSTOM_ENVIRONMENT_USAGE.PROVENANCE, usage.provenance())
                 .returning(CUSTOM_ENVIRONMENT_USAGE.ID)
                 .fetchOne()
-                .getCustomEnvironmentId();
+                .getId();
     }
 
 
@@ -160,7 +161,29 @@ public class CustomEnvironmentUsageDao {
 
     public Set<CustomEnvironmentUsageInfo> findUsageInfoByOwningRef(EntityReference ref){
 
-        Set<CustomEnvironmentUsageInfo> customEnvironmentUsages = dsl
+        Set<CustomEnvironmentUsageInfo> customEnvironmentUsages = fetchUsageInfoQuery()
+                .where(CUSTOM_ENVIRONMENT.OWNING_ENTITY_ID.eq(ref.id())
+                        .and(CUSTOM_ENVIRONMENT.OWNING_ENTITY_KIND.eq(ref.kind().name())))
+                .and(DATABASE_INFORMATION.ID.isNotNull()
+                        .or(SERVER_INFORMATION.ID.isNotNull()))
+                .fetchSet(TO_USAGE_INFO_MAPPER);
+
+        return customEnvironmentUsages;
+    }
+
+
+    public CustomEnvironmentUsageInfo getUsageInfoById(Long usageId){
+
+        return fetchUsageInfoQuery()
+                .where(CUSTOM_ENVIRONMENT_USAGE.ID.eq(usageId))
+                .and(DATABASE_INFORMATION.ID.isNotNull()
+                        .or(SERVER_INFORMATION.ID.isNotNull()))
+                .fetchOne(TO_USAGE_INFO_MAPPER);
+    }
+
+
+    private SelectOnConditionStep<Record> fetchUsageInfoQuery() {
+        return dsl
                 .select(CUSTOM_ENVIRONMENT_USAGE.fields())
                 .select(SERVER_INFORMATION.fields())
                 .select(SERVER_OWNING_APP.fields())
@@ -176,14 +199,6 @@ public class CustomEnvironmentUsageDao {
                         .and(SERVER_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .leftJoin(DATABASE_INFORMATION).on(CUSTOM_ENVIRONMENT_USAGE.ENTITY_ID.eq(DATABASE_INFORMATION.ID)
                         .and(CUSTOM_ENVIRONMENT_USAGE.ENTITY_KIND.eq(EntityKind.DATABASE.name())))
-                .leftJoin(DATABASE_OWNING_APP).on(DATABASE_INFORMATION.ASSET_CODE.eq(DATABASE_OWNING_APP.ASSET_CODE))
-                .where(CUSTOM_ENVIRONMENT.OWNING_ENTITY_ID.eq(ref.id())
-                        .and(CUSTOM_ENVIRONMENT.OWNING_ENTITY_KIND.eq(ref.kind().name())))
-                .and(DATABASE_INFORMATION.ID.isNotNull()
-                        .or(SERVER_INFORMATION.ID.isNotNull()))
-                .fetchSet(TO_USAGE_INFO_MAPPER);
-
-        return customEnvironmentUsages;
+                .leftJoin(DATABASE_OWNING_APP).on(DATABASE_INFORMATION.ASSET_CODE.eq(DATABASE_OWNING_APP.ASSET_CODE));
     }
-
 }

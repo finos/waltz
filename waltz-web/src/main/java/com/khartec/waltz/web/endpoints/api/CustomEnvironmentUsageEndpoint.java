@@ -21,6 +21,7 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.custom_environment.CustomEnvironmentUsage;
 import com.khartec.waltz.model.custom_environment.CustomEnvironmentUsageInfo;
+import com.khartec.waltz.model.custom_environment.ImmutableCustomEnvironmentUsage;
 import com.khartec.waltz.service.custom_environment.CustomEnvironmentUsageService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
@@ -59,7 +60,10 @@ public class CustomEnvironmentUsageEndpoint implements Endpoint {
 //            requireAnyRole(userRoleService, request, SystemRole.USER_ADMIN, SystemRole.ADMIN);
             CustomEnvironmentUsage usage = readBody(request, CustomEnvironmentUsage.class);
             String username = getUsername(request);
-            return customEnvironmentUsageService.addAsset(usage, username);
+            CustomEnvironmentUsage usageWithCreator = ImmutableCustomEnvironmentUsage
+                    .copyOf(usage)
+                    .withCreatedBy(username);
+            return customEnvironmentUsageService.addAsset(usageWithCreator, username);
         };
 
         DatumRoute<Boolean> removeRoute = (request, response) -> {

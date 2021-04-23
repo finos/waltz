@@ -38,6 +38,8 @@ public enum EntityKind {
     COST_KIND("Cost Kind"),
     COMPLEXITY("Complexity"),
     COMPLEXITY_KIND("Complexity Kind"),
+    CUSTOM_ENVIRONMENT("Custom environment"),
+    CUSTOM_ENVIRONMENT_USAGE("Custom environment Usage"),
     DATABASE("Database"),
     DATA_TYPE("Datatype"),
     END_USER_APPLICATION("End user application"),

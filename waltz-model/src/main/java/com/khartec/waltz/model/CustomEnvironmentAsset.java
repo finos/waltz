@@ -19,5 +19,5 @@
 package com.khartec.waltz.model;
 
 
-public interface CustomEnvironmentAsset {
+public interface CustomEnvironmentAsset extends WaltzEntity {
 }

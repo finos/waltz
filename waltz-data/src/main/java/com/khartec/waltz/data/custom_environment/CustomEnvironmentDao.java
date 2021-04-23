@@ -93,7 +93,7 @@ public class CustomEnvironmentDao {
     }
 
 
-    public boolean create(CustomEnvironment environment) {
+    public Long create(CustomEnvironment environment) {
 
         CustomEnvironmentRecord record = new CustomEnvironmentRecord();
         record.setName(environment.name());
@@ -106,7 +106,9 @@ public class CustomEnvironmentDao {
         return  dsl
                 .insertInto(CUSTOM_ENVIRONMENT)
                 .set(record)
-                .execute() > 0;
+                .returning(CUSTOM_ENVIRONMENT.ID)
+                .fetchOne()
+                .getId();
     }
 
 
@@ -115,5 +117,12 @@ public class CustomEnvironmentDao {
                 .delete(CUSTOM_ENVIRONMENT)
                 .where(CUSTOM_ENVIRONMENT.ID.eq(envId))
                 .execute() == 1;
+    }
+
+    public CustomEnvironment getById(Long id) {
+        return dsl
+                .selectFrom(CUSTOM_ENVIRONMENT)
+                .where(CUSTOM_ENVIRONMENT.ID.eq(id))
+                .fetchOne(TO_CUSTOM_ENV_MAPPER);
     }
 }
