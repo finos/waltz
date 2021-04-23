@@ -125,7 +125,7 @@
         const usage = {
             customEnvironmentId: environment.id,
             entityReference: ref,
-            createdBy: 'admin'
+            createdBy: 'pending'
         }
         return savePromise = customEnvironmentUsageStore.addAsset(usage)
             .then(() => customEnvironmentUsageStore.findUsageInfoByOwningEntityRef(primaryEntityRef, true));

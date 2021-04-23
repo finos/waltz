@@ -89,7 +89,7 @@ Custom environments can be used to group servers and databases used by this appl
     <EnvironmentRegistration primaryEntityRef={primaryEntityRef}
                              onCancel={cancel}/>
 {:else if $mode === Modes.DETAIL}
-    <UsagePanel onCancel={cancel} usages=""/>
+    <UsagePanel onCancel={cancel}/>
 {:else}
     {#if customEnvironments.length === 0}
         <NoData>

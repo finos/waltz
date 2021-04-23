@@ -39,7 +39,7 @@ public enum EntityKind {
     COMPLEXITY("Complexity"),
     COMPLEXITY_KIND("Complexity Kind"),
     CUSTOM_ENVIRONMENT("Custom environment"),
-    CUSTOM_ENVIRONMENT_USAGE("Custom environment Usage"),
+    CUSTOM_ENVIRONMENT_USAGE("Custom environment usage"),
     DATABASE("Database"),
     DATA_TYPE("Datatype"),
     END_USER_APPLICATION("End user application"),

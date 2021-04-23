@@ -58,7 +58,7 @@
     {#if !workingCopy.id}
 
         <div class="form-group">
-            <label for="name">Group:</label>
+            <label for="group">Group:</label>
             <input class="form-control"
                    id="group"
                    placeholder="Leave blank for default"
@@ -78,7 +78,7 @@
         <p class="text-muted">Names must be unique</p>
 
         <div class="form-group">
-            <label for="name">Description:</label>
+            <label for="description">Description:</label>
             <textarea class="form-control"
                       id="description"
                       bind:value={workingCopy.description}/>
