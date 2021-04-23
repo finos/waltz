@@ -127,6 +127,12 @@
                     <waltz-svelte-component component="$ctrl.CustomEnvironmentPanel"
                                             primary-entity-ref="$ctrl.parentEntityRef">
                     </waltz-svelte-component>
+                    <waltz-data-extract-link name="Download custom environment info"
+                                             styling="link"
+                                             filename="custom_environment_usage_info.csv"
+                                             extract="custom-environment/kind/{{$ctrl.parentEntityRef.kind}}/id/{{$ctrl.parentEntityRef.id}}"
+                                             method="GET">
+                    </waltz-data-extract-link>
                 </div>
             </uib-tab>
         </uib-tabset>
