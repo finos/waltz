@@ -18,12 +18,12 @@
             <Icon name="desktop"/>
             <span>{usageInfo.application.name}</span>
             <MiniActions ctx={usageInfo.application} actions={applicationActions}/>
-            <ul>
+            <ul style="padding-left: 2em">
                 {#if usageInfo.serverUsages.length > 0}
                     <li>
                         Servers
                     </li>
-                    <ul>
+                    <ul style="padding-left: 2em">
                         {#each usageInfo.serverUsages as server}
                             <li>
                                 <Icon name="server"/>
@@ -37,7 +37,7 @@
                     <li>
                         Databases
                     </li>
-                    <ul>
+                    <ul style="padding-left: 2em">
                         {#each usageInfo.databaseUsages as database}
                             <li>
                                 <Icon name="database"/>
@@ -53,3 +53,17 @@
         </li>
     {/each}
 </ul>
+
+<style>
+    ul {
+        padding: 0.2em 0 0 0;
+        margin: 0 0 0 0;
+        list-style: none;
+    }
+
+    li {
+        padding-top: 0.2em;
+    }
+
+</style>
+

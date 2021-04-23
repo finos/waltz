@@ -57,10 +57,12 @@
     background-color: transparent;
     margin: 0;
     padding: 0 0.2em 0 0.2em;
+    color: #337ab7;
 
     &:focus {
         outline: none !important;
         border-color: #999;
         box-shadow: none !important;
+        color: #23527c;
     }
 }

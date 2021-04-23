@@ -41,9 +41,9 @@
     let savePromise;
     let removePromise;
 
-    let showSearch = false;
+    let showSearch = true;
     let assetToAdd;
-    let searchApplication;
+    let searchApplication = null;
     let qry;
 
     let databasesInGroup;
@@ -102,7 +102,6 @@
         }
     }
 
-
     function doDatabaseSearch(qry, databaseAssets, databaseIdsInGroup) {
         const searchResults = termSearch(databaseAssets, qry, databaseSearchFields);
         return _
@@ -121,7 +120,6 @@
             .take(15)
             .value();
     }
-
 
     function addAsset(ref) {
         const usage = {
@@ -171,49 +169,19 @@
 
     }
 
+    function clearSearchApp(){
+        return searchApplication = null;
+    }
+
 </script>
 
-<UsageTree usages={usages} {databaseActions} {serverActions} {applicationActions}>
-</UsageTree>
-
-{#if savePromise}
-    {#await savePromise}
-        Saving...
-    {:then r}
-        Saved!
-    {:catch e}
-        <div class="alert alert-warning">
-            Failed to save asset to {environment.name}. Reason: {e.data.message}
-            <button class="btn-link"
-                    on:click={() => savePromise = null}>
-                <Icon name="check"/>
-                Okay
-            </button>
-        </div>
-    {/await}
-{/if}
-{#if removePromise}
-    {#await removePromise}
-        Removing...
-    {:then r}
-        Removed!
-    {:catch e}
-        <div class="alert alert-warning">
-            Failed to remove asset from {environment.name}. Reason: {e.data.message}
-            <button class="btn-link"
-                    on:click={() => removePromise = null}>
-                <Icon name="check"/>
-                Okay
-            </button>
-        </div>
-    {/await}
+{#if !_.isEmpty(usages)}
+    <UsageTree {usages} {databaseActions} {serverActions} {applicationActions}>
+    </UsageTree>
+    {:else}
+    <div>No databases or servers have been associated to this environment.</div>
 {/if}
 
-
-<button class="btn btn-default"
-        on:click|preventDefault={cancel}>
-    Cancel
-</button>
 
 {#if !showSearch}
     <button class="btn btn-link" on:click={() => showSearch = true}>
@@ -222,9 +190,7 @@
 {/if}
 
 {#if showSearch}
-
     <hr>
-
     {#if !searchApplication}
         <div class="form-group">
             <label for="searchApplication">Application:</label>
@@ -239,6 +205,11 @@
     {#if searchApplication}
         <h3>
             <EntityLabel ref={searchApplication}/>
+            <button class="btn btn-skinny"
+                    title="Clear search application"
+                    on:click={() => clearSearchApp()}>
+                (<Icon name="times"/>)
+            </button>
         </h3>
 
         <SearchInput bind:value={qry}/>
@@ -329,4 +300,41 @@
     {/if}
 {/if}
 
+<button class="btn btn-default"
+        on:click={cancel}>
+    Cancel
+</button>
+
+{#if savePromise}
+    {#await savePromise}
+        Saving...
+    {:then r}
+        Saved!
+    {:catch e}
+        <div class="alert alert-warning">
+            Failed to save asset to {environment.name}. Reason: {e.data.message}
+            <button class="btn-link"
+                    on:click={() => savePromise = null}>
+                <Icon name="check"/>
+                Okay
+            </button>
+        </div>
+    {/await}
+{/if}
+{#if removePromise}
+    {#await removePromise}
+        Removing...
+    {:then r}
+        Removed!
+    {:catch e}
+        <div class="alert alert-warning">
+            Failed to remove asset from {environment.name}. Reason: {e.data.message}
+            <button class="btn-link"
+                    on:click={() => removePromise = null}>
+                <Icon name="check"/>
+                Okay
+            </button>
+        </div>
+    {/await}
+{/if}
 

@@ -99,15 +99,16 @@ Custom environments can be used to group servers and databases used by this appl
     {:else}
         <table class="table table-condensed small">
             <thead>
-            <th></th>
-            <th>Group</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th># Linked Entities</th>
+                <th  width="5%"></th>
+                <th width="20%">Group</th>
+                <th width="30%">Name</th>
+                <th width="25%">Description</th>
+                <th width="20%"># Linked Entities</th>
             </thead>
             <tbody>
             {#each customEnvironments as environment}
-                <tr on:click={() => toggleDetailView(environment)}>
+                <tr class="clickable"
+                    on:click={() => toggleDetailView(environment)}>
                     <td>
                         <Icon name={_.includes(expandedEnvironmentIds, environment.id) ? "caret-down" : "caret-right"}/>
                     </td>
@@ -118,11 +119,12 @@ Custom environments can be used to group servers and databases used by this appl
                 </tr>
                 {#if _.includes(expandedEnvironmentIds, environment.id)}
                     <tr>
-                        <td colspan="6">
+                        <td></td>
+                        <td colspan="5">
                             <UsagePanel doCancel={cancel}
-                                                         {primaryEntityRef}
-                                                         environment={environment}
-                                                         usages={_.get(environmentUsagesById, [environment.id], [])}/>
+                                         {primaryEntityRef}
+                                         environment={environment}
+                                         usages={_.get(environmentUsagesById, [environment.id], [])}/>
                         </td>
                     </tr>
                 {/if}

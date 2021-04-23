@@ -1,6 +1,5 @@
 <script>
 
-    import NoData from "../../../common/svelte/NoData.svelte";
     import UsageEdit from "./UsageEdit.svelte";
     import EnvironmentRemovalConfirmation from "./EnvironmentRemovalConfirmation.svelte";
     import UsageTree from "./UsageTree.svelte";
@@ -58,7 +57,7 @@
     }
 
     function showEdit() {
-        return activeMode = Modes.EDIT
+        return activeMode = Modes.EDIT;
     }
 
     function doRemove(environment) {
@@ -68,32 +67,22 @@
 </script>
 
 <!--TREEMODE-->
-{#if usages.length === 0}
-    <span>No databases or servers have been associated to this environment</span>
+{#if usages.length === 0 && activeMode !== Modes.EDIT && activeMode !== Modes.REMOVE}
+    <div>No databases or servers have been associated to this environment.</div>
 {:else if activeMode === Modes.TREE}
-    <div class="row">
-        <div class="col-md-6">
-            <UsageTree usages={usages}/>
-        </div>
-        <div class="col-md-6">
-            {#if !selectedAsset}
-                <NoData>
-                    Select an asset from the tree for more information
-                </NoData>
-            {:else}
-                <span>You have selected something</span>
-            {/if}
-        </div>
-    </div>
+    <UsageTree usages={usages}/>
 {:else if activeMode === Modes.TABLE}
     <UsageTable {usages}/>
 {:else if activeMode === Modes.EDIT}
-    <UsageEdit {environment} {usages} {primaryEntityRef} doCancel={showTree}/>
+    <UsageEdit {environment}
+               usages={usages || []}
+               {primaryEntityRef}
+               doCancel={showTree}/>
 {:else if activeMode === Modes.REMOVE}
     <EnvironmentRemovalConfirmation {environment}
                                     {doRemove}
                                     doCancel={showTree}/>
 {/if}
-
+<br>
 <MiniActions actions={modeActions[activeMode]}/>
 
