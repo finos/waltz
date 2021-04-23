@@ -50,7 +50,7 @@
 </script>
 
 
-<h3>Register new custom environment:</h3>
+<h4>Register new custom environment:</h4>
 
 <form autocomplete="off"
       on:submit|preventDefault={saveEnvironment}>

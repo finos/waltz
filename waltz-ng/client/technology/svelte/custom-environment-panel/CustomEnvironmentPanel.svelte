@@ -78,11 +78,12 @@
 
 <p class="help-block">
 Custom environments can be used to group servers and databases used by this application.
-    Assets are not limited to those owned by this application.
+    Assets are not limited to those owned by this application. Click on an environment to view and edit assets or
     <button class="btn btn-skinny"
             on:click={addNewEnvironment}>
-        Register a new custom environment
+        register a new custom environment
     </button>
+    here.
 </p>
 
 {#if $mode === Modes.EDIT}

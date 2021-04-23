@@ -67,7 +67,7 @@
     ];
     let applicationActions = [
         {
-            icon: 'plus',
+            icon: 'pencil-square-o',
             handleAction: (application) => {
                 showSearch = true;
                 searchApplication = application;
@@ -203,14 +203,14 @@
     {/if}
 
     {#if searchApplication}
-        <h3>
+        <h4>
             <EntityLabel ref={searchApplication}/>
-            <button class="btn btn-skinny"
+            <button class="btn btn-link"
                     title="Clear search application"
                     on:click={() => clearSearchApp()}>
                 (<Icon name="times"/>)
             </button>
-        </h3>
+        </h4>
 
         <SearchInput bind:value={qry}/>
         <p class="text-muted">Start typing to filter servers and databases by name, environment etc.</p>
