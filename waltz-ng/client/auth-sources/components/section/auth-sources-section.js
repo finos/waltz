@@ -93,6 +93,7 @@ function controller(serviceBroker) {
     };
 
     const loadAuthSources = () => {
+        vm.selectionOptions = mkSelector();
         const selector = mkSelector();
         serviceBroker
             .loadViewData(
