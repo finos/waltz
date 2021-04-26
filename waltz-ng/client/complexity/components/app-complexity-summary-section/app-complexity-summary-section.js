@@ -30,7 +30,7 @@ const bindings = {
 };
 
 const initialState = {
-    targetEntityKind: 'APPLICATION',
+    targetEntityKind: "APPLICATION",
     selectedKind: null,
     complexities: [],
     complexityKinds: [],
@@ -45,9 +45,9 @@ const initialState = {
 
 const complexityColumnDefs = [
     {
-        field: 'entityReference.name',
-        displayName: 'Name',
-        width: '30%',
+        field: "entityReference.name",
+        displayName: "Name",
+        width: "30%",
         cellTemplate:`
             <div class="ui-grid-cell-contents">
                  <waltz-entity-link entity-ref="row.entity.entityReference"
@@ -55,9 +55,9 @@ const complexityColumnDefs = [
                  </waltz-entity-link>
             </div>`
     },{
-        field: 'complexityKind.name',
-        displayName: 'Kind',
-        width: '20%',
+        field: "complexityKind.name",
+        displayName: "Kind",
+        width: "20%",
         cellTemplate:`
             <div class="ui-grid-cell-contents">
                  <span ng-bind="row.entity.complexityKind.name"
@@ -69,10 +69,10 @@ const complexityColumnDefs = [
                 </span>
             </div>`
     },{
-        field: 'score',
-        displayName: 'Score',
-        width: '20%',
-        headerCellClass: 'waltz-grid-header-right',
+        field: "score",
+        displayName: "Score",
+        width: "20%",
+        headerCellClass: "waltz-grid-header-right",
         cellTemplate:`
             <div class="ui-grid-cell-contents"
             style="padding-right: 2em">
@@ -81,9 +81,9 @@ const complexityColumnDefs = [
                 </span>
             </div>`
     },{
-        field: 'provenance',
-        displayName: 'Provenance',
-        width: '30%'
+        field: "provenance",
+        displayName: "Provenance",
+        width: "30%"
     }];
 
 
@@ -132,7 +132,6 @@ function controller($q, serviceBroker) {
     };
 
     vm.onSelect = (d) => {
-        console.log(d);
         vm.selectedEntity = d;
     };
 
@@ -150,7 +149,7 @@ function controller($q, serviceBroker) {
                 [vm.targetEntityKind, vm.selector])
             .then(r => {
                 const enrichedComplexities =  enrichComplexitiesWithKind(r.data, vm.complexityKinds);
-                vm.allComplexities = _.orderBy(enrichedComplexities, ['entityReference.name', 'score']);
+                vm.allComplexities = _.orderBy(enrichedComplexities, ["entityReference.name", "score"]);
                 vm.visibility.loading = false;
             });
     };

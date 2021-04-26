@@ -121,11 +121,6 @@ public class QuestionPredicateEvaluator {
                                 JexlExpression expr = jexl.createExpression(p);
                                 JexlContext jexlCtx = new MapContext();
                                 Boolean result = Boolean.valueOf(expr.evaluate(jexlCtx).toString());
-                                System.out.printf(
-                                        "%s [%s] => %s\n",
-                                        q.questionText(),
-                                        q.inclusionPredicate().orElse(""),
-                                        result);
                                 return result;
                             }
                         })

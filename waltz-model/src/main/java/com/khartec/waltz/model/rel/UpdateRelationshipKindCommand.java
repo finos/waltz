@@ -22,12 +22,13 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.DescriptionProvider;
 import com.khartec.waltz.model.NameProvider;
+import com.khartec.waltz.model.command.Command;
 import org.immutables.value.Value;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableUpdateRelationshipKindCommand.class)
 @JsonDeserialize(as = ImmutableUpdateRelationshipKindCommand.class)
-public abstract class UpdateRelationshipKindCommand implements NameProvider, DescriptionProvider {
+public abstract class UpdateRelationshipKindCommand implements Command, NameProvider, DescriptionProvider {
 
     public abstract String reverseName();
     public abstract int position();

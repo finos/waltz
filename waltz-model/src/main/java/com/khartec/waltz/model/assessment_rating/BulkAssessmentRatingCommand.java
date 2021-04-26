@@ -23,13 +23,13 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.CommentProvider;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.ProvenanceProvider;
+import com.khartec.waltz.model.command.Command;
 import org.immutables.value.Value;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableBulkAssessmentRatingCommand.class)
 @JsonDeserialize(as = ImmutableBulkAssessmentRatingCommand.class)
-public abstract class BulkAssessmentRatingCommand implements CommentProvider {
+public abstract class BulkAssessmentRatingCommand implements CommentProvider, Command {
 
     public abstract long ratingId();
     public abstract EntityReference entityRef();

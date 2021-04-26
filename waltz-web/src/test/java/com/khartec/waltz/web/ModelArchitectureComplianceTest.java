@@ -24,7 +24,7 @@ import org.junit.Test;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
-public class ModelArchitectureCompliance extends BaseArchitectureComplianceCheck {
+public class ModelArchitectureComplianceTest extends BaseArchitectureComplianceTest {
 
     @Test
     public void commandsNeedMarkerInterface() {
