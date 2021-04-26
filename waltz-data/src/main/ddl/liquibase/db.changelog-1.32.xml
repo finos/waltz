@@ -177,7 +177,6 @@
                                  onDelete="CASCADE"/>
     </changeSet>
 
-
     <changeSet id="20210420-5143-7"
                author="woodjes">
         <comment>5143: Custom environment: create unique idx on custom env tables</comment>
@@ -196,5 +195,23 @@
             <column name="entity_id" type="${id.type}"/>
         </createIndex>
     </changeSet>
+
+
+    <!--5296: add unique index on report grid col def-->
+    <changeSet id="20210415-5296-1"
+               author="gharvai">
+        <comment>5296: add unique index on report grid col def</comment>
+        <createIndex tableName="report_grid_column_definition"
+                     indexName="idx_rgcd_entity_ref_report_grid_id"
+                     unique="true">
+            <column name="report_grid_id"
+                    type="BIGINT(19)"/>
+            <column name="column_entity_kind"
+                    type="VARCHAR"/>
+            <column name="column_entity_id"
+                    type="BIGINT(19)"/>
+        </createIndex>
+    </changeSet>
+
 
 </databaseChangeLog>
