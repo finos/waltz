@@ -17,43 +17,34 @@
  */
 
 import template from './recalculate-view.html';
+import {CORE_API} from "../common/services/core-api-utils";
 
 
 function controller(notification,
-                    authSourceStore,
-                    complexityScoreStore,
-                    dataTypeUsageStore) {
+                    serviceBroker) {
     const vm = this;
 
 
     vm.recalcFlowRatings = () => {
         notification.info('Flow Ratings recalculation requested');
-        authSourceStore
-            .recalculateAll()
+        serviceBroker
+            .execute(CORE_API.AuthSourcesStore.recalculateAll)
             .then(() => notification.success('Flow Ratings recalculated'));
     };
 
     vm.recalcDataTypeUsages = () => {
         notification.info('Data Type Usage recalculation requested');
-        dataTypeUsageStore
-            .recalculateAll()
+        serviceBroker
+            .execute(CORE_API.DataTypeUsageStore.recalculateAll)
             .then(() => notification.success('Data Type Usage recalculated'));
     };
 
-    vm.recalcComplexity = () => {
-        notification.info('Complexity recalculation requested');
-        complexityScoreStore
-            .recalculateAll()
-            .then(() => notification.success('Complexity recalculated'));
-    };
 }
 
 
 controller.$inject = [
     'Notification',
-    'AuthSourcesStore',
-    'ComplexityScoreStore',
-    'DataTypeUsageStore'
+    'ServiceBroker'
 ];
 
 

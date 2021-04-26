@@ -33,16 +33,24 @@ export function store($http, BaseApiUrl) {
             .then(r => r.data);
     };
 
-    const findByTopCostsSummaryByTargetKindAndSelector = (complexityKindId, targetKind, selectionOptions) => {
+    const findTotalsByTargetKindAndSelector = (targetKind, selectionOptions) => {
+        return $http
+            .post(`${BASE}/target-kind/${targetKind}/totals`, selectionOptions)
+            .then(r => r.data);
+    };
+
+    const findByTopComplexitiesSummaryByTargetKindAndSelector = (complexityKindId, targetKind, selectionOptions) => {
         return $http
             .post(`${BASE}/complexity-kind/${complexityKindId}/target-kind/${targetKind}`, selectionOptions)
             .then(r => r.data);
     };
 
+
     return {
         findByEntityReference,
         findBySelector,
-        findByTopCostsSummaryByTargetKindAndSelector
+        findByTopComplexitiesSummaryByTargetKindAndSelector,
+        findTotalsByTargetKindAndSelector
     };
 }
 
@@ -64,10 +72,15 @@ export const ComplexityStore_API = {
         serviceFnName: 'findBySelector',
         description: 'executes findBySelector (targetKind, selectionOptions) '
     },
-    findByTopCostsSummaryByTargetKindAndSelector: {
+    findByTopComplexitiesSummaryByTargetKindAndSelector: {
         serviceName,
-        serviceFnName: 'findByTopCostsSummaryByTargetKindAndSelector',
-        description: 'executes findByTopCostsSummaryByTargetKindAndSelector (complexityKindId, targetKind, selectionOptions) '
+        serviceFnName: 'findByTopComplexitiesSummaryByTargetKindAndSelector',
+        description: 'executes findByTopComplexitiesSummaryByTargetKindAndSelector (complexityKindId, targetKind, selectionOptions) '
+    },
+    findTotalsByTargetKindAndSelector: {
+        serviceName,
+        serviceFnName: 'findTotalsByTargetKindAndSelector',
+        description: 'executes findTotalsByTargetKindAndSelector (targetKind, selectionOptions) '
     }
 };
 

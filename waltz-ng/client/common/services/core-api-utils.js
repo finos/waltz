@@ -133,7 +133,6 @@ export const CORE_API = {
     ChangeUnitStore,
     ChangeUnitViewService,
     ClientCacheKeyStore,
-    ComplexityScoreStore, //TODO: Deprecated - remove in 1.32
     ComplexityStore,
     ComplexityKindStore,
     CostKindStore,

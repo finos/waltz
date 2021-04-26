@@ -22,6 +22,7 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.complexity.Complexity;
 import com.khartec.waltz.model.complexity.ComplexitySummary;
+import com.khartec.waltz.model.complexity.ComplexityTotal;
 import com.khartec.waltz.service.complexity.ComplexityService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
@@ -50,11 +51,15 @@ public class ComplexityEndpoint implements Endpoint {
     @Override
     public void register() {
         String findByEntityRefPath = mkPath(BASE_URL, "entity", "kind", ":kind", "id", ":id");
+        String findTotalsByTargetKindAndSelectorPath = mkPath(BASE_URL, "target-kind", ":kind", "totals");
         String findBySelectorPath = mkPath(BASE_URL, "target-kind", ":kind");
         String getComplexitySummaryForSelectorPath = mkPath(BASE_URL, "complexity-kind", ":id", "target-kind", ":kind");
 
         ListRoute<Complexity> findByEntityRefRoute = (request, response) -> complexityService
                 .findByEntityReference(getEntityReference(request));
+
+        ListRoute<ComplexityTotal> findTotalsByTargetKindAndSelectorRoute = (request, response) -> complexityService
+                .findTotalsByTargetKindAndSelector(getKind(request), readIdSelectionOptionsFromBody(request));
 
         ListRoute<Complexity> findBySelectorRoute = (request, response) -> complexityService
                 .findBySelector(getKind(request), readIdSelectionOptionsFromBody(request));
@@ -70,6 +75,7 @@ public class ComplexityEndpoint implements Endpoint {
         };
 
         getForList(findByEntityRefPath, findByEntityRefRoute);
+        postForList(findTotalsByTargetKindAndSelectorPath, findTotalsByTargetKindAndSelectorRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
         postForDatum(getComplexitySummaryForSelectorPath, getComplexitySummaryForSelectorRoute);
     }
