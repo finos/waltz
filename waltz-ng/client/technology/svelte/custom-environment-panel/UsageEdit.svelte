@@ -6,13 +6,13 @@
     import UsageTree from "./UsageTree.svelte";
     import {databaseInformationStore} from "../../../svelte-stores/database-information-store";
     import {serverInformationStore} from "../../../svelte-stores/server-information-store";
-    import {termSearch} from "../../../common";
     import SearchInput from "../../../common/svelte/SearchInput.svelte";
     import {serverUsageStore} from "../../../svelte-stores/server-usage-store";
     import {customEnvironmentUsageStore} from "../../../svelte-stores/custom-environment-usage-store";
     import {mkRef} from "../../../common/entity-utils";
     import EntityLabel from "../../../common/svelte/EntityLabel.svelte";
     import MiniActions from "../../../common/svelte/MiniActions.svelte";
+    import {combineServerData, doAssetSearch} from "./custom-environment-utils";
 
     export let usages;
     export let doCancel;
@@ -89,38 +89,6 @@
     $: databaseIdsInGroup = _.map(databasesInGroup, d => d.usage.entityReference.id);
     $: serverUsageIdsInGroup = _.map(serverUsagesInGroup, d => d.usage.entityReference.id);
 
-    function combineServerData(servers, usages) {
-        if (_.isEmpty(servers) || _.isEmpty(usages)) {
-            return [];
-        } else {
-            const serversById = _.keyBy(servers, d => d.id);
-            return _
-                .chain(usages)
-                .map(u => Object.assign({}, {serverUsage: u, serverInformation: serversById[u.serverId]}))
-                .filter(s => s.serverInformation != null)
-                .value();
-        }
-    }
-
-    function doDatabaseSearch(qry, databaseAssets, databaseIdsInGroup) {
-        const searchResults = termSearch(databaseAssets, qry, databaseSearchFields);
-        return _
-            .chain(searchResults)
-            .filter(d => !_.includes(databaseIdsInGroup, d.id))
-            .take(15)
-            .value();
-
-    }
-
-    function doServerSearch(qry, serverAssets, serverUsageIdsInGroup) {
-        const searchResults = termSearch(serverAssets, qry, serverSearchFields);
-        return _
-            .chain(searchResults)
-            .filter(d => !_.includes(serverUsageIdsInGroup, d.serverUsage.id))
-            .take(15)
-            .value();
-    }
-
     function addAsset(ref) {
         const usage = {
             customEnvironmentId: environment.id,
@@ -138,8 +106,8 @@
     $: databaseAssets = $databaseInformationCall?.data;
     $: serverAssets = combineServerData($serverInformationCall?.data, $serverUsageCall?.data);
 
-    $: databaseSearchResults = doDatabaseSearch(qry, databaseAssets, databaseIdsInGroup);
-    $: serverSearchResults = doServerSearch(qry, serverAssets, serverUsageIdsInGroup);
+    $: databaseSearchResults = doAssetSearch(qry, databaseAssets, databaseIdsInGroup, databaseSearchFields);
+    $: serverSearchResults = doAssetSearch(qry, serverAssets, serverUsageIdsInGroup, serverSearchFields);
 
 
     function cancel() {

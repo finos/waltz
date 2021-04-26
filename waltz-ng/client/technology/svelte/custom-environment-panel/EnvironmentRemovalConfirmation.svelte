@@ -10,7 +10,7 @@
 
     <div>
         <b>{environment.groupName} / {environment.name}</b>
-        <p>{environment.description}</p>
+        <p>{environment.description || "No description provided"}</p>
     </div>
 
     <button class="btn btn-warning"
