@@ -20,24 +20,21 @@ package com.khartec.waltz.web;
 
 import com.tngtech.archunit.lang.ArchRule;
 import org.junit.Test;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
-public class DaoArchitectureCompliance extends BaseArchitectureComplianceCheck {
-
+public class ServicesArchitectureComplianceTest extends BaseArchitectureComplianceTest {
 
     @Test
-    public void daosNeedRepositoryAnnotation() {
+    public void servicesNeedServiceAnnotation() {
         ArchRule rule = classes().that()
                 .areNotInterfaces()
                 .and()
-                .resideInAPackage("..khartec..")
-                .and()
-                .haveNameMatching(".*Dao")
+                .haveNameMatching(".*Service")
                 .should()
-                .beAnnotatedWith(Repository.class);
-        rule.check(waltzAndJavaUtilClasses);
+                .beAnnotatedWith(Service.class);
+        rule.check(waltzOnlyClasses);
     }
 
 
@@ -46,7 +43,7 @@ public class DaoArchitectureCompliance extends BaseArchitectureComplianceCheck {
         ArchRule rule = classes().that()
                 .areNotInterfaces()
                 .and()
-                .haveNameMatching(".*Dao")
+                .haveNameMatching(".*Service")
                 .should(haveFindMethodsThatReturnCollectionsOrMapsOrOptionals);
 
         rule.check(waltzAndJavaUtilClasses);

@@ -20,14 +20,14 @@ package com.khartec.waltz.web;
 
 import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.endpoints.extracts.DataExtractor;
-import com.khartec.waltz.web.endpoints.extracts.DirectQueryBasedDataExtractor;
 import com.tngtech.archunit.lang.ArchRule;
 import org.junit.Test;
 import org.springframework.stereotype.Service;
 
+import static com.tngtech.archunit.core.domain.JavaModifier.ABSTRACT;
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;
 
-public class EndpointArchitectureCompliance extends BaseArchitectureComplianceCheck {
+public class EndpointArchitectureComplianceTest extends BaseArchitectureComplianceTest {
 
     @Test
     public void endpointsNeedMarkerInterface() {
@@ -60,6 +60,8 @@ public class EndpointArchitectureCompliance extends BaseArchitectureComplianceCh
         ArchRule rule = classes().that()
                 .areAssignableTo(DataExtractor.class)
                 .and()
+                .doNotHaveModifier(ABSTRACT)
+                .and()
                 .doNotHaveSimpleName("DataExtractor")
                 .should()
                 .haveNameMatching(".*Extractor")
@@ -70,13 +72,15 @@ public class EndpointArchitectureCompliance extends BaseArchitectureComplianceCh
 
 
     @Test
-    public void extractorsExtendBaseExtractor() {
+    public void extractorsImplementDataExtractor() {
+
         ArchRule rule = classes().that()
                 .haveNameMatching(".*Extractor")
                 .and()
-                .doNotHaveSimpleName("DirectQueryBasedDataExtractor")
+                .areNotInterfaces()
                 .should()
-                .beAssignableTo(DirectQueryBasedDataExtractor.class);
+                .implement(DataExtractor.class);
+
         rule.check(waltzOnlyClasses);
     }
 

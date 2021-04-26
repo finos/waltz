@@ -37,7 +37,7 @@ export function store($http, BaseApiUrl) {
     };
 
 
-    const findBySelector = (options) => $http
+    const getBySelector = (options) => $http
         .post(`${BASE}/selector`, options)
         .then(x => x.data);
 
@@ -59,7 +59,7 @@ export function store($http, BaseApiUrl) {
 
     return {
         findByAppIds,
-        findBySelector,
+        getBySelector,
         findStatsForSelector,
         getByPackageId,
         getByLicenceId,
@@ -82,10 +82,10 @@ export const SoftwareCatalogStore_API = {
         serviceFnName: "findByAppIds",
         description: "retrieve catalog for a list of app ids"
     },
-    findBySelector: {
+    getBySelector: {
         serviceName,
-        serviceFnName: "findBySelector",
-        description: "find software catalog for a given selector options"
+        serviceFnName: "getBySelector",
+        description: "get software catalog for a given selector options"
     },
     findStatsForSelector: {
         serviceName,

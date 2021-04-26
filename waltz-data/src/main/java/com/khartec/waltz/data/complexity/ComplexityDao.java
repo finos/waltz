@@ -188,5 +188,4 @@ public class ComplexityDao {
                         r.get(entityWithComplexityCount),
                         r.get(entityCount) - r.get(entityWithComplexityCount)));
     }
-
 }
