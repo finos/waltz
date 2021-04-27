@@ -10,6 +10,9 @@
     import EnvironmentRegistration from "./EnvironmentRegistration.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
     import {applicationStore} from "../../../svelte-stores/application-store";
+    import {permissionGroupStore} from "../../../svelte-stores/permission-group-store";
+    import {setContext} from "svelte";
+    import {writable} from "svelte/store";
 
     export let primaryEntityRef;
 
@@ -50,6 +53,8 @@
     let loadEnvironmentsCall = customEnvironmentStore.findByOwningEntityRef(primaryEntityRef);
     let loadEnvironmentUsagesCall = customEnvironmentUsageStore.findUsageInfoByOwningEntityRef(primaryEntityRef);
     let loadApplicationCall = applicationStore.getById(primaryEntityRef.id);
+    let loadPermissionsCall = permissionGroupStore.findByEntity(primaryEntityRef);
+
 
     $: customEnvironments = _
         .chain($loadEnvironmentsCall.data)
@@ -65,16 +70,26 @@
     $: environmentUsagesById = _.groupBy(customEnvironmentUsageInfo, d => d.usage.customEnvironmentId);
     $: application = $loadApplicationCall.data;
 
+    const canEdit = writable(false);
+    setContext("canEdit", canEdit);
+
+    $: canEdit.set(_.some($loadPermissionsCall.data, d => d.subjectKind === "CUSTOM_ENVIRONMENT"));
 </script>
 
 <p class="help-block">
-Custom environments can be used to group servers and databases used by this application.
-    Assets are not limited to those owned by this application. Click on an environment to view and edit assets or
-    <button class="btn btn-skinny"
-            on:click={addNewEnvironment}>
-        register a new custom environment
-    </button>
-    here.
+    Custom environments can be used to group servers and databases used by this application.
+    Assets are not limited to those owned by this application.
+
+    {#if $canEdit}
+        Expand an environment to view and edit assets or
+        <button class="btn btn-skinny"
+                on:click={addNewEnvironment}>
+            register a new custom environment
+        </button>
+        here.
+    {:else}
+        Expand an environment to view linked assets.
+    {/if}
 </p>
 
 {#if $panelMode === PanelModes.REGISTER}
