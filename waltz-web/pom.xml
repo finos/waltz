@@ -124,17 +124,13 @@
                         <configuration>
                             <arguments>
                                 <argument>run</argument>
-                                <argument>build</argument>
+                                <argument>test-and-build</argument>
                             </arguments>
                         </configuration>
                     </execution>
                 </executions>
                 <configuration>
                     <executable>npm</executable>
-                    <arguments>
-                        <argument>run</argument>
-                        <argument>build</argument>
-                    </arguments>
                     <environmentVariables>
                         <BUILD_ENV>prod</BUILD_ENV>
                     </environmentVariables>

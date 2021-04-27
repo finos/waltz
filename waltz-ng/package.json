@@ -1,21 +1,18 @@
 {
   "name": "waltz-ng",
   "version": "0.0.0",
-  "description": "To start test server run:",
+  "description": "To start test server run: `npm run dev-server` and ensure java backend is running on 8443",
   "main": "client/main.js",
   "scripts": {
-    "test": "mocha --require @babel/register test/**/*.js",
-    "watch-test": "npm test -- --watch",
-    "dev-server-orig": "BUILD_ENV=test webpack-dev-server --config webpack.config.js --progress --colors --port 8000 --host 0.0.0.0",
-    "dev-server": "webpack-dev-server --config webpack.dev.js --progress --colors --port 8000 --host 0.0.0.0",
-    "test-server": "BUILD_ENV=test webpack-dev-server --config webpack.config.js --progress --colors --port 8000 --host 0.0.0.0",
-    "build-orig": "BUILD_ENV=prod webpack --config webpack.config.js -p --progress --profile --colors",
     "build": "webpack --config webpack.prod.js -p --progress --profile --colors",
     "build-debug": "webpack --config webpack.dev.js --progress --profile --colors",
+    "dev-server": "webpack-dev-server --config webpack.dev.js --progress --colors --port 8000 --host 0.0.0.0",
+    "postinstall": "patch-package",
+    "test": "mocha --require @babel/register test/**/*.js",
+    "test-and-build": "npm test && webpack --config webpack.prod.js -p --progress --profile --colors",
+    "test-server": "BUILD_ENV=test webpack-dev-server --config webpack.config.js --progress --colors --port 8000 --host 0.0.0.0",
     "watch": "webpack --progress --watch --colors",
-    "start-dev": "node lib/server-development",
-    "start": "node lib/server-production",
-    "postinstall": "patch-package"
+    "watch-test": "npm test -- --watch"
   },
   "dependencies": {
     "@babel/polyfill": "7.11.5",
