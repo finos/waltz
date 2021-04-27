@@ -72,15 +72,22 @@ public class CustomEnvironmentService {
         boolean removed = customEnvironmentDao.remove(envId);
 
         if(removed){
-            String message = format("Deleted custom environment: %s/%s and any mappings to assets", env.groupName(), env.name());
-            ChangeLog changeLog = mkChangeLog(env.owningEntity(), username, message, Operation.REMOVE);
+            String message = format(
+                    "Deleted custom environment: %s/%s and any mappings to assets",
+                    env.groupName(),
+                    env.name());
+            ChangeLog changeLog = mkChangeLog(
+                    env.owningEntity(),
+                    username,
+                    message,
+                    Operation.REMOVE);
             changeLogService.write(changeLog);
         }
         return removed;
     }
 
 
-    public CustomEnvironment findById(Long id) {
+    public CustomEnvironment getById(Long id) {
         return customEnvironmentDao.getById(id);
     }
 

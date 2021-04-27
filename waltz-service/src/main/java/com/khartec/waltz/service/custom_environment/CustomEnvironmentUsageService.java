@@ -45,7 +45,7 @@ public class CustomEnvironmentUsageService {
         Long usageId = customEnvironmentUsageDao.addAsset(usage, username);
 
         CustomEnvironmentUsageInfo usageInfo = customEnvironmentUsageDao.getUsageInfoById(usageId);
-        CustomEnvironment customEnvironment = customEnvironmentService.findById(usage.customEnvironmentId());
+        CustomEnvironment customEnvironment = customEnvironmentService.getById(usage.customEnvironmentId());
         String message = format("Added asset: %s to custom environment: %s/%s",
                 pretty(usageInfo.asset().entityReference()),
                 customEnvironment.groupName(),
@@ -63,7 +63,7 @@ public class CustomEnvironmentUsageService {
         boolean remove = customEnvironmentUsageDao.remove(usageId);
 
         if(remove) {
-            CustomEnvironment customEnvironment = customEnvironmentService.findById(usageInfo.usage().customEnvironmentId());
+            CustomEnvironment customEnvironment = customEnvironmentService.getById(usageInfo.usage().customEnvironmentId());
             String message = format("Removed asset: %s from custom environment: %s/%s",
                     pretty(usageInfo.asset().entityReference()),
                     customEnvironment.groupName(),
