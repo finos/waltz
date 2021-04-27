@@ -19,8 +19,6 @@
         icon: "trash",
         description: "Click to delete this environment and its associations to servers and databases",
         handleAction: showRemove}
-    const cancelEditAction = {name: "Cancel", icon: "times", description: "Cancel editing and return to tree view", handleAction: showTree}
-    const cancelRemoveAction = {name: "Cancel", icon: "times", description: "Cancel this removal and return to tree view", handleAction: showTree}
 
     const modeActions = {
         TREE: [showTableAction, editAction, removeAction],
@@ -34,12 +32,10 @@
         TABLE: "TABLE",
         EDIT: "EDIT",
         REMOVE: "REMOVE"
-    }
+    };
 
 
     let activeMode = Modes.TREE;
-    let selectedAsset
-
 
 
     function cancel() {

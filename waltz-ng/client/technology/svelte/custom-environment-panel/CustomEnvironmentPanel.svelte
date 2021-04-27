@@ -5,7 +5,7 @@
     import {customEnvironmentUsageStore} from "../../../svelte-stores/custom-environment-usage-store";
     import Icon from "../../../common/svelte/Icon.svelte";
 
-    import {mode, Modes, selectedEnvironment} from "./editingCustomEnvironmentState";
+    import {panelMode, PanelModes} from "./editingCustomEnvironmentState";
     import UsagePanel from "./UsagePanel.svelte";
     import EnvironmentRegistration from "./EnvironmentRegistration.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
@@ -25,18 +25,7 @@
     }
 
     function addNewEnvironment() {
-        selectedEnvironment.set({
-            name: null,
-            description: null,
-            owningEntity: primaryEntityRef,
-            externalId: null,
-            group: null
-        })
-        return mode.set(Modes.EDIT);
-    }
-
-    function tableView(){
-        mode.set(Modes.TABLE);
+        return panelMode.set(PanelModes.REGISTER);
     }
 
     function deleteEnvironment(environment) {
@@ -54,8 +43,7 @@
     }
 
     function cancel() {
-        mode.set(Modes.TABLE)
-        selectedEnvironment.set(null);
+        panelMode.set(PanelModes.VIEW);
     }
 
     let expandedEnvironmentIds = [];
@@ -89,11 +77,9 @@ Custom environments can be used to group servers and databases used by this appl
     here.
 </p>
 
-{#if $mode === Modes.EDIT}
+{#if $panelMode === PanelModes.REGISTER}
     <EnvironmentRegistration primaryEntityRef={primaryEntityRef}
                              onCancel={cancel}/>
-{:else if $mode === Modes.DETAIL}
-    <UsagePanel onCancel={cancel}/>
 {:else}
     {#if customEnvironments.length === 0}
         <NoData>

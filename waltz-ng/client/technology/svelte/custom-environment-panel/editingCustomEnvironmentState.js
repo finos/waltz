@@ -1,12 +1,15 @@
 import {writable} from "svelte/store";
 
-export const Modes = {
+export const EnvironmentModes = {
     TABLE: "TABLE",
     TREE: "TREE",
     EDIT: "EDIT",
     DETAIL: "DETAIL"
 }
 
-export const selectedEnvironment = writable(null);
+export const PanelModes = {
+    VIEW: "VIEW",
+    REGISTER: "REGISTER"
+}
 
-export const mode = writable(Modes.TABLE);
+export const panelMode = writable(PanelModes.VIEW);

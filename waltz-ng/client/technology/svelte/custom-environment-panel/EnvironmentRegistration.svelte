@@ -2,18 +2,27 @@
 
     import {customEnvironmentStore} from "../../../svelte-stores/custom-environment-store";
 
-    import {mode, Modes, selectedEnvironment} from "./editingCustomEnvironmentState";
+    import {panelMode, PanelModes} from "./editingCustomEnvironmentState";
     import Icon from "../../../common/svelte/Icon.svelte";
     import _ from "lodash";
     import {refToString} from "../../../common/entity-utils";
 
     export let onCancel;
     export let primaryEntityRef;
+
+    $: newEnvironment = {
+        name: null,
+        description: null,
+        owningEntity: primaryEntityRef,
+        externalId: null,
+        group: null
+    };
+
     let invalid = true;
     let savePromise;
 
 
-    let workingCopy = Object.assign({}, $selectedEnvironment);
+    let workingCopy = Object.assign({}, newEnvironment);
 
 
     function saveEnvironment() {
@@ -30,22 +39,15 @@
         }
 
         savePromise = customEnvironmentStore
-            .create(env);
-
-        mode.set(Modes.LIST);
+            .create(env)
+            .then(() => panelMode.set(PanelModes.VIEW));
     }
 
     function cancel() {
         onCancel();
     }
 
-    function fieldChanged(d){
-        d.name === $selectedEnvironment.name && d.description === $selectedEnvironment.description && d.group === $selectedEnvironment.group
-    }
-
-    $: invalid = (workingCopy.id)
-        ? ! fieldChanged(workingCopy)
-        : _.isNil(workingCopy.name);
+    $: invalid = _.isNil(workingCopy.name);
 
 </script>
 
@@ -105,7 +107,7 @@
         Saved!
     {:catch e}
         <div class="alert alert-warning">
-            Failed to save custom environment. Reason: {e.data.message}
+            Failed to save custom environment. Reason: {e.error}
             <button class="btn-link"
                     on:click={() => savePromise = null}>
                 <Icon name="check"/>

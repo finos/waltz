@@ -18,11 +18,14 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.custom_environment.CustomEnvironment;
 import com.khartec.waltz.service.custom_environment.CustomEnvironmentService;
+import com.khartec.waltz.service.permission.PermissionGroupService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
+import com.khartec.waltz.web.NotAuthorizedException;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -37,11 +40,14 @@ public class CustomEnvironmentEndpoint implements Endpoint {
     private static final String BASE_URL = mkPath("api", "custom-environment");
 
     private final CustomEnvironmentService customEnvironmentService;
+    private final PermissionGroupService permissionGroupService;
 
 
     @Autowired
-    public CustomEnvironmentEndpoint(CustomEnvironmentService customEnvironmentService) {
+    public CustomEnvironmentEndpoint(CustomEnvironmentService customEnvironmentService,
+                                     PermissionGroupService permissionGroupService) {
         this.customEnvironmentService = customEnvironmentService;
+        this.permissionGroupService = permissionGroupService;
     }
 
 
@@ -60,6 +66,8 @@ public class CustomEnvironmentEndpoint implements Endpoint {
 //            requireAnyRole(userRoleService, request, SystemRole.USER_ADMIN, SystemRole.ADMIN);
             CustomEnvironment env = readBody(request, CustomEnvironment.class);
             String username = getUsername(request);
+
+            ensureHasPermission(env, username);
             return customEnvironmentService.create(env, username);
         };
 
@@ -81,6 +89,18 @@ public class CustomEnvironmentEndpoint implements Endpoint {
 
         postForDatum(createPath, createRoute);
         deleteForDatum(deletePath, deleteRoute);
+    }
+
+
+    private void ensureHasPermission(CustomEnvironment env, String username) {
+        boolean hasPerm = permissionGroupService.hasPermission(
+                env.owningEntity(),
+                EntityKind.CUSTOM_ENVIRONMENT,
+                username);
+
+        if (!hasPerm) {
+            throw new NotAuthorizedException("Cannot create environment, insufficient permissions");
+        }
     }
 
 }

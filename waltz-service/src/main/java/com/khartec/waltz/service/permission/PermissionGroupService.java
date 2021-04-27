@@ -56,9 +56,11 @@ public class PermissionGroupService {
         return permissionGroupDao.getDefaultPermissions();
     }
 
-    public boolean hasPermission(EntityReference entityReference, EntityKind attestedEntityKind, String username) {
+    public boolean hasPermission(EntityReference entityReference,
+                                 EntityKind qualifierKind,
+                                 String username) {
         return findPermissions(entityReference, username)
                 .stream()
-                .anyMatch(permission -> permission.qualifierKind().equals(attestedEntityKind));
+                .anyMatch(permission -> permission.qualifierKind().equals(qualifierKind));
     }
 }
