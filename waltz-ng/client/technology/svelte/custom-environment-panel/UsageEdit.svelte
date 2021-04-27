@@ -16,7 +16,7 @@
 
     export let usages;
     export let doCancel;
-    export let primaryEntityRef;
+    export let application;
     export let environment;
 
     const databaseSearchFields = [
@@ -42,8 +42,6 @@
     let removePromise;
 
     let showSearch = true;
-    let assetToAdd;
-    let searchApplication = null;
     let qry;
 
     let databasesInGroup;
@@ -84,6 +82,7 @@
         }
     ];
 
+    $: searchApplication = application; // default to the owing app
     $: [databasesInGroup, serverUsagesInGroup] = _.partition(usages, d => d.usage.entityReference.kind === 'DATABASE');
 
     $: databaseIdsInGroup = _.map(databasesInGroup, d => d.usage.entityReference.id);

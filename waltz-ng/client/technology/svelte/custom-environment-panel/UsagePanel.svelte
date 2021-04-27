@@ -8,7 +8,7 @@
     import MiniActions from "../../../common/svelte/MiniActions.svelte";
 
     export let doCancel;
-    export let primaryEntityRef
+    export let application
     export let usages;
     export let environment;
 
@@ -76,7 +76,7 @@
 {:else if activeMode === Modes.EDIT}
     <UsageEdit {environment}
                usages={usages || []}
-               {primaryEntityRef}
+               {application}
                doCancel={showTree}/>
 {:else if activeMode === Modes.REMOVE}
     <EnvironmentRemovalConfirmation {environment}

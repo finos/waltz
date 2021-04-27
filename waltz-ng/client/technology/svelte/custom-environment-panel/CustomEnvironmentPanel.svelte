@@ -9,6 +9,7 @@
     import UsagePanel from "./UsagePanel.svelte";
     import EnvironmentRegistration from "./EnvironmentRegistration.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
+    import {applicationStore} from "../../../svelte-stores/application-store";
 
     export let primaryEntityRef;
 
@@ -60,6 +61,7 @@
     let expandedEnvironmentIds = [];
     let loadEnvironmentsCall = customEnvironmentStore.findByOwningEntityRef(primaryEntityRef);
     let loadEnvironmentUsagesCall = customEnvironmentUsageStore.findUsageInfoByOwningEntityRef(primaryEntityRef);
+    let loadApplicationCall = applicationStore.getById(primaryEntityRef.id);
 
     $: customEnvironments = _
         .chain($loadEnvironmentsCall.data)
@@ -73,6 +75,7 @@
 
     $: environmentUsageCounts = _.countBy(customEnvironmentUsageInfo, d => d.usage.customEnvironmentId);
     $: environmentUsagesById = _.groupBy(customEnvironmentUsageInfo, d => d.usage.customEnvironmentId);
+    $: application = $loadApplicationCall.data;
 
 </script>
 
@@ -98,9 +101,9 @@ Custom environments can be used to group servers and databases used by this appl
             <span>{primaryEntityRef.kind.toLowerCase()}</span>
         </NoData>
     {:else}
-        <table class="table table-condensed small">
+        <table class="table table-condensed">
             <thead>
-                <th  width="5%"></th>
+                <th width="5%"></th>
                 <th width="20%">Group</th>
                 <th width="30%">Name</th>
                 <th width="25%">Description</th>
@@ -111,7 +114,10 @@ Custom environments can be used to group servers and databases used by this appl
                 <tr class="clickable"
                     on:click={() => toggleDetailView(environment)}>
                     <td>
-                        <Icon name={_.includes(expandedEnvironmentIds, environment.id) ? "caret-down" : "caret-right"}/>
+                        <Icon size="lg"
+                              name={_.includes(expandedEnvironmentIds, environment.id)
+                                ? "caret-down"
+                                : "caret-right"}/>
                     </td>
                     <td>{environment.groupName || "-"}</td>
                     <td>{environment.name}</td>
@@ -123,7 +129,7 @@ Custom environments can be used to group servers and databases used by this appl
                         <td></td>
                         <td colspan="5">
                             <UsagePanel doCancel={cancel}
-                                         {primaryEntityRef}
+                                         {application}
                                          environment={environment}
                                          usages={_.get(environmentUsagesById, [environment.id], [])}/>
                         </td>
