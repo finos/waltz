@@ -18,14 +18,12 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.custom_environment.CustomEnvironment;
 import com.khartec.waltz.service.custom_environment.CustomEnvironmentService;
 import com.khartec.waltz.service.permission.PermissionGroupService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
-import com.khartec.waltz.web.NotAuthorizedException;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -67,7 +65,6 @@ public class CustomEnvironmentEndpoint implements Endpoint {
             CustomEnvironment env = readBody(request, CustomEnvironment.class);
             String username = getUsername(request);
 
-            ensureHasPermission(env, username);
             return customEnvironmentService.create(env, username);
         };
 
@@ -89,18 +86,6 @@ public class CustomEnvironmentEndpoint implements Endpoint {
 
         postForDatum(createPath, createRoute);
         deleteForDatum(deletePath, deleteRoute);
-    }
-
-
-    private void ensureHasPermission(CustomEnvironment env, String username) {
-        boolean hasPerm = permissionGroupService.hasPermission(
-                env.owningEntity(),
-                EntityKind.CUSTOM_ENVIRONMENT,
-                username);
-
-        if (!hasPerm) {
-            throw new NotAuthorizedException("Cannot create environment, insufficient permissions");
-        }
     }
 
 }

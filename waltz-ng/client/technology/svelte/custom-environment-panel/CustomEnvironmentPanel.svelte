@@ -31,9 +31,6 @@
         return panelMode.set(PanelModes.REGISTER);
     }
 
-    function deleteEnvironment(environment) {
-        return customEnvironmentStore.remove(environment);
-    }
 
     function isExpanded(environment){
         return _.includes(expandedEnvironmentIds, environment.id)
@@ -104,11 +101,13 @@
     {:else}
         <table class="table table-condensed">
             <thead>
+            <tr>
                 <th width="5%"></th>
                 <th width="20%">Group</th>
                 <th width="30%">Name</th>
                 <th width="25%">Description</th>
                 <th width="20%"># Linked Entities</th>
+            </tr>
             </thead>
             <tbody>
             {#each customEnvironments as environment}
@@ -131,9 +130,9 @@
                         <td></td>
                         <td colspan="4">
                             <UsagePanel doCancel={cancel}
-                                         {application}
-                                         environment={environment}
-                                         usages={_.get(environmentUsagesById, [environment.id], [])}/>
+                                        {application}
+                                        environment={environment}
+                                        usages={_.get(environmentUsagesById, [environment.id], [])}/>
                         </td>
                     </tr>
                 {/if}

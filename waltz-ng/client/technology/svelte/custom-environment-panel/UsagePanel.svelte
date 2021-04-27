@@ -6,6 +6,7 @@
     import UsageTable from "./UsageTable.svelte";
     import {customEnvironmentStore} from "../../../svelte-stores/custom-environment-store";
     import MiniActions from "../../../common/svelte/MiniActions.svelte";
+    import {getContext} from "svelte";
 
     export let doCancel;
     export let application
@@ -20,12 +21,19 @@
         description: "Click to delete this environment and its associations to servers and databases",
         handleAction: showRemove}
 
-    const modeActions = {
+    const editorActions = {
         TREE: [showTableAction, editAction, removeAction],
         TABLE: [showTreeAction, editAction, removeAction],
         EDIT: [],
         REMOVE: []
-    }
+    };
+
+    const viewerActions = {
+        TREE: [showTableAction],
+        TABLE: [showTreeAction],
+        EDIT: [],
+        REMOVE: []
+    };
 
     const Modes = {
         TREE: "TREE",
@@ -34,9 +42,13 @@
         REMOVE: "REMOVE"
     };
 
+    let canEdit = getContext("canEdit");
 
     let activeMode = Modes.TREE;
 
+    $: actions = $canEdit
+        ? editorActions[activeMode]
+        : viewerActions[activeMode];
 
     function cancel() {
         doCancel();
@@ -82,5 +94,5 @@
                                     doCancel={showTree}/>
 {/if}
 <br>
-<MiniActions actions={modeActions[activeMode]}/>
+<MiniActions {actions}/>
 

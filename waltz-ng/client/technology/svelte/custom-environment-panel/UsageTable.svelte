@@ -36,7 +36,7 @@
     {#each servers as usageInfo}
         <tr>
             <td><EntityLink ref={usageInfo.owningApplication}/></td>
-            <td>{usageInfo.asset.hostname}.intranet.ldn.db.com</td>
+            <td>{usageInfo.asset.hostname}</td>
             <td>{usageInfo.asset.operatingSystem}</td>
             <td>{usageInfo.asset.operatingSystemVersion}</td>
             <td>{usageInfo.asset.location}</td>
