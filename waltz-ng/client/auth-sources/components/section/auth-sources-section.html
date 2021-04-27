@@ -89,10 +89,24 @@
 <script type="text/ng-template"
         id="wass-sources-tab-content">
     <div class="waltz-panel-content">
-        <waltz-auth-sources-table ng-if="$ctrl.authSources.length > 0"
-                                  auth-sources="$ctrl.authSources"
-                                  parent-entity-ref="$ctrl.parentEntityRef">
-        </waltz-auth-sources-table>
+
+        <div ng-if="$ctrl.authSources.length > 0">
+            <!-- DOWNLOAD LINK -->
+            <div class="small pull-right">
+                <waltz-data-extract-link name="Download Authoritative Sources"
+                                         styling="link"
+                                         filename="AuthoritativeSources.csv"
+                                         extract="authoritative-source/by-selector"
+                                         method="POST"
+                                         request-body="$ctrl.selectionOptions">
+                </waltz-data-extract-link>
+            </div>
+        
+
+            <waltz-auth-sources-table auth-sources="$ctrl.authSources"
+                                      parent-entity-ref="$ctrl.parentEntityRef">
+            </waltz-auth-sources-table>
+       </div>
 
         <waltz-no-data ng-if="$ctrl.authSources.length === 0">
             <message>
