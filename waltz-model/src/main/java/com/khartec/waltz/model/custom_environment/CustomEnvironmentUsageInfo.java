@@ -16,31 +16,19 @@
  *
  */
 
-package com.khartec.waltz.model.server_usage;
+package com.khartec.waltz.model.custom_environment;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.CustomEnvironmentAsset;
+import com.khartec.waltz.model.application.Application;
 import org.immutables.value.Value;
 
-
 @Value.Immutable
-@JsonSerialize(as = ImmutableServerUsage.class)
-@JsonDeserialize(as = ImmutableServerUsage.class)
-public abstract class ServerUsage implements
-        IdProvider,
-        LastUpdatedProvider,
-        ProvenanceProvider,
-        EntityKindProvider{
+@JsonSerialize(as = ImmutableCustomEnvironmentUsageInfo.class)
+public abstract class CustomEnvironmentUsageInfo<T extends CustomEnvironmentAsset> {
 
-    public abstract long serverId();
-    public abstract EntityReference entityReference();
+    public abstract CustomEnvironmentUsage usage();
+    public abstract Application owningApplication();
 
-    @Value.Default
-    public EntityKind kind() { return EntityKind.SERVER_USAGE; }
-
-    @Value.Default
-    public String environment() {
-        return "UNKNOWN";
-    }
+    public abstract T asset();
 }

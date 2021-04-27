@@ -50,6 +50,7 @@ public class ServerUsageDao {
         EntityKind entityKind = readEnum(row.getEntityKind(), EntityKind.class, s -> null);
 
         return ImmutableServerUsage.builder()
+                .id(row.getId())
                 .serverId(row.getServerId())
                 .environment(row.getEnvironment())
                 .entityReference(EntityReference.mkRef(entityKind, row.getEntityId()))
