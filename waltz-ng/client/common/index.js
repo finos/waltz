@@ -60,13 +60,15 @@ export function randomPick(xs) {
 /**
  *
  * @param items - items to be searched
- * @param searchStr - query string to search for
+ * @param searchStr - query string to search for (case insensitive)
  * @param searchFields - fields in the items to consider when searching, may be a function
+ * @param omitCallback - evaluated against every passing results to see if it should be omitted, defaults to false
  * @returns {Array}
  */
 export function termSearch(items = [],
                            searchStr = "",
-                           searchFields = []) {
+                           searchFields = [],
+                           omitCallback = () => false) {
     if (_.isEmpty(searchStr)) {
         return items;
     }
@@ -80,19 +82,23 @@ export function termSearch(items = [],
             .value()
         : searchFields;
 
-    return _.filter(items, item => {
-        const targetStr = _
-            .chain(getSearchFieldsForItem(item))
-            .map(field => _.isFunction(field)
-                ? field(item)
-                : _.get(item, field, ""))
-            .map(v => String(v).toLowerCase())
-            .join(" ")
-            .value()
-            .toLowerCase();
+    return _
+        .chain(items)
+        .filter(item => {
+            const targetStr = _
+                .chain(getSearchFieldsForItem(item))
+                .map(field => _.isFunction(field)
+                    ? field(item)
+                    : _.get(item, field, ""))
+                .map(v => String(v).toLowerCase())
+                .join(" ")
+                .value()
+                .toLowerCase();
 
-        return _.every(terms, term => targetStr.includes(term));
-    });
+            return _.every(terms, term => targetStr.includes(term));
+        })
+        .reject(omitCallback)
+        .value();
 }
 
 

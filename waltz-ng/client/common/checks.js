@@ -110,6 +110,17 @@ const authSourceCreateCommand = {
     orgUnitId: apiCheck.number
 };
 
+const customEnvironmentShape = {
+    name: apiCheck.string,
+    owningEntity: myApiCheck.shape(entityRefShape),
+    externalId: apiCheck.string,
+};
+
+const customEnvironmentUsageShape = {
+    customEnvironmentId: apiCheck.number,
+    entityReference: myApiCheck.shape(entityRefShape),
+};
+
 const serviceBrokerCacheRefreshListenerShape = {
     componentId: apiCheck.string,
     fn: myApiCheck.func
@@ -247,6 +258,14 @@ export const checkIsAuthSourceUpdateCommand = (target) => {
 
 export const checkIsAuthSourceCreateCommand = (target) => {
     check(myApiCheck.shape(authSourceCreateCommand), target);
+};
+
+export const checkIsCustomEnvironment = (target) => {
+    check(myApiCheck.shape(customEnvironmentShape), target);
+};
+
+export const checkIsCustomEnvironmentUsage = (target) => {
+    check(myApiCheck.shape(customEnvironmentUsageShape), target);
 };
 
 export const checkIsServiceBrokerOptions = (options) => {

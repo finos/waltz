@@ -48,7 +48,7 @@
 
 
 import {assert} from "chai";
-import { buildHierarchies } from "../../../client/common/hierarchy-utils";
+import {buildHierarchies} from "../../../client/common/hierarchy-utils";
 
 
 const ouA = {

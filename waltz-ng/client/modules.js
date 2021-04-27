@@ -52,6 +52,7 @@ import ClientCacheKey from "./client_cache_key";
 import Complexity from "./complexity";
 import Common_Module from "./common/module";
 import Cost from "./cost"
+import CustomEnvironment from "./custom-environment"
 import ChangeLog from "./change-log";
 import ChangeSet from "./change-set";
 import ChangeUnit from "./change-unit";
@@ -162,6 +163,7 @@ const dependencies = [
     Complexity(),
     Cost(),
     Common_Module(),
+    CustomEnvironment(),
     ChangeLog(),
     ChangeSet(),
     ChangeUnit(),

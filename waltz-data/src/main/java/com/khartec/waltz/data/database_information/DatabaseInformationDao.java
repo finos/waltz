@@ -50,9 +50,10 @@ public class DatabaseInformationDao {
     private final DSLContext dsl;
 
 
-    private final static RecordMapper<? super Record, DatabaseInformation> DATABASE_RECORD_MAPPER = r -> {
+    public final static RecordMapper<? super Record, DatabaseInformation> DATABASE_RECORD_MAPPER = r -> {
         DatabaseInformationRecord record = r.into(DATABASE_INFORMATION);
         return ImmutableDatabaseInformation.builder()
+                .id(record.getId())
                 .databaseName(record.getDatabaseName())
                 .instanceName(record.getInstanceName())
                 .environment(record.getEnvironment())
