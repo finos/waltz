@@ -40,6 +40,8 @@
     let activeMode = Modes.TREE;
     let selectedAsset
 
+
+
     function cancel() {
         doCancel();
     }

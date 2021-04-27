@@ -70,7 +70,7 @@ export function termSearch(items = [],
                            searchFields = [],
                            omitCallback = () => false) {
     if (_.isEmpty(searchStr)) {
-        return items;
+        return _.reject(items, omitCallback);
     }
 
     const terms = searchStr.toLowerCase().split(/\W/);
@@ -97,7 +97,9 @@ export function termSearch(items = [],
 
             return _.every(terms, term => targetStr.includes(term));
         })
+        .tap(t => console.log("tap1", {t}))
         .reject(omitCallback)
+        .tap(t => console.log("tap2", {t}))
         .value();
 }
 

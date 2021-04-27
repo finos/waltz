@@ -112,6 +112,7 @@ Custom environments can be used to group servers and databases used by this appl
             <tbody>
             {#each customEnvironments as environment}
                 <tr class="clickable"
+                    class:expanded={_.includes(expandedEnvironmentIds, environment.id)}
                     on:click={() => toggleDetailView(environment)}>
                     <td>
                         <Icon size="lg"
@@ -125,9 +126,9 @@ Custom environments can be used to group servers and databases used by this appl
                     <td>{_.get(environmentUsageCounts, [environment.id], 0)}</td>
                 </tr>
                 {#if _.includes(expandedEnvironmentIds, environment.id)}
-                    <tr>
+                    <tr class="env-detail-row">
                         <td></td>
-                        <td colspan="5">
+                        <td colspan="4">
                             <UsagePanel doCancel={cancel}
                                          {application}
                                          environment={environment}
@@ -140,4 +141,15 @@ Custom environments can be used to group servers and databases used by this appl
         </table>
     {/if}
 {/if}
+
+
+<style>
+    .expanded {
+        background-color: #f5f5f5;
+    }
+
+    .env-detail-row td {
+        border-top: none;
+    }
+</style>
 

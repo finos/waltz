@@ -23,6 +23,7 @@
 <style>
     li + li::before {
         content: "|";
+        margin-right: 0.67em;
     }
 
     ul {
