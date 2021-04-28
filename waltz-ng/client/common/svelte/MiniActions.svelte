@@ -11,8 +11,9 @@
         <li class="clickable"
             title="{action.description}"
             on:click={() => action.handleAction(ctx)}>
-            <button class="btn-link">
-                <Icon name={action.icon}/>&nbsp;{action.name}
+            <button class="btn btn-skinny">
+                {#if action.icon}<Icon name={action.icon}/>{/if}
+                {#if action.name}{action.name}{/if}
             </button>
         </li>
     {/each}
@@ -22,10 +23,11 @@
 <style>
     li + li::before {
         content: "|";
+        margin-right: 0.67em;
     }
 
     ul {
         padding: 0;
-        margin: 0;
+        display: inline-block;
     }
 </style>

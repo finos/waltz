@@ -36,3 +36,6 @@ export function mkStaticPanelStore() {
         save
     };
 }
+
+
+export const staticPanelStore = mkStaticPanelStore();

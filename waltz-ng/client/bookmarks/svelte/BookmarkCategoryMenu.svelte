@@ -26,7 +26,7 @@
 </script>
 
 
-<ul class="list-group small">
+<ul class="list-group">
     {#each bookmarkKinds as bookmarkKind}
         <li class="list-group-item"
             class:selected={eq(selected, bookmarkKind)}
@@ -51,10 +51,6 @@
 <style>
     .selected {
         background-color: #e2ffd9;
-    }
-
-    .clickable {
-        font-size: larger;
     }
 
     .clickable > :global(.icon) {

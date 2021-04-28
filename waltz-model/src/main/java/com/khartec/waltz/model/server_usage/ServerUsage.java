@@ -20,9 +20,7 @@ package com.khartec.waltz.model.server_usage;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.LastUpdatedProvider;
-import com.khartec.waltz.model.ProvenanceProvider;
+import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
 
@@ -30,11 +28,16 @@ import org.immutables.value.Value;
 @JsonSerialize(as = ImmutableServerUsage.class)
 @JsonDeserialize(as = ImmutableServerUsage.class)
 public abstract class ServerUsage implements
+        IdProvider,
         LastUpdatedProvider,
-        ProvenanceProvider {
+        ProvenanceProvider,
+        EntityKindProvider{
 
     public abstract long serverId();
     public abstract EntityReference entityReference();
+
+    @Value.Default
+    public EntityKind kind() { return EntityKind.SERVER_USAGE; }
 
     @Value.Default
     public String environment() {

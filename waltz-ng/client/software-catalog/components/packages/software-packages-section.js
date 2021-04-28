@@ -92,7 +92,7 @@ function controller(serviceBroker) {
         const options = mkSelectionOptions(vm.parentEntityRef);
         return serviceBroker
             .loadViewData(
-                CORE_API.SoftwareCatalogStore.findBySelector,
+                CORE_API.SoftwareCatalogStore.getBySelector,
                 [options])
             .then(r => {
                 vm.softwareCatalog = r.data;

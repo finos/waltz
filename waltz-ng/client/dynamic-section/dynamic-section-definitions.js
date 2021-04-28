@@ -46,8 +46,6 @@ const authSourcesSection = {
     id: 4,
 };
 
-
-
 const bookmarksSection = {
     svelteComponent: BookmarkPanel,
     name: "Bookmarks",
@@ -67,13 +65,6 @@ const changeLogSection = {
     icon: "history",
     name: "Changes",
     id: 7,
-};
-
-const complexitySection = {
-    componentId: "complexity-section",
-    icon: "sort-numeric-asc",
-    name: "Complexity",
-    id: 8,
 };
 
 const dataFlowSection = {
@@ -386,7 +377,6 @@ export const dynamicSections = {
     changeLogSection,
     changeSetSection,
     changeUnitSection,
-    complexitySection,
     dataFlowSection,
     dataTypeFlowSection,
     dataTypeOriginatorsSection,

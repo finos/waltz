@@ -1,16 +1,36 @@
 <waltz-basic-info-tile name="Complexity"
-                       description="Derived from functions, connections and servers"
                        class="clickable"
+                       description="{{$ctrl.stats.length == 0
+                            ? 'No complexity scores found'
+                            : 'Complexity score summaries.  Click to open related section'}}"
                        waltz-jump-to="app-complexity-summary-section"
-                       icon="rocket">
-    <div style="font-size: x-large;">
-        &Sigma;
-        <span ng-bind="$ctrl.stats.cumulativeScore | toFixed:1">
-        </span>
+                       icon="sort-numeric-asc">
+
+    <div ng-if="$ctrl.stats.length == 0">
+        -
     </div>
-    <div class="small text-muted">
-        <span ng-bind="$ctrl.stats.averageScore | toFixed:2">
-        </span>
-        per app
+
+    <div ng-if="$ctrl.stats.length > 0">
+        <table class="table-condensed table small">
+            <thead>
+            <tr>
+                <th>Kind</th>
+                <th>Sum</th>
+                <th>Avg</th>
+            </tr>
+            </thead>
+            <tr ng-repeat="stat in $ctrl.stats"
+                ng-style="{ 'font-weight': stat.complexityKind.isDefault ? 'bold': 'none'}"
+                uib-popover="{{stat.complexityKind.description}}"
+                popover-popup-delay="300"
+                popover-append-to-body="true"
+                popover-placement="right"
+                popover-trigger="mouseenter">
+                <td ng-bind="stat.complexityKind.name"></td>
+                <td><span ng-bind="stat.total | toFixed:2"></span></td>
+                <td><span ng-bind="stat.average | toFixed:2"></span></td>
+            </tr>
+        </table>
     </div>
+
 </waltz-basic-info-tile>

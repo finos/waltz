@@ -12,7 +12,7 @@
     export let doSave;
     export let definition;
 
-    const ratingSchemes = ratingSchemeStore.loadAll();
+    const ratingSchemesCall = ratingSchemeStore.loadAll();
 
     let hasRatings = false;
     let workingCopy = _.cloneDeep(definition);
@@ -22,7 +22,7 @@
     $: ratings = $ratingCall.data;
     $: hasRatings = ratings.length > 0;
 
-    $: possibleRatingSchemes = _.sortBy($ratingSchemes.data, d => d.name);
+    $: possibleRatingSchemes = _.sortBy($ratingSchemesCall.data, d => d.name);
 
     $: invalid = _.some(getRequiredFields(workingCopy), v => _.isEmpty(v));
 

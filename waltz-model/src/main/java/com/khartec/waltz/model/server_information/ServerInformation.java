@@ -35,7 +35,8 @@ public abstract class ServerInformation implements
         IdProvider,
         ProvenanceProvider,
         ExternalIdProvider,
-        WaltzEntity {
+        WaltzEntity,
+        CustomEnvironmentAsset{
 
     public abstract String hostname();
     public abstract String operatingSystem();

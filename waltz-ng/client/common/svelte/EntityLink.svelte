@@ -1,6 +1,7 @@
 <script>
     import ViewLink from "./ViewLink.svelte";
     import EntityLabel from "./EntityLabel.svelte";
+    import {kindToViewState} from "../link-utils";
 
     /**
      * Entity Link takes an entity ref
@@ -13,11 +14,13 @@
      * @type {{id: number}}
      */
 
-
     export let ref = {};
+
+    $: state = kindToViewState(ref.kind);
+
 </script>
 
-<ViewLink state="main.app.view"
+<ViewLink {state}
           ctx={ref}>
     {#if $$slots.default}
         <slot/>

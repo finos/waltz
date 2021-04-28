@@ -1,0 +1,231 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.32.xml">
+
+    <changeSet id="20210217-5381-1"
+               author="woodjes">
+        <update tableName="settings">
+            <column name="value"
+                    value="DEV v1.32"/>
+            <where>name='ui.logo.overlay.text'</where>
+        </update>
+    </changeSet>
+
+    <!-- 5143: add id to server usage -->
+    <changeSet id="20210217-5143-1"
+               author="woodjes">
+        <comment>5143: adding id to server_usage (drop existing)</comment>
+        <dropPrimaryKey tableName="server_usage"/>
+        <rollback>
+            <addPrimaryKey columnNames="server_id, entity_id, entity_kind, environment"
+                           constraintName="server_usage_pkey"
+                           tableName="server_usage"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20210217-5143-2"
+               author="woodjes">
+        <comment>5143: adding id to server_usage (drop existing)</comment>
+        <createIndex indexName="idx_su_s_id_id_kind_env"
+                     tableName="server_usage"
+                     unique="true">
+            <column name="server_id"/>
+            <column name="entity_id"/>
+            <column name="entity_kind"/>
+            <column name="environment"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20210217-5143-3"
+               author="woodjes"
+               dbms="!h2">
+        <comment>5143: adding id to server_usage (drop existing)</comment>
+        <addColumn tableName="server_usage">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints primaryKey="true"
+                             primaryKeyName="server_usage_pkey"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20210217-5143-3"
+               author="woodjes"
+               dbms="h2">
+        <comment>5143: adding id to server_usage (drop existing)</comment>
+        <addColumn tableName="server_usage">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+            </column>
+        </addColumn>
+        <addPrimaryKey columnNames="id"
+                       constraintName="server_usage_pkey"
+                       tableName="server_usage"/>
+    </changeSet>
+
+
+    <!-- 5143: create custom environment tables   -->
+    <changeSet id="20210416-5143-4"
+               author="woodjes">
+        <comment>5143: Custom environment: add custom environment table</comment>
+        <createTable tableName="custom_environment">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="custom_environment_pkey"/>
+            </column>
+            <column name="owning_entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="owning_entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="group_name"
+                    type="${name.type}"
+                    defaultValue="Default">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20210416-5143-5"
+               author="woodjes">
+        <comment>5143: Custom environment: add custom environment table</comment>
+        <createTable tableName="custom_environment_usage">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="custom_env_usage_pkey"/>
+            </column>
+            <column name="custom_environment_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+
+    <changeSet id="20210416-5143-6"
+               author="woodjes">
+        <comment>5143: Custom environment: add custom environment fk </comment>
+        <addForeignKeyConstraint constraintName="custom_env_usage_to_custom_env_fk"
+                                 baseTableName="custom_environment_usage"
+                                 baseColumnNames="custom_environment_id"
+                                 referencedTableName="custom_environment"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20210420-5143-7"
+               author="woodjes">
+        <comment>5143: Custom environment: create unique idx on custom env tables</comment>
+        <createIndex indexName="idx_owning_entity_name"
+                     tableName="custom_environment"
+                     unique="true">
+            <column name="name" type="${name.type}"/>
+            <column name="owning_entity_kind" type="${enum.type}"/>
+            <column name="owning_entity_id" type="${id.type}"/>
+        </createIndex>
+        <createIndex indexName="idx_env_id_entity"
+                     tableName="custom_environment_usage"
+                     unique="true">
+            <column name="custom_environment_id" type="${id.type}"/>
+            <column name="entity_kind" type="${enum.type}"/>
+            <column name="entity_id" type="${id.type}"/>
+        </createIndex>
+    </changeSet>
+
+
+    <changeSet id="20210428-5143-8"
+               author="davidwatkins73">
+        <comment>Permission group involvement for custom envs</comment>
+
+        <insert tableName="permission_group_involvement">
+            <column name="permission_group_id" value="1"/>
+            <column name="subject_kind" value="CUSTOM_ENVIRONMENT"/>
+            <column name="qualifier_kind" value="CUSTOM_ENVIRONMENT"/>
+            <column name="qualifier_id" value="NULL"/>
+            <column name="involvement_group_id" value="NULL"/>
+        </insert>
+    </changeSet>
+
+
+    <!--5296: add unique index on report grid col def-->
+    <changeSet id="20210415-5296-1"
+               author="gharvai">
+        <comment>5296: add unique index on report grid col def</comment>
+        <createIndex tableName="report_grid_column_definition"
+                     indexName="idx_rgcd_entity_ref_report_grid_id"
+                     unique="true">
+            <column name="report_grid_id"
+                    type="BIGINT(19)"/>
+            <column name="column_entity_kind"
+                    type="VARCHAR"/>
+            <column name="column_entity_id"
+                    type="BIGINT(19)"/>
+        </createIndex>
+    </changeSet>
+
+
+</databaseChangeLog>

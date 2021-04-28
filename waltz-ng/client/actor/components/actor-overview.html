@@ -41,4 +41,29 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-sm-2">
+            <label>
+                External Id
+            </label>
+        </div>
+        <div class="col-sm-10">
+            <span ng-bind="$ctrl.actor.externalId || '-'">
+            </span>
+        </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-sm-2">
+            <label>
+                Provenance
+            </label>
+        </div>
+        <div class="col-sm-10">
+            <span ng-bind="$ctrl.actor.provenance">
+            </span>
+        </div>
+    </div>
+
 </div>

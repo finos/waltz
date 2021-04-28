@@ -6,6 +6,7 @@ import spark.Response;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+
 public abstract class BinaryDataBasedDataExtractor implements DataExtractor {
 
     protected Object writeExtract(String suggestedFilenameStem,

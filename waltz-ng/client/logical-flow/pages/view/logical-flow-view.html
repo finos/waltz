@@ -63,8 +63,28 @@
                 </div>
             </div>
 
+            <div class="row">
+                <div class="col-sm-1 waltz-display-field-label">
+                    Provenance
+                </div>
+                <div class="col-sm-11">
+                    <span ng-bind="ctrl.logicalFlow.provenance"></span>
+                    <span class="text-muted"
+                          ng-if="ctrl.logicalFlow.provenance != 'waltz'">
+                        <waltz-icon name="warning"
+                                    style="color: orange"
+                                    uib-popover="This flow has a provenance other than waltz.
+                                    Changes to this flow may be overwritten if it is sourced from another system."
+                                    popover-append-to-body="true"
+                                    popover-popup-delay="300"
+                                    popover-placement="right"
+                                    popover-trigger="mouseenter">
+                        </waltz-icon>
+                    </span>
+                </div>
+            </div>
             <div class="small text-muted"
-                 ng-if="ctrl.logicalFlow.lastUpdatedBy && ctrl.logicalFlow.lastUpdatedAt && ctrl.logicalFLow">
+                 ng-if="ctrl.logicalFlow.lastUpdatedBy && ctrl.logicalFlow.lastUpdatedAt && ctrl.logicalFlow">
                 Last updated by
                 <span ng-bind="ctrl.logicalFlow.lastUpdatedBy"></span>
                 (<waltz-from-now timestamp="ctrl.logicalFlow.lastUpdatedAt"></waltz-from-now>)
@@ -73,7 +93,6 @@
         <waltz-no-data ng-if="!ctrl.logicalFlow">
             <message>No information for this logical flow</message>
         </waltz-no-data>
-        <br>
 
     </div>
     <div ng-if="ctrl.logicalFlow">

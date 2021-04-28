@@ -1,0 +1,127 @@
+= Application environments
+Jessica Woodland-Scott <jessica.woodland-scott@db.com>
+:version: v0.1
+:modified: 2021-04-14
+:status: DRAFT
+:toc:
+
+<<<
+== Document Info
+
+|===
+| Attribute | Value
+
+| Status
+| {status} {version} ({modified})
+
+| Target Version
+| 1.32
+
+| Lead
+| Jessica Woodland-Scott
+|===
+
+<<<
+
+== Overview
+
+Desire to tag multiple servers and databases to show they belong to a specific environment on an application.
+
+e.g. sever-1, server-2 and database-1 all belong to 'UAT'.
+
+
+How is this different from the `environment` field on `server_usage`/`database_information`?
+
+* Can give custom/multiple environment names = e.g. 'INT-1', 'INT-2'.
+* Can show that servers/databases on used by other applications are a key part of the application environment
+* For user organisation rather than from authoritative system
+
+Changes:
+
+* Need to be able to create/update/delete environment tags (application specific?)
+* Need to be able to link this environment tag to servers and databases (even those not directly used by the application)
+* Need screen to show databases and servers linked to an environment
+
+
+Using existing tags:
+
+* Currently, tags belong to an `entity_kind` - for example 'APPLICATION' - which indicates the entity kind it can be
+applied to.
+** therefore, it wouldn't allow tags to be shared between databases and servers (unless we just combine based upon name)
+** it wouldn't be application/namespace specific - the environment tags would be shared across *all* servers
+** feels like we need something more like an app group but where the group belongs to a specific app and
+you can add any servers or databases (and potentially other entities in future) to be linked to it.
+
+
+<<<
+== Proposal
+
+=== Core Waltz changes
+
+Environment tags will be linked to `database_information` table and `server_usage` table. The `server_information`
+table doesn't give the app-server information - one server record can be linked to many apps.
+
+To use the `server_usage` table we will need to add an `id` field to the table.
+
+[NOTE]
+====
+If a server is used by multiple apps (sometimes hundreds), we want to show which usage on that
+server is important to the environment we are focused on.
+====
+
+- Could use owning entity to suggest likely environment tags you might want (from other usages)?
+- Could offer warnings where an environment is constructed with servers both from dev and from prod?
+
+
+
+==== Feedback
+
+Would like to be able to group custom environments - i.e. ISO-UAT, ISO-SIT grouped by 'ISO'
+
+==== Proposed tables:
+
+.custom_environment:
+|===
+| id | owning_entity_id | owning_entity_kind | name | description | external_id | group
+
+| 1
+| 12345
+| APPLICATION
+| INT-1
+| Second development environment without nightly database restore
+| WALTZ_INT
+| WALTZ
+|===
+
+
+.custom_environment_usage:
+
+|===
+| custom_environment_id | entity_id | entity_kind | created_at | created_by | provenance
+
+|1
+|678
+|DATABASE
+|2021-04-14
+|admin
+|waltz
+
+|1
+|91011
+|SERVER
+|2021-04-14
+|admin
+|waltz
+
+|1
+|121314
+|SERVER
+|2021-04-14
+|admin
+|waltz
+|===
+
+<<<
+
+
+== Appendices
