@@ -7,19 +7,32 @@
     import {customEnvironmentStore} from "../../../svelte-stores/custom-environment-store";
     import MiniActions from "../../../common/svelte/MiniActions.svelte";
     import {getContext} from "svelte";
+    import UsageAssetInfo from "./UsageAssetInfo.svelte";
 
     export let doCancel;
     export let application
     export let usages;
     export let environment;
 
-    const showTableAction = {name: "Show table", icon: "table", description: "Click to switch to table view", handleAction: showTable}
-    const showTreeAction = {name: "Show tree", icon: "sitemap", description: "Click to switch to tree view", handleAction: showTree}
+    const showTableAction = {
+        name: "Show table",
+        icon: "table",
+        description: "Click to switch to table view",
+        handleAction: showTable
+    }
+    const showTreeAction = {
+        name: "Show tree",
+        icon: "sitemap",
+        description: "Click to switch to tree view",
+        handleAction: showTree
+    }
     const editAction = {name: "Edit", icon: "pencil", description: "Click to edit environment", handleAction: showEdit}
-    const removeAction = {name: "Remove",
+    const removeAction = {
+        name: "Remove",
         icon: "trash",
         description: "Click to delete this environment and its associations to servers and databases",
-        handleAction: showRemove}
+        handleAction: showRemove
+    }
 
     const editorActions = {
         TREE: [showTableAction, editAction, removeAction],
@@ -45,6 +58,8 @@
     let canEdit = getContext("canEdit");
 
     let activeMode = Modes.TREE;
+
+    let selectedAsset;
 
     $: actions = $canEdit
         ? editorActions[activeMode]
@@ -74,13 +89,30 @@
         return customEnvironmentStore.remove(environment);
     }
 
+    function selectAsset(e) {
+        if( !_.isNil(selectedAsset) && selectedAsset === e.detail){
+            selectedAsset = null;
+        } else{
+            selectedAsset = e.detail;
+        }
+    }
+
+
 </script>
 
 <!--TREEMODE-->
 {#if usages.length === 0 && activeMode !== Modes.EDIT && activeMode !== Modes.REMOVE}
     <div>No databases or servers have been associated to this environment.</div>
 {:else if activeMode === Modes.TREE}
-    <UsageTree usages={usages}/>
+    <div class="row">
+        <div class="col-md-6">
+            <UsageTree on:select={selectAsset}
+                       usages={usages}/>
+        </div>
+        <div class="col-md-6">
+            <UsageAssetInfo asset={selectedAsset}/>
+        </div>
+    </div>
 {:else if activeMode === Modes.TABLE}
     <UsageTable {usages}/>
 {:else if activeMode === Modes.EDIT}

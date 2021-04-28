@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 import static com.khartec.waltz.common.EnumUtilities.readEnum;
-import static com.khartec.waltz.common.StringUtilities.mkSafe;
 
 /**
  * Represents classes which are used for Data Extraction.
@@ -33,17 +32,6 @@ public interface DataExtractor {
                 request.queryParams("format"),
                 ExtractFormat.class,
                 v -> ExtractFormat.CSV);
-    }
-
-
-    /**
-     * Removes illegal characters from sheetName.  Currently: `\ : ; * ? / `
-     *
-     * @param name  input name of the sheet
-     * @return outputs sanitized sheet name
-     */
-    default String sanitizeSheetName(String name) {
-        return mkSafe(name).replaceAll("[:;*?/\\\\]", "");
     }
 
 

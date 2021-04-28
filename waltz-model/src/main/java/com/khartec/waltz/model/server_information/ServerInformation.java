@@ -36,7 +36,8 @@ public abstract class ServerInformation implements
         ProvenanceProvider,
         ExternalIdProvider,
         WaltzEntity,
-        CustomEnvironmentAsset{
+        CustomEnvironmentAsset,
+        EntityKindProvider {
 
     public abstract String hostname();
     public abstract String operatingSystem();
@@ -74,6 +75,12 @@ public abstract class ServerInformation implements
     @Value.Default
     public boolean virtual() {
         return false;
+    }
+
+
+    @Value.Default
+    public EntityKind kind() {
+        return EntityKind.SERVER;
     }
 
 

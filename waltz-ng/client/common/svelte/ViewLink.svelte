@@ -31,6 +31,10 @@
         "main.org-unit.view": {
             path: ctx => `org-units/${ctx.id}`,
             title: "Org Unit View"
+        },
+        "main.server.view": {
+            path: ctx => `server/${ctx.id}`,
+            title: "Server View"
         }
     };
 
@@ -41,7 +45,13 @@
 
 </script>
 
-<a href={path}
-   {title}>
-    <slot></slot>
-</a>
+{#if path}
+    <a href={path}
+       {title}>
+        <slot></slot>
+    </a>
+{:else }
+    <span>
+        <slot/>
+    </span>
+{/if}
