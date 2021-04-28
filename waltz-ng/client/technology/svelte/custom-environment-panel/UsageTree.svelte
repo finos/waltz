@@ -26,7 +26,10 @@
                     </li>
                     <ul style="padding-left: 3em">
                         {#each usageInfo.serverUsages as server}
-                            <li class="waltz-visibility-parent">
+                            <li class="waltz-visibility-parent"
+                                data-env-usage-id={server.usage.id}
+                                data-server-usage-id={server.usage.entityReference.id}
+                                data-server-id={server.asset.id}>
                                 <span class="waltz-visibility-child-30">
                                     <Icon name="circle"/>
                                 </span>
@@ -45,8 +48,10 @@
                     </li>
                     <ul style="padding-left: 3em">
                         {#each usageInfo.databaseUsages as database}
-                            <li class="waltz-visibility-parent">
-                                 <span class="waltz-visibility-child-30">
+                            <li class="waltz-visibility-parent"
+                                data-env-usage-id={database.usage.id}
+                                data-database-id={database.asset.id}>
+                                <span class="waltz-visibility-child-30">
                                     <Icon name="circle"/>
                                 </span>
                                 <span>

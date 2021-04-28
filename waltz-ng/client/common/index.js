@@ -97,9 +97,7 @@ export function termSearch(items = [],
 
             return _.every(terms, term => targetStr.includes(term));
         })
-        .tap(t => console.log("tap1", {t}))
         .reject(omitCallback)
-        .tap(t => console.log("tap2", {t}))
         .value();
 }
 

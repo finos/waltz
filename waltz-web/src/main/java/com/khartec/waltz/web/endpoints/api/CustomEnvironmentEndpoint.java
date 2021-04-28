@@ -61,7 +61,6 @@ public class CustomEnvironmentEndpoint implements Endpoint {
         ListRoute<CustomEnvironment> findAllRoute = (request, response) -> customEnvironmentService.findAll();
 
         DatumRoute<Long> createRoute = (request, response) -> {
-//            requireAnyRole(userRoleService, request, SystemRole.USER_ADMIN, SystemRole.ADMIN);
             CustomEnvironment env = readBody(request, CustomEnvironment.class);
             String username = getUsername(request);
 
@@ -69,7 +68,6 @@ public class CustomEnvironmentEndpoint implements Endpoint {
         };
 
         DatumRoute<Boolean> deleteRoute = (request, response) -> {
-//            requireAnyRole(userRoleService, request, SystemRole.USER_ADMIN, SystemRole.ADMIN);
             String username = getUsername(request);
             long envId = getId(request);
             return customEnvironmentService.remove(envId, username);

@@ -330,7 +330,7 @@
         Saved!
     {:catch e}
         <div class="alert alert-warning">
-            Failed to save asset to {environment.name}. Reason: {e?.data?.message}
+            Failed to save asset to {environment.name}. Reason: {e.error}
             <button class="btn-link"
                     on:click={() => savePromise = null}>
                 <Icon name="check"/>
@@ -346,7 +346,7 @@
         Removed!
     {:catch e}
         <div class="alert alert-warning">
-            Failed to remove asset from {environment.name}. Reason: {e.data.message}
+            Failed to remove asset from {environment.name}. Reason: {e.error}
             <button class="btn-link"
                     on:click={() => removePromise = null}>
                 <Icon name="check"/>
@@ -356,15 +356,16 @@
     {/await}
 {/if}
 
+
 <style>
     .asset-row td {
         padding-bottom: 0;
-        /*margin: 0;*/
-        /*border: none;*/
     }
+
     .loading {
         background-color: #f6f5f0;
     }
+
     .no-data {
         background-color: #f6f0f0;
     }
