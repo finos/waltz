@@ -6,9 +6,10 @@
     import UsageTable from "./UsageTable.svelte";
     import {customEnvironmentStore} from "../../../svelte-stores/custom-environment-store";
     import MiniActions from "../../../common/svelte/MiniActions.svelte";
+    import {getContext} from "svelte";
 
     export let doCancel;
-    export let primaryEntityRef
+    export let application
     export let usages;
     export let environment;
 
@@ -19,26 +20,35 @@
         icon: "trash",
         description: "Click to delete this environment and its associations to servers and databases",
         handleAction: showRemove}
-    const cancelEditAction = {name: "Cancel", icon: "times", description: "Cancel editing and return to tree view", handleAction: showTree}
-    const cancelRemoveAction = {name: "Cancel", icon: "times", description: "Cancel this removal and return to tree view", handleAction: showTree}
 
-    const modeActions = {
+    const editorActions = {
         TREE: [showTableAction, editAction, removeAction],
         TABLE: [showTreeAction, editAction, removeAction],
         EDIT: [],
         REMOVE: []
-    }
+    };
+
+    const viewerActions = {
+        TREE: [showTableAction],
+        TABLE: [showTreeAction],
+        EDIT: [],
+        REMOVE: []
+    };
 
     const Modes = {
         TREE: "TREE",
         TABLE: "TABLE",
         EDIT: "EDIT",
         REMOVE: "REMOVE"
-    }
+    };
 
+    let canEdit = getContext("canEdit");
 
     let activeMode = Modes.TREE;
-    let selectedAsset
+
+    $: actions = $canEdit
+        ? editorActions[activeMode]
+        : viewerActions[activeMode];
 
     function cancel() {
         doCancel();
@@ -76,7 +86,7 @@
 {:else if activeMode === Modes.EDIT}
     <UsageEdit {environment}
                usages={usages || []}
-               {primaryEntityRef}
+               {application}
                doCancel={showTree}/>
 {:else if activeMode === Modes.REMOVE}
     <EnvironmentRemovalConfirmation {environment}
@@ -84,5 +94,5 @@
                                     doCancel={showTree}/>
 {/if}
 <br>
-<MiniActions actions={modeActions[activeMode]}/>
+<MiniActions {actions}/>
 

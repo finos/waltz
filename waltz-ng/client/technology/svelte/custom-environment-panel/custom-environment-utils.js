@@ -35,9 +35,3 @@ export function combineServerData(servers, usages) {
             .value();
     }
 }
-
-export function doAssetSearch(qry, assets, omitIds, searchFields) {
-    const searchResults = termSearch(assets, qry, searchFields, d => _.includes(omitIds, d.id));
-    return _.take(searchResults, 15);
-
-}

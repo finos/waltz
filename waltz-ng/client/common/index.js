@@ -70,7 +70,7 @@ export function termSearch(items = [],
                            searchFields = [],
                            omitCallback = () => false) {
     if (_.isEmpty(searchStr)) {
-        return items;
+        return _.reject(items, omitCallback);
     }
 
     const terms = searchStr.toLowerCase().split(/\W/);

@@ -58,7 +58,9 @@
     margin: 0;
     padding: 0 0.2em 0 0.2em;
     color: #337ab7;
-    vertical-align: text-bottom;
+    vertical-align: baseline;
+    box-sizing: border-box;
+    border: 0;
 
     &:focus {
         outline: none !important;

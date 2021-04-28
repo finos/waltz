@@ -197,6 +197,20 @@
     </changeSet>
 
 
+    <changeSet id="20210428-5143-8"
+               author="davidwatkins73">
+        <comment>Permission group involvement for custom envs</comment>
+
+        <insert tableName="permission_group_involvement">
+            <column name="permission_group_id" value="1"/>
+            <column name="subject_kind" value="CUSTOM_ENVIRONMENT"/>
+            <column name="qualifier_kind" value="CUSTOM_ENVIRONMENT"/>
+            <column name="qualifier_id" value="NULL"/>
+            <column name="involvement_group_id" value="NULL"/>
+        </insert>
+    </changeSet>
+
+
     <!--5296: add unique index on report grid col def-->
     <changeSet id="20210415-5296-1"
                author="gharvai">

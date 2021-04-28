@@ -5,10 +5,14 @@
     import {customEnvironmentUsageStore} from "../../../svelte-stores/custom-environment-usage-store";
     import Icon from "../../../common/svelte/Icon.svelte";
 
-    import {mode, Modes, selectedEnvironment} from "./editingCustomEnvironmentState";
+    import {panelMode, PanelModes} from "./editingCustomEnvironmentState";
     import UsagePanel from "./UsagePanel.svelte";
     import EnvironmentRegistration from "./EnvironmentRegistration.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
+    import {applicationStore} from "../../../svelte-stores/application-store";
+    import {permissionGroupStore} from "../../../svelte-stores/permission-group-store";
+    import {setContext} from "svelte";
+    import {writable} from "svelte/store";
 
     export let primaryEntityRef;
 
@@ -24,23 +28,9 @@
     }
 
     function addNewEnvironment() {
-        selectedEnvironment.set({
-            name: null,
-            description: null,
-            owningEntity: primaryEntityRef,
-            externalId: null,
-            group: null
-        })
-        return mode.set(Modes.EDIT);
+        return panelMode.set(PanelModes.REGISTER);
     }
 
-    function tableView(){
-        mode.set(Modes.TABLE);
-    }
-
-    function deleteEnvironment(environment) {
-        return customEnvironmentStore.remove(environment);
-    }
 
     function isExpanded(environment){
         return _.includes(expandedEnvironmentIds, environment.id)
@@ -53,13 +43,15 @@
     }
 
     function cancel() {
-        mode.set(Modes.TABLE)
-        selectedEnvironment.set(null);
+        panelMode.set(PanelModes.VIEW);
     }
 
     let expandedEnvironmentIds = [];
     let loadEnvironmentsCall = customEnvironmentStore.findByOwningEntityRef(primaryEntityRef);
     let loadEnvironmentUsagesCall = customEnvironmentUsageStore.findUsageInfoByOwningEntityRef(primaryEntityRef);
+    let loadApplicationCall = applicationStore.getById(primaryEntityRef.id);
+    let loadPermissionsCall = permissionGroupStore.findByEntity(primaryEntityRef);
+
 
     $: customEnvironments = _
         .chain($loadEnvironmentsCall.data)
@@ -73,24 +65,33 @@
 
     $: environmentUsageCounts = _.countBy(customEnvironmentUsageInfo, d => d.usage.customEnvironmentId);
     $: environmentUsagesById = _.groupBy(customEnvironmentUsageInfo, d => d.usage.customEnvironmentId);
+    $: application = $loadApplicationCall.data;
 
+    const canEdit = writable(false);
+    setContext("canEdit", canEdit);
+
+    $: canEdit.set(_.some($loadPermissionsCall.data, d => d.subjectKind === "CUSTOM_ENVIRONMENT"));
 </script>
 
 <p class="help-block">
-Custom environments can be used to group servers and databases used by this application.
-    Assets are not limited to those owned by this application. Click on an environment to view and edit assets or
-    <button class="btn btn-skinny"
-            on:click={addNewEnvironment}>
-        register a new custom environment
-    </button>
-    here.
+    Custom environments can be used to group servers and databases used by this application.
+    Assets are not limited to those owned by this application.
+
+    {#if $canEdit}
+        Expand an environment to view and edit assets or
+        <button class="btn btn-skinny"
+                on:click={addNewEnvironment}>
+            register a new custom environment
+        </button>
+        here.
+    {:else}
+        Expand an environment to view linked assets.
+    {/if}
 </p>
 
-{#if $mode === Modes.EDIT}
+{#if $panelMode === PanelModes.REGISTER}
     <EnvironmentRegistration primaryEntityRef={primaryEntityRef}
                              onCancel={cancel}/>
-{:else if $mode === Modes.DETAIL}
-    <UsagePanel onCancel={cancel}/>
 {:else}
     {#if customEnvironments.length === 0}
         <NoData>
@@ -98,20 +99,26 @@ Custom environments can be used to group servers and databases used by this appl
             <span>{primaryEntityRef.kind.toLowerCase()}</span>
         </NoData>
     {:else}
-        <table class="table table-condensed small">
+        <table class="table table-condensed">
             <thead>
-                <th  width="5%"></th>
+            <tr>
+                <th width="5%"></th>
                 <th width="20%">Group</th>
                 <th width="30%">Name</th>
                 <th width="25%">Description</th>
                 <th width="20%"># Linked Entities</th>
+            </tr>
             </thead>
             <tbody>
             {#each customEnvironments as environment}
                 <tr class="clickable"
+                    class:expanded={_.includes(expandedEnvironmentIds, environment.id)}
                     on:click={() => toggleDetailView(environment)}>
                     <td>
-                        <Icon name={_.includes(expandedEnvironmentIds, environment.id) ? "caret-down" : "caret-right"}/>
+                        <Icon size="lg"
+                              name={_.includes(expandedEnvironmentIds, environment.id)
+                                ? "caret-down"
+                                : "caret-right"}/>
                     </td>
                     <td>{environment.groupName || "-"}</td>
                     <td>{environment.name}</td>
@@ -119,13 +126,13 @@ Custom environments can be used to group servers and databases used by this appl
                     <td>{_.get(environmentUsageCounts, [environment.id], 0)}</td>
                 </tr>
                 {#if _.includes(expandedEnvironmentIds, environment.id)}
-                    <tr>
+                    <tr class="env-detail-row">
                         <td></td>
-                        <td colspan="5">
+                        <td colspan="4">
                             <UsagePanel doCancel={cancel}
-                                         {primaryEntityRef}
-                                         environment={environment}
-                                         usages={_.get(environmentUsagesById, [environment.id], [])}/>
+                                        {application}
+                                        environment={environment}
+                                        usages={_.get(environmentUsagesById, [environment.id], [])}/>
                         </td>
                     </tr>
                 {/if}
@@ -134,4 +141,15 @@ Custom environments can be used to group servers and databases used by this appl
         </table>
     {/if}
 {/if}
+
+
+<style>
+    .expanded {
+        background-color: #f5f5f5;
+    }
+
+    .env-detail-row td {
+        border-top: none;
+    }
+</style>
 

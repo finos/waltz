@@ -21,6 +21,7 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.custom_environment.CustomEnvironment;
 import com.khartec.waltz.service.custom_environment.CustomEnvironmentService;
+import com.khartec.waltz.service.permission.PermissionGroupService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -37,11 +38,14 @@ public class CustomEnvironmentEndpoint implements Endpoint {
     private static final String BASE_URL = mkPath("api", "custom-environment");
 
     private final CustomEnvironmentService customEnvironmentService;
+    private final PermissionGroupService permissionGroupService;
 
 
     @Autowired
-    public CustomEnvironmentEndpoint(CustomEnvironmentService customEnvironmentService) {
+    public CustomEnvironmentEndpoint(CustomEnvironmentService customEnvironmentService,
+                                     PermissionGroupService permissionGroupService) {
         this.customEnvironmentService = customEnvironmentService;
+        this.permissionGroupService = permissionGroupService;
     }
 
 
@@ -57,14 +61,13 @@ public class CustomEnvironmentEndpoint implements Endpoint {
         ListRoute<CustomEnvironment> findAllRoute = (request, response) -> customEnvironmentService.findAll();
 
         DatumRoute<Long> createRoute = (request, response) -> {
-//            requireAnyRole(userRoleService, request, SystemRole.USER_ADMIN, SystemRole.ADMIN);
             CustomEnvironment env = readBody(request, CustomEnvironment.class);
             String username = getUsername(request);
+
             return customEnvironmentService.create(env, username);
         };
 
         DatumRoute<Boolean> deleteRoute = (request, response) -> {
-//            requireAnyRole(userRoleService, request, SystemRole.USER_ADMIN, SystemRole.ADMIN);
             String username = getUsername(request);
             long envId = getId(request);
             return customEnvironmentService.remove(envId, username);

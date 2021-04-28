@@ -23,11 +23,11 @@
 <style>
     li + li::before {
         content: "|";
+        margin-right: 0.67em;
     }
 
     ul {
         padding: 0;
-        margin: 0;
         display: inline-block;
     }
 </style>

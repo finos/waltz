@@ -18,31 +18,46 @@
             <Icon name="desktop"/>
             <span>{usageInfo.application.name}</span>
             <MiniActions ctx={usageInfo.application} actions={applicationActions}/>
-            <ul style="padding-left: 2em">
+            <ul style="padding-left: 3em">
                 {#if usageInfo.serverUsages.length > 0}
                     <li>
+                        <Icon name="server"/>
                         Servers
                     </li>
-                    <ul style="padding-left: 2em">
+                    <ul style="padding-left: 3em">
                         {#each usageInfo.serverUsages as server}
-                            <li>
-                                <Icon name="server"/>
+                            <li class="waltz-visibility-parent"
+                                data-env-usage-id={server.usage.id}
+                                data-server-usage-id={server.usage.entityReference.id}
+                                data-server-id={server.asset.id}>
+                                <span class="waltz-visibility-child-30">
+                                    <Icon name="circle"/>
+                                </span>
                                 <span>{server.asset.hostname}</span>
-                                <MiniActions ctx={server.usage} actions={serverActions}/>
+                                <span class="waltz-visibility-child-30">
+                                    <MiniActions ctx={server.usage} actions={serverActions}/>
+                                </span>
                             </li>
                         {/each}
                     </ul>
                 {/if}
                 {#if usageInfo.databaseUsages.length > 0}
                     <li>
+                        <Icon name="database"/>
                         Databases
                     </li>
-                    <ul style="padding-left: 2em">
+                    <ul style="padding-left: 3em">
                         {#each usageInfo.databaseUsages as database}
-                            <li>
-                                <Icon name="database"/>
+                            <li class="waltz-visibility-parent"
+                                data-env-usage-id={database.usage.id}
+                                data-database-id={database.asset.id}>
+                                <span class="waltz-visibility-child-30">
+                                    <Icon name="circle"/>
+                                </span>
                                 <span>
                                     {database.asset.databaseName}
+                                </span>
+                                <span class="waltz-visibility-child-30">
                                     <MiniActions ctx={database.usage} actions={databaseActions}/>
                                 </span>
                             </li>

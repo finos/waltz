@@ -57,7 +57,6 @@ public class CustomEnvironmentUsageEndpoint implements Endpoint {
 
 
         DatumRoute<Long> addAssetRoute = (request, response) -> {
-//            requireAnyRole(userRoleService, request, SystemRole.USER_ADMIN, SystemRole.ADMIN);
             CustomEnvironmentUsage usage = readBody(request, CustomEnvironmentUsage.class);
             String username = getUsername(request);
             CustomEnvironmentUsage usageWithCreator = ImmutableCustomEnvironmentUsage
@@ -67,7 +66,6 @@ public class CustomEnvironmentUsageEndpoint implements Endpoint {
         };
 
         DatumRoute<Boolean> removeRoute = (request, response) -> {
-//            requireAnyRole(userRoleService, request, SystemRole.USER_ADMIN, SystemRole.ADMIN);
             String username = getUsername(request);
             long usageId = getId(request);
             return customEnvironmentUsageService.remove(usageId, username);
