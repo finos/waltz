@@ -50,6 +50,7 @@ import static com.khartec.waltz.common.ListUtilities.*;
 import static com.khartec.waltz.common.MapUtilities.*;
 import static com.khartec.waltz.model.utils.IdUtilities.indexById;
 import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.extracts.ExtractorUtilities.sanitizeSheetName;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.jooq.lambda.fi.util.function.CheckedConsumer.unchecked;

@@ -30,6 +30,7 @@ import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.web.WebUtilities.getEntityReference;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static java.lang.String.format;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 import static spark.Spark.get;
 
 
@@ -59,58 +60,91 @@ public class CustomEnvironmentUsageExtractor extends DirectQueryBasedDataExtract
 
             EntityReference ref = getEntityReference(request);
 
-            SelectConditionStep<Record> qry = getEnvironmentAndUsageInfoQuery(ref);
+            SelectSeekStep3<Record, String, String, String> serverUsagesQuery = getServerUsagesQuery(ref);
+            SelectSeekStep3<Record, String, String, String> databaseUsagesQuery = getDatabaseUsagesQuery(ref);
 
-            return writeExtract(
+            return writeAsMultiSheetExcel(
+                    dsl,
                     mkFilename(ref),
-                    qry,
-                    request,
-                    response);
+                    response,
+                    tuple("Instructions", mkInstructions()),
+                    tuple("Servers", serverUsagesQuery),
+                    tuple("Databases", databaseUsagesQuery));
         });
     }
 
+
+    private SelectSelectStep<Record1<String>> mkInstructions() {
+        String instructions = "Separate tabs have been created for servers and databases associated to custom environments. Extracted on: ";
+        return dsl
+                .select(DSL.concat(
+                        DSL.val(instructions),
+                        DSL.currentLocalDateTime()).as("instructions"));
+    }
+
     
-    private SelectConditionStep<Record> getEnvironmentAndUsageInfoQuery(EntityReference ref) {
+    private SelectSeekStep3<Record, String, String, String> getServerUsagesQuery(EntityReference ref) {
 
-        Condition isServer = CUSTOM_ENVIRONMENT_USAGE.ENTITY_KIND.eq(EntityKind.SERVER_USAGE.name());
-        Field<String> assetName = DSL
-                .when(isServer, SERVER_INFORMATION.HOSTNAME)
-                .otherwise(DATABASE_INFORMATION.DATABASE_NAME).as("asset_name");
-
-        Field<String> applicationName = DSL
-                .when(isServer, SERVER_OWNING_APP.NAME)
-                .otherwise(DATABASE_OWNING_APP.NAME).as("application_name");
-        
-        Field<String> assetCode = DSL
-                .when(isServer, SERVER_OWNING_APP.ASSET_CODE)
-                .otherwise(DATABASE_OWNING_APP.ASSET_CODE).as("asset_code");
-
-        SelectConditionStep<Record> qry = dsl
+        SelectSeekStep3<Record, String, String, String> qry = dsl
                 .select(CUSTOM_ENVIRONMENT.GROUP_NAME,
-                        CUSTOM_ENVIRONMENT.NAME,
-                        CUSTOM_ENVIRONMENT.DESCRIPTION
-                )
-                .select(applicationName)
-                .select(assetCode)
-                .select(CUSTOM_ENVIRONMENT_USAGE.ENTITY_ID.as("associated_entity_id"),
-                        CUSTOM_ENVIRONMENT_USAGE.ENTITY_KIND.as("associated_entity_kind"))
-                .select(assetName.as("associated_asset"))
+                        CUSTOM_ENVIRONMENT.NAME.as("environment_name"),
+                        CUSTOM_ENVIRONMENT.DESCRIPTION.as("environment_description"))
+                .select(SERVER_OWNING_APP.NAME.as("application_name"))
+                .select(SERVER_OWNING_APP.ASSET_CODE.as("asset_code"))
+                .select(SERVER_INFORMATION.HOSTNAME,
+                        SERVER_INFORMATION.EXTERNAL_ID.as("server_external_id"),
+                        SERVER_INFORMATION.OPERATING_SYSTEM,
+                        SERVER_INFORMATION.OPERATING_SYSTEM_VERSION,
+                        SERVER_INFORMATION.COUNTRY,
+                        SERVER_INFORMATION.LOCATION,
+                        SERVER_INFORMATION.HW_END_OF_LIFE_DATE,
+                        SERVER_INFORMATION.OS_END_OF_LIFE_DATE,
+                        SERVER_INFORMATION.IS_VIRTUAL)
                 .select(CUSTOM_ENVIRONMENT_USAGE.CREATED_AT,
                         CUSTOM_ENVIRONMENT_USAGE.CREATED_BY,
                         CUSTOM_ENVIRONMENT_USAGE.PROVENANCE)
                 .from(CUSTOM_ENVIRONMENT)
-                .leftJoin(CUSTOM_ENVIRONMENT_USAGE)
-                .on(CUSTOM_ENVIRONMENT_USAGE.CUSTOM_ENVIRONMENT_ID.eq(CUSTOM_ENVIRONMENT.ID))
+                .leftJoin(CUSTOM_ENVIRONMENT_USAGE).on(CUSTOM_ENVIRONMENT_USAGE.CUSTOM_ENVIRONMENT_ID.eq(CUSTOM_ENVIRONMENT.ID))
                 .leftJoin(SERVER_USAGE).on(CUSTOM_ENVIRONMENT_USAGE.ENTITY_ID.eq(SERVER_USAGE.ID)
                         .and(CUSTOM_ENVIRONMENT_USAGE.ENTITY_KIND.eq(EntityKind.SERVER_USAGE.name())))
                 .leftJoin(SERVER_INFORMATION).on(SERVER_USAGE.SERVER_ID.eq(SERVER_INFORMATION.ID))
                 .leftJoin(SERVER_OWNING_APP).on(SERVER_USAGE.ENTITY_ID.eq(SERVER_OWNING_APP.ID)
                         .and(SERVER_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .where(CUSTOM_ENVIRONMENT.OWNING_ENTITY_KIND.eq(ref.kind().name())
+                        .and(CUSTOM_ENVIRONMENT.OWNING_ENTITY_ID.eq(ref.id()))
+                .and(CUSTOM_ENVIRONMENT_USAGE.ENTITY_KIND.eq(EntityKind.SERVER_USAGE.name())))
+                .orderBy(CUSTOM_ENVIRONMENT.GROUP_NAME, CUSTOM_ENVIRONMENT.NAME, SERVER_INFORMATION.HOSTNAME);
+        return qry;
+    }
+
+
+    private SelectSeekStep3<Record, String, String, String> getDatabaseUsagesQuery(EntityReference ref) {
+
+        SelectSeekStep3<Record, String, String, String> qry = dsl
+                .select(CUSTOM_ENVIRONMENT.GROUP_NAME,
+                        CUSTOM_ENVIRONMENT.NAME.as("environment_name"),
+                        CUSTOM_ENVIRONMENT.DESCRIPTION.as("environment_description"))
+                .select(DATABASE_OWNING_APP.NAME.as("application_name"))
+                .select(DATABASE_OWNING_APP.ASSET_CODE.as("asset_code"))
+                .select(DATABASE_INFORMATION.DATABASE_NAME,
+                        DATABASE_INFORMATION.INSTANCE_NAME,
+                        DATABASE_INFORMATION.EXTERNAL_ID.as("database_external_id"),
+                        DATABASE_INFORMATION.DBMS_VENDOR,
+                        DATABASE_INFORMATION.DBMS_NAME,
+                        DATABASE_INFORMATION.DBMS_VERSION,
+                        DATABASE_INFORMATION.END_OF_LIFE_DATE)
+                .select(CUSTOM_ENVIRONMENT_USAGE.CREATED_AT,
+                        CUSTOM_ENVIRONMENT_USAGE.CREATED_BY,
+                        CUSTOM_ENVIRONMENT_USAGE.PROVENANCE)
+                .from(CUSTOM_ENVIRONMENT)
+                .leftJoin(CUSTOM_ENVIRONMENT_USAGE).on(CUSTOM_ENVIRONMENT_USAGE.CUSTOM_ENVIRONMENT_ID.eq(CUSTOM_ENVIRONMENT.ID))
                 .leftJoin(DATABASE_INFORMATION).on(CUSTOM_ENVIRONMENT_USAGE.ENTITY_ID.eq(DATABASE_INFORMATION.ID)
                         .and(CUSTOM_ENVIRONMENT_USAGE.ENTITY_KIND.eq(EntityKind.DATABASE.name())))
                 .leftJoin(DATABASE_OWNING_APP).on(DATABASE_INFORMATION.ASSET_CODE.eq(DATABASE_OWNING_APP.ASSET_CODE))
                 .where(CUSTOM_ENVIRONMENT.OWNING_ENTITY_KIND.eq(ref.kind().name())
-                        .and(CUSTOM_ENVIRONMENT.OWNING_ENTITY_ID.eq(ref.id())));
+                        .and(CUSTOM_ENVIRONMENT.OWNING_ENTITY_ID.eq(ref.id()))
+                .and(CUSTOM_ENVIRONMENT_USAGE.ENTITY_KIND.eq(EntityKind.DATABASE.name())))
+                .orderBy(CUSTOM_ENVIRONMENT.GROUP_NAME, CUSTOM_ENVIRONMENT.NAME, DATABASE_INFORMATION.DATABASE_NAME);
         return qry;
     }
 

@@ -20,27 +20,28 @@ package com.khartec.waltz.web.endpoints.extracts;
 
 
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.eclipse.jetty.http.MimeTypes;
 import org.jooq.DSLContext;
-import org.jooq.Field;
+import org.jooq.Result;
 import org.jooq.Select;
+import org.jooq.lambda.Unchecked;
+import org.jooq.lambda.tuple.Tuple2;
 import spark.Request;
 import spark.Response;
 
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static java.util.Optional.ofNullable;
-
+import static com.khartec.waltz.common.FunctionUtilities.time;
+import static com.khartec.waltz.web.endpoints.extracts.ExtractorUtilities.convertExcelToByteArray;
+import static com.khartec.waltz.web.endpoints.extracts.ExtractorUtilities.sanitizeSheetName;
 
 
 public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
@@ -70,14 +71,43 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
     }
 
 
-    private Object writeAsExcel(String suggestedFilenameStem,
-                                Select<?> qry,
-                                Response response) throws IOException {
+    @SafeVarargs
+    public static Object writeAsMultiSheetExcel(DSLContext dsl,
+                                                String suggestedFilenameStem,
+                                                Response response,
+                                                Tuple2<String, Select<?>>... sheetDefinitions) {
+        XSSFWorkbook workbook = new XSSFWorkbook();
+
+        for (Tuple2<String, Select<?>> sheetDef : sheetDefinitions) {
+            time("preparing excel sheet: " + sheetDef.v1, () -> {
+                XSSFSheet sheet = workbook.createSheet(sanitizeSheetName(sheetDef.v1));
+                writeExcelHeader(sheetDef.v2, sheet);
+                time("writing body", () -> writeExcelBody(sheetDef.v2, sheet, dsl));
+
+                int endFilterColumnIndex = sheetDef.v2.fields().length == 0
+                        ? 0
+                        : sheetDef.v2.fields().length - 1;
+
+                sheet.setAutoFilter(new CellRangeAddress(0, 0, 0, endFilterColumnIndex));
+                sheet.createFreezePane(0, 1);
+            });
+        }
+
+        return time("writing excel", Unchecked.supplier(() -> writeExcelToResponse(
+                suggestedFilenameStem,
+                response,
+                workbook)));
+    }
+
+
+    private static Object writeAsExcel(String suggestedFilenameStem,
+                                       Select<?> qry,
+                                       Response response) throws IOException {
         XSSFWorkbook workbook = new XSSFWorkbook();
         XSSFSheet sheet = workbook.createSheet(sanitizeSheetName(suggestedFilenameStem));
 
         writeExcelHeader(qry, sheet);
-        writeExcelBody(qry, sheet);
+        writeExcelBody(qry, sheet, null);
 
         int endFilterColumnIndex = qry.fields().length == 0
                 ? 0
@@ -86,6 +116,13 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
         sheet.setAutoFilter(new CellRangeAddress(0, 0, 0, endFilterColumnIndex));
         sheet.createFreezePane(0, 1);
 
+        return writeExcelToResponse(suggestedFilenameStem, response, workbook);
+    }
+
+
+    private static HttpServletResponse writeExcelToResponse(String suggestedFilenameStem,
+                                                            Response response,
+                                                            XSSFWorkbook workbook) throws IOException {
         byte[] bytes = convertExcelToByteArray(workbook);
 
         HttpServletResponse httpResponse = response.raw();
@@ -113,35 +150,32 @@ public abstract class DirectQueryBasedDataExtractor implements DataExtractor {
     }
 
 
-    private byte[] convertExcelToByteArray(XSSFWorkbook workbook) throws IOException {
-        ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
-        workbook.write(outByteStream);
-        workbook.close();
-        return outByteStream.toByteArray();
-    }
+    private static void writeExcelBody(Select<?> qry,
+                                       XSSFSheet sheet,
+                                       DSLContext dsl) {
+        AtomicInteger rowCounter = new AtomicInteger(1);
+        Result<?> records = dsl == null
+                ? qry.fetch()
+                : time("fetch", () -> dsl.fetch(dsl.renderInlined(qry)));
 
-
-    private void writeExcelBody(Select<?> qry, XSSFSheet sheet) {
-        AtomicInteger rowNum = new AtomicInteger(1);
-        qry.fetch().forEach(r -> {
-            Row row = sheet.createRow(rowNum.getAndIncrement());
-            AtomicInteger colNum = new AtomicInteger(0);
-            for (Field<?> field : r.fields()) {
-                Cell cell = row.createCell(colNum.getAndIncrement());
-                ofNullable(r.get(field)).ifPresent(v -> {
-                    if (v instanceof Number) {
-                        cell.setCellType(CellType.NUMERIC);
-                        cell.setCellValue(((Number) v).doubleValue());
-                    } else {
-                        cell.setCellValue(Objects.toString(v));
+        time("record chomper", () -> {
+            int colCount = qry.fields().length;
+            records.forEach(r -> {
+                int rowNum = rowCounter.getAndIncrement();
+                Row row = sheet.createRow(rowNum);
+                for (int col = 0; col < colCount; col++) {
+                    Cell cell = row.createCell(col);
+                    Object val = r.get(col);
+                    if (val != null) {
+                        cell.setCellValue(val.toString());
                     }
-                });
-            }
+                }
+            });
         });
     }
 
 
-    private void writeExcelHeader(Select<?> qry, XSSFSheet sheet) {
+    private static void writeExcelHeader(Select<?> qry, XSSFSheet sheet) {
         Row headerRow = sheet.createRow(0);
         AtomicInteger colNum = new AtomicInteger();
         qry.fieldStream().forEach(f -> {

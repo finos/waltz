@@ -16,7 +16,15 @@
 
     export let ref = {};
 
-    $: state = kindToViewState(ref.kind);
+    let state = null
+
+    $: {
+        try {
+            state = kindToViewState(ref.kind);
+        } catch(e){
+            console.log(e);
+        }
+    }
 
 </script>
 

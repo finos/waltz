@@ -29,7 +29,6 @@ import org.springframework.stereotype.Service;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
@@ -38,6 +37,8 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.khartec.waltz.common.ListUtilities.map;
+import static com.khartec.waltz.web.endpoints.extracts.ExtractorUtilities.convertExcelToByteArray;
+import static com.khartec.waltz.web.endpoints.extracts.ExtractorUtilities.sanitizeSheetName;
 import static org.jooq.lambda.fi.util.function.CheckedConsumer.unchecked;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
@@ -124,13 +125,6 @@ public abstract class CustomDataExtractor implements DataExtractor {
             }
         });
         return rowNum.get();
-    }
-
-    private byte[] convertExcelToByteArray(XSSFWorkbook workbook) throws IOException {
-        ByteArrayOutputStream outByteStream = new ByteArrayOutputStream();
-        workbook.write(outByteStream);
-        workbook.close();
-        return outByteStream.toByteArray();
     }
 
     private List<Object> simplify(List<Object> row) {
