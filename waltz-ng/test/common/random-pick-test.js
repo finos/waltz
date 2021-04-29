@@ -70,7 +70,7 @@ import {tryOrDefault} from "../../client/common/function-utils";
 
 
 
-describe("Common", () => {
+describe("common/function-utils", () => {
 
     describe("notEmpty", () => {
 

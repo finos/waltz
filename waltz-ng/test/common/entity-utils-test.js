@@ -40,7 +40,7 @@ const notARef = {
 };
 
 
-describe("EntityUtils", () => {
+describe("common/entity-utils", () => {
     describe("sameRef", () => {
 
         it("matches if references are same", () => {

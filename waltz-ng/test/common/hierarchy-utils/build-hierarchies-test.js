@@ -84,29 +84,30 @@ const ouCycleB = {
     parentId: 4
 };
 
-describe("HierarchyUtils/buildHierarchies", () => {
-    it("should give empty array when given no data", () => {
-        assert.equal(0, buildHierarchies().length);
-    });
+describe("common/hierarchy-utils", () => {
+    describe("buildHierarchies", () => {
+        it("should give empty array when given no data", () => {
+            assert.equal(0, buildHierarchies().length);
+        });
 
-    it("should one back if only given one thing", () => {
-        assert.equal(1, buildHierarchies([ouA]).length);
-    });
+        it("should one back if only given one thing", () => {
+            assert.equal(1, buildHierarchies([ouA]).length);
+        });
 
-    it("gives back an element for each root", () => {
-        assert.equal(2, buildHierarchies([ouA, ouB]).length);
-    });
+        it("gives back an element for each root", () => {
+            assert.equal(2, buildHierarchies([ouA, ouB]).length);
+        });
 
-    it("builds hierarchies and only returns the roots", () => {
-        assert.equal(2, buildHierarchies([ouA, ouA1, ouA2, ouB]).length);
-    });
+        it("builds hierarchies and only returns the roots", () => {
+            assert.equal(2, buildHierarchies([ouA, ouA1, ouA2, ouB]).length);
+        });
 
-    it("handles bogus parents", () => {
-        assert.equal(3, buildHierarchies([ouA, ouB, ouBogusParent]).length);
-    });
+        it("handles bogus parents", () => {
+            assert.equal(3, buildHierarchies([ouA, ouB, ouBogusParent]).length);
+        });
 
-    it("ignores cycles", () => {
-        assert.equal(0, buildHierarchies([ouCycleA, ouCycleB]).length);
+        it("ignores cycles", () => {
+            assert.equal(0, buildHierarchies([ouCycleA, ouCycleB]).length);
+        });
     });
-
 });

@@ -19,7 +19,7 @@
 import {assert} from "chai";
 import * as su from "../../client/common/string-utils";
 
-describe("StringUtils", () => {
+describe("common/string-utils", () => {
     describe("toDomainAll", () => {
         it ("returns just the domain part of a url",
             () => assert.equal("www.reddit.com", su.toDomain("https://www.reddit.com/r/programming")));

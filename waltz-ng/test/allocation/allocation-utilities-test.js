@@ -18,11 +18,9 @@
 
 import {updateDirtyFlag, updateDirtyFlags} from "../../client/allocation/allocation-utilities";
 import {calcWorkingTotal } from "../../client/allocation/allocation-utilities";
-import {updateFloatingValues } from "../../client/allocation/allocation-utilities";
 import {assert} from "chai"
-import _ from "lodash";
 
-describe("AllocationUtils", () => {
+describe("allocation/allocation-utilities", () => {
 
     describe("updateDirtyFlags", () => {
         it("if percentages differ then item is dirty", () => {

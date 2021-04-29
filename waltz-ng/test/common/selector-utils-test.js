@@ -23,7 +23,7 @@ import {mkRef, sameRef} from "../../client/common/entity-utils";
 const appRef = mkRef("APPLICATION", 1);
 const orgRef = mkRef("ORG_UNIT", 2);
 
-describe("SelectorUtils", () => {
+describe("common/selector-utils", () => {
     describe("mkSelectionOptions", () => {
 
         it("can make selection options from a simple entity appRef", () => {
