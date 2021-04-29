@@ -11,7 +11,7 @@
     import {customEnvironmentUsageStore} from "../../../svelte-stores/custom-environment-usage-store";
     import {mkRef} from "../../../common/entity-utils";
     import MiniActions from "../../../common/svelte/MiniActions.svelte";
-    import {combineServerData, doAssetSearch} from "./custom-environment-utils";
+    import {combineServerData} from "./custom-environment-utils";
     import {termSearch} from "../../../common";
 
     export let usages;
@@ -168,7 +168,7 @@
     <br>
     {#if !searchApplication}
         <div class="form-group">
-            <label for="searchApplication">Change asset owing application:</label>
+            <label for="searchApplication">Change asset owning application:</label>
             <div id="searchApplication">
                     <EntitySearchSelector entityKinds={['APPLICATION']}
                                           on:select={onSelectApplication}/>

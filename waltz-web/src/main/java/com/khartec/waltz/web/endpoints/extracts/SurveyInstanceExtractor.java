@@ -61,6 +61,7 @@ import static com.khartec.waltz.schema.tables.SurveyRun.SURVEY_RUN;
 import static com.khartec.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
 import static com.khartec.waltz.web.WebUtilities.getId;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.endpoints.extracts.ExtractorUtilities.sanitizeSheetName;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.jooq.lambda.fi.util.function.CheckedConsumer.unchecked;

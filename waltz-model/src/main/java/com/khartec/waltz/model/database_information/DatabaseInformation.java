@@ -36,7 +36,8 @@ public abstract class DatabaseInformation implements
         ProvenanceProvider,
         ExternalIdProvider,
         WaltzEntity,
-        CustomEnvironmentAsset{
+        CustomEnvironmentAsset,
+        EntityKindProvider {
 
 
     public abstract String databaseName();
@@ -56,6 +57,13 @@ public abstract class DatabaseInformation implements
     public EndOfLifeStatus endOfLifeStatus() {
         return calculateEndOfLifeStatus(endOfLifeDate());
     }
+
+
+    @Value.Default
+    public EntityKind kind(){
+        return EntityKind.DATABASE;
+    }
+
 
     public EntityReference entityReference() {
         return ImmutableEntityReference.builder()
