@@ -24,3 +24,5 @@ options similar to the following:
 - test directory: `<repos>/waltz/waltz-ng/tests`
 - working directory: `<repos>/waltz`
 - interface style: `bdd`
+
+Note you may want to add `--watch` to the mocha options.
