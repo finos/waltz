@@ -19,7 +19,7 @@
 import {kindToViewState, viewStateToKind} from "../../client/common/link-utils";
 import {assert} from "chai";
 
-describe("LinkUtils", () => {
+describe("common/link-utils", () => {
     describe("kindToViewState", () => {
         it("can resolve known entity kinds", () => {
             assert.equal(kindToViewState("APPLICATION"), "main.app.view");

@@ -66,7 +66,7 @@ const nodesWithParents = populateParents(nodes, false);
 const searchNodes = prepareSearchNodes(nodesWithParents);
 
 
-describe("HierarchyUtils/treeSearching", () => {
+describe("common/hierarchy-utils", () => {
     describe("prepareSearchTerms", () => {
         it("searchNodes should give back an entry for each given node", () => {
             assert.equal(searchNodes.length, nodesWithParents.length, "should have an equal number of inputs and outputs");

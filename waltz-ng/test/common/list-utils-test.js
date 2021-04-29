@@ -24,7 +24,7 @@ import {move} from "../../client/common/list-utils";
 const abc = ["a", "b", "c"];
 const abcd = ["a", "b", "c", "d"];
 
-describe("ListUtils", () => {
+describe("common/list-utils", () => {
     describe("containsAll", () => {
         it ("returns true if all items in the second list are contained in the first",
             () => assert.isTrue(lu.containsAll(abc, abc)));

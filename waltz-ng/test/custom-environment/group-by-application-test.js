@@ -35,7 +35,7 @@ const listMultipleApps = [
     {owningApplication: app2, usage: server2}];
 
 
-describe("CustomEnvironments", () => {
+describe("technology/svelte/custom-environment-panel/custom-environment-utils", () => {
     describe("groupUsagesByApplication - empty cases", () => {
         it("gives back empty list if no usages",
            () => assert.isEmpty(groupUsagesByApplication(emptyList), "List is not empty"));
