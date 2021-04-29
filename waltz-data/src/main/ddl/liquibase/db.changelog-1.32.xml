@@ -228,4 +228,25 @@
     </changeSet>
 
 
+    <!--5296: add fk and cascade delete onto server usage-->
+    <changeSet id="20210429-5394-1"
+               author="woodjes">
+        <comment>5394: Added constraint from server usage to server information</comment>
+        <delete tableName="server_usage">
+            <where>server_id not in (select id from server_information)</where>
+        </delete>
+    </changeSet>
+
+    <changeSet id="20210429-5394-2"
+               author="woodjes">
+        <comment>5394: Added constraint from server usage to server information</comment>
+        <addForeignKeyConstraint baseTableName="server_usage"
+                                 baseColumnNames="server_id"
+                                 constraintName="server_usage_server_id_fk"
+                                 onDelete="CASCADE"
+                                 referencedTableName="server_information"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+
 </databaseChangeLog>
