@@ -183,6 +183,14 @@
                                 </ui-select-choices>
                             </ui-select>
                         </div>
+
+                        <div ng-switch-when="MEASURABLE_MULTI_SELECT">
+                            <waltz-survey-measurable-multi-select question="qi.question"
+                                                                  responses="ctrl.surveyResponses[qi.question.id].listResponse"
+                                                                  on-add-list-response="ctrl.addListResponse"
+                                                                  on-remove-list-response="ctrl.removeListResponse">
+                            </waltz-survey-measurable-multi-select>
+                        </div>
                         <!-- application -->
                         <waltz-entity-selector ng-switch-when="APPLICATION"
                                                item-id="qi.question.id"
