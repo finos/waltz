@@ -17,32 +17,19 @@
   -->
 
 <div>
-
-    <style>
-
-    </style>
-    <waltz-page-header name="Playpen"
-                       small="2"
-                       icon="rocket">
-        <breadcrumbs>
-            <ol class="waltz-breadcrumbs">
-                <li><a ui-sref="main">Home</a></li>
-                <li>Playpen</li>
-            </ol>
-        </breadcrumbs>
-    </waltz-page-header>
-
-
-    <waltz-multi-select-tree-control items="$ctrl.recordsManagementItems"
+    <waltz-multi-select-tree-control items="$ctrl.measurableItems"
                                      disable-predicate="$ctrl.isDisabled"
                                      on-check="$ctrl.onItemCheck"
                                      on-uncheck="$ctrl.onItemUncheck"
-                                     checked-item-ids="$ctrl.checkedItemIds" >
+                                     checked-item-ids="$ctrl.checkedItemIds"
+                                     expanded-item-ids="$ctrl.checkedItemIds">
     </waltz-multi-select-tree-control>
-    <!--    expanded-item-ids="$ctrl.expandedItemIds"-->
-    <!--    disable-predicate="$ctrl.disableNode">-->
-
-
-    <pre ng-bind="$ctrl.checkedItemIds | json"></pre>
-
+    <div class="help-block">
+        The following items were associated but a match can no longer be found:
+        <ul>
+            <li ng-repeat="item in $ctrl.notFoundResults">
+                <span ng-bind="item"></span>
+            </li>
+        </ul>
+    </div>
 </div>

@@ -111,6 +111,7 @@ function controller($location,
 
     };
 
+
     vm.saveEntityResponse = (entity, questionId) => {
         const entityResponse = entity
             ? _.pick(entity, ["id", "kind", "name"])
