@@ -7,7 +7,7 @@ const emptyList = [];
 
 const itemList = [item1, item2];
 
-describe("TermSearch", () => {
+describe("common/index", () => {
     describe("termSearch - empty cases", () => {
         it("gives back empty list if no items to search over",
            () => assert.isEmpty(termSearch(emptyList), "List is not empty"));
@@ -28,7 +28,7 @@ describe("TermSearch", () => {
            () => {
                assert.isEmpty(termSearch(itemList, "similar", ["description"], d => d.name === "item2"), "List should be empty as field doesn't exist");
                assert.deepEqual(termSearch(itemList, "description", ["description"], d => d.name === "item2"),
-                                [item1], 
+                                [item1],
                                 "List should be empty as field doesn't exist");
            });
     });

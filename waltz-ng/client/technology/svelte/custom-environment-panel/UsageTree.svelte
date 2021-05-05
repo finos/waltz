@@ -2,16 +2,24 @@
     import Icon from "../../../common/svelte/Icon.svelte";
     import {groupUsagesByApplication} from "./custom-environment-utils";
     import MiniActions from "../../../common/svelte/MiniActions.svelte";
+    import {createEventDispatcher} from "svelte";
+
+    const dispatch = createEventDispatcher();
 
     export let usages;
     export let databaseActions = [];
     export let serverActions = [];
+
     export let applicationActions = [];
 
     $: usagesGroupedByApplication = groupUsagesByApplication(usages);
 
+    function selectAsset(asset) {
+        dispatch("select", asset);
+    }
 
 </script>
+
 <ul>
     {#each usagesGroupedByApplication as usageInfo}
         <li>
@@ -27,6 +35,7 @@
                     <ul style="padding-left: 3em">
                         {#each usageInfo.serverUsages as server}
                             <li class="waltz-visibility-parent"
+                                on:click={() => selectAsset(server)}
                                 data-env-usage-id={server.usage.id}
                                 data-server-usage-id={server.usage.entityReference.id}
                                 data-server-id={server.asset.id}>
@@ -49,6 +58,7 @@
                     <ul style="padding-left: 3em">
                         {#each usageInfo.databaseUsages as database}
                             <li class="waltz-visibility-parent"
+                                on:click={() => selectAsset(database)}
                                 data-env-usage-id={database.usage.id}
                                 data-database-id={database.asset.id}>
                                 <span class="waltz-visibility-child-30">

@@ -20,7 +20,7 @@ import {assert} from "chai";
 import Service from "../../../client/common/services/BaseLookupService";
 
 
-describe("BaseLookupService: general", () => {
+describe("services/BaseLookupService", () => {
 
     it("throws error if registering a non-string type", () => {
         const service = new Service();

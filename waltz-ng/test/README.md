@@ -20,7 +20,9 @@ Ensure Node support is installed.  Configure a test Mocha test runner with
 options similar to the following:
 
 - mocha package: `<repos>/waltz/waltz-ng/node_modules/mocha`
-- mocha options: `--recursive --compilers js:babel-core/register`
+- mocha options: `--recursive --require @babel/register`
 - test directory: `<repos>/waltz/waltz-ng/tests`
 - working directory: `<repos>/waltz`
 - interface style: `bdd`
+
+Note you may want to add `--watch` to the mocha options.

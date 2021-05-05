@@ -1,6 +1,7 @@
 <script>
     import Icon from "../../../common/svelte/Icon.svelte";
     import EntityLink from "../../../common/svelte/EntityLink.svelte";
+    import _ from "lodash";
 
     export let usages;
 
@@ -17,6 +18,7 @@
     <Icon name="server"/>
     Servers
 </h5>
+{#if !_.isEmpty(servers)}
 <table class="table table-condensed small table-hover">
     <thead>
     <tr>
@@ -49,12 +51,18 @@
     {/each}
     </tbody>
 </table>
-
+{:else}
+    No servers have been associated to this environment
+    <br>
+    <br>
+{/if}
 
 <h5>
     <Icon name="database"/>
     Databases
 </h5>
+
+{#if !_.isEmpty(databases)}
 <table class="table table-condensed small table-hover">
     <thead>
     <tr>
@@ -83,3 +91,7 @@
     {/each}
     </tbody>
 </table>
+{:else}
+    No databases have been associated to this environment
+    <br>
+{/if}
