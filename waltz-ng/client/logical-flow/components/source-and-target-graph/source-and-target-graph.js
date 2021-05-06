@@ -26,7 +26,8 @@ import {authoritativeRatingColorScale} from "../../../common/colors";
 import {mkLineWithArrowPath} from "../../../common/d3-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
-import template from "./source-and-target-graph.html";
+import template from "./source-and-target-graph.html"
+import {amberHex} from "../../../common/colors";
 
 
 const bindings = {
@@ -381,7 +382,8 @@ function drawLabels(section, items = [], scale, anchor = "start", tweakers) {
         .append("text")
         .attr("text-anchor", anchor)
         .attr("dx", textAdjustment)
-        .text(app => _.truncate(app.name, { length: 26 }));
+        .text(d => _.truncate(d.name, { length: 26 }))
+        .style("fill", d => d.deprecated ? amberHex : "inherit");
 
     newLabels
         .append("text")
@@ -394,9 +396,6 @@ function drawLabels(section, items = [], scale, anchor = "start", tweakers) {
         .classed("wsat-cuIcon",true)
         .attr("dx", cuIconAdjustment)
         .attr("font-family", "FontAwesome");
-
-    newLabels
-        .append("title");
 
     labels
         .merge(newLabels)
@@ -494,6 +493,11 @@ function drawTypeBoxes(section, model, scale, dimensions, tweakers) {
         .attr("y", d => scale(d.id) - dimensions.height - 2)
         .attr("x", dimensions.width / 2 * -1 + 2)
         .attr("opacity", 0);
+
+    newBoxes
+        .filter(d => d.deprecated)
+        .append("title")
+        .text(d => "This type has been marked as deprecated and should not be used");
 
     boxes
         .merge(newBoxes)
