@@ -16,7 +16,8 @@
   ~
   -->
 
-<div class="wmt-search-region">
+<div ng-if="!$ctrl.hideSearch"
+     class="wmt-search-region">
     <waltz-icon name="search"
                 ng-class="{
                     'wmt-search-active' : $ctrl.searchTerms.length > 0,

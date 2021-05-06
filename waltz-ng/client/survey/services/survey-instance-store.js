@@ -125,6 +125,12 @@ function store($http, baseApiUrl) {
             .then(result => result.data);
     };
 
+    const reportProblemWithQuestionResponse = (surveyInstanceId, questionId, message) => {
+        return $http
+            .post(`${base}/${surveyInstanceId}/response/${questionId}/problem`, message)
+            .then(result => result.data);
+    };
+
     return {
         getById,
         getPermissions,
@@ -142,105 +148,111 @@ function store($http, baseApiUrl) {
         updateRecipient,
         addRecipient,
         deleteRecipient,
-        markApproved
+        markApproved,
+        reportProblemWithQuestionResponse
     };
 }
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
 
-const serviceName = 'SurveyInstanceStore';
+const serviceName = "SurveyInstanceStore";
 
 
 export const SurveyInstanceStore_API = {
     getById: {
         serviceName,
-        serviceFnName: 'getById',
-        description: 'get survey instance for a given id'
+        serviceFnName: "getById",
+        description: "get survey instance for a given id"
     },
     findByEntityReference: {
         serviceName,
-        serviceFnName: 'findByEntityReference',
-        description: 'finds survey instances for a given entity reference'
+        serviceFnName: "findByEntityReference",
+        description: "finds survey instances for a given entity reference"
     },
     findForRecipientId: {
         serviceName,
-        serviceFnName: 'findForRecipientId',
-        description: 'finds survey instances for a recipient person id'
+        serviceFnName: "findForRecipientId",
+        description: "finds survey instances for a recipient person id"
     },
     findForUser: {
         serviceName,
-        serviceFnName: 'findForUser',
-        description: 'finds survey instances for the current logged in user'
+        serviceFnName: "findForUser",
+        description: "finds survey instances for the current logged in user"
     },
     findForSurveyRun: {
         serviceName,
-        serviceFnName: 'findForSurveyRun',
-        description: 'finds survey instances for a given survey run id'
+        serviceFnName: "findForSurveyRun",
+        description: "finds survey instances for a given survey run id"
     },
     findRecipients: {
         serviceName,
-        serviceFnName: 'findRecipients',
-        description: 'finds recipients for a given survey instance id'
+        serviceFnName: "findRecipients",
+        description: "finds recipients for a given survey instance id"
     },
     findResponses: {
         serviceName,
-        serviceFnName: 'findResponses',
-        description: 'finds responses for a given survey instance id'
+        serviceFnName: "findResponses",
+        description: "finds responses for a given survey instance id"
     },
     findPreviousVersions: {
         serviceName,
-        serviceFnName: 'findPreviousVersions',
-        description: 'finds previouse versions for a given survey instance id'
+        serviceFnName: "findPreviousVersions",
+        description: "finds previouse versions for a given survey instance id"
     },
     findPossibleActions: {
         serviceName,
-        serviceFnName: 'findPossibleActions',
-        description: 'finds all possible action on this survey instance'
+        serviceFnName: "findPossibleActions",
+        description: "finds all possible action on this survey instance"
     },
     getPermissions: {
         serviceName,
-        serviceFnName: 'getPermissions',
-        description: 'get permissions for this survey instance'
+        serviceFnName: "getPermissions",
+        description: "get permissions for this survey instance"
     },
     saveResponse: {
         serviceName,
-        serviceFnName: 'saveResponse',
-        description: 'save response for a given survey instance question'
+        serviceFnName: "saveResponse",
+        description: "save response for a given survey instance question"
     },
     updateStatus: {
         serviceName,
-        serviceFnName: 'updateStatus',
-        description: 'update status for a given survey instance id'
+        serviceFnName: "updateStatus",
+        description: "update status for a given survey instance id"
     },
     updateDueDate: {
         serviceName,
-        serviceFnName: 'updateDueDate',
-        description: 'update due date for a given survey instance id'
+        serviceFnName: "updateDueDate",
+        description: "update due date for a given survey instance id"
     },
     updateRecipient: {
         serviceName,
-        serviceFnName: 'updateRecipient',
-        description: 'update recipient for a given survey instance id'
+        serviceFnName: "updateRecipient",
+        description: "update recipient for a given survey instance id"
     },
     markApproved: {
         serviceName,
-        serviceFnName: 'markApproved',
-        description: 'approve a survey instance response'
+        serviceFnName: "markApproved",
+        description: "approve a survey instance response"
     },
     addRecipient: {
         serviceName,
-        serviceFnName: 'addRecipient',
-        description: 'add recipient to a given survey instance id'
+        serviceFnName: "addRecipient",
+        description: "add recipient to a given survey instance id"
     },
     deleteRecipient: {
         serviceName,
-        serviceFnName: 'deleteRecipient',
-        description: 'delete recipient from a given survey instance id'
+        serviceFnName: "deleteRecipient",
+        description: "delete recipient from a given survey instance id"
+    },
+    reportProblemWithQuestionResponse: {
+        serviceName,
+        serviceFnName: "reportProblemWithQuestionResponse",
+        description: "creates change log entry for survey instance"
     }
 };
 

@@ -19,9 +19,9 @@
 import _ from "lodash";
 import moment from "moment";
 import {formats} from "../common";
-import roles from "../user/system-roles";
 import {CORE_API} from "../common/services/core-api-utils";
 import {loadEntity} from "../common/entity-utils";
+import {mkSiphon} from "../common/siphon-utils";
 
 
 export function groupQuestions(questionInfos = []) {
@@ -175,4 +175,35 @@ export function loadSurveyInfo($q,
 
             return result;
         });
+}
+
+const findMeasurableIdRegEx = /MEASURABLE\/(\d+)\)$/;
+
+/**
+ * Takes a listResponse from a survey instance and returns the list of measurable ids,
+ * the invalidItemStringSiphon and theNotFoundSiphon
+ *
+ * @param responses
+ * @param measurablesById
+ * @returns {{invalidItemStringSiphon: (function(*=): boolean), measurableIds, notFoundSiphon: (function(*=): boolean)}}
+ */
+export function parseMeasurableListResponse(responses, measurablesById){
+    const measurableIds = _.map(_.keys(measurablesById), d => Number(d));
+    const invalidItemStringSiphon = mkSiphon(d => !d.match(findMeasurableIdRegEx));
+    const notFoundSiphon = mkSiphon(d => !_.includes(measurableIds, d.id));
+
+    const checkedItemIds = _
+        .chain(responses)
+        .reject(invalidItemStringSiphon)
+        .map(r => r.match(findMeasurableIdRegEx))
+        .map(m => ({id: Number(m[1]), input: m.input}))
+        .reject(notFoundSiphon)
+        .map(r => r.id)
+        .value();
+
+    return {
+        measurableIds: checkedItemIds,
+        invalidItemStringSiphon,
+        notFoundSiphon
+    }
 }

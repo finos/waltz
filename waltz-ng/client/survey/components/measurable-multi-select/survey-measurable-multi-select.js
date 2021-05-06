@@ -20,22 +20,28 @@ import {initialiseData} from "../../../common";
 import template from "./survey-measurable-multi-select.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
-import {mkSiphon} from "../../../common/siphon-utils";
+import {parseMeasurableListResponse} from "../../survey-utils";
 
 
 const bindings = {
+    instanceId: "<",
     question: "<",
     responses: "<?",
-    onRemoveMeasurable: "<?",
-    onAddMeasurable: "<?"
+    onSaveListResponse: "<?"
 }
 
 const initialState = {
-    onRemoveMeasurable: (d) => console.log("onRemove", d),
-    onAddMeasurable: (d) => console.log("onAdd", d)
+    onSaveListResponse: (d) => console.log("onAdd", d)
 };
 
-const findMeasurableIdRegEx = /MEASURABLE\/(\d+)\)$/;
+function toListResponse(itemIds, measurablesById) {
+    return _
+        .chain(itemIds)
+        .map(id => _.get(measurablesById, id, null))
+        .filter(m => m != null)
+        .map(m => `${m.name} (${m.externalId}:MEASURABLE/${m.id})`)
+        .value();
+}
 
 function controller(serviceBroker) {
 
@@ -50,44 +56,45 @@ function controller(serviceBroker) {
                               vm.question.qualifierEntity,
                               "EXACT")])
             .then(r => {
-                vm.measurableItems = console.log(r.data) || r.data;
+                vm.measurableItems = r.data;
                 vm.measurablesById = _.keyBy(vm.measurableItems, d => d.id);
 
-                const measurableIds = _.map(_.keys(vm.measurablesById), d => Number(d));
-                const invalidItemStringSiphon = mkSiphon(d => !d.match(findMeasurableIdRegEx));
-                const notFoundSiphon = mkSiphon(d => !_.includes(measurableIds, d.id));
 
-                vm.checkedItemIds = _
-                    .chain(vm.responses)
-                    .reject(invalidItemStringSiphon)
-                    .map(r => r.match(findMeasurableIdRegEx))
-                    .map(m => ({id: Number(m[1]), input: m.input}))
-                    .reject(notFoundSiphon)
-                    .map(r => r.id)
-                    .value();
+                const {measurableIds, notFoundSiphon} = parseMeasurableListResponse(
+                    vm.responses,
+                    vm.measurablesById);
 
+                vm.checkedItemIds = measurableIds;
                 vm.notFoundResults = _.map(notFoundSiphon.results, d => d.input);
-
-                console.log({checked: vm.checkedItemIds})
-                console.log({invalidMatches: invalidItemStringSiphon.results, notFound: vm.notFoundResults})
-
             });
     }
 
-
     vm.isDisabled = (d) => !d.concrete;
+
+    function updateItems() {
+        const listResponse = toListResponse(vm.checkedItemIds, vm.measurablesById);
+        if (vm.notFoundResults.length > 0) {
+            const message = "Removing the following items as they cannot be found: "
+                + _.join(vm.notFoundResults, ", ");
+
+            serviceBroker
+                .execute(
+                    CORE_API.SurveyInstanceStore.reportProblemWithQuestionResponse,
+                    [vm.instanceId, vm.question.id, message])
+                .then(() => vm.notFoundResults = []);
+        }
+        vm.onSaveListResponse(vm.question.id, listResponse);
+    }
 
     vm.onItemCheck = (d) => {
         vm.checkedItemIds = _.union(vm.checkedItemIds, [d]);
-        const measurable = _.get(vm.measurablesById, d, null);
-        vm.onAddMeasurable(measurable);
-    }
+        updateItems();
+    };
 
     vm.onItemUncheck = (d) => {
         vm.checkedItemIds = _.without(vm.checkedItemIds, d);
-        const measurable = _.get(vm.measurablesById, d, null);
-        vm.onRemoveMeasurable(measurable);
-    }
+        updateItems();
+    };
 }
 
 
