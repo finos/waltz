@@ -3,13 +3,10 @@
     import Icon from "./Icon.svelte";
     import {createEventDispatcher} from "svelte";
 
-
     export let childNodes = [];
     export let node;
     export let expanded = false;
     export let isRoot = false;
-
-    let selectedDataType;
 
     $: sortedNodes = _.orderBy(childNodes, d => d.name);
 
@@ -29,7 +26,8 @@
 {#if !isRoot}
     <button class="btn btn-skinny"
             on:click={toggleExpanded}>
-        <Icon size="lg" name={expanded ? "caret-down" : "caret-right"}/>
+        <Icon size="lg"
+              name={expanded ? "caret-down" : "caret-right"}/>
     </button>
     <button class="btn btn-skinny"
             class:concrete={node.concrete}
@@ -46,9 +44,11 @@
         {#each sortedNodes as childNode}
             <li>
                 {#if childNode.children.length > 0}
-                    <svelte:self on:select node={childNode} childNodes={childNode.children}/>
+                    <svelte:self on:select node={childNode}
+                                 childNodes={childNode.children}/>
                 {:else}
-                    <Icon size="lg" name="fw"/>
+                    <Icon size="lg"
+                          name="fw"/>
                     <button class="btn btn-skinny"
                           class:concrete={childNode.concrete}
                           class:abstract={!childNode.concrete}
@@ -56,6 +56,11 @@
                           class:deprecated={childNode.deprecated}
                           on:click={() => selectNode(childNode)}>
                         {childNode.name}
+                        {#if childNode.deprecated}
+                            <span class="label label-warning">
+                                Deprecated
+                            </span>
+                        {/if}
                     </button>
                 {/if}
             </li>

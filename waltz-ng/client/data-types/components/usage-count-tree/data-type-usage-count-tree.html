@@ -59,6 +59,10 @@
                               }">
                     <span ng-bind="node.name">
                     </span>
+                    <span ng-if="node.deprecated"
+                          class="label label-warning">
+                        Deprecated
+                    </span>
                 </a>
                 <waltz-rag-line class='waltz-visibility-child-50'
                                  scores="node.cumulativeCounts"
@@ -79,6 +83,11 @@
         <strong ng-bind="node.name"></strong>
         <p class="small text-muted"
            ng-bind="node.description">
+        </p>
+        <p class="small text-muted"
+           ng-if="node.deprecated">
+            <span class="label label-warning">Deprecated</span>
+            - this type has been deprecated and should no longer be used.
         </p>
         <div class="small">
             <table class="table table-condensed small">

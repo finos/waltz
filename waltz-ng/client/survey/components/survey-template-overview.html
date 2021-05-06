@@ -16,7 +16,7 @@
   ~
   -->
 
-<div>
+  <div>
     <div class="row">
         <div class="col-sm-2 waltz-display-field-label">
             Template Name
@@ -55,8 +55,14 @@
         <div class="col-sm-2 waltz-display-field-label">
             Status
         </div>
-        <div class="col-sm-10">
+        <div class="col-sm-4">
             <span ng-bind="$ctrl.template.status | toDisplayName:'releaseLifecycleStatus'"></span>
+        </div>
+        <div class="col-sm-2 waltz-display-field-label">
+            Exernal Id
+        </div>
+        <div class="col-sm-4">
+            <span ng-bind="$ctrl.template.externalId"></span>
         </div>
     </div>
 
