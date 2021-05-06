@@ -136,7 +136,9 @@
                                     </ul>
                                 </div>
                                 <div ng-switch-when="MEASURABLE_MULTI_SELECT">
-                                    <h4>Measurable Tree</h4>
+                                    <waltz-survey-question-measurable-renderer question="qi.question"
+                                                                               list-response="ctrl.answersById[qi.question.id].listResponse">
+                                    </waltz-survey-question-measurable-renderer>
                                 </div>
                                 <div ng-switch-default>
                                     <span ng-bind="ctrl.answersById[qi.question.id].stringResponse">

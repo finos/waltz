@@ -61,7 +61,7 @@
 
                 <label>
                     <ng-transclude>
-                        <span ng-bind="node.name"></span>
+                        <span ng-class="{'waltz-tree-node-implicit' : !node.concrete}" ng-bind="node.name"></span>
                     </ng-transclude>
                 </label>
 

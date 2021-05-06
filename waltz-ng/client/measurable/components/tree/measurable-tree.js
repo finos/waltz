@@ -39,6 +39,8 @@ import template from "./measurable-tree.html";
 const bindings = {
     measurables: "<",
     onSelect: "<?",
+    expandedNodes: "<?",
+    hideSearch: "<?",
     linkToState: "@?"
 };
 
@@ -50,6 +52,7 @@ const initialState = {
     searchNodes: [],
     searchTerms: "",
     chartScale: () => 0,
+    hideSearch: false,
     treeOptions: {
         nodeChildren: "children",
         dirSelectable: true,
@@ -107,7 +110,6 @@ function controller() {
         if (c.measurables) {
             vm.searchNodes = prepareSearchNodes(vm.measurables);
             vm.hierarchy = prepareTree(vm.measurables);
-            vm.expandedNodes = [];
             vm.chartScale = prepareChartScale(vm.hierarchy);
         }
     };

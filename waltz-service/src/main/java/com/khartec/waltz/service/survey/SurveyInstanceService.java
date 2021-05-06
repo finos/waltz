@@ -45,6 +45,7 @@ import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.common.CollectionUtilities.find;
 import static com.khartec.waltz.common.OptionalUtilities.contentsEqual;
 import static com.khartec.waltz.model.survey.SurveyInstanceStateMachineFactory.simple;
 
@@ -403,5 +404,29 @@ public class SurveyInstanceService {
                 .hasOwnerRole(hasOwningRole)
                 .isMetaEdit(isLatest && (isAdmin || isOwner || hasOwningRole))
                 .build();
+    }
+
+
+    public boolean reportProblemWithQuestionResponse(Long instanceId,
+                                                     Long questionId,
+                                                     String message,
+                                                     String username) {
+
+        List<SurveyQuestion> surveyQuestions = surveyQuestionService
+                .findForSurveyInstance(instanceId);
+
+        return find(d -> d.id().get().equals(questionId), surveyQuestions)
+                .map(q -> {
+                    changeLogService.write(
+                            ImmutableChangeLog.builder()
+                                    .operation(Operation.UPDATE)
+                                    .userId(username)
+                                    .parentReference(EntityReference.mkRef(EntityKind.SURVEY_INSTANCE, instanceId))
+                                    .childKind(EntityKind.SURVEY_QUESTION)
+                                    .message(String.format("Question [%s]: %s", q.questionText(), message))
+                                    .build());
+                    return true;
+                })
+                .orElse(false);
     }
 }

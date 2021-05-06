@@ -310,7 +310,7 @@ public class SurveyQuestionResponseDao {
         record.setEntityResponseId(entityResponse.map(EntityReference::id).orElse(null));
         record.setListResponseConcat(questionResponse.listResponse()
                                         .filter(l -> ! l.isEmpty())
-                                        .map(l -> join(l, ";;"))
+                                        .map(l -> join(l, "; "))
                                         .orElse(null));
 
         return record;
