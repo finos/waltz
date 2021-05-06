@@ -232,7 +232,8 @@ public class SurveyInstanceExtractor implements DataExtractor {
                     "SUBMITTED_BY",
                     "APPROVED_AT",
                     "APPROVED_BY",
-                    "Latest");
+                    "Latest",
+                    "EXTERNAL_ID");
 
         List<String> questionHeaders = questions
                 .stream()
@@ -357,6 +358,7 @@ public class SurveyInstanceExtractor implements DataExtractor {
                 .select(sqr.STRING_RESPONSE, sqr.NUMBER_RESPONSE, sqr.DATE_RESPONSE, sqr.BOOLEAN_RESPONSE, sqr.LIST_RESPONSE_CONCAT)
                 .select(responseNameField, responseExtIdField)
                 .select(DSL.when(si.ORIGINAL_INSTANCE_ID.isNull(), "Yes").else_("No").as("Latest"))
+                .select(st.EXTERNAL_ID)
                 .from(st)
                 .innerJoin(sr).on(sr.SURVEY_TEMPLATE_ID.eq(st.ID))
                 .innerJoin(si).on(si.SURVEY_RUN_ID.eq(sr.ID))
@@ -385,6 +387,7 @@ public class SurveyInstanceExtractor implements DataExtractor {
                         reportRow.add(firstAnswer.get(si.APPROVED_AT));
                         reportRow.add(firstAnswer.get(si.APPROVED_BY));
                         reportRow.add(firstAnswer.get("Latest"));
+                        reportRow.add(firstAnswer.get(st.EXTERNAL_ID));
 
                         Map<Long, Record> answersByQuestionId = indexBy(
                                 answersForInstance,
