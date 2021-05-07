@@ -38,6 +38,7 @@ import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.maybeFirst;
+import static com.khartec.waltz.common.FunctionUtilities.time;
 import static java.util.Optional.ofNullable;
 
 @Service
@@ -46,6 +47,7 @@ public class CostService {
     private final CostDao costDao;
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
     private final CostKindDao costKindDao;
+
 
     @Autowired
     CostService(CostDao costDao, CostKindDao costKindDao){
@@ -78,23 +80,33 @@ public class CostService {
 
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, selectionOptions);
 
-        Set<EntityCost> topCosts = costDao.findTopCostsForCostKindAndSelector(
-                costKindId,
-                genericSelector,
-                limit);
+        Set<EntityCost> topCosts = time(
+                "topCosts: "+selectionOptions.entityReference(),
+                () -> costDao.findTopCostsForCostKindAndSelector(
+                        costKindId,
+                        genericSelector,
+                        limit));
 
         Integer year = maybeFirst(topCosts)
                 .map(EntityCost::year)
                 .orElse(LocalDate.now().getYear());
 
-        BigDecimal totalCost = costDao.getTotalForKindAndYearBySelector(costKindId, year, genericSelector);
+        BigDecimal totalCost = time(
+                "totalCosts: "+selectionOptions.entityReference(),
+                () -> costDao.getTotalForKindAndYearBySelector(
+                        costKindId,
+                        year,
+                        genericSelector));
 
-        Tuple2<Integer, Integer> mappedAndMissingCounts = costDao.getMappedAndMissingCountsForKindAndYearBySelector(
-                costKindId,
-                year,
-                genericSelector);
+        Tuple2<Integer, Integer> mappedAndMissingCounts = time(
+                "missingCosts: "+selectionOptions.entityReference(),
+                () -> costDao.getMappedAndMissingCountsForKindAndYearBySelector(
+                        costKindId,
+                        year,
+                        genericSelector));
 
-        return ImmutableEntityCostsSummary.builder()
+        return ImmutableEntityCostsSummary
+                .builder()
                 .costKind(costKindDao.getById(costKindId))
                 .year(year)
                 .total(ofNullable(totalCost).orElse(BigDecimal.ZERO))

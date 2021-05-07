@@ -19,13 +19,13 @@
 package com.khartec.waltz.jobs.harness;
 
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.cost.CostService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import static com.khartec.waltz.common.FunctionUtilities.time;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 
 
@@ -36,12 +36,21 @@ public class AssetCostHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         CostService svc = ctx.getBean(CostService.class);
 
-        IdSelectionOptions options = mkOpts(
-                ImmutableEntityReference.builder()
-                        .id(260)
-                        .kind(EntityKind.ORG_UNIT)
-                        .build(),
-                HierarchyQueryScope.CHILDREN);
+        IdSelectionOptions bill = mkOpts(mkRef(EntityKind.PERSON, 1234));
+        IdSelectionOptions jennifer = mkOpts(mkRef(EntityKind.PERSON, 5678));
+        IdSelectionOptions scott = mkOpts(mkRef(EntityKind.PERSON, 9876));
+        IdSelectionOptions infra = mkOpts(mkRef(EntityKind.ORG_UNIT, 1234));
+
+        long tco = 6L;
+        long cirrus = 7L;
+//        time("tco cost summary for infra", () -> svc.summariseByCostKindAndSelector(tco, infra, EntityKind.APPLICATION, 20));
+//        time("cirrus cost summary for infra", () -> svc.summariseByCostKindAndSelector(cirrus, infra, EntityKind.APPLICATION, 20));
+////        time("cost summary for bill", () -> svc.summariseByCostKindAndSelector(tco, bill, EntityKind.APPLICATION, 20));
+//        time("tco cost summary for scott", () -> svc.summariseByCostKindAndSelector(tco, scott, EntityKind.APPLICATION, 20));
+        time("cirrus cost summary for jennifer", () -> svc.summariseByCostKindAndSelector(cirrus, jennifer, EntityKind.APPLICATION, 20));
+        time("cirrus cost summary for bill", () -> svc.summariseByCostKindAndSelector(cirrus, bill, EntityKind.APPLICATION, 20));
+        time("cirrus cost summary for scott", () -> svc.summariseByCostKindAndSelector(cirrus, scott, EntityKind.APPLICATION, 20));
+
 
     }
 
