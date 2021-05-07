@@ -179,8 +179,7 @@
                     <div ng-if="ctrl.selectedQuestionInfo.question.fieldType === 'DROPDOWN'
                                 || ctrl.selectedQuestionInfo.question.fieldType === 'DROPDOWN_MULTI_SELECT'"
                          class="col-sm-7 col-sm-offset-2">
-                        <div class=""
-                             style="display: block; background-color: #F8F9F9; margin-top:10px; padding: 1em; border-radius: 2px; border: 1px solid #eee">
+                        <div style="display: block; background-color: #F8F9F9; margin-top:10px; padding: 1em; border-radius: 2px; border: 1px solid #eee">
                             <waltz-survey-dropdown-editor entries="ctrl.selectedQuestionInfo.dropdownEntries"
                                                           on-change="ctrl.updateEntries">
                             </waltz-survey-dropdown-editor>
@@ -196,6 +195,9 @@
                                     ng-options="category.id as category.name for category in ctrl.measurableCategories | orderBy:'name'"
                                     ng-model="ctrl.selectedQuestionInfo.question.qualifierEntity.id">
                             </select>
+                            <div class='small text-muted'>
+                                Select a category to populate the tree
+                            </div>
                         </div>
 
                     </div>
