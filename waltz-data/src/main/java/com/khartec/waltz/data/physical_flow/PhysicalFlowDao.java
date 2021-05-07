@@ -148,6 +148,14 @@ public class PhysicalFlowDao {
     }
 
 
+    public PhysicalFlow getByIdAndIsRemoved(long id, boolean isRemoved) {
+        return findByCondition(PHYSICAL_FLOW.ID.eq(id).and(PHYSICAL_FLOW.IS_REMOVED.eq(isRemoved)))
+                .stream()
+                .findFirst()
+                .orElse(null);
+    }
+
+
     public List<PhysicalFlow> findBySpecificationId(long specificationId) {
         return findByCondition(PHYSICAL_FLOW.SPECIFICATION_ID.eq(specificationId));
     }
@@ -230,8 +238,16 @@ public class PhysicalFlowDao {
     }
 
 
+    /**
+     * Soft deletes the physical flow in the database that matches the parameter flowId
+     *
+     * @param flowId the physical flow id to match against
+     * @return soft deleted flow count or 0
+     */
     public int delete(long flowId) {
-        return dsl.delete(PHYSICAL_FLOW)
+        return dsl.update(PHYSICAL_FLOW)
+
+                .set(PHYSICAL_FLOW.IS_REMOVED, true)
                 .where(PHYSICAL_FLOW.ID.eq(flowId))
                 .execute();
     }
