@@ -115,6 +115,19 @@ public class PhysicalFlowExtractor extends CustomDataExtractor {
 
     @Override
     public void register() {
+        post(mkPath("data-extract", "physical-flows", "all", ":kind", ":id"), (request, response) -> {
+            EntityReference ref = getEntityReference(request);
+            String fileName = "physical-flows-all-" + ref.id();
+            return writeReportResults(
+                    response,
+                    preparePhysicalFlows(
+                            prepareAllFlowsQuery(ref),
+                            parseExtractFormat(request),
+                            fileName,
+                            getTagsMap()));
+        });
+
+
         post(mkPath("data-extract", "physical-flows", "produces", ":kind", ":id"), (request, response) -> {
             EntityReference ref = getEntityReference(request);
             String fileName = "physical-flows-produces-" + ref.id();
@@ -171,6 +184,11 @@ public class PhysicalFlowExtractor extends CustomDataExtractor {
                 .on(TAG.ID.eq(TAG_USAGE.TAG_ID))
                 .where(TAG_USAGE.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name()))
                 .fetchGroups(TAG_USAGE.ENTITY_ID, TAG.NAME);
+    }
+
+
+    private SelectConditionStep<Record> prepareAllFlowsQuery(EntityReference ref) {
+        return (SelectConditionStep<Record>) prepareProducesQuery(ref).union(prepareConsumesQuery(ref));
     }
 
 
