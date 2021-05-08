@@ -16,7 +16,8 @@
   ~
   -->
 
-<!-- if we are rendering a svelte component -->
+<!-- if we are rendering a svelte component,
+     for pure angular components we are including them via $compile -->
 <waltz-dynamic-section ng-if="$ctrl.section.svelteComponent"
                        parent-entity-ref="$ctrl.parentEntityRef"
                        class="waltz-dynamic-section waltz-dynamic-section-render-mode-standard waltz-dynamic-section-${section.id}"
