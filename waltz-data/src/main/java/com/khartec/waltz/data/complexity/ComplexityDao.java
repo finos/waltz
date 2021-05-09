@@ -117,8 +117,8 @@ public class ComplexityDao {
 
 
     public Tuple2<BigDecimal, BigDecimal> getAverageAndTotalScoreByKindAndSelector(Long complexityKindId, GenericSelector genericSelector) {
-        AggregateFunction<BigDecimal> total_complexity = DSL.sum(COMPLEXITY.SCORE);
-        Field<BigDecimal> average_complexity = total_complexity.divide(DSL.countDistinct(COMPLEXITY.ENTITY_ID)).as("average_complexity");
+        Field<BigDecimal> total_complexity = DSL.sum(COMPLEXITY.SCORE).as("total_complexity");
+        Field<BigDecimal> average_complexity = DSL.sum(COMPLEXITY.SCORE).divide(DSL.countDistinct(COMPLEXITY.ENTITY_ID)).as("average_complexity");
         return dsl
                 .select(total_complexity)
                 .select(average_complexity)
@@ -133,8 +133,8 @@ public class ComplexityDao {
 
     public Set<ComplexityTotal> findTotalsByGenericSelector(GenericSelector genericSelector) {
 
-        AggregateFunction<BigDecimal> total_complexity = DSL.sum(COMPLEXITY.SCORE);
-        Field<BigDecimal> average_complexity = total_complexity.divide(DSL.countDistinct(COMPLEXITY.ENTITY_ID)).as("average_complexity");
+        Field<BigDecimal> total_complexity = DSL.sum(COMPLEXITY.SCORE).as("total_complexity");
+        Field<BigDecimal> average_complexity = DSL.sum(COMPLEXITY.SCORE).divide(DSL.countDistinct(COMPLEXITY.ENTITY_ID)).as("average_complexity");
         SelectHavingStep<Record3<Long, BigDecimal, BigDecimal>> totalsAndAverages = DSL
                 .select( COMPLEXITY.COMPLEXITY_KIND_ID, total_complexity, average_complexity)
                 .from(COMPLEXITY)
