@@ -114,6 +114,12 @@
                                  extract="physical-flows/consumes/{{$ctrl.primaryRef.kind}}/{{$ctrl.primaryRef.id}}"
                                  method="POST">
         </waltz-data-extract-link>
+        <span> | </span>
+        <waltz-data-extract-link name="All"
+                                 styling="link"
+                                 extract="physical-flows/all/{{$ctrl.primaryRef.kind}}/{{$ctrl.primaryRef.id}}"
+                                 method="POST">
+        </waltz-data-extract-link>
         <span class="text-muted"> Download Physical Flows :  </span>
     </div>
 </div>
