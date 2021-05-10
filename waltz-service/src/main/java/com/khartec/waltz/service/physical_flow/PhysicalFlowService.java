@@ -169,7 +169,7 @@ public class PhysicalFlowService {
                 .isSpecificationUnused(false)
                 .isLastPhysicalFlow(false);
 
-        PhysicalFlow physicalFlow = physicalFlowDao.getById(command.flowId());
+        PhysicalFlow physicalFlow = physicalFlowDao.getByIdAndIsRemoved(command.flowId(), false);
 
         if (physicalFlow == null) {
             return responseBuilder
