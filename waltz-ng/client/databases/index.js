@@ -18,17 +18,28 @@
 
 import angular from 'angular';
 import * as DatabaseStore from './services/database-store';
-import {registerStores} from "../common/module-utils";
+import * as DatabaseUsageStore from './services/database-usage-store';
+import {registerComponents, registerStores} from "../common/module-utils";
 import DatabasePies from './components/database-pies';
+import Routes from "../databases/routes";
+import DatabaseView from "../databases/pages/view/database-view";
+import DatabaseOverview from "../databases/components/overview/database-overview";
 
 export default () => {
 
     const module = angular.module('waltz.databases', []);
 
+    module.config(Routes);
+
+    registerComponents(module, [
+        DatabaseView,
+        DatabaseOverview
+    ]);
+
     module
         .component('waltzDatabasePies', DatabasePies);
 
-    registerStores(module, [DatabaseStore]);
+    registerStores(module, [DatabaseStore, DatabaseUsageStore]);
 
     return module.name;
 };

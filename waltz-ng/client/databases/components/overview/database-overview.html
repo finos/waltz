@@ -1,0 +1,102 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<div class="waltz-page-summary waltz-page-summary-attach">
+    <div class="waltz-display-section">
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Name
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="$ctrl.databaseInfo.databaseName"></span>
+                <span ng-if="$ctrl.databaseInfo.externalId"
+                      class="text-muted">
+                    (<span ng-bind="$ctrl.databaseInfo.externalId"></span>)
+                </span>
+            </div>
+
+
+            <div class="col-sm-2 waltz-display-field-label">
+                Database Name
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="$ctrl.databaseInfo.dbmsName"></span>
+                <span class="text-muted">
+                    (version: <span ng-bind="$ctrl.databaseInfo.dbmsVersion"></span>)
+                </span>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Instance Name
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="$ctrl.databaseInfo.instanceName"></span>
+            </div>
+
+            <div class="col-sm-2 waltz-display-field-label">
+                Database Vendor
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="$ctrl.databaseInfo.dbmsVendor"></span>
+            </div>
+
+
+        </div>
+
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Lifecycle Status
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="$ctrl.databaseInfo.lifecycleStatus | toDisplayName:'lifecycleStatus'"></span>
+            </div>
+
+            <div class="col-sm-2 waltz-display-field-label">
+                Environment
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="$ctrl.databaseInfo.environment"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                End of Life Date
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="$ctrl.databaseInfo.endOfLifeDate"></span>
+            </div>
+
+            <div class="col-sm-2 waltz-display-field-label">
+                End of Life Status
+            </div>
+            <div class="col-sm-4">
+                <span ng-bind="$ctrl.databaseInfo.endOfLifeStatus"></span>
+            </div>
+        </div>
+
+
+        <!-- Entity Enum -->
+        <waltz-entity-enum parent-entity-ref="$ctrl.parentEntityRef">
+        </waltz-entity-enum>
+
+    </div>
+</div>
