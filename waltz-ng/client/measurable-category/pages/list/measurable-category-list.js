@@ -50,6 +50,7 @@ function controller($q,
 
     vm.$onInit = () => {
 
+        // last category is used when initialising the route in route.js
         serviceBroker
             .execute(
                 CORE_API.UserPreferenceStore.saveForUser,
