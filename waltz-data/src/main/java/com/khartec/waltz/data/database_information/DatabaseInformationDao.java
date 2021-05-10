@@ -134,4 +134,19 @@ public class DatabaseInformationDao {
 
     }
 
+    public DatabaseInformation findById(long id) {
+        return dsl.select(DATABASE_INFORMATION.fields())
+                .from(DATABASE_INFORMATION)
+                .where(DATABASE_INFORMATION.ID.eq(id))
+                .fetchOne(DATABASE_RECORD_MAPPER);
+
+    }
+
+    public DatabaseInformation findByExternalId(String externalId) {
+        return dsl.select(DATABASE_INFORMATION.fields())
+                .from(DATABASE_INFORMATION)
+                .where(DATABASE_INFORMATION.EXTERNAL_ID.eq(externalId))
+                .fetchOne(DATABASE_RECORD_MAPPER);
+
+    }
 }
