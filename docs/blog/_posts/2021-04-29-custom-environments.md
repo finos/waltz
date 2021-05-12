@@ -12,6 +12,11 @@ In this tutorial we will look at the new _Custom Environments_ feature introduce
 ## Custom Environments
 Custom environments can be used to group together databases and servers to express a user-defined environment - for example SIT, UAT etc.
 
+## Demonstration
+
+[![Waltz: Custom Environments](http://img.youtube.com/vi/fQY68pNTOJ4/0.jpg)](https://www.youtube.com/watch?v=fQY68pNTOJ4&list=PLGNSioXgrIEfJFJCTFGxKzfoDmxwPEap4)
+
+## Usage
 You must have an involvement to an application if you wish to create or edit its environments and associated assets, these can be
 maintained in the `People Section`.
 
