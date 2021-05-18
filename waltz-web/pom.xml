@@ -130,7 +130,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <executable>npm</executable>
+                    <executable>c:/users/watkdav/dev/tools/node_12/npm.cmd</executable>
                     <environmentVariables>
                         <BUILD_ENV>prod</BUILD_ENV>
                     </environmentVariables>

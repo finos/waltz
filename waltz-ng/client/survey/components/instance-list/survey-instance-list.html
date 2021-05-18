@@ -74,6 +74,7 @@
         <thead>
         <tr>
             <th>Title</th>
+            <th>Name</th>
             <th ng-if="$ctrl.visibility.showSurveySubject">Subject</th>
             <th>Status</th>
             <th>Issued On</th>
@@ -86,14 +87,16 @@
         <tbody>
         <tr ng-repeat="row in surveys | orderBy:'surveyRun.name'">
             <td>
-                <a ng-if="row.surveyInstance.status === 'COMPLETED' || row.surveyInstance.status === 'APPROVED'"
-                   ng-bind="row.surveyRun.name"
+                <a ng-bind="row.surveyRun.name"
                    class="clickable"
-                   ui-sref="main.survey.instance.response.view ({id: row.surveyInstance.id })"></a>
-                <a ng-if="row.surveyInstance.status !== 'COMPLETED' && row.surveyInstance.status !== 'APPROVED'"
-                   ng-bind="row.surveyRun.name"
+                   ui-sref="{{$ctrl.determineViewState(row.surveyInstance)}} ({id: row.surveyInstance.id })">
+                </a>
+            </td>
+            <td>
+                <a ng-bind="row.surveyInstance.name || '-'"
                    class="clickable"
-                   ui-sref="main.survey.instance.response.edit ({id: row.surveyInstance.id })"></a>
+                   ui-sref="{{$ctrl.determineViewState(row.surveyInstance)}} ({id: row.surveyInstance.id })">
+                </a>
             </td>
             <td ng-if="$ctrl.visibility.showSurveySubject">
                 <waltz-entity-link entity-ref="row.surveyInstance.surveyEntity">

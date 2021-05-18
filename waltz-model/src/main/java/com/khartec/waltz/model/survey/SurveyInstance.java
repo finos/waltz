@@ -38,6 +38,9 @@ public abstract class SurveyInstance implements IdProvider {
     public abstract EntityReference surveyEntity();
 
     @Nullable
+    public abstract EntityReference qualifierEntity();
+
+    @Nullable
     public abstract String surveyEntityExternalId();
     public abstract SurveyInstanceStatus status();
     public abstract LocalDate dueDate();
@@ -62,4 +65,7 @@ public abstract class SurveyInstance implements IdProvider {
 
     @Nullable
     public abstract String owningRole();
+
+    @Nullable
+    public abstract String name();
 }

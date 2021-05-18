@@ -53,83 +53,94 @@ function mkSurveyData(surveyRuns = [], surveyInstances = []) {
     };
 }
 
+const subjectField = mkEntityLinkGridCell("Subject", "surveyInstance.surveyEntity");
 
-function mkCommonColumnDefs() {
+const subjectExtIdField = {
+    field: "surveyInstance.surveyEntityExternalId",
+    name: "Subject External Id",
+    width: "10%"
+};
+const statusField = {
+    field: "surveyInstance.status",
+        name: "Status",
+    cellFilter: "toDisplayName:'surveyInstanceStatus'",
+    width: "10%"
+};
+const issuedOnField = {
+    field: "surveyRun.issuedOn",
+    name: "Issued",
+    cellTemplate: "<div class=\"ui-grid-cell-contents\"><waltz-from-now timestamp=\"COL_FIELD\" days-only=\"true\"></waltz-from-now></div>",
+    width: "10%"
+};
+const dueDateField = {
+    field: "surveyInstance.dueDate",
+    name: "Due",
+    cellTemplate: "<div class=\"ui-grid-cell-contents\"><waltz-from-now timestamp=\"COL_FIELD\" days-only=\"true\"></waltz-from-now></div>",
+    width: "10%"
+};
+
+const  surveyRunEditLinkField  = Object.assign(
+    {},
+    mkLinkGridCell("Survey Run", "surveyRun.name", "surveyInstance.id", "main.survey.instance.response.edit"),
+    { width: "25%"});
+
+const  surveyRunViewLinkField  = Object.assign(
+    {},
+    mkLinkGridCell("Survey Run", "surveyRun.name", "surveyInstance.id", "main.survey.instance.response.edit"),
+    { width: "25%"});
+
+const surveyInstanceNameField = mkLinkGridCell("Survey Name", "surveyInstance.name", "surveyInstance.id", "main.survey.instance.response.edit");
+
+
+const approvedField = {
+    field: "surveyInstance.approvedBy",
+    name: "Approved By",
+    cellTemplate: `
+        <div class="ui-grid-cell-contents">
+           <span ng-if="row.entity.surveyInstance.approvedBy">
+                <span ng-bind="row.entity.surveyInstance.approvedBy">
+                </span>,
+            </span>
+            <waltz-from-now class='text-muted'
+                        ng-if="row.entity.surveyInstance.approvedAt"
+                        timestamp="row.entity.surveyInstance.approvedAt">
+            </waltz-from-now>
+            <span ng-if="! row.entity.surveyInstance.approvedAt">
+                -
+            </span>
+       </div>`,
+    width: "15%"
+};
+
+
+
+
+function mkIncompleteColumnDefs() {
     return [
-        {
-            field: "surveyInstance.id",
-            name: "ID",
-            width: "5%"
-        },
-        mkEntityLinkGridCell("Subject", "surveyInstance.surveyEntity"),
-        {
-            field: "surveyInstance.surveyEntityExternalId",
-            name: "Subject External Id",
-            width: "10%"
-        },
-        {
-            field: "surveyInstance.status",
-            name: "Status",
-            cellFilter: "toDisplayName:'surveyInstanceStatus'",
-            width: "10%"
-        },
-        {
-            field: "surveyRun.issuedOn",
-            name: "Issued",
-            cellTemplate: "<div class=\"ui-grid-cell-contents\"><waltz-from-now timestamp=\"COL_FIELD\" days-only=\"true\"></waltz-from-now></div>",
-            width: "10%"
-        },
-        {
-            field: "surveyInstance.dueDate",
-            name: "Due",
-            cellTemplate: "<div class=\"ui-grid-cell-contents\"><waltz-from-now timestamp=\"COL_FIELD\" days-only=\"true\"></waltz-from-now></div>",
-            width: "10%"
-        },
+        subjectField,
+        subjectExtIdField,
+        surveyRunEditLinkField,
+        surveyInstanceNameField,
+        statusField,
+        issuedOnField,
+        dueDateField
     ];
 }
 
 
-function mkIncompleteColumnDefs() {
-    const columnDefs = mkCommonColumnDefs();
-    columnDefs.splice(0, 0, Object.assign(
-        {},
-        mkLinkGridCell("Survey", "surveyRun.name", "surveyInstance.id", "main.survey.instance.response.edit"),
-        { width: "25%"}
-    ));
-    return columnDefs;
-}
-
 
 function mkCompleteColumnDefs() {
-    const columnDefs = mkCommonColumnDefs();
-    columnDefs.splice(0, 0, Object.assign(
-        {},
-        mkLinkGridCell("Survey", "surveyRun.name", "surveyInstance.id", "main.survey.instance.response.view"),
-        { width: "25%"}
-    ));
 
-    const approved = {
-        field: "surveyInstance.approvedBy",
-        name: "Approved By",
-        cellTemplate: `<div class="ui-grid-cell-contents">
-                               <span ng-if="row.entity.surveyInstance.approvedBy">
-                                    <span ng-bind="row.entity.surveyInstance.approvedBy">
-                                    </span>,
-                                </span>
-                                <waltz-from-now class='text-muted'
-                                            ng-if="row.entity.surveyInstance.approvedAt"
-                                            timestamp="row.entity.surveyInstance.approvedAt">
-                                </waltz-from-now>
-                                <span ng-if="! row.entity.surveyInstance.approvedAt">
-                                    -
-                                </span>
-                           </div>`,
-        width: "15%"
-    };
-
-    columnDefs.push(approved);
-
-    return columnDefs;
+    return [
+        subjectField,
+        subjectExtIdField,
+        surveyRunEditLinkField,
+        surveyInstanceNameField,
+        statusField,
+        issuedOnField,
+        dueDateField,
+        approvedField,
+    ];
 }
 
 

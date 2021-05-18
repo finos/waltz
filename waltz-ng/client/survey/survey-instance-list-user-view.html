@@ -52,7 +52,7 @@
         </div>
 
         <hr>
-        <h4>Completed/Expired</h4>
+        <h4>Completed/Withdrawn</h4>
         <br>
         <div ng-if="ctrl.surveys.complete.length > 0">
             <waltz-grid-with-search column-defs="ctrl.completeColumnDefs"
@@ -62,7 +62,7 @@
         </div>
         <div ng-if="ctrl.surveys.complete.length == 0">
             <span class="text-muted">
-                No completed/expired surveys found
+                No completed/withdrawn surveys found
             </span>
         </div>
     </div>
