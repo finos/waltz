@@ -67,6 +67,11 @@ function controller($q, serviceBroker) {
         vm.visibility.dataTab = idx;
     };
 
+    vm.determineViewState = (surveyInstance) => {
+        return surveyInstance.status === 'COMPLETED' || surveyInstance.status === 'APPROVED'
+            ? 'main.survey.instance.response.view'
+            : 'main.survey.instance.response.edit';
+    };
 
     vm.$onChanges = () => {
         if (vm.parentEntityRef) {

@@ -47,6 +47,35 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="20210513-5402-2"
+               author="davidwatkins73">
+        <comment>5402: adding entity_qualifier_id to survey_instance</comment>
+        <addColumn tableName="survey_instance">
+            <column name="entity_qualifier_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="survey_instance">
+            <column name="entity_qualifier_kind"
+                    type="${enum.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20210514-5402-3"
+               author="davidwatkins73">
+        <comment>5402: adding name to survey_instance</comment>
+        <addColumn tableName="survey_instance">
+            <column name="name"
+                    type="${name.type}"
+                    defaultValue="">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 <!--    <changeSet id="20210505-5405-2"-->
 <!--               author="woodjes">-->
 <!--        <update tableName="settings">-->
