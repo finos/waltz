@@ -109,7 +109,7 @@ function controller($stateParams,
 
     const loadQuestions = () =>
         serviceBroker
-            .loadViewData(CORE_API.SurveyQuestionStore.findForTemplate, [vm.id])
+            .loadViewData(CORE_API.SurveyQuestionStore.findForTemplate, [vm.id], {force: true})
             .then(r => vm.surveyQuestionInfos = r.data);
 
     vm.updateTemplate = () => {
@@ -120,7 +120,8 @@ function controller($stateParams,
                     id: vm.surveyTemplate.id,
                     name: vm.surveyTemplate.name,
                     description: vm.surveyTemplate.description,
-                    targetEntityKind: vm.surveyTemplate.targetEntityKind
+                    targetEntityKind: vm.surveyTemplate.targetEntityKind,
+                    externalId: vm.surveyTemplate.externalId
                 }])
             .then(() => notification.success("Survey template updated successfully"));
     };
@@ -179,7 +180,7 @@ function controller($stateParams,
         }
 
         serviceBroker
-            .loadViewData(CORE_API.SurveyQuestionStore.update, [qi])
+            .execute(CORE_API.SurveyQuestionStore.update, [qi])
             .then(() => {
                 notification.success("Survey question updated successfully");
                 loadQuestions();
