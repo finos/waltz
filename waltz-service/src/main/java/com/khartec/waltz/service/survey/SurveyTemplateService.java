@@ -97,6 +97,7 @@ public class SurveyTemplateService {
                 .ownerId(owner.id().get())
                 .createdAt(DateTimeUtilities.nowUtc())
                 .status(ReleaseLifecycleStatus.DRAFT)
+                .externalId(command.externalId())
                 .build());
 
         changeLogService.write(

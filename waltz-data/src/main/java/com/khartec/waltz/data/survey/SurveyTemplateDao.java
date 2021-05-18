@@ -33,6 +33,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -52,6 +53,7 @@ public class SurveyTemplateDao {
                 .ownerId(record.getOwnerId())
                 .createdAt(record.getCreatedAt().toLocalDateTime())
                 .status(ReleaseLifecycleStatus.valueOf(record.getStatus()))
+                .externalId(Optional.ofNullable(record.getExternalId()))
                 .build();
     };
 
@@ -64,6 +66,7 @@ public class SurveyTemplateDao {
         record.setTargetEntityKind(template.targetEntityKind().name());
         record.setCreatedAt(Timestamp.valueOf(template.createdAt()));
         record.setStatus(template.status().name());
+        record.setExternalId(template.externalId().orElse(null));
 
         return record;
     };
@@ -126,9 +129,11 @@ public class SurveyTemplateDao {
     public int update(SurveyTemplateChangeCommand command) {
         checkNotNull(command, "command cannot be null");
 
-        return dsl.update(SURVEY_TEMPLATE)
+        return dsl
+                .update(SURVEY_TEMPLATE)
                 .set(SURVEY_TEMPLATE.NAME, command.name())
                 .set(SURVEY_TEMPLATE.DESCRIPTION, command.description())
+                .set(SURVEY_TEMPLATE.EXTERNAL_ID, command.externalId().orElse(null))
                 .set(SURVEY_TEMPLATE.TARGET_ENTITY_KIND, command.targetEntityKind().name())
                 .where(SURVEY_TEMPLATE.ID.eq(command.id().get()))
                 .execute();
@@ -138,7 +143,8 @@ public class SurveyTemplateDao {
     public int updateStatus(long templateId, ReleaseLifecycleStatus newStatus) {
         checkNotNull(newStatus, "newStatus cannot be null");
 
-        return dsl.update(SURVEY_TEMPLATE)
+        return dsl
+                .update(SURVEY_TEMPLATE)
                 .set(SURVEY_TEMPLATE.STATUS, newStatus.name())
                 .where(SURVEY_TEMPLATE.STATUS.notEqual(newStatus.name())
                         .and(SURVEY_TEMPLATE.ID.eq(templateId)))
