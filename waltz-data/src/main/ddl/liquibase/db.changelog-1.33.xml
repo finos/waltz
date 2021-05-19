@@ -76,7 +76,26 @@
         </addColumn>
     </changeSet>
 
-<!--    <changeSet id="20210505-5405-2"-->
+
+    <changeSet id="20210519-5402-4"
+               author="davidwatkins73">
+        <comment>5402: adding entity_ref to survey_question_list_response</comment>
+        <addColumn tableName="survey_question_list_response">
+            <column name="entity_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="survey_question_list_response">
+            <column name="entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <!--    <changeSet id="20210505-5405-2"-->
 <!--               author="woodjes">-->
 <!--        <update tableName="settings">-->
 <!--            <column name="value"-->
