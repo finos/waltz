@@ -32,7 +32,6 @@ import static com.khartec.waltz.model.EndOfLifeStatus.calculateEndOfLifeStatus;
 @JsonDeserialize(as = ImmutableDatabaseInformation.class)
 public abstract class DatabaseInformation implements
         IdProvider,
-        AssetCodeProvider,
         ProvenanceProvider,
         ExternalIdProvider,
         WaltzEntity,
@@ -42,7 +41,6 @@ public abstract class DatabaseInformation implements
 
     public abstract String databaseName();
     public abstract String instanceName();
-    public abstract String environment();
     public abstract String dbmsName();
     public abstract String dbmsVersion();
     public abstract String dbmsVendor();

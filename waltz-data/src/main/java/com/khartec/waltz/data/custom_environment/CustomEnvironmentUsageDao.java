@@ -199,6 +199,8 @@ public class CustomEnvironmentUsageDao {
                         .and(SERVER_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .leftJoin(DATABASE_INFORMATION).on(CUSTOM_ENVIRONMENT_USAGE.ENTITY_ID.eq(DATABASE_INFORMATION.ID)
                         .and(CUSTOM_ENVIRONMENT_USAGE.ENTITY_KIND.eq(EntityKind.DATABASE.name())))
-                .leftJoin(DATABASE_OWNING_APP).on(DATABASE_INFORMATION.ASSET_CODE.eq(DATABASE_OWNING_APP.ASSET_CODE));
+                .leftJoin(DATA_TYPE_USAGE).on(DATA_TYPE_USAGE.ENTITY_ID.eq(DATABASE_INFORMATION.ID))
+                .leftJoin(DATABASE_OWNING_APP).on(DATA_TYPE_USAGE.ENTITY_ID.eq(DATABASE_OWNING_APP.ID)
+                        .and(DATA_TYPE_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
     }
 }
