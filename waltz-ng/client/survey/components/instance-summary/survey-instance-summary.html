@@ -51,21 +51,25 @@
         <div ng-include="'wsis-response-version'"></div>
     </div>
 
+    <div class="row waltz-survey-summary-row">
+        <div ng-include="'wsis-issued-date'"></div>
+        <div ng-include="'wsis-due-date'"></div>
+    </div>
+
     <!-- ISSUED / APPROVED -->
     <div class="row waltz-survey-summary-row">
         <div ng-include="'wsis-issued-by'"></div>
-        <div ng-include="'wsis-issued-date'"></div>
+        <div ng-include="'wsis-owner'"></div>
     </div>
 
     <!-- SUBJECT / DUE -->
     <div class="row waltz-survey-summary-row">
         <div ng-include="'wsis-subject'"></div>
-        <div ng-include="'wsis-due-date'"></div>
+        <div ng-include="'wsis-subject-ext-id'"></div>
     </div>
 
     <!-- EXTERNAL_ID / SUBMITTED -->
     <div class="row waltz-survey-summary-row">
-        <div ng-include="'wsis-subject-ext-id'"></div>
         <div ng-include="'wsis-submitted-date'"></div>
     </div>
 
@@ -196,6 +200,20 @@
     </div>
 </script>
 
+<!-- OWNER -->
+<script type="text/ng-template"
+        id="wsis-owner">
+
+    <div class="col-sm-2 waltz-display-field-label">
+        Owner
+    </div>
+    <div class="col-sm-4">
+        <waltz-entity-link entity-ref="$ctrl.surveyDetails.instanceOwner"
+                           tooltip-placement="right">
+        </waltz-entity-link>
+    </div>
+</script>
+
 
 <!-- SUBMITTED DATE -->
 <script type="text/ng-template"
@@ -269,8 +287,9 @@
     <div class="col-sm-2 waltz-display-field-label">
         Status
     </div>
-    <div class="col-sm-4"
-         ng-bind="$ctrl.surveyDetails.instance.status | toDisplayName:'surveyInstanceStatus'">
+    <div class="col-sm-4">
+        <span ng-bind="$ctrl.surveyDetails.instance.status | toDisplayName:'surveyInstanceStatus'"></span>
+        <waltz-icon name="{{$ctrl.statusIcon}}"></waltz-icon>
     </div>
 </script>
 
