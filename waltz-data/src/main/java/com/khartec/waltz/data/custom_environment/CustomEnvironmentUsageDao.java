@@ -28,7 +28,10 @@ import com.khartec.waltz.model.custom_environment.CustomEnvironmentUsage;
 import com.khartec.waltz.model.custom_environment.CustomEnvironmentUsageInfo;
 import com.khartec.waltz.model.custom_environment.ImmutableCustomEnvironmentUsage;
 import com.khartec.waltz.model.custom_environment.ImmutableCustomEnvironmentUsageInfo;
+import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.Application;
+import com.khartec.waltz.schema.tables.DatabaseInformation;
+import com.khartec.waltz.schema.tables.DatabaseInformationMa;
 import com.khartec.waltz.schema.tables.records.CustomEnvironmentUsageRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -44,6 +47,7 @@ import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.model.EntityKind.valueOf;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
+import static com.khartec.waltz.schema.Tables.DATABASE_INFORMATION;
 
 
 @Repository
@@ -197,10 +201,11 @@ public class CustomEnvironmentUsageDao {
                 .leftJoin(SERVER_INFORMATION).on(SERVER_USAGE.SERVER_ID.eq(SERVER_INFORMATION.ID))
                 .leftJoin(SERVER_OWNING_APP).on(SERVER_USAGE.ENTITY_ID.eq(SERVER_OWNING_APP.ID)
                         .and(SERVER_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
-                .leftJoin(DATABASE_INFORMATION).on(CUSTOM_ENVIRONMENT_USAGE.ENTITY_ID.eq(DATABASE_INFORMATION.ID)
-                        .and(CUSTOM_ENVIRONMENT_USAGE.ENTITY_KIND.eq(EntityKind.DATABASE.name())))
-                .leftJoin(DATA_TYPE_USAGE).on(DATA_TYPE_USAGE.ENTITY_ID.eq(DATABASE_INFORMATION.ID))
-                .leftJoin(DATABASE_OWNING_APP).on(DATA_TYPE_USAGE.ENTITY_ID.eq(DATABASE_OWNING_APP.ID)
-                        .and(DATA_TYPE_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
+
+                .leftJoin(DATABASE_USAGE).on(CUSTOM_ENVIRONMENT_USAGE.ENTITY_ID.eq(DATABASE_USAGE.ID)
+                        .and(CUSTOM_ENVIRONMENT_USAGE.ENTITY_KIND.eq(EntityKind.DATABASE_USAGE.name())))
+                .leftJoin(DATABASE_INFORMATION).on(DATABASE_USAGE.DATABASE_ID.eq(DATABASE_INFORMATION.ID))
+                .leftJoin(DATABASE_OWNING_APP).on(DATABASE_USAGE.ENTITY_ID.eq(DATABASE_OWNING_APP.ID)
+                        .and(DATABASE_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
     }
 }

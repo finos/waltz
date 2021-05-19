@@ -41,6 +41,7 @@ public enum EntityKind {
     CUSTOM_ENVIRONMENT("Custom environment"),
     CUSTOM_ENVIRONMENT_USAGE("Custom environment usage"),
     DATABASE("Database"),
+    DATABASE_USAGE("Database Usage"),
     DATA_TYPE("Datatype"),
     END_USER_APPLICATION("End user application"),
     ENTITY_HIERARCHY("Entity hierarchy"),

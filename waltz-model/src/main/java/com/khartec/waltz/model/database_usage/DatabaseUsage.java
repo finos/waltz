@@ -26,12 +26,14 @@ import org.immutables.value.Value;
 
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableServerUsage.class)
-@JsonDeserialize(as = ImmutableServerUsage.class)
+@JsonSerialize(as = ImmutableDatabaseUsage.class)
+@JsonDeserialize(as = ImmutableDatabaseUsage.class)
 public abstract class DatabaseUsage implements
         LastUpdatedProvider,
         ProvenanceProvider{
 
+    public abstract long id();
     public abstract long databaseId();
+    public abstract String environment();
     public abstract EntityReference entityReference();
 }

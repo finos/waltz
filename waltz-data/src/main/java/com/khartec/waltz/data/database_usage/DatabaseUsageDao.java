@@ -50,8 +50,10 @@ public class DatabaseUsageDao {
         EntityKind entityKind = readEnum(row.getEntityKind(), EntityKind.class, s -> null);
 
         return ImmutableDatabaseUsage.builder()
+                .id(row.getId())
                 .databaseId(row.getDatabaseId())
                 .entityReference(EntityReference.mkRef(entityKind, row.getEntityId()))
+                .environment(row.getEnvironment())
                 .lastUpdatedBy(row.getLastUpdatedBy())
                 .lastUpdatedAt(row.getLastUpdatedAt().toLocalDateTime())
                 .provenance(row.getProvenance())
