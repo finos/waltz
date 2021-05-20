@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.SurveyQuestionDropdownEntry.SURVEY_QUESTION_DROPDOWN_ENTRY;
 import static java.util.stream.Collectors.toList;
 
@@ -98,5 +99,18 @@ public class SurveyQuestionDropdownEntryDao {
             tx.batchInsert(records)
                     .execute();
         });
+    }
+
+    public List<SurveyQuestionDropdownEntry> findForSurveyInstance(long surveyInstanceId) {
+        return dsl
+                .select(SURVEY_QUESTION_DROPDOWN_ENTRY.fields())
+                .from(SURVEY_QUESTION_DROPDOWN_ENTRY)
+                .innerJoin(SURVEY_QUESTION).on(SURVEY_QUESTION.ID.eq(SURVEY_QUESTION_DROPDOWN_ENTRY.QUESTION_ID))
+                .innerJoin(SURVEY_TEMPLATE).on(SURVEY_TEMPLATE.ID.eq(SURVEY_QUESTION.SURVEY_TEMPLATE_ID))
+                .innerJoin(SURVEY_RUN).on(SURVEY_RUN.SURVEY_TEMPLATE_ID.eq(SURVEY_TEMPLATE.ID))
+                .innerJoin(SURVEY_INSTANCE).on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
+                .where(SURVEY_INSTANCE.ID.eq(surveyInstanceId))
+                .orderBy(SURVEY_QUESTION_DROPDOWN_ENTRY.POSITION.asc(), SURVEY_QUESTION_DROPDOWN_ENTRY.VALUE.asc())
+                .fetch(TO_DOMAIN_MAPPER);
     }
 }

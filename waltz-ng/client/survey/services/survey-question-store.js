@@ -36,8 +36,13 @@ function store($http, baseUrl) {
     };
 
 
-    const findForInstance = (id) => {
-        return $http.get(`${BASE}/instance/${id}`)
+    const findQuestionsForInstance = (id) => {
+        return $http.get(`${BASE}/questions/instance/${id}`)
+            .then(result => result.data);
+    };
+
+    const findDropdownEntriesForInstance = (id) => {
+        return $http.get(`${BASE}/dropdown-entries/instance/${id}`)
             .then(result => result.data);
     };
 
@@ -50,8 +55,9 @@ function store($http, baseUrl) {
         create,
         update,
         deleteQuestion,
-        findForInstance,
-        findForTemplate
+        findForTemplate,
+        findDropdownEntriesForInstance,
+        findQuestionsForInstance
     };
 }
 
@@ -81,15 +87,20 @@ export const SurveyQuestionStore_API = {
         serviceFnName: "deleteQuestion",
         description: "delete a question"
     },
-    findForInstance: {
-        serviceName,
-        serviceFnName: "findForInstance",
-        description: "findForInstance"
-    },
     findForTemplate: {
         serviceName,
         serviceFnName: "findForTemplate",
         description: "findForTemplate"
+    },
+    findQuestionsForInstance: {
+        serviceName,
+        serviceFnName: "findQuestionsForInstance",
+        description: "findQuestionsForInstance"
+    },
+    findDropdownEntriesForInstance: {
+        serviceName,
+        serviceFnName: "findDropdownEntriesForInstance",
+        description: "findDropdownEntriesForInstance"
     }
 };
 

@@ -24,22 +24,23 @@ import {loadEntity} from "../common/entity-utils";
 import {mkSiphon} from "../common/siphon-utils";
 
 
-export function groupQuestions(questionInfos = []) {
+export function groupQuestions(questions = []) {
     const sections = _
-        .chain(questionInfos)
-        .map(q => q.question.sectionName || "Other")
+        .chain(questions)
+        .map(q => q.sectionName || "Other")
         .uniq()
         .value();
 
-    const groupedQuestionInfos = _.groupBy(questionInfos, q => q.question.sectionName || "Other");
+    const groupedQuestions = _.groupBy(questions, q => q.sectionName || "Other");
 
     return _.map(sections, s => {
         return {
             "sectionName": s,
-            "questionInfos": groupedQuestionInfos[s]
+            "questions": groupedQuestions[s]
         };
     });
 }
+
 
 
 export function isSurveyTargetKind(entityKind = "") {
@@ -88,6 +89,11 @@ export function loadSurveyInfo($q,
                                userService,
                                surveyInstanceId,
                                force = false) {
+
+
+    const dropdownEntriesPromise = serviceBroker
+        .loadViewData(CORE_API.SurveyQuestionStore.findDropdownEntriesForInstance, [surveyInstanceId], {force})
+        .then(r => r.data);
 
     const recipientsPromise = serviceBroker
         .loadViewData(CORE_API.SurveyInstanceStore.findRecipients, [surveyInstanceId], {force})
@@ -144,9 +150,11 @@ export function loadSurveyInfo($q,
     const  subjectPromise = instancePromise
         .then(instance => loadEntity(serviceBroker, instance.surveyEntity));
 
+
     const promises = [
         userPromise,
         instancePromise,
+        dropdownEntriesPromise,
         runPromise,
         templatePromise,
         recipientsPromise,
@@ -161,7 +169,7 @@ export function loadSurveyInfo($q,
 
     return $q
         .all(promises)
-        .then(([u, instance, run, template, recipients,  versions, subject, owner, ownerRole, instanceOwner, possibleActions, permissions]) => {
+        .then(([u, instance, dropdownEntries, run, template, recipients,  versions, subject, owner, ownerRole, instanceOwner, possibleActions, permissions]) => {
 
             const latestInstanceId = instance.originalInstanceId || instance.id;
             const isLatest = latestInstanceId === instance.id;
@@ -169,6 +177,7 @@ export function loadSurveyInfo($q,
             const result = {
                 instance,
                 recipients,
+                dropdownEntries,
                 run,
                 template,
                 isLatest,

@@ -31,7 +31,8 @@ const initialState = {
     instanceCanBeEdited: false,
     groupedQuestions: [],
     surveyResponses: {},
-    user: {}
+    user: {},
+    dropdownEntriesByQuestionId: {}
 };
 
 const submissionConfirmationPrompt = `The survey cannot be edited once submitted.
@@ -77,14 +78,17 @@ function controller($location,
                 vm.availableStatusActions = actions.determineAvailableStatusActions(
                     details.isLatest,
                     details.possibleActions);
+                vm.dropdownEntriesByQuestionId = _.groupBy(
+                    details.dropdownEntries,
+                    d => d.questionId);
             });
 
         reloadQuestions();
     }
 
     function reloadQuestions() {
-        const questionPromise = serviceBroker
-            .loadViewData(CORE_API.SurveyQuestionStore.findForInstance, [id], { force: true })
+        return serviceBroker
+            .loadViewData(CORE_API.SurveyQuestionStore.findQuestionsForInstance, [id], { force: true })
             .then(r => {
                 vm.groupedQuestions = SurveyUtils.groupQuestions(r.data);
             });

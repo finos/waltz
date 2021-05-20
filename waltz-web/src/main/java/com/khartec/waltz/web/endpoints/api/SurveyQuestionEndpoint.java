@@ -19,6 +19,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.survey.SurveyQuestion;
+import com.khartec.waltz.model.survey.SurveyQuestionDropdownEntry;
 import com.khartec.waltz.model.survey.SurveyQuestionFieldType;
 import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.survey.SurveyQuestionDropdownEntryService;
@@ -67,17 +68,12 @@ public class SurveyQuestionEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        String findForInstancePath = mkPath(BASE_URL, "instance", ":id");
         String findForTemplatePath = mkPath(BASE_URL, "template", ":id");
         String deletePath = mkPath(BASE_URL, ":id");
 
-        ListRoute<SurveyQuestionInfo> findForInstanceRoute =
-                (req, res) -> {
-                    List<SurveyQuestion> questions = surveyQuestionService.findForSurveyInstance(getId(req));
-                    return questions.stream()
-                            .map(q -> mkQuestionInfo(q))
-                            .collect(toList());
-                };
+        ListRoute<SurveyQuestion> findQuestionsForInstance = (req, res) -> surveyQuestionService.findForSurveyInstance(getId(req));
+        ListRoute<SurveyQuestionDropdownEntry> findDropdownEntriesForInstance = (req, res) -> surveyQuestionDropdownEntryService.findForSurveyInstance(getId(req));
+
 
         ListRoute<SurveyQuestionInfo> findForTemplateRoute =
                 (req, res) -> {
@@ -111,7 +107,9 @@ public class SurveyQuestionEndpoint implements Endpoint {
                     return surveyQuestionService.delete(getId(req));
                 };
 
-        getForList(findForInstancePath, findForInstanceRoute);
+        getForList(mkPath(BASE_URL, "questions", "instance", ":id"), findQuestionsForInstance);
+        getForList(mkPath(BASE_URL, "dropdown-entries", "instance", ":id"), findDropdownEntriesForInstance);
+
         getForList(findForTemplatePath, findForTemplateRoute);
         postForDatum(BASE_URL, createRoute);
         putForDatum(BASE_URL, updateRoute);
