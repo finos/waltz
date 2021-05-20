@@ -189,14 +189,6 @@
         <waltz-entity-link entity-ref="$ctrl.surveyDetails.owner"
                            tooltip-placement="right">
         </waltz-entity-link>
-        <span ng-if="$ctrl.surveyDetails.ownerRole">
-            /
-            <span ng-bind="$ctrl.surveyDetails.ownerRole.name"
-                  uib-popover="Admin group for this survey"
-                  popover-trigger="mouseenter"
-                  popover-append-to-body="true">
-            </span>
-        </span>
     </div>
 </script>
 
@@ -211,6 +203,15 @@
         <waltz-entity-link entity-ref="$ctrl.surveyDetails.instanceOwner"
                            tooltip-placement="right">
         </waltz-entity-link>
+        <span ng-if="$ctrl.surveyDetails.ownerRole">
+            /
+            <span ng-bind="$ctrl.surveyDetails.ownerRole.name"
+                  uib-popover="Admin group for this survey"
+                  popover-trigger="mouseenter"
+                  popover-append-to-body="true">
+            </span>
+        </span>
+
     </div>
 </script>
 

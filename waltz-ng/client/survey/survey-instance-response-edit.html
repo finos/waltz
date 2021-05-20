@@ -65,7 +65,7 @@
                 <hr>
                 <div ng-repeat="qi in groupedQuestion.questionInfos track by qi.question.id"
                      class="form-group">
-                    <label ng-attr-for="{{ qi.question.id }}"
+                    <div ng-attr-for="{{ qi.question.id }}"
                            class="col-sm-4">
                         <span ng-bind="qi.question.questionText">
                         </span>
@@ -78,7 +78,7 @@
                                         style="display: block;"
                                         class='small text-muted'>
                         </waltz-markdown>
-                    </label>
+                    </div>
 
                     <!-- inputs -->
                     <div ng-switch="qi.question.fieldType"
@@ -178,7 +178,7 @@
                                 <ui-select-match placeholder="Select values...">
                                     <span ng-bind="$item.value"></span>
                                 </ui-select-match>
-                                <ui-select-choices repeat="entry.value as entry in qi.dropdownEntries | orderBy:'position' | filter: { value: $select.search }">
+                                <ui-select-choices repeat="entry.value as entry in qi.dropdownEntries | filter: { value: $select.search }">
                                     <span ng-bind-html="entry.value | highlight: $select.search"></span>
                                 </ui-select-choices>
                             </ui-select>

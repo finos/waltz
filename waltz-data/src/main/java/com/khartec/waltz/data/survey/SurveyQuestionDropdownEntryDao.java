@@ -29,10 +29,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Function;
 
-import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.SurveyQuestionDropdownEntry.SURVEY_QUESTION_DROPDOWN_ENTRY;
 import static java.util.stream.Collectors.toList;
@@ -74,9 +72,11 @@ public class SurveyQuestionDropdownEntryDao {
 
 
     public List<SurveyQuestionDropdownEntry> findForQuestion(long questionId) {
-        return dsl.select(SURVEY_QUESTION_DROPDOWN_ENTRY.fields())
+        return dsl
+                .select(SURVEY_QUESTION_DROPDOWN_ENTRY.fields())
                 .from(SURVEY_QUESTION_DROPDOWN_ENTRY)
                 .where(SURVEY_QUESTION_DROPDOWN_ENTRY.QUESTION_ID.eq(questionId))
+                .orderBy(SURVEY_QUESTION_DROPDOWN_ENTRY.POSITION.asc(), SURVEY_QUESTION_DROPDOWN_ENTRY.VALUE.asc())
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
