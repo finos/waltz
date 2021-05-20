@@ -95,13 +95,13 @@
     </changeSet>
 
 
-    <!--    <changeSet id="20210505-5405-2"-->
-<!--               author="woodjes">-->
-<!--        <update tableName="settings">-->
-<!--            <column name="value"-->
-<!--                    value="Prod v1.33"/>-->
-<!--            <where>name='ui.logo.overlay.text'</where>-->
-<!--        </update>-->
-<!--    </changeSet>-->
+    <changeSet id="20210505-5405-2"
+               author="woodjes">
+        <update tableName="settings">
+            <column name="value"
+                    value="Prod v1.33"/>
+            <where>name='ui.logo.overlay.text'</where>
+        </update>
+    </changeSet>
 
 </databaseChangeLog>
