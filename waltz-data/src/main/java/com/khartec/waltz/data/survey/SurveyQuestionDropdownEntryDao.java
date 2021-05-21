@@ -101,6 +101,7 @@ public class SurveyQuestionDropdownEntryDao {
         });
     }
 
+
     public List<SurveyQuestionDropdownEntry> findForSurveyInstance(long surveyInstanceId) {
         return dsl
                 .select(SURVEY_QUESTION_DROPDOWN_ENTRY.fields())
@@ -110,6 +111,17 @@ public class SurveyQuestionDropdownEntryDao {
                 .innerJoin(SURVEY_RUN).on(SURVEY_RUN.SURVEY_TEMPLATE_ID.eq(SURVEY_TEMPLATE.ID))
                 .innerJoin(SURVEY_INSTANCE).on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
                 .where(SURVEY_INSTANCE.ID.eq(surveyInstanceId))
+                .orderBy(SURVEY_QUESTION_DROPDOWN_ENTRY.POSITION.asc(), SURVEY_QUESTION_DROPDOWN_ENTRY.VALUE.asc())
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<SurveyQuestionDropdownEntry> findForSurveyTemplate(long surveyTemplateId) {
+        return dsl
+                .select(SURVEY_QUESTION_DROPDOWN_ENTRY.fields())
+                .from(SURVEY_QUESTION_DROPDOWN_ENTRY)
+                .innerJoin(SURVEY_QUESTION).on(SURVEY_QUESTION.ID.eq(SURVEY_QUESTION_DROPDOWN_ENTRY.QUESTION_ID))
+                .where(SURVEY_QUESTION.SURVEY_TEMPLATE_ID.eq(surveyTemplateId))
                 .orderBy(SURVEY_QUESTION_DROPDOWN_ENTRY.POSITION.asc(), SURVEY_QUESTION_DROPDOWN_ENTRY.VALUE.asc())
                 .fetch(TO_DOMAIN_MAPPER);
     }

@@ -28,18 +28,14 @@ import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
-import com.khartec.waltz.web.json.ImmutableSurveyQuestionInfo;
 import com.khartec.waltz.web.json.SurveyQuestionInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
-import java.util.List;
-
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
-import static java.util.stream.Collectors.toList;
 
 
 @Service
@@ -68,20 +64,13 @@ public class SurveyQuestionEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        String findForTemplatePath = mkPath(BASE_URL, "template", ":id");
         String deletePath = mkPath(BASE_URL, ":id");
 
         ListRoute<SurveyQuestion> findQuestionsForInstance = (req, res) -> surveyQuestionService.findForSurveyInstance(getId(req));
         ListRoute<SurveyQuestionDropdownEntry> findDropdownEntriesForInstance = (req, res) -> surveyQuestionDropdownEntryService.findForSurveyInstance(getId(req));
 
-
-        ListRoute<SurveyQuestionInfo> findForTemplateRoute =
-                (req, res) -> {
-                    List<SurveyQuestion> questions = surveyQuestionService.findForSurveyTemplate(getId(req));
-                    return questions.stream()
-                            .map(q -> mkQuestionInfo(q))
-                            .collect(toList());
-                };
+        ListRoute<SurveyQuestion> findQuestionsForTemplate = (req, res) -> surveyQuestionService.findForSurveyTemplate(getId(req));
+        ListRoute<SurveyQuestionDropdownEntry> findDropdownEntriesForTemplate = (req, res) -> surveyQuestionDropdownEntryService.findForSurveyTemplate(getId(req));
 
         DatumRoute<Long> createRoute =
                 (req, res) -> {
@@ -110,23 +99,12 @@ public class SurveyQuestionEndpoint implements Endpoint {
         getForList(mkPath(BASE_URL, "questions", "instance", ":id"), findQuestionsForInstance);
         getForList(mkPath(BASE_URL, "dropdown-entries", "instance", ":id"), findDropdownEntriesForInstance);
 
-        getForList(findForTemplatePath, findForTemplateRoute);
+        getForList(mkPath(BASE_URL, "questions", "template", ":id"), findQuestionsForTemplate);
+        getForList(mkPath(BASE_URL, "dropdown-entries", "template", ":id"), findDropdownEntriesForTemplate);
+
         postForDatum(BASE_URL, createRoute);
         putForDatum(BASE_URL, updateRoute);
         deleteForDatum(deletePath, deleteRoute);
-    }
-
-
-    private SurveyQuestionInfo mkQuestionInfo(SurveyQuestion question) {
-        ImmutableSurveyQuestionInfo.Builder builder = ImmutableSurveyQuestionInfo.builder();
-
-        if (question.fieldType() == SurveyQuestionFieldType.DROPDOWN
-                || question.fieldType() == SurveyQuestionFieldType.DROPDOWN_MULTI_SELECT) {
-            builder.dropdownEntries(surveyQuestionDropdownEntryService.findForQuestion(question.id().get()));
-        }
-        return builder
-                .question(question)
-                .build();
     }
 
 

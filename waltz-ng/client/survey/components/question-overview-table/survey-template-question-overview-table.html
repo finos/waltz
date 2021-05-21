@@ -25,37 +25,37 @@
                 <th ng-show="$ctrl.actions.length > 0">Actions</th>
             </tr>
             </thead>
-            <tr ng-repeat="qi in $ctrl.questionInfos | filter:$ctrl.qry | orderBy:'position'">
-                <td><span ng-bind="qi.question.sectionName"></span></td>
-                <td><span ng-bind="qi.question.questionText"></span></td>
-                <td><span ng-bind="qi.question.fieldType | toDisplayName:'surveyQuestionFieldType'"></span></td>
-                <td><span ng-bind="qi.question.position"></span></td>
-                <td><span ng-bind="qi.question.externalId || '-'"></span></td>
+            <tr ng-repeat="question in $ctrl.questions | filter:$ctrl.qry">
+                <td><span ng-bind="question.sectionName"></span></td>
+                <td><span ng-bind="question.questionText"></span></td>
+                <td><span ng-bind="question.fieldType | toDisplayName:'surveyQuestionFieldType'"></span></td>
+                <td><span ng-bind="question.position"></span></td>
+                <td><span ng-bind="question.externalId || '-'"></span></td>
                 <td>
-                    <span uib-popover="{{qi.question.inclusionPredicate}}"
+                    <span uib-popover="{{question.inclusionPredicate}}"
                           popover-trigger="mouseenter"
                           popover-placement="right">
                         <waltz-boolean-renderer mute-false="true"
-                                                value="qi.question.inclusionPredicate.length > 0">
+                                                value="question.inclusionPredicate.length > 0">
                         </waltz-boolean-renderer>
                     </span>
                 </td>
                 <td>
-                    <span uib-popover="{{qi.question.helpText}}"
+                    <span uib-popover="{{question.helpText}}"
                           popover-trigger="mouseenter">
                         <waltz-boolean-renderer mute-false="true"
-                                                value="qi.question.helpText.length > 0">
+                                                value="question.helpText.length > 0">
                         </waltz-boolean-renderer>
                     </span>
                 </td>
                 <td>
                     <waltz-boolean-renderer mute-false="true"
-                                            value="qi.question.isMandatory">
+                                            value="question.isMandatory">
                     </waltz-boolean-renderer>
                 </td>
                 <td>
                     <waltz-boolean-renderer mute-false="true"
-                                            value="qi.question.allowComment">
+                                            value="question.allowComment">
                     </waltz-boolean-renderer>
                 </td>
                 <td ng-show="$ctrl.actions.length > 0">
@@ -86,10 +86,10 @@
                 <th ng-show="$ctrl.actions.length > 0">Actions</th>
             </tr>
             </thead>
-            <tr ng-repeat="qi in $ctrl.questionInfos | filter:$ctrl.qry | orderBy:'position'">
-                <td><span ng-bind="qi.question.questionText"></span></td>
-                <td><span style="font-family: monospace" ng-bind="qi.question.externalId"></span></td>
-                <td><span style="font-family: monospace" ng-bind="qi.question.inclusionPredicate"></span></td>
+            <tr ng-repeat="question in $ctrl.questions | filter:$ctrl.qry">
+                <td><span ng-bind="question.questionText"></span></td>
+                <td><span style="font-family: monospace" ng-bind="question.externalId"></span></td>
+                <td><span style="font-family: monospace" ng-bind="question.inclusionPredicate"></span></td>
                 <td ng-show="$ctrl.actions.length > 0">
                     <span ng-include="'wstqot-actions'"></span>
                 </td>
@@ -109,7 +109,7 @@
 <script type="text/ng-template"
         id="wstqot-actions">
     <span ng-repeat="action in $ctrl.actions">
-        <a ng-click="action.action(qi)"
+        <a ng-click="action.action(question)"
            class="clickable btn btn-xs waltz-visibility-child-30">
             <waltz-icon name="{{action.icon}}"></waltz-icon>
             <span ng-bind="action.name"></span>

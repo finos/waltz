@@ -57,7 +57,7 @@
 
 
             <div class="form-group">
-                <label for="targetEntityKind"
+                <label for="externalId"
                        class="col-sm-2 control-label">
                     External Id
                 </label>
@@ -138,7 +138,7 @@
 
         <!-- LIST: (not editing) -->
         <div ng-if="!ctrl.editingQuestion">
-            <waltz-survey-template-question-overview-table question-infos="ctrl.surveyQuestionInfos"
+            <waltz-survey-template-question-overview-table questions="ctrl.surveyQuestions"
                                                            actions="[{
                                                                 name: 'Edit',
                                                                 icon:'pencil',

@@ -79,7 +79,7 @@ const initialState = {
         value: "PERSON"
     }],
     selectedQuestionInfo: {},
-    surveyQuestionInfos: [],
+    surveyQuestions: [],
     surveyTemplate: {},
     targetEntityKinds: [{
         name: "Application",
@@ -92,7 +92,8 @@ const initialState = {
 };
 
 
-function controller($stateParams,
+function controller($q,
+                    $stateParams,
                     notification,
                     serviceBroker) {
 
@@ -107,10 +108,18 @@ function controller($stateParams,
         .loadViewData(CORE_API.SurveyTemplateStore.getById, [vm.id])
         .then(r => vm.surveyTemplate = r.data);
 
-    const loadQuestions = () =>
-        serviceBroker
-            .loadViewData(CORE_API.SurveyQuestionStore.findForTemplate, [vm.id], {force: true})
-            .then(r => vm.surveyQuestionInfos = r.data);
+    const loadQuestions = () => {
+        const questionPromise = serviceBroker
+            .loadViewData(CORE_API.SurveyQuestionStore.findQuestionsForTemplate, [vm.id], {force: true})
+            .then(r => vm.surveyQuestions = r.data);
+
+        const dropdownPromise = serviceBroker
+            .loadViewData(CORE_API.SurveyQuestionStore.findDropdownEntriesForTemplate, [vm.id], {force: true})
+            .then(r => vm.dropdownEntriesByQuestionId = _.groupBy(r.data, d => d.questionId));
+
+        return $q
+            .all([questionPromise, dropdownPromise]);
+    }
 
     vm.updateTemplate = () => {
         serviceBroker
@@ -147,9 +156,13 @@ function controller($stateParams,
         };
     };
 
-    vm.showEditQuestionForm = (qi) => {
+    vm.showEditQuestionForm = (question) => {
         vm.editingQuestion = true;
-        vm.selectedQuestionInfo = _.cloneDeep(qi);
+        const dropdownEntries = vm.dropdownEntriesByQuestionId[question.id] || [];
+        vm.selectedQuestionInfo = {
+            question: _.cloneDeep(question),
+            dropdownEntries: _.cloneDeep(dropdownEntries)
+        };
     };
 
 
@@ -215,6 +228,7 @@ function controller($stateParams,
 
 
 controller.$inject = [
+    "$q",
     "$stateParams",
     "Notification",
     "ServiceBroker",

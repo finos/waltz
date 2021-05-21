@@ -64,7 +64,13 @@ public class SurveyQuestionDropdownEntryService {
         return true;
     }
 
+
     public List<SurveyQuestionDropdownEntry> findForSurveyInstance(long surveyInstanceId) {
         return surveyQuestionDropdownEntryDao.findForSurveyInstance(surveyInstanceId);
+    }
+
+
+    public List<SurveyQuestionDropdownEntry> findForSurveyTemplate(long surveyTemplateId) {
+        return surveyQuestionDropdownEntryDao.findForSurveyTemplate(surveyTemplateId);
     }
 }
