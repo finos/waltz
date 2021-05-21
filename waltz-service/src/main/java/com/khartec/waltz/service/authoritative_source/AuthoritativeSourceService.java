@@ -136,8 +136,10 @@ public class AuthoritativeSourceService {
 
     public int insert(AuthoritativeSourceCreateCommand command, String username) {
         int insertedCount = authoritativeSourceDao.insert(command);
-        ratingCalculator.update(command.dataTypeId(), mkRef(ORG_UNIT, command.orgUnitId()));
+        ratingCalculator
+                .update(command.dataTypeId(), mkRef(ORG_UNIT, command.orgUnitId()));
         logInsert(command, username);
+        authoritativeSourceDao.updateAuthStatementsForActors();
         return insertedCount;
     }
 
@@ -152,6 +154,7 @@ public class AuthoritativeSourceService {
         logRemoval(id, username);
         int deletedCount = authoritativeSourceDao.remove(id);
         ratingCalculator.update(authSourceToDelete.dataType(), authSourceToDelete.parentReference());
+        authoritativeSourceDao.clearAuthRatingsForActors(authSourceToDelete);
         return deletedCount;
     }
 
@@ -174,12 +177,19 @@ public class AuthoritativeSourceService {
 
     public boolean fastRecalculateAllFlowRatings() {
         logicalFlowDecoratorDao.updateRatingsByCondition(AuthoritativenessRating.NO_OPINION, DSL.trueCondition());
+
+        //finds all the vantage points to apply using parent as selector
         List<AuthoritativeRatingVantagePoint> authoritativeRatingVantagePoints = authoritativeSourceDao.findAuthoritativeRatingVantagePoints();
-        authoritativeRatingVantagePoints.forEach(a -> {
+        authoritativeRatingVantagePoints
+                .forEach(a -> {
             LOG.info("Updating decorators for: {}", a);
             int updateCount = logicalFlowDecoratorDao.updateDecoratorsForAuthSource(a);
             LOG.info("Updated {} decorators for: {}", updateCount, a);
         });
+
+        //overrides Auth Statement where downstream is actor
+        authoritativeSourceDao.updateAuthStatementsForActors();
+
         return true;
     }
 

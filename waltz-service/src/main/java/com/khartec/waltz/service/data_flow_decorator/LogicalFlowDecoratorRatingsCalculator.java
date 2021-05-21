@@ -95,7 +95,8 @@ public class LogicalFlowDecoratorRatingsCalculator {
 
         AuthoritativeSourceResolver resolver = createResolver(targetApps);
 
-        return decorators.stream()
+        return decorators
+                .stream()
                 .filter(d -> flowsById.containsKey(d.dataFlowId()))
                 .map(decorator -> {
                     try {
