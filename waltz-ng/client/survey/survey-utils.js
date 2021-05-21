@@ -195,33 +195,27 @@ export function loadSurveyInfo($q,
         });
 }
 
-const findMeasurableIdRegEx = /MEASURABLE\/(\d+)\)$/;
 
 /**
  * Takes a listResponse from a survey instance and returns the list of measurable ids,
- * the invalidItemStringSiphon and theNotFoundSiphon
+ * and theNotFoundSiphon
  *
  * @param responses
  * @param measurablesById
- * @returns {{invalidItemStringSiphon: (function(*=): boolean), measurableIds, notFoundSiphon: (function(*=): boolean)}}
+ * @returns {measurableIds, notFoundSiphon: (function(*=): boolean)}}
  */
 export function parseMeasurableListResponse(responses, measurablesById){
     const measurableIds = _.map(_.keys(measurablesById), d => Number(d));
-    const invalidItemStringSiphon = mkSiphon(d => !d.match(findMeasurableIdRegEx));
     const notFoundSiphon = mkSiphon(d => !_.includes(measurableIds, d.id));
 
     const checkedItemIds = _
         .chain(responses)
-        .reject(invalidItemStringSiphon)
-        .map(r => r.match(findMeasurableIdRegEx))
-        .map(m => ({id: Number(m[1]), input: m.input}))
         .reject(notFoundSiphon)
-        .map(r => r.id)
+        .map(d => d.id)
         .value();
 
     return {
         measurableIds: checkedItemIds,
-        invalidItemStringSiphon,
         notFoundSiphon
     }
 }

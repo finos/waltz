@@ -42,7 +42,11 @@ function toListResponse(itemIds, measurablesById) {
         .chain(itemIds)
         .map(id => _.get(measurablesById, id, null))
         .filter(m => m != null)
-        .map(m => `${m.name} (${m.externalId}:MEASURABLE/${m.id})`)
+        .map(m => ({
+            name: `${m.name} (${m.externalId}:MEASURABLE/${m.id})`,
+            id: m.id,
+            kind: "MEASURABLE"
+        }))
         .value();
 }
 

@@ -194,9 +194,9 @@
                         <div ng-switch-when="MEASURABLE_MULTI_SELECT">
                             <waltz-survey-measurable-multi-select question="question"
                                                                   instance-id="ctrl.surveyDetails.instance.id"
-                                                                  responses="ctrl.surveyResponses[question.id].listResponse"
+                                                                  responses="ctrl.surveyResponses[question.id].entityListResponse"
                                                                   required="question.isMandatory"
-                                                                  on-save-list-response="ctrl.saveListResponse">
+                                                                  on-save-list-response="ctrl.saveEntityListResponse">
                             </waltz-survey-measurable-multi-select>
                         </div>
 

@@ -123,6 +123,11 @@ function controller($location,
         vm.saveResponse(questionId, listResponse);
     }
 
+    vm.saveEntityListResponse = (questionId, entityListResponse) => {
+        vm.surveyResponses[questionId] = {entityListResponse};
+        vm.saveResponse(questionId, entityListResponse);
+    }
+
     vm.saveEntityResponse = (entity, questionId) => {
         const entityResponse = entity
             ? _.pick(entity, ["id", "kind", "name"])
