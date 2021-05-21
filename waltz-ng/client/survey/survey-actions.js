@@ -46,7 +46,7 @@ const statusActions = [
 ];
 
 
-export function determineAvailableStatusActions(isLatest, possibleActions, form) {
+export function determineAvailableStatusActions(isLatest, possibleActions) {
     return statusActions
         .filter(act => possibleActions.some(pa => isLatest && pa.display === act.name))
         .map(act => {

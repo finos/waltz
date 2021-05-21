@@ -27,11 +27,14 @@ const bindings = {
     instanceId: "<",
     question: "<",
     responses: "<?",
-    onSaveListResponse: "<?"
+    onSaveListResponse: "<?",
+    required: "<?"
 }
 
 const initialState = {
-    onSaveListResponse: (d) => console.log("onAdd", d)
+    onSaveListResponse: (d) => console.log("onAdd", d),
+    required: false,
+    responses: []
 };
 
 function toListResponse(itemIds, measurablesById) {

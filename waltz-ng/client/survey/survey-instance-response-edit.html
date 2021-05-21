@@ -95,6 +95,7 @@
                                ng-required="question.isMandatory"
                                ng-change="ctrl.saveResponse(question.id)"
                                class="form-control"/>
+
                         <!-- boolean -->
                         <div ng-switch-when="BOOLEAN">
                             <label>
@@ -126,6 +127,7 @@
                                 N/a
                             </label>
                         </div>
+
                         <!-- text -->
                         <textarea ng-switch-when="TEXT"
                                   ng-attr-id="{{ question.id }}"
@@ -135,6 +137,7 @@
                                   rows="1"
                                   class="form-control">
                         </textarea>
+
                         <!-- textarea -->
                         <textarea ng-switch-when="TEXTAREA"
                                   ng-attr-id="{{ question.id }}"
@@ -144,6 +147,7 @@
                                   rows="4"
                                   class="form-control">
                         </textarea>
+
                         <!-- date -->
                         <waltz-date-picker-form-input ng-switch-when="DATE"
                                                       ng-attr-id="{{ question.id }}"
@@ -155,6 +159,7 @@
                                                       on-change="ctrl.saveDateResponse"
                                                       ng-required="question.isMandatory">
                         </waltz-date-picker-form-input>
+
                         <!-- dropdown (single value) -->
                         <select ng-switch-when="DROPDOWN"
                                 ng-attr-id="{{ question.id }}"
@@ -164,6 +169,7 @@
                                 ng-options="entry.value as entry.value for entry in ctrl.dropdownEntriesByQuestionId[question.id]"
                                 class="form-control">
                         </select>
+
                         <!-- dropdown (multi-select) -->
                         <div ng-switch-when="DROPDOWN_MULTI_SELECT">
                             <ui-select input-id="{{ question.id }}"
@@ -184,13 +190,16 @@
                             </ui-select>
                         </div>
 
+                        <!-- measurable multi select -->
                         <div ng-switch-when="MEASURABLE_MULTI_SELECT">
                             <waltz-survey-measurable-multi-select question="question"
                                                                   instance-id="ctrl.surveyDetails.instance.id"
                                                                   responses="ctrl.surveyResponses[question.id].listResponse"
+                                                                  required="question.isMandatory"
                                                                   on-save-list-response="ctrl.saveListResponse">
                             </waltz-survey-measurable-multi-select>
                         </div>
+
                         <!-- application -->
                         <waltz-entity-selector ng-switch-when="APPLICATION"
                                                item-id="question.id"
@@ -200,6 +209,7 @@
                                                entity-lifecycle-statuses="['ACTIVE', 'PENDING']"
                                                entity-kinds="['APPLICATION']">
                         </waltz-entity-selector>
+
                         <!-- person -->
                         <waltz-entity-selector ng-switch-when="PERSON"
                                                item-id="question.id"
@@ -209,6 +219,7 @@
                                                entity-lifecycle-statuses='["ACTIVE"]'
                                                entity-kinds="['PERSON']">
                         </waltz-entity-selector>
+
                         <!-- comment -->
                         <waltz-editable-field ng-if="question.allowComment"
                                               field-type="textarea"

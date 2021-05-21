@@ -24,6 +24,12 @@
                                      checked-item-ids="$ctrl.checkedItemIds"
                                      expanded-item-ids="$ctrl.checkedItemIds">
     </waltz-multi-select-tree-control>
+
+    <!-- hidden input to make any wrapping form fail validation if required is set -->
+    <input style="display: none"
+           ng-model="$ctrl.checkedItemIds"
+           ng-required="$ctrl.required">
+
     <div class="help-block"
          ng-if="$ctrl.notFoundResults.length > 0">
         The following items were associated but a match can no longer be found:
