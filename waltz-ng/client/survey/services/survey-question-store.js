@@ -56,16 +56,10 @@ function store($http, baseUrl) {
             .then(result => result.data);
     };
 
-    const findForTemplate = (id) => {
-        return $http.get(`${BASE}/template/${id}`)
-            .then(result => result.data);
-    };
-
     return {
         create,
         update,
         deleteQuestion,
-        findForTemplate,  // TODO : remove
         findDropdownEntriesForInstance,
         findQuestionsForInstance,
         findDropdownEntriesForTemplate,
@@ -98,11 +92,6 @@ export const SurveyQuestionStore_API = {
         serviceName,
         serviceFnName: "deleteQuestion",
         description: "delete a question"
-    },
-    findForTemplate: {
-        serviceName,
-        serviceFnName: "findForTemplate",
-        description: "findForTemplate"
     },
     findQuestionsForInstance: {
         serviceName,

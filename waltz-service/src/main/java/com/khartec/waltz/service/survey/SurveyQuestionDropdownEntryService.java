@@ -44,11 +44,6 @@ public class SurveyQuestionDropdownEntryService {
     }
 
 
-    public List<SurveyQuestionDropdownEntry> findForQuestion(long questionId) {
-        return surveyQuestionDropdownEntryDao.findForQuestion(questionId);
-    }
-
-
     public boolean saveEntries(long questionId, List<SurveyQuestionDropdownEntry> entries) {
         checkNotNull(entries, "entries cannot be null");
 
