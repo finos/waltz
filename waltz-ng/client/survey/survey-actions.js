@@ -66,9 +66,9 @@ export function invokeStatusAction(serviceBroker, notification, reloader, $timeo
         const name = action.actionName
 
         // SHOW MESSAGE
-        const msg = "Are you sure you want " + display + " this survey?"
+        const msg = `Are you sure you want to ${_.toLower(display)} this survey?`;
         const reason = action.isCommentMandatory
-            ? prompt(msg + " Please enter a reason below (mandatory):")
+            ? prompt(msg + " Please enter a reason below (mandatory):", verb)
             : confirm(msg);
 
         // SEND API SERVER CALL
