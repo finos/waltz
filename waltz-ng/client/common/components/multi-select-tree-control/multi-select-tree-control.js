@@ -129,7 +129,7 @@ function controller() {
     vm.$onChanges = changes => {
         if(changes.items) {
             vm.hierarchy = buildHierarchies(vm.items, false);
-            vm.searchNodes = prepareSearchNodes(vm.items);
+            vm.searchNodes = prepareSearchNodes(vm.items, d => d.dataType.name);
             vm.expandedNodes = expandSelectedNodes(vm.items, vm.expandedItemIds);
         }
 
