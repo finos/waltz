@@ -32,7 +32,7 @@ function bouncer($state, $stateParams, settingsService, serviceBroker) {
     const attemptToRouteViaLastVisited = () => serviceBroker
         .loadViewData(CORE_API.UserPreferenceStore.findAllForUser, [], {force: true})
         .then(prefs => {
-            const lastCategory = _.find(prefs, p => p.key === lastViewedMeasurableCategoryKey);
+            const lastCategory = _.find(prefs.data, p => p.key === lastViewedMeasurableCategoryKey);
             if (_.get(lastCategory, ["value"], 0) > 0) {
                 go(lastCategory.value);
             } else {

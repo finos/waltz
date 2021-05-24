@@ -32,7 +32,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
@@ -53,7 +55,7 @@ public class CostDao {
             newArrayList(EntityKind.APPLICATION))
             .as("entity_name");
 
-    private RecordMapper<Record, EntityCost> TO_COST_MAPPER = r -> {
+    private static final RecordMapper<Record, EntityCost> TO_COST_MAPPER = r -> {
         CostRecord record = r.into(COST);
         EntityReference ref = mkRef(EntityKind.valueOf(record.getEntityKind()), record.getEntityId(), r.getValue(ENTITY_NAME_FIELD));
         return ImmutableEntityCost.builder()
@@ -115,17 +117,23 @@ public class CostDao {
 
         SelectConditionStep<Record1<Integer>> latestYear = mkLatestYearSelector(costKindId, genericSelector);
 
-        return dsl
+        Condition cond = COST.ENTITY_ID.in(genericSelector.selector())
+                .and(COST.ENTITY_KIND.eq(genericSelector.kind().name()))
+                .and(COST.COST_KIND_ID.eq(costKindId))
+                .and(COST.YEAR.eq(latestYear));
+
+        SelectSeekStep1<Record, BigDecimal> qry = dsl
                 .select(ENTITY_NAME_FIELD)
                 .select(COST.fields())
                 .from(COST)
-                .where(COST.ENTITY_ID.in(genericSelector.selector())
-                        .and(COST.ENTITY_KIND.eq(genericSelector.kind().name())))
-                .and(COST.COST_KIND_ID.eq(costKindId))
-                .and(COST.YEAR.eq(latestYear))
-                .orderBy(COST.AMOUNT.desc())
+                .where(cond)
+                .orderBy(COST.AMOUNT.desc());
+
+        return qry
+                .fetchStream()
+                .map(TO_COST_MAPPER::map)
                 .limit(limit)
-                .fetchSet(TO_COST_MAPPER);
+                .collect(Collectors.toSet());
     }
 
 
@@ -139,13 +147,22 @@ public class CostDao {
                                                        Integer year,
                                                        GenericSelector selector) {
         Field<BigDecimal> total = DSL.sum(COST.AMOUNT).as("total");
-        return dsl
-                .select(total)
-                .from(COST)
-                .where(dsl.renderInlined(COST.COST_KIND_ID.eq(costKindId)
+
+        List<Long> appIds = dsl
+                .fetch(selector.selector())
+                .map(Record1::value1);
+
+        Condition condition = COST.COST_KIND_ID.eq(costKindId)
                 .and(COST.YEAR.eq(year))
                 .and(COST.ENTITY_KIND.eq(selector.kind().name()))
-                .and(COST.ENTITY_ID.in(selector.selector()))))
+                .and(COST.ENTITY_ID.in(appIds));
+
+        SelectConditionStep<Record1<BigDecimal>> qry = dsl
+                .select(total)
+                .from(COST)
+                .where(dsl.renderInlined(condition));
+
+        return qry
                 .fetchOne(total);
     }
 
@@ -171,14 +188,16 @@ public class CostDao {
         // nulls - in this case the failed left join to an actual cost
         Field<Integer> appsWithCostsCount = DSL.count(appsWithCosts.field(0)).as("apps_with_costs_count");
 
-        return dsl
+        SelectOnConditionStep<Record2<Integer, Integer>> qry = dsl
                 .with(appIds)
                 .with(appsWithCosts)
                 .select(appCount,
                         appsWithCostsCount)
                 .from(appIds)
                 .leftJoin(dsl.renderInlined(appsWithCosts))
-                .on(dsl.renderInlined(appIds.field(0, Long.class).eq(appsWithCosts.field(0, Long.class))))
+                .on(dsl.renderInlined(appIds.field(0, Long.class).eq(appsWithCosts.field(0, Long.class))));
+
+        return qry
                 .fetchOne(r -> tuple(
                         r.get(appsWithCostsCount),
                         r.get(appCount) - r.get(appsWithCostsCount)));

@@ -1,0 +1,16 @@
+<div>
+    <waltz-measurable-tree measurables="$ctrl.requiredMeasurables"
+                           expanded-nodes="$ctrl.requiredMeasurables"
+                           hide-search="true"
+                           on-select="$ctrl.onSelect">
+    </waltz-measurable-tree>
+    <div class="help-block"
+         ng-if="$ctrl.notFoundResults.length > 0">
+        The following items were associated but a match can no longer be found:
+        <ul>
+            <li ng-repeat="item in $ctrl.notFoundResults">
+                <span ng-bind="item"></span>
+            </li>
+        </ul>
+    </div>
+</div>

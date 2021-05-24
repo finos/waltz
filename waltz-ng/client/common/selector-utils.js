@@ -29,6 +29,7 @@ export function determineDownwardsScopeForKind(kind) {
         case "LICENCE":
         case "LOGICAL_DATA_ELEMENT":
         case "LOGICAL_FLOW":
+        case "MEASURABLE_CATEGORY":
         case "PHYSICAL_FLOW":
         case "PHYSICAL_SPECIFICATION":
         case "SCENARIO":

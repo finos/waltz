@@ -3,7 +3,7 @@ import {initialiseData} from "../../../common";
 
 
 const bindings = {
-    questionInfos: "<",
+    questions: "<",
     actions: "<?"
 }
 
@@ -20,12 +20,12 @@ const initialState = {
 };
 
 
-function controller($transclude) {
+function controller() {
     const vm = initialiseData(this, initialState);
 }
 
 
-controller.$inject = ["$transclude"];
+controller.$inject = [];
 
 
 export default {

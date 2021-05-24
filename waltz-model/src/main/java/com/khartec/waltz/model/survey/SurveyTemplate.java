@@ -28,7 +28,7 @@ import java.time.LocalDateTime;
 @Value.Immutable
 @JsonSerialize(as = ImmutableSurveyTemplate.class)
 @JsonDeserialize(as = ImmutableSurveyTemplate.class)
-public abstract class SurveyTemplate implements IdProvider, NameProvider, DescriptionProvider {
+public abstract class SurveyTemplate implements IdProvider, NameProvider, DescriptionProvider, ExternalIdProvider {
 
     public abstract EntityKind targetEntityKind();
     public abstract Long ownerId();

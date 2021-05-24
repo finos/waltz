@@ -153,8 +153,8 @@ export function getSelectedTagsFromPreferences(allTags = [],
                                                serviceBroker) {
     return serviceBroker
         .loadAppData(CORE_API.UserPreferenceStore.findAllForUser)
-        .then(preferences => {
-            const preference = _.find(preferences, p => p.key === preferenceKey);
+        .then(r => {
+            const preference = _.find(r.data, p => p.key === preferenceKey);
             const excludedTagIdsStr = _.get(preference, ["value"], "");
 
             if (!_.isEmpty(excludedTagIdsStr)) {

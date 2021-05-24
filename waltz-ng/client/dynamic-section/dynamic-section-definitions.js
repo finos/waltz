@@ -48,6 +48,7 @@ const authSourcesSection = {
 
 const bookmarksSection = {
     svelteComponent: BookmarkPanel,
+    componentId: "bookmarks-section",
     name: "Bookmarks",
     icon: "rocket",
     id: 5,

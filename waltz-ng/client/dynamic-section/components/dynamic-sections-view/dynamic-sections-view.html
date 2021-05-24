@@ -18,8 +18,11 @@
 
 <div class="waltz-dynamic-sections-view">
 
-    <div ng-repeat="section in $ctrl.sections track by section.id"
-         class='waltz-animate-repeat'>
+    <!-- we jump to this anchor when opening a new section -->
+    <a id="page-top" class="waltz-page-top-anchor"></a>
+
+    <div class="waltz-animate-repeat"
+         ng-repeat="section in $ctrl.sections track by section.id">
         <waltz-dynamic-section-wrapper section="section"
                                        on-remove="$ctrl.onRemove"
                                        parent-entity-ref="$ctrl.parentEntityRef"

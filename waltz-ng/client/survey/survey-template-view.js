@@ -30,7 +30,7 @@ const initialState = {
     issuedAndCompletedRuns: [],
     issuedAndCompletedRunsEnriched: [],
     draftRuns: [],
-    questionInfos: [],
+    questions: [],
     runCompletionRates: {}
 };
 
@@ -106,7 +106,7 @@ function mkColumnDefs() {
                        ng-if="row.entity.isRunOwnedByLoggedInUser"
                        uib-popover="Delete this Survey Run"
                        popover-placement="left"
-                       popover-trigger="mouseenter" 
+                       popover-trigger="mouseenter"
                        class="btn btn-xs btn-danger waltz-visibility-child-30">
                         <waltz-icon name="trash-o"></waltz-icon>
                     </a>
@@ -178,8 +178,8 @@ function controller($q,
 
     // questions
     serviceBroker
-        .loadViewData(CORE_API.SurveyQuestionStore.findForTemplate, [templateId])
-        .then(r => vm.questionInfos = r.data);
+        .loadViewData(CORE_API.SurveyQuestionStore.findQuestionsForTemplate, [templateId])
+        .then(r => vm.questions = r.data);
 
     const updateTemplateStatus = (newStatus, successMessage) => {
         serviceBroker
