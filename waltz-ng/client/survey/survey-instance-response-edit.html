@@ -17,9 +17,9 @@
   -->
 
 <div>
-    <waltz-page-header icon="wpforms"
-                       name="{{ ctrl.surveyDetails.run.name }}"
-                       small="edit response">
+    <waltz-page-header icon="pencil-square-o"
+                       name="Edit: {{ ctrl.surveyDetails.run.name }}"
+                       small="{{ctrl.surveyDetails.instance.name}}">
         <breadcrumbs>
             <ol class="waltz-breadcrumbs">
                 <li>
@@ -63,149 +63,168 @@
                     class="text-muted">
                 </h4>
                 <hr>
-                <div ng-repeat="qi in groupedQuestion.questionInfos track by qi.question.id"
+                <div ng-repeat="question in groupedQuestion.questions track by question.id"
                      class="form-group">
-                    <label ng-attr-for="{{ qi.question.id }}"
+                    <div ng-attr-for="{{ question.id }}"
                            class="col-sm-4">
-                        <span ng-bind="qi.question.questionText">
+                        <span ng-bind="question.questionText">
                         </span>
-                        <span ng-if="qi.question.isMandatory"
+                        <span ng-if="question.isMandatory"
                               class="text-danger">
                             *
                         </span>
                         <!-- help text -->
-                        <waltz-markdown text="qi.question.helpText"
+                        <waltz-markdown text="question.helpText"
                                         style="display: block;"
                                         class='small text-muted'>
                         </waltz-markdown>
-                    </label>
+                    </div>
 
                     <!-- inputs -->
-                    <div ng-switch="qi.question.fieldType"
+                    <div ng-switch="question.fieldType"
                          class="col-sm-6"
-                         ng-class="{'col-md-3': qi.question.fieldType === 'DATE'}">
+                         ng-class="{'col-md-3': question.fieldType === 'DATE'}">
 
                         <!-- number -->
                         <input ng-switch-when="NUMBER"
                                type="number"
-                               ng-attr-id="{{ qi.question.id }}"
+                               ng-attr-id="{{ question.id }}"
                                placeholder="Please enter a number"
                                ng-model-options="{ allowInvalid: true, debounce: 200 }"
-                               ng-model="ctrl.surveyResponses[qi.question.id].numberResponse"
-                               ng-required="qi.question.isMandatory"
-                               ng-change="ctrl.saveResponse(qi.question.id)"
+                               ng-model="ctrl.surveyResponses[question.id].numberResponse"
+                               ng-required="question.isMandatory"
+                               ng-change="ctrl.saveResponse(question.id)"
                                class="form-control"/>
+
                         <!-- boolean -->
                         <div ng-switch-when="BOOLEAN">
                             <label>
-                                <input ng-attr-name="{{ qi.question.id }}"
+                                <input ng-attr-name="{{ question.id }}"
                                        type="radio"
-                                       ng-model="ctrl.surveyResponses[qi.question.id].booleanResponse"
-                                       ng-required="qi.question.isMandatory"
-                                       ng-change="ctrl.saveResponse(qi.question.id)"
+                                       ng-model="ctrl.surveyResponses[question.id].booleanResponse"
+                                       ng-required="question.isMandatory"
+                                       ng-change="ctrl.saveResponse(question.id)"
                                        value="true"/>
                                 Yes
                             </label>
                             &nbsp;
                             <label>
-                                <input ng-attr-name="{{ qi.question.id }}"
+                                <input ng-attr-name="{{ question.id }}"
                                        type="radio"
-                                       ng-model="ctrl.surveyResponses[qi.question.id].booleanResponse"
-                                       ng-required="qi.question.isMandatory"
-                                       ng-change="ctrl.saveResponse(qi.question.id)"
+                                       ng-model="ctrl.surveyResponses[question.id].booleanResponse"
+                                       ng-required="question.isMandatory"
+                                       ng-change="ctrl.saveResponse(question.id)"
                                        value="false"/>
                                 No
                             </label>
                             &nbsp;
-                            <label ng-if="! qi.question.isMandatory">
-                                <input ng-attr-name="{{ qi.question.id }}"
+                            <label ng-if="! question.isMandatory">
+                                <input ng-attr-name="{{ question.id }}"
                                        type="radio"
-                                       ng-model="ctrl.surveyResponses[qi.question.id].booleanResponse"
-                                       ng-change="ctrl.saveResponse(qi.question.id)"
+                                       ng-model="ctrl.surveyResponses[question.id].booleanResponse"
+                                       ng-change="ctrl.saveResponse(question.id)"
                                        value="null"/>
                                 N/a
                             </label>
                         </div>
+
                         <!-- text -->
                         <textarea ng-switch-when="TEXT"
-                                  ng-attr-id="{{ qi.question.id }}"
-                                  ng-model="ctrl.surveyResponses[qi.question.id].stringResponse"
-                                  ng-required="qi.question.isMandatory"
-                                  ng-blur="ctrl.saveResponse(qi.question.id)"
+                                  ng-attr-id="{{ question.id }}"
+                                  ng-model="ctrl.surveyResponses[question.id].stringResponse"
+                                  ng-required="question.isMandatory"
+                                  ng-blur="ctrl.saveResponse(question.id)"
                                   rows="1"
                                   class="form-control">
                         </textarea>
+
                         <!-- textarea -->
                         <textarea ng-switch-when="TEXTAREA"
-                                  ng-attr-id="{{ qi.question.id }}"
-                                  ng-model="ctrl.surveyResponses[qi.question.id].stringResponse"
-                                  ng-required="qi.question.isMandatory"
-                                  ng-blur="ctrl.saveResponse(qi.question.id)"
+                                  ng-attr-id="{{ question.id }}"
+                                  ng-model="ctrl.surveyResponses[question.id].stringResponse"
+                                  ng-required="question.isMandatory"
+                                  ng-blur="ctrl.saveResponse(question.id)"
                                   rows="4"
                                   class="form-control">
                         </textarea>
+
                         <!-- date -->
                         <waltz-date-picker-form-input ng-switch-when="DATE"
-                                                      ng-attr-id="{{ qi.question.id }}"
-                                                      item-id="qi.question.id"
+                                                      ng-attr-id="{{ question.id }}"
+                                                      item-id="question.id"
                                                       allow-past-dates="true"
                                                       place-holder="dd-MMM-yyyy"
                                                       format="dd-MMM-yyyy"
-                                                      model="ctrl.surveyResponses[qi.question.id].dateResponse"
+                                                      model="ctrl.surveyResponses[question.id].dateResponse"
                                                       on-change="ctrl.saveDateResponse"
-                                                      ng-required="qi.question.isMandatory">
+                                                      ng-required="question.isMandatory">
                         </waltz-date-picker-form-input>
+
                         <!-- dropdown (single value) -->
                         <select ng-switch-when="DROPDOWN"
-                                ng-attr-id="{{ qi.question.id }}"
-                                ng-model="ctrl.surveyResponses[qi.question.id].stringResponse"
-                                ng-required="qi.question.isMandatory"
-                                ng-change="ctrl.saveResponse(qi.question.id)"
-                                ng-options="entry.value as entry.value for entry in qi.dropdownEntries | orderBy:'position'"
+                                ng-attr-id="{{ question.id }}"
+                                ng-model="ctrl.surveyResponses[question.id].stringResponse"
+                                ng-required="question.isMandatory"
+                                ng-change="ctrl.saveResponse(question.id)"
+                                ng-options="entry.value as entry.value for entry in ctrl.dropdownEntriesByQuestionId[question.id]"
                                 class="form-control">
                         </select>
+
                         <!-- dropdown (multi-select) -->
                         <div ng-switch-when="DROPDOWN_MULTI_SELECT">
-                            <ui-select input-id="{{ qi.question.id }}"
+                            <ui-select input-id="{{ question.id }}"
                                        multiple="true"
                                        theme="bootstrap"
                                        close-on-select="false"
-                                       ng-model="ctrl.surveyResponses[qi.question.id].listResponse"
-                                       ng-required="qi.question.isMandatory"
-                                       on-select="ctrl.saveResponse(qi.question.id)"
-                                       on-remove="ctrl.saveResponse(qi.question.id)"
+                                       ng-model="ctrl.surveyResponses[question.id].listResponse"
+                                       ng-required="question.isMandatory"
+                                       on-select="ctrl.saveResponse(question.id)"
+                                       on-remove="ctrl.saveResponse(question.id)"
                                        class="form-control waltz-survey-form-control">
                                 <ui-select-match placeholder="Select values...">
                                     <span ng-bind="$item.value"></span>
                                 </ui-select-match>
-                                <ui-select-choices repeat="entry.value as entry in qi.dropdownEntries | orderBy:'position' | filter: { value: $select.search }">
+                                <ui-select-choices repeat="entry.value as entry in ctrl.dropdownEntriesByQuestionId[question.id] | filter: { value: $select.search }">
                                     <span ng-bind-html="entry.value | highlight: $select.search"></span>
                                 </ui-select-choices>
                             </ui-select>
                         </div>
+
+                        <!-- measurable multi select -->
+                        <div ng-switch-when="MEASURABLE_MULTI_SELECT">
+                            <waltz-survey-measurable-multi-select question="question"
+                                                                  instance-id="ctrl.surveyDetails.instance.id"
+                                                                  responses="ctrl.surveyResponses[question.id].entityListResponse"
+                                                                  required="question.isMandatory"
+                                                                  on-save-list-response="ctrl.saveEntityListResponse">
+                            </waltz-survey-measurable-multi-select>
+                        </div>
+
                         <!-- application -->
                         <waltz-entity-selector ng-switch-when="APPLICATION"
-                                               item-id="qi.question.id"
-                                               required="qi.question.isMandatory"
-                                               current-selection="ctrl.surveyResponses[qi.question.id].entityResponse"
+                                               item-id="question.id"
+                                               required="question.isMandatory"
+                                               current-selection="ctrl.surveyResponses[question.id].entityResponse"
                                                on-select="ctrl.saveEntityResponse"
                                                entity-lifecycle-statuses="['ACTIVE', 'PENDING']"
                                                entity-kinds="['APPLICATION']">
                         </waltz-entity-selector>
+
                         <!-- person -->
                         <waltz-entity-selector ng-switch-when="PERSON"
-                                               item-id="qi.question.id"
-                                               required="qi.question.isMandatory"
-                                               current-selection="ctrl.surveyResponses[qi.question.id].entityResponse"
+                                               item-id="question.id"
+                                               required="question.isMandatory"
+                                               current-selection="ctrl.surveyResponses[question.id].entityResponse"
                                                on-select="ctrl.saveEntityResponse"
                                                entity-lifecycle-statuses='["ACTIVE"]'
                                                entity-kinds="['PERSON']">
                         </waltz-entity-selector>
+
                         <!-- comment -->
-                        <waltz-editable-field ng-if="qi.question.allowComment"
+                        <waltz-editable-field ng-if="question.allowComment"
                                               field-type="textarea"
-                                              initial-val="ctrl.surveyResponses[qi.question.id].comment"
-                                              ctx="qi.question"
+                                              initial-val="ctrl.surveyResponses[question.id].comment"
+                                              ctx="question"
                                               on-save="ctrl.saveComment"
                                               button-label="Comment"
                                               class="small text-muted">

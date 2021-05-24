@@ -19,27 +19,28 @@
 import _ from "lodash";
 import moment from "moment";
 import {formats} from "../common";
-import roles from "../user/system-roles";
 import {CORE_API} from "../common/services/core-api-utils";
 import {loadEntity} from "../common/entity-utils";
+import {mkSiphon} from "../common/siphon-utils";
 
 
-export function groupQuestions(questionInfos = []) {
+export function groupQuestions(questions = []) {
     const sections = _
-        .chain(questionInfos)
-        .map(q => q.question.sectionName || "Other")
+        .chain(questions)
+        .map(q => q.sectionName || "Other")
         .uniq()
         .value();
 
-    const groupedQuestionInfos = _.groupBy(questionInfos, q => q.question.sectionName || "Other");
+    const groupedQuestions = _.groupBy(questions, q => q.sectionName || "Other");
 
     return _.map(sections, s => {
         return {
             "sectionName": s,
-            "questionInfos": groupedQuestionInfos[s]
+            "questions": groupedQuestions[s]
         };
     });
 }
+
 
 
 export function isSurveyTargetKind(entityKind = "") {
@@ -89,6 +90,11 @@ export function loadSurveyInfo($q,
                                surveyInstanceId,
                                force = false) {
 
+
+    const dropdownEntriesPromise = serviceBroker
+        .loadViewData(CORE_API.SurveyQuestionStore.findDropdownEntriesForInstance, [surveyInstanceId], {force})
+        .then(r => r.data);
+
     const recipientsPromise = serviceBroker
         .loadViewData(CORE_API.SurveyInstanceStore.findRecipients, [surveyInstanceId], {force})
         .then(r => r.data);
@@ -121,7 +127,14 @@ export function loadSurveyInfo($q,
         .then(run => serviceBroker
             .loadViewData(CORE_API.PersonStore.getById, [run.ownerId]))
         .then(r => r.data);
-    
+
+    const instanceOwnerPromise = instancePromise
+        .then(instance => instance.ownerId
+            ? serviceBroker
+                .loadViewData(CORE_API.PersonStore.getById, [instance.ownerId])
+                .then(r => r.data)
+            : Promise.resolve(null));
+
     const owningRolePromise = instancePromise
         .then(instance => serviceBroker
             .loadAppData(CORE_API.RoleStore.findAllRoles)
@@ -137,9 +150,11 @@ export function loadSurveyInfo($q,
     const  subjectPromise = instancePromise
         .then(instance => loadEntity(serviceBroker, instance.surveyEntity));
 
+
     const promises = [
         userPromise,
         instancePromise,
+        dropdownEntriesPromise,
         runPromise,
         templatePromise,
         recipientsPromise,
@@ -147,20 +162,22 @@ export function loadSurveyInfo($q,
         subjectPromise,
         ownerPromise,
         owningRolePromise,
+        instanceOwnerPromise,
         possibleActionsPromise,
         permissionsPromise
     ];
 
     return $q
         .all(promises)
-        .then(([u, instance, run, template, recipients,  versions, subject, owner, ownerRole, possibleActions, permissions]) => {
-            
+        .then(([u, instance, dropdownEntries, run, template, recipients,  versions, subject, owner, ownerRole, instanceOwner, possibleActions, permissions]) => {
+
             const latestInstanceId = instance.originalInstanceId || instance.id;
             const isLatest = latestInstanceId === instance.id;
 
             const result = {
                 instance,
                 recipients,
+                dropdownEntries,
                 run,
                 template,
                 isLatest,
@@ -169,10 +186,36 @@ export function loadSurveyInfo($q,
                 subject,
                 owner,
                 ownerRole,
+                instanceOwner,
                 possibleActions,
                 permissions
             };
 
             return result;
         });
+}
+
+
+/**
+ * Takes a listResponse from a survey instance and returns the list of measurable ids,
+ * and theNotFoundSiphon
+ *
+ * @param responses
+ * @param measurablesById
+ * @returns {measurableIds, notFoundSiphon: (function(*=): boolean)}}
+ */
+export function parseMeasurableListResponse(responses, measurablesById){
+    const measurableIds = _.map(_.keys(measurablesById), d => Number(d));
+    const notFoundSiphon = mkSiphon(d => !_.includes(measurableIds, d.id));
+
+    const checkedItemIds = _
+        .chain(responses)
+        .reject(notFoundSiphon)
+        .map(d => d.id)
+        .value();
+
+    return {
+        measurableIds: checkedItemIds,
+        notFoundSiphon
+    }
 }

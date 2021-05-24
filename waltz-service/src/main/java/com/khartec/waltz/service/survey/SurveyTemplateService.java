@@ -97,6 +97,7 @@ public class SurveyTemplateService {
                 .ownerId(owner.id().get())
                 .createdAt(DateTimeUtilities.nowUtc())
                 .status(ReleaseLifecycleStatus.DRAFT)
+                .externalId(command.externalId())
                 .build());
 
         changeLogService.write(
@@ -180,6 +181,7 @@ public class SurveyTemplateService {
                     if(sq.fieldType() == SurveyQuestionFieldType.DROPDOWN
                             || sq.fieldType() == SurveyQuestionFieldType.DROPDOWN_MULTI_SELECT) {
                         //clone the entries too
+                        // TODO: use the more efficient findQuestionsForTemplate method
                         List<SurveyQuestionDropdownEntry> existingEntries = surveyQuestionDropdownEntryDao.findForQuestion(sq.id().get());
                         List<SurveyQuestionDropdownEntry> clonedEntries = map(
                                 existingEntries,

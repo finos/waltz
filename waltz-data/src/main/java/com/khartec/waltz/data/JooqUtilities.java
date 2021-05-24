@@ -54,6 +54,16 @@ public class JooqUtilities {
     public static final Field<Integer> TALLY_COUNT_FIELD = DSL.field("count", Integer.class);
 
 
+    public static Optional<EntityReference> maybeReadRef(Record record,
+                                                         Field<String> kindField,
+                                                         Field<Long> idField) {
+        return Optional
+                .ofNullable(record.getValue(kindField))
+                .map(kindStr -> mkRef(
+                    EntityKind.valueOf(kindStr),
+                    record.getValue(idField)));
+    }
+
     public static EntityReference readRef(Record record, Field<String> kindField, Field<Long> idField) {
         return mkRef(
                 EntityKind.valueOf(record.getValue(kindField)),

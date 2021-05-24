@@ -36,13 +36,23 @@ function store($http, baseUrl) {
     };
 
 
-    const findForInstance = (id) => {
-        return $http.get(`${BASE}/instance/${id}`)
+    const findQuestionsForInstance = (id) => {
+        return $http.get(`${BASE}/questions/instance/${id}`)
             .then(result => result.data);
     };
 
-    const findForTemplate = (id) => {
-        return $http.get(`${BASE}/template/${id}`)
+    const findDropdownEntriesForInstance = (id) => {
+        return $http.get(`${BASE}/dropdown-entries/instance/${id}`)
+            .then(result => result.data);
+    };
+
+    const findQuestionsForTemplate = (id) => {
+        return $http.get(`${BASE}/questions/template/${id}`)
+            .then(result => result.data);
+    };
+
+    const findDropdownEntriesForTemplate = (id) => {
+        return $http.get(`${BASE}/dropdown-entries/template/${id}`)
             .then(result => result.data);
     };
 
@@ -50,8 +60,10 @@ function store($http, baseUrl) {
         create,
         update,
         deleteQuestion,
-        findForInstance,
-        findForTemplate
+        findDropdownEntriesForInstance,
+        findQuestionsForInstance,
+        findDropdownEntriesForTemplate,
+        findQuestionsForTemplate
     };
 }
 
@@ -81,15 +93,25 @@ export const SurveyQuestionStore_API = {
         serviceFnName: "deleteQuestion",
         description: "delete a question"
     },
-    findForInstance: {
+    findQuestionsForInstance: {
         serviceName,
-        serviceFnName: "findForInstance",
-        description: "findForInstance"
+        serviceFnName: "findQuestionsForInstance",
+        description: "findQuestionsForInstance"
     },
-    findForTemplate: {
+    findDropdownEntriesForInstance: {
         serviceName,
-        serviceFnName: "findForTemplate",
-        description: "findForTemplate"
+        serviceFnName: "findDropdownEntriesForInstance",
+        description: "findDropdownEntriesForInstance"
+    },
+    findQuestionsForTemplate: {
+        serviceName,
+        serviceFnName: "findQuestionsForTemplate",
+        description: "findQuestionsForTemplate"
+    },
+    findDropdownEntriesForTemplate: {
+        serviceName,
+        serviceFnName: "findDropdownEntriesForTemplate",
+        description: "findDropdownEntriesForTemplate"
     }
 };
 

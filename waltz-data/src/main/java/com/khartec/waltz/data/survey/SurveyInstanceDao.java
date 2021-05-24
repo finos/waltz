@@ -21,7 +21,6 @@ package com.khartec.waltz.data.survey;
 import com.khartec.waltz.common.CollectionUtilities;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.survey.*;
 import com.khartec.waltz.schema.tables.records.SurveyInstanceRecipientRecord;
 import com.khartec.waltz.schema.tables.records.SurveyInstanceRecord;
@@ -33,16 +32,15 @@ import org.springframework.stereotype.Repository;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.data.JooqUtilities.maybeReadRef;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
 import static java.util.Optional.ofNullable;
 
@@ -69,7 +67,7 @@ public class SurveyInstanceDao {
         return ImmutableSurveyInstance.builder()
                 .id(record.getId())
                 .surveyRunId(record.getSurveyRunId())
-                .surveyEntity(EntityReference.mkRef(
+                .surveyEntity(mkRef(
                         EntityKind.valueOf(record.getEntityKind()),
                         record.getEntityId(),
                         r.getValue(ENTITY_NAME_FIELD)))
@@ -83,6 +81,12 @@ public class SurveyInstanceDao {
                 .originalInstanceId(record.getOriginalInstanceId())
                 .ownerId(record.getOwnerId())
                 .owningRole(record.getOwningRole())
+                .name(record.getName())
+                .qualifierEntity(maybeReadRef(
+                            record,
+                            SURVEY_INSTANCE.ENTITY_QUALIFIER_KIND,
+                            SURVEY_INSTANCE.ENTITY_QUALIFIER_ID)
+                        .orElse(null))
                 .build();
     };
 
@@ -166,6 +170,13 @@ public class SurveyInstanceDao {
         record.setApprovedBy(currentInstance.approvedBy());
         record.setOwnerId(currentInstance.ownerId());
         record.setOwningRole(currentInstance.owningRole());
+        record.setName(currentInstance.name());
+        Optional
+            .ofNullable(currentInstance.qualifierEntity())
+            .ifPresent(ref -> {
+                record.setEntityQualifierKind(ref.kind().name());
+                record.setEntityQualifierId(ref.id());
+            });
 
         record.store();
         return record.getId();

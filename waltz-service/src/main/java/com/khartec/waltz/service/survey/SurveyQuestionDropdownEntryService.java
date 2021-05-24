@@ -44,11 +44,6 @@ public class SurveyQuestionDropdownEntryService {
     }
 
 
-    public List<SurveyQuestionDropdownEntry> findForQuestion(long questionId) {
-        return surveyQuestionDropdownEntryDao.findForQuestion(questionId);
-    }
-
-
     public boolean saveEntries(long questionId, List<SurveyQuestionDropdownEntry> entries) {
         checkNotNull(entries, "entries cannot be null");
 
@@ -62,5 +57,15 @@ public class SurveyQuestionDropdownEntryService {
         surveyQuestionDropdownEntryDao.saveEntries(questionId, sanitisedEntries);
 
         return true;
+    }
+
+
+    public List<SurveyQuestionDropdownEntry> findForSurveyInstance(long surveyInstanceId) {
+        return surveyQuestionDropdownEntryDao.findForSurveyInstance(surveyInstanceId);
+    }
+
+
+    public List<SurveyQuestionDropdownEntry> findForSurveyTemplate(long surveyTemplateId) {
+        return surveyQuestionDropdownEntryDao.findForSurveyTemplate(surveyTemplateId);
     }
 }
