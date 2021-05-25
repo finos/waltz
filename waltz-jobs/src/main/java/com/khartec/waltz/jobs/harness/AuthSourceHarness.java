@@ -65,7 +65,7 @@ public class AuthSourceHarness {
 //        List<EntityHierarchyItem> desendents = ehDao.findDesendents(EntityReference.mkRef(EntityKind.DATA_TYPE, 41300));
 //        updateDecoratorsForAuthSource(dsl);
 
-        FunctionUtilities.time("Actor rating", () -> dao.updateAuthStatementsForActors());
+        FunctionUtilities.time("Actor rating", () -> dao.updatePointToPointAuthStatements());
 //        FunctionUtilities.time("Fast Flow Ratings", svc::fastRecalculateAllFlowRatings);
 
 //        FunctionUtilities.time("Flow ratings", () -> svc.recalculateAllFlowRatings());

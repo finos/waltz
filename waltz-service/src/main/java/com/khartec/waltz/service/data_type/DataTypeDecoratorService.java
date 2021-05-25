@@ -223,16 +223,11 @@ public class DataTypeDecoratorService {
                     dtId -> mkDecorator(userName, entityReference, dtId,
                             Optional.of(AuthoritativenessRating.NO_OPINION)));
             LogicalFlow flow = logicalFlowDao.getByFlowId(entityReference.id());
+            boolean requiresRating = flow.source().kind() == APPLICATION && flow.target().kind() == APPLICATION;
 
-            boolean isAppToAppFlow = flow.source().kind() == APPLICATION && flow.target().kind() == APPLICATION;
-
-            if(isAppToAppFlow){
-                return ratingsCalculator.calculate(decorators)
-            } else if (isAppToActorFlow) {
-
-            } else {
-                return decorators;
-            }
+            return requiresRating
+                    ? ratingsCalculator.calculate(decorators)
+                    : decorators;
         }
 
         return map(dataTypeIds,

@@ -78,7 +78,7 @@ public class LogicalFlowDecoratorRatingsCalculator {
     }
 
 
-    public Collection<DataTypeDecorator> calculate(Collection<DataTypeDecorator> decorators) {
+    public Collection<DataTypeDecorator>  calculate(Collection<DataTypeDecorator> decorators) {
 
         List<LogicalFlow> appToAppFlows = filter(
                 IS_APP_TO_APP_FLOW,

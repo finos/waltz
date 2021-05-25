@@ -21,11 +21,10 @@ package com.khartec.waltz.service.authoritative_source;
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_type.DataTypeDao;
-import com.khartec.waltz.data.entity_hierarchy.EntityHierarchyDao;
 import com.khartec.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
+import com.khartec.waltz.data.entity_hierarchy.EntityHierarchyDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
@@ -109,7 +108,7 @@ public class AuthSourceRatingCalculator {
                 dataType.id().get(),
                 vantageRef);
 
-        IdSelectionOptions selectorOptions = mkOpts(vantageRef, HierarchyQueryScope.CHILDREN);
+        IdSelectionOptions selectorOptions = mkOpts(vantageRef);
         Select<Record1<Long>> selector = appIdSelectorFactory.apply(selectorOptions);
         Set<Long> dataTypeDescendents = entityHierarchyDao
                 .findDesendents(dataType.entityReference())
