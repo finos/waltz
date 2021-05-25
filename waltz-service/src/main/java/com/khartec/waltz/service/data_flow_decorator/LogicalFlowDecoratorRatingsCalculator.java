@@ -123,7 +123,6 @@ public class LogicalFlowDecoratorRatingsCalculator {
     }
 
 
-
     private List<Application> loadTargetApplications(List<LogicalFlow> flows) {
         Set<Long> targetApplicationIds = map(
                 flows,
