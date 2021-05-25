@@ -1,0 +1,18 @@
+.wsis-status-NOT_STARTED{
+    color: $waltz-dark-amber;
+}
+.wsis-status-IN_PROGRESS{
+    color: $waltz-dark-amber;
+}
+.wsis-status-COMPLETED{
+    color: $waltz-dark-purple;
+}
+.wsis-status-REJECTED{
+    color: $waltz-dark-red;
+}
+.wsis-status-WITHDRAWN{
+    color: $waltz-dark-grey;
+}
+.wsis-status-APPROVED{
+    color: $waltz-dark-green;
+}

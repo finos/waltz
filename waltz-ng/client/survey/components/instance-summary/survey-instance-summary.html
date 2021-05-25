@@ -289,7 +289,7 @@
     <div class="col-sm-2 waltz-display-field-label">
         Status
     </div>
-    <div class="col-sm-4">
+    <div class="col-sm-4" ng-class="'wsis-status-' + $ctrl.surveyDetails.instance.status">
         <span ng-bind="$ctrl.surveyDetails.instance.status | toDisplayName:'surveyInstanceStatus'"></span>
         <waltz-icon name="{{$ctrl.statusIcon}}"></waltz-icon>
     </div>

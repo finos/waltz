@@ -232,8 +232,7 @@ function controller($q, serviceBroker) {
         }
     };
 
-    vm.dump = d => console.log("dump", d)
-
+    vm.nameProviderFn = d => d.dataType.name;
 }
 
 

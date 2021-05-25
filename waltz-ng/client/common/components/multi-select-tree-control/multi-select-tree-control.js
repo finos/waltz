@@ -32,6 +32,7 @@ const bindings = {
     checkedItemIds: "<",
     expandedItemIds: "<",
     disablePredicate: "<?",
+    nameProviderFn: "<?",
     isReadonlyPredicate: "<?" //overwrites if selected to mark as read only
 };
 
@@ -46,7 +47,8 @@ const initialState = {
     onUncheck: (id, node) => console.log("default handler in multi-select-treecontrol for node id uncheck: ", id),
     onClick: (id, node) => console.log("default handler in multi-select-treecontrol for node click: ", node),
     disablePredicate: node => false,
-    isReadonlyPredicate: node => false
+    isReadonlyPredicate: node => false,
+    nameProvideFn: node => node.name
 };
 
 function haltEvent() {
@@ -129,7 +131,7 @@ function controller() {
     vm.$onChanges = changes => {
         if(changes.items) {
             vm.hierarchy = buildHierarchies(vm.items, false);
-            vm.searchNodes = prepareSearchNodes(vm.items, d => d.dataType.name);
+            vm.searchNodes = prepareSearchNodes(vm.items, vm.nameProviderFn);
             vm.expandedNodes = expandSelectedNodes(vm.items, vm.expandedItemIds);
         }
 

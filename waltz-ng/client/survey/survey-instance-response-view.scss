@@ -1,0 +1,18 @@
+.wsirv-answer {
+    border: 1px solid #eee;
+    background-color: #fefefe;
+    padding: 0.5em 0 0.5em 0.7em;
+    min-height: 2.4em;
+    border-radius: 2px;
+
+
+    .wsirv-dropdown-multi ul {
+        margin-bottom: 0;
+        padding-left: 1em;
+    }
+
+    .wsirv-measurable-multi {
+        padding-left: 0;
+        left: -10px;
+    }
+}
