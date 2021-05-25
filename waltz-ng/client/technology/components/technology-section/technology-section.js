@@ -130,7 +130,7 @@ function prepareServerGridOptions($animate, uiGridConstants) {
 function prepareDatabaseGridOptions($animate, uiGridConstants) {
 
     const columnDefs = [
-        mkLinkGridCell("Name", "instanceName", "id", "main.database.view"),
+        mkLinkGridCell("Name", "instanceName", "databaseId", "main.database.view"),
         { field: "databaseName", displayName: "Database" },
         { field: "environment" },
         { field: "dbmsVendor", displayName: "Vendor" },
