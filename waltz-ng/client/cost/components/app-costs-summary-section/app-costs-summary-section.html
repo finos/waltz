@@ -79,7 +79,8 @@
          ng-if="$ctrl.costKindSummary">
         <div class="col-sm-8">
             <waltz-entity-costs-graph costs="$ctrl.costKindSummary.topCosts"
-                                      on-select="$ctrl.onSelect" style="max-width: 95%">
+                                      on-select="$ctrl.onSelect"
+                                      style="max-width: 95%">
             </waltz-entity-costs-graph>
         </div>
         <div class="col-sm-4">
@@ -117,11 +118,11 @@
                             <hr>
                             <h4>
                                 <waltz-entity-link tooltip-placement="left"
-                                                   entity-ref="$ctrl.selectedEntity.entityReference">
+                                                   entity-ref="$ctrl.selectedEntity">
                                 </waltz-entity-link>
                             </h4>
                             <h4>
-                                <waltz-currency-amount amount="$ctrl.selectedEntity.amount">
+                                <waltz-currency-amount amount="$ctrl.selectedCost.amount">
                                 </waltz-currency-amount>
                             </h4>
                         </div>

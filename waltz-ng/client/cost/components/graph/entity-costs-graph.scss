@@ -32,6 +32,10 @@
         stroke: none;
     }
 
+    .tick:hover {
+        cursor: pointer;
+    }
+
     .wacg-bar text {
         fill: #555;
         font-size: smaller;

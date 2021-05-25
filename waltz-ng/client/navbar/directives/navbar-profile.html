@@ -50,17 +50,23 @@
             <li ng-if="ctrl.user.userName !== 'anonymous'"
                 style="margin: 4px"
                 class="no-overflow">
-                <a ui-sref="main.profile.view ({userId: ctrl.user.userName})"
-                   ng-bind="ctrl.user.userName">
-                </a>
+                <span>
+                    <a ui-sref="main.profile.view ({userId: ctrl.user.userName})">
+                        <waltz-icon name="user" fixed-width="true"></waltz-icon>
+                        <span ng-bind="ctrl.user.userName"></span>
+                    </a>
+                </span>
             </li>
 
             <!-- anonymous -->
             <li ng-if="ctrl.user.userName === 'anonymous'"
                 style="margin: 4px">
-                <a>
-                    Anonymous
-                </a>
+                <span>
+                    <a>
+                        <waltz-icon name="user" fixed-width="true"></waltz-icon>
+                        Anonymous
+                    </a>
+                </span>
             </li>
 
             <!-- login/logout -->
@@ -70,7 +76,7 @@
                 <span ng-if="ctrl.user.userName === 'anonymous'">
                     <a class="clickable"
                        ng-click="ctrl.login()">
-                        <waltz-icon name="sign-in"></waltz-icon>
+                        <waltz-icon name="sign-in" fixed-width="true"></waltz-icon>
                         <span>Login</span>
                     </a>
                 </span>
