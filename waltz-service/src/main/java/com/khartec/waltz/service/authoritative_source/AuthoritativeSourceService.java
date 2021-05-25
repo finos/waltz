@@ -136,8 +136,7 @@ public class AuthoritativeSourceService {
 
     public int insert(AuthoritativeSourceCreateCommand command, String username) {
         int insertedCount = authoritativeSourceDao.insert(command);
-        ratingCalculator
-                .update(command.dataTypeId(), mkRef(ORG_UNIT, command.orgUnitId()));
+        ratingCalculator.update(command.dataTypeId(), mkRef(ORG_UNIT, command.orgUnitId()));
         logInsert(command, username);
         authoritativeSourceDao.updateAuthStatementsForActors();
         return insertedCount;
@@ -179,7 +178,9 @@ public class AuthoritativeSourceService {
         logicalFlowDecoratorDao.updateRatingsByCondition(AuthoritativenessRating.NO_OPINION, DSL.trueCondition());
 
         //finds all the vantage points to apply using parent as selector
-        List<AuthoritativeRatingVantagePoint> authoritativeRatingVantagePoints = authoritativeSourceDao.findAuthoritativeRatingVantagePoints();
+        List<AuthoritativeRatingVantagePoint> authoritativeRatingVantagePoints = authoritativeSourceDao
+                .findAuthoritativeRatingVantagePoints();
+
         authoritativeRatingVantagePoints
                 .forEach(a -> {
             LOG.info("Updating decorators for: {}", a);
