@@ -32,6 +32,7 @@ const bindings = {
 const initialState = {
     targetEntityKind: 'APPLICATION',
     selectedKind: null,
+    selectedCost: null,
     costInfo: [],
     visibility: {
         selectKind: false,
@@ -216,15 +217,19 @@ function controller($q, serviceBroker, uiGridConstants, settingsService) {
     };
 
     vm.onSelect = (d) => {
-        if (vm.selectedEntity && vm.selectedEntity.entityReference.id === d.entityReference.id){
+        if (vm.selectedEntity && vm.selectedEntity.id === d.id){
             vm.onClearSelectedEntity();
         } else {
             vm.selectedEntity = d;
+            vm.selectedCost = _.find(
+                vm.costKindSummary.topCosts,
+                c => c.entityReference.id === d.id);
         }
     };
 
     vm.onClearSelectedEntity = () => {
         vm.selectedEntity = null;
+        vm.selectedCost = null;
     };
 }
 
