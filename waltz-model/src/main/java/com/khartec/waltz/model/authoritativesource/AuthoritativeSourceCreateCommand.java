@@ -22,6 +22,7 @@ package com.khartec.waltz.model.authoritativesource;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.DescriptionProvider;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.command.Command;
 import com.khartec.waltz.model.rating.AuthoritativenessRating;
 import org.immutables.value.Value;
@@ -33,5 +34,5 @@ public abstract class AuthoritativeSourceCreateCommand implements Command, Descr
     public abstract AuthoritativenessRating rating();
     public abstract long dataTypeId();
     public abstract long applicationId();
-    public abstract long orgUnitId();
+    public abstract EntityReference parentReference();
 }

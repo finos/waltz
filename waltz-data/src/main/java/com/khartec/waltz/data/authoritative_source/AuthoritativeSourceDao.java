@@ -19,6 +19,7 @@
 package com.khartec.waltz.data.authoritative_source;
 
 import com.khartec.waltz.common.ListUtilities;
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
@@ -37,9 +38,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
@@ -51,6 +54,7 @@ import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
+import static java.util.stream.Collectors.collectingAndThen;
 
 
 @Repository
@@ -58,6 +62,11 @@ public class AuthoritativeSourceDao {
 
     public final static Application CONSUMER_APP = APPLICATION.as("consumer");
     public final static Application SUPPLIER_APP = APPLICATION.as("supplier");
+    public static final com.khartec.waltz.schema.tables.DataType parent_dt = DATA_TYPE.as("parent_dt");
+    public static final com.khartec.waltz.schema.tables.DataType child_dt = DATA_TYPE.as("child_dt");
+    public static final com.khartec.waltz.schema.tables.EntityHierarchy eh = ENTITY_HIERARCHY.as("eh");
+    public static final com.khartec.waltz.schema.tables.EntityHierarchy level = ENTITY_HIERARCHY.as("level");
+
     private final static AggregateFunction<Integer> COUNT_FIELD = DSL.count(LOGICAL_FLOW);
 
     private final static EntityHierarchy ehOrgUnit = ENTITY_HIERARCHY.as("ehOrgUnit");
@@ -72,6 +81,11 @@ public class AuthoritativeSourceDao {
     private final static Field<Integer> declaredDataTypeLevel = ehDataType.LEVEL.as("declaredDataTypeLevel");
     private final static Field<String> targetDataTypeCode = impliedDataType.CODE.as("targetDataTypeCode");
 
+    private static final Field<String> PARENT_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+            AUTHORITATIVE_SOURCE.PARENT_ID,
+            AUTHORITATIVE_SOURCE.PARENT_KIND,
+            newArrayList(EntityKind.ORG_UNIT, EntityKind.APPLICATION, EntityKind.ACTOR));
+
 
     private final DSLContext dsl;
 
@@ -81,6 +95,7 @@ public class AuthoritativeSourceDao {
         EntityReference parentRef = ImmutableEntityReference.builder()
                 .id(record.getParentId())
                 .kind(EntityKind.valueOf(record.getParentKind()))
+                .name(r.get(PARENT_NAME_FIELD))
                 .build();
 
         EntityReference orgUnitRef = ImmutableEntityReference.builder()
@@ -180,9 +195,10 @@ public class AuthoritativeSourceDao {
                 .from(DATA_TYPE)
                 .where(DATA_TYPE.ID.eq(command.dataTypeId()));
 
-        return dsl.insertInto(AUTHORITATIVE_SOURCE)
-                .set(AUTHORITATIVE_SOURCE.PARENT_KIND, EntityKind.ORG_UNIT.name())
-                .set(AUTHORITATIVE_SOURCE.PARENT_ID, command.orgUnitId())
+        return dsl
+                .insertInto(AUTHORITATIVE_SOURCE)
+                .set(AUTHORITATIVE_SOURCE.PARENT_KIND, command.parentReference().kind().name())
+                .set(AUTHORITATIVE_SOURCE.PARENT_ID, command.parentReference().id())
                 .set(AUTHORITATIVE_SOURCE.DATA_TYPE, dataTypeSelection)
                 .set(AUTHORITATIVE_SOURCE.APPLICATION_ID, command.applicationId())
                 .set(AUTHORITATIVE_SOURCE.RATING, command.rating().name())
@@ -233,15 +249,15 @@ public class AuthoritativeSourceDao {
 
 
     public List<AuthoritativeRatingVantagePoint> findAuthoritativeRatingVantagePoints() {
-        SelectSeekStep4<Record8<Long, Integer, String, Long, Integer, String, Long, String>, Integer, Integer, Long, Long> select = dsl.select(
-                targetOrgUnitId,
-                declaredOrgUnitLevel,
-                declaredDataTypeCode,
-                declaredDataTypeId,
-                declaredDataTypeLevel,
-                declaredDataTypeCode.as(targetDataTypeCode),
-                AUTHORITATIVE_SOURCE.APPLICATION_ID,
-                AUTHORITATIVE_SOURCE.RATING)
+        SelectSeekStep4<Record8<Long, Integer, String, Long, Integer, String, Long, String>, Integer, Integer, Long, Long> select = dsl
+                .select(targetOrgUnitId,
+                        declaredOrgUnitLevel,
+                        declaredDataTypeCode,
+                        declaredDataTypeId,
+                        declaredDataTypeLevel,
+                        declaredDataTypeCode.as(targetDataTypeCode),
+                        AUTHORITATIVE_SOURCE.APPLICATION_ID,
+                        AUTHORITATIVE_SOURCE.RATING)
                 .from(AUTHORITATIVE_SOURCE)
                 .innerJoin(ehOrgUnit)
                 .on(ehOrgUnit.ANCESTOR_ID.eq(AUTHORITATIVE_SOURCE.PARENT_ID)
@@ -435,6 +451,7 @@ public class AuthoritativeSourceDao {
 
     private SelectOnConditionStep<Record> baseSelect() {
         return dsl
+                .select(PARENT_NAME_FIELD)
                 .select(ORGANISATIONAL_UNIT.ID, ORGANISATIONAL_UNIT.NAME)
                 .select(AUTHORITATIVE_SOURCE.fields())
                 .select(SUPPLIER_APP.NAME, SUPPLIER_APP.ID)
@@ -445,4 +462,68 @@ public class AuthoritativeSourceDao {
                 .on(ORGANISATIONAL_UNIT.ID.eq(SUPPLIER_APP.ORGANISATIONAL_UNIT_ID));
     }
 
+
+    public int updatePointToPointAuthStatements() {
+
+        Condition logicalFlowTargetIsAuthSourceParent = AUTHORITATIVE_SOURCE.APPLICATION_ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID)
+                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(AUTHORITATIVE_SOURCE.PARENT_KIND)
+                                .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(AUTHORITATIVE_SOURCE.PARENT_ID))));
+
+        int[] updatedActorDecoratorRatings = dsl
+                .select(LOGICAL_FLOW_DECORATOR.ID,
+                        child_dt.ID,
+                        AUTHORITATIVE_SOURCE.RATING)
+                .from(AUTHORITATIVE_SOURCE)
+                .innerJoin(parent_dt).on(AUTHORITATIVE_SOURCE.DATA_TYPE.eq(parent_dt.CODE))
+                .innerJoin(ENTITY_HIERARCHY).on(parent_dt.ID.eq(ENTITY_HIERARCHY.ANCESTOR_ID)
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.DATA_TYPE.name())))
+                .innerJoin(child_dt).on(ENTITY_HIERARCHY.ID.eq(child_dt.ID))
+                .innerJoin(LOGICAL_FLOW).on(logicalFlowTargetIsAuthSourceParent)
+                .innerJoin(LOGICAL_FLOW_DECORATOR).on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID)
+                        .and(child_dt.ID.eq(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID)
+                                .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))))
+                .innerJoin(level).on(level.ID.eq(parent_dt.ID)
+                        .and(level.ID.eq(level.ANCESTOR_ID)
+                        .and(level.KIND.eq(EntityKind.DATA_TYPE.name()))))
+                .where(AUTHORITATIVE_SOURCE.RATING.ne(LOGICAL_FLOW_DECORATOR.RATING))
+                .orderBy(level.LEVEL)
+                .fetch()
+                .stream()
+                .map(r -> dsl
+                        .update(LOGICAL_FLOW_DECORATOR)
+                        .set(LOGICAL_FLOW_DECORATOR.RATING, r.get(AUTHORITATIVE_SOURCE.RATING))
+                        .where(LOGICAL_FLOW_DECORATOR.ID.eq(r.get(LOGICAL_FLOW_DECORATOR.ID))
+                                .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(r.get(child_dt.ID))
+                                        .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))))
+                .collect(collectingAndThen(Collectors.toSet(), r -> dsl.batch(r).execute()));
+
+        return IntStream.of(updatedActorDecoratorRatings).sum();
+    }
+
+
+    public int clearAuthRatingsForPointToPointFlows(AuthoritativeSource authSource) {
+
+        // this may wipe any lower level explicit datatype mappings but these will be restored by the nightly job
+        SelectConditionStep<Record1<Long>> decoratorsToMarkAsNoOpinion = dsl
+                .select(LOGICAL_FLOW_DECORATOR.ID)
+                .from(LOGICAL_FLOW)
+                .innerJoin(LOGICAL_FLOW_DECORATOR).on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID))
+                .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
+                .innerJoin(ENTITY_HIERARCHY).on(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(ENTITY_HIERARCHY.ID))
+                .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.DATA_TYPE.name()))
+                .innerJoin(DATA_TYPE).on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(DATA_TYPE.ID))
+                .where(dsl.renderInlined(DATA_TYPE.CODE.eq(authSource.dataType())
+                        .and(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(authSource.applicationReference().id())
+                                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(authSource.parentReference().kind().name())
+                                                .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(authSource.parentReference().id()))))
+                                .and(LOGICAL_FLOW_DECORATOR.RATING.eq(authSource.rating().name())))));
+
+        return dsl
+                .update(LOGICAL_FLOW_DECORATOR)
+                .set(LOGICAL_FLOW_DECORATOR.RATING, AuthoritativenessRating.NO_OPINION.name())
+                .where(LOGICAL_FLOW_DECORATOR.ID.in(decoratorsToMarkAsNoOpinion))
+                .execute();
+    }
 }

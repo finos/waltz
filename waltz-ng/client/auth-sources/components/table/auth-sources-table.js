@@ -98,7 +98,7 @@ function mkColumnDefs(parentRef) {
 
     return _.compact([
         mkEntityLabelGridCell("Data Type", "dataType", "none", "right"),
-        mkEntityLabelGridCell("Declaring Org Unit", "declaringOrgUnit", "none"),
+        mkEntityLabelGridCell("Scope", "parentReference", "left"),
         mkEntityLabelGridCell("Application", "app", "none", "right"),
         consumerCell,
         ratingCell,
@@ -134,7 +134,6 @@ function controller($q, serviceBroker, enumValueService) {
 
     function mkGridData() {
         const dataTypesByCode= _.keyBy(vm.dataTypes, "code");
-        const orgUnitsById = _.keyBy(vm.orgUnits, "id");
 
         vm.columnDefs = mkColumnDefs(vm.parentEntityRef);
         vm.gridData = _.map(vm.authSources, d => {
@@ -144,7 +143,7 @@ function controller($q, serviceBroker, enumValueService) {
                 app: d.applicationReference,
                 dataType: dataTypesByCode[d.dataType],
                 appOrgUnit: d.appOrgUnitReference,
-                declaringOrgUnit: orgUnitsById[d.parentReference.id],
+                parentReference: d.parentReference,
                 description: d.description,
                 rating: d.rating,
                 ratingValue: authoritativenessRatingEnum,

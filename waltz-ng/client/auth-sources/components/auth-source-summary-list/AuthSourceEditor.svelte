@@ -45,7 +45,7 @@
             rating: workingCopy.rating,
             applicationId: workingCopy.app.id,
             dataTypeId: workingCopy.dataType.id,
-            orgUnitId: workingCopy.orgUnit.id
+            parentReference: workingCopy.orgUnit
         };
 
         savePromise = doSave(cmd);
@@ -130,10 +130,10 @@
             <div id="scope">
                 <EntitySearchSelector on:select={onSelectScope}
                                       placeholder="Search for scope"
-                                      entityKinds={['ORG_UNIT']}>
+                                      entityKinds={['ORG_UNIT', 'ACTOR', 'APPLICATION']}>
                 </EntitySearchSelector>
             </div>
-            <p class="text-muted">Start typing to select the selector for applications this authority statement will apply to</p>
+            <p class="text-muted">Start typing to select the selector for which this authority statement will apply to</p>
         </div>
     {:else }
 
@@ -146,7 +146,7 @@
 
         <div>
             <strong>Scope:</strong>
-            <EntityLabel ref={workingCopy.declaringOrgUnit}/>
+            <EntityLabel ref={workingCopy.parentReference}/>
         </div>
         <p class="text-muted">The selector for applications this authority statement applies to</p>
     {/if}
