@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.data.person.search;
 
+import com.khartec.waltz.data.SearchDao;
 import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
@@ -31,14 +32,14 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.SetUtilities.orderedUnion;
+import static com.khartec.waltz.data.JooqUtilities.mkBasicTermSearch;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 
 @Repository
-public class PersonSearchDao {
+public class PersonSearchDao implements SearchDao<Person> {
 
     private final DSLContext dsl;
 
@@ -49,23 +50,21 @@ public class PersonSearchDao {
     }
 
 
+    @Override
     public List<Person> search(EntitySearchOptions options) {
         List<String> terms = mkTerms(options.searchQuery());
         if (terms.isEmpty()) {
             return Collections.emptyList();
         }
 
-        Condition displayNameCondition = terms.stream()
-                .map(PERSON.DISPLAY_NAME::containsIgnoreCase)
-                .collect(Collectors.reducing(
-                        DSL.trueCondition(),
-                        (acc, frag) -> acc.and(frag)));
+        Condition displayNameCondition = mkBasicTermSearch(PERSON.DISPLAY_NAME, terms);
 
         List<Person> peopleViaEmail = executeWithCondition(options, PERSON.EMAIL.startsWithIgnoreCase(options.searchQuery()));
         List<Person> peopleViaName = executeWithCondition(options, displayNameCondition);
 
         return new ArrayList<>(orderedUnion(peopleViaEmail, peopleViaName));
     }
+
 
     private List<Person> executeWithCondition(EntitySearchOptions options, Condition condition) {
         boolean showRemoved = options

@@ -19,6 +19,7 @@
 package com.khartec.waltz.data.server_information.search;
 
 import com.khartec.waltz.data.FullTextSearch;
+import com.khartec.waltz.data.SearchDao;
 import com.khartec.waltz.data.UnsupportedSearcher;
 import com.khartec.waltz.data.server_information.ServerInformationDao;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
@@ -26,14 +27,12 @@ import com.khartec.waltz.model.server_information.ServerInformation;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.SetUtilities.orderedUnion;
@@ -44,7 +43,7 @@ import static com.khartec.waltz.schema.Tables.SERVER_INFORMATION;
 
 
 @Repository
-public class ServerInformationSearchDao {
+public class ServerInformationSearchDao implements SearchDao<ServerInformation> {
 
     private final DSLContext dsl;
     private final FullTextSearch<ServerInformation> searcher;
@@ -57,6 +56,7 @@ public class ServerInformationSearchDao {
     }
 
 
+    @Override
     public List<ServerInformation> search(EntitySearchOptions options) {
         checkNotNull(options, "options cannot be null");
         List<String> terms = mkTerms(options.searchQuery());
@@ -65,26 +65,20 @@ public class ServerInformationSearchDao {
             return Collections.emptyList();
         }
 
-        Condition externalIdCondition = terms.stream()
-                .map(SERVER_INFORMATION.EXTERNAL_ID::startsWithIgnoreCase)
-                .collect(Collectors.reducing(
-                        DSL.trueCondition(),
-                        (acc, frag) -> acc.and(frag)));
+        Condition externalIdCondition = mkBasicTermSearch(SERVER_INFORMATION.EXTERNAL_ID, terms);
 
-        List<ServerInformation> serversViaExternalId = dsl.selectDistinct(SERVER_INFORMATION.fields())
+        List<ServerInformation> serversViaExternalId = dsl
+                .select(SERVER_INFORMATION.fields())
                 .from(SERVER_INFORMATION)
                 .where(externalIdCondition)
                 .orderBy(SERVER_INFORMATION.HOSTNAME)
                 .limit(options.limit())
                 .fetch(ServerInformationDao.TO_DOMAIN_MAPPER);
 
-        Condition hostnameCondition = terms.stream()
-                .map(SERVER_INFORMATION.HOSTNAME::containsIgnoreCase)
-                .collect(Collectors.reducing(
-                        DSL.trueCondition(),
-                        (acc, frag) -> acc.and(frag)));
+        Condition hostnameCondition = mkBasicTermSearch(SERVER_INFORMATION.HOSTNAME, terms);
 
-        List<ServerInformation> serversViaHostname = dsl.selectDistinct(SERVER_INFORMATION.fields())
+        List<ServerInformation> serversViaHostname = dsl
+                .select(SERVER_INFORMATION.fields())
                 .from(SERVER_INFORMATION)
                 .where(hostnameCondition)
                 .orderBy(SERVER_INFORMATION.HOSTNAME)
@@ -93,7 +87,7 @@ public class ServerInformationSearchDao {
 
         List<ServerInformation> serversViaFullText = searcher.searchFullText(dsl, options);
 
-        serversViaHostname.sort(mkRelevancyComparator(a -> a.hostname(), terms.get(0)));
+        serversViaHostname.sort(mkRelevancyComparator(ServerInformation::hostname, terms.get(0)));
         serversViaExternalId.sort(mkRelevancyComparator(a -> a.externalId().orElse(null), terms.get(0)));
 
         return new ArrayList<>(orderedUnion(serversViaExternalId, serversViaHostname, serversViaFullText));

@@ -19,6 +19,7 @@
 package com.khartec.waltz.data.orgunit.search;
 
 import com.khartec.waltz.data.FullTextSearch;
+import com.khartec.waltz.data.SearchDao;
 import com.khartec.waltz.data.UnsupportedSearcher;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
@@ -26,14 +27,12 @@ import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.SetUtilities.orderedUnion;
 import static com.khartec.waltz.data.JooqUtilities.*;
@@ -41,7 +40,7 @@ import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 
 @Repository
-public class OrganisationalUnitSearchDao {
+public class OrganisationalUnitSearchDao implements SearchDao<OrganisationalUnit> {
 
     private final DSLContext dsl;
     private final FullTextSearch<OrganisationalUnit> searcher;
@@ -54,6 +53,7 @@ public class OrganisationalUnitSearchDao {
     }
 
 
+    @Override
     public List<OrganisationalUnit> search(EntitySearchOptions options) {
         List<String> terms = mkTerms(options.searchQuery());
 
@@ -61,11 +61,7 @@ public class OrganisationalUnitSearchDao {
             return Collections.emptyList();
         }
 
-        Condition nameCondition = terms.stream()
-                .map(ORGANISATIONAL_UNIT.NAME::containsIgnoreCase)
-                .collect(Collectors.reducing(
-                        DSL.trueCondition(),
-                        (acc, frag) -> acc.and(frag)));
+        Condition nameCondition = mkBasicTermSearch(ORGANISATIONAL_UNIT.NAME, terms);
 
         List<OrganisationalUnit> orgUnitsViaName = dsl.selectDistinct(ORGANISATIONAL_UNIT.fields())
                 .from(ORGANISATIONAL_UNIT)

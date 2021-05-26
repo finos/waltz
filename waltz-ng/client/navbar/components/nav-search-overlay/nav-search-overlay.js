@@ -107,20 +107,25 @@ function controller($q,
 
     // helper fn, to reduce boilerplate
     const handleSearch = (query,
-                          entityKind) => {
+                          entityKinds) => {
         const statuses = vm.showActiveOnly
             ? [entityLifecycleStatuses.ACTIVE, entityLifecycleStatuses.PENDING]
             : [entityLifecycleStatuses.ACTIVE, entityLifecycleStatuses.PENDING, entityLifecycleStatuses.REMOVED];
 
         const searchOptions = {
-            entityKinds: [entityKind],
-            entityLifecycleStatuses: statuses
+            entityKinds,
+            entityLifecycleStatuses: statuses,
+            searchQuery: query
         };
 
         return serviceBroker
-            .loadViewData(CORE_API.EntitySearchStore.search,
-                [_.assign({}, searchOptions, {"searchQuery": query})])
-            .then(r => vm.results[entityKind] = r.data);
+            .loadViewData(
+                CORE_API.EntitySearchStore.search,
+                [searchOptions])
+            .then(r => Object.assign(
+                vm.results,
+                _.reduce(entityKinds, (acc, k) => { acc[k] = []; return acc;}, {}),
+                _.groupBy(r.data, d => d.kind)));
     };
 
 
@@ -136,20 +141,12 @@ function controller($q,
         }
 
         $q.all([
-            handleSearch(query, entity.APPLICATION.key),
-            handleSearch(query, entity.PERSON.key),
-            handleSearch(query, entity.APP_GROUP.key),
-            handleSearch(query, entity.CHANGE_INITIATIVE.key),
-            handleSearch(query, entity.ORG_UNIT.key),
-            handleSearch(query, entity.ACTOR.key)
+            handleSearch(query, [entity.APPLICATION.key, entity.PERSON.key]),
+            handleSearch(query, [entity.APP_GROUP.key, entity.CHANGE_INITIATIVE.key, entity.ORG_UNIT.key]),
+            handleSearch(query, [entity.ACTOR.key, entity.MEASURABLE.key])
         ]).then(() => {
-            handleSearch(query, entity.MEASURABLE.key);
-            handleSearch(query, entity.PHYSICAL_SPECIFICATION.key);
-            handleSearch(query, entity.DATA_TYPE.key);
-            handleSearch(query, entity.SERVER.key);
-            handleSearch(query, entity.SOFTWARE.key);
-            handleSearch(query, entity.ROADMAP.key);
-            handleSearch(query, entity.LOGICAL_DATA_ELEMENT.key);
+            handleSearch(query, [entity.PHYSICAL_SPECIFICATION.key, entity.DATA_TYPE.key, entity.SERVER.key]);
+            handleSearch(query, [entity.SOFTWARE.key, entity.ROADMAP.key, entity.LOGICAL_DATA_ELEMENT.key]);
         });
     };
 

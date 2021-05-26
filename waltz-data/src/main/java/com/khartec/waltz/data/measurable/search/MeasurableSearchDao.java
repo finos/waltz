@@ -19,6 +19,7 @@
 package com.khartec.waltz.data.measurable.search;
 
 import com.khartec.waltz.data.FullTextSearch;
+import com.khartec.waltz.data.SearchDao;
 import com.khartec.waltz.data.UnsupportedSearcher;
 import com.khartec.waltz.data.measurable.MeasurableDao;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
@@ -26,13 +27,11 @@ import com.khartec.waltz.model.measurable.Measurable;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.SetUtilities.orderedUnion;
 import static com.khartec.waltz.common.StringUtilities.lower;
@@ -42,7 +41,7 @@ import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static java.util.Collections.emptyList;
 
 @Repository
-public class MeasurableSearchDao {
+public class MeasurableSearchDao implements SearchDao<Measurable> {
 
 
     private final DSLContext dsl;
@@ -56,6 +55,7 @@ public class MeasurableSearchDao {
     }
 
 
+    @Override
     public List<Measurable> search(EntitySearchOptions options) {
         List<String> terms = mkTerms(lower(options.searchQuery()));
 
@@ -63,15 +63,13 @@ public class MeasurableSearchDao {
             return emptyList();
         }
 
-        Condition externalIdCondition = terms.stream()
-                .map(MEASURABLE.EXTERNAL_ID::containsIgnoreCase)
-                .collect(Collectors.reducing(
-                        DSL.trueCondition(),
-                        (acc, frag) -> acc.and(frag)));
+        Condition externalIdCondition = mkBasicTermSearch(MEASURABLE.EXTERNAL_ID, terms);
+        Condition nameCondition = mkBasicTermSearch(MEASURABLE.NAME, terms);
 
         Condition entityLifecycleCondition = MEASURABLE.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
 
-        List<Measurable> measurablesViaExternalId = dsl.selectDistinct(MEASURABLE.fields())
+        List<Measurable> measurablesViaExternalId = dsl
+                .select(MEASURABLE.fields())
                 .from(MEASURABLE)
                 .where(externalIdCondition)
                 .and(entityLifecycleCondition)
@@ -79,13 +77,8 @@ public class MeasurableSearchDao {
                 .limit(options.limit())
                 .fetch(MeasurableDao.TO_DOMAIN_MAPPER);
 
-        Condition nameCondition = terms.stream()
-                .map(MEASURABLE.NAME::containsIgnoreCase)
-                .collect(Collectors.reducing(
-                        DSL.trueCondition(),
-                        (acc, frag) -> acc.and(frag)));
-
-        List<Measurable> measurablesViaName = dsl.selectDistinct(MEASURABLE.fields())
+        List<Measurable> measurablesViaName = dsl
+                .select(MEASURABLE.fields())
                 .from(MEASURABLE)
                 .where(nameCondition)
                 .and(entityLifecycleCondition)
@@ -95,7 +88,10 @@ public class MeasurableSearchDao {
 
         List<Measurable> measurablesViaFullText = searcher.searchFullText(dsl, options);
 
-        return new ArrayList<>(orderedUnion(measurablesViaExternalId, measurablesViaName, measurablesViaFullText));
+        return new ArrayList<>(orderedUnion(
+                measurablesViaExternalId,
+                measurablesViaName,
+                measurablesViaFullText));
     }
 
 

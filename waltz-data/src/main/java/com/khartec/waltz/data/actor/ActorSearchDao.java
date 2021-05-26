@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.data.actor;
 
+import com.khartec.waltz.data.SearchDao;
 import com.khartec.waltz.data.SearchUtilities;
 import com.khartec.waltz.model.actor.Actor;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
@@ -33,22 +34,19 @@ import static java.util.stream.Collectors.toList;
 
 
 @Repository
-public class ActorSearchDao {
+public class ActorSearchDao implements SearchDao<Actor> {
 
-    private final DSLContext dsl;
     private final ActorDao actorDao;
 
 
     @Autowired
     public ActorSearchDao(DSLContext dsl, ActorDao actorDao) {
-        checkNotNull(dsl, "dsl cannot be null");
         checkNotNull(actorDao, "actorDao cannot be null");
-
-        this.dsl = dsl;
         this.actorDao = actorDao;
     }
 
 
+    @Override
     public List<Actor> search(EntitySearchOptions options) {
         List<String> terms = SearchUtilities.mkTerms(options.searchQuery().toLowerCase());
         return actorDao.findAll()
@@ -57,7 +55,7 @@ public class ActorSearchDao {
                     String s = (actor.name() + " " + actor.description()).toLowerCase();
                     return all(
                             terms,
-                            t -> s.indexOf(t) > -1);
+                            s::contains);
                 })
                 .limit(options.limit())
                 .collect(toList());

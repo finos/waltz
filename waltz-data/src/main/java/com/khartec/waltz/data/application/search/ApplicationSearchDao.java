@@ -19,6 +19,7 @@
 package com.khartec.waltz.data.application.search;
 
 import com.khartec.waltz.data.FullTextSearch;
+import com.khartec.waltz.data.SearchDao;
 import com.khartec.waltz.data.UnsupportedSearcher;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.model.EntityKind;
@@ -28,12 +29,10 @@ import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -43,9 +42,10 @@ import static com.khartec.waltz.data.SearchUtilities.mkRelevancyComparator;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;
+import static java.util.Collections.emptyList;
 
 @Repository
-public class ApplicationSearchDao {
+public class ApplicationSearchDao implements SearchDao<Application> {
 
 
     private final DSLContext dsl;
@@ -59,34 +59,30 @@ public class ApplicationSearchDao {
     }
 
 
+    @Override
     public List<Application> search(EntitySearchOptions options) {
         checkNotNull(options, "options cannot be null");
 
         List<String> terms = mkTerms(options.searchQuery());
 
         if (terms.isEmpty()) {
-            return Collections.emptyList();
+            return emptyList();
         }
 
         Condition lifecycleCondition = APPLICATION.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
+        Condition nameCondition = mkBasicTermSearch(APPLICATION.NAME, terms);
+        Condition assetCodeCondition = mkBasicTermSearch(APPLICATION.ASSET_CODE, terms);
+        Condition aliasCondition = ENTITY_ALIAS.KIND.eq(EntityKind.APPLICATION.name())
+                .and(mkBasicTermSearch(ENTITY_ALIAS.ALIAS, terms));
 
-        Condition assetCodeCondition = terms
-                .stream()
-                .map(APPLICATION.ASSET_CODE::startsWith)
-                .reduce(DSL.trueCondition(), Condition::and);
-
-        List<Application> appsViaAssetCode = dsl.selectDistinct(APPLICATION.fields())
+        List<Application> appsViaAssetCode = dsl
+                .selectDistinct(APPLICATION.fields())
                 .from(APPLICATION)
                 .where(assetCodeCondition)
                 .and(lifecycleCondition)
                 .orderBy(APPLICATION.NAME)
                 .limit(options.limit())
                 .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
-
-        Condition aliasCondition = terms
-                .stream()
-                .map(ENTITY_ALIAS.ALIAS::containsIgnoreCase)
-                .reduce(ENTITY_ALIAS.KIND.eq(EntityKind.APPLICATION.name()), Condition::and);
 
         List<Application> appsViaAlias = dsl
                 .selectDistinct(APPLICATION.fields())
@@ -99,11 +95,6 @@ public class ApplicationSearchDao {
                 .limit(options.limit())
                 .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
 
-        Condition nameCondition = terms
-                .stream()
-                .map(APPLICATION.NAME::containsIgnoreCase)
-                .reduce(DSL.trueCondition(), Condition::and);
-
         List<Application> appsViaName = dsl
                 .selectDistinct(APPLICATION.fields())
                 .from(APPLICATION)
@@ -112,7 +103,6 @@ public class ApplicationSearchDao {
                 .orderBy(APPLICATION.NAME)
                 .limit(options.limit())
                 .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
-
 
         List<Application> appsViaFullText = searcher.searchFullText(dsl, options);
 

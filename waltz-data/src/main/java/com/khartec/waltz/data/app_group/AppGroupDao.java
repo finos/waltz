@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.data.app_group;
 
+import com.khartec.waltz.data.SearchDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.app_group.AppGroup;
@@ -38,6 +39,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
+import static com.khartec.waltz.data.JooqUtilities.mkBasicTermSearch;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
@@ -45,7 +47,7 @@ import static com.khartec.waltz.schema.tables.ApplicationGroupMember.APPLICATION
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 
 @Repository
-public class AppGroupDao {
+public class AppGroupDao implements SearchDao<AppGroup> {
 
 
     private static final RecordMapper<? super Record, AppGroup> TO_DOMAIN = r -> {
@@ -195,32 +197,33 @@ public class AppGroupDao {
     }
 
 
+    @Override
     public List<AppGroup> search(EntitySearchOptions options) {
         List<String> terms = mkTerms(options.searchQuery());
         if (terms.isEmpty()) {
             return Collections.emptyList();
         }
 
-        Condition searchCondition = terms.stream()
-                .map(term -> APPLICATION_GROUP.NAME.like("%" + term + "%"))
-                .collect(Collectors.reducing(
-                        DSL.trueCondition(),
-                        (acc, frag) -> acc.and(frag)));
+        Condition searchCondition = mkBasicTermSearch(APPLICATION_GROUP.NAME, terms);
 
-        Select<Record> publicGroups = dsl.select(APPLICATION_GROUP.fields())
+        Select<Record> publicGroups = dsl
+                .select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name())
                     .and(searchCondition))
-                    .and(notRemoved);
+                    .and(notRemoved)
+                .limit(options.limit());
 
         Select<Record1<Long>> userGroupIds = getPrivateGroupIdByOwner(options.userId());
 
-        Select<Record> privateGroups = dsl.select(APPLICATION_GROUP.fields())
+        Select<Record> privateGroups = dsl
+                .select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.ID.in(userGroupIds)
                     .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PRIVATE.name()))
                     .and(searchCondition))
-                    .and(notRemoved);
+                    .and(notRemoved)
+                .limit(options.limit());
 
         return publicGroups
                 .unionAll(privateGroups)
@@ -237,6 +240,7 @@ public class AppGroupDao {
                 .execute();
     }
 
+
     public Long insert(AppGroup appGroup) {
         return dsl.insertInto(APPLICATION_GROUP)
                 .set(APPLICATION_GROUP.DESCRIPTION, appGroup.description())
@@ -249,6 +253,7 @@ public class AppGroupDao {
                 .getId();
     }
 
+
     public int deleteGroup(long groupId) {
         return dsl.update(APPLICATION_GROUP)
                 .set(APPLICATION_GROUP.IS_REMOVED, true)
@@ -256,6 +261,7 @@ public class AppGroupDao {
                 .execute();
 
     }
+
 
     public Set<AppGroup> findByIds(String user, List<Long> ids) {
         return dsl.select(APPLICATION_GROUP.fields())
