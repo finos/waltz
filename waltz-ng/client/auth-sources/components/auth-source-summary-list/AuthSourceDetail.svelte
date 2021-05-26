@@ -52,9 +52,9 @@
 
     <div>
         <strong>Scope:</strong>
-        <EntityLink ref={$selectedAuthSource?.declaringOrgUnit}/>
+        <EntityLink ref={$selectedAuthSource?.parentReference}/>
     </div>
-    <p class="text-muted">The selector for applications this authority statement will apply to</p>
+    <p class="text-muted">The selector for which this authority statement will apply to</p>
 
     <div>
         <strong>Rating:</strong>
