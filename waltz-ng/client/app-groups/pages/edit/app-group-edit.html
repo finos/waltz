@@ -65,18 +65,22 @@
                           ng-model="ctrl.appGroup.description">
                 </textarea>
 
-                <div class="radio">
-                    <label>
-                        <input type="radio" ng-model="ctrl.appGroup.appGroupKind" value="PRIVATE">
-                        Private - (recommended) - limited viewers and the group will not be listed in the search results.
-                    </label>
+                <div ng-if="! ctrl.appGroup.isFavouriteGroup">
+                    <div class="radio">
+                        <label>
+                            <input type="radio" ng-model="ctrl.appGroup.appGroupKind" value="PRIVATE">
+                            Private - (recommended) - limited viewers and the group will not be listed in the search results.
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" ng-model="ctrl.appGroup.appGroupKind" value="PUBLIC">
+                            Public - anyone can search for and view this group.
+                        </label>
+                    </div>
                 </div>
-                <div class="radio">
-                    <label>
-                        <input type="radio" ng-model="ctrl.appGroup.appGroupKind" value="PUBLIC">
-                        Public - anyone can search for and view this group.
-                    </label>
-                </div>
+
+                <br>
 
                 <button type="submit"
                         class="btn btn-success">
@@ -463,8 +467,8 @@
         <table class="table table-condensed table-striped">
             <thead>
             <tr>
-                <th>Owners</th>
-                <th>Operations</th>
+                <th width="50%">Owners</th>
+                <th width="50%">Operations</th>
             </tr>
             </thead>
             <tr ng-repeat="owner in ctrl.owners | orderBy:'userId'">
@@ -492,8 +496,8 @@
             <table class="table table-condensed table-striped">
                 <thead>
                 <tr>
-                    <th>Subscribers</th>
-                    <th>Operations</th>
+                    <th width="50%">Subscribers</th>
+                    <th width="50%">Operations</th>
                 </tr>
                 </thead>
                 <tr ng-repeat="viewer in ctrl.viewers | orderBy:'userId'" class="waltz-visibility-parent">
@@ -502,10 +506,12 @@
                     </td>
                     <td>
                         <div class="waltz-visibility-child-50">
-                            <a ng-click="ctrl.promoteToOwner(viewer)"
-                               class="clickable">
-                                Promote to owner
-                            </a>
+                            <span ng-if="!ctrl.appGroup.isFavouriteGroup">
+                                <a ng-click="ctrl.promoteToOwner(viewer)"
+                                   class="clickable">
+                                    Promote to owner
+                                </a>
+                            </span>
                         </div>
                     </td>
                 </tr>
