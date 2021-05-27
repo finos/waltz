@@ -1,0 +1,53 @@
+<configuration>
+	
+	<appender name="TIME_BASED_FILE" 
+			  class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>../logs/waltz.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>../logs/waltz.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+	
+	<appender name="PERFORMANCE_FILE"
+			  class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>../logs/waltz-performance.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!-- daily rollover -->
+            <fileNamePattern>../logs/waltz-performance.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.khartec" level="DEBUG" />
+	<logger name="com.db.ct.cto.waltz" level="DEBUG" />
+	<logger name="org.springframework" level="DEBUG"/>
+	
+	
+	<logger name="WALTZ.PERFORMANCE" level="DEBUG">
+		<appender-ref ref="PERFORMANCE_FILE" />
+	</logger>
+
+	
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="TIME_BASED_FILE" />
+    </root>
+
+</configuration>
