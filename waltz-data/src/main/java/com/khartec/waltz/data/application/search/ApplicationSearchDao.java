@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.data.application.search;
 
+import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.data.FullTextSearch;
 import com.khartec.waltz.data.SearchDao;
 import com.khartec.waltz.data.UnsupportedSearcher;
@@ -29,13 +30,18 @@ import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
+import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Future;
+import java.util.function.Supplier;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.CollectionUtilities.sort;
 import static com.khartec.waltz.common.SetUtilities.orderedUnion;
 import static com.khartec.waltz.data.JooqUtilities.*;
 import static com.khartec.waltz.data.SearchUtilities.mkRelevancyComparator;
@@ -50,11 +56,13 @@ public class ApplicationSearchDao implements SearchDao<Application> {
 
     private final DSLContext dsl;
     private final FullTextSearch<Application> searcher;
+    private final DBExecutorPoolInterface dbExecutorPool;
 
 
     @Autowired
-    public ApplicationSearchDao(DSLContext dsl) {
+    public ApplicationSearchDao(DSLContext dsl, DBExecutorPoolInterface dbExecutorPool) {
         this.dsl = dsl;
+        this.dbExecutorPool = dbExecutorPool;
         this.searcher = determineSearcher(dsl.dialect());
     }
 
@@ -75,16 +83,16 @@ public class ApplicationSearchDao implements SearchDao<Application> {
         Condition aliasCondition = ENTITY_ALIAS.KIND.eq(EntityKind.APPLICATION.name())
                 .and(mkBasicTermSearch(ENTITY_ALIAS.ALIAS, terms));
 
-        List<Application> appsViaAssetCode = dsl
-                .selectDistinct(APPLICATION.fields())
+        Future<List<Application>> appsViaAssetCode = dbExecutorPool.submit(() -> dsl
+                .select(APPLICATION.fields())
                 .from(APPLICATION)
                 .where(assetCodeCondition)
                 .and(lifecycleCondition)
                 .orderBy(APPLICATION.NAME)
                 .limit(options.limit())
-                .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
+                .fetch(ApplicationDao.TO_DOMAIN_MAPPER));
 
-        List<Application> appsViaAlias = dsl
+        Future<List<Application>> appsViaAlias = dbExecutorPool.submit(() -> dsl
                 .selectDistinct(APPLICATION.fields())
                 .from(APPLICATION)
                 .innerJoin(ENTITY_ALIAS)
@@ -93,22 +101,28 @@ public class ApplicationSearchDao implements SearchDao<Application> {
                 .and(lifecycleCondition)
                 .orderBy(APPLICATION.NAME)
                 .limit(options.limit())
-                .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
+                .fetch(ApplicationDao.TO_DOMAIN_MAPPER));
 
-        List<Application> appsViaName = dsl
-                .selectDistinct(APPLICATION.fields())
-                .from(APPLICATION)
-                .where(nameCondition)
-                .and(lifecycleCondition)
-                .orderBy(APPLICATION.NAME)
-                .limit(options.limit())
-                .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
+        Future<List<Application>> appsViaName = dbExecutorPool.submit(() -> sort(
+                dsl
+                    .select(APPLICATION.fields())
+                    .from(APPLICATION)
+                    .where(nameCondition)
+                    .and(lifecycleCondition)
+                    .orderBy(APPLICATION.NAME)
+                    .limit(options.limit())
+                    .fetch(ApplicationDao.TO_DOMAIN_MAPPER),
+                mkRelevancyComparator(NameProvider::name, terms.get(0))));
 
-        List<Application> appsViaFullText = searcher.searchFullText(dsl, options);
+        Future<List<Application>> appsViaFullText = dbExecutorPool.submit(() -> searcher.searchFullText(dsl, options));
 
-        appsViaName.sort(mkRelevancyComparator(NameProvider::name, terms.get(0)));
+        Supplier<Set<Application>> result = Unchecked.supplier(() -> orderedUnion(
+                appsViaAssetCode.get(),
+                appsViaName.get(),
+                appsViaAlias.get(),
+                appsViaFullText.get()));
 
-        return new ArrayList<>(orderedUnion(appsViaAssetCode, appsViaName, appsViaAlias, appsViaFullText));
+        return new ArrayList<>(result.get());
     }
 
 

@@ -55,7 +55,8 @@ const initialState = {
     selectedCategory: null,
     showActiveOnly: true,
     results: {},
-    filteredResults: []
+    filteredResults: [],
+    searching: false
 };
 
 
@@ -141,15 +142,14 @@ function controller($element,
             return;
         }
 
+        vm.searching = true;
         handleSearch(query, [entity.APPLICATION.key, entity.PERSON.key])
-            .then(() => {
-                handleSearch(query, [entity.APP_GROUP.key, entity.CHANGE_INITIATIVE.key, entity.ORG_UNIT.key])
-            }).then(() => {
-                handleSearch(query, [entity.ACTOR.key, entity.MEASURABLE.key])
-            }).then(() => {
-                handleSearch(query, [entity.PHYSICAL_SPECIFICATION.key, entity.DATA_TYPE.key, entity.SERVER.key]);
-                handleSearch(query, [entity.SOFTWARE.key, entity.ROADMAP.key, entity.LOGICAL_DATA_ELEMENT.key]);
-            }).catch(e => displayError(notificationService, "Failed to search"));
+            .then(() => handleSearch(query, [entity.APP_GROUP.key, entity.CHANGE_INITIATIVE.key, entity.ORG_UNIT.key]))
+            .then(() => handleSearch(query, [entity.ACTOR.key, entity.MEASURABLE.key]))
+            .then(() => handleSearch(query, [entity.PHYSICAL_SPECIFICATION.key, entity.DATA_TYPE.key, entity.SERVER.key]))
+            .then(() => handleSearch(query, [entity.SOFTWARE.key, entity.ROADMAP.key, entity.LOGICAL_DATA_ELEMENT.key]))
+            .catch(e => displayError(notificationService, "Failed to search"))
+            .finally(() => vm.searching = false);
     };
 
     vm.doSearch = () => doSearch(vm.query);
