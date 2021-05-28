@@ -204,13 +204,13 @@ public class AppGroupDao implements SearchDao<AppGroup> {
             return Collections.emptyList();
         }
 
-        Condition searchCondition = mkBasicTermSearch(APPLICATION_GROUP.NAME, terms);
+        Condition nameCondition = mkBasicTermSearch(APPLICATION_GROUP.NAME, terms);
 
         Select<Record> publicGroups = dsl
                 .select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name())
-                    .and(searchCondition))
+                    .and(nameCondition))
                     .and(notRemoved);
 
         Select<Record1<Long>> userGroupIds = getPrivateGroupIdByOwner(options.userId());
@@ -220,7 +220,7 @@ public class AppGroupDao implements SearchDao<AppGroup> {
                 .from(APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.ID.in(userGroupIds)
                     .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PRIVATE.name()))
-                    .and(searchCondition))
+                    .and(nameCondition))
                     .and(notRemoved);
 
         return privateGroups

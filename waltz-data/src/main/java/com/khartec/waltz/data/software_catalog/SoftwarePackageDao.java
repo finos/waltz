@@ -37,6 +37,7 @@ import java.util.*;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.SetUtilities.orderedUnion;
 import static com.khartec.waltz.data.JooqUtilities.mkBasicTermSearch;
+import static com.khartec.waltz.data.JooqUtilities.mkStartsWithTermSearch;
 import static com.khartec.waltz.data.SearchUtilities.mkRelevancyComparator;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.SoftwarePackage.SOFTWARE_PACKAGE;
@@ -127,7 +128,7 @@ public class SoftwarePackageDao implements SearchDao<SoftwarePackage> {
             return Collections.emptyList();
         }
 
-        Condition externalIdCondition = mkBasicTermSearch(SOFTWARE_PACKAGE.EXTERNAL_ID, terms);
+        Condition externalIdCondition = mkStartsWithTermSearch(SOFTWARE_PACKAGE.EXTERNAL_ID, terms);
 
         List<SoftwarePackage> serversViaExternalId = dsl
                 .select(SOFTWARE_PACKAGE.fields())

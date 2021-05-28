@@ -300,6 +300,15 @@ public class JooqUtilities {
     }
 
 
+    public static Condition mkStartsWithTermSearch(Field<String> field,
+                                                   List<String> terms) {
+        return terms
+                .stream()
+                .map(field::startsWithIgnoreCase)
+                .reduce(DSL.falseCondition(), Condition::or);
+    }
+
+
 
     public static Condition mkDateRangeCondition(TableField<ChangeLogRecord, Timestamp> field, java.sql.Date date) {
         long time = date.getTime();

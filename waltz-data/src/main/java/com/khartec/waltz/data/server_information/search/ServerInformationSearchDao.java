@@ -65,7 +65,7 @@ public class ServerInformationSearchDao implements SearchDao<ServerInformation> 
             return Collections.emptyList();
         }
 
-        Condition externalIdCondition = mkBasicTermSearch(SERVER_INFORMATION.EXTERNAL_ID, terms);
+        Condition externalIdCondition = mkStartsWithTermSearch(SERVER_INFORMATION.EXTERNAL_ID, terms);
 
         List<ServerInformation> serversViaExternalId = dsl
                 .select(SERVER_INFORMATION.fields())

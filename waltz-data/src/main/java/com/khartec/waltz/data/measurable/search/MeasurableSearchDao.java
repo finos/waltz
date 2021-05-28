@@ -63,7 +63,7 @@ public class MeasurableSearchDao implements SearchDao<Measurable> {
             return emptyList();
         }
 
-        Condition externalIdCondition = mkBasicTermSearch(MEASURABLE.EXTERNAL_ID, terms);
+        Condition externalIdCondition = mkStartsWithTermSearch(MEASURABLE.EXTERNAL_ID, terms);
         Condition nameCondition = mkBasicTermSearch(MEASURABLE.NAME, terms);
 
         Condition entityLifecycleCondition = MEASURABLE.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());

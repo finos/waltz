@@ -49,7 +49,8 @@ public class ActorSearchDao implements SearchDao<Actor> {
     @Override
     public List<Actor> search(EntitySearchOptions options) {
         List<String> terms = SearchUtilities.mkTerms(options.searchQuery().toLowerCase());
-        return actorDao.findAll()
+        return actorDao
+                .findAll()
                 .stream()
                 .filter(actor -> {
                     String s = (actor.name() + " " + actor.description()).toLowerCase();

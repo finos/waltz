@@ -71,7 +71,7 @@ public class ApplicationSearchDao implements SearchDao<Application> {
 
         Condition lifecycleCondition = APPLICATION.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
         Condition nameCondition = mkBasicTermSearch(APPLICATION.NAME, terms);
-        Condition assetCodeCondition = mkBasicTermSearch(APPLICATION.ASSET_CODE, terms);
+        Condition assetCodeCondition = mkStartsWithTermSearch(APPLICATION.ASSET_CODE, terms);
         Condition aliasCondition = ENTITY_ALIAS.KIND.eq(EntityKind.APPLICATION.name())
                 .and(mkBasicTermSearch(ENTITY_ALIAS.ALIAS, terms));
 

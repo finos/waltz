@@ -39,6 +39,7 @@ import java.util.Optional;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.JooqUtilities.mkBasicTermSearch;
+import static com.khartec.waltz.data.JooqUtilities.mkStartsWithTermSearch;
 import static com.khartec.waltz.data.SearchUtilities.mkRelevancyComparator;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao.owningEntityNameField;
@@ -68,8 +69,8 @@ public class PhysicalSpecificationSearchDao implements SearchDao<PhysicalSpecifi
 
         Condition likeName = mkBasicTermSearch(PHYSICAL_SPECIFICATION.NAME, terms);
         Condition likeDesc = mkBasicTermSearch(PHYSICAL_SPECIFICATION.DESCRIPTION, terms);
-        Condition likeExternalIdentifier = mkBasicTermSearch(PHYSICAL_SPECIFICATION.EXTERNAL_ID, terms)
-                .or(mkBasicTermSearch(EXTERNAL_IDENTIFIER.EXTERNAL_ID, terms));
+        Condition likeExternalIdentifier = mkStartsWithTermSearch(PHYSICAL_SPECIFICATION.EXTERNAL_ID, terms)
+                .or(mkStartsWithTermSearch(EXTERNAL_IDENTIFIER.EXTERNAL_ID, terms));
 
         Condition searchFilter = likeName.or(likeDesc).or(likeExternalIdentifier);
 
