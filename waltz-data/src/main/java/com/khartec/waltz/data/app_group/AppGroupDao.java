@@ -211,8 +211,7 @@ public class AppGroupDao implements SearchDao<AppGroup> {
                 .from(APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name())
                     .and(searchCondition))
-                    .and(notRemoved)
-                .limit(options.limit());
+                    .and(notRemoved);
 
         Select<Record1<Long>> userGroupIds = getPrivateGroupIdByOwner(options.userId());
 
@@ -222,12 +221,15 @@ public class AppGroupDao implements SearchDao<AppGroup> {
                 .where(APPLICATION_GROUP.ID.in(userGroupIds)
                     .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PRIVATE.name()))
                     .and(searchCondition))
-                    .and(notRemoved)
-                .limit(options.limit());
+                    .and(notRemoved);
 
-        return publicGroups
-                .unionAll(privateGroups)
-                .fetch(TO_DOMAIN);
+        return privateGroups
+                .unionAll(publicGroups)
+                .fetch(TO_DOMAIN)
+                .stream()
+                .limit(options.limit())
+                .collect(Collectors.toList());
+
     }
 
 

@@ -32,7 +32,6 @@ import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -152,7 +151,7 @@ public class SoftwareCatalogService {
         }
     }
 
-    public Collection<SoftwarePackage> search(EntitySearchOptions options) {
+    public List<SoftwarePackage> search(EntitySearchOptions options) {
         return softwarePackageDao.search(options);
     }
 }
