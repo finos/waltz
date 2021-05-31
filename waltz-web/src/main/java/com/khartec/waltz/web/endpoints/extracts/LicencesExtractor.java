@@ -19,7 +19,6 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
@@ -30,11 +29,13 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
-import static com.khartec.waltz.schema.Tables.ENTITY_RELATIONSHIP;
 import static com.khartec.waltz.schema.Tables.LICENCE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static com.khartec.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
+import static com.khartec.waltz.schema.tables.SoftwareVersionLicence.SOFTWARE_VERSION_LICENCE;
 import static com.khartec.waltz.web.WebUtilities.getEntityReference;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static java.lang.String.format;
 import static spark.Spark.get;
 
 
@@ -69,14 +70,16 @@ public class LicencesExtractor extends DirectQueryBasedDataExtractor {
                             LICENCE.LAST_UPDATED_BY.as("Last Updated By"),
                             LICENCE.PROVENANCE.as("Provenance"))
                     .from(LICENCE)
-                    .innerJoin(ENTITY_RELATIONSHIP)
-                    .on(LICENCE.ID.eq(ENTITY_RELATIONSHIP.ID_B).and(ENTITY_RELATIONSHIP.KIND_B.eq(EntityKind.LICENCE.name())))
-                    .innerJoin(APPLICATION)
-                    .on(APPLICATION.ID.eq(ENTITY_RELATIONSHIP.ID_A).and(ENTITY_RELATIONSHIP.KIND_A.eq(EntityKind.APPLICATION.name())))
-                    .where(APPLICATION.ID.in(appIdSelector))
-                    .and(APPLICATION.ENTITY_LIFECYCLE_STATUS.notEqual(EntityLifecycleStatus.REMOVED.name()));
+                    .innerJoin(SOFTWARE_VERSION_LICENCE)
+                    .on(SOFTWARE_VERSION_LICENCE.LICENCE_ID.eq(LICENCE.ID))
+                    .innerJoin(SOFTWARE_USAGE)
+                    .on(SOFTWARE_VERSION_LICENCE.SOFTWARE_VERSION_ID.eq(SOFTWARE_USAGE.SOFTWARE_VERSION_ID))
+                    .innerJoin(APPLICATION).on(SOFTWARE_USAGE.APPLICATION_ID.eq(APPLICATION.ID))
+                    .where(dsl.renderInlined(SOFTWARE_USAGE.APPLICATION_ID.in(appIdSelector)
+                            .and(APPLICATION.ENTITY_LIFECYCLE_STATUS.notEqual(EntityLifecycleStatus.REMOVED.name())
+                                    .and(APPLICATION.IS_REMOVED.isFalse()))));
 
-            String filename = "licences";
+            String filename = format("licences-%s/%s", entityRef.kind(), entityRef.id());
 
             return writeExtract(
                     filename,
