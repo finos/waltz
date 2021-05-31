@@ -271,8 +271,6 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                 break;
         }
 
-        System.out.println(selector);
-
         return selector;
     }
 

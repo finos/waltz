@@ -19,6 +19,8 @@
 package com.khartec.waltz.data.software_catalog;
 
 import com.khartec.waltz.data.JooqUtilities;
+import com.khartec.waltz.data.SearchDao;
+import com.khartec.waltz.model.NameProvider;
 import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.software_catalog.ImmutableSoftwarePackage;
@@ -27,18 +29,15 @@ import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.SoftwarePackageRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static com.khartec.waltz.common.SetUtilities.orderedUnion;
+import static com.khartec.waltz.data.JooqUtilities.mkBasicTermSearch;
+import static com.khartec.waltz.data.JooqUtilities.mkStartsWithTermSearch;
 import static com.khartec.waltz.data.SearchUtilities.mkRelevancyComparator;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.SoftwarePackage.SOFTWARE_PACKAGE;
@@ -46,27 +45,7 @@ import static com.khartec.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
 import static com.khartec.waltz.schema.tables.SoftwareVersion.SOFTWARE_VERSION;
 
 @Repository
-public class SoftwarePackageDao {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SoftwarePackageDao.class);
-
-
-    private static final Function<SoftwarePackage, SoftwarePackageRecord> TO_RECORD = sp -> {
-        SoftwarePackageRecord record = new SoftwarePackageRecord();
-
-        record.setVendor(sp.vendor());
-        record.setGroup(sp.group());
-        record.setName(sp.name());
-        record.setNotable(sp.isNotable());
-        record.setDescription(sp.description());
-        record.setExternalId(sp.externalId().orElse(null));
-        record.setCreatedAt(sp.created().map(t -> t.atTimestamp()).orElse(nowUtcTimestamp()));
-        record.setCreatedBy(sp.created().map(t -> t.by()).orElse(""));
-        record.setProvenance(sp.provenance());
-
-        return record;
-    };
-
+public class SoftwarePackageDao implements SearchDao<SoftwarePackage> {
 
     private static final RecordMapper<Record, SoftwarePackage> TO_DOMAIN = r -> {
         SoftwarePackageRecord record = r.into(SOFTWARE_PACKAGE);
@@ -92,21 +71,10 @@ public class SoftwarePackageDao {
     }
 
 
-    public int[] bulkStore(Collection<SoftwarePackage> softwarePackages) {
-        checkNotNull(softwarePackages, "Cannot store a null collection of software packages");
-
-        List<SoftwarePackageRecord> records = softwarePackages.stream()
-                .map(TO_RECORD)
-                .collect(Collectors.toList());
-
-        LOG.info("Bulk storing " + records.size() + " records");
-        return dsl.batchInsert(records).execute();
-    }
-
-
     public List<SoftwarePackage> findByIds(Long... ids) {
         return findByCondition(SOFTWARE_PACKAGE.ID.in(ids));
     }
+
 
     public List<SoftwarePackage> findByIds(Collection<Long> ids) {
         return findByCondition(SOFTWARE_PACKAGE.ID.in(ids));
@@ -120,15 +88,10 @@ public class SoftwarePackageDao {
                 .fetchOne(TO_DOMAIN);
     }
 
-
-    public List<SoftwarePackage> findByExternalIds(String... externalIds) {
-        return findByCondition(SOFTWARE_PACKAGE.EXTERNAL_ID.in(externalIds));
-    }
-
     public List<SoftwarePackage> findAll() {
         return findByCondition(DSL.trueCondition());
-
     }
+
     // -----
 
     private List<SoftwarePackage> findByCondition(Condition condition) {
@@ -139,7 +102,7 @@ public class SoftwarePackageDao {
     }
 
 
-    public List<Tally<String>> toTallies(Select<Record1<Long>> appIdSelector, Field groupingField) {
+    public List<Tally<String>> toTallies(Select<Record1<Long>> appIdSelector, Field<String> groupingField) {
 
         Condition condition = SOFTWARE_USAGE.APPLICATION_ID.in(appIdSelector);
 
@@ -156,7 +119,8 @@ public class SoftwarePackageDao {
     }
 
 
-    public Collection<SoftwarePackage> search(EntitySearchOptions options) {
+    @Override
+    public List<SoftwarePackage> search(EntitySearchOptions options) {
         checkNotNull(options, "options cannot be null");
         List<String> terms = mkTerms(options.searchQuery());
 
@@ -164,47 +128,38 @@ public class SoftwarePackageDao {
             return Collections.emptyList();
         }
 
-        Condition externalIdCondition = terms.stream()
-                .map(SOFTWARE_PACKAGE.EXTERNAL_ID::startsWithIgnoreCase)
-                .collect(Collectors.reducing(
-                        DSL.trueCondition(),
-                        (acc, frag) -> acc.and(frag)));
+        Condition externalIdCondition = mkStartsWithTermSearch(SOFTWARE_PACKAGE.EXTERNAL_ID, terms);
 
-        List<SoftwarePackage> serversViaExternalId = dsl.selectDistinct(SOFTWARE_PACKAGE.fields())
+        List<SoftwarePackage> serversViaExternalId = dsl
+                .select(SOFTWARE_PACKAGE.fields())
                 .from(SOFTWARE_PACKAGE)
                 .where(externalIdCondition)
                 .orderBy(SOFTWARE_PACKAGE.EXTERNAL_ID)
                 .limit(options.limit())
                 .fetch(SoftwarePackageDao.TO_DOMAIN);
 
-        Condition nameCondition = terms.stream()
-                .map(SOFTWARE_PACKAGE.NAME::containsIgnoreCase)
-                .collect(Collectors.reducing(
-                        DSL.trueCondition(),
-                        (acc, frag) -> acc.and(frag)));
+        Condition nameCondition = mkBasicTermSearch(SOFTWARE_PACKAGE.NAME, terms);
 
-        List<SoftwarePackage> softwareViaName = dsl.selectDistinct(SOFTWARE_PACKAGE.fields())
+        List<SoftwarePackage> softwareViaName = dsl
+                .select(SOFTWARE_PACKAGE.fields())
                 .from(SOFTWARE_PACKAGE)
                 .where(nameCondition)
                 .orderBy(SOFTWARE_PACKAGE.NAME)
                 .limit(options.limit())
                 .fetch(SoftwarePackageDao.TO_DOMAIN);
 
-        Condition vendorCondition = terms.stream()
-                .map(SOFTWARE_PACKAGE.VENDOR::containsIgnoreCase)
-                .collect(Collectors.reducing(
-                        DSL.trueCondition(),
-                        (acc, frag) -> acc.and(frag)));
+        Condition vendorCondition = mkBasicTermSearch(SOFTWARE_PACKAGE.VENDOR, terms);
 
-        List<SoftwarePackage> softwareViaVendor = dsl.selectDistinct(SOFTWARE_PACKAGE.fields())
+        List<SoftwarePackage> softwareViaVendor = dsl
+                .select(SOFTWARE_PACKAGE.fields())
                 .from(SOFTWARE_PACKAGE)
                 .where(vendorCondition)
                 .orderBy(SOFTWARE_PACKAGE.VENDOR)
                 .limit(options.limit())
                 .fetch(SoftwarePackageDao.TO_DOMAIN);
 
-        softwareViaName.sort(mkRelevancyComparator(a -> a.name(), terms.get(0)));
-        softwareViaVendor.sort(mkRelevancyComparator(a -> a.vendor(), terms.get(0)));
+        softwareViaName.sort(mkRelevancyComparator(NameProvider::name, terms.get(0)));
+        softwareViaVendor.sort(mkRelevancyComparator(SoftwarePackage::vendor, terms.get(0)));
         serversViaExternalId.sort(mkRelevancyComparator(a -> a.externalId().orElse(null), terms.get(0)));
 
         return new ArrayList<>(orderedUnion(serversViaExternalId, softwareViaName, softwareViaVendor));

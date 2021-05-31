@@ -24,6 +24,7 @@ import {isDescendant} from "../../../common/browser-utils";
 import template from "./nav-search-overlay.html";
 import {kindToViewState} from "../../../common/link-utils";
 import _ from "lodash";
+import {displayError} from "../../../common/error-utils";
 
 const ESCAPE_KEYCODE = 27;
 const ENTER_KEYCODE = 13;
@@ -39,30 +40,31 @@ const initialState = {
     categories: [
         entity.APPLICATION.key,
         entity.PERSON.key,
-        entity.ACTOR.key,
         entity.CHANGE_INITIATIVE.key,
-        entity.DATA_TYPE.key,
         entity.APP_GROUP.key,
         entity.ORG_UNIT.key,
+        entity.ACTOR.key,
         entity.MEASURABLE.key,
+        entity.DATA_TYPE.key,
         entity.PHYSICAL_SPECIFICATION.key,
-        entity.LOGICAL_DATA_ELEMENT.key,
-        entity.ROADMAP.key,
         entity.SERVER.key,
-        entity.SOFTWARE.key
+        entity.SOFTWARE.key,
+        entity.ROADMAP.key,
+        entity.LOGICAL_DATA_ELEMENT.key
     ],
     selectedCategory: null,
     showActiveOnly: true,
     results: {},
-    filteredResults: []
+    filteredResults: [],
+    searching: false
 };
 
 
-function controller($q,
-                    $element,
+function controller($element,
                     $document,
                     $timeout,
                     $state,
+                    notificationService,
                     serviceBroker) {
     const vm = initialiseData(this, initialState);
 
@@ -107,20 +109,25 @@ function controller($q,
 
     // helper fn, to reduce boilerplate
     const handleSearch = (query,
-                          entityKind) => {
+                          entityKinds) => {
         const statuses = vm.showActiveOnly
             ? [entityLifecycleStatuses.ACTIVE, entityLifecycleStatuses.PENDING]
             : [entityLifecycleStatuses.ACTIVE, entityLifecycleStatuses.PENDING, entityLifecycleStatuses.REMOVED];
 
         const searchOptions = {
-            entityKinds: [entityKind],
-            entityLifecycleStatuses: statuses
+            entityKinds,
+            entityLifecycleStatuses: statuses,
+            searchQuery: query
         };
 
         return serviceBroker
-            .loadViewData(CORE_API.EntitySearchStore.search,
-                [_.assign({}, searchOptions, {"searchQuery": query})])
-            .then(r => vm.results[entityKind] = r.data);
+            .loadViewData(
+                CORE_API.EntitySearchStore.search,
+                [searchOptions])
+            .then(r => Object.assign(
+                vm.results,
+                _.reduce(entityKinds, (acc, k) => { acc[k] = []; return acc;}, {}),
+                _.groupBy(r.data, d => d.kind)));
     };
 
 
@@ -135,22 +142,14 @@ function controller($q,
             return;
         }
 
-        $q.all([
-            handleSearch(query, entity.APPLICATION.key),
-            handleSearch(query, entity.PERSON.key),
-            handleSearch(query, entity.APP_GROUP.key),
-            handleSearch(query, entity.CHANGE_INITIATIVE.key),
-            handleSearch(query, entity.ORG_UNIT.key),
-            handleSearch(query, entity.ACTOR.key)
-        ]).then(() => {
-            handleSearch(query, entity.MEASURABLE.key);
-            handleSearch(query, entity.PHYSICAL_SPECIFICATION.key);
-            handleSearch(query, entity.DATA_TYPE.key);
-            handleSearch(query, entity.SERVER.key);
-            handleSearch(query, entity.SOFTWARE.key);
-            handleSearch(query, entity.ROADMAP.key);
-            handleSearch(query, entity.LOGICAL_DATA_ELEMENT.key);
-        });
+        vm.searching = true;
+        handleSearch(query, [entity.APPLICATION.key, entity.PERSON.key])
+            .then(() => handleSearch(query, [entity.APP_GROUP.key, entity.CHANGE_INITIATIVE.key, entity.ORG_UNIT.key]))
+            .then(() => handleSearch(query, [entity.ACTOR.key, entity.MEASURABLE.key]))
+            .then(() => handleSearch(query, [entity.PHYSICAL_SPECIFICATION.key, entity.DATA_TYPE.key, entity.SERVER.key]))
+            .then(() => handleSearch(query, [entity.SOFTWARE.key, entity.ROADMAP.key, entity.LOGICAL_DATA_ELEMENT.key]))
+            .catch(e => displayError(notificationService, "Failed to search"))
+            .finally(() => vm.searching = false);
     };
 
     vm.doSearch = () => doSearch(vm.query);
@@ -199,11 +198,11 @@ function controller($q,
 
 
 controller.$inject = [
-    "$q",
     "$element",
     "$document",
     "$timeout",
     "$state",
+    "Notification",
     "ServiceBroker"
 ];
 

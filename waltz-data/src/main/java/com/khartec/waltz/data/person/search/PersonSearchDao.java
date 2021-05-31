@@ -18,6 +18,8 @@
 
 package com.khartec.waltz.data.person.search;
 
+import com.khartec.waltz.data.DBExecutorPoolInterface;
+import com.khartec.waltz.data.SearchDao;
 import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
@@ -25,47 +27,53 @@ import com.khartec.waltz.model.person.Person;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.concurrent.Future;
 
 import static com.khartec.waltz.common.SetUtilities.orderedUnion;
+import static com.khartec.waltz.data.JooqUtilities.mkBasicTermSearch;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 
 @Repository
-public class PersonSearchDao {
+public class PersonSearchDao implements SearchDao<Person> {
 
     private final DSLContext dsl;
+    private final DBExecutorPoolInterface dbExecutorPool;
 
 
     @Autowired
-    public PersonSearchDao(DSLContext dsl) {
+    public PersonSearchDao(DSLContext dsl, DBExecutorPoolInterface dbExecutorPool) {
         this.dsl = dsl;
+        this.dbExecutorPool = dbExecutorPool;
     }
 
 
+    @Override
     public List<Person> search(EntitySearchOptions options) {
         List<String> terms = mkTerms(options.searchQuery());
         if (terms.isEmpty()) {
             return Collections.emptyList();
         }
 
-        Condition displayNameCondition = terms.stream()
-                .map(PERSON.DISPLAY_NAME::containsIgnoreCase)
-                .collect(Collectors.reducing(
-                        DSL.trueCondition(),
-                        (acc, frag) -> acc.and(frag)));
+        Condition displayNameCondition = mkBasicTermSearch(PERSON.DISPLAY_NAME, terms);
 
-        List<Person> peopleViaEmail = executeWithCondition(options, PERSON.EMAIL.startsWithIgnoreCase(options.searchQuery()));
-        List<Person> peopleViaName = executeWithCondition(options, displayNameCondition);
+        Future<List<Person>> peopleViaEmail = dbExecutorPool.submit(() -> executeWithCondition(options, PERSON.EMAIL.startsWithIgnoreCase(options.searchQuery())));
+        Future<List<Person>> peopleViaName = dbExecutorPool.submit(() -> executeWithCondition(options, displayNameCondition));
 
-        return new ArrayList<>(orderedUnion(peopleViaEmail, peopleViaName));
+        return new ArrayList<>(Unchecked.supplier(() ->
+                orderedUnion(
+                        peopleViaEmail.get(),
+                        peopleViaName.get()))
+                .get());
     }
+
 
     private List<Person> executeWithCondition(EntitySearchOptions options, Condition condition) {
         boolean showRemoved = options

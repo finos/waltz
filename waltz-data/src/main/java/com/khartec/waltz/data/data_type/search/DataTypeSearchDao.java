@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.data.data_type.search;
 
-import com.khartec.waltz.data.SearchUtilities;
+import com.khartec.waltz.data.SearchDao;
 import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
@@ -29,11 +29,12 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.PredicateUtilities.all;
+import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static java.util.stream.Collectors.toList;
 
 
 @Repository
-public class DataTypeSearchDao {
+public class DataTypeSearchDao implements SearchDao<DataType> {
 
     private final DataTypeDao dataTypeDao;
 
@@ -46,17 +47,19 @@ public class DataTypeSearchDao {
     }
 
 
+    @Override
     public List<DataType> search(EntitySearchOptions options) {
         checkNotNull(options, "options cannot be null");
 
-        List<String> terms = SearchUtilities.mkTerms(options.searchQuery().toLowerCase());
-        return dataTypeDao.findAll()
+        List<String> terms = mkTerms(options.searchQuery().toLowerCase());
+        return dataTypeDao
+                .findAll()
                 .stream()
                 .filter(dataType -> {
                     String s = (dataType.name() + " " + dataType.description()).toLowerCase();
                     return all(
                             terms,
-                            t -> s.indexOf(t) > -1);
+                            s::contains);
                 })
                 .limit(options.limit())
                 .collect(toList());
