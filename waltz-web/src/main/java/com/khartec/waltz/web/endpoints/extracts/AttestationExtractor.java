@@ -22,6 +22,7 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.application.LifecyclePhase;
 import com.khartec.waltz.schema.tables.AttestationInstance;
 import com.khartec.waltz.web.json.AttestationStatus;
 import org.jooq.*;
@@ -73,12 +74,12 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
             EntityReference entityReference = idSelectionOptions.entityReference();
             EntityKind kind = getKind(request);
             Optional<Integer> year = getYearParam(request);
-            Optional<String> lifecycle = getLifecycleParam(request);
-            Optional<String> status = getStatusParam(request);
+            Optional<LifecyclePhase> lifecycle = getLifecycleParam(request);
+            Optional<AttestationStatus> status = getStatusParam(request);
 
             String fileName = format(
                     "%s-for-%s-%s-%s",
-                    status.orElse("ALL_ATTESTATIONS"),
+                    status.map(Enum::name).orElse("ALL_ATTESTATIONS"),
                     entityReference.kind().name().toLowerCase(),
                     entityReference.id(),
                     kind.name().toLowerCase());
@@ -103,8 +104,8 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
     private SelectConditionStep<Record> mkQueryForReportingAttestationsByKindAndSelector(Select<Record1<Long>> appIds,
                                                                                          EntityKind kind,
                                                                                          Optional<Integer> year,
-                                                                                         Optional<String> lifecycle,
-                                                                                         Optional<String> status) {
+                                                                                         Optional<LifecyclePhase> lifecycle,
+                                                                                         Optional<AttestationStatus> status) {
 
         AttestationInstance latestAttestationInstance = ATTESTATION_INSTANCE.as("latestAttestationInstance");
         AttestationInstance attestationInstanceForPerson= ATTESTATION_INSTANCE.as("attestationInstanceForPerson");
@@ -138,11 +139,11 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
                 .orElse(DSL.trueCondition());
 
         Condition lifecycleCondition = lifecycle
-                .map(l -> APPLICATION.LIFECYCLE_PHASE.eq(lifecycle.get()))
+                .map(l -> APPLICATION.LIFECYCLE_PHASE.eq(l.name()))
                 .orElse(DSL.trueCondition());
 
         Condition statusCondition = status
-                .map(s -> s.equalsIgnoreCase(AttestationStatus.NEVER_ATTESTED.name())
+                .map(s -> s.equals(AttestationStatus.NEVER_ATTESTED)
                         ? peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT).isNull()
                         : peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT).isNotNull())
                 .orElse(DSL.trueCondition());
@@ -220,19 +221,19 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
     }
 
 
-    private Optional<String> getLifecycleParam(Request request) {
+    private Optional<LifecyclePhase> getLifecycleParam(Request request) {
         String lifecycleVal = request.queryParams("lifecycle");
         return Optional
                 .ofNullable(lifecycleVal)
-                .map(String::valueOf);
+                .map(LifecyclePhase::valueOf);
     }
 
 
-    private Optional<String> getStatusParam(Request request) {
+    private Optional<AttestationStatus> getStatusParam(Request request) {
         String status = request.queryParams("status");
         return Optional
                 .ofNullable(status)
-                .map(String::valueOf);
+                .map(AttestationStatus::valueOf);
     }
 
 }
