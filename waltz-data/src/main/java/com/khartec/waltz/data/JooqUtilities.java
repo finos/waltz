@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.data;
 
+import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.model.EndOfLifeStatus;
 import com.khartec.waltz.model.EntityKind;
@@ -34,7 +35,6 @@ import org.jooq.impl.DSL;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.*;
-import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -43,7 +43,6 @@ import java.util.stream.Stream;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDate;
 import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
-import static com.khartec.waltz.common.SetUtilities.union;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static java.util.stream.Collectors.*;
 import static org.jooq.impl.DSL.currentDate;
@@ -94,7 +93,7 @@ public class JooqUtilities {
         return Collector.of(
                 HashSet::new,
                 Set::add,
-                (s1, s2) -> union(s1, s2),
+                SetUtilities::union,
                 operation,
                 Collector.Characteristics.CONCURRENT);
     }
@@ -184,6 +183,7 @@ public class JooqUtilities {
                 recordsInScopeCondition);
         return query.fetch(TO_LONG_TALLY);
     }
+
 
 
     /**
@@ -285,16 +285,29 @@ public class JooqUtilities {
 
     public static Field<String> mkEndOfLifeStatusDerivedField(Field<Date> endOfLifeDateField) {
 
-        return DSL.when(endOfLifeDateField.lt(currentDate()), inline(EndOfLifeStatus.END_OF_LIFE.name()))
+        return DSL
+                .when(endOfLifeDateField.lt(currentDate()), inline(EndOfLifeStatus.END_OF_LIFE.name()))
                 .otherwise(inline(EndOfLifeStatus.NOT_END_OF_LIFE.name()));
     }
 
 
-    public static Condition mkBasicTermSearch(Field<String> field, List<String> terms) {
-        Function<String, Condition> mapper = (term) -> field.likeIgnoreCase("%"+term+"%");
-        BinaryOperator<Condition> combiner = (a, b) -> a.and(b);
-        return terms.stream().collect(Collectors.reducing(DSL.trueCondition(), mapper, combiner));
+    public static Condition mkBasicTermSearch(Field<String> field,
+                                               List<String> terms) {
+        return terms
+                .stream()
+                .map(field::containsIgnoreCase)
+                .reduce(DSL.trueCondition(), Condition::and);
     }
+
+
+    public static Condition mkStartsWithTermSearch(Field<String> field,
+                                                   List<String> terms) {
+        return terms
+                .stream()
+                .map(field::startsWithIgnoreCase)
+                .reduce(DSL.falseCondition(), Condition::or);
+    }
+
 
 
     public static Condition mkDateRangeCondition(TableField<ChangeLogRecord, Timestamp> field, java.sql.Date date) {
@@ -322,6 +335,7 @@ public class JooqUtilities {
     private static Date getOneDayLater(Timestamp timestamp) {
         return toSqlDate(toLocalDate(timestamp).plusDays(1));
     }
+
 
     public static CommonTableExpression<Record1<Long>> selectorToCTE(String name,
                                                                      GenericSelector genericSelector) {

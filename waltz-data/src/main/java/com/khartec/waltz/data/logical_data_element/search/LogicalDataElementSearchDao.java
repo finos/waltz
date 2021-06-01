@@ -19,6 +19,8 @@
 package com.khartec.waltz.data.logical_data_element.search;
 
 
+import com.khartec.waltz.common.EnumUtilities;
+import com.khartec.waltz.data.SearchDao;
 import com.khartec.waltz.data.logical_data_element.LogicalDataElementDao;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.logical_data_element.LogicalDataElement;
@@ -29,17 +31,17 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.sort;
-import static com.khartec.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.data.JooqUtilities.mkBasicTermSearch;
 import static com.khartec.waltz.data.SearchUtilities.mkRelevancyComparator;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.LogicalDataElement.LOGICAL_DATA_ELEMENT;
 
 @Repository
-public class LogicalDataElementSearchDao {
+public class LogicalDataElementSearchDao implements SearchDao<LogicalDataElement> {
 
     private final DSLContext dsl;
 
@@ -52,6 +54,7 @@ public class LogicalDataElementSearchDao {
     }
 
 
+    @Override
     public List<LogicalDataElement> search(EntitySearchOptions options) {
         List<String> terms = mkTerms(options.searchQuery());
 
@@ -59,9 +62,7 @@ public class LogicalDataElementSearchDao {
             return Collections.emptyList();
         }
 
-        List<String> validStatusNames = map(
-                options.entityLifecycleStatuses(),
-                s -> s.name());
+        Set<String> validStatusNames = EnumUtilities.names(options.entityLifecycleStatuses());
 
         Condition statusCondition = LOGICAL_DATA_ELEMENT.ENTITY_LIFECYCLE_STATUS.in(validStatusNames);
 

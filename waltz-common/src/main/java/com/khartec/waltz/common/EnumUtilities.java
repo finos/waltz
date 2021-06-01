@@ -72,18 +72,18 @@ public class EnumUtilities {
      * @param <T> Type of enum values
      * @return Set of names associated to the given enum
      */
-    public static <T extends Enum> Set<String> names(T... enums) {
+    public static <T extends Enum<?>> Set<String> names(T... enums) {
         return Stream
                 .of(enums)
-                .map(t -> t.name())
+                .map(Enum::name)
                 .collect(Collectors.toSet());
     }
 
 
-    public static <T extends Enum> Set<String> names(Collection<T> enums) {
+    public static <T extends Enum<?>> Set<String> names(Collection<T> enums) {
         return enums
                 .stream()
-                .map(t -> t.name())
+                .map(Enum::name)
                 .collect(Collectors.toSet());
     }
 

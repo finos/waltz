@@ -36,7 +36,8 @@ public class SqlServerChangeInitiativeSearch implements FullTextSearch<ChangeIni
     @Override
     public List<ChangeInitiative> searchFullText(DSLContext dsl, EntitySearchOptions options) {
         List<String> terms = mkTerms(options.searchQuery());
-        return dsl.select(CHANGE_INITIATIVE.fields())
+        return dsl
+                .select(CHANGE_INITIATIVE.fields())
                 .from(CHANGE_INITIATIVE)
                 .where(JooqUtilities.MSSQL.mkContainsPrefix(terms))
                 .limit(options.limit())

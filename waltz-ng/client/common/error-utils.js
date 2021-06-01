@@ -25,7 +25,9 @@ const fallbackReasons = {
 
 
 function mkErrorMessage(message, e) {
-    const fallbackReason = fallbackReasons[e.status] || "Unknown reason";
+    const fallbackReason = e
+        ? fallbackReasons[e.status] || `Status Code: ${e.status}`
+        : "Unknown reason";
 
     const reason = e
         ? ": " + _.get(e, ["data", "message"], fallbackReason)

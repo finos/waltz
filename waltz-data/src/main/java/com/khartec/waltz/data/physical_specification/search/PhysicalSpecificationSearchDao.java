@@ -19,6 +19,7 @@
 package com.khartec.waltz.data.physical_specification.search;
 
 
+import com.khartec.waltz.data.SearchDao;
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.NameProvider;
@@ -38,6 +39,7 @@ import java.util.Optional;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.JooqUtilities.mkBasicTermSearch;
+import static com.khartec.waltz.data.JooqUtilities.mkStartsWithTermSearch;
 import static com.khartec.waltz.data.SearchUtilities.mkRelevancyComparator;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao.owningEntityNameField;
@@ -46,7 +48,7 @@ import static com.khartec.waltz.schema.Tables.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 
 @Repository
-public class PhysicalSpecificationSearchDao {
+public class PhysicalSpecificationSearchDao implements SearchDao<PhysicalSpecification> {
 
     private final DSLContext dsl;
 
@@ -58,6 +60,7 @@ public class PhysicalSpecificationSearchDao {
     }
 
 
+    @Override
     public List<PhysicalSpecification> search(EntitySearchOptions options) {
         List<String> terms = mkTerms(options.searchQuery());
         if (terms.isEmpty()) {
@@ -66,11 +69,10 @@ public class PhysicalSpecificationSearchDao {
 
         Condition likeName = mkBasicTermSearch(PHYSICAL_SPECIFICATION.NAME, terms);
         Condition likeDesc = mkBasicTermSearch(PHYSICAL_SPECIFICATION.DESCRIPTION, terms);
-        Condition likeExternalIdentifier = mkBasicTermSearch(PHYSICAL_SPECIFICATION.EXTERNAL_ID, terms)
-                .or(mkBasicTermSearch(EXTERNAL_IDENTIFIER.EXTERNAL_ID, terms));
+        Condition likeExternalIdentifier = mkStartsWithTermSearch(PHYSICAL_SPECIFICATION.EXTERNAL_ID, terms)
+                .or(mkStartsWithTermSearch(EXTERNAL_IDENTIFIER.EXTERNAL_ID, terms));
 
         Condition searchFilter = likeName.or(likeDesc).or(likeExternalIdentifier);
-
 
         SelectQuery<Record> query = dsl
                 .selectDistinct(PHYSICAL_SPECIFICATION.fields())
