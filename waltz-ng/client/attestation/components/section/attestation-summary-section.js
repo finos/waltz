@@ -69,15 +69,21 @@ const ALL_LIFECYCLES = 0;
  * @returns {string}
  */
 function mkExtractUrl(attestationType, segment, year, lifecycle) {
-    const status = segment.key;
+    const status = _.get(segment, "key", null);
+
+    const statusParam = _.isNil(status)
+        ? ""
+        : `status=${status}`
+
     const yearParam = status === "NEVER_ATTESTED" || year === ALL_YEARS
         ? ""
         : `&year=${year}`;
-    const lifecycleParam = status === "NEVER_ATTESTED" || lifecycle === ALL_LIFECYCLES
+
+    const lifecycleParam = lifecycle === ALL_LIFECYCLES
         ? ""
         : `&lifecycle=${lifecycle}`;
 
-    return `attestations/${attestationType}?status=${status}${yearParam}${lifecycleParam}`;
+    return `attestations/${attestationType}?${statusParam}${yearParam}${lifecycleParam}`;
 }
 
 
