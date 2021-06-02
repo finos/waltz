@@ -3,6 +3,7 @@
     import {positionFor, shapeFor, toGraphId} from "../../flow-diagram-utils";
     import {select} from "d3-selection";
     import {wrapText} from "../../../common/d3-utils";
+    import {draw, fade} from "svelte/transition"
 
     export let positions;
     export let annotation;
@@ -76,8 +77,10 @@
    transform={`translate(${geom.subjectPosition.x} ${geom.subjectPosition.y})`}
    fill="#888">
     <path d={linePath}
+          in:draw="{{duration: 1500}}"
+          out:draw="{{duration: 2000}}"
           fill="none"
-          stroke="#aaa"
+          stroke="#ddd"
           stroke-dasharray="4 2">
     </path>
     <circle r="12"
@@ -87,6 +90,8 @@
             fill="none"
             stroke="#ccc"></circle>
     <text style="font-size: smaller"
+          in:fade="{{ delay: 500, duration: 1000}}"
+          out:fade="{{ duration: 1500}}"
           bind:this={textElem}>
     </text>
 </g>
