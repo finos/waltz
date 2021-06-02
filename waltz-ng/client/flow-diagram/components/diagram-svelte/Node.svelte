@@ -44,6 +44,10 @@
         DEFAULT: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), { icon: "\uf096" })
     };
 
+    function selectNode() {
+        dispatch("selectNode", node.data);
+    }
+
     let nameElem;
     let gElem;
 
@@ -58,6 +62,7 @@
 
 <g {transform}
    bind:this={gElem}
+   on:click={selectNode}
    class="wfd-node">
     <path d={shape.path}
           class="node"
@@ -86,14 +91,10 @@
         user-select: none;
         opacity: 0.9;
         transition: opacity 300ms;
-
-        &,.wfd-title {
-              font-size: xx-small;
-              fill: $waltz-font-color;
-        }
+        pointer-events: all;
 
         &:hover {
-             cursor: move;
+            cursor: move;
             path {
                 stroke: #999;
             }

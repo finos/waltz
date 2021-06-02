@@ -1,6 +1,11 @@
 <script>
     import {select} from "d3-selection";
     import {mkCurvedLine} from "../../../common/d3-utils";
+    import {createEventDispatcher} from "svelte";
+    import {node} from "./Node.svelte";
+
+
+    const dispatch = createEventDispatcher();
 
     export let flow;
     export let positions;
@@ -55,6 +60,9 @@
         return `translate(${p.x}, ${p.y})`;
     }
 
+    function selectBucket() {
+        dispatch("selectFlow", { flow: flow.data, decorations: _.map(decorations[flow.id], d=> d.data)});
+    }
 
     let gElem;
 
@@ -76,6 +84,7 @@
         }
     }
 
+
 </script>
 
 <g bind:this={gElem}>
@@ -90,7 +99,8 @@
           stroke="#999">
     </path>
 
-    <g class="wfd-flow-bucket">
+    <g class="wfd-flow-bucket"
+       on:click={selectBucket}>
         <circle r={decorationCount > 0 ? 16 : 12}
                 stroke="#999"
                 fill="#fff">
@@ -108,5 +118,6 @@
 <style>
     .wfd-flow-bucket {
         user-select: none;
+        pointer-events: all;
     }
 </style>

@@ -7,7 +7,8 @@
 </script>
 
 {#each flows as flow}
-    <Flow {positions}
+    <Flow on:selectFlow
+          {positions}
           {decorations}
           {flow}/>
 {/each}

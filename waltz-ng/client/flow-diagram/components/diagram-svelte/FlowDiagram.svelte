@@ -8,6 +8,13 @@
 
     let elem;
 
+    function onSelectFlow(d) {
+        console.log("selectFlow", d)
+    }
+
+    function onSelectNode(d) {
+        console.log("selectNode", d)
+    }
     /**
      * Pan and zoom only enabled if ctrl or meta key is held down.
      * @param commandProcessor
@@ -39,8 +46,8 @@
     }
 
     $: select(elem)
-            .selectAll(".wfd-flow-bucket")
-            .style("display", $store.visibility?.layers.flowBuckets ? "": "none");
+           .selectAll(".wfd-flow-bucket")
+           .style("display", $store.visibility?.layers.flowBuckets ? "": "none");
 
     $: elem && setupPanAndZoom($processor);
 
@@ -57,11 +64,13 @@
                                  annotations={$store.model?.annotations}/>
             {/if}
 
-            <FlowLayer positions={$store.layout?.positions}
+            <FlowLayer on:selectFlow={onSelectFlow}
+                       positions={$store.layout?.positions}
                        decorations={$store.model?.decorations}
                        flows={$store.model?.flows}/>
 
-            <NodeLayer positions={$store.layout?.positions}
+            <NodeLayer on:selectNode={onSelectNode}
+                       positions={$store.layout?.positions}
                        nodes={$store.model?.nodes}/>
 
         </g>
