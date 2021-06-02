@@ -14,6 +14,7 @@
         <g transform={$store.layout?.diagramTransform}>
 
             <FlowLayer positions={$store.layout?.positions}
+                       decorations={$store.model?.decorations}
                        flows={$store.model?.flows}/>
 
             <NodeLayer positions={$store.layout?.positions}

@@ -4,6 +4,17 @@
 
     export let flow;
     export let positions;
+    export let decorations;
+
+    function determineIcon(count) {
+        if (count === 0) {
+            return "\uf29c"; // question
+        } else if (count === 1) {
+            return "\uf016"; // one
+        } else {
+            return "\uf0c5"; // many
+        }
+    }
 
     function mkLinePath(f) {
         const sourcePos = positions[f.source];
@@ -26,6 +37,7 @@
             targetPos.y + targetShape.cy);
     }
 
+
     function mkArrowTransform(elem) {
         const arrowPt1 = elem.getPointAtLength(elem.getTotalLength() / 1.4);
         const arrowPt2 = elem.getPointAtLength(elem.getTotalLength() / 1.6);
@@ -37,11 +49,21 @@
         return `translate(${arrowPt1.x}, ${arrowPt1.y}) rotate(${theta * (180 / Math.PI)})`;
     }
 
+
+    function mkBucketTransform(elem) {
+        const p = elem.getPointAtLength(elem.getTotalLength() / 2);
+        return `translate(${p.x}, ${p.y})`;
+    }
+
+
     let gElem;
 
     $: g = gElem && select(gElem);
     $: line = g && g.select(".wfd-flow-arrow");
     $: arrow = g && g.select(".wfd-flow-arrow-head");
+    $: bucket = g && g.select(".wfd-flow-bucket");
+    $: decorationCount = _.size(decorations[flow.id]) || 0;
+    $: icon = determineIcon(decorationCount);
 
     $: {
         if (line && arrow) {
@@ -50,6 +72,7 @@
             // arrow heads sometimes being 'left-behind' if nodes are moved quickly
             line.attr("d", mkLinePath(flow))
             arrow.attr("transform", mkArrowTransform(line.node()));
+            bucket.attr("transform", mkBucketTransform(line.node()));
         }
     }
 
@@ -66,4 +89,18 @@
           class="wfd-flow-arrow-head"
           stroke="#999">
     </path>
+
+    <g class="wfd-flow-bucket">
+        <circle r={decorationCount > 0 ? 16 : 12}
+                stroke="#999"
+                fill="#fff">
+        </circle>
+        <text style="font-size: small;"
+              font-family="FontAwesome"
+              text-anchor="middle"
+              dx="0"
+              dy="4.5">
+            {icon}
+        </text>
+    </g>
 </g>
