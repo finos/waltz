@@ -4,7 +4,9 @@
     export let positions = {};
 </script>
 
-{#each nodes as node}
-    <Node {node}
-          {positions}/>
-{/each}
+<g class="wfd-nodes">
+    {#each nodes as node}
+        <Node {node}
+              {positions}/>
+    {/each}
+</g>

@@ -1,5 +1,5 @@
 import FlowDiagram from "./FlowDiagram.svelte"
-import {store} from "./diagram-model-store";
+import {store, processor} from "./diagram-model-store";
 import {initialiseData} from "../../../common";
 
 const initialState = {
@@ -9,6 +9,7 @@ const initialState = {
 function controller(flowDiagramStateService) {
     const vm = initialiseData(this, initialState);
 
+    processor.set(flowDiagramStateService.processCommands);
     flowDiagramStateService.onChange((newState) => console.log("ns", {newState}) || store.set(newState));
 }
 
@@ -19,7 +20,8 @@ controller.$inject = [
 
 
 const component = {
-    template: `<waltz-svelte-component component="$ctrl.FlowDiagram"></waltz-svelte-component>`,
+    template: `<waltz-svelte-component component="$ctrl.FlowDiagram">
+               </waltz-svelte-component>`,
     bindings: {},
     controller
 };
