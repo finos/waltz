@@ -104,3 +104,9 @@
         </text>
     </g>
 </g>
+
+<style>
+    .wfd-flow-bucket {
+        user-select: none;
+    }
+</style>

@@ -3,11 +3,13 @@
     import {event, select} from "d3-selection";
     import {processor} from "./diagram-model-store";
     import {mkDragHandler} from "./drag-handler";
+    import {createEventDispatcher} from "svelte";
+
+
+    const dispatch = createEventDispatcher();
 
     export let node = null;
     export let positions = {};
-
-
 
 
     function mkTrapezoidShape(widthHint) {
@@ -81,7 +83,7 @@
     @import "style/variables";
 
     .wfd-node {
-        //@extend .no-text-select;
+        user-select: none;
         opacity: 0.9;
         transition: opacity 300ms;
 
