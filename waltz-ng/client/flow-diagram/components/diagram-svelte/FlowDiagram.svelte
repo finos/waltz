@@ -38,6 +38,10 @@
         });
     }
 
+    $: select(elem)
+            .selectAll(".wfd-flow-bucket")
+            .style("display", $store.visibility?.layers.flowBuckets ? "": "none");
+
     $: elem && setupPanAndZoom($processor);
 
 </script>

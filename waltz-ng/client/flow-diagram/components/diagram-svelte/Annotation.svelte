@@ -4,6 +4,8 @@
     import {select} from "d3-selection";
     import {wrapText} from "../../../common/d3-utils";
     import {draw, fade} from "svelte/transition"
+    import {mkDragHandler} from "./drag-handler";
+    import {processor} from "./diagram-model-store";
 
     export let positions;
     export let annotation;
@@ -44,6 +46,7 @@
 
     let linePath = "";
     let textElem;
+    let elbowElem;
 
     $: geom = determineAnnotationGeometry(positions, annotation);
     $: {
@@ -51,8 +54,7 @@
         linePath = `
                 M${geom.subjectShape.cx},${geom.subjectShape.cy}
                 l${geom.annotationPosition.x},${geom.annotationPosition.y}
-                l${bar},0
-            `;
+                l${bar},0`;
     }
 
     $: {
@@ -69,9 +71,10 @@
             .call(wrapText, 115);
     }
 
-    $: console.log({geom})
-
+    $: dragHandler = mkDragHandler(annotation, $processor)
+    $: select(elbowElem).call(dragHandler);
 </script>
+
 
 <g class="wfd-annotation"
    transform={`translate(${geom.subjectPosition.x} ${geom.subjectPosition.y})`}
@@ -88,6 +91,7 @@
             cx={geom.annotationPosition.x + geom.subjectShape.cx}
             cy={geom.annotationPosition.y + geom.subjectShape.cy}
             fill="none"
+            bind:this={elbowElem}
             stroke="#ccc"></circle>
     <text style="font-size: smaller"
           in:fade="{{ delay: 500, duration: 1000}}"
@@ -95,6 +99,7 @@
           bind:this={textElem}>
     </text>
 </g>
+
 
 <style type="text/scss">
     $annotation-color: #a4a2a6;

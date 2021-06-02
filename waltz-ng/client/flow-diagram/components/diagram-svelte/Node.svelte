@@ -2,45 +2,12 @@
     import {drag} from "d3-drag";
     import {event, select} from "d3-selection";
     import {processor} from "./diagram-model-store";
+    import {mkDragHandler} from "./drag-handler";
 
     export let node = null;
     export let positions = {};
 
-    let dragStartPos = null;
 
-    function dragStarted() {
-        dragStartPos = { x: event.x, y: event.y };
-        return select(this)
-            .raise()
-            .classed("wfd-active", true);
-    }
-
-
-    function dragger(commandProcessor) {
-        return (d) => {
-            const cmd = {
-                command: "MOVE",
-                payload: {id: node.id, dx: event.dx, dy: event.dy}
-            };
-            console.log("move", cmd);
-            $processor([cmd]);
-        };
-    }
-
-    function dragEnded(d) {
-        const noMove = dragStartPos.x === event.x && dragStartPos.y === event.y;
-        if (noMove) {
-            console.log("No move")
-        }
-
-        return select(this)
-            .classed("wfd-active", false);
-    }
-
-    const dragHandler = drag()
-        .on("start", dragStarted)
-        .on("drag", dragger()) //commandProcessor))
-        .on("end", dragEnded);
 
 
     function mkTrapezoidShape(widthHint) {
@@ -81,6 +48,7 @@
     $: width = nameElem && nameElem.getComputedTextLength() + 30;
     $: shape = node && shapes[node.data.kind](width);
     $: transform = node && `translate(${positions[node.id].x} ${positions[node.id].y})`;
+    $: dragHandler = mkDragHandler(node, $processor)
     $: select(gElem).call(dragHandler);
 
 </script>
