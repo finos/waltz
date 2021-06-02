@@ -51,7 +51,7 @@
           dy={shape.title.dy}>
         {shape.icon}
     </text>
-    <text dx={shape.title.dx + 14}
+    <text dx={shape.title.dx + 16}
           dy={shape.title.dy}
           style="font-size: small;">
         {node.data.name}
