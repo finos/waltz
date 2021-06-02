@@ -141,7 +141,7 @@ public class AuthoritativeSourceService {
 
 
     public int insert(AuthoritativeSourceCreateCommand command, String username) {
-        int insertedCount = authoritativeSourceDao.insert(command);
+        int authSourceId = authoritativeSourceDao.insert(command);
 
         if (command.parentReference().kind() == ORG_UNIT) {
             ratingCalculator.update(command.dataTypeId(), command.parentReference());
@@ -150,7 +150,7 @@ public class AuthoritativeSourceService {
         logInsert(command, username);
         authoritativeSourceDao.updatePointToPointAuthStatements();
 
-        return insertedCount;
+        return authSourceId;
     }
 
 

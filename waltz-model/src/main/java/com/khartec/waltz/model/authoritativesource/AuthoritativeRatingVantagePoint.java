@@ -36,6 +36,7 @@ public abstract class AuthoritativeRatingVantagePoint {
     public abstract String dataTypeCode();
     public abstract int dataTypeRank();
     public abstract Long applicationId();
+    public abstract Long authSourceId();
     public abstract AuthoritativenessRating rating();
 
 }
