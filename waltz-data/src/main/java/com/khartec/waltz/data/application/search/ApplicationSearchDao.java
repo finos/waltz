@@ -18,7 +18,9 @@
 
 package com.khartec.waltz.data.application.search;
 
+import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.data.FullTextSearch;
+import com.khartec.waltz.data.SearchDao;
 import com.khartec.waltz.data.UnsupportedSearcher;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.model.EntityKind;
@@ -28,67 +30,69 @@ import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
-import org.jooq.impl.DSL;
+import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.Future;
+import java.util.function.Supplier;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.CollectionUtilities.sort;
 import static com.khartec.waltz.common.SetUtilities.orderedUnion;
 import static com.khartec.waltz.data.JooqUtilities.*;
 import static com.khartec.waltz.data.SearchUtilities.mkRelevancyComparator;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;
+import static java.util.Collections.emptyList;
 
 @Repository
-public class ApplicationSearchDao {
+public class ApplicationSearchDao implements SearchDao<Application> {
 
 
     private final DSLContext dsl;
     private final FullTextSearch<Application> searcher;
+    private final DBExecutorPoolInterface dbExecutorPool;
 
 
     @Autowired
-    public ApplicationSearchDao(DSLContext dsl) {
+    public ApplicationSearchDao(DSLContext dsl, DBExecutorPoolInterface dbExecutorPool) {
         this.dsl = dsl;
+        this.dbExecutorPool = dbExecutorPool;
         this.searcher = determineSearcher(dsl.dialect());
     }
 
 
+    @Override
     public List<Application> search(EntitySearchOptions options) {
         checkNotNull(options, "options cannot be null");
 
         List<String> terms = mkTerms(options.searchQuery());
 
         if (terms.isEmpty()) {
-            return Collections.emptyList();
+            return emptyList();
         }
 
         Condition lifecycleCondition = APPLICATION.ENTITY_LIFECYCLE_STATUS.in(options.entityLifecycleStatuses());
+        Condition nameCondition = mkBasicTermSearch(APPLICATION.NAME, terms);
+        Condition assetCodeCondition = mkStartsWithTermSearch(APPLICATION.ASSET_CODE, terms);
+        Condition aliasCondition = ENTITY_ALIAS.KIND.eq(EntityKind.APPLICATION.name())
+                .and(mkBasicTermSearch(ENTITY_ALIAS.ALIAS, terms));
 
-        Condition assetCodeCondition = terms
-                .stream()
-                .map(APPLICATION.ASSET_CODE::startsWith)
-                .reduce(DSL.trueCondition(), Condition::and);
-
-        List<Application> appsViaAssetCode = dsl.selectDistinct(APPLICATION.fields())
+        Future<List<Application>> appsViaAssetCode = dbExecutorPool.submit(() -> dsl
+                .select(APPLICATION.fields())
                 .from(APPLICATION)
                 .where(assetCodeCondition)
                 .and(lifecycleCondition)
                 .orderBy(APPLICATION.NAME)
                 .limit(options.limit())
-                .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
+                .fetch(ApplicationDao.TO_DOMAIN_MAPPER));
 
-        Condition aliasCondition = terms
-                .stream()
-                .map(ENTITY_ALIAS.ALIAS::containsIgnoreCase)
-                .reduce(ENTITY_ALIAS.KIND.eq(EntityKind.APPLICATION.name()), Condition::and);
-
-        List<Application> appsViaAlias = dsl
+        Future<List<Application>> appsViaAlias = dbExecutorPool.submit(() -> dsl
                 .selectDistinct(APPLICATION.fields())
                 .from(APPLICATION)
                 .innerJoin(ENTITY_ALIAS)
@@ -97,28 +101,28 @@ public class ApplicationSearchDao {
                 .and(lifecycleCondition)
                 .orderBy(APPLICATION.NAME)
                 .limit(options.limit())
-                .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
+                .fetch(ApplicationDao.TO_DOMAIN_MAPPER));
 
-        Condition nameCondition = terms
-                .stream()
-                .map(APPLICATION.NAME::containsIgnoreCase)
-                .reduce(DSL.trueCondition(), Condition::and);
+        Future<List<Application>> appsViaName = dbExecutorPool.submit(() -> sort(
+                dsl
+                    .select(APPLICATION.fields())
+                    .from(APPLICATION)
+                    .where(nameCondition)
+                    .and(lifecycleCondition)
+                    .orderBy(APPLICATION.NAME)
+                    .limit(options.limit())
+                    .fetch(ApplicationDao.TO_DOMAIN_MAPPER),
+                mkRelevancyComparator(NameProvider::name, terms.get(0))));
 
-        List<Application> appsViaName = dsl
-                .selectDistinct(APPLICATION.fields())
-                .from(APPLICATION)
-                .where(nameCondition)
-                .and(lifecycleCondition)
-                .orderBy(APPLICATION.NAME)
-                .limit(options.limit())
-                .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
+        Future<List<Application>> appsViaFullText = dbExecutorPool.submit(() -> searcher.searchFullText(dsl, options));
 
+        Supplier<Set<Application>> result = Unchecked.supplier(() -> orderedUnion(
+                appsViaAssetCode.get(),
+                appsViaName.get(),
+                appsViaAlias.get(),
+                appsViaFullText.get()));
 
-        List<Application> appsViaFullText = searcher.searchFullText(dsl, options);
-
-        appsViaName.sort(mkRelevancyComparator(NameProvider::name, terms.get(0)));
-
-        return new ArrayList<>(orderedUnion(appsViaAssetCode, appsViaName, appsViaAlias, appsViaFullText));
+        return new ArrayList<>(result.get());
     }
 
 

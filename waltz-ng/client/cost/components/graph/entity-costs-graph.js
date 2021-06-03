@@ -65,14 +65,20 @@ function drawYAxis(yScale,
                    onSelect) {
 
     const yAxis = axisLeft(yScale)
-        .tickFormat(d => truncateMiddle(
-            _.get(refsById, [ d, 'name'], 'Unknown'),
-            25));
+        .tickFormat(d => {
+            const name = _.get(refsById, [ d, 'name'], 'Unknown');
+            return truncateMiddle(name, 25);
+        });
 
     container
         .transition()
         .duration(transitionDuration)
         .call(yAxis);
+
+
+    container
+        .selectAll(".tick")
+        .on("click", d => onSelect(refsById[d]));
 
     container
         .selectAll('.tick')
@@ -116,7 +122,7 @@ function draw(chartBody,
         .append("g")
         .classed("wacg-bar", true)
         .attr("transform", (d) => `translate(0, ${yScale(d.entityReference.id)})`)
-        .on("click.select", d => onSelect(d));
+        .on("click.select", d => onSelect(d.entityReference));
 
     newBars
         .append("rect")

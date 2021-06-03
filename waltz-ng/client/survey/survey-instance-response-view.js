@@ -47,7 +47,7 @@ function controller($q,
 
     const questionPromise = serviceBroker
         .loadViewData(
-            CORE_API.SurveyQuestionStore.findForInstance,
+            CORE_API.SurveyQuestionStore.findQuestionsForInstance,
             [ id ])
         .then(r => r.data);
 

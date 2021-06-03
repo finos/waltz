@@ -19,9 +19,12 @@
 //
 // Dropdowns - used for the dropdown menu on top right.
 // --------------------------------------------------
-.dropdown-menu > li span a {
+.dropdown-menu > li a {
     display: block;
-    padding: 3px 20px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 10px;
+    padding-right: 10px;
     clear: both;
     font-weight: normal;
     line-height: 1.42857;
@@ -30,11 +33,15 @@
     text-decoration: none;
 }
 
+.dropdown-menu-items {
+    border: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.15);
+}
+
 
 .dropdown-menu > li span a:hover,
 .dropdown-menu > li span a:focus {
-    @include gradient-vertical($start-color: $dropdown-link-hover-bg, $end-color: darken($dropdown-link-hover-bg, 5%));
-    background-color: darken($dropdown-link-hover-bg, 5%);
+    background-color: #f5f5f5;
 }
 
 

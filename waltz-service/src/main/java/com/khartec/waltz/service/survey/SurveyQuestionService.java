@@ -62,11 +62,6 @@ public class SurveyQuestionService {
     }
 
 
-    public List<SurveyQuestion> findForSurveyInstanceOld(long surveyInstanceId) {
-        return surveyQuestionDao.findForSurveyInstance(surveyInstanceId);
-    }
-
-
     public long create(SurveyQuestion surveyQuestion) {
         checkNotNull(surveyQuestion, "surveyQuestion cannot be null");
 

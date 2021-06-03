@@ -104,7 +104,7 @@ public class FavouritesService {
 
         ImmutableAppGroup favouritesGroup = ImmutableAppGroup.builder()
                 .name(format("Favourite apps for: %s", username))
-                .externalId("FAVOURITE")
+                .externalId(format("FAVOURITE-%s", username.toUpperCase()))
                 .description("Favourite applications for group owner")
                 .appGroupKind(AppGroupKind.PRIVATE)
                 .isFavouriteGroup(true)

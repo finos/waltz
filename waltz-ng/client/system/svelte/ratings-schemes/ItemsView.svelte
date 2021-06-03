@@ -101,7 +101,8 @@
         <thead>
         <tr>
             <th width="20%">Rating</th>
-            <th width="20%">Color</th>
+            <th width="5%">Code</th>
+            <th width="15%">Color</th>
             <th width="20%">Description</th>
             <th width="20%">Usages</th>
             <th width="20%">Operations</th>
@@ -111,6 +112,7 @@
         {#each ratings as rating}
             <tr>
                 <td>{rating.name}</td>
+                <td>{rating.rating}</td>
                 <td>
                     <div class="rating-square"
                          style="background-color: {rating.color}">

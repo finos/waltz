@@ -128,7 +128,7 @@ function controller($q,
                 .whoami()
                 .then(me => {
                     const owner = _.find(vm.owners, o => o.userId === me.userName && o.role === "OWNER");
-                    vm.canDelete = owner != null;
+                    vm.canDelete = owner != null && !vm.appGroup.isFavouriteGroup;
                 });
         });
 
@@ -349,7 +349,7 @@ function controller($q,
     //add app via recently viewed
     vm.history = localStorageService
         .get("history_2").filter(r => r.kind === "APPLICATION") || [];
-    
+
     vm.changeInitiativeHistory = localStorageService
         .get("history_2").filter(r => r.kind === "CHANGE_INITIATIVE") || [];
 
@@ -390,12 +390,12 @@ function controller($q,
                 .filter(r => r.action === "ADD")
                 .map(r => r.entityRef.id)
                 .value();
-    
+
             const changeInitiativeIdsToRemove = _.chain(results)
                 .filter(r => r.action === "REMOVE")
                 .map(r => r.entityRef.id)
                 .value();
-    
+
             if (changeInitiativeIdsToAdd.length > 0) {
                 serviceBroker
                     .execute(CORE_API.AppGroupStore.addChangeInitiatives,
@@ -404,7 +404,7 @@ function controller($q,
                     .then(changeInitiatives => vm.changeInitiatives = changeInitiatives, e => handleError(e))
                     .then(() => notification.success(`Added ${changeInitiativeIdsToAdd.length} change initiatives`));
             }
-    
+
             if (changeInitiativeIdsToRemove.length > 0) {
                 serviceBroker
                     .execute(CORE_API.AppGroupStore.removeChangeInitiatives, [id, changeInitiativeIdsToRemove])
@@ -412,7 +412,7 @@ function controller($q,
                     .then(changeInitiatives => vm.changeInitiatives = changeInitiatives, e => handleError(e))
                     .then(() => notification.success(`Removed ${changeInitiativeIdsToRemove.length} change initiatives`));
             }
-    
+
             if (changeInitiativeIdsToAdd.length === 0 && changeInitiativeIdsToRemove.length === 0){
                 notification.info("There are no change initiatives to be added or removed");
             }

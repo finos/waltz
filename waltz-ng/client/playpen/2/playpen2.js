@@ -17,15 +17,43 @@
  */
 
 import template from "./playpen2.html";
-import data from "./test-data.js";
+import {mkSelectionOptions} from "../../common/selector-utils";
+import {CORE_API} from "../../common/services/core-api-utils";
+import {mkRef} from "../../common/entity-utils";
+
+
+const initialState = {
+    checkedItemIds: [],
+    parentEntityRef: {id: 20506, kind: "APPLICATION"}
+}
 
 function controller(serviceBroker) {
 
-    const vm = Object.assign(this, {
-        parentEntityRef: {id: 20506, kind: 'APPLICATION'}});
+    const vm = Object.assign(this, initialState);
 
-    vm.rawData = data;
+    serviceBroker
+        .loadViewData(CORE_API.MeasurableStore.findMeasurablesBySelector, 
+                      [mkSelectionOptions(
+                          mkRef("MEASURABLE_CATEGORY", 16),
+                          "EXACT")])
+        .then(r => vm.recordsManagementItems = console.log(r.data) || r.data);
+    
+    vm.isDisabled = (d) => !d.concrete;
+
+    vm.onItemCheck = (d) => {
+
+
+        vm.checkedItemIds = _.union(vm.checkedItemIds, [d]);
+    }
+
+    vm.onItemUncheck = (d) => {
+        vm.checkedItemIds = _.without(vm.checkedItemIds, d);
+
+    }
+
 }
+
+
 
 
 controller.$inject = ["ServiceBroker"];
@@ -34,7 +62,7 @@ controller.$inject = ["ServiceBroker"];
 const view = {
     template,
     controller,
-    controllerAs: '$ctrl',
+    controllerAs: "$ctrl",
     bindToController: true,
     scope: {}
 };

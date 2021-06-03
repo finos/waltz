@@ -41,4 +41,5 @@ public abstract class SurveyQuestionResponse {
     public abstract Optional<LocalDate> dateResponse();
     public abstract Optional<EntityReference> entityResponse();
     public abstract Optional<List<String>> listResponse();
+    public abstract Optional<List<EntityReference>> entityListResponse();
 }

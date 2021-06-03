@@ -55,6 +55,25 @@
                 </div>
             </div>
 
+
+            <div class="form-group">
+                <label for="externalId"
+                       class="col-sm-2 control-label">
+                    External Id
+                </label>
+                <div class="col-sm-10">
+                    <input class="form-control form-control-warning"
+                           id="externalId"
+                           placeholder="External identifier for this template"
+                           ng-model="ctrl.surveyTemplate.externalId" />
+                    <p class="help-block">
+                        External identifiers can be used to simplify reading/writing data programmatically.
+                        Consumers <i>may</i> break if an external identifier is changed.
+                    </p>
+                </div>
+            </div>
+
+
             <div class="form-group">
                 <label for="description"
                        class="col-sm-2 control-label">
@@ -111,6 +130,7 @@
         <waltz-section-actions>
             <a class="btn btn-primary btn-xs"
                waltz-has-role="SURVEY_TEMPLATE_ADMIN"
+               ng-disabled="ctrl.editingQuestion"
                ng-click="ctrl.showAddQuestionForm()">
                 Add New
             </a>
@@ -118,7 +138,7 @@
 
         <!-- LIST: (not editing) -->
         <div ng-if="!ctrl.editingQuestion">
-            <waltz-survey-template-question-overview-table question-infos="ctrl.surveyQuestionInfos"
+            <waltz-survey-template-question-overview-table questions="ctrl.surveyQuestions"
                                                            actions="[{
                                                                 name: 'Edit',
                                                                 icon:'pencil',
@@ -179,11 +199,25 @@
                     <div ng-if="ctrl.selectedQuestionInfo.question.fieldType === 'DROPDOWN'
                                 || ctrl.selectedQuestionInfo.question.fieldType === 'DROPDOWN_MULTI_SELECT'"
                          class="col-sm-7 col-sm-offset-2">
-                        <div class=""
-                             style="display: block; background-color: #F8F9F9; margin-top:10px; padding: 1em; border-radius: 2px; border: 1px solid #eee">
+                        <div style="display: block; background-color: #F8F9F9; margin-top:10px; padding: 1em; border-radius: 2px; border: 1px solid #eee">
                             <waltz-survey-dropdown-editor entries="ctrl.selectedQuestionInfo.dropdownEntries"
                                                           on-change="ctrl.updateEntries">
                             </waltz-survey-dropdown-editor>
+                        </div>
+
+                    </div>
+                    <div ng-if="ctrl.selectedQuestionInfo.question.fieldType === 'MEASURABLE_MULTI_SELECT'"
+                         class="col-sm-7 col-sm-offset-2">
+                        <div style="display: block; background-color: #F8F9F9; margin-top:10px; padding: 1em; border-radius: 2px; border: 1px solid #eee">
+                            <select id="qCategoryId"
+                                    required
+                                    class="form-control"
+                                    ng-options="category.id as category.name for category in ctrl.measurableCategories | orderBy:'name'"
+                                    ng-model="ctrl.selectedQuestionInfo.question.qualifierEntity.id">
+                            </select>
+                            <div class='small text-muted'>
+                                Select a category to populate the tree
+                            </div>
                         </div>
 
                     </div>

@@ -21,6 +21,7 @@ package com.khartec.waltz.model.survey;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ExternalIdProvider;
 import com.khartec.waltz.model.IdProvider;
 import org.immutables.value.Value;
@@ -40,6 +41,8 @@ public abstract class SurveyQuestion implements
     public abstract SurveyQuestionFieldType fieldType();
     public abstract Optional<String> sectionName();
     public abstract Optional<String> inclusionPredicate();
+
+    public abstract Optional<EntityReference> qualifierEntity();
 
     @Value.Default
     public Integer position() {

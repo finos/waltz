@@ -33,22 +33,16 @@
     </waltz-page-header>
 
 
-    <waltz-section name="svelte">
-        <div class="row">
-            <div class="col-md-12">
+    <waltz-multi-select-tree-control items="$ctrl.recordsManagementItems"
+                                     disable-predicate="$ctrl.isDisabled"
+                                     on-check="$ctrl.onItemCheck"
+                                     on-uncheck="$ctrl.onItemUncheck"
+                                     checked-item-ids="$ctrl.checkedItemIds" >
+    </waltz-multi-select-tree-control>
+    <!--    expanded-item-ids="$ctrl.expandedItemIds"-->
+    <!--    disable-predicate="$ctrl.disableNode">-->
 
-            </div>
-        </div>
-    </waltz-section>
 
-    <waltz-section name="New Old">
-        <div class="row">
-            <div class="col-md-12">
-
-            </div>
-        </div>
-    </waltz-section>
-
-=
+    <pre ng-bind="$ctrl.checkedItemIds | json"></pre>
 
 </div>

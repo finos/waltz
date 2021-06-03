@@ -240,12 +240,14 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
         EntityReference dataType = ratingVantagePoint.dataType();
         AuthoritativenessRating rating = ratingVantagePoint.rating();
 
-        SelectConditionStep<Record1<Long>> orgUnitSubselect = DSL.select(ENTITY_HIERARCHY.ID)
+        SelectConditionStep<Record1<Long>> orgUnitSubselect = DSL
+                .select(ENTITY_HIERARCHY.ID)
                 .from(ENTITY_HIERARCHY)
                 .where(ENTITY_HIERARCHY.KIND.eq(vantagePoint.kind().name()))
                 .and(ENTITY_HIERARCHY.ANCESTOR_ID.eq(vantagePoint.id()));
 
-        SelectConditionStep<Record1<Long>> dataTypeSubselect = DSL.select(ENTITY_HIERARCHY.ID)
+        SelectConditionStep<Record1<Long>> dataTypeSubselect = DSL
+                .select(ENTITY_HIERARCHY.ID)
                 .from(ENTITY_HIERARCHY)
                 .where(ENTITY_HIERARCHY.KIND.eq(DATA_TYPE.name()))
                 .and(ENTITY_HIERARCHY.ANCESTOR_ID.eq(dataType.id()));

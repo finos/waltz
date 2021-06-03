@@ -15,11 +15,10 @@
   ~ See the License for the specific
   ~
   -->
-
 <div>
     <waltz-page-header icon="wpforms"
                        name="{{ ctrl.surveyDetails.run.name }}"
-                       small="{{ ctrl.surveyDetails.subject.name }}">
+                       small="{{ctrl.surveyDetails.instance.name || ctrl.surveyDetails.subject.name }}">
         <breadcrumbs>
             <ol class="waltz-breadcrumbs">
                 <li><a ui-sref="main">Home</a></li>
@@ -43,7 +42,6 @@
     </div>
 
     <br>
-
 
     <!-- IN PROGRESS -->
     <div ng-if="ctrl.surveyDetails.instance.status === 'IN_PROGRESS' || ctrl.surveyDetails.instance.status === 'REJECTED'">
@@ -92,58 +90,80 @@
             </h4>
             <hr>
 
-            <div ng-repeat="qi in groupedQuestion.questionInfos">
+            <div ng-repeat="question in groupedQuestion.questions">
                 <div class="row"
                      style="margin-bottom: 0.5em;"
-                     data-question-ext-id="{{qi.question.externalId}}"
-                     data-question-id="{{qi.question.id}}">
+                     data-question-ext-id="{{question.externalId}}"
+                     data-question-id="{{question.id}}">
                     <div class="col-sm-4">
-                        <div ng-bind="qi.question.questionText"
-                             class="text-muted">
-                        </div>
+                        <span ng-bind="question.questionText"
+                              uib-popover="{{question.helpText}}"
+                              popover-enable="question.helpText"
+                              popover-trigger="mouseenter"
+                              popover-placement="bottom"
+                              popover-delay="300"
+                              class="text-muted">
+                        </span>
+                        <waltz-icon style="color: #999999"
+                                    ng-if="question.helpText"
+                                    name="info-circle">
+                        </waltz-icon>
                     </div>
                     <div class="col-sm-6">
-                        <div>
-                            <div ng-switch="qi.question.fieldType">
-                                <div ng-switch-when="BOOLEAN">
-                                    <waltz-boolean-renderer value="ctrl.answersById[qi.question.id].booleanResponse">
+                        <div class="wsirv-answer">
+                            <div ng-switch="question.fieldType">
+                                <div ng-switch-when="BOOLEAN"
+                                     class="wsirv-boolean">
+                                    <waltz-boolean-renderer value="ctrl.answersById[question.id].booleanResponse">
                                     </waltz-boolean-renderer>
                                 </div>
                                 <div ng-switch-when="APPLICATION|PERSON"
-                                     ng-switch-when-separator="|">
-                                    <waltz-entity-link entity-ref="ctrl.answersById[qi.question.id].entityResponse">
+                                     ng-switch-when-separator="|"
+                                     class="wsirv-entity">
+                                    <waltz-entity-link entity-ref="ctrl.answersById[question.id].entityResponse">
                                     </waltz-entity-link>
                                 </div>
-                                <div ng-switch-when="NUMBER">
-                                    <span ng-bind="ctrl.answersById[qi.question.id].numberResponse | number">
+                                <div ng-switch-when="NUMBER"
+                                     class="wsirv-number">
+                                    <span ng-bind="ctrl.answersById[question.id].numberResponse | number">
                                     </span>
                                 </div>
-                                <div ng-switch-when="DATE">
-                                    <span ng-bind="ctrl.answersById[qi.question.id].dateResponse | date:'dd-MMM-yyyy'">
+                                <div ng-switch-when="DATE"
+                                     class="wsirv-data">
+                                    <span ng-bind="ctrl.answersById[question.id].dateResponse | date:'dd-MMM-yyyy'">
                                     </span>
                                 </div>
                                 <div ng-switch-when="TEXTAREA|TEXT"
-                                     ng-switch-when-separator="|">
-                                    <waltz-markdown text="ctrl.answersById[qi.question.id].stringResponse">
+                                     ng-switch-when-separator="|"
+                                     class="wsirv-text">
+                                    <waltz-markdown text="ctrl.answersById[question.id].stringResponse">
                                     </waltz-markdown>
                                 </div>
-                                <div ng-switch-when="DROPDOWN_MULTI_SELECT">
-                                    <ul class="list-unstyled">
-                                        <li ng-repeat="item in ctrl.answersById[qi.question.id].listResponse">
+                                <div ng-switch-when="DROPDOWN_MULTI_SELECT"
+                                     class="wsirv-dropdown-multi">
+                                    <ul class="">
+                                        <li ng-repeat="item in ctrl.answersById[question.id].listResponse">
                                             <span ng-bind="item">
                                             </span>
                                         </li>
                                     </ul>
                                 </div>
-                                <div ng-switch-default>
-                                    <span ng-bind="ctrl.answersById[qi.question.id].stringResponse">
+                                <div ng-switch-when="MEASURABLE_MULTI_SELECT"
+                                     class="wsirv-measurable-multi">
+                                    <waltz-survey-question-measurable-renderer question="question"
+                                                                               list-response="ctrl.answersById[question.id].entityListResponse">
+                                    </waltz-survey-question-measurable-renderer>
+                                </div>
+                                <div ng-switch-default
+                                     class="wsirv-string">
+                                    <span ng-bind="ctrl.answersById[question.id].stringResponse">
                                     </span>
                                 </div>
                             </div>
                             <div class='small text-muted'
-                                 ng-if="ctrl.answersById[qi.question.id].comment">
+                                 ng-if="ctrl.answersById[question.id].comment">
                                 <strong>Comment:</strong>
-                                <span ng-bind="ctrl.answersById[qi.question.id].comment"></span>
+                                <span ng-bind="ctrl.answersById[question.id].comment"></span>
                             </div>
                         </div>
                     </div>

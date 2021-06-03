@@ -55,7 +55,7 @@ function controller(dynamicSectionManager,
                 vm.stickyVisible = $window.pageYOffset > vm.offset;
             });
         },
-        150);
+        300);
 
     function enableScrollListener() {
         angular
@@ -99,7 +99,8 @@ function controller(dynamicSectionManager,
 
     vm.onSelect = (section) => {
         dynamicSectionManager.activate(section);
-        $window.scrollTo(0, vm.offset);
+        const elem = document.getElementById('page-top');
+        elem.scrollIntoView()
     };
 
 }

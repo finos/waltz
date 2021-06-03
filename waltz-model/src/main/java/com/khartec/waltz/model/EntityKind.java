@@ -76,6 +76,7 @@ public enum EntityKind {
     SOFTWARE("Software"),
     SOFTWARE_VERSION("Software version"),
     SURVEY_INSTANCE("Survey instance"),
+    SURVEY_QUESTION("Survey question"),
     SURVEY_RUN("Survey run"),
     SURVEY_TEMPLATE("Survey template"),
     SYSTEM("System"),

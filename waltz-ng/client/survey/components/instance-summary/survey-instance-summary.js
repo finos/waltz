@@ -33,7 +33,9 @@ const bindings = {
 };
 
 
-const initialState = {};
+const initialState = {
+    statusIcon: "fw"
+};
 
 
 function mkUpdateRecipientCommand(instanceRecipientId, person, surveyInstanceId) {
@@ -57,6 +59,15 @@ function findMatchingRecipient(recipients = [], person) {
     return _.find(recipients, r => sameRef(r.person, person))
 }
 
+const statusToIcon = {
+    APPROVED: "thumbs-o-up",
+    COMPLETED: "check",
+    IN_PROGRESS: "pencil",
+    NOT_STARTED: "clock-o",
+    REJECTED: "ban",
+    WITHDRAWN: "cross"
+};
+
 
 function controller($q,
                     $state,
@@ -72,6 +83,8 @@ function controller($q,
             .loadSurveyInfo($q,  serviceBroker, userService, vm.instanceId, true)
             .then(details => {
                 vm.surveyDetails = details;
+
+                vm.statusIcon = statusToIcon[vm.surveyDetails.instance.status] || "fw";
 
                 vm.description = surveyUtils.mkDescription([details.template.description, details.run.description]);
                 vm.people = _.map(details.recipients, d => d.person);

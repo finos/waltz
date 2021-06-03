@@ -20,6 +20,7 @@ import _ from "lodash";
 import {initialiseData} from "../common/index";
 import template from "./survey-template-edit.html";
 import {displayError} from "../common/error-utils";
+import {CORE_API} from "../common/services/core-api-utils";
 
 /*
     Note: this list of functions/operators is derived from the capabilities of BigEval and the extension methods
@@ -68,6 +69,9 @@ const initialState = {
         name: "Dropdown (Multi-Select)",
         value: "DROPDOWN_MULTI_SELECT"
     },{
+        name: "Measurable tree (Multi-Select)",
+        value: "MEASURABLE_MULTI_SELECT"
+    },{
         name: "Application",
         value: "APPLICATION"
     },{
@@ -75,7 +79,7 @@ const initialState = {
         value: "PERSON"
     }],
     selectedQuestionInfo: {},
-    surveyQuestionInfos: [],
+    surveyQuestions: [],
     surveyTemplate: {},
     targetEntityKinds: [{
         name: "Application",
@@ -88,37 +92,53 @@ const initialState = {
 };
 
 
-function controller($stateParams,
+function controller($q,
+                    $stateParams,
                     notification,
-                    surveyQuestionStore,
-                    surveyTemplateStore) {
+                    serviceBroker) {
 
     const vm = initialiseData(this, initialState);
     vm.id = $stateParams.id;
 
-    surveyTemplateStore
-        .getById(vm.id)
-        .then(template => vm.surveyTemplate = template);
+    serviceBroker
+        .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
+        .then(r => vm.measurableCategories = r.data);
 
-    const loadQuestions = () =>
-        surveyQuestionStore
-            .findForTemplate(vm.id)
-            .then(qis => vm.surveyQuestionInfos = qis);
+    serviceBroker
+        .loadViewData(CORE_API.SurveyTemplateStore.getById, [vm.id])
+        .then(r => vm.surveyTemplate = r.data);
+
+    const loadQuestions = () => {
+        const questionPromise = serviceBroker
+            .loadViewData(CORE_API.SurveyQuestionStore.findQuestionsForTemplate, [vm.id], {force: true})
+            .then(r => vm.surveyQuestions = r.data);
+
+        const dropdownPromise = serviceBroker
+            .loadViewData(CORE_API.SurveyQuestionStore.findDropdownEntriesForTemplate, [vm.id], {force: true})
+            .then(r => vm.dropdownEntriesByQuestionId = _.groupBy(r.data, d => d.questionId));
+
+        return $q
+            .all([questionPromise, dropdownPromise]);
+    }
 
     vm.updateTemplate = () => {
-        surveyTemplateStore
-            .update({
-                id: vm.surveyTemplate.id,
-                name: vm.surveyTemplate.name,
-                description: vm.surveyTemplate.description,
-                targetEntityKind: vm.surveyTemplate.targetEntityKind
-            })
+        serviceBroker
+            .execute(
+                CORE_API.SurveyTemplateStore.update,
+                [{
+                    id: vm.surveyTemplate.id,
+                    name: vm.surveyTemplate.name,
+                    description: vm.surveyTemplate.description,
+                    targetEntityKind: vm.surveyTemplate.targetEntityKind,
+                    externalId: vm.surveyTemplate.externalId
+                }])
             .then(() => notification.success("Survey template updated successfully"));
     };
 
     vm.showAddQuestionForm = () => {
         vm.editingQuestion = true;
-        const currentMaxPos = _.chain(vm.surveyQuestionInfos)
+        const currentMaxPos = _
+            .chain(vm.surveyQuestionInfos)
             .map(qi => qi.question.position)
             .max()
             .value();
@@ -136,9 +156,13 @@ function controller($stateParams,
         };
     };
 
-    vm.showEditQuestionForm = (qi) => {
+    vm.showEditQuestionForm = (question) => {
         vm.editingQuestion = true;
-        vm.selectedQuestionInfo = _.cloneDeep(qi);
+        const dropdownEntries = vm.dropdownEntriesByQuestionId[question.id] || [];
+        vm.selectedQuestionInfo = {
+            question: _.cloneDeep(question),
+            dropdownEntries: _.cloneDeep(dropdownEntries)
+        };
     };
 
 
@@ -148,8 +172,13 @@ function controller($stateParams,
     };
 
     vm.createQuestion = (qi) => {
-        surveyQuestionStore
-            .create(qi)
+
+        if(qi.question.fieldType === "MEASURABLE_MULTI_SELECT"){
+            qi.question.qualifierEntity.kind = "MEASURABLE_CATEGORY";
+        }
+
+        serviceBroker
+            .execute(CORE_API.SurveyQuestionStore.create, [qi])
             .then(() => {
                 notification.success("Survey question created successfully");
                 loadQuestions();
@@ -158,8 +187,13 @@ function controller($stateParams,
     };
 
     vm.updateQuestion = (qi) => {
-        surveyQuestionStore
-            .update(qi)
+
+        if(qi.question.fieldType === "MEASURABLE_MULTI_SELECT"){
+            qi.question.qualifierEntity.kind = "MEASURABLE_CATEGORY";
+        }
+
+        serviceBroker
+            .execute(CORE_API.SurveyQuestionStore.update, [qi])
             .then(() => {
                 notification.success("Survey question updated successfully");
                 loadQuestions();
@@ -169,8 +203,8 @@ function controller($stateParams,
 
     vm.deleteQuestion = (qi) => {
         if (confirm("Are you sure you want to delete this question?")) {
-            surveyQuestionStore
-                .deleteQuestion(qi.question.id)
+            serviceBroker
+                .execute(CORE_API.SurveyQuestionStore.deleteQuestion, [qi.question.id])
                 .then(() => {
                     notification.success("Survey question deleted successfully");
                     loadQuestions();
@@ -194,10 +228,10 @@ function controller($stateParams,
 
 
 controller.$inject = [
+    "$q",
     "$stateParams",
     "Notification",
-    "SurveyQuestionStore",
-    "SurveyTemplateStore"
+    "ServiceBroker",
 ];
 
 

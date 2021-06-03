@@ -107,7 +107,7 @@ const authSourceCreateCommand = {
     rating: apiCheck.string,
     applicationId: apiCheck.number,
     dataTypeId: apiCheck.number,
-    orgUnitId: apiCheck.number
+    parentReference: apiCheck.shape(entityRefShape)
 };
 
 const customEnvironmentShape = {

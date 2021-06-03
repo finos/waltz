@@ -29,9 +29,7 @@ import com.khartec.waltz.schema.tables.EntityHierarchy;
 import com.khartec.waltz.schema.tables.LogicalFlowDecorator;
 import com.khartec.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
 import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.authoritative_source.AuthSourceRatingCalculator;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService;
-import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorRatingsCalculator;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.function.Function2;
@@ -55,17 +53,20 @@ public class AuthSourceHarness {
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
         AuthoritativeSourceService svc = ctx.getBean(AuthoritativeSourceService.class);
-        AuthSourceRatingCalculator authSourceRatingCalculatorCalculator = ctx.getBean(AuthSourceRatingCalculator.class);
-        LogicalFlowDecoratorRatingsCalculator flowCalculator = ctx.getBean(LogicalFlowDecoratorRatingsCalculator.class);
-        LogicalFlowDecoratorSummaryDao decoratorDao = ctx.getBean(LogicalFlowDecoratorSummaryDao.class);
-        AuthoritativeSourceDao authoritativeSourceDao = ctx.getBean(AuthoritativeSourceDao.class);
+//        AuthSourceRatingCalculator authSourceRatingCalculatorCalculator = ctx.getBean(AuthSourceRatingCalculator.class);
+//        LogicalFlowDecoratorRatingsCalculator flowCalculator = ctx.getBean(LogicalFlowDecoratorRatingsCalculator.class);
+//        LogicalFlowDecoratorSummaryDao decoratorDao = ctx.getBean(LogicalFlowDecoratorSummaryDao.class);
+        AuthoritativeSourceDao dao = ctx.getBean(AuthoritativeSourceDao.class);
 
+
+//        boolean b = svc.fastRecalculateAllFlowRatings();
 
 //        EntityHierarchyDao ehDao = ctx.getBean(EntityHierarchyDao.class);
 //        List<EntityHierarchyItem> desendents = ehDao.findDesendents(EntityReference.mkRef(EntityKind.DATA_TYPE, 41300));
 //        updateDecoratorsForAuthSource(dsl);
 
-        FunctionUtilities.time("Fast Flow Ratings", () -> fastRecalculateAllFlowRatings(dsl, decoratorDao, authoritativeSourceDao));
+        FunctionUtilities.time("Actor rating", () -> dao.updatePointToPointAuthStatements());
+//        FunctionUtilities.time("Fast Flow Ratings", svc::fastRecalculateAllFlowRatings);
 
 //        FunctionUtilities.time("Flow ratings", () -> svc.recalculateAllFlowRatings());
 
@@ -89,7 +90,9 @@ public class AuthSourceHarness {
 //        System.exit(-1);
     }
 
-    private static void fastRecalculateAllFlowRatings(DSLContext dsl, LogicalFlowDecoratorSummaryDao decoratorDao, AuthoritativeSourceDao authoritativeSourceDao) {
+    private static void fastRecalculateAllFlowRatings(DSLContext dsl,
+                                                      LogicalFlowDecoratorSummaryDao decoratorDao,
+                                                      AuthoritativeSourceDao authoritativeSourceDao) {
         decoratorDao.updateRatingsByCondition(AuthoritativenessRating.NO_OPINION, DSL.trueCondition());
 
         EntityHierarchy ehOrgUnit = ENTITY_HIERARCHY.as("ehOrgUnit");

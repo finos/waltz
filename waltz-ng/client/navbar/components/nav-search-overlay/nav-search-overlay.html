@@ -46,6 +46,13 @@
                    autofocus="autofocus"
                    placeholder="Search"
                    ng-keydown="$ctrl.onKeypress($event)" />
+
+            <span style="padding-left: 1em;"
+                  ng-show="$ctrl.searching">
+                <waltz-icon name="spinner"
+                            spin="true">
+                </waltz-icon>
+            </span>
         </div>
 
         <div class="row">

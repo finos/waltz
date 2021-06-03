@@ -24,15 +24,19 @@ import SurveyTemplateStore from "./services/survey-template-store";
 
 import SurveyInstanceList from "./components/instance-list/survey-instance-list";
 import SurveyInstanceSummary from "./components/instance-summary/survey-instance-summary";
+import surveyQuestionMeasurableRenderer
+    from "./components/survey-question-measurable-renderer/survey-question-measurable-renderer"
 
 import surveySection from "./components/survey-section";
+import measurableMultiSelect from "./components/measurable-multi-select/survey-measurable-multi-select"
 import Routes from "./routes";
 import SurveyDropdownEditor from "./components/dropdown/survey-dropdown-editor";
 import SurveyRunCreateGeneral from "./components/survey-run-create-general";
 import SurveyRunCreateRecipient from "./components/survey-run-create-recipient";
 import SurveyRunOverview from "./components/survey-run-overview";
 import SurveyTemplateOverview from "./components/survey-template-overview";
-import SurveyTemplateQuestionOverviewTable from "./components/question-overview-table/survey-template-question-overview-table";
+import SurveyTemplateQuestionOverviewTable
+    from "./components/question-overview-table/survey-template-question-overview-table";
 import SurveyQuestionStore from "./services/survey-question-store";
 
 export default () => {
@@ -42,7 +46,9 @@ export default () => {
         .config(Routes);
 
     registerComponents(module, [
-        surveySection
+        surveySection,
+        measurableMultiSelect,
+        surveyQuestionMeasurableRenderer
     ]);
 
     module

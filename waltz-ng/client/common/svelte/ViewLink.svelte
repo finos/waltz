@@ -16,6 +16,10 @@
             path: () => "system/list",
             title: "System Administration"
         },
+        "main.actor.view": {
+            path: ctx => `actor/${ctx.id}`,
+            title: "Actor View"
+        },
         "main.app.view": {
             path: ctx => `application/${ctx.id}`,
             title: "Application View"

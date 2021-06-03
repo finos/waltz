@@ -21,6 +21,89 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
                    logicalFilePath="db.changelog-1.33.xml">
 
+    <changeSet id="20210505-5405-1"
+               author="woodjes">
+        <update tableName="settings">
+            <column name="value"
+                    value="DEV v1.33"/>
+            <where>name='ui.logo.overlay.text'</where>
+        </update>
+    </changeSet>
+
+    <changeSet id="20210505-5402-1"
+               author="woodjes">
+        <comment>5402: adding entity_qualifier_id to survey_question</comment>
+        <addColumn tableName="survey_question">
+            <column name="entity_qualifier_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="survey_question">
+            <column name="entity_qualifier_kind"
+                    type="${enum.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20210513-5402-2"
+               author="davidwatkins73">
+        <comment>5402: adding entity_qualifier_id to survey_instance</comment>
+        <addColumn tableName="survey_instance">
+            <column name="entity_qualifier_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="survey_instance">
+            <column name="entity_qualifier_kind"
+                    type="${enum.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20210514-5402-3"
+               author="davidwatkins73">
+        <comment>5402: adding name to survey_instance</comment>
+        <addColumn tableName="survey_instance">
+            <column name="name"
+                    type="${name.type}"
+                    defaultValue="">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet id="20210519-5402-4"
+               author="davidwatkins73">
+        <comment>5402: adding entity_ref to survey_question_list_response</comment>
+        <addColumn tableName="survey_question_list_response">
+            <column name="entity_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="survey_question_list_response">
+            <column name="entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+
+    <changeSet id="20210505-5405-2"
+               author="woodjes">
+        <update tableName="settings">
+            <column name="value"
+                    value="Prod v1.33"/>
+            <where>name='ui.logo.overlay.text'</where>
+        </update>
+    </changeSet>
+
     <changeSet id="20200507-3784-1"
                author="alimuza">
         <comment>3784: Database Usage table</comment>

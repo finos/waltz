@@ -78,7 +78,7 @@ public class LogicalFlowDecoratorRatingsCalculator {
     }
 
 
-    public Collection<DataTypeDecorator> calculate(Collection<DataTypeDecorator> decorators) {
+    public Collection<DataTypeDecorator>  calculate(Collection<DataTypeDecorator> decorators) {
 
         List<LogicalFlow> appToAppFlows = filter(
                 IS_APP_TO_APP_FLOW,
@@ -95,7 +95,8 @@ public class LogicalFlowDecoratorRatingsCalculator {
 
         AuthoritativeSourceResolver resolver = createResolver(targetApps);
 
-        return decorators.stream()
+        return decorators
+                .stream()
                 .filter(d -> flowsById.containsKey(d.dataFlowId()))
                 .map(decorator -> {
                     try {

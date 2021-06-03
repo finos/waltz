@@ -24,6 +24,13 @@ import {mkEntityLabelGridCell} from "../common/grid-utils";
 const columnDefs = [
     mkEntityLabelGridCell("Entity", "surveyEntity", "left", "right"),
     {
+        field: "name",
+        cellTemplate: `
+            <div class="ui-grid-cell-contents">
+               <span ng-bind="COL_FIELD || '-'"></span>
+            </div>`
+    },
+    {
         field: "id",
         name: "Actions",
         cellTemplate: `

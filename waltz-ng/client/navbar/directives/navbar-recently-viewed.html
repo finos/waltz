@@ -25,14 +25,15 @@
             Recent
             <b class="caret"></b>
         </a>
-        <ul class="dropdown-menu no-overflow"
+        <ul class="dropdown-menu dropdown-menu-items"
             uib-dropdown-menu
-            style="width: 250px; margin-right:8px"
+            style="width: 400px;"
             role="menu">
-            <li style="margin: 4px"
+            <li style="margin: 4px;"
                 class="no-overflow"
                 ng-repeat="item in ctrl.history">
-                <a ui-sref="{{ ::item.state }} (::item.stateParams)">
+                <a class="no-overflow"
+                   ui-sref="{{ ::item.state }} (::item.stateParams)">
                     <waltz-icon class='text-muted small'
                                 fixed-width="true"
                                 name="{{ item.kind | toIconName:'entity' }}"></waltz-icon>

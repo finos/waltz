@@ -20,12 +20,12 @@
 @import "../../../../style/variables";
 
 .waltz-nav-filters-overlay {
-    top: 52px;
+    top: 51px;
     right: 100px;
     position: absolute;
     background-color: #fafafa;
+    border: 1px solid rgba(0, 0, 0, 0.15);
     width:50%;
-    border: 1px solid #ccc;
     outline: none;
 
     @include waltz-box-shadow();

@@ -20,7 +20,6 @@ package com.khartec.waltz.web.endpoints.api;
 
 
 import com.khartec.waltz.model.DateChangeCommand;
-import com.khartec.waltz.model.StringChangeCommand;
 import com.khartec.waltz.model.survey.*;
 import com.khartec.waltz.service.survey.SurveyInstanceService;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -30,15 +29,11 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
-
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
-import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 
 @Service
 public class SurveyInstanceEndpoint implements Endpoint {
@@ -76,6 +71,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
         String updateDueDatePath = mkPath(BASE_URL, ":id", "due-date");
         String recipientPath = mkPath(BASE_URL, ":id", "recipient");
         String deleteRecipientPath = mkPath(BASE_URL, ":id", "recipient", ":instanceRecipientId");
+        String reportProblemWithQuestionResponsePath = mkPath(BASE_URL, ":id", "response", ":questionId", "problem");
 
         DatumRoute<SurveyInstance> getByIdRoute =
                 (req, res) -> surveyInstanceService.getById(getId(req));
@@ -124,6 +120,22 @@ public class SurveyInstanceEndpoint implements Endpoint {
                     ImmutableSurveyInstanceStatusChangeCommand.builder()
                             .action(SurveyInstanceAction.SAVING)
                             .build());
+
+            return result;
+        };
+
+        DatumRoute<Boolean> reportProblemWithQuestionResponseRoute = (req, res) -> {
+            String userName = getUsername(req);
+            Long instanceId = getId(req);
+            Long questionId = getLong(req, "questionId");
+
+            String message = req.body();
+
+            boolean result = surveyInstanceService.reportProblemWithQuestionResponse(
+                    instanceId,
+                    questionId,
+                    message,
+                    userName);
 
             return result;
         };
@@ -183,6 +195,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
         putForDatum(recipientPath, updateRecipientRoute);
         postForDatum(recipientPath, addRecipientRoute);
         deleteForDatum(deleteRecipientPath, deleteRecipientRoute);
+        postForDatum(reportProblemWithQuestionResponsePath, reportProblemWithQuestionResponseRoute);
     }
 
 }

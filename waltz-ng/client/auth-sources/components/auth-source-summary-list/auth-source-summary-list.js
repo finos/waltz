@@ -39,7 +39,7 @@ function controller(serviceBroker, userService, $scope){
 
     vm.create = () => {
         selectedAuthSource.set({
-            orgUnit: null,
+            parentReference: null,
             app: null,
             description: null,
             dataType: null,
