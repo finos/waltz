@@ -19,8 +19,10 @@
 import _ from "lodash";
 import * as fields from "../../formly/fields";
 import {CORE_API} from '../../../common/services/core-api-utils';
+import AppEdit from "./AppEdit.svelte";
 
 import template from './app-edit.html';
+import {initialiseData} from "../../../common";
 
 
 function mkRef(orgUnit) {
@@ -86,6 +88,9 @@ function setupFields(fields = [], formModel = {}) {
     fields.businessCriticalityField.model = formModel.app;
 }
 
+const initialState = {
+    AppEdit,
+};
 
 function controller(app,
                     appStore,
@@ -93,7 +98,7 @@ function controller(app,
                     $state,
                     serviceBroker) {
 
-    const vm = this;
+    const vm = initialiseData(this, initialState);
 
 
 
