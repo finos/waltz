@@ -10,7 +10,7 @@ function controller(flowDiagramStateService) {
     const vm = initialiseData(this, initialState);
 
     processor.set(flowDiagramStateService.processCommands);
-    flowDiagramStateService.onChange((newState) => console.log("ns", {newState}) || store.set(newState));
+    flowDiagramStateService.onChange((newState) => store.set(newState));
 }
 
 

@@ -20,26 +20,28 @@
 
     function determineAnnotationGeometry(positions, annotation) {
         const ref = annotation.data.entityReference;
-        console.log("dag", {annotation, ref});
+        const refStr = refToString(ref);
+        const annotationPosition = positions[annotation.id];
 
         if (ref.kind === "LOGICAL_DATA_FLOW") {
-            // const geometry = {
-            //     subjectPosition: {x: 0, y: 0},
-            //     subjectShape: { cx: 0, cy: 0},
-            //     annotationPosition: positionFor(state, d.id)
-            // };
-            //
-            // select(`[data-flow-id="${toGraphId(ref)}"] .${styles.FLOW_ARROW}`)
-            //     .each(function() {
-            //         geometry.subjectPosition = calcBucketPt(select(this));
-            //     });
-            //
-            // return geometry;
+            const geometry = {
+                subjectPosition: {x: 0, y: 0},
+                subjectShape: {cx: 0, cy: 0},
+                annotationPosition
+            };
+
+            select(`[data-flow-id="${refStr}"] .wfd-flow-bucket`)
+                .each(function() {
+                    const d = select(this);
+                    const x = d.attr("data-bucket-x");
+                    const y = d.attr("data-bucket-y");
+                    geometry.subjectPosition = {x, y};
+                });
+
+            return geometry;
         } else {
-            const subjectPosition = positions[toGraphId(ref)];
+            const subjectPosition = positions[refStr];
             const subjectShape = {cx: 50, cy: 5}; //shapeFor(state, toGraphId(ref));
-            const annotationPosition = positions[annotation.id];
-            console.log({annotation, subjectPosition, annotationPosition});
             return { subjectPosition, subjectShape, annotationPosition };
         }
     }

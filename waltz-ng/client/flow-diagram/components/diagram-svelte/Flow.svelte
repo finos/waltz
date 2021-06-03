@@ -2,7 +2,7 @@
     import {select} from "d3-selection";
     import {mkCurvedLine} from "../../../common/d3-utils";
     import {createEventDispatcher} from "svelte";
-    import {node} from "./Node.svelte";
+    import {refToString} from "../../../common/entity-utils";
 
 
     const dispatch = createEventDispatcher();
@@ -55,9 +55,8 @@
     }
 
 
-    function mkBucketTransform(elem) {
-        const p = elem.getPointAtLength(elem.getTotalLength() / 2);
-        return `translate(${p.x}, ${p.y})`;
+    function calcBucketPosition(elem) {
+        return elem.getPointAtLength(elem.getTotalLength() / 2);
     }
 
     function selectBucket() {
@@ -80,14 +79,20 @@
             // arrow heads sometimes being 'left-behind' if nodes are moved quickly
             line.attr("d", mkLinePath(flow))
             arrow.attr("transform", mkArrowTransform(line.node()));
-            bucket.attr("transform", mkBucketTransform(line.node()));
+            const bucketPosition = calcBucketPosition(line.node());
+            bucket
+                .attr("transform", `translate(${bucketPosition.x}, ${bucketPosition.y})`)
+                .attr("data-bucket-x", bucketPosition.x)
+                .attr("data-bucket-y", bucketPosition.y);
         }
     }
 
 
 </script>
 
-<g bind:this={gElem}>
+<g class="wfd-flow"
+   data-flow-id={refToString(flow.data)}
+   bind:this={gElem}>
     <path fill="none"
           class="wfd-flow-arrow"
           stroke="black">

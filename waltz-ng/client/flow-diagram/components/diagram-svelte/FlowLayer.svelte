@@ -6,9 +6,11 @@
     export let flows = [];
 </script>
 
-{#each flows as flow}
-    <Flow on:selectFlow
-          {positions}
-          {decorations}
-          {flow}/>
-{/each}
+<g class="wfd-flows">
+    {#each flows as flow}
+        <Flow on:selectFlow
+              {positions}
+              {decorations}
+              {flow}/>
+    {/each}
+</g>

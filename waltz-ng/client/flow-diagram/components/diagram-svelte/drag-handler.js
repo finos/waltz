@@ -34,9 +34,9 @@ export function mkDragHandler(node, processor) {
     }
 
     return drag()
-        .on("start", dragStarted)
-        .on("drag", dragger()) //commandProcessor))
-        .on("end", dragEnded);
+        .on("start.foo", dragStarted)
+        .on("drag.foo", dragger()) //commandProcessor))
+        .on("end.foo", dragEnded);
 }
 
 
