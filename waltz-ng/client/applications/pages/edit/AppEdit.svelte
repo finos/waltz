@@ -13,7 +13,6 @@
     const criticalities = _.values(criticality);
 
     function getRequiredFields(d) {
-        // return [];
         return [
             d.name,
             d.organisationalUnitId,
@@ -26,10 +25,12 @@
 
     $: invalid = console.log(getRequiredFields($formData)) || _.some(
         getRequiredFields($formData),
-        v => _.isNil(v));
+        v => _.isNumber(v)
+            ? _.isNil(v)
+            : _.isEmpty(v));
 
     function save() {
-        console.log("Saving", $formData)
+        console.log("Saving", $formData);
     }
 </script>
 
@@ -62,6 +63,7 @@
                     </label>
                     <input class="form-control"
                            id="name"
+                           maxlength="255"
                            required="required"
                            placeholder="Name of the application"
                            bind:value={$formData.name}/>
@@ -90,6 +92,7 @@
                     <textarea class="form-control"
                               id="description"
                               bind:value={$formData.description}
+                              maxlength="4000"
                               rows="11"></textarea>
                     <div class="help-block">
                         Basic markdown formatting is supported
