@@ -1,24 +1,32 @@
 <script>
+    import _ from "lodash";
     import PageHeader from "../../../common/svelte/PageHeader.svelte";
     import ViewLink from "../../../common/svelte/ViewLink.svelte";
-    import {formData} from "./edit-store";
     import EntitySearchSelector from "../../../common/svelte/EntitySearchSelector.svelte";
-    import _ from "lodash";
+    import {formData} from "./edit-store";
     import {applicationKind} from "../../../common/services/enums/application-kind";
     import {lifecyclePhase} from "../../../common/services/enums/lifecycle-phase";
+    import {criticality} from "../../../common/services/enums/criticality";
 
     const kinds = _.values(applicationKind);
     const phases = _.values(lifecyclePhase);
-
-    $: console.log($formData);
+    const criticalities = _.values(criticality);
 
     function getRequiredFields(d) {
-        return [d.name, d.orgUnit, d.phase, d.kind, d.rating];
+        // return [];
+        return [
+            d.name,
+            d.organisationalUnitId,
+            d.lifecyclePhase,
+            d.applicationKind,
+            d.businessCriticality,
+            d.overallRating
+        ];
     }
 
-    $: invalid = _.some(
+    $: invalid = console.log(getRequiredFields($formData)) || _.some(
         getRequiredFields($formData),
-        v => _.isEmpty(v));
+        v => _.isNil(v));
 
     function save() {
         console.log("Saving", $formData)
@@ -62,12 +70,12 @@
                     </div>
 
                     <!-- ORG UNIT -->
-                    <label for="name">
+                    <label for="org-unit">
                         Owning Organisational Unit
                         <small class="text-muted">(required)</small>
                     </label>
-                    <div>
-                        <EntitySearchSelector on:select={e => $formData.orgUnit = e.detail.id}
+                    <div id="org-unit">
+                        <EntitySearchSelector on:select={e => $formData.organisationalUnitId = e.detail.id}
                                               entityKinds={['ORG_UNIT']} />
                     </div>
                     <div class="help-block">
@@ -75,13 +83,14 @@
                     </div>
 
                     <!-- ORG UNIT -->
-                    <label for="name">
+                    <label for="description">
                         Description
                         <small class="text-muted">(required)</small>
                     </label>
                     <textarea class="form-control"
+                              id="description"
                               bind:value={$formData.description}
-                              rows="8"></textarea>
+                              rows="11"></textarea>
                     <div class="help-block">
                         Basic markdown formatting is supported
                     </div>
@@ -90,7 +99,7 @@
             <div class="col-md-4">
 
                 <!-- ASSET CODE -->
-                <label for="name">
+                <label for="assetCode">
                     Asset Code
                 </label>
                 <input class="form-control"
@@ -102,12 +111,13 @@
                 </div>
 
                 <!-- OVERALL RATING -->
-                <label for="name">
+                <label for="rating">
                     Overall Rating
                     <small class="text-muted">(required)</small>
                 </label>
                 <select class="form-control"
-                        bind:value={$formData.rating}>
+                        id="rating"
+                        bind:value={$formData.overallRating}>
                     <option disabled value={undefined}> -- select a rating -- </option>
                     <option value="G">Invest</option>
                     <option value="R">Disinvest</option>
@@ -119,16 +129,17 @@
                 </div>
 
                 <!-- TYPE -->
-                <label for="name">
+                <label for="type">
                     Type
                     <small class="text-muted">(required)</small>
                 </label>
                 <select class="form-control"
-                        bind:value={$formData.kind}>
+                        id="type"
+                        bind:value={$formData.applicationKind}>
                     <option disabled value={undefined}> -- select a kind -- </option>
-                    {#each kinds as kind}
-                        <option value={kind.key}>
-                            {kind.name}
+                    {#each kinds as option}
+                        <option value={option.key}>
+                            {option.name}
                         </option>
                     {/each}
                 </select>
@@ -137,23 +148,42 @@
                 </div>
 
                 <!-- LIFECYCLE_PHASE -->
-                <label for="name">
+                <label for="phase">
                     Lifecycle Phase
                     <small class="text-muted">(required)</small>
                 </label>
                 <select class="form-control"
-                        bind:value={$formData.phase}>
+                        id="phase"
+                        bind:value={$formData.lifecyclePhase}>
                     <option disabled value={undefined}> -- select a phase -- </option>
-                    {#each phases as phase}
-                        <option value={phase.key}>
-                            {phase.name}
+                    {#each phases as option}
+                        <option value={option.key}>
+                            {option.name}
                         </option>
                     {/each}
                 </select>
                 <div class="help-block">
                     Current lifecycle phase of the application
                 </div>
+
                 <!-- BUSINESS_CRITICALITY -->
+                <label for="criticality">
+                    Business Criticality
+                    <small class="text-muted">(required)</small>
+                </label>
+                <select class="form-control"
+                        id="criticality"
+                        bind:value={$formData.businessCriticality}>
+                    <option disabled value={undefined}> -- select a criticality -- </option>
+                    {#each criticalities as option}
+                        <option value={option.key}>
+                            {option.name}
+                        </option>
+                    {/each}
+                </select>
+                <div class="help-block">
+                    Criticality rating of application to business
+                </div>
 
             </div>
         </div>

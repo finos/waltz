@@ -22,7 +22,7 @@ import {checkIsAuthSourceCreateCommand, checkIsAuthSourceUpdateCommand} from "..
 export function mkApplicationStore() {
 
     const getById = (id) => {
-        return remote.fetchViewData("GET", `api/app/id/${id}`);
+        return remote.fetchViewData("GET", `api/app/id/${id}`, null, {});
     };
 
     return {
