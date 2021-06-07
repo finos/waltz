@@ -24,8 +24,6 @@ import com.khartec.waltz.model.database_information.DatabaseInformation;
 import com.khartec.waltz.model.database_information.DatabaseSummaryStatistics;
 import com.khartec.waltz.model.database_information.ImmutableDatabaseInformation;
 import com.khartec.waltz.model.database_information.ImmutableDatabaseSummaryStatistics;
-import com.khartec.waltz.schema.tables.DatabaseInformationMa;
-import com.khartec.waltz.schema.tables.records.DatabaseInformationMaRecord;
 import com.khartec.waltz.schema.tables.records.DatabaseInformationRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -55,7 +53,7 @@ public class DatabaseInformationDao {
 
 
     public final static RecordMapper<? super Record, DatabaseInformation> DATABASE_RECORD_MAPPER = r -> {
-        DatabaseInformationMaRecord record = r.into(DATABASE_INFORMATION);
+        DatabaseInformationRecord record = r.into(DATABASE_INFORMATION);
         return ImmutableDatabaseInformation.builder()
                 .id(record.getId())
                 .databaseName(record.getDatabaseName())

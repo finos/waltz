@@ -31,7 +31,6 @@ import com.khartec.waltz.model.custom_environment.ImmutableCustomEnvironmentUsag
 import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.Application;
 import com.khartec.waltz.schema.tables.DatabaseInformation;
-import com.khartec.waltz.schema.tables.DatabaseInformationMa;
 import com.khartec.waltz.schema.tables.records.CustomEnvironmentUsageRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
