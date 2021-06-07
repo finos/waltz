@@ -31,47 +31,29 @@ const initialState = {
 };
 
 
-function controller(settingsService, $timeout) {
+function controller($rootScope) {
 
     const vm = initialiseData(this, initialState);
 
-    const removeIssueNotificationMsg = () => {
-        console.log("Removing issue notification message.");
+    $rootScope.$on('notificationMessageChanged', function (event, value) {
+        if(!_.isEmpty(value)){
+            vm.bannerMessage = value;
+            vm.bannerVisible = true;
+        }else{
+            vm.bannerMessage = null;
+            vm.bannerVisible = false;
+        }
+        
+    });
+   
+    vm.closeBanner = () => {
         vm.bannerVisible = false;
-    };
-
-    const getIssueNotificationMsg = () => {
-        settingsService
-        .findOrDefault("waltz.issue.notification.message", null)
-        .then(setting => vm.bannerMessage = setting);
-
-    };
-
-    settingsService
-        .findOrDefault("waltz.issue.notification.time", 0)
-        .then(notificationTimeout  => {
-            if(+notificationTimeout > 0) {
-                getIssueNotificationMsg();
-                console.log("Configuring issue notification time and message for " + notificationTimeout + " ms");
-                vm.bannerVisible = true;
-                $timeout(removeIssueNotificationMsg, notificationTimeout);
-
-            } else if(notificationTimeout === '' || notificationTimeout === null) {
-                getIssueNotificationMsg();
-                console.log("Configuring issue notification time and message");
-                console.log("Admin will remove the notification once issue is resolved.");
-                vm.bannerVisible = true;
-            } else if(+notificationTimeout === 0){
-                vm.bannerVisible = false;
-            }
-
-        });  
+    }        
 }
 
 
 controller.$inject = [
-    "SettingsService",
-    "$timeout"
+    "$rootScope"
 ];
 
 

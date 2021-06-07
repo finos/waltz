@@ -40,7 +40,7 @@ function controller(serviceBroker) {
                 })
             .then(r => {
                 vm.summaries = _
-                    .chain(r.data)
+                    .chain(r.data.summary)
                     .map(d => {
                         const attrs = {
                             label: labelsByKind[d.kind],  // don't use the ones from `entity` as need plurals

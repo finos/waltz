@@ -28,12 +28,6 @@
             <column name="restricted" valueBoolean="false"/>
             <column name="description" value="Message notifying about Waltz technical issue."/>
         </insert>
-        <insert tableName="settings">
-            <column name="name" value="waltz.issue.notification.time"/>
-            <column name="value" value="10000"/>
-            <column name="restricted" valueBoolean="false"/>
-            <column name="description" value="Setting time for Waltz technical issue message. Values allowed for this key are: 0 (hide), &gt; 0 (show for that much ms time) and null (Manual setting)."/>
-        </insert>
     </changeSet>
 
 </databaseChangeLog>

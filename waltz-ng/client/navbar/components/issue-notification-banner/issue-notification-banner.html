@@ -18,8 +18,13 @@
 
 
 <div class="waltz-issue-notification-banner"
-     ng-if="$ctrl.bannerVisible">
+     ng-if="$ctrl.bannerVisible && $ctrl.bannerMessage">
     <div>
-        <waltz-markdown text="$ctrl.bannerMessage"></waltz-markdown>
-    </div>
+      <waltz-markdown text="$ctrl.bannerMessage"></waltz-markdown>
+      <waltz-icon class="clickable pull-right"
+                  style="margin-right: 40px"
+                  name="close"
+                  ng-click="$ctrl.closeBanner()">
+      </waltz-icon>
+  </div>
 </div>
