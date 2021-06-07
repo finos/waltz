@@ -16,9 +16,9 @@
  *
  */
 import _ from "lodash";
-import { ifPresent } from "../../common/function-utils";
-import { positionFor, toGraphFlow, toGraphId, toGraphNode } from "../flow-diagram-utils";
-import { toEntityRef } from "../../common/entity-utils";
+import {ifPresent} from "../../common/function-utils";
+import {positionFor, toGraphFlow, toGraphId, toGraphNode} from "../flow-diagram-utils";
+import {toEntityRef} from "../../common/entity-utils";
 
 
 const initialState = {
@@ -287,6 +287,7 @@ export function service(
             .then(id => {
                 state.diagramId = id;
                 state.dirty = false;
+                listener(state);
                 return id;
             });
     };
@@ -356,7 +357,7 @@ export function service(
     };
 
     const processCommand = (state, commandObject) => {
-        //console.log("wFDSS - processing command: ", commandObject, state);
+        console.log("wFDSS - processing command: ", commandObject, state);
         const payload = commandObject.payload;
         const model = state.model;
         switch (commandObject.command) {
@@ -476,6 +477,7 @@ export function service(
                         return isDirectAnnotation || isFlowAnnotation;
                     });
                 _.forEach(flowIdsToRemove, id => model.decorations[id] = []);
+                listener(state);
                 break;
 
             case "REMOVE_ANNOTATION":

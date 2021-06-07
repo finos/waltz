@@ -72,6 +72,19 @@
     $: decorationCount = _.size(decorations[flow.id]) || 0;
     $: icon = determineIcon(decorationCount);
 
+    function determineFlowStyling(status) {
+        switch (status) {
+            case "PENDING":
+                return {color: "green", dashArray: "6 3"};
+            case "REMOVED":
+                return {color: "#888", dashArray: "3 6"};
+            default:
+                return {color: "black", dashArray: "1"};
+        }
+    }
+
+    $: flowStyling = determineFlowStyling(flow.data.entityLifecycleStatus);
+
     $: {
         if (line && arrow) {
             // splitting these as separate reactive statements causes issues
@@ -83,38 +96,42 @@
             bucket
                 .attr("transform", `translate(${bucketPosition.x}, ${bucketPosition.y})`)
                 .attr("data-bucket-x", bucketPosition.x)
-                .attr("data-bucket-y", bucketPosition.y);
+                .attr("data-bucket-y", bucketPosition.y)
         }
     }
 
 
 </script>
 
-<g class="wfd-flow"
+<g class="wfd-flow wfd-flow-lifecycle-{flow.data.entityLifecycleStatus}"
    data-flow-id={refToString(flow.data)}
    bind:this={gElem}>
     <path fill="none"
           class="wfd-flow-arrow"
-          stroke="black">
+          stroke={flowStyling.color}
+          stroke-dasharray={flowStyling.dashArray}>
     </path>
 
     <path d="M -8,-4 8,0 -8,4 Z"
           fill="#aaa"
           class="wfd-flow-arrow-head"
-          stroke="#999">
+          stroke={flowStyling.color}
+          stroke-dasharray={flowStyling.dashArray}>
     </path>
 
     <g class="wfd-flow-bucket"
        on:click={selectBucket}>
         <circle r={decorationCount > 0 ? 16 : 12}
-                stroke="#999"
-                fill="#fff">
+                stroke={flowStyling.color}
+                fill="#fff"
+                stroke-dasharray={flowStyling.dashArray}>
         </circle>
         <text style="font-size: small;"
               font-family="FontAwesome"
               text-anchor="middle"
               dx="0"
-              dy="4.5">
+              dy="4.5"
+              fill={flowStyling.color}>
             {icon}
         </text>
     </g>
@@ -125,4 +142,5 @@
         user-select: none;
         pointer-events: all;
     }
+
 </style>

@@ -7,7 +7,8 @@
 
 <g class="annotations">
     {#each annotations as annotation}
-       <Annotation {annotation}
+       <Annotation on:selectAnnotation
+                   {annotation}
                    {positions}/>
     {/each}
 </g>

@@ -1,14 +1,16 @@
 <script>
     import {refToString} from "../../../common/entity-utils";
-    import {positionFor, shapeFor, toGraphId} from "../../flow-diagram-utils";
     import {select} from "d3-selection";
     import {wrapText} from "../../../common/d3-utils";
     import {draw, fade} from "svelte/transition"
     import {mkDragHandler} from "./drag-handler";
     import {processor} from "./diagram-model-store";
+    import {createEventDispatcher} from "svelte";
 
     export let positions;
     export let annotation;
+
+    const dispatch = createEventDispatcher();
 
     function calcPosition(annotation) {
         const offset = positions[annotation.id];
@@ -30,8 +32,8 @@
                 annotationPosition
             };
 
-            select(`[data-flow-id="${refStr}"] .wfd-flow-bucket`)
-                .each(function() {
+             select(`[data-flow-id="${refStr}"] .wfd-flow-bucket`)
+                 .each(function() {
                     const d = select(this);
                     const x = d.attr("data-bucket-x");
                     const y = d.attr("data-bucket-y");
@@ -75,12 +77,18 @@
 
     $: dragHandler = mkDragHandler(annotation, $processor)
     $: select(elbowElem).call(dragHandler);
+
+    function selectAnnotation(){
+        dispatch("selectAnnotation", annotation.data);
+    }
+
 </script>
 
 
 <g class="wfd-annotation"
    transform={`translate(${geom.subjectPosition.x} ${geom.subjectPosition.y})`}
-   fill="#888">
+   fill="#888"
+   on:click={selectAnnotation}>
     <path d={linePath}
           in:draw="{{duration: 1500}}"
           out:draw="{{duration: 2000}}"
@@ -108,7 +116,9 @@
 
     .wfd-annotation {
 
-        &:hover circle {
+      user-select: none;
+
+      &:hover circle {
             stroke-opacity: 1;
             stroke: darken($annotation-color, 20);
             cursor: move;
