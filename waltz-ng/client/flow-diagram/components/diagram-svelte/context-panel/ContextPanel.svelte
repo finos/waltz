@@ -7,6 +7,7 @@
     import {flowDiagramStore} from "../../../../svelte-stores/flow-diagram-store";
     import AnnotationPanel from "./AnnotationPanel.svelte";
     import Icon from "../../../../common/svelte/Icon.svelte";
+    import DecoratorGroupsMenu from "./DecoratorGroupsPanel.svelte";
 
     export let doSave;
     export let diagramId;
@@ -44,6 +45,10 @@
     <p class="help-block">Select a node or flow on the diagram to make changes</p>
     <DefaultPanel {doSave}/>
 {/if}
+
+<hr>
+
+<DecoratorGroupsMenu {diagramId}/>
 
 {#if $store.dirty}
     <span class="help-block">

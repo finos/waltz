@@ -19,6 +19,7 @@ import _ from "lodash";
 import {ifPresent} from "../../common/function-utils";
 import {positionFor, toGraphFlow, toGraphId, toGraphNode} from "../flow-diagram-utils";
 import {toEntityRef} from "../../common/entity-utils";
+import {mkSelectionOptions} from "../../common/selector-utils";
 
 
 const initialState = {
@@ -28,7 +29,8 @@ const initialState = {
         nodes: [],
         flows: [],
         decorations: {},
-        annotations: []
+        annotations: [],
+        groups: []
     },
     layout: {
         positions: {}, // gid -> {  x, y }
@@ -44,7 +46,8 @@ const initialState = {
         }
     },
     detail: {
-        applicationsById: {}
+        applicationsById: {},
+        measurablesByAppId: {}
     }
 };
 
@@ -122,7 +125,8 @@ function restoreDiagram(
     annotations = [],
     entityNodes = [],
     logicalFlows = [],
-    physicalFlows = [])
+    physicalFlows = [], 
+    groups = [])
 {
     const layoutData = JSON.parse(diagram.layoutData);
     const logicalFlowsById = _.keyBy(logicalFlows, "id");
@@ -227,6 +231,13 @@ function restoreDiagram(
         payload: diagram.description
     }];
 
+    const groupCommands = _.map(groups, g => {
+        return {
+            command: "ADD_GROUP",
+            payload: g
+        }
+    });
+
     commandProcessor(nodeCommands);
     commandProcessor(flowCommands);
     commandProcessor(annotationCommands);
@@ -235,6 +246,7 @@ function restoreDiagram(
     commandProcessor(decorationCommands);
     commandProcessor(titleCommands);
     commandProcessor(descriptionCommands);
+    commandProcessor(groupCommands);
 }
 
 
@@ -266,6 +278,21 @@ function removeDecoration(payload, model) {
 }
 
 
+function addGroup(payload, model) {
+    const group = Object.assign({},
+                                payload, 
+                                {id: toGraphId(payload.group)});
+    
+    const currentGroups = model.groups || [];
+    const existingIds = _.map(currentGroups, "id");
+    if (_.includes(existingIds, group.id)) {
+        console.log("Ignoring request to add duplicate group");
+    } else {
+        model.groups = _.concat(currentGroups, [group]);
+    }
+}
+
+
 export function service(
     $q,
     applicationStore,
@@ -273,7 +300,8 @@ export function service(
     flowDiagramAnnotationStore,
     flowDiagramEntityStore,
     logicalFlowStore,
-    physicalFlowStore)
+    physicalFlowStore,
+    measurableRatingStore)
 {
 
     const reset = () => {
@@ -342,15 +370,31 @@ export function service(
             flowDiagramAnnotationStore.findByDiagramId(id),
             flowDiagramEntityStore.findByDiagramId(id),
             logicalFlowStore.findBySelector(diagramSelector),
-            physicalFlowStore.findBySelector(diagramSelector)
+            physicalFlowStore.findBySelector(diagramSelector),
+            measurableRatingStore.findByAppSelector(diagramSelector)
         ];
 
         return $q
             .all(promises)
-            .then(([applications, diagram, annotations, entityNodes, logicalFlows, physicalFlows]) => {
+            .then(([applications, diagram, annotations, entityNodes, logicalFlows, physicalFlows, measurableRatings]) => {
                 state.detail.applicationsById = _.keyBy(applications, "id");
+                state.detail.measurablesByAppId = _.keyBy(measurableRatings, "entityReference.id")
                 const allEntityNodes = addMissingEntityNodes(diagram.id, entityNodes, applications);
+                
+                
                 restoreDiagram(processCommands, diagram, annotations, allEntityNodes, logicalFlows, physicalFlows);
+
+                //store on state the list of groups to be shown
+                const groupPromises = _.map(
+                    state.model.groups,
+                    g => applicationStore
+                        .findBySelector(mkSelectionOptions(g.group.entityReference))
+                        .then(r => Object.assign({}, {group: g.group, applicationIds: _.map(r, d => d.id)})));
+
+                $q
+                    .all(groupPromises)
+                    .then((groupIdsWithApps) => state.model.groups = groupIdsWithApps)
+
                 state.dirty = false;
             })
             .then(() => getState());
@@ -483,6 +527,14 @@ export function service(
             case "REMOVE_ANNOTATION":
                 model.annotations = _.reject(model.annotations, a => a.id === payload.id );
                 break;
+                
+            case "ADD_GROUP":
+                addGroup(payload, model);
+                break;
+
+            case "REMOVE_GROUP":
+                model.groups = _.reject(model.groups, a => a.id === payload.id );
+                break;
 
             case "SET_POSITION":
                 state.layout.positions[payload.id] = { x: payload.x, y: payload.y };
@@ -558,7 +610,8 @@ service.$inject = [
     "FlowDiagramAnnotationStore",
     "FlowDiagramEntityStore",
     "LogicalFlowStore",
-    "PhysicalFlowStore"
+    "PhysicalFlowStore",
+    "MeasurableRatingStore"
 ];
 
 

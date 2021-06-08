@@ -1,16 +1,16 @@
 <script>
-    import {drag} from "d3-drag";
-    import {event, select} from "d3-selection";
+    import {select} from "d3-selection";
     import {processor} from "./diagram-model-store";
     import {mkDragHandler} from "./drag-handler";
     import {createEventDispatcher} from "svelte";
+    import _ from "lodash";
 
 
     const dispatch = createEventDispatcher();
 
     export let node = null;
     export let positions = {};
-
+    export let groups = [];
 
     function mkTrapezoidShape(widthHint) {
         return {
@@ -26,7 +26,7 @@
 
     function mkRectShape(widthHint) {
         const shape = {
-            path: `M0,0 L${widthHint},0 L${widthHint},20 L0,20 z`,
+            path: `M0,0 L${widthHint},0 L${widthHint},30 L0,30 z`,
             cx: widthHint / 2,
             cy: 10,
             title: {
@@ -57,6 +57,10 @@
     $: dragHandler = mkDragHandler(node, $processor)
     $: select(gElem).call(dragHandler);
 
+    $: associatedGroups = _.filter(groups, g => _.includes(g.applicationIds, node.data.id))
+
+    // $: console.log({node, groups: $store.model?.groups, g: groups, associatedGroups})
+
 </script>
 
 
@@ -79,8 +83,18 @@
           dy={shape.title.dy}
           style="font-size: small;"
           bind:this={nameElem}>
-        {node.data.name}
+        {node.data.name || "Unknown"}
     </text>
+    <g transform="translate(10, 16)"
+       class="wfd-node-classifiers">
+        {#each associatedGroups as group}
+            <circle r="4"
+                    fill={group.group?.fill}
+                    stroke={group.group?.stroke}
+                    cx={0 + _.findIndex(associatedGroups, group) * 12}
+                    cy="6"/>
+        {/each}
+    </g>
 </g>
 
 

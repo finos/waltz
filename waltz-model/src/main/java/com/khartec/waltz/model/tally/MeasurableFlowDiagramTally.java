@@ -16,23 +16,19 @@
  *
  */
 
-import {remote} from "./remote";
+package com.khartec.waltz.model.tally;
 
-export function mkApplicationStore() {
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.immutables.value.Value;
 
-    const getById = (id) => {
-        return remote.fetchViewData("GET", `api/app/id/${id}`);
-    };
+@Value.Immutable
+@JsonSerialize(as = ImmutableMeasurableRatingTally.class)
+@JsonDeserialize(as = ImmutableMeasurableRatingTally.class)
+public abstract class MeasurableFlowDiagramTally {
 
+    public abstract long id();
+    public abstract char rating();
+    public abstract long count();
 
-    const findBySelector = (selector) => {
-        return remote.fetchViewList("POST", "api/app/selector", selector);
-    };
-
-    return {
-        getById,
-        findBySelector
-    };
 }
-
-export const applicationStore = mkApplicationStore();

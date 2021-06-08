@@ -63,6 +63,14 @@
         .selectAll(".wfd-flow-bucket")
         .style("display", $store.visibility?.layers.flowBuckets ? "" : "none");
 
+    $: select(elem)
+        .selectAll(".wfd-flow-lifecycle-REMOVED")
+        .style("display", $store.visibility?.layers.removedFlows ? "" : "none");
+
+    $: select(elem)
+        .selectAll(".wfd-flow-lifecycle-PENDING")
+        .style("display", $store.visibility?.layers.pendingFlows ? "" : "none");
+
     $: elem && setupPanAndZoom($processor);
 
     $: console.log("store", $store);
@@ -90,7 +98,8 @@
 
             <NodeLayer on:selectNode={onSelectNode}
                        positions={$store.layout?.positions}
-                       nodes={$store.model?.nodes}/>
+                       nodes={$store.model?.nodes}
+                       groups={$store.model?.groups}/>
 
         </g>
     </svg>

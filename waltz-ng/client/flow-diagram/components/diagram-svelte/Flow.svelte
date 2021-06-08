@@ -26,13 +26,13 @@
         const targetPos = positions[f.target];
 
         const sourceShape = {
-            cx: 50,
-            cy: 10
+            cx: 30,
+            cy: 15
         };
 
         const targetShape = {
-            cx: 50,
-            cy: 10
+            cx: 30,
+            cy: 15
         };
 
         return mkCurvedLine(
@@ -75,11 +75,11 @@
     function determineFlowStyling(status) {
         switch (status) {
             case "PENDING":
-                return {color: "green", dashArray: "6 3"};
+                return {color: "#629fcd", dashArray: "6 3"};
             case "REMOVED":
                 return {color: "#888", dashArray: "3 6"};
             default:
-                return {color: "black", dashArray: "1"};
+                return {color: "black", dashArray: "0"};
         }
     }
 
