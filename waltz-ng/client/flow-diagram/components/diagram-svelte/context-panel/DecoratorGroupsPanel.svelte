@@ -20,7 +20,7 @@
 
     $: decoratorGroups = $store.model.groups;
 
-    $: console.log({alignments, workingGroup, decoratorGroups});
+    // $: console.log({alignments, workingGroup, decoratorGroups});
 
     function selectGroup(e) {
         console.log("selecting from tree", e);

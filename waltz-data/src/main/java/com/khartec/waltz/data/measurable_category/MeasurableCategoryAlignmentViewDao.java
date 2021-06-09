@@ -19,6 +19,7 @@
 package com.khartec.waltz.data.measurable_category;
 
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.measurable.*;
 import com.khartec.waltz.schema.Tables;
@@ -91,6 +92,7 @@ public class MeasurableCategoryAlignmentViewDao {
                 .innerJoin(m)
                 .on(parents_with_ratings.field(eh.ANCESTOR_ID).eq(m.ID))
                 .innerJoin(mc).on(m.MEASURABLE_CATEGORY_ID.eq(mc.ID))
+                .where(m.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))
                 .fetchGroups(r -> mkRef(EntityKind.MEASURABLE_CATEGORY, r.get(mc.ID), r.get(mc.NAME)));
 
 

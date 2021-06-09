@@ -7,6 +7,7 @@
     export let node;
     export let expanded = false;
     export let isRoot = false;
+    export let applicationsByMeasurableId;
 
     $: sortedNodes = _.orderBy(childNodes, d => d.name);
 
@@ -21,7 +22,7 @@
         dispatcher("select", selectedNode);
     }
 
-    $: console.log({childNodes, node})
+    $: console.log({applicationsByMeasurableId, childNodes, node})
 
 </script>
 
@@ -37,6 +38,7 @@
             on:click={() => selectNode(node)}>
         {node.name}
     </button>
+    <span>({applicationsByMeasurableId[node.id]?.length || 0})</span>
 {/if}
 
 {#if expanded || node.isExpanded}
@@ -45,7 +47,8 @@
             <li>
                 {#if childNode.children.length > 0}
                     <svelte:self on:select node={childNode}
-                                 childNodes={childNode.children}/>
+                                 childNodes={childNode.children}
+                                 {applicationsByMeasurableId}/>
                 {:else}
                     <Icon size="lg"
                           name="fw"/>
@@ -54,6 +57,7 @@
                           on:click={() => selectNode(childNode)}>
                         {childNode.name}
                     </button>
+                    <span>({applicationsByMeasurableId[childNode.id]?.length || 0})</span>
                 {/if}
             </li>
         {/each}

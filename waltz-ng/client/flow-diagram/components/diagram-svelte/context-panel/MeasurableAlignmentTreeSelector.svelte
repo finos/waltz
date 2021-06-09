@@ -24,8 +24,15 @@
     }
 
     $: measurables = _.map(alignments, d => d.measurable);
+    $: applicationsByMeasurableId = _.reduce(
+        alignments,
+        (acc, d) => {
+            acc[d.measurable.id] = d.applicationIds;
+            return acc;
+        },
+        {});
 
-    $: console.log({measurables});
+    $: console.log({measurables, applicationsByMeasurableId});
 
     let expanded = true;
     let qry = "";
@@ -35,6 +42,8 @@
     $: searchNodes = prepareSearchNodes(measurables);
     $: displayedHierarchy = calcDisplayHierarchy(searchNodes, qry);
 
+
+    $: console.log({alignments, searchNodes})
 
     function selectNode(e) {
         console.log("tree selector", e);
@@ -50,7 +59,8 @@
                         node={root}
                         childNodes={displayedHierarchy}
                         expanded={expanded}
-                        on:select={selectNode}>
+                        on:select={selectNode}
+                        {applicationsByMeasurableId}>
     </MeasurableAlignmentTreeNode>
 </div>
 

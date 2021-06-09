@@ -85,16 +85,18 @@
          bind:this={elem}>
         <g transform={$store.layout?.diagramTransform}>
 
-            <FlowLayer on:selectFlow={onSelectFlow}
-                       positions={$store.layout?.positions}
-                       decorations={$store.model?.decorations}
-                       flows={$store.model?.flows}/>
-
             {#if $store.visibility?.layers.annotations}
                 <AnnotationLayer on:selectAnnotation={onSelectAnnotation}
                                  positions={$store.layout?.positions}
                                  annotations={$store.model?.annotations}/>
             {/if}
+
+
+            <FlowLayer on:selectFlow={onSelectFlow}
+                       positions={$store.layout?.positions}
+                       decorations={$store.model?.decorations}
+                       flows={$store.model?.flows}/>
+
 
             <NodeLayer on:selectNode={onSelectNode}
                        positions={$store.layout?.positions}

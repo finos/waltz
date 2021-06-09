@@ -401,7 +401,7 @@ export function service(
     };
 
     const processCommand = (state, commandObject) => {
-        console.log("wFDSS - processing command: ", commandObject, state);
+        // console.log("wFDSS - processing command: ", commandObject, state);
         const payload = commandObject.payload;
         const model = state.model;
         switch (commandObject.command) {

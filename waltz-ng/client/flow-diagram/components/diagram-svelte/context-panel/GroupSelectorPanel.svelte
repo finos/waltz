@@ -21,7 +21,7 @@
 
     $: selectedCategoryAlignments = _.find(alignments, d => d.categoryReference === selectedCategory);
 
-    $: console.log({selectedCategory, decoratorGroups, first, selectedCategoryAlignments});
+    // $: console.log({selectedCategory, decoratorGroups, first, selectedCategoryAlignments});
 
 
     function selectGroup(e) {
@@ -32,14 +32,20 @@
 </script>
 
 {#if selectCategory}
-    {#each alignments as alignment}
-        <label>
-            <input type=radio
-                   bind:group={selectedCategory}
-                   value={alignment.categoryReference}>
-            {alignment.categoryReference.name}
+    <div class="form-group">
+        <label for="selectedCategory">
+            Category:
         </label>
-    {/each}
+        <select id="selectedCategory"
+                bind:value={selectedCategory}
+                class="form-control">
+            {#each alignments as alignment}
+                <option value={alignment.categoryReference}>
+                    {alignment.categoryReference.name}
+                </option>
+            {/each}
+        </select>
+    </div>
     {#if selectedCategory}
     <MeasurableAlignmentTreeSelector alignments={selectedCategoryAlignments.alignments}
                             on:select={selectGroup}/>
