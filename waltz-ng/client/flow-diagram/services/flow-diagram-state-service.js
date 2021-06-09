@@ -20,6 +20,8 @@ import {ifPresent} from "../../common/function-utils";
 import {positionFor, toGraphFlow, toGraphId, toGraphNode} from "../flow-diagram-utils";
 import {toEntityRef} from "../../common/entity-utils";
 import {mkSelectionOptions} from "../../common/selector-utils";
+import newModel from "../components/diagram-svelte/store/model"
+import {diagramTransform} from "../components/diagram-svelte/store/layout";
 
 
 const initialState = {
@@ -125,7 +127,7 @@ function restoreDiagram(
     annotations = [],
     entityNodes = [],
     logicalFlows = [],
-    physicalFlows = [], 
+    physicalFlows = [],
     groups = [])
 {
     const layoutData = JSON.parse(diagram.layoutData);
@@ -146,17 +148,7 @@ function restoreDiagram(
     const nodeCommands = _
         .chain(entityNodes)
         .filter(ent => _.includes(["APPLICATION", "ACTOR"], ent.entityReference.kind))
-        .map(ent => {
-            return {
-                command: "ADD_NODE",
-                payload: {
-                    id: ent.entityReference.id,
-                    kind: ent.entityReference.kind,
-                    name: ent.entityReference.name,
-                    isNotable: ent.isNotable
-                }
-            }
-        })
+        .forEach(ent => newModel.addNode(toGraphNode(ent.entityReference)))
         .value();
 
 
@@ -238,7 +230,7 @@ function restoreDiagram(
         }
     });
 
-    commandProcessor(nodeCommands);
+    // commandProcessor(nodeCommands);
     commandProcessor(flowCommands);
     commandProcessor(annotationCommands);
     commandProcessor(moveCommands);
@@ -280,9 +272,9 @@ function removeDecoration(payload, model) {
 
 function addGroup(payload, model) {
     const group = Object.assign({},
-                                payload, 
+                                payload,
                                 {id: toGraphId(payload.group)});
-    
+
     const currentGroups = model.groups || [];
     const existingIds = _.map(currentGroups, "id");
     if (_.includes(existingIds, group.id)) {
@@ -380,8 +372,8 @@ export function service(
                 state.detail.applicationsById = _.keyBy(applications, "id");
                 state.detail.measurablesByAppId = _.keyBy(measurableRatings, "entityReference.id")
                 const allEntityNodes = addMissingEntityNodes(diagram.id, entityNodes, applications);
-                
-                
+
+
                 restoreDiagram(processCommands, diagram, annotations, allEntityNodes, logicalFlows, physicalFlows);
 
                 //store on state the list of groups to be shown
@@ -406,7 +398,8 @@ export function service(
         const model = state.model;
         switch (commandObject.command) {
             case "TRANSFORM_DIAGRAM":
-                state = _.defaultsDeep({}, { layout: { diagramTransform : payload }}, state);
+                diagramTransform.set(payload);
+                // state = _.defaultsDeep({}, { layout: { diagramTransform : payload }}, state);
                 break;
 
             case "SET_TITLE":
@@ -439,62 +432,68 @@ export function service(
                 - id = annotation identifier
              */
             case "UPDATE_ANNOTATION":
-                model.annotations = _.map(
-                    model.annotations,
-                    ann =>{
-                        if (ann.id !== payload.id) {
-                            return ann;
-                        } else {
-                            const updatedAnn = Object.assign({}, ann);
-                            updatedAnn.data.note = payload.note;
-                            return updatedAnn;
-                        }
-                    });
+                newModel.updateAnnotation(payload);
+                // model.annotations = _.map(
+                //     model.annotations,
+                //     ann =>{
+                //         if (ann.id !== payload.id) {
+                //             return ann;
+                //         } else {
+                //             const updatedAnn = Object.assign({}, ann);
+                //             updatedAnn.data.note = payload.note;
+                //             return updatedAnn;
+                //         }
+                //     });
                 break;
 
             case "ADD_ANNOTATION":
                 const annotationNode = toGraphNode(payload);
-                const existingAnnotationIds = _.map(model.annotations, "id");
-                if (_.includes(existingAnnotationIds, payload.id)) {
-                    console.log("Ignoring request to re-add annotation", payload);
-                } else {
-                    model.annotations = _.concat(model.annotations || [], [ annotationNode ]);
-                }
+                newModel.addAnnotation(annotationNode);
+                // const existingAnnotationIds = _.map(model.annotations, "id");
+                // if (_.includes(existingAnnotationIds, payload.id)) {
+                //     console.log("Ignoring request to re-add annotation", payload);
+                // } else {
+                //     model.annotations = _.concat(model.annotations || [], [ annotationNode ]);
+                // }
                 break;
 
             case "ADD_NODE":
-                const graphNode = toGraphNode(payload);
-                const existingNodeIds = _.map(model.nodes, "id");
-                if (_.includes(existingNodeIds, graphNode.id)) {
-                    console.log("Ignoring request to re-add node", payload);
-                } else {
-                    model.nodes = _.concat(model.nodes || [], [ graphNode ]);
-                    listener(state);
-                }
-                if (graphNode.data.kind === "APPLICATION" && !state.detail.applicationsById[graphNode.data.id]) {
-                    // load full app detail
-                    applicationStore
-                        .getById(graphNode.data.id)
-                        .then(app => state.detail.applicationsById[graphNode.data.id] = app)
-                        .then(() => listener(state));
-                }
+                newModel.addNode(toGraphNode(payload));
+                //
+                // const graphNode = toGraphNode(payload);
+                // const existingNodeIds = _.map(model.nodes, "id");
+                // if (_.includes(existingNodeIds, graphNode.id)) {
+                //     console.log("Ignoring request to re-add node", payload);
+                // } else {
+                //     model.nodes = _.concat(model.nodes || [], [ graphNode ]);
+                //     listener(state);
+                // }
+                // if (graphNode.data.kind === "APPLICATION" && !state.detail.applicationsById[graphNode.data.id]) {
+                //     // load full app detail
+                //     applicationStore
+                //         .getById(graphNode.data.id)
+                //         .then(app => state.detail.applicationsById[graphNode.data.id] = app)
+                //         .then(() => listener(state));
+                // }
                 break;
 
             case "ADD_FLOW":
-                const graphFlow = toGraphFlow(payload);
-                const existingFlowIds = _.map(model.flows, "id");
-                if (_.includes(existingFlowIds, graphFlow.id)) {
-                    console.log("Ignoring request to add duplicate flow", payload);
-                } else {
-                    model.flows = _.concat(model.flows || [], [graphFlow]);
-                }
+                newModel.addFlow(toGraphFlow(payload));
+                // const graphFlow = toGraphFlow(payload);
+                // const existingFlowIds = _.map(model.flows, "id");
+                // if (_.includes(existingFlowIds, graphFlow.id)) {
+                //     console.log("Ignoring request to add duplicate flow", payload);
+                // } else {
+                //     model.flows = _.concat(model.flows || [], [graphFlow]);
+                // }
                 break;
 
             case "REMOVE_FLOW":
-                model.annotations = _.reject(
-                    model.annotations,
-                    a => toGraphId(a.data.entityReference) === payload.id);
-                model.flows = _.reject(model.flows, f => f.id === payload.id);
+                newModel.removeFlow(payload);
+                // model.annotations = _.reject(
+                //     model.annotations,
+                //     a => toGraphId(a.data.entityReference) === payload.id);
+                // model.flows = _.reject(model.flows, f => f.id === payload.id);
                 break;
 
             case "ADD_DECORATION":
@@ -506,28 +505,31 @@ export function service(
                 break;
 
             case "REMOVE_NODE":
-                const flowIdsToRemove = _.chain(model.flows)
-                    .filter(f => f.source === payload.id || f.target === payload.id)
-                    .map("id")
-                    .value();
-                model.flows = _.reject(model.flows, f => _.includes(flowIdsToRemove, f.id));
-                model.nodes = _.reject(model.nodes, n => n.id === payload.id);
-                model.annotations = _.reject(
-                    model.annotations,
-                    a => {
-                        const annotationEntityRef = toGraphId(a.data.entityReference);
-                        const isDirectAnnotation = annotationEntityRef === payload.id;
-                        const isFlowAnnotation = _.includes(flowIdsToRemove, annotationEntityRef);
-                        return isDirectAnnotation || isFlowAnnotation;
-                    });
-                _.forEach(flowIdsToRemove, id => model.decorations[id] = []);
-                listener(state);
+                console.log("REMOVE_NODE", payload)
+                newModel.removeNode(payload);
+                // const flowIdsToRemove = _.chain(model.flows)
+                //     .filter(f => f.source === payload.id || f.target === payload.id)
+                //     .map("id")
+                //     .value();
+                // model.flows = _.reject(model.flows, f => _.includes(flowIdsToRemove, f.id));
+                // model.nodes = _.reject(model.nodes, n => n.id === payload.id);
+                // model.annotations = _.reject(
+                //     model.annotations,
+                //     a => {
+                //         const annotationEntityRef = toGraphId(a.data.entityReference);
+                //         const isDirectAnnotation = annotationEntityRef === payload.id;
+                //         const isFlowAnnotation = _.includes(flowIdsToRemove, annotationEntityRef);
+                //         return isDirectAnnotation || isFlowAnnotation;
+                //     });
+                // _.forEach(flowIdsToRemove, id => model.decorations[id] = []);
+                // listener(state);
                 break;
 
             case "REMOVE_ANNOTATION":
-                model.annotations = _.reject(model.annotations, a => a.id === payload.id );
+                newModel.removeAnnotation(payload);
+                // model.annotations = _.reject(model.annotations, a => a.id === payload.id );
                 break;
-                
+
             case "ADD_GROUP":
                 addGroup(payload, model);
                 break;

@@ -1,6 +1,7 @@
 import _ from "lodash";
 import {sameRef} from "../../../../common/entity-utils";
-import {toGraphId} from "../../../flow-diagram-utils";
+import {toGraphId, toGraphNode} from "../../../flow-diagram-utils";
+import model from "../store/model";
 
 
 export function prepareUpdateCommands(flows = [],
@@ -15,10 +16,8 @@ export function prepareUpdateCommands(flows = [],
         .chain(additions)
         .reject(f => _.some(existingEntities, ent => sameRef(ent, f.counterpartEntity)))
         .flatMap(f => {
-            const addCmd = {
-                command: 'ADD_NODE',
-                payload: f.counterpartEntity
-            };
+            model.addNode(toGraphNode(f.counterpartEntity));
+
             const dx = _.random(-80, 80);
             const dy = _.random(50, 80) * (isUpstream ? -1 : 1);
 
@@ -31,7 +30,7 @@ export function prepareUpdateCommands(flows = [],
                     dy
                 }
             };
-            return [addCmd, moveCmd];
+            return [moveCmd];
         })
         .value();
 

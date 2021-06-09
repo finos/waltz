@@ -22,6 +22,7 @@ import {downloadTextFile} from "../common/file-utils";
 
 import template from "./flow-diagram-view.html";
 import {entity} from "../common/services/enums/entity";
+import visbility from "./components/diagram-svelte/store/visibility"
 
 const initialState = {
     visibility: {},
