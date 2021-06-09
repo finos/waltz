@@ -9,7 +9,7 @@
     import model from "./store/model";
     import visibility from "./store/visibility"
     import VisibilityToggles from "./context-panel/VisibilityToggles.svelte";
-    import {diagramTransform} from "./store/layout";
+    import {diagramTransform, positions} from "./store/layout";
 
     let elem;
     let editMode = false;
@@ -91,19 +91,18 @@
 
             {#if $visibility.annotations}
                 <AnnotationLayer on:selectAnnotation={onSelectAnnotation}
-                                 positions={$store.layout?.positions}
+                                 positions={$positions}
                                  annotations={$model.annotations}/>
             {/if}
 
 
             <FlowLayer on:selectFlow={onSelectFlow}
-                       positions={$store.layout?.positions}
-                       decorations={$store.model?.decorations}
-                       flows={$model.flows}/>
+                       {positions}
+                       {model}/>
 
 
             <NodeLayer on:selectNode={onSelectNode}
-                       positions={$store.layout?.positions}
+                       positions={$positions}
                        nodes={$model.nodes}
                        groups={$store.model?.groups}/>
 

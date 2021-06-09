@@ -8,6 +8,7 @@
     import {mkSelectionOptions} from "../../../../common/selector-utils";
     import {physicalSpecStore} from "../../../../svelte-stores/physical-spec-store";
     import {toGraphId} from "../../../flow-diagram-utils";
+    import model from "../store/model";
 
 
     const Modes = {
@@ -28,7 +29,7 @@
 
     $: physicalSpecCall = physicalSpecStore.findBySelector(flowSelectionOpts)
     $: physicalSpecs = _.map($physicalSpecCall.data, r => Object.assign({}, r, {kind: 'PHYSICAL_SPECIFICATION'}));
-    $: existing = _.flatMap($store.model.decorations);
+    $: existing = _.flatMap($model.decorations);
     $: existingIds = _.map(existing, d => d.id);
     $: preparedFlows = preparePhysicalFlows(physicalFlows, physicalSpecs, _.map(existing, d => d.data));
 

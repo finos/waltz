@@ -21,7 +21,7 @@ import {positionFor, toGraphFlow, toGraphId, toGraphNode} from "../flow-diagram-
 import {toEntityRef} from "../../common/entity-utils";
 import {mkSelectionOptions} from "../../common/selector-utils";
 import newModel from "../components/diagram-svelte/store/model"
-import {diagramTransform} from "../components/diagram-svelte/store/layout";
+import {diagramTransform, positions} from "../components/diagram-svelte/store/layout";
 
 
 const initialState = {
@@ -208,10 +208,7 @@ function restoreDiagram(
             }
         });
 
-    const transformCommands = [{
-        command: "TRANSFORM_DIAGRAM",
-        payload: layoutData.diagramTransform
-    }];
+    diagramTransform.set(layoutData.diagramTransform);
 
     const titleCommands = [{
         command: "SET_TITLE",
@@ -234,7 +231,6 @@ function restoreDiagram(
     commandProcessor(flowCommands);
     commandProcessor(annotationCommands);
     commandProcessor(moveCommands);
-    commandProcessor(transformCommands);
     commandProcessor(decorationCommands);
     commandProcessor(titleCommands);
     commandProcessor(descriptionCommands);
@@ -418,12 +414,13 @@ export function service(
                 - refId? = if specified, move is relative to the current position of this item
              */
             case "MOVE":
-                const startPosition = payload.refId
-                    ? positionFor(state, payload.refId)
-                    : positionFor(state, payload.id);
-                const endPosition = positionFor(state, payload.id);
-                endPosition.x = startPosition.x + payload.dx;
-                endPosition.y = startPosition.y + payload.dy;
+                positions.move(payload);
+                // const startPosition = payload.refId
+                //     ? positionFor(state, payload.refId)
+                //     : positionFor(state, payload.id);
+                // const endPosition = positionFor(state, payload.id);
+                // endPosition.x = startPosition.x + payload.dx;
+                // endPosition.y = startPosition.y + payload.dy;
                 break;
 
             /* UPDATE_ANNOTATION
@@ -497,11 +494,11 @@ export function service(
                 break;
 
             case "ADD_DECORATION":
-                addDecoration(payload, model);
+                newModel.addDecoration(payload);
                 break;
 
             case "REMOVE_DECORATION":
-                removeDecoration(payload, model);
+                newModel.removeDecoration(payload);
                 break;
 
             case "REMOVE_NODE":
@@ -539,15 +536,16 @@ export function service(
                 break;
 
             case "SET_POSITION":
-                state.layout.positions[payload.id] = { x: payload.x, y: payload.y };
+                positions.setPosition(payload);
+                // state.layout.positions[payload.id] = { x: payload.x, y: payload.y };
                 break;
 
             case "SHOW_LAYER":
-                state.visibility.layers[payload] = true;
+                // state.visibility.layers[payload] = true;
                 break;
 
             case "HIDE_LAYER":
-                state.visibility.layers[payload] = false;
+                // state.visibility.layers[payload] = false;
                 break;
 
             default:

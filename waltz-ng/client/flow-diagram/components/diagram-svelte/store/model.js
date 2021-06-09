@@ -2,12 +2,13 @@ import _ from "lodash";
 import {writable} from "svelte/store";
 import dirty from "./dirty";
 import {sameRef} from "../../../../common/entity-utils";
-import {toGraphId} from "../../../flow-diagram-utils";
+import {toGraphId, toGraphNode} from "../../../flow-diagram-utils";
 
 const initialState = {
     nodes: [],
     flows: [],
-    annotations: []
+    annotations: [],
+    decorations: {} // logicalFlowGraphId  -> [ physFlowGraphObjs...]
 };
 
 
@@ -28,7 +29,6 @@ function removeNode(state, node) {
 
     if (existing) {
         dirty.set(true);
-        // TODO: remove flows
         const stateWithoutFlows = _  // and flow annotations!
             .chain(state.flows)
             .filter(d => sameRef(d.data.source, node.data) || sameRef(d.data.target, node.data))
@@ -131,8 +131,45 @@ function updateAnnotation(state, annotationUpd) {
 }
 
 
+function removeDecoration(state, decoration) {
+    console.log(decoration);
+    const refId = toGraphId(decoration.ref);
+    const currentDecorations = state.decorations[refId] || [];
+
+    const decorationId = toGraphId(decoration.decoration);
+    const existing = _.find(currentDecorations, d => d.id === decorationId);
+
+    if (existing) {
+        dirty.set(true);
+        const newDecorationsForFlow = _.reject(currentDecorations, d => d.id === decorationId);
+        const newDecorations = Object.assign({}, state.decorations, {[refId]: newDecorationsForFlow});
+        return Object.assign({}, state, {decorations: newDecorations});
+    } else {
+        return state;
+    }
+}
+
+
+function addDecoration(state, decoration) {
+    const refId = toGraphId(decoration.ref);
+    const currentDecorations = state.decorations[refId] || [];
+
+    const decorationNode = toGraphNode(decoration.decoration);
+    const existing = _.find(currentDecorations, d => d.id === decorationNode.id);
+
+    if (existing) {
+        return state;
+    } else {
+        dirty.set(true);
+        const newDecorationsForFlow = [...currentDecorations, decorationNode];
+        const newDecorations = Object.assign({}, state.decorations, {[refId]: newDecorationsForFlow});
+        return Object.assign({}, state, {decorations: newDecorations});
+    }
+}
+
+
 function createStore() {
-    const {subscribe, set, update} = writable(initialState);
+    const {subscribe, update} = writable(initialState);
 
     return {
         subscribe,
@@ -142,9 +179,13 @@ function createStore() {
         removeFlow: (flow) => update(s => removeFlow(s, flow)),
         addAnnotation: (annotation) => update(s => addAnnotation(s, annotation)),
         updateAnnotation: (annotation) => update(s => updateAnnotation(s, annotation)),
-        removeAnnotation: (annotation) => update(s => removeAnnotation(s, annotation))
+        removeAnnotation: (annotation) => update(s => removeAnnotation(s, annotation)),
+        addDecoration: (decoration) => update(s => addDecoration(s, decoration)),
+        removeDecoration: (decoration) => update(s => removeDecoration(s, decoration))
     };
 }
+
+
 
 const store = createStore();
 
