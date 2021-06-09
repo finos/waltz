@@ -58,7 +58,6 @@
         <strong>{selected.name}</strong> is the {oppositeDirection.toLowerCase()} node.
         Pick an application or actor to be the {direction.toLowerCase()} node.
     </p>
-    <pre>{JSON.stringify(possibleFlows, "", null)}</pre>
     <div class="waltz-scroll-region-250">
         {#each possibleFlows as flow}
             <label>

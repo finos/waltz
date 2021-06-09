@@ -21,7 +21,6 @@
 
     export let selected;
 
-
     $: flowRef = Object.assign({}, selected, {kind: 'LOGICAL_DATA_FLOW'});
     $: flowSelectionOpts = mkSelectionOptions(flowRef, 'EXACT' );
     $: physicalFlowCall = physicalFlowStore.findBySelector(flowSelectionOpts);
@@ -48,7 +47,6 @@
 
 </script>
 
-<pre>{JSON.stringify(preparedFlows, "", null)}</pre>
 <div class="waltz-scroll-region-250">
     <ul>
         {#each preparedFlows as flow}

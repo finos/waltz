@@ -46,7 +46,6 @@
     <strong>
         <EntityLink ref={selected}/>
     </strong>
-    <pre>{JSON.stringify(node, "", null)}</pre>
 </div>
 
 {#if activeMode === Modes.MENU}

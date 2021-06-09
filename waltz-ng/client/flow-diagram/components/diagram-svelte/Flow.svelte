@@ -8,7 +8,8 @@
     const dispatch = createEventDispatcher();
 
     export let flow;
-    export let positions;
+    export let sourcePos;
+    export let targetPos;
     export let decorations;
 
     function determineIcon(count) {
@@ -21,10 +22,18 @@
         }
     }
 
-    function mkLinePath(f) {
-        const sourcePos = positions[f.source];
-        const targetPos = positions[f.target];
+    function determineFlowStyling(status) {
+        switch (status) {
+            case "PENDING":
+                return {color: "#629fcd", dashArray: "6 3"};
+            case "REMOVED":
+                return {color: "#888", dashArray: "3 6"};
+            default:
+                return {color: "black", dashArray: "0"};
+        }
+    }
 
+    function mkLinePath(f, start, end) {
         const sourceShape = {
             cx: 30,
             cy: 15
@@ -36,10 +45,10 @@
         };
 
         return mkCurvedLine(
-            sourcePos.x + sourceShape.cx,
-            sourcePos.y + sourceShape.cy,
-            targetPos.x + targetShape.cx,
-            targetPos.y + targetShape.cy);
+            start.x + sourceShape.cx,
+            start.y + sourceShape.cy,
+            end.x + targetShape.cx,
+            end.y + targetShape.cy);
     }
 
 
@@ -72,16 +81,6 @@
     $: decorationCount = _.size(decorations[flow.id]) || 0;
     $: icon = determineIcon(decorationCount);
 
-    function determineFlowStyling(status) {
-        switch (status) {
-            case "PENDING":
-                return {color: "#629fcd", dashArray: "6 3"};
-            case "REMOVED":
-                return {color: "#888", dashArray: "3 6"};
-            default:
-                return {color: "black", dashArray: "0"};
-        }
-    }
 
     $: flowStyling = determineFlowStyling(flow.data.entityLifecycleStatus);
 
@@ -90,7 +89,7 @@
             // splitting these as separate reactive statements causes issues
             // looks like the reactivity may be rate limited which results in the
             // arrow heads sometimes being 'left-behind' if nodes are moved quickly
-            line.attr("d", mkLinePath(flow))
+            line.attr("d", mkLinePath(flow, sourcePos, targetPos))
             arrow.attr("transform", mkArrowTransform(line.node()));
             const bucketPosition = calcBucketPosition(line.node());
             bucket
@@ -99,8 +98,6 @@
                 .attr("data-bucket-y", bucketPosition.y)
         }
     }
-
-
 </script>
 
 <g class="wfd-flow wfd-flow-lifecycle-{flow.data.entityLifecycleStatus}"
