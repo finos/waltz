@@ -70,10 +70,16 @@
             </div>
 
             <div class="col-sm-2 waltz-display-field-label">
-                End of Life Date
+                End of Life
             </div>
             <div class="col-sm-4">
-                <span ng-bind="$ctrl.databaseInfo.endOfLifeDate"></span>
+                <span ng-bind="$ctrl.databaseInfo.endOfLifeStatus | toDisplayName:'endOfLifeStatus'"></span>
+                <span ng-if="$ctrl.databaseInfo.endOfLifeDate"
+                      class="text-muted">
+                    (<waltz-from-now timestamp="$ctrl.databaseInfo.endOfLifeDate"
+                                     days-only="true">
+                    </waltz-from-now>)
+                </span>
             </div>
         </div>
 
