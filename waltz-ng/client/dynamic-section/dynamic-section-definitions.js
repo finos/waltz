@@ -619,5 +619,11 @@ export const dynamicSectionsByKind = {
         changeLogSection,
         entityNamedNotesSection,
         involvedPeopleSection
+    ],
+    "DATABASE": [
+        appsSection,
+        entityNamedNotesSection,
+        bookmarksSection,
+        changeLogSection,
     ]
 };

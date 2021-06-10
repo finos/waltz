@@ -39,18 +39,11 @@ const databaseViewByExternalIdBouncerState = {
 };
 
 
-// const databaseViewByDatabaseNameBouncerState = {
-//     url: "/database-name/{databaseName}",
-//     resolve: { hostnameBouncer }
-// };
-
-
 function setup($stateProvider) {
     $stateProvider
         .state("main.database", baseState)
         .state("main.database.view", viewState)
         .state("main.database.external-id", databaseViewByExternalIdBouncerState)
-        // .state("main.database.hostname", databaseViewByDatabaseNameBouncerState);
 }
 
 setup.$inject = [
@@ -80,24 +73,3 @@ externalIdBouncer.$inject = [
     "$stateParams",
     "ServiceBroker"
 ];
-
-
-// function databaseNameBouncer($state, $stateParams, serviceBroker) {
-//     const databaseName = $stateParams.databaseName;
-//     serviceBroker
-//         .loadViewData(CORE_API.DatabaseStore.getByName, [hostname])
-//         .then(r => {
-//             const element = r.data;
-//             if(element) {
-//                 $state.go("main.server.view", {id: element.id});
-//             } else {
-//                 console.log(`Cannot find server corresponding to hostname: ${hostname}`);
-//             }
-//         });
-// }
-
-// hostnameBouncer.$inject = [
-//     "$state",
-//     "$stateParams",
-//     "ServiceBroker"
-// ];

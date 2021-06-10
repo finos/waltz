@@ -29,11 +29,6 @@ const bindings = {
 
 const initialState = {
     databaseInfo: null,
-
-    appsSection: dynamicSections.appsSection,
-    bookmarksSection: dynamicSections.bookmarksSection,
-    entityNamedNotesSection: dynamicSections.entityNamedNotesSection,
-    changeLogSection: dynamicSections.changeLogSection
 };
 
 
@@ -47,7 +42,7 @@ const addToHistory = (historyStore, database) => {
 };
 
 
-function controller($stateParams, historyStore, serviceBroker) {
+function controller($stateParams, historyStore, serviceBroker, dynamicSectionManager) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
@@ -57,7 +52,8 @@ function controller($stateParams, historyStore, serviceBroker) {
             id: vm.databaseId
         };
 
-        console.log('databaseId ' , vm.databaseId, vm.parentEntityRef);
+        dynamicSectionManager.initialise("DATABASE");
+
         serviceBroker
             .loadViewData(CORE_API.DatabaseStore.getById, [vm.parentEntityRef.id])
             .then(r => {
@@ -71,7 +67,8 @@ function controller($stateParams, historyStore, serviceBroker) {
 controller.$inject = [
     "$stateParams",
     "HistoryStore",
-    "ServiceBroker"
+    "ServiceBroker",
+    "DynamicSectionManager"
 ];
 
 

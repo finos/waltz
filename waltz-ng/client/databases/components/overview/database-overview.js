@@ -44,6 +44,17 @@ function controller(serviceBroker) {
             serviceBroker
                 .loadViewData(CORE_API.DatabaseStore.getById, [vm.parentEntityRef.id])
                 .then(r => vm.databaseInfo = r.data);
+
+            serviceBroker
+                .loadViewData(CORE_API.DatabaseUsageStore.findByDatabaseId, [vm.parentEntityRef.id])
+                .then(r => {
+                    vm.databaseUsage = r.data;
+                    vm.environments = _.chain(vm.databaseUsage)
+                        .map(du => du.environment)
+                        .uniq()
+                        .sort()
+                        .value();
+                });
         }
     };
 }

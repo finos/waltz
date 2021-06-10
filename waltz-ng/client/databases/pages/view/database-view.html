@@ -33,8 +33,13 @@
 <waltz-database-overview parent-entity-ref="$ctrl.parentEntityRef">
 </waltz-database-overview>
 
-<br/>
-<!-- APPS -->
-<waltz-dynamic-section-wrapper section="$ctrl.appsSection"
-                               parent-entity-ref="$ctrl.parentEntityRef">
-</waltz-dynamic-section-wrapper>
+<!-- NAVIGATION -->
+<div class="waltz-page-summary waltz-page-summary-attach">
+    <waltz-dynamic-section-navigation parent-entity-ref="$ctrl.parentEntityRef">
+    </waltz-dynamic-section-navigation>
+</div>
+
+<br>
+
+<waltz-dynamic-sections-view parent-entity-ref="$ctrl.parentEntityRef">
+</waltz-dynamic-sections-view>
