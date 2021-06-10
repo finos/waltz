@@ -26,19 +26,12 @@
         const annotationPosition = positions[annotation.id];
 
         if (ref.kind === "LOGICAL_DATA_FLOW") {
+            const bucketPos = positions[`BUCKET_${refStr}`] || {x: 0, y: 0};
             const geometry = {
-                subjectPosition: {x: 0, y: 0},
+                subjectPosition: bucketPos,
                 subjectShape: {cx: 0, cy: 0},
                 annotationPosition
             };
-
-             select(`[data-flow-id="${refStr}"] .wfd-flow-bucket`)
-                 .each(function() {
-                    const d = select(this);
-                    const x = d.attr("data-bucket-x");
-                    const y = d.attr("data-bucket-y");
-                    geometry.subjectPosition = {x, y};
-                });
 
             return geometry;
         } else {

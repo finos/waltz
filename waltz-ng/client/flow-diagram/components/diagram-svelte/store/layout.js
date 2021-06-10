@@ -12,13 +12,18 @@ function move(state, moveCmd) {
     return Object.assign({}, state, {[moveCmd.id]: newPos});
 }
 
+function setPosition(state, posCmd) {
+    console.log("SetPosition", {state, posCmd});
+    return Object.assign({}, state, {[posCmd.id]: { x: posCmd.x, y: posCmd.y}});
+}
 
 function createPositionStore() {
     const {update, subscribe} = writable(initialPositions);
 
     return {
         subscribe,
-        move: (moveCmd) => update(s => move(s, moveCmd))
+        move: (moveCmd) => update(s => move(s, moveCmd)),
+        setPosition: (posCmd) => update(s => setPosition(s, posCmd))
     };
 }
 

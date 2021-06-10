@@ -3,6 +3,7 @@
     import {mkCurvedLine} from "../../../common/d3-utils";
     import {createEventDispatcher} from "svelte";
     import {refToString} from "../../../common/entity-utils";
+    import {positions} from "./store/layout";
 
 
     const dispatch = createEventDispatcher();
@@ -80,8 +81,7 @@
     $: bucket = g && g.select(".wfd-flow-bucket");
     $: decorationCount = _.size(decorations[flow.id]) || 0;
     $: icon = determineIcon(decorationCount);
-
-
+    $: linePath = mkLinePath(flow, sourcePos, targetPos);
     $: flowStyling = determineFlowStyling(flow.data.entityLifecycleStatus);
 
     $: {
@@ -89,13 +89,15 @@
             // splitting these as separate reactive statements causes issues
             // looks like the reactivity may be rate limited which results in the
             // arrow heads sometimes being 'left-behind' if nodes are moved quickly
-            line.attr("d", mkLinePath(flow, sourcePos, targetPos))
+            // line.attr("d", mkLinePath(flow, sourcePos, targetPos))
+            line.attr("d", linePath);
             arrow.attr("transform", mkArrowTransform(line.node()));
             const bucketPosition = calcBucketPosition(line.node());
             bucket
                 .attr("transform", `translate(${bucketPosition.x}, ${bucketPosition.y})`)
-                .attr("data-bucket-x", bucketPosition.x)
-                .attr("data-bucket-y", bucketPosition.y)
+                // .attr("data-bucket-x", bucketPosition.x)
+                // .attr("data-bucket-y", bucketPosition.y);
+            positions.setPosition({id: `BUCKET_${flow.id}`, x: bucketPosition.x, y: bucketPosition.y});
         }
     }
 </script>

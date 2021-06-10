@@ -77,7 +77,7 @@
 
     $: elem && setupPanAndZoom($processor);
 
-    $: console.log({"store": $store, model: $model});
+    $: console.log("FlowDiag:", {store: $store, model: $model, positions: $positions});
 
 </script>
 
