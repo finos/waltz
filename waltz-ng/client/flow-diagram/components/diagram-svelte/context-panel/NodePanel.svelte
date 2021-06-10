@@ -8,6 +8,7 @@
     import {actorStore} from "../../../../svelte-stores/actor-store";
     import EntityLink from "../../../../common/svelte/EntityLink.svelte";
     import AddAnnotationSubPanel from "./AddAnnotationSubPanel.svelte";
+    import model from "../store/model";
 
     export let selected;
     const dispatch = createEventDispatcher();
@@ -35,8 +36,7 @@
     }
 
     function removeNode() {
-        const removeCmd = {command: "REMOVE_NODE", payload: {id: toGraphId(selected), data: selected}};
-        $processor([removeCmd]);
+        model.removeNode({id: toGraphId(selected), data: selected})
         cancel();
     }
 

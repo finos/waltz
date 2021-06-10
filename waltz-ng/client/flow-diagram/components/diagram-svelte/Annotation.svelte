@@ -6,6 +6,7 @@
     import {mkDragHandler} from "./drag-handler";
     import {processor} from "./diagram-model-store";
     import {createEventDispatcher} from "svelte";
+    import {shapeFor, toGraphId} from "../../flow-diagram-utils";
 
     export let positions;
     export let annotation;
@@ -24,28 +25,9 @@
         const ref = annotation.data.entityReference;
         const refStr = refToString(ref);
         const annotationPosition = positions[annotation.id];
-
-        if (ref.kind === "LOGICAL_DATA_FLOW") {
-            const geometry = {
-                subjectPosition: {x: 0, y: 0},
-                subjectShape: {cx: 0, cy: 0},
-                annotationPosition
-            };
-
-             select(`[data-flow-id="${refStr}"] .wfd-flow-bucket`)
-                 .each(function() {
-                    const d = select(this);
-                    const x = d.attr("data-bucket-x");
-                    const y = d.attr("data-bucket-y");
-                    geometry.subjectPosition = {x, y};
-                });
-
-            return geometry;
-        } else {
-            const subjectPosition = positions[refStr];
-            const subjectShape = {cx: 50, cy: 5}; //shapeFor(state, toGraphId(ref));
-            return { subjectPosition, subjectShape, annotationPosition };
-        }
+        const subjectPosition = positions[refStr] || {x: 0, y: 0};
+        const subjectShape = shapeFor(ref);
+        return { subjectPosition, subjectShape, annotationPosition };
     }
 
     let linePath = "";

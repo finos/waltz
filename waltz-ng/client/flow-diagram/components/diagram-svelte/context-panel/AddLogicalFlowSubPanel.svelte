@@ -6,6 +6,8 @@
     import {Directions} from "./panel-utils";
     import {createEventDispatcher} from "svelte";
     import EntityLabel from "../../../../common/svelte/EntityLabel.svelte";
+    import model from "../store/model";
+    import {positions} from "../store/layout";
 
     const Modes = {
         OVERVIEW: "OVERVIEW",
@@ -24,8 +26,8 @@
     let activeMode = Modes.OVERVIEW;
     let selectionOptions = [];
 
-    $: existingFlows = _.map($store.model.flows, d => d.data);
-    $: existingNodes = _.map($store.model.nodes, d => d.data);
+    $: existingFlows = _.map($model.flows, d => d.data);
+    $: existingNodes = _.map($model.nodes, d => d.data);
     $: possibleFlows = mkFlows(logicalFlows, $selectedNode, direction === Directions.UPSTREAM, existingNodes);
     $: checkedFlows = _
         .chain(possibleFlows)
@@ -33,14 +35,16 @@
         .value();
 
     function updateFlows() {
-        const updateCmds = prepareUpdateCommands(
+        const updates = prepareUpdateCommands(
             checkedFlows,
             existingNodes,
             direction === Directions.UPSTREAM,
             $selectedNode);
 
-        $processor(updateCmds);
-        cancel();
+        updates.nodeAdditions.forEach(model.addNode);
+        updates.flowAdditions.forEach(model.addFlow);
+        updates.flowRemovals.forEach(model.removeFlow);
+        updates.moves.forEach(positions.move);
     }
 
     $: oppositeDirection = (direction === Directions.UPSTREAM)
@@ -60,12 +64,14 @@
     </p>
     <div class="waltz-scroll-region-250">
         {#each possibleFlows as flow}
-            <label>
-                <input type="checkbox"
-                       checked={_.includes(checkedFlows, flow)}
-                       on:click={() => flow.used = !flow.used}>
-                <EntityLabel ref={flow.counterpartEntity}/>
-            </label>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox"
+                           checked={_.includes(checkedFlows, flow)}
+                           on:click={() => flow.used = !flow.used}>
+                    <EntityLabel ref={flow.counterpartEntity}/>
+                </label>
+            </div>
         {/each}
     </div>
 </div>

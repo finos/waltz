@@ -80,13 +80,6 @@ export function drawNodeShape(selection, state) {
 }
 
 
-function initialiseShape(state, graphNode) {
-    if (!_.isObject(graphNode)) throw "Cannot initialise shape without an object, was given: " + graphNode;
-    const shape = toNodeShape(_.get(graphNode, "data.kind", "DEFAULT"));
-    state.layout.shapes[graphNode.id] = shape;
-    return shape;
-}
-
 
 function initialisePosition(state, graphNodeId) {
     const position =  { x: 0, y: 0 };
@@ -104,12 +97,13 @@ export function positionFor(state, graphNode) {
 }
 
 
-export function shapeFor(state, graphNode) {
-    const id = _.isString(graphNode)
-        ? graphNode
-        : graphNode.id;
-
-    return state.layout.shapes[id] || initialiseShape(state, graphNode);
+export function shapeFor(ref) {
+    switch (ref.kind) {
+        case "LOGICAL_DATA_FLOW":
+            return {cx: 0, cy: 0};
+        default:
+            return {cx: 50, cy: 5};
+    }
 }
 
 

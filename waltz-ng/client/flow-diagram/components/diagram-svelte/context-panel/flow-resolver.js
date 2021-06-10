@@ -3,56 +3,49 @@ import {sameRef} from "../../../../common/entity-utils";
 import {toGraphId, toGraphNode} from "../../../flow-diagram-utils";
 import model from "../store/model";
 
-
+/**
+ * adds/removes logical flows
+ */
 export function prepareUpdateCommands(flows = [],
                                       existingEntities = [],
                                       isUpstream,
                                       baseEntity) {
 
-    const additions = _.filter(flows, f => ! f.existing && f.used);
-    const removals = _.filter(flows, f => f.existing && ! f.used);
+    const isAddition = f => ! f.existing && f.used;
+    const isRemoval = f =>  f.existing && ! f.used
 
-    const nodeAdditionCommands = _
-        .chain(additions)
-        .reject(f => _.some(existingEntities, ent => sameRef(ent, f.counterpartEntity)))
-        .flatMap(f => {
-            model.addNode(toGraphNode(f.counterpartEntity));
+    const newFlows = _
+        .chain(flows)
+        .filter(isAddition)
+        .reject(f => _.some(existingEntities, ent => sameRef(ent, f.counterpartEntity)));
 
-            const dx = _.random(-80, 80);
-            const dy = _.random(50, 80) * (isUpstream ? -1 : 1);
+    const nodeAdditions = _.map(newFlows, toGraphNode(f.counterpartEntity));
+    const flowAdditions = _.map(newFlows, f => f.logicalFlow);
+    const moves = _.map(
+        newFlows,
+        f => ({
+            id: toGraphId(f.counterpartEntity),
+            refId: toGraphId(baseEntity),
+            dx: _.random(-80, 80),
+            dy: _.random(50, 80) * (isUpstream ? -1 : 1)
+        }));
 
-            const moveCmd = {
-                command: 'MOVE',
-                payload: {
-                    id: toGraphId(f.counterpartEntity),
-                    refId: toGraphId(baseEntity),
-                    dx,
-                    dy
-                }
-            };
-            return [moveCmd];
-        })
+    const flowRemovals = _
+        .chain(flows)
+        .filter(isRemoval)
+        .map(f => ({
+            id: toGraphId(f.logicalFlow),
+            source: toGraphId(f.logicalFlow.source),
+            target: toGraphId(f.logicalFlow.target)
+        }))
         .value();
 
-    const flowAdditionCommands = _.map(additions, f => {
-        return {
-            command: 'ADD_FLOW',
-            payload: f.logicalFlow
-        };
-    });
-
-    const flowRemovalCommands = _.map(removals, f => {
-        return {
-            command: 'REMOVE_FLOW',
-            payload: {
-                id: toGraphId(f.logicalFlow),
-                source: toGraphId(f.logicalFlow.source),
-                target: toGraphId(f.logicalFlow.target)
-            }
-        };
-    });
-
-    return _.concat(nodeAdditionCommands, flowAdditionCommands, flowRemovalCommands);
+    return {
+        nodeAdditions,
+        flowAdditions,
+        flowRemovals,
+        moves
+    };
 }
 
 
@@ -86,14 +79,15 @@ export function mkFlows(logicalFlows = [], node, isUpstream, existingEntities = 
 }
 
 
+/**
+ * adds/removes physical flows
+ */
 export function preparePhysicalFlowUpdates(flows) {
-    const additions = _.filter(flows, f => ! f.existing && f.used);
-    const removals = _.filter(flows, f => f.existing && ! f.used);
 
-    const additionCommands = _.map(additions, f => {
-        return {
-            command: 'ADD_DECORATION',
-            payload: {
+    const additions = _
+        .chain(flows)
+        .filter(f => ! f.existing && f.used)
+        .map(f => ({
                 ref: {
                     id: f.physicalFlow.logicalFlowId,
                     kind: 'LOGICAL_DATA_FLOW'
@@ -102,27 +96,25 @@ export function preparePhysicalFlowUpdates(flows) {
                     id: f.physicalFlow.id,
                     kind: 'PHYSICAL_FLOW'
                 }
-            }
-        };
-    });
+            }))
+        .value();
 
-    const removalCommands = _.map(removals, f => {
-        return {
-            command: 'REMOVE_DECORATION',
-            payload: {
-                ref: {
-                    id: f.physicalFlow.logicalFlowId,
-                    kind: 'LOGICAL_DATA_FLOW'
-                },
-                decoration: {
-                    id: f.physicalFlow.id,
-                    kind: 'PHYSICAL_FLOW'
-                }
+    const removals = _
+        .chain(flows)
+        .filter(f => f.existing && ! f.used)
+        .map(f => ({
+            ref: {
+                id: f.physicalFlow.logicalFlowId,
+                kind: 'LOGICAL_DATA_FLOW'
+            },
+            decoration: {
+                id: f.physicalFlow.id,
+                kind: 'PHYSICAL_FLOW'
             }
-        };
-    });
+        }))
+        .value();
 
-    return _.concat(additionCommands, removalCommands)
+    return { additions, removals };
 }
 
 

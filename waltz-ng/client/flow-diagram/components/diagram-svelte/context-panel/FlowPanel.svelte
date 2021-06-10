@@ -1,11 +1,10 @@
 <script>
 
     import {toGraphId} from "../../../flow-diagram-utils";
-    import {processor} from "../diagram-model-store";
     import {createEventDispatcher} from "svelte";
     import AddAnnotationSubPanel from "./AddAnnotationSubPanel.svelte";
     import AddPhysicalFlowSubPanel from "./AddPhysicalFlowSubPanel.svelte";
-    import VisibilityToggles from "./VisibilityToggles.svelte";
+    import model from "../store/model";
 
     export let selected;
     const dispatch = createEventDispatcher();
@@ -21,8 +20,7 @@
 
 
     function removeFlow() {
-        const deleteCmd = {command: "REMOVE_FLOW", payload: {id: toGraphId(selected.flow), data: selected.flow}}
-        $processor([deleteCmd]);
+        model.removeFlow({id: toGraphId(selected.flow), data: selected.flow});
         cancel()
     }
 
@@ -36,15 +34,12 @@
 
 <div>
     <strong>{selected.flow.source.name} &rarr {selected.flow.target.name}</strong>
-    <pre>{JSON.stringify(selected, "", null)}</pre>
     {#if selected.decorations.length > 0}
-    This flow has {selected.decorations.length} physical flow decorators associated.
+        This flow has {selected.decorations.length} physical flow decorators associated.
     {:else}
-    No physical flow decorators have been associated to this flow.
+        No physical flow decorators have been associated to this flow.
     {/if}
 </div>
-
-<VisibilityToggles/>
 
 {#if activeMode === Modes.MENU}
 <ul>

@@ -53,7 +53,6 @@ function removeNode(state, node) {
 
 
 function removeFlow(state, flow) {
-    console.log("Remove flow", {state, flow})
     const existing = _.find(state.flows, d => d.id === flow.id);
 
     if (existing) {
@@ -132,7 +131,6 @@ function updateAnnotation(state, annotationUpd) {
 
 
 function removeDecoration(state, decoration) {
-    console.log(decoration);
     const refId = toGraphId(decoration.ref);
     const currentDecorations = state.decorations[refId] || [];
 
