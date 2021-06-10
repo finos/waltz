@@ -21,8 +21,7 @@
     }
 
     function removeAnnotation() {
-        const removeCmd = {command: "REMOVE_ANNOTATION", payload: {id: toGraphId(selected), data: selected}};
-        $processor([removeCmd])
+        model.removeAnnotation( {id: toGraphId(selected), data: selected});
     }
 
     const nodeKinds = ["APPLICATION", "ACTOR"];

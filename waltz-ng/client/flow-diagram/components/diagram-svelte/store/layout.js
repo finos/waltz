@@ -3,6 +3,7 @@ import {writable} from "svelte/store";
 
 const initialPositions = {}; // gid -> {  x, y }
 
+
 function move(state, moveCmd) {
     const currentPos = state[moveCmd.id] || {x:0, y: 0};
     const newPos = {
@@ -12,10 +13,12 @@ function move(state, moveCmd) {
     return Object.assign({}, state, {[moveCmd.id]: newPos});
 }
 
+
 function setPosition(state, posCmd) {
-    console.log("SetPosition", {state, posCmd});
-    return Object.assign({}, state, {[posCmd.id]: { x: posCmd.x, y: posCmd.y}});
+    const updatedStateFrag = {[posCmd.id]: { x: posCmd.x, y: posCmd.y}};
+    return Object.assign({}, state, updatedStateFrag);
 }
+
 
 function createPositionStore() {
     const {update, subscribe} = writable(initialPositions);

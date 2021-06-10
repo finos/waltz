@@ -3,7 +3,9 @@ import {sameRef} from "../../../../common/entity-utils";
 import {toGraphId, toGraphNode} from "../../../flow-diagram-utils";
 import model from "../store/model";
 
-
+/**
+ * adds/removes logical flows
+ */
 export function prepareUpdateCommands(flows = [],
                                       existingEntities = [],
                                       isUpstream,
@@ -86,14 +88,15 @@ export function mkFlows(logicalFlows = [], node, isUpstream, existingEntities = 
 }
 
 
+/**
+ * adds/removes physical flows
+ */
 export function preparePhysicalFlowUpdates(flows) {
-    const additions = _.filter(flows, f => ! f.existing && f.used);
-    const removals = _.filter(flows, f => f.existing && ! f.used);
 
-    const additionCommands = _.map(additions, f => {
-        return {
-            command: 'ADD_DECORATION',
-            payload: {
+    const additions = _
+        .chain(flows)
+        .filter(f => ! f.existing && f.used)
+        .map(f => ({
                 ref: {
                     id: f.physicalFlow.logicalFlowId,
                     kind: 'LOGICAL_DATA_FLOW'
@@ -102,27 +105,25 @@ export function preparePhysicalFlowUpdates(flows) {
                     id: f.physicalFlow.id,
                     kind: 'PHYSICAL_FLOW'
                 }
-            }
-        };
-    });
+            }))
+        .value();
 
-    const removalCommands = _.map(removals, f => {
-        return {
-            command: 'REMOVE_DECORATION',
-            payload: {
-                ref: {
-                    id: f.physicalFlow.logicalFlowId,
-                    kind: 'LOGICAL_DATA_FLOW'
-                },
-                decoration: {
-                    id: f.physicalFlow.id,
-                    kind: 'PHYSICAL_FLOW'
-                }
+    const removals = _
+        .chain(flows)
+        .filter(f => f.existing && ! f.used)
+        .map(f => ({
+            ref: {
+                id: f.physicalFlow.logicalFlowId,
+                kind: 'LOGICAL_DATA_FLOW'
+            },
+            decoration: {
+                id: f.physicalFlow.id,
+                kind: 'PHYSICAL_FLOW'
             }
-        };
-    });
+        }))
+        .value();
 
-    return _.concat(additionCommands, removalCommands)
+    return { additions, removals }
 }
 
 

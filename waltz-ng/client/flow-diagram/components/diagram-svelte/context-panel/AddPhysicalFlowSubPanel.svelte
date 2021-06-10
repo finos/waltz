@@ -40,8 +40,9 @@
     }
 
     function updateFlows(){
-        const updateCmds = preparePhysicalFlowUpdates(preparedFlows);
-        $processor(updateCmds);
+        const updates = preparePhysicalFlowUpdates(preparedFlows);
+        updates.additions.forEach(d => model.addDecoration(d));
+        updates.removals.forEach(d => model.removeDecoration(d));
         cancel();
     }
 

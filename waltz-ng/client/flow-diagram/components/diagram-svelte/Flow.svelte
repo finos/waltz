@@ -95,9 +95,7 @@
             const bucketPosition = calcBucketPosition(line.node());
             bucket
                 .attr("transform", `translate(${bucketPosition.x}, ${bucketPosition.y})`)
-                // .attr("data-bucket-x", bucketPosition.x)
-                // .attr("data-bucket-y", bucketPosition.y);
-            positions.setPosition({id: `BUCKET_${flow.id}`, x: bucketPosition.x, y: bucketPosition.y});
+            positions.setPosition({id: flow.id, x: bucketPosition.x, y: bucketPosition.y});
         }
     }
 </script>
