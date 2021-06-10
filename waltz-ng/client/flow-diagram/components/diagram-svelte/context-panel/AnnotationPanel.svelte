@@ -4,6 +4,7 @@
     import EntityLink from "../../../../common/svelte/EntityLink.svelte";
     import AddAnnotationSubPanel from "./AddAnnotationSubPanel.svelte";
     import {toGraphId} from "../../../flow-diagram-utils";
+    import model from "../store/model";
 
     export let selected;
     const dispatch = createEventDispatcher();
@@ -24,15 +25,21 @@
         $processor([removeCmd])
     }
 
-    $: isApp = selected.entityReference.kind === 'APPLICATION'
+    const nodeKinds = ["APPLICATION", "ACTOR"];
 
-    $: owningEntity = (isApp)
-        ? _.find($store?.model?.nodes, d => d.data.id === selected.entityReference.id)
-        : _.find($store?.model?.flows, d => d.data.id === selected.entityReference.id)
 
-    $: owningEntityName = (isApp)
+    $: isNode = _.includes(nodeKinds, selected.entityReference.kind);
+    $: selectedGraphId = toGraphId(selected.entityReference);
+
+    $: owningEntity = (isNode)
+        ? _.find($model.nodes, d => d.id === selectedGraphId)
+        : _.find($model.flows, d => d.id === selectedGraphId)
+
+    $: owningEntityName = (isNode)
         ? owningEntity.data.name
-        : owningEntity.data.source.name + " -> " + owningEntity.data.target.name
+        : owningEntity.data.source.name + " -> " + owningEntity.data.target.name;
+
+    $: console.log("ap", {s: selected, model: $model, owningEntity, owningEntityName})
 
 </script>
 
@@ -40,7 +47,6 @@
     <strong>
         Annotation linked to <EntityLink ref={selected.entityReference}><span>{owningEntityName}</span></EntityLink>
     </strong>
-    <pre>{JSON.stringify(selected, "", null)}</pre>
 </div>
 
 

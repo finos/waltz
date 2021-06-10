@@ -25,7 +25,6 @@
 
 
     function selectGroup(e) {
-        console.log("sleector panel", e);
         dispatch("select", e.detail);
     }
 
@@ -60,13 +59,5 @@
 
 
 <style>
-    ul {
-        padding: 0;
-        margin: 0;
-        list-style: none;
-    }
 
-    li {
-        padding-top: 0;
-    }
 </style>

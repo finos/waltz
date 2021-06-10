@@ -1,5 +1,6 @@
 import {event, select} from "d3-selection";
 import {drag} from "d3-drag";
+import {positions} from "./store/layout";
 
 
 export function mkDragHandler(node, processor) {
@@ -15,11 +16,7 @@ export function mkDragHandler(node, processor) {
 
     function dragger() {
         return (d) => {
-            const cmd = {
-                command: "MOVE",
-                payload: {id: node.id, dx: event.dx, dy: event.dy}
-            };
-            processor([cmd]);
+            positions.move({id: node.id, dx: event.dx, dy: event.dy});
         };
     }
 

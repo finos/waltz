@@ -1,16 +1,24 @@
 <script>
     import Flow from "./Flow.svelte";
 
-    export let positions = {};
-    export let decorations = {};
-    export let flows = [];
+    export let model;
+    export let positions;
+
+    /*
+            const sourcePos = positions[f.source];
+        const targetPos = positions[f.target];
+
+     */
+    $: console.log("model", {model})
 </script>
 
 <g class="wfd-flows">
-    {#each flows as flow}
+    {#each $model.flows as flow}
+<!--        <text dy="100" dx="100">Foo</text>-->
         <Flow on:selectFlow
-              {positions}
-              {decorations}
+              sourcePos={$positions[flow.source]}
+              targetPos={$positions[flow.target]}
+              decorations={$model.decorations}
               {flow}/>
     {/each}
 </g>

@@ -6,6 +6,10 @@
     import {event, select} from "d3-selection";
     import {zoom} from "d3-zoom";
     import ContextPanel from "./context-panel/ContextPanel.svelte";
+    import model from "./store/model";
+    import visibility from "./store/visibility"
+    import VisibilityToggles from "./context-panel/VisibilityToggles.svelte";
+    import {diagramTransform, positions} from "./store/layout";
 
     let elem;
     let editMode = false;
@@ -36,7 +40,7 @@
     function setupPanAndZoom(commandProcessor) {
         function zoomed() {
             const t = event.transform;
-            commandProcessor([{command: "TRANSFORM_DIAGRAM", payload: t}]);
+            $diagramTransform = t;
         }
 
         const myZoom = zoom()
@@ -61,19 +65,19 @@
 
     $: select(elem)
         .selectAll(".wfd-flow-bucket")
-        .style("display", $store.visibility?.layers.flowBuckets ? "" : "none");
+        .style("display", $visibility.flowBuckets ? "" : "none");
 
     $: select(elem)
         .selectAll(".wfd-flow-lifecycle-REMOVED")
-        .style("display", $store.visibility?.layers.removedFlows ? "" : "none");
+        .style("display", $visibility.removedFlows ? "" : "none");
 
     $: select(elem)
         .selectAll(".wfd-flow-lifecycle-PENDING")
-        .style("display", $store.visibility?.layers.pendingFlows ? "" : "none");
+        .style("display", $visibility.pendingFlows ? "" : "none");
 
     $: elem && setupPanAndZoom($processor);
 
-    $: console.log("store", $store);
+    $: console.log({"store": $store, model: $model});
 
 </script>
 
@@ -83,24 +87,23 @@
     <svg viewBox="0 0 1100 600"
          width="100%"
          bind:this={elem}>
-        <g transform={$store.layout?.diagramTransform}>
+        <g transform={$diagramTransform}>
 
-            {#if $store.visibility?.layers.annotations}
+            {#if $visibility.annotations}
                 <AnnotationLayer on:selectAnnotation={onSelectAnnotation}
-                                 positions={$store.layout?.positions}
-                                 annotations={$store.model?.annotations}/>
+                                 positions={$positions}
+                                 annotations={$model.annotations}/>
             {/if}
 
 
             <FlowLayer on:selectFlow={onSelectFlow}
-                       positions={$store.layout?.positions}
-                       decorations={$store.model?.decorations}
-                       flows={$store.model?.flows}/>
+                       {positions}
+                       {model}/>
 
 
             <NodeLayer on:selectNode={onSelectNode}
-                       positions={$store.layout?.positions}
-                       nodes={$store.model?.nodes}
+                       positions={$positions}
+                       nodes={$model.nodes}
                        groups={$store.model?.groups}/>
 
         </g>
@@ -108,6 +111,7 @@
 </div>
 <div class="col-md-4 context-menu">
     <ContextPanel diagramId={$store.diagramId} {doSave}/>
+    <VisibilityToggles/>
 </div>
 {/if}
 

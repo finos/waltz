@@ -5,6 +5,7 @@
     import {createEventDispatcher} from "svelte";
     import AddAnnotationSubPanel from "./AddAnnotationSubPanel.svelte";
     import AddPhysicalFlowSubPanel from "./AddPhysicalFlowSubPanel.svelte";
+    import VisibilityToggles from "./VisibilityToggles.svelte";
 
     export let selected;
     const dispatch = createEventDispatcher();
@@ -42,6 +43,8 @@
     No physical flow decorators have been associated to this flow.
     {/if}
 </div>
+
+<VisibilityToggles/>
 
 {#if activeMode === Modes.MENU}
 <ul>
