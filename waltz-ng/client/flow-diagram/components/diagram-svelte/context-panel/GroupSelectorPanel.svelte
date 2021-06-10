@@ -21,7 +21,7 @@
 
     $: selectedCategoryAlignments = _.find(alignments, d => d.categoryReference === selectedCategory);
 
-    // $: console.log({selectedCategory, decoratorGroups, first, selectedCategoryAlignments});
+    // $: console.log({selectedCategory, overlayGroups, first, selectedCategoryAlignments});
 
 
     function selectGroup(e) {

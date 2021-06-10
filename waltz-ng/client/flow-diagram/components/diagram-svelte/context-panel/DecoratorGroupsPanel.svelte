@@ -8,6 +8,7 @@
     import AddGroupSubPanel from "./AddGroupSubPanel.svelte";
     import GroupSelectorPanel from "./GroupSelectorPanel.svelte";
     import {measurableCategoryAlignmentViewStore} from "../../../../svelte-stores/measurable-category-alignment-view-store";
+    import {flowDiagramOverlayGroupStore} from "../../../../svelte-stores/flow-diagram-overlay-group-store";
 
     let workingGroup;
     let categoryId = 9;
@@ -18,9 +19,12 @@
 
     $: alignments = $measurableAlignmentCall.data;
 
-    $: decoratorGroups = $store.model.groups;
+    $: overlayGroupCall = flowDiagramOverlayGroupStore.findById(diagramId);
+    $: overlays = $overlayGroupCall.data
 
-    // $: console.log({alignments, workingGroup, decoratorGroups});
+    $: overlayGroups = $store.model.groups;
+
+    $: console.log({alignments, overlays, overlayGroups});
 
     function selectGroup(e) {
         console.log("selecting from tree", e);
@@ -44,11 +48,11 @@
 
 <div>
     <strong>Groups:</strong>
-    {#if _.isEmpty(decoratorGroups)}
+    {#if _.isEmpty(overlayGroups)}
         You have no groups selected; once added these can be used to group/filter applications.
     {:else}
     <ul>
-        {#each decoratorGroups as group}
+        {#each overlayGroups as group}
             <li>
                 <EntityLink ref={group.group.entityReference}/> ({group.group.symbol}/{group.group.fill})
                 <button class="btn btn-skinny"
@@ -65,7 +69,7 @@
     <GroupSelectorPanel on:select={selectGroup} {alignments}/>
 {:else}
     <AddGroupSubPanel  group={workingGroup}
-                       existingGroups={decoratorGroups}
+                       existingGroups={overlayGroups}
                        on:cancel={cancel}/>
 {/if}
 
