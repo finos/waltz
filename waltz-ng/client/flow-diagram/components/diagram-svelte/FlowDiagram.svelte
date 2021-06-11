@@ -10,6 +10,8 @@
     import visibility from "./store/visibility"
     import VisibilityToggles from "./context-panel/VisibilityToggles.svelte";
     import {diagramTransform, positions} from "./store/layout";
+    import overlay from "./store/overlay";
+
 
     let elem;
     let editMode = false;
@@ -77,7 +79,7 @@
 
     $: elem && setupPanAndZoom($processor);
 
-    $: console.log("FlowDiag:", {store: $store, model: $model, positions: $positions});
+    $: console.log("FlowDiag:", {store: $store, overlay: $overlay, model: $model, positions: $positions});
 
 </script>
 
@@ -97,14 +99,14 @@
 
 
             <FlowLayer on:selectFlow={onSelectFlow}
-                       {positions}
+                       positions={$positions}
                        {model}/>
 
 
             <NodeLayer on:selectNode={onSelectNode}
                        positions={$positions}
                        nodes={$model.nodes}
-                       groups={$store.model?.groups}/>
+                       groups={$overlay.groupOverlays[$overlay.selectedGroup?.id] || []}/>
 
         </g>
     </svg>

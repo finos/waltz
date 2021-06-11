@@ -22,6 +22,7 @@ import angular from "angular";
 import FlowDiagramStore from "./services/flow-diagram-store";
 import FlowDiagramAnnotationStore from "./services/flow-diagram-annotation-store";
 import FlowDiagramEntityStore from "./services/flow-diagram-entity-store";
+import FlowDiagramOverlayGroupStore from "./services/flow-diagram-overlay-group-store";
 
 import FlowDiagramStateService from "./services/flow-diagram-state-service";
 
@@ -32,8 +33,10 @@ import flowDiagramPhysicalFlowPopup from "./components/editor/flow-diagram-physi
 import flowDiagramAnnotationPopup from "./components/editor/flow-diagram-annotation-popup";
 import flowDiagramEditor from "./components/editor/flow-diagram-editor";
 import FlowDiagramsPanelView from "./components/diagrams-panel/view/flow-diagrams-panel-view";
-import FlowDiagramMeasurableAssociations from "./components/measurable-associations/flow-diagram-measurable-associations";
-import FlowDiagramChangeInitiativeAssociations from "./components/change-initiative-associations/flow-diagram-change-initiative-associations";
+import FlowDiagramMeasurableAssociations
+    from "./components/measurable-associations/flow-diagram-measurable-associations";
+import FlowDiagramChangeInitiativeAssociations
+    from "./components/change-initiative-associations/flow-diagram-change-initiative-associations";
 import FlowDiagramInfoPopup from "./components/editor/flow-diagram-info-popup";
 import FlowDiagramSvelte from "./components/diagram-svelte/flow-diagram-svelte";
 
@@ -73,6 +76,7 @@ export default () => {
 
     registerStores(module, [
         FlowDiagramStore,
+        FlowDiagramOverlayGroupStore,
         FlowDiagramAnnotationStore,
         FlowDiagramEntityStore
     ]);

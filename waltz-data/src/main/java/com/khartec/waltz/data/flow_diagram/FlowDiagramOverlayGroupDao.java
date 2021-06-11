@@ -52,7 +52,7 @@ public class FlowDiagramOverlayGroupDao {
     private static Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             fde.ENTITY_ID,
             fde.ENTITY_KIND,
-            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
+            newArrayList(EntityKind.MEASURABLE, EntityKind.APP_GROUP));
 
 
     private static final RecordMapper<Record, FlowDiagramOverlayGroup> TO_GROUP_MAPPER = r -> {
@@ -98,6 +98,17 @@ public class FlowDiagramOverlayGroupDao {
                 .from(FLOW_DIAGRAM_OVERLAY_GROUP)
                 .where(FLOW_DIAGRAM_OVERLAY_GROUP.FLOW_DIAGRAM_ID.eq(diagramId))
                 .fetchSet(TO_GROUP_MAPPER);
+    }
+
+
+    public Set<FlowDiagramOverlayGroupEntry> findOverlaysByDiagramId(long diagramId) {
+        return dsl
+                .select(FLOW_DIAGRAM_OVERLAY_GROUP_ENTRY.fields())
+                .from(FLOW_DIAGRAM_OVERLAY_GROUP_ENTRY)
+                .innerJoin(FLOW_DIAGRAM_OVERLAY_GROUP)
+                .on(FLOW_DIAGRAM_OVERLAY_GROUP_ENTRY.OVERLAY_GROUP_ID.eq(FLOW_DIAGRAM_OVERLAY_GROUP.ID))
+                .where(FLOW_DIAGRAM_OVERLAY_GROUP.FLOW_DIAGRAM_ID.eq(diagramId))
+                .fetchSet(TO_OVERLAY_ENTRY_MAPPER);
     }
 
 }

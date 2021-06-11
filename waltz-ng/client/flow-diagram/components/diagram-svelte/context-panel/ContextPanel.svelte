@@ -7,7 +7,9 @@
     import {flowDiagramStore} from "../../../../svelte-stores/flow-diagram-store";
     import AnnotationPanel from "./AnnotationPanel.svelte";
     import Icon from "../../../../common/svelte/Icon.svelte";
-    import DecoratorGroupsMenu from "./DecoratorGroupsPanel.svelte";
+    import OverlayGroupsPanel from "./OverlayGroupsPanel.svelte";
+    import dirty from "../store/dirty";
+
 
     export let doSave;
     export let diagramId;
@@ -48,9 +50,10 @@
 
 <hr>
 
-<DecoratorGroupsMenu {diagramId}/>
+<OverlayGroupsPanel {diagramId}/>
 
-{#if $store.dirty}
+
+{#if $dirty}
     <span class="help-block">
         <Icon name="exclamation-circle"/>
         Changes have been made to this diagram, if you do not

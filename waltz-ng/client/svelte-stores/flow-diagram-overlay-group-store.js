@@ -20,12 +20,17 @@ import {remote} from "./remote";
 
 export function mkFlowDiagramOverlayGroupStore() {
 
-    const findById = (id) => {
+    const findByDiagramId = (id) => {
         return remote.fetchViewData("GET", `api/flow-diagram-overlay-group/id/${id}`);
     };
 
+    const findOverlaysByDiagramId = (id) => {
+        return remote.fetchViewData("GET", `api/flow-diagram-overlay-group/overlays/diagram-id/${id}`);
+    };
+
     return {
-        findById
+        findByDiagramId,
+        findOverlaysByDiagramId
     };
 }
 

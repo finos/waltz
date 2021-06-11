@@ -37,7 +37,7 @@ export function determineFillAndSymbol(existingGroups) {
         return _.find(
             existingGroups,
             g => {
-                const takenDecorationId = mkDecoratorId(g.group.symbol, g.group.fill, g.group.stroke);
+                const takenDecorationId = mkDecoratorId(g.data.symbol, g.data.fill, g.data.stroke);
                 return desiredDecorationId === takenDecorationId;
             });
     };

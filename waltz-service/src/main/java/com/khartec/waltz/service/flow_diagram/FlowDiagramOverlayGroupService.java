@@ -20,6 +20,7 @@ package com.khartec.waltz.service.flow_diagram;
 
 import com.khartec.waltz.data.flow_diagram.FlowDiagramOverlayGroupDao;
 import com.khartec.waltz.model.flow_diagram.FlowDiagramOverlayGroup;
+import com.khartec.waltz.model.flow_diagram.FlowDiagramOverlayGroupEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,6 +43,10 @@ public class FlowDiagramOverlayGroupService {
 
     public Set<FlowDiagramOverlayGroup> findByDiagramId(long diagramId) {
         return flowDiagramOverlayGroupDao.findByDiagramId(diagramId);
+    }
+
+    public Set<FlowDiagramOverlayGroupEntry> findOverlaysByDiagramId(long diagramId) {
+        return flowDiagramOverlayGroupDao.findOverlaysByDiagramId(diagramId);
     }
 
 

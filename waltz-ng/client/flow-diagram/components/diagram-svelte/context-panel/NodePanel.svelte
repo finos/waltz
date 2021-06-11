@@ -2,7 +2,6 @@
     import AddLogicalFlowSubPanel from "./AddLogicalFlowSubPanel.svelte";
     import {Directions} from "./panel-utils";
     import {createEventDispatcher} from "svelte";
-    import {processor} from "../diagram-model-store";
     import {toGraphId} from "../../../flow-diagram-utils";
     import {applicationStore} from "../../../../svelte-stores/application-store";
     import {actorStore} from "../../../../svelte-stores/actor-store";
@@ -47,7 +46,7 @@
         <EntityLink ref={selected}/>
     </strong>
 </div>
-
+<br>
 {#if activeMode === Modes.MENU}
 <ul>
     <li>

@@ -1,7 +1,6 @@
 import _ from "lodash";
 import {sameRef} from "../../../../common/entity-utils";
-import {toGraphId, toGraphNode} from "../../../flow-diagram-utils";
-import model from "../store/model";
+import {toGraphFlow, toGraphId, toGraphNode} from "../../../flow-diagram-utils";
 
 /**
  * adds/removes logical flows
@@ -17,10 +16,12 @@ export function prepareUpdateCommands(flows = [],
     const newFlows = _
         .chain(flows)
         .filter(isAddition)
-        .reject(f => _.some(existingEntities, ent => sameRef(ent, f.counterpartEntity)));
+        .reject(f => _.some(existingEntities, ent => sameRef(ent, f.counterpartEntity)))
+        .value()
 
-    const nodeAdditions = _.map(newFlows, toGraphNode(f.counterpartEntity));
-    const flowAdditions = _.map(newFlows, f => f.logicalFlow);
+    const nodeAdditions = _.map(newFlows, f => toGraphNode(f.counterpartEntity));
+    const flowAdditions = _.map(newFlows, f => toGraphFlow(f.logicalFlow));
+
     const moves = _.map(
         newFlows,
         f => ({
@@ -52,21 +53,21 @@ export function prepareUpdateCommands(flows = [],
 
 export function mkFlows(logicalFlows = [], node, isUpstream, existingEntities = []) {
     const counterpartPropName = isUpstream
-        ? 'source'
-        : 'target';
+        ? "source"
+        : "target";
 
     const selfPropName = isUpstream
-        ? 'target'
-        : 'source';
+        ? "target"
+        : "source";
 
     return _
         .chain(logicalFlows)
         .filter(f => f[selfPropName].id === node.id)
         .reject(f => f[counterpartPropName].id === node.id)
-        .map(f => Object.assign({}, f, { kind: 'LOGICAL_DATA_FLOW' }))
+        .map(f => Object.assign({}, f, { kind: "LOGICAL_DATA_FLOW" }))
         .map(f => {
             const counterpartEntity = f[counterpartPropName];
-            const flowExists = _.some(existingEntities, ref => sameRef(ref, counterpartEntity));
+            const flowExists = _.some(existingEntities, ref => sameRef(ref, counterpartEntity)); // this needs to be changed to existing flows
             return {
                 counterpartEntity,
                 logicalFlow: f,
@@ -88,15 +89,15 @@ export function preparePhysicalFlowUpdates(flows) {
         .chain(flows)
         .filter(f => ! f.existing && f.used)
         .map(f => ({
-                ref: {
-                    id: f.physicalFlow.logicalFlowId,
-                    kind: 'LOGICAL_DATA_FLOW'
-                },
-                decoration: {
-                    id: f.physicalFlow.id,
-                    kind: 'PHYSICAL_FLOW'
-                }
-            }))
+            ref: {
+                id: f.physicalFlow.logicalFlowId,
+                kind: "LOGICAL_DATA_FLOW"
+            },
+            decoration: {
+                id: f.physicalFlow.id,
+                kind: "PHYSICAL_FLOW"
+            }
+        }))
         .value();
 
     const removals = _
@@ -105,11 +106,11 @@ export function preparePhysicalFlowUpdates(flows) {
         .map(f => ({
             ref: {
                 id: f.physicalFlow.logicalFlowId,
-                kind: 'LOGICAL_DATA_FLOW'
+                kind: "LOGICAL_DATA_FLOW"
             },
             decoration: {
                 id: f.physicalFlow.id,
-                kind: 'PHYSICAL_FLOW'
+                kind: "PHYSICAL_FLOW"
             }
         }))
         .value();
@@ -123,10 +124,10 @@ export function preparePhysicalFlows(
     physicalSpecifications = [],
     existingEntities = [])
 {
-    const specsById = _.keyBy(physicalSpecifications, 'id');
+    const specsById = _.keyBy(physicalSpecifications, "id");
     return _.chain(physicalFlows)
         .map(f => {
-            const currentlyUsed = _.some(existingEntities, existing => sameRef(existing, { kind: 'PHYSICAL_FLOW', id: f.id }))
+            const currentlyUsed = _.some(existingEntities, existing => sameRef(existing, { kind: "PHYSICAL_FLOW", id: f.id }))
             return {
                 used: currentlyUsed,
                 existing: currentlyUsed,

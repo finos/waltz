@@ -30,7 +30,7 @@
             case "REMOVED":
                 return {color: "#888", dashArray: "3 6"};
             default:
-                return {color: "black", dashArray: "0"};
+                return {color: "#888888", dashArray: "0"};
         }
     }
 

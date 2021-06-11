@@ -1,6 +1,5 @@
 <script>
     import {createEventDispatcher} from "svelte";
-    import {processor, store} from "../diagram-model-store";
     import EntityLink from "../../../../common/svelte/EntityLink.svelte";
     import AddAnnotationSubPanel from "./AddAnnotationSubPanel.svelte";
     import {toGraphId} from "../../../flow-diagram-utils";
@@ -22,6 +21,7 @@
 
     function removeAnnotation() {
         model.removeAnnotation( {id: toGraphId(selected), data: selected});
+        cancel();
     }
 
     const nodeKinds = ["APPLICATION", "ACTOR"];

@@ -4,13 +4,14 @@
     import {mkDragHandler} from "./drag-handler";
     import {createEventDispatcher} from "svelte";
     import _ from "lodash";
+    import overlay from "./store/overlay";
 
 
     const dispatch = createEventDispatcher();
 
     export let node = null;
     export let positions = {};
-    export let groups = [];
+    export let groups = {};
 
     function mkTrapezoidShape(widthHint) {
         return {
@@ -48,6 +49,16 @@
         dispatch("selectNode", node.data);
     }
 
+    function determineFill(overlayGroup, associatedGroups){
+        if (_.isNil(overlayGroup)){
+            return "#fafafa"
+        } else if (_.includes(associatedGroups, overlayGroup)){
+            return overlayGroup.data.fill;
+        } else {
+            return "#fdfdfd"
+        }
+    }
+
     let nameElem;
     let gElem;
 
@@ -57,9 +68,9 @@
     $: dragHandler = mkDragHandler(node, $processor)
     $: select(gElem).call(dragHandler);
 
-    $: associatedGroups = _.filter(groups, g => _.includes(g.applicationIds, node.data.id))
+    $: associatedGroups = _.filter(groups, g => _.includes(g.data.applicationIds, node.data.id))
 
-    // $: console.log({node, groups: $store.model?.groups, g: groups, associatedGroups})
+    $: fill = determineFill($overlay.appliedOverlay, associatedGroups);
 
 </script>
 
@@ -70,10 +81,13 @@
    class="wfd-node">
     <path d={shape.path}
           class="node"
-          fill="#fafafa"
+          fill={fill}
+          class:wfd-node-overlay={_.includes(associatedGroups, $overlay.appliedOverlay)}
+          class:wfd-node-fade={$overlay.appliedOverlay && !_.includes(associatedGroups, $overlay.appliedOverlay)}
           stroke="#ccc">
     </path>
     <text style="font-size: small;"
+          class:wfd-node-fade={$overlay.appliedOverlay && !_.includes(associatedGroups, $overlay.appliedOverlay)}
           font-family="FontAwesome"
           dx={shape.title.dx}
           dy={shape.title.dy}>
@@ -82,6 +96,7 @@
     <text dx={shape.title.dx + 16}
           dy={shape.title.dy}
           style="font-size: small;"
+          class:wfd-node-fade={$overlay.appliedOverlay && !_.includes(associatedGroups, $overlay.appliedOverlay)}
           bind:this={nameElem}>
         {node.data.name || "Unknown"}
     </text>
@@ -89,8 +104,8 @@
        class="wfd-node-classifiers">
         {#each associatedGroups as group}
             <circle r="4"
-                    fill={group.group?.fill}
-                    stroke={group.group?.stroke}
+                    fill={group.data?.fill}
+                    stroke={group.data?.stroke}
                     cx={0 + _.findIndex(associatedGroups, group) * 12}
                     cy="6"/>
         {/each}
@@ -113,5 +128,16 @@
                 stroke: #999;
             }
         }
+
+        .wfd-node-overlay {
+            opacity: 0.5;
+        }
+
+        .wfd-node-fade {
+            opacity: 0.5;
+            stroke: #EEEEEE;
+            color: #bbb;
+        }
+
     }
 </style>

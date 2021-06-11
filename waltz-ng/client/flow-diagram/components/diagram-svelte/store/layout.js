@@ -1,11 +1,14 @@
 import {writable} from "svelte/store";
+import dirty from "./dirty";
 
 
 const initialPositions = {}; // gid -> {  x, y }
 
 
 function move(state, moveCmd) {
-    const currentPos = state[moveCmd.id] || {x:0, y: 0};
+    dirty.set(true);
+    // get current position, if not try position of ref
+    const currentPos = state[moveCmd.id] || state[moveCmd.refId] || {x:0, y: 0};
     const newPos = {
         x: currentPos.x + moveCmd.dx,
         y: currentPos.y + moveCmd.dy
@@ -15,6 +18,7 @@ function move(state, moveCmd) {
 
 
 function setPosition(state, posCmd) {
+    dirty.set(true);
     const updatedStateFrag = {[posCmd.id]: { x: posCmd.x, y: posCmd.y}};
     return Object.assign({}, state, updatedStateFrag);
 }

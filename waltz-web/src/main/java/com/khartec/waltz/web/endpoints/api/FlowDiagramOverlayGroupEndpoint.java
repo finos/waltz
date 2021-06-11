@@ -19,6 +19,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.flow_diagram.FlowDiagramOverlayGroup;
+import com.khartec.waltz.model.flow_diagram.FlowDiagramOverlayGroupEntry;
 import com.khartec.waltz.service.flow_diagram.FlowDiagramOverlayGroupService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
@@ -51,11 +52,16 @@ public class FlowDiagramOverlayGroupEndpoint implements Endpoint {
     @Override
     public void register() {
         String findByDiagramIdPath = mkPath(BASE_URL, "id", ":id");
+        String findOverlaysByDiagramIdPath = mkPath(BASE_URL, "overlays", "diagram-id", ":id");
 
         ListRoute<FlowDiagramOverlayGroup> findByDiagramIdRoute = (req, res)
                 -> flowDiagramOverlayGroupService.findByDiagramId(getId(req));
 
+        ListRoute<FlowDiagramOverlayGroupEntry> findOverlaysByDiagramIdRoute = (req, res)
+                -> flowDiagramOverlayGroupService.findOverlaysByDiagramId(getId(req));
+
         getForList(findByDiagramIdPath, findByDiagramIdRoute);
+        getForList(findOverlaysByDiagramIdPath, findOverlaysByDiagramIdRoute);
     }
 
 }

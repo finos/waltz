@@ -1,6 +1,6 @@
 <script>
     import AddNodeSubPanel from "./AddNodeSubPanel.svelte";
-    import {store} from "../diagram-model-store";
+    import dirty from "../store/dirty";
 
     export let doSave;
 
@@ -47,7 +47,7 @@
 {/if}
     |
     <button class="btn btn-skinny"
-            disabled={!$store.dirty}
+            disabled={!$dirty}
             on:click={() => saveDiagram()}>
         Save diagram
     </button>

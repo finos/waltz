@@ -17,11 +17,13 @@
  */
 import _ from "lodash";
 import {ifPresent} from "../../common/function-utils";
-import {positionFor, toGraphFlow, toGraphId, toGraphNode} from "../flow-diagram-utils";
+import {toGraphFlow, toGraphId, toGraphNode} from "../flow-diagram-utils";
 import {toEntityRef} from "../../common/entity-utils";
 import {mkSelectionOptions} from "../../common/selector-utils";
 import newModel from "../components/diagram-svelte/store/model"
 import {diagramTransform, positions} from "../components/diagram-svelte/store/layout";
+import dirty from "../components/diagram-svelte/store/dirty";
+import overlay from "../components/diagram-svelte/store/overlay";
 
 
 const initialState = {
@@ -128,7 +130,8 @@ function restoreDiagram(
     entityNodes = [],
     logicalFlows = [],
     physicalFlows = [],
-    groups = [])
+    overlayGroups = [],
+    overlayGroupEntries = [])
 {
     const layoutData = JSON.parse(diagram.layoutData);
     const logicalFlowsById = _.keyBy(logicalFlows, "id");
@@ -184,6 +187,23 @@ function restoreDiagram(
         .forEach(ann => newModel.addAnnotation(toGraphNode(ann)))
         .value();
 
+    // overlay groups
+    _.chain(overlayGroups)
+        .map(g => ({
+            id: toGraphId({id: g.id, kind: 'GROUP'}),
+            data: g}))
+        .forEach(g => overlay.addGroup(g))
+        .value();
+
+    //  overlay entries
+    _.chain(overlayGroupEntries)
+        .map(g => ({
+            id: toGraphId({id: g.id, kind: 'OVERLAY'}),
+            groupRef: toGraphId({id: g.overlayGroupId, kind: 'GROUP'}),
+            data: g}))
+        .forEach(g => overlay.addOverlay(g))
+        .value();
+
     diagramTransform.set(layoutData.diagramTransform);
 
     const titleCommands = [{
@@ -196,17 +216,10 @@ function restoreDiagram(
         payload: diagram.description
     }];
 
-    const groupCommands = _.map(groups, g => {
-        return {
-            command: "ADD_GROUP",
-            payload: g
-        }
-    });
-
     // commandProcessor(annotationCommands);
     commandProcessor(titleCommands);
     commandProcessor(descriptionCommands);
-    commandProcessor(groupCommands);
+    // commandProcessor(groupCommands);
 }
 
 
@@ -220,7 +233,7 @@ function addGroup(payload, model) {
     const currentGroups = model.groups || [];
     const existingIds = _.map(currentGroups, "id");
     if (_.includes(existingIds, group.id)) {
-        console.log("Ignoring request to add duplicate group");
+        console.log("Ignoring request to add duplicate overlay");
     } else {
         model.groups = _.concat(currentGroups, [group]);
     }
@@ -235,7 +248,8 @@ export function service(
     flowDiagramEntityStore,
     logicalFlowStore,
     physicalFlowStore,
-    measurableRatingStore)
+    measurableRatingStore,
+    flowDiagramOverlayGroupStore)
 {
 
     const reset = () => {
@@ -249,6 +263,7 @@ export function service(
             .then(id => {
                 state.diagramId = id;
                 state.dirty = false;
+                dirty.set(false);
                 listener(state);
                 return id;
             });
@@ -305,29 +320,31 @@ export function service(
             flowDiagramEntityStore.findByDiagramId(id),
             logicalFlowStore.findBySelector(diagramSelector),
             physicalFlowStore.findBySelector(diagramSelector),
-            measurableRatingStore.findByAppSelector(diagramSelector)
+            measurableRatingStore.findByAppSelector(diagramSelector),
+            flowDiagramOverlayGroupStore.findByDiagramId(id),
+            flowDiagramOverlayGroupStore.findOverlaysByDiagramId(id)
         ];
 
         return $q
             .all(promises)
-            .then(([applications, diagram, annotations, entityNodes, logicalFlows, physicalFlows, measurableRatings]) => {
+            .then(([applications, diagram, annotations, entityNodes, logicalFlows, physicalFlows, measurableRatings, overlayGroups, overlayEntries]) => {
                 state.detail.applicationsById = _.keyBy(applications, "id");
                 state.detail.measurablesByAppId = _.keyBy(measurableRatings, "entityReference.id")
                 const allEntityNodes = addMissingEntityNodes(diagram.id, entityNodes, applications);
 
 
-                restoreDiagram(processCommands, diagram, annotations, allEntityNodes, logicalFlows, physicalFlows);
+                restoreDiagram(processCommands, diagram, annotations, allEntityNodes, logicalFlows, physicalFlows, overlayGroups, overlayEntries);
 
-                //store on state the list of groups to be shown
+                // store on state the list of groups to be shown
                 const groupPromises = _.map(
-                    state.model.groups,
-                    g => applicationStore
-                        .findBySelector(mkSelectionOptions(g.group.entityReference))
-                        .then(r => Object.assign({}, {group: g.group, applicationIds: _.map(r, d => d.id)})));
+                    overlayEntries,
+                    overlay => applicationStore
+                        .findBySelector(mkSelectionOptions(overlay.entityReference))
+                        .then(r => Object.assign({}, overlay, {applicationIds: _.map(r, d => d.id)})));
 
                 $q
                     .all(groupPromises)
-                    .then((groupIdsWithApps) => state.model.groups = groupIdsWithApps)
+                    .then((overlaysWithApps) => overlaysWithApps.forEach(o => overlay.updateOverlay(o)));
 
                 state.dirty = false;
             })
@@ -550,7 +567,8 @@ service.$inject = [
     "FlowDiagramEntityStore",
     "LogicalFlowStore",
     "PhysicalFlowStore",
-    "MeasurableRatingStore"
+    "MeasurableRatingStore",
+    "FlowDiagramOverlayGroupStore"
 ];
 
 

@@ -1,7 +1,8 @@
 <script>
-    import {processor} from "../diagram-model-store";
     import {toGraphId} from "../../../flow-diagram-utils";
     import {createEventDispatcher} from "svelte";
+    import model from "../store/model";
+    import {positions} from "../store/layout";
 
     export let selected;
     const dispatch = createEventDispatcher();
@@ -22,33 +23,18 @@
     function saveAnnotation() {
         const commands = [];
 
-
         if (selected.kind === 'ANNOTATION') {
-            commands.push({
-                command: 'UPDATE_ANNOTATION',
-                payload: {
-                    note: note,
-                    id: toGraphId(selected)
-                }
-            });
+            model.updateAnnotation({id: toGraphId(selected), note: note})
+
         } else {
             const payload = mkNewAnnotation(selected);
-
-            commands.push({
-                command: 'ADD_ANNOTATION',
-                payload
-            });
-
-            commands.push({
-                command: 'MOVE',
-                payload: {
+            model.addAnnotation({id: toGraphId(payload), data: payload})
+            positions.move({
                     id: toGraphId(payload),
                     dx: 30,
                     dy: 30
-                }
-            });
+            })
         }
-        $processor(commands);
         cancel();
     }
 

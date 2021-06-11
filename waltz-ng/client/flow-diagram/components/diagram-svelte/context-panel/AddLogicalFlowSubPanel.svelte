@@ -1,5 +1,5 @@
 <script>
-    import {processor, selectedNode, store} from "../diagram-model-store";
+    import {selectedNode} from "../diagram-model-store";
     import _ from "lodash";
     import {mkFlows, prepareUpdateCommands} from "./flow-resolver";
     import {logicalFlowStore} from "../../../../svelte-stores/logical-flow-store";
@@ -29,14 +29,12 @@
     $: existingFlows = _.map($model.flows, d => d.data);
     $: existingNodes = _.map($model.nodes, d => d.data);
     $: possibleFlows = mkFlows(logicalFlows, $selectedNode, direction === Directions.UPSTREAM, existingNodes);
-    $: checkedFlows = _
-        .chain(possibleFlows)
-        .filter(d => d.used)
-        .value();
+
+    $: checkedFlows = _.filter(possibleFlows, d => d.used);
 
     function updateFlows() {
         const updates = prepareUpdateCommands(
-            checkedFlows,
+            possibleFlows,
             existingNodes,
             direction === Directions.UPSTREAM,
             $selectedNode);
