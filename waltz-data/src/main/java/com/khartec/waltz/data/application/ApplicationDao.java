@@ -170,7 +170,7 @@ public class ApplicationDao {
         ApplicationRecord record = dsl.newRecord(APPLICATION);
 
         record.setName(request.name());
-        record.setDescription(request.description().orElse("TBC"));
+        record.setDescription(request.description());
         record.setAssetCode(request.assetCode().orElse(""));
         record.setParentAssetCode(request.parentAssetCode().orElse(""));
         record.setOrganisationalUnitId(request.organisationalUnitId());
@@ -179,7 +179,7 @@ public class ApplicationDao {
         record.setOverallRating(request.overallRating().name());
         record.setUpdatedAt(Timestamp.from(Instant.now()));
         record.setBusinessCriticality(request.businessCriticality().name());
-        record.setProvenance(request.provenance().orElse("waltz"));
+        record.setProvenance(request.provenance());
 
         try {
             int count = record.insert();

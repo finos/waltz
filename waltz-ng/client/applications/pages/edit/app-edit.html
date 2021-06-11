@@ -17,6 +17,14 @@
   -->
 
 <div>
+
+    <waltz-svelte-component appId="ctrl.app.id"
+                            component="ctrl.AppEdit">
+    </waltz-svelte-component>
+
+    <br>
+
+
     <waltz-page-header icon="edit"
                        name="{{ ctrl.application.name }}"
                        small="Editor">
@@ -28,6 +36,7 @@
             </ol>
         </breadcrumbs>
     </waltz-page-header>
+
 
 
     <div class="waltz-page-summary waltz-page-summary-attach">
