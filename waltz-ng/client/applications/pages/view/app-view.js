@@ -54,7 +54,6 @@ function controller($stateParams,
 
     function postLoadActions(app) {
         addToHistory(historyStore, app);
-        vm.parentEntityRef = Object.assign({}, vm.parentEntityRef, {name: app.name});
     }
 
     // -- BOOT --
