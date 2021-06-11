@@ -5,13 +5,14 @@
     import _ from "lodash";
     import UsageTree from "./UsageTree.svelte";
     import {databaseInformationStore} from "../../../svelte-stores/database-information-store";
+    import {databaseUsageStore} from "../../../svelte-stores/database-usage-store";
     import {serverInformationStore} from "../../../svelte-stores/server-information-store";
     import SearchInput from "../../../common/svelte/SearchInput.svelte";
     import {serverUsageStore} from "../../../svelte-stores/server-usage-store";
     import {customEnvironmentUsageStore} from "../../../svelte-stores/custom-environment-usage-store";
     import {mkRef} from "../../../common/entity-utils";
     import MiniActions from "../../../common/svelte/MiniActions.svelte";
-    import {combineServerData} from "./custom-environment-utils";
+    import {combineDatabaseUsage, combineServerData} from "./custom-environment-utils";
     import {termSearch} from "../../../common";
 
     export let usages;
@@ -20,11 +21,11 @@
     export let environment;
 
     const databaseSearchFields = [
-        'databaseName',
-        'environment',
-        'instanceName',
-        'dbmsVendor',
-        'dbmsName'
+        'databaseInformation.databaseName',
+        'databaseInformation.instanceName',
+        'databaseInformation.dbmsVendor',
+        'databaseInformation.dbmsName',
+        'databaseUsage.environment'
     ];
 
     const serverSearchFields = [
@@ -83,7 +84,7 @@
     ];
 
     $: searchApplication = application; // default to the owing app
-    $: [databasesInGroup, serverUsagesInGroup] = _.partition(usages, d => d.usage.entityReference.kind === 'DATABASE');
+    $: [databasesInGroup, serverUsagesInGroup] = _.partition(usages, d => d.usage.entityReference.kind === 'DATABASE_USAGE');
 
     $: databaseIdsInGroup = _.map(databasesInGroup, d => d.usage.entityReference.id);
     $: serverUsageIdsInGroup = _.map(serverUsagesInGroup, d => d.usage.entityReference.id);
@@ -99,17 +100,18 @@
     }
 
     $: databaseInformationCall = searchApplication && databaseInformationStore.findByAppId(searchApplication.id);
+    $: databaseUsageCall = searchApplication && databaseUsageStore.findByEntityRef(searchApplication);
+    $: databaseAssets = combineDatabaseUsage($databaseInformationCall?.data, $databaseUsageCall?.data);
+
     $: serverInformationCall = searchApplication && serverInformationStore.findByAppId(searchApplication.id);
     $: serverUsageCall = searchApplication && serverUsageStore.findByEntityRef(searchApplication);
-
-    $: databaseAssets = $databaseInformationCall?.data;
     $: serverAssets = combineServerData($serverInformationCall?.data, $serverUsageCall?.data);
 
     $: databaseSearchResults = termSearch(
         databaseAssets,
         qry,
         databaseSearchFields,
-        d => _.includes(databaseIdsInGroup, d.id));
+        d => _.includes(databaseIdsInGroup, d.databaseUsage.id));
 
     $: serverSearchResults = termSearch(
         serverAssets,
@@ -133,7 +135,7 @@
     }
 
     function toDatabaseContext(result){
-        const ref = mkRef('DATABASE', result.id);
+        const ref = mkRef('DATABASE_USAGE', result.databaseUsage.id);
         return {assetRef: ref, environmentId: environment.id}
 
     }
@@ -282,11 +284,11 @@
                             <tbody>
                             {#each databaseSearchResults as result}
                                 <tr class="asset-row">
-                                    <td>{result.environment}</td>
-                                    <td>{result.databaseName}</td>
-                                    <td>{result.instanceName}</td>
-                                    <td>{result.dbmsName}</td>
-                                    <td>{result.dbmsVendor}</td>
+                                    <td>{result.databaseUsage.environment}</td>
+                                    <td>{result.databaseInformation.databaseName}</td>
+                                    <td>{result.databaseInformation.instanceName}</td>
+                                    <td>{result.databaseInformation.dbmsName}</td>
+                                    <td>{result.databaseInformation.dbmsVendor}</td>
                                     <td>
                                         <MiniActions ctx={toDatabaseContext(result)}
                                                      actions={assetActions}/>
