@@ -26,26 +26,17 @@
         activeMode = Modes.TABLE;
     }
 
-    // $: overlayGroupCall = flowDiagramOverlayGroupStore.findByDiagramId(diagramId);
-    // $: overlayGroups = $overlayGroupCall.data
-
-
-    // $: overlaysCall = flowDiagramOverlayGroupStore.findOverlaysByDiagramId(diagramId);
-    // $: overlaysByGroupId = _.groupBy($overlaysCall.data, d => d.overlayGroupId);
-
 
     function selectRow(group) {
         if(selectedGroup === group){
             overlay.clearSelectedGroup();
         } else {
-            // overlay.setSelectedGroup({id: toGraphId({kind: 'GROUP', id: group.id}), data: group})
             overlay.setSelectedGroup(group);
         }
         selectedGroup = (selectedGroup === group) ? null : group;
     }
 
     $: groupOverlays = selectedGroup && _.get($overlay.groupOverlays, selectedGroup?.id, []);
-    // $: groupOverlays = selectedGroup && _.get($overlay.groupOverlays, toGraphId({kind: 'GROUP', id: selectedGroup.id}), []);
 
     function setOverlay(groupOverlay) {
         overlay.setAppliedOverlay(groupOverlay);
@@ -58,6 +49,7 @@
     function removeOverlay(groupOverlay) {
         overlay.removeOverlay(groupOverlay);
     }
+
 
 </script>
 

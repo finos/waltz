@@ -5,6 +5,7 @@
     import {measurableCategoryAlignmentViewStore} from "../../../../svelte-stores/measurable-category-alignment-view-store";
     import {flowDiagramOverlayGroupStore} from "../../../../svelte-stores/flow-diagram-overlay-group-store";
     import OverlayGroupsTable from "./OverlayGroupsTable.svelte";
+    import CreateNewOverlayGroupPanel from "./CreateNewOverlayGroupPanel.svelte";
 
     let workingGroup;
     export let diagramId;
@@ -34,8 +35,13 @@
 
 {#if activeMode === Modes.TABLE}
     <OverlayGroupsTable {diagramId} {alignments}/>
+    <button class="btn btn-skinny"
+            on:click={() => activeMode = Modes.ADD_GROUP}>
+        Add new overlay group
+    </button>
 {:else if activeMode === Modes.ADD_GROUP}
     <h4>Add group</h4>
+    <CreateNewOverlayGroupPanel {diagramId} on:cancel={() => activeMode = Modes.TABLE}/>
 {/if}
 
 <style>

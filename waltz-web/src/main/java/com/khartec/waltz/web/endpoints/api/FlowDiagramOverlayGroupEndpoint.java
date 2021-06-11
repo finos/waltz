@@ -22,15 +22,16 @@ import com.khartec.waltz.model.flow_diagram.FlowDiagramOverlayGroup;
 import com.khartec.waltz.model.flow_diagram.FlowDiagramOverlayGroupEntry;
 import com.khartec.waltz.service.flow_diagram.FlowDiagramOverlayGroupService;
 import com.khartec.waltz.service.user.UserRoleService;
+import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.web.WebUtilities.getId;
-import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
 
 
 @Service
@@ -53,6 +54,7 @@ public class FlowDiagramOverlayGroupEndpoint implements Endpoint {
     public void register() {
         String findByDiagramIdPath = mkPath(BASE_URL, "id", ":id");
         String findOverlaysByDiagramIdPath = mkPath(BASE_URL, "overlays", "diagram-id", ":id");
+        String createGroupPath = mkPath(BASE_URL, "create");
 
         ListRoute<FlowDiagramOverlayGroup> findByDiagramIdRoute = (req, res)
                 -> flowDiagramOverlayGroupService.findByDiagramId(getId(req));
@@ -60,8 +62,16 @@ public class FlowDiagramOverlayGroupEndpoint implements Endpoint {
         ListRoute<FlowDiagramOverlayGroupEntry> findOverlaysByDiagramIdRoute = (req, res)
                 -> flowDiagramOverlayGroupService.findOverlaysByDiagramId(getId(req));
 
+
+        DatumRoute<Long> createGroupRoute = (req, resp) -> {
+            FlowDiagramOverlayGroup group = readBody(req, FlowDiagramOverlayGroup.class);
+            String username = getUsername(req);
+            return flowDiagramOverlayGroupService.create(group, username);
+        };
+
         getForList(findByDiagramIdPath, findByDiagramIdRoute);
         getForList(findOverlaysByDiagramIdPath, findOverlaysByDiagramIdRoute);
+        postForDatum(createGroupPath, createGroupRoute);
     }
 
 }

@@ -130,8 +130,7 @@ function restoreDiagram(
     entityNodes = [],
     logicalFlows = [],
     physicalFlows = [],
-    overlayGroups = [],
-    overlayGroupEntries = [])
+    overlayGroups = [])
 {
     const layoutData = JSON.parse(diagram.layoutData);
     const logicalFlowsById = _.keyBy(logicalFlows, "id");
@@ -190,19 +189,19 @@ function restoreDiagram(
     // overlay groups
     _.chain(overlayGroups)
         .map(g => ({
-            id: toGraphId({id: g.id, kind: 'GROUP'}),
+            id: toGraphId({id: g.id, kind: "GROUP"}),
             data: g}))
         .forEach(g => overlay.addGroup(g))
         .value();
 
     //  overlay entries
-    _.chain(overlayGroupEntries)
-        .map(g => ({
-            id: toGraphId({id: g.id, kind: 'OVERLAY'}),
-            groupRef: toGraphId({id: g.overlayGroupId, kind: 'GROUP'}),
-            data: g}))
-        .forEach(g => overlay.addOverlay(g))
-        .value();
+    // _.chain(overlayGroupEntries)
+    //     .map(g => ({
+    //         id: toGraphId({id: g.id, kind: 'OVERLAY'}),
+    //         groupRef: toGraphId({id: g.overlayGroupId, kind: 'GROUP'}),
+    //         data: g}))
+    //     .forEach(g => overlay.addOverlay(g))
+    //     .value();
 
     diagramTransform.set(layoutData.diagramTransform);
 
@@ -332,19 +331,24 @@ export function service(
                 state.detail.measurablesByAppId = _.keyBy(measurableRatings, "entityReference.id")
                 const allEntityNodes = addMissingEntityNodes(diagram.id, entityNodes, applications);
 
-
-                restoreDiagram(processCommands, diagram, annotations, allEntityNodes, logicalFlows, physicalFlows, overlayGroups, overlayEntries);
+                restoreDiagram(processCommands, diagram, annotations, allEntityNodes, logicalFlows, physicalFlows, overlayGroups);
 
                 // store on state the list of groups to be shown
                 const groupPromises = _.map(
                     overlayEntries,
                     overlay => applicationStore
                         .findBySelector(mkSelectionOptions(overlay.entityReference))
-                        .then(r => Object.assign({}, overlay, {applicationIds: _.map(r, d => d.id)})));
+                        .then(r => Object.assign(
+                            {},
+                            overlay, 
+                            {
+                                groupRef: toGraphId({id: overlay.overlayGroupId, kind: "GROUP"}), 
+                                applicationIds: _.map(r, d => d.id)
+                            })));
 
                 $q
                     .all(groupPromises)
-                    .then((overlaysWithApps) => overlaysWithApps.forEach(o => overlay.updateOverlay(o)));
+                    .then((overlaysWithApps) => overlaysWithApps.forEach(o => overlay.addOverlay(o)));
 
                 state.dirty = false;
             })
@@ -369,126 +373,126 @@ export function service(
                 model.description = payload;
                 break;
 
-            // /* MOVE
-            //     payload = { dx, dy, id, refId? }
-            //     - dx = delta x
-            //     - dy = delta y
-            //     - id = identifier of item to move
-            //     - refId? = if specified, move is relative to the current position of this item
-            //  */
-            // case "MOVE":
-            //     positions.move(payload);
-            //     // const startPosition = payload.refId
-            //     //     ? positionFor(state, payload.refId)
-            //     //     : positionFor(state, payload.id);
-            //     // const endPosition = positionFor(state, payload.id);
-            //     // endPosition.x = startPosition.x + payload.dx;
-            //     // endPosition.y = startPosition.y + payload.dy;
-            //     break;
-            //
-            // /* UPDATE_ANNOTATION
-            //     payload = { note, id }
-            //     - note = text to use in the annotation
-            //     - id = annotation identifier
-            //  */
-            // case "UPDATE_ANNOTATION":
-            //     newModel.updateAnnotation(payload);
-            //     // model.annotations = _.map(
-            //     //     model.annotations,
-            //     //     ann =>{
-            //     //         if (ann.id !== payload.id) {
-            //     //             return ann;
-            //     //         } else {
-            //     //             const updatedAnn = Object.assign({}, ann);
-            //     //             updatedAnn.data.note = payload.note;
-            //     //             return updatedAnn;
-            //     //         }
-            //     //     });
-            //     break;
-            //
-            // case "ADD_ANNOTATION":
-            //     const annotationNode = toGraphNode(payload);
-            //     newModel.addAnnotation(annotationNode);
-            //     // const existingAnnotationIds = _.map(model.annotations, "id");
-            //     // if (_.includes(existingAnnotationIds, payload.id)) {
-            //     //     console.log("Ignoring request to re-add annotation", payload);
-            //     // } else {
-            //     //     model.annotations = _.concat(model.annotations || [], [ annotationNode ]);
-            //     // }
-            //     break;
-            //
-            // case "ADD_NODE":
-            //     newModel.addNode(toGraphNode(payload));
-            //     //
-            //     // const graphNode = toGraphNode(payload);
-            //     // const existingNodeIds = _.map(model.nodes, "id");
-            //     // if (_.includes(existingNodeIds, graphNode.id)) {
-            //     //     console.log("Ignoring request to re-add node", payload);
-            //     // } else {
-            //     //     model.nodes = _.concat(model.nodes || [], [ graphNode ]);
-            //     //     listener(state);
-            //     // }
-            //     // if (graphNode.data.kind === "APPLICATION" && !state.detail.applicationsById[graphNode.data.id]) {
-            //     //     // load full app detail
-            //     //     applicationStore
-            //     //         .getById(graphNode.data.id)
-            //     //         .then(app => state.detail.applicationsById[graphNode.data.id] = app)
-            //     //         .then(() => listener(state));
-            //     // }
-            //     break;
-            //
-            // case "ADD_FLOW":
-            //     newModel.addFlow(toGraphFlow(payload));
-            //     // const graphFlow = toGraphFlow(payload);
-            //     // const existingFlowIds = _.map(model.flows, "id");
-            //     // if (_.includes(existingFlowIds, graphFlow.id)) {
-            //     //     console.log("Ignoring request to add duplicate flow", payload);
-            //     // } else {
-            //     //     model.flows = _.concat(model.flows || [], [graphFlow]);
-            //     // }
-            //     break;
-            //
-            // case "REMOVE_FLOW":
-            //     newModel.removeFlow(payload);
-            //     // model.annotations = _.reject(
-            //     //     model.annotations,
-            //     //     a => toGraphId(a.data.entityReference) === payload.id);
-            //     // model.flows = _.reject(model.flows, f => f.id === payload.id);
-            //     break;
-            //
-            // case "ADD_DECORATION":
-            //     newModel.addDecoration(payload);
-            //     break;
-            //
-            // case "REMOVE_DECORATION":
-            //     newModel.removeDecoration(payload);
-            //     break;
-            //
-            // case "REMOVE_NODE":
-            //     console.log("REMOVE_NODE", payload)
-            //     newModel.removeNode(payload);
-            //     // const flowIdsToRemove = _.chain(model.flows)
-            //     //     .filter(f => f.source === payload.id || f.target === payload.id)
-            //     //     .map("id")
-            //     //     .value();
-            //     // model.flows = _.reject(model.flows, f => _.includes(flowIdsToRemove, f.id));
-            //     // model.nodes = _.reject(model.nodes, n => n.id === payload.id);
-            //     // model.annotations = _.reject(
-            //     //     model.annotations,
-            //     //     a => {
-            //     //         const annotationEntityRef = toGraphId(a.data.entityReference);
-            //     //         const isDirectAnnotation = annotationEntityRef === payload.id;
-            //     //         const isFlowAnnotation = _.includes(flowIdsToRemove, annotationEntityRef);
-            //     //         return isDirectAnnotation || isFlowAnnotation;
-            //     //     });
-            //     // _.forEach(flowIdsToRemove, id => model.decorations[id] = []);
-            //     // listener(state);
-            //     break;
-            //
-            // case "REMOVE_ANNOTATION":
-            //     newModel.removeAnnotation(payload);
-            //     // model.annotations = _.reject(model.annotations, a => a.id === payload.id );
-            //     break;
+                // /* MOVE
+                //     payload = { dx, dy, id, refId? }
+                //     - dx = delta x
+                //     - dy = delta y
+                //     - id = identifier of item to move
+                //     - refId? = if specified, move is relative to the current position of this item
+                //  */
+                // case "MOVE":
+                //     positions.move(payload);
+                //     // const startPosition = payload.refId
+                //     //     ? positionFor(state, payload.refId)
+                //     //     : positionFor(state, payload.id);
+                //     // const endPosition = positionFor(state, payload.id);
+                //     // endPosition.x = startPosition.x + payload.dx;
+                //     // endPosition.y = startPosition.y + payload.dy;
+                //     break;
+                //
+                // /* UPDATE_ANNOTATION
+                //     payload = { note, id }
+                //     - note = text to use in the annotation
+                //     - id = annotation identifier
+                //  */
+                // case "UPDATE_ANNOTATION":
+                //     newModel.updateAnnotation(payload);
+                //     // model.annotations = _.map(
+                //     //     model.annotations,
+                //     //     ann =>{
+                //     //         if (ann.id !== payload.id) {
+                //     //             return ann;
+                //     //         } else {
+                //     //             const updatedAnn = Object.assign({}, ann);
+                //     //             updatedAnn.data.note = payload.note;
+                //     //             return updatedAnn;
+                //     //         }
+                //     //     });
+                //     break;
+                //
+                // case "ADD_ANNOTATION":
+                //     const annotationNode = toGraphNode(payload);
+                //     newModel.addAnnotation(annotationNode);
+                //     // const existingAnnotationIds = _.map(model.annotations, "id");
+                //     // if (_.includes(existingAnnotationIds, payload.id)) {
+                //     //     console.log("Ignoring request to re-add annotation", payload);
+                //     // } else {
+                //     //     model.annotations = _.concat(model.annotations || [], [ annotationNode ]);
+                //     // }
+                //     break;
+                //
+                // case "ADD_NODE":
+                //     newModel.addNode(toGraphNode(payload));
+                //     //
+                //     // const graphNode = toGraphNode(payload);
+                //     // const existingNodeIds = _.map(model.nodes, "id");
+                //     // if (_.includes(existingNodeIds, graphNode.id)) {
+                //     //     console.log("Ignoring request to re-add node", payload);
+                //     // } else {
+                //     //     model.nodes = _.concat(model.nodes || [], [ graphNode ]);
+                //     //     listener(state);
+                //     // }
+                //     // if (graphNode.data.kind === "APPLICATION" && !state.detail.applicationsById[graphNode.data.id]) {
+                //     //     // load full app detail
+                //     //     applicationStore
+                //     //         .getById(graphNode.data.id)
+                //     //         .then(app => state.detail.applicationsById[graphNode.data.id] = app)
+                //     //         .then(() => listener(state));
+                //     // }
+                //     break;
+                //
+                // case "ADD_FLOW":
+                //     newModel.addFlow(toGraphFlow(payload));
+                //     // const graphFlow = toGraphFlow(payload);
+                //     // const existingFlowIds = _.map(model.flows, "id");
+                //     // if (_.includes(existingFlowIds, graphFlow.id)) {
+                //     //     console.log("Ignoring request to add duplicate flow", payload);
+                //     // } else {
+                //     //     model.flows = _.concat(model.flows || [], [graphFlow]);
+                //     // }
+                //     break;
+                //
+                // case "REMOVE_FLOW":
+                //     newModel.removeFlow(payload);
+                //     // model.annotations = _.reject(
+                //     //     model.annotations,
+                //     //     a => toGraphId(a.data.entityReference) === payload.id);
+                //     // model.flows = _.reject(model.flows, f => f.id === payload.id);
+                //     break;
+                //
+                // case "ADD_DECORATION":
+                //     newModel.addDecoration(payload);
+                //     break;
+                //
+                // case "REMOVE_DECORATION":
+                //     newModel.removeDecoration(payload);
+                //     break;
+                //
+                // case "REMOVE_NODE":
+                //     console.log("REMOVE_NODE", payload)
+                //     newModel.removeNode(payload);
+                //     // const flowIdsToRemove = _.chain(model.flows)
+                //     //     .filter(f => f.source === payload.id || f.target === payload.id)
+                //     //     .map("id")
+                //     //     .value();
+                //     // model.flows = _.reject(model.flows, f => _.includes(flowIdsToRemove, f.id));
+                //     // model.nodes = _.reject(model.nodes, n => n.id === payload.id);
+                //     // model.annotations = _.reject(
+                //     //     model.annotations,
+                //     //     a => {
+                //     //         const annotationEntityRef = toGraphId(a.data.entityReference);
+                //     //         const isDirectAnnotation = annotationEntityRef === payload.id;
+                //     //         const isFlowAnnotation = _.includes(flowIdsToRemove, annotationEntityRef);
+                //     //         return isDirectAnnotation || isFlowAnnotation;
+                //     //     });
+                //     // _.forEach(flowIdsToRemove, id => model.decorations[id] = []);
+                //     // listener(state);
+                //     break;
+                //
+                // case "REMOVE_ANNOTATION":
+                //     newModel.removeAnnotation(payload);
+                //     // model.annotations = _.reject(model.annotations, a => a.id === payload.id );
+                //     break;
 
             case "ADD_GROUP":
                 addGroup(payload, model);

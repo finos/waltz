@@ -50,4 +50,9 @@ public class FlowDiagramOverlayGroupService {
     }
 
 
+    public Long create(FlowDiagramOverlayGroup group, String username) {
+
+        //create change log
+        return flowDiagramOverlayGroupDao.create(group);
+    }
 }

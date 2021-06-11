@@ -11,6 +11,7 @@ const initialState = {
     selectedGroup: null
 };
 
+// remove the group from this store
 
 function setAppliedOverlay(state, overlay){
     return Object.assign({}, state, {appliedOverlay: overlay})
@@ -87,7 +88,7 @@ function removeOverlay(state, overlay) {
 }
 
 function updateOverlay(state, overlay) {
-    const refId = toGraphId(overlay.data.groupRef);
+    const refId = toGraphId(overlay.groupRef);
     const currentOverlays = state.groupOverlays[refId] || [];
 
     const existing = _.find(currentOverlays, d => d.id === overlay.id);
@@ -111,7 +112,6 @@ function createStore() {
         addGroup: (group) => update(s => addGroup(s, group)),
         removeGroup: (group) => update(s => removeGroup(s, group)),
         addOverlay: (overlay) => update(s => addOverlay(s, overlay)),
-        updateOverlay: (overlay) => update(s => updateOverlay(s, overlay)),
         removeOverlay: (overlay) => update(s => removeOverlay(s, overlay)),
         setAppliedOverlay: (overlay => update(s => setAppliedOverlay(s, overlay))),
         clearAppliedOverlay: (() => update(s => clearAppliedOverlay(s))),
@@ -123,5 +123,3 @@ function createStore() {
 const store = createStore();
 
 export default store;
-
-// export const overlay = writable(null);

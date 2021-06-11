@@ -34,11 +34,13 @@
 
 <div>
     <strong>{selected.flow.source.name} &rarr {selected.flow.target.name}</strong>
-    {#if selected.decorations.length > 0}
-        This flow has {selected.decorations.length} physical flow decorators associated.
-    {:else}
-        No physical flow decorators have been associated to this flow.
-    {/if}
+    <div>
+        {#if selected.decorations.length > 0}
+            This flow has {selected.decorations.length} physical flow decorators associated.
+        {:else}
+            No physical flow decorators have been associated to this flow.
+        {/if}
+    </div>
 </div>
 
 {#if activeMode === Modes.MENU}

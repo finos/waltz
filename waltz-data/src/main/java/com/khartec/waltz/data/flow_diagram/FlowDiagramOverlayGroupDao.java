@@ -40,18 +40,15 @@ import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.FLOW_DIAGRAM_OVERLAY_GROUP;
 import static com.khartec.waltz.schema.Tables.FLOW_DIAGRAM_OVERLAY_GROUP_ENTRY;
-import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 
 
 @Repository
 public class FlowDiagramOverlayGroupDao {
 
-    private static final com.khartec.waltz.schema.tables.FlowDiagramEntity fde = FLOW_DIAGRAM_ENTITY.as("fde");
-
 
     private static Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
-            fde.ENTITY_ID,
-            fde.ENTITY_KIND,
+            FLOW_DIAGRAM_OVERLAY_GROUP_ENTRY.ENTITY_ID,
+            FLOW_DIAGRAM_OVERLAY_GROUP_ENTRY.ENTITY_KIND,
             newArrayList(EntityKind.MEASURABLE, EntityKind.APP_GROUP));
 
 
@@ -71,13 +68,14 @@ public class FlowDiagramOverlayGroupDao {
         FlowDiagramOverlayGroupEntryRecord record = r.into(FLOW_DIAGRAM_OVERLAY_GROUP_ENTRY);
         return ImmutableFlowDiagramOverlayGroupEntry.builder()
                 .overlayGroupId(record.getOverlayGroupId())
+                .id(record.getId())
                 .entityReference(mkRef(
                         EntityKind.valueOf(record.getEntityKind()),
                         record.getEntityId(),
                         r.getValue(ENTITY_NAME_FIELD)))
                 .symbol(record.getSymbol())
                 .fill(record.getFill())
-                .fill(record.getStroke())
+                .stroke(record.getStroke())
                 .build();
     };
 
@@ -103,6 +101,7 @@ public class FlowDiagramOverlayGroupDao {
 
     public Set<FlowDiagramOverlayGroupEntry> findOverlaysByDiagramId(long diagramId) {
         return dsl
+                .select(ENTITY_NAME_FIELD)
                 .select(FLOW_DIAGRAM_OVERLAY_GROUP_ENTRY.fields())
                 .from(FLOW_DIAGRAM_OVERLAY_GROUP_ENTRY)
                 .innerJoin(FLOW_DIAGRAM_OVERLAY_GROUP)
@@ -111,4 +110,22 @@ public class FlowDiagramOverlayGroupDao {
                 .fetchSet(TO_OVERLAY_ENTRY_MAPPER);
     }
 
+
+    public Long create(FlowDiagramOverlayGroup group) {
+
+        FlowDiagramOverlayGroupRecord r = dsl.newRecord(FLOW_DIAGRAM_OVERLAY_GROUP);
+
+        r.setName(group.name());
+        r.setDescription(group.description());
+        r.setExternalId(group.externalId());
+        r.setIsDefault(group.isDefault());
+        r.setFlowDiagramId(group.diagramId());
+
+        return dsl
+                .insertInto(FLOW_DIAGRAM_OVERLAY_GROUP)
+                .set(r)
+                .returning(FLOW_DIAGRAM_OVERLAY_GROUP.ID)
+                .fetchOne()
+                .getFlowDiagramId();
+    }
 }

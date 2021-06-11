@@ -20,17 +20,33 @@ import {remote} from "./remote";
 
 export function mkFlowDiagramOverlayGroupStore() {
 
-    const findByDiagramId = (id) => {
-        return remote.fetchViewData("GET", `api/flow-diagram-overlay-group/id/${id}`);
+    const findByDiagramId = (id, force = false) => {
+        return remote
+            .fetchViewData(
+                "GET", 
+                `api/flow-diagram-overlay-group/id/${id}`, 
+                null,
+                [], 
+                {force});
     };
 
     const findOverlaysByDiagramId = (id) => {
         return remote.fetchViewData("GET", `api/flow-diagram-overlay-group/overlays/diagram-id/${id}`);
     };
 
+    const createGroup = (group) => {
+        return remote
+            .execute(
+                "POST",
+                "api/flow-diagram-overlay-group/create",
+                group)
+            .then(() => findByDiagramId(group.diagramId, true));
+    };
+
     return {
         findByDiagramId,
-        findOverlaysByDiagramId
+        findOverlaysByDiagramId,
+        createGroup
     };
 }
 
