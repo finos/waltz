@@ -163,7 +163,7 @@
                             <div class='small text-muted'
                                  ng-if="ctrl.answersById[question.id].comment">
                                 <strong>Comment:</strong>
-                                <span ng-bind="ctrl.answersById[question.id].comment"></span>
+                                <waltz-markdown text="ctrl.answersById[question.id].comment"></waltz-markdown>
                             </div>
                         </div>
                     </div>
