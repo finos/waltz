@@ -43,6 +43,7 @@ import {CostKindStore_API as CostKindStore} from "../../cost/services/cost-kind-
 import {CostStore_API as CostStore} from "../../cost/services/cost-store";
 import {CustomEnvironmentStore_API as CustomEnvironmentStore} from "../../custom-environment/services/custom-environment-store";
 import {DatabaseStore_API as DatabaseStore} from "../../databases/services/database-store";
+import {DatabaseUsageStore_API as DatabaseUsageStore} from "../../databases/services/database-usage-store";
 import {DataTypeStore_API as DataTypeStore} from "../../data-types/services/data-type-store";
 import {DataTypeDecoratorStore_API as DataTypeDecoratorStore} from "../../data-types/services/data-type-decorator-store";
 import {DataTypeUsageStore_API as DataTypeUsageStore} from "../../data-type-usage/services/data-type-usage-store";
@@ -139,6 +140,7 @@ export const CORE_API = {
     CostStore,
     CustomEnvironmentStore,
     DatabaseStore,
+    DatabaseUsageStore,
     DataTypeStore,
     DataTypeDecoratorStore,
     DataTypeUsageStore,

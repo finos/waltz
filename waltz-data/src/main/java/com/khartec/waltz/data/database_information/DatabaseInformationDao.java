@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.data.database_information;
 
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.LifecycleStatus;
 import com.khartec.waltz.model.database_information.DatabaseInformation;
 import com.khartec.waltz.model.database_information.DatabaseSummaryStatistics;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
 
 import static com.khartec.waltz.data.JooqUtilities.calculateStringTallies;
 import static com.khartec.waltz.data.JooqUtilities.mkEndOfLifeStatusDerivedField;
+import static com.khartec.waltz.schema.Tables.DATABASE_USAGE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DatabaseInformation.DATABASE_INFORMATION;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
@@ -56,13 +58,11 @@ public class DatabaseInformationDao {
                 .id(record.getId())
                 .databaseName(record.getDatabaseName())
                 .instanceName(record.getInstanceName())
-                .environment(record.getEnvironment())
                 .dbmsVendor(record.getDbmsVendor())
                 .dbmsName(record.getDbmsName())
                 .dbmsVersion(record.getDbmsVersion())
                 .externalId(Optional.ofNullable(record.getExternalId()))
                 .provenance(record.getProvenance())
-                .assetCode(record.getAssetCode())
                 .endOfLifeDate(record.getEndOfLifeDate())
                 .lifecycleStatus(LifecycleStatus.valueOf(record.getLifecycleStatus()))
                 .build();
@@ -78,9 +78,10 @@ public class DatabaseInformationDao {
     public List<DatabaseInformation> findByApplicationId(long id) {
         return dsl.select(DATABASE_INFORMATION.fields())
                 .from(DATABASE_INFORMATION)
-                .innerJoin(APPLICATION)
-                .on(APPLICATION.ASSET_CODE.eq(DATABASE_INFORMATION.ASSET_CODE))
-                .where(APPLICATION.ID.eq(id))
+                .join(DATABASE_USAGE)
+                .on(DATABASE_USAGE.DATABASE_ID.eq(DATABASE_INFORMATION.ID))
+                .and(DATABASE_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .where(DATABASE_USAGE.ENTITY_ID.eq(id))
                 .fetch(DATABASE_RECORD_MAPPER);
     }
 
@@ -90,9 +91,10 @@ public class DatabaseInformationDao {
                 .select(ENTITY_RELATIONSHIP.ID_A, ENTITY_RELATIONSHIP.KIND_A)
                 .select(DATABASE_INFORMATION.fields())
                 .from(DATABASE_INFORMATION)
-                .innerJoin(APPLICATION)
-                .on(APPLICATION.ASSET_CODE.eq(DATABASE_INFORMATION.ASSET_CODE))
-                .where(APPLICATION.ID.in(appIdSelector))
+                .join(DATABASE_USAGE)
+                .on(DATABASE_USAGE.DATABASE_ID.eq(DATABASE_INFORMATION.ID))
+                .and(DATABASE_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .where(DATABASE_USAGE.ENTITY_ID.in(appIdSelector))
                 .fetch()
                 .stream()
                 .map(r -> tuple(
@@ -115,15 +117,16 @@ public class DatabaseInformationDao {
         Result<? extends Record> dbInfo = dsl.selectDistinct(
                     DATABASE_INFORMATION.DATABASE_NAME,
                     DATABASE_INFORMATION.INSTANCE_NAME,
-                    DATABASE_INFORMATION.ENVIRONMENT.as(environmentInner),
+                    DATABASE_USAGE.ENVIRONMENT.as(environmentInner),
                     DATABASE_INFORMATION.DBMS_VENDOR.as(dbmsVendorInner),
                     DATABASE_INFORMATION.DBMS_NAME,
                     DATABASE_INFORMATION.DBMS_VERSION,
                     mkEndOfLifeStatusDerivedField(DATABASE_INFORMATION.END_OF_LIFE_DATE).as(eolStatusInner))
                 .from(DATABASE_INFORMATION)
-                .innerJoin(APPLICATION)
-                    .on(APPLICATION.ASSET_CODE.eq(DATABASE_INFORMATION.ASSET_CODE))
-                .where(APPLICATION.ID.in(appIdSelector))
+                .join(DATABASE_USAGE)
+                .on(DATABASE_USAGE.DATABASE_ID.eq(DATABASE_INFORMATION.ID))
+                .and(DATABASE_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .where(DATABASE_USAGE.ENTITY_ID.in(appIdSelector))
                 .fetch();
 
         return ImmutableDatabaseSummaryStatistics.builder()
@@ -134,4 +137,19 @@ public class DatabaseInformationDao {
 
     }
 
+    public DatabaseInformation findById(long id) {
+        return dsl.select(DATABASE_INFORMATION.fields())
+                .from(DATABASE_INFORMATION)
+                .where(DATABASE_INFORMATION.ID.eq(id))
+                .fetchOne(DATABASE_RECORD_MAPPER);
+
+    }
+
+    public DatabaseInformation findByExternalId(String externalId) {
+        return dsl.select(DATABASE_INFORMATION.fields())
+                .from(DATABASE_INFORMATION)
+                .where(DATABASE_INFORMATION.EXTERNAL_ID.eq(externalId))
+                .fetchOne(DATABASE_RECORD_MAPPER);
+
+    }
 }

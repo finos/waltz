@@ -19,21 +19,23 @@
 package com.khartec.waltz.jobs.generators;
 
 import com.khartec.waltz.common.RandomUtilities;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.LifecycleStatus;
 import com.khartec.waltz.model.software_catalog.SoftwarePackage;
 import com.khartec.waltz.schema.tables.records.DatabaseInformationRecord;
+import com.khartec.waltz.schema.tables.records.DatabaseUsageRecord;
 import org.jooq.DSLContext;
+import org.jooq.lambda.tuple.Tuple;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.context.ApplicationContext;
 
 import java.sql.Date;
 import java.time.LocalDate;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.RandomUtilities.randomPick;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DatabaseInformation.DATABASE_INFORMATION;
 
 public class DatabaseGenerator implements SampleDataGenerator {
@@ -46,11 +48,6 @@ public class DatabaseGenerator implements SampleDataGenerator {
     public Map<String, Integer> create(ApplicationContext ctx) {
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        List<String> codes = dsl
-                .select(APPLICATION.ASSET_CODE)
-                .from(APPLICATION)
-                .fetch(APPLICATION.ASSET_CODE);
-
         List<DatabaseInformationRecord> databaseRecords = new LinkedList<>();
 
         for (int i = 0; i < 150; i++) {
@@ -62,13 +59,11 @@ public class DatabaseGenerator implements SampleDataGenerator {
                 DatabaseInformationRecord databaseRecord = dsl.newRecord(DATABASE_INFORMATION);
                 databaseRecord.setDatabaseName("DB_LON_" + i + "_" + j);
                 databaseRecord.setInstanceName("DB_INST_" + i);
-                databaseRecord.setEnvironment(randomPick("PROD", "PROD", "QA", "DEV", "DEV"));
                 databaseRecord.setDbmsVendor(pkg.vendor());
                 databaseRecord.setDbmsName(pkg.name());
                 databaseRecord.setDbmsVersion("1.0.1");
                 databaseRecord.setExternalId("ext_" + i + "_" +j);
                 databaseRecord.setProvenance("RANDOM_GENERATOR");
-                databaseRecord.setAssetCode(randomPick(codes));
                 databaseRecord.setLifecycleStatus(randomPick(LifecycleStatus.values()).toString());
                 databaseRecord.setEndOfLifeDate(
                         rnd.nextInt(10) > 5
@@ -79,34 +74,23 @@ public class DatabaseGenerator implements SampleDataGenerator {
             }
         }
 
-        // insert duplicate database instance records (more than one app using the same database)
-        SoftwarePackage dupDbPackage = randomPick(DatabaseSoftwarePackages.dbs);
-        String dupDbEnvironment = randomPick("PROD", "PROD", "QA", "DEV", "DEV");
-        Date dupDbEolDate = rnd.nextInt(10) > 5
-                ? Date.valueOf(LocalDate.now().plusMonths(rnd.nextInt(12 * 6) - (12 * 3)))
-                : null;
-        for (int i = 0; i < 10; i++) {
-            DatabaseInformationRecord databaseRecord = dsl.newRecord(DATABASE_INFORMATION);
-            databaseRecord.setDatabaseName("DB_LON_REF_DATA");
-            databaseRecord.setInstanceName("DB_INST_REF_DATA");
-            databaseRecord.setEnvironment(dupDbEnvironment);
-            databaseRecord.setDbmsVendor(dupDbPackage.vendor());
-            databaseRecord.setDbmsName(dupDbPackage.name());
-            databaseRecord.setDbmsVersion("1.0.2");
-            databaseRecord.setExternalId("ext_ref_data");
-            databaseRecord.setProvenance("RANDOM_GENERATOR");
-            databaseRecord.setAssetCode(randomPick(codes));
-            databaseRecord.setLifecycleStatus(randomPick(LifecycleStatus.values()).toString());
-            databaseRecord.setEndOfLifeDate(
-                    dupDbEolDate);
+        // create Database usages
+        List<Long> appIds = getAppIds(dsl);
+        List<Long> databaseIds = getDatabaseIds(dsl);
 
-            databaseRecords.add(databaseRecord);
-        }
+        HashSet<Tuple2<Long,Long>> databaseAppMappings = new HashSet<>();
 
+        IntStream.range(0, 20_000)
+                .forEach(i -> {
+                    databaseAppMappings.add(Tuple.tuple(randomPick(databaseIds), randomPick(appIds)));
+                });
 
-        log("-- storing db records ( " + databaseRecords.size() + " )");
-        dsl.batchStore(databaseRecords).execute();
-        log("-- done inserting db records");
+        List<DatabaseUsageRecord> databaseUsage = databaseAppMappings
+                .stream()
+                .map(t -> mkDatabaseUsageRecord(t.v1, t.v2))
+                .collect(Collectors.toList());
+
+        dsl.batchInsert(databaseUsage).execute();
 
         return null;
     }
@@ -119,5 +103,23 @@ public class DatabaseGenerator implements SampleDataGenerator {
                 .where(DATABASE_INFORMATION.PROVENANCE.eq(SAMPLE_DATA_PROVENANCE))
                 .execute();
         return true;
+    }
+
+    private static DatabaseUsageRecord mkDatabaseUsageRecord(long databaseId, long appId) {
+        DatabaseUsageRecord r = new DatabaseUsageRecord();
+        r.setDatabaseId(databaseId);
+        r.setEntityKind(EntityKind.APPLICATION.name());
+        r.setEntityId(appId);
+        r.setEnvironment(randomPick(SampleData.environments));
+        r.setLastUpdatedBy("admin");
+        r.setProvenance(SAMPLE_DATA_PROVENANCE);
+        return r;
+    }
+
+
+    private static List<Long> getDatabaseIds(DSLContext dsl) {
+        return dsl.select(DATABASE_INFORMATION.ID)
+                .from(DATABASE_INFORMATION)
+                .fetch(DATABASE_INFORMATION.ID);
     }
 }
