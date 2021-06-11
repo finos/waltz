@@ -25,4 +25,5 @@
               labelFieldName="name"
               valueFieldName="id"
               {placeholder}
+              {showClear}
               bind:selectedItem={selectedItem} />

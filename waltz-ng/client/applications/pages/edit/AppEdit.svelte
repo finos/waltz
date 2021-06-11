@@ -77,7 +77,7 @@
                         <small class="text-muted">(required)</small>
                     </label>
                     <div id="org-unit">
-                        <EntitySearchSelector on:select={e => $formData.organisationalUnitId = e.detail.id}
+                        <EntitySearchSelector on:select={e => $formData.organisationalUnitId = e.detail?.id}
                                               entityKinds={['ORG_UNIT']} />
                     </div>
                     <div class="help-block">
