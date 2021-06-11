@@ -1,0 +1,176 @@
+<!--
+  ~ Waltz - Enterprise Architecture
+  ~ Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+  ~ See README.md for more information
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~     http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific
+  ~
+  -->
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+                   logicalFilePath="db.changelog-1.34.xml">
+
+    <changeSet id="20210611-5395-1"
+               author="alimuza">
+        <comment>5395: Database Usage table</comment>
+        <createTable tableName="database_usage">
+            <column autoIncrement="true"
+                    name="id"
+                    type="${id.type}">
+                <constraints primaryKey="true"
+                             primaryKeyName="database_usage_id_pkey"/>
+            </column>
+            <column name="database_id"
+                    type="${id.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="entity_id"
+                    type="${id.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="environment"
+                    type="${enum.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false" />
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}">
+                <constraints nullable="false" />
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}">
+                <constraints nullable="false" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20210611-5395-2"
+               author="alimuza">
+    <comment>5395: Database Information new table</comment>
+        <createTable tableName="database_information_2">
+            <column autoIncrement="true"
+                    name="id"
+                    type="${id.type}">
+                <constraints primaryKey="true"
+                             primaryKeyName="database_information_2_pkey"/>
+            </column>
+
+            <column name="database_name"
+                    type="${name.type}"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+            <column name="instance_name"
+                    type="${name.type}"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dbms_vendor"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dbms_name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="dbms_version"
+                    type="${code.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="external_id"
+                    type="${external-id.type}"
+                    defaultValue="waltz">
+                <constraints nullable="true"/>
+            </column>
+            <column name="end_of_life_date"
+                    type="DATE">
+                <constraints nullable="true"/>
+            </column>
+            <column name="lifecycle_status"
+                    type="${enum.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20210611-5395-3"
+               author="alimuza">
+        <comment>5395: populate new database information table</comment>
+        <sql>
+            INSERT INTO database_information_2 (database_name, instance_name, dbms_vendor, dbms_name, dbms_version, external_id, provenance, end_of_life_date, lifecycle_status)
+            SELECT DISTINCT database_name, instance_name, dbms_vendor, dbms_name, dbms_version, external_id, provenance, end_of_life_date, lifecycle_status
+            FROM database_information
+        </sql>
+    </changeSet>
+
+    <changeSet id="20200507-3784-4"
+               author="alimuza">
+        <comment>5395: Migrating data from database information to database usage</comment>
+        <sql>
+            INSERT INTO database_usage (database_id, entity_kind, entity_id, environment, last_updated_by, provenance)
+            SELECT di_new.id, 'APPLICATION', app.id, di.environment, 'admin', di.provenance
+            FROM database_information di
+            INNER JOIN application app ON di.asset_code = app.asset_code
+            INNER JOIN database_information_2 di_new ON di_new.external_id = di.external_id
+        </sql>
+    </changeSet>
+
+    <changeSet id="20210611-5395-5"
+               author="alimuza">
+        <comment>5395: Database Information table rename</comment>
+        <renameTable  newTableName="database_information_1_34"
+                      oldTableName="database_information"/>
+        <renameTable  newTableName="database_information"
+                      oldTableName="database_information_2"/>
+    </changeSet>
+
+    <changeSet id="20210611-5395-6"
+               author="alimuza">
+        <comment>5395: Added constraint from database usage to database information</comment>
+        <addForeignKeyConstraint baseTableName="database_usage"
+                                 baseColumnNames="database_id"
+                                 constraintName="database_usage_database_id_fk"
+                                 onDelete="CASCADE"
+                                 referencedTableName="database_information"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+
+    <changeSet id="20210611-5395-7"
+               author="alimuza">
+        <comment>5395: Update custom environment usage with database usage references</comment>
+        <sql>
+            UPDATE custom_environment_usage
+            SET entity_id = du.id, entity_kind = 'DATABASE_USAGE'
+            FROM custom_environment_usage as ceu
+            JOIN database_information_1_34 old_db ON (old_db.id = ceu.entity_id)
+            JOIN database_information new_db ON (old_db.external_id = new_db.external_id)
+            JOIN application a ON old_db.asset_code = a.asset_code
+            JOIN database_usage du ON new_db.id = du.database_id
+            WHERE ceu.entity_kind = 'DATABASE';
+        </sql>
+    </changeSet>
+</databaseChangeLog>
