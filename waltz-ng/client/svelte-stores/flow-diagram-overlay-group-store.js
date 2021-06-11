@@ -18,21 +18,20 @@
 
 import {remote} from "./remote";
 
-export function mkApplicationStore() {
+export function mkFlowDiagramOverlayGroupStore() {
 
-    const getById = (id) => {
-        return remote.fetchViewData("GET", `api/app/id/${id}`);
+    const findByDiagramId = (id) => {
+        return remote.fetchViewData("GET", `api/flow-diagram-overlay-group/id/${id}`);
     };
 
-
-    const findBySelector = (selector) => {
-        return remote.fetchViewList("POST", "api/app/selector", selector);
+    const findOverlaysByDiagramId = (id) => {
+        return remote.fetchViewData("GET", `api/flow-diagram-overlay-group/overlays/diagram-id/${id}`);
     };
 
     return {
-        getById,
-        findBySelector
+        findByDiagramId,
+        findOverlaysByDiagramId
     };
 }
 
-export const applicationStore = mkApplicationStore();
+export const flowDiagramOverlayGroupStore = mkFlowDiagramOverlayGroupStore();

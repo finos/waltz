@@ -28,6 +28,10 @@
             path: ctx => `data-types/${ctx.id}`,
             title: "DataType View"
         },
+        "main.logical-flow.view": {
+            path: ctx => `logical-flow/${ctx.id}`,
+            title: "Logical Flow View"
+        },
         "main.measurable.view": {
             path: ctx => `measurable/${ctx.id}`,
             title: "Measurable View"

@@ -18,21 +18,15 @@
 
 import {remote} from "./remote";
 
-export function mkApplicationStore() {
+export function mkFlowDiagramStore() {
 
     const getById = (id) => {
-        return remote.fetchViewData("GET", `api/app/id/${id}`);
-    };
-
-
-    const findBySelector = (selector) => {
-        return remote.fetchViewList("POST", "api/app/selector", selector);
+        return remote.fetchViewData("GET", `api/flow-diagram/id/${id}`);
     };
 
     return {
-        getById,
-        findBySelector
+        getById
     };
 }
 
-export const applicationStore = mkApplicationStore();
+export const flowDiagramStore = mkFlowDiagramStore();

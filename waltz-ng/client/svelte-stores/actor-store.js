@@ -18,21 +18,15 @@
 
 import {remote} from "./remote";
 
-export function mkApplicationStore() {
+export function mkActorStore() {
 
     const getById = (id) => {
-        return remote.fetchViewData("GET", `api/app/id/${id}`);
-    };
-
-
-    const findBySelector = (selector) => {
-        return remote.fetchViewList("POST", "api/app/selector", selector);
+        return remote.fetchViewData("GET", `api/actor/id/${id}`);
     };
 
     return {
-        getById,
-        findBySelector
+        getById
     };
 }
 
-export const applicationStore = mkApplicationStore();
+export const actorStore = mkActorStore();

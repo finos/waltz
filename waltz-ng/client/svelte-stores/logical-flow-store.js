@@ -18,21 +18,16 @@
 
 import {remote} from "./remote";
 
-export function mkApplicationStore() {
+export function mkLogicalFlowStore() {
 
-    const getById = (id) => {
-        return remote.fetchViewData("GET", `api/app/id/${id}`);
+    const findByEntityReference = (ref) => {
+        return remote.fetchViewList("GET", `api/logical-flow/entity/${ref.kind}/${ref.id}`);
     };
 
-
-    const findBySelector = (selector) => {
-        return remote.fetchViewList("POST", "api/app/selector", selector);
-    };
 
     return {
-        getById,
-        findBySelector
+        findByEntityReference
     };
 }
 
-export const applicationStore = mkApplicationStore();
+export const logicalFlowStore = mkLogicalFlowStore();

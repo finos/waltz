@@ -16,23 +16,22 @@
  *
  */
 
-import {remote} from "./remote";
-
-export function mkApplicationStore() {
-
-    const getById = (id) => {
-        return remote.fetchViewData("GET", `api/app/id/${id}`);
-    };
+package com.khartec.waltz.model.measurable;
 
 
-    const findBySelector = (selector) => {
-        return remote.fetchViewList("POST", "api/app/selector", selector);
-    };
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.immutables.value.Value;
 
-    return {
-        getById,
-        findBySelector
-    };
+import java.util.Set;
+
+
+@Value.Immutable
+@JsonSerialize(as = ImmutableMeasurableAlignment.class)
+@JsonDeserialize(as = ImmutableMeasurableAlignment.class)
+public abstract class MeasurableAlignment {
+
+    public abstract Measurable measurable();
+
+    public abstract Set<Long> applicationIds();
 }
-
-export const applicationStore = mkApplicationStore();
