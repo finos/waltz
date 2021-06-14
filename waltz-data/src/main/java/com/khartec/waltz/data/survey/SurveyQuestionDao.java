@@ -83,6 +83,10 @@ public class SurveyQuestionDao {
         record.setExternalId(question.externalId()
                 .filter(StringUtilities::notEmpty)
                 .orElse(null));
+        record.setParentExternalId(question.parentExternalId()
+                .filter(StringUtilities::notEmpty)
+                .orElse(null));
+        record.setLabel(question.label().orElse(null));
         record.setInclusionPredicate(question.inclusionPredicate().orElse(null));
 
         question.qualifierEntity().ifPresent(ref -> {
