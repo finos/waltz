@@ -314,6 +314,52 @@
                 </div>
 
 
+
+                <div class="form-group">
+                    <label for="qParentExternalId"
+                           class="col-sm-2 control-label">
+                        Parent External Id
+                    </label>
+                    <div class="col-sm-10">
+                        <input class="form-control form-control-warning"
+                               id="qParentExternalId"
+                               placeholder="Parent Question identifier (used for sub questions)"
+                               ng-model="ctrl.selectedQuestionInfo.question.parentExternalId" />
+                        <div class='small text-muted'>
+                            Sub questions are rendered alongside their parents.  It is recommended
+                            that each sub question has a unique identifier and they <i>must</i>
+                            point to their parent's external id.
+                        </div>
+                        <div class='small text-muted'>
+                            The parents position determines where the questions will appear on the form.
+                            Additional sub questions are ordered by their relative position values.
+                        </div>
+                        <div class='small text-muted'>
+                            Sub questions only display their parents <i>question text</i> and <i>help text</i>.
+                            For this reason we strongly recommend providing a label to allow users to differentiate between the questions.
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <label for="qLabel"
+                           class="col-sm-2 control-label">
+                        Label
+                    </label>
+                    <div class="col-sm-10">
+                        <input class="form-control form-control-warning"
+                               id="qLabel"
+                               placeholder="Label (recommended for sub questions)"
+                               ng-model="ctrl.selectedQuestionInfo.question.label" />
+                        <div class='small text-muted'>
+                            As discussed above, sub questions do not display the question text or help text.
+                            Therefore consider using the <i>Label</i> to differentiate between sub questions.
+                        </div>
+                    </div>
+                </div>
+
+
                 <div class="form-group">
                     <label for="qInclusionPredicate"
                            class="col-sm-2 control-label">
