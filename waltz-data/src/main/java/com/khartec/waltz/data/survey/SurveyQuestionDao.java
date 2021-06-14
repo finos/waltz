@@ -63,6 +63,8 @@ public class SurveyQuestionDao {
                 .externalId(Optional.ofNullable(record.getExternalId()))
                 .inclusionPredicate(Optional.ofNullable(record.getInclusionPredicate()))
                 .qualifierEntity(qualifierRef)
+                .label(Optional.ofNullable(record.getLabel()))
+                .parentExternalId(Optional.ofNullable(record.getParentExternalId()))
                 .build();
     };
 

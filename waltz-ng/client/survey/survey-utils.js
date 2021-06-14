@@ -22,23 +22,40 @@ import {formats} from "../common";
 import {CORE_API} from "../common/services/core-api-utils";
 import {loadEntity} from "../common/entity-utils";
 import {mkSiphon} from "../common/siphon-utils";
+import {nest} from "d3-collection";
 
 
 export function groupQuestions(questions = []) {
+    const byExtId = _.keyBy(questions, d => d.externalId);
+
+    const [subQs, topQs] = _.partition(
+        questions,
+        q => q.parentExternalId && byExtId[q.parentExternalId]);
+
+    _.forEach(
+        subQs,
+        sq => {
+            const parent = byExtId[sq.parentExternalId];
+            parent.subQuestions = _.union(parent.subQuestions, [sq]);
+        });
+
+
     const sections = _
-        .chain(questions)
+        .chain(topQs)
         .map(q => q.sectionName || "Other")
         .uniq()
         .value();
 
-    const groupedQuestions = _.groupBy(questions, q => q.sectionName || "Other");
+    const groupedQuestions = _.groupBy(topQs, q => q.sectionName || "Other");
 
-    return _.map(sections, s => {
+    const result = _.map(sections, s => {
         return {
             "sectionName": s,
             "questions": groupedQuestions[s]
         };
     });
+
+    return result;
 }
 
 

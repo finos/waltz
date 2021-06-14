@@ -63,8 +63,9 @@
                     class="text-muted">
                 </h4>
                 <hr>
+
                 <div ng-repeat="question in groupedQuestion.questions track by question.id"
-                     class="form-group">
+                     class="waltz-survey-question-edit-row row">
                     <div ng-attr-for="{{ question.id }}"
                            class="col-sm-4">
                         <span ng-bind="question.questionText">
@@ -129,24 +130,30 @@
                         </div>
 
                         <!-- text -->
-                        <textarea ng-switch-when="TEXT"
-                                  ng-attr-id="{{ question.id }}"
-                                  ng-model="ctrl.surveyResponses[question.id].stringResponse"
-                                  ng-required="question.isMandatory"
-                                  ng-blur="ctrl.saveResponse(question.id)"
-                                  rows="1"
-                                  class="form-control">
-                        </textarea>
+                        <div ng-switch-when="TEXT">
+                            <label ng-if="question.label"
+                                   ng-attr-for="{{question.id}}"
+                                   ng-bind="question.label">
+                            </label>
+                            <textarea ng-attr-id="{{ question.id }}"
+                                      ng-model="ctrl.surveyResponses[question.id].stringResponse"
+                                      ng-required="question.isMandatory"
+                                      ng-blur="ctrl.saveResponse(question.id)"
+                                      rows="1"
+                                      class="form-control">
+                            </textarea>
+                        </div>
 
                         <!-- textarea -->
-                        <textarea ng-switch-when="TEXTAREA"
-                                  ng-attr-id="{{ question.id }}"
-                                  ng-model="ctrl.surveyResponses[question.id].stringResponse"
-                                  ng-required="question.isMandatory"
-                                  ng-blur="ctrl.saveResponse(question.id)"
-                                  rows="4"
-                                  class="form-control">
-                        </textarea>
+                        <div ng-switch-when="TEXTAREA">
+                            <textarea ng-attr-id="{{ question.id }}"
+                                      ng-model="ctrl.surveyResponses[question.id].stringResponse"
+                                      ng-required="question.isMandatory"
+                                      ng-blur="ctrl.saveResponse(question.id)"
+                                      rows="4"
+                                      class="form-control">
+                            </textarea>
+                        </div>
 
                         <!-- date -->
                         <waltz-date-picker-form-input ng-switch-when="DATE"
@@ -289,3 +296,11 @@
                                    parent-entity-ref="ctrl.entityReference">
     </waltz-dynamic-section-wrapper>
 </div>
+
+
+
+<style>
+    .question-row {
+
+    }
+</style>
