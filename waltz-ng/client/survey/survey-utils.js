@@ -22,7 +22,6 @@ import {formats} from "../common";
 import {CORE_API} from "../common/services/core-api-utils";
 import {loadEntity} from "../common/entity-utils";
 import {mkSiphon} from "../common/siphon-utils";
-import {nest} from "d3-collection";
 
 
 export function groupQuestions(questions = []) {
