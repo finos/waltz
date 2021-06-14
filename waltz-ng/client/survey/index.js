@@ -26,6 +26,8 @@ import SurveyInstanceList from "./components/instance-list/survey-instance-list"
 import SurveyInstanceSummary from "./components/instance-summary/survey-instance-summary";
 import surveyQuestionMeasurableRenderer
     from "./components/survey-question-measurable-renderer/survey-question-measurable-renderer"
+import SurveyResponseInput
+    from "./components/input/survey-response-input"
 
 import surveySection from "./components/survey-section";
 import measurableMultiSelect from "./components/measurable-multi-select/survey-measurable-multi-select"
@@ -70,7 +72,8 @@ export default () => {
     registerComponents(module, [
         SurveyInstanceList,
         SurveyInstanceSummary,
-        SurveyTemplateQuestionOverviewTable
+        SurveyTemplateQuestionOverviewTable,
+        SurveyResponseInput
     ]);
 
     return module.name;
