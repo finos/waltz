@@ -13,13 +13,12 @@ const bindings = {
     saveEntityResponse: "<",
     saveEntityListResponse: "<"
 };
+
 const initialState = {};
 
 
 function controller() {
     const vm = initialiseData(this, initialState);
-
-    controller.$onChanges = () => console.log("oc", vm)
 }
 
 controller.$inject = [];
