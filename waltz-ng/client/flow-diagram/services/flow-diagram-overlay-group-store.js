@@ -20,7 +20,7 @@ export function store($http, base) {
     const BASE = `${base}/flow-diagram-overlay-group`;
 
     const findByDiagramId = (id) => $http
-        .get(`${BASE}/id/${id}`)
+        .get(`${BASE}/diagram-id/${id}`)
         .then(r => r.data);
 
     const findOverlaysByDiagramId = (id) => $http

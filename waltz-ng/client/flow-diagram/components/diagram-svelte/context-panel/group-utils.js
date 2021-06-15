@@ -1,7 +1,7 @@
 import _ from "lodash";
 import {randomPick} from "../../../../common";
 
-const colorSchemes = [
+export const colorSchemes = [
     { fill: "red", stroke: "#ee9c9c" },
     { fill: "orange", stroke: "#e2a864" },
     { fill: "blue", stroke: "#74b7f1" },

@@ -56,6 +56,12 @@ public class FlowDiagramOverlayGroupService {
     }
 
 
+    public boolean delete(Long id, String username) {
+        //create change log
+        return flowDiagramOverlayGroupDao.delete(id);
+    }
+
+
     public int updateOverlaysForDiagram(Long diagramId,
                                          Set<FlowDiagramOverlayGroupEntry> overlays,
                                          String username) {

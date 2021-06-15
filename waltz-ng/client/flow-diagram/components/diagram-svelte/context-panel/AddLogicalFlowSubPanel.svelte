@@ -43,6 +43,7 @@
         updates.flowAdditions.forEach(model.addFlow);
         updates.flowRemovals.forEach(model.removeFlow);
         updates.moves.forEach(positions.move);
+        cancel();
     }
 
     $: oppositeDirection = (direction === Directions.UPSTREAM)

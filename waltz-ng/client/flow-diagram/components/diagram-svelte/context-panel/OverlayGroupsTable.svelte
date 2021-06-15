@@ -21,6 +21,8 @@
     let selectedGroup;
     let groupOverlays;
 
+    let removePromise;
+
     const Modes = {
         TABLE: "TABLE",
         ADD_OVERLAY: "ADD_OVERLAY",
@@ -33,7 +35,6 @@
     function cancel() {
         activeMode = Modes.TABLE;
     }
-
 
     function selectRow(group) {
         if(selectedGroup === group){
@@ -58,6 +59,11 @@
         overlay.removeOverlay(groupOverlay);
     }
 
+    function removeOverlayGroup(group){
+        console.log({group})
+        return removePromise = flowDiagramOverlayGroupStore
+            .deleteGroup(diagramId, group.data.id);
+    }
 
 </script>
 
@@ -114,6 +120,12 @@
                                 on:click={() => activeMode = Modes.ADD_OVERLAY}>
                             <Icon name="plus"/>
                             Add overlay
+                        </button>
+                        |
+                        <button class="btn btn-skinny"
+                                on:click={() => removeOverlayGroup(group)}>
+                            <Icon name="trash"/>
+                            Remove Group
                         </button>
                     </td>
                 </tr>

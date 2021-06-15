@@ -30,8 +30,7 @@ import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
@@ -52,9 +51,10 @@ public class FlowDiagramOverlayGroupEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        String findByDiagramIdPath = mkPath(BASE_URL, "id", ":id");
+        String findByDiagramIdPath = mkPath(BASE_URL, "diagram-id", ":id");
         String findOverlaysByDiagramIdPath = mkPath(BASE_URL, "overlays", "diagram-id", ":id");
         String createGroupPath = mkPath(BASE_URL, "create");
+        String deleteGroupPath = mkPath(BASE_URL, "id", ":id");
 
         ListRoute<FlowDiagramOverlayGroup> findByDiagramIdRoute = (req, res)
                 -> flowDiagramOverlayGroupService.findByDiagramId(getId(req));
@@ -69,9 +69,16 @@ public class FlowDiagramOverlayGroupEndpoint implements Endpoint {
             return flowDiagramOverlayGroupService.create(group, username);
         };
 
+
+        DatumRoute<Boolean> deleteGroupRoute = (req, resp) -> {
+            String username = getUsername(req);
+            return flowDiagramOverlayGroupService.delete(getId(req), username);
+        };
+
         getForList(findByDiagramIdPath, findByDiagramIdRoute);
         getForList(findOverlaysByDiagramIdPath, findOverlaysByDiagramIdRoute);
         postForDatum(createGroupPath, createGroupRoute);
+        deleteForDatum(deleteGroupPath, deleteGroupRoute);
     }
 
 }

@@ -24,7 +24,7 @@ export function mkFlowDiagramOverlayGroupStore() {
         return remote
             .fetchViewData(
                 "GET", 
-                `api/flow-diagram-overlay-group/id/${id}`, 
+                `api/flow-diagram-overlay-group/diagram-id/${id}`,
                 null,
                 [], 
                 {force});
@@ -43,10 +43,19 @@ export function mkFlowDiagramOverlayGroupStore() {
             .then(() => findByDiagramId(group.diagramId, true));
     };
 
+    const deleteGroup = (diagramId, id) => {
+        return remote
+            .execute(
+                "DELETE",
+                `api/flow-diagram-overlay-group/id/${id}`)
+            .then(() => findByDiagramId(diagramId, true));
+    }
+
     return {
         findByDiagramId,
         findOverlaysByDiagramId,
-        createGroup
+        createGroup,
+        deleteGroup
     };
 }
 

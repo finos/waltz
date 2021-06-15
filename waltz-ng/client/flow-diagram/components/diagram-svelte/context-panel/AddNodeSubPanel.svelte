@@ -19,7 +19,7 @@
 </script>
 
 <div>
-    <h4>Add a new node:</h4>
+    <strong>Add a new node:</strong>
     <EntitySearchSelector on:select={saveNode}
                           placeholder="Search for source"
                           entityKinds={['APPLICATION', 'ACTOR']}>

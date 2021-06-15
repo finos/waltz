@@ -21,7 +21,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
                    logicalFilePath="db.changelog-1.34.xml">
 
-    <changeSet id="20210609-xxxx-1"
+    <changeSet id="20210609-5447-1"
                author="woodjes">
         <update tableName="settings">
             <column name="value"
@@ -281,7 +281,7 @@
     </changeSet>
 
 
-    <!--    <changeSet id="20210505-5405-1"-->
+    <!--    <changeSet id="20210609-5447-1"-->
     <!--               author="woodjes">-->
     <!--        <update tableName="settings">-->
     <!--            <column name="value"-->

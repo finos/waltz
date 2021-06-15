@@ -154,15 +154,19 @@
 <!-- Diagram title -->
 <div style="padding-bottom: 1px">
     {#if activeMode === Modes.VIEW}
-        <h4>{$diagram.name}</h4>
+        <h4>
+            {$diagram.name}
+            <span class="small">
+                <button class="tn btn-skinny"
+                    on:click={() => activeMode = Modes.EDIT}>
+                <Icon name="pencil"/>Edit
+            </button>
+        </span>
+        </h4>
         <p class="help-block">{$diagram.description || "No description provided"}</p>
-        <div class="small pull-right text-muted">
+        <div class="small text-muted">
             (<LastEdited class="small pull-right text-muted" entity={$diagram}/>)
         </div>
-        <button class="tn btn-skinny"
-                on:click={() => activeMode = Modes.EDIT}>
-            Edit
-        </button>
     {:else  if activeMode === Modes.EDIT}
         <EditFlowDiagramPanel flowDiagram={$diagram} on:cancel={() => activeMode = Modes.VIEW}/>
     {/if}

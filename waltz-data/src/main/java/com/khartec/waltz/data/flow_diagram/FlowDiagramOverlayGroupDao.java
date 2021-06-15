@@ -134,6 +134,14 @@ public class FlowDiagramOverlayGroupDao {
     }
 
 
+    public boolean delete(Long id){
+        return dsl
+                .deleteFrom(FLOW_DIAGRAM_OVERLAY_GROUP)
+                .where(FLOW_DIAGRAM_OVERLAY_GROUP.ID.eq(id))
+                .execute() == 1;
+    }
+
+
     public int deleteOverlaysForDiagram(Long diagramId){
         int deleted = dsl.deleteFrom(FLOW_DIAGRAM_OVERLAY_GROUP_ENTRY)
                 .where(FLOW_DIAGRAM_OVERLAY_GROUP_ENTRY.OVERLAY_GROUP_ID.in(
