@@ -8,7 +8,6 @@
     import ContextPanel from "./context-panel/ContextPanel.svelte";
     import model from "./store/model";
     import visibility from "./store/visibility"
-    import VisibilityToggles from "./context-panel/VisibilityToggles.svelte";
     import {diagramTransform, positions} from "./store/layout";
     import overlay from "./store/overlay";
 
@@ -113,7 +112,6 @@
 </div>
 <div class="col-md-4 context-menu">
     <ContextPanel diagramId={$store.diagramId} {doSave}/>
-    <VisibilityToggles/>
 </div>
 {/if}
 

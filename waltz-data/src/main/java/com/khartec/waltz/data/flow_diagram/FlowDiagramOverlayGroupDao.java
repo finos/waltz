@@ -30,16 +30,20 @@ import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.FLOW_DIAGRAM_OVERLAY_GROUP;
 import static com.khartec.waltz.schema.Tables.FLOW_DIAGRAM_OVERLAY_GROUP_ENTRY;
+import static java.util.stream.Collectors.collectingAndThen;
 
 
 @Repository
@@ -127,5 +131,39 @@ public class FlowDiagramOverlayGroupDao {
                 .returning(FLOW_DIAGRAM_OVERLAY_GROUP.ID)
                 .fetchOne()
                 .getFlowDiagramId();
+    }
+
+
+    public int deleteOverlaysForDiagram(Long diagramId){
+        int deleted = dsl.deleteFrom(FLOW_DIAGRAM_OVERLAY_GROUP_ENTRY)
+                .where(FLOW_DIAGRAM_OVERLAY_GROUP_ENTRY.OVERLAY_GROUP_ID.in(
+                        DSL
+                                .select(FLOW_DIAGRAM_OVERLAY_GROUP.ID)
+                                .from(FLOW_DIAGRAM_OVERLAY_GROUP)
+                                .where(FLOW_DIAGRAM_OVERLAY_GROUP.FLOW_DIAGRAM_ID.eq(diagramId))))
+                .execute();
+
+        return deleted;
+    }
+
+
+    public int createOverlays(Set<FlowDiagramOverlayGroupEntry> overlays) {
+
+        int[] insertedEntries = overlays
+                .stream()
+                .map(o -> {
+
+                    FlowDiagramOverlayGroupEntryRecord r = dsl.newRecord(FLOW_DIAGRAM_OVERLAY_GROUP_ENTRY);
+                    r.setOverlayGroupId(o.overlayGroupId());
+                    r.setEntityId(o.entityReference().id());
+                    r.setEntityKind(o.entityReference().kind().name());
+                    r.setFill(o.fill());
+                    r.setStroke(o.stroke());
+                    r.setSymbol(o.symbol());
+                    return r;
+                })
+                .collect(collectingAndThen(Collectors.toSet(), r -> dsl.batchInsert(r).execute()));
+
+        return IntStream.of(insertedEntries).sum();
     }
 }

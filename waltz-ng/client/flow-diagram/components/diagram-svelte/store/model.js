@@ -179,7 +179,8 @@ function createStore() {
         updateAnnotation: (annotation) => update(s => updateAnnotation(s, annotation)),
         removeAnnotation: (annotation) => update(s => removeAnnotation(s, annotation)),
         addDecoration: (decoration) => update(s => addDecoration(s, decoration)),
-        removeDecoration: (decoration) => update(s => removeDecoration(s, decoration))
+        removeDecoration: (decoration) => update(s => removeDecoration(s, decoration)),
+        reset: () => update(s => console.log("reset") || Object.assign({}, initialState))
     };
 }
 

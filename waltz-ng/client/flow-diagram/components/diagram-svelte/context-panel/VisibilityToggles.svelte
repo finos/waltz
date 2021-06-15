@@ -2,6 +2,7 @@
     import visibility from "../store/visibility";
 </script>
 
+<p class="help-block">Use filters to selectively hide or show elements on the flow diagram</p>
 <form>
     <div class="checkbox">
         <label>

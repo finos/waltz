@@ -12,7 +12,6 @@ function controller(flowDiagramStateService) {
     processor.set(flowDiagramStateService.processCommands);
     flowDiagramStateService.onChange((newState) => store.set(newState));
 
-
     vm.doSave = flowDiagramStateService.save;
 
 }

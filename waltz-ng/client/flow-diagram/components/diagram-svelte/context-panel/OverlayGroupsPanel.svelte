@@ -1,11 +1,10 @@
 <script>
-    import {store} from "../diagram-model-store";
     import {mkRef} from "../../../../common/entity-utils";
     import {mkSelectionOptions} from "../../../../common/selector-utils";
     import {measurableCategoryAlignmentViewStore} from "../../../../svelte-stores/measurable-category-alignment-view-store";
-    import {flowDiagramOverlayGroupStore} from "../../../../svelte-stores/flow-diagram-overlay-group-store";
     import OverlayGroupsTable from "./OverlayGroupsTable.svelte";
     import CreateNewOverlayGroupPanel from "./CreateNewOverlayGroupPanel.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
 
     let workingGroup;
     export let diagramId;
@@ -22,11 +21,6 @@
 
     $: alignments = $measurableAlignmentCall.data;
 
-    $: overlayGroupCall = flowDiagramOverlayGroupStore.findByDiagramId(diagramId);
-    $: overlays = $overlayGroupCall.data
-
-    $: overlayGroups = $store.model.groups;
-
     function cancel() {
         workingGroup = null;
     }
@@ -37,10 +31,10 @@
     <OverlayGroupsTable {diagramId} {alignments}/>
     <button class="btn btn-skinny"
             on:click={() => activeMode = Modes.ADD_GROUP}>
-        Add new overlay group
+        <Icon name="plus"/> Add new overlay group
     </button>
 {:else if activeMode === Modes.ADD_GROUP}
-    <h4>Add group</h4>
+    <h4>Create Group:</h4>
     <CreateNewOverlayGroupPanel {diagramId} on:cancel={() => activeMode = Modes.TABLE}/>
 {/if}
 

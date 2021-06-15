@@ -5,10 +5,18 @@
     import {createEventDispatcher} from "svelte";
     import AddOverlayGroupEntrySubPanel from "./AddOverlayGroupEntrySubPanel.svelte";
     import overlay from "../store/overlay";
+    import {flowDiagramOverlayGroupStore} from "../../../../svelte-stores/flow-diagram-overlay-group-store";
+    import {toGraphId} from "../../../flow-diagram-utils";
 
 
     export let diagramId;
     export let alignments;
+
+    $: overlayGroupsCall = flowDiagramOverlayGroupStore.findByDiagramId(diagramId);
+    $: overlayGroups = _.map($overlayGroupsCall.data, d => Object.assign(
+        {},
+        {id: toGraphId({kind: 'GROUP', id: d.id}), data: d}));
+
 
     let selectedGroup;
     let groupOverlays;
@@ -56,18 +64,20 @@
 
 <div>
     {#if  activeMode === Modes.TABLE}
-        <h4>Groups:</h4>
+        <p class="help-block">Overlay groups can be used to show relationships between nodes and other Waltz entities</p>
+        {#if _.size(overlayGroups) === 0 }
+            No overlay groups have been created for this diagram.
+        {:else}
         <table class="table table-condensed small">
         <thead>
         <tr>
             <th width="5%"></th>
             <th width="40%">Name</th>
             <th width="40%">Description</th>
-            <th width="15%"># Overlays</th>
         </tr>
         </thead>
         <tbody>
-        {#each $overlay.groups as group}
+        {#each overlayGroups as group}
             <tr class="clickable"
                 on:click={() => selectRow(group)}>
                 <td>
@@ -78,7 +88,6 @@
                 </td>
                 <td>{group.data.name}</td>
                 <td>{group.data.description || "-"}</td>
-                <td>0</td>
             </tr>
             {#if selectedGroup === group}
                 <tr class="env-detail-row">
@@ -112,6 +121,7 @@
         {/each}
         </tbody>
     </table>
+    {/if}
     {:else if activeMode === Modes.ADD_OVERLAY}
         <h4>Adding overlay for {selectedGroup.name}:</h4>
         <AddOverlayGroupEntrySubPanel {alignments}

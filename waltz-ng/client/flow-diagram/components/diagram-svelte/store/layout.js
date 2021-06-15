@@ -30,7 +30,8 @@ function createPositionStore() {
     return {
         subscribe,
         move: (moveCmd) => update(s => move(s, moveCmd)),
-        setPosition: (posCmd) => update(s => setPosition(s, posCmd))
+        setPosition: (posCmd) => update(s => setPosition(s, posCmd)),
+        reset: () => update(s => console.log("reset") || Object.assign({}, initialPositions))
     };
 }
 

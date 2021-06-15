@@ -14,12 +14,13 @@
     const dispatch = createEventDispatcher();
 
     function cancel() {
+        $name = null;
+        $description = null;
         dispatch("cancel");
     }
 
 
     function saveOverlayGroup(){
-        console.log("hi");
         const savePromise = flowDiagramOverlayGroupStore.createGroup(
             {
                 name: $name,
@@ -37,31 +38,26 @@
 
 <form autocomplete="off"
       on:submit|preventDefault={saveOverlayGroup}>
+    <div class="form-group">
+        <label for="name">
+            Name:
+            <span style="color: darkred">*</span>
+        </label>
+        <input class="form-control"
+               id="name"
+               bind:value={$name}/>
+    </div>
+    <p class="text-muted">Set a name for the new overlay group</p>
 
-    <!--{#if !workingGroup.id}-->
-
-        <div class="form-group">
-            <label for="name">
-                Name:
-                <span style="color: darkred">*</span>
-            </label>
-            <input class="form-control"
-                   id="name"
-                   bind:value={$name}/>
-        </div>
-        <p class="text-muted">Set a name for the new overlay group</p>
-
-        <div class="form-group">
-            <label for="description">
-                Description:
-            </label>
-            <input class="form-control"
-                   id="description"
-                   bind:value={$description}/>
-        </div>
-        <p class="text-muted">Enter a description for this group of overlays</p>
-
-    <!--{/if}-->
+    <div class="form-group">
+        <label for="description">
+            Description:
+        </label>
+        <input class="form-control"
+               id="description"
+               bind:value={$description}/>
+    </div>
+    <p class="text-muted">Enter a description for this group of overlays</p>
 
     <button class="btn btn-success"
             type="submit"

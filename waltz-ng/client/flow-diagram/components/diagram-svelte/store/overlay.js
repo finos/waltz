@@ -5,7 +5,6 @@ import dirty from "./dirty";
 
 
 const initialState = {
-    groups: [],
     groupOverlays: {}, //overlays grouped by overlayGroupId
     appliedOverlay: null,
     selectedGroup: null
@@ -116,7 +115,8 @@ function createStore() {
         setAppliedOverlay: (overlay => update(s => setAppliedOverlay(s, overlay))),
         clearAppliedOverlay: (() => update(s => clearAppliedOverlay(s))),
         setSelectedGroup: (group => update(s => setSelectedGroup(s, group))),
-        clearSelectedGroup: (() => update(s => clearSelectedGroup(s)))
+        clearSelectedGroup: (() => update(s => clearSelectedGroup(s))),
+        reset: () => update(s => console.log("reset") || Object.assign({}, initialState))
     };
 }
 

@@ -34,7 +34,6 @@ const initialState = {
         flows: [],
         decorations: {},
         annotations: [],
-        groups: []
     },
     layout: {
         positions: {}, // gid -> {  x, y }
@@ -129,8 +128,7 @@ function restoreDiagram(
     annotations = [],
     entityNodes = [],
     logicalFlows = [],
-    physicalFlows = [],
-    overlayGroups = [])
+    physicalFlows = [])
 {
     const layoutData = JSON.parse(diagram.layoutData);
     const logicalFlowsById = _.keyBy(logicalFlows, "id");
@@ -186,23 +184,6 @@ function restoreDiagram(
         .forEach(ann => newModel.addAnnotation(toGraphNode(ann)))
         .value();
 
-    // overlay groups
-    _.chain(overlayGroups)
-        .map(g => ({
-            id: toGraphId({id: g.id, kind: "GROUP"}),
-            data: g}))
-        .forEach(g => overlay.addGroup(g))
-        .value();
-
-    //  overlay entries
-    // _.chain(overlayGroupEntries)
-    //     .map(g => ({
-    //         id: toGraphId({id: g.id, kind: 'OVERLAY'}),
-    //         groupRef: toGraphId({id: g.overlayGroupId, kind: 'GROUP'}),
-    //         data: g}))
-    //     .forEach(g => overlay.addOverlay(g))
-    //     .value();
-
     diagramTransform.set(layoutData.diagramTransform);
 
     const titleCommands = [{
@@ -252,6 +233,9 @@ export function service(
 {
 
     const reset = () => {
+        newModel.reset();
+        overlay.reset();
+        positions.reset();
         state = _.cloneDeep(initialState);
         if (listener) listener(state);
     };
@@ -320,21 +304,20 @@ export function service(
             logicalFlowStore.findBySelector(diagramSelector),
             physicalFlowStore.findBySelector(diagramSelector),
             measurableRatingStore.findByAppSelector(diagramSelector),
-            flowDiagramOverlayGroupStore.findByDiagramId(id),
             flowDiagramOverlayGroupStore.findOverlaysByDiagramId(id)
         ];
 
         return $q
             .all(promises)
-            .then(([applications, diagram, annotations, entityNodes, logicalFlows, physicalFlows, measurableRatings, overlayGroups, overlayEntries]) => {
+            .then(([applications, diagram, annotations, entityNodes, logicalFlows, physicalFlows, measurableRatings, overlayEntries]) => {
                 state.detail.applicationsById = _.keyBy(applications, "id");
                 state.detail.measurablesByAppId = _.keyBy(measurableRatings, "entityReference.id")
                 const allEntityNodes = addMissingEntityNodes(diagram.id, entityNodes, applications);
 
-                restoreDiagram(processCommands, diagram, annotations, allEntityNodes, logicalFlows, physicalFlows, overlayGroups);
+                restoreDiagram(processCommands, diagram, annotations, allEntityNodes, logicalFlows, physicalFlows);
 
                 // store on state the list of groups to be shown
-                const groupPromises = _.map(
+                const overlayPromises = _.map(
                     overlayEntries,
                     overlay => applicationStore
                         .findBySelector(mkSelectionOptions(overlay.entityReference))
@@ -342,12 +325,12 @@ export function service(
                             {},
                             overlay, 
                             {
-                                groupRef: toGraphId({id: overlay.overlayGroupId, kind: "GROUP"}), 
+                                groupRef: toGraphId({id: overlay.overlayGroupId, kind: "GROUP"}),
                                 applicationIds: _.map(r, d => d.id)
                             })));
 
                 $q
-                    .all(groupPromises)
+                    .all(overlayPromises)
                     .then((overlaysWithApps) => overlaysWithApps.forEach(o => overlay.addOverlay(o)));
 
                 state.dirty = false;
@@ -494,13 +477,13 @@ export function service(
                 //     // model.annotations = _.reject(model.annotations, a => a.id === payload.id );
                 //     break;
 
-            case "ADD_GROUP":
-                addGroup(payload, model);
-                break;
-
-            case "REMOVE_GROUP":
-                model.groups = _.reject(model.groups, a => a.id === payload.id );
-                break;
+                // case "ADD_GROUP":
+                //     addGroup(payload, model);
+                //     break;
+                //
+                // case "REMOVE_GROUP":
+                //     model.groups = _.reject(model.groups, a => a.id === payload.id );
+                //     break;
 
             case "SET_POSITION":
                 positions.setPosition(payload);
