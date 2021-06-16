@@ -27,6 +27,15 @@
     </changeSet>
 
 
+    <changeSet id="20210609-5447-1"
+               author="woodjes">
+        <update tableName="settings">
+            <column name="value"
+                    value="DEV v1.34"/>
+            <where>name='ui.logo.overlay.text'</where>
+        </update>
+    </changeSet>
+
     <changeSet id="20210611-5395-1"
                author="alimuza">
         <comment>5395: Database Usage table</comment>
@@ -71,7 +80,7 @@
 
     <changeSet id="20210611-5395-2"
                author="alimuza">
-    <comment>5395: Database Information new table</comment>
+        <comment>5395: Database Information new table</comment>
         <createTable tableName="database_information_2">
             <column autoIncrement="true"
                     name="id"
@@ -181,6 +190,102 @@
     </changeSet>
 
 
+    <!-- 5455: Create flow diagram overlay group tables -->
+    <changeSet id="20210609-5455-1"
+               author="woodjes">
+        <comment>5455: Create flow diagram overlay group tables</comment>
+        <createTable tableName="flow_diagram_overlay_group">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="overlay_group_pkey"/>
+            </column>
+            <column name="flow_diagram_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_default"
+                    type="boolean"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20210609-5455-2"
+               author="woodjes">
+        <comment>5455: Create flow diagram overlay tables</comment>
+        <createTable tableName="flow_diagram_overlay_group_entry">
+            <column name="id"
+                    type="${id.type}"
+                    autoIncrement="true">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="overlay_group_entry_pkey"/>
+            </column>
+            <column name="overlay_group_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="entity_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="symbol"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="fill"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="stroke"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20210609-5455-3"
+               author="woodjes">
+        <comment>5455: Create flow diagram overlay tables</comment>
+        <addForeignKeyConstraint constraintName="fd_overlay_group_flow_diagram_id_fk"
+                                 baseTableName="flow_diagram_overlay_group"
+                                 baseColumnNames="flow_diagram_id"
+                                 referencedTableName="flow_diagram"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
+    <changeSet id="20210609-5455-4"
+               author="woodjes">
+        <comment>5455: Create flow diagram overlay tables</comment>
+        <addForeignKeyConstraint constraintName="fd_overlay_group_entry_fd_overlay_group_id_fk"
+                                 baseTableName="flow_diagram_overlay_group_entry"
+                                 baseColumnNames="overlay_group_id"
+                                 referencedTableName="flow_diagram_overlay_group"
+                                 referencedColumnNames="id"
+                                 onDelete="CASCADE"/>
+    </changeSet>
+
     <changeSet id="20210614-5466-tag"
                author="davidwatkins73">
         <tagDatabase tag="pre5466"/>
@@ -202,4 +307,26 @@
             </column>
         </addColumn>
     </changeSet>
+
+    <changeSet id="20210616-5455-5"
+               author="woodjes">
+        <comment>5455: adding editor role to flow diagram</comment>
+        <addColumn tableName="flow_diagram">
+            <column name="editor_role"
+                    type="${enum.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20210609-5447-2"
+               author="woodjes">
+        <update tableName="settings">
+            <column name="value"
+                    value="Prod v1.34"/>
+            <where>name='ui.logo.overlay.text'</where>
+        </update>
+    </changeSet>
+
+
 </databaseChangeLog>

@@ -13,6 +13,7 @@ export function mkAssessmentDefinitionStore() {
             "PUT",
             `api/assessment-definition`,
             def);
+
     const remove = (id) => remote
         .execute(
             "DELETE",
