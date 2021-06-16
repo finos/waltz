@@ -10,6 +10,8 @@
     import visibility from "./store/visibility"
     import {diagramTransform, positions} from "./store/layout";
     import overlay from "./store/overlay";
+    import {diagram} from "./store/diagram";
+
 
 
     let elem;
@@ -78,12 +80,13 @@
 
     $: elem && setupPanAndZoom($processor);
 
-    $: console.log("FlowDiag:", {store: $store, overlay: $overlay, model: $model, positions: $positions});
+
+    $: console.log("FlowDiag:", {diag: $diagram, store: $store, overlay: $overlay, model: $model, positions: $positions});
 
 </script>
 
 
-{#if $store.diagramId}
+{#if $diagram?.id} <!--//$store.diagramId}-->
 <div class="col-md-8 diagram-svg">
     <svg viewBox="0 0 1100 600"
          width="100%"
@@ -111,7 +114,7 @@
     </svg>
 </div>
 <div class="col-md-4 context-menu">
-    <ContextPanel diagramId={$store.diagramId} {doSave}/>
+    <ContextPanel diagramId={$diagram.id} {doSave}/> <!--//$store.diagramId} {doSave}/>-->
 </div>
 {/if}
 

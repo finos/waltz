@@ -73,7 +73,8 @@
 </script>
 
 {#if activeMode === Modes.VIEW}
-    <RelatedEntitiesViewTable measurables={associatedMeasurables}
+    <RelatedEntitiesViewTable {diagramId}
+                              measurables={associatedMeasurables}
                               changeInitiatives={associatedCis}
                               on:select={addEntityMode}/>
 {:else if activeMode === Modes.ADD_MEASURABLE }

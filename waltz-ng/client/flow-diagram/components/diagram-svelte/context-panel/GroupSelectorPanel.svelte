@@ -13,16 +13,9 @@
 
     let selectedCategory;
 
-    $: decoratorGroups = $store.model.groups;
-
-    $: first = _.first(alignments);
-
-    $: selectedCategory = selectedCategory || first?.categoryReference
+    $: selectedCategory = selectedCategory || _.first(alignments)?.categoryReference
 
     $: selectedCategoryAlignments = _.find(alignments, d => d.categoryReference === selectedCategory);
-
-    $: console.log({selectedCategory, first, selectedCategoryAlignments});
-
 
     function selectGroup(e) {
         dispatch("select", e.detail);
@@ -47,7 +40,7 @@
     </div>
     {#if selectedCategory}
     <MeasurableAlignmentTreeSelector alignments={selectedCategoryAlignments.alignments}
-                            on:select={selectGroup}/>
+                                     on:select={selectGroup}/>
     {/if}
 {:else}
     <h4>Add a new group:</h4>

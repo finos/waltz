@@ -31,6 +31,10 @@
         <td colspan="2">No associated viewpoints</td>
     </tr>
     {:else}
+    <thead>
+        <th width="80%"/>
+        <th width="20%"/>
+    </thead>
     <!-- LIST -->
     <tbody>
     {#each measurables as measurable}
@@ -73,6 +77,10 @@
             <td colspan="2">No associated change initiatives</td>
         </tr>
     {:else}
+        <thead>
+            <th width="80%"/>
+            <th width="20%"/>
+        </thead>
         <!-- LIST -->
         <tbody>
         {#each changeInitiatives as changeInitiative}

@@ -60,7 +60,6 @@
     $: relatedAppIds = $relatedAppsCall?.data || [];
     $: newOverlay = getNewOverlay(workingOverlay);
 
-    $:console.log({overlayStore: $overlay})
 </script>
 
 
@@ -76,9 +75,20 @@
                     <button class="btn btn-skinny" on:click={() => showColorPicker = true}><Icon name="pencil"/>Edit Colour</button>
                 </span>
                 <div>
-                    <button class="btn btn-skinny" on:click={() => saveOverlay()}>Save</button>|
-                    <button class="btn btn-skinny" on:click={() => newOverlay = getNewOverlay(workingOverlay)}>Refresh Icon</button>|
-                    <button class="btn btn-skinny" on:click={cancel}>Cancel</button>
+                    <button class="btn btn-skinny"
+                            on:click={() => saveOverlay()}>
+                        Save
+                    </button>
+                    |
+                    <button class="btn btn-skinny"
+                            on:click={() => newOverlay = getNewOverlay(workingOverlay)}>
+                        Refresh Icon
+                    </button>
+                    |
+                    <button class="btn btn-skinny"
+                            on:click={cancel}>
+                        Cancel
+                    </button>
                 </div>
             {:else }
                 <ColorPicker predefinedColors={_.map(colorSchemes, d => d.fill)}

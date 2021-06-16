@@ -24,6 +24,7 @@ import newModel from "../components/diagram-svelte/store/model"
 import {diagramTransform, positions} from "../components/diagram-svelte/store/layout";
 import dirty from "../components/diagram-svelte/store/dirty";
 import overlay from "../components/diagram-svelte/store/overlay";
+import {diagram} from "../components/diagram-svelte/store/diagram";
 
 
 const initialState = {
@@ -124,13 +125,15 @@ function prepareSaveCmd(state) {
 
 function restoreDiagram(
     commandProcessor,
-    diagram,
+    flowDiagram,
     annotations = [],
     entityNodes = [],
     logicalFlows = [],
-    physicalFlows = [])
-{
-    const layoutData = JSON.parse(diagram.layoutData);
+    physicalFlows = []) {
+
+    diagram.set(flowDiagram);
+
+    const layoutData = JSON.parse(flowDiagram.layoutData);
     const logicalFlowsById = _.keyBy(logicalFlows, "id");
 
     // nodes
@@ -207,12 +210,12 @@ function restoreDiagram(
 
     const titleCommands = [{
         command: "SET_TITLE",
-        payload: diagram.name
+        payload: flowDiagram.name
     }];
 
     const descriptionCommands = [{
         command: "SET_DESCRIPTION",
-        payload: diagram.description
+        payload: flowDiagram.description
     }];
 
     // commandProcessor(annotationCommands);
@@ -221,22 +224,6 @@ function restoreDiagram(
     // commandProcessor(groupCommands);
 }
 
-
-
-
-function addGroup(payload, model) {
-    const group = Object.assign({},
-                                payload,
-                                {id: toGraphId(payload.group)});
-
-    const currentGroups = model.groups || [];
-    const existingIds = _.map(currentGroups, "id");
-    if (_.includes(existingIds, group.id)) {
-        console.log("Ignoring request to add duplicate overlay");
-    } else {
-        model.groups = _.concat(currentGroups, [group]);
-    }
-}
 
 
 export function service(

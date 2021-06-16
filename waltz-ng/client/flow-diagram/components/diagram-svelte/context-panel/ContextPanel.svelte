@@ -146,9 +146,6 @@
         $selectedAnnotation = null;
     }
 
-    $: diagramCall = flowDiagramStore.getById(diagramId, true);
-    $: flowDiagram = $diagramCall.data;
-    $: diagram.set(flowDiagram);
 </script>
 
 <!-- Diagram title -->
