@@ -20,6 +20,7 @@
     import {flowDiagramOverlayGroupStore} from "../../../../svelte-stores/flow-diagram-overlay-group-store";
     import {toGraphId} from "../../../flow-diagram-utils";
     import VisibilityToggles from "./VisibilityToggles.svelte";
+    import RelatedEntitiesPanel from "./RelatedEntitiesPanel.svelte";
 
 
     export let doSave;
@@ -220,6 +221,15 @@
         <span>Filters</span>
     </label>
 
+    <input type="radio"
+           bind:group={selectedTab}
+           value="relationships"
+           id="relationships">
+    <label class="wt-label"
+           for="relationships">
+        <span>Relationships</span>
+    </label>
+
     <div class="wt-tab wt-active">
         <!-- SERVERS -->
         {#if selectedTab === 'context'}
@@ -231,12 +241,14 @@
                 <AnnotationPanel selected="{$selectedAnnotation}" on:cancel={cancel}/>
             {:else}
                 <p class="help-block">Select a node or flow on the diagram to make changes</p>
-                <DefaultPanel doSave={save}/>
+                <DefaultPanel/>
             {/if}
         {:else if selectedTab === 'overlays'}
             <OverlayGroupsPanel {diagramId}/>
         {:else if selectedTab === 'filters'}
             <VisibilityToggles/>
+        {:else if selectedTab === 'relationships'}
+            <RelatedEntitiesPanel {diagramId}/>
         {/if}
     </div>
 </div>

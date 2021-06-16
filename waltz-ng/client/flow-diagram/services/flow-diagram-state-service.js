@@ -173,6 +173,21 @@ function restoreDiagram(
         .forEach(p => positions.move(p))
         .value();
 
+
+    _.chain(entityNodes)
+        .filter(ent => _.includes(["APPLICATION", "ACTOR"], ent.entityReference.kind))
+        .filter(n => {
+
+            console.log({node: n});
+            const hasPosition = layoutData.positions[toGraphId(n.entityReference)];
+            return !hasPosition;
+        })
+        .forEach(n => positions.move({
+            id: toGraphId(n.entityReference),
+            dx: Math.random() * 1000,
+            dy: Math.random() * 1000}))
+        .value()
+
     // annotations
     _.chain(annotations)
         .map(ann => ({

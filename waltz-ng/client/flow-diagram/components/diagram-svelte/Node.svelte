@@ -55,7 +55,7 @@
         } else if (_.includes(associatedGroups, overlayGroup)){
             return overlayGroup.data.fill;
         } else {
-            return "#fdfdfd"
+            return "#eee"
         }
     }
 
@@ -135,7 +135,6 @@
 
         .wfd-node-fade {
             opacity: 0.5;
-            stroke: #EEEEEE;
             color: #bbb;
         }
 
