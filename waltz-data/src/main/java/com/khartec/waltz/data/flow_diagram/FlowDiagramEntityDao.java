@@ -49,7 +49,11 @@ public class FlowDiagramEntityDao {
     private static Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             fde.ENTITY_ID,
             fde.ENTITY_KIND,
-            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
+            newArrayList(
+                    EntityKind.APPLICATION,
+                    EntityKind.ACTOR,
+                    EntityKind.MEASURABLE,
+                    EntityKind.CHANGE_INITIATIVE));
 
 
     private static final RecordMapper<Record, FlowDiagramEntity> TO_DOMAIN_MAPPER = r -> {
@@ -128,7 +132,7 @@ public class FlowDiagramEntityDao {
      * which remain as they are explicitly linked to diagrams, not implicitly
      * stored as part of the the diagram picture.
      *
-     * @param diagramId the diagram to remove entites from
+     * @param diagramId the diagram to remove entities from
      * @return count of removed diagrams
      */
     public int deleteForDiagram(long diagramId) {

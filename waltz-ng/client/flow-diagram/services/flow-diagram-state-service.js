@@ -139,6 +139,12 @@ function restoreDiagram(
         .forEach(ent => newModel.addNode(toGraphNode(ent.entityReference)))
         .value();
 
+    // relationships
+    _.chain(entityNodes)
+        .filter(ent => _.includes(["MEASURABLE", "CHANGE_INITIATIVE"], ent.entityReference.kind))
+        .forEach(ent => newModel.addRelationship(toGraphNode(ent.entityReference)))
+        .value();
+
     // flows
     _.chain(entityNodes)
         .filter(node => node.entityReference.kind === "LOGICAL_DATA_FLOW")
