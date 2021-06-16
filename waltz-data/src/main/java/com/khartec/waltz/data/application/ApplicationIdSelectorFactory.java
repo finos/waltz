@@ -248,7 +248,7 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                 .where(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.LOGICAL_DATA_FLOW.name())
                         .and(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId))));
 
-        Condition applicationConditions = DSL.trueCondition(); //mkApplicationConditions(options);
+        Condition applicationConditions = mkApplicationConditions(options);
 
         SelectConditionStep<Record1<Long>> directlyReferencedApps = DSL
                 .select(flowDiagram.ENTITY_ID)

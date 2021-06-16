@@ -131,24 +131,6 @@
 </div>
 
 
-<!-- FLOW DIAGRAM -->
-<div ng-if="$ctrl.selectedDiagram.type === 'Flow'">
-    <div ng-switch="$ctrl.visibility.flowDiagramMode">
-        <div ng-switch-when="VIEW">
-            <waltz-flow-diagrams-panel-view parent-entity-ref="$ctrl.selectedDiagram.ref"
-                                            on-edit-diagram="$ctrl.onDiagramEdit"
-                                            on-dismiss-diagram="$ctrl.onDiagramDismiss">
-            </waltz-flow-diagrams-panel-view>
-        </div>
-        <div ng-switch-when="EDIT">
-            <waltz-flow-diagram-editor parent-entity-ref="$ctrl.selectedDiagram.ref"
-                                       on-cancel="$ctrl.onEditorClose">
-            </waltz-flow-diagram-editor>
-        </div>
-    </div>
-</div>
-
-
 <!-- MAKE NEW DIAGRAM (template) -->
 <script type="text/ng-template"
         id="weds-make-new-diagram.html">

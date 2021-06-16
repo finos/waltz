@@ -17,7 +17,6 @@
  */
 
 import {remote} from "./remote";
-import {checkIsAuthSourceCreateCommand, checkIsAuthSourceUpdateCommand} from "../common/checks";
 
 export function mkApplicationStore() {
 
@@ -25,8 +24,14 @@ export function mkApplicationStore() {
         return remote.fetchViewData("GET", `api/app/id/${id}`);
     };
 
+
+    const findBySelector = (selector) => {
+        return remote.fetchViewList("POST", "api/app/selector", selector);
+    };
+
     return {
-        getById
+        getById,
+        findBySelector
     };
 }
 

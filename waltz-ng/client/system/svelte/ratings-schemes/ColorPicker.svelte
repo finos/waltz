@@ -1,5 +1,5 @@
 <script>
-    import { createEventDispatcher } from 'svelte';
+    import {createEventDispatcher} from 'svelte';
 
     const dispatch = createEventDispatcher();
 
@@ -9,6 +9,8 @@
     $: selectedColor = startColor;
 
     $: dispatch("select", selectedColor);
+
+    $: console.log({startColor, selectedColor})
 </script>
 
 

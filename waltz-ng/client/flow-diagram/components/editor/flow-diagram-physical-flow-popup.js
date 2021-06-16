@@ -97,6 +97,9 @@ function controller($state) {
     };
 
     vm.update = () => {
+
+        console.log({flows: vm.flows});
+
         const additions = _.filter(vm.flows, f => ! f.existing && f.used);
         const removals = _.filter(vm.flows, f => f.existing && ! f.used);
 

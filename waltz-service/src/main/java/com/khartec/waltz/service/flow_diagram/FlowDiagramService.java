@@ -76,6 +76,7 @@ public class FlowDiagramService {
     private final FlowDiagramDao flowDiagramDao;
     private final FlowDiagramEntityDao flowDiagramEntityDao;
     private final FlowDiagramAnnotationDao flowDiagramAnnotationDao;
+    private final FlowDiagramOverlayGroupService flowDiagramOverlayGroupService;
     private final ApplicationDao applicationDao;
     private final LogicalFlowDao logicalFlowDao;
     private final PhysicalFlowDao physicalFlowDao;
@@ -93,6 +94,7 @@ public class FlowDiagramService {
                               FlowDiagramDao flowDiagramDao,
                               FlowDiagramEntityDao flowDiagramEntityDao,
                               FlowDiagramAnnotationDao flowDiagramAnnotationDao,
+                              FlowDiagramOverlayGroupService flowDiagramOverlayGroupService,
                               ApplicationDao applicationDao,
                               LogicalFlowDao logicalFlowDao,
                               PhysicalFlowDao physicalFlowDao,
@@ -104,6 +106,7 @@ public class FlowDiagramService {
         checkNotNull(flowDiagramDao, "flowDiagramDao cannot be null");
         checkNotNull(flowDiagramEntityDao, "flowDiagramEntityDao cannot be null");
         checkNotNull(flowDiagramAnnotationDao, "flowDiagramAnnotationDao cannot be null");
+        checkNotNull(flowDiagramOverlayGroupService, "flowDiagramOverlayGroupService cannot be null");
         checkNotNull(applicationDao, "applicationDao cannot be null");
         checkNotNull(logicalFlowDao, "logicalFlowDao cannot be null");
         checkNotNull(physicalFlowDao, "physicalFlowDao cannot be null");
@@ -116,6 +119,7 @@ public class FlowDiagramService {
         this.flowDiagramDao = flowDiagramDao;
         this.flowDiagramEntityDao = flowDiagramEntityDao;
         this.flowDiagramAnnotationDao = flowDiagramAnnotationDao;
+        this.flowDiagramOverlayGroupService = flowDiagramOverlayGroupService;
         this.applicationDao = applicationDao;
         this.logicalFlowDao = logicalFlowDao;
         this.physicalFlowDao = physicalFlowDao;
@@ -188,6 +192,8 @@ public class FlowDiagramService {
 
         createEntities(diagramId, command.entities());
         createAnnotations(diagramId, command.annotations());
+
+        flowDiagramOverlayGroupService.updateOverlaysForDiagram(diagramId, command.overlays(), username);
 
         List<EntityReference> newEntities = map(command.entities(), FlowDiagramEntity::entityReference);
         auditEntityChange(mkRef(FLOW_DIAGRAM, diagramId), existingEntities, newEntities, username);
