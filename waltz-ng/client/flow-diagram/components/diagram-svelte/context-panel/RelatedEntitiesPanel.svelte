@@ -29,9 +29,6 @@
 
     $: measurablesById =  _.keyBy(measurables, d => d.id);
 
-
-    $: console.log({relatedEntities});
-
     $: relatedMeasurableIds = _
         .chain(relatedEntities)
         .filter(e => e.entityReference.kind === 'MEASURABLE')
@@ -45,23 +42,17 @@
             .sortBy(d => d?.name)
             .value();
 
-    $: console.log({categoriesById, measurablesById, relatedMeasurableIds})
-
     $: suggestedMeasurables = _
         .chain(measurables)
         .reject(aId => _.includes(relatedMeasurableIds, aId))
         .sortBy(d => d?.name)
         .value();
 
-
-    $: console.log({associatedMeasurables, suggestedMeasurables});
-
-
     let activeMode = Modes.VIEW;
     let associatedMeasurables = [];
 
     function addNode() {
-        activeMode = Modes.ADD_NODE
+        activeMode = Modes.ADD_NODE;
     }
 
 
@@ -83,8 +74,8 @@
             <td>
                 <div >{measurable.name}</div>
                 <div class="small text-muted">
-                    {measurable.categoryId}
-                </div>
+                    {_.get(categoriesById[measurable.categoryId], "name", "unknown")}
+                </div>wal
             </td>
             <td>
                 <button on:click={() => console.log("remove")}
