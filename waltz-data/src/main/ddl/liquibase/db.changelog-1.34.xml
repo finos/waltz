@@ -308,7 +308,18 @@
         </addColumn>
     </changeSet>
 
-    <changeSet id="20210609-5447-1"
+    <changeSet id="20210616-5455-5"
+               author="woodjes">
+        <comment>5455: adding editor role to flow diagram</comment>
+        <addColumn tableName="flow_diagram">
+            <column name="editor_role"
+                    type="${enum.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20210609-5447-2"
                author="woodjes">
         <update tableName="settings">
             <column name="value"
