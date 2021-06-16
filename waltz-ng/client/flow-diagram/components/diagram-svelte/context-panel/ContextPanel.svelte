@@ -23,7 +23,6 @@
     import RelatedEntitiesPanel from "./RelatedEntitiesPanel.svelte";
 
 
-    export let doSave;
     export let diagramId;
     let selectedApp = null;
 

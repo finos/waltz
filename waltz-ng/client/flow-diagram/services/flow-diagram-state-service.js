@@ -177,8 +177,6 @@ function restoreDiagram(
     _.chain(entityNodes)
         .filter(ent => _.includes(["APPLICATION", "ACTOR"], ent.entityReference.kind))
         .filter(n => {
-
-            console.log({node: n});
             const hasPosition = layoutData.positions[toGraphId(n.entityReference)];
             return !hasPosition;
         })

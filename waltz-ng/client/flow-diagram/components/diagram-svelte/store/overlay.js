@@ -116,7 +116,7 @@ function createStore() {
         clearAppliedOverlay: (() => update(s => clearAppliedOverlay(s))),
         setSelectedGroup: (group => update(s => setSelectedGroup(s, group))),
         clearSelectedGroup: (() => update(s => clearSelectedGroup(s))),
-        reset: () => update(s => console.log("reset") || Object.assign({}, initialState))
+        reset: () => update(s => Object.assign({}, initialState))
     };
 }
 

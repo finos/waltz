@@ -5,6 +5,7 @@
     import {flowDiagramEntityStore} from "../../../../svelte-stores/flow-diagram-entity-store";
     import {measurableStore} from "../../../../svelte-stores/measurables";
     import {measurableCategoryStore} from "../../../../svelte-stores/measurable-category-store";
+    import _ from "lodash";
 
     export let diagramId;
 
