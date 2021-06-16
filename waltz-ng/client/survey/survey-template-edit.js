@@ -150,6 +150,8 @@ function controller($q,
                 allowComment: false,
                 position: (currentMaxPos || 0) + 10,
                 externalId: null,
+                parentExternalId: null,
+                label: null,
                 inclusionPredicate: null
             },
             dropdownEntries: []

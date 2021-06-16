@@ -21,6 +21,12 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
                    logicalFilePath="db.changelog-1.34.xml">
 
+    <changeSet id="v1-33-tag"
+               author="davidwatkins73">
+        <tagDatabase tag="v1.33"/> <!-- tag the current db version, i.e. the last  -->
+    </changeSet>
+
+
     <changeSet id="20210609-5447-1"
                author="woodjes">
         <update tableName="settings">
@@ -136,7 +142,7 @@
         </sql>
     </changeSet>
 
-    <changeSet id="20200507-3784-4"
+    <changeSet id="20210611-5395-4"
                author="alimuza">
         <comment>5395: Migrating data from database information to database usage</comment>
         <sql>
@@ -280,15 +286,36 @@
                                  onDelete="CASCADE"/>
     </changeSet>
 
+    <changeSet id="20210614-5466-tag"
+               author="davidwatkins73">
+        <tagDatabase tag="pre5466"/>
+    </changeSet>
 
-    <!--    <changeSet id="20210609-5447-1"-->
-    <!--               author="woodjes">-->
-    <!--        <update tableName="settings">-->
-    <!--            <column name="value"-->
-    <!--                    value="Prod v1.34"/>-->
-    <!--            <where>name='ui.logo.overlay.text'</where>-->
-    <!--        </update>-->
-    <!--    </changeSet>-->
+    <changeSet id="20210614-5466-1"
+               author="davidwatkins73">
+        <comment>5466: adding support for survey subquestions</comment>
+        <addColumn tableName="survey_question">
+            <column name="parent_external_id"
+                    type="${external-id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="survey_question">
+            <column name="label"
+                    type="${name.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20210609-5447-1"
+               author="woodjes">
+        <update tableName="settings">
+            <column name="value"
+                    value="Prod v1.34"/>
+            <where>name='ui.logo.overlay.text'</where>
+        </update>
+    </changeSet>
 
 
 </databaseChangeLog>
