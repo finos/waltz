@@ -16,52 +16,8 @@
   ~
   -->
 
-<div>
 
-    <waltz-svelte-component appId="ctrl.app.id"
-                            component="ctrl.AppEdit">
-    </waltz-svelte-component>
+<waltz-svelte-component app-id="ctrl.application.id"
+                        component="ctrl.AppEdit">
+</waltz-svelte-component>
 
-    <br>
-
-
-    <waltz-page-header icon="edit"
-                       name="{{ ctrl.application.name }}"
-                       small="Editor">
-        <breadcrumbs>
-            <ol class="waltz-breadcrumbs">
-                <li><a ui-sref="main">Home</a></li>
-                <li><a ui-sref="main.app.view ({ id: ctrl.application.id })">{{ ctrl.application.name }}</a></li>
-                <li>Edit</li>
-            </ol>
-        </breadcrumbs>
-    </waltz-page-header>
-
-
-
-    <div class="waltz-page-summary waltz-page-summary-attach">
-        <form ng-submit="ctrl.onSubmit()"
-              name="ctrl.form"
-              novalidate>
-            <formly-form form="ctrl.form"
-                         model="ctrl.formModel"
-                         fields="ctrl.fieldLayout">
-
-            </formly-form>
-
-            <hr/>
-
-            <input type="submit"
-                   ng-disabled="ctrl.form.$pristine || ctrl.form.$invalid"
-                   value="Save"
-                   style="margin-left: 12px"
-                   class="btn btn-success">
-
-            <a ui-sref="main.app.view ({ id: ctrl.application.id })"
-               class="clickable">
-                Cancel
-            </a>
-        </form>
-    </div>
-
-</div>

@@ -29,6 +29,7 @@ import {
     overallRatingField,
     businessCriticalityField
 } from "../../formly/fields";
+// import AppEdit from "../edit/AppEdit.svelte";
 
 
 import template from "./app-registration.html";

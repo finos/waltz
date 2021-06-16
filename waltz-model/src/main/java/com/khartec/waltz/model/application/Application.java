@@ -74,6 +74,7 @@ public abstract class Application implements
     @Value.Default
     public Criticality businessCriticality() { return Criticality.UNKNOWN; }
 
+
     public EntityReference entityReference() {
         return ImmutableEntityReference.builder()
                 .kind(EntityKind.APPLICATION)

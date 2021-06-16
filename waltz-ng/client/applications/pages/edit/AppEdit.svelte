@@ -7,6 +7,8 @@
     import {applicationKind} from "../../../common/services/enums/application-kind";
     import {lifecyclePhase} from "../../../common/services/enums/lifecycle-phase";
     import {criticality} from "../../../common/services/enums/criticality";
+    import {applicationStore} from "../../../svelte-stores/application-store";
+    import EntityLink from "../../../common/svelte/EntityLink.svelte";
 
     const kinds = _.values(applicationKind);
     const phases = _.values(lifecyclePhase);
@@ -23,25 +25,86 @@
         ];
     }
 
-    $: invalid = console.log(getRequiredFields($formData)) || _.some(
-        getRequiredFields($formData),
-        v => _.isNumber(v)
-            ? _.isNil(v)
-            : _.isEmpty(v));
+    function toFormData(d) {
+        return {
+            name: d.name,
+            description: d.description,
+            assetCode: d.assetCode,
+            parentAssetCode: d.parentAssetCode,
+            overallRating: d.overallRating,
+            applicationKind: d.applicationKind,
+            lifecyclePhase: d.lifecyclePhase,
+            businessCriticality: d.businessCriticality,
+            organisationalUnitId: d.organisationalUnitId
+        };
+    }
+
+    function mkChanges(newObj, oldObj) {
+        // note, in the the following nv = new value, ov = old value, k = property key
+        return _
+            .chain(newObj)
+            .map((nv, k) => ({k, nv, ov: oldObj[k]}))
+            .filter(d => d.nv !== d.ov)
+            .map(d => ({
+                key: d.k,
+                name: d.k,
+                dirty: true,
+                original: d.ov,
+                current: d.nv
+            }))
+            .value();
+    }
+
+    function prepSubmission(data) {
+        return {
+            app: Object.assign({}, data, {id: appId}),
+            changes: mkChanges(data, origData)
+        }
+    }
+
+    function hasNoChanges(newData, oldData) {
+        if (! oldData) {
+            return false;
+        } else {
+            return _.isEmpty(mkChanges(newData, oldData));
+        }
+    }
+
+    export let appId = null;
+
+    $: appLoadCall = appId && applicationStore.getById(appId);
+    $: existingApp = $appLoadCall.data;
+    $: origData = toFormData(existingApp);
+    $: $formData = toFormData(existingApp);
+
+    $: invalid = hasNoChanges($formData, origData) ||
+        _.some(
+            getRequiredFields($formData),
+            v => _.isNumber(v)
+                ? _.isNil(v)
+                : _.isEmpty(v));
 
     function save() {
-        console.log("Saving", $formData);
+        const data = prepSubmission($formData);
+        applicationStore
+            .update(appId, data)
+            .then(d => history.back());
     }
 </script>
 
 
 <PageHeader icon="edit"
-            small={$formData?.name}
+            small={origData ? origData.name : "New"}
             name="App Edit">
     <div slot="breadcrumbs">
         <ol class="waltz-breadcrumbs">
             <li><ViewLink state="main">Home</ViewLink></li>
             <li>Applications</li>
+            {#if existingApp}
+                <li><EntityLink ref={existingApp}/></li>
+            {:else}
+                <li>New</li>
+            {/if}
         </ol>
     </div>
 </PageHeader>
@@ -49,12 +112,10 @@
 
 <div class="waltz-page-summary waltz-page-summary-attach">
 
-    <pre>{JSON.stringify($formData, "", null)}</pre>
-
     <form autocomplete="off"
           on:submit|preventDefault={save}>
         <div class="row">
-            <div class="col-md-8">
+            <div class="col-sm-8">
                 <div class="form-group">
                     <!-- NAME -->
                     <label for="name">
@@ -93,13 +154,13 @@
                               id="description"
                               bind:value={$formData.description}
                               maxlength="4000"
-                              rows="11"></textarea>
+                              rows="16"></textarea>
                     <div class="help-block">
                         Basic markdown formatting is supported
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-sm-4">
 
                 <!-- ASSET CODE -->
                 <label for="assetCode">
@@ -111,6 +172,18 @@
                        bind:value={$formData.assetCode}/>
                 <div class="help-block">
                     Asset code/external identifier for the application
+                </div>
+
+                <!-- ASSET CODE -->
+                <label for="parentAssetCode">
+                    Parent Asset Code
+                </label>
+                <input class="form-control"
+                       id="parentAssetCode"
+                       placeholder="Parent Asset code"
+                       bind:value={$formData.parentAssetCode}/>
+                <div class="help-block">
+                    Parent asset code/external identifier for the application
                 </div>
 
                 <!-- OVERALL RATING -->
