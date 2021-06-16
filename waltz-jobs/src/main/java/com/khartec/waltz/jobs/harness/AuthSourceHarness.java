@@ -56,7 +56,7 @@ public class AuthSourceHarness {
 //        AuthSourceRatingCalculator authSourceRatingCalculatorCalculator = ctx.getBean(AuthSourceRatingCalculator.class);
 //        LogicalFlowDecoratorRatingsCalculator flowCalculator = ctx.getBean(LogicalFlowDecoratorRatingsCalculator.class);
 //        LogicalFlowDecoratorSummaryDao decoratorDao = ctx.getBean(LogicalFlowDecoratorSummaryDao.class);
-        AuthoritativeSourceDao dao = ctx.getBean(AuthoritativeSourceDao.class);
+//        AuthoritativeSourceDao dao = ctx.getBean(AuthoritativeSourceDao.class);
 
 
 //        boolean b = svc.fastRecalculateAllFlowRatings();
@@ -65,8 +65,7 @@ public class AuthSourceHarness {
 //        List<EntityHierarchyItem> desendents = ehDao.findDesendents(EntityReference.mkRef(EntityKind.DATA_TYPE, 41300));
 //        updateDecoratorsForAuthSource(dsl);
 
-        FunctionUtilities.time("Actor rating", () -> dao.updatePointToPointAuthStatements());
-//        FunctionUtilities.time("Fast Flow Ratings", svc::fastRecalculateAllFlowRatings);
+        FunctionUtilities.time("Fast Flow Ratings", svc::fastRecalculateAllFlowRatings);
 
 //        FunctionUtilities.time("Flow ratings", () -> svc.recalculateAllFlowRatings());
 
