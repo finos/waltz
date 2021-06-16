@@ -27,7 +27,6 @@ import com.khartec.waltz.model.database_information.DatabaseSummaryStatistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -60,13 +59,13 @@ public class DatabaseInformationService {
         return databaseInformationDao.calculateStatsForAppSelector(factory.apply(options));
     }
 
-    public DatabaseInformation findById(long id) {
+    public DatabaseInformation getById(long id) {
         checkNotNull(id, "id cannot be null");
-        return databaseInformationDao.findById(id);
+        return databaseInformationDao.getById(id);
     }
 
-    public DatabaseInformation findByExternalId(String externalId) {
+    public DatabaseInformation getByExternalId(String externalId) {
         checkNotNull(externalId, " external id cannot be null");
-        return databaseInformationDao.findByExternalId(externalId);
+        return databaseInformationDao.getByExternalId(externalId);
     }
 }
