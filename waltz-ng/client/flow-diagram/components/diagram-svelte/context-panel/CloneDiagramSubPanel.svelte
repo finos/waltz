@@ -4,6 +4,7 @@
     import _ from "lodash";
     import {diagram} from "../store/diagram";
     import {flowDiagramStore} from "../../../../svelte-stores/flow-diagram-store";
+    import EntityLink from "../../../../common/svelte/EntityLink.svelte";
 
     export let diagramId;
 
@@ -17,9 +18,15 @@
 
     }
 
-    function saveClone(){
-        flowDiagramStore.clone(diagramId, newName);
-        cancel();
+    let newDiagram;
+
+    function saveClone() {
+        savePromise = flowDiagramStore.clone(diagramId, newName);
+
+        savePromise
+            .then(r => r.subscribe(d => newDiagram = d.data));
+
+        return savePromise;
     }
 
 </script>
@@ -29,17 +36,23 @@
 <form autocomplete="off"
       on:submit|preventDefault={saveClone}>
 
-    <div class="form-group">
-        <label for="name">
-            Name:
-            <span style="color: darkred">*</span>
-        </label>
-        <input class="form-control"
-               id="name"
-               bind:value={newName}/>
-    </div>
-    <p class="text-muted">Name for the cloned diagram</p>
-
+    {#if _.isNil(newDiagram)}
+        <div class="form-group">
+            <label for="name">
+                Name:
+                <span style="color: darkred">*</span>
+            </label>
+            <input class="form-control"
+                   id="name"
+                   bind:value={newName}/>
+        </div>
+        <p class="text-muted">Name for the cloned diagram</p>
+    {:else}
+        <div>
+            <EntityLink ref={newDiagram}/>
+        </div>
+        <br>
+    {/if}
     <button class="btn btn-success"
             type="submit"
             disabled={_.isNil(newName) || _.isEmpty(newName) || savePromise}>
@@ -49,24 +62,24 @@
             on:click|preventDefault={cancel}>
         Cancel
     </button>
+    {#if savePromise}
+        {#await savePromise}
+            Saving...
+        {:then r}
+            Saved!
+        {:catch e}
+            <div class="alert alert-warning">
+                Failed to clone diagram. Reason: {e.error}
+                <button class="btn-link"
+                        on:click={() => savePromise = null}>
+                    <Icon name="check"/>
+                    Okay
+                </button>
+            </div>
+        {/await}
+    {/if}
 </form>
 
-{#if savePromise}
-    {#await savePromise}
-        Saving...
-    {:then r}
-        Saved!
-    {:catch e}
-        <div class="alert alert-warning">
-            Failed to clone diagram. Reason: {e.error}
-            <button class="btn-link"
-                    on:click={() => savePromise = null}>
-                <Icon name="check"/>
-                Okay
-            </button>
-        </div>
-    {/await}
-{/if}
 
 
 <style>
