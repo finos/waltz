@@ -314,6 +314,8 @@ public class FlowDiagramService {
                 return makeForApplication(ref, userId, title);
             case ACTOR:
                 return makeForActor(ref, userId, title);
+            case LOGICAL_DATA_FLOW:
+                return makeForLogicalFlow(ref, userId, title);
             case PHYSICAL_FLOW:
                 return makeForPhysicalFlow(ref, userId, title);
             case PHYSICAL_SPECIFICATION:
@@ -325,6 +327,21 @@ public class FlowDiagramService {
             default:
                 throw new UnsupportedOperationException("Cannot make diagram for entity: "+ref);
         }
+    }
+
+    private Long makeForLogicalFlow(EntityReference ref, String userId, String providedTitle) {
+        LogicalFlow logicalFlow = logicalFlowDao.getByFlowId(ref.id());
+
+        String title = isEmpty(providedTitle)
+                ? format("%s -> %s flow diagram", logicalFlow.source().name(), logicalFlow.target().name())
+                : providedTitle;
+
+        ArrayList<FlowDiagramEntity> entities = newArrayList(
+                mkDiagramEntity(logicalFlow),
+                mkDiagramEntity(logicalFlow.source()),
+                mkDiagramEntity(logicalFlow.target()));
+
+        return mkNewFlowDiagram(title, userId, entities, emptyList());
     }
 
 
@@ -503,6 +520,5 @@ public class FlowDiagramService {
                 .isNotable(true)
                 .build();
     }
-
 
 }
