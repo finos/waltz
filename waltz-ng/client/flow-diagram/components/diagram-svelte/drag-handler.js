@@ -3,7 +3,7 @@ import {drag} from "d3-drag";
 import {positions} from "./store/layout";
 
 
-export function mkDragHandler(node, processor) {
+export function mkDragHandler(node) {
     let dragStartPos = null;
 
     function dragStarted() {

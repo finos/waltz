@@ -2,7 +2,7 @@
     import NodeLayer from "./NodeLayer.svelte";
     import FlowLayer from "./FlowLayer.svelte";
     import AnnotationLayer from "./AnnotationLayer.svelte";
-    import {processor, selectedAnnotation, selectedFlow, selectedNode, store} from "./diagram-model-store";
+    import {selectedAnnotation, selectedFlow, selectedNode, store} from "./diagram-model-store";
     import {event, select} from "d3-selection";
     import {zoom} from "d3-zoom";
     import ContextPanel from "./context-panel/ContextPanel.svelte";
@@ -38,9 +38,8 @@
 
     /**
      * Pan and zoom only enabled if ctrl or meta key is held down.
-     * @param commandProcessor
      */
-    function setupPanAndZoom(commandProcessor) {
+    function setupPanAndZoom() {
         function zoomed() {
             const t = event.transform;
             $diagramTransform = t;
@@ -78,7 +77,7 @@
         .selectAll(".wfd-flow-lifecycle-PENDING")
         .style("display", $visibility.pendingFlows ? "" : "none");
 
-    $: elem && setupPanAndZoom($processor);
+    $: elem && setupPanAndZoom();
 
 
     $: console.log("FlowDiag:", {diag: $diagram, store: $store, overlay: $overlay, model: $model, positions: $positions});
@@ -86,7 +85,7 @@
 </script>
 
 
-{#if $diagram?.id} <!--//$store.diagramId}-->
+{#if $diagram?.id}
 <div class="col-md-8 diagram-svg">
     <svg viewBox="0 0 1100 600"
          width="100%"
@@ -114,7 +113,7 @@
     </svg>
 </div>
 <div class="col-md-4 context-menu">
-    <ContextPanel diagramId={$diagram.id} {doSave}/> <!--//$store.diagramId} {doSave}/>-->
+    <ContextPanel diagramId={$diagram.id}/>
 </div>
 {/if}
 

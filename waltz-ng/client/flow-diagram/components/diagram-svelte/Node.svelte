@@ -65,7 +65,7 @@
     $: width = nameElem && nameElem.getComputedTextLength() + 30;
     $: shape = node && shapes[node.data.kind](width);
     $: transform = node && `translate(${positions[node.id].x} ${positions[node.id].y})`;
-    $: dragHandler = mkDragHandler(node, $processor)
+    $: dragHandler = mkDragHandler(node)
     $: select(gElem).call(dragHandler);
 
     $: associatedGroups = _.filter(groups, g => _.includes(g.data.applicationIds, node.data.id))

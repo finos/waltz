@@ -21,7 +21,7 @@
 
     let activeMode = Modes.VIEW;
 
-    $: measurablesCall = measurableStore.findMeasurablesBySelector(mkSelectionOptions(mkRef('FLOW_DIAGRAM', diagramId)));
+    $: measurablesCall = measurableStore.findMeasurablesBySelector(mkSelectionOptions(mkRef('FLOW_DIAGRAM', diagramId)), true);
     $: measurables = $measurablesCall.data;
     $: measurablesById = _.keyBy(measurables, d => d.id);
 

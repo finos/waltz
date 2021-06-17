@@ -57,7 +57,7 @@
             .call(wrapText, 115);
     }
 
-    $: dragHandler = mkDragHandler(annotation, $processor)
+    $: dragHandler = mkDragHandler(annotation)
     $: select(elbowElem).call(dragHandler);
 
     function selectAnnotation(){

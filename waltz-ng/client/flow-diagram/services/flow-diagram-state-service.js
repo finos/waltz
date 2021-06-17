@@ -339,7 +339,7 @@ export function service(
                     .all(overlayPromises)
                     .then((overlaysWithApps) => overlaysWithApps.forEach(o => overlay.addOverlay(o)));
 
-                state.dirty = false;
+                dirty.set(false);
             })
             .then(() => getState());
     };
@@ -354,13 +354,13 @@ export function service(
             //     // state = _.defaultsDeep({}, { layout: { diagramTransform : payload }}, state);
             //     break;
 
-            case "SET_TITLE":
-                model.title = payload;
-                break;
-
-            case "SET_DESCRIPTION":
-                model.description = payload;
-                break;
+            // case "SET_TITLE":
+            //     model.title = payload;
+            //     break;
+            //
+            // case "SET_DESCRIPTION":
+            //     model.description = payload;
+            //     break;
 
                 // /* MOVE
                 //     payload = { dx, dy, id, refId? }
@@ -491,10 +491,10 @@ export function service(
                 //     model.groups = _.reject(model.groups, a => a.id === payload.id );
                 //     break;
 
-            case "SET_POSITION":
-                positions.setPosition(payload);
-                // state.layout.positions[payload.id] = { x: payload.x, y: payload.y };
-                break;
+            // case "SET_POSITION":
+            //     positions.setPosition(payload);
+            //     // state.layout.positions[payload.id] = { x: payload.x, y: payload.y };
+            //     break;
 
 
             default:

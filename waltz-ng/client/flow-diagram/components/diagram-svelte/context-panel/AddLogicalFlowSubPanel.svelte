@@ -28,16 +28,16 @@
 
     $: existingFlows = _.map($model.flows, d => d.data);
     $: existingNodes = _.map($model.nodes, d => d.data);
-    $: possibleFlows = mkFlows(logicalFlows, $selectedNode, direction === Directions.UPSTREAM, existingNodes);
+    $: possibleFlows = mkFlows(logicalFlows, $selectedNode, direction === Directions.UPSTREAM, existingFlows);
 
     $: checkedFlows = _.filter(possibleFlows, d => d.used);
 
     function updateFlows() {
         const updates = prepareUpdateCommands(
             possibleFlows,
-            existingNodes,
             direction === Directions.UPSTREAM,
-            $selectedNode);
+            $selectedNode,
+            existingFlows);
 
         updates.nodeAdditions.forEach(model.addNode);
         updates.flowAdditions.forEach(model.addFlow);

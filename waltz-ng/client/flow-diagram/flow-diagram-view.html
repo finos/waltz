@@ -43,13 +43,6 @@
 
     <div class="row">
         <div class="col-md-12">
-            <div class="small text-muted">
-                Last updated by
-                <span ng-bind="ctrl.diagram.lastUpdatedBy"></span>
-                (<waltz-from-now timestamp="ctrl.diagram.lastUpdatedAt"></waltz-from-now>)
-            </div>
-            <br/>
-
             <!-- HELP -->
             <div class="help-block small small">
                 This diagram may be moved and resized by holding down
@@ -57,39 +50,6 @@
                 and dragging and/or zooming.
             </div>
             <br>
-            <div>
-                <h5>Toggle Layers</h5>
-                <div class="small">
-                    <waltz-toggle style='display:block'
-                                  label-on="Annotations"
-                                  label-off="Annotations"
-                                  state="ctrl.visibility.layers.annotations"
-                                  on-toggle="ctrl.toggleLayer('annotations')">
-                    </waltz-toggle>
-                    <waltz-toggle style='display:block'
-                                  label-on="Physical Flows"
-                                  label-off="Physical Flows"
-                                  state="ctrl.visibility.layers.flowBuckets"
-                                  on-toggle="ctrl.toggleLayer('flowBuckets')">
-                    </waltz-toggle>
-                    <waltz-toggle style='display:block'
-                                  label-on="Pending Flows"
-                                  label-off="Pending Flows"
-                                  state="ctrl.visibility.layers.pendingFlows"
-                                  on-toggle="ctrl.toggleLayer('pendingFlows')">
-                    </waltz-toggle>
-                    <waltz-toggle style='display:block'
-                                  label-on="Removed Flows"
-                                  label-off="Removed Flows"
-                                  state="ctrl.visibility.layers.removedFlows"
-                                  on-toggle="ctrl.toggleLayer('removedFlows')">
-                    </waltz-toggle>
-                </div>
-                <div class="help-block small small">
-                    Toggle the layers to show more/less detail.
-                </div>
-            </div>
-
         </div>
     </div>
 
