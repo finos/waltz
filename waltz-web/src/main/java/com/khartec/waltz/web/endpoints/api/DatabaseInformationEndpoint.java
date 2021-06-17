@@ -50,8 +50,8 @@ public class DatabaseInformationEndpoint implements Endpoint {
     public void register() {
 
         String findForAppPath = mkPath(BASE_URL, "app", ":id");
-        String findForIdPath = mkPath(BASE_URL, ":id");
-        String findForExternalIdPath = mkPath(BASE_URL, "external-id", ":externalId");
+        String getByIdPath = mkPath(BASE_URL, ":id");
+        String getByExternalIdPath = mkPath(BASE_URL, "external-id", ":externalId");
         String findForAppSelectorPath = mkPath(BASE_URL);
         String calculateStatsForAppIdSelectorPath = mkPath(BASE_URL, "stats");
 
@@ -59,11 +59,11 @@ public class DatabaseInformationEndpoint implements Endpoint {
         ListRoute<DatabaseInformation> findForAppRoute = (request, response)
                 -> databaseInformationService.findByApplicationId(getId(request));
 
-        DatumRoute<DatabaseInformation> findForIdRoute = (request, response)
-                -> databaseInformationService.findById(getId(request));
+        DatumRoute<DatabaseInformation> getByIdRoute = (request, response)
+                -> databaseInformationService.getById(getId(request));
 
-        DatumRoute<DatabaseInformation> findForExternalIdRoute = (request, response)
-                -> databaseInformationService.findByExternalId(request.params("externalId"));
+        DatumRoute<DatabaseInformation> getByExternalIdRoute = (request, response)
+                -> databaseInformationService.getByExternalId(request.params("externalId"));
 
         ListRoute<ApplicationDatabases> findForAppSelectorRoute = (request, response)
                 -> databaseInformationService.findByApplicationSelector(readIdSelectionOptionsFromBody(request))
@@ -82,8 +82,8 @@ public class DatabaseInformationEndpoint implements Endpoint {
         getForList(findForAppPath, findForAppRoute);
         postForList(findForAppSelectorPath, findForAppSelectorRoute);
         postForDatum(calculateStatsForAppIdSelectorPath, calculateStatsForAppIdSelectorRoute);
-        getForDatum(findForIdPath, findForIdRoute);
-        getForDatum(findForExternalIdPath, findForExternalIdRoute);
+        getForDatum(getByIdPath, getByIdRoute);
+        getForDatum(getByExternalIdPath, getByExternalIdRoute);
 
     }
 }
