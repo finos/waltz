@@ -76,6 +76,7 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .isReadonly(record.getIsReadonly())
+                .authSourceId(Optional.ofNullable(record.getAuthSourceId()))
                 .build();
     };
 
@@ -92,6 +93,7 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
         r.setLastUpdatedAt(Timestamp.valueOf(d.lastUpdatedAt()));
         r.setLastUpdatedBy(d.lastUpdatedBy());
         r.setIsReadonly(d.isReadonly());
+        d.authSourceId().ifPresent(r::setAuthSourceId);
         return r;
     };
 
@@ -258,6 +260,7 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
         Function2<Condition, String, Update<LogicalFlowDecoratorRecord>> mkQuery = (appScopingCondition, ratingName) -> dsl
                 .update(LOGICAL_FLOW_DECORATOR)
                 .set(LOGICAL_FLOW_DECORATOR.RATING, ratingName)
+                .set(LOGICAL_FLOW_DECORATOR.AUTH_SOURCE_ID, ratingVantagePoint.authSourceId())
                 .where(LOGICAL_FLOW_DECORATOR.ID.in(
                         DSL.select(lfd.ID)
                                 .from(lfd)

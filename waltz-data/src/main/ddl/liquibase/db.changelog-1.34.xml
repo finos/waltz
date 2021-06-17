@@ -286,11 +286,6 @@
                                  onDelete="CASCADE"/>
     </changeSet>
 
-    <changeSet id="20210614-5466-tag"
-               author="davidwatkins73">
-        <tagDatabase tag="pre5466"/>
-    </changeSet>
-
     <changeSet id="20210614-5466-1"
                author="davidwatkins73">
         <comment>5466: adding support for survey subquestions</comment>
@@ -326,6 +321,30 @@
                     value="Prod v1.34"/>
             <where>name='ui.logo.overlay.text'</where>
         </update>
+    </changeSet>
+
+
+    <!--5444: Add auth source id to decorator table-->
+    <changeSet id="20210602-5444-1"
+               author="woodjes">
+        <comment>5444: adding auth source id column to logical flow decorator</comment>
+        <addColumn tableName="logical_flow_decorator">
+            <column name="auth_source_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20210602-5444-2"
+               author="woodjes">
+        <comment>5444: adding auth source id column to logical flow decorator</comment>
+        <addForeignKeyConstraint baseColumnNames="auth_source_id"
+                                 baseTableName="logical_flow_decorator"
+                                 constraintName="lfd_auth_source_id_fkey"
+                                 onDelete="SET NULL"
+                                 referencedColumnNames="id"
+                                 referencedTableName="authoritative_source"/>
     </changeSet>
 
 
