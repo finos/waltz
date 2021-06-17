@@ -1,6 +1,5 @@
 <script>
     import {select} from "d3-selection";
-    import {processor} from "./diagram-model-store";
     import {mkDragHandler} from "./drag-handler";
     import {createEventDispatcher} from "svelte";
     import _ from "lodash";
@@ -20,7 +19,7 @@
             cy: 10,
             title: {
                 dx: 8,
-                dy: 13
+                dy: 14
             }
         };
     }
@@ -32,7 +31,7 @@
             cy: 10,
             title: {
                 dx: 4,
-                dy: 13
+                dy: 14
             }
         };
         return shape
@@ -63,7 +62,7 @@
     let gElem;
 
     $: console.log({node, nameElem, width})
-    $: width = nameElem && nameElem.getComputedTextLength() + 30;
+    $: width = nameElem && determineWidth(nameElem, associatedGroups);
     $: shape = node && shapes[node.data.kind](width);
     $: transform = node && `translate(${positions[node.id].x} ${positions[node.id].y})`;
     $: dragHandler = mkDragHandler(node)
@@ -72,6 +71,13 @@
     $: associatedGroups = _.filter(groups, g => _.includes(g.data.applicationIds, node.data.id))
 
     $: fill = determineFill($overlay.appliedOverlay, associatedGroups);
+
+
+    function determineWidth(elem, icons){
+        const textWidth = elem.getComputedTextLength() + 24
+        const iconsWidth = _.size(icons) * 12 + 6
+        return textWidth > iconsWidth ? textWidth : iconsWidth
+    }
 
 </script>
 
@@ -85,7 +91,8 @@
           fill={fill}
           class:wfd-node-overlay={_.includes(associatedGroups, $overlay.appliedOverlay)}
           class:wfd-node-fade={$overlay.appliedOverlay && !_.includes(associatedGroups, $overlay.appliedOverlay)}
-          stroke="#ccc">
+          stroke="#ccc"
+          style="padding-top: 20px">
     </path>
     <text style="font-size: small;"
           class:wfd-node-fade={$overlay.appliedOverlay && !_.includes(associatedGroups, $overlay.appliedOverlay)}
