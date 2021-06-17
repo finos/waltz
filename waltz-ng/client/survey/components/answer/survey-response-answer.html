@@ -1,0 +1,62 @@
+<div class="wsirv-answer">
+
+    <label ng-if="$ctrl.question.label"
+           ng-attr-for="{{$ctrl.question.id}}"
+           ng-bind="$ctrl.question.label">
+    </label>
+
+    <div ng-switch="$ctrl.question.fieldType">
+        <div ng-switch-when="BOOLEAN"
+             class="wsirv-boolean">
+            <waltz-boolean-renderer value="$ctrl.answer.booleanResponse">
+            </waltz-boolean-renderer>
+        </div>
+        <div ng-switch-when="APPLICATION|PERSON"
+             ng-switch-when-separator="|"
+             class="wsirv-entity">
+            <waltz-entity-link entity-ref="$ctrl.answer.entityResponse">
+            </waltz-entity-link>
+        </div>
+        <div ng-switch-when="NUMBER"
+             class="wsirv-number">
+            <span ng-bind="$ctrl.answer.numberResponse | number">
+            </span>
+        </div>
+        <div ng-switch-when="DATE"
+             class="wsirv-data">
+            <span ng-bind="$ctrl.answer.dateResponse | date:'dd-MMM-yyyy'">
+            </span>
+        </div>
+        <div ng-switch-when="TEXTAREA|TEXT"
+             ng-switch-when-separator="|"
+             class="wsirv-text">
+            <waltz-markdown text="$ctrl.answer.stringResponse">
+            </waltz-markdown>
+        </div>
+        <div ng-switch-when="DROPDOWN_MULTI_SELECT"
+             class="wsirv-dropdown-multi">
+            <ul class="">
+                <li ng-repeat="item in $ctrl.answer.listResponse">
+                    <span ng-bind="item">
+                    </span>
+                </li>
+            </ul>
+        </div>
+        <div ng-switch-when="MEASURABLE_MULTI_SELECT"
+             class="wsirv-measurable-multi">
+            <waltz-survey-question-measurable-renderer question="$ctrl.question"
+                                                       list-response="$ctrl.answer.entityListResponse">
+            </waltz-survey-question-measurable-renderer>
+        </div>
+        <div ng-switch-default
+             class="wsirv-string">
+                <span ng-bind="$ctrl.answer.stringResponse">
+                </span>
+        </div>
+    </div>
+    <div class='small text-muted'
+         ng-if="$ctrl.answer.comment">
+        <strong>Comment:</strong>
+        <waltz-markdown text="$ctrl.answer.comment"></waltz-markdown>
+    </div>
+</div>

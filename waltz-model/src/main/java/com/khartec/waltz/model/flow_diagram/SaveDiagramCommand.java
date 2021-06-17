@@ -31,6 +31,7 @@ import org.immutables.value.Value;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableSaveDiagramCommand.class)
@@ -44,4 +45,6 @@ public abstract class SaveDiagramCommand implements Command, NameProvider, Descr
     public abstract List<FlowDiagramEntity> entities();
 
     public abstract List<FlowDiagramAnnotation> annotations();
+
+    public abstract Set<FlowDiagramOverlayGroupEntry> overlays();
 }

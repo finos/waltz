@@ -22,6 +22,7 @@ import template from "./entity-diagrams-section.html";
 import {refToString, toEntityRef} from "../../../common/entity-utils";
 import {determineIfCreateAllowed} from "../../../flow-diagram/flow-diagram-utils";
 import {displayError} from "../../../common/error-utils";
+import {kindToViewState} from "../../../common/link-utils";
 
 
 const bindings = {
@@ -83,23 +84,24 @@ function selectInitialDiagram(diagrams = [], selectedDiagram) {
 
 
 function controller($q,
+                    $state,
                     serviceBroker,
                     notification) {
     const vm = initialiseData(this, initialState);
 
     const loadFlowDiagrams = (force = true) => serviceBroker
-            .loadViewData(
-                CORE_API.FlowDiagramStore.findByEntityReference,
-                [ vm.parentEntityRef ],
-                { force })
-            .then(r => r.data);
+        .loadViewData(
+            CORE_API.FlowDiagramStore.findByEntityReference,
+            [ vm.parentEntityRef ],
+            { force })
+        .then(r => r.data);
 
     const loadEntitySvgDiagrams = (force = false) => serviceBroker
-            .loadViewData(
-                CORE_API.EntitySvgDiagramStore.findByEntityReference,
-                [ vm.parentEntityRef ],
-                { force  })
-            .then(r => r.data);
+        .loadViewData(
+            CORE_API.EntitySvgDiagramStore.findByEntityReference,
+            [ vm.parentEntityRef ],
+            { force  })
+        .then(r => r.data);
 
     const flowActions = [
         {
@@ -131,7 +133,8 @@ function controller($q,
             loadFlowDiagrams(true),
             loadEntitySvgDiagrams(false)
         ];
-        return $q.all(promises)
+        return $q
+            .all(promises)
             .then(([flowDiagrams = [], svgDiagrams = []]) => {
                 vm.diagrams = combineDiagrams(flowDiagrams, svgDiagrams, flowActions);
                 vm.selectedDiagram = selectInitialDiagram(vm.diagrams, vm.selectedDiagram);
@@ -150,11 +153,14 @@ function controller($q,
     vm.onDiagramSelect = (diagram) => {
         vm.selectedDiagram = diagram;
         vm.visibility.flowDiagramMode = "VIEW";
+
+        if(diagram.type === 'Flow'){
+            $state.go(kindToViewState("FLOW_DIAGRAM"), {id: diagram.ref.id});
+        }
     };
 
     vm.onDiagramDismiss = () => {
         vm.selectedDiagram = null;
-        reload();
     };
 
     vm.onEditorClose = () => {
@@ -181,13 +187,12 @@ function controller($q,
         serviceBroker
             .execute(CORE_API.FlowDiagramStore.makeNewForEntityReference, [vm.parentEntityRef, name])
             .then(r => {
-                newDiagramId = `FLOW_DIAGRAM/${r.data}`;
-                return reload();
+                reload();
+                return r.data;
             })
-            .then(diagrams => {
+            .then(diagramId => {
                 notification.success("Diagram created, click edit if you wish to make changes");
-                const newDiagram = _.find(diagrams, { id:  newDiagramId });
-                vm.onDiagramSelect(newDiagram);
+                $state.go(kindToViewState("FLOW_DIAGRAM"), {id: diagramId});
             })
             .catch(e => displayError(notification, "Failed to create new diagram", e));
     };
@@ -196,6 +201,7 @@ function controller($q,
 
 controller.$inject = [
     "$q",
+    "$state",
     "ServiceBroker",
     "Notification"
 ];

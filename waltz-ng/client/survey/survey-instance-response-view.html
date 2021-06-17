@@ -95,7 +95,7 @@
                      style="margin-bottom: 0.5em;"
                      data-question-ext-id="{{question.externalId}}"
                      data-question-id="{{question.id}}">
-                    <div class="col-sm-4">
+                    <div class="col-md-3">
                         <span ng-bind="question.questionText"
                               uib-popover="{{question.helpText}}"
                               popover-enable="question.helpText"
@@ -109,61 +109,21 @@
                                     name="info-circle">
                         </waltz-icon>
                     </div>
-                    <div class="col-sm-6">
-                        <div class="wsirv-answer">
-                            <div ng-switch="question.fieldType">
-                                <div ng-switch-when="BOOLEAN"
-                                     class="wsirv-boolean">
-                                    <waltz-boolean-renderer value="ctrl.answersById[question.id].booleanResponse">
-                                    </waltz-boolean-renderer>
-                                </div>
-                                <div ng-switch-when="APPLICATION|PERSON"
-                                     ng-switch-when-separator="|"
-                                     class="wsirv-entity">
-                                    <waltz-entity-link entity-ref="ctrl.answersById[question.id].entityResponse">
-                                    </waltz-entity-link>
-                                </div>
-                                <div ng-switch-when="NUMBER"
-                                     class="wsirv-number">
-                                    <span ng-bind="ctrl.answersById[question.id].numberResponse | number">
-                                    </span>
-                                </div>
-                                <div ng-switch-when="DATE"
-                                     class="wsirv-data">
-                                    <span ng-bind="ctrl.answersById[question.id].dateResponse | date:'dd-MMM-yyyy'">
-                                    </span>
-                                </div>
-                                <div ng-switch-when="TEXTAREA|TEXT"
-                                     ng-switch-when-separator="|"
-                                     class="wsirv-text">
-                                    <waltz-markdown text="ctrl.answersById[question.id].stringResponse">
-                                    </waltz-markdown>
-                                </div>
-                                <div ng-switch-when="DROPDOWN_MULTI_SELECT"
-                                     class="wsirv-dropdown-multi">
-                                    <ul class="">
-                                        <li ng-repeat="item in ctrl.answersById[question.id].listResponse">
-                                            <span ng-bind="item">
-                                            </span>
-                                        </li>
-                                    </ul>
-                                </div>
-                                <div ng-switch-when="MEASURABLE_MULTI_SELECT"
-                                     class="wsirv-measurable-multi">
-                                    <waltz-survey-question-measurable-renderer question="question"
-                                                                               list-response="ctrl.answersById[question.id].entityListResponse">
-                                    </waltz-survey-question-measurable-renderer>
-                                </div>
-                                <div ng-switch-default
-                                     class="wsirv-string">
-                                    <span ng-bind="ctrl.answersById[question.id].stringResponse">
-                                    </span>
-                                </div>
+                    <div class="col-md-9">
+                        <div class="row">
+                            <div ng-class="{
+                                    'col-md-12': !question.subQuestions,
+                                    'col-md-4': question.subQuestions
+                                 }">
+                                <waltz-survey-response-answer question="question"
+                                                              answer="ctrl.answersById[question.id]">
+                                </waltz-survey-response-answer>
                             </div>
-                            <div class='small text-muted'
-                                 ng-if="ctrl.answersById[question.id].comment">
-                                <strong>Comment:</strong>
-                                <span ng-bind="ctrl.answersById[question.id].comment"></span>
+                            <div class="col-md-4"
+                                 ng-repeat="sq in question.subQuestions">
+                                <waltz-survey-response-answer question="sq"
+                                                              answer="ctrl.answersById[sq.id]">
+                                </waltz-survey-response-answer>
                             </div>
                         </div>
                     </div>

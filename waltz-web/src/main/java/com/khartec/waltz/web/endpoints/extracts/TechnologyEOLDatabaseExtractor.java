@@ -20,7 +20,9 @@ package com.khartec.waltz.web.endpoints.extracts;
 
 import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.schema.Tables;
 import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +32,8 @@ import spark.Request;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
-import static com.khartec.waltz.schema.Tables.DATABASE_INFORMATION;
-import static com.khartec.waltz.schema.Tables.ORGANISATIONAL_UNIT;
+import static com.khartec.waltz.schema.Tables.*;
+import static com.khartec.waltz.schema.Tables.DATABASE_USAGE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.web.WebUtilities.getEntityReference;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
@@ -67,14 +69,17 @@ public class TechnologyEOLDatabaseExtractor extends DirectQueryBasedDataExtracto
                     .select(APPLICATION.NAME.as("Application Name"), APPLICATION.ASSET_CODE.as("Asset Code"))
                     .select(DATABASE_INFORMATION.DATABASE_NAME.as("Database Name"),
                             DATABASE_INFORMATION.INSTANCE_NAME.as("Instance Name"),
-                            DATABASE_INFORMATION.ENVIRONMENT.as("DBMS Environment"),
+                            DATABASE_USAGE.ENVIRONMENT.as("DBMS Environment"),
                             DATABASE_INFORMATION.DBMS_VENDOR.as("DBMS Vendor"),
                             DATABASE_INFORMATION.DBMS_NAME.as("DBMS Name"),
                             DATABASE_INFORMATION.END_OF_LIFE_DATE.as("End of Life date"),
                             DATABASE_INFORMATION.LIFECYCLE_STATUS.as("Lifecycle"))
                     .from(DATABASE_INFORMATION)
+                    .innerJoin(DATABASE_USAGE)
+                    .on(DATABASE_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                            .and(DATABASE_USAGE.ENTITY_ID.eq(Tables.APPLICATION.ID)))
                     .join(APPLICATION)
-                    .on(APPLICATION.ASSET_CODE.eq(DATABASE_INFORMATION.ASSET_CODE))
+                    .on(APPLICATION.ID.eq(DATABASE_USAGE.DATABASE_ID))
                     .join(ORGANISATIONAL_UNIT)
                     .on(ORGANISATIONAL_UNIT.ID.eq(APPLICATION.ORGANISATIONAL_UNIT_ID))
                     .where(APPLICATION.ID.in(appIdSelector))

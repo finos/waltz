@@ -27,6 +27,7 @@ import com.khartec.waltz.model.database_information.DatabaseSummaryStatistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -58,5 +59,14 @@ public class DatabaseInformationService {
         Checks.checkNotNull(options, "options cannot be null");
         return databaseInformationDao.calculateStatsForAppSelector(factory.apply(options));
     }
-        
+
+    public DatabaseInformation findById(long id) {
+        checkNotNull(id, "id cannot be null");
+        return databaseInformationDao.findById(id);
+    }
+
+    public DatabaseInformation findByExternalId(String externalId) {
+        checkNotNull(externalId, " external id cannot be null");
+        return databaseInformationDao.findByExternalId(externalId);
+    }
 }

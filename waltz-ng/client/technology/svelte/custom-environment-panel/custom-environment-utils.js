@@ -35,3 +35,17 @@ export function combineServerData(servers, usages) {
             .value();
     }
 }
+
+
+export function combineDatabaseUsage(databases, usages) {
+    if (_.isEmpty(databases) || _.isEmpty(usages)) {
+        return [];
+    } else {
+        const databasesById = _.keyBy(databases, d => d.id);
+        return _
+            .chain(usages)
+            .map(u => Object.assign({}, {databaseUsage: u, databaseInformation: databasesById[u.databaseId]}))
+            .filter(s => s.databaseInformation != null)
+            .value();
+    }
+}

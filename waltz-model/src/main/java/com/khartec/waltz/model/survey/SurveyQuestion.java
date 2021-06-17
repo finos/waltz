@@ -58,4 +58,9 @@ public abstract class SurveyQuestion implements
     public Boolean allowComment() {
         return false;
     }
+
+    public abstract Optional<String> label();
+
+    public abstract Optional<String> parentExternalId();
+
 }

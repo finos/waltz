@@ -27,6 +27,14 @@ export function store($http, baseUrl) {
         $http.get(`${BASE}/app/${appId}`)
             .then(result => result.data);
 
+    const findByExternalId = (externalId) =>
+        $http.get(`${BASE}/external-id/${externalId}`)
+            .then(result => result.data);
+
+    const getById = (databaseId) =>
+        $http.get(`${BASE}/${databaseId}`)
+            .then(result => result.data);
+
     const findBySelector = (id, kind, scope='CHILDREN') => {
         const options = _.isObject(id)
             ? id
@@ -47,6 +55,8 @@ export function store($http, baseUrl) {
 
     return {
         findByAppId,
+        getById,
+        findByExternalId,
         findBySelector,
         findStatsForSelector
     };
@@ -63,6 +73,16 @@ export const DatabaseStore_API = {
         serviceName,
         serviceFnName: 'findByAppId',
         description: 'executes findByAppId'
+    },
+    findByExternalId: {
+        serviceName,
+        serviceFnName: 'findByExternalId',
+        description: 'executes findByExternalId'
+    },
+    getById: {
+        serviceName,
+        serviceFnName: 'getById',
+        description: 'executes getById'
     },
     findBySelector: {
         serviceName,
