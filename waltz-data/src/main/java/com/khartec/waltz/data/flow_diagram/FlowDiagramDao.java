@@ -166,7 +166,8 @@ public class FlowDiagramDao {
                 .withId(Optional.empty())
                 .withName(newName)
                 .withLastUpdatedBy(userId)
-                .withLastUpdatedAt(DateTimeUtilities.nowUtc());
+                .withLastUpdatedAt(DateTimeUtilities.nowUtc())
+                .withEditorRole(Optional.empty());
 
         return create(copiedDiagram);
     }

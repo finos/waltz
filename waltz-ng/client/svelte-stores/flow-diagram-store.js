@@ -31,12 +31,19 @@ export function mkFlowDiagramStore() {
         .then(r => getById(id));
 
     const save = (saveCmd) => remote.execute("POST", "api/flow-diagram", saveCmd);
-    
+
+    const clone = (diagramId, newName) => {
+        return remote
+            .execute("POST", `api/flow-diagram/id/${diagramId}/clone`, newName)
+            .then(r => getById(r.data, true));
+    }
+
     return {
         getById,
         updateName,
         updateDescription,
-        save
+        save,
+        clone
     };
 }
 

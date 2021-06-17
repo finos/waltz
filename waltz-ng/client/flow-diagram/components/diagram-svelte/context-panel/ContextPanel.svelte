@@ -12,7 +12,6 @@
     import EditFlowDiagramPanel from "./EditFlowDiagramOverviewPanel.svelte";
     import {diagram} from "../store/diagram";
     import _ from "lodash";
-    import {ifPresent} from "../../../../common/function-utils";
     import model from "../store/model";
     import overlay from "../store/overlay";
     import visibility from "../store/visibility";
@@ -22,30 +21,26 @@
     import VisibilityToggles from "./VisibilityToggles.svelte";
     import RelatedEntitiesPanel from "./RelatedEntitiesPanel.svelte";
     import {userStore} from "../../../../svelte-stores/user-store";
+    import CloneDiagramSubPanel from "./CloneDiagramSubPanel.svelte";
+    import {prepareSaveCmd} from "./panel-utils";
 
 
     export let diagramId;
-    let selectedApp = null;
+
+    const Modes = {
+        VIEW: "VIEW",
+        EDIT: "EDIT",
+        CLONE: "CLONE"
+    }
 
     let userCall = userStore.load();
     $: roles = $userCall.data?.roles;
     $: canEdit = _.isNil($diagram.editorRole) || _.includes(roles, $diagram.editorRole);
 
     let savePromise;
+    let selectedApp = null;
     let selectedTab = 'context';
-
-    const Modes = {
-        VIEW: "VIEW",
-        EDIT: "EDIT"
-    }
-
-
-    function toRef(d) {
-        return {
-            kind: d.data.kind,
-            id: d.data.id
-        };
-    }
+    let activeMode = Modes.VIEW;
 
     $: overlayGroupsCall = flowDiagramOverlayGroupStore.findByDiagramId(diagramId);
     $: overlayGroupsByGraphId = _
@@ -54,84 +49,9 @@
         .keyBy(d => d.id)
         .value();
 
-
-    function prepareSaveCmd(diagram,
-                            model,
-                            overlay,
-                            visibility,
-                            positions,
-                            diagramTransform,
-                            overlayGroupsByGraphId) {
-
-        const nodes = _.map(model.nodes, n => {
-            return {
-                entityReference: toRef(n),
-                isNotable: false
-            };
-        });
-
-        const flows = _.map(model.flows, f => {
-            return {
-                entityReference: toRef(f)
-            };
-        });
-
-        const decorations = _
-            .chain(model.decorations)
-            .values()
-            .flatten()
-            .map(d => {
-                return {
-                    entityReference: toRef(d),
-                    isNotable: false
-                };
-            })
-            .value();
-
-        const entities = _.concat(nodes, flows, decorations);
-
-        const layoutData = {
-            positions,
-            diagramTransform: ifPresent(
-                diagramTransform,
-                x => x.toString(),
-                "translate(0,0) scale(1)")
-        };
-
-        const annotations = _.map(model.annotations, a => {
-            const ref = a.data.entityReference;
-            return {
-                entityReference: {kind: ref.kind, id: ref.id},
-                note: a.data.note,
-                annotationId: a.data.id
-            }
-        });
-
-        const overlays = _
-            .chain(overlay.groupOverlays)
-            .flatMap(d => d)
-            .map(d => ({
-                overlayGroupId: overlayGroupsByGraphId[d.data.groupRef].data.id,
-                entityReference: {id: d.data.entityReference.id, kind: d.data.entityReference.kind},
-                fill: d.data.fill,
-                stroke: d.data.stroke,
-                symbol: d.data.symbol
-            }))
-            .value();
-
-        return {
-            diagramId: diagramId,
-            name: diagram.name,
-            description: diagram.description,
-            entities,
-            annotations,
-            overlays,
-            layoutData: JSON.stringify(layoutData)
-        };
-    }
-
     function save() {
-        let saveCmd = prepareSaveCmd($diagram,
+        let saveCmd = prepareSaveCmd(
+            $diagram,
             $model,
             $overlay,
             $visibility,
@@ -143,16 +63,10 @@
         dirty.set(false);
     }
 
-    let activeMode = Modes.VIEW;
-
     function cancel() {
         $selectedNode = null;
         $selectedFlow = null;
         $selectedAnnotation = null;
-    }
-
-    function cloneDiagram(){
-        console.log("CLONING!");
     }
 
 </script>
@@ -166,48 +80,63 @@
             <span class="small">
                 <button class="tn btn-skinny"
                     on:click={() => activeMode = Modes.EDIT}>
-                <Icon name="pencil"/>Edit
-            </button>
+                    <Icon name="pencil"/>Edit
+                </button>
+                |
             </span>
             {/if}
+            <span class="small">
+                <button class="tn btn-skinny"
+                        on:click={() => activeMode = Modes.CLONE}>
+                <Icon name="clone"/>Clone
+            </button>
+            </span>
         </h4>
         <p class="help-block">{$diagram.description || "No description provided"}</p>
         <div class="small text-muted">
             (<LastEdited class="small pull-right text-muted" entity={$diagram}/>)
         </div>
+        <br>
+        {#if canEdit}
+            {#if $dirty}
+                <span class="help-block">
+                    <span class="save-warning">
+                        <Icon name="exclamation-circle"/>
+                    </span>
+                    Changes have been made to this diagram, if you do not
+                        <button class="btn btn-skinny"
+                                on:click={() => save()}>
+                            <strong>
+                                save
+                            </strong>
+                        </button>
+                    them they will be lost.
+                </span>
+                    {/if}
+                {:else}
+                <span class="help-block">
+                    <span class="save-warning">
+                        <Icon name="exclamation-circle"/>
+                    </span>
+                    You do not have permission to edit this diagram, any changes made will be lost.
+                    You may wish to
+                    <button class="btn btn-skinny"
+                            on:click={() => activeMode = Modes.CLONE}>
+                        <strong>
+                            clone this diagram
+                        </strong>
+                    </button>
+                    for an editable version.
+                </span>
+        {/if}
     {:else  if activeMode === Modes.EDIT}
         <EditFlowDiagramPanel flowDiagram={$diagram} on:cancel={() => activeMode = Modes.VIEW}/>
+        <br>
+    {:else if activeMode === Modes.CLONE}
+        <CloneDiagramSubPanel {diagramId} on:cancel={() => activeMode = Modes.VIEW}/>
+        <br>
     {/if}
 </div>
-
-<br>
-{#if $dirty}
-    <span class="help-block">
-        <span class="save-warning">
-            <Icon name="exclamation-circle"/>
-        </span>
-        {#if canEdit}
-        Changes have been made to this diagram, if you do not
-            <button class="btn btn-skinny"
-                    on:click={() => save()}>
-                <strong>
-                    save
-                </strong>
-            </button>
-        them they will be lost.
-        {:else}
-        You do not have permission to edit this diagram, any changes made will be lost.
-        You may wish to
-            <button class="btn btn-skinny"
-                    on:click={() => cloneDiagram()}>
-                <strong>
-                    clone this diagram
-                </strong>
-            </button>
-            for an editable version.
-        {/if}
-    </span>
-{/if}
 
 <!--Tabs for context, overlays and filters-->
 <div class="waltz-tabs">
