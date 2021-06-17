@@ -19,7 +19,9 @@
 package com.khartec.waltz.data.notification;
 
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.notification.ImmutableNotificationResponse;
 import com.khartec.waltz.model.notification.ImmutableNotificationSummary;
+import com.khartec.waltz.model.notification.NotificationResponse;
 import com.khartec.waltz.model.notification.NotificationSummary;
 import com.khartec.waltz.model.survey.SurveyInstanceStatus;
 import org.jooq.*;
@@ -82,6 +84,7 @@ public class NotificationDao {
                 .and(SURVEY_INSTANCE.STATUS.in(asList(
                         SurveyInstanceStatus.NOT_STARTED.name(),
                         SurveyInstanceStatus.IN_PROGRESS.name())));
+
 
         Select<Record2<String, Integer>> qry = attestationCount
                 .unionAll(surveyCount);

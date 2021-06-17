@@ -1,4 +1,4 @@
-/*!
+/*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
@@ -16,12 +16,21 @@
  *
  */
 
-@import "../../../../style/util";
-@import "../../../../style/variables";
+package com.khartec.waltz.model.notification;
 
-.waltz-browser-detect-banner {
-    background-color: #fafafa;
-    text-align: center;
-    outline: none;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.immutables.value.Value;
+
+import java.util.List;
+import java.util.Optional;
+
+
+@Value.Immutable
+@JsonSerialize(as = ImmutableNotificationResponse.class)
+@JsonDeserialize(as = ImmutableNotificationResponse.class)
+public abstract class NotificationResponse {
+
+    public abstract List<NotificationSummary> summary();
+    public abstract Optional<String> message();
 }
-
