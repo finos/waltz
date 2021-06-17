@@ -11,12 +11,11 @@
     import {diagramTransform, positions} from "./store/layout";
     import overlay from "./store/overlay";
     import {diagram} from "./store/diagram";
-
+    import dirty from "./store/dirty";
 
 
     let elem;
     let editMode = false;
-    export let doSave;
 
     function onSelectFlow(d) {
         $selectedNode = null;
@@ -80,7 +79,7 @@
     $: elem && setupPanAndZoom();
 
 
-    $: console.log("FlowDiag:", {diag: $diagram, store: $store, overlay: $overlay, model: $model, positions: $positions});
+    $: console.log("FlowDiag:", {dirty: $dirty, diag: $diagram, store: $store, overlay: $overlay, model: $model, positions: $positions});
 
 </script>
 

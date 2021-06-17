@@ -11,6 +11,7 @@
 
     export let diagramId;
     export let alignments;
+    export let canEdit;
 
     $: overlayGroupsCall = flowDiagramOverlayGroupStore.findByDiagramId(diagramId);
     $: overlayGroups = _.map($overlayGroupsCall.data, d => Object.assign(
@@ -60,7 +61,6 @@
     }
 
     function removeOverlayGroup(group){
-        console.log({group})
         return removePromise = flowDiagramOverlayGroupStore
             .deleteGroup(diagramId, group.data.id);
     }
@@ -107,14 +107,17 @@
                                 <li on:mouseenter={() =>  setOverlay(groupOverlay)}
                                     on:mouseleave={() => clearOverlay()}>
                                     <EntityLink ref={groupOverlay.data.entityReference}/> ({groupOverlay.data.symbol}/{groupOverlay.data.fill})
+                                    {#if canEdit}
                                     <button class="btn btn-skinny"
                                             on:click={() => removeOverlay(groupOverlay)}>
                                         <Icon name="trash"/>
                                     </button>
+                                    {/if}
                                 </li>
                             {/each}
                             </ul>
                         {/if}
+                        {#if canEdit}
                         <br>
                         <button class="btn btn-skinny"
                                 on:click={() => activeMode = Modes.ADD_OVERLAY}>
@@ -127,6 +130,7 @@
                             <Icon name="trash"/>
                             Remove Group
                         </button>
+                        {/if}
                     </td>
                 </tr>
             {/if}

@@ -23,6 +23,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.*;
 import org.immutables.value.Value;
 
+import java.util.Optional;
+
 @Value.Immutable
 @JsonSerialize(as = ImmutableFlowDiagram.class)
 @JsonDeserialize(as = ImmutableFlowDiagram.class)
@@ -35,6 +37,8 @@ public abstract class FlowDiagram implements
         IsRemovedProvider {
 
     public abstract String layoutData();
+
+    public abstract Optional<String> editorRole();
 
     @Value.Default
     public EntityKind kind() { return EntityKind.FLOW_DIAGRAM; }

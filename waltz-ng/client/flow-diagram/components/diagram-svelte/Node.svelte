@@ -62,6 +62,7 @@
     let nameElem;
     let gElem;
 
+    $: console.log({node, nameElem, width})
     $: width = nameElem && nameElem.getComputedTextLength() + 30;
     $: shape = node && shapes[node.data.kind](width);
     $: transform = node && `translate(${positions[node.id].x} ${positions[node.id].y})`;
@@ -97,7 +98,7 @@
           dy={shape.title.dy}
           style="font-size: small;"
           class:wfd-node-fade={$overlay.appliedOverlay && !_.includes(associatedGroups, $overlay.appliedOverlay)}
-          bind:this={nameElem}>
+          bind:this={nameElem}> <!-- think this is confused, unlike d3 not id tracked? -->
         {node.data.name || "Unknown"}
     </text>
     <g transform="translate(10, 16)"

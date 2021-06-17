@@ -7,6 +7,7 @@
     import {createEventDispatcher} from "svelte";
 
     export let diagramId;
+    export let canEdit;
     export let measurables;
     export let changeInitiatives;
 
@@ -46,10 +47,12 @@
             </div>
         </td>
         <td>
+            {#if canEdit}
             <button on:click={() => removeEntity(measurable)}
                class="clickable">
                 <Icon name="trash"/>Remove
             </button>
+            {/if}
         </td>
     </tr>
     {/each}
@@ -57,6 +60,7 @@
     {/if}
 
     <!-- FOOTER-->
+    {#if canEdit}
     <tfoot>
     <tr>
         <td colspan="2">
@@ -67,6 +71,7 @@
         </td>
     </tr>
     </tfoot>
+    {/if}
 </table>
 
 <strong>Change Initiatives:</strong>
@@ -89,10 +94,12 @@
                     <div>{changeInitiative.data.name}</div>
                 </td>
                 <td>
+                    {#if canEdit}
                     <button on:click={() => removeEntity(changeInitiative)}
                             class="clickable">
                         <Icon name="trash"/>Remove
                     </button>
+                    {/if}
                 </td>
             </tr>
         {/each}
@@ -100,6 +107,7 @@
     {/if}
 
     <!-- FOOTER-->
+    {#if canEdit}
     <tfoot>
     <tr>
         <td colspan="2">
@@ -110,4 +118,5 @@
         </td>
     </tr>
     </tfoot>
+    {/if}
 </table>

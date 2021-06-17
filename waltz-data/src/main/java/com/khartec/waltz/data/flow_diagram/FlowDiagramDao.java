@@ -50,6 +50,7 @@ public class FlowDiagramDao {
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .isRemoved(record.getIsRemoved())
+                .editorRole(Optional.ofNullable(record.getEditorRole()))
                 .build();
     };
 
@@ -64,6 +65,7 @@ public class FlowDiagramDao {
         record.setLastUpdatedBy(fd.lastUpdatedBy());
         record.setLastUpdatedAt(Timestamp.valueOf(fd.lastUpdatedAt()));
         record.setIsRemoved(fd.isRemoved());
+        fd.editorRole().ifPresent(record::setEditorRole);
         return record;
     };
 

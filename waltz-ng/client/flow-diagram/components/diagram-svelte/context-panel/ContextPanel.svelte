@@ -21,10 +21,15 @@
     import {toGraphId} from "../../../flow-diagram-utils";
     import VisibilityToggles from "./VisibilityToggles.svelte";
     import RelatedEntitiesPanel from "./RelatedEntitiesPanel.svelte";
+    import {userStore} from "../../../../svelte-stores/user-store";
 
 
     export let diagramId;
     let selectedApp = null;
+
+    let userCall = userStore.load();
+    $: roles = $userCall.data?.roles;
+    $: canEdit = _.isNil($diagram.editorRole) || _.includes(roles, $diagram.editorRole);
 
     let savePromise;
     let selectedTab = 'context';
@@ -146,6 +151,10 @@
         $selectedAnnotation = null;
     }
 
+    function cloneDiagram(){
+        console.log("CLONING!");
+    }
+
 </script>
 
 <!-- Diagram title -->
@@ -153,12 +162,14 @@
     {#if activeMode === Modes.VIEW}
         <h4>
             {$diagram.name}
+            {#if canEdit}
             <span class="small">
                 <button class="tn btn-skinny"
                     on:click={() => activeMode = Modes.EDIT}>
                 <Icon name="pencil"/>Edit
             </button>
-        </span>
+            </span>
+            {/if}
         </h4>
         <p class="help-block">{$diagram.description || "No description provided"}</p>
         <div class="small text-muted">
@@ -175,15 +186,26 @@
         <span class="save-warning">
             <Icon name="exclamation-circle"/>
         </span>
+        {#if canEdit}
         Changes have been made to this diagram, if you do not
             <button class="btn btn-skinny"
                     on:click={() => save()}>
                 <strong>
                     save
                 </strong>
-
             </button>
         them they will be lost.
+        {:else}
+        You do not have permission to edit this diagram, any changes made will be lost.
+        You may wish to
+            <button class="btn btn-skinny"
+                    on:click={() => cloneDiagram()}>
+                <strong>
+                    clone this diagram
+                </strong>
+            </button>
+            for an editable version.
+        {/if}
     </span>
 {/if}
 
@@ -230,21 +252,27 @@
         <!-- SERVERS -->
         {#if selectedTab === 'context'}
             {#if $selectedNode}
-                <NodePanel selected={$selectedNode} on:cancel={cancel}/>
+                <NodePanel selected={$selectedNode}
+                           on:cancel={cancel}
+                           {canEdit}/>
             {:else if $selectedFlow}
-                <FlowPanel selected="{$selectedFlow}" on:cancel={cancel}/>
+                <FlowPanel selected="{$selectedFlow}"
+                           on:cancel={cancel}
+                           {canEdit}/>
             {:else if $selectedAnnotation}
-                <AnnotationPanel selected="{$selectedAnnotation}" on:cancel={cancel}/>
+                <AnnotationPanel selected="{$selectedAnnotation}"
+                                 on:cancel={cancel}
+                                 {canEdit}/>
             {:else}
                 <p class="help-block">Select a node or flow on the diagram to make changes</p>
-                <DefaultPanel/>
+                <DefaultPanel {canEdit}/>
             {/if}
         {:else if selectedTab === 'overlays'}
-            <OverlayGroupsPanel {diagramId}/>
+            <OverlayGroupsPanel {diagramId} {canEdit}/>
         {:else if selectedTab === 'filters'}
             <VisibilityToggles/>
         {:else if selectedTab === 'relationships'}
-            <RelatedEntitiesPanel {diagramId}/>
+            <RelatedEntitiesPanel {diagramId} {canEdit}/>
         {/if}
     </div>
 </div>

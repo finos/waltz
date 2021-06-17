@@ -7,6 +7,7 @@
     import model from "../store/model";
 
     export let selected;
+    export let canEdit;
     const dispatch = createEventDispatcher();
 
     const Modes = {
@@ -45,6 +46,7 @@
 
 {#if activeMode === Modes.MENU}
 <ul>
+    {#if canEdit}
     <li>
         <button class="btn btn-skinny"
                 on:click={() => activeMode = Modes.ADD_ANNOTATION}>
@@ -63,6 +65,7 @@
             Remove
         </button>
     </li>
+    {/if}
     <li>
         <button class="btn btn-skinny"
                 on:click={() => cancel()}>

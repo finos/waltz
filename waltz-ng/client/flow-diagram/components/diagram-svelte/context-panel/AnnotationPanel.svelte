@@ -38,8 +38,6 @@
         ? owningEntity.data.name
         : owningEntity.data.source.name + " -> " + owningEntity.data.target.name;
 
-    $: console.log("ap", {s: selected, model: $model, owningEntity, owningEntityName})
-
 </script>
 
 <div>
@@ -58,6 +56,7 @@
             on:click={() => cancel()}>
         Cancel
     </button>
+    {#if canEdit}
     |
     <button class="btn btn-link"
             on:click={() => activeMode = Modes.EDIT}>
@@ -68,6 +67,7 @@
             on:click={() => removeAnnotation()}>
         Remove
     </button>
+    {/if}
 </span>
 {:else if activeMode === Modes.EDIT}
     <AddAnnotationSubPanel selected={selected}

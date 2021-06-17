@@ -12,6 +12,7 @@
     import AddRelatedChangeInitiativeSubPanel from "./AddRelatedChangeInitiativeSubPanel.svelte";
 
     export let diagramId;
+    export let canEdit;
 
     const Modes = {
         VIEW: "VIEW",
@@ -74,6 +75,7 @@
 
 {#if activeMode === Modes.VIEW}
     <RelatedEntitiesViewTable {diagramId}
+                              {canEdit}
                               measurables={associatedMeasurables}
                               changeInitiatives={associatedCis}
                               on:select={addEntityMode}/>

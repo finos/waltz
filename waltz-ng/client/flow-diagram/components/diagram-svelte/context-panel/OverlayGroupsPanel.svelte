@@ -8,6 +8,7 @@
 
     let workingGroup;
     export let diagramId;
+    export let canEdit;
 
     const Modes = {
         TABLE: "TABLE",
@@ -28,11 +29,13 @@
 </script>
 
 {#if activeMode === Modes.TABLE}
-    <OverlayGroupsTable {diagramId} {alignments}/>
+    <OverlayGroupsTable {diagramId} {alignments} {canEdit}/>
+    {#if canEdit}
     <button class="btn btn-skinny"
             on:click={() => activeMode = Modes.ADD_GROUP}>
         <Icon name="plus"/> Add new overlay group
     </button>
+    {/if}
 {:else if activeMode === Modes.ADD_GROUP}
     <h4>Create Group:</h4>
     <CreateNewOverlayGroupPanel {diagramId} on:cancel={() => activeMode = Modes.TABLE}/>
