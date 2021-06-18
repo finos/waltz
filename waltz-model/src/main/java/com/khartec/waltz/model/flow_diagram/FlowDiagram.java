@@ -34,7 +34,8 @@ public abstract class FlowDiagram implements
         NameProvider,
         DescriptionProvider,
         LastUpdatedProvider,
-        IsRemovedProvider {
+        IsRemovedProvider,
+        WaltzEntity {
 
     public abstract String layoutData();
 
@@ -42,4 +43,13 @@ public abstract class FlowDiagram implements
 
     @Value.Default
     public EntityKind kind() { return EntityKind.FLOW_DIAGRAM; }
+
+    public EntityReference entityReference() {
+        return ImmutableEntityReference.builder()
+                .kind(EntityKind.FLOW_DIAGRAM)
+                .id(id().get())
+                .name(name())
+                .description(description())
+                .build();
+    }
 }

@@ -94,6 +94,14 @@ public class FlowDiagramOverlayGroupDao {
     }
 
 
+    public FlowDiagramOverlayGroup getById(Long id){
+        return dsl
+                .selectFrom(FLOW_DIAGRAM_OVERLAY_GROUP)
+                .where(FLOW_DIAGRAM_OVERLAY_GROUP.ID.eq(id))
+                .fetchOne(TO_GROUP_MAPPER);
+    }
+
+
     public Set<FlowDiagramOverlayGroup> findByDiagramId(long diagramId) {
         return dsl
                 .select(FLOW_DIAGRAM_OVERLAY_GROUP.fields())
@@ -115,6 +123,16 @@ public class FlowDiagramOverlayGroupDao {
     }
 
 
+    public Set<FlowDiagramOverlayGroupEntry> findOverlaysByGroupId(long groupId) {
+        return dsl
+                .select(FLOW_DIAGRAM_OVERLAY_GROUP_ENTRY.fields())
+                .select(ENTITY_NAME_FIELD)
+                .from(FLOW_DIAGRAM_OVERLAY_GROUP_ENTRY)
+                .where(FLOW_DIAGRAM_OVERLAY_GROUP_ENTRY.OVERLAY_GROUP_ID.eq(groupId))
+                .fetchSet(TO_OVERLAY_ENTRY_MAPPER);
+    }
+
+
     public Long create(FlowDiagramOverlayGroup group) {
 
         FlowDiagramOverlayGroupRecord r = dsl.newRecord(FLOW_DIAGRAM_OVERLAY_GROUP);
@@ -130,7 +148,7 @@ public class FlowDiagramOverlayGroupDao {
                 .set(r)
                 .returning(FLOW_DIAGRAM_OVERLAY_GROUP.ID)
                 .fetchOne()
-                .getFlowDiagramId();
+                .getId();
     }
 
 

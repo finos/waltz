@@ -31,7 +31,8 @@
     const Modes = {
         VIEW: "VIEW",
         EDIT: "EDIT",
-        CLONE: "CLONE"
+        CLONE: "CLONE",
+        REMOVE: "REMOVE"
     }
 
     let userCall = userStore.load();

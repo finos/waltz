@@ -21,12 +21,16 @@ package com.khartec.waltz.service.flow_diagram;
 import com.khartec.waltz.data.flow_diagram.FlowDiagramOverlayGroupDao;
 import com.khartec.waltz.model.flow_diagram.FlowDiagramOverlayGroup;
 import com.khartec.waltz.model.flow_diagram.FlowDiagramOverlayGroupEntry;
+import com.khartec.waltz.model.flow_diagram.ImmutableFlowDiagramOverlayGroup;
+import com.khartec.waltz.model.flow_diagram.ImmutableFlowDiagramOverlayGroupEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.SetUtilities.map;
 
 
 @Service
@@ -68,5 +72,26 @@ public class FlowDiagramOverlayGroupService {
         //create change log
         int deletedOverlays = flowDiagramOverlayGroupDao.deleteOverlaysForDiagram(diagramId);
         return flowDiagramOverlayGroupDao.createOverlays(overlays);
+    }
+
+
+    public Long clone(long diagramId, long id, String username) {
+        FlowDiagramOverlayGroup group = flowDiagramOverlayGroupDao.getById(id);
+        FlowDiagramOverlayGroup clonedGroup = ImmutableFlowDiagramOverlayGroup
+                .copyOf(group)
+                .withId(Optional.empty())
+                .withDiagramId(diagramId);
+
+        Long clonedGroupId = flowDiagramOverlayGroupDao.create(clonedGroup);
+
+        Set<FlowDiagramOverlayGroupEntry> overlays = flowDiagramOverlayGroupDao.findOverlaysByGroupId(id);
+
+        Set<FlowDiagramOverlayGroupEntry> clonedOverlays = map(overlays,
+                o -> ImmutableFlowDiagramOverlayGroupEntry.copyOf(o)
+                        .withId(Optional.empty())
+                        .withOverlayGroupId(clonedGroupId));
+
+        int overlaysCreated = flowDiagramOverlayGroupDao.createOverlays(clonedOverlays);
+        return clonedGroupId;
     }
 }
