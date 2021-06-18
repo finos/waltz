@@ -173,13 +173,12 @@ export function service(
             flowDiagramEntityStore.findByDiagramId(id),
             logicalFlowStore.findBySelector(diagramSelector),
             physicalFlowStore.findBySelector(diagramSelector),
-            measurableRatingStore.findByAppSelector(diagramSelector),
             flowDiagramOverlayGroupStore.findOverlaysByDiagramId(id)
         ];
 
         return $q
             .all(promises)
-            .then(([applications, diagram, annotations, entityNodes, logicalFlows, physicalFlows, measurableRatings, overlayEntries]) => {
+            .then(([applications, diagram, annotations, entityNodes, logicalFlows, physicalFlows, overlayEntries]) => {
                 if(!_.isNil(diagram)) {
 
                     const allEntityNodes = addMissingEntityNodes(diagram.id, entityNodes, applications);
@@ -195,6 +194,7 @@ export function service(
                                 {},
                                 overlay,
                                 {
+                                    kind: "OVERLAY",
                                     groupRef: toGraphId({id: overlay.overlayGroupId, kind: "GROUP"}),
                                     applicationIds: _.map(r, d => d.id)
                                 })));

@@ -102,7 +102,7 @@
                             You have no overlays added to this group; these can be used to group/filter applications.
                         {:else }
                             <ul>
-                            {#each groupOverlays as groupOverlay}
+                            {#each _.sortBy(groupOverlays, g => g.data.entityReference.name) as groupOverlay}
                                 <li on:mouseenter={() =>  setOverlay(groupOverlay)}
                                     on:mouseleave={() => clearOverlay()}>
                                     <EntityLink ref={groupOverlay.data.entityReference}/> ({groupOverlay.data.symbol}/{groupOverlay.data.fill})
