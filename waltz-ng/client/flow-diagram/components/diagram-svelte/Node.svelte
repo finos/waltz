@@ -4,7 +4,27 @@
     import {createEventDispatcher} from "svelte";
     import _ from "lodash";
     import overlay from "./store/overlay";
+    import {
+        symbol,
+        symbolCircle,
+        symbolCross,
+        symbolDiamond,
+        symbolSquare,
+        symbolStar,
+        symbolTriangle,
+        symbolWye
+    } from "d3-shape";
 
+    const symbolsByName = {
+        "triangle": symbol().type(symbolTriangle).size(40),
+        "circle": symbol().type(symbolCircle).size(60),
+        "diamond": symbol().type(symbolDiamond).size(30),
+        "cross": symbol().type(symbolCross).size(40),
+        "star": symbol().type(symbolStar).size(30),
+        "wye": symbol().type(symbolWye).size(50),
+        "square": symbol().type(symbolSquare).size(60),
+        "DEFAULT": symbol().type(symbolWye).size(40)
+    };
 
     const dispatch = createEventDispatcher();
 
@@ -71,7 +91,6 @@
 
     $: fill = determineFill($overlay.appliedOverlay, associatedGroups);
 
-
     function determineWidth(node, elem, icons){
         const margin = node.data.kind === 'ACTOR' ? 30 : 24
         const textWidth = elem.getComputedTextLength() + margin
@@ -111,11 +130,12 @@
     <g transform="translate(10, 16)"
        class="wfd-node-classifiers">
         {#each associatedGroups as group}
-            <circle r="4"
-                    fill={group.data?.fill}
-                    stroke={group.data?.stroke}
-                    cx={0 + _.findIndex(associatedGroups, group) * 12}
-                    cy="6"/>
+            <path class="symbol"
+                  d="{symbolsByName[group.data.symbol]()}"
+                  transform="translate({0 + _.findIndex(associatedGroups, group) * 12}, {group.data.symbol === 'triangle' ? 7 :6 })"
+                  fill={group.data?.fill}
+                  stroke={group.data?.stroke}>
+            </path>
         {/each}
     </g>
 </g>
