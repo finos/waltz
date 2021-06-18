@@ -22,8 +22,6 @@
         dispatcher("select", selectedNode);
     }
 
-    $: console.log({applicationsByMeasurableId, childNodes, node})
-
 </script>
 
 

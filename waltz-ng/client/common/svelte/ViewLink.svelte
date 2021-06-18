@@ -24,6 +24,14 @@
             path: ctx => `application/${ctx.id}`,
             title: "Application View"
         },
+        "main.app-group.view": {
+            path: ctx => `app-group/${ctx.id}`,
+            title: "Application Group View"
+        },
+        "main.change-initiative.view": {
+            path: ctx => `change-initiative/${ctx.id}`,
+            title: "Change Initiative View"
+        },
         "main.data-type.view": {
             path: ctx => `data-types/${ctx.id}`,
             title: "DataType View"

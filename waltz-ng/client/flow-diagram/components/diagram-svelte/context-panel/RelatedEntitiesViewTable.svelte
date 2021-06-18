@@ -5,6 +5,7 @@
     import model from "../store/model";
     import {changeInitiative} from "../../../../common/services/enums/change-initiative";
     import {createEventDispatcher} from "svelte";
+    import EntityLink from "../../../../common/svelte/EntityLink.svelte";
 
     export let diagramId;
     export let canEdit;
@@ -18,7 +19,7 @@
         model.removeRelationship(entity);
     }
 
-    function addEntity(kind){
+    function addEntity(kind) {
         dispatch("select", kind);
     }
 
@@ -41,7 +42,7 @@
     {#each measurables as measurable}
     <tr>
         <td>
-            <div >{measurable.data.name}</div>
+            <div><EntityLink ref={measurable.data}/></div>
             <div class="small text-muted">
                 {_.get(measurable.category, "name", "unknown")}
             </div>
@@ -91,7 +92,7 @@
         {#each changeInitiatives as changeInitiative}
             <tr>
                 <td>
-                    <div>{changeInitiative.data.name}</div>
+                    <div><EntityLink ref={changeInitiative.data}/></div>
                 </td>
                 <td>
                     {#if canEdit}

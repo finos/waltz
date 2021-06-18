@@ -105,17 +105,14 @@
                                  annotations={$model.annotations}/>
             {/if}
 
-
             <FlowLayer on:selectFlow={onSelectFlow}
                        positions={$positions}
                        {model}/>
-
 
             <NodeLayer on:selectNode={onSelectNode}
                        positions={$positions}
                        nodes={$model.nodes}
                        groups={$overlay.groupOverlays[$overlay.selectedGroup?.id] || []}/>
-
         </g>
     </svg>
 </div>

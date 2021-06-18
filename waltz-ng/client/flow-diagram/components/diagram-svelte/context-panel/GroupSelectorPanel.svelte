@@ -1,5 +1,4 @@
 <script>
-    import {store} from "../diagram-model-store";
     import EntitySearchSelector from "../../../../common/svelte/EntitySearchSelector.svelte";
     import _ from "lodash";
     import {createEventDispatcher} from "svelte";

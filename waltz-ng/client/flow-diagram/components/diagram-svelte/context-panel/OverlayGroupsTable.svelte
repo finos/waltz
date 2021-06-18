@@ -138,11 +138,11 @@
     </table>
     {/if}
     {:else if activeMode === Modes.ADD_OVERLAY}
-        <h4>Adding overlay for {selectedGroup.name}:</h4>
         <AddOverlayGroupEntrySubPanel {diagramId}
                                       group={selectedGroup}
                                       on:cancel={cancel}
                                       overlays={groupOverlays}/>
+        <br>
     {/if}
 </div>
 

@@ -10,6 +10,7 @@
     import ColorPicker from "../../../../system/svelte/ratings-schemes/ColorPicker.svelte";
     import {measurableCategoryAlignmentViewStore} from "../../../../svelte-stores/measurable-category-alignment-view-store";
     import {mkRef} from "../../../../common/entity-utils";
+    import EntitySearchSelector from "../../../../common/svelte/EntitySearchSelector.svelte";
 
     export let group;
     export let overlays;
@@ -18,6 +19,13 @@
     let workingOverlay;
     let relatedAppIds = [];
     let showColorPicker = false
+
+    const Modes = {
+        ADD_OVERLAY: "ADD_OVERLAY",
+        SELECT_MEASURABLE: "SELECT_MEASURABLE",
+        SELECT_APP_GROUP: "SELECT_APP_GROUP"
+    }
+    let activeMode = Modes.SELECT_MEASURABLE
 
     $: measurableAlignmentCall = measurableCategoryAlignmentViewStore
         .findAlignmentsByAppSelectorRoute(mkSelectionOptions(mkRef('FLOW_DIAGRAM', diagramId)));
@@ -35,6 +43,7 @@
 
     function selectOverlay(e) {
         workingOverlay = e.detail;
+        activeMode = Modes.ADD_OVERLAY;
     }
 
     function getNewOverlay(overlay) {
@@ -57,7 +66,6 @@
         submit();
     }
 
-
     function selectColor(e) {
         newOverlay = Object.assign({}, newOverlay, {fill: e.detail});
         showColorPicker = false;
@@ -71,8 +79,23 @@
 
 
 <div>
-    {#if _.isNil(workingOverlay) && alignments}
+    {#if activeMode === Modes.SELECT_MEASURABLE && alignments}
+        <h4>Adding measurable overlay for {group.data.name}:</h4>
         <GroupSelectorPanel on:select={selectOverlay} {alignments}/>
+        <button on:click={() => activeMode = Modes.SELECT_APP_GROUP}
+                class="btn btn-skinny">
+            ...or add application group overlay
+        </button>
+    {:else if activeMode === Modes.SELECT_APP_GROUP}
+        <h4>Adding application group overlay for {group.data.name}:</h4>
+        <EntitySearchSelector on:select={selectOverlay}
+                              placeholder="Search for app group"
+                              entityKinds={['APP_GROUP']}>
+        </EntitySearchSelector>
+        <button on:click={() => activeMode = Modes.SELECT_MEASURABLE}
+                class="btn btn-skinny">
+            ...or add measurable overlay
+        </button>
     {:else}
         <div style="padding-bottom: 1em">
             <strong>{newOverlay.entityReference.name}</strong>
