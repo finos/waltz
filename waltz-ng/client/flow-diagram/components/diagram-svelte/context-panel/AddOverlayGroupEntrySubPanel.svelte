@@ -8,14 +8,20 @@
     import overlay from "../store/overlay";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import ColorPicker from "../../../../system/svelte/ratings-schemes/ColorPicker.svelte";
+    import {measurableCategoryAlignmentViewStore} from "../../../../svelte-stores/measurable-category-alignment-view-store";
+    import {mkRef} from "../../../../common/entity-utils";
 
     export let group;
-    export let alignments;
     export let overlays;
+    export let diagramId;
 
     let workingOverlay;
     let relatedAppIds = [];
     let showColorPicker = false
+
+    $: measurableAlignmentCall = measurableCategoryAlignmentViewStore
+        .findAlignmentsByAppSelectorRoute(mkSelectionOptions(mkRef('FLOW_DIAGRAM', diagramId)));
+    $: alignments = $measurableAlignmentCall.data;
 
     const dispatch = createEventDispatcher();
 
@@ -39,19 +45,20 @@
     }
 
     function saveOverlay() {
-        overlay.addOverlay(Object.assign({},
-            newOverlay,
-            {
-                groupRef: group.id,
-                applicationIds: _.map(relatedAppIds, d => d.id)
-            }))
+        overlay.addOverlay(
+            Object.assign(
+                {},
+                newOverlay,
+                {
+                    groupRef: group.id,
+                    applicationIds: _.map(relatedAppIds, d => d.id)
+                }))
         cancel();
         submit();
     }
 
 
     function selectColor(e) {
-        console.log("color", {e});
         newOverlay = Object.assign({}, newOverlay, {fill: e.detail});
         showColorPicker = false;
     }

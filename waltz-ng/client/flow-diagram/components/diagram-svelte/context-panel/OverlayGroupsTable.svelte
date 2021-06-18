@@ -10,7 +10,6 @@
 
 
     export let diagramId;
-    export let alignments;
     export let canEdit;
 
     $: overlayGroupsCall = flowDiagramOverlayGroupStore.findByDiagramId(diagramId);
@@ -140,7 +139,7 @@
     {/if}
     {:else if activeMode === Modes.ADD_OVERLAY}
         <h4>Adding overlay for {selectedGroup.name}:</h4>
-        <AddOverlayGroupEntrySubPanel {alignments}
+        <AddOverlayGroupEntrySubPanel {diagramId}
                                       group={selectedGroup}
                                       on:cancel={cancel}
                                       overlays={groupOverlays}/>

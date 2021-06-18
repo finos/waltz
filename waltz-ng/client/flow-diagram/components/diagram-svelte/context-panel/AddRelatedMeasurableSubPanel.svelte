@@ -4,7 +4,6 @@
     import EntitySearchSelector from "../../../../common/svelte/EntitySearchSelector.svelte";
     import {createEventDispatcher} from "svelte";
 
-    export let diagramId;
     export let measurables;
 
     let showSuggestedMeasurables = true;
@@ -66,7 +65,7 @@
     <div class="form-group">
         <label for="measurable">Measurable:</label>
         <div id="measurable">
-            <EntitySearchSelector on:select={e => console.log({e}) ||selectEntity(e.detail)}
+            <EntitySearchSelector on:select={e => selectEntity(e.detail)}
                                   placeholder="Search for measurables"
                                   entityKinds={['MEASURABLE']}>
             </EntitySearchSelector>

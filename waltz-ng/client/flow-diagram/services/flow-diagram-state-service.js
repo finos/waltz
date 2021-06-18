@@ -26,103 +26,6 @@ import dirty from "../components/diagram-svelte/store/dirty";
 import overlay from "../components/diagram-svelte/store/overlay";
 import {diagram} from "../components/diagram-svelte/store/diagram";
 
-
-const initialState = {
-    dirty: false,
-    model: {
-        diagramId: null,
-        nodes: [],
-        flows: [],
-        decorations: {},
-        annotations: [],
-    },
-    layout: {
-        positions: {}, // gid -> {  x, y }
-        shapes: {}, // gid -> { path, cx, cy, etc} }
-        diagramTransform: null
-    },
-    visibility: {
-        layers: {
-            flowBuckets: true,
-            annotations: true,
-            pendingFlows: true,
-            removedFlows: true
-        }
-    },
-    detail: {
-        applicationsById: {},
-        measurablesByAppId: {}
-    }
-};
-
-
-let state = _.cloneDeep(initialState);
-
-
-function toRef(d) {
-    return {
-        kind: d.data.kind,
-        id: d.data.id
-    };
-}
-
-
-function prepareSaveCmd(state) {
-    const nodes = _.map(state.model.nodes, n => {
-        return {
-            entityReference: toRef(n),
-            isNotable: false
-        };
-    });
-
-    const flows = _.map(state.model.flows, f => {
-        return {
-            entityReference: toRef(f)
-        };
-    });
-
-    const decorations = _
-        .chain(state.model.decorations)
-        .values()
-        .flatten()
-        .map(d => {
-            return {
-                entityReference: toRef(d),
-                isNotable: false
-            };
-        })
-        .value();
-
-    const entities = _.concat(nodes, flows, decorations);
-
-    const layoutData = {
-        positions: state.layout.positions,
-        diagramTransform: ifPresent(
-            state.layout.diagramTransform,
-            x => x.toString(),
-            "translate(0,0) scale(1)")
-    };
-
-    const annotations = _.map(state.model.annotations, a => {
-        const ref = a.data.entityReference;
-        return {
-            entityReference: { kind: ref.kind, id: ref.id },
-            note: a.data.note,
-            annotationId: a.data.id
-        }
-    });
-
-    return {
-        diagramId: state.diagramId,
-        name: state.model.title,
-        description: state.model.description,
-        entities,
-        annotations,
-        layoutData: JSON.stringify(layoutData)
-    };
-}
-
-
 function restoreDiagram(
     flowDiagram,
     annotations = [],
@@ -231,14 +134,6 @@ export function service(
         dirty.set(false);
     };
 
-    const save = () => {
-        const cmd = prepareSaveCmd(state);
-        return flowDiagramStore.save(cmd)
-            .then(id => {
-                dirty.set(false);
-                return id;
-            });
-    };
 
     const addMissingEntityNodes = function (diagramId, entityNodes = [], applications = []) {
         const appEntityIds = _
@@ -285,33 +180,35 @@ export function service(
         return $q
             .all(promises)
             .then(([applications, diagram, annotations, entityNodes, logicalFlows, physicalFlows, measurableRatings, overlayEntries]) => {
-                const allEntityNodes = addMissingEntityNodes(diagram.id, entityNodes, applications);
+                if(!_.isNil(diagram)) {
 
-                restoreDiagram(diagram, annotations, allEntityNodes, logicalFlows, physicalFlows);
+                    const allEntityNodes = addMissingEntityNodes(diagram.id, entityNodes, applications);
 
-                // store on state the list of groups to be shown
-                const overlayPromises = _.map(
-                    overlayEntries,
-                    overlay => applicationStore
-                        .findBySelector(mkSelectionOptions(overlay.entityReference))
-                        .then(r => Object.assign(
-                            {},
-                            overlay, 
-                            {
-                                groupRef: toGraphId({id: overlay.overlayGroupId, kind: "GROUP"}),
-                                applicationIds: _.map(r, d => d.id)
-                            })));
+                    restoreDiagram(diagram, annotations, allEntityNodes, logicalFlows, physicalFlows);
 
-                $q
-                    .all(overlayPromises)
-                    .then((overlaysWithApps) => overlaysWithApps.forEach(o => overlay.addOverlay(o)));
+                    // store on state the list of groups to be shown
+                    const overlayPromises = _.map(
+                        overlayEntries,
+                        overlay => applicationStore
+                            .findBySelector(mkSelectionOptions(overlay.entityReference))
+                            .then(r => Object.assign(
+                                {},
+                                overlay,
+                                {
+                                    groupRef: toGraphId({id: overlay.overlayGroupId, kind: "GROUP"}),
+                                    applicationIds: _.map(r, d => d.id)
+                                })));
+
+                    $q
+                        .all(overlayPromises)
+                        .then((overlaysWithApps) => overlaysWithApps.forEach(o => overlay.addOverlay(o)));
+                }
             })
             .then(() => dirty.set(false));
     };
 
 
     return {
-        save,
         load,
         reset
     };

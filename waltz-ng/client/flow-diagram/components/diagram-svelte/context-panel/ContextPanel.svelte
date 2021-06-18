@@ -23,6 +23,7 @@
     import {userStore} from "../../../../svelte-stores/user-store";
     import CloneDiagramSubPanel from "./CloneDiagramSubPanel.svelte";
     import {prepareSaveCmd} from "./panel-utils";
+    import RemoveDiagramSubPanel from "./RemoveDiagramSubPanel.svelte";
 
 
     export let diagramId;
@@ -76,21 +77,26 @@
     {#if activeMode === Modes.VIEW}
         <h4>
             {$diagram.name}
-            {#if canEdit}
-            <span class="small">
-                <button class="tn btn-skinny"
-                    on:click={() => activeMode = Modes.EDIT}>
-                    <Icon name="pencil"/>Edit
-                </button>
-                |
-            </span>
-            {/if}
             <span class="small">
                 <button class="tn btn-skinny"
                         on:click={() => activeMode = Modes.CLONE}>
                 <Icon name="clone"/>Clone
             </button>
             </span>
+            {#if canEdit}
+            <span class="small">
+                |
+                <button class="tn btn-skinny"
+                    on:click={() => activeMode = Modes.EDIT}>
+                    <Icon name="pencil"/>Edit
+                </button>
+                |
+                <button class="tn btn-skinny"
+                        on:click={() => activeMode = Modes.REMOVE}>
+                    <Icon name="trash"/>Remove
+                </button>
+            </span>
+            {/if}
         </h4>
         <p class="help-block">{$diagram.description || "No description provided"}</p>
         <div class="small text-muted">
@@ -134,6 +140,9 @@
         <br>
     {:else if activeMode === Modes.CLONE}
         <CloneDiagramSubPanel {diagramId} on:cancel={() => activeMode = Modes.VIEW}/>
+        <br>
+    {:else if activeMode === Modes.REMOVE}
+        <RemoveDiagramSubPanel {diagramId} on:cancel={() => activeMode = Modes.VIEW}/>
         <br>
     {/if}
 </div>

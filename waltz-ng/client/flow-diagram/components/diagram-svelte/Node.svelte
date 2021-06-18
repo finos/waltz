@@ -61,8 +61,7 @@
     let nameElem;
     let gElem;
 
-    $: console.log({node, nameElem, width})
-    $: width = nameElem && determineWidth(nameElem, associatedGroups);
+    $: width = nameElem && determineWidth(node, nameElem, associatedGroups);
     $: shape = node && shapes[node.data.kind](width);
     $: transform = node && `translate(${positions[node.id].x} ${positions[node.id].y})`;
     $: dragHandler = mkDragHandler(node)
@@ -73,8 +72,9 @@
     $: fill = determineFill($overlay.appliedOverlay, associatedGroups);
 
 
-    function determineWidth(elem, icons){
-        const textWidth = elem.getComputedTextLength() + 24
+    function determineWidth(node, elem, icons){
+        const margin = node.data.kind === 'ACTOR' ? 30 : 24
+        const textWidth = elem.getComputedTextLength() + margin
         const iconsWidth = _.size(icons) * 12 + 6
         return textWidth > iconsWidth ? textWidth : iconsWidth
     }

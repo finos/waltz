@@ -12,6 +12,7 @@
     import overlay from "./store/overlay";
     import {diagram} from "./store/diagram";
     import dirty from "./store/dirty";
+    import NoData from "../../../common/svelte/NoData.svelte";
 
 
     let elem;
@@ -79,7 +80,14 @@
     $: elem && setupPanAndZoom();
 
 
-    $: console.log("FlowDiag:", {dirty: $dirty, diag: $diagram, store: $store, overlay: $overlay, model: $model, positions: $positions});
+    $: console.log("FlowDiag:", {
+        dirty: $dirty,
+        diag: $diagram,
+        store: $store,
+        overlay: $overlay,
+        model: $model,
+        positions: $positions
+    });
 
 </script>
 
@@ -114,6 +122,10 @@
 <div class="col-md-4 context-menu">
     <ContextPanel diagramId={$diagram.id}/>
 </div>
+{:else}
+    <NoData>
+        No diagram found! It may have been removed.
+    </NoData>
 {/if}
 
 <style>

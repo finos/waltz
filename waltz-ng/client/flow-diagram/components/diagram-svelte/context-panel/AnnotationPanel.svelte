@@ -6,6 +6,7 @@
     import model from "../store/model";
 
     export let selected;
+    export let canEdit
     const dispatch = createEventDispatcher();
 
     const Modes = {
