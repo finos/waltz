@@ -3,7 +3,7 @@
     import PageHeader from "../../../common/svelte/PageHeader.svelte";
     import ViewLink from "../../../common/svelte/ViewLink.svelte";
     import EntitySearchSelector from "../../../common/svelte/EntitySearchSelector.svelte";
-    import {formData} from "./edit-store";
+    import {formData, recentlyCreated} from "./edit-store";
     import {applicationKind} from "../../../common/services/enums/application-kind";
     import {lifecyclePhase} from "../../../common/services/enums/lifecycle-phase";
     import {criticality} from "../../../common/services/enums/criticality";
@@ -26,6 +26,7 @@
     }
 
     function toFormData(d) {
+        if (! d) return {};
         return {
             name: d.name,
             description: d.description,
@@ -70,10 +71,33 @@
         }
     }
 
+    function save() {
+        const submission = prepSubmission($formData);
+        if (isNew) {
+            applicationStore
+                .registerApp($formData)
+                .then(d => {
+                    const newRef = {
+                        id: d.data.id,
+                        kind: 'APPLICATION',
+                        name: submission.app.name,
+                        description: submission.app.description
+                    };
+                    recentlyCreated.update(xs => [...xs, newRef]);
+                    $formData = {};
+                });
+        } else {
+            applicationStore
+                .update(appId, submission)
+                .then(d => history.back());
+        }
+    }
+
     export let appId = null;
 
+    $: isNew = appId === null;
     $: appLoadCall = appId && applicationStore.getById(appId);
-    $: existingApp = $appLoadCall.data;
+    $: existingApp = $appLoadCall && $appLoadCall.data;
     $: origData = toFormData(existingApp);
     $: $formData = toFormData(existingApp);
 
@@ -84,18 +108,13 @@
                 ? _.isNil(v)
                 : _.isEmpty(v));
 
-    function save() {
-        const data = prepSubmission($formData);
-        applicationStore
-            .update(appId, data)
-            .then(d => history.back());
-    }
+    $: console.log({rc: $recentlyCreated})
 </script>
 
 
 <PageHeader icon="edit"
-            small={origData ? origData.name : "New"}
-            name="App Edit">
+            small={isNew ? "New" : origData.name}
+            name={isNew ? 'App Creation' : 'App Edit'}>
     <div slot="breadcrumbs">
         <ol class="waltz-breadcrumbs">
             <li><ViewLink state="main">Home</ViewLink></li>
@@ -270,5 +289,38 @@
             Save
         </button>
     </form>
-
 </div>
+
+<br>
+
+{#if isNew}
+<div class="waltz-section">
+    <div class="waltz-section-header">
+        <div class="waltz-section-header-title">
+            Recently Registered
+        </div>
+    </div>
+
+    <div class="container-fluid waltz-section-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="help-block">
+                    Recently registered applications appear here:
+                </div>
+
+                <ul>
+                    {#each $recentlyCreated as app}
+                        <li>
+                            <EntityLink ref={app}/>
+                        </li>
+                    {:else}
+                        <li>
+                            <i>Nothing registered yet</i>
+                        </li>
+                    {/each}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{/if}

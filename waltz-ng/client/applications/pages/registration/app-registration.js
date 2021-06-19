@@ -17,136 +17,23 @@
  *
  */
 
-import _ from "lodash";
-import {
-    nameField,
-    assetCodeField,
-    descriptionField,
-    orgUnitField,
-    parentAssetCodeField,
-    typeField,
-    lifecyclePhaseField,
-    overallRatingField,
-    businessCriticalityField
-} from "../../formly/fields";
-// import AppEdit from "../edit/AppEdit.svelte";
+import AppEdit from "../edit/AppEdit.svelte";
+
+const initialState = {
+    AppEdit
+};
 
 
 import template from "./app-registration.html";
+import {initialiseData} from "../../../common";
 
 // ----- CONTROLLER -----
 
-const controller = function(applicationStore,
-                            notification,
-                            orgUnitStore) {
-    const vm = this;
-
-    let allOrgUnits = [];
-
-    orgUnitStore
-        .findAll()
-        .then(units => {
-            allOrgUnits = units;
-            orgUnitField.templateOptions.options = _.map(units, (u) => ({ name: u.name, code: u.id}));
-        });
-
-
-    const model = {
-        lifecyclePhase: 'PRODUCTION',
-        applicationKind: 'IN_HOUSE'
-    };
-
-
-    const fields = [
-        {
-            className: 'row',
-            fieldGroup: [
-                { className: 'col-xs-8', fieldGroup: [nameField, orgUnitField] },
-                { className: 'col-xs-4', fieldGroup: [assetCodeField, parentAssetCodeField] }
-            ]
-        }, {
-            className: 'row',
-            fieldGroup: [
-                { className: 'col-xs-8', fieldGroup: [descriptionField] },
-                { className: 'col-xs-4', fieldGroup: [overallRatingField, typeField, lifecyclePhaseField, businessCriticalityField] }
-            ]
-        }
-    ];
-
-
-    const registrations = [];
-
-
-    function onSubmit() {
-        const onSuccess = (result) => {
-            notification.success('New Application registered');
-            const { registered, message, id, originalRequest } = result;
-            const { name, organisationalUnitId, applicationKind, lifecyclePhase } = originalRequest;
-
-            registrations.push({
-                success: registered,
-                message,
-                app: {
-                    id,
-                    name,
-                    applicationKind,
-                    lifecyclePhase,
-                    organisationalUnit: _.find(allOrgUnits, {id: organisationalUnitId})
-                }
-            });
-        };
-
-        const onFailure = (result) => {
-            notification.success('Failed to register application, see below');
-            registrations.push({
-                success: false,
-                message: result.data.message,
-                app: {
-                    name: result.config.data.name
-                }
-            });
-        };
-
-        const newApp = Object.assign(
-            {},
-            model,
-            {
-                aliases: _.map(model.aliases, 'text'),
-                tags: _.map(model.tags, 'text')
-            });
-
-
-        applicationStore
-            .registerNewApp(newApp)
-            .then(onSuccess, onFailure);
-    }
-
-    // -- INIT --
-    vm.$onInit = () => {
-        nameField.model = model;
-        assetCodeField.model = model;
-        descriptionField.model = model;
-        orgUnitField.model = model;
-        orgUnitField.templateOptions.ouRef = null;
-        parentAssetCodeField.model = model;
-        typeField.model = model;
-        lifecyclePhaseField.model = model;
-        overallRatingField.model = model;
-        businessCriticalityField.model = model;
-
-        vm.fields = fields;
-        vm.model = model;
-        vm.onSubmit = onSubmit;
-        vm.registrations = registrations;
-    };
-
+const controller = function() {
+    initialiseData(this, initialState);
 };
 
-controller.$inject = [
-    'ApplicationStore',
-    'Notification',
-    'OrgUnitStore'
-];
+controller.$inject = [];
 
 export default {
     template,

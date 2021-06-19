@@ -27,9 +27,13 @@ export function mkApplicationStore() {
     const update = (id, data) => remote
         .execute("POST", `api/app/${id}`, data);
 
+    const registerApp = (data) => remote
+        .execute("POST", `api/app`, data);
+
     return {
         getById,
-        update
+        update,
+        registerApp
     };
 }
 
