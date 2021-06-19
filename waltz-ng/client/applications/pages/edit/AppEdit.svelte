@@ -89,7 +89,7 @@
         } else {
             applicationStore
                 .update(appId, submission)
-                .then(d => history.back());
+                .then(() => history.back());
         }
     }
 
