@@ -20,10 +20,14 @@ import {remote} from "./remote";
 
 export function mkApplicationStore() {
 
-    const getById = (id) => {
-        return remote.fetchViewData("GET", `api/app/id/${id}`);
-    };
+    const getById = (id) => remote
+        .fetchViewData("GET", `api/app/id/${id}`, null, {});
 
+    const update = (id, data) => remote
+        .execute("POST", `api/app/${id}`, data);
+
+    const registerApp = (data) => remote
+        .execute("POST", `api/app`, data);
 
     const findBySelector = (selector) => {
         return remote.fetchViewList("POST", "api/app/selector", selector);
@@ -31,6 +35,8 @@ export function mkApplicationStore() {
 
     return {
         getById,
+        update,
+        registerApp
         findBySelector
     };
 }

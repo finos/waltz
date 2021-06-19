@@ -3,9 +3,11 @@
     import AutoComplete from "simple-svelte-autocomplete";
     import {createEventDispatcher} from "svelte";
 
-    let selectedItem;
     export let entityKinds;
-    export let placeholder = "Search..."
+    export let placeholder = "Search...";
+    export let showClear = true;
+
+    let selectedItem;
 
     const dispatch = createEventDispatcher();
 
@@ -23,4 +25,5 @@
               labelFieldName="name"
               valueFieldName="id"
               {placeholder}
+              {showClear}
               bind:selectedItem={selectedItem} />

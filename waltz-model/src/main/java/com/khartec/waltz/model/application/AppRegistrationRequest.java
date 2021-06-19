@@ -20,7 +20,7 @@ package com.khartec.waltz.model.application;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.Criticality;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.rating.RagRating;
 import org.immutables.value.Value;
 
@@ -31,10 +31,11 @@ import java.util.Set;
 @Value.Immutable
 @JsonSerialize(as = ImmutableAppRegistrationRequest.class)
 @JsonDeserialize(as = ImmutableAppRegistrationRequest.class)
-public abstract class AppRegistrationRequest {
+public abstract class AppRegistrationRequest implements
+        NameProvider,
+        ProvenanceProvider,
+        DescriptionProvider {
 
-    public abstract String name();
-    public abstract Optional<String> description();
     public abstract long organisationalUnitId();
     public abstract ApplicationKind applicationKind();
     public abstract LifecyclePhase lifecyclePhase();
@@ -44,6 +45,6 @@ public abstract class AppRegistrationRequest {
     public abstract Set<String> tags();
     public abstract RagRating overallRating();
     public abstract Criticality businessCriticality();
-    public abstract Optional<String> provenance();
+
 
 }

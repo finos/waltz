@@ -24,6 +24,8 @@ import org.immutables.value.Value;
 
 import java.util.Optional;
 
+import static java.lang.String.format;
+
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableFieldChange.class)
@@ -32,10 +34,11 @@ import java.util.Optional;
 public abstract class FieldChange {
 
     private static String describeChange(FieldChange c) {
-        return String.format("Updated: %s, from: '%s' to: '%s'",
+        return format(
+                "Updated: %s, from: '%s' to: '%s'",
                 c.name(),
-                c.original().orElse(""),
-                c.current().orElse(""));
+                c.original().orElse("(empty)"),
+                c.current().orElse("(empty)"));
     }
 
     public abstract String name();
