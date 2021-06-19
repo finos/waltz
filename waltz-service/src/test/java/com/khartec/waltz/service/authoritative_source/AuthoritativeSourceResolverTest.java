@@ -71,6 +71,7 @@ public class AuthoritativeSourceResolverTest {
                 .dataTypeRank(1)
                 .applicationId(200L)
                 .rating(AuthoritativenessRating.SECONDARY)
+                .authSourceId(1L)
                 .build());
 
         AuthoritativeSourceResolver authoritativeSourceResolver = new AuthoritativeSourceResolver(vantagePoints);
@@ -94,6 +95,7 @@ public class AuthoritativeSourceResolverTest {
                 .dataTypeRank(1)
                 .applicationId(205L)
                 .rating(AuthoritativenessRating.PRIMARY)
+                .authSourceId(1L)
                 .build());
 
         AuthoritativeSourceResolver authoritativeSourceResolver = new AuthoritativeSourceResolver(vantagePoints);
@@ -117,6 +119,7 @@ public class AuthoritativeSourceResolverTest {
                 .dataTypeRank(2)
                 .applicationId(205L)
                 .rating(AuthoritativenessRating.PRIMARY)
+                .authSourceId(1L)
                 .build());
 
 
@@ -128,6 +131,7 @@ public class AuthoritativeSourceResolverTest {
                 .dataTypeRank(3)
                 .applicationId(200L)
                 .rating(AuthoritativenessRating.SECONDARY)
+                .authSourceId(1L)
                 .build());
 
         AuthoritativeSourceResolver authoritativeSourceResolver = new AuthoritativeSourceResolver(vantagePoints);
@@ -150,6 +154,7 @@ public class AuthoritativeSourceResolverTest {
                 .dataTypeRank(2)
                 .applicationId(205L)
                 .rating(AuthoritativenessRating.PRIMARY)
+                .authSourceId(1L)
                 .build();
 
 

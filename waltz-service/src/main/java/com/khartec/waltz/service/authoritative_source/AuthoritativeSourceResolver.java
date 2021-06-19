@@ -85,6 +85,20 @@ public class AuthoritativeSourceResolver {
     }
 
 
+    public Optional<AuthoritativeRatingVantagePoint> resolveAuthSource(EntityReference vantagePoint, EntityReference source, String dataTypeCode) {
+
+        Map<String, Map<Long, Optional<AuthoritativeRatingVantagePoint>>> ouGroup = byOuThenDataTypeThenApp.get(vantagePoint);
+        if(isEmpty(ouGroup)) return Optional.empty();
+
+        Map<Long, Optional<AuthoritativeRatingVantagePoint>> dataTypeGroup = ouGroup.get(dataTypeCode);
+        if(isEmpty(dataTypeGroup)) return Optional.empty();
+
+        return  dataTypeGroup.getOrDefault(
+                source.id(),
+                Optional.empty());
+    }
+
+
     /**
      * Given a collection of vantages points (maybe) return the first
      * after sorting them in (descending) rank order.

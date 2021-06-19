@@ -133,6 +133,7 @@ public class AuthoritativeSourceDao {
                 .dataType(mkRef(EntityKind.DATA_TYPE, r.get(declaredDataTypeId)))
                 .dataTypeCode(r.get(targetDataTypeCode))
                 .dataTypeRank(r.get(declaredDataTypeLevel))
+                .authSourceId(r.get(AUTHORITATIVE_SOURCE.ID))
                 .build();
     };
 
@@ -204,6 +205,7 @@ public class AuthoritativeSourceDao {
                 .set(AUTHORITATIVE_SOURCE.RATING, command.rating().name())
                 .set(AUTHORITATIVE_SOURCE.DESCRIPTION, command.description())
                 .set(AUTHORITATIVE_SOURCE.PROVENANCE, "waltz")
+                .returning(AUTHORITATIVE_SOURCE.ID)
                 .execute();
     }
 
@@ -223,7 +225,7 @@ public class AuthoritativeSourceDao {
 
 
     public List<AuthoritativeRatingVantagePoint> findExpandedAuthoritativeRatingVantagePoints(Set<Long> orgIds) {
-        SelectSeekStep3<Record8<Long, Integer, String, Long, Integer, String, Long, String>, Integer, Integer, Long> select = dsl.select(
+        SelectSeekStep3<Record9<Long, Integer, String, Long, Integer, String, Long, String, Long>, Integer, Integer, Long> select = dsl.select(
                 targetOrgUnitId,
                 declaredOrgUnitLevel,
                 declaredDataTypeCode,
@@ -231,7 +233,8 @@ public class AuthoritativeSourceDao {
                 declaredDataTypeLevel,
                 targetDataTypeCode,
                 AUTHORITATIVE_SOURCE.APPLICATION_ID,
-                AUTHORITATIVE_SOURCE.RATING)
+                AUTHORITATIVE_SOURCE.RATING,
+                AUTHORITATIVE_SOURCE.ID)
                 .from(ehOrgUnit)
                 .innerJoin(AUTHORITATIVE_SOURCE)
                     .on(ehOrgUnit.ANCESTOR_ID.eq(AUTHORITATIVE_SOURCE.PARENT_ID).and(ehOrgUnit.KIND.eq(EntityKind.ORG_UNIT.name())))
@@ -249,7 +252,7 @@ public class AuthoritativeSourceDao {
 
 
     public List<AuthoritativeRatingVantagePoint> findAuthoritativeRatingVantagePoints() {
-        SelectSeekStep4<Record8<Long, Integer, String, Long, Integer, String, Long, String>, Integer, Integer, Long, Long> select = dsl
+        SelectSeekStep4<Record9<Long, Integer, String, Long, Integer, String, Long, String, Long>, Integer, Integer, Long, Long> select = dsl
                 .select(targetOrgUnitId,
                         declaredOrgUnitLevel,
                         declaredDataTypeCode,
@@ -257,7 +260,8 @@ public class AuthoritativeSourceDao {
                         declaredDataTypeLevel,
                         declaredDataTypeCode.as(targetDataTypeCode),
                         AUTHORITATIVE_SOURCE.APPLICATION_ID,
-                        AUTHORITATIVE_SOURCE.RATING)
+                        AUTHORITATIVE_SOURCE.RATING,
+                        AUTHORITATIVE_SOURCE.ID)
                 .from(AUTHORITATIVE_SOURCE)
                 .innerJoin(ehOrgUnit)
                 .on(ehOrgUnit.ANCESTOR_ID.eq(AUTHORITATIVE_SOURCE.PARENT_ID)
@@ -473,7 +477,8 @@ public class AuthoritativeSourceDao {
         int[] updatedActorDecoratorRatings = dsl
                 .select(LOGICAL_FLOW_DECORATOR.ID,
                         child_dt.ID,
-                        AUTHORITATIVE_SOURCE.RATING)
+                        AUTHORITATIVE_SOURCE.RATING,
+                        AUTHORITATIVE_SOURCE.ID)
                 .from(AUTHORITATIVE_SOURCE)
                 .innerJoin(parent_dt).on(AUTHORITATIVE_SOURCE.DATA_TYPE.eq(parent_dt.CODE))
                 .innerJoin(ENTITY_HIERARCHY).on(parent_dt.ID.eq(ENTITY_HIERARCHY.ANCESTOR_ID)
@@ -493,6 +498,7 @@ public class AuthoritativeSourceDao {
                 .map(r -> dsl
                         .update(LOGICAL_FLOW_DECORATOR)
                         .set(LOGICAL_FLOW_DECORATOR.RATING, r.get(AUTHORITATIVE_SOURCE.RATING))
+                        .set(LOGICAL_FLOW_DECORATOR.AUTH_SOURCE_ID, r.get(AUTHORITATIVE_SOURCE.ID))
                         .where(LOGICAL_FLOW_DECORATOR.ID.eq(r.get(LOGICAL_FLOW_DECORATOR.ID))
                                 .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(r.get(child_dt.ID))
                                         .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))))
@@ -523,6 +529,7 @@ public class AuthoritativeSourceDao {
         return dsl
                 .update(LOGICAL_FLOW_DECORATOR)
                 .set(LOGICAL_FLOW_DECORATOR.RATING, AuthoritativenessRating.NO_OPINION.name())
+                .setNull(LOGICAL_FLOW_DECORATOR.AUTH_SOURCE_ID)
                 .where(LOGICAL_FLOW_DECORATOR.ID.in(decoratorsToMarkAsNoOpinion))
                 .execute();
     }

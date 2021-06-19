@@ -18,6 +18,8 @@
                 <th>Field Type</th>
                 <th>Position</th>
                 <th>External Id</th>
+                <th>Parent Id</th>
+                <th>Label</th>
                 <th>Conditional?</th>
                 <th>Help Text?</th>
                 <th>Mandatory?</th>
@@ -31,6 +33,8 @@
                 <td><span ng-bind="question.fieldType | toDisplayName:'surveyQuestionFieldType'"></span></td>
                 <td><span ng-bind="question.position"></span></td>
                 <td><span ng-bind="question.externalId || '-'"></span></td>
+                <td><span ng-bind="question.parentExternalId || '-'"></span></td>
+                <td><span ng-bind="question.label || '-'"></span></td>
                 <td>
                     <span uib-popover="{{question.inclusionPredicate}}"
                           popover-trigger="mouseenter"

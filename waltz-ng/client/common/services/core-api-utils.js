@@ -63,6 +63,7 @@ import {FavouritesStore_API as FavouritesStore} from "../../app-groups/services/
 import {FlowDiagramStore_API as FlowDiagramStore} from "../../flow-diagram/services/flow-diagram-store";
 import {FlowDiagramAnnotationStore_API as FlowDiagramAnnotationStore} from "../../flow-diagram/services/flow-diagram-annotation-store";
 import {FlowDiagramEntityStore_API as FlowDiagramEntityStore} from "../../flow-diagram/services/flow-diagram-entity-store";
+import {FlowDiagramOverlayGroupStore_API as FlowDiagramOverlayGroupStore} from "../../flow-diagram/services/flow-diagram-overlay-group-store";
 import {InvolvementStore_API as InvolvementStore} from "../../involvement/services/involvement-store";
 import {InvolvementKindStore_API as InvolvementKindStore} from "../../involvement-kind/services/involvement-kind-store";
 import {InvolvementViewService_API as InvolvementViewService} from "../../involvement/services/involvement-view-service";
@@ -159,6 +160,7 @@ export const CORE_API = {
     FlowDiagramStore,
     FlowDiagramAnnotationStore,
     FlowDiagramEntityStore,
+    FlowDiagramOverlayGroupStore,
     EntitySvgDiagramStore,
     InvolvementStore,
     InvolvementKindStore,

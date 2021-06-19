@@ -25,13 +25,19 @@ import _ from "lodash";
  */
 export function prepareSearchNodes(nodes = [],
                                    attr = "name",
-                                   parentKey = "parentId") {
+                                   parent = "parentId") {
 
     const nodesById = _.keyBy(nodes, "id");
 
     const attrFn = _.isString(attr)
         ? n => n[attr]
         : attr;
+
+
+    const parentFn = _.isString(parent)
+        ? n => n[parent]
+        : parent;
+
 
     return _.map(nodes, n => {
         let ptr = n;
@@ -40,7 +46,7 @@ export function prepareSearchNodes(nodes = [],
         while (ptr) {
             nodePath.push(ptr);
             searchStr += (attrFn(ptr) || "") + " ";
-            const parentId = ptr[parentKey];
+            const parentId = parentFn(ptr);
             ptr = nodesById[parentId];
         }
         return {

@@ -42,6 +42,8 @@ public abstract class DataTypeDecorator implements
 
     public abstract Optional<AuthoritativenessRating> rating();
 
+    public abstract Optional<Long> authSourceId();
+
     @Value.Derived
     public long dataTypeId() { return decoratorEntity().id(); }
 
@@ -50,4 +52,5 @@ public abstract class DataTypeDecorator implements
 
     @Value.Default
     public boolean isReadonly() { return false; };
+
 }
