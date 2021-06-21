@@ -36,7 +36,7 @@ export function mkApplicationStore() {
     return {
         getById,
         update,
-        registerApp
+        registerApp,
         findBySelector
     };
 }
