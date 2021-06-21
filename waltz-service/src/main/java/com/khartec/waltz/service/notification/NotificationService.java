@@ -37,7 +37,7 @@ public class NotificationService {
 
     private final NotificationDao notificationDao;
     private final SettingsService settingsService;
-    private static final String NOTIFICATIONMESSAGEKEY = "waltz.issue.notification.message";
+    private static final String NOTIFICATION_MESSAGE_KEY = "ui.banner.notification.text";
 
 
     @Autowired
@@ -51,7 +51,7 @@ public class NotificationService {
 
     public NotificationResponse findNotificationsByUserId(String userId) {
         List<NotificationSummary> summary = notificationDao.findNotificationsByUserId(userId);
-        Optional<String> message = settingsService.getValue(NOTIFICATIONMESSAGEKEY);
+        Optional<String> message = settingsService.getValue(NOTIFICATION_MESSAGE_KEY);
 
         return ImmutableNotificationResponse.builder()
                 .summary(summary)
