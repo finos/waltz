@@ -13,6 +13,7 @@
     import {diagram} from "./store/diagram";
     import dirty from "./store/dirty";
     import NoData from "../../../common/svelte/NoData.svelte";
+    import _ from "lodash";
 
 
     let elem;
@@ -89,15 +90,33 @@
         positions: $positions
     });
 
+    let windowWidth;
+    let svgHeight;
+    let svgWidth;
+
+    const ua = window.navigator.userAgent
+
+    const isIE = _.includes(ua, "MSIE") || _.includes(ua, "Trident/");
+
+    $: svgWidth = isIE
+        ? windowWidth * 0.6 + "px"
+        : "100%";
+
+    $: svgHeight = isIE
+        ? windowWidth * 0.4 + "px"
+        : "100%";
+
+
 </script>
 
-
+<svelte:window bind:innerWidth={windowWidth}/>
 {#if $diagram?.id}
 <div class="col-md-8 diagram-svg">
     <svg viewBox="0 0 1100 600"
-         width="100%"
+         width={svgWidth}
+         height={svgHeight}
          bind:this={elem}>
-        <g transform={$diagramTransform}>
+    <g transform={$diagramTransform}>
 
             {#if $visibility.annotations}
                 <AnnotationLayer on:selectAnnotation={onSelectAnnotation}
