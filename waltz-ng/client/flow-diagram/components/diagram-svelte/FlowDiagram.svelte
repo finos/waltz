@@ -80,16 +80,6 @@
 
     $: elem && setupPanAndZoom();
 
-
-    $: console.log("FlowDiag:", {
-        dirty: $dirty,
-        diag: $diagram,
-        store: $store,
-        overlay: $overlay,
-        model: $model,
-        positions: $positions
-    });
-
     let windowWidth;
     let svgHeight;
     let svgWidth;
