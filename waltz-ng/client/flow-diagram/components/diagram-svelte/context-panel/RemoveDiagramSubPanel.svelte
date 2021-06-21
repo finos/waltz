@@ -16,7 +16,8 @@
     }
 
     function removeDiagram(){
-        return removePromise = flowDiagramStore.deleteForId(diagramId);
+        return removePromise = flowDiagramStore.deleteForId(diagramId)
+            .then(() => history.back());
     }
 
 

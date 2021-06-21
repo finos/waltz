@@ -21,7 +21,9 @@ package com.khartec.waltz.data.flow_diagram;
 import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.flow_diagram.FlowDiagramEntity;
 import com.khartec.waltz.model.flow_diagram.ImmutableFlowDiagramEntity;
 import com.khartec.waltz.schema.tables.records.FlowDiagramEntityRecord;
@@ -29,14 +31,18 @@ import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
+import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 
 
@@ -45,25 +51,44 @@ public class FlowDiagramEntityDao {
 
     private static final com.khartec.waltz.schema.tables.FlowDiagramEntity fde = FLOW_DIAGRAM_ENTITY.as("fde");
 
+    private static final ArrayList<EntityKind> POSSIBLE_ENTITY_KINDS = newArrayList(
+            EntityKind.APPLICATION,
+            EntityKind.ACTOR,
+            EntityKind.MEASURABLE,
+            EntityKind.CHANGE_INITIATIVE,
+            EntityKind.LOGICAL_DATA_FLOW,
+            EntityKind.PHYSICAL_FLOW);
 
     private static Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             fde.ENTITY_ID,
             fde.ENTITY_KIND,
-            newArrayList(
-                    EntityKind.APPLICATION,
-                    EntityKind.ACTOR,
-                    EntityKind.MEASURABLE,
-                    EntityKind.CHANGE_INITIATIVE));
+            POSSIBLE_ENTITY_KINDS);
+
+
+    private static Field<String> ENTITY_LIFECYCLE_PHASE_FIELD = InlineSelectFieldFactory.mkEntityLifecycleField(
+            fde.ENTITY_ID,
+            fde.ENTITY_KIND,
+            POSSIBLE_ENTITY_KINDS);
+
 
 
     private static final RecordMapper<Record, FlowDiagramEntity> TO_DOMAIN_MAPPER = r -> {
         FlowDiagramEntityRecord record = r.into(FLOW_DIAGRAM_ENTITY);
+        EntityReference ref = mkRef(
+                EntityKind.valueOf(record.getEntityKind()),
+                record.getEntityId(),
+                Optional.ofNullable(r.getValue(ENTITY_NAME_FIELD)).orElse(format("Deleted %s", record.getEntityKind())));
+
+        EntityLifecycleStatus entityLifecycleStatus = readEnum(
+                r.getValue(ENTITY_LIFECYCLE_PHASE_FIELD),
+                EntityLifecycleStatus.class,
+                t -> EntityLifecycleStatus.REMOVED);
+
         return ImmutableFlowDiagramEntity.builder()
                 .diagramId(record.getDiagramId())
-                .entityReference(mkRef(
-                        EntityKind.valueOf(record.getEntityKind()),
-                        record.getEntityId(),
-                        r.getValue(ENTITY_NAME_FIELD)))
+                .entityReference(ImmutableEntityReference
+                        .copyOf(ref)
+                        .withEntityLifecycleStatus(entityLifecycleStatus))
                 .isNotable(record.getIsNotable())
                 .build();
     };
@@ -198,6 +223,7 @@ public class FlowDiagramEntityDao {
         return dsl
                 .select(fde.fields())
                 .select(ENTITY_NAME_FIELD)
+                .select(ENTITY_LIFECYCLE_PHASE_FIELD)
                 .from(fde)
                 .where(condition)
                 .fetch(TO_DOMAIN_MAPPER);

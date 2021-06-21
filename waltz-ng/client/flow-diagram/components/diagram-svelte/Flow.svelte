@@ -4,6 +4,7 @@
     import {createEventDispatcher} from "svelte";
     import {refToString} from "../../../common/entity-utils";
     import {positions} from "./store/layout";
+    import {determineStylingBasedUponLifecycle} from "./flow-diagram-utils";
 
 
     const dispatch = createEventDispatcher();
@@ -20,17 +21,6 @@
             return "\uf016"; // one
         } else {
             return "\uf0c5"; // many
-        }
-    }
-
-    function determineFlowStyling(status) {
-        switch (status) {
-            case "PENDING":
-                return {color: "#629fcd", dashArray: "6 3"};
-            case "REMOVED":
-                return {color: "#888", dashArray: "3 6"};
-            default:
-                return {color: "#888888", dashArray: "0"};
         }
     }
 
@@ -82,7 +72,7 @@
     $: decorationCount = _.size(decorations[flow.id]) || 0;
     $: icon = determineIcon(decorationCount);
     $: linePath = mkLinePath(flow, sourcePos, targetPos);
-    $: flowStyling = determineFlowStyling(flow.data.entityLifecycleStatus);
+    $: flowStyling = determineStylingBasedUponLifecycle(flow.data.entityLifecycleStatus);
 
     $: {
         if (line && arrow) {

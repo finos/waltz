@@ -46,6 +46,13 @@
     </ul>
     {/if}
 {/if}
+<div>
+    <br>
+    <button class="btn btn-skinny"
+            on:click|preventDefault={cancel}>
+        Cancel
+    </button>
+</div>
 
 <style>
     ul {

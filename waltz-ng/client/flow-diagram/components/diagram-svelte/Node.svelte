@@ -14,6 +14,7 @@
         symbolTriangle,
         symbolWye
     } from "d3-shape";
+    import {determineStylingBasedUponLifecycle} from "./flow-diagram-utils";
 
     const symbolsByName = {
         "triangle": symbol().type(symbolTriangle).size(40),
@@ -68,17 +69,6 @@
         dispatch("selectNode", node.data);
     }
 
-    function determineFill(overlayGroup, associatedGroups){
-        return "#fafafa"
-        // if (_.isNil(overlayGroup)){
-        //     return "#fafafa"
-        // } else if (_.includes(associatedGroups, overlayGroup)){
-        //     return "#eee" //overlayGroup.data.fill;
-        // } else {
-        //     return "#eee"
-        // }
-    }
-
     let nameElem;
     let gElem;
 
@@ -90,13 +80,13 @@
 
     $: associatedGroups = _.filter(groups, g => _.includes(g.data.applicationIds, node.data.id))
 
-    $: fill = determineFill($overlay.appliedOverlay, associatedGroups);
-
     $: classes = [`
             wfd-node
             ${$overlay.appliedOverlay && !_.includes(associatedGroups, $overlay.appliedOverlay)
             ? "wfd-not-active" : "wfd-active"}
     `]
+
+    $: nodeStyling = determineStylingBasedUponLifecycle(node.data.entityLifecycleStatus);
 
     function determineWidth(node, elem, icons){
         const margin = node.data.kind === 'ACTOR' ? 30 : 24
@@ -113,9 +103,10 @@
    on:click={selectNode}
    class={classes}>
     <path d={shape.path}
-          fill={fill}
+          fill="#fafafa"
           class="shape"
-          stroke="#ccc"
+          stroke={nodeStyling.color}
+          stroke-dasharray={nodeStyling.dashArray}
           style="padding-top: 20px">
     </path>
     <text style="font-size: small;"
