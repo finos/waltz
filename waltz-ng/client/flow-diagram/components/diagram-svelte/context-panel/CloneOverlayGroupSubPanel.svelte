@@ -2,11 +2,10 @@
     import EntitySearchSelector from "../../../../common/svelte/EntitySearchSelector.svelte";
     import {createEventDispatcher} from "svelte";
     import {flowDiagramOverlayGroupStore} from "../../../../svelte-stores/flow-diagram-overlay-group-store";
+    import _ from "lodash";
 
-    let workingGroup;
     let workingDiagram;
     export let diagramId;
-    export let canEdit;
 
     let dispatch = createEventDispatcher();
 
@@ -14,8 +13,6 @@
         dispatch("cancel")
         workingDiagram = null;
     }
-
-    $: console.log({workingDiagram});
 
     $: groupsCall = workingDiagram && flowDiagramOverlayGroupStore.findByDiagramId(workingDiagram?.id);
 
@@ -25,8 +22,6 @@
         flowDiagramOverlayGroupStore.cloneOverlayGroup(diagramId, group.id);
         cancel();
     }
-
-    $: console.log({groups});
 
 </script>
 
@@ -42,12 +37,24 @@
     <ul>
         {#each groups as group}
         <li>
-            <button on:click={() => selectGroup(group)}>{group.name}</button></li>
+            <button class="btn btn-skinny"
+                    on:click={() => selectGroup(group)}>
+                {group.name}
+            </button>
+        </li>
         {/each}
     </ul>
     {/if}
 {/if}
 
 <style>
+    ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
 
+    li {
+        padding-top: 0;
+    }
 </style>
