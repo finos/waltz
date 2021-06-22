@@ -18,19 +18,23 @@
 
 <div class="waltz-attestation-confirmation">
     <div class="wac-header">
-        You are attesting that the
-        <span ng-bind="$ctrl.attestationKind | toDisplayName:'entity'">
-        </span>
-        entries for
-        <waltz-entity-icon-label entity-ref="$ctrl.parentEntityRef">
-        </waltz-entity-icon-label>
-        are correct.
+        <div style="padding-bottom: 0.5em">
+            You are attesting that the
+            <span ng-bind="$ctrl.attestationKind | toDisplayName:'entity'">
+            </span>
+            entries are correct.
+        </div>
 
-        <span style="padding-left: 30px">
-            <button class="btn btn-sm"
+        <div class="alert alert-danger"
+             style="margin-top: 0.5em"
+             ng-if="$ctrl.disabled">
+            <waltz-markdown text="$ctrl.message"></waltz-markdown>
+        </div>
+
+        <div>
+            <button class="btn btn-sm btn-success"
                     ng-class="{
-                        'disabled': $ctrl.disabled,
-                        'btn-success': !$ctrl.disabled
+                        'disabled': $ctrl.disabled
                     }"
                     ng-disabled="$ctrl.disabled"
                     ng-click="$ctrl.confirm($ctrl.instance)">
@@ -40,13 +44,9 @@
                class="clickable">
                 Cancel
             </a>
-        </span>
-
-        <div class="alert alert-danger"
-             style="margin-top: 6px"
-             ng-if="$ctrl.disabled">
-            <span ng-bind="$ctrl.message"></span>
         </div>
+
+
     </div>
 
     <div class="wac-content">
