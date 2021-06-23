@@ -21,22 +21,38 @@ import {remote} from "./remote";
 export function mkFlowDiagramStore() {
 
     const getById = (id, force = false) => {
-        return remote.fetchViewData("GET", `api/flow-diagram/id/${id}`, null, {}, {force: force});
+        return remote
+            .fetchViewData("GET", `api/flow-diagram/id/${id}`, null, {}, {force: force});
     };
 
-    const updateName = (id, cmd) => remote.execute("POST", `api/flow-diagram/update-name/${id}`, cmd)
+    const updateName = (id, cmd) => remote
+        .execute("POST", `api/flow-diagram/update-name/${id}`, cmd)
         .then(r => getById(id));
 
-    const updateDescription = (id, cmd) => remote.execute("POST",`api/flow-diagram/update-description/${id}`, cmd)
+    const updateDescription = (id, cmd) => remote
+        .execute("POST",`api/flow-diagram/update-description/${id}`, cmd)
         .then(r => getById(id));
 
     const save = (saveCmd) => remote.execute("POST", "api/flow-diagram", saveCmd);
-    
+
+    const clone = (diagramId, newName) => {
+        return remote
+            .execute("POST", `api/flow-diagram/id/${diagramId}/clone`, newName)
+            .then(r => getById(r.data, true));
+    }
+
+    const deleteForId = (id) => remote
+        .execute("DELETE", `api/flow-diagram/id/${id}`);
+        // .then(r => r.data);
+
+
     return {
         getById,
         updateName,
         updateDescription,
-        save
+        save,
+        clone,
+        deleteForId
     };
 }
 

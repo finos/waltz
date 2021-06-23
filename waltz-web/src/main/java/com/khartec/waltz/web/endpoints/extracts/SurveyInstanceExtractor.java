@@ -351,7 +351,7 @@ public class SurveyInstanceExtractor implements DataExtractor {
     private List<List<Object>> prepareReportRows(List<SurveyQuestion> questions, Condition condition) {
 
         SelectConditionStep<Record> extractAnswersQuery = dsl
-                .select(sr.NAME, sr.ID, st.STATUS)
+                .selectDistinct(sr.NAME, sr.ID, st.STATUS)
                 .select(subjectNameField, subjectExtIdField)
                 .select(si.ID, si.STATUS, si.APPROVED_AT, si.APPROVED_BY, si.SUBMITTED_AT, si.SUBMITTED_BY)
                 .select(sqr.QUESTION_ID, sqr.COMMENT)
@@ -363,7 +363,7 @@ public class SurveyInstanceExtractor implements DataExtractor {
                 .innerJoin(sr).on(sr.SURVEY_TEMPLATE_ID.eq(st.ID))
                 .innerJoin(si).on(si.SURVEY_RUN_ID.eq(sr.ID))
                 .innerJoin(sq).on(sq.SURVEY_TEMPLATE_ID.eq(st.ID))
-                .innerJoin(sqr).on(sqr.SURVEY_INSTANCE_ID.eq(si.ID).and(sqr.QUESTION_ID.eq(sq.ID)))
+                .leftJoin(sqr).on(sqr.SURVEY_INSTANCE_ID.eq(si.ID).and(sqr.QUESTION_ID.eq(sq.ID)))
                 .where(condition);
 
         Result<Record> results = extractAnswersQuery.fetch();

@@ -10,6 +10,7 @@
     import model from "../store/model";
 
     export let selected;
+    export let canEdit;
     const dispatch = createEventDispatcher();
 
     $: isApp = selected.kind === 'APPLICATION';
@@ -49,6 +50,7 @@
 <br>
 {#if activeMode === Modes.MENU}
 <ul>
+    {#if canEdit}
     <li>
         <button class="btn btn-skinny"
                 on:click={() => activeMode = Modes.ADD_UPSTREAM_FLOW}>
@@ -73,6 +75,7 @@
             Remove
         </button>
     </li>
+    {/if}
     <li>
         <button class="btn btn-skinny"
                 on:click={() => cancel()}>

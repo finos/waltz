@@ -67,6 +67,7 @@
         on:click={() => cancel()}>
     Cancel
 </button>
+|
 <button class="btn btn-link"
         on:click={() => updateFlows()}>
     Update flows

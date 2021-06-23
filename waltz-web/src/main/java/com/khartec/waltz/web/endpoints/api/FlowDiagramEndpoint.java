@@ -29,6 +29,7 @@ import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import spark.Request;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.user.SystemRole.LINEAGE_EDITOR;
@@ -75,28 +76,35 @@ public class FlowDiagramEndpoint implements Endpoint {
                 -> flowDiagramService.findByEntityReference(getEntityReference(req));
         ListRoute<FlowDiagram> findForSelectorRoute = (req, res)
                 -> flowDiagramService.findForSelector(readIdSelectionOptionsFromBody(req));
+
         DatumRoute<Long> saveDiagramRoute = (req, res)
                 ->  {
+            SaveDiagramCommand saveDiagramCommand = readBody(req, SaveDiagramCommand.class);
             requireRole(userRoleService, req, LINEAGE_EDITOR);
-            return flowDiagramService.save(
-                    readBody(req, SaveDiagramCommand.class),
-                    getUsername(req));
+            saveDiagramCommand
+                    .diagramId()
+                    .ifPresent(id -> verifyCanEdit(req, id));
+            return flowDiagramService.save(saveDiagramCommand, getUsername(req));
         };
 
         DatumRoute<Boolean> updateNameRoute = (req, res)
                 ->  {
             requireRole(userRoleService, req, LINEAGE_EDITOR);
+            long diagramId = getId(req);
+            verifyCanEdit(req, diagramId);
             return flowDiagramService.updateName(
-                    getId(req),
+                    diagramId,
                     readBody(req, UpdateNameCommand.class),
                     getUsername(req));
         };
 
         DatumRoute<Boolean> updateDescriptionRoute = (req, res)
                 ->  {
+            long diagramId = getId(req);
+            verifyCanEdit(req, diagramId);
             requireRole(userRoleService, req, LINEAGE_EDITOR);
             return flowDiagramService.updateDescription(
-                    getId(req),
+                    diagramId,
                     readBody(req, UpdateDescriptionCommand.class),
                     getUsername(req));
         };
@@ -120,7 +128,12 @@ public class FlowDiagramEndpoint implements Endpoint {
         };
 
         DatumRoute<Boolean> deleteByIdRoute = (req, res)
-                -> flowDiagramService.deleteById(getId(req), getUsername(req));
+                -> {
+            requireRole(userRoleService, req, LINEAGE_EDITOR);
+            long diagramId = getId(req);
+            verifyCanEdit(req, diagramId);
+            return flowDiagramService.deleteById(getId(req), getUsername(req));
+        };
 
         getForDatum(getByIdPath, getByIdRoute);
         getForList(findByEntityPath, findByEntityRoute);
@@ -134,6 +147,11 @@ public class FlowDiagramEndpoint implements Endpoint {
         postForDatum(makeNewDiagramPath, makeNewDiagramRoute);
 
         deleteForDatum(deleteByIdPath, deleteByIdRoute);
+    }
+
+    private void verifyCanEdit(Request request, long diagramId) {
+        FlowDiagram def = flowDiagramService.getById(diagramId);
+        def.editorRole().ifPresent(r -> requireRole(userRoleService, request, r));
     }
 
 }

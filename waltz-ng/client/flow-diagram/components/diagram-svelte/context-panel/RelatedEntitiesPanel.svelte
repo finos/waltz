@@ -1,13 +1,18 @@
 <script>
-    import Icon from "../../../../common/svelte/Icon.svelte";
     import {mkSelectionOptions} from "../../../../common/selector-utils";
     import {mkRef} from "../../../../common/entity-utils";
     import {flowDiagramEntityStore} from "../../../../svelte-stores/flow-diagram-entity-store";
     import {measurableStore} from "../../../../svelte-stores/measurables";
     import {measurableCategoryStore} from "../../../../svelte-stores/measurable-category-store";
     import _ from "lodash";
+    import model from "../store/model";
+    import {toGraphId} from "../../../flow-diagram-utils";
+    import RelatedEntitiesViewTable from "./RelatedEntitiesViewTable.svelte";
+    import AddRelatedMeasurableSubPanel from "./AddRelatedMeasurableSubPanel.svelte";
+    import AddRelatedChangeInitiativeSubPanel from "./AddRelatedChangeInitiativeSubPanel.svelte";
 
     export let diagramId;
+    export let canEdit;
 
     const Modes = {
         VIEW: "VIEW",
@@ -15,106 +20,70 @@
         ADD_CHANGE_INITIATIVE: "ADD_CHANGE_INITIATITVE",
     };
 
-    $: entitiesCall = flowDiagramEntityStore
-        .findByDiagramId(diagramId);
+    let activeMode = Modes.VIEW;
 
-    $: relatedEntities = $entitiesCall.data;
-
-    $: measurablesCall = measurableStore
-        .findMeasurablesBySelector(mkSelectionOptions(mkRef('FLOW_DIAGRAM', diagramId)));
-
+    $: measurablesCall = measurableStore.findMeasurablesBySelector(mkSelectionOptions(mkRef('FLOW_DIAGRAM', diagramId)), true);
     $: measurables = $measurablesCall.data;
+    $: measurablesById = _.keyBy(measurables, d => d.id);
 
     $: measurableCategoryCall = measurableCategoryStore.findAll();
     $: categoriesById = _.keyBy($measurableCategoryCall.data, d => d.id);
 
-    $: measurablesById =  _.keyBy(measurables, d => d.id);
-
-    $: relatedMeasurableIds = _
-        .chain(relatedEntities)
-        .filter(e => e.entityReference.kind === 'MEASURABLE')
-        .map(e => e.entityReference.id)
+    $: associatedCis = _
+        .chain($model.relationships)
+        .filter(d => d.data.kind === 'CHANGE_INITIATIVE')
+        .sortBy("data.name")
         .value();
 
     $: associatedMeasurables = _
-            .chain(relatedMeasurableIds)
-            .map(aId => measurablesById[aId])
-            .filter(m =>  !_.isNil(m))
-            .sortBy(d => d?.name)
-            .value();
+        .chain($model.relationships)
+        .filter(d => d.data.kind === 'MEASURABLE')
+        .map(d => {
+            const measurable = measurablesById[d.data.id];
+            const category = categoriesById[measurable?.categoryId];
+
+            return Object.assign({}, d, {category: category})
+        })
+        .sortBy("data.name")
+        .value();
+
+    $: associatedMeasurableIds = _.map(associatedMeasurables, d => d.data.id)
 
     $: suggestedMeasurables = _
         .chain(measurables)
-        .reject(aId => _.includes(relatedMeasurableIds, aId))
+        .reject(m => _.includes(associatedMeasurableIds, m.id))
+        .map(m => Object.assign({}, m, {category: categoriesById[m.categoryId]}))
         .sortBy(d => d?.name)
         .value();
 
-    let activeMode = Modes.VIEW;
-    let associatedMeasurables = [];
 
-    function addNode() {
-        activeMode = Modes.ADD_NODE;
+    function selectEntity(e) {
+        flowDiagramEntityStore.addRelationship(diagramId, mkRef(e.kind, e.id, e.name));
+        model.addRelationship({id: toGraphId(e), data: e});
+        activeMode = Modes.VIEW;
     }
 
+    function addEntityMode(e) {
+        if (e.detail === 'MEASURABLE') {
+            activeMode = Modes.ADD_MEASURABLE;
+        } else {
+            activeMode = Modes.ADD_CHANGE_INITIATIVE;
+        }
+    }
 
 </script>
 
 {#if activeMode === Modes.VIEW}
-    <strong>Measurables:</strong>
-    <table class="table table-condensed small">
-        <!-- IF NONE -->
-        {#if _.isEmpty(associatedMeasurables)}
-        <tr>
-            <td colspan="2">No associated viewpoints</td>
-        </tr>
-        {:else}
-        <!-- LIST -->
-        <tbody>
-        {#each associatedMeasurables as measurable}
-        <tr>
-            <td>
-                <div >{measurable.name}</div>
-                <div class="small text-muted">
-                    {_.get(categoriesById[measurable.categoryId], "name", "unknown")}
-                </div>wal
-            </td>
-            <td>
-                <button on:click={() => console.log("remove")}
-                   class="clickable">
-                    <Icon name="trash"/>Remove
-                </button>
-            </td>
-        </tr>
-        {/each}
-        </tbody>
-        {/if}
-
-        <!-- FOOTER-->
-        <tfoot>
-        <tr>
-            <td colspan="2">
-                <button class="btn btn-skinny"
-                        on:click={() =>  console.log("add")}>
-                    <Icon name="plus"/>Add
-                </button>
-            </td>
-        </tr>
-        </tfoot>
-
-    </table>
-
-    <strong>Change Initiatives:</strong>
-    <button class="btn btn-skinny"
-            on:click={() => addNode()}>
-        Add node
-    </button>
+    <RelatedEntitiesViewTable {diagramId}
+                              {canEdit}
+                              measurables={associatedMeasurables}
+                              changeInitiatives={associatedCis}
+                              on:select={addEntityMode}/>
 {:else if activeMode === Modes.ADD_MEASURABLE }
-    <br>
-    <button class="btn btn-skinny"
-            on:click={() => activeMode = Modes.VIEW}>
-        Cancel
-    </button>
+    <AddRelatedMeasurableSubPanel measurables={suggestedMeasurables}
+                                  on:select={e => selectEntity(e.detail)}
+                                  on:cancel={() => activeMode = Modes.VIEW}/>
+{:else if activeMode === Modes.ADD_CHANGE_INITIATIVE }
+    <AddRelatedChangeInitiativeSubPanel on:select={e => selectEntity(e.detail)}
+                                        on:cancel={() => activeMode = Modes.VIEW}/>
 {/if}
-
-<style>
-</style>

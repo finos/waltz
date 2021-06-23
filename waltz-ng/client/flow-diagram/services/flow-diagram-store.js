@@ -27,7 +27,7 @@ export function store($http, base) {
         .delete(`${BASE}/id/${id}`)
         .then(r => r.data);
 
-    const clone = (id, newName ) => $http
+    const clone = (id, newName) => $http
         .post(`${BASE}/id/${id}/clone`, newName)
         .then(r => r.data);
 

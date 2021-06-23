@@ -31,7 +31,8 @@ export function mkFlowDiagramOverlayGroupStore() {
     };
 
     const findOverlaysByDiagramId = (id) => {
-        return remote.fetchViewData("GET", `api/flow-diagram-overlay-group/overlays/diagram-id/${id}`);
+        return remote
+            .fetchViewData("GET", `api/flow-diagram-overlay-group/overlays/diagram-id/${id}`);
     };
 
     const createGroup = (group) => {
@@ -51,11 +52,19 @@ export function mkFlowDiagramOverlayGroupStore() {
             .then(() => findByDiagramId(diagramId, true));
     }
 
+    const cloneOverlayGroup = (diagramId, groupId) => {
+        return remote
+            .execute(
+                "POST",
+                `api/flow-diagram-overlay-group/clone/diagram-id/${diagramId}/id/${groupId}`)
+    }
+
     return {
         findByDiagramId,
         findOverlaysByDiagramId,
         createGroup,
-        deleteGroup
+        deleteGroup,
+        cloneOverlayGroup
     };
 }
 

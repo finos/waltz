@@ -24,9 +24,21 @@
             path: ctx => `application/${ctx.id}`,
             title: "Application View"
         },
+        "main.app-group.view": {
+            path: ctx => `app-group/${ctx.id}`,
+            title: "Application Group View"
+        },
+        "main.change-initiative.view": {
+            path: ctx => `change-initiative/${ctx.id}`,
+            title: "Change Initiative View"
+        },
         "main.data-type.view": {
             path: ctx => `data-types/${ctx.id}`,
             title: "DataType View"
+        },
+        "main.flow-diagram.view": {
+            path: ctx => `flow-diagram/${ctx.id}`,
+            title: "Flow Diagram View"
         },
         "main.logical-flow.view": {
             path: ctx => `logical-flow/${ctx.id}`,

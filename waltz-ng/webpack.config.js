@@ -89,7 +89,7 @@ module.exports = {
                         loader: "svelte-loader",
                         options: {
                             preprocess: require('svelte-preprocess')({
-                                postcss: true
+                                // postcss: true
                             }),
                             emitCss: true,
                             hotReload: true

@@ -55,6 +55,7 @@ public class FlowDiagramOverlayGroupEndpoint implements Endpoint {
         String findOverlaysByDiagramIdPath = mkPath(BASE_URL, "overlays", "diagram-id", ":id");
         String createGroupPath = mkPath(BASE_URL, "create");
         String deleteGroupPath = mkPath(BASE_URL, "id", ":id");
+        String cloneGroupPath = mkPath(BASE_URL, "clone", "diagram-id", ":diagramId", "id", ":id");
 
         ListRoute<FlowDiagramOverlayGroup> findByDiagramIdRoute = (req, res)
                 -> flowDiagramOverlayGroupService.findByDiagramId(getId(req));
@@ -75,9 +76,17 @@ public class FlowDiagramOverlayGroupEndpoint implements Endpoint {
             return flowDiagramOverlayGroupService.delete(getId(req), username);
         };
 
+
+        DatumRoute<Long> cloneGroupRoute = (req, resp) -> {
+            long diagramId = getLong(req, "diagramId");
+            String username = getUsername(req);
+            return flowDiagramOverlayGroupService.clone(diagramId, getId(req), username);
+        };
+
         getForList(findByDiagramIdPath, findByDiagramIdRoute);
         getForList(findOverlaysByDiagramIdPath, findOverlaysByDiagramIdRoute);
         postForDatum(createGroupPath, createGroupRoute);
+        postForDatum(cloneGroupPath, cloneGroupRoute);
         deleteForDatum(deleteGroupPath, deleteGroupRoute);
     }
 

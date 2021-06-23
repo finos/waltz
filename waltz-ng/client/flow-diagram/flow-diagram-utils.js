@@ -23,6 +23,7 @@ export function determineIfCreateAllowed(kind) {
         case "ACTOR":
         case "APPLICATION":
         case "CHANGE_INITIATIVE":
+        case "LOGICAL_DATA_FLOW":
         case "MEASURABLE":
         case "PHYSICAL_FLOW":
         case "PHYSICAL_SPECIFICATION":

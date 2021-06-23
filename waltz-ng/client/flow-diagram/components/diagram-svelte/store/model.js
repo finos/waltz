@@ -8,7 +8,8 @@ const initialState = {
     nodes: [],
     flows: [],
     annotations: [],
-    decorations: {} // logicalFlowGraphId  -> [ physFlowGraphObjs...]
+    decorations: {}, // logicalFlowGraphId  -> [ physFlowGraphObjs...]
+    relationships: []
 };
 
 
@@ -165,6 +166,29 @@ function addDecoration(state, decoration) {
     }
 }
 
+function removeRelationship(state, relationship) {
+    const existing = _.find(state.relationships, d => d.id === relationship.id);
+
+    if (existing) {
+        dirty.set(true);
+        return Object.assign({}, state, {relationships: _.without(state.relationships, existing)});
+    } else {
+        return state;
+    }
+}
+
+
+function addRelationship(state, relationship) {
+    const existing = _.find(state.relationships, d => d.id === relationship.id);
+
+    if (existing) {
+        return state;
+    } else {
+        dirty.set(true);
+        return Object.assign({}, state, {relationships: [...state.relationships, relationship]});
+    }
+}
+
 
 function createStore() {
     const {subscribe, update} = writable(initialState);
@@ -180,6 +204,8 @@ function createStore() {
         removeAnnotation: (annotation) => update(s => removeAnnotation(s, annotation)),
         addDecoration: (decoration) => update(s => addDecoration(s, decoration)),
         removeDecoration: (decoration) => update(s => removeDecoration(s, decoration)),
+        addRelationship: (relationship) => update(s => addRelationship(s, relationship)),
+        removeRelationship: (relationship) => update(s => removeRelationship(s, relationship)),
         reset: () => update(s => Object.assign({}, initialState))
     };
 }

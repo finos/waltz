@@ -6,9 +6,13 @@ import {toGraphFlow, toGraphId, toGraphNode} from "../../../flow-diagram-utils";
  * adds/removes logical flows
  */
 export function prepareUpdateCommands(flows = [],
-                                      existingEntities = [],
                                       isUpstream,
-                                      baseEntity) {
+                                      baseEntity,
+                                      existingFlows = []) {
+
+    const counterpartPropName = isUpstream
+        ? "source"
+        : "target";
 
     const isAddition = f => ! f.existing && f.used;
     const isRemoval = f =>  f.existing && ! f.used
@@ -16,7 +20,7 @@ export function prepareUpdateCommands(flows = [],
     const newFlows = _
         .chain(flows)
         .filter(isAddition)
-        .reject(f => _.some(existingEntities, ent => sameRef(ent, f.counterpartEntity)))
+        .reject(f => _.some(existingFlows, flow => sameRef(flow[counterpartPropName], f.counterpartEntity)))
         .value()
 
     const nodeAdditions = _.map(newFlows, f => toGraphNode(f.counterpartEntity));
@@ -51,7 +55,7 @@ export function prepareUpdateCommands(flows = [],
 
 
 
-export function mkFlows(logicalFlows = [], node, isUpstream, existingEntities = []) {
+export function mkFlows(logicalFlows = [], node, isUpstream, existingFlows = []) {
     const counterpartPropName = isUpstream
         ? "source"
         : "target";
@@ -67,7 +71,7 @@ export function mkFlows(logicalFlows = [], node, isUpstream, existingEntities = 
         .map(f => Object.assign({}, f, { kind: "LOGICAL_DATA_FLOW" }))
         .map(f => {
             const counterpartEntity = f[counterpartPropName];
-            const flowExists = _.some(existingEntities, ref => sameRef(ref, counterpartEntity)); // this needs to be changed to existing flows
+            const flowExists = _.some(existingFlows, flow => sameRef(flow[counterpartPropName], counterpartEntity));
             return {
                 counterpartEntity,
                 logicalFlow: f,
