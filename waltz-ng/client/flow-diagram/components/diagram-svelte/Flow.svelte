@@ -60,7 +60,7 @@
     }
 
     function selectBucket() {
-        dispatch("selectFlow", { flow: flow.data, decorations: _.map(decorations[flow.id], d=> d.data)});
+        dispatch("selectFlow", flow.data);
     }
 
     let gElem;
