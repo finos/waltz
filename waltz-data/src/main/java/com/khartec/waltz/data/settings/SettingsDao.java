@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.data.settings;
 
+import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.model.settings.ImmutableSetting;
 import com.khartec.waltz.model.settings.Setting;
 import com.khartec.waltz.schema.tables.records.SettingsRecord;
@@ -28,6 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.khartec.waltz.schema.tables.Settings.SETTINGS;
@@ -71,4 +73,15 @@ public class SettingsDao {
                 .fetchOne(SETTINGS_MAPPER);
     }
 
+
+    public Map<String, String> indexByPrefix(String prefix) {
+        return dsl
+                .select(SETTINGS.NAME, SETTINGS.VALUE)
+                .from(SETTINGS)
+                .where(SETTINGS.NAME.startsWith(prefix))
+                .and(SETTINGS.RESTRICTED.isFalse())
+                .fetchMap(
+                        SETTINGS.NAME,
+                        r -> StringUtilities.mkSafe(r.get(SETTINGS.VALUE)).trim());
+    }
 }

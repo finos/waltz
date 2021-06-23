@@ -21,7 +21,6 @@ import {CORE_API} from "../common/services/core-api-utils";
 import _ from "lodash";
 import {mkDateGridCell, mkEntityLinkGridCell} from "../common/grid-utils";
 import {mapToDisplayNames} from "../applications/application-utils";
-import {entity} from "../common/services/enums/entity";
 
 
 function mkAttestationCommand(attestedEntityRef, attestationKind){
@@ -52,93 +51,10 @@ export function attest(serviceBroker, attestedEntityRef, attestationKind) {
 
 
 /**
- * Logical flows are unattestable if they have unknown data types
- * and/or deprecated data types.
- *
- * Currently only upstream flows (with respect to the endpointRef)
- * are considered.
- *
- * @param endpointRef  which app we are attesting on behalf of, used
- *      to give us the directionality of the flow
- * @param logicalFlows  set of all logical flows to be checked
- * @param dataTypes  all dataTypes
- * @param flowDecorators  all decorations for the above flows
- * @return {*}
- */
-function calcUnattestableLogicalFlows(endpointRef, logicalFlows, dataTypes, flowDecorators) {
-    const upstreamFlowIds = _.chain(logicalFlows)
-        .filter(flow => flow.target.id === endpointRef.id)
-        .map(flow => flow.id)
-        .value();
-
-    const unknownOrDeprecatedDatatypeIds = _.chain(dataTypes)
-        .filter(dt => dt.deprecated === true || dt.unknown === true)
-        .map(dt => dt.id)
-        .value();
-
-    return _.filter(
-        flowDecorators,
-        d => {
-            const isUpstream = _.includes(upstreamFlowIds, d.dataFlowId);
-            const isUnknownOrDeprecated = _.includes(unknownOrDeprecatedDatatypeIds, d.decoratorEntity.id);
-            return isUpstream && isUnknownOrDeprecated;
-        });
-}
-
-
-/**
- * Logical flows are unattestable if they have unknown data types
- * and/or deprecated data types.
- *
- * Currently only upstream flows (with respect to the endpoint given
- * in the selector)
- * are considered.
- *
- * @param $q  service to combine promises
- * @param serviceBroker  service to communicate to Waltz server
- * @param selector  selector (typicall app) of the entity being attested to
- * @return {*}
- */
-export function loadAndCalcUnattestableLogicalFlows($q, serviceBroker, selector) {
-
-    const logicalFlowsPromise = serviceBroker
-        .loadViewData(
-            CORE_API.LogicalFlowStore.findByEntityReference,
-            [selector.entityReference],
-            { force: true })
-        .then(r => r.data);
-
-    const logicalFlowDecoratorPromise = serviceBroker
-        .loadViewData(
-            CORE_API.DataTypeDecoratorStore.findBySelector,
-            [selector, entity.LOGICAL_DATA_FLOW.key ],
-            { force: true })
-        .then(r => r.data);
-
-    const dataTypePromise = serviceBroker
-        .loadAppData(CORE_API.DataTypeStore.findAll)
-        .then(r => r.data);
-
-    return $q
-        .all([logicalFlowsPromise, logicalFlowDecoratorPromise, dataTypePromise])
-        .then(([logicalFlows, flowDecorators, dataTypes]) => {
-            return calcUnattestableLogicalFlows(
-                selector.entityReference,
-                logicalFlows,
-                dataTypes,
-                flowDecorators);
-        });
-}
-
-
-
-
-
-/**
  * Returns grid data with application, latest attestation, attested status
  * @param applications: all applications subjected for aggregation
  * @param attestationInstances: all attestationInstances for the applications
- * @param attestedEntityKind: Entity Kind against which attestation data needs to be collected
+ * @param displayNameService:  converts codes to nice names
  * **/
 export function mkAttestationSummaryDataForApps(applications = [],
                                                 attestationInstances = [],

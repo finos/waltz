@@ -19,6 +19,7 @@
 import angular from 'angular';
 import {registerComponents, registerStores} from "../common/module-utils";
 import * as attestationInstanceStore from './services/attestation-instance-store';
+import attestationPreCheckStore from './services/attestation-pre-check-store';
 import attestationRunStore from './services/attestation-run-store';
 import attestationConfirmation from './components/confirmation/attestation-confirmation';
 import attestedKind from './components/attested-kind/attested-kind';
@@ -40,6 +41,7 @@ export default () => {
 
     registerStores(module, [
         attestationInstanceStore,
+        attestationPreCheckStore,
         attestationRunStore
     ]);
 
