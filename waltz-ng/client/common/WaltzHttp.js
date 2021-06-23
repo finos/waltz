@@ -52,7 +52,9 @@ function post(url, body) {
     const requestOptions = {
         method: "POST",
         headers,
-        body: JSON.stringify(body)
+        body: _.isString(body)
+            ? body
+            : JSON.stringify(body)
     };
     return fetch(url, requestOptions)
         .then(handleResponse);

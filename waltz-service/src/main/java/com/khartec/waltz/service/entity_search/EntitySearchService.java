@@ -28,6 +28,7 @@ import com.khartec.waltz.service.app_group.AppGroupService;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.change_initiative.ChangeInitiativeService;
 import com.khartec.waltz.service.data_type.DataTypeService;
+import com.khartec.waltz.service.flow_diagram.FlowDiagramService;
 import com.khartec.waltz.service.logical_data_element.LogicalDataElementService;
 import com.khartec.waltz.service.measurable.MeasurableService;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
@@ -66,6 +67,7 @@ public class EntitySearchService {
     private final RoadmapService roadmapService;
     private final ServerInformationService serverInformationService;
     private final SoftwareCatalogService softwareCatalogService;
+    private final FlowDiagramService flowDiagramService;
 
 
     @Autowired
@@ -82,14 +84,17 @@ public class EntitySearchService {
                                PhysicalSpecificationService physicalSpecificationService,
                                RoadmapService roadmapService,
                                ServerInformationService serverInformationService,
-                               SoftwareCatalogService softwareCatalogService) {
+                               SoftwareCatalogService softwareCatalogService,
+                               FlowDiagramService flowDiagramService) {
+
         checkNotNull(dbExecutorPool, "dbExecutorPool cannot be null");
         checkNotNull(actorService, "actorService cannot be null");
         checkNotNull(applicationService, "applicationService cannot be null");
         checkNotNull(appGroupService, "appGroupService cannot be null");
         checkNotNull(changeInitiativeService, "changeInitiativeService cannot be null");
-        checkNotNull(logicalDataElementService, "logicalDataElementService cannot be null");
         checkNotNull(dataTypeService, "dataTypeService cannot be null");
+        checkNotNull(flowDiagramService, "flowDiagramService cannot be null");
+        checkNotNull(logicalDataElementService, "logicalDataElementService cannot be null");
         checkNotNull(measurableService, "measurableService cannot be null");
         checkNotNull(organisationalUnitService, "organisationalUnitService cannot be null");
         checkNotNull(personService, "personService cannot be null");
@@ -104,6 +109,7 @@ public class EntitySearchService {
         this.appGroupService = appGroupService;
         this.changeInitiativeService = changeInitiativeService;
         this.dataTypeService = dataTypeService;
+        this.flowDiagramService = flowDiagramService;
         this.logicalDataElementService = logicalDataElementService;
         this.measurableService = measurableService;
         this.organisationalUnitService = organisationalUnitService;
@@ -150,6 +156,8 @@ public class EntitySearchService {
                 return () -> changeInitiativeService.search(options);
             case DATA_TYPE:
                 return () -> dataTypeService.search(options);
+            case FLOW_DIAGRAM:
+                return () -> flowDiagramService.search(options);
             case LOGICAL_DATA_ELEMENT:
                 return () -> logicalDataElementService.search(options);
             case MEASURABLE:

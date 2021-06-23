@@ -94,7 +94,6 @@ function controller(
 
         flowDiagramStateService
             .load(id)
-            .then(loadVisibility);
 
         serviceBroker
             .loadViewData(CORE_API.FlowDiagramStore.getById, [ id ])
@@ -161,9 +160,6 @@ function controller(
 
     };
 
-    const loadVisibility = () =>
-        vm.visibility.layers = flowDiagramStateService.getState().visibility.layers;
-
     vm.clickHandlers =  {
         node: (d) => $timeout(
             () => vm.highlightIds = [d.data.id],
@@ -171,16 +167,6 @@ function controller(
         flowBucket: (d) => $timeout(
             () => vm.highlightIds = [d.data.id],
             0)
-    };
-
-    vm.toggleLayer = (layer) => {
-        const currentlyVisible = flowDiagramStateService.getState().visibility.layers[layer];
-        const cmd = {
-            command: currentlyVisible ? "HIDE_LAYER" : "SHOW_LAYER",
-            payload: layer
-        };
-        flowDiagramStateService.processCommands([cmd]);
-        loadVisibility();
     };
 
     vm.exportDiagramTable = () => {

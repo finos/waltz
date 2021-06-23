@@ -105,10 +105,12 @@ public class InlineSelectFieldFactory {
         mappings.put(EntityKind.FLOW_DIAGRAM, tuple(FLOW_DIAGRAM, FLOW_DIAGRAM.ID, FLOW_DIAGRAM.NAME));
         mappings.put(EntityKind.END_USER_APPLICATION, tuple(END_USER_APPLICATION, END_USER_APPLICATION.ID, END_USER_APPLICATION.NAME));
         mappings.put(EntityKind.ENTITY_STATISTIC, tuple(ENTITY_STATISTIC_DEFINITION, ENTITY_STATISTIC_DEFINITION.ID, ENTITY_STATISTIC_DEFINITION.NAME));
+        mappings.put(EntityKind.LOGICAL_DATA_FLOW, tuple(LOGICAL_FLOW, LOGICAL_FLOW.ID, DSL.val("Logical Flow")));
         mappings.put(EntityKind.MEASURABLE, tuple(MEASURABLE, MEASURABLE.ID, MEASURABLE.NAME));
         mappings.put(EntityKind.MEASURABLE_CATEGORY, tuple(MEASURABLE_CATEGORY, MEASURABLE_CATEGORY.ID, MEASURABLE_CATEGORY.NAME));
         mappings.put(EntityKind.ORG_UNIT, tuple(ORGANISATIONAL_UNIT, ORGANISATIONAL_UNIT.ID, ORGANISATIONAL_UNIT.NAME));
         mappings.put(EntityKind.PERSON, tuple(PERSON, PERSON.ID, PERSON.DISPLAY_NAME));
+        mappings.put(EntityKind.PHYSICAL_FLOW, tuple(PHYSICAL_FLOW, PHYSICAL_FLOW.ID, DSL.val("Physical Flow")));
         mappings.put(EntityKind.PHYSICAL_SPECIFICATION, tuple(PHYSICAL_SPECIFICATION, PHYSICAL_SPECIFICATION.ID, PHYSICAL_SPECIFICATION.NAME));
         mappings.put(EntityKind.SERVER, tuple(SERVER_INFORMATION, SERVER_INFORMATION.ID, SERVER_INFORMATION.HOSTNAME));
         mappings.put(EntityKind.LICENCE, tuple(LICENCE, LICENCE.ID, LICENCE.NAME));
@@ -117,14 +119,19 @@ public class InlineSelectFieldFactory {
 
     private static Map<EntityKind, Tuple3<Table, Field<Long>, Field<String>>> mkLifecycleFieldMappings() {
         Map<EntityKind, Tuple3<Table, Field<Long>, Field<String>>> mappings = new HashMap<>();
-        mappings.put(EntityKind.APPLICATION, tuple(APPLICATION, APPLICATION.ID, APPLICATION.ENTITY_LIFECYCLE_STATUS));
-        mappings.put(EntityKind.LOGICAL_DATA_ELEMENT, tuple(LOGICAL_DATA_ELEMENT, LOGICAL_DATA_ELEMENT.ID, LOGICAL_DATA_ELEMENT.ENTITY_LIFECYCLE_STATUS));
         mappings.put(EntityKind.ACTOR, tuple(ACTOR, ACTOR.ID, DSL.val(EntityLifecycleStatus.ACTIVE.name())));
+        mappings.put(EntityKind.APPLICATION, tuple(APPLICATION, APPLICATION.ID, APPLICATION.ENTITY_LIFECYCLE_STATUS));
+        mappings.put(EntityKind.CHANGE_INITIATIVE, tuple(CHANGE_INITIATIVE, CHANGE_INITIATIVE.ID, DSL.val(EntityLifecycleStatus.ACTIVE.name())));
+        mappings.put(EntityKind.LOGICAL_DATA_ELEMENT, tuple(LOGICAL_DATA_ELEMENT, LOGICAL_DATA_ELEMENT.ID, LOGICAL_DATA_ELEMENT.ENTITY_LIFECYCLE_STATUS));
+        mappings.put(EntityKind.LOGICAL_DATA_FLOW, tuple(LOGICAL_FLOW, LOGICAL_FLOW.ID, LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS));
+        mappings.put(EntityKind.MEASURABLE, tuple(MEASURABLE, MEASURABLE.ID, MEASURABLE.ENTITY_LIFECYCLE_STATUS));
+        mappings.put(EntityKind.PHYSICAL_FLOW, tuple(PHYSICAL_FLOW, PHYSICAL_FLOW.ID, PHYSICAL_FLOW.ENTITY_LIFECYCLE_STATUS));
         return mappings;
     }
 
     private static Map<EntityKind,Tuple3<Table,Field<Long>,Field<String>>> mkExternalIdMappings() {
         Map<EntityKind, Tuple3<Table, Field<Long>, Field<String>>> mappings = new HashMap<>();
+        mappings.put(EntityKind.ACTOR, tuple(ACTOR, ACTOR.ID, ACTOR.EXTERNAL_ID));
         mappings.put(EntityKind.APPLICATION, tuple(APPLICATION, APPLICATION.ID, APPLICATION.ASSET_CODE));
         mappings.put(EntityKind.CHANGE_INITIATIVE, tuple(CHANGE_INITIATIVE, CHANGE_INITIATIVE.ID, CHANGE_INITIATIVE.EXTERNAL_ID));
         mappings.put(EntityKind.DATA_TYPE, tuple(DATA_TYPE, DATA_TYPE.ID, DATA_TYPE.CODE));
@@ -132,8 +139,8 @@ public class InlineSelectFieldFactory {
         mappings.put(EntityKind.MEASURABLE, tuple(MEASURABLE, MEASURABLE.ID, MEASURABLE.EXTERNAL_ID));
         mappings.put(EntityKind.MEASURABLE_CATEGORY, tuple(MEASURABLE_CATEGORY, MEASURABLE_CATEGORY.ID, MEASURABLE_CATEGORY.EXTERNAL_ID));
         mappings.put(EntityKind.PERSON, tuple(PERSON, PERSON.ID, PERSON.EMPLOYEE_ID));
-        mappings.put(EntityKind.PHYSICAL_SPECIFICATION, tuple(PHYSICAL_SPECIFICATION, PHYSICAL_SPECIFICATION.ID, PHYSICAL_SPECIFICATION.EXTERNAL_ID));
         mappings.put(EntityKind.PHYSICAL_FLOW, tuple(PHYSICAL_FLOW, PHYSICAL_FLOW.ID, PHYSICAL_FLOW.EXTERNAL_ID));
+        mappings.put(EntityKind.PHYSICAL_SPECIFICATION, tuple(PHYSICAL_SPECIFICATION, PHYSICAL_SPECIFICATION.ID, PHYSICAL_SPECIFICATION.EXTERNAL_ID));
         mappings.put(EntityKind.SERVER, tuple(SERVER_INFORMATION, SERVER_INFORMATION.ID, SERVER_INFORMATION.EXTERNAL_ID));
         return mappings;
     }

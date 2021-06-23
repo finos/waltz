@@ -10,7 +10,6 @@
 
     $: dispatch("select", selectedColor);
 
-    $: console.log({startColor, selectedColor})
 </script>
 
 

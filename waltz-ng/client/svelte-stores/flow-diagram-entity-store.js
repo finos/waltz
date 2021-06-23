@@ -48,6 +48,7 @@ export function mkFlowDiagramEntityStore() {
             .execute(
                 "POST",
                 `api/flow-diagram-entity/id/${diagramId}/${ref.kind}/${ref.id}`, {})
+            .then(() => findByDiagramId(diagramId, true));
     };
 
     const removeRelationship = (diagramId, ref) => {
@@ -55,7 +56,8 @@ export function mkFlowDiagramEntityStore() {
         return remote
             .execute(
                 "DELETE",
-                `api/flow-diagram-entity/id/${diagramId}/${ref.kind}/${ref.id}`);
+                `api/flow-diagram-entity/id/${diagramId}/${ref.kind}/${ref.id}`)
+            .then(() => findByDiagramId(diagramId, true));
     };
 
     return {

@@ -32,7 +32,6 @@
         },
         {});
 
-    $: console.log({measurables, applicationsByMeasurableId});
 
     let expanded = true;
     let qry = "";
@@ -43,7 +42,6 @@
     $: displayedHierarchy = calcDisplayHierarchy(searchNodes, qry);
 
 
-    $: console.log({alignments, searchNodes})
 
     function selectNode(e) {
         console.log("tree selector", e);

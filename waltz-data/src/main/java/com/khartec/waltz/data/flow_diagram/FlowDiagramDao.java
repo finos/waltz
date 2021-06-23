@@ -20,6 +20,8 @@ package com.khartec.waltz.data.flow_diagram;
 
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.NameProvider;
+import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.flow_diagram.FlowDiagram;
 import com.khartec.waltz.model.flow_diagram.ImmutableFlowDiagram;
 import com.khartec.waltz.schema.tables.records.FlowDiagramRecord;
@@ -28,12 +30,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.data.JooqUtilities.mkBasicTermSearch;
+import static com.khartec.waltz.data.SearchUtilities.mkRelevancyComparator;
+import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.FlowDiagram.FLOW_DIAGRAM;
 import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 
@@ -50,6 +57,7 @@ public class FlowDiagramDao {
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .isRemoved(record.getIsRemoved())
+                .editorRole(Optional.ofNullable(record.getEditorRole()))
                 .build();
     };
 
@@ -64,6 +72,7 @@ public class FlowDiagramDao {
         record.setLastUpdatedBy(fd.lastUpdatedBy());
         record.setLastUpdatedAt(Timestamp.valueOf(fd.lastUpdatedAt()));
         record.setIsRemoved(fd.isRemoved());
+        fd.editorRole().ifPresent(record::setEditorRole);
         return record;
     };
 
@@ -164,8 +173,38 @@ public class FlowDiagramDao {
                 .withId(Optional.empty())
                 .withName(newName)
                 .withLastUpdatedBy(userId)
-                .withLastUpdatedAt(DateTimeUtilities.nowUtc());
+                .withLastUpdatedAt(DateTimeUtilities.nowUtc())
+                .withEditorRole(Optional.empty());
 
         return create(copiedDiagram);
+    }
+
+    public Collection<FlowDiagram> search(EntitySearchOptions options) {
+
+        List<String> terms = mkTerms(options.searchQuery());
+
+        if (terms.isEmpty()) {
+            return newArrayList();
+        }
+
+        Condition likeName = mkBasicTermSearch(FLOW_DIAGRAM.NAME, terms);
+
+        SelectQuery<Record> query = dsl
+                .select(FLOW_DIAGRAM.fields())
+                .from(FLOW_DIAGRAM)
+                .where(FLOW_DIAGRAM.IS_REMOVED.isFalse()
+                .and(likeName))
+                .orderBy(FLOW_DIAGRAM.NAME)
+                .limit(options.limit())
+                .getQuery();
+
+        List<FlowDiagram> results = query
+                .fetch(TO_DOMAIN_MAPPER);
+
+        results.sort(mkRelevancyComparator(
+                NameProvider::name,
+                terms.get(0)));
+
+        return results;
     }
 }

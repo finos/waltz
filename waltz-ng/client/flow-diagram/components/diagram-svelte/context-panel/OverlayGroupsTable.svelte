@@ -10,7 +10,7 @@
 
 
     export let diagramId;
-    export let alignments;
+    export let canEdit;
 
     $: overlayGroupsCall = flowDiagramOverlayGroupStore.findByDiagramId(diagramId);
     $: overlayGroups = _.map($overlayGroupsCall.data, d => Object.assign(
@@ -60,7 +60,6 @@
     }
 
     function removeOverlayGroup(group){
-        console.log({group})
         return removePromise = flowDiagramOverlayGroupStore
             .deleteGroup(diagramId, group.data.id);
     }
@@ -103,18 +102,21 @@
                             You have no overlays added to this group; these can be used to group/filter applications.
                         {:else }
                             <ul>
-                            {#each groupOverlays as groupOverlay}
+                            {#each _.sortBy(groupOverlays, g => g.data.entityReference.name) as groupOverlay}
                                 <li on:mouseenter={() =>  setOverlay(groupOverlay)}
                                     on:mouseleave={() => clearOverlay()}>
                                     <EntityLink ref={groupOverlay.data.entityReference}/> ({groupOverlay.data.symbol}/{groupOverlay.data.fill})
+                                    {#if canEdit}
                                     <button class="btn btn-skinny"
                                             on:click={() => removeOverlay(groupOverlay)}>
                                         <Icon name="trash"/>
                                     </button>
+                                    {/if}
                                 </li>
                             {/each}
                             </ul>
                         {/if}
+                        {#if canEdit}
                         <br>
                         <button class="btn btn-skinny"
                                 on:click={() => activeMode = Modes.ADD_OVERLAY}>
@@ -127,6 +129,7 @@
                             <Icon name="trash"/>
                             Remove Group
                         </button>
+                        {/if}
                     </td>
                 </tr>
             {/if}
@@ -135,11 +138,11 @@
     </table>
     {/if}
     {:else if activeMode === Modes.ADD_OVERLAY}
-        <h4>Adding overlay for {selectedGroup.name}:</h4>
-        <AddOverlayGroupEntrySubPanel {alignments}
+        <AddOverlayGroupEntrySubPanel {diagramId}
                                       group={selectedGroup}
                                       on:cancel={cancel}
                                       overlays={groupOverlays}/>
+        <br>
     {/if}
 </div>
 

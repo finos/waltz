@@ -2,7 +2,7 @@
     import NodeLayer from "./NodeLayer.svelte";
     import FlowLayer from "./FlowLayer.svelte";
     import AnnotationLayer from "./AnnotationLayer.svelte";
-    import {processor, selectedAnnotation, selectedFlow, selectedNode, store} from "./diagram-model-store";
+    import {selectedAnnotation, selectedFlow, selectedNode, store} from "./diagram-model-store";
     import {event, select} from "d3-selection";
     import {zoom} from "d3-zoom";
     import ContextPanel from "./context-panel/ContextPanel.svelte";
@@ -10,11 +10,14 @@
     import visibility from "./store/visibility"
     import {diagramTransform, positions} from "./store/layout";
     import overlay from "./store/overlay";
+    import {diagram} from "./store/diagram";
+    import dirty from "./store/dirty";
+    import NoData from "../../../common/svelte/NoData.svelte";
+    import _ from "lodash";
 
 
     let elem;
     let editMode = false;
-    export let doSave;
 
     function onSelectFlow(d) {
         $selectedNode = null;
@@ -36,9 +39,8 @@
 
     /**
      * Pan and zoom only enabled if ctrl or meta key is held down.
-     * @param commandProcessor
      */
-    function setupPanAndZoom(commandProcessor) {
+    function setupPanAndZoom() {
         function zoomed() {
             const t = event.transform;
             $diagramTransform = t;
@@ -76,19 +78,35 @@
         .selectAll(".wfd-flow-lifecycle-PENDING")
         .style("display", $visibility.pendingFlows ? "" : "none");
 
-    $: elem && setupPanAndZoom($processor);
+    $: elem && setupPanAndZoom();
 
-    $: console.log("FlowDiag:", {store: $store, overlay: $overlay, model: $model, positions: $positions});
+    let windowWidth;
+    let svgHeight;
+    let svgWidth;
+
+    const ua = window.navigator.userAgent
+
+    const isIE = _.includes(ua, "MSIE") || _.includes(ua, "Trident/");
+
+    $: svgWidth = isIE
+        ? windowWidth * 0.6 + "px"
+        : "100%";
+
+    $: svgHeight = isIE
+        ? windowWidth * 0.4 + "px"
+        : "100%";
+
 
 </script>
 
-
-{#if $store.diagramId}
+<svelte:window bind:innerWidth={windowWidth}/>
+{#if $diagram?.id}
 <div class="col-md-8 diagram-svg">
     <svg viewBox="0 0 1100 600"
-         width="100%"
+         width={svgWidth}
+         height={svgHeight}
          bind:this={elem}>
-        <g transform={$diagramTransform}>
+    <g transform={$diagramTransform}>
 
             {#if $visibility.annotations}
                 <AnnotationLayer on:selectAnnotation={onSelectAnnotation}
@@ -96,23 +114,24 @@
                                  annotations={$model.annotations}/>
             {/if}
 
-
             <FlowLayer on:selectFlow={onSelectFlow}
                        positions={$positions}
                        {model}/>
-
 
             <NodeLayer on:selectNode={onSelectNode}
                        positions={$positions}
                        nodes={$model.nodes}
                        groups={$overlay.groupOverlays[$overlay.selectedGroup?.id] || []}/>
-
         </g>
     </svg>
 </div>
 <div class="col-md-4 context-menu">
-    <ContextPanel diagramId={$store.diagramId} {doSave}/>
+    <ContextPanel diagramId={$diagram.id}/>
 </div>
+{:else}
+    <NoData>
+        No diagram found! It may have been removed.
+    </NoData>
 {/if}
 
 <style>
