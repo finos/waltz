@@ -84,4 +84,8 @@ public class SettingsService {
                 .flatMap(s -> s.value());
     }
 
+
+    public Map<String, String> indexByPrefix(String prefix) {
+        return settingsDao.indexByPrefix(prefix);
+    }
 }

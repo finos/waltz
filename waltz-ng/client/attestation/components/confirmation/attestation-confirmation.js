@@ -19,8 +19,7 @@
 import {initialiseData, invokeFunction} from "../../../common/index";
 
 import template from "./attestation-confirmation.html";
-import {loadAndCalcUnattestableLogicalFlows} from "../../attestation-utils";
-import {mkSelectionOptions} from "../../../common/selector-utils";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 const bindings = {
@@ -31,11 +30,9 @@ const bindings = {
     onCancel: "<?"
 };
 
-const unknownOrDeprecatedFlowErrorMessage = "Flows cannot be attested as there unknown and/or deprecated datatype usages. Please amend the flows.";
-
 const initialState = {
     disabled: false,
-    onConfirm: (attestation) => console.log("default onConfirm handler for attestation-confirmation: "+ instance),
+    onConfirm: (attestation) => console.log("default onConfirm handler for attestation-confirmation: "+ attestation),
     onCancel: () => console.log("default onCancel handler for attestation-confirmation")
 };
 
@@ -43,8 +40,12 @@ const initialState = {
 function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-    function disableSubmission(message) {
-        vm.message = message;
+    function disableSubmission(messages) {
+        vm.message = _
+            .chain(messages)
+            .map(m => " - " + m)
+            .join("\n")
+            .value();
         vm.disabled = true;
     }
 
@@ -54,12 +55,12 @@ function controller($q, serviceBroker) {
     }
 
     function validateLogicalFlows() {
-        const selector = mkSelectionOptions(vm.parentEntityRef, "EXACT");
-        loadAndCalcUnattestableLogicalFlows($q, serviceBroker, selector)
-            .then(unattestableFlows =>
-                _.isEmpty(unattestableFlows)
-                    ? enableSubmission()
-                    : disableSubmission(unknownOrDeprecatedFlowErrorMessage));
+        serviceBroker
+            .loadViewData(CORE_API.AttestationPreCheckStore.logicalFlowCheck, [vm.parentEntityRef])
+            .then(r => r.data)
+            .then(failures =>  _.isEmpty(failures)
+                ? enableSubmission()
+                : disableSubmission(failures))
     }
 
     vm.$onInit = () => {

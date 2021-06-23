@@ -25,6 +25,7 @@ import {ApplicationStore_API as ApplicationStore} from "../../applications/servi
 import {AssessmentDefinitionStore_API as AssessmentDefinitionStore} from "../../assessments/services/assessment-definition-store";
 import {AssessmentRatingStore_API as AssessmentRatingStore} from "../../assessments/services/assessment-rating-store";
 import {AttestationInstanceStore_API as AttestationInstanceStore} from "../../attestation/services/attestation-instance-store";
+import {AttestationPreCheckStore_API as AttestationPreCheckStore} from "../../attestation/services/attestation-pre-check-store";
 import {AttestationRunStore_API as AttestationRunStore} from "../../attestation/services/attestation-run-store";
 import {AttributeChangeStore_API as AttributeChangeStore} from "../../attribute-change/services/attribute-change-store";
 import {AssetCostStore_API as AssetCostStore} from "../../asset-cost/services/asset-cost-store";
@@ -122,6 +123,7 @@ export const CORE_API = {
     ApplicationStore,
     AttestationInstanceStore,
     AttestationRunStore,
+    AttestationPreCheckStore,
     AttributeChangeStore,
     AssetCostStore,
     AssessmentDefinitionStore,
