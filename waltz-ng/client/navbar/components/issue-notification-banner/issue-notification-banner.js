@@ -18,7 +18,7 @@
 
 import {initialiseData} from "../../../common";
 
-import template from "./browser-detect-banner.html";
+import template from "./issue-notification-banner.html";
 import _ from "lodash";
 
 const bindings = {
@@ -26,30 +26,34 @@ const bindings = {
 
 
 const initialState = {
-    bannerVisible: true
+    bannerVisible: false,
+    bannerMessage: null
 };
 
 
-function controller(settingsService, $window) {
+function controller($rootScope) {
 
     const vm = initialiseData(this, initialState);
 
-    const ua = $window.navigator.userAgent;
-    vm.isIE = _.includes(ua, "MSIE") || _.includes(ua, "Trident/"); //checking IE 11 and below
-
-    settingsService
-        .findOrDefault("ui.banner.message","Waltz is optimised for use in modern browsers. For example Google Chrome, Firefox and Microsoft Edge")
-        .then(setting => vm.bannerMessage = setting);
-
+    $rootScope.$on('notificationMessageChanged', function (event, value) {
+        if(!_.isEmpty(value)){
+            vm.bannerMessage = value;
+            vm.bannerVisible = true;
+        }else{
+            vm.bannerMessage = null;
+            vm.bannerVisible = false;
+        }
+        
+    });
+   
     vm.closeBanner = () => {
         vm.bannerVisible = false;
-    };
+    }        
 }
 
 
 controller.$inject = [
-    "SettingsService",
-    "$window"
+    "$rootScope"
 ];
 
 
@@ -62,5 +66,5 @@ const component = {
 
 export default {
     component,
-    id: "waltzBrowserDetectBanner"
+    id: "waltzIssueNotificationBanner"
 };
