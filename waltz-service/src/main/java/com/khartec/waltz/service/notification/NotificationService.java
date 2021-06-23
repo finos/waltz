@@ -20,11 +20,15 @@ package com.khartec.waltz.service.notification;
 
 
 import com.khartec.waltz.data.notification.NotificationDao;
+import com.khartec.waltz.model.notification.ImmutableNotificationResponse;
+import com.khartec.waltz.model.notification.NotificationResponse;
 import com.khartec.waltz.model.notification.NotificationSummary;
+import com.khartec.waltz.service.settings.SettingsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
@@ -32,18 +36,27 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 public class NotificationService {
 
     private final NotificationDao notificationDao;
+    private final SettingsService settingsService;
+    private static final String NOTIFICATION_MESSAGE_KEY = "ui.banner.notification.text";
 
 
     @Autowired
-    public NotificationService(NotificationDao notificationDao) {
+    public NotificationService(NotificationDao notificationDao, SettingsService settingsService) {
         checkNotNull(notificationDao, "notificationDao cannot be null");
 
         this.notificationDao = notificationDao;
+        this.settingsService = settingsService;
     }
 
 
-    public List<NotificationSummary> findNotificationsByUserId(String userId) {
-        return notificationDao.findNotificationsByUserId(userId);
+    public NotificationResponse findNotificationsByUserId(String userId) {
+        List<NotificationSummary> summary = notificationDao.findNotificationsByUserId(userId);
+        Optional<String> message = settingsService.getValue(NOTIFICATION_MESSAGE_KEY);
+
+        return ImmutableNotificationResponse.builder()
+                .summary(summary)
+                .message(message)
+                .build();
     }
 
 }

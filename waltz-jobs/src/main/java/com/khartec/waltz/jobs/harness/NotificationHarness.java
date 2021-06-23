@@ -18,13 +18,11 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.model.notification.NotificationSummary;
+import com.khartec.waltz.model.notification.NotificationResponse;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.notification.NotificationService;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import java.util.List;
 
 
 public class NotificationHarness {
@@ -34,7 +32,7 @@ public class NotificationHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
         NotificationService svc = ctx.getBean(NotificationService.class);
-        List<NotificationSummary> notifications = svc.findNotificationsByUserId("admin");
+        NotificationResponse notifications = svc.findNotificationsByUserId("admin");
         System.out.println(notifications);
     }
 

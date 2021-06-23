@@ -104,9 +104,21 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                 return mkForSoftwareVersion(options);
             case TAG:
                 return mkForTag(options);
+            case DATABASE:
+                return mkForDatabase(options);
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: " + ref.kind());
         }
+    }
+
+    private Select<Record1<Long>> mkForDatabase(IdSelectionOptions options) {
+        return DSL.select(DATABASE_USAGE.ENTITY_ID)
+                .from(DATABASE_USAGE)
+                .innerJoin(APPLICATION)
+                .on(APPLICATION.ID.eq(DATABASE_USAGE.ENTITY_ID))
+                .where(DATABASE_USAGE.DATABASE_ID.eq(options.entityReference().id()))
+                .and(DATABASE_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .and(mkApplicationConditions(options));
     }
 
 
@@ -236,7 +248,7 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                 .where(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.LOGICAL_DATA_FLOW.name())
                         .and(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId))));
 
-        Condition applicationConditions = DSL.trueCondition(); //mkApplicationConditions(options);
+        Condition applicationConditions = mkApplicationConditions(options);
 
         SelectConditionStep<Record1<Long>> directlyReferencedApps = DSL
                 .select(flowDiagram.ENTITY_ID)

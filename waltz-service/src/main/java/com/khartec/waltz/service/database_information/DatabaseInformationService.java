@@ -58,5 +58,14 @@ public class DatabaseInformationService {
         Checks.checkNotNull(options, "options cannot be null");
         return databaseInformationDao.calculateStatsForAppSelector(factory.apply(options));
     }
-        
+
+    public DatabaseInformation getById(long id) {
+        checkNotNull(id, "id cannot be null");
+        return databaseInformationDao.getById(id);
+    }
+
+    public DatabaseInformation getByExternalId(String externalId) {
+        checkNotNull(externalId, " external id cannot be null");
+        return databaseInformationDao.getByExternalId(externalId);
+    }
 }

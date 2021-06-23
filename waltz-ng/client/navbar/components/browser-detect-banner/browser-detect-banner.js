@@ -38,12 +38,12 @@ function controller(settingsService, $window) {
     vm.isIE = _.includes(ua, "MSIE") || _.includes(ua, "Trident/"); //checking IE 11 and below
 
     settingsService
-        .findOrDefault("ui.banner.message","Waltz is optimised for use in Google Chrome, try a different browser for better performance")
+        .findOrDefault("ui.banner.message","Waltz is optimised for use in modern browsers. For example Google Chrome, Firefox and Microsoft Edge")
         .then(setting => vm.bannerMessage = setting);
 
     vm.closeBanner = () => {
         vm.bannerVisible = false;
-    }
+    };
 }
 
 

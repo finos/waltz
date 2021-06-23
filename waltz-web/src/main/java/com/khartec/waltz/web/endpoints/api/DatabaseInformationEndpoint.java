@@ -50,12 +50,20 @@ public class DatabaseInformationEndpoint implements Endpoint {
     public void register() {
 
         String findForAppPath = mkPath(BASE_URL, "app", ":id");
+        String getByIdPath = mkPath(BASE_URL, ":id");
+        String getByExternalIdPath = mkPath(BASE_URL, "external-id", ":externalId");
         String findForAppSelectorPath = mkPath(BASE_URL);
         String calculateStatsForAppIdSelectorPath = mkPath(BASE_URL, "stats");
 
 
         ListRoute<DatabaseInformation> findForAppRoute = (request, response)
                 -> databaseInformationService.findByApplicationId(getId(request));
+
+        DatumRoute<DatabaseInformation> getByIdRoute = (request, response)
+                -> databaseInformationService.getById(getId(request));
+
+        DatumRoute<DatabaseInformation> getByExternalIdRoute = (request, response)
+                -> databaseInformationService.getByExternalId(request.params("externalId"));
 
         ListRoute<ApplicationDatabases> findForAppSelectorRoute = (request, response)
                 -> databaseInformationService.findByApplicationSelector(readIdSelectionOptionsFromBody(request))
@@ -74,6 +82,8 @@ public class DatabaseInformationEndpoint implements Endpoint {
         getForList(findForAppPath, findForAppRoute);
         postForList(findForAppSelectorPath, findForAppSelectorRoute);
         postForDatum(calculateStatsForAppIdSelectorPath, calculateStatsForAppIdSelectorRoute);
+        getForDatum(getByIdPath, getByIdRoute);
+        getForDatum(getByExternalIdPath, getByExternalIdRoute);
 
     }
 }

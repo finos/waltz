@@ -103,5 +103,4 @@
             <where>name='ui.logo.overlay.text'</where>
         </update>
     </changeSet>
-
 </databaseChangeLog>

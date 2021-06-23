@@ -62,6 +62,7 @@ loginController.$inject = [
 function controller($interval,
                     $state,
                     $uibModal,
+                    $scope,
                     serviceBroker,
                     settingsService,
                     userService) {
@@ -95,9 +96,10 @@ function controller($interval,
                 }
             })
             .then(r => {
-                const notificationSummaries = r.data;
+                const notificationSummaries = r.data.summary;
                 vm.notificationCountTotal = _.sumBy(notificationSummaries, "count");
                 vm.notificationsCountsByKind = _.keyBy(notificationSummaries, "kind");
+                $scope.notificationMessage = r.data.message;
             });
     };
 
@@ -108,6 +110,10 @@ function controller($interval,
 
     loadNotifications()
         .then(() => setupNotificationTimer());
+    
+    $scope.$watch('notificationMessage', function (newValue) {
+        $scope.$emit('notificationMessageChanged', newValue);
+    });
 
     const reloadPage = () => $state.reload();
 
@@ -147,6 +153,7 @@ controller.$inject = [
     "$interval",
     "$state",
     "$uibModal",
+    "$scope",
     "ServiceBroker",
     "SettingsService",
     "UserService"

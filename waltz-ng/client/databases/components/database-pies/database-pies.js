@@ -16,9 +16,9 @@
  *
  */
 
-import { environmentColorScale, variableScale } from "../../common/colors";
-import { notEmpty, toKeyCounts } from "../../common";
-import { endOfLifeStatus } from "../../common/services/enums/end-of-life-status";
+import { environmentColorScale, variableScale } from "../../../common/colors";
+import { notEmpty, toKeyCounts } from "../../../common";
+import { endOfLifeStatus } from "../../../common/services/enums/end-of-life-status";
 import template from "./database-pies.html";
 
 

@@ -42,7 +42,7 @@ public class SettingsDao {
         return ImmutableSetting
                 .builder()
                 .name(record.getName())
-                .value(Optional.ofNullable(r.getValue(SETTINGS.VALUE)))
+                .value(Optional.ofNullable(r.getValue(SETTINGS.VALUE)).map(String::trim))
                 .restricted(record.getRestricted())
                 .description(record.getDescription())
                 .build();

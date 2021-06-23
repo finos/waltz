@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.data.roadmap;
 
+import com.khartec.waltz.data.SearchDao;
 import com.khartec.waltz.data.SearchUtilities;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.roadmap.Roadmap;
@@ -32,7 +33,7 @@ import static java.util.stream.Collectors.toList;
 
 
 @Repository
-public class RoadmapSearchDao {
+public class RoadmapSearchDao implements SearchDao<Roadmap> {
 
     private final RoadmapDao roadmapDao;
 
@@ -44,9 +45,11 @@ public class RoadmapSearchDao {
     }
 
 
+    @Override
     public List<Roadmap> search(EntitySearchOptions options) {
         List<String> terms = SearchUtilities.mkTerms(options.searchQuery().toLowerCase());
-        List<Roadmap> collect = roadmapDao.findAll()
+        return roadmapDao
+                .findAll()
                 .stream()
                 .filter(roadmap -> {
                     if (!options.entityLifecycleStatuses().contains(roadmap.entityLifecycleStatus())) {
@@ -56,12 +59,10 @@ public class RoadmapSearchDao {
                     String s = (roadmap.name() + " " + roadmap.description()).toLowerCase();
                     return all(
                             terms,
-                            t -> s.indexOf(t) > -1);
+                            s::contains);
                 })
                 .limit(options.limit())
                 .collect(toList());
-
-        return collect;
     }
 
 }

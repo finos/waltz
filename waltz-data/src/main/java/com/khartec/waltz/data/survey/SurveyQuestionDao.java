@@ -63,6 +63,8 @@ public class SurveyQuestionDao {
                 .externalId(Optional.ofNullable(record.getExternalId()))
                 .inclusionPredicate(Optional.ofNullable(record.getInclusionPredicate()))
                 .qualifierEntity(qualifierRef)
+                .label(Optional.ofNullable(record.getLabel()))
+                .parentExternalId(Optional.ofNullable(record.getParentExternalId()))
                 .build();
     };
 
@@ -81,6 +83,10 @@ public class SurveyQuestionDao {
         record.setExternalId(question.externalId()
                 .filter(StringUtilities::notEmpty)
                 .orElse(null));
+        record.setParentExternalId(question.parentExternalId()
+                .filter(StringUtilities::notEmpty)
+                .orElse(null));
+        record.setLabel(question.label().orElse(null));
         record.setInclusionPredicate(question.inclusionPredicate().orElse(null));
 
         question.qualifierEntity().ifPresent(ref -> {

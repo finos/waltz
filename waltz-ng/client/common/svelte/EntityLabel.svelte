@@ -5,7 +5,8 @@
 
     const nameMap = {
         SERVER: "hostname",
-        DATABASE: "databaseName"}
+        DATABASE: "databaseName"
+    }
 
     $: name = _.get(ref, [nameMap[ref.kind] || "name"], "unknown");
 
