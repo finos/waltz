@@ -41,7 +41,8 @@
                                 on:cancel={() => activeMode = Modes.TABLE}/>
 {:else if activeMode === Modes.CLONE_GROUP}
     <h4>Clone Group from:</h4>
-    <CloneOverlayGroupSubPanel {diagramId} on:cancel={() => activeMode = Modes.TABLE}/>
+    <CloneOverlayGroupSubPanel {diagramId}
+                               on:cancel={() => activeMode = Modes.TABLE}/>
 {/if}
 
 <style>
