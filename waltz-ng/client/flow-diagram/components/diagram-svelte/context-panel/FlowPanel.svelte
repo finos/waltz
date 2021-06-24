@@ -90,25 +90,27 @@
         </table>
     {/if}
 </div>
-<span>
+<div style="border-top: 1px solid #eee; margin-top:0.5em; padding-top:0.5em" >
+    <span>
     {#if canEdit}
-    <button class="btn btn-skinny"
-            on:click={() => activeMode = Modes.EDIT}>
-        <Icon name="pencil"/>Edit
-    </button>
-    {/if}
-    |
-    <button class="btn btn-skinny"
-            on:click={() => cancel()}>
-        Cancel
-    </button>
-</span>
+        <button class="btn btn-skinny"
+                on:click={() => activeMode = Modes.EDIT}>
+            <Icon name="pencil"/>Edit
+        </button>
+        {/if}
+            |
+        <button class="btn btn-skinny"
+                on:click={() => cancel()}>
+            Cancel
+        </button>
+    </span>
+</div>
 {:else if activeMode === Modes.EDIT}
 <ul>
     <li>
         <button class="btn btn-skinny"
                 on:click={() => activeMode = Modes.ADD_ANNOTATION}>
-            <Icon name="plus"/>
+            <Icon name="comment-o"/>
             Add annotation
         </button>
     </li>
@@ -126,13 +128,14 @@
             Remove
         </button>
     </li>
-    <li>
+</ul>
+    <div style="border-top: 1px solid #eee; margin-top:0.5em; padding-top:0.3em" >
         <button class="btn btn-skinny"
                 on:click={() => activeMode = Modes.VIEW}>
+            <Icon name="fw"/>
             Cancel
         </button>
-    </li>
-</ul>
+    </div>
 {:else if activeMode === Modes.ADD_ANNOTATION}
     <AddAnnotationSubPanel {selected}
                            on:cancel={() => activeMode = Modes.VIEW}/>
