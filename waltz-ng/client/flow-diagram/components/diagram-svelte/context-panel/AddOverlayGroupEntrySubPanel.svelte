@@ -11,6 +11,7 @@
     import {measurableCategoryAlignmentViewStore} from "../../../../svelte-stores/measurable-category-alignment-view-store";
     import {mkRef} from "../../../../common/entity-utils";
     import EntitySearchSelector from "../../../../common/svelte/EntitySearchSelector.svelte";
+    import OverlayGlyph from "./OverlayGlyph.svelte";
 
     export let group;
     export let overlays;
@@ -101,8 +102,10 @@
             <strong>{newOverlay.entityReference.name}</strong>
             {#if !showColorPicker}
                 <span>
-                    ({newOverlay.symbol}/{newOverlay.fill})
-                    <button class="btn btn-skinny" on:click={() => showColorPicker = true}><Icon name="pencil"/>Edit Colour</button>
+                    <OverlayGlyph overlay={newOverlay}/>
+                    <button class="btn btn-skinny" on:click={() => showColorPicker = true}>
+                        <Icon name="pencil"/>Edit Colour
+                    </button>
                 </span>
                 <div>
                     <button class="btn btn-skinny"
