@@ -7,45 +7,36 @@
     import overlay from "../store/overlay";
     import {flowDiagramOverlayGroupStore} from "../../../../svelte-stores/flow-diagram-overlay-group-store";
     import {toGraphId} from "../../../flow-diagram-utils";
-
-
-    export let diagramId;
-    export let canEdit;
-
-    $: overlayGroupsCall = flowDiagramOverlayGroupStore.findByDiagramId(diagramId);
-    $: overlayGroups = _.map($overlayGroupsCall.data, d => Object.assign(
-        {},
-        {id: toGraphId({kind: 'GROUP', id: d.id}), data: d}));
-
-
-    let selectedGroup;
-    let groupOverlays;
-
-    let removePromise;
+    import OverlayGlyph from "./OverlayGlyph.svelte";
 
     const Modes = {
         TABLE: "TABLE",
         ADD_OVERLAY: "ADD_OVERLAY",
     };
 
+    const dispatch = createEventDispatcher();
+
+    export let diagramId;
+    export let canEdit;
+
+    let selectedGroup;
+    let groupOverlays;
+    let removePromise;
     let activeMode = Modes.TABLE;
 
-    const dispatch = createEventDispatcher();
 
     function cancel() {
         activeMode = Modes.TABLE;
     }
 
     function selectRow(group) {
-        if(selectedGroup === group){
+        if (selectedGroup === group) {
             overlay.clearSelectedGroup();
         } else {
             overlay.setSelectedGroup(group);
         }
         selectedGroup = (selectedGroup === group) ? null : group;
     }
-
-    $: groupOverlays = selectedGroup && _.get($overlay.groupOverlays, selectedGroup?.id, []);
 
     function setOverlay(groupOverlay) {
         overlay.setAppliedOverlay(groupOverlay);
@@ -59,11 +50,20 @@
         overlay.removeOverlay(groupOverlay);
     }
 
-    function removeOverlayGroup(group){
+    function removeOverlayGroup(group) {
         return removePromise = flowDiagramOverlayGroupStore
             .deleteGroup(diagramId, group.data.id);
     }
 
+    $: overlayGroupsCall = flowDiagramOverlayGroupStore.findByDiagramId(diagramId);
+    $: overlayGroups = _.map(
+        $overlayGroupsCall.data,
+        d => ({
+            id: toGraphId({kind: 'GROUP', id: d.id}),
+            data: d
+        }));
+
+    $: groupOverlays = selectedGroup && _.get($overlay.groupOverlays, selectedGroup?.id, []);
 </script>
 
 
@@ -103,11 +103,14 @@
                         {:else }
                             <ul>
                             {#each _.sortBy(groupOverlays, g => g.data.entityReference.name) as groupOverlay}
-                                <li on:mouseenter={() =>  setOverlay(groupOverlay)}
+                                <li class="waltz-visibility-parent"
+                                    on:mouseenter={() =>  setOverlay(groupOverlay)}
                                     on:mouseleave={() => clearOverlay()}>
-                                    <EntityLink ref={groupOverlay.data.entityReference}/> ({groupOverlay.data.symbol}/{groupOverlay.data.fill})
+                                    <OverlayGlyph overlay={groupOverlay.data}/>
+                                    &nbsp;
+                                    <EntityLink ref={groupOverlay.data.entityReference}/>
                                     {#if canEdit}
-                                    <button class="btn btn-skinny"
+                                    <button class="btn btn-skinny waltz-visibility-child-30"
                                             on:click={() => removeOverlay(groupOverlay)}>
                                         <Icon name="trash"/>
                                     </button>

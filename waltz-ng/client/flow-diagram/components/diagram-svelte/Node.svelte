@@ -4,28 +4,7 @@
     import {createEventDispatcher} from "svelte";
     import _ from "lodash";
     import overlay from "./store/overlay";
-    import {
-        symbol,
-        symbolCircle,
-        symbolCross,
-        symbolDiamond,
-        symbolSquare,
-        symbolStar,
-        symbolTriangle,
-        symbolWye
-    } from "d3-shape";
-    import {determineStylingBasedUponLifecycle} from "./flow-diagram-utils";
-
-    const symbolsByName = {
-        "triangle": symbol().type(symbolTriangle).size(40),
-        "circle": symbol().type(symbolCircle).size(60),
-        "diamond": symbol().type(symbolDiamond).size(30),
-        "cross": symbol().type(symbolCross).size(40),
-        "star": symbol().type(symbolStar).size(30),
-        "wye": symbol().type(symbolWye).size(50),
-        "square": symbol().type(symbolSquare).size(60),
-        "DEFAULT": symbol().type(symbolWye).size(40)
-    };
+    import {determineStylingBasedUponLifecycle, symbolsByName} from "./flow-diagram-utils";
 
     const dispatch = createEventDispatcher();
 
@@ -75,24 +54,26 @@
     $: width = nameElem && determineWidth(node, nameElem, associatedGroups);
     $: shape = node && shapes[node.data.kind](width);
     $: transform = node && `translate(${positions[node.id].x} ${positions[node.id].y})`;
-    $: dragHandler = mkDragHandler(node)
+    $: dragHandler = mkDragHandler(node);
     $: select(gElem).call(dragHandler);
 
-    $: associatedGroups = _.filter(groups, g => _.includes(g.data.applicationIds, node.data.id))
+    $: associatedGroups = _.filter(groups, g => _.includes(g.data.applicationIds, node.data.id));
 
     $: classes = [`
             wfd-node
             ${$overlay.appliedOverlay && !_.includes(associatedGroups, $overlay.appliedOverlay)
             ? "wfd-not-active" : "wfd-active"}
-    `]
+    `];
 
     $: nodeStyling = determineStylingBasedUponLifecycle(node.data.entityLifecycleStatus);
 
-    function determineWidth(node, elem, icons){
-        const margin = node.data.kind === 'ACTOR' ? 30 : 24
-        const textWidth = elem.getComputedTextLength() + margin
-        const iconsWidth = _.size(icons) * 12 + 6
-        return textWidth > iconsWidth ? textWidth : iconsWidth
+    function determineWidth(node, elem, icons) {
+        const margin = node.data.kind === 'ACTOR'
+            ? 30
+            : 24;
+        const textWidth = elem.getComputedTextLength() + margin;
+        const iconsWidth = _.size(icons) * 12 + 6;
+        return _.max([textWidth, iconsWidth]);
     }
 
 </script>
@@ -155,11 +136,17 @@
     }
 
     .wfd-active {
-      fill: black;
+        fill: black;
     }
 
     .wfd-not-active {
-      fill: lightgray;
+        fill: lightgray;
+        .shape {
+            stroke: #eee;
+        }
+        .symbol {
+            opacity: 0.3;
+        }
     }
 
 </style>
