@@ -92,7 +92,7 @@ function createDefaultTableOptions($animate, uiGridConstants, exportFileName = "
 function prepareServerGridOptions($animate, uiGridConstants) {
 
     const columnDefs = [
-        mkLinkGridCell("Host", "hostname", "id", "main.server.view"),
+        mkLinkGridCell("Host", "hostname", "serverId", "main.server.view"),
         { field: "environment" },
         {
             field: "virtual",
