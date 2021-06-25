@@ -158,10 +158,12 @@ public class FlowDiagramDao {
                 .execute() == 1;
     }
 
-    public boolean deleteById(long id) {
+    public boolean deleteById(long id, String username) {
         return dsl
                 .update(FLOW_DIAGRAM)
                 .set(FLOW_DIAGRAM.IS_REMOVED, true)
+                .set(FLOW_DIAGRAM.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
+                .set(FLOW_DIAGRAM.LAST_UPDATED_BY, username)
                 .where(FLOW_DIAGRAM.ID.eq(id))
                 .execute() == 1;
     }

@@ -24,6 +24,7 @@
     import CloneDiagramSubPanel from "./CloneDiagramSubPanel.svelte";
     import {prepareSaveCmd} from "./panel-utils";
     import RemoveDiagramSubPanel from "./RemoveDiagramSubPanel.svelte";
+    import Markdown from "../../../../common/svelte/Markdown.svelte";
 
 
     export let diagramId;
@@ -74,18 +75,18 @@
 </script>
 
 <!-- Diagram title -->
-<div style="padding-bottom: 1px">
+<div style="padding-bottom: 1px"
+     class="waltz-visibility-parent">
     {#if activeMode === Modes.VIEW}
         <h4>
             {$diagram.name}
-            <span class="small">
-                <button class="tn btn-skinny"
-                        on:click={() => activeMode = Modes.CLONE}>
+        </h4>
+        <div class="small waltz-visibility-child-50">
+            <button class="tn btn-skinny"
+                    on:click={() => activeMode = Modes.CLONE}>
                 <Icon name="clone"/>Clone
             </button>
-            </span>
             {#if canEdit}
-            <span class="small">
                 |
                 <button class="tn btn-skinny"
                     on:click={() => activeMode = Modes.EDIT}>
@@ -96,14 +97,20 @@
                         on:click={() => activeMode = Modes.REMOVE}>
                     <Icon name="trash"/>Remove
                 </button>
-            </span>
             {/if}
-        </h4>
-        <p class="help-block">{$diagram.description || "No description provided"}</p>
-        <div class="small text-muted">
-            (<LastEdited class="small pull-right text-muted" entity={$diagram}/>)
         </div>
+
+        <p class="help-block">
+            <Markdown text={$diagram.description || "No description provided"}/>
+        </p>
+
+        <div class="small text-muted">
+            (<LastEdited class="small pull-right text-muted"
+                         entity={$diagram}/>)
+        </div>
+
         <br>
+
         {#if canEdit}
             {#if $dirty}
                 <span class="help-block">

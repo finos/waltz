@@ -28,6 +28,16 @@ const initialState = {
 };
 
 
+const addToHistory = (historyStore, diagram) => {
+    if (! diagram) { return; }
+    historyStore.put(
+        diagram.name,
+        "FLOW_DIAGRAM",
+        "main.flow-diagram.view",
+        { id: diagram.id });
+};
+
+
 function prepareDataForExport(flows = []) {
     const columnNames = [[
         "Source",
@@ -71,6 +81,7 @@ function controller(
     displayNameService,
     dynamicSectionManager,
     flowDiagramStateService,
+    historyStore,
     serviceBroker)
 {
     const vm = initialiseData(this, initialState);
@@ -97,7 +108,10 @@ function controller(
 
         serviceBroker
             .loadViewData(CORE_API.FlowDiagramStore.getById, [ id ])
-            .then(r => vm.diagram = r.data);
+            .then(r => {
+                vm.diagram = r.data;
+                addToHistory(historyStore, vm.diagram);
+            });
 
         serviceBroker
             .loadViewData(CORE_API.FlowDiagramEntityStore.findByDiagramId, [ id ])
@@ -188,6 +202,7 @@ controller.$inject = [
     "DisplayNameService",
     "DynamicSectionManager",
     "FlowDiagramStateService",
+    "HistoryStore",
     "ServiceBroker"
 ];
 
