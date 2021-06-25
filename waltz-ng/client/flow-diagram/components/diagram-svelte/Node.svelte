@@ -5,6 +5,7 @@
     import _ from "lodash";
     import overlay from "./store/overlay";
     import {determineStylingBasedUponLifecycle, symbolsByName} from "./flow-diagram-utils";
+    import {widths} from "./store/layout";
 
     const dispatch = createEventDispatcher();
 
@@ -51,7 +52,12 @@
     let nameElem;
     let gElem;
 
-    $: width = nameElem && determineWidth(node, nameElem, associatedGroups);
+    function getWidth(id, associatedGroups) {
+        $widths[id] = determineWidth(node, nameElem, associatedGroups);
+        return $widths[id];
+    }
+
+    $: width = nameElem && getWidth(node.id, associatedGroups);
     $: shape = node && shapes[node.data.kind](width);
     $: transform = node && `translate(${positions[node.id].x} ${positions[node.id].y})`;
     $: dragHandler = mkDragHandler(node);

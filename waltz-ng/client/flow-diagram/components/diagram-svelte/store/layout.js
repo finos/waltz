@@ -37,5 +37,6 @@ function createPositionStore() {
 
 
 export const positions = createPositionStore();
+export const widths = writable({});
 
 export const diagramTransform = writable("translate(0 0)");
