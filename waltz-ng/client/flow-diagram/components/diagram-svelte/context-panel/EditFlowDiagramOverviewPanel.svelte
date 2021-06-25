@@ -62,9 +62,10 @@
         <label for="description">
             Description:
         </label>
-        <input class="form-control"
-               id="description"
-               bind:value={$description}/>
+        <textarea class="form-control"
+                  rows="4"
+                  id="description"
+                  bind:value={$description}/>
     </div>
     <p class="text-muted">Description for this diagram</p>
 

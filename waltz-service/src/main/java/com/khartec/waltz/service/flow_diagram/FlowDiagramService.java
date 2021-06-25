@@ -244,7 +244,7 @@ public class FlowDiagramService {
 
     public boolean deleteById(long id, String username) {
         auditChange("removed", mkRef(FLOW_DIAGRAM, id), username, Operation.REMOVE);
-        return flowDiagramDao.deleteById(id);
+        return flowDiagramDao.deleteById(id, username);
     }
 
 
