@@ -85,7 +85,7 @@
             fill="none"
             bind:this={elbowElem}
             stroke="#ccc"></circle>
-    <text style="font-size: smaller"
+    <text style="font-size: 14px;"
           in:fade="{{ delay: 500, duration: 1000}}"
           out:fade="{{ duration: 1500}}"
           bind:this={textElem}>

@@ -90,7 +90,7 @@
           stroke-dasharray={nodeStyling.dashArray}
           style="padding-top: 20px">
     </path>
-    <text style="font-size: small;"
+    <text style="font-size: 12px;"
           class="icon"
           font-family="FontAwesome"
           dx={shape.title.dx}
@@ -99,7 +99,7 @@
     </text>
     <text dx={shape.title.dx + 16}
           dy={shape.title.dy}
-          style="font-size: small;"
+          style="font-size: 14px;"
           class="name"
           bind:this={nameElem}> <!-- think this is confused, unlike d3 not id tracked? -->
         {node.data.name || "Unknown"}

@@ -36,6 +36,7 @@
 
     function cancel() {
         workingOverlay = null;
+        activeMode = Modes.SELECT_MEASURABLE;
     }
 
     function submit() {
@@ -54,15 +55,15 @@
             {entityReference: overlay, kind: 'OVERLAY'});
     }
 
-    function saveOverlay() {
-        overlay.addOverlay(
-            Object.assign(
-                {},
-                newOverlay,
-                {
-                    groupRef: group.id,
-                    applicationIds: _.map(relatedAppIds, d => d.id)
-                }))
+    function addOverlay() {
+        const overlayToAdd = Object.assign(
+            {},
+            newOverlay,
+            {
+                groupRef: group.id,
+                applicationIds: _.map(relatedAppIds, d => d.id)
+            });
+        overlay.addOverlay(overlayToAdd)
         cancel();
         submit();
     }
@@ -109,8 +110,8 @@
                 </span>
                 <div>
                     <button class="btn btn-skinny"
-                            on:click={() => saveOverlay()}>
-                        Save
+                            on:click={() => addOverlay()}>
+                        Add
                     </button>
                     |
                     <button class="btn btn-skinny"

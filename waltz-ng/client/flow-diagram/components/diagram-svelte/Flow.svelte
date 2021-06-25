@@ -113,7 +113,7 @@
                 fill="#fff"
                 stroke-dasharray={flowStyling.dashArray}>
         </circle>
-        <text style="font-size: small;"
+        <text style="font-size: 14px;"
               font-family="FontAwesome"
               text-anchor="middle"
               dx="0"
