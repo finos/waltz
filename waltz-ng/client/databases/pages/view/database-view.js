@@ -36,7 +36,7 @@ const addToHistory = (historyStore, database) => {
     if (! database) { return; }
     historyStore.put(
         database.databaseName,
-        'Database',
+        'DATABASE',
         'main.database.view',
         { id: database.id });
 };
