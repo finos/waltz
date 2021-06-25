@@ -5,6 +5,7 @@
     import _ from "lodash";
     import overlay from "./store/overlay";
     import {determineStylingBasedUponLifecycle, symbolsByName} from "./flow-diagram-utils";
+    import {widths} from "./store/layout";
 
     const dispatch = createEventDispatcher();
 
@@ -51,7 +52,12 @@
     let nameElem;
     let gElem;
 
-    $: width = nameElem && determineWidth(node, nameElem, associatedGroups);
+    function getWidth(id, associatedGroups) {
+        $widths[id] = determineWidth(node, nameElem, associatedGroups);
+        return $widths[id];
+    }
+
+    $: width = nameElem && getWidth(node.id, associatedGroups);
     $: shape = node && shapes[node.data.kind](width);
     $: transform = node && `translate(${positions[node.id].x} ${positions[node.id].y})`;
     $: dragHandler = mkDragHandler(node);
@@ -90,7 +96,7 @@
           stroke-dasharray={nodeStyling.dashArray}
           style="padding-top: 20px">
     </path>
-    <text style="font-size: small;"
+    <text style="font-size: 12px;"
           class="icon"
           font-family="FontAwesome"
           dx={shape.title.dx}
@@ -99,7 +105,7 @@
     </text>
     <text dx={shape.title.dx + 16}
           dy={shape.title.dy}
-          style="font-size: small;"
+          style="font-size: 14px;"
           class="name"
           bind:this={nameElem}> <!-- think this is confused, unlike d3 not id tracked? -->
         {node.data.name || "Unknown"}

@@ -74,15 +74,23 @@
         {/each}
     </div>
 </div>
-<button class="btn btn-link"
-        on:click={() => cancel()}>
-    Cancel
-</button>
-<button class="btn btn-link"
-        on:click={() => updateFlows()}>
-    Update flows
-</button>
+<div class="context-panel-footer">
+    <button class="btn btn-skinny"
+            on:click={() => updateFlows()}>
+        Update
+    </button>
+    |
+    <button class="btn btn-skinny"
+            on:click={() => cancel()}>
+        Cancel
+    </button>
+</div>
 
 
 <style>
+    .context-panel-footer {
+        border-top: 1px solid #eee;
+        margin-top:0.5em;
+        padding-top:0.5em;
+    }
 </style>

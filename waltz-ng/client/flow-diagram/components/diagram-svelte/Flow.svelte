@@ -3,7 +3,7 @@
     import {mkCurvedLine} from "../../../common/d3-utils";
     import {createEventDispatcher} from "svelte";
     import {refToString} from "../../../common/entity-utils";
-    import {positions} from "./store/layout";
+    import {positions, widths} from "./store/layout";
     import {determineStylingBasedUponLifecycle} from "./flow-diagram-utils";
 
 
@@ -24,7 +24,7 @@
         }
     }
 
-    function mkLinePath(f, start, end) {
+    function mkLinePath(f, start, end, sw, tw) {
         const sourceShape = {
             cx: 30,
             cy: 15
@@ -36,9 +36,9 @@
         };
 
         return mkCurvedLine(
-            start.x + sourceShape.cx,
+            start.x + (sw / 2 || 15),
             start.y + sourceShape.cy,
-            end.x + targetShape.cx,
+            end.x + (tw / 2 || 15),
             end.y + targetShape.cy);
     }
 
@@ -71,7 +71,7 @@
     $: bucket = g && g.select(".wfd-flow-bucket");
     $: decorationCount = _.size(decorations[flow.id]) || 0;
     $: icon = determineIcon(decorationCount);
-    $: linePath = mkLinePath(flow, sourcePos, targetPos);
+    $: linePath = mkLinePath(flow, sourcePos, targetPos, $widths[flow.source], $widths[flow.target]);
     $: flowStyling = determineStylingBasedUponLifecycle(flow.data.entityLifecycleStatus);
 
     $: {
@@ -113,7 +113,7 @@
                 fill="#fff"
                 stroke-dasharray={flowStyling.dashArray}>
         </circle>
-        <text style="font-size: small;"
+        <text style="font-size: 14px;"
               font-family="FontAwesome"
               text-anchor="middle"
               dx="0"

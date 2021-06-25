@@ -53,14 +53,22 @@
               required="required"
               bind:value={note}/>
 </div>
-<span>
+
+<div class="context-panel-footer">
+    <button class="btn btn-skinny" on:click={saveAnnotation}>
+        Update
+    </button>
+    |
     <button class="btn btn-skinny" on:click={cancel}>
         Cancel
     </button>
-    |
-    <button class="btn btn-skinny" on:click={saveAnnotation}>
-        Update text
-    </button>
-</span>
+</div>
+
+
 <style>
+    .context-panel-footer {
+        border-top: 1px solid #eee;
+        margin-top:0.5em;
+        padding-top:0.5em;
+    }
 </style>
