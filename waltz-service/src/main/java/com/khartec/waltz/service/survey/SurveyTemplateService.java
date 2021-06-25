@@ -36,6 +36,7 @@ import java.util.Optional;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
 import static com.khartec.waltz.common.ListUtilities.map;
 
 @Service
@@ -44,6 +45,7 @@ public class SurveyTemplateService {
 
     private final PersonDao personDao;
     private final SurveyTemplateDao surveyTemplateDao;
+    private final SurveyRunService surveyRunService;
     private final SurveyQuestionDao surveyQuestionDao;
     private final SurveyQuestionDropdownEntryDao surveyQuestionDropdownEntryDao;
 
@@ -52,17 +54,19 @@ public class SurveyTemplateService {
     public SurveyTemplateService(ChangeLogService changeLogService,
                                  PersonDao personDao,
                                  SurveyTemplateDao surveyTemplateDao,
-                                 SurveyQuestionDao surveyQuestionDao,
+                                 SurveyRunService surveyRunService, SurveyQuestionDao surveyQuestionDao,
                                  SurveyQuestionDropdownEntryDao surveyQuestionDropdownEntryDao) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(personDao, "personDao cannot be null");
         checkNotNull(surveyTemplateDao, "surveyTemplateDao cannot be null");
+        checkNotNull(surveyRunService, "surveyRunService cannot be null");
         checkNotNull(surveyQuestionDao, "surveyQuestionDao cannot be null");
         checkNotNull(surveyQuestionDropdownEntryDao, "surveyQuestionDropdownEntryDao cannot be null");
 
         this.changeLogService = changeLogService;
         this.personDao = personDao;
         this.surveyTemplateDao = surveyTemplateDao;
+        this.surveyRunService = surveyRunService;
         this.surveyQuestionDao = surveyQuestionDao;
         this.surveyQuestionDropdownEntryDao = surveyQuestionDropdownEntryDao;
     }
@@ -195,8 +199,14 @@ public class SurveyTemplateService {
 
 
     public Boolean delete(long id) {
-        surveyQuestionDropdownEntryDao.deleteForTemplate(id);
-        surveyQuestionDao.deleteForTemplate(id);
-        return surveyTemplateDao.delete(id);
+        List<SurveyRunWithOwnerAndStats> runs = surveyRunService.findByTemplateId(id);
+
+        if(isEmpty(runs)){
+            surveyQuestionDropdownEntryDao.deleteForTemplate(id);
+            surveyQuestionDao.deleteForTemplate(id);
+            return surveyTemplateDao.delete(id);
+        } else {
+            throw new IllegalArgumentException("Cannot delete a template that has runs");
+        }
     }
 }
