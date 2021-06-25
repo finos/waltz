@@ -32,7 +32,7 @@ public class NotificationHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
         NotificationService svc = ctx.getBean(NotificationService.class);
-        NotificationResponse notifications = svc.findNotificationsByUserId("admin");
+        NotificationResponse notifications = svc.getNotificationsByUserId("admin");
         System.out.println(notifications);
     }
 

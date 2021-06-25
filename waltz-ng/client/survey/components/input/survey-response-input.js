@@ -8,10 +8,13 @@ const bindings = {
     options: "<",
     instanceId: "<",
     saveComment: "<",
-    saveResponse: "<",
+    saveStringResponse: "<",
+    saveNumberResponse: "<",
+    saveBooleanResponse: "<",
     saveDateResponse: "<",
     saveEntityResponse: "<",
-    saveEntityListResponse: "<"
+    saveEntityListResponse: "<",
+    saveListResponse: "<"
 };
 
 const initialState = {};

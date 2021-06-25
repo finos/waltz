@@ -53,12 +53,12 @@ public class NotificationEndpoint implements Endpoint {
     @Override
     public void register() {
 
-        String findNotificationsByUserIdPath = mkPath(BASE_URL);
+        String getNotificationsByUserIdPath = mkPath(BASE_URL);
 
-        DatumRoute<NotificationResponse> findNotificationsByUserIdRoute = (request, response)
-                -> notificationService.findNotificationsByUserId(getUsername(request));
+        DatumRoute<NotificationResponse> getNotificationsByUserIdRoute = (request, response)
+                -> notificationService.getNotificationsByUserId(getUsername(request));
 
-        getForDatum(findNotificationsByUserIdPath, findNotificationsByUserIdRoute);
+        getForDatum(getNotificationsByUserIdPath, getNotificationsByUserIdRoute);
     }
 
 }

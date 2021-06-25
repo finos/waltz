@@ -49,7 +49,7 @@ public class NotificationService {
     }
 
 
-    public NotificationResponse findNotificationsByUserId(String userId) {
+    public NotificationResponse getNotificationsByUserId(String userId) {
         List<NotificationSummary> summary = notificationDao.findNotificationsByUserId(userId);
         Optional<String> message = settingsService.getValue(NOTIFICATION_MESSAGE_KEY);
 

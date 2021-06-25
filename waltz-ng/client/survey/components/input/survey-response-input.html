@@ -13,7 +13,7 @@
            ng-model-options="{ allowInvalid: true, debounce: 200 }"
            ng-model="$ctrl.response.numberResponse"
            ng-required="question.isMandatory"
-           ng-change="$ctrl.saveResponse($ctrl.question.id)"
+           ng-change="$ctrl.saveNumberResponse($ctrl.question.id, $ctrl.response.numberResponse)"
            class="form-control"/>
 
     <!-- boolean -->
@@ -23,7 +23,7 @@
                    type="radio"
                    ng-model="$ctrl.response.booleanResponse"
                    ng-required="$ctrl.question.isMandatory"
-                   ng-change="$ctrl.saveResponse($ctrl.question.id)"
+                   ng-change="$ctrl.saveBooleanResponse($ctrl.question.id, $ctrl.response.booleanResponse)"
                    value="true"/>
             Yes
         </label>
@@ -33,7 +33,7 @@
                    type="radio"
                    ng-model="$ctrl.response.booleanResponse"
                    ng-required="$ctrl.question.isMandatory"
-                   ng-change="$ctrl.saveResponse($ctrl.question.id)"
+                   ng-change="$ctrl.saveBooleanResponse($ctrl.question.id, $ctrl.response.booleanResponse)"
                    value="false"/>
             No
         </label>
@@ -42,7 +42,7 @@
             <input ng-attr-name="{{ $ctrl.question.id }}"
                    type="radio"
                    ng-model="$ctrl.response.booleanResponse"
-                   ng-change="$ctrl.saveResponse($ctrl.question.id)"
+                   ng-change="$ctrl.saveBooleanResponse($ctrl.question.id, $ctrl.response.booleanResponse)"
                    value="null"/>
             N/a
         </label>
@@ -53,7 +53,7 @@
         <textarea ng-attr-id="{{ $ctrl.question.id }}"
                   ng-model="$ctrl.response.stringResponse"
                   ng-required="$ctrl.question.isMandatory"
-                  ng-blur="$ctrl.saveResponse($ctrl.question.id)"
+                  ng-blur="$ctrl.saveStringResponse($ctrl.question.id, $ctrl.response.stringResponse)"
                   rows="1"
                   class="form-control">
         </textarea>
@@ -64,7 +64,7 @@
         <textarea ng-attr-id="{{ $ctrl.question.id }}"
                   ng-model="$ctrl.response.stringResponse"
                   ng-required="$ctrl.question.isMandatory"
-                  ng-blur="$ctrl.saveResponse($ctrl.question.id)"
+                  ng-blur="$ctrl.saveStringResponse($ctrl.question.id, $ctrl.response.stringResponse)"
                   rows="4"
                   class="form-control">
         </textarea>
@@ -87,7 +87,7 @@
             ng-attr-id="{{ $ctrl.question.id }}"
             ng-model="$ctrl.response.stringResponse"
             ng-required="$ctrl.question.isMandatory"
-            ng-change="$ctrl.saveResponse($ctrl.question.id)"
+            ng-change="$ctrl.saveStringResponse($ctrl.question.id, $ctrl.response.stringResponse)"
             ng-options="entry.value as entry.value for entry in $ctrl.options"
             class="form-control">
     </select>
@@ -100,8 +100,8 @@
                    close-on-select="false"
                    ng-model="$ctrl.response.listResponse"
                    ng-required="$ctrl.question.isMandatory"
-                   on-select="$ctrl.saveResponse($ctrl.question.id)"
-                   on-remove="$ctrl.saveResponse($ctrl.question.id)"
+                   on-select="$ctrl.saveListResponse($ctrl.question.id, $ctrl.response.listResponse)"
+                   on-remove="$ctrl.saveListResponse($ctrl.question.id, $ctrl.response.listResponse)"
                    class="form-control waltz-survey-form-control">
             <ui-select-match placeholder="Select values...">
                 <span ng-bind="$item.value"></span>
