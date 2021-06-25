@@ -69,7 +69,6 @@
 
 <div>
     {#if  activeMode === Modes.TABLE}
-        <p class="help-block">Overlay groups can be used to show relationships between nodes and other Waltz entities</p>
         {#if _.size(overlayGroups) === 0 }
             No overlay groups have been created for this diagram.
         {:else}

@@ -52,28 +52,34 @@
 <div>
     <span>{selected.note}</span>
 </div>
-<span>
-    <button class="btn btn-link"
-            on:click={() => cancel()}>
-        Cancel
-    </button>
+<div class="context-panel-footer">
     {#if canEdit}
-    |
-    <button class="btn btn-link"
+    <button class="btn btn-skinny"
             on:click={() => activeMode = Modes.EDIT}>
         Edit
     </button>
     |
-    <button class="btn btn-link"
+    <button class="btn btn-skinny"
             on:click={() => removeAnnotation()}>
         Remove
     </button>
+    |
     {/if}
-</span>
+    <button class="btn btn-skinny"
+            on:click={() => cancel()}>
+        Cancel
+    </button>
+
+</div>
 {:else if activeMode === Modes.EDIT}
     <AddAnnotationSubPanel selected={selected}
                            on:cancel={() => cancel()}/>
 {/if}
 
 <style>
+    .context-panel-footer {
+        border-top: 1px solid #eee;
+        margin-top:0.5em;
+        padding-top:0.5em;
+    }
 </style>

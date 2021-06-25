@@ -22,19 +22,28 @@
 
 </script>
 
+<p class="help-block">Overlay groups can be used to show relationships between nodes and other Waltz entities</p>
 {#if activeMode === Modes.TABLE}
-    <OverlayGroupsTable {diagramId} {canEdit}/>
     {#if canEdit}
-    <button class="btn btn-skinny"
-            on:click={() => activeMode = Modes.ADD_GROUP}>
-        <Icon name="plus"/>Add new overlay group
-    </button>
-    |
-    <button class="btn btn-skinny"
-            on:click={() => activeMode = Modes.CLONE_GROUP}>
-        <Icon name="clone"/>Import overlay group
-    </button>
+        <ul>
+            <li>
+                <button class="btn btn-skinny"
+                        on:click={() => activeMode = Modes.ADD_GROUP}>
+                    <Icon name="plus"/>Add new overlay group
+                </button>
+            </li>
+            <li>
+                <button class="btn btn-skinny"
+                        on:click={() => activeMode = Modes.CLONE_GROUP}>
+                    <Icon name="clone"/>Import overlay group
+                </button>
+            </li>
+        </ul>
     {/if}
+    <div style="margin-top: 1em">
+        <strong>Groups:</strong>
+        <OverlayGroupsTable {diagramId} {canEdit}/>
+    </div>
 {:else if activeMode === Modes.ADD_GROUP}
     <h4>Create Group:</h4>
     <CreateNewOverlayGroupPanel {diagramId}
@@ -46,5 +55,14 @@
 {/if}
 
 <style>
+    ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+
+    li {
+        padding-top: 0;
+    }
 
 </style>
