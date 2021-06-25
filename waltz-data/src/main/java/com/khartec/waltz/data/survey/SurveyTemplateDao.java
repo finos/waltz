@@ -156,6 +156,7 @@ public class SurveyTemplateDao {
         return dsl
                 .deleteFrom(SURVEY_TEMPLATE)
                 .where(SURVEY_TEMPLATE.ID.eq(id))
+                .and(SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.DRAFT.name()))
                 .execute() == 1;
     }
 }
