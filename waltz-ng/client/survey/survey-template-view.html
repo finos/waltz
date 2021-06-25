@@ -39,6 +39,14 @@
         </a>
         <a class="btn btn-primary btn-xs"
            waltz-has-role="SURVEY_TEMPLATE_ADMIN"
+           ng-if="ctrl.template.status === 'DRAFT'
+                    && ctrl.noRuns()
+                    && ctrl.isOwnerOrAdmin"
+           ng-click="ctrl.removeTemplate()">
+            Remove
+        </a>
+        <a class="btn btn-primary btn-xs"
+           waltz-has-role="SURVEY_TEMPLATE_ADMIN"
            ng-click="ctrl.cloneTemplate()">
             Clone
         </a>

@@ -192,4 +192,11 @@ public class SurveyTemplateService {
 
         return newTemplateId;
     }
+
+
+    public Boolean delete(long id) {
+        surveyQuestionDropdownEntryDao.deleteForTemplate(id);
+        surveyQuestionDao.deleteForTemplate(id);
+        return surveyTemplateDao.delete(id);
+    }
 }

@@ -150,4 +150,12 @@ public class SurveyTemplateDao {
                         .and(SURVEY_TEMPLATE.ID.eq(templateId)))
                 .execute();
     }
+
+
+    public boolean delete(long id) {
+        return dsl
+                .deleteFrom(SURVEY_TEMPLATE)
+                .where(SURVEY_TEMPLATE.ID.eq(id))
+                .execute() == 1;
+    }
 }
