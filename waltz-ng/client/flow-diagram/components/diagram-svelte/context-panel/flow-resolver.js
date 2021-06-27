@@ -20,7 +20,6 @@ export function prepareUpdateCommands(flows = [],
     const newFlows = _
         .chain(flows)
         .filter(isAddition)
-        .reject(f => _.some(existingFlows, flow => sameRef(flow[counterpartPropName], f.counterpartEntity)))
         .value()
 
     const nodeAdditions = _.map(newFlows, f => toGraphNode(f.counterpartEntity));
@@ -56,22 +55,20 @@ export function prepareUpdateCommands(flows = [],
 
 
 export function mkFlows(logicalFlows = [], node, isUpstream, existingFlows = []) {
-    const counterpartPropName = isUpstream
-        ? "source"
-        : "target";
+    console.log('mkFlows', {logicalFlows, node, isUpstream, existingFlows})
 
-    const selfPropName = isUpstream
-        ? "target"
-        : "source";
+    const [counterpartPropName, selfPropName] = isUpstream
+        ? ["source", "target"]
+        : ["target", "source"];
 
     return _
         .chain(logicalFlows)
-        .filter(f => f[selfPropName].id === node.id)
-        .reject(f => f[counterpartPropName].id === node.id)
+        .filter(f => f[selfPropName].id === node.id) // keep
+        .reject(f => f[counterpartPropName].id === node.id) // reject self loops
         .map(f => Object.assign({}, f, { kind: "LOGICAL_DATA_FLOW" }))
         .map(f => {
             const counterpartEntity = f[counterpartPropName];
-            const flowExists = _.some(existingFlows, flow => sameRef(flow[counterpartPropName], counterpartEntity));
+            const flowExists = _.some(existingFlows, flow => flow.id === f.id);
             return {
                 counterpartEntity,
                 logicalFlow: f,
