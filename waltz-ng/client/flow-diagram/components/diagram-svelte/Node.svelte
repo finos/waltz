@@ -6,6 +6,8 @@
     import overlay from "./store/overlay";
     import {determineStylingBasedUponLifecycle, symbolsByName} from "./flow-diagram-utils";
     import {widths} from "./store/layout";
+    import {selectedNode} from "./diagram-model-store";
+    import {toGraphId} from "../../flow-diagram-utils";
 
     const dispatch = createEventDispatcher();
 
@@ -65,11 +67,15 @@
 
     $: associatedGroups = _.filter(groups, g => _.includes(g.data.applicationIds, node.data.id));
 
-    $: classes = [`
-            wfd-node
-            ${$overlay.appliedOverlay && !_.includes(associatedGroups, $overlay.appliedOverlay)
-            ? "wfd-not-active" : "wfd-active"}
-    `];
+    $: classes = [
+        "wfd-node",
+        $overlay.appliedOverlay && !_.includes(associatedGroups, $overlay.appliedOverlay)
+            ? "wfd-not-active"
+            : "wfd-active",
+        $selectedNode && toGraphId($selectedNode) === node.id
+            ? 'wfd-selected-node'
+            : ''
+    ].join(" ");
 
     $: nodeStyling = determineStylingBasedUponLifecycle(node.data.entityLifecycleStatus);
 
@@ -134,10 +140,6 @@
 
       &:hover {
         cursor: move;
-
-        path {
-          stroke: #999;
-        }
       }
     }
 
@@ -153,6 +155,12 @@
         .symbol {
             opacity: 0.3;
         }
+    }
+
+    .wfd-selected-node .shape {
+        stroke-width: 2;
+        stroke: #bea64c;
+        fill: #f1eee1;
     }
 
 </style>

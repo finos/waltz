@@ -5,6 +5,8 @@
     import {refToString} from "../../../common/entity-utils";
     import {positions, widths} from "./store/layout";
     import {determineStylingBasedUponLifecycle} from "./flow-diagram-utils";
+    import {selectedFlow, selectedNode} from "./diagram-model-store";
+    import {toGraphId} from "../../flow-diagram-utils";
 
 
     const dispatch = createEventDispatcher();
@@ -88,9 +90,17 @@
             positions.setPosition({id: flow.id, x: bucketPosition.x, y: bucketPosition.y});
         }
     }
+
+    $: classes = [
+        `wfd-flow`,
+        `wfd-flow-lifecycle-${flow.data.entityLifecycleStatus}`,
+        $selectedFlow && flow.id === toGraphId($selectedFlow) ? 'wfd-selected-flow' : ''
+    ].join(" ");
+
+
 </script>
 
-<g class="wfd-flow wfd-flow-lifecycle-{flow.data.entityLifecycleStatus}"
+<g class={classes}
    data-flow-id={refToString(flow.data)}
    bind:this={gElem}>
     <path fill="none"
@@ -130,4 +140,7 @@
         pointer-events: all;
     }
 
+    .wfd-selected-flow .wfd-flow-arrow {
+        stroke-width: 3;
+    }
 </style>
