@@ -97,11 +97,6 @@
         $selectedFlow && flow.id === toGraphId($selectedFlow) ? 'wfd-selected-flow' : ''
     ].join(" ");
 
-    $: console.log({
-        sf: $selectedFlow,
-        f: flow,
-        b: $selectedFlow && flow.id === toGraphId($selectedFlow)
-    });
 
 </script>
 

@@ -67,13 +67,15 @@
 
     $: associatedGroups = _.filter(groups, g => _.includes(g.data.applicationIds, node.data.id));
 
-    $: classes = [`
-            wfd-node
-            ${$overlay.appliedOverlay && !_.includes(associatedGroups, $overlay.appliedOverlay)
-                ? "wfd-not-active"
-                : "wfd-active"}
-            ${$selectedNode && toGraphId($selectedNode) === node.id ? 'wfd-selected-node' : ''}
-    `];
+    $: classes = [
+        "wfd-node",
+        $overlay.appliedOverlay && !_.includes(associatedGroups, $overlay.appliedOverlay)
+            ? "wfd-not-active"
+            : "wfd-active",
+        $selectedNode && toGraphId($selectedNode) === node.id
+            ? 'wfd-selected-node'
+            : ''
+    ].join(" ");
 
     $: nodeStyling = determineStylingBasedUponLifecycle(node.data.entityLifecycleStatus);
 
