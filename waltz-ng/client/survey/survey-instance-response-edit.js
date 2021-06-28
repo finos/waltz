@@ -116,6 +116,33 @@ function controller($location,
     };
 
 
+    vm.saveStringResponse = (questionId, stringResponse) => {
+        vm.surveyResponses[questionId] = {
+            stringResponse: stringResponse
+        }
+
+        vm.saveResponse(questionId);
+    }
+
+
+    vm.saveNumberResponse = (questionId, numberResponse) => {
+        vm.surveyResponses[questionId] = {
+            numberResponse: numberResponse
+        }
+
+        vm.saveResponse(questionId);
+    }
+
+
+    vm.saveBooleanResponse = (questionId, booleanResponse) => {
+        vm.surveyResponses[questionId] = {
+            booleanResponse: booleanResponse
+        }
+
+        vm.saveResponse(questionId);
+    }
+
+
     vm.saveListResponse = (questionId, listResponse) => {
         vm.surveyResponses[questionId] = {
             listResponse:  listResponse
