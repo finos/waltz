@@ -8,10 +8,12 @@
     import {flowDiagramOverlayGroupStore} from "../../../../svelte-stores/flow-diagram-overlay-group-store";
     import {toGraphId} from "../../../flow-diagram-utils";
     import OverlayGlyph from "./OverlayGlyph.svelte";
+    import EditOverlayIconSubPanel from "./EditOverlayIconSubPanel.svelte";
 
     const Modes = {
         TABLE: "TABLE",
         ADD_OVERLAY: "ADD_OVERLAY",
+        EDIT_OVERLAY: "EDIT_OVERLAY",
     };
 
     const dispatch = createEventDispatcher();
@@ -20,6 +22,7 @@
     export let canEdit;
 
     let selectedGroup;
+    let selectedOverlay;
     let groupOverlays;
     let removePromise;
     let activeMode = Modes.TABLE;
@@ -53,6 +56,11 @@
     function removeOverlayGroup(group) {
         return removePromise = flowDiagramOverlayGroupStore
             .deleteGroup(diagramId, group.data.id);
+    }
+
+    function editOverlay(overlayGroup) {
+        selectedOverlay = overlayGroup.data;
+        activeMode = Modes.EDIT_OVERLAY
     }
 
     $: overlayGroupsCall = flowDiagramOverlayGroupStore.findByDiagramId(diagramId);
@@ -114,6 +122,10 @@
                                             on:click={() => removeOverlay(groupOverlay)}>
                                         <Icon name="trash"/>
                                     </button>
+                                    <button class="btn btn-skinny waltz-visibility-child-30"
+                                            on:click={() => editOverlay(groupOverlay)}>
+                                        <Icon name="pencil"/>
+                                    </button>
                                     {/if}
                                 </li>
                             {/each}
@@ -145,6 +157,11 @@
                                       group={selectedGroup}
                                       on:cancel={cancel}
                                       overlays={groupOverlays}/>
+        <br>
+    {:else if activeMode === Modes.EDIT_OVERLAY}
+        <EditOverlayIconSubPanel  group={selectedGroup}
+                                  on:cancel={cancel}
+                                  selectedOverlay={selectedOverlay}/>
         <br>
     {/if}
 </div>

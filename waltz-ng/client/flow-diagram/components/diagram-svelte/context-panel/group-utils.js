@@ -12,7 +12,7 @@ export const colorSchemes = [
 
 const symbols = ["star", "square", "diamond", "circle", "wye", "triangle", "cross"];
 
-function mkDecoratorId(symbol, fill, stroke) {
+export function mkDecoratorId(symbol, fill, stroke) {
     return `${symbol}_${fill}_${stroke}`;
 }
 
@@ -22,7 +22,7 @@ const symbolColorCombinations = _.flatMap(
         {},
         colorScheme,
         {
-            id: mkDecoratorId(s, colorScheme.fill, colorScheme.stroke),
+            decoratorId: mkDecoratorId(s, colorScheme.fill, colorScheme.stroke),
             symbol: s
         })));
 
