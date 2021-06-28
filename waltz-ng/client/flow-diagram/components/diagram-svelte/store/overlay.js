@@ -39,7 +39,11 @@ function addOverlay(state, overlay){
     const existing = _.find(currentOverlays, d => d.id === overlayItem.id);
 
     if (existing) {
-        return state;
+        dirty.set(true);
+        const newOverlaysForGroupWithout = _.reject(currentOverlays, d => d.id === overlayItem.id);
+        const newOverlaysForGroup = [...newOverlaysForGroupWithout, overlayItem];
+        const newOverlays = Object.assign({}, state.groupOverlays, {[refId]: newOverlaysForGroup});
+        return Object.assign({}, state, {groupOverlays: newOverlays});
     } else {
         dirty.set(true);
         const newOverlaysForGroup = [...currentOverlays, overlayItem];

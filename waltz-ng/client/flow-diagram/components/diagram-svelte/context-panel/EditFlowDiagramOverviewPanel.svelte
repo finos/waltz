@@ -26,8 +26,6 @@
     $: noChange = $name === flowDiagram.name && $description === flowDiagram.description;
 
     function saveDiagram(){
-        console.log({name: $name, desc: $description})
-
         if($name !== flowDiagram.name){
             const namePromise = flowDiagramStore.updateName(flowDiagram.id, {newName: $name});
         }
