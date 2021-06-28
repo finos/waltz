@@ -41,7 +41,6 @@
         </ul>
     {/if}
     <div style="margin-top: 1em">
-        <strong>Groups:</strong>
         <OverlayGroupsTable {diagramId} {canEdit}/>
     </div>
 {:else if activeMode === Modes.ADD_GROUP}

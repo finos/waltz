@@ -44,7 +44,6 @@
 
 
     function selectNode(e) {
-        console.log("tree selector", e);
         dispatch("select", e.detail);
     }
 
