@@ -28,6 +28,7 @@
 
     function cancel() {
         newOverlay = selectedOverlay;
+        overlay.clearAppliedOverlay();
         dispatch("cancel");
     }
 
@@ -78,7 +79,7 @@
 
 <div>
     {#if activeMode === Modes.ADD_OVERLAY}
-        <div style="padding-bottom: 1em">
+        <div>
             <strong>{newOverlay.entityReference.name}</strong>
             <OverlayGlyph overlay={newOverlay}/>
             <div>
@@ -99,7 +100,7 @@
                    </li>
                 </ul>
             </div>
-            <div style="padding-top: 1em">
+            <div class="context-panel-footer">
                 <button class="btn btn-skinny"
                         on:click={() => saveOverlay()}>
                     Ok
@@ -140,5 +141,11 @@
 
     li {
         padding-top: 0;
+    }
+
+    .context-panel-footer {
+        border-top: 1px solid #eee;
+        margin-top:0.5em;
+        padding-top:0.5em;
     }
 </style>

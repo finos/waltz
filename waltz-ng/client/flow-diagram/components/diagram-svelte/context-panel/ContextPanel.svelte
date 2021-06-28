@@ -24,6 +24,7 @@
     import CloneDiagramSubPanel from "./CloneDiagramSubPanel.svelte";
     import {prepareSaveCmd} from "./panel-utils";
     import RemoveDiagramSubPanel from "./RemoveDiagramSubPanel.svelte";
+    import Markdown from "../../../../common/svelte/Markdown.svelte";
 
 
     export let diagramId;
@@ -74,18 +75,18 @@
 </script>
 
 <!-- Diagram title -->
-<div style="padding-bottom: 1px">
+<div style="padding-bottom: 1px"
+     class="waltz-visibility-parent">
     {#if activeMode === Modes.VIEW}
         <h4>
             {$diagram.name}
-            <span class="small">
-                <button class="tn btn-skinny"
-                        on:click={() => activeMode = Modes.CLONE}>
+        </h4>
+        <div class="small waltz-visibility-child-50">
+            <button class="tn btn-skinny"
+                    on:click={() => activeMode = Modes.CLONE}>
                 <Icon name="clone"/>Clone
             </button>
-            </span>
             {#if canEdit}
-            <span class="small">
                 |
                 <button class="tn btn-skinny"
                     on:click={() => activeMode = Modes.EDIT}>
@@ -96,14 +97,20 @@
                         on:click={() => activeMode = Modes.REMOVE}>
                     <Icon name="trash"/>Remove
                 </button>
-            </span>
             {/if}
-        </h4>
-        <p class="help-block">{$diagram.description || "No description provided"}</p>
-        <div class="small text-muted">
-            (<LastEdited class="small pull-right text-muted" entity={$diagram}/>)
         </div>
+
+        <p class="help-block">
+            <Markdown text={$diagram.description || "No description provided"}/>
+        </p>
+
+        <div class="small text-muted">
+            (<LastEdited class="small pull-right text-muted"
+                         entity={$diagram}/>)
+        </div>
+
         <br>
+
         {#if canEdit}
             {#if $dirty}
                 <span class="help-block">
@@ -149,72 +156,73 @@
 </div>
 
 <!--Tabs for context, overlays and filters-->
-<div class="waltz-tabs">
-    <!-- TAB HEADERS -->
-    <input type="radio"
-           bind:group={selectedTab}
-           value="context"
-           id="context">
-    <label class="wt-label"
-           for="context">
-        <span>Context</span>
-    </label>
+{#if activeMode === Modes.VIEW}
+    <div class="waltz-tabs">
+        <!-- TAB HEADERS -->
+        <input type="radio"
+               bind:group={selectedTab}
+               value="context"
+               id="context">
+        <label class="wt-label"
+               for="context">
+            <span>Context</span>
+        </label>
 
-    <input type="radio"
-           bind:group={selectedTab}
-           value="overlays"
-           id="overlays">
-    <label class="wt-label"
-           for="overlays">
-        <span>Overlays</span>
-    </label>
+        <input type="radio"
+               bind:group={selectedTab}
+               value="overlays"
+               id="overlays">
+        <label class="wt-label"
+               for="overlays">
+            <span>Overlays</span>
+        </label>
 
-    <input type="radio"
-           bind:group={selectedTab}
-           value="filters"
-           id="filters">
-    <label class="wt-label"
-           for="filters">
-        <span>Filters</span>
-    </label>
+        <input type="radio"
+               bind:group={selectedTab}
+               value="filters"
+               id="filters">
+        <label class="wt-label"
+               for="filters">
+            <span>Filters</span>
+        </label>
 
-    <input type="radio"
-           bind:group={selectedTab}
-           value="relationships"
-           id="relationships">
-    <label class="wt-label"
-           for="relationships">
-        <span>Relationships</span>
-    </label>
+        <input type="radio"
+               bind:group={selectedTab}
+               value="relationships"
+               id="relationships">
+        <label class="wt-label"
+               for="relationships">
+            <span>Relationships</span>
+        </label>
 
-    <div class="wt-tab wt-active">
-        <!-- SERVERS -->
-        {#if selectedTab === 'context'}
-            {#if $selectedNode}
-                <NodePanel selected={$selectedNode}
-                           on:cancel={cancel}
-                           {canEdit}/>
-            {:else if $selectedFlow}
-                <FlowPanel selected="{$selectedFlow}"
-                           on:cancel={cancel}
-                           {canEdit}/>
-            {:else if $selectedAnnotation}
-                <AnnotationPanel selected="{$selectedAnnotation}"
-                                 on:cancel={cancel}
-                                 {canEdit}/>
-            {:else}
-                <p class="help-block">Select a node or flow on the diagram to make changes</p>
-                <DefaultPanel {canEdit}/>
+        <div class="wt-tab wt-active">
+            <!-- SERVERS -->
+            {#if selectedTab === 'context'}
+                {#if $selectedNode}
+                    <NodePanel selected={$selectedNode}
+                               on:cancel={cancel}
+                               {canEdit}/>
+                {:else if $selectedFlow}
+                    <FlowPanel selected="{$selectedFlow}"
+                               on:cancel={cancel}
+                               {canEdit}/>
+                {:else if $selectedAnnotation}
+                    <AnnotationPanel selected="{$selectedAnnotation}"
+                                     on:cancel={cancel}
+                                     {canEdit}/>
+                {:else}
+                    <DefaultPanel {canEdit}/>
+                {/if}
+            {:else if selectedTab === 'overlays'}
+                <OverlayGroupsPanel {diagramId} {canEdit}/>
+            {:else if selectedTab === 'filters'}
+                <VisibilityToggles/>
+            {:else if selectedTab === 'relationships'}
+                <RelatedEntitiesPanel {diagramId} {canEdit}/>
             {/if}
-        {:else if selectedTab === 'overlays'}
-            <OverlayGroupsPanel {diagramId} {canEdit}/>
-        {:else if selectedTab === 'filters'}
-            <VisibilityToggles/>
-        {:else if selectedTab === 'relationships'}
-            <RelatedEntitiesPanel {diagramId} {canEdit}/>
-        {/if}
+        </div>
     </div>
-</div>
+{/if}
 
 <style type="text/scss">
 

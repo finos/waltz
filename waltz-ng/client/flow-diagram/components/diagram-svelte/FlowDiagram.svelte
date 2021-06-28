@@ -96,10 +96,10 @@
         ? windowWidth * 0.4 + "px"
         : "100%";
 
-
 </script>
 
 <svelte:window bind:innerWidth={windowWidth}/>
+
 {#if $diagram?.id}
 <div class="col-md-8 diagram-svg">
     <svg viewBox="0 0 1100 600"

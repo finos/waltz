@@ -52,28 +52,6 @@ function addOverlay(state, overlay){
     }
 }
 
-function addGroup(state, group){
-    const existing = _.find(state.groups, d => d.id === group.id);
-
-    if (existing) {
-        return state;
-    } else {
-        dirty.set(true);
-        return Object.assign({}, state, {groups: [...state.groups, group]});
-    }
-}
-
-function removeGroup(state, group) {
-    const existing = _.find(state.groups, d => d.id === group.id);
-
-    if (existing) {
-        dirty.set(true);
-        return Object.assign({}, state, {groups: _.without(state.groups, existing)});
-    } else {
-        return state;
-    }
-}
-
 function removeOverlay(state, overlay) {
     const refId = toGraphId(overlay.data.groupRef);
     const currentOverlays = state.groupOverlays[refId] || [];
@@ -112,8 +90,6 @@ function createStore() {
 
     return {
         subscribe,
-        addGroup: (group) => update(s => addGroup(s, group)),
-        removeGroup: (group) => update(s => removeGroup(s, group)),
         addOverlay: (overlay) => update(s => addOverlay(s, overlay)),
         removeOverlay: (overlay) => update(s => removeOverlay(s, overlay)),
         setAppliedOverlay: (overlay => update(s => setAppliedOverlay(s, overlay))),
