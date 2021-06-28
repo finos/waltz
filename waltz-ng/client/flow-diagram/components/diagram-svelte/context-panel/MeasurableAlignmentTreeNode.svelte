@@ -18,7 +18,6 @@
     }
 
     function selectNode(selectedNode) {
-        console.log({selectedNode});
         dispatcher("select", selectedNode);
     }
 
