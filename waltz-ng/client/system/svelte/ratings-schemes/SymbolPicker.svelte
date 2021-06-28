@@ -20,17 +20,17 @@
     <div style="display: inline-block">
         Symbols:
         &nbsp;
-        {#each _.keys(symbolsByName) as symbol}
-            {#if symbol !== "DEFAULT"}
+        {#each _.keys(symbolsByName) as symbolName}
+            {#if symbolName !== "DEFAULT"}
             <span style="padding-right: 2px">
                 <svg width="10"
                      height="10"
-                     on:click|preventDefault={() => selectedSymbol = symbol}
+                     on:click|preventDefault={() => selectedSymbol = symbolName}
                      viewBox="0 0 10 10">
                     <path fill={color}
                           stroke={color}
                           transform="translate(5 5)"
-                          d={symbolsByName[symbol]()}>
+                          d={symbolsByName[symbolName]()}>
                     </path>
                 </svg>
             </span>

@@ -102,7 +102,7 @@
             <div style="padding-top: 1em">
                 <button class="btn btn-skinny"
                         on:click={() => saveOverlay()}>
-                    Save
+                    Ok
                 </button>
                 |
                 <button class="btn btn-skinny"
@@ -122,7 +122,7 @@
     {:else if activeMode === Modes.EDIT_SYMBOL}
         <SymbolPicker color={newOverlay.fill}
                       symbolsByName={symbolsByName}
-                      startSymbol={newOverlay.symbol}
+                      startSymbol={newOverlay?.symbol || "DEFAULT"}
                       on:select={selectSymbol}/>
         <button class="btn btn-skinny"
                 on:click={() => activeMode = Modes.ADD_OVERLAY}>
