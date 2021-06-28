@@ -4,7 +4,6 @@
     import {wrapText} from "../../../common/d3-utils";
     import {draw, fade} from "svelte/transition"
     import {mkDragHandler} from "./drag-handler";
-    import {processor} from "./diagram-model-store";
     import {createEventDispatcher} from "svelte";
     import {shapeFor} from "../../flow-diagram-utils";
 
@@ -12,14 +11,6 @@
     export let annotation;
 
     const dispatch = createEventDispatcher();
-
-    function calcPosition(annotation) {
-        const offset = positions[annotation.id];
-
-        const entity = positions[refToString(annotation.data.entityReference)];
-        return `translate(${entity.x + offset.x + 50} ${entity.y + offset.y + 10})`;
-    }
-
 
     function determineAnnotationGeometry(positions, annotation) {
         const ref = annotation.data.entityReference;

@@ -32,7 +32,7 @@
         dispatch("cancel");
     }
 
-    function saveOverlay() {
+    function addOverlay() {
         const overlayToAdd = Object.assign(
             {},
             newOverlay,
@@ -102,7 +102,7 @@
             </div>
             <div class="context-panel-footer">
                 <button class="btn btn-skinny"
-                        on:click={() => saveOverlay()}>
+                        on:click={() => addOverlay()}>
                     Ok
                 </button>
                 |
