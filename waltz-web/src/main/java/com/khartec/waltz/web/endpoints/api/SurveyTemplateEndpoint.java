@@ -19,9 +19,11 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.ReleaseLifecycleStatusChangeCommand;
+import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.model.survey.SurveyTemplate;
 import com.khartec.waltz.model.survey.SurveyTemplateChangeCommand;
 import com.khartec.waltz.model.user.SystemRole;
+import com.khartec.waltz.service.person.PersonService;
 import com.khartec.waltz.service.survey.SurveyTemplateService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
@@ -42,15 +44,21 @@ public class SurveyTemplateEndpoint implements Endpoint {
 
     private final SurveyTemplateService surveyTemplateService;
     private final UserRoleService userRoleService;
+    private final PersonService personService;
+
 
     @Autowired
     public SurveyTemplateEndpoint(SurveyTemplateService surveyTemplateService,
-                                  UserRoleService userRoleService) {
+                                  UserRoleService userRoleService,
+                                  PersonService personService) {
         checkNotNull(surveyTemplateService, "surveyTemplateService must not be null");
         checkNotNull(userRoleService, "userRoleService must not be null");
+        checkNotNull(personService, "personService must not be null");
 
         this.surveyTemplateService = surveyTemplateService;
         this.userRoleService = userRoleService;
+        this.personService = personService;
+
     }
 
 
@@ -99,16 +107,48 @@ public class SurveyTemplateEndpoint implements Endpoint {
                             getId(req));
         };
 
+        DatumRoute<Boolean> deleteRoute =
+                (req, res) -> {
+                    String username = getUsername(req);
+                    long templateId = getId(req);
+                    ensureUserIsOwnerOrAdmin(req, templateId, username);
+                    return surveyTemplateService.delete(templateId);
+        };
+
+
         getForList(BASE_URL, findAllRoute);
         getForDatum(getByIdPath, getByIdRoute);
         postForDatum(BASE_URL, createRoute);
         postForDatum(clonePath, cloneRoute);
         putForDatum(BASE_URL, updateRoute);
         putForDatum(updateStatusPath, updateStatusRoute);
+        deleteForDatum(mkPath(BASE_URL, ":id"), deleteRoute);
     }
 
 
     private void ensureUserHasAdminRights(Request request) {
         requireRole(userRoleService, request, SystemRole.SURVEY_TEMPLATE_ADMIN);
+    }
+
+
+    private void ensureUserIsOwnerOrAdmin(Request request,
+                                          Long templateId,
+                                          String username) {
+
+        Person person = personService.getPersonByUserId(username);
+        if(person == null) {
+            throw new IllegalArgumentException("User not found");
+        }
+
+        SurveyTemplate template = surveyTemplateService.getById(templateId);
+        //if person record found id is always present
+        person.id()
+                .ifPresent(id -> {
+                    if (template.ownerId().equals(id)){
+                        requireRole(userRoleService, request, SystemRole.SURVEY_TEMPLATE_ADMIN);
+                    } else {
+                        requireRole(userRoleService, request, SystemRole.ADMIN);
+                    }
+                });
     }
 }

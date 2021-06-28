@@ -21,9 +21,7 @@ package com.khartec.waltz.data.survey;
 import com.khartec.waltz.model.survey.ImmutableSurveyQuestionDropdownEntry;
 import com.khartec.waltz.model.survey.SurveyQuestionDropdownEntry;
 import com.khartec.waltz.schema.tables.records.SurveyQuestionDropdownEntryRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -124,5 +122,19 @@ public class SurveyQuestionDropdownEntryDao {
                 .where(SURVEY_QUESTION.SURVEY_TEMPLATE_ID.eq(surveyTemplateId))
                 .orderBy(SURVEY_QUESTION_DROPDOWN_ENTRY.POSITION.asc(), SURVEY_QUESTION_DROPDOWN_ENTRY.VALUE.asc())
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public int deleteForTemplate(Long templateId) {
+
+        SelectConditionStep<Record1<Long>> questionIds = DSL
+                .select(SURVEY_QUESTION.ID)
+                .from(SURVEY_QUESTION)
+                .where(SURVEY_QUESTION.SURVEY_TEMPLATE_ID.eq(templateId));
+
+        return dsl
+                .deleteFrom(SURVEY_QUESTION_DROPDOWN_ENTRY)
+                .where(SURVEY_QUESTION_DROPDOWN_ENTRY.QUESTION_ID.in(questionIds))
+                .execute();
     }
 }
