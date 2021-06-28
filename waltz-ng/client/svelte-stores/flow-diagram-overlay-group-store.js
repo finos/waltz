@@ -57,6 +57,7 @@ export function mkFlowDiagramOverlayGroupStore() {
             .execute(
                 "POST",
                 `api/flow-diagram-overlay-group/clone/diagram-id/${diagramId}/id/${groupId}`)
+            .then(() => findByDiagramId(diagramId, true));
     }
 
     return {

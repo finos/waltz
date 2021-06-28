@@ -97,8 +97,8 @@
                 on:click={() => activeMode = Modes.EDIT}>
             <Icon name="pencil"/>Edit
         </button>
+        |
         {/if}
-            |
         <button class="btn btn-skinny"
                 on:click={() => cancel()}>
             Cancel
