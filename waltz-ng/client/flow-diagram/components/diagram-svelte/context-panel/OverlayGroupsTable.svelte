@@ -50,6 +50,7 @@
     }
 
     function removeOverlay(groupOverlay) {
+        overlay.clearAppliedOverlay();
         overlay.removeOverlay(groupOverlay);
     }
 
@@ -77,6 +78,7 @@
 
 <div>
     {#if  activeMode === Modes.TABLE}
+        <strong>Groups:</strong>
         {#if _.size(overlayGroups) === 0 }
             No overlay groups have been created for this diagram.
         {:else}

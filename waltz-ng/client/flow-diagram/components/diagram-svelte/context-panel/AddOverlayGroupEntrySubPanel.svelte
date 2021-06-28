@@ -60,7 +60,7 @@
 
 <div>
     {#if activeMode === Modes.SELECT_MEASURABLE && alignments}
-        <h4>Adding measurable overlay for {group.data.name}:</h4>
+        <strong>Adding measurable overlay for {group.data.name}:</strong>
         <GroupSelectorPanel on:select={selectOverlayEntity} {alignments}/>
         <button on:click={() => activeMode = Modes.SELECT_APP_GROUP}
                 class="btn btn-skinny">
@@ -77,6 +77,7 @@
             ...or add measurable overlay
         </button>
     {:else if activeMode === Modes.ADD_OVERLAY}
+        <strong>Editing overlay for {group.data.name}:</strong>
         <EditOverlayIconSubPanel selectedOverlay={newOverlay}
                                  {group}
                                  on:cancel={cancel}/>
