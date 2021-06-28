@@ -170,6 +170,14 @@ public class SurveyQuestionDao {
     }
 
 
+    public int deleteForTemplate(Long templateId){
+        return dsl
+                .deleteFrom(SURVEY_QUESTION)
+                .where(SURVEY_QUESTION.SURVEY_TEMPLATE_ID.eq(templateId))
+                .execute();
+    }
+
+
     private List<SurveyQuestion> findForTemplateIdSelector(Select<Record1<Long>> templateIdSelector) {
         return dsl.selectFrom(SURVEY_QUESTION)
                 .where(SURVEY_QUESTION.SURVEY_TEMPLATE_ID.in(templateIdSelector))

@@ -50,6 +50,12 @@ function store($http, baseUrl) {
             .then(result => result.data);
     };
 
+    const remove = (id) => {
+        return $http
+            .delete(`${BASE}/${id}`)
+            .then(result => result.data);
+    }
+
 
     return {
         create,
@@ -57,50 +63,56 @@ function store($http, baseUrl) {
         getById,
         findAll,
         update,
-        updateStatus
+        updateStatus,
+        remove
     };
 }
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
 
-const serviceName ='SurveyTemplateStore';
+const serviceName ="SurveyTemplateStore";
 
 
 export const SurveyTemplateStore_API = {
     create: {
         serviceName,
-        serviceFnName: 'create',
-        description: 'create survey template'
+        serviceFnName: "create",
+        description: "create survey template"
     },
     clone: {
         serviceName,
-        serviceFnName: 'clone',
-        description: 'clone survey template'
+        serviceFnName: "clone",
+        description: "clone survey template"
     },
     getById: {
         serviceName,
-        serviceFnName: 'getById',
-        description: 'get survey template for a given id'
+        serviceFnName: "getById",
+        description: "get survey template for a given id"
     },
     findAll: {
         serviceName,
-        serviceFnName: 'findAll',
-        description: 'find all survey templates'
+        serviceFnName: "findAll",
+        description: "find all survey templates"
     },
     update: {
         serviceName,
-        serviceFnName: 'update',
-        description: 'update a survey template'
+        serviceFnName: "update",
+        description: "update a survey template"
     },
     updateStatus: {
         serviceName,
-        serviceFnName: 'updateStatus',
-        description: `update a survey templates's status`
+        serviceFnName: "updateStatus",
+        description: "update a survey template's status"
+    },
+    remove: {
+        serviceName,
+        serviceFnName: "remove",
+        description: "remove a survey templates"
     }
 };
 
