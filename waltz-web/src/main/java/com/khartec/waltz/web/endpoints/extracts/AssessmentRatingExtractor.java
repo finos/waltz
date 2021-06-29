@@ -81,7 +81,7 @@ public class AssessmentRatingExtractor extends DirectQueryBasedDataExtractor {
     }
 
 
-    private SelectConditionStep<Record9<Long, String, String, String, String, String, Timestamp, String, String>> prepareExtractQuery(Long definitionId) {
+    private SelectConditionStep<Record10<Long, String, String, String, String, String, String, Timestamp, String, String>> prepareExtractQuery(Long definitionId) {
 
         return dsl
                 .selectDistinct(
@@ -91,6 +91,7 @@ public class AssessmentRatingExtractor extends DirectQueryBasedDataExtractor {
                         RATING_SCHEME_ITEM.CODE.as("Code"),
                         RATING_SCHEME_ITEM.NAME.as("Rating Name"),
                         RATING_SCHEME_ITEM.DESCRIPTION.as("Comment"),
+                        ASSESSMENT_RATING.DESCRIPTION.as("User Comment"),
                         ASSESSMENT_RATING.LAST_UPDATED_AT.as("Last Updated At"),
                         ASSESSMENT_RATING.LAST_UPDATED_BY.as("Last Updated By"),
                         ASSESSMENT_DEFINITION.NAME.as("Definition Name"))
@@ -100,7 +101,6 @@ public class AssessmentRatingExtractor extends DirectQueryBasedDataExtractor {
                 .innerJoin(ASSESSMENT_DEFINITION)
                 .on(ASSESSMENT_DEFINITION.ID.eq(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID))
                 .where(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID.eq(definitionId))
-                .and(ASSESSMENT_RATING.ENTITY_KIND.ne(EntityKind.APPLICATION.name())
-                        .or(entityLifecycleField.ne(EntityLifecycleStatus.REMOVED.name())));
+                .and(entityLifecycleField.ne(EntityLifecycleStatus.REMOVED.name()));
     }
 }
