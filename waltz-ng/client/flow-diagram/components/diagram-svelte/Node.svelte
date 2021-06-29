@@ -28,7 +28,7 @@
     }
 
     function mkRectShape(widthHint) {
-        const shape = {
+        return {
             path: `M0,0 L${widthHint},0 L${widthHint},30 L0,30 z`,
             cx: widthHint / 2,
             cy: 10,
@@ -37,7 +37,6 @@
                 dy: 14
             }
         };
-        return shape
     }
 
     const shapes = {
