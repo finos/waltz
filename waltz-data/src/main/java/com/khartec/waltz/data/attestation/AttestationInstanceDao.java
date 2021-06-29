@@ -133,8 +133,9 @@ public class AttestationInstanceDao {
                 .where(ATTESTATION_INSTANCE_RECIPIENT.USER_ID.eq(userId))
                 .and(ATTESTATION_INSTANCE.ATTESTED_AT.isNull());
 
-        // get the historically completed atttestations based on the above list of parent refs
-        return dsl.select(ATTESTATION_INSTANCE.fields())
+        // get the historically completed attestations based on the above list of parent refs
+        return dsl
+                .select(ATTESTATION_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
                 .from(ATTESTATION_INSTANCE)
                 .innerJoin(currentlyPendingAttestationParentRefs)
@@ -148,7 +149,8 @@ public class AttestationInstanceDao {
 
 
     public List<AttestationInstance> findByEntityReference(EntityReference ref) {
-        return dsl.select(ATTESTATION_INSTANCE.fields())
+        return dsl
+                .select(ATTESTATION_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
                 .from(ATTESTATION_INSTANCE)
                 .where(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND.eq(ref.kind().name()))
@@ -158,7 +160,8 @@ public class AttestationInstanceDao {
 
 
     public boolean attestInstance(long instanceId, String attestedBy, LocalDateTime dateTime) {
-        return dsl.update(ATTESTATION_INSTANCE)
+        return dsl
+                .update(ATTESTATION_INSTANCE)
                 .set(ATTESTATION_INSTANCE.ATTESTED_BY, attestedBy)
                 .set(ATTESTATION_INSTANCE.ATTESTED_AT, Timestamp.valueOf(dateTime))
                 .where(ATTESTATION_INSTANCE.ID.eq(instanceId).and(ATTESTATION_INSTANCE.ATTESTED_AT.isNull()))
@@ -167,7 +170,8 @@ public class AttestationInstanceDao {
 
 
     public List<AttestationInstance> findByRunId(long runId) {
-        return dsl.select(ATTESTATION_INSTANCE.fields())
+        return dsl
+                .select(ATTESTATION_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
                 .from(ATTESTATION_INSTANCE)
                 .where(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(runId))
@@ -177,7 +181,8 @@ public class AttestationInstanceDao {
 
     public int cleanupOrphans() {
 
-        Select<Record1<Long>> orphanAttestationIds = DSL.selectDistinct(ATTESTATION_INSTANCE.ID)
+        Select<Record1<Long>> orphanAttestationIds = DSL
+                .selectDistinct(ATTESTATION_INSTANCE.ID)
                 .from(ATTESTATION_INSTANCE)
                 .leftJoin(APPLICATION)
                 .on(APPLICATION.ID.eq(ATTESTATION_INSTANCE.PARENT_ENTITY_ID)
@@ -221,7 +226,8 @@ public class AttestationInstanceDao {
     }
 
     public List<AttestationInstance> findByIdSelector(Select<Record1<Long>> selector) {
-        return dsl.select(ATTESTATION_INSTANCE.fields())
+        return dsl
+                .select(ATTESTATION_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
                 .from(ATTESTATION_INSTANCE)
                 .where(ATTESTATION_INSTANCE.ID.in(selector))

@@ -41,22 +41,19 @@ public class AttestationPreCheckDao {
 
     
     public LogicalFlowAttestationPreChecks calcLogicalFlowAttestationPreChecks(EntityReference ref) {
-        CommonTableExpression<Record1<Long>> inScopeFlows = DSL
-                .name("in_scope_flows")
-                .as(DSL
-                        .select(lf.ID)
-                        .from(lf)
-                        .where(lf.TARGET_ENTITY_KIND.eq(ref.kind().name()))
-                        .and(lf.TARGET_ENTITY_ID.eq(ref.id()))
-                        .and(lf.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))
-                        .and(lf.IS_REMOVED.isFalse()));
+
+        Condition upstreamFlowsCondition = lf.TARGET_ENTITY_KIND.eq(ref.kind().name()).and(lf.TARGET_ENTITY_ID.eq(ref.id()));
+        Condition downstreamFlowsCondition = lf.SOURCE_ENTITY_KIND.eq(ref.kind().name()).and(lf.SOURCE_ENTITY_ID.eq(ref.id()));
+
+        CommonTableExpression<Record1<Long>> upstreamFlows = mkInScopeFlowsQry("upstream_flows", upstreamFlowsCondition);
+        CommonTableExpression<Record1<Long>> anyFlows = mkInScopeFlowsQry("any_flows", upstreamFlowsCondition.or(downstreamFlowsCondition));
 
         CommonTableExpression<Record2<String, Integer>> flowCount = DSL
                 .name("flow_count")
                 .as(DSL
                         .select(DSL.val("FLOWS").as("check"),
                                 DSL.count().as("count"))
-                        .from(inScopeFlows));
+                        .from(anyFlows));
 
         CommonTableExpression<Record2<String, Integer>> unknownFlowCount = DSL
                 .name("unknown_flow_count")
@@ -64,7 +61,7 @@ public class AttestationPreCheckDao {
                         .select(DSL.val("UNKNOWN").as("check"),
                                 DSL.count().as("count"))
                         .from(lfd)
-                        .where(lfd.LOGICAL_FLOW_ID.in(DSL.selectFrom(inScopeFlows)))
+                        .where(lfd.LOGICAL_FLOW_ID.in(DSL.selectFrom(upstreamFlows)))
                         .and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
                         .and(lfd.DECORATOR_ENTITY_ID.in(DSL.select(dt.ID).from(dt).where(dt.UNKNOWN.isTrue()))));
 
@@ -74,7 +71,7 @@ public class AttestationPreCheckDao {
                         .select(DSL.val("DEPRECATED").as("check"),
                                 DSL.count().as("count"))
                         .from(lfd)
-                        .where(lfd.LOGICAL_FLOW_ID.in(DSL.selectFrom(inScopeFlows)))
+                        .where(lfd.LOGICAL_FLOW_ID.in(DSL.selectFrom(upstreamFlows)))
                         .and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
                         .and(lfd.DECORATOR_ENTITY_ID.in(DSL.select(dt.ID).from(dt).where(dt.DEPRECATED.isTrue()))));
 
@@ -95,7 +92,8 @@ public class AttestationPreCheckDao {
 
 
         SelectOrderByStep<Record> qry = dsl
-                .with(inScopeFlows)
+                .with(upstreamFlows)
+                .with(anyFlows)
                 .with(unknownFlowCount)
                 .with(deprecatedFlowCount)
                 .with(exemptForMustHaveFlows)
@@ -139,6 +137,17 @@ public class AttestationPreCheckDao {
         });
 
         return builder.build();
+    }
+
+    private CommonTableExpression<Record1<Long>> mkInScopeFlowsQry(String cteName, Condition inScopeFlowsCondition) {
+        return DSL
+                .name(cteName)
+                .as(DSL
+                        .select(lf.ID)
+                        .from(lf)
+                        .where(inScopeFlowsCondition)
+                        .and(lf.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))
+                        .and(lf.IS_REMOVED.isFalse()));
     }
 
 
