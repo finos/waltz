@@ -92,5 +92,9 @@
     .secondary-link {
         color: $waltz-font-color;
         font-weight: bold;
+
+      &:hover {
+        color: $waltz-link-color;
+      }
     }
 </style>

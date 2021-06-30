@@ -46,7 +46,7 @@
 
 <div>
     <strong>
-        <EntityLink ref={selected}/>
+        <EntityLink ref={selected} isSecondaryLink={true}/>
     </strong>
 </div>
 <br>
