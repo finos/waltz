@@ -68,10 +68,20 @@
     </div>
 
     <!-- EXPIRED -->
-    <div class="alert alert-fatal"
+    <div class="alert alert-danger"
          ng-if="ctrl.surveyDetails.instance.status === 'EXPIRED'">
         <h4>Survey Expired</h4>
         <p>This survey response expired without being submitted</p>
+    </div>
+
+    <!-- WITHDRAWN -->
+    <div ng-if="ctrl.surveyDetails.instance.status === 'WITHDRAWN'">
+        <waltz-warning>
+            <message>Survey Withdrawn</message>
+            <content>
+                <p>Survey responses cannot be viewed for withdrawn surveys</p>
+            </content>
+        </waltz-warning>
     </div>
 
     <waltz-section name="Survey Response"
