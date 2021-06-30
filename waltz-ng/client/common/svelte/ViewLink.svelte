@@ -67,18 +67,11 @@
 </script>
 
 {#if path}
-    {#if !isSecondaryLink}
-        <a href={path}
-           {title}>
-            <slot></slot>
-        </a>
-    {:else}
-        <a class="secondary-link"
-           href={path}
-           {title}>
-            <slot></slot>
-        </a>
-    {/if}
+    <a href={path}
+       class:secondary-link={isSecondaryLink}
+       {title}>
+        <slot></slot>
+    </a>
 {:else }
     <span>
         <slot/>
