@@ -61,23 +61,41 @@
 <div>
     {#if activeMode === Modes.SELECT_MEASURABLE && alignments}
         <strong>Adding measurable overlay for {group.data.name}:</strong>
-        <GroupSelectorPanel on:select={selectOverlayEntity} {alignments}/>
-        <button on:click={() => activeMode = Modes.SELECT_APP_GROUP}
-                class="btn btn-skinny">
-            ...or add application group overlay
-        </button>
+        <div style="padding-top: 1em">
+            <GroupSelectorPanel on:select={selectOverlayEntity} {alignments}/>
+            <button on:click={() => activeMode = Modes.SELECT_APP_GROUP}
+                    class="btn btn-skinny">
+                ...or add an application group overlay
+            </button>
+        </div>
+        <div class="context-panel-footer">
+            <button on:click={cancel}
+                    class="btn btn-skinny">
+                Cancel
+            </button>
+        </div>
     {:else if activeMode === Modes.SELECT_APP_GROUP}
-        <h4>Adding application group overlay for {group.data.name}:</h4>
-        <EntitySearchSelector on:select={selectOverlayEntity}
-                              placeholder="Search for app group"
-                              entityKinds={['APP_GROUP']}>
-        </EntitySearchSelector>
-        <button on:click={() => activeMode = Modes.SELECT_MEASURABLE}
-                class="btn btn-skinny">
-            ...or add measurable overlay
-        </button>
+        <strong>Adding application group overlay for {group.data.name}:</strong>
+        <div style="padding-top: 1em">
+            <EntitySearchSelector on:select={selectOverlayEntity}
+                                  placeholder="Search for app group"
+                                  entityKinds={['APP_GROUP']}>
+            </EntitySearchSelector>
+            <div>
+                <button on:click={() => activeMode = Modes.SELECT_MEASURABLE}
+                    class="btn btn-skinny">
+                ...or add a measurable overlay
+                </button>
+            </div>
+        </div>
+        <div class="context-panel-footer">
+            <button on:click={cancel}
+                    class="btn btn-skinny">
+                Cancel
+            </button>
+        </div>
     {:else if activeMode === Modes.ADD_OVERLAY}
-        <strong>Editing overlay for {group.data.name}:</strong>
+        <strong>Editing overlay for group: {group.data.name}:</strong>
         <EditOverlayIconSubPanel selectedOverlay={newOverlay}
                                  {group}
                                  on:cancel={cancel}/>
@@ -85,4 +103,9 @@
 </div>
 
 <style>
+    .context-panel-footer {
+        border-top: 1px solid #eee;
+        margin-top:0.5em;
+        padding-top:0.5em;
+    }
 </style>

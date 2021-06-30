@@ -22,7 +22,7 @@
         &nbsp;
         {#each _.keys(symbolsByName) as symbolName}
             {#if symbolName !== "DEFAULT"}
-            <span style="padding-right: 2px">
+            <span style="padding-right: 2px" class="clickable">
                 <svg width="10"
                      height="10"
                      on:click|preventDefault={() => selectedSymbol = symbolName}
