@@ -53,7 +53,12 @@ function mkSurveyData(surveyRuns = [], surveyInstances = []) {
     };
 }
 
-const subjectField = mkEntityLinkGridCell("Subject", "surveyInstance.surveyEntity");
+const subjectField = mkEntityLinkGridCell("Subject", 
+                                          "surveyInstance.surveyEntity", 
+                                          "left", 
+                                          "top", 
+                                          {}, 
+                                          true);
 
 const subjectExtIdField = {
     field: "surveyInstance.surveyEntityExternalId",
@@ -62,7 +67,7 @@ const subjectExtIdField = {
 };
 const statusField = {
     field: "surveyInstance.status",
-        name: "Status",
+    name: "Status",
     cellFilter: "toDisplayName:'surveyInstanceStatus'",
     width: "10%"
 };

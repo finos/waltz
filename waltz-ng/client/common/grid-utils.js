@@ -61,7 +61,8 @@ export function mkEntityLinkGridCell(columnHeading,
                                      entityRefField,
                                      iconPlacement = "left",
                                      tooltipPlacement = "top",
-                                     additionalProps = {}) {
+                                     additionalProps = {},
+                                     isSecondaryLink = false) {
     return Object.assign(
         {},
         additionalProps,
@@ -72,7 +73,8 @@ export function mkEntityLinkGridCell(columnHeading,
                 <div class="ui-grid-cell-contents">
                     <waltz-entity-link entity-ref="row.entity.${entityRefField}"
                                        tooltip-placement="${tooltipPlacement}"
-                                       icon-placement="${iconPlacement}">
+                                       icon-placement="${iconPlacement}"
+                                       is-secondary-link="${isSecondaryLink}">
                     </waltz-entity-link>
                 </div>`
         });
