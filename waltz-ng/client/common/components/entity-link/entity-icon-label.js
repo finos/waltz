@@ -83,6 +83,24 @@ const entityLoaders = {
             }
         ])
     },
+    "AUTHORITATIVE_SOURCE": {
+        method: CORE_API.AuthSourcesStore.getById,
+        mkProps: (authSrc) => ([
+            {
+                name: "Application",
+                value: authSrc.applicationReference?.name || "?"
+            }, {
+                name: "Datatype Code",
+                value: authSrc.dataType || "?"
+            }, {
+                name: "Scope",
+                value: authSrc.parentReference?.name || "?"
+            }, {
+                name: "Rating",
+                value: authSrc.rating || "?"
+            }
+        ])
+    },
     "CHANGE_INITIATIVE": {
         method: CORE_API.ChangeInitiativeStore.getById,
         mkProps: (ci, displayNameService) => ([

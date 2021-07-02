@@ -9,6 +9,7 @@ const bindings = {
 
 const initialState = {
     AuthSourceOverview,
+    parentEntityRef: null
 }
 
 const addToHistory = (historyStore, id, name) => {
@@ -31,7 +32,8 @@ function controller($q, $stateParams, serviceBroker, historyStore, dynamicSectio
 
         vm.parentEntityRef = {
             kind: "AUTHORITATIVE_SOURCE",
-            id: authSourceId
+            id: authSourceId,
+            name: "?"
         };
 
         dynamicSectionManager.initialise("AUTHORITATIVE_SOURCE");
@@ -41,16 +43,24 @@ function controller($q, $stateParams, serviceBroker, historyStore, dynamicSectio
             .then(r => _.keyBy(r.data, d => d.code));
 
         const authSourcePromise = serviceBroker
-            .loadViewData(CORE_API.AuthSourcesStore.getById, [vm.parentEntityRef.id])
+            .loadViewData(CORE_API.AuthSourcesStore.getById, [authSourceId])
             .then(r =>  r.data);
 
         $q.all([dataTypesPromise, authSourcePromise])
             .then(([datatypesByCode, authSource]) => {
-                const datatype = datatypesByCode[vm.authoritativeSource.dataType];
+
+                const datatype = datatypesByCode[authSource.dataType];
                 const authSourceName =
                     authSource.applicationReference.name
                     + " - "
                     + _.get(datatype, "name", "unknown datatype");
+
+                vm.parentEntityRef = {
+                    kind: "AUTHORITATIVE_SOURCE",
+                    id: authSourceId,
+                    name: authSourceName
+                };
+
                 addToHistory(historyStore, authSource.id, authSourceName);
             });
 
