@@ -17,7 +17,7 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 import {
     checkIsAuthSourceCreateCommand,
     checkIsAuthSourceUpdateCommand,
@@ -37,8 +37,12 @@ export function store($http, root) {
             .then(result => result.data);
     };
 
+    const getById = (id) =>
+        $http
+            .get(`${BASE}/id/${id}`)
+            .then(r => r.data);
 
-    const findAll = (id) =>
+    const findAll = () =>
         $http
             .get(BASE)
             .then(result => result.data);
@@ -102,6 +106,7 @@ export function store($http, root) {
         findByReference,
         findAll,
         findByApp,
+        getById,
         update,
         insert,
         recalculateAll,
@@ -114,68 +119,73 @@ export function store($http, root) {
 }
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
 
-export const serviceName = 'AuthSourcesStore';
+export const serviceName = "AuthSourcesStore";
 
 
 export const AuthSourcesStore_API = {
     calculateConsumersForDataTypeIdSelector: {
         serviceName,
-        serviceFnName: 'calculateConsumersForDataTypeIdSelector',
-        description: 'calculateConsumersForDataTypeIdSelector'
+        serviceFnName: "calculateConsumersForDataTypeIdSelector",
+        description: "calculateConsumersForDataTypeIdSelector"
     },
     findByReference: {
         serviceName,
-        serviceFnName: 'findByReference',
-        description: 'findByReference'
+        serviceFnName: "findByReference",
+        description: "findByReference"
     },
     findAll: {
         serviceName,
-        serviceFnName: 'findAll',
-        description: 'findAll'
+        serviceFnName: "findAll",
+        description: "findAll"
     },
     findByApp: {
         serviceName,
-        serviceFnName: 'findByApp',
-        description: 'findByApp'
+        serviceFnName: "findByApp",
+        description: "findByApp"
+    },
+    getById: {
+        serviceName,
+        serviceFnName: "getById",
+        description: "getById"
     },
     update: {
         serviceName,
-        serviceFnName: 'update',
-        description: 'update'
+        serviceFnName: "update",
+        description: "update"
     },
     insert: {
         serviceName,
-        serviceFnName: 'insert',
-        description: 'insert'
+        serviceFnName: "insert",
+        description: "insert"
     },
     recalculateAll: {
         serviceName,
-        serviceFnName: 'recalculateAll',
-        description: 'recalculateAll'
+        serviceFnName: "recalculateAll",
+        description: "recalculateAll"
     },
     remove: {
         serviceName,
-        serviceFnName: 'remove',
-        description: 'remove'
+        serviceFnName: "remove",
+        description: "remove"
     },
     findNonAuthSources: {
         serviceName,
-        serviceFnName: 'findNonAuthSources',
-        description: 'findNonAuthSources'
+        serviceFnName: "findNonAuthSources",
+        description: "findNonAuthSources"
     },
     findAuthSources: {
         serviceName,
-        serviceFnName: 'findAuthSources',
-        description: 'findAuthSources (entityRef)'
+        serviceFnName: "findAuthSources",
+        description: "findAuthSources (entityRef)"
     },
     cleanupOrphans: {
         serviceName,
-        serviceFnName: 'cleanupOrphans',
-        description: 'cleanupOrphans'
+        serviceFnName: "cleanupOrphans",
+        description: "cleanupOrphans"
     },
 };

@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.data.authoritative_source;
 
+import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
@@ -33,15 +34,13 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
@@ -119,6 +118,9 @@ public class AuthoritativeSourceDao {
                 .rating(AuthoritativenessRating.valueOf(record.getRating()))
                 .description(record.getDescription())
                 .provenance(record.getProvenance())
+                .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
+                .lastUpdatedBy(record.getLastUpdatedBy())
+                .externalId(Optional.ofNullable(record.getExternalId()))
                 .build();
     };
 
@@ -188,7 +190,7 @@ public class AuthoritativeSourceDao {
     }
 
 
-    public int insert(AuthoritativeSourceCreateCommand command) {
+    public int insert(AuthoritativeSourceCreateCommand command, String username) {
         checkNotNull(command, "command cannot be null");
 
         SelectConditionStep<Record1<String>> dataTypeSelection = DSL
@@ -205,6 +207,8 @@ public class AuthoritativeSourceDao {
                 .set(AUTHORITATIVE_SOURCE.RATING, command.rating().name())
                 .set(AUTHORITATIVE_SOURCE.DESCRIPTION, command.description())
                 .set(AUTHORITATIVE_SOURCE.PROVENANCE, "waltz")
+                .set(AUTHORITATIVE_SOURCE.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
+                .set(AUTHORITATIVE_SOURCE.LAST_UPDATED_BY, username)
                 .returning(AUTHORITATIVE_SOURCE.ID)
                 .execute();
     }

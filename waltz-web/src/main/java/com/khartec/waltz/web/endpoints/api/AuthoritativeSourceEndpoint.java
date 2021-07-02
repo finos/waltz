@@ -29,6 +29,7 @@ import com.khartec.waltz.model.authoritativesource.NonAuthoritativeSource;
 import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService;
 import com.khartec.waltz.service.user.UserRoleService;
+import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.slf4j.Logger;
@@ -81,6 +82,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
         String calculateConsumersForDataTypeIdSelectorPath = mkPath(BASE_URL, "data-type", "consumers");
         String findByEntityReferencePath = mkPath(BASE_URL, "entity-ref", ":kind", ":id");
         String findByApplicationIdPath = mkPath(BASE_URL, "app", ":id");
+        String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String deletePath = mkPath(BASE_URL, "id", ":id");
         String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
 
@@ -102,8 +104,12 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
         ListRoute<AuthoritativeSource> findAllRoute = (request, response)
                 -> authoritativeSourceService.findAll();
 
+        DatumRoute<AuthoritativeSource> getByIdRoute = (request, response)
+                -> authoritativeSourceService.getById(getId(request));
+
         getForDatum(recalculateFlowRatingsPath, this::recalculateFlowRatingsRoute);
         getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
+        getForDatum(getByIdPath, getByIdRoute);
         postForList(calculateConsumersForDataTypeIdSelectorPath, this::calculateConsumersForDataTypeIdSelectorRoute);
         postForList(findNonAuthSourcesPath, findNonAuthSourcesRoute);
         getForList(findByEntityReferencePath, findByEntityReferenceRoute);

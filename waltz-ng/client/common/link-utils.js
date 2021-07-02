@@ -28,6 +28,7 @@ const stateKindTuples = [
     {kind: "ACTOR", state: "main.actor.view"},
     {kind: "APPLICATION", state: "main.app.view"},
     {kind: "APP_GROUP", state: "main.app-group.view"},
+    {kind: "AUTHORITATIVE_SOURCE", state: "main.authoritative-source.view"},
     {kind: "CHANGE_INITIATIVE", state: "main.change-initiative.view"},
     {kind: "CHANGE_SET", state: "main.change-set.view"},
     {kind: "DATA_TYPE", state: "main.data-type.view"},
