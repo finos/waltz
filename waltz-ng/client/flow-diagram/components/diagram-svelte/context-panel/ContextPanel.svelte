@@ -38,7 +38,8 @@
 
     let userCall = userStore.load();
     $: roles = $userCall.data?.roles;
-    $: canEdit = _.isNil($diagram.editorRole) || _.includes(roles, $diagram.editorRole);
+    $: canEdit = _.includes(roles, 'LINEAGE_EDITOR')
+        && (_.isNil($diagram.editorRole) || _.includes(roles, $diagram.editorRole));
 
     let savePromise;
     let selectedApp = null;
