@@ -15,6 +15,7 @@
      */
 
     export let ref = {};
+    export let isSecondaryLink = false;
 
     let state = null
 
@@ -28,7 +29,7 @@
 
 </script>
 
-<ViewLink {state}
+<ViewLink {state} {isSecondaryLink}
           ctx={ref}>
     {#if $$slots.default}
         <slot/>
