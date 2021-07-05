@@ -23,6 +23,7 @@ import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.external_identifier.ExternalId;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jgrapht.Graph;
@@ -35,6 +36,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -42,14 +44,14 @@ import static java.util.stream.Collectors.toSet;
 
 public class ShortestPath {
 
-    private static String[] sourceAssetCodes = new String[] {
-           "assetCode1",
-           "assetCode2",
-           "assetCode3"
+    private static ExternalId[] sourceAssetCodes = new ExternalId[] {
+            ExternalId.of("assetCode1"),
+            ExternalId.of("assetCode2"),
+            ExternalId.of("assetCode3")
     };
 
 
-    private static String targetAssetCode = "26877-2";
+    private static final ExternalId targetAssetCode = ExternalId.of("26877-2");
 
 
     public static void main(String[] args) {
@@ -63,9 +65,12 @@ public class ShortestPath {
         Application targetApp = findFirstMatchByCode(applicationDao, targetAssetCode);
         Stream.of(sourceAssetCodes)
                 .map(assetCode -> findFirstMatchByCode(applicationDao, assetCode))
-                .filter(a -> a != null)
+                .filter(Objects::nonNull)
                 .map(sourceApp -> {
-                    System.out.printf("Route from: %s (%s)\n----------------------\n", sourceApp.name(), sourceApp.assetCode().orElse(""));
+                    System.out.printf(
+                            "Route from: %s (%s)\n----------------------\n",
+                            sourceApp.name(),
+                            ExternalId.orElse(sourceApp.assetCode(), ""));
                     return sourceApp.entityReference();
                 })
                 .filter(sourceRef -> {
@@ -88,7 +93,9 @@ public class ShortestPath {
                     Set<Long> appIds = edgeList.stream()
                             .flatMap(e -> Stream.of(g.getEdgeSource(e).id(), g.getEdgeTarget(e).id()))
                             .collect(toSet());
-                    Map<Long, Application> appsById = MapUtilities.indexBy(a -> a.id().get(), applicationDao.findByIds(appIds));
+                    Map<Long, Application> appsById = MapUtilities.indexBy(
+                            a -> a.id().get(),
+                            applicationDao.findByIds(appIds));
 
                     edgeList.forEach(edge -> {
                         Application source = appsById.get(g.getEdgeSource(edge).id());
@@ -96,9 +103,9 @@ public class ShortestPath {
                         System.out.printf(
                                 "%s (%s) -> %s (%s) \n",
                                 source.name(),
-                                source.assetCode().orElse(""),
+                                ExternalId.orElse(source.assetCode(), ""),
                                 target.name(),
-                                target.assetCode().orElse(""));
+                                ExternalId.orElse(target.assetCode(), ""));
                     });
 
                     System.out.println();
@@ -109,7 +116,7 @@ public class ShortestPath {
 
     }
 
-    private static Application findFirstMatchByCode(ApplicationDao applicationDao, String assetCode) {
+    private static Application findFirstMatchByCode(ApplicationDao applicationDao, ExternalId assetCode) {
         List<Application> apps = applicationDao.findByAssetCode(assetCode);
         // should be only one
         return apps.size() > 0
@@ -133,7 +140,7 @@ public class ShortestPath {
                 .stream()
                 .flatMap(f -> Stream.of(f.source(), f.target()))
                 .distinct()
-                .forEach(v -> g.addVertex(v));
+                .forEach(g::addVertex);
 
         flows
                 .forEach(f -> g.addEdge(f.source(), f.target()));

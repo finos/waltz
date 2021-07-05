@@ -14,11 +14,13 @@ import org.immutables.value.Value;
  * @param <T>
  */
 public abstract class Wrapper<T> {
-  @Value.Parameter
-  @JsonValue
-  public abstract T value();
-  @Override
-  public String toString() {
+    @Value.Parameter
+    @JsonValue
+    public abstract T value();
+
+    @Override
+    public String toString() {
     return getClass().getSimpleName() + "(" + value() + ")";
   }
+
 }

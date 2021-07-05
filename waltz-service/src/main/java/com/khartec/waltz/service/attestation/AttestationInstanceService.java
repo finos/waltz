@@ -28,6 +28,7 @@ import com.khartec.waltz.model.attestation.AttestEntityCommand;
 import com.khartec.waltz.model.attestation.AttestationInstance;
 import com.khartec.waltz.model.attestation.AttestationRun;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.external_identifier.ExternalId;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
@@ -146,7 +147,11 @@ public class AttestationInstanceService {
         String logMessage = EntityKind.APPLICATION.equals(instance.parentEntity().kind())
                 ? String.format("Attestation of %s for application %s",
                     attestedKind,
-                    applicationService.getById(instance.parentEntity().id()).assetCode().orElse("UNKNOWN"))
+                    ExternalId.orElse(
+                        applicationService
+                            .getById(instance.parentEntity().id())
+                            .assetCode(),
+                        "UNKNOWN"))
                 : String.format("Attestation of %s ", attestedKind);
 
         changeLogService.write(ImmutableChangeLog.builder()

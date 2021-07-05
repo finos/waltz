@@ -34,6 +34,7 @@ import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.external_identifier.ExternalId;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
 import com.khartec.waltz.model.measurable_rating_replacement.MeasurableRatingReplacement;
@@ -346,7 +347,9 @@ public class ChangeLogService {
                 measurableName,
                 measurableRatingPlannedDecommission.measurableId(),
                 entityName,
-                getExternalId(entityReference).orElse(String.valueOf(entityReference.id())));
+                getExternalId(entityReference)
+                        .map(ExternalId::value)
+                        .orElse(String.valueOf(entityReference.id())));
 
         return tuple(
                 messagePreamble,
@@ -354,11 +357,12 @@ public class ChangeLogService {
     }
 
 
-    private Optional<String> getExternalId(EntityReference entityReference) {
+    private Optional<ExternalId> getExternalId(EntityReference entityReference) {
         return entityReference.kind().equals(APPLICATION)
                 ? applicationDao.getById(entityReference.id()).assetCode()
                 : Optional.empty();
     }
+
 
     private String resolveName(long id, EntityKind kind) {
         return nameResolver

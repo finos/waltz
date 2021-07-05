@@ -23,6 +23,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.external_identifier.ExternalId;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.application.ApplicationService;
@@ -81,7 +82,7 @@ public class DiagramToDotExport {
 
     private static String renderApplications(List<Application> apps) {
         return apps.stream()
-                .map(a -> quote(a.assetCode())
+                .map(a -> quoteExtId(a.assetCode())
                         + "["
                         + attr("label", a.name())
                         + ", "
@@ -91,15 +92,15 @@ public class DiagramToDotExport {
     }
 
     private static String attr(String name, Object value) {
-        return name + "=" + quote(value == null ? "" : value.toString());
+        return name + "=" + quoteStr(value == null ? "" : value.toString());
     }
 
 
-    private static String quote(Optional<String> str) {
-        return str.map(s -> quote(s)).orElse("");
+    private static String quoteExtId(Optional<ExternalId> str) {
+        return str.map(s -> quoteStr(s.value())).orElse("");
     }
 
-    private static String quote(String str) {
+    private static String quoteStr(String str) {
         return "\"" + str + "\"";
     }
 
@@ -107,9 +108,9 @@ public class DiagramToDotExport {
                                       Map<Long, Application> appsById) {
         return flows.stream()
                 .map(f ->
-                        quote(appsById.get(f.source().id()).assetCode())
+                        quoteExtId(appsById.get(f.source().id()).assetCode())
                         + " -> "
-                        + quote(appsById.get(f.target().id()).assetCode()))
+                        + quoteExtId(appsById.get(f.target().id()).assetCode()))
                 .reduce("", (acc, s) -> acc + "\n\t" + s);
     }
 

@@ -20,6 +20,7 @@ package com.khartec.waltz.service.physical_flow;
 
 import com.khartec.waltz.common.Aliases;
 import com.khartec.waltz.common.MapUtilities;
+import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.actor.ActorDao;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.data_type.DataTypeDao;
@@ -36,6 +37,7 @@ import com.khartec.waltz.model.command.CommandOutcome;
 import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.enum_value.EnumValueKind;
+import com.khartec.waltz.model.external_identifier.ExternalId;
 import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.physical_flow.*;
@@ -338,7 +340,10 @@ public class PhysicalFlowUploadService {
 
     private Map<String, Application> loadApplicationsByAssetCode() {
         return MapUtilities.indexBy(
-                a -> lower(a.assetCode().get()),
+                a -> a.assetCode()
+                        .map(ExternalId::value)
+                        .map(StringUtilities::lower)
+                        .orElse(""),
                 applicationDao.findAll());
     }
 
