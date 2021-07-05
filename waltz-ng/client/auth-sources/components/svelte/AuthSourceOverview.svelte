@@ -19,7 +19,7 @@
 
 </script>
 
-<PageHeader icon="puzzle-piece"
+<PageHeader icon="shield"
             name={`Authoritative source: ${authSource.applicationReference?.name}`}
             small={datatypeName}>
     <div slot="breadcrumbs">
