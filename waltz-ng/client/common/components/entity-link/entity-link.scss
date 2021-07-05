@@ -1,0 +1,10 @@
+@import '../../../../style/_variables.scss';
+
+.secondary-link {
+    color: $waltz-font-color;
+    font-weight: bold;
+
+    &:hover {
+        text-decoration: none;
+    }
+}

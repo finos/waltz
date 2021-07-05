@@ -4,6 +4,7 @@
     export let state;
     export let title = null;
     export let ctx = {};
+    export let isSecondaryLink = false;
 
     let path;
 
@@ -67,6 +68,7 @@
 
 {#if path}
     <a href={path}
+       class:secondary-link={isSecondaryLink}
        {title}>
         <slot></slot>
     </a>
@@ -75,3 +77,17 @@
         <slot/>
     </span>
 {/if}
+
+
+<style type="text/scss">
+    @import '../../../style/variables';
+
+    .secondary-link {
+        color: $waltz-font-color;
+        font-weight: bold;
+
+      &:hover {
+        color: $waltz-link-color;
+      }
+    }
+</style>

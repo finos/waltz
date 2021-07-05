@@ -27,13 +27,15 @@ const bindings = {
     tooltipPlacement: "@?",
     additionalDisplayData: "<?",
     target: "@", /** if '_blank' the external icon is shown **/
+    isSecondaryLink: "<?"
 };
 
 
 const initialState = {
     additionalDisplayData: [],
     iconPlacement: "left", // can be left, right, none
-    tooltipPlacement: "top" // left, top-left, top-right; refer to: (https://github.com/angular-ui/bootstrap/tree/master/src/tooltip)
+    tooltipPlacement: "top", // left, top-left, top-right; refer to: (https://github.com/angular-ui/bootstrap/tree/master/src/tooltip)
+    isSecondaryLink: false
 };
 
 
