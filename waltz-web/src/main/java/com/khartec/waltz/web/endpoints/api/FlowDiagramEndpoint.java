@@ -100,9 +100,9 @@ public class FlowDiagramEndpoint implements Endpoint {
 
         DatumRoute<Boolean> updateDescriptionRoute = (req, res)
                 ->  {
+            requireRole(userRoleService, req, LINEAGE_EDITOR);
             long diagramId = getId(req);
             verifyCanEdit(req, diagramId);
-            requireRole(userRoleService, req, LINEAGE_EDITOR);
             return flowDiagramService.updateDescription(
                     diagramId,
                     readBody(req, UpdateDescriptionCommand.class),
