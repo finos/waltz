@@ -44,7 +44,6 @@ import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecifica
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.service.data_type.DataTypeDecoratorService;
 import com.khartec.waltz.service.enum_value.EnumValueAliasService;
-import com.khartec.waltz.service.physical_specification_data_type.PhysicalSpecDataTypeService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -122,7 +121,7 @@ public class PhysicalFlowUploadService {
         Map<String, Application> applicationsByAssetCode = loadApplicationsByAssetCode();
         Map<String, Actor> actorsByNameMap = loadActorsByName();
         Map<String, DataType> dataTypesByNameOrCodeMap = loadDataTypesByNameOrCode();
-        Aliases<String> transportAliases = loadTransportAliases();
+        Aliases<TransportKind> transportAliases = loadTransportAliases();
 
         // parse flows and resolve strings into entities or enums
         List<PhysicalFlowUploadCommandResponse> parsedFlows = cmds.stream()
@@ -203,7 +202,7 @@ public class PhysicalFlowUploadService {
     private PhysicalFlowUploadCommandResponse validateCommand(Map<String, Actor> actorsByName,
                                                               Map<String, Application> applicationsByAssetCode,
                                                               Map<String, DataType> dataTypeMap,
-                                                              Aliases<String> transportAliases,
+                                                              Aliases<TransportKind> transportAliases,
                                                               PhysicalFlowUploadCommand cmd) {
         checkNotNull(cmd, "cmd cannot be null");
 
@@ -243,7 +242,7 @@ public class PhysicalFlowUploadService {
             errors.put("frequency", String.format("%s is not a recognised value", cmd.frequency()));
         }
 
-        String transport = transportAliases
+        TransportKind transport = transportAliases
                 .lookup(cmd.transport())
                 .orElseGet(() -> {
                     errors.put("transport", String.format("%s is not a recognised value", cmd.transport()));
@@ -304,8 +303,6 @@ public class PhysicalFlowUploadService {
 
     /**
      * Retrieve Entity Reference by string input (can either be asset code if application or name of an actor)
-     * @param input
-     * @return
      */
     private EntityReference getNodeRefByString(Map<String, Actor> actorsByName,
                                                Map<String, Application> applicationsByAssetCode,
@@ -449,8 +446,9 @@ public class PhysicalFlowUploadService {
         }
     }
 
-    private Aliases<String> loadTransportAliases() {
-        return enumValueAliasService.mkAliases(EnumValueKind.TRANSPORT_KIND);
+
+    private Aliases<TransportKind> loadTransportAliases() {
+        return enumValueAliasService.mkAliases(EnumValueKind.TRANSPORT_KIND, TransportKind::of);
     }
 
 

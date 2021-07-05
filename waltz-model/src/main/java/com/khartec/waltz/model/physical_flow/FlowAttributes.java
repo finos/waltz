@@ -29,7 +29,7 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableFlowAttributes.class)
 public abstract class FlowAttributes implements DescriptionProvider{
 
-    public abstract String transport();
+    public abstract TransportKind transport();
     public abstract FrequencyKind frequency();
     public abstract Criticality criticality();
     public abstract int basisOffset();

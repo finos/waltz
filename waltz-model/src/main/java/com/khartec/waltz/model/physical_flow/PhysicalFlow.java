@@ -58,7 +58,10 @@ public abstract class PhysicalFlow implements
     // e.g. for representing T+0, T+1, T+7, T-1
     public abstract int basisOffset();
 
-    public abstract String transport();
+    @Value.Default
+    public TransportKind transport() {
+        return TransportKind.UNKNOWN;
+    }
 
     @Value.Default
     public FreshnessIndicator freshnessIndicator() {

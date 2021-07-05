@@ -18,12 +18,12 @@
 
 package com.khartec.waltz.data.bookmark;
 
-import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.bookmark.Bookmark;
+import com.khartec.waltz.model.bookmark.BookmarkKind;
 import com.khartec.waltz.model.bookmark.ImmutableBookmark;
 import com.khartec.waltz.schema.tables.records.BookmarkRecord;
 import org.jooq.*;
@@ -60,7 +60,7 @@ public class BookmarkDao {
                 .description(Optional.ofNullable(record.getDescription()))
                 .title(Optional.ofNullable(record.getTitle()))
                 .url(Optional.ofNullable(record.getUrl()))
-                .bookmarkKind(record.getKind())
+                .bookmarkKind(BookmarkKind.of(record.getKind()))
                 .isPrimary(record.getIsPrimary())
                 .isRequired(record.getIsRequired())
                 .provenance(record.getProvenance())
@@ -118,7 +118,7 @@ public class BookmarkDao {
                 .set(BOOKMARK.DESCRIPTION, bookmark.description().orElse(null))
                 .set(BOOKMARK.URL, bookmark.url().orElse(null))
                 .set(BOOKMARK.TITLE, bookmark.title().orElse(null))
-                .set(BOOKMARK.KIND, bookmark.bookmarkKind())
+                .set(BOOKMARK.KIND, bookmark.bookmarkKind().value())
                 .set(BOOKMARK.PARENT_ID, bookmark.parent().id())
                 .set(BOOKMARK.PARENT_KIND, bookmark.parent().kind().name())
                 .set(BOOKMARK.IS_PRIMARY, bookmark.isPrimary())
@@ -143,7 +143,7 @@ public class BookmarkDao {
         checkNotEmpty(username, "username cannot be empty");
 
         int rc = dsl.update(BOOKMARK)
-                .set(BOOKMARK.KIND, bookmark.bookmarkKind())
+                .set(BOOKMARK.KIND, bookmark.bookmarkKind().value())
                 .set(BOOKMARK.DESCRIPTION, bookmark.description().orElse(null))
                 .set(BOOKMARK.URL, bookmark.url().orElse(""))
                 .set(BOOKMARK.TITLE, bookmark.title().orElse(""))
