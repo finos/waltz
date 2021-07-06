@@ -625,5 +625,11 @@ export const dynamicSectionsByKind = {
         entityNamedNotesSection,
         bookmarksSection,
         changeLogSection,
+    ],
+    "AUTHORITATIVE_SOURCE": [
+        bookmarksSection,
+        changeLogSection,
+        entityNamedNotesSection,
+        involvedPeopleSection
     ]
 };

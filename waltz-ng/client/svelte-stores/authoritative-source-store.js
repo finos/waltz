@@ -30,6 +30,10 @@ export function mkAuthoritativeSourceStore() {
     const findAll = () => {
         return remote.execute("GET", "api/authoritative-source")
     }
+
+    const getById = (id) => {
+        return remote.fetchViewData("GET", `api/authoritative-source/id/${id}`);
+    }
     
     const create = (cmd) => {
         checkIsAuthSourceCreateCommand(cmd);
@@ -38,7 +42,8 @@ export function mkAuthoritativeSourceStore() {
 
     return {
         update,
-        create
+        create,
+        getById
     };
 }
 

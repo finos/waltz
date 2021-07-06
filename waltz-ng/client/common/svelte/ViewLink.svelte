@@ -29,6 +29,10 @@
             path: ctx => `app-group/${ctx.id}`,
             title: "Application Group View"
         },
+        "main.authoritative-source.view": {
+            path: ctx => `authoritative-source/${ctx.id}`,
+            title: "Authoritative Source View"
+        },
         "main.change-initiative.view": {
             path: ctx => `change-initiative/${ctx.id}`,
             title: "Change Initiative View"
