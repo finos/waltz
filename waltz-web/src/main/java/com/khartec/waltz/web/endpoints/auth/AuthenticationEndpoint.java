@@ -51,7 +51,7 @@ import static spark.Spark.post;
 @Service
 public class AuthenticationEndpoint implements Endpoint {
 
-    private static final String BASE_URL = mkPath("auth");
+    private static final String BASE_URL = mkPath("authentication");
 
     private static final Logger LOG = LoggerFactory.getLogger(AuthenticationEndpoint.class);
 

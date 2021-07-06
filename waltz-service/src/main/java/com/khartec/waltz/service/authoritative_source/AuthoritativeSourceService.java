@@ -141,7 +141,7 @@ public class AuthoritativeSourceService {
 
 
     public int insert(AuthoritativeSourceCreateCommand command, String username) {
-        int authSourceId = authoritativeSourceDao.insert(command);
+        int authSourceId = authoritativeSourceDao.insert(command, username);
 
         if (command.parentReference().kind() == ORG_UNIT) {
             ratingCalculator.update(command.dataTypeId(), command.parentReference());

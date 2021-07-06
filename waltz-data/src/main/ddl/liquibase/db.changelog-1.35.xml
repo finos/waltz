@@ -35,6 +35,38 @@
         </update>
     </changeSet>
 
+    <changeSet id="20210702-5445-1"
+               author="woodjes">
+        <comment>5445: adding columns to auth source table</comment>
+        <addColumn tableName="authoritative_source">
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="authoritative_source">
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="authoritative_source">
+            <column name="last_updated_by"
+                    type="${name.type}"
+                    defaultValue="admin">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20210702-5445-2"
+               author="woodjes">
+        <dropDefaultValue columnDataType="${name.type}"
+                          columnName="last_updated_by"
+                          tableName="authoritative_source"/>
+    </changeSet>
+
     <!-- TODO: uncomment this when the ddl is finalised -->
     <!--
     <changeSet id="20210630-5471-2"
