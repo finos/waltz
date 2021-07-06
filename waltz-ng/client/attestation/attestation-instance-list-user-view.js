@@ -23,6 +23,7 @@ import {initialiseData} from "../common/index";
 
 import template from "./attestation-instance-list-user-view.html";
 import {attest} from "./attestation-utils";
+import {displayError} from "../common/error-utils";
 
 
 const initialState = {
@@ -34,7 +35,8 @@ const initialState = {
 
 function controller($q,
                     serviceBroker,
-                    userService) {
+                    userService,
+                    notification) {
     const vm = initialiseData(this, initialState);
 
     userService
@@ -87,7 +89,8 @@ function controller($q,
         const instance = vm.selectedAttestation;
         attest(serviceBroker, instance.parentEntity, instance.attestedEntityKind)
             .then(() => loadData())
-            .then(() => vm.selectedAttestation = null);
+            .then(() => vm.selectedAttestation = null)
+            .catch(e => displayError(notification, "Could not attest", e));
     };
 
     vm.onCancelAttestation = () => {
@@ -105,7 +108,8 @@ function controller($q,
 controller.$inject = [
     "$q",
     "ServiceBroker",
-    "UserService"
+    "UserService",
+    "Notification"
 ];
 
 
