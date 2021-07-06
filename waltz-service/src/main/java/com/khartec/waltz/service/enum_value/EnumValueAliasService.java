@@ -25,6 +25,8 @@ import com.khartec.waltz.model.enum_value.EnumValueKind;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.function.Function;
+
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
 @Service
@@ -41,7 +43,13 @@ public class EnumValueAliasService {
 
 
     public Aliases<String> mkAliases(EnumValueKind kind) {
-        return enumValueAliasDao.mkAliases(kind);
+        return enumValueAliasDao.mkAliases(kind, s -> s);
+    }
+
+
+    public <T> Aliases<T> mkAliases(EnumValueKind kind,
+                                    Function<String, T> mapper) {
+        return enumValueAliasDao.mkAliases(kind, mapper);
     }
 
 }

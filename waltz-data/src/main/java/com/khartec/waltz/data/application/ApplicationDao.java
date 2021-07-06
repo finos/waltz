@@ -24,6 +24,7 @@ import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.application.*;
+import com.khartec.waltz.model.external_identifier.ExternalIdValue;
 import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.ApplicationRecord;
@@ -57,8 +58,8 @@ public class ApplicationDao {
         return ImmutableApplication.builder()
                 .name(appRecord.getName())
                 .description(appRecord.getDescription())
-                .assetCode(ofNullable(appRecord.getAssetCode()))
-                .parentAssetCode(ofNullable(appRecord.getParentAssetCode()))
+                .assetCode(ExternalIdValue.ofNullable(appRecord.getAssetCode()))
+                .parentAssetCode(ExternalIdValue.ofNullable(appRecord.getParentAssetCode()))
                 .id(appRecord.getId())
                 .isRemoved(appRecord.getIsRemoved())
                 .organisationalUnitId(appRecord.getOrganisationalUnitId())
@@ -216,8 +217,8 @@ public class ApplicationDao {
 
         record.setName(application.name());
         record.setDescription(application.description());
-        record.setAssetCode(application.assetCode().orElse(""));
-        record.setParentAssetCode(application.parentAssetCode().orElse(""));
+        record.setAssetCode(ExternalIdValue.orElse(application.assetCode(), ""));
+        record.setParentAssetCode(ExternalIdValue.orElse(application.parentAssetCode(), ""));
         record.setOrganisationalUnitId(application.organisationalUnitId());
         record.setLifecyclePhase(application.lifecyclePhase().name());
         record.setKind(application.applicationKind().name());
@@ -239,7 +240,7 @@ public class ApplicationDao {
     }
 
 
-    public List<Application> findByAssetCode(String externalId) {
+    public List<Application> findByAssetCode(ExternalIdValue externalId) {
         checkNotNull(externalId, "externalId cannot be null");
 
         return dsl
@@ -248,8 +249,8 @@ public class ApplicationDao {
                 .leftJoin(EXTERNAL_IDENTIFIER)
                 .on(EXTERNAL_IDENTIFIER.ENTITY_ID.eq(APPLICATION.ID)
                         .and(EXTERNAL_IDENTIFIER.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
-                .where(APPLICATION.ASSET_CODE.eq(externalId)
-                        .or(EXTERNAL_IDENTIFIER.EXTERNAL_ID.eq(externalId)))
+                .where(APPLICATION.ASSET_CODE.eq(externalId.value())
+                        .or(EXTERNAL_IDENTIFIER.EXTERNAL_ID.eq(externalId.value())))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 }

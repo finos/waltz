@@ -20,6 +20,7 @@ package com.khartec.waltz.service.physical_flow;
 
 import com.khartec.waltz.common.Aliases;
 import com.khartec.waltz.common.MapUtilities;
+import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.actor.ActorDao;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.data_type.DataTypeDao;
@@ -36,6 +37,7 @@ import com.khartec.waltz.model.command.CommandOutcome;
 import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.enum_value.EnumValueKind;
+import com.khartec.waltz.model.external_identifier.ExternalIdValue;
 import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.physical_flow.*;
@@ -44,7 +46,6 @@ import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecifica
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.service.data_type.DataTypeDecoratorService;
 import com.khartec.waltz.service.enum_value.EnumValueAliasService;
-import com.khartec.waltz.service.physical_specification_data_type.PhysicalSpecDataTypeService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -122,7 +123,7 @@ public class PhysicalFlowUploadService {
         Map<String, Application> applicationsByAssetCode = loadApplicationsByAssetCode();
         Map<String, Actor> actorsByNameMap = loadActorsByName();
         Map<String, DataType> dataTypesByNameOrCodeMap = loadDataTypesByNameOrCode();
-        Aliases<String> transportAliases = loadTransportAliases();
+        Aliases<TransportKindValue> transportAliases = loadTransportAliases();
 
         // parse flows and resolve strings into entities or enums
         List<PhysicalFlowUploadCommandResponse> parsedFlows = cmds.stream()
@@ -203,7 +204,7 @@ public class PhysicalFlowUploadService {
     private PhysicalFlowUploadCommandResponse validateCommand(Map<String, Actor> actorsByName,
                                                               Map<String, Application> applicationsByAssetCode,
                                                               Map<String, DataType> dataTypeMap,
-                                                              Aliases<String> transportAliases,
+                                                              Aliases<TransportKindValue> transportAliases,
                                                               PhysicalFlowUploadCommand cmd) {
         checkNotNull(cmd, "cmd cannot be null");
 
@@ -243,7 +244,7 @@ public class PhysicalFlowUploadService {
             errors.put("frequency", String.format("%s is not a recognised value", cmd.frequency()));
         }
 
-        String transport = transportAliases
+        TransportKindValue transport = transportAliases
                 .lookup(cmd.transport())
                 .orElseGet(() -> {
                     errors.put("transport", String.format("%s is not a recognised value", cmd.transport()));
@@ -304,8 +305,6 @@ public class PhysicalFlowUploadService {
 
     /**
      * Retrieve Entity Reference by string input (can either be asset code if application or name of an actor)
-     * @param input
-     * @return
      */
     private EntityReference getNodeRefByString(Map<String, Actor> actorsByName,
                                                Map<String, Application> applicationsByAssetCode,
@@ -341,7 +340,10 @@ public class PhysicalFlowUploadService {
 
     private Map<String, Application> loadApplicationsByAssetCode() {
         return MapUtilities.indexBy(
-                a -> lower(a.assetCode().get()),
+                a -> a.assetCode()
+                        .map(ExternalIdValue::value)
+                        .map(StringUtilities::lower)
+                        .orElse(""),
                 applicationDao.findAll());
     }
 
@@ -449,9 +451,9 @@ public class PhysicalFlowUploadService {
         }
     }
 
-    private Aliases<String> loadTransportAliases() {
-        return enumValueAliasService.mkAliases(EnumValueKind.TRANSPORT_KIND);
-    }
 
+    private Aliases<TransportKindValue> loadTransportAliases() {
+        return enumValueAliasService.mkAliases(EnumValueKind.TRANSPORT_KIND, TransportKindValue::of);
+    }
 
 }

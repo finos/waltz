@@ -28,6 +28,7 @@ import com.khartec.waltz.data.scenario.ScenarioDao;
 import com.khartec.waltz.model.AxisOrientation;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.application.Application;
+import com.khartec.waltz.model.external_identifier.ExternalIdValue;
 import com.khartec.waltz.model.measurable.Measurable;
 import com.khartec.waltz.model.rating.RatingSchemeItem;
 import com.khartec.waltz.model.rating.RatingScheme;
@@ -107,13 +108,17 @@ public class ScenarioRatingImporter {
         List<Application> allApps = dsl.select()
                 .from(APPLICATION)
                 .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
-        assetCodeToApplicationMap = indexBy(a -> a.assetCode().get(), allApps);
+        assetCodeToApplicationMap = indexBy(
+                a -> ExternalIdValue.orElse(a.assetCode(), null),
+                allApps);
 
         List<ScenarioRatingRow> ratingRows = parseData(filename);
 
         Map<String, Map<String, List<ScenarioRatingRow>>> rowsGroupedByRoadmapByScenario = ratingRows
                 .stream()
-                .collect(groupingBy(m -> m.roadmap(), groupingBy(m -> m.scenario())));
+                .collect(groupingBy(
+                        ScenarioRatingRow::roadmap,
+                        groupingBy(ScenarioRatingRow::scenario)));
 
         // get roadmap id
         Map<String, Roadmap> roadmapNameToIdMap = getNameToRoadmapMap(roadmapDao);
@@ -308,7 +313,7 @@ public class ScenarioRatingImporter {
             List<ScenarioRatingRow> roadmapRows = new ArrayList<>();
             Map<String, String> row;
             while((row = mapReader.read(header)) != null) {
-                roadmapRows.add(com.khartec.waltz.jobs.tools.importers.ImmutableScenarioRatingRow.builder()
+                roadmapRows.add(ImmutableScenarioRatingRow.builder()
                         .roadmap(row.get("Roadmap"))
                         .scenario(row.get("Scenario"))
                         .column(row.get("Column"))

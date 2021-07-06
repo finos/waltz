@@ -26,11 +26,11 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional;
+import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.schema.Tables.*;
-import static java.util.Optional.ofNullable;
+import static com.khartec.waltz.schema.Tables.ENUM_VALUE;
+import static com.khartec.waltz.schema.Tables.ENUM_VALUE_ALIAS;
 
 @Repository
 public class EnumValueAliasDao {
@@ -45,8 +45,8 @@ public class EnumValueAliasDao {
     }
 
 
-    public Aliases<String> mkAliases(EnumValueKind kind) {
-        Aliases<String> aliases = new Aliases<>();
+    public <T> Aliases<T> mkAliases(EnumValueKind kind, Function<String, T> mapper) {
+        Aliases<T> aliases = new Aliases<>();
 
         // join on ENUM_VALUE in case there are no aliases
         dsl.select(ENUM_VALUE.KEY, DSL.coalesce(ENUM_VALUE_ALIAS.ALIAS, ENUM_VALUE.KEY))
@@ -55,12 +55,12 @@ public class EnumValueAliasDao {
                 .on(ENUM_VALUE.KEY.eq(ENUM_VALUE_ALIAS.ENUM_KEY))
                 .where(ENUM_VALUE.TYPE.eq(kind.dbValue()))
                 .fetch()
-                .forEach(r -> aliases.register(
-                        r.value1(),
-                        r.value2()));
+                .forEach(r -> aliases
+                        .register(
+                            mapper.apply(r.value1()),
+                            r.value2()));
 
         return aliases;
-
     }
 
 }

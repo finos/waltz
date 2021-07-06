@@ -34,6 +34,7 @@ import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.external_identifier.ExternalIdValue;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
 import com.khartec.waltz.model.measurable_rating_replacement.MeasurableRatingReplacement;
@@ -42,8 +43,6 @@ import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.model.tally.DateTally;
 import org.jooq.lambda.Unchecked;
 import org.jooq.lambda.tuple.Tuple2;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -62,7 +61,6 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 @Service
 public class ChangeLogService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(ChangeLogService.class);
     private final ChangeLogDao changeLogDao;
     private final ChangeLogSummariesDao changeLogSummariesDao;
     private final DBExecutorPoolInterface dbExecutorPool;
@@ -247,7 +245,9 @@ public class ChangeLogService {
             List<ChangeLog> all = new ArrayList<>();
             all.addAll(flowLogs);
             all.addAll(specLogs);
-            return (List<ChangeLog>) CollectionUtilities.sort(all, Comparator.comparing(ChangeLog::createdAt).reversed());
+            return CollectionUtilities.sort(
+                    all,
+                    Comparator.comparing(ChangeLog::createdAt).reversed());
         }).get();
     }
 
@@ -259,7 +259,7 @@ public class ChangeLogService {
                                        String userId) {
         Set<ChangeLog> changeLogEntries = map(
                 refs,
-                r -> (ChangeLog) ImmutableChangeLog
+                r -> ImmutableChangeLog
                         .builder()
                         .parentReference(r)
                         .message(message)
@@ -346,7 +346,9 @@ public class ChangeLogService {
                 measurableName,
                 measurableRatingPlannedDecommission.measurableId(),
                 entityName,
-                getExternalId(entityReference).orElse(String.valueOf(entityReference.id())));
+                getExternalId(entityReference)
+                        .map(ExternalIdValue::value)
+                        .orElse(String.valueOf(entityReference.id())));
 
         return tuple(
                 messagePreamble,
@@ -354,11 +356,12 @@ public class ChangeLogService {
     }
 
 
-    private Optional<String> getExternalId(EntityReference entityReference) {
+    private Optional<ExternalIdValue> getExternalId(EntityReference entityReference) {
         return entityReference.kind().equals(APPLICATION)
                 ? applicationDao.getById(entityReference.id()).assetCode()
                 : Optional.empty();
     }
+
 
     private String resolveName(long id, EntityKind kind) {
         return nameResolver

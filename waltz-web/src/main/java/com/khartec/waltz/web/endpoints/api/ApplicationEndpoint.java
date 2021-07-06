@@ -25,6 +25,7 @@ import com.khartec.waltz.model.application.AppRegistrationResponse;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.application.AssetCodeRelationshipKind;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.external_identifier.ExternalIdValue;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
@@ -178,7 +179,7 @@ public class ApplicationEndpoint implements Endpoint {
                 -> appService.findByAppIdSelector(readIdSelectionOptionsFromBody(request));
 
         ListRoute<Application> findByAssetCodeRoute = (request, response)
-                -> appService.findByAssetCode(request.splat()[0]);
+                -> appService.findByAssetCode(ExternalIdValue.of(request.splat()[0]));
 
 
         getForList(mkPath(BASE_URL, "search", ":query"), searchRoute);
