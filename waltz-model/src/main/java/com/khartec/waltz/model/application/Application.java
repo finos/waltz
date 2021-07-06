@@ -23,7 +23,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.external_identifier.ExternalId;
+import com.khartec.waltz.model.external_identifier.ExternalIdValue;
 import com.khartec.waltz.model.rating.RagRating;
 import org.immutables.value.Value;
 
@@ -46,8 +46,8 @@ public abstract class Application implements
         ExternalIdProvider,
         OrganisationalUnitIdProvider {
 
-    public abstract Optional<ExternalId> assetCode();
-    public abstract Optional<ExternalId> parentAssetCode();
+    public abstract Optional<ExternalIdValue> assetCode();
+    public abstract Optional<ExternalIdValue> parentAssetCode();
     public abstract ApplicationKind applicationKind();
     public abstract LifecyclePhase lifecyclePhase();
     public abstract RagRating overallRating();
@@ -69,7 +69,7 @@ public abstract class Application implements
     @Override
     @Value.Derived
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    public Optional<String> externalId() { return assetCode().map(ExternalId::value); }
+    public Optional<String> externalId() { return assetCode().map(ExternalIdValue::value); }
 
 
     @Value.Default

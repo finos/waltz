@@ -63,7 +63,7 @@ public class PhysicalFlowDao {
                 .criticality(Criticality.valueOf(record.getCriticality()))
                 .description(record.getDescription())
                 .logicalFlowId(record.getLogicalFlowId())
-                .transport(TransportKind.of(record.getTransport()))
+                .transport(TransportKindValue.of(record.getTransport()))
                 .freshnessIndicator(readEnum(
                         record.getFreshnessIndicator(),
                         FreshnessIndicator.class,

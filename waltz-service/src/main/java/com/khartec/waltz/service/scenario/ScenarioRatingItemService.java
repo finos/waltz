@@ -20,7 +20,7 @@ package com.khartec.waltz.service.scenario;
 
 import com.khartec.waltz.data.scenario.ScenarioRatingItemDao;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.external_identifier.ExternalId;
+import com.khartec.waltz.model.external_identifier.ExternalIdValue;
 import com.khartec.waltz.model.rating.RatingSchemeItem;
 import com.khartec.waltz.model.scenario.ChangeScenarioCommand;
 import com.khartec.waltz.model.scenario.Scenario;
@@ -115,7 +115,7 @@ public class ScenarioRatingItemService {
         List<RatingSchemeItem> ratings = ratingSchemeService.getById(command.ratingSchemeId()).ratings();
         message = String.format(
                 "Application %s (%s), moved from %s to %s for %s",
-                ExternalId.orElse(application.assetCode(), "Unknown"),
+                ExternalIdValue.orElse(application.assetCode(), "Unknown"),
                 application.name(),
                 getRatingName(ratings, command.previousRating()),
                 getRatingName(ratings, command.rating()),
@@ -129,7 +129,7 @@ public class ScenarioRatingItemService {
         Scenario scenario = scenarioService.getById(command.scenarioId());
         String message = String.format(
                 messageFormat,
-                ExternalId.orElse(application.assetCode(), "Unknown"),
+                ExternalIdValue.orElse(application.assetCode(), "Unknown"),
                 application.name(),
                 scenario.name());
         changeLogService.write(mkBasicLogEntry(command.scenarioId(), message, userId));

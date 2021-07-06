@@ -5,8 +5,8 @@ import com.khartec.waltz.model.Wrapper;
 import org.immutables.value.Value;
 
 @Value.Immutable @Wrapped
-public abstract class _TransportKind extends Wrapper<String> {
+public abstract class _TransportKindValue extends Wrapper<String> {
 
-    public static TransportKind UNKNOWN = TransportKind.of("UNKNOWN");
+    public static TransportKindValue UNKNOWN = TransportKindValue.of("UNKNOWN");
 
 }

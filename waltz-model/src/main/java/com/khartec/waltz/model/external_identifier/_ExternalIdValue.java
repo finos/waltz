@@ -7,19 +7,19 @@ import org.immutables.value.Value;
 import java.util.Optional;
 
 @Value.Immutable @Wrapped
-public abstract class _ExternalId extends Wrapper<String> {
+public abstract class _ExternalIdValue extends Wrapper<String> {
 
-    public static Optional<ExternalId> ofNullable(String str) {
+    public static Optional<ExternalIdValue> ofNullable(String str) {
         return Optional
                 .ofNullable(str)
-                .map(ExternalId::of);
+                .map(ExternalIdValue::of);
     }
 
 
-    public static String orElse(Optional<ExternalId> extId,
+    public static String orElse(Optional<ExternalIdValue> extId,
                                 String dflt) {
         return extId
-                .map(ExternalId::value)
+                .map(ExternalIdValue::value)
                 .orElse(dflt);
     }
 

@@ -5,5 +5,5 @@ import com.khartec.waltz.model.Wrapper;
 import org.immutables.value.Value;
 
 @Value.Immutable @Wrapped
-public abstract class _BookmarkKind extends Wrapper<String> {
+public abstract class _BookmarkKindValue extends Wrapper<String> {
 }

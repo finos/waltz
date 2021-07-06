@@ -23,7 +23,7 @@ import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.external_identifier.ExternalId;
+import com.khartec.waltz.model.external_identifier.ExternalIdValue;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jgrapht.Graph;
@@ -44,14 +44,14 @@ import static java.util.stream.Collectors.toSet;
 
 public class ShortestPath {
 
-    private static ExternalId[] sourceAssetCodes = new ExternalId[] {
-            ExternalId.of("assetCode1"),
-            ExternalId.of("assetCode2"),
-            ExternalId.of("assetCode3")
+    private static ExternalIdValue[] sourceAssetCodes = new ExternalIdValue[] {
+            ExternalIdValue.of("assetCode1"),
+            ExternalIdValue.of("assetCode2"),
+            ExternalIdValue.of("assetCode3")
     };
 
 
-    private static final ExternalId targetAssetCode = ExternalId.of("26877-2");
+    private static final ExternalIdValue targetAssetCode = ExternalIdValue.of("26877-2");
 
 
     public static void main(String[] args) {
@@ -70,7 +70,7 @@ public class ShortestPath {
                     System.out.printf(
                             "Route from: %s (%s)\n----------------------\n",
                             sourceApp.name(),
-                            ExternalId.orElse(sourceApp.assetCode(), ""));
+                            ExternalIdValue.orElse(sourceApp.assetCode(), ""));
                     return sourceApp.entityReference();
                 })
                 .filter(sourceRef -> {
@@ -103,20 +103,19 @@ public class ShortestPath {
                         System.out.printf(
                                 "%s (%s) -> %s (%s) \n",
                                 source.name(),
-                                ExternalId.orElse(source.assetCode(), ""),
+                                ExternalIdValue.orElse(source.assetCode(), ""),
                                 target.name(),
-                                ExternalId.orElse(target.assetCode(), ""));
+                                ExternalIdValue.orElse(target.assetCode(), ""));
                     });
 
                     System.out.println();
                     System.out.println();
 
                 });
-
-
     }
 
-    private static Application findFirstMatchByCode(ApplicationDao applicationDao, ExternalId assetCode) {
+
+    private static Application findFirstMatchByCode(ApplicationDao applicationDao, ExternalIdValue assetCode) {
         List<Application> apps = applicationDao.findByAssetCode(assetCode);
         // should be only one
         return apps.size() > 0

@@ -31,7 +31,7 @@ import com.khartec.waltz.model.application.AppRegistrationResponse;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.application.AssetCodeRelationshipKind;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.model.external_identifier.ExternalId;
+import com.khartec.waltz.model.external_identifier.ExternalIdValue;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.service.tag.TagService;
 import org.jooq.Record1;
@@ -174,12 +174,10 @@ public class ApplicationService {
                 }
             };
 
-            Map<AssetCodeRelationshipKind, List<Application>> grouped = related
+            return related
                     .stream()
                     .filter(relatedApp -> relatedApp != app)  // can do simple ref check here
                     .collect(Collectors.groupingBy(classifier));
-
-            return grouped;
         } else {
             return emptyMap();
         }
@@ -187,7 +185,7 @@ public class ApplicationService {
     }
 
 
-    public List<Application> findByAssetCode(ExternalId assetCode) {
+    public List<Application> findByAssetCode(ExternalIdValue assetCode) {
         return applicationDao.findByAssetCode(assetCode);
     }
 

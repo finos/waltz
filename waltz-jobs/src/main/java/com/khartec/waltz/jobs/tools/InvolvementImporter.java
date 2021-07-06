@@ -24,7 +24,7 @@ import com.khartec.waltz.common.IOUtilities;
 import com.khartec.waltz.common.StreamUtilities.Siphon;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.application.LifecyclePhase;
-import com.khartec.waltz.model.external_identifier.ExternalId;
+import com.khartec.waltz.model.external_identifier.ExternalIdValue;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.application.ApplicationService;
@@ -65,7 +65,7 @@ public class InvolvementImporter {
         PersonService personService = ctx.getBean(PersonService.class);
 
         Map<String, Application> appsByExtId = indexBy(
-                a -> ExternalId.orElse(a.assetCode(), null),
+                a -> ExternalIdValue.orElse(a.assetCode(), null),
                 applicationService.findAll());
 
         Map<String, Person> peopleByName= indexBy(

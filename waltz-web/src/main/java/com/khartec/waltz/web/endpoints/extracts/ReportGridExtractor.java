@@ -21,7 +21,7 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.NameProvider;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.external_identifier.ExternalId;
+import com.khartec.waltz.model.external_identifier.ExternalIdValue;
 import com.khartec.waltz.model.rating.RatingSchemeItem;
 import com.khartec.waltz.model.report_grid.ReportGrid;
 import com.khartec.waltz.model.report_grid.ReportGridCell;
@@ -223,7 +223,7 @@ public class ReportGridExtractor implements DataExtractor {
 
         long appId = row.v1.entityReference().id();
         String appName = row.v1.name();
-        Optional<ExternalId> assetCode = row.v1.assetCode();
+        Optional<ExternalIdValue> assetCode = row.v1.assetCode();
 
         List<Object> appInfo = asList(appId, appName, assetCode);
 
@@ -268,7 +268,7 @@ public class ReportGridExtractor implements DataExtractor {
 
             long appId = r.v1.entityReference().id();
             String appName = r.v1.name();
-            Optional<ExternalId> assetCode = r.v1.assetCode();
+            Optional<ExternalIdValue> assetCode = r.v1.assetCode();
 
             List<Object> appInfo = asList(appId, appName, assetCode);
 
@@ -288,9 +288,9 @@ public class ReportGridExtractor implements DataExtractor {
                 } else if (v instanceof Number) {
                     Cell cell = row.createCell(nextColNum, CellType.NUMERIC);
                     cell.setCellValue(((Number) v).doubleValue());
-                } else if (v instanceof ExternalId) {
+                } else if (v instanceof ExternalIdValue) {
                     Cell cell = row.createCell(nextColNum, CellType.STRING);
-                    cell.setCellValue(((ExternalId) v).value());
+                    cell.setCellValue(((ExternalIdValue) v).value());
                 } else {
                     Cell cell = row.createCell(nextColNum);
                     cell.setCellValue(Objects.toString(v));

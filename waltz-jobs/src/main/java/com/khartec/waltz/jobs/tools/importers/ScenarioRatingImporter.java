@@ -28,7 +28,7 @@ import com.khartec.waltz.data.scenario.ScenarioDao;
 import com.khartec.waltz.model.AxisOrientation;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.external_identifier.ExternalId;
+import com.khartec.waltz.model.external_identifier.ExternalIdValue;
 import com.khartec.waltz.model.measurable.Measurable;
 import com.khartec.waltz.model.rating.RatingSchemeItem;
 import com.khartec.waltz.model.rating.RatingScheme;
@@ -109,7 +109,7 @@ public class ScenarioRatingImporter {
                 .from(APPLICATION)
                 .fetch(ApplicationDao.TO_DOMAIN_MAPPER);
         assetCodeToApplicationMap = indexBy(
-                a -> ExternalId.orElse(a.assetCode(), null),
+                a -> ExternalIdValue.orElse(a.assetCode(), null),
                 allApps);
 
         List<ScenarioRatingRow> ratingRows = parseData(filename);

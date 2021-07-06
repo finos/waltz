@@ -23,7 +23,7 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.bookmark.Bookmark;
-import com.khartec.waltz.model.bookmark.BookmarkKind;
+import com.khartec.waltz.model.bookmark.BookmarkKindValue;
 import com.khartec.waltz.model.bookmark.ImmutableBookmark;
 import com.khartec.waltz.schema.tables.records.BookmarkRecord;
 import org.jooq.*;
@@ -60,7 +60,7 @@ public class BookmarkDao {
                 .description(Optional.ofNullable(record.getDescription()))
                 .title(Optional.ofNullable(record.getTitle()))
                 .url(Optional.ofNullable(record.getUrl()))
-                .bookmarkKind(BookmarkKind.of(record.getKind()))
+                .bookmarkKind(BookmarkKindValue.of(record.getKind()))
                 .isPrimary(record.getIsPrimary())
                 .isRequired(record.getIsRequired())
                 .provenance(record.getProvenance())

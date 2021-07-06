@@ -23,7 +23,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.external_identifier.ExternalId;
+import com.khartec.waltz.model.external_identifier.ExternalIdValue;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.application.ApplicationService;
@@ -96,7 +96,7 @@ public class DiagramToDotExport {
     }
 
 
-    private static String quoteExtId(Optional<ExternalId> str) {
+    private static String quoteExtId(Optional<ExternalIdValue> str) {
         return str.map(s -> quoteStr(s.value())).orElse("");
     }
 

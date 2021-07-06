@@ -59,8 +59,8 @@ public abstract class PhysicalFlow implements
     public abstract int basisOffset();
 
     @Value.Default
-    public TransportKind transport() {
-        return TransportKind.UNKNOWN;
+    public TransportKindValue transport() {
+        return TransportKindValue.UNKNOWN;
     }
 
     @Value.Default

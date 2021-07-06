@@ -38,7 +38,7 @@ public abstract class Bookmark implements
 
     public abstract Optional<Long> id();
     public abstract EntityReference parent();
-    public abstract BookmarkKind bookmarkKind();
+    public abstract BookmarkKindValue bookmarkKind();
     public abstract Optional<String> title();
     public abstract Optional<String> url();
     public abstract Optional<String> description();

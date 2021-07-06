@@ -32,7 +32,7 @@ import com.khartec.waltz.model.NameProvider;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
-import com.khartec.waltz.model.external_identifier.ExternalId;
+import com.khartec.waltz.model.external_identifier.ExternalIdValue;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.service.DIConfiguration;
@@ -139,13 +139,13 @@ public class FlowSummaryWithTypesAndPhysicalsExport {
                             .map(p -> t.concat(p.skip1())))
                 .map(t -> newArrayList(
                         t.v2.name(),  // src
-                        t.v2.assetCode().map(ExternalId::value).orElse(""),
+                        t.v2.assetCode().map(ExternalIdValue::value).orElse(""),
                         t.v2.applicationKind().name(),
                         t.v2.entityLifecycleStatus().name(),
                         Optional.ofNullable(t.v4).map(NameProvider::name).orElse("?"), // src OU
                         t.v7.toString(),
                         t.v3.name(),  // trg
-                        t.v3.assetCode().map(ExternalId::value).orElse(""),
+                        t.v3.assetCode().map(ExternalIdValue::value).orElse(""),
                         t.v3.applicationKind().name(),
                         t.v3.entityLifecycleStatus().name(),
                         Optional.ofNullable(t.v5).map(NameProvider::name).orElse("?"), // trg OU
