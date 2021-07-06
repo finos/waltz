@@ -67,6 +67,20 @@
                           tableName="authoritative_source"/>
     </changeSet>
 
+
+    <changeSet id="20210706-5512-1"
+               author="davidwatkins73">
+        <comment>Permission group involvement for attestation of measurable categories</comment>
+
+        <insert tableName="permission_group_involvement">
+            <column name="permission_group_id" value="1"/>
+            <column name="subject_kind" value="ATTESTATION"/>
+            <column name="qualifier_kind" value="MEASURABLE_CATEGORY"/>
+        </insert>
+    </changeSet>
+
+
+
     <!-- TODO: uncomment this when the ddl is finalised -->
     <!--
     <changeSet id="20210630-5471-2"

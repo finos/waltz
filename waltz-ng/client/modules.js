@@ -73,7 +73,6 @@ import EntitySvgDiagram from "./entity-svg-diagram";
 import Tag from "./tag";
 import EnumValue from "./enum-value";
 import Examples from "./examples";
-import Extensions from "./extensions";
 import ExternalIdentifier from "./external-identifier";
 import Facet from "./facet";
 import FlowDiagram from "./flow-diagram";
@@ -184,7 +183,6 @@ const dependencies = [
     Tag(),
     EnumValue(),
     Examples(),
-    Extensions(),
     ExternalIdentifier(),
     Facet(),
     FlowDiagram(),

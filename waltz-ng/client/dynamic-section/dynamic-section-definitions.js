@@ -363,6 +363,12 @@ const appComplexitySummarySection = {
     id: 240
 };
 
+const entityAttestationSection = {
+    componentId: "attestation-section",
+    name: "Attestations",
+    icon: "check-square-o",
+    id: 10001
+};
 
 export const dynamicSections = {
     appCostsSection,
@@ -381,6 +387,7 @@ export const dynamicSections = {
     dataFlowSection,
     dataTypeFlowSection,
     dataTypeOriginatorsSection,
+    entityAttestationSection,
     entityCostsSection,
     entityDiagramsSection,
     entityNamedNotesSection,
@@ -424,6 +431,7 @@ function pack(section, children = []) {
 }
 
 
+
 export const dynamicSectionsByKind = {
     "APPLICATION": [
         assessmentRatingSection,
@@ -431,6 +439,7 @@ export const dynamicSectionsByKind = {
         changeInitiativeSection,
         changeSetSection,
         dataFlowSection,
+        entityAttestationSection,
         entityCostsSection,
         entityDiagramsSection,
         entityNamedNotesSection,

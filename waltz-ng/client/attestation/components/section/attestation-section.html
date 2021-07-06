@@ -18,104 +18,141 @@
 
 <div>
     <div class="row">
-        <br>
-        <div ng-if="$ctrl.mode === 'EDIT'"
-             class="col-sm-12">
-            <waltz-attestation-confirmation parent-entity-ref="$ctrl.parentEntityRef"
-                                            attestation-kind="$ctrl.activeAttestationSection.type"
-                                            on-confirm="$ctrl.attestEntity"
-                                            on-cancel="$ctrl.onCancelAttestation">
-            </waltz-attestation-confirmation>
-        </div>
 
-        <!-- ATTESTATION SUMMARY SUB_SECTIONS -->
-        <div ng-if="$ctrl.mode === 'VIEW'"
-             ng-repeat="attestationSection in $ctrl.attestationSections | orderBy: 'section.name'"
-             class="col-sm-6">
-            <div ng-include="'was-latest-attestation-subsection'"></div>
-        </div>
+        <div class="waltz-tabs col-md-12">
+            <!-- TAB HEADERS -->
+            <input type="radio"
+                   value="flows"
+                   ng-model="$ctrl.activeTab"
+                   id="flows">
+            <label class="wt-label"
+                   ng-model="$ctrl.activeTab"
+                   for="flows">
+                <span>Flows</span>
+            </label>
+
+<!--            <input type="radio"-->
+<!--                   value="viewpoints"-->
+<!--                   ng-model="$ctrl.activeTab"-->
+<!--                   id="viewpoints">-->
+<!--            <label class="wt-label"-->
+<!--                   for="viewpoints">-->
+<!--                <span>Viewpoints</span>-->
+<!--            </label>-->
+
+            <input type="radio"
+                   ng-model="$ctrl.activeTab"
+                   value="history"
+                   id="history">
+            <label class="wt-label"
+                   for="history">
+                <span>History</span>
+            </label>
+
+            <div class="wt-tab wt-active">
+                <!-- SERVERS -->
+                <div ng-if="$ctrl.activeTab === 'flows'"
+                     class="row"
+                     style="padding-top: 1em; padding-bottom: 0.7em; padding-left:1em">
+                    <div ng-if="$ctrl.mode === 'EDIT'"
+                         class="col-sm-12">
+                        <waltz-attestation-confirmation parent-entity-ref="$ctrl.parentEntityRef"
+                                                        attestation-kind="$ctrl.activeAttestationSection.type"
+                                                        on-confirm="$ctrl.attestEntity"
+                                                        on-cancel="$ctrl.onCancelAttestation">
+                        </waltz-attestation-confirmation>
+                    </div>
+
+                    <!-- ATTESTATION SUMMARY SUB_SECTIONS -->
+                    <div ng-if="$ctrl.mode === 'VIEW'"
+                         ng-repeat="attestationSection in $ctrl.attestationSections | orderBy: 'section.name'"
+                         class="col-sm-6">
+                        <div ng-include="'was-latest-attestation-subsection'"></div>
+                    </div>
+                </div>
+
+                <div ng-if="$ctrl.activeTab === 'history'">
+                    <div class="row">
+                        <div class="col-sm-12" ng-if="$ctrl.attestations.length > 0">
+                            <h4>Historical Attestations:</h4>
+                            <table class="table table-striped table-condensed small">
+                                <colgroup>
+                                    <col width="1%">
+                                    <col width="15%">
+                                    <col width="20%">
+                                    <col width="16%">
+                                    <col width="12%">
+                                    <col width="12%">
+                                    <col width="14%">
+                                    <col width="10%">
+                                </colgroup>
+                                <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Attestation</th>
+                                    <th>Description</th>
+                                    <th>Target</th>
+                                    <th>Issued</th>
+                                    <th>Due</th>
+                                    <th>Attested by</th>
+                                    <th>Attested</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="attestation in $ctrl.attestations | orderBy: 'issuedOn':true"
+                                    ng-class="{'success': attestation.instance.attestedAt,
+                        'warning': !attestation.instance.attestedAt && !$ctrl.outOfDate(attestation.run.dueDate),
+                        'danger': !attestation.instance.attestedAt && $ctrl.outOfDate(attestation.run.dueDate)}"
+                                    uib-popover="{{ $ctrl.determinePopoverText(attestation) }}"
+                                    popover-class="waltz-popover-width-700"
+                                    popover-append-to-body="true"
+                                    popover-placement="top"
+                                    popover-trigger="mouseenter">
+                                    <td>
+                                        <waltz-icon ng-if="attestation.instance.attestedAt"
+                                                    name="check">
+                                        </waltz-icon>
+                                        <waltz-icon ng-if="!attestation.instance.attestedAt"
+                                                    name="times">
+                                        </waltz-icon>
+                                    </td>
+                                    <td ng-bind="attestation.run.name">
+                                    </td>
+                                    <td ng-bind="attestation.run.description | truncate:150">
+                                    </td>
+                                    <td>
+                                        <waltz-attested-kind run="attestation.run"></waltz-attested-kind>
+                                    </td>
+                                    <td>
+                                        <waltz-from-now timestamp="attestation.run.issuedOn"
+                                                        days-only="true">
+                                        </waltz-from-now>
+                                    </td>
+                                    <td>
+                                        <waltz-from-now timestamp="attestation.run.dueDate"
+                                                        days-only="true">
+                                        </waltz-from-now>
+                                    </td>
+                                    <td ng-bind="attestation.instance.attestedBy">
+                                    </td>
+                                    <td>
+                                        <waltz-from-now timestamp="attestation.instance.attestedAt">
+                                        </waltz-from-now>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <waltz-no-data ng-if="$ctrl.attestations.length == 0">
+                        <message>
+                            <strong>No attestations</strong>
+                        </message>
+                    </waltz-no-data>
+                </div>
+            </div>
     </div>
-
-    <br>
-
-    <div class="row">
-        <div class="col-sm-12" ng-if="$ctrl.attestations.length > 0">
-            <h4>Historical Attestations:</h4>
-            <table class="table table-striped table-condensed small">
-                <colgroup>
-                    <col width="1%">
-                    <col width="15%">
-                    <col width="20%">
-                    <col width="16%">
-                    <col width="12%">
-                    <col width="12%">
-                    <col width="14%">
-                    <col width="10%">
-                </colgroup>
-                <thead>
-                <tr>
-                    <th></th>
-                    <th>Attestation</th>
-                    <th>Description</th>
-                    <th>Target</th>
-                    <th>Issued</th>
-                    <th>Due</th>
-                    <th>Attested by</th>
-                    <th>Attested</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr ng-repeat="attestation in $ctrl.attestations | orderBy: 'issuedOn':true"
-                    ng-class="{'success': attestation.instance.attestedAt,
-                    'warning': !attestation.instance.attestedAt && !$ctrl.outOfDate(attestation.run.dueDate),
-                    'danger': !attestation.instance.attestedAt && $ctrl.outOfDate(attestation.run.dueDate)}"
-                    uib-popover="{{ $ctrl.determinePopoverText(attestation) }}"
-                    popover-class="waltz-popover-width-700"
-                    popover-append-to-body="true"
-                    popover-placement="top"
-                    popover-trigger="mouseenter">
-                    <td>
-                        <waltz-icon ng-if="attestation.instance.attestedAt"
-                                    name="check">
-                        </waltz-icon>
-                        <waltz-icon ng-if="!attestation.instance.attestedAt"
-                                    name="times">
-                        </waltz-icon>
-                    </td>
-                    <td ng-bind="attestation.run.name">
-                    </td>
-                    <td ng-bind="attestation.run.description | truncate:150">
-                    </td>
-                    <td>
-                        <waltz-attested-kind run="attestation.run"></waltz-attested-kind>
-                    </td>
-                    <td>
-                        <waltz-from-now timestamp="attestation.run.issuedOn"
-                                        days-only="true">
-                        </waltz-from-now>
-                    </td>
-                    <td>
-                        <waltz-from-now timestamp="attestation.run.dueDate"
-                                        days-only="true">
-                        </waltz-from-now>
-                    </td>
-                    <td ng-bind="attestation.instance.attestedBy">
-                    </td>
-                    <td>
-                        <waltz-from-now timestamp="attestation.instance.attestedAt">
-                        </waltz-from-now>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <waltz-no-data ng-if="$ctrl.attestations.length == 0">
-        <message>
-            <strong>No attestations</strong>
-        </message>
-    </waltz-no-data>
 </div>
 
 

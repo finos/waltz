@@ -21,6 +21,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import template from "./attestation-section.html";
 import {attest} from "../../attestation-utils";
+import {displayError} from "../../../common/error-utils";
 
 
 const bindings = {
@@ -38,7 +39,8 @@ const initialState = {
     attestations: [],
     attestationSections: [],
     mode: modes.VIEW,
-    activeAttestationSection: null
+    activeAttestationSection: null,
+    activeTab: "flows"
 };
 
 
@@ -158,7 +160,8 @@ function controller($q,
                     notification.success("Attested successfully");
                     loadAttestationData(vm.parentEntityRef);
                     vm.onCancelAttestation();
-                });
+                })
+                .catch(e => displayError(notification, "Could not attest", e));
         }
     };
 
