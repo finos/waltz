@@ -33,6 +33,11 @@
     function deleteAuthSource() {
         deletePromise = doDelete($selectedAuthSource.id);
     }
+
+    $: ref = {
+        id: $selectedAuthSource?.id,
+        kind: "AUTHORITATIVE_SOURCE"
+    };
 </script>
 
 
@@ -80,7 +85,11 @@
 </button>
 {/if}
 
-
+<EntityLink {ref}>
+    View Page
+</EntityLink>
+&nbsp;
+|
 <button class="btn-link"
         on:click={onCancelDetailView}>
     Cancel

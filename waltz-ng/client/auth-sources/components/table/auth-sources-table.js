@@ -107,7 +107,7 @@ function mkColumnDefs(parentRef) {
 }
 
 
-function controller($q, serviceBroker, enumValueService) {
+function controller($q, $state, serviceBroker, enumValueService) {
 
     const vm = initialiseData(this, initialState);
 
@@ -184,11 +184,17 @@ function controller($q, serviceBroker, enumValueService) {
             loadAll();
         }
     };
+
+    vm.onSelect = (d) => $state.go(
+        "main.authoritative-source.view",
+        { id: d.id });
+
 }
 
 
 controller.$inject = [
     "$q",
+    "$state",
     "ServiceBroker",
     "EnumValueService"
 ];
