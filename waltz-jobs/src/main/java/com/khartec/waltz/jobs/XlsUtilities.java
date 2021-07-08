@@ -19,6 +19,7 @@
 package com.khartec.waltz.jobs;
 
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import java.util.function.Function;
@@ -37,10 +38,14 @@ public class XlsUtilities {
 
 
     public static Stream<Row> streamRows(Workbook workbook, SheetNumProvider sheetDefinition) {
+        return streamRows(workbook.getSheetAt(sheetDefinition.sheetNum()));
+    }
+
+
+    public static Stream<Row> streamRows(Sheet sheet) {
         Stream.Builder<Row> streamBuilder = Stream.builder();
-        workbook.getSheetAt(sheetDefinition.sheetNum())
-                .rowIterator()
-                .forEachRemaining(r -> streamBuilder.add(r));
+        sheet.rowIterator()
+                .forEachRemaining(streamBuilder::add);
         return streamBuilder.build();
     }
 
