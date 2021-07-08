@@ -26,8 +26,8 @@
         <ol class="waltz-breadcrumbs">
             <li><ViewLink state="main">Home</ViewLink></li>
             <li><ViewLink state="main.system.list">Authoritative Source</ViewLink></li>
-            <li><ViewLink state="main.system.list">{authSource.applicationReference?.name}</ViewLink></li>
-            <li><ViewLink state="main.system.list">{datatypeName}</ViewLink></li>
+            <li><EntityLink ref={authSource.applicationReference}/></li>
+            <li><EntityLink ref={datatype}/></li>
         </ol>
     </div>
 </PageHeader>
