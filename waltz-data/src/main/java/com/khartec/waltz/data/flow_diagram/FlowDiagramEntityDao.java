@@ -38,8 +38,7 @@ import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.EnumUtilities.readEnum;
-import static com.khartec.waltz.common.ListUtilities.map;
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.common.ListUtilities.*;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static java.lang.String.format;
@@ -54,9 +53,10 @@ public class FlowDiagramEntityDao {
     private static final ArrayList<EntityKind> POSSIBLE_ENTITY_KINDS = newArrayList(
             EntityKind.APPLICATION,
             EntityKind.ACTOR,
-            EntityKind.MEASURABLE,
             EntityKind.CHANGE_INITIATIVE,
+            EntityKind.DATA_TYPE,
             EntityKind.LOGICAL_DATA_FLOW,
+            EntityKind.MEASURABLE,
             EntityKind.PHYSICAL_FLOW);
 
     private static Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
@@ -161,10 +161,11 @@ public class FlowDiagramEntityDao {
      * @return count of removed diagrams
      */
     public int deleteForDiagram(long diagramId) {
+        List<String> relatedEntityKinds = asList(EntityKind.MEASURABLE.name(), EntityKind.CHANGE_INITIATIVE.name(), EntityKind.DATA_TYPE.name());
         return dsl
                 .deleteFrom(FLOW_DIAGRAM_ENTITY)
                 .where(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID.eq(diagramId))
-                .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.notIn(EntityKind.MEASURABLE.name(), EntityKind.CHANGE_INITIATIVE.name()))
+                .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.notIn(relatedEntityKinds))
                 .execute();
     }
 

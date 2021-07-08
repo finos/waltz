@@ -122,6 +122,7 @@ public class InlineSelectFieldFactory {
         mappings.put(EntityKind.ACTOR, tuple(ACTOR, ACTOR.ID, DSL.val(EntityLifecycleStatus.ACTIVE.name())));
         mappings.put(EntityKind.APPLICATION, tuple(APPLICATION, APPLICATION.ID, APPLICATION.ENTITY_LIFECYCLE_STATUS));
         mappings.put(EntityKind.CHANGE_INITIATIVE, tuple(CHANGE_INITIATIVE, CHANGE_INITIATIVE.ID, DSL.val(EntityLifecycleStatus.ACTIVE.name())));
+        mappings.put(EntityKind.DATA_TYPE, tuple(DATA_TYPE, DATA_TYPE.ID, DSL.val(EntityLifecycleStatus.ACTIVE.name())));
         mappings.put(EntityKind.LOGICAL_DATA_ELEMENT, tuple(LOGICAL_DATA_ELEMENT, LOGICAL_DATA_ELEMENT.ID, LOGICAL_DATA_ELEMENT.ENTITY_LIFECYCLE_STATUS));
         mappings.put(EntityKind.LOGICAL_DATA_FLOW, tuple(LOGICAL_FLOW, LOGICAL_FLOW.ID, LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS));
         mappings.put(EntityKind.MEASURABLE, tuple(MEASURABLE, MEASURABLE.ID, MEASURABLE.ENTITY_LIFECYCLE_STATUS));

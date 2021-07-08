@@ -528,6 +528,7 @@ export const dynamicSectionsByKind = {
         appsSection,
         entityNamedNotesSection,
         bookmarksSection,
+        entityDiagramsSection,
         involvedPeopleSection,
         authSourcesSection,
         dataTypeOriginatorsSection,
