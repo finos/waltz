@@ -46,7 +46,7 @@ function restoreDiagram(
 
     // relationships
     _.chain(entityNodes)
-        .filter(ent => _.includes(["MEASURABLE", "CHANGE_INITIATIVE"], ent.entityReference.kind))
+        .filter(ent => _.includes(["MEASURABLE", "CHANGE_INITIATIVE", "DATA_TYPE"], ent.entityReference.kind))
         .forEach(ent => newModel.addRelationship(toGraphNode(ent.entityReference)))
         .value();
 
