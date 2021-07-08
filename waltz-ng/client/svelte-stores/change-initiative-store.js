@@ -14,8 +14,18 @@ export function mkChangeInitiativeStore() {
                 {force});
     };
 
+    const getById = (id, force = false) => {
+        return remote.fetchViewData(
+            "GET",
+            `api/change-initiative/id/${id}`,
+            null,
+            {},
+            {force: force})
+    }
+
     return {
-        findForSelector
+        findForSelector,
+        getById
     };
 }
 

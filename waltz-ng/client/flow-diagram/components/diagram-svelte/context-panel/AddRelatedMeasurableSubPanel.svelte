@@ -14,7 +14,7 @@
         dispatch("select", e);
     }
 
-    function cancel(){
+    function cancel() {
         dispatch("cancel");
     }
 

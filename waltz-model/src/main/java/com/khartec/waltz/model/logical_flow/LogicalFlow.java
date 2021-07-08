@@ -34,7 +34,8 @@ public abstract class LogicalFlow implements
         ProvenanceProvider,
         LastUpdatedProvider,
         LastAttestedProvider,
-        WaltzEntity {
+        WaltzEntity,
+        EntityKindProvider {
 
     public abstract EntityReference source();
     public abstract EntityReference target();
@@ -44,6 +45,11 @@ public abstract class LogicalFlow implements
         return EntityReference.mkRef(
                 EntityKind.LOGICAL_DATA_FLOW,
                 id().get());
+    }
+
+    @Value.Default
+    public EntityKind kind (){
+        return EntityKind.LOGICAL_DATA_FLOW;
     }
 
     @Value.Default
