@@ -28,7 +28,13 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableAuthoritativeSource.class)
 @JsonDeserialize(as = ImmutableAuthoritativeSource.class)
-public abstract class AuthoritativeSource implements IdProvider, ProvenanceProvider, DescriptionProvider, ExternalIdProvider, LastUpdatedProvider {
+public abstract class AuthoritativeSource implements
+        IdProvider,
+        ProvenanceProvider,
+        DescriptionProvider,
+        ExternalIdProvider,
+        LastUpdatedProvider,
+        EntityKindProvider {
 
     public abstract EntityReference applicationReference();
     public abstract EntityReference appOrgUnitReference();
@@ -39,6 +45,11 @@ public abstract class AuthoritativeSource implements IdProvider, ProvenanceProvi
     @Value.Default
     public String provenance() {
         return "waltz";
+    }
+
+    @Value.Default
+    public EntityKind kind() {
+        return EntityKind.AUTHORITATIVE_SOURCE;
     }
 
 
