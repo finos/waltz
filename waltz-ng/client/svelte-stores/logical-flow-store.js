@@ -24,9 +24,18 @@ export function mkLogicalFlowStore() {
         return remote.fetchViewList("GET", `api/logical-flow/entity/${ref.kind}/${ref.id}`);
     };
 
+    const findBySelector = (selector, force = false) => {
+        return remote.fetchViewList(
+            "POST", 
+            "api/logical-flow/selector",
+            selector,
+            {force});
+    }
+
 
     return {
-        findByEntityReference
+        findByEntityReference,
+        findBySelector
     };
 }
 

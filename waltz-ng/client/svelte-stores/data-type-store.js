@@ -24,8 +24,18 @@ export function mkDataTypeStore() {
         return remote.fetchViewList("GET", "api/data-types", null, {force})
     }
 
+    const getById = (id, force = false) => {
+        return remote.fetchViewData(
+            "GET",
+            `api/data-types/id/${id}`,
+            null,
+            {},
+            {force})
+    }
+
     return {
-        findAll
+        findAll,
+        getById
     };
 }
 
