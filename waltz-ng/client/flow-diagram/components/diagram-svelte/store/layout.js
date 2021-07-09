@@ -10,8 +10,8 @@ function move(state, moveCmd) {
     // get current position, if not try position of ref
     const currentPos = state[moveCmd.id] || state[moveCmd.refId] || {x:0, y: 0};
     const newPos = {
-        x: currentPos.x + moveCmd.dx,
-        y: currentPos.y + moveCmd.dy
+        x: currentPos.x + (moveCmd.dx || 0),
+        y: currentPos.y + (moveCmd.dy || 0)
     };
     return Object.assign({}, state, {[moveCmd.id]: newPos});
 }

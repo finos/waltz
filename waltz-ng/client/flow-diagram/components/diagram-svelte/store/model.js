@@ -3,6 +3,7 @@ import {writable} from "svelte/store";
 import dirty from "./dirty";
 import {sameRef} from "../../../../common/entity-utils";
 import {toGraphId, toGraphNode} from "../../../flow-diagram-utils";
+import {checkNotEmpty} from "../../../../common/checks";
 
 const initialState = {
     nodes: [],
@@ -13,19 +14,38 @@ const initialState = {
 };
 
 
-function addNode(state, node) {
-    const existing = _.find(state.nodes, d => d.id === node.id);
+/**
+ * private helper to add an entity (e.g. a flow or node)
+
+ * @param state  current state
+ * @param entity  the entity to add (must have an `id` property)
+ * @param propName  property name of the entity collection within the state
+ * @returns updated state
+ */
+function addEntity(state, entity, propName) {
+    checkNotEmpty(entity, `Cannot add a null to ${propName}`);
+    checkNotEmpty(entity.id, `Cannot add an entity with a null id to ${propName}`);
+
+    const existing = _.find(state[propName], d => d.id === entity.id);
 
     if (existing) {
         return state;
     } else {
         dirty.set(true);
-        return Object.assign({}, state, {nodes: [...state.nodes, node]});
+        const delta = {};
+        delta[propName] = [...state[propName], entity];
+        return Object.assign({}, state, delta);
     }
 }
 
 
+function addNode(state, node) {
+    return addEntity(state, node, "nodes");
+}
+
+
 function removeNode(state, node) {
+    checkNotEmpty()
     const existing = _.find(state.nodes, d => d.id === node.id);
 
     if (existing) {
@@ -72,16 +92,8 @@ function removeFlow(state, flow) {
     }
 }
 
-
 function addFlow(state, flow) {
-    const existing = _.find(state.flows, d => d.id === flow.id);
-
-    if (existing) {
-        return state;
-    } else {
-        dirty.set(true);
-        return Object.assign({}, state, {flows: [...state.flows, flow]});
-    }
+    return addEntity(state, flow, "flows");
 }
 
 
@@ -98,14 +110,7 @@ function removeAnnotation(state, annotation) {
 
 
 function addAnnotation(state, annotation) {
-    const existing = _.find(state.annotations, d => d.id === annotation.id);
-
-    if (existing) {
-        return state;
-    } else {
-        dirty.set(true);
-        return Object.assign({}, state, {annotations: [...state.annotations, annotation]});
-    }
+    return addEntity(state, annotation, "annotations");
 }
 
 
