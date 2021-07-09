@@ -20,9 +20,19 @@ export function mkMeasurableStore() {
                 {force});
     };
 
+    const getById = (id, force = false) => {
+        return remote.fetchViewData(
+            "GET",
+            `api/measurable/id/${id}`,
+            null,
+            {},
+            {force: force});
+    }
+
     return {
         loadAll,
-        findMeasurablesBySelector
+        findMeasurablesBySelector,
+        getById
     };
 }
 
