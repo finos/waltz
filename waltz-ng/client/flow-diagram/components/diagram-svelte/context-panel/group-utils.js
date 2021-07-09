@@ -1,5 +1,6 @@
 import _ from "lodash";
 import {randomPick} from "../../../../common";
+import {toGraphId} from "../../../flow-diagram-utils";
 
 export const colorSchemes = [
     { fill: "red", stroke: "#ee9c9c" },
@@ -49,5 +50,17 @@ export function determineFillAndSymbol(existingGroups) {
     }
 
     return candidate;
+}
+
+
+export function getNewOverlay(overlayEntity, overlays) {
+    return Object.assign(
+        {},
+        determineFillAndSymbol(overlays),
+        {
+            id: toGraphId(overlayEntity),
+            entityReference: overlayEntity,
+            kind: "OVERLAY"
+        });
 }
 

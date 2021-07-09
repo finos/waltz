@@ -35,7 +35,7 @@
     }
 
     function remove() {
-        dispatch("remove");
+        dispatch("remove", entity);
         cancel();
     }
 
@@ -114,8 +114,18 @@
     </div>
     {:else if activeMode = Modes.CONFIRM_ADD}
     <div>Are you sure you want to add {_.size(toAdd)} new flows?</div>
+    {#if _.size(toAdd) > 100}
+        <div class="alert alert-warning">
+            <Icon name="warning"/>
+            There are too many flows to add at once.
+            You may be able to choose a child of
+            <strong>{entity.data.name}</strong>
+            for a more selective group of applications.
+        </div>
+    {/if}
     <button class="btn btn-success"
-            on:click={saveNewFlows}>
+            on:click={saveNewFlows}
+            disabled={_.size(toAdd) > 100}>
         OK
     </button>
     <button class="btn btn-default"
