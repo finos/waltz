@@ -93,6 +93,7 @@
                 applicationIds: _.map(relatedApps, d => d.id)
             });
         overlay.addOverlay(overlayToAdd);
+        cancel();
     }
 
 
@@ -125,6 +126,7 @@
                     Add related applications
                 </button>
             </li>
+            {#if entity.data.kind === 'MEASURABLE'}
             <li>
                 <button class="btn btn-skinny"
                         on:click={() => addToOverlayGroup()}>
@@ -132,6 +134,7 @@
                     Add to an overlay group
                 </button>
             </li>
+            {/if}
             <li>
                 <button class="btn btn-skinny"
                         on:click={remove}>
