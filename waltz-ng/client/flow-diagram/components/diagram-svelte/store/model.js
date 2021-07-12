@@ -45,7 +45,6 @@ function addNode(state, node) {
 
 
 function removeNode(state, node) {
-    checkNotEmpty()
     const existing = _.find(state.nodes, d => d.id === node.id);
 
     if (existing) {
@@ -184,14 +183,7 @@ function removeRelationship(state, relationship) {
 
 
 function addRelationship(state, relationship) {
-    const existing = _.find(state.relationships, d => d.id === relationship.id);
-
-    if (existing) {
-        return state;
-    } else {
-        dirty.set(true);
-        return Object.assign({}, state, {relationships: [...state.relationships, relationship]});
-    }
+    return addEntity(state, relationship, "relationships");
 }
 
 
