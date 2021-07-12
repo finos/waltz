@@ -2,16 +2,15 @@
     import GroupSelectorPanel from "./GroupSelectorPanel.svelte";
     import {createEventDispatcher} from "svelte";
     import {mkSelectionOptions} from "../../../../common/selector-utils";
-    import {determineFillAndSymbol} from "./group-utils";
+    import {getNewOverlay} from "./group-utils";
     import {measurableCategoryAlignmentViewStore} from "../../../../svelte-stores/measurable-category-alignment-view-store";
     import {mkRef} from "../../../../common/entity-utils";
     import EntitySearchSelector from "../../../../common/svelte/EntitySearchSelector.svelte";
     import EditOverlayIconSubPanel from "./EditOverlayIconSubPanel.svelte";
-    import {toGraphId} from "../../../flow-diagram-utils";
 
     export let group;
-    export let overlays;
     export let diagramId;
+    export let overlays;
 
     let workingOverlayEntity;
 
@@ -43,17 +42,8 @@
         activeMode = Modes.ADD_OVERLAY;
     }
 
-    function getNewOverlay(overlayEntity) {
-        return Object.assign(
-            {},
-            determineFillAndSymbol(overlays),
-            {
-                id: toGraphId(overlayEntity),
-                entityReference: overlayEntity, kind: 'OVERLAY'
-            });
-    }
 
-    $: newOverlay = workingOverlayEntity && getNewOverlay(workingOverlayEntity);
+    $: newOverlay = workingOverlayEntity && getNewOverlay(workingOverlayEntity, overlays);
 
 </script>
 
