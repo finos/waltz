@@ -74,7 +74,9 @@
     <thead><th></th></thead>
     <tbody>
         <tr class="clickable" on:click={() => selectKind("MEASURABLE")}>
-            <td>Viewpoints - ({_.size(measurables)})
+            <td>
+                <Icon name={selectedKind === 'MEASURABLE' ? "caret-down" : "caret-right"}/>
+                Viewpoints - ({_.size(measurables)})
                 {#if canEdit}
                     <button class="btn btn-skinny"
                             on:click={() => addEntity("MEASURABLE")}>
@@ -85,33 +87,35 @@
         </tr>
         {#if selectedKind === 'MEASURABLE'}
             <tr>
-                <div class:waltz-scroll-region-250={_.size(measurables) > 4}>
+                <div class:waltz-scroll-region-250={_.size(measurables) > 8}>
                     <table class="table table-condensed small table-hover entity-inner-table">
+                        <tbody>
                         {#if _.isEmpty(measurables)}
                             <tr>
                                 <td>No associated viewpoints</td>
                             </tr>
                         {:else}
-                            <tbody>
                             {#each measurables as measurable}
                                 <tr on:click={() => selectEntity(measurable)}
                                     class="clickable">
                                     <td>
                                         <Icon name="puzzle-piece"/>{measurable.data.name}
                                         <span class="small text-muted">
-                                            {_.get(measurable.category, "name", "unknown")}
-                                        </span>
+                                        {_.get(measurable.category, "name", "unknown")}
+                                    </span>
                                     </td>
                                 </tr>
                             {/each}
-                            </tbody>
                         {/if}
+                        </tbody>
                     </table>
                 </div>
             </tr>
         {/if}
         <tr class="clickable" on:click={() => selectKind('CHANGE_INITIATIVE')}>
-            <td>Change Initiatives - ({_.size(changeInitiatives)})
+            <td>
+                <Icon name={selectedKind === 'CHANGE_INITIATIVE' ? "caret-down" : "caret-right"}/>
+                Change Initiatives - ({_.size(changeInitiatives)})
                 {#if canEdit}
                     <button class="btn btn-skinny"
                             on:click={() => addEntity("CHANGE_INITIATIVE")}>
@@ -124,12 +128,12 @@
             <tr>
                 <div class:waltz-scroll-region-250={_.size(changeInitiatives) > 8}>
                     <table class="table table-condensed small table-hover entity-inner-table">
-                        {#if _.isEmpty(changeInitiatives)}
-                            <tr>
-                                <td>No associated change initiatives</td>
-                            </tr>
-                        {:else}
-                            <tbody>
+                        <tbody>
+                            {#if _.isEmpty(changeInitiatives)}
+                                <tr>
+                                    <td>No associated change initiatives</td>
+                                </tr>
+                            {:else}
                             {#each changeInitiatives as changeInitiative}
                                 <tr on:click={() => selectEntity(changeInitiative)}
                                     class="clickable">
@@ -138,14 +142,16 @@
                                     </td>
                                 </tr>
                             {/each}
-                            </tbody>
-                        {/if}
+                            {/if}
+                        </tbody>
                     </table>
                 </div>
             </tr>
         {/if}
         <tr class="clickable" on:click={() => selectKind('DATA_TYPE')}>
-            <td>Data Types - ({_.size(datatypes)})
+            <td>
+                <Icon name={selectedKind === 'DATA_TYPE' ? "caret-down" : "caret-right"}/>
+                Data Types - ({_.size(datatypes)})
                 {#if canEdit}
                     <button class="btn btn-skinny"
                             on:click={() => addEntity("DATA_TYPE")}>
@@ -158,12 +164,12 @@
             <tr>
                 <div class:waltz-scroll-region-250={_.size(datatypes) > 8}>
                     <table class="table table-condensed small table-hover entity-inner-table">
-                        {#if _.isEmpty(datatypes)}
-                            <tr>
-                                <td>No associated datatypes</td>
-                            </tr>
-                        {:else}
-                            <tbody>
+                        <tbody>
+                            {#if _.isEmpty(datatypes)}
+                                <tr>
+                                    <td>No associated datatypes</td>
+                                </tr>
+                            {:else}
                             {#each datatypes as datatype}
                                 <tr on:click={() => selectEntity(datatype)}
                                     class="clickable">
@@ -172,8 +178,8 @@
                                     </td>
                                 </tr>
                             {/each}
-                            </tbody>
-                        {/if}
+                            {/if}
+                        </tbody>
                     </table>
                 </div>
             </tr>
