@@ -5,18 +5,22 @@
     import {dataTypeStore} from "../../../svelte-stores/data-type-store";
     import EntityLink from "../../../common/svelte/EntityLink.svelte";
     import LastEdited from "../../../common/svelte/LastEdited.svelte";
+    import {nestEnums} from "../../../common/svelte/enum-utils";
+    import {enumValueStore} from "../../../svelte-stores/enum-value-store";
 
     export let primaryEntityRef;
 
     let authSourceCall = authoritativeSourceStore.getById(primaryEntityRef.id)
+    let datatypesCall = dataTypeStore.findAll();
+    let enumsCall = enumValueStore.load();
+
     $: authSource = $authSourceCall.data;
 
-    let datatypesCall = dataTypeStore.findAll();
     $: datatypes = $datatypesCall.data
     $: datatypesByCode = _.keyBy(datatypes, d => d.code);
     $: datatype = Object.assign({}, datatypesByCode[authSource.dataType], {kind: "DATA_TYPE"});
     $: datatypeName = _.get(datatypesByCode, [authSource.dataType, "name"], "unknown");
-
+    $: ratings = _.get(nestEnums($enumsCall.data), ["AuthoritativenessRating"], {});
 </script>
 
 <PageHeader icon="shield"
@@ -59,12 +63,11 @@
                 <EntityLink ref={authSource.parentReference}/>
             </div>
 
-
             <div class="col-sm-2 waltz-display-field-label">
                 Rating:
             </div>
             <div class="col-sm-4">
-                {authSource.rating}
+                <span>{ratings[authSource.rating]?.name}</span>
             </div>
         </div>
 
