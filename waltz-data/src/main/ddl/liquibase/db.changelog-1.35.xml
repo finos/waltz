@@ -96,7 +96,10 @@
                author="dwatkins"
                dbms="mssql">
         <sql>
-            UPDATE enum_value SET [type] = 'scenarioType' WHERE [type] = 'scenarioStatus';
+            UPDATE enum_value SET icon_color = '#5BB65D' WHERE [type] = 'AuthoritativenessRating' and [key] = 'PRIMARY';
+            UPDATE enum_value SET icon_color = '#B7A61F' WHERE [type] = 'AuthoritativenessRating' and [key] = 'SECONDARY';
+            UPDATE enum_value SET icon_color = '#939393' WHERE [type] = 'AuthoritativenessRating' and [key] = 'NO_OPINION';
+            UPDATE enum_value SET icon_color = '#DA524B' WHERE [type] = 'AuthoritativenessRating' and [key] = 'DISCOURAGED';
         </sql>
     </changeSet>
 
