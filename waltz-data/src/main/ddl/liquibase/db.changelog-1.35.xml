@@ -80,9 +80,30 @@
     </changeSet>
 
 
+    <changeSet id="20210714-5453-1"
+               author="dwatkins"
+               dbms="mysql,postgresql">
+        <sql>
+            UPDATE enum_value SET icon_color = '#5BB65D' WHERE type = 'AuthoritativenessRating' and key = 'PRIMARY';
+            UPDATE enum_value SET icon_color = '#B7A61F' WHERE type = 'AuthoritativenessRating' and key = 'SECONDARY';
+            UPDATE enum_value SET icon_color = '#939393' WHERE type = 'AuthoritativenessRating' and key = 'NO_OPINION';
+            UPDATE enum_value SET icon_color = '#DA524B' WHERE type = 'AuthoritativenessRating' and key = 'DISCOURAGED';
+        </sql>
+    </changeSet>
 
-    <!-- TODO: uncomment this when the ddl is finalised -->
-    <!--
+
+    <changeSet id="20210714-5453-1"
+               author="dwatkins"
+               dbms="mssql">
+        <sql>
+            UPDATE enum_value SET icon_color = '#5BB65D' WHERE [type] = 'AuthoritativenessRating' and [key] = 'PRIMARY';
+            UPDATE enum_value SET icon_color = '#B7A61F' WHERE [type] = 'AuthoritativenessRating' and [key] = 'SECONDARY';
+            UPDATE enum_value SET icon_color = '#939393' WHERE [type] = 'AuthoritativenessRating' and [key] = 'NO_OPINION';
+            UPDATE enum_value SET icon_color = '#DA524B' WHERE [type] = 'AuthoritativenessRating' and [key] = 'DISCOURAGED';
+        </sql>
+    </changeSet>
+
+
     <changeSet id="20210630-5471-2"
                author="davidwatkins73">
         <update tableName="settings">
@@ -91,6 +112,5 @@
             <where>name='ui.logo.overlay.text'</where>
         </update>
     </changeSet>
-    -->
 
 </databaseChangeLog>
