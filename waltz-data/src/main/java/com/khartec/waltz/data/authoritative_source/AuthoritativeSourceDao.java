@@ -181,7 +181,7 @@ public class AuthoritativeSourceDao {
         checkTrue(command.id().isPresent(), "id must be +ve");
 
         UpdateSetMoreStep<AuthoritativeSourceRecord> upd = dsl.update(AUTHORITATIVE_SOURCE)
-                .set(AUTHORITATIVE_SOURCE.RATING, command.rating().name())
+                .set(AUTHORITATIVE_SOURCE.RATING, command.rating().value())
                 .set(AUTHORITATIVE_SOURCE.DESCRIPTION, command.description());
 
         return upd
