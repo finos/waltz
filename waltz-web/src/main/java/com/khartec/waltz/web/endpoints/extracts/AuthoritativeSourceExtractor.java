@@ -7,13 +7,13 @@ import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.schema.tables.Application;
 import org.jooq.*;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW;
-import static com.khartec.waltz.schema.Tables.ORGANISATIONAL_UNIT;
+import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.AuthoritativeSource.AUTHORITATIVE_SOURCE;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
@@ -64,16 +64,19 @@ public class AuthoritativeSourceExtractor extends DirectQueryBasedDataExtractor{
     private SelectHavingStep<Record> prepareExtractQuery(Condition condition) {
 
         return dsl
-                .select(ORGANISATIONAL_UNIT.NAME.as("Org Name"))
                 .select(SUPPLIER_APP.ID.as("Application Id"), SUPPLIER_APP.ASSET_CODE.as("Asset Code"), SUPPLIER_APP.NAME.as("Application Name"))
                 .select(DATA_TYPE.NAME.as("Data Type"))
-                .select(AUTHORITATIVE_SOURCE.RATING.as("Rating"))
+                .select(AUTHORITATIVE_SOURCE.RATING.as("Rating Code"))
+                .select(ENUM_VALUE.DISPLAY_NAME.as("Rating Name"))
+                .select(AUTHORITATIVE_SOURCE.PARENT_KIND.as("Scope Entity Kind"))
+                .select(DSL.coalesce(ORGANISATIONAL_UNIT.NAME, APPLICATION.NAME).as("Scope Entity Name"))
                 .from(AUTHORITATIVE_SOURCE)
                 .innerJoin(SUPPLIER_APP).on(SUPPLIER_APP.ID.eq(AUTHORITATIVE_SOURCE.APPLICATION_ID))
-                .innerJoin(ORGANISATIONAL_UNIT).on(ORGANISATIONAL_UNIT.ID.eq(SUPPLIER_APP.ORGANISATIONAL_UNIT_ID))
                 .innerJoin(DATA_TYPE).on(DATA_TYPE.CODE.eq(AUTHORITATIVE_SOURCE.DATA_TYPE))
-                .where(condition)
-                .groupBy(ORGANISATIONAL_UNIT.NAME, SUPPLIER_APP.ID, SUPPLIER_APP.ASSET_CODE, SUPPLIER_APP.NAME,DATA_TYPE.NAME, AUTHORITATIVE_SOURCE.RATING);
+                .innerJoin(ENUM_VALUE).on(ENUM_VALUE.TYPE.eq("AuthoritativenessRating")).and(ENUM_VALUE.KEY.eq(AUTHORITATIVE_SOURCE.RATING))
+                .leftJoin(ORGANISATIONAL_UNIT).on(ORGANISATIONAL_UNIT.ID.eq(AUTHORITATIVE_SOURCE.PARENT_ID)).and(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(EntityKind.ORG_UNIT.name()))
+                .leftJoin(APPLICATION).on(APPLICATION.ID.eq(AUTHORITATIVE_SOURCE.PARENT_ID)).and(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(EntityKind.APPLICATION.name()))
+                .where(condition);
     }
 
 }
