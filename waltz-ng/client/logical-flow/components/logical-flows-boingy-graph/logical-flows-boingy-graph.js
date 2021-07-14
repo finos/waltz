@@ -25,6 +25,7 @@ import template from "./logical-flows-boingy-graph.html";
 import {buildHierarchies, findNode, flattenChildren} from "../../../common/hierarchy-utils";
 import {entity} from "../../../common/services/enums/entity";
 import {filterUtils, maybeAddUntaggedFlowsTag} from "../../logical-flow-utils";
+import {mkAuthoritativeRatingColorScale} from "../../../common/colors";
 
 const bindings = {
     filters: "<",
@@ -139,10 +140,11 @@ function getDataTypeIds(allDataTypes = [], decorators = []) {
 
 function prepareGraphTweakers(logicalFlowUtilityService,
                               applications = [],
-                              decorators = [])
+                              decorators = [],
+                              authRatingColors = () => "grey")
 {
     const appIds = _.map(applications, "id");
-    return logicalFlowUtilityService.buildGraphTweakers(appIds, decorators);
+    return logicalFlowUtilityService.buildGraphTweakers(appIds, decorators, authRatingColors);
 }
 
 
@@ -214,7 +216,8 @@ function controller($scope,
         vm.graphTweakers = prepareGraphTweakers(
             logicalFlowUtilityService,
             vm.applications,
-            vm.filteredFlowData.decorators);
+            vm.filteredFlowData.decorators,
+            vm.authRatingColors);
     };
 
 
@@ -233,6 +236,12 @@ function controller($scope,
         serviceBroker
             .loadAppData(CORE_API.DataTypeStore.findAll)
             .then(r => vm.allDataTypes = r.data);
+
+        serviceBroker.loadAppData(CORE_API.EnumValueStore.findAll)
+            .then(r => vm.authRatingColors = mkAuthoritativeRatingColorScale(
+                _.filter(
+                    r.data,
+                    d => d.type === 'AuthoritativenessRating')));
     };
 
 }
