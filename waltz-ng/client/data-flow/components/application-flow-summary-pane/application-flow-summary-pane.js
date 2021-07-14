@@ -29,6 +29,7 @@ import {tallyBy} from "../../../common/tally-utils";
 import {color} from "d3-color";
 import indexByKeyForType from "../../../enum-value/enum-value-utilities";
 import {entity} from "../../../common/services/enums/entity";
+import {loadAuthSourceRatings} from "../../../auth-sources/auth-sources-utils";
 
 
 const bindings = {
@@ -37,12 +38,6 @@ const bindings = {
 
 
 const initialState = {
-    authoritativeCols: [
-        "PRIMARY",
-        "SECONDARY",
-        "DISCOURAGED",
-        "NO_OPINION"
-    ],
     visibility: {
         stats: false
     }
@@ -184,7 +179,10 @@ function controller($q, serviceBroker) {
 
     vm.$onInit = () => {
         loadUnknownDataType()
-            .then(unknownDataType => reload(unknownDataType.id))
+            .then(unknownDataType => reload(unknownDataType.id));
+
+        loadAuthSourceRatings(serviceBroker)
+            .then(xs => vm.authoritativeCols = xs);
     }
 }
 
