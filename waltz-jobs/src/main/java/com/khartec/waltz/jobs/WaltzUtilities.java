@@ -22,7 +22,7 @@ import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import com.khartec.waltz.schema.tables.records.CostKindRecord;
 import com.khartec.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
 import com.khartec.waltz.schema.tables.records.LogicalFlowRecord;
@@ -96,7 +96,7 @@ public class WaltzUtilities {
         decorator.setProvenance(provenance);
         decorator.setLastUpdatedAt(nowUtcTimestamp());
         decorator.setLastUpdatedBy("admin");
-        decorator.setRating(AuthoritativenessRating.NO_OPINION.name());
+        decorator.setRating(AuthoritativenessRatingValue.NO_OPINION.value());
         return decorator;
     }
 

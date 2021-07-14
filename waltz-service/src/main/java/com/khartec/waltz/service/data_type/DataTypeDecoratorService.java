@@ -32,7 +32,7 @@ import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorRatingsCalculator;
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
@@ -220,8 +220,11 @@ public class DataTypeDecoratorService {
 
         if(LOGICAL_DATA_FLOW.equals(entityReference.kind())) {
             Collection<DataTypeDecorator> decorators = map(dataTypeIds,
-                    dtId -> mkDecorator(userName, entityReference, dtId,
-                            Optional.of(AuthoritativenessRating.NO_OPINION)));
+                    dtId -> mkDecorator(
+                            userName,
+                            entityReference,
+                            dtId,
+                            Optional.of(AuthoritativenessRatingValue.NO_OPINION)));
             LogicalFlow flow = logicalFlowDao.getByFlowId(entityReference.id());
             boolean requiresRating = flow.source().kind() == APPLICATION && flow.target().kind() == APPLICATION;
 
@@ -237,7 +240,7 @@ public class DataTypeDecoratorService {
     private ImmutableDataTypeDecorator mkDecorator(String userName,
                                                    EntityReference entityReference,
                                                    Long dtId,
-                                                   Optional<AuthoritativenessRating> rating) {
+                                                   Optional<AuthoritativenessRatingValue> rating) {
         return ImmutableDataTypeDecorator.builder()
                 .rating(rating)
                 .entityReference(entityReference)

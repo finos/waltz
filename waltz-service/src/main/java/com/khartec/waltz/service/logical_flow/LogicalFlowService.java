@@ -23,16 +23,16 @@ import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
+import com.khartec.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowStatsDao;
-import com.khartec.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
 import com.khartec.waltz.model.logical_flow.*;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import com.khartec.waltz.model.tally.TallyPack;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.data_type.DataTypeService;
@@ -350,7 +350,7 @@ public class LogicalFlowService {
                         .decoratorEntity(t.v1)
                         .entityReference(mkRef(DATA_TYPE, t.v2))
                         .lastUpdatedBy(username)
-                        .rating(AuthoritativenessRating.DISCOURAGED)
+                        .rating(AuthoritativenessRatingValue.DISCOURAGED)
                         .build())
                 .map(decoration -> logicalFlowDecoratorDao.addDecorators(newArrayList(decoration)));
     }

@@ -24,14 +24,14 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.DescriptionProvider;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.command.Command;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import org.immutables.value.Value;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableAuthoritativeSourceCreateCommand.class)
 @JsonDeserialize(as = ImmutableAuthoritativeSourceCreateCommand.class)
 public abstract class AuthoritativeSourceCreateCommand implements Command, DescriptionProvider {
-    public abstract AuthoritativenessRating rating();
+    public abstract AuthoritativenessRatingValue rating();
     public abstract long dataTypeId();
     public abstract long applicationId();
     public abstract EntityReference parentReference();

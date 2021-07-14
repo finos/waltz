@@ -25,9 +25,9 @@ import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorSummaryDao;
 import com.khartec.waltz.data.data_type.DataTypeDao;
+import com.khartec.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowStatsDao;
-import com.khartec.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
@@ -37,7 +37,7 @@ import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
 import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlowMeasures;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
@@ -121,7 +121,7 @@ public class LogicalFlowDecoratorService {
                 .flatMap(action -> action.addedDecorators()
                         .stream()
                         .map(ref -> ImmutableDataTypeDecorator.builder()
-                                .rating(AuthoritativenessRating.NO_OPINION)
+                                .rating(AuthoritativenessRatingValue.NO_OPINION)
                                 .provenance("waltz")
                                 .entityReference(mkRef(EntityKind.LOGICAL_DATA_FLOW, action.flowId()))
                                 .decoratorEntity(ref)

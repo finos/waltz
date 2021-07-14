@@ -18,10 +18,11 @@
 
 <div class="row waltz-source-and-target-panel">
     <div class="col-sm-12 waltz-visibility-parent">
-        <waltz-source-and-target-graph entity-ref="$ctrl.entityRef"
-                                       logical-flows="$ctrl.filteredFlowData.flows"
-                                       decorators="$ctrl.filteredFlowData.decorators"
+        <waltz-source-and-target-graph auth-rating-colors="$ctrl.authRatingColors"
                                        change-units="$ctrl.changeUnits"
+                                       decorators="$ctrl.filteredFlowData.decorators"
+                                       entity-ref="$ctrl.entityRef"
+                                       logical-flows="$ctrl.filteredFlowData.flows"
                                        tweakers="$ctrl.tweakers">
         </waltz-source-and-target-graph>
         <div ng-if="$ctrl.filterFlags.nodeFilterApplied || $ctrl.filterFlags.typeFilterApplied || $ctrl.filterFlags.tagFilterApplied"
@@ -148,10 +149,7 @@
                 <li ng-repeat='type in $ctrl.selected.types'
                     style="padding-bottom: 2px">
                     <waltz-entity-link class="label wsatp-data-types"
-                                       ng-class="{ 'label-success' : type.rating == 'PRIMARY',
-                                                   'label-warning' : type.rating == 'SECONDARY',
-                                                   'label-danger' : type.rating == 'DISCOURAGED',
-                                                   'label-default' : type.rating == 'NO_OPINION'}"
+                                       ng-style="{'background-color': $ctrl.authRatingColors(type.rating)}"
                                        entity-ref="{kind: 'DATA_TYPE',
                                                     id: type.id,
                                                     name: type.name}"

@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.DescriptionProvider;
 import com.khartec.waltz.model.IdProvider;
 import com.khartec.waltz.model.command.Command;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -35,5 +35,5 @@ public abstract class AuthoritativeSourceUpdateCommand implements
         DescriptionProvider,
         IdProvider
 {
-    public abstract AuthoritativenessRating rating();
+    public abstract AuthoritativenessRatingValue rating();
 }

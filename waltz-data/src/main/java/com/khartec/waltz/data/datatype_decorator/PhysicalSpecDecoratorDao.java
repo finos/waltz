@@ -25,7 +25,7 @@ import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.datatype.DataTypeUsageCharacteristics;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeUsageCharacteristics;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.records.PhysicalSpecDataTypeRecord;
 import org.jooq.*;
@@ -212,7 +212,7 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
                                 PHYSICAL_FLOW.LOGICAL_FLOW_ID,
                                 DSL.val(DATA_TYPE.name()),
                                 PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID,
-                                DSL.val(AuthoritativenessRating.NO_OPINION.name()),
+                                DSL.val(AuthoritativenessRatingValue.NO_OPINION.value()),
                                 DSL.val("waltz"),
                                 DSL.val(Timestamp.valueOf(nowUtc())),
                                 DSL.val("admin"))

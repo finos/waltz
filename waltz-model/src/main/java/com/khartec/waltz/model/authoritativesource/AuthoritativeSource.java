@@ -21,7 +21,7 @@ package com.khartec.waltz.model.authoritativesource;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import org.immutables.value.Value;
 
 
@@ -40,7 +40,7 @@ public abstract class AuthoritativeSource implements
     public abstract EntityReference appOrgUnitReference();
     public abstract EntityReference parentReference();
     public abstract String dataType();
-    public abstract AuthoritativenessRating rating();
+    public abstract AuthoritativenessRatingValue rating();
 
     @Value.Default
     public String provenance() {

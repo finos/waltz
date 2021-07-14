@@ -19,6 +19,14 @@ import {rgb} from "d3-color";
 import {scaleOrdinal, schemeCategory20c} from "d3-scale";
 import _ from "lodash";
 
+
+function mkColorScaleFromEnumValues(enumValues = []) {
+    return scaleOrdinal()
+        .domain(_.map(enumValues, d => d.key))
+        .range(_.map(enumValues, d => d.iconColor));
+}
+
+
 export const blackHex = "#000000";
 export const greyHex = "#939393";
 export const lightGreyHex = "#D1D1D1";
@@ -88,6 +96,10 @@ export const authoritativeSourceColorScale = scaleOrdinal()
     .domain(["NON_STRATEGIC", "SECONDARY", "PRIMARY", "NOT_APPLICABLE"])
     .range([red, amber, green, grey]);
 
+
+export function mkAuthoritativeRatingColorScale(enumValues = []) {
+    return mkColorScaleFromEnumValues(enumValues);
+}
 
 export const authoritativeRatingColorScale = scaleOrdinal()
     .domain(["DISCOURAGED", "SECONDARY", "PRIMARY", "NO_OPINION"])

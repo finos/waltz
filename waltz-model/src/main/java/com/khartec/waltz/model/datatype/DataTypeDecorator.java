@@ -21,7 +21,7 @@ package com.khartec.waltz.model.datatype;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import org.immutables.value.Value;
 
 import java.util.Optional;
@@ -40,7 +40,7 @@ public abstract class DataTypeDecorator implements
 
     public abstract EntityReference decoratorEntity();
 
-    public abstract Optional<AuthoritativenessRating> rating();
+    public abstract Optional<AuthoritativenessRatingValue> rating();
 
     public abstract Optional<Long> authSourceId();
 

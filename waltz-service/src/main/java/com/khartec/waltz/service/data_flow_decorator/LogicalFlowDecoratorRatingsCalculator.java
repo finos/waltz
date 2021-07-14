@@ -29,7 +29,7 @@ import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceResolver;
 import org.slf4j.Logger;
@@ -103,7 +103,7 @@ public class LogicalFlowDecoratorRatingsCalculator {
                         if (decorator.decoratorEntity().kind() != EntityKind.DATA_TYPE) {
                             return decorator;
                         } else {
-                            AuthoritativenessRating rating = lookupRating(
+                            AuthoritativenessRatingValue rating = lookupRating(
                                     typesById,
                                     flowsById,
                                     targetAppsById,
@@ -157,7 +157,7 @@ public class LogicalFlowDecoratorRatingsCalculator {
     }
 
 
-    private AuthoritativenessRating lookupRating(Map<Long, DataType> typesById,
+    private AuthoritativenessRatingValue lookupRating(Map<Long, DataType> typesById,
                                                  Map<Long, LogicalFlow> flowsById,
                                                  Map<Long, Application> targetAppsById,
                                                  AuthoritativeSourceResolver resolver,
