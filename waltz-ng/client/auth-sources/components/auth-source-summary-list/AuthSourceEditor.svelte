@@ -160,7 +160,8 @@
                     <input type=radio
                            bind:group={workingCopy.rating}
                            value={rating.key}>
-                    <div style="display: inline-block; width: 1em; height: 1.1em; border: 1px solid #aaa; border-radius: 2px; background-color: {rating.iconColor}">&nbsp;</div>
+                    <div class="rating-indicator-block"
+                         style="background-color: {rating.iconColor}">&nbsp;</div>
                     {rating.name}
                     <span class="help-block">{rating.description}</span>
                 </label>
@@ -205,3 +206,16 @@
             </div>
     {/await}
 {/if}
+
+
+<style>
+    .rating-indicator-block {
+        display: inline-block;
+        width: 1em;
+        height: 1.1em;
+        border: 1px solid #aaa;
+        border-radius: 2px;
+        position: relative;
+        top: 2px;
+    }
+</style>
