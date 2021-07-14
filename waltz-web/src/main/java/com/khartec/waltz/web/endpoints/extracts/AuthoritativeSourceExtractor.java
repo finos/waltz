@@ -52,7 +52,8 @@ public class AuthoritativeSourceExtractor extends DirectQueryBasedDataExtractor{
                       .where(AUTHORITATIVE_SOURCE.PARENT_ID.in(orgUnitSelector)));
 
             SelectHavingStep <Record> qry = prepareExtractQuery(condition);
-            String fileName = String.format("authoritative-sources-for-%s-%s",
+            String fileName = String.format(
+                    "authoritative-sources-for-%s-%s",
                     idSelectionOptions.entityReference().kind().name().toLowerCase(),
                     idSelectionOptions.entityReference().id());
             LOG.debug("extracted authoritative sources for entity ref {}", idSelectionOptions.entityReference());
