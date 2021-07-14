@@ -88,6 +88,7 @@ function mkColumnDefs(parentRef) {
     const ratingCell = {
         field: "ratingValue",
         displayName: "Rating",
+        toSearchTerm: _.get(d, ["ratingValue", "name"], ""),
         cellTemplate: `
             <div class="ui-grid-cell-contents">
                 <span ng-bind="COL_FIELD.name"
