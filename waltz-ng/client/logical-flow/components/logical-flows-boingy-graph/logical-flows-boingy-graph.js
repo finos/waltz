@@ -26,6 +26,7 @@ import {buildHierarchies, findNode, flattenChildren} from "../../../common/hiera
 import {entity} from "../../../common/services/enums/entity";
 import {filterUtils, maybeAddUntaggedFlowsTag} from "../../logical-flow-utils";
 import {mkAuthoritativeRatingColorScale} from "../../../common/colors";
+import {loadRatingColorScale} from "../../../auth-sources/auth-sources-utils";
 
 const bindings = {
     filters: "<",
@@ -237,11 +238,7 @@ function controller($scope,
             .loadAppData(CORE_API.DataTypeStore.findAll)
             .then(r => vm.allDataTypes = r.data);
 
-        serviceBroker.loadAppData(CORE_API.EnumValueStore.findAll)
-            .then(r => vm.authRatingColors = mkAuthoritativeRatingColorScale(
-                _.filter(
-                    r.data,
-                    d => d.type === 'AuthoritativenessRating')));
+        loadRatingColorScale(serviceBroker).then(r => vm.authRatingColors = r);
     };
 
 }

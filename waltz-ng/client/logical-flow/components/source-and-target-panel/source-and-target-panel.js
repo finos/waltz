@@ -32,6 +32,7 @@ import {mkAuthoritativeRatingColorScale} from "../../../common/colors";
 import template from "./source-and-target-panel.html";
 import {sameRef} from "../../../common/entity-utils";
 import {appLogicalFlowFilterExcludedTagIdsKey} from "../../../user";
+import {loadRatingColorScale} from "../../../auth-sources/auth-sources-utils";
 
 
 const bindings = {
@@ -222,12 +223,8 @@ function controller($element,
     };
 
     vm.$onInit = () => {
-        serviceBroker.loadAppData(CORE_API.EnumValueStore.findAll)
-            .then(r => vm.authRatingColors = mkAuthoritativeRatingColorScale(
-                _.filter(
-                    r.data,
-                    d => d.type === 'AuthoritativenessRating')));
-
+        loadRatingColorScale(serviceBroker)
+            .then(r => vm.authRatingColors = r);
 
         serviceBroker
             .loadViewData(CORE_API.DataTypeStore.findAll)
