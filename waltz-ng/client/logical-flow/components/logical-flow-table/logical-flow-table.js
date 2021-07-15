@@ -22,7 +22,8 @@ import {mkAuthoritativeRatingSchemeItems} from "../../../ratings/rating-utils";
 
 const bindings = {
     decorators: "<",
-    flows: "<"
+    flows: "<",
+    ratingItems: "<"
 };
 
 
@@ -38,11 +39,18 @@ const template = `<div class="row">
 const ratingColumn = {
     field: "rating",
     displayName: "Authoritativeness",
-    cellTemplate: `<span>
-                     <waltz-rating-indicator-cell rating="row.entity.rating"
-                                                  show-name="true">
-                     </waltz-rating-indicator-cell>
-                   </span>`,
+    cellTemplate: `<div class="ui-grid-cell-contents">
+                      <div style="display: inline-block;
+                                  height: 1em;
+                                  width: 1em;
+                                  border-radius: 2px;
+                                  border: 1px solid #ccc;
+                                  background-color: {{COL_FIELD.iconColor}}">
+                      </div>
+                      <span ng-bind="COL_FIELD.name"
+                            title="{{COL_FIELD.description}}">
+                      </span>
+                   </div>`,
     sortingAlgorithm: (a, b) => a.name.localeCompare(b.name),
     exportFormatter: (input) => input.name
 };
@@ -76,13 +84,14 @@ function groupDecoratorsByFlowId(decorators = [], displayNameService) {
 
 
 function prepareGridData(flows = [], decorators = [], displayNameService, ratingSchemeItems) {
+    const ratingItemsByKey = _.keyBy(ratingSchemeItems, d => d.key);
     const groupedDecorators = groupDecoratorsByFlowId(decorators, displayNameService);
     return _.flatMap(
         flows,
         flow => _.map(
             groupedDecorators[flow.id],
             dc => Object.assign(
-                {dataType: dc.dataType, rating: ratingSchemeItems[dc.authSourceRating] },
+                {dataType: dc.dataType, rating: ratingItemsByKey[dc.authSourceRating] },
                 flow)));
 }
 
@@ -91,10 +100,10 @@ function controller(displayNameService) {
     const vm = this;
 
     vm.$onChanges = () => {
-        const ratingScheme = mkAuthoritativeRatingSchemeItems(displayNameService);
-        const gridData = prepareGridData(vm.flows, vm.decorators, displayNameService, ratingScheme);
+        const gridData = prepareGridData(vm.flows, vm.decorators, displayNameService, vm.ratingItems);
         vm.columnDefs = columnDefs;
         vm.gridData = gridData;
+        console.log({gridData})
     };
 }
 
