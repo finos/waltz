@@ -23,6 +23,7 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 
 import template from "./rated-flow-summary-panel.html";
 import {entity} from "../../../common/services/enums/entity";
+import {loadAuthSourceRatings} from "../../../auth-sources/auth-sources-utils";
 
 
 const bindings = {
@@ -33,6 +34,7 @@ const bindings = {
 
 const initialState = {
     infoCell : null,
+    ratingItems: [],
     visibility: {
         chart: false
     }
@@ -159,6 +161,9 @@ function controller(serviceBroker)
         serviceBroker
             .loadAppData(CORE_API.DataTypeStore.findAll)
             .then(r => vm.dataTypes = r.data);
+
+        loadAuthSourceRatings(serviceBroker)
+            .then(xs => vm.ratingItems = xs);
     };
 
     vm.$onChanges = (changes) => {

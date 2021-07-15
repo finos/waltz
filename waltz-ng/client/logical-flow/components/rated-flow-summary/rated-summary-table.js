@@ -16,17 +16,18 @@
  *
  */
 
-import _ from 'lodash';
-import {nest} from 'd3-collection';
+import _ from "lodash";
+import {nest} from "d3-collection";
 import {notEmpty} from "../../../common";
-import template from './rated-summary-table.html';
+import template from "./rated-summary-table.html";
 
 
 const bindings = {
-    exactSummaries: '<',
-    childSummaries: '<',
-    decoratorEntities: '<',
-    onClick: '<'
+    exactSummaries: "<",
+    childSummaries: "<",
+    decoratorEntities: "<",
+    ratingItems: "<",
+    onClick: "<"
 };
 
 
@@ -42,18 +43,19 @@ function nestByDecoratorThenRating(summaries = []) {
 
 
 function getRelevantDecorators(allDecorators = [], summaries = []) {
-    const decoratorEntitiesById = _.keyBy(allDecorators, 'id');
+    const decoratorEntitiesById = _.keyBy(allDecorators, "id");
     return _.chain(summaries)
-        .map('decoratorEntityReference.id')
+        .map("decoratorEntityReference.id")
         .uniq()
         .map(id => decoratorEntitiesById[id])
         .filter(dec => dec != null)
-        .sortBy('name')
+        .sortBy("name")
         .value();
 }
 
 
-function setup(decoratorEntities = [], exactSummaries = [], childSummaries = []) {
+function setup(decoratorEntities = [], exactSummaries = [], childSummaries = [], ratingItems = []) {
+    console.log({ratingItems, decoratorEntities, exactSummaries, childSummaries})
     const maxCounts = nest()
         .key(d => d.decoratorEntityReference.id)
         .rollup(ds => _.sumBy(ds, "count"))
@@ -62,14 +64,12 @@ function setup(decoratorEntities = [], exactSummaries = [], childSummaries = [])
     const totalCounts = nestByDecoratorThenRating(childSummaries);
     const directCounts = nestByDecoratorThenRating(exactSummaries);
 
-    const result = {
+    return {
         maxCounts,
         directCounts,
         totalCounts,
         decorators: getRelevantDecorators(decoratorEntities, childSummaries)
     };
-
-    return result;
 }
 
 
@@ -83,11 +83,11 @@ function controller() {
 
     vm.$onChanges = () => Object.assign(
         vm,
-        setup(vm.decoratorEntities, vm.exactSummaries, vm.childSummaries));
+        setup(vm.decoratorEntities, vm.exactSummaries, vm.childSummaries, vm.ratingItems));
 
-    vm.columnClick = ($event, rating) => invokeClick($event, { type: 'COLUMN', rating });
-    vm.rowClick = ($event, dataType) => invokeClick($event, { type: 'ROW', dataType });
-    vm.cellClick = ($event, dataType, rating) => invokeClick($event, { type: 'CELL', dataType, rating });
+    vm.columnClick = ($event, rating) => invokeClick($event, { type: "COLUMN", rating });
+    vm.rowClick = ($event, dataType) => invokeClick($event, { type: "ROW", dataType });
+    vm.cellClick = ($event, dataType, rating) => invokeClick($event, { type: "CELL", dataType, rating });
 }
 
 

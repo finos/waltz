@@ -95,26 +95,25 @@ function controller($q, serviceBroker) {
                 .then(r => r.data);
 
             $q.all([inboundPromise, outboundPromise, ratingsPromise])
-                .then(([inbound, outbound, ratings]) => {
+                .then((xs) => {
                     //in case user has chosen to selectively plot only some items then we feed them into display separately
-                    console.log({inbound, outbound, ratings})
-                    const xs = [inbound, outbound];
-                    let filteredDataTypes = xs.map(r => {
-                        if (selectedItems && selectedItems.length){
-                            const reduceable = [...r].map(e => Object.assign({e}, {id :e.decoratorEntityReference.id}));
-                            const reduced = reduceToSelectedNodesOnly(reduceable, selectedItems).map(e => e.id);
-                            return r.filter(e => reduced.includes(e.decoratorEntityReference.id))
-                        }
-                        else {
-                            return r;
-                        }
-                    });
+                    const filteredDataTypes = xs
+                        .map(r => {
+                            if (selectedItems && selectedItems.length){
+                                const reduceable = [...r].map(e => Object.assign({e}, {id :e.decoratorEntityReference.id}));
+                                const reduced = reduceToSelectedNodesOnly(reduceable, selectedItems).map(e => e.id);
+                                return r.filter(e => reduced.includes(e.decoratorEntityReference.id))
+                            }
+                            else {
+                                return r;
+                            }
+                        });
+
                     const [inboundStats, outboundStats] = filteredDataTypes.map(r => toStats(r));
                     vm.visibility.chart = determineIfChartShouldBeVisible(inboundStats, outboundStats);
                     vm.inboundStats = inboundStats;
                     vm.outboundStats = outboundStats;
-                    return xs;
-                }).then(xs => {
+
                     const [inboundDataTypes, outboundDataTypes] = xs;
                     const extractDtIdsFn = (myDataTypes) => myDataTypes.map(e => e.decoratorEntityReference.id);
                     const displayDataTypeIds = extractDtIdsFn(inboundDataTypes).concat(extractDtIdsFn(outboundDataTypes));
@@ -124,7 +123,8 @@ function controller($q, serviceBroker) {
                         .then(result => result.data)
                         .then(dataTypes => dataTypes.map(e => Object.assign(e, {concrete: displayDataTypeIds.includes(e.id)})))
                         .then(dataTypes => reduceToSelectedNodesOnly(dataTypes, displayDataTypeIds));
-                }).then(applicableDataTypes => {
+                })
+                .then(applicableDataTypes => {
                     vm.dataTypes = applicableDataTypes
                 });
         }
