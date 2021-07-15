@@ -25,7 +25,6 @@ import template from "./logical-flows-boingy-graph.html";
 import {buildHierarchies, findNode, flattenChildren} from "../../../common/hierarchy-utils";
 import {entity} from "../../../common/services/enums/entity";
 import {filterUtils, maybeAddUntaggedFlowsTag} from "../../logical-flow-utils";
-import {mkAuthoritativeRatingColorScale} from "../../../common/colors";
 import {loadRatingColorScale} from "../../../auth-sources/auth-sources-utils";
 
 const bindings = {

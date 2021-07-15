@@ -1,7 +1,7 @@
 import _ from "lodash";
 
 import {CORE_API} from "../common/services/core-api-utils";
-import {mkAuthoritativeRatingColorScale} from "../common/colors";
+import {mkColorScaleFromEnumValues} from "../common/colors";
 
 export function loadAuthSourceRatings(serviceBroker) {
     return serviceBroker
@@ -15,5 +15,5 @@ export function loadAuthSourceRatings(serviceBroker) {
 
 export function loadRatingColorScale(serviceBroker) {
     return loadAuthSourceRatings(serviceBroker)
-        .then(mkAuthoritativeRatingColorScale);
+        .then(mkColorScaleFromEnumValues);
 }

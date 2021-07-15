@@ -27,7 +27,6 @@ import {
     maybeAddUntaggedFlowsTag,
     saveTagFilterPreferences
 } from "../../logical-flow-utils";
-import {mkAuthoritativeRatingColorScale} from "../../../common/colors";
 
 import template from "./source-and-target-panel.html";
 import {sameRef} from "../../../common/entity-utils";

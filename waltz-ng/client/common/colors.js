@@ -20,11 +20,6 @@ import {scaleOrdinal, schemeCategory20c} from "d3-scale";
 import _ from "lodash";
 
 
-function mkColorScaleFromEnumValues(enumValues = []) {
-    return scaleOrdinal()
-        .domain(_.map(enumValues, d => d.key))
-        .range(_.map(enumValues, d => d.iconColor));
-}
 
 
 export const blackHex = "#000000";
@@ -96,9 +91,10 @@ export const authoritativeSourceColorScale = scaleOrdinal()
     .domain(["NON_STRATEGIC", "SECONDARY", "PRIMARY", "NOT_APPLICABLE"])
     .range([red, amber, green, grey]);
 
-
-export function mkAuthoritativeRatingColorScale(enumValues = []) {
-    return mkColorScaleFromEnumValues(enumValues);
+export function mkColorScaleFromEnumValues(enumValues = []) {
+    return scaleOrdinal()
+        .domain(_.map(enumValues, d => d.key))
+        .range(_.map(enumValues, d => d.iconColor));
 }
 
 export const authoritativeRatingColorScale = scaleOrdinal()

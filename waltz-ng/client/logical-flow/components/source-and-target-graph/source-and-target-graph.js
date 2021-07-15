@@ -23,7 +23,6 @@ import {color} from "d3-color";
 import "d3-selection-multi";
 
 import {initialiseData} from "../../../common";
-import {mkAuthoritativeRatingColorScale} from "../../../common/colors";
 import {mkLineWithArrowPath} from "../../../common/d3-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
