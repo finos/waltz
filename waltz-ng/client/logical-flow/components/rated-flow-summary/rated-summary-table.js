@@ -44,7 +44,8 @@ function nestByDecoratorThenRating(summaries = []) {
 
 function getRelevantDecorators(allDecorators = [], summaries = []) {
     const decoratorEntitiesById = _.keyBy(allDecorators, "id");
-    return _.chain(summaries)
+    return _
+        .chain(summaries)
         .map("decoratorEntityReference.id")
         .uniq()
         .map(id => decoratorEntitiesById[id])
@@ -55,7 +56,6 @@ function getRelevantDecorators(allDecorators = [], summaries = []) {
 
 
 function setup(decoratorEntities = [], exactSummaries = [], childSummaries = [], ratingItems = []) {
-    console.log({ratingItems, decoratorEntities, exactSummaries, childSummaries})
     const maxCounts = nest()
         .key(d => d.decoratorEntityReference.id)
         .rollup(ds => _.sumBy(ds, "count"))
@@ -68,7 +68,8 @@ function setup(decoratorEntities = [], exactSummaries = [], childSummaries = [],
         maxCounts,
         directCounts,
         totalCounts,
-        decorators: getRelevantDecorators(decoratorEntities, childSummaries)
+        decorators: getRelevantDecorators(decoratorEntities, childSummaries),
+        colWidth: 80 / (ratingItems.length || 1)
     };
 }
 
