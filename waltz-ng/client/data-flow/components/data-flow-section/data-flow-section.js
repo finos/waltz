@@ -24,7 +24,7 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 
 import template from "./data-flow-section.html";
 import {entity} from "../../../common/services/enums/entity";
-import AuthRatingLegend from "./AuthRatingLegend.svelte";
+import AuthRatingLegend from "../../../auth-sources/components/svelte/AuthRatingLegend.svelte";
 
 
 const bindings = {

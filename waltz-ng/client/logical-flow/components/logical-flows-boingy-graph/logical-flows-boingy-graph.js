@@ -26,6 +26,7 @@ import {buildHierarchies, findNode, flattenChildren} from "../../../common/hiera
 import {entity} from "../../../common/services/enums/entity";
 import {filterUtils, maybeAddUntaggedFlowsTag} from "../../logical-flow-utils";
 import {loadRatingColorScale} from "../../../auth-sources/auth-sources-utils";
+import AuthRatingLegend from "../../../auth-sources/components/svelte/AuthRatingLegend.svelte";
 
 const bindings = {
     filters: "<",
@@ -53,6 +54,7 @@ const defaultOptions = {
 
 
 const initialState = {
+    AuthRatingLegend,
     applications: [],
     flows: [],
     decorators: [],
