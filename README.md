@@ -6,7 +6,9 @@ In a nutshell Waltz allows you to visualize and define your organisation's techn
 Learn more
   - [Features](docs/features/README.md)
   - [Product Site](https://waltz.finos.org/)
-  - [FINOS Announcement](https://www.finos.org/blog/introduction-to-finos-waltz) - now part of the [Linux Foundation](https://www.linuxfoundation.org/blog/2020/04/finos-joins-the-linux-foundation/)
+  - [Blog](https://waltz.finos.org/blog/)
+  - [FINOS Announcement](https://www.finos.org/blog/introduction-to-finos-waltz) 
+    - now part of the [Linux Foundation](https://www.linuxfoundation.org/blog/2020/04/finos-joins-the-linux-foundation/)
 
 Getting started
  - [Building](docs/development/build.md) 
@@ -79,9 +81,6 @@ All contributions should contain the standard license and copyright notice (see 
 
 Individual and organisational contributors are listed in [the contributors file](CONTRIBUTORS.md)
 
-## External Resources
-
-[Using ArchUnit to formalize architecture rules in the Waltz codebase](https://medium.com/@davidwatkins73/using-archunit-to-formalize-architecture-rules-in-the-waltz-code-base-5fd3e092fc22)
 
 ## License
 
