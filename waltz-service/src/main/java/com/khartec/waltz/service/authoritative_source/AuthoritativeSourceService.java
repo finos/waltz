@@ -35,7 +35,7 @@ import com.khartec.waltz.model.authoritativesource.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.datatype.DataType;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.jooq.Condition;
 import org.jooq.Record1;
@@ -187,7 +187,7 @@ public class AuthoritativeSourceService {
 
     @Deprecated
     public boolean recalculateAllFlowRatings() {
-        logicalFlowDecoratorDao.updateRatingsByCondition(AuthoritativenessRating.NO_OPINION, DSL.trueCondition());
+        logicalFlowDecoratorDao.updateRatingsByCondition(AuthoritativenessRatingValue.NO_OPINION, DSL.trueCondition());
         findAll()
                 .forEach(authSource -> ratingCalculator.update(
                         authSource.dataType(),
@@ -197,7 +197,7 @@ public class AuthoritativeSourceService {
 
 
     public boolean fastRecalculateAllFlowRatings() {
-        logicalFlowDecoratorDao.updateRatingsByCondition(AuthoritativenessRating.NO_OPINION, DSL.trueCondition());
+        logicalFlowDecoratorDao.updateRatingsByCondition(AuthoritativenessRatingValue.NO_OPINION, DSL.trueCondition());
 
         //finds all the vantage points to apply using parent as selector
         List<AuthoritativeRatingVantagePoint> authoritativeRatingVantagePoints = authoritativeSourceDao

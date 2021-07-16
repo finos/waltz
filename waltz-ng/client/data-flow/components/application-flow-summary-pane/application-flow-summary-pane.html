@@ -115,20 +115,13 @@
 
     <table class="table table-condensed small">
         <colgroup>
-            <col width="20%">
-            <col width="20%">
-            <col width="20%">
-            <col width="20%">
-            <col width="20%">
+            <col width="15%">
         </colgroup>
         <thead>
         <tr>
             <th>Direction</th>
-            <th ng-repeat="col in $ctrl.authoritativeCols">
-                <waltz-enum-value key="col"
-                                  show-icon="false"
-                                  type="'AuthoritativenessRating'">
-                </waltz-enum-value>
+            <th ng-repeat="col in $ctrl.authoritativeCols" style="border-bottom: 2px solid {{col.iconColor}};">
+                <span ng-bind="col.name"></span>
             </th>
         </tr>
         </thead>
@@ -136,13 +129,13 @@
         <tr>
             <td>Inbound</td>
             <td ng-repeat="col in $ctrl.authoritativeCols">
-                <span ng-bind="$ctrl.stats.byDirectionAndAuthoritativeness['INBOUND'][col].length || 0"></span>
+                <span ng-bind="$ctrl.stats.byDirectionAndAuthoritativeness['INBOUND'][col.key].length || 0"></span>
             </td>
         </tr>
         <tr>
             <td>Outbound</td>
             <td ng-repeat="col in $ctrl.authoritativeCols">
-                <span ng-bind="$ctrl.stats.byDirectionAndAuthoritativeness['OUTBOUND'][col].length || 0"></span>
+                <span ng-bind="$ctrl.stats.byDirectionAndAuthoritativeness['OUTBOUND'][col.key].length || 0"></span>
             </td>
         </tr>
         </tbody>

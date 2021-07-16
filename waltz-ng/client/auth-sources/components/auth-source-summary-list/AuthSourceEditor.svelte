@@ -86,10 +86,10 @@
         workingCopy.dataType = null;
     }
 
-    $: ratingsByKey = _
+    $: ratings = _
         .chain($enumCall.data)
         .filter(d => d.type === "AuthoritativenessRating")
-        .keyBy(d => d.key)
+        .sortBy("position", "display_name")
         .value();
 
 </script>
@@ -154,18 +154,19 @@
     <label for="rating">Rating:</label>
     <div id="rating"
          class="form-group">
-        <label>
-            <input type=radio
-                   bind:group={workingCopy.rating}
-                   value='PRIMARY'>
-            {_.get(ratingsByKey, ["PRIMARY", "name"], "-")}
-        </label>
-        <label>
-            <input type=radio
-                   bind:group={workingCopy.rating}
-                   value='SECONDARY'>
-            {_.get(ratingsByKey, ["SECONDARY", "name"], "-")}
-        </label>
+        {#each ratings as rating}
+            <div class="radio">
+                <label>
+                    <input type=radio
+                           bind:group={workingCopy.rating}
+                           value={rating.key}>
+                    <div class="rating-indicator-block"
+                         style="background-color: {rating.iconColor}">&nbsp;</div>
+                    {rating.name}
+                    <span class="help-block">{rating.description}</span>
+                </label>
+            </div>
+        {/each}
         <p class="text-muted">Select an authority statement for this source</p>
     </div>
 
@@ -205,3 +206,16 @@
             </div>
     {/await}
 {/if}
+
+
+<style>
+    .rating-indicator-block {
+        display: inline-block;
+        width: 1em;
+        height: 1.1em;
+        border: 1px solid #aaa;
+        border-radius: 2px;
+        position: relative;
+        top: 2px;
+    }
+</style>

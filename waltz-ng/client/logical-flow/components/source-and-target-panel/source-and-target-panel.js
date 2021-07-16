@@ -31,6 +31,7 @@ import {
 import template from "./source-and-target-panel.html";
 import {sameRef} from "../../../common/entity-utils";
 import {appLogicalFlowFilterExcludedTagIdsKey} from "../../../user";
+import {loadRatingColorScale} from "../../../auth-sources/auth-sources-utils";
 
 
 const bindings = {
@@ -101,7 +102,8 @@ function calculateFlowData(allFlows = [],
 function calcPhysicalFlows(physicalFlows = [], specifications = [], logicalFlowId) {
     const specsById = _.keyBy(specifications, "id");
 
-    return _.chain(physicalFlows)
+    return _
+        .chain(physicalFlows)
         .filter(pf => pf.logicalFlowId === logicalFlowId)
         .map(pf => Object.assign({}, pf, { specification: specsById[pf.specificationId] }))
         .value();
@@ -110,7 +112,8 @@ function calcPhysicalFlows(physicalFlows = [], specifications = [], logicalFlowI
 
 // flowId -> [ { id (typeId), rating }... ]
 function mkTypeInfo(decorators = [], dataTypes) {
-    return _.chain(decorators)
+    return _
+        .chain(decorators)
         .filter({ decoratorEntity: { kind: "DATA_TYPE" }})
         .groupBy(d => d.dataFlowId)
         .mapValues(xs => _.map(xs, x => {
@@ -125,7 +128,8 @@ function mkTypeInfo(decorators = [], dataTypes) {
 
 // flowId -> [ {id (tagId), name }... ]
 function mkTagInfo(tags = []) {
-    return _.chain(tags)
+    return _
+        .chain(tags)
         .flatMap(t => {
             return _.map(t.tagUsages, tu => ({
                 flowId: tu.entityReference.id,
@@ -145,12 +149,14 @@ function calculateSourceAndTargetFlowsByEntity(primaryEntity, logical = []) {
     if (! primaryEntity) return {};
 
 
-    const sourceFlowsByEntityId = _.chain(logical)
+    const sourceFlowsByEntityId = _
+        .chain(logical)
         .filter(f => f.target.id === primaryEntity.id && f.target.kind === primaryEntity.kind)
         .reduce((acc, f) => { acc[f.source.id] = f.id; return acc; }, {})
         .value();
 
-    const targetFlowsByEntityId = _.chain(logical)
+    const targetFlowsByEntityId = _
+        .chain(logical)
         .filter(f => f.source.id === primaryEntity.id && f.source.kind === primaryEntity.kind)
         .reduce((acc, f) => { acc[f.target.id] = f.id; return acc; }, {})
         .value();
@@ -216,6 +222,9 @@ function controller($element,
     };
 
     vm.$onInit = () => {
+        loadRatingColorScale(serviceBroker)
+            .then(r => vm.authRatingColors = r);
+
         serviceBroker
             .loadViewData(CORE_API.DataTypeStore.findAll)
             .then(r => vm.dataTypes = _.keyBy(r.data, dt => dt.id));
@@ -251,7 +260,8 @@ function controller($element,
             const types = typeInfoByFlowId[logicalFlowId] || [];
             const logicalFlow = logicalFlowsById[logicalFlowId];
             const physicalFlows = calcPhysicalFlows(vm.physicalFlows, vm.physicalSpecifications, logicalFlowId);
-            const changeUnitsByPhysicalFlowId = _.chain(vm.changeUnits)
+            const changeUnitsByPhysicalFlowId = _
+                .chain(vm.changeUnits)
                 .filter(cu => cu.subjectEntity.kind = "PHYSICAL_FLOW")
                 .keyBy(cu => cu.subjectEntity.id)
                 .value();
@@ -354,7 +364,8 @@ function controller($element,
         const calcDataTypes = (fId) => {
             const dts = dataTypesByFlowId[fId] || [];
 
-            return _.chain(dts)
+            return _
+                .chain(dts)
                 .map(dt => dt.code)
                 .map(code => displayNameService.lookup("dataType", code))
                 .value()
@@ -365,7 +376,8 @@ function controller($element,
         const calcTags = (fId) => {
             const tags = tagsByFlowId[fId] || [];
 
-            return _.chain(tags)
+            return _
+                .chain(tags)
                 .map(t => t.name)
                 .value()
                 .join("; ");

@@ -18,11 +18,9 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.common.ArrayUtilities;
-import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.common.RandomUtilities;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import com.khartec.waltz.schema.tables.records.AuthoritativeSourceRecord;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
@@ -68,7 +66,10 @@ public class AuthSourceGenerator implements SampleDataGenerator {
                         .mapToObj(i -> {
                             AuthoritativeSourceRecord record = dsl.newRecord(AUTHORITATIVE_SOURCE);
                             record.setDataType(t);
-                            record.setRating(randomPick(AuthoritativenessRating.PRIMARY, AuthoritativenessRating.SECONDARY).name());
+                            record.setRating(
+                                    randomPick(
+                                        AuthoritativenessRatingValue.of("PRIMARY"),
+                                        AuthoritativenessRatingValue.of("SECONDARY")).value());
                             record.setApplicationId(randomPick(appIds));
                             record.setParentId(randomPick(ouIds));
                             record.setParentKind(EntityKind.ORG_UNIT.name());

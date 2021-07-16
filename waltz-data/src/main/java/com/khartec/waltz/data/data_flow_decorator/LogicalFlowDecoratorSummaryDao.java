@@ -24,7 +24,7 @@ import com.khartec.waltz.model.FlowDirection;
 import com.khartec.waltz.model.data_flow_decorator.DataTypeDirectionKey;
 import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
 import com.khartec.waltz.model.data_flow_decorator.ImmutableDecoratorRatingSummary;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import com.khartec.waltz.schema.tables.LogicalFlow;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -106,7 +106,7 @@ public class LogicalFlowDecoratorSummaryDao {
                     long decoratorEntityId = r.getValue(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID);
 
                     EntityReference decoratorRef = EntityReference.mkRef(decoratorEntityKind, decoratorEntityId);
-                    AuthoritativenessRating rating = AuthoritativenessRating.valueOf(r.getValue(LOGICAL_FLOW_DECORATOR.RATING));
+                    AuthoritativenessRatingValue rating = AuthoritativenessRatingValue.of(r.getValue(LOGICAL_FLOW_DECORATOR.RATING));
                     Integer count = r.getValue(countField);
 
                     return ImmutableDecoratorRatingSummary.builder()
@@ -118,10 +118,10 @@ public class LogicalFlowDecoratorSummaryDao {
     }
 
 
-    public int updateRatingsByCondition(AuthoritativenessRating rating, Condition condition) {
+    public int updateRatingsByCondition(AuthoritativenessRatingValue rating, Condition condition) {
         return dsl
                 .update(LOGICAL_FLOW_DECORATOR)
-                .set(LOGICAL_FLOW_DECORATOR.RATING, rating.name())
+                .set(LOGICAL_FLOW_DECORATOR.RATING, rating.value())
                 .where(condition)
                 .execute();
     }

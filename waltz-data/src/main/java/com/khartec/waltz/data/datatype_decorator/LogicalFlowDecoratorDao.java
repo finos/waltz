@@ -27,7 +27,7 @@ import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.datatype.DataTypeUsageCharacteristics;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeUsageCharacteristics;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import com.khartec.waltz.schema.tables.LogicalFlowDecorator;
 import com.khartec.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
 import org.jooq.*;
@@ -71,7 +71,7 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                 .decoratorEntity(mkRef(
                         DATA_TYPE,
                         record.getDecoratorEntityId()))
-                .rating(Optional.of(AuthoritativenessRating.valueOf(record.getRating())))
+                .rating(AuthoritativenessRatingValue.ofNullable(record.getRating()))
                 .provenance(record.getProvenance())
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .lastUpdatedBy(record.getLastUpdatedBy())
@@ -89,7 +89,7 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
         r.setDecoratorEntityId(d.decoratorEntity().id());
         r.setLogicalFlowId(d.entityReference().id());
         r.setProvenance(d.provenance());
-        d.rating().ifPresent(rating -> r.setRating(rating.name()));
+        d.rating().ifPresent(rating -> r.setRating(rating.value()));
         r.setLastUpdatedAt(Timestamp.valueOf(d.lastUpdatedAt()));
         r.setLastUpdatedBy(d.lastUpdatedBy());
         r.setIsReadonly(d.isReadonly());
@@ -240,7 +240,7 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
         EntityReference vantagePoint = ratingVantagePoint.vantagePoint();
         Long appId = ratingVantagePoint.applicationId();
         EntityReference dataType = ratingVantagePoint.dataType();
-        AuthoritativenessRating rating = ratingVantagePoint.rating();
+        AuthoritativenessRatingValue rating = ratingVantagePoint.rating();
 
         SelectConditionStep<Record1<Long>> orgUnitSubselect = DSL
                 .select(ENTITY_HIERARCHY.ID)
@@ -273,12 +273,18 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                                         .and(APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitSubselect))
                                         .and(lfd.DECORATOR_ENTITY_KIND.eq(DATA_TYPE.name()))
                                         .and(lfd.DECORATOR_ENTITY_ID.in(dataTypeSubselect)))
-                                .and(lfd.RATING.in(AuthoritativenessRating.NO_OPINION.name(), AuthoritativenessRating.DISCOURAGED.name()))
+                                .and(lfd.RATING.in(
+                                        AuthoritativenessRatingValue.NO_OPINION.value(),
+                                        AuthoritativenessRatingValue.DISCOURAGED.value()))
 
                 ));
 
-        Update<LogicalFlowDecoratorRecord> updateAuthSources = mkQuery.apply(usingAuthSource, rating.name());
-        Update<LogicalFlowDecoratorRecord> updateNonAuthSources = mkQuery.apply(notUsingAuthSource, AuthoritativenessRating.DISCOURAGED.name());
+        Update<LogicalFlowDecoratorRecord> updateAuthSources = mkQuery.apply(
+                usingAuthSource,
+                rating.value());
+        Update<LogicalFlowDecoratorRecord> updateNonAuthSources = mkQuery.apply(
+                notUsingAuthSource,
+                AuthoritativenessRatingValue.DISCOURAGED.value());
         int authSourceUpdateCount = updateAuthSources.execute();
         int nonAuthSourceUpdateCount = updateNonAuthSources.execute();
         return authSourceUpdateCount + nonAuthSourceUpdateCount;
@@ -335,10 +341,10 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
     }
 
 
-    public int updateRatingsByCondition(AuthoritativenessRating rating, Condition condition) {
+    public int updateRatingsByCondition(AuthoritativenessRatingValue rating, Condition condition) {
         return dsl
                 .update(LOGICAL_FLOW_DECORATOR)
-                .set(LOGICAL_FLOW_DECORATOR.RATING, rating.name())
+                .set(LOGICAL_FLOW_DECORATOR.RATING, rating.value())
                 .where(condition)
                 .execute();
     }

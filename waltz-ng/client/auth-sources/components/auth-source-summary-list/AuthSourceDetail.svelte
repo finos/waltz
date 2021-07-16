@@ -63,6 +63,8 @@
 
     <div>
         <strong>Rating:</strong>
+        <div class="rating-indicator-block"
+             style="background-color: {_.get(ratingsByKey, [selected.rating, "iconColor"], "#ccc")}"></div>
         <span>{_.get(ratingsByKey, [selected?.rating, "name"], "-")}</span>
         <p class="text-muted">{_.get(ratingsByKey, [selected?.rating, "description"], "-")}</p>
     </div>
@@ -113,3 +115,17 @@
             </div>
     {/await}
 {/if}
+
+
+
+<style>
+    .rating-indicator-block {
+        display: inline-block;
+        width: 1em;
+        height: 1.1em;
+        border: 1px solid #aaa;
+        border-radius: 2px;
+        position: relative;
+        top: 2px;
+    }
+</style>

@@ -20,42 +20,29 @@ import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {buildHierarchies, doSearch, prepareSearchNodes} from "../../../common/hierarchy-utils";
 import template from "./data-type-usage-count-tree.html";
-import {mkAuthoritativeRatingSchemeItems} from "../../../ratings/rating-utils";
+import {loadAuthSourceRatings} from "../../../auth-sources/auth-sources-utils";
 
 const bindings = {
     onSelection: "<"
 };
 
 
-function ratingToRag(r) {
-    switch(r){
-        case "PRIMARY":
-            return "G";
-        case "SECONDARY":
-            return "A";
-        case "DISCOURAGED":
-            return "R";
-        case "NO_OPINION":
-            return "Z";
-        default:
-            return r;
-    }
-}
+function prepareTree(dataTypes = [],
+                     ratingSchemeItems = [],
+                     usageCounts = []) {
 
-
-function prepareTree(dataTypes = [], usageCounts = []) {
     const dataTypesById = _.keyBy(dataTypes, "id");
+
     _.chain(usageCounts)
         .filter(uc => uc.decoratorEntityReference.kind === "DATA_TYPE")
         .filter(uc => ! _.isNil(dataTypesById[uc.decoratorEntityReference.id]))
         .forEach(uc => {
             const dtId = uc.decoratorEntityReference.id;
             const dt = dataTypesById[dtId];
-            const rag = ratingToRag(uc.rating);
             dt.directCounts = Object.assign(
                 {},
                 dt.directCounts,
-                { [rag] : uc.count });
+                { [uc.rating] : uc.count });
         })
         .value();
 
@@ -69,19 +56,18 @@ function prepareTree(dataTypes = [], usageCounts = []) {
         return total;
     };
 
-    _.forEach(hierarchy, root => {
-        const R = sumBy("R", root);
-        const A = sumBy("A", root);
-        const G = sumBy("G", root);
-        const Z = sumBy("Z", root);
-        root.cumulativeCounts = {
-            R,
-            A,
-            G,
-            Z,
-            total: R + A + G + Z
-        };
-    });
+    _.forEach(hierarchy, root =>
+        root.cumulativeCounts = _
+            .reduce(
+                ratingSchemeItems,
+                (acc, d) => {
+                    const rating = d.key;
+                    const count = sumBy(rating, root);
+                    acc[rating] = count;
+                    acc.total += count;
+                    return acc;
+                },
+                {total: 0}));
 
     return hierarchy;
 }
@@ -94,22 +80,34 @@ function prepareExpandedNodes(hierarchy = []) {
 }
 
 
-function controller(displayNameService, serviceBroker) {
+function controller($q, displayNameService, serviceBroker) {
     const vm = this;
 
     vm.$onInit = () => {
+        const ratingsPromise = loadAuthSourceRatings(serviceBroker)
+            .then(rs => {
+                vm.authSourceRatings = rs;
+                vm.ratings = _.map(rs, d => ({color: d.iconColor, name: d.name, rating: d.key}))
+            });
 
-        vm.ratingSchemeItems = mkAuthoritativeRatingSchemeItems(displayNameService);
-
-        serviceBroker
-            .loadAppData(CORE_API.DataTypeStore.findAll, [])
+        const dataTypesPromise = serviceBroker
+            .loadAppData(CORE_API.DataTypeStore.findAll)
             .then(r => {
                 vm.dataTypes = r.data;
                 vm.searchNodes = prepareSearchNodes(vm.dataTypes);
-            })
-            .then(() => serviceBroker.loadViewData(CORE_API.LogicalFlowDecoratorStore.summarizeInboundForAll))
-            .then(r => {
-                vm.hierarchy = prepareTree(vm.dataTypes, r.data);
+            });
+
+        const summaryPromise = serviceBroker
+            .loadViewData(CORE_API.LogicalFlowDecoratorStore.summarizeInboundForAll)
+            .then(r => vm.summaries = r.data);
+
+        $q.all([ratingsPromise, dataTypesPromise, summaryPromise])
+            .then(() => {
+                vm.hierarchy = prepareTree(
+                    vm.dataTypes,
+                    vm.authSourceRatings,
+                    vm.summaries);
+
                 vm.maxTotal = _
                     .chain(vm.hierarchy)
                     .map("cumulativeCounts.total")
@@ -117,7 +115,6 @@ function controller(displayNameService, serviceBroker) {
                     .value();
             });
     };
-
 
     vm.treeOptions = {
         nodeChildren: "children",
@@ -139,6 +136,7 @@ function controller(displayNameService, serviceBroker) {
 
 
 controller.$inject = [
+    "$q",
     "DisplayNameService",
     "ServiceBroker"
 ];

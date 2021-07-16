@@ -24,7 +24,7 @@ import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorSummaryDao
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import com.khartec.waltz.schema.tables.EntityHierarchy;
 import com.khartec.waltz.schema.tables.LogicalFlowDecorator;
 import com.khartec.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
@@ -92,7 +92,7 @@ public class AuthSourceHarness {
     private static void fastRecalculateAllFlowRatings(DSLContext dsl,
                                                       LogicalFlowDecoratorSummaryDao decoratorDao,
                                                       AuthoritativeSourceDao authoritativeSourceDao) {
-        decoratorDao.updateRatingsByCondition(AuthoritativenessRating.NO_OPINION, DSL.trueCondition());
+        decoratorDao.updateRatingsByCondition(AuthoritativenessRatingValue.NO_OPINION, DSL.trueCondition());
 
         EntityHierarchy ehOrgUnit = ENTITY_HIERARCHY.as("ehOrgUnit");
         EntityHierarchy ehDataType = ENTITY_HIERARCHY.as("ehDataType");
@@ -142,7 +142,7 @@ public class AuthSourceHarness {
         EntityReference vantagePoint = ratingVantagePoint.vantagePoint();
         Long appId = ratingVantagePoint.applicationId();
         EntityReference dataType = ratingVantagePoint.dataType();
-        AuthoritativenessRating rating = ratingVantagePoint.rating();
+        AuthoritativenessRatingValue rating = ratingVantagePoint.rating();
 
         SelectConditionStep<Record1<Long>> orgUnitSubselect = DSL.select(ENTITY_HIERARCHY.ID)
                 .from(ENTITY_HIERARCHY)
@@ -173,12 +173,12 @@ public class AuthSourceHarness {
                                         .and(APPLICATION.ORGANISATIONAL_UNIT_ID.in(orgUnitSubselect))
                                         .and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
                                         .and(lfd.DECORATOR_ENTITY_ID.in(dataTypeSubselect)))
-                                .and(lfd.RATING.in(AuthoritativenessRating.NO_OPINION.name(), AuthoritativenessRating.DISCOURAGED.name()))
+                                .and(lfd.RATING.in(AuthoritativenessRatingValue.NO_OPINION.value(), AuthoritativenessRatingValue.DISCOURAGED.value()))
 
                 ));
 
-        Update<LogicalFlowDecoratorRecord> updateAuthSources = mkQuery.apply(usingAuthSource, rating.name());
-        Update<LogicalFlowDecoratorRecord> updateNonAuthSources = mkQuery.apply(notUsingAuthSource, AuthoritativenessRating.DISCOURAGED.name());
+        Update<LogicalFlowDecoratorRecord> updateAuthSources = mkQuery.apply(usingAuthSource, rating.value());
+        Update<LogicalFlowDecoratorRecord> updateNonAuthSources = mkQuery.apply(notUsingAuthSource, AuthoritativenessRatingValue.DISCOURAGED.value());
         int authSourceUpdateCount = updateAuthSources.execute();
         System.out.printf("Updated %s Authoritative decorators for: %s \r\n", authSourceUpdateCount, ratingVantagePoint);
         int nonAuthSourceUpdateCount = updateNonAuthSources.execute();

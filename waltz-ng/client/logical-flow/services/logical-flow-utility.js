@@ -17,7 +17,7 @@
  */
 
 import _ from "lodash";
-import {authoritativeRatingColorScale} from "../../common/colors";
+import {color} from "d3-color";
 
 
 function pickWorst(ratings = []) {
@@ -30,7 +30,7 @@ function pickWorst(ratings = []) {
 
 export default [
     () => {
-        const buildGraphTweakers = (appIds = [], decorators = []) => {
+        const buildGraphTweakers = (appIds = [], decorators = [], authRatingColors) => {
 
             const decoratorsByFlowId = _.groupBy(decorators, "dataFlowId");
             const calcRating = (d) => {
@@ -55,11 +55,11 @@ export default [
                         return selection
                             .attr("stroke", d => {
                                 const rating = calcRating(d);
-                                return authoritativeRatingColorScale(rating);
+                                return authRatingColors(rating);
                             })
                             .attr("fill", d => {
                                 const rating = calcRating(d);
-                                return authoritativeRatingColorScale(rating).brighter();
+                                return color(authRatingColors(rating)).brighter();
                             });
                     },
                     enter: (selection) => {

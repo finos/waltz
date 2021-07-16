@@ -161,24 +161,14 @@
                                                            tags="$ctrl.tags">
                             </waltz-source-and-target-panel>
 
-                            <p class="text-muted small">
+                            <p class="help-block">
                                 This diagram shows flows categorized by data type to this application (center)
                                 from sending systems (on the left)
                                 and to the receiving system (on the right).
-                                <span style="color: darkred">Red lines</span>
-                                indicate
-                                <span ng-bind="'DISCOURAGED'|toDisplayName:'AuthoritativenessRating'"></span>
-                                flows.
-
-                                <span style="color: orange">Amber lines</span>
-                                indicate
-                                <span ng-bind="'SECONDARY' |toDisplayName:'AuthoritativenessRating'"></span>
-                                flows and
-
-                                <span style="color: darkgreen">Green Lines</span>
-                                indicate
-                                <span ng-bind="'PRIMARY'|toDisplayName:'AuthoritativenessRating'"></span>
-                                flows.
+                            </p>
+                            <p class="help-block">
+                                Legend:
+                                <waltz-svelte-component component="$ctrl.AuthRatingLegend"></waltz-svelte-component>
                             </p>
                         </div>
                     </div>

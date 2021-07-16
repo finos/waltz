@@ -48,15 +48,16 @@
                  options="$ctrl.treeOptions">
             <span class="waltz-visibility-parent">
 
-                <a ui-sref="main.data-type.view ({id: node.id })"
-                   uib-popover-template="'wdtt-popover.html'"
+                <a uib-popover-template="'wdtt-popover.html'"
                    popover-trigger="mouseenter"
                    popover-popup-delay="300"
                    popover-append-to-body="true"
+                   popover-placement="right"
                    ng-style="{
-                                'font-style': node.concrete ? 'inherit' : 'italic',
-                                'font-weight': node.concrete ? 'bold' : 'bolder'
-                              }">
+                        'font-style': node.concrete ? 'inherit' : 'italic',
+                        'font-weight': node.concrete ? 'bold' : 'bolder'
+                   }"
+                   ui-sref="main.data-type.view ({id: node.id })">
                     <span ng-bind="node.name">
                     </span>
                     <span ng-if="node.deprecated"
@@ -66,7 +67,7 @@
                 </a>
                 <waltz-rag-line class='waltz-visibility-child-50'
                                  scores="node.cumulativeCounts"
-                                 rating-scheme-items="$ctrl.ratingSchemeItems"
+                                 rating-scheme-items="$ctrl.ratings"
                                  style="padding-left: 20px;"
                                  range="[0, $ctrl.maxTotal]">
                 </waltz-rag-line>
@@ -77,9 +78,12 @@
                 </div>
             </span>
     </treecontrol>
+</div>
 
-    <script type="text/ng-template"
-            id="wdtt-popover.html">
+
+<script type="text/ng-template"
+        id="wdtt-popover.html">
+    <div>
         <strong ng-bind="node.name"></strong>
         <p class="small text-muted"
            ng-bind="node.description">
@@ -94,44 +98,29 @@
                 <thead>
                 <tr>
                     <th>Flow Ratings</th>
-                    <th>Count</th>
+                    <th style="text-align:right">Count</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
+                <tr ng-repeat="rating in $ctrl.authSourceRatings">
                     <td>
-                        <span ng-bind="'PRIMARY'| toDisplayName: 'AuthoritativenessRating'"></span>
+                        <span style="
+                            display: inline-block;
+                            position: relative;
+                            top: 2px;
+                            width: 1em;
+                            height: 1.1em;
+                            border:1px solid #ccc;
+                            background-color: {{rating.iconColor}}">
+                        </span>
+                        <span ng-bind="rating.name"></span>
                     </td>
-                    <td>
-                        <span ng-bind="node.cumulativeCounts.G"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <span ng-bind="'SECONDARY'| toDisplayName: 'AuthoritativenessRating'"></span>
-                    </td>
-                    <td>
-                        <span ng-bind="node.cumulativeCounts.A"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <span ng-bind="'DISCOURAGED'| toDisplayName: 'AuthoritativenessRating'"></span>
-                    </td>
-                    <td>
-                        <span ng-bind="node.cumulativeCounts.R"></span>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <span ng-bind="'NO_OPINION'| toDisplayName: 'AuthoritativenessRating'"></span>
-                    </td>
-                    <td>
-                        <span ng-bind="node.cumulativeCounts.Z"></span>
+                    <td style="text-align:right">
+                        <span ng-bind="node.cumulativeCounts[rating.key]"></span>
                     </td>
                 </tr>
                 </tbody>
             </table>
         </div>
-    </script>
-</div>
+    </div>
+</script>

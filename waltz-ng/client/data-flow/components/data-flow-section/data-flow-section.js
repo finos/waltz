@@ -24,6 +24,7 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 
 import template from "./data-flow-section.html";
 import {entity} from "../../../common/services/enums/entity";
+import AuthRatingLegend from "../../../auth-sources/components/svelte/AuthRatingLegend.svelte";
 
 
 const bindings = {
@@ -32,6 +33,7 @@ const bindings = {
 
 
 const initialState = {
+    AuthRatingLegend,
     changeUnits: [],
     dataTypeUsages: [],
     logicalFlows: [],
@@ -105,7 +107,6 @@ function controller(serviceBroker) {
                 CORE_API.PhysicalSpecificationStore.findByEntityReference,
                 [vm.parentEntityRef])
             .then(r => vm.physicalSpecifications = r.data);
-
 
         serviceBroker
             .loadViewData(

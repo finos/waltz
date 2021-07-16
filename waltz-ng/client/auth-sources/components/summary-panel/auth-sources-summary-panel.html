@@ -30,27 +30,13 @@
 
 <div class="row"
      ng-show="$ctrl.visibility.chart">
-    <div class="col-sm-3">
+    <div class="col-sm-4">
         <waltz-tree-filter items="$ctrl.dataTypes"
                            on-filter-change="$ctrl.onTreeFilterChange">
         </waltz-tree-filter>
     </div>
-    <div class="col-sm-5">
-
-        <!-- INBOUND_SEMI_PIE -->
-        <span id="wassp-inbound">
-        </span>
-
+    <div class="col-sm-8">
         <span ng-include="'wassp-breakdown-table'"></span>
-
-        <!-- OUTBOUND_SEMI_PIE -->
-        <span id="wassp-outbound">
-        </span>
-
-        <p>Overall percentage of authorised sources =
-            <span ng-bind="$ctrl.overallPercentageOfAuthoritiveSources"></span>
-            %
-        </p>
     </div>
 </div>
 
@@ -71,22 +57,19 @@
             <tbody>
             <tr ng-repeat="row in $ctrl.rowInfo">
                 <td style="text-align: center;">
-                    <div ng-style="{ 'opacity' : $ctrl.inboundStats[row.rating] > 0 ? 1 : 0.3 }">
-                        <div ng-bind="$ctrl.inboundStats[row.rating]"
+                    <div ng-style="{ 'opacity' : $ctrl.inboundStats[row.rating.key] > 0 ? 1 : 0.3 }">
+                        <div ng-bind="$ctrl.inboundStats[row.rating.key]"
                              style="border: 1px solid; padding: 1px; margin: 1px"
                              ng-style="row.style">
                         </div>
                     </div>
                 </td>
                 <td style="text-align: center;">
-                    <waltz-enum-value type="'AuthoritativenessRating'"
-                                      show-icon="false"
-                                      key="row.rating">
-                    </waltz-enum-value>
+                    <span ng-bind="row.rating.name"></span>
                 </td>
                 <td style="text-align: center;">
-                    <div ng-style="{ 'opacity' : $ctrl.outboundStats[row.rating] > 0 ? 1 : 0.3 }">
-                        <div ng-bind="$ctrl.outboundStats[row.rating]"
+                    <div ng-style="{ 'opacity' : $ctrl.outboundStats[row.rating.key] > 0 ? 1 : 0.3 }">
+                        <div ng-bind="$ctrl.outboundStats[row.rating.key]"
                              style="border: 1px solid; padding: 1px; margin: 1px"
                              ng-style="row.style">
                         </div>

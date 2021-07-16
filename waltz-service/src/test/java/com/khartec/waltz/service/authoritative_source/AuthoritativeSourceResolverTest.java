@@ -25,7 +25,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
 import com.khartec.waltz.model.authoritativesource.ImmutableAuthoritativeRatingVantagePoint;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -53,9 +53,9 @@ public class AuthoritativeSourceResolverTest {
         List<AuthoritativeRatingVantagePoint> vantagePoints = new ArrayList<>();
         AuthoritativeSourceResolver authoritativeSourceResolver = new AuthoritativeSourceResolver(vantagePoints);
 
-        AuthoritativenessRating rating = authoritativeSourceResolver.resolve(vantagePoint, sourceApp, "REF_DATA");
+        AuthoritativenessRatingValue rating = authoritativeSourceResolver.resolve(vantagePoint, sourceApp, "REF_DATA");
 
-        Assert.assertEquals(AuthoritativenessRating.NO_OPINION, rating);
+        Assert.assertEquals(AuthoritativenessRatingValue.NO_OPINION, rating);
     }
 
 
@@ -70,15 +70,15 @@ public class AuthoritativeSourceResolverTest {
                 .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 10))
                 .dataTypeRank(1)
                 .applicationId(200L)
-                .rating(AuthoritativenessRating.SECONDARY)
+                .rating(AuthoritativenessRatingValue.of("SECONDARY"))
                 .authSourceId(1L)
                 .build());
 
         AuthoritativeSourceResolver authoritativeSourceResolver = new AuthoritativeSourceResolver(vantagePoints);
 
-        AuthoritativenessRating rating = authoritativeSourceResolver.resolve(vantagePoint, sourceApp, "REF_DATA");
+        AuthoritativenessRatingValue rating = authoritativeSourceResolver.resolve(vantagePoint, sourceApp, "REF_DATA");
 
-        Assert.assertEquals(AuthoritativenessRating.NO_OPINION, rating);
+        Assert.assertEquals(AuthoritativenessRatingValue.NO_OPINION, rating);
     }
 
 
@@ -94,15 +94,15 @@ public class AuthoritativeSourceResolverTest {
                 .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 20))
                 .dataTypeRank(1)
                 .applicationId(205L)
-                .rating(AuthoritativenessRating.PRIMARY)
+                .rating(AuthoritativenessRatingValue.of("PRIMARY"))
                 .authSourceId(1L)
                 .build());
 
         AuthoritativeSourceResolver authoritativeSourceResolver = new AuthoritativeSourceResolver(vantagePoints);
 
-        AuthoritativenessRating rating = authoritativeSourceResolver.resolve(vantagePoint, sourceApp, "REF_DATA");
+        AuthoritativenessRatingValue rating = authoritativeSourceResolver.resolve(vantagePoint, sourceApp, "REF_DATA");
 
-        Assert.assertEquals(AuthoritativenessRating.DISCOURAGED, rating);
+        Assert.assertEquals(AuthoritativenessRatingValue.DISCOURAGED, rating);
     }
 
 
@@ -118,7 +118,7 @@ public class AuthoritativeSourceResolverTest {
                 .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 20))
                 .dataTypeRank(2)
                 .applicationId(205L)
-                .rating(AuthoritativenessRating.PRIMARY)
+                .rating(AuthoritativenessRatingValue.of("PRIMARY"))
                 .authSourceId(1L)
                 .build());
 
@@ -130,15 +130,15 @@ public class AuthoritativeSourceResolverTest {
                 .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 20))
                 .dataTypeRank(3)
                 .applicationId(200L)
-                .rating(AuthoritativenessRating.SECONDARY)
+                .rating(AuthoritativenessRatingValue.of("SECONDARY"))
                 .authSourceId(1L)
                 .build());
 
         AuthoritativeSourceResolver authoritativeSourceResolver = new AuthoritativeSourceResolver(vantagePoints);
 
-        AuthoritativenessRating rating = authoritativeSourceResolver.resolve(vantagePoint, sourceApp, "REF_DATA");
+        AuthoritativenessRatingValue rating = authoritativeSourceResolver.resolve(vantagePoint, sourceApp, "REF_DATA");
 
-        Assert.assertEquals(AuthoritativenessRating.SECONDARY, rating);
+        Assert.assertEquals(AuthoritativenessRatingValue.of("SECONDARY"), rating);
 
     }
 
@@ -153,7 +153,7 @@ public class AuthoritativeSourceResolverTest {
                 .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 20))
                 .dataTypeRank(2)
                 .applicationId(205L)
-                .rating(AuthoritativenessRating.PRIMARY)
+                .rating(AuthoritativenessRatingValue.of("PRIMARY"))
                 .authSourceId(1L)
                 .build();
 

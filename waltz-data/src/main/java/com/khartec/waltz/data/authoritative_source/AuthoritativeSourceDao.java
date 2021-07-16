@@ -25,7 +25,7 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.authoritativesource.*;
-import com.khartec.waltz.model.rating.AuthoritativenessRating;
+import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import com.khartec.waltz.schema.tables.Application;
 import com.khartec.waltz.schema.tables.EntityHierarchy;
 import com.khartec.waltz.schema.tables.records.AuthoritativeSourceRecord;
@@ -115,7 +115,7 @@ public class AuthoritativeSourceDao {
                 .appOrgUnitReference(orgUnitRef)
                 .applicationReference(appRef)
                 .dataType(record.getDataType())
-                .rating(AuthoritativenessRating.valueOf(record.getRating()))
+                .rating(AuthoritativenessRatingValue.of(record.getRating()))
                 .description(record.getDescription())
                 .provenance(record.getProvenance())
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
@@ -131,7 +131,7 @@ public class AuthoritativeSourceDao {
                 .vantagePoint(mkRef(EntityKind.ORG_UNIT, r.get(targetOrgUnitId)))
                 .vantagePointRank(r.get(declaredOrgUnitLevel))
                 .applicationId(authRecord.getApplicationId())
-                .rating(AuthoritativenessRating.valueOf(authRecord.getRating()))
+                .rating(AuthoritativenessRatingValue.of(authRecord.getRating()))
                 .dataType(mkRef(EntityKind.DATA_TYPE, r.get(declaredDataTypeId)))
                 .dataTypeCode(r.get(targetDataTypeCode))
                 .dataTypeRank(r.get(declaredDataTypeLevel))
@@ -181,7 +181,7 @@ public class AuthoritativeSourceDao {
         checkTrue(command.id().isPresent(), "id must be +ve");
 
         UpdateSetMoreStep<AuthoritativeSourceRecord> upd = dsl.update(AUTHORITATIVE_SOURCE)
-                .set(AUTHORITATIVE_SOURCE.RATING, command.rating().name())
+                .set(AUTHORITATIVE_SOURCE.RATING, command.rating().value())
                 .set(AUTHORITATIVE_SOURCE.DESCRIPTION, command.description());
 
         return upd
@@ -204,7 +204,7 @@ public class AuthoritativeSourceDao {
                 .set(AUTHORITATIVE_SOURCE.PARENT_ID, command.parentReference().id())
                 .set(AUTHORITATIVE_SOURCE.DATA_TYPE, dataTypeSelection)
                 .set(AUTHORITATIVE_SOURCE.APPLICATION_ID, command.applicationId())
-                .set(AUTHORITATIVE_SOURCE.RATING, command.rating().name())
+                .set(AUTHORITATIVE_SOURCE.RATING, command.rating().value())
                 .set(AUTHORITATIVE_SOURCE.DESCRIPTION, command.description())
                 .set(AUTHORITATIVE_SOURCE.PROVENANCE, "waltz")
                 .set(AUTHORITATIVE_SOURCE.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
@@ -399,8 +399,8 @@ public class AuthoritativeSourceDao {
         Condition consumerNotRemoved =  CONSUMER_APP.IS_REMOVED.isFalse();
         Condition decorationIsAboutDataTypes = LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name());
         Condition badFlow = LOGICAL_FLOW_DECORATOR.RATING.in(
-                AuthoritativenessRating.DISCOURAGED.name(),
-                AuthoritativenessRating.NO_OPINION.name());
+                AuthoritativenessRatingValue.DISCOURAGED.value(),
+                AuthoritativenessRatingValue.NO_OPINION.value());
 
         Condition commonSelectionCriteria = flowNotRemoved
                 .and(consumerNotRemoved)
@@ -528,11 +528,11 @@ public class AuthoritativeSourceDao {
                                 .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
                                         .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(authSource.parentReference().kind().name())
                                                 .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(authSource.parentReference().id()))))
-                                .and(LOGICAL_FLOW_DECORATOR.RATING.eq(authSource.rating().name())))));
+                                .and(LOGICAL_FLOW_DECORATOR.RATING.eq(authSource.rating().value())))));
 
         return dsl
                 .update(LOGICAL_FLOW_DECORATOR)
-                .set(LOGICAL_FLOW_DECORATOR.RATING, AuthoritativenessRating.NO_OPINION.name())
+                .set(LOGICAL_FLOW_DECORATOR.RATING, AuthoritativenessRatingValue.NO_OPINION.value())
                 .setNull(LOGICAL_FLOW_DECORATOR.AUTH_SOURCE_ID)
                 .where(LOGICAL_FLOW_DECORATOR.ID.in(decoratorsToMarkAsNoOpinion))
                 .execute();

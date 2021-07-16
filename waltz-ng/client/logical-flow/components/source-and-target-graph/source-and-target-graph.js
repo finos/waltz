@@ -19,10 +19,10 @@
 import _ from "lodash";
 import {scalePoint} from "d3-scale";
 import {event, select} from "d3-selection";
+import {color} from "d3-color";
 import "d3-selection-multi";
 
 import {initialiseData} from "../../../common";
-import {authoritativeRatingColorScale} from "../../../common/colors";
 import {mkLineWithArrowPath} from "../../../common/d3-utils";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
@@ -31,11 +31,12 @@ import {amberHex} from "../../../common/colors";
 
 
 const bindings = {
+    authRatingColors: "<",
+    changeUnits: "<",
+    decorators: "<",
     entityRef: "<",
     logicalFlows: "<",
-    decorators: "<",
-    tweakers: "<",
-    changeUnits: "<"
+    tweakers: "<"
 };
 
 
@@ -441,7 +442,7 @@ function drawLabels(section, items = [], scale, anchor = "start", tweakers) {
 }
 
 
-function drawArcs(section, model, layoutFn) {
+function drawArcs(section, model, layoutFn, authRatingColor) {
     const arcs = section
         .selectAll(`.${styles.ARC}`)
         .data(model, d => d.from + "-" + d.to);
@@ -453,9 +454,8 @@ function drawArcs(section, model, layoutFn) {
         .classed(styles.ARC_REMOVED, d => d.entityLifecycleStatus === "REMOVED")
         .classed(styles.ARC_PENDING, d => d.entityLifecycleStatus === "PENDING")
         .attr("opacity", 0)
-        .attr("stroke", d => authoritativeRatingColorScale(d.rating))
-        .attr("fill", d => authoritativeRatingColorScale(d.rating).brighter());
-
+        .attr("stroke", d => authRatingColor(d.rating))
+        .attr("fill", d => color(authRatingColor(d.rating)).brighter());
 
     arcs
         .merge(newArcs)
@@ -523,7 +523,7 @@ function drawTypeBoxes(section, model, scale, dimensions, tweakers) {
 }
 
 
-function drawInbound(section, model, scales, dimensions) {
+function drawInbound(section, model, scales, dimensions, authRatingColor) {
     const inboundLayout = (selection) => selection
         .attr("d", d =>
             mkLineWithArrowPath(
@@ -532,11 +532,11 @@ function drawInbound(section, model, scales, dimensions) {
                 (dimensions.canvas.width / 2) - (dimensions.label.width / 2),
                 dimensions.margin.top + scales.type(d.to) - dimensions.label.height / 2));
 
-    drawArcs(section, model, inboundLayout);
+    drawArcs(section, model, inboundLayout, authRatingColor);
 }
 
 
-function drawOutbound(section, model, scales, dimensions) {
+function drawOutbound(section, model, scales, dimensions, authRatingColor) {
     const outboundLayout = (selection) => selection
         .attr("d", d =>
             mkLineWithArrowPath(
@@ -545,7 +545,7 @@ function drawOutbound(section, model, scales, dimensions) {
                 dimensions.canvas.width - (dimensions.label.width + 10) - 15,
                 dimensions.margin.top + scales.target(d.to) - dimensions.label.height / 2));
 
-    drawArcs(section, model, outboundLayout);
+    drawArcs(section, model, outboundLayout, authRatingColor);
 }
 
 
@@ -578,8 +578,9 @@ function drawCenterBox(section, dimensions, name = "") {
 
 function update(sections,
                 model,
-                tweakers) {
-    redraw = () => update(sections, model, tweakers);
+                tweakers,
+                authRatingColor) {
+    redraw = () => update(sections, model, tweakers, authRatingColor);
 
     const dimensions = calculateDimensions(model);
 
@@ -596,8 +597,8 @@ function update(sections,
     drawTypeBoxes(sections.types, model, scales.type, dimensions.label, tweakers.typeBlock);
     drawLabels(sections.types, model.types, scales.type, "middle", tweakers.type);
 
-    drawInbound(sections.inbound, model.sourceToType, scales, dimensions);
-    drawOutbound(sections.outbound, model.typeToTarget, scales, dimensions);
+    drawInbound(sections.inbound, model.sourceToType, scales, dimensions, authRatingColor);
+    drawOutbound(sections.outbound, model.typeToTarget, scales, dimensions, authRatingColor);
 }
 
 
@@ -636,7 +637,7 @@ function controller($element, $window, serviceBroker) {
                     allTypes: types
                 };
                 const model = mkModel(data);
-                update(svgSections, model, tweakers);
+                update(svgSections, model, tweakers, vm.authRatingColors);
             });
     };
 

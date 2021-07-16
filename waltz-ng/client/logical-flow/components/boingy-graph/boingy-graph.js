@@ -38,9 +38,8 @@ const DEFAULT_NODE_LIMIT = 500;
 
 const bindings = {
     data: "<", // { decorators: [], entities: [], flows: [] }
-    tweakers: "<",
-    filterOptions: "<"
-
+    filterOptions: "<",
+    tweakers: "<"
 };
 
 const initialState = {
@@ -592,7 +591,10 @@ function controller($timeout, $element) {
 }
 
 
-controller.$inject = ["$timeout", "$element"];
+controller.$inject = [
+    "$timeout",
+    "$element"
+];
 
 
 const component = {

@@ -88,8 +88,15 @@ function mkColumnDefs(parentRef) {
     const ratingCell = {
         field: "ratingValue",
         displayName: "Rating",
+        toSearchTerm: d => _.get(d, ["ratingValue", "name"], ""),
         cellTemplate: `
             <div class="ui-grid-cell-contents">
+                <div style="display: inline-block;
+                            height: 1em;
+                            width: 1em;
+                            border-radius: 2px;
+                            background-color: {{COL_FIELD.iconColor}}">
+                </div>
                 <span ng-bind="COL_FIELD.name"
                       title="{{COL_FIELD.description}}">
                 </span>
@@ -179,7 +186,7 @@ function controller($q, $state, serviceBroker, enumValueService) {
         loadAll();
     };
 
-    vm.$onChanges = (changes) => {
+    vm.$onChanges = () => {
         if(vm.authSources) {
             loadAll();
         }

@@ -24,6 +24,7 @@ import {initialiseData} from "../../../common";
 import {authoritativeRatingBackgroundColorScale, authoritativeRatingColorScale} from "../../../common/colors";
 
 import template from "./application-flow-summary-graph.html";
+import {loadAuthSourceRatings, loadRatingColorScale} from "../../../auth-sources/auth-sources-utils";
 
 
 const bindings = {
@@ -42,7 +43,6 @@ const h = rowHeight * 3;
 const colWidth = 120;
 const colPadding = 5;
 const w = colWidth * 3;
-const keys = ["NO_OPINION", "DISCOURAGED", "SECONDARY", "PRIMARY"];
 
 
 const cellTransforms = {
@@ -120,7 +120,7 @@ function drawTitleBar(svg) {
 }
 
 
-function enrichData(data = []) {
+function enrichData(data = [], ratings = []) {
     return _.chain(data)
         .flatMap((vs, k) => {
             return _.map(vs, (authCounts, rating) => {
@@ -131,12 +131,12 @@ function enrichData(data = []) {
                 };
             })
         })
-        .map(enrichCellData)
+        .map(d => enrichCellData(d, _.map(ratings, d => d.key)))
         .value(data);
 }
 
 
-function enrichCellData(data = []) {
+function enrichCellData(data = [], keys = []) {
     let ptr = 0;
     const stack = [];
     _.forEach(keys, k => {
@@ -149,7 +149,7 @@ function enrichCellData(data = []) {
 }
 
 
-function drawData(svg, data = []) {
+function drawData(svg, data = [], ratings) {
 
     if (! svg) return;
 
@@ -165,7 +165,8 @@ function drawData(svg, data = []) {
         .domain([0, maxSize])
         .range([0, actualColWidth]);
 
-    const bars = svg.selectAll(`.${styles.BAR}`)
+    const bars = svg
+        .selectAll(`.${styles.BAR}`)
         .data(data);
 
     const newBars = bars
@@ -186,18 +187,21 @@ function drawData(svg, data = []) {
         .attr("y", rowPadding)
         .attr("height", rowHeight - (2 * rowPadding))
         .attr("width", d => scale(d[1] - d[0]))
-        .attr("stroke", (d, idx) => authoritativeRatingBackgroundColorScale(keys[idx]))
+        .attr("stroke", "#ccc")
         .attr("stroke-width", 0.5)
-        .attr("fill", (d, idx) => authoritativeRatingColorScale(keys[idx]));
+        .attr("fill", (d, idx) => ratings[idx].iconColor);
 }
 
 
 
-function controller($element) {
+function controller($element, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     let svg = null;
-    const redraw = () => drawData(svg, enrichData(vm.summaryData));
+    const redraw = () => drawData(
+        svg,
+        enrichData(vm.summaryData, vm.authSourceRatings),
+        vm.authSourceRatings);
 
     vm.$onChanges = () => redraw();
 
@@ -211,13 +215,17 @@ function controller($element) {
         drawBackground(svg);
         drawTitleBar(svg);
         drawCenterLabels(svg);
-        redraw();
+
+        loadAuthSourceRatings(serviceBroker)
+            .then(xs => vm.authSourceRatings = xs)
+            .then(redraw);
     };
 }
 
 
 controller.$inject = [
-    "$element"
+    "$element",
+    "ServiceBroker"
 ];
 
 
