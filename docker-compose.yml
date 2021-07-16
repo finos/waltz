@@ -1,0 +1,24 @@
+version: "3"
+services:
+  web:
+    image: jdbohrman/waltz:latest
+    deploy:
+      replicas: 5
+      resources:
+        limits:
+          cpus: "0.1"
+          memory: 50M
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "4000:80"
+    networks:
+      - webnet
+  db:
+    image: postgres
+    restart: always
+    environment:
+      - POSTGRES_USER: 'user'
+      - POSTGRES_PASSWORD: 'password'
+networks:
+  webnet:
