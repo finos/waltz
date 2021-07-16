@@ -1,0 +1,17 @@
+{
+  "name": "waltz-integration-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "test/testing.js",
+  "type": "module",
+  "scripts": {
+    "main": "test/testing.js",
+    "e2eTest": "mocha --report"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "mocha": "^8.2.1",
+    "playwright": "^1.6.1"
+  }
+}

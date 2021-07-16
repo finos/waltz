@@ -22,6 +22,7 @@
         <button waltz-has-role-for-entity-kind="{{$ctrl.parentEntityRef.kind}},PERSON"
                 ng-click="$ctrl.editMode(true)"
                 class="btn btn-xs btn-primary"
+                data-ux="involvement-edit"
                 ng-if="$ctrl.visibility.editor === false">
             Edit
         </button>
