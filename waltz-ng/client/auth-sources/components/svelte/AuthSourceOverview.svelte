@@ -20,7 +20,11 @@
     $: datatypesByCode = _.keyBy(datatypes, d => d.code);
     $: datatype = Object.assign({}, datatypesByCode[authSource.dataType], {kind: "DATA_TYPE"});
     $: datatypeName = _.get(datatypesByCode, [authSource.dataType, "name"], "unknown");
-    $: ratings = _.get(nestEnums($enumsCall.data), ["AuthoritativenessRating"], {});
+    $: rating = _
+        .chain($enumsCall.data)
+        .filter(d => d.type === "AuthoritativenessRating")
+        .find(d => d.key === authSource.rating)
+        .value();
 </script>
 
 <PageHeader icon="shield"
@@ -38,6 +42,27 @@
 
 <div class="waltz-page-summary waltz-page-summary-attach">
     <div class="waltz-display-section">
+
+        <div class="row">
+            <div class="col-sm-2 waltz-display-field-label">
+                Rating:
+            </div>
+            <div class="col-sm-4">
+                <span class="indicator"
+                      style={`background-color: ${rating?.iconColor}`}>
+                </span>
+                <span title={rating?.description}>
+                    {rating?.name}
+                </span>
+            </div>
+
+            <div class="col-sm-6">
+                <p class="help-block">
+                    {rating?.description}
+                </p>
+            </div>
+        </div>
+
         <div class="row">
             <div class="col-sm-2 waltz-display-field-label">
                 Source Application:
@@ -45,13 +70,20 @@
             <div class="col-sm-4">
                 <EntityLink ref={authSource.applicationReference}/>
             </div>
+        </div>
 
-
+        <div class="row">
             <div class="col-sm-2 waltz-display-field-label">
                 Datatype:
             </div>
             <div class="col-sm-4">
                 <EntityLink ref={datatype}/>
+            </div>
+
+            <div class="col-sm-6">
+                <p class="help-block">
+                    {datatype.description}
+                </p>
             </div>
         </div>
 
@@ -62,23 +94,18 @@
             <div class="col-sm-4">
                 <EntityLink ref={authSource.parentReference}/>
             </div>
-
-            <div class="col-sm-2 waltz-display-field-label">
-                Rating:
-            </div>
-            <div class="col-sm-4">
-                <span>{ratings[authSource.rating]?.name}</span>
-            </div>
         </div>
 
         <div class="row">
             <div class="col-sm-2 waltz-display-field-label">
-                External Id:
+                Description:
             </div>
             <div class="col-sm-4">
-                {authSource.externalId || "-"}
+                {authSource.description || "-"}
             </div>
+        </div>
 
+        <div class="row">
             <div class="col-sm-2 waltz-display-field-label">
                 Provenance:
             </div>
@@ -89,17 +116,29 @@
 
         <div class="row">
             <div class="col-sm-2 waltz-display-field-label">
-                Description:
+                External Id:
             </div>
-            <div class="col-sm-10">
-                {authSource.description || "-"}
+            <div class="col-sm-4">
+                {authSource.externalId || "-"}
             </div>
         </div>
 
         <div class="row">
-            <div class="col-sm-12 text-muted small">
-                Last updated: <LastEdited entity={authSource}/>
+            <div class="col-sm-12">
+                <div class="help-block pull-right">
+                    Last updated: <LastEdited entity={authSource}/>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+    .indicator {
+        display: inline-block;
+        height: 0.9em;
+        width: 1em;
+        border: 1px solid #ccc;
+        border-radius: 2px;
+    }
+</style>

@@ -190,7 +190,7 @@ public class AuthoritativeSourceDao {
     }
 
 
-    public int insert(AuthoritativeSourceCreateCommand command, String username) {
+    public long insert(AuthoritativeSourceCreateCommand command, String username) {
         checkNotNull(command, "command cannot be null");
 
         SelectConditionStep<Record1<String>> dataTypeSelection = DSL
@@ -210,7 +210,8 @@ public class AuthoritativeSourceDao {
                 .set(AUTHORITATIVE_SOURCE.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
                 .set(AUTHORITATIVE_SOURCE.LAST_UPDATED_BY, username)
                 .returning(AUTHORITATIVE_SOURCE.ID)
-                .execute();
+                .fetchOne()
+                .getId();
     }
 
 

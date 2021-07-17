@@ -32,6 +32,8 @@ function controller(serviceBroker, userService, $scope){
             .then(user => vm.canEdit = userService.hasRole(user, roles.AUTHORITATIVE_SOURCE_EDITOR));
     };
 
+    vm.$onDestroy =() => mode.set("LIST");
+
     vm.onSelectAuthSource = (authSource) => {
         selectedAuthSource.set(authSource)
         mode.set("DETAIL");
@@ -84,7 +86,7 @@ function controller(serviceBroker, userService, $scope){
 
     mode.subscribe(d => {
         $scope.$applyAsync(() => vm.viewMode = d)
-    })
+    });
 
 }
 

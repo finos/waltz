@@ -54,7 +54,6 @@ import java.util.Map;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityKind.ACTOR;
 import static com.khartec.waltz.model.EntityKind.ORG_UNIT;
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.AuthoritativeSource.AUTHORITATIVE_SOURCE;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
@@ -140,14 +139,14 @@ public class AuthoritativeSourceService {
     }
 
 
-    public int insert(AuthoritativeSourceCreateCommand command, String username) {
-        int authSourceId = authoritativeSourceDao.insert(command, username);
+    public long insert(AuthoritativeSourceCreateCommand command, String username) {
+        long authSourceId = authoritativeSourceDao.insert(command, username);
 
         if (command.parentReference().kind() == ORG_UNIT) {
             ratingCalculator.update(command.dataTypeId(), command.parentReference());
         }
 
-        logInsert(command, username);
+        logInsert(authSourceId, command, username);
         authoritativeSourceDao.updatePointToPointAuthStatements();
 
         return authSourceId;
@@ -339,12 +338,12 @@ public class AuthoritativeSourceService {
                     authSource.parentReference().kind().prettyName(),
                     parentName);
 
-            tripleLog(username, authSource.parentReference(), dataType, app, msg, Operation.REMOVE);
+            multiLog(username, id, authSource.parentReference(), dataType, app, msg, Operation.REMOVE);
         }
     }
 
 
-    private void logInsert(AuthoritativeSourceCreateCommand command, String username) {
+    private void logInsert(Long authSourceId, AuthoritativeSourceCreateCommand command, String username) {
 
         String parentName = getParentEntityName(command.parentReference());
         DataType dataType = dataTypeDao.getById(command.dataTypeId());
@@ -358,7 +357,14 @@ public class AuthoritativeSourceService {
                     command.parentReference().kind().prettyName(),
                     parentName);
 
-            tripleLog(username, command.parentReference(), dataType, app, msg, Operation.ADD);
+            multiLog(
+                    username,
+                    authSourceId,
+                    command.parentReference(),
+                    dataType,
+                    app,
+                    msg,
+                    Operation.ADD);
         }
     }
 
@@ -389,23 +395,32 @@ public class AuthoritativeSourceService {
 
         if (app != null && dataType != null && parentName != null) {
             String msg = format(
-                    "Updated %s as an authoritative source for type: %s for %s: %s",
+                    "Updated %s as an authoritative source with rating: %s, for type: %s, for %s: %s",
                     app.name(),
+                    command.rating().value(),
                     dataType.name(),
                     authSource.parentReference().kind().prettyName(),
                     parentName);
 
-            tripleLog(username, authSource.parentReference(), dataType, app, msg, Operation.UPDATE);
+            multiLog(
+                    username,
+                    authSource.id().get(),
+                    authSource.parentReference(),
+                    dataType,
+                    app,
+                    msg,
+                    Operation.UPDATE);
         }
     }
 
 
-    private void tripleLog(String username,
-                           EntityReference parentRef,
-                           DataType dataType,
-                           Application app,
-                           String msg,
-                           Operation operation) {
+    private void multiLog(String username,
+                          Long authSourceId,
+                          EntityReference parentRef,
+                          DataType dataType,
+                          Application app,
+                          String msg,
+                          Operation operation) {
 
         ChangeLog parentLog = ImmutableChangeLog.builder()
                 .message(msg)
@@ -418,15 +433,20 @@ public class AuthoritativeSourceService {
 
         ChangeLog appLog = ImmutableChangeLog
                 .copyOf(parentLog)
-                .withParentReference(mkRef(EntityKind.APPLICATION, app.id().get()));
+                .withParentReference(app.entityReference());
 
         ChangeLog dtLog = ImmutableChangeLog
                 .copyOf(parentLog)
-                .withParentReference(mkRef(EntityKind.DATA_TYPE, dataType.id().get()));
+                .withParentReference(dataType.entityReference());
+
+        ChangeLog authLog = ImmutableChangeLog
+                .copyOf(parentLog)
+                .withParentReference(EntityReference.mkRef(EntityKind.AUTHORITATIVE_SOURCE, authSourceId));
 
         changeLogService.write(parentLog);
         changeLogService.write(appLog);
         changeLogService.write(dtLog);
+        changeLogService.write(authLog);
     }
 
 }
