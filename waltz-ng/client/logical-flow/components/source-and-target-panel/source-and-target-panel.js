@@ -31,7 +31,7 @@ import {
 import template from "./source-and-target-panel.html";
 import {sameRef} from "../../../common/entity-utils";
 import {appLogicalFlowFilterExcludedTagIdsKey} from "../../../user";
-import {loadRatingColorScale} from "../../../auth-sources/auth-sources-utils";
+import {loadAuthSourceRatings} from "../../../auth-sources/auth-sources-utils";
 
 
 const bindings = {
@@ -222,8 +222,10 @@ function controller($element,
     };
 
     vm.$onInit = () => {
-        loadRatingColorScale(serviceBroker)
-            .then(r => vm.authRatingColors = r);
+        loadAuthSourceRatings(serviceBroker)
+            .then(r => {
+                vm.authRatingsByKey = _.keyBy(r, d => d.key);
+            });
 
         serviceBroker
             .loadViewData(CORE_API.DataTypeStore.findAll)

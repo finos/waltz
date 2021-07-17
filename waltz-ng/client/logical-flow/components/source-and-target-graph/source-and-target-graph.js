@@ -31,7 +31,7 @@ import {amberHex} from "../../../common/colors";
 
 
 const bindings = {
-    authRatingColors: "<",
+    authRatingsByKey: "<",
     changeUnits: "<",
     decorators: "<",
     entityRef: "<",
@@ -442,7 +442,7 @@ function drawLabels(section, items = [], scale, anchor = "start", tweakers) {
 }
 
 
-function drawArcs(section, model, layoutFn, authRatingColor) {
+function drawArcs(section, model, layoutFn, authRatingsByKey) {
     const arcs = section
         .selectAll(`.${styles.ARC}`)
         .data(model, d => d.from + "-" + d.to);
@@ -454,8 +454,8 @@ function drawArcs(section, model, layoutFn, authRatingColor) {
         .classed(styles.ARC_REMOVED, d => d.entityLifecycleStatus === "REMOVED")
         .classed(styles.ARC_PENDING, d => d.entityLifecycleStatus === "PENDING")
         .attr("opacity", 0)
-        .attr("stroke", d => authRatingColor(d.rating))
-        .attr("fill", d => color(authRatingColor(d.rating)).brighter());
+        .attr("stroke", d => authRatingsByKey[d.rating].iconColor)
+        .attr("fill", d => color(authRatingsByKey[d.rating].iconColor).brighter());
 
     arcs
         .merge(newArcs)
@@ -523,7 +523,7 @@ function drawTypeBoxes(section, model, scale, dimensions, tweakers) {
 }
 
 
-function drawInbound(section, model, scales, dimensions, authRatingColor) {
+function drawInbound(section, model, scales, dimensions, authRatingsByKey) {
     const inboundLayout = (selection) => selection
         .attr("d", d =>
             mkLineWithArrowPath(
@@ -532,11 +532,11 @@ function drawInbound(section, model, scales, dimensions, authRatingColor) {
                 (dimensions.canvas.width / 2) - (dimensions.label.width / 2),
                 dimensions.margin.top + scales.type(d.to) - dimensions.label.height / 2));
 
-    drawArcs(section, model, inboundLayout, authRatingColor);
+    drawArcs(section, model, inboundLayout, authRatingsByKey);
 }
 
 
-function drawOutbound(section, model, scales, dimensions, authRatingColor) {
+function drawOutbound(section, model, scales, dimensions, authRatingsByKey) {
     const outboundLayout = (selection) => selection
         .attr("d", d =>
             mkLineWithArrowPath(
@@ -545,7 +545,7 @@ function drawOutbound(section, model, scales, dimensions, authRatingColor) {
                 dimensions.canvas.width - (dimensions.label.width + 10) - 15,
                 dimensions.margin.top + scales.target(d.to) - dimensions.label.height / 2));
 
-    drawArcs(section, model, outboundLayout, authRatingColor);
+    drawArcs(section, model, outboundLayout, authRatingsByKey);
 }
 
 
@@ -579,8 +579,8 @@ function drawCenterBox(section, dimensions, name = "") {
 function update(sections,
                 model,
                 tweakers,
-                authRatingColor) {
-    redraw = () => update(sections, model, tweakers, authRatingColor);
+                authRatingsByKey) {
+    redraw = () => update(sections, model, tweakers, authRatingsByKey);
 
     const dimensions = calculateDimensions(model);
 
@@ -597,8 +597,8 @@ function update(sections,
     drawTypeBoxes(sections.types, model, scales.type, dimensions.label, tweakers.typeBlock);
     drawLabels(sections.types, model.types, scales.type, "middle", tweakers.type);
 
-    drawInbound(sections.inbound, model.sourceToType, scales, dimensions, authRatingColor);
-    drawOutbound(sections.outbound, model.typeToTarget, scales, dimensions, authRatingColor);
+    drawInbound(sections.inbound, model.sourceToType, scales, dimensions, authRatingsByKey);
+    drawOutbound(sections.outbound, model.typeToTarget, scales, dimensions, authRatingsByKey);
 }
 
 
@@ -637,7 +637,7 @@ function controller($element, $window, serviceBroker) {
                     allTypes: types
                 };
                 const model = mkModel(data);
-                update(svgSections, model, tweakers, vm.authRatingColors);
+                update(svgSections, model, tweakers, vm.authRatingsByKey);
             });
     };
 

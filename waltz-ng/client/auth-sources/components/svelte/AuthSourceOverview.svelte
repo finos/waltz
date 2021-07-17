@@ -56,10 +56,11 @@
                 </span>
             </div>
 
-            <div class="col-sm-6">
-                <p class="help-block">
-                    {rating?.description}
-                </p>
+            <div class="col-sm-2 waltz-display-field-label">
+                Rating Description:
+            </div>
+            <div class="col-sm-4">
+                {rating?.description || "-"}
             </div>
         </div>
 
@@ -80,10 +81,11 @@
                 <EntityLink ref={datatype}/>
             </div>
 
-            <div class="col-sm-6">
-                <p class="help-block">
-                    {datatype.description}
-                </p>
+            <div class="col-sm-2 waltz-display-field-label">
+                Datatype Description:
+            </div>
+            <div class="col-sm-4">
+                    {datatype.description || "-"}
             </div>
         </div>
 
