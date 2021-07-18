@@ -7,6 +7,7 @@
     import {createEventDispatcher} from "svelte";
     import RelatedEntityAddNodesPanel from "./RelatedEntityAddNodesPanel.svelte";
     import RelatedEntityAddFlowsPanel from "./RelatedEntityAddFlowsPanel.svelte";
+    import EntityLabel from "../../../../common/svelte/EntityLabel.svelte";
 
     export let diagramId;
     export let canEdit;
@@ -14,9 +15,7 @@
     export let changeInitiatives;
     export let datatypes;
 
-    let selectedKind;
-
-    let dispatch = createEventDispatcher();
+    const dispatch = createEventDispatcher();
 
     const Modes = {
         OVERVIEW: "OVERVIEW",
@@ -26,11 +25,13 @@
 
     let activeMode = Modes.OVERVIEW
     let selectedEntity = null;
+    let activeGroup;
 
     function removeEntity(evt) {
         const entity = evt.detail
         flowDiagramEntityStore.removeRelationship(diagramId, entity.data);
         model.removeRelationship(entity);
+        selectedEntity = null;
     }
 
     function addEntity(kind) {
@@ -53,159 +54,136 @@
         }
     }
 
-    function selectKind(kind) {
-        if(selectedKind === kind){
-            selectedKind = null;
-        } else {
-            selectedKind = kind;
+    $: groups = [
+        {
+            name: "Viewpoints",
+            items: measurables,
+            kind: "MEASURABLE"
+        }, {
+            name: "Change Initiatives",
+            items: changeInitiatives,
+            kind: "CHANGE_INITIATIVE"
+        }, {
+            name: "Data Types",
+            items: datatypes,
+            kind: "DATA_TYPE"
         }
-    }
+    ];
+
+    $: breadcrumbs = _.compact([
+        {name: "Relationships", active: ! activeGroup, onClick: () => { activeGroup = null; selectedEntity = null;}},
+        activeGroup
+            ? {name: activeGroup.name, active: ! selectedEntity, onClick: () => selectedEntity = null}
+            : null,
+        selectedEntity
+            ? {name: selectedEntity.data.name, active: true}
+            : null,
+    ]);
 
 </script>
 
-{#if activeMode === Modes.OVERVIEW}
-
 <div class="help-block">
     Related entities can be used to link this diagram to other pages in waltz.
-    They can also be used to quickly generate diagrams or populate overlay groups.
+    They can also be used to quickly add associated nodes and flows to diagrams or populate overlay groups.
 </div>
 
-<table class="table table-condensed">
-    <thead><th></th></thead>
-    <tbody>
-        <tr class="clickable" on:click={() => selectKind("MEASURABLE")}>
-            <td>
-                <Icon name={selectedKind === 'MEASURABLE' ? "caret-down" : "caret-right"}/>
-                Viewpoints - ({_.size(measurables)})
-                {#if canEdit}
-                    <button class="btn btn-skinny"
-                            on:click={() => addEntity("MEASURABLE")}>
-                        <Icon name="plus"/>Add
-                    </button>
-                {/if}
-            </td>
-        </tr>
-        {#if selectedKind === 'MEASURABLE'}
-            <tr>
-                <div class:waltz-scroll-region-250={_.size(measurables) > 8}>
-                    <table class="table table-condensed small table-hover entity-inner-table">
-                        <tbody>
-                        {#if _.isEmpty(measurables)}
-                            <tr>
-                                <td>No associated viewpoints</td>
-                            </tr>
-                        {:else}
-                            {#each measurables as measurable}
-                                <tr on:click={() => selectEntity(measurable)}
-                                    class="clickable">
-                                    <td>
-                                        <Icon name="puzzle-piece"/>{measurable.data.name}
-                                        <span class="small text-muted">
-                                        {_.get(measurable.category, "name", "unknown")}
-                                    </span>
-                                    </td>
-                                </tr>
-                            {/each}
-                        {/if}
-                        </tbody>
-                    </table>
-                </div>
-            </tr>
+<ol class="breadcrumb">
+    {#each breadcrumbs as crumb}
+        {#if crumb.active}
+            <li class="active">{crumb.name}</li>
+        {:else}
+            <li>
+                <a class="clickable"
+                   on:click={crumb.onClick}>
+                    {crumb.name}
+                </a>
+            </li>
         {/if}
-        <tr class="clickable" on:click={() => selectKind('CHANGE_INITIATIVE')}>
-            <td>
-                <Icon name={selectedKind === 'CHANGE_INITIATIVE' ? "caret-down" : "caret-right"}/>
-                Change Initiatives - ({_.size(changeInitiatives)})
-                {#if canEdit}
-                    <button class="btn btn-skinny"
-                            on:click={() => addEntity("CHANGE_INITIATIVE")}>
-                        <Icon name="plus"/>Add
+    {/each}
+</ol>
+
+{#if !activeGroup}
+    <ul class="list-unstyled"
+        style="padding-left: 1em;">
+        {#each groups as group}
+        <li>
+            <button class="btn-skinny"
+                    on:click={() => activeGroup = group}>
+                {group.name}
+                <span class={_.isEmpty(group.items)
+                        ? 'list-size-badge empty-list-badge'
+                        : 'list-size-badge non-empty-list-badge'}>
+                    {_.size(group.items)}
+                </span>
+            </button>
+        </li>
+        {/each}
+    </ul>
+{/if}
+
+{#if activeGroup && ! selectedEntity}
+    <div class:waltz-scroll-region-250={_.size(activeGroup.items) > 8}>
+        <ul class="list-unstyled">
+            {#each activeGroup.items as item}
+                <li>
+                    <button class="btn-skinny"
+                            on:click={() => selectEntity(item)}>
+                        <Icon name="fw"/>
+                        <EntityLabel ref={item.data}/>
                     </button>
-                {/if}
-            </td>
-        </tr>
-        {#if selectedKind === 'CHANGE_INITIATIVE'}
-            <tr>
-                <div class:waltz-scroll-region-250={_.size(changeInitiatives) > 8}>
-                    <table class="table table-condensed small table-hover entity-inner-table">
-                        <tbody>
-                            {#if _.isEmpty(changeInitiatives)}
-                                <tr>
-                                    <td>No associated change initiatives</td>
-                                </tr>
-                            {:else}
-                            {#each changeInitiatives as changeInitiative}
-                                <tr on:click={() => selectEntity(changeInitiative)}
-                                    class="clickable">
-                                    <td>
-                                        <Icon name="paper-plane-o"/>{changeInitiative.data.name}
-                                    </td>
-                                </tr>
-                            {/each}
-                            {/if}
-                        </tbody>
-                    </table>
-                </div>
-            </tr>
-        {/if}
-        <tr class="clickable" on:click={() => selectKind('DATA_TYPE')}>
-            <td>
-                <Icon name={selectedKind === 'DATA_TYPE' ? "caret-down" : "caret-right"}/>
-                Data Types - ({_.size(datatypes)})
-                {#if canEdit}
+                </li>
+            {:else}
+                <li>
+                    <Icon name="fw" />
+                    No associated {activeGroup.name}s
+                </li>
+            {/each}
+            {#if canEdit}
+                <li>
+                    <Icon name="fw"/>
                     <button class="btn btn-skinny"
-                            on:click={() => addEntity("DATA_TYPE")}>
-                        <Icon name="plus"/>Add
+                            on:click={() => addEntity(activeGroup.kind)}>
+                        <Icon name="plus"/>
+                        Add
                     </button>
-                {/if}
-            </td>
-        </tr>
-        {#if selectedKind === 'DATA_TYPE'}
-            <tr>
-                <div class:waltz-scroll-region-250={_.size(datatypes) > 8}>
-                    <table class="table table-condensed small table-hover entity-inner-table">
-                        <tbody>
-                            {#if _.isEmpty(datatypes)}
-                                <tr>
-                                    <td>No associated datatypes</td>
-                                </tr>
-                            {:else}
-                            {#each datatypes as datatype}
-                                <tr on:click={() => selectEntity(datatype)}
-                                    class="clickable">
-                                    <td>
-                                        <Icon name="qrcode"/>{datatype.data.name}
-                                    </td>
-                                </tr>
-                            {/each}
-                            {/if}
-                        </tbody>
-                    </table>
-                </div>
-            </tr>
+                </li>
+            {/if}
+        </ul>
+    </div>
+{/if}
+
+{#if selectedEntity}
+    <div style="padding-left: 1em;">
+        {#if activeMode === Modes.RELATED_ENTITY_ADD_NODES}
+        <RelatedEntityAddNodesPanel entity={selectedEntity}
+                                    {canEdit}
+                                    on:remove={removeEntity}/>
+        {:else if activeMode === Modes.RELATED_ENTITY_ADD_FLOWS}
+        <RelatedEntityAddFlowsPanel entity={selectedEntity}
+                                    {canEdit}
+                                    on:remove={removeEntity}/>
         {/if}
-    </tbody>
-</table>
-{:else if activeMode === Modes.RELATED_ENTITY_ADD_NODES}
-    <RelatedEntityAddNodesPanel entity={selectedEntity}
-                                {canEdit}
-                                on:cancel={() => activeMode = Modes.OVERVIEW}
-                                on:remove={removeEntity}/>
-{:else if activeMode === Modes.RELATED_ENTITY_ADD_FLOWS}
-    <RelatedEntityAddFlowsPanel entity={selectedEntity}
-                                {canEdit}
-                                on:cancel={() => activeMode = Modes.OVERVIEW}
-                                on:remove={removeEntity}/>
+    </div>
 {/if}
 
 
 <style>
-    .entity-inner-table{
-        margin-bottom: 0;
-        border-bottom: solid #ccc 1px;
-        border-top: none;
-        margin-top: 0;
-        padding-top: 0;
+    .breadcrumb {
+        margin-bottom: 0.4em;
+    }
+
+    .list-size-badge {
+        padding-left: 0.4em;
+        padding-right: 0.4em;
+        border-radius: 2px;
+    }
+
+    .empty-list-badge {
+        background-color: #e8e3e3;
+    }
+
+    .non-empty-list-badge {
+        background-color: #d1e5d1;
     }
 </style>
 
