@@ -139,7 +139,7 @@
                 </li>
             {/each}
             {#if canEdit}
-                <li>
+                <li style="border-top: 1px dotted #eee; padding-top: 0.2em; margin-top: 0.2em">
                     <Icon name="fw"/>
                     <button class="btn btn-skinny"
                             on:click={() => addEntity(activeGroup.kind)}>

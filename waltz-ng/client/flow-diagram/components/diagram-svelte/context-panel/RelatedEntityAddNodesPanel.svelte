@@ -22,6 +22,7 @@
     const Modes = {
         VIEW: "VIEW",
         CONFIRM_ADD_APPS: "CONFIRM_ADD_APPS",
+        CONFIRM_REMOVE: "CONFIRM_REMOVE",
         ADD_TO_OVERLAY_GROUP: "ADD_TO_OVERLAY_GROUP"
     };
 
@@ -49,6 +50,10 @@
         .value();
 
     function remove() {
+        activeMode = Modes.CONFIRM_REMOVE;
+    }
+
+    function doRemove() {
         dispatch("remove", entity);
     }
 
@@ -90,8 +95,6 @@
         overlay.addOverlay(overlayToAdd);
         activeMode = Modes.VIEW;
     }
-
-
 </script>
 
 <p class="help-block">External Id: {entityData.externalId || "-"}</p>
@@ -102,21 +105,21 @@
         <ul>
             <li>
                 <button class="btn btn-skinny"
-                        on:click={() => addRelatedApplications()}>
-                    <Icon name="plus"/>
+                        on:click={addRelatedApplications}>
+                    <Icon name="desktop"/>
                     Add related applications
                 </button>
             </li>
             {#if entity.data.kind === 'MEASURABLE'}
             <li>
                 <button class="btn btn-skinny"
-                        on:click={() => addToOverlayGroup()}>
-                    <Icon name="plus"/>
+                        on:click={addToOverlayGroup}>
+                    <Icon name="star-o"/>
                     Add to an overlay group
                 </button>
             </li>
             {/if}
-            <li>
+            <li style="border-top: 1px dotted #eee; padding-top: 0.2em; margin-top: 0.2em;">
                 <button class="btn btn-skinny"
                         on:click={remove}>
                     <Icon name="trash"/>
@@ -125,6 +128,18 @@
             </li>
         </ul>
     {/if}
+{:else if activeMode === Modes.CONFIRM_REMOVE}
+    <div>
+        Sure you want to remove this related entity ?
+    </div>
+    <button class="btn btn-danger"
+            on:click={doRemove}>
+        OK
+    </button>
+    <button class="btn btn-default"
+            on:click={() => activeMode = Modes.VIEW}>
+        Cancel
+    </button>
 {:else if activeMode === Modes.CONFIRM_ADD_APPS}
     <div>Are you sure you want to add {_.size(toAdd)} new nodes?</div>
     {#if _.size(toAdd) > 100}
