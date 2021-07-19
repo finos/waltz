@@ -1,18 +1,12 @@
 <script>
     import {createEventDispatcher} from "svelte";
-    import EntityLink from "../../../../common/svelte/EntityLink.svelte";
     import Icon from "../../../../common/svelte/Icon.svelte";
-    import {measurableStore} from "../../../../svelte-stores/measurables";
-    import {applicationStore} from "../../../../svelte-stores/application-store";
     import {mkSelectionOptions} from "../../../../common/selector-utils";
     import model from "../store/model";
-    import {toGraphFlow, toGraphNode} from "../../../flow-diagram-utils";
+    import {toGraphFlow} from "../../../flow-diagram-utils";
     import _ from "lodash";
-    import {positions} from "../store/layout";
-    import {changeInitiativeStore} from "../../../../svelte-stores/change-initiative-store";
     import {dataTypeStore} from "../../../../svelte-stores/data-type-store";
     import {logicalFlowStore} from "../../../../svelte-stores/logical-flow-store";
-    import {mkRef} from "../../../../common/entity-utils";
 
 
     export let entity;
@@ -72,21 +66,13 @@
         toAdd.forEach(n => model.addFlow(n));
         cancel();
     }
-
-
-
 </script>
 
-<div>
-    <strong>
-        <EntityLink ref={entity.data}/>
-    </strong>
-    <span class="text-muted small">( {entityData.code} )</span>
-</div>
+
+<p class="help-block">External Id: {entityData.code}</p>
+<p class="help-block">{entityData.description}</p>
+
 {#if activeMode === Modes.VIEW}
-    <div class="help-block">
-        {entityData.description}
-    </div>
     {#if canEdit}
         <ul>
             <li>
@@ -105,13 +91,7 @@
             </li>
         </ul>
     {/if}
-    <div class="context-panel-footer">
-        <button class="btn btn-skinny"
-                on:click={cancel}>
-            <Icon name="fw"/>
-            Cancel
-        </button>
-    </div>
+
     {:else if activeMode = Modes.CONFIRM_ADD}
     <div>Are you sure you want to add {_.size(toAdd)} new flows?</div>
     {#if _.size(toAdd) > 100}
