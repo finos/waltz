@@ -1,9 +1,6 @@
 <script>
     import Icon from "../../../../common/svelte/Icon.svelte";
-    import {flowDiagramEntityStore} from "../../../../svelte-stores/flow-diagram-entity-store";
     import _ from "lodash";
-    import model from "../store/model";
-    import {changeInitiative} from "../../../../common/services/enums/change-initiative";
     import {createEventDispatcher} from "svelte";
     import RelatedEntityAddNodesPanel from "./RelatedEntityAddNodesPanel.svelte";
     import RelatedEntityAddFlowsPanel from "./RelatedEntityAddFlowsPanel.svelte";
@@ -28,9 +25,7 @@
     let activeGroup;
 
     function removeEntity(evt) {
-        const entity = evt.detail
-        flowDiagramEntityStore.removeRelationship(diagramId, entity.data);
-        model.removeRelationship(entity);
+        dispatch("removeEntity", evt.detail);
         selectedEntity = null;
     }
 
@@ -57,16 +52,16 @@
     $: groups = [
         {
             name: "Viewpoints",
-            items: measurables,
-            kind: "MEASURABLE"
+            kind: "MEASURABLE",
+            getItems: () => measurables
         }, {
             name: "Change Initiatives",
-            items: changeInitiatives,
-            kind: "CHANGE_INITIATIVE"
+            kind: "CHANGE_INITIATIVE",
+            getItems: () => changeInitiatives
         }, {
             name: "Data Types",
-            items: datatypes,
-            kind: "DATA_TYPE"
+            kind: "DATA_TYPE",
+            getItems: () => datatypes
         }
     ];
 
@@ -110,10 +105,10 @@
             <button class="btn-skinny"
                     on:click={() => activeGroup = group}>
                 {group.name}
-                <span class={_.isEmpty(group.items)
+                <span class={_.isEmpty(group.getItems())
                         ? 'list-size-badge empty-list-badge'
                         : 'list-size-badge non-empty-list-badge'}>
-                    {_.size(group.items)}
+                    {_.size(group.getItems())}
                 </span>
             </button>
         </li>
@@ -122,9 +117,9 @@
 {/if}
 
 {#if activeGroup && ! selectedEntity}
-    <div class:waltz-scroll-region-250={_.size(activeGroup.items) > 8}>
+    <div class:waltz-scroll-region-250={_.size(activeGroup.getItems()) > 8}>
         <ul class="list-unstyled">
-            {#each activeGroup.items as item}
+            {#each activeGroup.getItems() as item}
                 <li>
                     <button class="btn-skinny"
                             on:click={() => selectEntity(item)}>
