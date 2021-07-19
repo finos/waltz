@@ -141,9 +141,4 @@
         padding-top: 0;
     }
 
-    .context-panel-footer {
-        border-top: 1px solid #eee;
-        margin-top:0.5em;
-        padding-top:0.5em;
-    }
 </style>
