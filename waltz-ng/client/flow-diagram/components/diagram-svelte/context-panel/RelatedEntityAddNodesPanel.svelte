@@ -165,20 +165,20 @@
         You have no associated groups. Select the 'Overlays' tab to add one.
     {:else }
         <div>Add to one of the overlay groups below:</div>
-        {#each overlayGroups as group}
-            <table class="table table-condensed">
-                <tbody>
-                    <tr>
-                        <td>{group.name}</td>
-                        <td><button class="btn btn-skinny"
-                                    on:click={() => saveToGroup(group)}>
-                                <Icon name="plus"/>Add
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        {/each}
+        <table class="table table-condensed">
+            {#each overlayGroups as group}
+                <tr>
+                    <td>{group.name}</td>
+                    <td>
+                        <button class="btn btn-skinny"
+                                on:click={() => saveToGroup(group)}>
+                            <Icon name="plus"/>
+                            Add
+                        </button>
+                    </td>
+                </tr>
+            {/each}
+        </table>
     {/if}
 {/if}
 
@@ -191,11 +191,5 @@
 
     li {
         padding-top: 0;
-    }
-
-    .context-panel-footer {
-        border-top: 1px solid #eee;
-        margin-top:0.5em;
-        padding-top:0.5em;
     }
 </style>

@@ -64,7 +64,8 @@
         .map(n => n.data.id)
         .value();
 
-    $: nodeIds = _.chain($model.nodes)
+    $: nodeIds = _
+        .chain($model.nodes)
         .filter(n => n.data.kind === 'APPLICATION')
         .map(n => n.data.id)
         .value();
