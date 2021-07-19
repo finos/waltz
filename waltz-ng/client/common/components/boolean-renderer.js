@@ -17,26 +17,28 @@
  */
 import {initialiseData} from "../../common";
 import {stringToBoolean} from "../string-utils";
+import template from "./boolean-renderer.html";
 
 
 const bindings = {
     value: "<",
     muteFalse: "<?",
     muteTrue: "<?",
-    muteNull: "<?"
+    muteNull: "<?",
+    trueLabel: "<?",
+    falseLabel: "<?",
+    nullLabel: "<?",
 };
-
-
-const template = `<waltz-icon ng-if="$ctrl.booleanValue === true"  ng-style="{opacity: $ctrl.muteTrue ? 0.4 : 1}" name="check" class="text-success"></waltz-icon>
-                  <waltz-icon ng-if="$ctrl.booleanValue === false" ng-style="{opacity: $ctrl.muteFalse ? 0.4 : 1}" name="times" class="text-danger"></waltz-icon>
-                  <span ng-if="$ctrl.booleanValue == null" ng-style="{opacity: $ctrl.muteNull ? 0.4 : 1}" class="text-muted">-</span>`;
 
 
 const initialState = {
     booleanValue: null,
     muteFalse: false,
     muteTrue: false,
-    muteNull: false
+    muteNull: false,
+    trueLabel: "Yes",
+    falseLabel: "No",
+    nullLabel: "Not provided",
 };
 
 

@@ -1,0 +1,23 @@
+<span ng-if="$ctrl.booleanValue === true"
+      ng-style="{opacity: $ctrl.muteTrue ? 0.4 : 1}">
+    <waltz-icon name="check"
+                class="text-success">
+    </waltz-icon>
+    <span ng-bind="$ctrl.trueLabel"></span>
+</span>
+
+<span ng-if="$ctrl.booleanValue === false"
+      ng-style="{opacity: $ctrl.muteFalse ? 0.4 : 1}">
+    <waltz-icon name="times"
+                class="text-danger">
+    </waltz-icon>
+    <span ng-bind="$ctrl.falseLabel"></span>
+</span>
+
+<span ng-if="$ctrl.booleanValue == null"
+      ng-style="{opacity: $ctrl.muteNull ? 0.4 : 1}">
+    <waltz-icon name="circle-thin"
+                class="text-muted">
+    </waltz-icon>
+    <span ng-bind="$ctrl.nullLabel"></span>
+</span>
