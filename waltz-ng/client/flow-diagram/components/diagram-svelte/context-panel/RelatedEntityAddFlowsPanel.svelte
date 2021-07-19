@@ -80,7 +80,7 @@
         <ul>
             <li>
                 <button class="btn btn-skinny"
-                        on:click={() => addRelatedFlows()}>
+                        on:click={addRelatedFlows}>
                     <Icon name="random"/>
                     Add related flows
                 </button>
