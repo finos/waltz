@@ -9,18 +9,18 @@
     import OverlayGlyph from "./OverlayGlyph.svelte";
     import EditOverlayIconSubPanel from "./EditOverlayIconSubPanel.svelte";
     import CreateNewOverlayGroupPanel from "./CreateNewOverlayGroupPanel.svelte";
-    import CloneOverlayGroupSubPanel from "./CloneOverlayGroupSubPanel.svelte";
     import EntityLabel from "../../../../common/svelte/EntityLabel.svelte";
+    import ImportOverlayGroupSubPanel from "./ImportOverlayGroupSubPanel.svelte";
 
     const Modes = {
         LIST_GROUPS: "LIST_GROUPS",
         SHOW_GROUP: "SHOW_GROUP",
         SHOW_ENTRY: "SHOW_ENTRY",
         ADD_GROUP: "ADD_GROUP",
-        CLONE_GROUP: "CLONE_GROUP",
         ADD_OVERLAY_ENTRY: "ADD_OVERLAY_ENTRY",
         EDIT_OVERLAY: "EDIT_OVERLAY",
-        CONFIRM_REMOVE_GROUP: "CONFIRM_REMOVE_GROUP"
+        CONFIRM_REMOVE_GROUP: "CONFIRM_REMOVE_GROUP",
+        IMPORT_ENTRIES: "IMPORT_ENTRIES"
     };
 
     const dispatch = createEventDispatcher();
@@ -88,7 +88,7 @@
         }));
 
     $: {
-        breadcrumbs =_
+        breadcrumbs = _
             .chain([
                 {name: "Groups", onClick: showGroupList},
                 $overlay.selectedGroup
@@ -146,13 +146,6 @@
                     Add new overlay group
                 </button>
             </li>
-            <li>
-                <button class="btn-skinny"
-                        on:click={() => activeMode = Modes.CLONE_GROUP}>
-                    <Icon name="clone"/>
-                    Clone existing overlay group
-                </button>
-            </li>
         </ul>
     {/if}
 
@@ -160,12 +153,6 @@
         <h4>Create Group:</h4>
         <CreateNewOverlayGroupPanel {diagramId}
                                     on:cancel={() => activeMode = Modes.LIST_GROUPS}/>
-    {/if}
-
-    {#if activeMode === Modes.CLONE_GROUP}
-        <h4>Clone Group from:</h4>
-        <CloneOverlayGroupSubPanel {diagramId}
-                                   on:cancel={() => activeMode = Modes.LIST_GROUPS}/>
     {/if}
 
     {#if activeMode === Modes.SHOW_GROUP}
@@ -199,6 +186,13 @@
                 </li>
                 <li>
                     <button class="btn btn-skinny"
+                            on:click={() => activeMode = Modes.IMPORT_ENTRIES}>
+                        <Icon name="clone"/>
+                        Import entries from another diagram
+                    </button>
+                </li>
+                <li>
+                    <button class="btn btn-skinny"
                             on:click={() => activeMode = Modes.CONFIRM_REMOVE_GROUP}>
                         <Icon name="trash"/>
                         Remove Group
@@ -206,6 +200,10 @@
                 </li>
             {/if}
         </ul>
+    {/if}
+
+    {#if activeMode === Modes.IMPORT_ENTRIES}
+        <ImportOverlayGroupSubPanel on:cancel={() => activeMode = Modes.SHOW_GROUP}/>
     {/if}
 
     {#if activeMode === Modes.CONFIRM_REMOVE_GROUP}

@@ -5,7 +5,7 @@ import dirty from "./dirty";
 
 
 const initialState = {
-    groupOverlays: {}, //overlays grouped by overlayGroupId
+    groupOverlays: {}, //overlays grouped by overlayGroupId ---- these are the overlayEntriesKeyedByGroupId
     appliedOverlay: null,
     selectedGroup: null
 };
