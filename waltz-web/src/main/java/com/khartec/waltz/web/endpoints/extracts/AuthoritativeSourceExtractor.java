@@ -19,6 +19,7 @@ import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
 import static spark.Spark.post;
+import static spark.Spark.get;
 
 @Service
 public class AuthoritativeSourceExtractor extends DirectQueryBasedDataExtractor{
@@ -59,6 +60,11 @@ public class AuthoritativeSourceExtractor extends DirectQueryBasedDataExtractor{
             LOG.debug("extracted authoritative sources for entity ref {}", idSelectionOptions.entityReference());
             return writeExtract(fileName, qry, request, response);
         });
+
+        get(mkPath("data-extract", "authoritative-source", "all"), (request, response) -> {
+            SelectHavingStep <Record> qry = prepareExtractQuery(DSL.trueCondition());
+            return writeExtract("authoritative-sources", qry, request, response);
+        });
     }
 
 
@@ -70,13 +76,14 @@ public class AuthoritativeSourceExtractor extends DirectQueryBasedDataExtractor{
                 .select(AUTHORITATIVE_SOURCE.RATING.as("Rating Code"))
                 .select(ENUM_VALUE.DISPLAY_NAME.as("Rating Name"))
                 .select(AUTHORITATIVE_SOURCE.PARENT_KIND.as("Scope Entity Kind"))
-                .select(DSL.coalesce(ORGANISATIONAL_UNIT.NAME, APPLICATION.NAME).as("Scope Entity Name"))
+                .select(DSL.coalesce(ORGANISATIONAL_UNIT.NAME, APPLICATION.NAME, ACTOR.NAME).as("Scope Entity Name"))
                 .from(AUTHORITATIVE_SOURCE)
                 .innerJoin(SUPPLIER_APP).on(SUPPLIER_APP.ID.eq(AUTHORITATIVE_SOURCE.APPLICATION_ID))
                 .innerJoin(DATA_TYPE).on(DATA_TYPE.CODE.eq(AUTHORITATIVE_SOURCE.DATA_TYPE))
                 .innerJoin(ENUM_VALUE).on(ENUM_VALUE.TYPE.eq("AuthoritativenessRating")).and(ENUM_VALUE.KEY.eq(AUTHORITATIVE_SOURCE.RATING))
                 .leftJoin(ORGANISATIONAL_UNIT).on(ORGANISATIONAL_UNIT.ID.eq(AUTHORITATIVE_SOURCE.PARENT_ID)).and(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(EntityKind.ORG_UNIT.name()))
                 .leftJoin(APPLICATION).on(APPLICATION.ID.eq(AUTHORITATIVE_SOURCE.PARENT_ID)).and(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(EntityKind.APPLICATION.name()))
+                .leftJoin(ACTOR).on(ACTOR.ID.eq(AUTHORITATIVE_SOURCE.PARENT_ID)).and(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(EntityKind.ACTOR.name()))
                 .where(condition);
     }
 
