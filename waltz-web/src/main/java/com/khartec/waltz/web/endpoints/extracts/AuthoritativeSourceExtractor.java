@@ -72,11 +72,16 @@ public class AuthoritativeSourceExtractor extends DirectQueryBasedDataExtractor{
 
         return dsl
                 .select(SUPPLIER_APP.ID.as("Application Id"), SUPPLIER_APP.ASSET_CODE.as("Asset Code"), SUPPLIER_APP.NAME.as("Application Name"))
-                .select(DATA_TYPE.NAME.as("Data Type"))
+                .select(DATA_TYPE.NAME.as("Data Type"), DATA_TYPE.CODE.as("Data Type Code"))
                 .select(AUTHORITATIVE_SOURCE.RATING.as("Rating Code"))
                 .select(ENUM_VALUE.DISPLAY_NAME.as("Rating Name"))
                 .select(AUTHORITATIVE_SOURCE.PARENT_KIND.as("Scope Entity Kind"))
                 .select(DSL.coalesce(ORGANISATIONAL_UNIT.NAME, APPLICATION.NAME, ACTOR.NAME).as("Scope Entity Name"))
+                .select(DSL.coalesce(ORGANISATIONAL_UNIT.EXTERNAL_ID, APPLICATION.ASSET_CODE, ACTOR.EXTERNAL_ID).as("Scope Entity External Id"))
+                .select(AUTHORITATIVE_SOURCE.EXTERNAL_ID.as("Statement External Id"),
+                        AUTHORITATIVE_SOURCE.LAST_UPDATED_AT.as("Statement Last Updated At"),
+                        AUTHORITATIVE_SOURCE.LAST_UPDATED_BY.as("Statement Last Updated By"),
+                        AUTHORITATIVE_SOURCE.PROVENANCE.as("Statement Provenance"))
                 .from(AUTHORITATIVE_SOURCE)
                 .innerJoin(SUPPLIER_APP).on(SUPPLIER_APP.ID.eq(AUTHORITATIVE_SOURCE.APPLICATION_ID))
                 .innerJoin(DATA_TYPE).on(DATA_TYPE.CODE.eq(AUTHORITATIVE_SOURCE.DATA_TYPE))
