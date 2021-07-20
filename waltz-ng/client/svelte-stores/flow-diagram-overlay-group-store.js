@@ -23,16 +23,21 @@ export function mkFlowDiagramOverlayGroupStore() {
     const findByDiagramId = (id, force = false) => {
         return remote
             .fetchViewData(
-                "GET", 
+                "GET",
                 `api/flow-diagram-overlay-group/diagram-id/${id}`,
                 null,
-                [], 
+                [],
                 {force});
     };
 
     const findOverlaysByDiagramId = (id) => {
         return remote
-            .fetchViewData("GET", `api/flow-diagram-overlay-group/overlays/diagram-id/${id}`);
+            .fetchViewData(
+                "GET",
+                `api/flow-diagram-overlay-group/overlays/diagram-id/${id}`,
+                null,
+                [],
+                {force: true});
     };
 
     const createGroup = (group) => {

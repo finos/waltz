@@ -1,61 +1,35 @@
 <script>
     import {createEventDispatcher} from "svelte";
-    import EntityLink from "../../../../common/svelte/EntityLink.svelte";
     import Icon from "../../../../common/svelte/Icon.svelte";
-    import {measurableStore} from "../../../../svelte-stores/measurables";
-    import {applicationStore} from "../../../../svelte-stores/application-store";
     import {mkSelectionOptions} from "../../../../common/selector-utils";
     import model from "../store/model";
-    import {toGraphFlow, toGraphNode} from "../../../flow-diagram-utils";
+    import {toGraphFlow} from "../../../flow-diagram-utils";
     import _ from "lodash";
-    import {positions} from "../store/layout";
-    import {changeInitiativeStore} from "../../../../svelte-stores/change-initiative-store";
     import {dataTypeStore} from "../../../../svelte-stores/data-type-store";
     import {logicalFlowStore} from "../../../../svelte-stores/logical-flow-store";
-    import {mkRef} from "../../../../common/entity-utils";
-
 
     export let entity;
     export let canEdit;
     const dispatch = createEventDispatcher();
 
-
-    $: entityCall = dataTypeStore.getById(entity.data.id);
-    $: entityData = $entityCall.data;
-
     const Modes = {
         VIEW: "VIEW",
-        CONFIRM_ADD: "CONFIRM_ADD"
+        CONFIRM_ADD: "CONFIRM_ADD",
+        CONFIRM_REMOVE: "CONFIRM_REMOVE"
     };
-
-    let activeMode = Modes.VIEW;
 
     function cancel() {
         dispatch("cancel");
     }
 
     function remove() {
+        activeMode = Modes.CONFIRM_REMOVE;
+    }
+
+    function doRemove() {
         dispatch("remove", entity);
         cancel();
     }
-
-    $: opts = mkSelectionOptions(entity.data);
-
-    $: flowsCall = opts && logicalFlowStore.findBySelector(opts);
-    $: relatedFlows = $flowsCall.data;
-
-    $: existingFlowIds = _
-        .chain($model.flows)
-        .filter(n => n.data.kind === 'LOGICAL_DATA_FLOW')
-        .map(n => n.data.id)
-        .value();
-
-    $: nodeIds = _.chain($model.nodes)
-        .filter(n => n.data.kind === 'APPLICATION')
-        .map(n => n.data.id)
-        .value();
-
-    let toAdd = [];
 
     function addRelatedFlows(){
         toAdd = _
@@ -73,30 +47,45 @@
         cancel();
     }
 
+    let toAdd = [];
+    let activeMode = Modes.VIEW;
 
+    $: entityCall = dataTypeStore.getById(entity.data.id);
+    $: entityData = $entityCall.data;
 
+    $: opts = mkSelectionOptions(entity.data);
+
+    $: flowsCall = opts && logicalFlowStore.findBySelector(opts);
+    $: relatedFlows = $flowsCall.data;
+
+    $: existingFlowIds = _
+        .chain($model.flows)
+        .filter(n => n.data.kind === 'LOGICAL_DATA_FLOW')
+        .map(n => n.data.id)
+        .value();
+
+    $: nodeIds = _
+        .chain($model.nodes)
+        .filter(n => n.data.kind === 'APPLICATION')
+        .map(n => n.data.id)
+        .value();
 </script>
 
-<div>
-    <strong>
-        <EntityLink ref={entity.data}/>
-    </strong>
-    <span class="text-muted small">( {entityData.code} )</span>
-</div>
+
+<p class="help-block">External Id: {entityData.code}</p>
+<p class="help-block">{entityData.description}</p>
+
 {#if activeMode === Modes.VIEW}
-    <div class="help-block">
-        {entityData.description}
-    </div>
     {#if canEdit}
         <ul>
             <li>
                 <button class="btn btn-skinny"
-                        on:click={() => addRelatedFlows()}>
-                    <Icon name="plus"/>
+                        on:click={addRelatedFlows}>
+                    <Icon name="random"/>
                     Add related flows
                 </button>
             </li>
-            <li>
+            <li style="border-top: 1px dotted #eee; padding-top: 0.2em; margin-top: 0.2em;">
                 <button class="btn btn-skinny"
                         on:click={remove}>
                     <Icon name="trash"/>
@@ -105,15 +94,22 @@
             </li>
         </ul>
     {/if}
-    <div class="context-panel-footer">
-        <button class="btn btn-skinny"
-                on:click={cancel}>
-            <Icon name="fw"/>
-            Cancel
-        </button>
+{:else if activeMode === Modes.CONFIRM_REMOVE}
+    <div>
+        Sure you want to remove this datatype ?
     </div>
-    {:else if activeMode = Modes.CONFIRM_ADD}
-    <div>Are you sure you want to add {_.size(toAdd)} new flows?</div>
+    <button class="btn btn-danger"
+            on:click={doRemove}>
+        OK
+    </button>
+    <button class="btn btn-default"
+            on:click={() => activeMode = Modes.VIEW}>
+        Cancel
+    </button>
+{:else if activeMode = Modes.CONFIRM_ADD}
+    <div>
+        Are you sure you want to add {_.size(toAdd)} new flows ?
+    </div>
     {#if _.size(toAdd) > 100}
         <div class="alert alert-warning">
             <Icon name="warning"/>
@@ -145,9 +141,4 @@
         padding-top: 0;
     }
 
-    .context-panel-footer {
-        border-top: 1px solid #eee;
-        margin-top:0.5em;
-        padding-top:0.5em;
-    }
 </style>

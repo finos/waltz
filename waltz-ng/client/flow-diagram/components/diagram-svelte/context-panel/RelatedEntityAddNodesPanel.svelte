@@ -22,6 +22,7 @@
     const Modes = {
         VIEW: "VIEW",
         CONFIRM_ADD_APPS: "CONFIRM_ADD_APPS",
+        CONFIRM_REMOVE: "CONFIRM_REMOVE",
         ADD_TO_OVERLAY_GROUP: "ADD_TO_OVERLAY_GROUP"
     };
 
@@ -48,13 +49,12 @@
         .map(n => n.data.id)
         .value();
 
-    function cancel() {
-        dispatch("cancel");
+    function remove() {
+        activeMode = Modes.CONFIRM_REMOVE;
     }
 
-    function remove() {
+    function doRemove() {
         dispatch("remove", entity);
-        cancel();
     }
 
     function addRelatedApplications(){
@@ -72,11 +72,11 @@
             model.addNode(n)
             positions.move({
                 id: n.id,
-                dx: _.random(-80, 80),
-                dy: _.random(50, 80)
+                dx: _.random(-20, 160),
+                dy: _.random(50, 120)
             });
         });
-        cancel();
+        activeMode = Modes.VIEW;
     }
 
     function addToOverlayGroup(){
@@ -93,49 +93,33 @@
                 applicationIds: _.map(relatedApps, d => d.id)
             });
         overlay.addOverlay(overlayToAdd);
-        cancel();
+        activeMode = Modes.VIEW;
     }
-
-
 </script>
 
-<div>
-    <strong>
-        <EntityLink ref={entity.data}/>
-    </strong>
-    <span class="text-muted small">( {entityData.externalId} )</span>
-</div>
+<p class="help-block">External Id: {entityData.externalId || "-"}</p>
+<p class="help-block">{entityData.description}</p>
+
 {#if activeMode === Modes.VIEW}
-    {#if entity.data.kind === 'CHANGE_INITIATIVE'}
-        <div class="help-block">
-            <p>{entityData.changeInitiativeKind || "Unknown kind"}</p>
-            {entityData.description}
-        </div>
-    {:else if entity.data.kind === 'MEASURABLE'}
-        <div class="help-block">
-            <p>{entity.category?.name || "Unknown category"}</p>
-            {entityData.description}
-        </div>
-    {/if}
     {#if canEdit}
         <ul>
             <li>
                 <button class="btn btn-skinny"
-                        on:click={() => addRelatedApplications()}>
-                    <Icon name="plus"/>
+                        on:click={addRelatedApplications}>
+                    <Icon name="desktop"/>
                     Add related applications
                 </button>
             </li>
             {#if entity.data.kind === 'MEASURABLE'}
             <li>
                 <button class="btn btn-skinny"
-                        on:click={() => addToOverlayGroup()}>
-                    <Icon name="plus"/>
+                        on:click={addToOverlayGroup}>
+                    <Icon name="star-o"/>
                     Add to an overlay group
                 </button>
             </li>
             {/if}
-            <li>
+            <li style="border-top: 1px dotted #eee; padding-top: 0.2em; margin-top: 0.2em;">
                 <button class="btn btn-skinny"
                         on:click={remove}>
                     <Icon name="trash"/>
@@ -144,13 +128,18 @@
             </li>
         </ul>
     {/if}
-    <div class="context-panel-footer">
-        <button class="btn btn-skinny"
-                on:click={cancel}>
-            <Icon name="fw"/>
-            Cancel
-        </button>
+{:else if activeMode === Modes.CONFIRM_REMOVE}
+    <div>
+        Sure you want to remove this related entity ?
     </div>
+    <button class="btn btn-danger"
+            on:click={doRemove}>
+        OK
+    </button>
+    <button class="btn btn-default"
+            on:click={() => activeMode = Modes.VIEW}>
+        Cancel
+    </button>
 {:else if activeMode === Modes.CONFIRM_ADD_APPS}
     <div>Are you sure you want to add {_.size(toAdd)} new nodes?</div>
     {#if _.size(toAdd) > 100}
@@ -176,20 +165,20 @@
         You have no associated groups. Select the 'Overlays' tab to add one.
     {:else }
         <div>Add to one of the overlay groups below:</div>
-        {#each overlayGroups as group}
-            <table class="table table-condensed">
-                <tbody>
-                    <tr>
-                        <td>{group.name}</td>
-                        <td><button class="btn btn-skinny"
-                                    on:click={() => saveToGroup(group)}>
-                                <Icon name="plus"/>Add
-                            </button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        {/each}
+        <table class="table table-condensed">
+            {#each overlayGroups as group}
+                <tr>
+                    <td>{group.name}</td>
+                    <td>
+                        <button class="btn btn-skinny"
+                                on:click={() => saveToGroup(group)}>
+                            <Icon name="plus"/>
+                            Add
+                        </button>
+                    </td>
+                </tr>
+            {/each}
+        </table>
     {/if}
 {/if}
 
@@ -202,11 +191,5 @@
 
     li {
         padding-top: 0;
-    }
-
-    .context-panel-footer {
-        border-top: 1px solid #eee;
-        margin-top:0.5em;
-        padding-top:0.5em;
     }
 </style>

@@ -171,6 +171,15 @@
 
         <input type="radio"
                bind:group={selectedTab}
+               value="relationships"
+               id="relationships">
+        <label class="wt-label"
+               for="relationships">
+            <span>Relationships</span>
+        </label>
+
+        <input type="radio"
+               bind:group={selectedTab}
                value="overlays"
                id="overlays">
         <label class="wt-label"
@@ -185,15 +194,6 @@
         <label class="wt-label"
                for="filters">
             <span>Filters</span>
-        </label>
-
-        <input type="radio"
-               bind:group={selectedTab}
-               value="relationships"
-               id="relationships">
-        <label class="wt-label"
-               for="relationships">
-            <span>Relationships</span>
         </label>
 
         <div class="wt-tab wt-active">

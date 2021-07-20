@@ -11,6 +11,7 @@
     export let group;
     export let diagramId;
     export let overlays;
+    export let canEdit;
 
     let workingOverlayEntity;
 
@@ -87,6 +88,7 @@
     {:else if activeMode === Modes.ADD_OVERLAY}
         <strong>Editing overlay for group: {group.data.name}:</strong>
         <EditOverlayIconSubPanel selectedOverlay={newOverlay}
+                                 {canEdit}
                                  {group}
                                  on:cancel={cancel}/>
     {/if}

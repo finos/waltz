@@ -82,6 +82,11 @@
         }
     }
 
+    function removeEntity(evt) {
+        const entity = evt.detail
+        flowDiagramEntityStore.removeRelationship(diagramId, entity.data);
+        model.removeRelationship(entity);
+    }
 </script>
 
 {#if activeMode === Modes.VIEW}
@@ -90,6 +95,7 @@
                               measurables={associatedMeasurables}
                               changeInitiatives={associatedCis}
                               datatypes={associatedDatatypes}
+                              on:removeEntity={removeEntity}
                               on:select={addEntityMode}/>
 {:else if activeMode === Modes.ADD_MEASURABLE }
     <AddRelatedMeasurableSubPanel measurables={suggestedMeasurables}
