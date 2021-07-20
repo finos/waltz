@@ -18,7 +18,7 @@
 
     $: groups = $groupsCall?.data;
 
-    function selectGroup(group){
+    function doClone(group){
         flowDiagramOverlayGroupStore.cloneOverlayGroup(diagramId, group.id);
         cancel();
     }
@@ -38,7 +38,7 @@
         {#each groups as group}
         <li>
             <button class="btn btn-skinny"
-                    on:click={() => selectGroup(group)}>
+                    on:click={() => doClone(group)}>
                 {group.name}
             </button>
         </li>
@@ -55,16 +55,6 @@
 
 
 <style>
-    ul {
-        padding: 0;
-        margin: 0;
-        list-style: none;
-    }
-
-    li {
-        padding-top: 0;
-    }
-
     .context-panel-footer {
         border-top: 1px solid #eee;
         margin-top:0.5em;

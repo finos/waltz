@@ -10,9 +10,12 @@
     import OverlayGlyph from "./OverlayGlyph.svelte";
     import SymbolPicker from "../../../../system/svelte/ratings-schemes/SymbolPicker.svelte";
     import {symbolsByName} from "../flow-diagram-utils";
+    import EntityLink from "../../../../common/svelte/EntityLink.svelte";
+    import {toGraphId} from "../../../flow-diagram-utils";
 
     export let group;
     export let selectedOverlay;
+    export let canEdit = false;
 
     let relatedAppIds = [];
 
@@ -44,6 +47,17 @@
         overlay.addOverlay(overlayToAdd)
         cancel();
     }
+
+
+    function removeIndividualOverlay(overlayItem) {
+        overlay.clearAppliedOverlay();
+        overlay.removeOverlay({
+            id: toGraphId(overlayItem),
+            data: overlayItem
+        });
+        cancel();
+    }
+
 
     function selectColor(e) {
         newOverlay = Object.assign(
@@ -79,38 +93,51 @@
 
 <div>
     {#if activeMode === Modes.ADD_OVERLAY}
+        <EntityLink ref={newOverlay.entityReference} />
+        <br>
         <div>
-            <strong>{newOverlay.entityReference.name}</strong>
+            <span  style="padding-right: 1em;">
+                Color / Symbol:
+            </span>
             <OverlayGlyph overlay={newOverlay}/>
-            <div>
-                <ul>
+        </div>
+        <br>
+
+        <div>
+            <ul class="list-unstyled">
+                {#if canEdit}
                     <li>
                         <button class="btn btn-skinny"
                                 on:click={() => activeMode = Modes.EDIT_COLOUR}>
-                            <Icon name="pencil"/>Edit Colour
+                            <Icon name="pencil"/>
+                            Edit Colour
                         </button>
                     </li>
-                   <li>
+                    <li>
                        <button class="btn btn-skinny"
                                on:click={() => activeMode = Modes.EDIT_SYMBOL}
                                 on:cancel={() => activeMode = Modes.ADD_OVERLAY}
                                 on:submit={selectSymbol}>
-                           <Icon name="pencil"/>Edit Symbol
+                           <Icon name="pencil"/>
+                           Edit Symbol
                         </button>
-                   </li>
-                </ul>
-            </div>
-            <div class="context-panel-footer">
-                <button class="btn btn-skinny"
-                        on:click={() => addOverlay()}>
-                    Ok
-                </button>
-                |
-                <button class="btn btn-skinny"
-                        on:click={cancel}>
-                    Cancel
-                </button>
-            </div>
+                    </li>
+                    <li style="border-top: 1px dotted #eee; padding-top: 0.2em; margin-top: 0.2em">
+                        <button class="btn btn-skinny"
+                                on:click={() => addOverlay()}>
+                            <Icon name="check"/>
+                            Okay
+                        </button>
+                    </li>
+                    <li>
+                        <button class="btn btn-skinny waltz-visibility-child-30"
+                                on:click={() => removeIndividualOverlay(selectedOverlay)}>
+                            <Icon name="trash"/>
+                            Remove
+                        </button>
+                    </li>
+                {/if}
+            </ul>
         </div>
     {:else if activeMode === Modes.EDIT_COLOUR}
         <ColorPicker predefinedColors={_.map(colorSchemes, d => d.fill)}
@@ -131,21 +158,3 @@
         </button>
     {/if}
 </div>
-
-<style>
-    ul {
-        padding: 0;
-        margin: 0;
-        list-style: none;
-    }
-
-    li {
-        padding-top: 0;
-    }
-
-    .context-panel-footer {
-        border-top: 1px solid #eee;
-        margin-top:0.5em;
-        padding-top:0.5em;
-    }
-</style>

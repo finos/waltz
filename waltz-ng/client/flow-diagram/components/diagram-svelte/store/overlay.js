@@ -16,7 +16,6 @@ function setAppliedOverlay(state, overlay){
     return Object.assign({}, state, {appliedOverlay: overlay})
 }
 
-
 function clearAppliedOverlay(state){
     return Object.assign({}, state, {appliedOverlay: null})
 }
@@ -25,11 +24,9 @@ function setSelectedGroup(state, group){
     return Object.assign({}, state, {selectedGroup: group})
 }
 
-
 function clearSelectedGroup(state){
     return Object.assign({}, state, {selectedGroup: null})
 }
-
 
 function addOverlay(state, overlay){
     const refId = toGraphId(overlay.groupRef);
@@ -61,23 +58,6 @@ function removeOverlay(state, overlay) {
     if (existing) {
         dirty.set(true);
         const newOverlaysForGroup = _.reject(currentOverlays, d => d.id === overlay.id);
-        const newOverlays = Object.assign({}, state.groupOverlays, {[refId]: newOverlaysForGroup});
-        return Object.assign({}, state, {groupOverlays: newOverlays});
-    } else {
-        return state;
-    }
-}
-
-function updateOverlay(state, overlay) {
-    const refId = toGraphId(overlay.groupRef);
-    const currentOverlays = state.groupOverlays[refId] || [];
-
-    const existing = _.find(currentOverlays, d => d.id === overlay.id);
-
-    if (existing) {
-        dirty.set(true);
-        const newOverlaysMinusOld = _.reject(currentOverlays, d => d.id === overlay.id);
-        const newOverlaysForGroup = [...newOverlaysMinusOld, overlay]
         const newOverlays = Object.assign({}, state.groupOverlays, {[refId]: newOverlaysForGroup});
         return Object.assign({}, state, {groupOverlays: newOverlays});
     } else {

@@ -6,7 +6,6 @@
     import RelatedEntityAddFlowsPanel from "./RelatedEntityAddFlowsPanel.svelte";
     import EntityLabel from "../../../../common/svelte/EntityLabel.svelte";
 
-    export let diagramId;
     export let canEdit;
     export let measurables;
     export let changeInitiatives;
@@ -88,10 +87,11 @@
             <li class="active">{crumb.name}</li>
         {:else}
             <li>
-                <a class="clickable"
-                   on:click={crumb.onClick}>
+                <button style="padding: 0"
+                        class="btn-skinny"
+                        on:click={crumb.onClick}>
                     {crumb.name}
-                </a>
+                </button>
             </li>
         {/if}
     {/each}
