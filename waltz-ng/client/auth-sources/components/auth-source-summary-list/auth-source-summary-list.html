@@ -1,6 +1,16 @@
 <waltz-section icon='shield'
                name="Authoritative Sources">
 
+    <div class="waltz-section-actions">
+        <div ng-if="$ctrl.viewMode==='LIST'">
+            <waltz-data-extract-link name="Export"
+                                     styling="button"
+                                     extract="authoritative-source/all"
+                                     method="GET">
+            </waltz-data-extract-link>
+        </div>
+    </div>
+
     <waltz-static-panels render-mode='minimal-border'
                          group-key='SECTION.AUTH_SOURCES.ABOUT'>
     </waltz-static-panels>
@@ -11,6 +21,7 @@
                                   on-select="$ctrl.onSelectAuthSource">
         </waltz-auth-sources-table>
     </div>
+
 
     <div ng-if="$ctrl.viewMode==='DETAIL'">
         <waltz-svelte-component component="$ctrl.AuthSourceDetail"
