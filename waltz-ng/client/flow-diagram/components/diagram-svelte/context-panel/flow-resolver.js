@@ -55,7 +55,6 @@ export function prepareUpdateCommands(flows = [],
 
 
 export function mkFlows(logicalFlows = [], node, isUpstream, existingFlows = []) {
-    console.log('mkFlows', {logicalFlows, node, isUpstream, existingFlows})
 
     const [counterpartPropName, selfPropName] = isUpstream
         ? ["source", "target"]
