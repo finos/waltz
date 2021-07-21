@@ -26,12 +26,14 @@ div.waltz-tabs {
             color: #555;
             background: #fff;
             border-color: #ccc;
-            border-bottom: none;
             font-weight: bolder;
 
             cursor:default;
             border-top: 3px solid #e36209;
             margin-top: 0;
+            position: relative;
+            top: 1px;
+            border-bottom: 1px solid white;
         }
 
         &:disabled + .wt-label {
@@ -48,7 +50,12 @@ div.waltz-tabs {
         display: inline-block;
         padding: 5px 10px;
         cursor: pointer;
-        border: 1px solid #ddd;
+        border-style: solid;
+        border-top-width: 1px;
+        border-bottom-width: 0;
+        border-left-width: 1px;
+        border-right-width: 1px;
+        border-color: #ddd;
         background-color: #fafafa;
         border-top-left-radius: 4px;
         border-top-right-radius: 4px;
@@ -69,6 +76,7 @@ div.waltz-tabs {
             padding-bottom: 10px;
             border-bottom-left-radius: 3px;
             display: block;
+            border-top: 1px solid #ddd;
         }
     }
 
