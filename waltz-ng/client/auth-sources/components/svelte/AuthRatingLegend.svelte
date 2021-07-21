@@ -8,8 +8,6 @@
         .orderBy(["position", "name"])
         .value();
 
-    $: console.log({ratings})
-
 </script>
 
 <ul style="display: inline"
