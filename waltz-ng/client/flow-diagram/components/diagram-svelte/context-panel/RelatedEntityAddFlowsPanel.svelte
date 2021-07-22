@@ -18,17 +18,12 @@
         CONFIRM_REMOVE: "CONFIRM_REMOVE"
     };
 
-    function cancel() {
-        dispatch("cancel");
-    }
-
     function remove() {
         activeMode = Modes.CONFIRM_REMOVE;
     }
 
     function doRemove() {
         dispatch("remove", entity);
-        cancel();
     }
 
     function addRelatedFlows(){
@@ -44,7 +39,7 @@
 
     function saveNewFlows(){
         toAdd.forEach(n => model.addFlow(n));
-        cancel();
+        activeMode = Modes.VIEW;
     }
 
     let toAdd = [];
