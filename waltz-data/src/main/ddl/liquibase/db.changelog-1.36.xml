@@ -35,13 +35,13 @@
         </update>
     </changeSet>
 
-    <changeSet id="20210722-5545-2"
-               author="woodjes">
-        <update tableName="settings">
-            <column name="value"
-                    value="Prod v1.36"/>
-            <where>name='ui.logo.overlay.text'</where>
-        </update>
-    </changeSet>
+<!--    <changeSet id="20210722-5545-2"-->
+<!--               author="woodjes">-->
+<!--        <update tableName="settings">-->
+<!--            <column name="value"-->
+<!--                    value="Prod v1.36"/>-->
+<!--            <where>name='ui.logo.overlay.text'</where>-->
+<!--        </update>-->
+<!--    </changeSet>-->
 
 </databaseChangeLog>
