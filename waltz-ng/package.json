@@ -61,7 +61,7 @@
     "satellizer": "0.15.5",
     "ui-select": "0.19.8",
     "whatwg-fetch": "^3.6.2",
-    "xlsx": "0.16.9"
+    "xlsx": "0.17.0"
   },
   "devDependencies": {
     "@babel/core": "7.11.6",
