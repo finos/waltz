@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Surveys: Bulk adding people to already issued surveys"
-date:   2021-07-22
+date:   2021-07-23
 categories: waltz sql
 ---
 
