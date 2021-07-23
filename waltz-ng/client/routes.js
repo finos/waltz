@@ -56,6 +56,14 @@ function configureRoutes($locationProvider, $stateProvider, $urlRouterProvider) 
             views: {
                 "content@": WelcomeJs
             }
+        })
+        .state("main.wibble", {
+            url: "wibble",
+            views: {
+                "header@": {template:"<div style='border: 1px solid green;'><h1>HEader</h1></div>"},
+                "content@": {template: "<div style='border: 1px solid red;'><h1>Content</h1></div>"},
+                "sidebar@": {template: "<div style='border: 1px solid blue;'><h1>Sidebar</h1></div>"}
+            }
         });
 
     $locationProvider

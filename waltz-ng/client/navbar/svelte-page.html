@@ -1,0 +1,18 @@
+<!-- Header -->
+<div style="border: 1px dotted red"
+     ui-view="header">
+</div>
+
+<div style="border: 1px dotted green"
+     class="under-header">
+    <!-- Content -->
+    <aside style="border: 1px dotted cyan"
+           class="sidebar">
+       <waltz-svelte-component component="$ctrl.Sidebar"></waltz-svelte-component>
+    </aside>
+
+    <main style="border: 1px dashed purple" ui-view="content"
+          class="main">
+        Hello world
+    </main>
+</div>

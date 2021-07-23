@@ -20,6 +20,7 @@ import {initialiseData} from "../../../common/index";
 
 import template from "./unit-view.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import store from "../../../navbar/sidebar-store";
 
 
 const initialState = {
@@ -38,6 +39,7 @@ const addToHistory = (historyStore, orgUnit) => {
 };
 
 
+
 function controller($stateParams,
                     dynamicSectionManager,
                     historyStore,
@@ -46,6 +48,7 @@ function controller($stateParams,
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
+        store.setPageKind("ORG_UNIT");
         const id = $stateParams.id;
         vm.parentEntityRef = { kind: "ORG_UNIT", id };
 
