@@ -27,6 +27,7 @@ uiSelectSetup.$inject = ['uiSelectConfig'];
 
 function authProviderSetup($authProvider, BaseUrl) {
     $authProvider.baseUrl = BaseUrl;
+    $authProvider.loginUrl = '/authentication/login';
     $authProvider.withCredentials = false;
 
     $authProvider.google({
