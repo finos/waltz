@@ -40,6 +40,7 @@ import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.change_initiative.ChangeInitiative;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
+import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.flow_diagram.*;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
@@ -47,6 +48,7 @@ import com.khartec.waltz.model.measurable.Measurable;
 import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.data_type.DataTypeService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.exception.InvalidResultException;
@@ -74,6 +76,7 @@ import static java.util.stream.Collectors.toList;
 public class FlowDiagramService {
 
     private final ChangeLogService changeLogService;
+    private final DataTypeService dataTypeService;
     private final FlowDiagramDao flowDiagramDao;
     private final FlowDiagramEntityDao flowDiagramEntityDao;
     private final FlowDiagramAnnotationDao flowDiagramAnnotationDao;
@@ -92,6 +95,7 @@ public class FlowDiagramService {
 
     @Autowired
     public FlowDiagramService(ChangeLogService changeLogService,
+                              DataTypeService dataTypeService,
                               FlowDiagramDao flowDiagramDao,
                               FlowDiagramEntityDao flowDiagramEntityDao,
                               FlowDiagramAnnotationDao flowDiagramAnnotationDao,
@@ -104,6 +108,7 @@ public class FlowDiagramService {
                               MeasurableDao measurableDao,
                               ChangeInitiativeDao changeInitiativeDao) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
+        checkNotNull(dataTypeService, "        checkNotNull(changeInitiativeDao, \"changeInitiativeDao cannot be null\");\n cannot be null");
         checkNotNull(flowDiagramDao, "flowDiagramDao cannot be null");
         checkNotNull(flowDiagramEntityDao, "flowDiagramEntityDao cannot be null");
         checkNotNull(flowDiagramAnnotationDao, "flowDiagramAnnotationDao cannot be null");
@@ -117,6 +122,8 @@ public class FlowDiagramService {
         checkNotNull(changeInitiativeDao, "changeInitiativeDao cannot be null");
 
         this.changeLogService = changeLogService;
+        this.dataTypeService = dataTypeService;
+
         this.flowDiagramDao = flowDiagramDao;
         this.flowDiagramEntityDao = flowDiagramEntityDao;
         this.flowDiagramAnnotationDao = flowDiagramAnnotationDao;
@@ -325,6 +332,8 @@ public class FlowDiagramService {
                 return makeForMeasurable(ref, userId, title);
             case CHANGE_INITIATIVE:
                 return makeForChangeInitiative(ref, userId, title);
+            case DATA_TYPE:
+                return makeForDataType(ref, userId, title);
             default:
                 throw new UnsupportedOperationException("Cannot make diagram for entity: "+ref);
         }
@@ -343,6 +352,17 @@ public class FlowDiagramService {
                 mkDiagramEntity(logicalFlow.target()));
 
         return mkNewFlowDiagram(title, userId, entities, emptyList());
+    }
+
+
+    private Long makeForDataType(EntityReference ref, String userId, String providedTitle) {
+        DataType dataType = dataTypeService.getDataTypeById(ref.id());
+
+        String title = isEmpty(providedTitle)
+                ? dataType.name() + " flows"
+                : providedTitle;
+
+        return mkNewFlowDiagram(title, userId, newArrayList(mkDiagramEntity(dataType)), emptyList());
     }
 
 

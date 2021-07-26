@@ -169,12 +169,14 @@ function controller($q, serviceBroker, uiGridConstants, settingsService) {
     }
 
     function loadSummaryForCostKind(){
-        return serviceBroker
-            .loadViewData(
-                CORE_API.CostStore.summariseByCostKindAndSelector,
-                [vm.selectedKind.id, vm.targetEntityKind, vm.selector],
-                { force: true })
-            .then(r => vm.costKindSummary = r.data);
+        if(vm.selectedKind){
+            return serviceBroker
+                .loadViewData(
+                    CORE_API.CostStore.summariseByCostKindAndSelector,
+                    [vm.selectedKind.id, vm.targetEntityKind, vm.selector],
+                    { force: true })
+                .then(r => vm.costKindSummary = r.data);
+        }
     }
 
     vm.loadAllCosts = () => {
