@@ -18,7 +18,6 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.common.FunctionUtilities;
 import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
 import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorSummaryDao;
 import com.khartec.waltz.model.EntityKind;
@@ -65,7 +64,7 @@ public class AuthSourceHarness {
 //        List<EntityHierarchyItem> desendents = ehDao.findDesendents(EntityReference.mkRef(EntityKind.DATA_TYPE, 41300));
 //        updateDecoratorsForAuthSource(dsl);
 
-        FunctionUtilities.time("Fast Flow Ratings", svc::fastRecalculateAllFlowRatings);
+//        FunctionUtilities.time("Fast Flow Ratings", svc::fastRecalculateAllFlowRatings);
 
 //        FunctionUtilities.time("Flow ratings", () -> svc.recalculateAllFlowRatings());
 

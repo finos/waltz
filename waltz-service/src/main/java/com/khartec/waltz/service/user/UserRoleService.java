@@ -139,7 +139,8 @@ public class UserRoleService {
             changeLogService.write(logEntry);
         }
 
-        return userRoleDao.updateRoles(targetUserName, newRoles);
+        boolean b = userRoleDao.updateRoles(targetUserName, newRoles);
+        return b;
     }
 
 

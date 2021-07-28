@@ -20,18 +20,21 @@ package com.khartec.waltz.service.data_flow_decorator;
 
 import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
 import com.khartec.waltz.data.data_type.DataTypeDao;
+import com.khartec.waltz.data.flow_classification_rule.FlowClassificationDao;
+import com.khartec.waltz.data.flow_classification_rule.FlowClassificationRuleDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
 import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
+import com.khartec.waltz.model.flow_classification.FlowClassification;
+import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import com.khartec.waltz.service.application.ApplicationService;
-import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceResolver;
+import com.khartec.waltz.service.flow_classification_rule.FlowClassificationRuleResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +60,8 @@ public class LogicalFlowDecoratorRatingsCalculator {
 
     private final ApplicationService applicationService;
     private final AuthoritativeSourceDao authoritativeSourceDao;
+    private final FlowClassificationDao flowClassificationDao;
+    private final FlowClassificationRuleDao flowClassificationRuleDao;
     private final LogicalFlowDao logicalFlowDao;
     private final DataTypeDao dataTypeDao;
 
@@ -64,15 +69,21 @@ public class LogicalFlowDecoratorRatingsCalculator {
     @Autowired
     public LogicalFlowDecoratorRatingsCalculator(ApplicationService applicationService,
                                                  AuthoritativeSourceDao authoritativeSourceDao,
+                                                 FlowClassificationDao flowClassificationDao,
+                                                 FlowClassificationRuleDao flowClassificationRuleDao,
                                                  LogicalFlowDao logicalFlowDao,
                                                  DataTypeDao dataTypeDao) {
         checkNotNull(applicationService, "applicationService cannot be null");
         checkNotNull(authoritativeSourceDao, "authoritativeSourceDao cannot be null");
+        checkNotNull(flowClassificationDao, "flowClassificationDao cannot be null");
+        checkNotNull(flowClassificationRuleDao, "flowClassificationRuleDao cannot be null");
         checkNotNull(logicalFlowDao, "logicalFlowDao cannot be null");
         checkNotNull(dataTypeDao, "dataTypeDao cannot be null");
 
         this.applicationService = applicationService;
         this.authoritativeSourceDao = authoritativeSourceDao;
+        this.flowClassificationDao = flowClassificationDao;
+        this.flowClassificationRuleDao = flowClassificationRuleDao;
         this.logicalFlowDao = logicalFlowDao;
         this.dataTypeDao = dataTypeDao;
     }
@@ -88,12 +99,13 @@ public class LogicalFlowDecoratorRatingsCalculator {
 
         List<Application> targetApps = loadTargetApplications(appToAppFlows);
         List<DataType> dataTypes = dataTypeDao.findAll();
+        Set<FlowClassification> flowClassifications = flowClassificationDao.findAll();
 
         Map<Long, DataType> typesById = indexById(dataTypes);
         Map<Long, LogicalFlow> flowsById = indexById(appToAppFlows);
         Map<Long, Application> targetAppsById = indexById(targetApps);
 
-        AuthoritativeSourceResolver resolver = createResolver(targetApps);
+        FlowClassificationRuleResolver resolver = createResolver(targetApps);
 
         return decorators
                 .stream()
@@ -104,12 +116,11 @@ public class LogicalFlowDecoratorRatingsCalculator {
                             return decorator;
                         } else {
                             AuthoritativenessRatingValue rating = lookupRating(
-                                    typesById,
                                     flowsById,
                                     targetAppsById,
                                     resolver,
                                     decorator);
-                            Optional<Long> authSource = lookupAuthSource(
+                            Optional<Long> ruleId = lookupFlowClassificationRule(
                                     typesById,
                                     flowsById,
                                     targetAppsById,
@@ -118,7 +129,7 @@ public class LogicalFlowDecoratorRatingsCalculator {
                             return ImmutableDataTypeDecorator
                                     .copyOf(decorator)
                                     .withRating(rating)
-                                    .withAuthSourceId(authSource);
+                                    .withFlowClassificationRuleId(ruleId);
                         }
                     } catch (Exception e) {
                         LOG.warn("Failed to calculate rating for decorator: {}, reason: {}", decorator, e.getMessage());
@@ -146,47 +157,46 @@ public class LogicalFlowDecoratorRatingsCalculator {
     }
 
 
-    private AuthoritativeSourceResolver createResolver(Collection<Application> targetApps) {
+    private FlowClassificationRuleResolver createResolver(Collection<Application> targetApps) {
         Set<Long> orgIds = map(targetApps, app -> app.organisationalUnitId());
 
-        List<AuthoritativeRatingVantagePoint> authoritativeRatingVantagePoints =
-                authoritativeSourceDao.findExpandedAuthoritativeRatingVantagePoints(orgIds);
+        List<FlowClassificationRuleVantagePoint> flowClassificationRuleVantagePoints =
+                flowClassificationRuleDao.findExpandedFlowClassificationRuleVantagePoints(orgIds);
 
-        AuthoritativeSourceResolver resolver = new AuthoritativeSourceResolver(authoritativeRatingVantagePoints);
+        FlowClassificationRuleResolver resolver = new FlowClassificationRuleResolver(flowClassificationRuleVantagePoints);
+
         return resolver;
     }
 
 
-    private AuthoritativenessRatingValue lookupRating(Map<Long, DataType> typesById,
-                                                 Map<Long, LogicalFlow> flowsById,
-                                                 Map<Long, Application> targetAppsById,
-                                                 AuthoritativeSourceResolver resolver,
-                                                 DataTypeDecorator decorator) {
-        LogicalFlow flow = flowsById.get(decorator.dataFlowId());
+    private AuthoritativenessRatingValue lookupRating(Map<Long, LogicalFlow> flowsById,
+                                                      Map<Long, Application> targetAppsById,
+                                                      FlowClassificationRuleResolver resolver,
+                                                      DataTypeDecorator decorator) {
 
+        LogicalFlow flow = flowsById.get(decorator.dataFlowId());
         EntityReference vantagePoint = lookupVantagePoint(targetAppsById, flow);
         EntityReference source = flow.source();
-        String dataTypeCode = lookupDataTypeCode(typesById, decorator);
 
-        return resolver.resolve(vantagePoint, source, dataTypeCode);
+        return resolver.resolve(vantagePoint, source, decorator.decoratorEntity().id());
     }
 
 
-    private Optional<Long> lookupAuthSource(Map<Long, DataType> typesById,
-                                                     Map<Long, LogicalFlow> flowsById,
-                                                     Map<Long, Application> targetAppsById,
-                                                     AuthoritativeSourceResolver resolver,
-                                                     DataTypeDecorator decorator) {
+    private Optional<Long> lookupFlowClassificationRule(Map<Long, DataType> typesById,
+                                                        Map<Long, LogicalFlow> flowsById,
+                                                        Map<Long, Application> targetAppsById,
+                                                        FlowClassificationRuleResolver resolver,
+                                                        DataTypeDecorator decorator) {
         LogicalFlow flow = flowsById.get(decorator.dataFlowId());
 
         EntityReference vantagePoint = lookupVantagePoint(targetAppsById, flow);
         EntityReference source = flow.source();
-        String dataTypeCode = lookupDataTypeCode(typesById, decorator);
 
-        Optional<AuthoritativeRatingVantagePoint> authoritativeRatingVantagePoint = resolver.resolveAuthSource(vantagePoint, source, dataTypeCode);
+        Optional<FlowClassificationRuleVantagePoint> flowClassificationRuleVantagePoint = resolver
+                .resolveAuthSource(vantagePoint, source, decorator.dataTypeId());
 
-        return authoritativeRatingVantagePoint
-                .map(AuthoritativeRatingVantagePoint::authSourceId);
+        return flowClassificationRuleVantagePoint
+                .map(FlowClassificationRuleVantagePoint::ruleId);
     }
 
 

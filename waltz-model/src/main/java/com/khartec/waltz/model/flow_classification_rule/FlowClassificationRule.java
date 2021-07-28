@@ -16,41 +16,40 @@
  *
  */
 
-package com.khartec.waltz.model.datatype;
+package com.khartec.waltz.model.flow_classification_rule;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import org.immutables.value.Value;
 
-import java.util.Optional;
 
-/**
- * Data Type decoration for physical specifications
- */
 @Value.Immutable
-@JsonSerialize(as = ImmutableDataTypeDecorator.class)
-@JsonDeserialize(as = ImmutableDataTypeDecorator.class)
-public abstract class DataTypeDecorator implements
-        LastUpdatedProvider,
+@JsonSerialize(as = ImmutableFlowClassificationRule.class)
+@JsonDeserialize(as = ImmutableFlowClassificationRule.class)
+public abstract class FlowClassificationRule implements
+        IdProvider,
         ProvenanceProvider,
-        WaltzEntity,
-        IdProvider {
+        DescriptionProvider,
+        ExternalIdProvider,
+        LastUpdatedProvider,
+        EntityKindProvider {
 
-    public abstract EntityReference decoratorEntity();
-
-    public abstract Optional<AuthoritativenessRatingValue> rating();
-
-    public abstract Optional<Long> flowClassificationRuleId();
-
-    @Value.Derived
-    public long dataTypeId() { return decoratorEntity().id(); }
-
-    @Value.Derived
-    public long dataFlowId() { return entityReference().id(); }
+    public abstract EntityReference applicationReference();
+    public abstract EntityReference appOrgUnitReference();
+    public abstract EntityReference parentReference();
+    public abstract Long dataTypeId();
+    public abstract Long classificationId();
 
     @Value.Default
-    public boolean isReadonly() { return false; };
+    public String provenance() {
+        return "waltz";
+    }
+
+    @Value.Default
+    public EntityKind kind() {
+        return EntityKind.FLOW_CLASSIFICATION_RULE;
+    }
+
 
 }

@@ -144,6 +144,41 @@
 
     <changeSet id="20210727-5554-4"
                author="woodjes">
+        <comment>5554: Create fk from flow_classification_rule to application</comment>
+        <addForeignKeyConstraint baseColumnNames="application_id"
+                                 baseTableName="flow_classification_rule"
+                                 constraintName="flow_classification_rule_application_id_fkey"
+                                 onDelete="CASCADE"
+                                 referencedColumnNames="id"
+                                 referencedTableName="application"/>
+    </changeSet>
+
+    <changeSet id="20210727-5554-5"
+               author="woodjes">
+        <comment>5554: Create fk from flow_classification_rule to data_type</comment>
+        <addForeignKeyConstraint baseColumnNames="data_type_id"
+                                 baseTableName="flow_classification_rule"
+                                 constraintName="flow_classification_rule_data_type_id_fkey"
+                                 onDelete="CASCADE"
+                                 referencedColumnNames="id"
+                                 referencedTableName="data_type"/>
+    </changeSet>
+
+    <changeSet id="20210726-5554-6"
+               author="woodjes">
+        <comment>5554: Create unique index</comment>
+        <createIndex indexName="idx_fcr_scope_dt_app"
+                     tableName="flow_classification_rule"
+                     unique="true">
+            <column name="parent_kind" type="${enum.type}"/>
+            <column name="parent_id" type="${id.type}"/>
+            <column name="application_id" type="${id.type}"/>
+            <column name="data_type_id" type="${id.type}"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20210727-5554-7"
+               author="woodjes">
         <comment>5554: Insert authority ratings from enum_value into flow_classification</comment>
         <sql>
             INSERT INTO flow_classification (name, description, code, color, position, is_custom)
@@ -153,7 +188,7 @@
         </sql>
     </changeSet>
 
-    <changeSet id="20210727-5554-5"
+    <changeSet id="20210727-5554-8"
                author="woodjes">
         <comment>5554: Copy authoritative_source info into flow_classification_rule</comment>
         <sql>
@@ -181,6 +216,41 @@
             INNER JOIN data_type dt on auth.data_type = dt.code
             INNER JOIN flow_classification fc on auth.rating = fc.code
         </sql>
+    </changeSet>
+
+    <changeSet id="20210727-5554-9"
+               author="woodjes">
+        <dropForeignKeyConstraint baseTableName="logical_flow_decorator"
+                                  constraintName="lfd_auth_source_id_fkey"/>
+    </changeSet>
+
+    <changeSet id="20210727-5554-10"
+               author="woodjes">
+        <comment>5444: dropping auth_source_id column from logical flow decorator</comment>
+        <dropColumn tableName="logical_flow_decorator"
+                    columnName="auth_source_id" />
+    </changeSet>
+
+    <changeSet id="20210727-5554-11"
+               author="woodjes">
+        <comment>5444: adding flow_classification_rule_id column to logical flow decorator</comment>
+        <addColumn tableName="logical_flow_decorator">
+            <column name="flow_classification_rule_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20210727-5554-12"
+               author="woodjes">
+        <comment>5444: adding flow_classification_rule_id column to logical flow decorator</comment>
+        <addForeignKeyConstraint baseColumnNames="flow_classification_rule_id"
+                                 baseTableName="logical_flow_decorator"
+                                 constraintName="lfd_flow_classification_rule_id_fkey"
+                                 onDelete="SET NULL"
+                                 referencedColumnNames="id"
+                                 referencedTableName="flow_classification_rule"/>
     </changeSet>
 
     <!--    <changeSet id="20210722-5545-2"-->

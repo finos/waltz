@@ -26,6 +26,7 @@ import com.khartec.waltz.model.scheduled_job.JobLifecycleStatus;
 import com.khartec.waltz.service.attestation.AttestationRunService;
 import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService;
 import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
+import com.khartec.waltz.service.flow_classification_rule.FlowClassificationRuleService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import com.khartec.waltz.service.physical_specification_data_type.PhysicalSpecDataTypeService;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
@@ -47,6 +48,7 @@ public class ScheduledJobService {
     private final AuthoritativeSourceService authoritativeSourceService;
     private final DataTypeUsageService dataTypeUsageService;
     private final EntityHierarchyService entityHierarchyService;
+    private final FlowClassificationRuleService flowClassificationRuleService;
     private final LogicalFlowService logicalFlowService;
     private final PhysicalSpecDataTypeService physicalSpecDataTypeService;
     private final ScheduledJobDao scheduledJobDao;
@@ -57,12 +59,14 @@ public class ScheduledJobService {
     public ScheduledJobService(AuthoritativeSourceService authoritativeSourceService,
                                DataTypeUsageService dataTypeUsageService,
                                EntityHierarchyService entityHierarchyService,
+                               FlowClassificationRuleService flowClassificationRuleService,
                                LogicalFlowService logicalFlowService,
                                PhysicalSpecDataTypeService physicalSpecDataTypeService,
                                ScheduledJobDao scheduledJobDao,
                                AttestationRunService attestationRunService) {
         checkNotNull(authoritativeSourceService, "authoritativeSourceService cannot be null");
         checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
+        checkNotNull(flowClassificationRuleService, "flowClassificationRuleService cannot be null");
         checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
         checkNotNull(physicalSpecDataTypeService, "physicalSpecDataTypeService cannot be null");
         checkNotNull(scheduledJobDao, "scheduledJobDao cannot be null");
@@ -71,6 +75,7 @@ public class ScheduledJobService {
         this.authoritativeSourceService = authoritativeSourceService;
         this.dataTypeUsageService = dataTypeUsageService;
         this.entityHierarchyService = entityHierarchyService;
+        this.flowClassificationRuleService = flowClassificationRuleService;
         this.logicalFlowService = logicalFlowService;
         this.physicalSpecDataTypeService = physicalSpecDataTypeService;
         this.scheduledJobDao = scheduledJobDao;
@@ -106,7 +111,7 @@ public class ScheduledJobService {
                 (jk) -> dataTypeUsageService.recalculateForAllApplications());
 
         runIfNeeded(JobKey.AUTH_SOURCE_RECALC_FLOW_RATINGS,
-                (jk) -> authoritativeSourceService.fastRecalculateAllFlowRatings());
+                (jk) -> flowClassificationRuleService.fastRecalculateAllFlowRatings());
 
         runIfNeeded(JobKey.LOGICAL_FLOW_CLEANUP_ORPHANS,
                 (jk) -> logicalFlowService.cleanupOrphans());

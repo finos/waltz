@@ -22,12 +22,12 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Entry;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
-import com.khartec.waltz.model.authoritativesource.AuthoritativeSourceCreateCommand;
-import com.khartec.waltz.model.authoritativesource.AuthoritativeSourceUpdateCommand;
 import com.khartec.waltz.model.authoritativesource.NonAuthoritativeSource;
+import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRule;
+import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRuleCreateCommand;
+import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRuleUpdateCommand;
 import com.khartec.waltz.model.user.SystemRole;
-import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService;
+import com.khartec.waltz.service.flow_classification_rule.FlowClassificationRuleService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
@@ -50,23 +50,22 @@ import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
-public class AuthoritativeSourceEndpoint implements Endpoint {
+public class FlowClassificationRuleEndpoint implements Endpoint {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AuthoritativeSourceEndpoint.class);
-    private static final String BASE_URL = mkPath("api", "authoritative-source");
+    private static final Logger LOG = LoggerFactory.getLogger(FlowClassificationRuleEndpoint.class);
+    private static final String BASE_URL = mkPath("api", "flow-classification-rule");
 
-    private final AuthoritativeSourceService authoritativeSourceService;
+    private final FlowClassificationRuleService flowClassificationRuleService;
     private final UserRoleService userRoleService;
 
 
     @Autowired
-    public AuthoritativeSourceEndpoint(
-            AuthoritativeSourceService authoritativeSourceService,
-            UserRoleService userRoleService) {
-        checkNotNull(authoritativeSourceService, "authoritativeSourceService must not be null");
+    public FlowClassificationRuleEndpoint(FlowClassificationRuleService flowClassificationRuleService,
+                                          UserRoleService userRoleService) {
+        checkNotNull(flowClassificationRuleService, "flowClassificationRuleService must not be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
 
-        this.authoritativeSourceService = authoritativeSourceService;
+        this.flowClassificationRuleService = flowClassificationRuleService;
         this.userRoleService = userRoleService;
     }
 
@@ -78,7 +77,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
 
         String recalculateFlowRatingsPath = mkPath(BASE_URL, "recalculate-flow-ratings");
         String findNonAuthSourcesPath = mkPath(BASE_URL, "non-auth");
-        String findAuthSourcesPath = mkPath(BASE_URL, "auth");
+        String findFlowClassificationRulesPath = mkPath(BASE_URL, "auth");
         String calculateConsumersForDataTypeIdSelectorPath = mkPath(BASE_URL, "data-type", "consumers");
         String findByEntityReferencePath = mkPath(BASE_URL, "entity-ref", ":kind", ":id");
         String findByApplicationIdPath = mkPath(BASE_URL, "app", ":id");
@@ -89,23 +88,23 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
 
         // -- ROUTES
 
-        ListRoute<AuthoritativeSource> findByEntityReferenceRoute = (request, response)
-                -> authoritativeSourceService.findByEntityReference(getEntityReference(request));
+        ListRoute<FlowClassificationRule> findByEntityReferenceRoute = (request, response)
+                -> flowClassificationRuleService.findByEntityReference(getEntityReference(request));
 
-        ListRoute<AuthoritativeSource> findByApplicationIdRoute = (request, response)
-                -> authoritativeSourceService.findByApplicationId(getId(request));
+        ListRoute<FlowClassificationRule> findByApplicationIdRoute = (request, response)
+                -> flowClassificationRuleService.findByApplicationId(getId(request));
 
         ListRoute<NonAuthoritativeSource> findNonAuthSourcesRoute = (request, response)
-                -> authoritativeSourceService.findNonAuthSources(readIdSelectionOptionsFromBody(request));
+                -> flowClassificationRuleService.findNonAuthSources(readIdSelectionOptionsFromBody(request));
 
-        ListRoute<AuthoritativeSource> findAuthSourcesRoute = (request, response)
-                -> authoritativeSourceService.findAuthSources(readIdSelectionOptionsFromBody(request));
+        ListRoute<FlowClassificationRule> findAuthSourcesRoute = (request, response)
+                -> flowClassificationRuleService.findClassificationRules(readIdSelectionOptionsFromBody(request));
 
-        ListRoute<AuthoritativeSource> findAllRoute = (request, response)
-                -> authoritativeSourceService.findAll();
+        ListRoute<FlowClassificationRule> findAllRoute = (request, response)
+                -> flowClassificationRuleService.findAll();
 
-        DatumRoute<AuthoritativeSource> getByIdRoute = (request, response)
-                -> authoritativeSourceService.getById(getId(request));
+        DatumRoute<FlowClassificationRule> getByIdRoute = (request, response)
+                -> flowClassificationRuleService.getById(getId(request));
 
         getForDatum(recalculateFlowRatingsPath, this::recalculateFlowRatingsRoute);
         getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
@@ -114,7 +113,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
         postForList(findNonAuthSourcesPath, findNonAuthSourcesRoute);
         getForList(findByEntityReferencePath, findByEntityReferenceRoute);
         getForList(findByApplicationIdPath, findByApplicationIdRoute);
-        postForList(findAuthSourcesPath, findAuthSourcesRoute);
+        postForList(findFlowClassificationRulesPath, findAuthSourcesRoute);
         getForList(BASE_URL, findAllRoute);
         putForDatum(BASE_URL, this::updateRoute);
         deleteForDatum(deletePath, this::deleteRoute);
@@ -128,14 +127,14 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
         String username = getUsername(request);
 
         LOG.info("User: {}, requested auth source cleanup", username);
-        return authoritativeSourceService.cleanupOrphans(username);
+        return flowClassificationRuleService.cleanupOrphans(username);
     }
 
 
     private String insertRoute(Request request, Response response) throws IOException {
         requireRole(userRoleService, request, SystemRole.AUTHORITATIVE_SOURCE_EDITOR);
-        AuthoritativeSourceCreateCommand command = readBody(request, AuthoritativeSourceCreateCommand.class);
-        authoritativeSourceService.insert(command, getUsername(request));
+        FlowClassificationRuleCreateCommand command = readBody(request, FlowClassificationRuleCreateCommand.class);
+        flowClassificationRuleService.insert(command, getUsername(request));
         return "done";
     }
 
@@ -143,7 +142,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
     private String deleteRoute(Request request, Response response) {
         requireRole(userRoleService, request, SystemRole.AUTHORITATIVE_SOURCE_EDITOR);
         long id = getId(request);
-        authoritativeSourceService.remove(id, getUsername(request));
+        flowClassificationRuleService.remove(id, getUsername(request));
 
         return "done";
     }
@@ -151,8 +150,8 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
 
     private String updateRoute(Request request, Response response) throws IOException {
         requireRole(userRoleService, request, SystemRole.AUTHORITATIVE_SOURCE_EDITOR);
-        AuthoritativeSourceUpdateCommand command = readBody(request, AuthoritativeSourceUpdateCommand.class);
-        authoritativeSourceService.update(command, getUsername(request));
+        FlowClassificationRuleUpdateCommand command = readBody(request, FlowClassificationRuleUpdateCommand.class);
+        flowClassificationRuleService.update(command, getUsername(request));
         return "done";
     }
 
@@ -163,8 +162,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
         String username = getUsername(request);
         LOG.info("Recalculating all flow ratings (requested by: {})", username);
 
-        return false;
-//        return authoritativeSourceService.fastRecalculateAllFlowRatings();
+        return flowClassificationRuleService.fastRecalculateAllFlowRatings();
     }
 
 
@@ -174,7 +172,7 @@ public class AuthoritativeSourceEndpoint implements Endpoint {
     {
         IdSelectionOptions options = readIdSelectionOptionsFromBody(request);
 
-        Map<EntityReference, Collection<EntityReference>> result = authoritativeSourceService
+        Map<EntityReference, Collection<EntityReference>> result = flowClassificationRuleService
                 .calculateConsumersForDataTypeIdSelector(options);
 
         return simplifyMapToList(result);

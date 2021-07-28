@@ -16,19 +16,19 @@
  *
  */
 
-package com.khartec.waltz.data.authoritative_source;
+package com.khartec.waltz.data.flow_classification_rule;
 
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.authoritativesource.*;
+import com.khartec.waltz.model.authoritativesource.ImmutableNonAuthoritativeSource;
+import com.khartec.waltz.model.authoritativesource.NonAuthoritativeSource;
+import com.khartec.waltz.model.flow_classification_rule.*;
 import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import com.khartec.waltz.schema.tables.Application;
 import com.khartec.waltz.schema.tables.EntityHierarchy;
-import com.khartec.waltz.schema.tables.records.AuthoritativeSourceRecord;
+import com.khartec.waltz.schema.tables.records.FlowClassificationRuleRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,12 +40,16 @@ import java.util.stream.IntStream;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.Checks.checkTrue;
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
+import static com.khartec.waltz.common.SetUtilities.union;
 import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
 import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.schema.Tables.FLOW_CLASSIFICATION;
+import static com.khartec.waltz.schema.Tables.FLOW_CLASSIFICATION_RULE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.AuthoritativeSource.AUTHORITATIVE_SOURCE;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
@@ -57,14 +61,14 @@ import static java.util.stream.Collectors.collectingAndThen;
 
 
 @Repository
-public class AuthoritativeSourceDao {
+public class FlowClassificationRuleDao {
 
     public final static Application CONSUMER_APP = APPLICATION.as("consumer");
     public final static Application SUPPLIER_APP = APPLICATION.as("supplier");
     public static final com.khartec.waltz.schema.tables.DataType parent_dt = DATA_TYPE.as("parent_dt");
     public static final com.khartec.waltz.schema.tables.DataType child_dt = DATA_TYPE.as("child_dt");
-    public static final com.khartec.waltz.schema.tables.EntityHierarchy eh = ENTITY_HIERARCHY.as("eh");
-    public static final com.khartec.waltz.schema.tables.EntityHierarchy level = ENTITY_HIERARCHY.as("level");
+    public static final EntityHierarchy eh = ENTITY_HIERARCHY.as("eh");
+    public static final EntityHierarchy level = ENTITY_HIERARCHY.as("level");
 
     private final static AggregateFunction<Integer> COUNT_FIELD = DSL.count(LOGICAL_FLOW);
 
@@ -75,21 +79,24 @@ public class AuthoritativeSourceDao {
 
     private final static Field<Long> targetOrgUnitId = ehOrgUnit.ID.as("targetOrgUnitId");
     private final static Field<Integer> declaredOrgUnitLevel = ehOrgUnit.LEVEL.as("declaredOrgUnitLevel");
-    private final static Field<String> declaredDataTypeCode = AUTHORITATIVE_SOURCE.DATA_TYPE.as("declaredDataTypeCode");
     private final static Field<Long> declaredDataTypeId = ehDataType.ID.as("declaredDataTypeId");
     private final static Field<Integer> declaredDataTypeLevel = ehDataType.LEVEL.as("declaredDataTypeLevel");
     private final static Field<String> targetDataTypeCode = impliedDataType.CODE.as("targetDataTypeCode");
 
     private static final Field<String> PARENT_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
-            AUTHORITATIVE_SOURCE.PARENT_ID,
-            AUTHORITATIVE_SOURCE.PARENT_KIND,
+            FLOW_CLASSIFICATION_RULE.PARENT_ID,
+            FLOW_CLASSIFICATION_RULE.PARENT_KIND,
             newArrayList(EntityKind.ORG_UNIT, EntityKind.APPLICATION, EntityKind.ACTOR));
 
+    private static final Condition flowNotRemoved = LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name())
+            .and(LOGICAL_FLOW.IS_REMOVED.isFalse());
+    private static final Condition supplierNotRemoved =  SUPPLIER_APP.IS_REMOVED.isFalse();
+    private static final Condition consumerNotRemoved =  CONSUMER_APP.IS_REMOVED.isFalse();
 
     private final DSLContext dsl;
 
-    private static final RecordMapper<Record, AuthoritativeSource> TO_DOMAIN_MAPPER = r -> {
-        AuthoritativeSourceRecord record = r.into(AuthoritativeSourceRecord.class);
+    private static final RecordMapper<Record, FlowClassificationRule> TO_DOMAIN_MAPPER = r -> {
+        FlowClassificationRuleRecord record = r.into(FlowClassificationRuleRecord.class);
 
         EntityReference parentRef = ImmutableEntityReference.builder()
                 .id(record.getParentId())
@@ -109,13 +116,13 @@ public class AuthoritativeSourceDao {
                 .name(r.getValue(SUPPLIER_APP.NAME))
                 .build();
 
-        return ImmutableAuthoritativeSource.builder()
+        return ImmutableFlowClassificationRule.builder()
                 .id(record.getId())
                 .parentReference(parentRef)
                 .appOrgUnitReference(orgUnitRef)
                 .applicationReference(appRef)
-                .dataType(record.getDataType())
-                .rating(AuthoritativenessRatingValue.of(record.getRating()))
+                .dataTypeId(record.getDataTypeId())
+                .classificationId(record.getFlowClassificationId())
                 .description(record.getDescription())
                 .provenance(record.getProvenance())
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
@@ -125,148 +132,219 @@ public class AuthoritativeSourceDao {
     };
 
 
-    private static final RecordMapper<Record, AuthoritativeRatingVantagePoint> TO_VANTAGE_MAPPER = r -> {
-        AuthoritativeSourceRecord authRecord = r.into(AuthoritativeSourceRecord.class);
-        return ImmutableAuthoritativeRatingVantagePoint.builder()
+    private static final RecordMapper<Record, FlowClassificationRuleVantagePoint> TO_VANTAGE_MAPPER = r -> {
+
+        return ImmutableFlowClassificationRuleVantagePoint.builder()
                 .vantagePoint(mkRef(EntityKind.ORG_UNIT, r.get(targetOrgUnitId)))
                 .vantagePointRank(r.get(declaredOrgUnitLevel))
-                .applicationId(authRecord.getApplicationId())
-                .rating(AuthoritativenessRatingValue.of(authRecord.getRating()))
+                .applicationId(r.get(FLOW_CLASSIFICATION_RULE.APPLICATION_ID))
+                .classificationCode(r.get(FLOW_CLASSIFICATION.CODE))
                 .dataType(mkRef(EntityKind.DATA_TYPE, r.get(declaredDataTypeId)))
-                .dataTypeCode(r.get(targetDataTypeCode))
                 .dataTypeRank(r.get(declaredDataTypeLevel))
-                .authSourceId(r.get(AUTHORITATIVE_SOURCE.ID))
+                .ruleId(r.get(FLOW_CLASSIFICATION_RULE.ID))
                 .build();
     };
 
 
     @Autowired
-    public AuthoritativeSourceDao(DSLContext dsl) {
+    public FlowClassificationRuleDao(DSLContext dsl) {
         checkNotNull(dsl, "dsl must not be null");
         this.dsl = dsl;
     }
 
 
-    public List<AuthoritativeSource> findByEntityKind(EntityKind kind) {
+    public List<FlowClassificationRule> findAll() {
+        return baseSelect()
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public FlowClassificationRule getById(long id) {
+        return baseSelect()
+                .where(FLOW_CLASSIFICATION_RULE.ID.eq(id))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<FlowClassificationRule> findByEntityKind(EntityKind kind) {
         checkNotNull(kind, "kind must not be null");
         
         return baseSelect()
-                .where(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(kind.name()))
+                .where(FLOW_CLASSIFICATION_RULE.PARENT_KIND.eq(kind.name()))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
-    public List<AuthoritativeSource> findByEntityReference(EntityReference ref) {
+    public List<FlowClassificationRule> findByEntityReference(EntityReference ref) {
         checkNotNull(ref, "ref must not be null");
-        
-        
+
         return baseSelect()
-                .where(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(ref.kind().name()))
-                .and(AUTHORITATIVE_SOURCE.PARENT_ID.eq(ref.id()))
+                .where(FLOW_CLASSIFICATION_RULE.PARENT_KIND.eq(ref.kind().name()))
+                .and(FLOW_CLASSIFICATION_RULE.PARENT_ID.eq(ref.id()))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
-    public List<AuthoritativeSource> findByApplicationId(long applicationId) {
+    public List<FlowClassificationRule> findByApplicationId(long applicationId) {
         checkTrue(applicationId > -1, "applicationId must be +ve");
         
         return baseSelect()
-                .where(AUTHORITATIVE_SOURCE.APPLICATION_ID.eq(applicationId))
+                .where(FLOW_CLASSIFICATION_RULE.APPLICATION_ID.eq(applicationId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
-    public int update(AuthoritativeSourceUpdateCommand command) {
+    public int update(FlowClassificationRuleUpdateCommand command) {
         checkNotNull(command, "command cannot be null");
         checkTrue(command.id().isPresent(), "id must be +ve");
 
-        UpdateSetMoreStep<AuthoritativeSourceRecord> upd = dsl.update(AUTHORITATIVE_SOURCE)
-                .set(AUTHORITATIVE_SOURCE.RATING, command.rating().value())
-                .set(AUTHORITATIVE_SOURCE.DESCRIPTION, command.description());
+        UpdateSetMoreStep<FlowClassificationRuleRecord> upd = dsl
+                .update(FLOW_CLASSIFICATION_RULE)
+                .set(FLOW_CLASSIFICATION_RULE.FLOW_CLASSIFICATION_ID, command.classificationId())
+                .set(FLOW_CLASSIFICATION_RULE.DESCRIPTION, command.description());
 
         return upd
-                .where(AUTHORITATIVE_SOURCE.ID.eq(command.id().get()))
+                .where(FLOW_CLASSIFICATION_RULE.ID.eq(command.id().get()))
                 .execute();
     }
 
 
-    public long insert(AuthoritativeSourceCreateCommand command, String username) {
+    public long insert(FlowClassificationRuleCreateCommand command, String username) {
         checkNotNull(command, "command cannot be null");
 
-        SelectConditionStep<Record1<String>> dataTypeSelection = DSL
-                .select(DATA_TYPE.CODE)
-                .from(DATA_TYPE)
-                .where(DATA_TYPE.ID.eq(command.dataTypeId()));
-
         return dsl
-                .insertInto(AUTHORITATIVE_SOURCE)
-                .set(AUTHORITATIVE_SOURCE.PARENT_KIND, command.parentReference().kind().name())
-                .set(AUTHORITATIVE_SOURCE.PARENT_ID, command.parentReference().id())
-                .set(AUTHORITATIVE_SOURCE.DATA_TYPE, dataTypeSelection)
-                .set(AUTHORITATIVE_SOURCE.APPLICATION_ID, command.applicationId())
-                .set(AUTHORITATIVE_SOURCE.RATING, command.rating().value())
-                .set(AUTHORITATIVE_SOURCE.DESCRIPTION, command.description())
-                .set(AUTHORITATIVE_SOURCE.PROVENANCE, "waltz")
-                .set(AUTHORITATIVE_SOURCE.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
-                .set(AUTHORITATIVE_SOURCE.LAST_UPDATED_BY, username)
-                .returning(AUTHORITATIVE_SOURCE.ID)
+                .insertInto(FLOW_CLASSIFICATION_RULE)
+                .set(FLOW_CLASSIFICATION_RULE.PARENT_KIND, command.parentReference().kind().name())
+                .set(FLOW_CLASSIFICATION_RULE.PARENT_ID, command.parentReference().id())
+                .set(FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID, command.dataTypeId())
+                .set(FLOW_CLASSIFICATION_RULE.APPLICATION_ID, command.applicationId())
+                .set(FLOW_CLASSIFICATION_RULE.FLOW_CLASSIFICATION_ID, command.classificationId())
+                .set(FLOW_CLASSIFICATION_RULE.DESCRIPTION, command.description())
+                .set(FLOW_CLASSIFICATION_RULE.PROVENANCE, "waltz")
+                .set(FLOW_CLASSIFICATION_RULE.LAST_UPDATED_AT, nowUtcTimestamp())
+                .set(FLOW_CLASSIFICATION_RULE.LAST_UPDATED_BY, username)
+                .returning(FLOW_CLASSIFICATION_RULE.ID)
                 .fetchOne()
                 .getId();
     }
 
 
     public int remove(long id) {
-        return dsl.delete(AUTHORITATIVE_SOURCE)
-                .where(AUTHORITATIVE_SOURCE.ID.eq(id))
+        return dsl
+                .delete(FLOW_CLASSIFICATION_RULE)
+                .where(FLOW_CLASSIFICATION_RULE.ID.eq(id))
                 .execute();
     }
 
 
-    public AuthoritativeSource getById(long id) {
-        return baseSelect()
-                .where(AUTHORITATIVE_SOURCE.ID.eq(id))
-                .fetchOne(TO_DOMAIN_MAPPER);
+    public Set<EntityReference> cleanupOrphans() {
+        Select<Record1<Long>> orgUnitIds = DSL
+                .select(ORGANISATIONAL_UNIT.ID)
+                .from(ORGANISATIONAL_UNIT);
+
+        Select<Record1<Long>> appIds = DSL
+                .select(APPLICATION.ID)
+                .from(APPLICATION)
+                .where(IS_ACTIVE);
+
+        Condition unknownOrgUnit = FLOW_CLASSIFICATION_RULE.PARENT_ID.notIn(orgUnitIds)
+                .and(FLOW_CLASSIFICATION_RULE.PARENT_KIND.eq(EntityKind.ORG_UNIT.name()));
+
+        Condition appIsInactive = FLOW_CLASSIFICATION_RULE.APPLICATION_ID.notIn(appIds);
+
+        Set<EntityReference> appsInRulesWithoutOrgUnit = dsl
+                .select(FLOW_CLASSIFICATION_RULE.APPLICATION_ID)
+                .from(FLOW_CLASSIFICATION_RULE)
+                .where(unknownOrgUnit)
+                .fetchSet(r -> mkRef(EntityKind.APPLICATION, r.get(FLOW_CLASSIFICATION_RULE.ID)));
+
+        Set<EntityReference> orgUnitsInRulesWithoutApp = dsl
+                .select(FLOW_CLASSIFICATION_RULE.PARENT_ID, FLOW_CLASSIFICATION_RULE.PARENT_KIND)
+                .from(FLOW_CLASSIFICATION_RULE)
+                .where(appIsInactive)
+                .fetchSet(r -> mkRef(
+                        EntityKind.valueOf(r.get(FLOW_CLASSIFICATION_RULE.PARENT_KIND)),
+                        r.get(FLOW_CLASSIFICATION_RULE.PARENT_ID)));
+
+        Set<EntityReference> bereaved = union(appsInRulesWithoutOrgUnit, orgUnitsInRulesWithoutApp);
+
+        int deleted = dsl
+                .deleteFrom(FLOW_CLASSIFICATION_RULE)
+                .where(unknownOrgUnit)
+                .or(appIsInactive)
+                .execute();
+
+        return bereaved;
     }
 
 
-    public List<AuthoritativeRatingVantagePoint> findExpandedAuthoritativeRatingVantagePoints(Set<Long> orgIds) {
-        SelectSeekStep3<Record9<Long, Integer, String, Long, Integer, String, Long, String, Long>, Integer, Integer, Long> select = dsl.select(
-                targetOrgUnitId,
-                declaredOrgUnitLevel,
-                declaredDataTypeCode,
-                declaredDataTypeId,
-                declaredDataTypeLevel,
-                targetDataTypeCode,
-                AUTHORITATIVE_SOURCE.APPLICATION_ID,
-                AUTHORITATIVE_SOURCE.RATING,
-                AUTHORITATIVE_SOURCE.ID)
+    public int clearAuthRatingsForPointToPointFlows(FlowClassificationRule rule) {
+
+        // this may wipe any lower level explicit datatype mappings but these will be restored by the nightly job
+        SelectConditionStep<Record1<Long>> decoratorsToMarkAsNoOpinion = dsl
+                .select(LOGICAL_FLOW_DECORATOR.ID)
+                .from(LOGICAL_FLOW)
+                .innerJoin(LOGICAL_FLOW_DECORATOR).on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID))
+                .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
+                .innerJoin(ENTITY_HIERARCHY).on(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(ENTITY_HIERARCHY.ID))
+                .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.DATA_TYPE.name()))
+                .innerJoin(DATA_TYPE).on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(DATA_TYPE.ID))
+                .innerJoin(FLOW_CLASSIFICATION).on(LOGICAL_FLOW_DECORATOR.RATING.eq(FLOW_CLASSIFICATION.CODE))
+                .where(dsl.renderInlined(DATA_TYPE.ID.eq(rule.dataTypeId())
+                        .and(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(rule.applicationReference().id())
+                                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(rule.parentReference().kind().name())
+                                                .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(rule.parentReference().id()))))
+                                .and(FLOW_CLASSIFICATION.ID.eq(rule.classificationId())))));
+
+        return dsl
+                .update(LOGICAL_FLOW_DECORATOR)
+                .set(LOGICAL_FLOW_DECORATOR.RATING, AuthoritativenessRatingValue.NO_OPINION.value())
+                .setNull(LOGICAL_FLOW_DECORATOR.FLOW_CLASSIFICATION_RULE_ID)
+                .where(LOGICAL_FLOW_DECORATOR.ID.in(decoratorsToMarkAsNoOpinion))
+                .execute();
+    }
+
+
+    // Complicated stuff for calc
+
+
+    public List<FlowClassificationRuleVantagePoint> findExpandedFlowClassificationRuleVantagePoints(Set<Long> orgIds) {
+        SelectSeekStep3<Record7<Long, Integer, Long, Integer, Long, String, Long>, Integer, Integer, Long> select = dsl
+                .select(targetOrgUnitId,
+                        declaredOrgUnitLevel,
+                        declaredDataTypeId,
+                        declaredDataTypeLevel,
+                        FLOW_CLASSIFICATION_RULE.APPLICATION_ID,
+                        FLOW_CLASSIFICATION.CODE,
+                        FLOW_CLASSIFICATION_RULE.ID)
                 .from(ehOrgUnit)
-                .innerJoin(AUTHORITATIVE_SOURCE)
-                    .on(ehOrgUnit.ANCESTOR_ID.eq(AUTHORITATIVE_SOURCE.PARENT_ID).and(ehOrgUnit.KIND.eq(EntityKind.ORG_UNIT.name())))
+                .innerJoin(FLOW_CLASSIFICATION_RULE)
+                    .on(ehOrgUnit.ANCESTOR_ID.eq(FLOW_CLASSIFICATION_RULE.PARENT_ID).and(ehOrgUnit.KIND.eq(EntityKind.ORG_UNIT.name())))
                 .innerJoin(declaredDataType)
-                    .on(declaredDataType.CODE.eq(AUTHORITATIVE_SOURCE.DATA_TYPE))
+                    .on(declaredDataType.ID.eq(FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID))
                 .innerJoin(ehDataType)
                     .on(ehDataType.ANCESTOR_ID.eq(declaredDataType.ID).and(ehDataType.KIND.eq(EntityKind.DATA_TYPE.name())))
                 .innerJoin(impliedDataType)
                     .on(impliedDataType.ID.eq(ehDataType.ID).and(ehDataType.KIND.eq(EntityKind.DATA_TYPE.name())))
+                .innerJoin(FLOW_CLASSIFICATION).on(FLOW_CLASSIFICATION_RULE.FLOW_CLASSIFICATION_ID.eq(FLOW_CLASSIFICATION.ID))
                 .where(ehOrgUnit.ID.in(orgIds))
                 .orderBy(ehOrgUnit.LEVEL.desc(), ehDataType.LEVEL.desc(), ehOrgUnit.ID);
 
-        return select.fetch(TO_VANTAGE_MAPPER);
+        return select
+                .fetch(TO_VANTAGE_MAPPER);
     }
 
 
-    public List<AuthoritativeRatingVantagePoint> findAuthoritativeRatingVantagePoints() {
-        SelectSeekStep4<Record9<Long, Integer, String, Long, Integer, String, Long, String, Long>, Integer, Integer, Long, Long> select = dsl
+    public List<FlowClassificationRuleVantagePoint> findFlowClassificationRuleVantagePoints() {
+        SelectSeekStep4<Record7<Long, Integer, Long, Integer, Long, String, Long>, Integer, Integer, Long, Long> select = dsl
                 .select(targetOrgUnitId,
                         declaredOrgUnitLevel,
-                        declaredDataTypeCode,
                         declaredDataTypeId,
                         declaredDataTypeLevel,
-                        declaredDataTypeCode.as(targetDataTypeCode),
-                        AUTHORITATIVE_SOURCE.APPLICATION_ID,
-                        AUTHORITATIVE_SOURCE.RATING,
-                        AUTHORITATIVE_SOURCE.ID)
+                        FLOW_CLASSIFICATION_RULE.APPLICATION_ID,
+                        FLOW_CLASSIFICATION.NAME,
+                        FLOW_CLASSIFICATION_RULE.ID)
                 .from(AUTHORITATIVE_SOURCE)
                 .innerJoin(ehOrgUnit)
                 .on(ehOrgUnit.ANCESTOR_ID.eq(AUTHORITATIVE_SOURCE.PARENT_ID)
@@ -278,6 +356,7 @@ public class AuthoritativeSourceDao {
                 .on(ehDataType.ANCESTOR_ID.eq(DATA_TYPE.ID)
                         .and(ehDataType.KIND.eq(EntityKind.DATA_TYPE.name()))
                         .and(ehDataType.ID.eq(ehDataType.ANCESTOR_ID)))
+                .innerJoin(FLOW_CLASSIFICATION).on(FLOW_CLASSIFICATION_RULE.FLOW_CLASSIFICATION_ID.eq(FLOW_CLASSIFICATION.ID))
                 .orderBy(
                         ehOrgUnit.LEVEL.desc(),
                         ehDataType.LEVEL.desc(),
@@ -285,12 +364,6 @@ public class AuthoritativeSourceDao {
                         ehDataType.ID
                 );
         return select.fetch(TO_VANTAGE_MAPPER);
-    }
-
-
-    public List<AuthoritativeSource> findAll() {
-        return baseSelect()
-                .fetch(TO_DOMAIN_MAPPER);
     }
 
 
@@ -305,40 +378,38 @@ public class AuthoritativeSourceDao {
         Condition appJoin = APPLICATION.ID.eq(LOGICAL_FLOW.TARGET_ENTITY_ID)
                 .and(APPLICATION.ORGANISATIONAL_UNIT_ID.eq(ENTITY_HIERARCHY.ID));
 
-        Condition hierarchyJoin = ENTITY_HIERARCHY.ANCESTOR_ID.eq(AUTHORITATIVE_SOURCE.PARENT_ID)
+        Condition hierarchyJoin = ENTITY_HIERARCHY.ANCESTOR_ID.eq(FLOW_CLASSIFICATION_RULE.PARENT_ID)
                 .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name()));
 
-        Condition authSourceJoin = AUTHORITATIVE_SOURCE.APPLICATION_ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID)
+        Condition flowClassificationRuleJoin = FLOW_CLASSIFICATION_RULE.APPLICATION_ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID)
                 .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
-
-        Condition dataFlowDecoratorJoin = LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID);
 
         Condition condition = LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeIdSelector)
                 .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
-                .and(AUTHORITATIVE_SOURCE.DATA_TYPE.in(dataTypeCodeSelector))
-                .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name()));
+                .and(FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID.in(dataTypeIdSelector))
+                .and(flowNotRemoved);
 
-        Field<Long> authSourceIdField = AUTHORITATIVE_SOURCE.ID.as("auth_source_id");
+        Field<Long> classificationRuleIdField = FLOW_CLASSIFICATION_RULE.ID.as("classification_rule_id");
         Field<Long> applicationIdField = APPLICATION.ID.as("application_id");
         Field<String> applicationNameField = APPLICATION.NAME.as("application_name");
 
         Result<Record3<Long, Long, String>> records = dsl
-                .select(authSourceIdField,
+                .select(classificationRuleIdField,
                         applicationIdField,
                         applicationNameField)
                 .from(LOGICAL_FLOW)
-                .innerJoin(LOGICAL_FLOW_DECORATOR).on(dataFlowDecoratorJoin)
-                .innerJoin(AUTHORITATIVE_SOURCE).on(authSourceJoin)
+                .innerJoin(LOGICAL_FLOW_DECORATOR).on(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID))
+                .innerJoin(FLOW_CLASSIFICATION).on(flowClassificationRuleJoin)
                 .innerJoin(ENTITY_HIERARCHY).on(hierarchyJoin)
                 .innerJoin(APPLICATION).on(appJoin)
                 .where(condition)
-                .orderBy(AUTHORITATIVE_SOURCE.ID, APPLICATION.NAME)
+                .orderBy(FLOW_CLASSIFICATION_RULE.ID, APPLICATION.NAME)
                 .fetch();
 
         return groupBy(
                 r -> mkRef(
-                        EntityKind.AUTHORITATIVE_SOURCE,
-                        r.getValue(authSourceIdField)),
+                        EntityKind.FLOW_CLASSIFICATION_RULE,
+                        r.getValue(classificationRuleIdField)),
                 r -> mkRef(
                         EntityKind.APPLICATION,
                         r.getValue(applicationIdField),
@@ -347,58 +418,10 @@ public class AuthoritativeSourceDao {
     }
 
 
-    public List<EntityReference> cleanupOrphans() {
-        Select<Record1<Long>> orgUnitIds = DSL
-                .select(ORGANISATIONAL_UNIT.ID)
-                .from(ORGANISATIONAL_UNIT);
-        Select<Record1<Long>> appIds = DSL
-                .select(APPLICATION.ID)
-                .from(APPLICATION)
-                .where(IS_ACTIVE);
-
-        Condition unknownOrgUnit = AUTHORITATIVE_SOURCE.PARENT_ID.notIn(orgUnitIds)
-                .and(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(EntityKind.ORG_UNIT.name()));
-
-        Condition appIsInactive = AUTHORITATIVE_SOURCE.APPLICATION_ID.notIn(appIds);
-
-        List<EntityReference> authSourceAppsWithoutOrgUnit = dsl
-                .select(AUTHORITATIVE_SOURCE.APPLICATION_ID)
-                .from(AUTHORITATIVE_SOURCE)
-                .where(unknownOrgUnit)
-                .fetch(AUTHORITATIVE_SOURCE.APPLICATION_ID)
-                .stream()
-                .map(id -> mkRef(EntityKind.APPLICATION, id))
-                .collect(Collectors.toList());
-
-        List<EntityReference> authSourceOrgUnitsWithoutApp = dsl
-                .select(AUTHORITATIVE_SOURCE.PARENT_ID, AUTHORITATIVE_SOURCE.PARENT_KIND)
-                .from(AUTHORITATIVE_SOURCE)
-                .where(appIsInactive)
-                .fetch()
-                .stream()
-                .map(r -> mkRef(
-                        EntityKind.valueOf(r.get(AUTHORITATIVE_SOURCE.PARENT_KIND)),
-                        r.get(AUTHORITATIVE_SOURCE.PARENT_ID)))
-                .collect(Collectors.toList());
-
-        List<EntityReference> bereaved = ListUtilities.concat(
-                authSourceAppsWithoutOrgUnit,
-                authSourceOrgUnitsWithoutApp);
-
-        dsl.deleteFrom(AUTHORITATIVE_SOURCE)
-                .where(unknownOrgUnit)
-                .or(appIsInactive)
-                .execute();
-
-        return bereaved;
-    }
-
-
     public List<NonAuthoritativeSource> findNonAuthSources(Condition customSelectionCriteria) {
-        Condition flowNotRemoved = LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name());
-        Condition supplierNotRemoved =  SUPPLIER_APP.IS_REMOVED.isFalse();
-        Condition consumerNotRemoved =  CONSUMER_APP.IS_REMOVED.isFalse();
+
         Condition decorationIsAboutDataTypes = LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name());
+
         Condition badFlow = LOGICAL_FLOW_DECORATOR.RATING.in(
                 AuthoritativenessRatingValue.DISCOURAGED.value(),
                 AuthoritativenessRatingValue.NO_OPINION.value());
@@ -422,8 +445,7 @@ public class AuthoritativeSourceDao {
                 .innerJoin(CONSUMER_APP)
                 .on(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(CONSUMER_APP.ID)
                         .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
-                .where(customSelectionCriteria)
-                .and(commonSelectionCriteria)
+                .where(customSelectionCriteria).and(commonSelectionCriteria)
                 .groupBy(SUPPLIER_APP.ID, SUPPLIER_APP.NAME, LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID)
                 .fetch()
                 .map(r -> ImmutableNonAuthoritativeSource.builder()
@@ -437,22 +459,25 @@ public class AuthoritativeSourceDao {
     }
 
 
-    public List<AuthoritativeSource> findAuthSources(Condition customSelectionCriteria) {
-        Condition criteria = AUTHORITATIVE_SOURCE.ID.in(DSL
-                .select(AUTHORITATIVE_SOURCE.ID)
-                .from(AUTHORITATIVE_SOURCE)
-                    .innerJoin(LOGICAL_FLOW)
-                    .on(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(AUTHORITATIVE_SOURCE.APPLICATION_ID)
-                            .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                            .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name())))
-                    .innerJoin(CONSUMER_APP)
-                    .on(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(CONSUMER_APP.ID)
-                            .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
-                    .where(customSelectionCriteria));
+    public Set<FlowClassificationRule> findClassificationRules(Condition customSelectionCriteria) {
+
+        SelectConditionStep<Record1<Long>> ruleSelectorBasedOnCustomSelectionForTargetApps = DSL
+                .select(FLOW_CLASSIFICATION_RULE.ID)
+                .from(FLOW_CLASSIFICATION_RULE)
+                .innerJoin(LOGICAL_FLOW)
+                .on(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(FLOW_CLASSIFICATION_RULE.APPLICATION_ID)
+                        .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                        .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name())
+                                .and(LOGICAL_FLOW.IS_REMOVED.isFalse())))
+                .innerJoin(CONSUMER_APP).on(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(CONSUMER_APP.ID)
+                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .where(customSelectionCriteria);
+
+        Condition criteria = FLOW_CLASSIFICATION_RULE.ID.in(ruleSelectorBasedOnCustomSelectionForTargetApps);
 
         return baseSelect()
                 .where(criteria)
-                .fetch(TO_DOMAIN_MAPPER);
+                .fetchSet(TO_DOMAIN_MAPPER);
     }
 
 
@@ -462,11 +487,11 @@ public class AuthoritativeSourceDao {
         return dsl
                 .select(PARENT_NAME_FIELD)
                 .select(ORGANISATIONAL_UNIT.ID, ORGANISATIONAL_UNIT.NAME)
-                .select(AUTHORITATIVE_SOURCE.fields())
+                .select(FLOW_CLASSIFICATION_RULE.fields())
                 .select(SUPPLIER_APP.NAME, SUPPLIER_APP.ID)
-                .from(AUTHORITATIVE_SOURCE)
+                .from(FLOW_CLASSIFICATION_RULE)
                 .innerJoin(SUPPLIER_APP)
-                .on(SUPPLIER_APP.ID.eq(AUTHORITATIVE_SOURCE.APPLICATION_ID))
+                .on(SUPPLIER_APP.ID.eq(FLOW_CLASSIFICATION_RULE.APPLICATION_ID))
                 .innerJoin(ORGANISATIONAL_UNIT)
                 .on(ORGANISATIONAL_UNIT.ID.eq(SUPPLIER_APP.ORGANISATIONAL_UNIT_ID));
     }
@@ -474,18 +499,17 @@ public class AuthoritativeSourceDao {
 
     public int updatePointToPointAuthStatements() {
 
-        Condition logicalFlowTargetIsAuthSourceParent = AUTHORITATIVE_SOURCE.APPLICATION_ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID)
+        Condition logicalFlowTargetIsAuthSourceParent = FLOW_CLASSIFICATION_RULE.APPLICATION_ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID)
                 .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(AUTHORITATIVE_SOURCE.PARENT_KIND)
-                                .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(AUTHORITATIVE_SOURCE.PARENT_ID))));
+                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(FLOW_CLASSIFICATION_RULE.PARENT_KIND)
+                                .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(FLOW_CLASSIFICATION_RULE.PARENT_ID))));
 
         int[] updatedActorDecoratorRatings = dsl
                 .select(LOGICAL_FLOW_DECORATOR.ID,
                         child_dt.ID,
-                        AUTHORITATIVE_SOURCE.RATING,
-                        AUTHORITATIVE_SOURCE.ID)
-                .from(AUTHORITATIVE_SOURCE)
-                .innerJoin(parent_dt).on(AUTHORITATIVE_SOURCE.DATA_TYPE.eq(parent_dt.CODE))
+                        FLOW_CLASSIFICATION.CODE,
+                        FLOW_CLASSIFICATION_RULE.ID)
+                .from(FLOW_CLASSIFICATION_RULE)
                 .innerJoin(ENTITY_HIERARCHY).on(parent_dt.ID.eq(ENTITY_HIERARCHY.ANCESTOR_ID)
                         .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.DATA_TYPE.name())))
                 .innerJoin(child_dt).on(ENTITY_HIERARCHY.ID.eq(child_dt.ID))
@@ -493,49 +517,23 @@ public class AuthoritativeSourceDao {
                 .innerJoin(LOGICAL_FLOW_DECORATOR).on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID)
                         .and(child_dt.ID.eq(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID)
                                 .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))))
-                .innerJoin(level).on(level.ID.eq(parent_dt.ID)
+                .innerJoin(level).on(level.ID.eq(FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID)
                         .and(level.ID.eq(level.ANCESTOR_ID)
                         .and(level.KIND.eq(EntityKind.DATA_TYPE.name()))))
-                .where(AUTHORITATIVE_SOURCE.RATING.ne(LOGICAL_FLOW_DECORATOR.RATING))
+                .innerJoin(FLOW_CLASSIFICATION).on(FLOW_CLASSIFICATION_RULE.FLOW_CLASSIFICATION_ID.eq(FLOW_CLASSIFICATION.ID))
+                .where(FLOW_CLASSIFICATION.CODE.ne(LOGICAL_FLOW_DECORATOR.RATING))
                 .orderBy(level.LEVEL)
                 .fetch()
                 .stream()
                 .map(r -> dsl
                         .update(LOGICAL_FLOW_DECORATOR)
-                        .set(LOGICAL_FLOW_DECORATOR.RATING, r.get(AUTHORITATIVE_SOURCE.RATING))
-                        .set(LOGICAL_FLOW_DECORATOR.FLOW_CLASSIFICATION_RULE_ID, r.get(AUTHORITATIVE_SOURCE.ID))
+                        .set(LOGICAL_FLOW_DECORATOR.RATING, r.get(FLOW_CLASSIFICATION.CODE))
+                        .set(LOGICAL_FLOW_DECORATOR.FLOW_CLASSIFICATION_RULE_ID, r.get(FLOW_CLASSIFICATION_RULE.ID))
                         .where(LOGICAL_FLOW_DECORATOR.ID.eq(r.get(LOGICAL_FLOW_DECORATOR.ID))
                                 .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(r.get(child_dt.ID))
                                         .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))))
                 .collect(collectingAndThen(Collectors.toSet(), r -> dsl.batch(r).execute()));
 
         return IntStream.of(updatedActorDecoratorRatings).sum();
-    }
-
-
-    public int clearAuthRatingsForPointToPointFlows(AuthoritativeSource authSource) {
-
-        // this may wipe any lower level explicit datatype mappings but these will be restored by the nightly job
-        SelectConditionStep<Record1<Long>> decoratorsToMarkAsNoOpinion = dsl
-                .select(LOGICAL_FLOW_DECORATOR.ID)
-                .from(LOGICAL_FLOW)
-                .innerJoin(LOGICAL_FLOW_DECORATOR).on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID))
-                .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
-                .innerJoin(ENTITY_HIERARCHY).on(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(ENTITY_HIERARCHY.ID))
-                .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.DATA_TYPE.name()))
-                .innerJoin(DATA_TYPE).on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(DATA_TYPE.ID))
-                .where(dsl.renderInlined(DATA_TYPE.CODE.eq(authSource.dataType())
-                        .and(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(authSource.applicationReference().id())
-                                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(authSource.parentReference().kind().name())
-                                                .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(authSource.parentReference().id()))))
-                                .and(LOGICAL_FLOW_DECORATOR.RATING.eq(authSource.rating().value())))));
-
-        return dsl
-                .update(LOGICAL_FLOW_DECORATOR)
-                .set(LOGICAL_FLOW_DECORATOR.RATING, AuthoritativenessRatingValue.NO_OPINION.value())
-                .setNull(LOGICAL_FLOW_DECORATOR.FLOW_CLASSIFICATION_RULE_ID)
-                .where(LOGICAL_FLOW_DECORATOR.ID.in(decoratorsToMarkAsNoOpinion))
-                .execute();
     }
 }

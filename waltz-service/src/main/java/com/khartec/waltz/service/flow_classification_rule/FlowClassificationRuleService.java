@@ -16,7 +16,7 @@
  *
  */
 
-package com.khartec.waltz.service.authoritative_source;
+package com.khartec.waltz.service.flow_classification_rule;
 
 import com.khartec.waltz.common.exception.NotFoundException;
 import com.khartec.waltz.data.GenericSelector;
@@ -28,13 +28,20 @@ import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
 import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
+import com.khartec.waltz.data.flow_classification_rule.FlowClassificationDao;
+import com.khartec.waltz.data.flow_classification_rule.FlowClassificationRuleDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.authoritativesource.*;
+import com.khartec.waltz.model.authoritativesource.NonAuthoritativeSource;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.datatype.DataType;
+import com.khartec.waltz.model.flow_classification.FlowClassification;
+import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRule;
+import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRuleCreateCommand;
+import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRuleUpdateCommand;
+import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
 import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.jooq.Condition;
@@ -50,10 +57,12 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityKind.ACTOR;
 import static com.khartec.waltz.model.EntityKind.ORG_UNIT;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.AuthoritativeSource.AUTHORITATIVE_SOURCE;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
@@ -61,16 +70,17 @@ import static java.lang.String.format;
 
 
 @Service
-public class AuthoritativeSourceService {
+public class FlowClassificationRuleService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(AuthoritativeSourceService.class);
+    private static final Logger LOG = LoggerFactory.getLogger(FlowClassificationRuleService.class);
 
-    private final AuthoritativeSourceDao authoritativeSourceDao;
+    private final FlowClassificationRuleDao flowClassificationRuleDao;
+    private final FlowClassificationDao flowClassificationDao;
     private final DataTypeDao dataTypeDao;
     private final OrganisationalUnitDao organisationalUnitDao;
     private final ApplicationDao applicationDao;
     private final ActorDao actorDao;
-    private final AuthSourceRatingCalculator ratingCalculator;
+    private final FlowClassificationCalculator ratingCalculator;
     private final ChangeLogService changeLogService;
     private final LogicalFlowDecoratorDao logicalFlowDecoratorDao;
     private final DataTypeIdSelectorFactory dataTypeIdSelectorFactory = new DataTypeIdSelectorFactory();
@@ -79,15 +89,17 @@ public class AuthoritativeSourceService {
 
 
     @Autowired
-    public AuthoritativeSourceService(AuthoritativeSourceDao authoritativeSourceDao,
-                                      DataTypeDao dataTypeDao,
-                                      OrganisationalUnitDao organisationalUnitDao,
-                                      ApplicationDao applicationDao,
-                                      ActorDao actorDao,
-                                      AuthSourceRatingCalculator ratingCalculator,
-                                      ChangeLogService changeLogService,
-                                      LogicalFlowDecoratorDao logicalFlowDecoratorDao) {
-        checkNotNull(authoritativeSourceDao, "authoritativeSourceDao must not be null");
+    public FlowClassificationRuleService(FlowClassificationRuleDao flowClassificationRuleDao,
+                                         FlowClassificationDao flowClassificationDao,
+                                         DataTypeDao dataTypeDao,
+                                         OrganisationalUnitDao organisationalUnitDao,
+                                         ApplicationDao applicationDao,
+                                         ActorDao actorDao,
+                                         FlowClassificationCalculator ratingCalculator,
+                                         ChangeLogService changeLogService,
+                                         LogicalFlowDecoratorDao logicalFlowDecoratorDao) {
+        checkNotNull(flowClassificationRuleDao, "flowClassificationRuleDao must not be null");
+        checkNotNull(flowClassificationDao, "flowClassificationDao must not be null");
         checkNotNull(actorDao, "actorDao must not be null");
         checkNotNull(dataTypeDao, "dataTypeDao cannot be null");
         checkNotNull(organisationalUnitDao, "organisationalUnitDao cannot be null");
@@ -96,7 +108,8 @@ public class AuthoritativeSourceService {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(logicalFlowDecoratorDao, "logicalFlowDecoratorDao cannot be null");
 
-        this.authoritativeSourceDao = authoritativeSourceDao;
+        this.flowClassificationRuleDao = flowClassificationRuleDao;
+        this.flowClassificationDao = flowClassificationDao;
         this.dataTypeDao = dataTypeDao;
         this.organisationalUnitDao = organisationalUnitDao;
         this.applicationDao = applicationDao;
@@ -107,47 +120,47 @@ public class AuthoritativeSourceService {
     }
 
 
-    public List<AuthoritativeSource> findByEntityKind(EntityKind kind) {
-        return authoritativeSourceDao.findByEntityKind(kind);
+    public List<FlowClassificationRule> findByEntityKind(EntityKind kind) {
+        return flowClassificationRuleDao.findByEntityKind(kind);
     }
 
 
-    public AuthoritativeSource getById(long id) {
-        return authoritativeSourceDao.getById(id);
+    public FlowClassificationRule getById(long id) {
+        return flowClassificationRuleDao.getById(id);
     }
 
 
-    public List<AuthoritativeSource> findByEntityReference(EntityReference ref) {
-        return authoritativeSourceDao.findByEntityReference(ref);
+    public List<FlowClassificationRule> findByEntityReference(EntityReference ref) {
+        return flowClassificationRuleDao.findByEntityReference(ref);
     }
 
 
-    public List<AuthoritativeSource> findByApplicationId(long applicationId) {
-        return authoritativeSourceDao.findByApplicationId(applicationId);
+    public List<FlowClassificationRule> findByApplicationId(long applicationId) {
+        return flowClassificationRuleDao.findByApplicationId(applicationId);
     }
 
 
-    public int update(AuthoritativeSourceUpdateCommand command, String username) {
-        int updateCount = authoritativeSourceDao.update(command);
-        long authSourceId = command
+    public int update(FlowClassificationRuleUpdateCommand command, String username) {
+        int updateCount = flowClassificationRuleDao.update(command);
+        long ruleId = command
                 .id()
                 .orElseThrow(() -> new IllegalArgumentException("cannot update an auth source without an id"));
-        AuthoritativeSource updatedAuthSource = getById(authSourceId);
-        ratingCalculator.update(updatedAuthSource.dataType(), updatedAuthSource.parentReference());
+        FlowClassificationRule updatedClassificationRule = getById(ruleId);
+        ratingCalculator.update(updatedClassificationRule.dataTypeId(), updatedClassificationRule.parentReference());
         logUpdate(command, username);
         return updateCount;
     }
 
 
-    public long insert(AuthoritativeSourceCreateCommand command, String username) {
-        long authSourceId = authoritativeSourceDao.insert(command, username);
+    public long insert(FlowClassificationRuleCreateCommand command, String username) {
+        long authSourceId = flowClassificationRuleDao.insert(command, username);
 
         if (command.parentReference().kind() == ORG_UNIT) {
             ratingCalculator.update(command.dataTypeId(), command.parentReference());
         }
 
         logInsert(authSourceId, command, username);
-        authoritativeSourceDao.updatePointToPointAuthStatements();
+        flowClassificationRuleDao.updatePointToPointAuthStatements();
 
         return authSourceId;
     }
@@ -155,77 +168,77 @@ public class AuthoritativeSourceService {
 
     public int remove(long id, String username) {
 
-        AuthoritativeSource authSourceToDelete = getById(id);
+        FlowClassificationRule classificationRuleToDelete = getById(id);
 
-        if(authSourceToDelete == null){
+        if(classificationRuleToDelete == null){
             throw new NotFoundException("ASRM-NF", "Authoritative source not found");
         }
 
         logRemoval(id, username);
 
-        int deletedCount = authoritativeSourceDao.remove(id);
+        int deletedCount = flowClassificationRuleDao.remove(id);
 
         //set any point-to-point overrides as no opinion first then recalculate for all auth
         LOG.debug("Updating point-point ratings");
-        authoritativeSourceDao.clearAuthRatingsForPointToPointFlows(authSourceToDelete);
+        flowClassificationRuleDao.clearAuthRatingsForPointToPointFlows(classificationRuleToDelete);
 
         LOG.debug("Updated point-point");
-        if(authSourceToDelete.parentReference().kind() != ACTOR){
+        if(classificationRuleToDelete.parentReference().kind() != ACTOR){
             LOG.debug("Updating org unit /app flow ratings");
-            ratingCalculator.update(authSourceToDelete.dataType(), authSourceToDelete.parentReference());
+            ratingCalculator.update(classificationRuleToDelete.dataTypeId(), classificationRuleToDelete.parentReference());
         }
 
         return deletedCount;
     }
 
 
-    public List<AuthoritativeSource> findAll() {
-        return authoritativeSourceDao.findAll();
+    public List<FlowClassificationRule> findAll() {
+        return flowClassificationRuleDao.findAll();
     }
 
 
     @Deprecated
     public boolean recalculateAllFlowRatings() {
         logicalFlowDecoratorDao.updateRatingsByCondition(AuthoritativenessRatingValue.NO_OPINION, DSL.trueCondition());
-        findAll()
-                .forEach(authSource -> ratingCalculator.update(
-                        authSource.dataType(),
-                        authSource.parentReference()));
+        findAll().forEach(
+                classificationRule -> ratingCalculator.update(
+                        classificationRule.dataTypeId(),
+                        classificationRule.parentReference()));
         return true;
     }
 
-//
-//    public boolean fastRecalculateAllFlowRatings() {
-//        logicalFlowDecoratorDao.updateRatingsByCondition(AuthoritativenessRatingValue.NO_OPINION, DSL.trueCondition());
-//
-//        //finds all the vantage points to apply using parent as selector
-//        List<AuthoritativeRatingVantagePoint> authoritativeRatingVantagePoints = authoritativeSourceDao
-//                .findAuthoritativeRatingVantagePoints();
-//
-//        authoritativeRatingVantagePoints
-//                .forEach(a -> {
-//            LOG.info("Updating decorators for: {}", a);
-//            int updateCount = logicalFlowDecoratorDao.updateDecoratorsForAuthSource(a);
-//            LOG.info("Updated {} decorators for: {}", updateCount, a);
-//        });
-//
-//        //overrides Auth Statement for point to point flows (must run after the above)
-//        int updatedDecoratorRatings = authoritativeSourceDao.updatePointToPointAuthStatements();
-//        LOG.info("Updated decorators for: {} point-to-point flows", updatedDecoratorRatings);
-//
-//        return true;
-//    }
+
+    public boolean fastRecalculateAllFlowRatings() {
+        logicalFlowDecoratorDao.updateRatingsByCondition(AuthoritativenessRatingValue.NO_OPINION, DSL.trueCondition());
+
+        //finds all the vantage points to apply using parent as selector
+        List<FlowClassificationRuleVantagePoint> flowClassificationRuleVantagePoints = flowClassificationRuleDao
+                .findFlowClassificationRuleVantagePoints();
+
+        flowClassificationRuleVantagePoints
+                .forEach(a -> {
+                    LOG.info("Updating decorators for: {}", a);
+                    int updateCount = logicalFlowDecoratorDao.updateDecoratorsForAuthSource(a);
+                    LOG.info("Updated {} decorators for: {}", updateCount, a);
+        });
+
+        //overrides Auth Statement for point to point flows (must run after the above)
+        int updatedDecoratorRatings = flowClassificationRuleDao.updatePointToPointAuthStatements();
+        LOG.info("Updated decorators for: {} point-to-point flows", updatedDecoratorRatings);
+
+        return true;
+    }
 
 
     public Map<EntityReference, Collection<EntityReference>> calculateConsumersForDataTypeIdSelector(
             IdSelectionOptions options) {
         Select<Record1<Long>> selector = dataTypeIdSelectorFactory.apply(options);
-        return authoritativeSourceDao.calculateConsumersForDataTypeIdSelector(selector);
+        return flowClassificationRuleDao.calculateConsumersForDataTypeIdSelector(selector);
     }
 
 
     public Integer cleanupOrphans(String userId) {
-        List<EntityReference> entityReferences = authoritativeSourceDao.cleanupOrphans();
+        Set<EntityReference> entityReferences = flowClassificationRuleDao.cleanupOrphans();
 
         entityReferences
                 .forEach(ref -> {
@@ -274,11 +287,12 @@ public class AuthoritativeSourceService {
                 throw new UnsupportedOperationException("Cannot calculate non-auth sources for ref" + options.entityReference());
         }
 
-        return authoritativeSourceDao.findNonAuthSources(customSelectionCriteria);
+        return flowClassificationRuleDao.findNonAuthSources(customSelectionCriteria);
     }
 
 
-    public List<AuthoritativeSource> findAuthSources(IdSelectionOptions options) {
+    public Set<FlowClassificationRule> findClassificationRules(IdSelectionOptions options) {
+
         Condition customSelectionCriteria;
 
         switch(options.entityReference().kind()) {
@@ -306,7 +320,7 @@ public class AuthoritativeSourceService {
                 throw new UnsupportedOperationException("Cannot calculate auth sources for ref" + options.entityReference());
         }
 
-        return authoritativeSourceDao.findAuthSources(customSelectionCriteria);
+        return flowClassificationRuleDao.findClassificationRules(customSelectionCriteria);
 
     }
 
@@ -315,18 +329,19 @@ public class AuthoritativeSourceService {
 
     private Condition mkConsumerSelectionCondition(IdSelectionOptions options) {
         Select<Record1<Long>> appIdSelector = applicationIdSelectorFactory.apply(options);
-        return AuthoritativeSourceDao.CONSUMER_APP.ID.in(appIdSelector);
+        return FlowClassificationRuleDao.CONSUMER_APP.ID.in(appIdSelector);
     }
 
 
     private void logRemoval(long id, String username) {
-        AuthoritativeSource authSource = getById(id);
+        FlowClassificationRule authSource = getById(id);
+
         if (authSource == null) {
             return;
         }
 
         String parentName = getParentEntityName(authSource.parentReference());
-        DataType dataType = dataTypeDao.getByCode(authSource.dataType());
+        DataType dataType = dataTypeDao.getById(authSource.dataTypeId());
         Application app = applicationDao.getById(authSource.applicationReference().id());
 
 
@@ -343,7 +358,7 @@ public class AuthoritativeSourceService {
     }
 
 
-    private void logInsert(Long authSourceId, AuthoritativeSourceCreateCommand command, String username) {
+    private void logInsert(Long authSourceId, FlowClassificationRuleCreateCommand command, String username) {
 
         String parentName = getParentEntityName(command.parentReference());
         DataType dataType = dataTypeDao.getById(command.dataTypeId());
@@ -383,29 +398,31 @@ public class AuthoritativeSourceService {
     }
 
 
-    private void logUpdate(AuthoritativeSourceUpdateCommand command, String username) {
-        AuthoritativeSource authSource = getById(command.id().get());
-        if (authSource == null) {
+    private void logUpdate(FlowClassificationRuleUpdateCommand command, String username) {
+        FlowClassificationRule rule = getById(command.id().get());
+
+        if (rule == null) {
             return;
         }
 
-        String parentName = getParentEntityName(authSource.parentReference());
-        DataType dataType = dataTypeDao.getByCode(authSource.dataType());
-        Application app = applicationDao.getById(authSource.applicationReference().id());
+        String parentName = getParentEntityName(rule.parentReference());
+        DataType dataType = dataTypeDao.getById(rule.dataTypeId());
+        Application app = applicationDao.getById(rule.applicationReference().id());
+        FlowClassification classification = flowClassificationDao.getById(command.classificationId());
 
         if (app != null && dataType != null && parentName != null) {
             String msg = format(
                     "Updated %s as an authoritative source with rating: %s, for type: %s, for %s: %s",
                     app.name(),
-                    command.rating().value(),
+                    classification.name(),
                     dataType.name(),
-                    authSource.parentReference().kind().prettyName(),
+                    rule.parentReference().kind().prettyName(),
                     parentName);
 
             multiLog(
                     username,
-                    authSource.id().get(),
-                    authSource.parentReference(),
+                    rule.id().get(),
+                    rule.parentReference(),
                     dataType,
                     app,
                     msg,
@@ -415,7 +432,7 @@ public class AuthoritativeSourceService {
 
 
     private void multiLog(String username,
-                          Long authSourceId,
+                          Long classificationRuleId,
                           EntityReference parentRef,
                           DataType dataType,
                           Application app,
@@ -427,7 +444,7 @@ public class AuthoritativeSourceService {
                 .severity(Severity.INFORMATION)
                 .userId(username)
                 .parentReference(parentRef)
-                .childKind(EntityKind.AUTHORITATIVE_SOURCE)
+                .childKind(EntityKind.FLOW_CLASSIFICATION_RULE)
                 .operation(operation)
                 .build();
 
@@ -441,7 +458,7 @@ public class AuthoritativeSourceService {
 
         ChangeLog authLog = ImmutableChangeLog
                 .copyOf(parentLog)
-                .withParentReference(EntityReference.mkRef(EntityKind.AUTHORITATIVE_SOURCE, authSourceId));
+                .withParentReference(mkRef(EntityKind.FLOW_CLASSIFICATION_RULE, classificationRuleId));
 
         changeLogService.write(parentLog);
         changeLogService.write(appLog);
