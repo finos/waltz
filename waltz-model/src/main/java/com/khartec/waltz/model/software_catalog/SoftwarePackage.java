@@ -52,6 +52,7 @@ public abstract class SoftwarePackage implements
                 .kind(EntityKind.SOFTWARE)
                 .id(id().get())
                 .name(name())
+                .externalId(externalId())
                 .description(description())
                 .build();
     }
