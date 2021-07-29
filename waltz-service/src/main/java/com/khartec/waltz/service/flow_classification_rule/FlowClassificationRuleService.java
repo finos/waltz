@@ -204,7 +204,7 @@ public class FlowClassificationRuleService {
     public boolean fastRecalculateAllFlowRatings() {
         logicalFlowDecoratorDao.updateRatingsByCondition(AuthoritativenessRatingValue.NO_OPINION, DSL.trueCondition());
 
-        //finds all the vantage points to apply using parent as selector - 1646
+        //finds all the vantage points to apply using parent as selector
         List<FlowClassificationRuleVantagePoint> flowClassificationRuleVantagePoints = flowClassificationRuleDao
                 .findFlowClassificationRuleVantagePoints();
 
@@ -277,7 +277,7 @@ public class FlowClassificationRuleService {
                 break;
 
             default:
-                throw new UnsupportedOperationException("Cannot calculate non-auth sources for ref" + options.entityReference());
+                throw new UnsupportedOperationException("Cannot calculate discouraged sources for ref" + options.entityReference());
         }
 
         return flowClassificationRuleDao.findDiscouragedSourcesBySelector(customSelectionCriteria);
