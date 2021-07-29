@@ -89,6 +89,7 @@ public abstract class ServerInformation implements
                 .kind(EntityKind.SERVER)
                 .id(id().get())
                 .name(hostname())
+                .externalId(externalId())
                 .entityLifecycleStatus(EntityLifecycleStatus.ACTIVE)
                 .build();
     }

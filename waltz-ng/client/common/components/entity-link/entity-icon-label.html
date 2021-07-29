@@ -36,6 +36,11 @@
           }">
     </span>
 
+    <span ng-if="$ctrl.showExternalId && $ctrl.entityRef.externalId"
+          ng-bind="$ctrl.entityRef.externalId"
+          class="small text-muted">
+    </span>
+
     <waltz-icon fixed-width="true"
                 name="{{ $ctrl.entityRef.kind | toIconName:'entity' }}"
                 ng-if="$ctrl.iconPlacement === 'right'"

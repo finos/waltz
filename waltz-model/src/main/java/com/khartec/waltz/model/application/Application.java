@@ -81,6 +81,7 @@ public abstract class Application implements
                 .kind(EntityKind.APPLICATION)
                 .id(id().get())
                 .name(name())
+                .externalId(externalId())
                 .description(description())
                 .entityLifecycleStatus(entityLifecycleStatus())
                 .build();

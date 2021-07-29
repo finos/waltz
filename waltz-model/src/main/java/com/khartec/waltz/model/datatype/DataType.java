@@ -57,6 +57,7 @@ public abstract class DataType implements
                 .kind(EntityKind.DATA_TYPE)
                 .id(id().get())
                 .name(name())
+                .externalId(code())
                 .description(description())
                 .build();
     }

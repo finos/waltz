@@ -54,6 +54,7 @@ public abstract class LogicalDataElement implements
                 .kind(EntityKind.LOGICAL_DATA_ELEMENT)
                 .id(id().get())
                 .name(name())
+                .externalId(externalId())
                 .description(description())
                 .entityLifecycleStatus(entityLifecycleStatus())
                 .build();
