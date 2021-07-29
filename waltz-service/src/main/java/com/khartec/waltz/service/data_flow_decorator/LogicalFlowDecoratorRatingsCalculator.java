@@ -18,7 +18,6 @@
 
 package com.khartec.waltz.service.data_flow_decorator;
 
-import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
 import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.flow_classification_rule.FlowClassificationDao;
 import com.khartec.waltz.data.flow_classification_rule.FlowClassificationRuleDao;
@@ -59,7 +58,6 @@ public class LogicalFlowDecoratorRatingsCalculator {
                 f.source().kind() == EntityKind.APPLICATION;
 
     private final ApplicationService applicationService;
-    private final AuthoritativeSourceDao authoritativeSourceDao;
     private final FlowClassificationDao flowClassificationDao;
     private final FlowClassificationRuleDao flowClassificationRuleDao;
     private final LogicalFlowDao logicalFlowDao;
@@ -68,20 +66,17 @@ public class LogicalFlowDecoratorRatingsCalculator {
 
     @Autowired
     public LogicalFlowDecoratorRatingsCalculator(ApplicationService applicationService,
-                                                 AuthoritativeSourceDao authoritativeSourceDao,
                                                  FlowClassificationDao flowClassificationDao,
                                                  FlowClassificationRuleDao flowClassificationRuleDao,
                                                  LogicalFlowDao logicalFlowDao,
                                                  DataTypeDao dataTypeDao) {
         checkNotNull(applicationService, "applicationService cannot be null");
-        checkNotNull(authoritativeSourceDao, "authoritativeSourceDao cannot be null");
         checkNotNull(flowClassificationDao, "flowClassificationDao cannot be null");
         checkNotNull(flowClassificationRuleDao, "flowClassificationRuleDao cannot be null");
         checkNotNull(logicalFlowDao, "logicalFlowDao cannot be null");
         checkNotNull(dataTypeDao, "dataTypeDao cannot be null");
 
         this.applicationService = applicationService;
-        this.authoritativeSourceDao = authoritativeSourceDao;
         this.flowClassificationDao = flowClassificationDao;
         this.flowClassificationRuleDao = flowClassificationRuleDao;
         this.logicalFlowDao = logicalFlowDao;

@@ -29,7 +29,6 @@ public enum EntityKind {
     ASSET_COST("Asset cost"),
     ATTESTATION("Attestation"),
     ATTESTATION_RUN("Attestation run"),
-    AUTHORITATIVE_SOURCE("Authoritative source"),
     BOOKMARK("Bookmark"),
     CHANGE_INITIATIVE("Change initiative"),
     CHANGE_SET("Change set"),

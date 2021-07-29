@@ -24,7 +24,6 @@ import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.actor.ActorDao;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
 import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
@@ -33,21 +32,17 @@ import com.khartec.waltz.data.flow_classification_rule.FlowClassificationRuleDao
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.authoritativesource.NonAuthoritativeSource;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.flow_classification.FlowClassification;
-import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRule;
-import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRuleCreateCommand;
-import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRuleUpdateCommand;
-import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
+import com.khartec.waltz.model.flow_classification_rule.*;
 import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
+import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
-import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,8 +58,6 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityKind.ACTOR;
 import static com.khartec.waltz.model.EntityKind.ORG_UNIT;
 import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.schema.tables.AuthoritativeSource.AUTHORITATIVE_SOURCE;
-import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static java.lang.String.format;
 
@@ -144,7 +137,7 @@ public class FlowClassificationRuleService {
         int updateCount = flowClassificationRuleDao.update(command);
         long ruleId = command
                 .id()
-                .orElseThrow(() -> new IllegalArgumentException("cannot update an auth source without an id"));
+                .orElseThrow(() -> new IllegalArgumentException("cannot update an flow classification rule without an id"));
         FlowClassificationRule updatedClassificationRule = getById(ruleId);
         ratingCalculator.update(updatedClassificationRule.dataTypeId(), updatedClassificationRule.parentReference());
         logUpdate(command, username);
@@ -153,16 +146,16 @@ public class FlowClassificationRuleService {
 
 
     public long insert(FlowClassificationRuleCreateCommand command, String username) {
-        long authSourceId = flowClassificationRuleDao.insert(command, username);
+        long classificationRuleId = flowClassificationRuleDao.insert(command, username);
 
         if (command.parentReference().kind() == ORG_UNIT) {
             ratingCalculator.update(command.dataTypeId(), command.parentReference());
         }
 
-        logInsert(authSourceId, command, username);
-        flowClassificationRuleDao.updatePointToPointAuthStatements();
+        logInsert(classificationRuleId, command, username);
+        flowClassificationRuleDao.updatePointToPointFlowClassificationRules();
 
-        return authSourceId;
+        return classificationRuleId;
     }
 
 
@@ -171,16 +164,16 @@ public class FlowClassificationRuleService {
         FlowClassificationRule classificationRuleToDelete = getById(id);
 
         if(classificationRuleToDelete == null){
-            throw new NotFoundException("ASRM-NF", "Authoritative source not found");
+            throw new NotFoundException("ASRM-NF", "Flow Classification Rule not found");
         }
 
         logRemoval(id, username);
 
         int deletedCount = flowClassificationRuleDao.remove(id);
 
-        //set any point-to-point overrides as no opinion first then recalculate for all auth
+        //set any point-to-point overrides as no opinion first then recalculate for all rules
         LOG.debug("Updating point-point ratings");
-        flowClassificationRuleDao.clearAuthRatingsForPointToPointFlows(classificationRuleToDelete);
+        flowClassificationRuleDao.clearRatingsForPointToPointFlows(classificationRuleToDelete);
 
         LOG.debug("Updated point-point");
         if(classificationRuleToDelete.parentReference().kind() != ACTOR){
@@ -211,19 +204,19 @@ public class FlowClassificationRuleService {
     public boolean fastRecalculateAllFlowRatings() {
         logicalFlowDecoratorDao.updateRatingsByCondition(AuthoritativenessRatingValue.NO_OPINION, DSL.trueCondition());
 
-        //finds all the vantage points to apply using parent as selector
+        //finds all the vantage points to apply using parent as selector - 1646
         List<FlowClassificationRuleVantagePoint> flowClassificationRuleVantagePoints = flowClassificationRuleDao
                 .findFlowClassificationRuleVantagePoints();
 
         flowClassificationRuleVantagePoints
                 .forEach(a -> {
                     LOG.info("Updating decorators for: {}", a);
-                    int updateCount = logicalFlowDecoratorDao.updateDecoratorsForAuthSource(a);
+                    int updateCount = logicalFlowDecoratorDao.updateDecoratorsForFlowClassificationRule(a);
                     LOG.info("Updated {} decorators for: {}", updateCount, a);
         });
 
-        //overrides Auth Statement for point to point flows (must run after the above)
-        int updatedDecoratorRatings = flowClassificationRuleDao.updatePointToPointAuthStatements();
+        //overrides rating for point to point flows (must run after the above)
+        int updatedDecoratorRatings = flowClassificationRuleDao.updatePointToPointFlowClassificationRules();
         LOG.info("Updated decorators for: {} point-to-point flows", updatedDecoratorRatings);
 
         return true;
@@ -243,8 +236,8 @@ public class FlowClassificationRuleService {
         entityReferences
                 .forEach(ref -> {
                     String message = ref.kind() == EntityKind.APPLICATION
-                            ? "Removed as an authoritative source as declaring Org Unit no longer exists"
-                            : "Application removed as an authoritative source as it no longer exists";
+                            ? "Removed as a flow classification rule source as declaring Org Unit no longer exists"
+                            : "Application removed as an flow classification rule source as it no longer exists";
 
                     ChangeLog logEntry = ImmutableChangeLog.builder()
                             .parentReference(ref)
@@ -261,19 +254,19 @@ public class FlowClassificationRuleService {
     }
 
 
-    public List<NonAuthoritativeSource> findNonAuthSources(IdSelectionOptions options) {
+    public List<DiscouragedSource> findDiscouragedSources(IdSelectionOptions options) {
         Condition customSelectionCriteria;
         switch(options.entityReference().kind()) {
             case DATA_TYPE:
                 GenericSelector dataTypeSelector = genericSelectorFactory.apply(options);
                 customSelectionCriteria = LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.in(dataTypeSelector.selector())
-                    .and(AuthoritativeSourceDao.SUPPLIER_APP.KIND.notIn(options.filters().omitApplicationKinds()));
+                    .and(FlowClassificationRuleDao.SUPPLIER_APP.KIND.notIn(options.filters().omitApplicationKinds()));
                 break;
 
             case ORG_UNIT:
                 GenericSelector orgUnitSelector = genericSelectorFactory.apply(options);
-                customSelectionCriteria = AuthoritativeSourceDao.CONSUMER_APP.ORGANISATIONAL_UNIT_ID.in(orgUnitSelector.selector())
-                    .and(AuthoritativeSourceDao.SUPPLIER_APP.KIND.notIn(options.filters().omitApplicationKinds()));
+                customSelectionCriteria = FlowClassificationRuleDao.CONSUMER_APP.ORGANISATIONAL_UNIT_ID.in(orgUnitSelector.selector())
+                    .and(FlowClassificationRuleDao.SUPPLIER_APP.KIND.notIn(options.filters().omitApplicationKinds()));
                 break;
 
             case APP_GROUP:
@@ -287,7 +280,7 @@ public class FlowClassificationRuleService {
                 throw new UnsupportedOperationException("Cannot calculate non-auth sources for ref" + options.entityReference());
         }
 
-        return flowClassificationRuleDao.findNonAuthSources(customSelectionCriteria);
+        return flowClassificationRuleDao.findDiscouragedSourcesBySelector(customSelectionCriteria);
     }
 
 
@@ -298,17 +291,13 @@ public class FlowClassificationRuleService {
         switch(options.entityReference().kind()) {
             case ORG_UNIT:
                 GenericSelector orgUnitSelector = genericSelectorFactory.apply(options);
-                customSelectionCriteria = AUTHORITATIVE_SOURCE.PARENT_ID.in(orgUnitSelector.selector())
-                        .and(AuthoritativeSourceDao.SUPPLIER_APP.KIND.notIn(options.filters().omitApplicationKinds()));
+                customSelectionCriteria = Tables.FLOW_CLASSIFICATION_RULE.PARENT_ID.in(orgUnitSelector.selector())
+                        .and(FlowClassificationRuleDao.SUPPLIER_APP.KIND.notIn(options.filters().omitApplicationKinds()));
                 break;
             case DATA_TYPE:
                 GenericSelector dataTypeSelector = genericSelectorFactory.apply(options);
-                SelectConditionStep<Record1<String>> codeSelector = DSL
-                        .select(DATA_TYPE.CODE)
-                        .from(DATA_TYPE)
-                        .where(DATA_TYPE.ID.in(dataTypeSelector.selector()));
-                customSelectionCriteria = AUTHORITATIVE_SOURCE.DATA_TYPE.in(codeSelector)
-                        .and(AuthoritativeSourceDao.SUPPLIER_APP.KIND.notIn(options.filters().omitApplicationKinds()));
+                customSelectionCriteria = Tables.FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID.in(dataTypeSelector.selector())
+                        .and(FlowClassificationRuleDao.SUPPLIER_APP.KIND.notIn(options.filters().omitApplicationKinds()));
                 break;
             case APP_GROUP:
             case FLOW_DIAGRAM:
@@ -317,7 +306,7 @@ public class FlowClassificationRuleService {
                 customSelectionCriteria = mkConsumerSelectionCondition(options);
                 break;
             default:
-                throw new UnsupportedOperationException("Cannot calculate auth sources for ref" + options.entityReference());
+                throw new UnsupportedOperationException("Cannot calculate flow classification rules for ref" + options.entityReference());
         }
 
         return flowClassificationRuleDao.findClassificationRules(customSelectionCriteria);
@@ -334,31 +323,31 @@ public class FlowClassificationRuleService {
 
 
     private void logRemoval(long id, String username) {
-        FlowClassificationRule authSource = getById(id);
+        FlowClassificationRule rule = getById(id);
 
-        if (authSource == null) {
+        if (rule == null) {
             return;
         }
 
-        String parentName = getParentEntityName(authSource.parentReference());
-        DataType dataType = dataTypeDao.getById(authSource.dataTypeId());
-        Application app = applicationDao.getById(authSource.applicationReference().id());
+        String parentName = getParentEntityName(rule.parentReference());
+        DataType dataType = dataTypeDao.getById(rule.dataTypeId());
+        Application app = applicationDao.getById(rule.applicationReference().id());
 
 
         if (app != null && dataType != null && parentName != null) {
             String msg = format(
-                    "Removed %s as an authoritative source for type: %s for %s: %s",
+                    "Removed the flow classification rule where %s is a source app for type: %s for %s: %s",
                     app.name(),
                     dataType.name(),
-                    authSource.parentReference().kind().prettyName(),
+                    rule.parentReference().kind().prettyName(),
                     parentName);
 
-            multiLog(username, id, authSource.parentReference(), dataType, app, msg, Operation.REMOVE);
+            multiLog(username, id, rule.parentReference(), dataType, app, msg, Operation.REMOVE);
         }
     }
 
 
-    private void logInsert(Long authSourceId, FlowClassificationRuleCreateCommand command, String username) {
+    private void logInsert(Long ruleId, FlowClassificationRuleCreateCommand command, String username) {
 
         String parentName = getParentEntityName(command.parentReference());
         DataType dataType = dataTypeDao.getById(command.dataTypeId());
@@ -366,7 +355,7 @@ public class FlowClassificationRuleService {
 
         if (app != null && dataType != null && parentName != null) {
             String msg = format(
-                    "Registered %s as an authoritative source for type: %s for %s: %s",
+                    "Registered the flow classification rule with %s as the source app for type: %s for %s: %s",
                     app.name(),
                     dataType.name(),
                     command.parentReference().kind().prettyName(),
@@ -374,7 +363,7 @@ public class FlowClassificationRuleService {
 
             multiLog(
                     username,
-                    authSourceId,
+                    ruleId,
                     command.parentReference(),
                     dataType,
                     app,
@@ -412,7 +401,7 @@ public class FlowClassificationRuleService {
 
         if (app != null && dataType != null && parentName != null) {
             String msg = format(
-                    "Updated %s as an authoritative source with rating: %s, for type: %s, for %s: %s",
+                    "Updated flow classification rule: %s as the source application with rating: %s, for type: %s, for %s: %s",
                     app.name(),
                     classification.name(),
                     dataType.name(),

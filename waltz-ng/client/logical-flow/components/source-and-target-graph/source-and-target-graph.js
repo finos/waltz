@@ -31,7 +31,7 @@ import {amberHex} from "../../../common/colors";
 
 
 const bindings = {
-    authRatingsByKey: "<",
+    flowClassificationsByCode: "<",
     changeUnits: "<",
     decorators: "<",
     entityRef: "<",
@@ -442,7 +442,7 @@ function drawLabels(section, items = [], scale, anchor = "start", tweakers) {
 }
 
 
-function drawArcs(section, model, layoutFn, authRatingsByKey) {
+function drawArcs(section, model, layoutFn, flowClassificationsByCode) {
     const arcs = section
         .selectAll(`.${styles.ARC}`)
         .data(model, d => d.from + "-" + d.to);
@@ -454,8 +454,8 @@ function drawArcs(section, model, layoutFn, authRatingsByKey) {
         .classed(styles.ARC_REMOVED, d => d.entityLifecycleStatus === "REMOVED")
         .classed(styles.ARC_PENDING, d => d.entityLifecycleStatus === "PENDING")
         .attr("opacity", 0)
-        .attr("stroke", d => authRatingsByKey[d.rating].iconColor)
-        .attr("fill", d => color(authRatingsByKey[d.rating].iconColor).brighter());
+        .attr("stroke", d => flowClassificationsByCode[d.rating].color)
+        .attr("fill", d => color(flowClassificationsByCode[d.rating].color).brighter());
 
     arcs
         .merge(newArcs)
@@ -523,7 +523,7 @@ function drawTypeBoxes(section, model, scale, dimensions, tweakers) {
 }
 
 
-function drawInbound(section, model, scales, dimensions, authRatingsByKey) {
+function drawInbound(section, model, scales, dimensions, flowClassificationsByCode) {
     const inboundLayout = (selection) => selection
         .attr("d", d =>
             mkLineWithArrowPath(
@@ -532,11 +532,11 @@ function drawInbound(section, model, scales, dimensions, authRatingsByKey) {
                 (dimensions.canvas.width / 2) - (dimensions.label.width / 2),
                 dimensions.margin.top + scales.type(d.to) - dimensions.label.height / 2));
 
-    drawArcs(section, model, inboundLayout, authRatingsByKey);
+    drawArcs(section, model, inboundLayout, flowClassificationsByCode);
 }
 
 
-function drawOutbound(section, model, scales, dimensions, authRatingsByKey) {
+function drawOutbound(section, model, scales, dimensions, flowClassificationsByCode) {
     const outboundLayout = (selection) => selection
         .attr("d", d =>
             mkLineWithArrowPath(
@@ -545,7 +545,7 @@ function drawOutbound(section, model, scales, dimensions, authRatingsByKey) {
                 dimensions.canvas.width - (dimensions.label.width + 10) - 15,
                 dimensions.margin.top + scales.target(d.to) - dimensions.label.height / 2));
 
-    drawArcs(section, model, outboundLayout, authRatingsByKey);
+    drawArcs(section, model, outboundLayout, flowClassificationsByCode);
 }
 
 
@@ -579,8 +579,8 @@ function drawCenterBox(section, dimensions, name = "") {
 function update(sections,
                 model,
                 tweakers,
-                authRatingsByKey) {
-    redraw = () => update(sections, model, tweakers, authRatingsByKey);
+                flowClassificationsByCode) {
+    redraw = () => update(sections, model, tweakers, flowClassificationsByCode);
 
     const dimensions = calculateDimensions(model);
 
@@ -597,8 +597,8 @@ function update(sections,
     drawTypeBoxes(sections.types, model, scales.type, dimensions.label, tweakers.typeBlock);
     drawLabels(sections.types, model.types, scales.type, "middle", tweakers.type);
 
-    drawInbound(sections.inbound, model.sourceToType, scales, dimensions, authRatingsByKey);
-    drawOutbound(sections.outbound, model.typeToTarget, scales, dimensions, authRatingsByKey);
+    drawInbound(sections.inbound, model.sourceToType, scales, dimensions, flowClassificationsByCode);
+    drawOutbound(sections.outbound, model.typeToTarget, scales, dimensions, flowClassificationsByCode);
 }
 
 
@@ -637,7 +637,7 @@ function controller($element, $window, serviceBroker) {
                     allTypes: types
                 };
                 const model = mkModel(data);
-                update(svgSections, model, tweakers, vm.authRatingsByKey);
+                update(svgSections, model, tweakers, vm.flowClassificationsByCode);
             });
     };
 
@@ -651,7 +651,9 @@ function controller($element, $window, serviceBroker) {
                 .value();
         }
 
-        debouncedRender();
+        if(changes.flowClassificationsByCode){
+            debouncedRender();
+        }
     };
 
     vm.$onInit = () => angular

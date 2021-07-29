@@ -22,8 +22,6 @@ import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.authoritativesource.ImmutableNonAuthoritativeSource;
-import com.khartec.waltz.model.authoritativesource.NonAuthoritativeSource;
 import com.khartec.waltz.model.flow_classification_rule.*;
 import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import com.khartec.waltz.schema.tables.Application;
@@ -51,7 +49,6 @@ import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.FLOW_CLASSIFICATION;
 import static com.khartec.waltz.schema.Tables.FLOW_CLASSIFICATION_RULE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.AuthoritativeSource.AUTHORITATIVE_SOURCE;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
@@ -278,7 +275,7 @@ public class FlowClassificationRuleDao {
     }
 
 
-    public int clearAuthRatingsForPointToPointFlows(FlowClassificationRule rule) {
+    public int clearRatingsForPointToPointFlows(FlowClassificationRule rule) {
 
         // this may wipe any lower level explicit datatype mappings but these will be restored by the nightly job
         SelectConditionStep<Record1<Long>> decoratorsToMarkAsNoOpinion = dsl
@@ -343,15 +340,15 @@ public class FlowClassificationRuleDao {
                         declaredDataTypeId,
                         declaredDataTypeLevel,
                         FLOW_CLASSIFICATION_RULE.APPLICATION_ID,
-                        FLOW_CLASSIFICATION.NAME,
+                        FLOW_CLASSIFICATION.CODE,
                         FLOW_CLASSIFICATION_RULE.ID)
-                .from(AUTHORITATIVE_SOURCE)
+                .from(FLOW_CLASSIFICATION_RULE)
                 .innerJoin(ehOrgUnit)
-                .on(ehOrgUnit.ANCESTOR_ID.eq(AUTHORITATIVE_SOURCE.PARENT_ID)
+                .on(ehOrgUnit.ANCESTOR_ID.eq(FLOW_CLASSIFICATION_RULE.PARENT_ID)
                         .and(ehOrgUnit.KIND.eq(EntityKind.ORG_UNIT.name()))
                         .and(ehOrgUnit.ID.eq(ehOrgUnit.ANCESTOR_ID)))
                 .innerJoin(DATA_TYPE)
-                .on(DATA_TYPE.CODE.eq(AUTHORITATIVE_SOURCE.DATA_TYPE))
+                .on(DATA_TYPE.ID.eq(FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID))
                 .innerJoin(ehDataType)
                 .on(ehDataType.ANCESTOR_ID.eq(DATA_TYPE.ID)
                         .and(ehDataType.KIND.eq(EntityKind.DATA_TYPE.name()))
@@ -369,11 +366,6 @@ public class FlowClassificationRuleDao {
 
     public Map<EntityReference, Collection<EntityReference>> calculateConsumersForDataTypeIdSelector(
             Select<Record1<Long>> dataTypeIdSelector) {
-
-        SelectConditionStep<Record1<String>> dataTypeCodeSelector = DSL
-                .select(DATA_TYPE.CODE)
-                .from(DATA_TYPE)
-                .where(DATA_TYPE.ID.in(dataTypeIdSelector));
 
         Condition appJoin = APPLICATION.ID.eq(LOGICAL_FLOW.TARGET_ENTITY_ID)
                 .and(APPLICATION.ORGANISATIONAL_UNIT_ID.eq(ENTITY_HIERARCHY.ID));
@@ -418,7 +410,7 @@ public class FlowClassificationRuleDao {
     }
 
 
-    public List<NonAuthoritativeSource> findNonAuthSources(Condition customSelectionCriteria) {
+    public List<DiscouragedSource> findDiscouragedSourcesBySelector(Condition customSelectionCriteria) {
 
         Condition decorationIsAboutDataTypes = LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name());
 
@@ -448,14 +440,14 @@ public class FlowClassificationRuleDao {
                 .where(customSelectionCriteria).and(commonSelectionCriteria)
                 .groupBy(SUPPLIER_APP.ID, SUPPLIER_APP.NAME, LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID)
                 .fetch()
-                .map(r -> ImmutableNonAuthoritativeSource.builder()
-                        .sourceReference(mkRef(
-                                EntityKind.APPLICATION,
-                                r.get(SUPPLIER_APP.ID),
-                                r.get(SUPPLIER_APP.NAME)))
-                        .dataTypeId(r.get(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID))
-                        .count(r.get(COUNT_FIELD))
-                        .build());
+                .map(r -> ImmutableDiscouragedSource.builder()
+                            .sourceReference(mkRef(
+                                    EntityKind.APPLICATION,
+                                    r.get(SUPPLIER_APP.ID),
+                                    r.get(SUPPLIER_APP.NAME)))
+                            .dataTypeId(r.get(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID))
+                            .count(r.get(COUNT_FIELD))
+                            .build());
     }
 
 
@@ -497,7 +489,7 @@ public class FlowClassificationRuleDao {
     }
 
 
-    public int updatePointToPointAuthStatements() {
+    public int updatePointToPointFlowClassificationRules() {
 
         Condition logicalFlowTargetIsAuthSourceParent = FLOW_CLASSIFICATION_RULE.APPLICATION_ID.eq(LOGICAL_FLOW.SOURCE_ENTITY_ID)
                 .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
@@ -510,6 +502,7 @@ public class FlowClassificationRuleDao {
                         FLOW_CLASSIFICATION.CODE,
                         FLOW_CLASSIFICATION_RULE.ID)
                 .from(FLOW_CLASSIFICATION_RULE)
+                .innerJoin(parent_dt).on(FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID.eq(parent_dt.ID))
                 .innerJoin(ENTITY_HIERARCHY).on(parent_dt.ID.eq(ENTITY_HIERARCHY.ANCESTOR_ID)
                         .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.DATA_TYPE.name())))
                 .innerJoin(child_dt).on(ENTITY_HIERARCHY.ID.eq(child_dt.ID))
@@ -517,7 +510,7 @@ public class FlowClassificationRuleDao {
                 .innerJoin(LOGICAL_FLOW_DECORATOR).on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID)
                         .and(child_dt.ID.eq(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID)
                                 .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))))
-                .innerJoin(level).on(level.ID.eq(FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID)
+                .innerJoin(level).on(level.ID.eq(parent_dt.ID)
                         .and(level.ID.eq(level.ANCESTOR_ID)
                         .and(level.KIND.eq(EntityKind.DATA_TYPE.name()))))
                 .innerJoin(FLOW_CLASSIFICATION).on(FLOW_CLASSIFICATION_RULE.FLOW_CLASSIFICATION_ID.eq(FLOW_CLASSIFICATION.ID))

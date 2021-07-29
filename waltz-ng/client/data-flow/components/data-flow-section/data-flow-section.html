@@ -168,7 +168,7 @@
                             </p>
                             <p class="help-block">
                                 Legend:
-                                <waltz-svelte-component component="$ctrl.AuthRatingLegend"></waltz-svelte-component>
+                                <waltz-svelte-component component="$ctrl.FlowClassificationLegend"></waltz-svelte-component>
                             </p>
                         </div>
                     </div>
@@ -235,8 +235,8 @@
                  heading="Authority">
 
             <div ng-if="$ctrl.visibility.dataTab == 2" style="padding-top: 1em;">
-                <waltz-auth-sources-table auth-sources="$ctrl.authSources">
-                </waltz-auth-sources-table>
+                <waltz-flow-classification-rules-table rules="$ctrl.flowClassificationRules">
+                </waltz-flow-classification-rules-table>
             </div>
 
         </uib-tab>

@@ -22,7 +22,7 @@ package com.khartec.waltz.web.endpoints.api;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Entry;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.authoritativesource.NonAuthoritativeSource;
+import com.khartec.waltz.model.flow_classification_rule.DiscouragedSource;
 import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRule;
 import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRuleCreateCommand;
 import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRuleUpdateCommand;
@@ -76,8 +76,8 @@ public class FlowClassificationRuleEndpoint implements Endpoint {
         // -- PATHS
 
         String recalculateFlowRatingsPath = mkPath(BASE_URL, "recalculate-flow-ratings");
-        String findNonAuthSourcesPath = mkPath(BASE_URL, "non-auth");
-        String findFlowClassificationRulesPath = mkPath(BASE_URL, "auth");
+        String findDiscouragedSourcesPath = mkPath(BASE_URL, "discouraged");
+        String findFlowClassificationRulesBySelectorPath = mkPath(BASE_URL, "selector");
         String calculateConsumersForDataTypeIdSelectorPath = mkPath(BASE_URL, "data-type", "consumers");
         String findByEntityReferencePath = mkPath(BASE_URL, "entity-ref", ":kind", ":id");
         String findByApplicationIdPath = mkPath(BASE_URL, "app", ":id");
@@ -94,10 +94,10 @@ public class FlowClassificationRuleEndpoint implements Endpoint {
         ListRoute<FlowClassificationRule> findByApplicationIdRoute = (request, response)
                 -> flowClassificationRuleService.findByApplicationId(getId(request));
 
-        ListRoute<NonAuthoritativeSource> findNonAuthSourcesRoute = (request, response)
-                -> flowClassificationRuleService.findNonAuthSources(readIdSelectionOptionsFromBody(request));
+        ListRoute<DiscouragedSource> findDiscouragedSourcesRoute = (request, response)
+                -> flowClassificationRuleService.findDiscouragedSources(readIdSelectionOptionsFromBody(request));
 
-        ListRoute<FlowClassificationRule> findAuthSourcesRoute = (request, response)
+        ListRoute<FlowClassificationRule> findFlowClassificationRulesBySelectorRoute = (request, response)
                 -> flowClassificationRuleService.findClassificationRules(readIdSelectionOptionsFromBody(request));
 
         ListRoute<FlowClassificationRule> findAllRoute = (request, response)
@@ -110,10 +110,10 @@ public class FlowClassificationRuleEndpoint implements Endpoint {
         getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
         getForDatum(getByIdPath, getByIdRoute);
         postForList(calculateConsumersForDataTypeIdSelectorPath, this::calculateConsumersForDataTypeIdSelectorRoute);
-        postForList(findNonAuthSourcesPath, findNonAuthSourcesRoute);
+        postForList(findDiscouragedSourcesPath, findDiscouragedSourcesRoute);
         getForList(findByEntityReferencePath, findByEntityReferenceRoute);
         getForList(findByApplicationIdPath, findByApplicationIdRoute);
-        postForList(findFlowClassificationRulesPath, findAuthSourcesRoute);
+        postForList(findFlowClassificationRulesBySelectorPath, findFlowClassificationRulesBySelectorRoute);
         getForList(BASE_URL, findAllRoute);
         putForDatum(BASE_URL, this::updateRoute);
         deleteForDatum(deletePath, this::deleteRoute);
@@ -143,7 +143,6 @@ public class FlowClassificationRuleEndpoint implements Endpoint {
         requireRole(userRoleService, request, SystemRole.AUTHORITATIVE_SOURCE_EDITOR);
         long id = getId(request);
         flowClassificationRuleService.remove(id, getUsername(request));
-
         return "done";
     }
 
@@ -168,8 +167,8 @@ public class FlowClassificationRuleEndpoint implements Endpoint {
 
     private List<Entry<EntityReference, Collection<EntityReference>>> calculateConsumersForDataTypeIdSelectorRoute(
             Request request,
-            Response response) throws IOException
-    {
+            Response response) throws IOException {
+
         IdSelectionOptions options = readIdSelectionOptionsFromBody(request);
 
         Map<EntityReference, Collection<EntityReference>> result = flowClassificationRuleService

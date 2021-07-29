@@ -23,7 +23,7 @@ import {mkAuthoritativeRatingSchemeItems} from "../../../ratings/rating-utils";
 const bindings = {
     decorators: "<",
     flows: "<",
-    ratingItems: "<"
+    flowClassifications: "<"
 };
 
 
@@ -36,16 +36,16 @@ const template = `<div class="row">
                   </div>`;
 
 
-const ratingColumn = {
-    field: "rating",
-    displayName: "Authoritativeness",
+const flowClassification = {
+    field: "classification",
+    displayName: "Flow Classification",
     cellTemplate: `<div class="ui-grid-cell-contents">
                       <div style="display: inline-block;
                                   height: 1em;
                                   width: 1em;
                                   border-radius: 2px;
                                   border: 1px solid #ccc;
-                                  background-color: {{COL_FIELD.iconColor}}">
+                                  background-color: {{COL_FIELD.color}}">
                       </div>
                       <span ng-bind="COL_FIELD.name"
                             title="{{COL_FIELD.description}}">
@@ -60,7 +60,7 @@ const columnDefs = [
     mkEntityLinkGridCell("Source", "source", "none"),
     mkEntityLinkGridCell("Target", "target", "none"),
     mkEntityLinkGridCell("Data Type", "dataType", "none"),
-    ratingColumn
+    flowClassification
 ];
 
 
@@ -83,15 +83,15 @@ function groupDecoratorsByFlowId(decorators = [], displayNameService) {
 }
 
 
-function prepareGridData(flows = [], decorators = [], displayNameService, ratingSchemeItems) {
-    const ratingItemsByKey = _.keyBy(ratingSchemeItems, d => d.key);
+function prepareGridData(flows = [], decorators = [], displayNameService, flowClassifications) {
+    const flowClassificationsByCode = _.keyBy(flowClassifications, d => d.code);
     const groupedDecorators = groupDecoratorsByFlowId(decorators, displayNameService);
     return _.flatMap(
         flows,
         flow => _.map(
             groupedDecorators[flow.id],
             dc => Object.assign(
-                {dataType: dc.dataType, rating: ratingItemsByKey[dc.authSourceRating] },
+                {dataType: dc.dataType, classification: flowClassificationsByCode[dc.authSourceRating] },
                 flow)));
 }
 
@@ -100,10 +100,9 @@ function controller(displayNameService) {
     const vm = this;
 
     vm.$onChanges = () => {
-        const gridData = prepareGridData(vm.flows, vm.decorators, displayNameService, vm.ratingItems);
+        const gridData = prepareGridData(vm.flows, vm.decorators, displayNameService, vm.flowClassifications);
         vm.columnDefs = columnDefs;
         vm.gridData = gridData;
-        console.log({gridData})
     };
 }
 

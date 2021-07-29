@@ -31,7 +31,7 @@ import {
 import template from "./source-and-target-panel.html";
 import {sameRef} from "../../../common/entity-utils";
 import {appLogicalFlowFilterExcludedTagIdsKey} from "../../../user";
-import {loadAuthSourceRatings} from "../../../auth-sources/auth-sources-utils";
+import {loadFlowClassificationRatings} from "../../../flow-classification-rule/flow-classification-utils";
 
 
 const bindings = {
@@ -222,9 +222,9 @@ function controller($element,
     };
 
     vm.$onInit = () => {
-        loadAuthSourceRatings(serviceBroker)
+        loadFlowClassificationRatings(serviceBroker)
             .then(r => {
-                vm.authRatingsByKey = _.keyBy(r, d => d.key);
+                vm.flowClassificationsByCode = _.keyBy(r, d => d.code);
             });
 
         serviceBroker

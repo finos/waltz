@@ -19,15 +19,17 @@
 <div>
     <div ng-if="$ctrl.visibility.chart">
         <div class="row">
-            <div class="col-md-7">
-                <waltz-rated-summary-table decorator-entities="$ctrl.dataTypes"
-                                           exact-summaries="$ctrl.exactSummaries"
-                                           child-summaries="$ctrl.childSummaries"
-                                           rating-items="$ctrl.ratingItems"
-                                           on-click="$ctrl.onTableClick">
-                </waltz-rated-summary-table>
+            <div class="col-md-8">
+                <div class="waltz-scroll-region" style="height: 530px">
+                    <waltz-rated-summary-table decorator-entities="$ctrl.dataTypes"
+                                               exact-summaries="$ctrl.exactSummaries"
+                                               child-summaries="$ctrl.childSummaries"
+                                               flow-classifications="$ctrl.flowClassifications"
+                                               on-click="$ctrl.onTableClick">
+                    </waltz-rated-summary-table>
+                </div>
             </div>
-            <div class="col-md-5">
+            <div class="col-md-4">
                 <div class="waltz-fade-if"
                      ng-if="$ctrl.infoPanel != null">
                     <waltz-rated-flow-summary-info-cell applications="$ctrl.infoPanel.applications"

@@ -31,7 +31,6 @@ import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.Tables.FLOW_CLASSIFICATION;
-import static com.khartec.waltz.schema.Tables.FLOW_CLASSIFICATION_RULE;
 
 
 @Repository
@@ -70,39 +69,10 @@ public class FlowClassificationDao {
     public FlowClassification getById(long id) {
         return dsl
                 .selectFrom(FLOW_CLASSIFICATION)
-                .where(FLOW_CLASSIFICATION_RULE.ID.eq(id))
+                .where(FLOW_CLASSIFICATION.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
-
-//    public int update(FlowClassificationRuleUpdateCommand command) {
-//        checkNotNull(command, "command cannot be null");
-//        checkTrue(command.id().isPresent(), "id must be +ve");
-//
-//        UpdateSetMoreStep<FlowClassificationRuleRecord> upd = dsl
-//                .update(FLOW_CLASSIFICATION_RULE)
-//                .set(FLOW_CLASSIFICATION_RULE.FLOW_CLASSIFICATION_ID, command.classificationId())
-//                .set(FLOW_CLASSIFICATION_RULE.DESCRIPTION, command.description());
-//
-//        return upd
-//                .where(FLOW_CLASSIFICATION_RULE.ID.eq(command.id().get()))
-//                .execute();
-//    }
-//
-//
-//    public long insert(FlowClassificationRuleCreateCommand command, String username) {
-//        checkNotNull(command, "command cannot be null");
-//
-//        return dsl
-//                .insertInto(FLOW_CLASSIFICATION)
-//                .set(FLOW_CLASSIFICATION.ID, command.parentReference().kind().name())
-//                .set(FLOW_CLASSIFICATION.PARENT_ID, command.parentReference().id())
-//                .set(FLOW_CLASSIFICATION.DATA_TYPE_ID, command.dataTypeId())
-//                .returning(FLOW_CLASSIFICATION.ID)
-//                .fetchOne()
-//                .getId();
-//    }
-//
 
     public int remove(long id) {
         return dsl

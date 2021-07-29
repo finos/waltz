@@ -26,7 +26,7 @@ const bindings = {
     exactSummaries: "<",
     childSummaries: "<",
     decoratorEntities: "<",
-    ratingItems: "<",
+    flowClassifications: "<",
     onClick: "<"
 };
 
@@ -55,7 +55,7 @@ function getRelevantDecorators(allDecorators = [], summaries = []) {
 }
 
 
-function setup(decoratorEntities = [], exactSummaries = [], childSummaries = [], ratingItems = []) {
+function setup(decoratorEntities = [], exactSummaries = [], childSummaries = [], flowClassifications = []) {
     const maxCounts = nest()
         .key(d => d.decoratorEntityReference.id)
         .rollup(ds => _.sumBy(ds, "count"))
@@ -69,7 +69,7 @@ function setup(decoratorEntities = [], exactSummaries = [], childSummaries = [],
         directCounts,
         totalCounts,
         decorators: getRelevantDecorators(decoratorEntities, childSummaries),
-        colWidth: 80 / (ratingItems.length || 1)
+        colWidth: 80 / (flowClassifications.length || 1)
     };
 }
 
@@ -84,7 +84,7 @@ function controller() {
 
     vm.$onChanges = () => Object.assign(
         vm,
-        setup(vm.decoratorEntities, vm.exactSummaries, vm.childSummaries, vm.ratingItems));
+        setup(vm.decoratorEntities, vm.exactSummaries, vm.childSummaries, vm.flowClassifications));
 
     vm.columnClick = ($event, rating) => invokeClick($event, { type: "COLUMN", rating });
     vm.rowClick = ($event, dataType) => invokeClick($event, { type: "ROW", dataType });

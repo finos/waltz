@@ -83,21 +83,21 @@ const entityLoaders = {
             }
         ])
     },
-    "AUTHORITATIVE_SOURCE": {
-        method: CORE_API.AuthSourcesStore.getById,
-        mkProps: (authSrc) => ([
+    "FLOW_CLASSIFICATION_RULE": {
+        method: CORE_API.FlowClassificationRuleStore.getById,
+        mkProps: (rule) => ([
             {
                 name: "Application",
-                value: authSrc.applicationReference?.name || "?"
+                value: rule.applicationReference?.name || "?"
             }, {
                 name: "Datatype Code",
-                value: authSrc.dataType || "?"
+                value: rule.dataType || "?"
             }, {
                 name: "Scope",
-                value: authSrc.parentReference?.name || "?"
+                value: rule.parentReference?.name || "?"
             }, {
                 name: "Rating",
-                value: authSrc.rating || "?"
+                value: rule.rating || "?"
             }
         ])
     },

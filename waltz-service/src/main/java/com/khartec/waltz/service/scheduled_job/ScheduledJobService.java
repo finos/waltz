@@ -24,7 +24,6 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.scheduled_job.JobKey;
 import com.khartec.waltz.model.scheduled_job.JobLifecycleStatus;
 import com.khartec.waltz.service.attestation.AttestationRunService;
-import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService;
 import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import com.khartec.waltz.service.flow_classification_rule.FlowClassificationRuleService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
@@ -45,7 +44,6 @@ public class ScheduledJobService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ScheduledJobService.class);
 
-    private final AuthoritativeSourceService authoritativeSourceService;
     private final DataTypeUsageService dataTypeUsageService;
     private final EntityHierarchyService entityHierarchyService;
     private final FlowClassificationRuleService flowClassificationRuleService;
@@ -56,15 +54,13 @@ public class ScheduledJobService {
 
 
     @Autowired
-    public ScheduledJobService(AuthoritativeSourceService authoritativeSourceService,
-                               DataTypeUsageService dataTypeUsageService,
+    public ScheduledJobService(DataTypeUsageService dataTypeUsageService,
                                EntityHierarchyService entityHierarchyService,
                                FlowClassificationRuleService flowClassificationRuleService,
                                LogicalFlowService logicalFlowService,
                                PhysicalSpecDataTypeService physicalSpecDataTypeService,
                                ScheduledJobDao scheduledJobDao,
                                AttestationRunService attestationRunService) {
-        checkNotNull(authoritativeSourceService, "authoritativeSourceService cannot be null");
         checkNotNull(dataTypeUsageService, "dataTypeUsageService cannot be null");
         checkNotNull(flowClassificationRuleService, "flowClassificationRuleService cannot be null");
         checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
@@ -72,7 +68,6 @@ public class ScheduledJobService {
         checkNotNull(scheduledJobDao, "scheduledJobDao cannot be null");
         checkNotNull(attestationRunService, "attestationRunService cannot be null");
 
-        this.authoritativeSourceService = authoritativeSourceService;
         this.dataTypeUsageService = dataTypeUsageService;
         this.entityHierarchyService = entityHierarchyService;
         this.flowClassificationRuleService = flowClassificationRuleService;

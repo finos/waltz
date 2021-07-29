@@ -20,12 +20,12 @@ package com.khartec.waltz.jobs.generators;
 
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.common.SetUtilities;
-import com.khartec.waltz.data.authoritative_source.AuthoritativeSourceDao;
+import com.khartec.waltz.data.flow_classification_rule.FlowClassificationRuleDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
+import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRule;
 import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
@@ -52,18 +52,19 @@ public class LogicalFlowGenerator implements SampleDataGenerator {
 
     @Override
     public Map<String, Integer> create(ApplicationContext ctx) {
-        AuthoritativeSourceDao authSourceDao = ctx.getBean(AuthoritativeSourceDao.class);
+        FlowClassificationRuleDao flowClassificationRuleDao = ctx.getBean(FlowClassificationRuleDao.class);
         ApplicationService applicationDao = ctx.getBean(ApplicationService.class);
         OrganisationalUnitService orgUnitDao = ctx.getBean(OrganisationalUnitService.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
 
-        List<AuthoritativeSource> authSources = authSourceDao.findByEntityKind(EntityKind.ORG_UNIT);
+        List<FlowClassificationRule> flowClassificationRules = flowClassificationRuleDao.findByEntityKind(EntityKind.ORG_UNIT);
         List<Application> apps = applicationDao.findAll();
         List<OrganisationalUnit> orgUnits = orgUnitDao.findAll();
 
         LocalDateTime now = LocalDateTime.now();
 
-        Set<LogicalFlow> expectedFlows = authSources.stream()
+        Set<LogicalFlow> expectedFlows = flowClassificationRules
+                .stream()
                 .flatMap(a -> {
                     long orgUnitId = a.parentReference().id();
 
@@ -83,7 +84,8 @@ public class LogicalFlowGenerator implements SampleDataGenerator {
                 .collect(toSet());
 
 
-        Set<LogicalFlow> probableFlows = authSources.stream()
+        Set<LogicalFlow> probableFlows = flowClassificationRules
+                .stream()
                 .flatMap(a -> randomlySizedIntStream(0, 30)
                         .mapToObj(i -> randomAppPick(apps, randomPick(orgUnits).id().get())
                                 .map(target -> ImmutableLogicalFlow.builder()
@@ -98,7 +100,8 @@ public class LogicalFlowGenerator implements SampleDataGenerator {
                 .collect(toSet());
 
 
-        Set<LogicalFlow> randomFlows = apps.stream()
+        Set<LogicalFlow> randomFlows = apps
+                .stream()
                 .flatMap(a -> randomlySizedIntStream(0, 5)
                         .mapToObj(i ->
                             randomAppPick(apps, randomPick(orgUnits).id().get())

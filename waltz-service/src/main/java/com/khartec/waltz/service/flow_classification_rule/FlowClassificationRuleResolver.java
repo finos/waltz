@@ -116,7 +116,7 @@ public class FlowClassificationRuleResolver {
      * @param vantagePoints
      * @return
      */
-    static Optional<FlowClassificationRuleVantagePoint> getMostSpecificRanked(Collection<FlowClassificationRuleVantagePoint> vantagePoints) {
+    public static Optional<FlowClassificationRuleVantagePoint> getMostSpecificRanked(Collection<FlowClassificationRuleVantagePoint> vantagePoints) {
         Comparator<FlowClassificationRuleVantagePoint> comparator = Comparator
                 .comparingInt(FlowClassificationRuleVantagePoint::vantagePointRank)
                 .thenComparingInt(FlowClassificationRuleVantagePoint::dataTypeRank);

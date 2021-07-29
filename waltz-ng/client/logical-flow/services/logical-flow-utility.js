@@ -30,7 +30,7 @@ function pickWorst(ratings = []) {
 
 export default [
     () => {
-        const buildGraphTweakers = (appIds = [], decorators = [], authRatingColors) => {
+        const buildGraphTweakers = (appIds = [], decorators = [], flowClassificationColors) => {
 
             const decoratorsByFlowId = _.groupBy(decorators, "dataFlowId");
             const calcRating = (d) => {
@@ -55,11 +55,11 @@ export default [
                         return selection
                             .attr("stroke", d => {
                                 const rating = calcRating(d);
-                                return authRatingColors(rating);
+                                return flowClassificationColors(rating);
                             })
                             .attr("fill", d => {
                                 const rating = calcRating(d);
-                                return color(authRatingColors(rating)).brighter();
+                                return color(flowClassificationColors(rating)).brighter();
                             });
                     },
                     enter: (selection) => {

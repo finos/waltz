@@ -234,7 +234,7 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
     }
 
 
-    public int updateDecoratorsForAuthSource(FlowClassificationRuleVantagePoint flowClassificationRuleVantagePoint) {
+    public int updateDecoratorsForFlowClassificationRule(FlowClassificationRuleVantagePoint flowClassificationRuleVantagePoint) {
         LogicalFlowDecorator lfd = LOGICAL_FLOW_DECORATOR.as("lfd");
 
         EntityReference vantagePoint = flowClassificationRuleVantagePoint.vantagePoint();
