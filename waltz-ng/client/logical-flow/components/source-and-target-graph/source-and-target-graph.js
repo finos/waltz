@@ -651,8 +651,8 @@ function controller($element, $window, serviceBroker) {
                 .value();
         }
 
-        if(changes.flowClassificationsByCode){
-            debouncedRender();
+        if(changes.flowClassificationsByCode) {
+            render();
         }
     };
 

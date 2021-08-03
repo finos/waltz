@@ -63,7 +63,8 @@ const initialState = {
         nodeFilterApplied: false,
         tagFilterApplied: false
     },
-    tags: []
+    tags: [],
+    flowClassificationsByCode: []
 };
 
 
@@ -223,9 +224,7 @@ function controller($element,
 
     vm.$onInit = () => {
         loadFlowClassificationRatings(serviceBroker)
-            .then(r => {
-                vm.flowClassificationsByCode = _.keyBy(r, d => d.code);
-            });
+            .then(r => vm.flowClassificationsByCode = _.keyBy(r, d => d.code));
 
         serviceBroker
             .loadViewData(CORE_API.DataTypeStore.findAll)
@@ -233,6 +232,9 @@ function controller($element,
     };
 
     vm.$onChanges = (changes) => {
+
+        loadFlowClassificationRatings(serviceBroker)
+            .then(r => vm.flowClassificationsByCode = _.keyBy(r, d => d.code));
 
         if (changes.logicalFlows || changes.decorators) {
             vm.resetNodeAndTypeFilter();
