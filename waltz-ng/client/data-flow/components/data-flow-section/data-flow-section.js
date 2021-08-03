@@ -117,7 +117,7 @@ function controller(serviceBroker) {
         serviceBroker
             .loadViewData(
                 CORE_API.FlowClassificationRuleStore.findByApp,
-                [ vm.parentEntityRef.id ])
+                [ vm.parentEntityRef.id ], {force: true})
             .then(r => {
                 vm.flowClassificationRules = r.data;
             });
