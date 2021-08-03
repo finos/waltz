@@ -17,18 +17,19 @@
  */
 
 import _ from "lodash";
-import {initialiseData} from "../../../common";
+import { initialiseData } from "../../../common";
 import template from "./entity-icon-label.html";
-import {CORE_API} from "../../services/core-api-utils";
+import { CORE_API } from "../../services/core-api-utils";
 import namedSettings from "../../../system/named-settings";
-import {mkSelectionOptions} from "../../selector-utils";
-import {mkRef} from "../../entity-utils";
-import {genericAvatarDataUrl} from "../../../person/person-utils";
+import { mkSelectionOptions } from "../../selector-utils";
+import { mkRef } from "../../entity-utils";
+import { genericAvatarDataUrl } from "../../../person/person-utils";
 
 const bindings = {
     entityRef: "<",
     iconPlacement: "@?",
     additionalDisplayData: "<?",
+    showExternalId: "<?",
     tooltipPlacement: "@?"
 };
 
@@ -36,6 +37,7 @@ const bindings = {
 const initialState = {
     iconPlacement: "left", // can be left, right, none
     tooltipPlacement: "top", // left, top-left, top-right; refer to: (https://github.com/angular-ui/bootstrap/tree/master/src/tooltip)
+    showExternalId: false,
     trigger: "none",
     ready: false,
     additionalDisplayData: [],
@@ -257,6 +259,66 @@ const entityLoaders = {
                 {
                     name: "Description",
                     value: _.get(version, "description", "-")
+                },
+                licenceProperty,
+                {
+                    name: "Usage",
+                    value: appUsages.length + " applications"
+                },
+            ];
+        }
+    },
+    "SOFTWARE": {
+        method: CORE_API.SoftwareCatalogStore.getByPackageId,
+        mkProps: (catalog, displayNameService, serviceBroker) => {
+            const versions = _.get(catalog, ["versions"], null);
+            const softwarePackage = _.get(catalog, ["packages", 0], null);
+            const usages = _.get(catalog, "usages", []);
+
+            const appUsages = _.chain(usages)
+                .map(u => u.applicationId)
+                .uniq()
+                .value();
+
+            const licenceProperty = {
+                name: "Licence(s)",
+                value: "-"
+            };
+
+            const options = mkSelectionOptions(mkRef("SOFTWARE", softwarePackage.id));
+
+            serviceBroker
+                .loadViewData(CORE_API.LicenceStore.findBySelector, [options])
+                .then(r => {
+                    licenceProperty.value = _.chain(r.data)
+                        .map(r => r.externalId)
+                        .join(", ")
+                        .value();
+                });
+
+            return [
+                {
+                    name: "Name",
+                    value: _.get(softwarePackage, "name", "-")
+                },
+                {
+                    name: "Vendor",
+                    value: _.get(softwarePackage, "releaseDate", "-")
+                },
+                {
+                    name: "External Id",
+                    value: _.get(softwarePackage, "externalId", "-")
+                },
+                {
+                    name: "Description",
+                    value: _.get(softwarePackage, "description", "-")
+                },
+                {
+                    name: "Versions",
+                    value: _.chain(versions)
+                        .map(r => r.name)
+                        .join(", ")
+                        .value()
                 },
                 licenceProperty,
                 {

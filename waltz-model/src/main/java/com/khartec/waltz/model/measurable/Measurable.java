@@ -73,6 +73,7 @@ public abstract class Measurable implements
                 .kind(EntityKind.MEASURABLE)
                 .id(id().get())
                 .name(name())
+                .externalId(externalId())
                 .description(description())
                 .entityLifecycleStatus(entityLifecycleStatus())
                 .build();

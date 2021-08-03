@@ -48,6 +48,7 @@ public interface AppGroup extends
                 .kind(EntityKind.APP_GROUP)
                 .id(id().get())
                 .name(name())
+                .externalId(externalId())
                 .description(description())
                 .build();
     }

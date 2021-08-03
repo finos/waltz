@@ -16,8 +16,8 @@
  *
  */
 
-import {initialiseData} from "../../../common";
-import {kindToViewState} from "../../../common/link-utils";
+import { initialiseData } from "../../../common";
+import { kindToViewState } from "../../../common/link-utils";
 import template from "./entity-link.html";
 
 
@@ -26,6 +26,7 @@ const bindings = {
     iconPlacement: "@?",
     tooltipPlacement: "@?",
     additionalDisplayData: "<?",
+    showExternalId: "<?",
     target: "@", /** if '_blank' the external icon is shown **/
     isSecondaryLink: "<?"
 };
@@ -35,6 +36,7 @@ const initialState = {
     additionalDisplayData: [],
     iconPlacement: "left", // can be left, right, none
     tooltipPlacement: "top", // left, top-left, top-right; refer to: (https://github.com/angular-ui/bootstrap/tree/master/src/tooltip)
+    showExternalId: false,
     isSecondaryLink: false
 };
 

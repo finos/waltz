@@ -58,6 +58,7 @@ public abstract class ChangeInitiative implements
                 .kind(EntityKind.CHANGE_INITIATIVE)
                 .id(id().get())
                 .name(name() + externalId().map(extId -> " (" + extId + ")").orElse(""))
+                .externalId(externalId())
                 .description(description())
                 .build();
     }

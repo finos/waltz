@@ -52,6 +52,7 @@ public abstract class PhysicalSpecification implements
                 .kind(EntityKind.PHYSICAL_SPECIFICATION)
                 .id(id().get())
                 .name(name() + externalId().map(extId -> " (" + extId + ")").orElse(""))
+                .externalId(externalId())
                 .description(description())
                 .build();
     }
