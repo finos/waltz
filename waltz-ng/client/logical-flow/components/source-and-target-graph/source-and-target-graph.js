@@ -454,8 +454,8 @@ function drawArcs(section, model, layoutFn, flowClassificationsByCode) {
         .classed(styles.ARC_REMOVED, d => d.entityLifecycleStatus === "REMOVED")
         .classed(styles.ARC_PENDING, d => d.entityLifecycleStatus === "PENDING")
         .attr("opacity", 0)
-        .attr("stroke", d => flowClassificationsByCode[d.rating].color)
-        .attr("fill", d => color(flowClassificationsByCode[d.rating].color).brighter());
+        .attr("stroke", d => _.get(flowClassificationsByCode, [d.rating, "color"], "#fafafa"))
+        .attr("fill", d => color(_.get(flowClassificationsByCode, [d.rating, "color"], "#fafafa")).brighter());
 
     arcs
         .merge(newArcs)
