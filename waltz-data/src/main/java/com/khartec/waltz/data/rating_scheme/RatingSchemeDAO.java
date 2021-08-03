@@ -257,7 +257,7 @@ public class RatingSchemeDAO {
                 .select(rsi.SCHEME_ID, rsi.ID, DSL.val("ASSESSMENT_RATING"), DSL.count())
                 .from(ar)
                 .innerJoin(rsi).on(rsi.ID.eq(ar.RATING_ID))
-                .groupBy(rsi.ID);
+                .groupBy(rsi.SCHEME_ID, rsi.ID);
 
         SelectHavingStep<Record4<Long, Long, String, Integer>> measurableCounts = dsl
                 .select(rsi.SCHEME_ID, rsi.ID, DSL.val("MEASURABLE_RATING"), DSL.count())
@@ -266,7 +266,7 @@ public class RatingSchemeDAO {
                 .innerJoin(mc).on(mc.ID.eq(m.MEASURABLE_CATEGORY_ID))
                 .innerJoin(rs).on(rs.ID.eq(mc.RATING_SCHEME_ID))
                 .innerJoin(rsi).on(rsi.CODE.eq(mr.RATING)).and(rsi.SCHEME_ID.eq(rs.ID))
-                .groupBy(rsi.ID);
+                .groupBy(rsi.SCHEME_ID, rsi.ID);
 
         SelectHavingStep<Record4<Long, Long, String, Integer>> scenarioCounts = dsl
                 .select(rsi.SCHEME_ID, rsi.ID, DSL.val("SCENARIO"), DSL.count())
@@ -275,7 +275,7 @@ public class RatingSchemeDAO {
                 .innerJoin(r).on(r.ID.eq(s.ROADMAP_ID))
                 .innerJoin(rs).on(rs.ID.eq(r.RATING_SCHEME_ID))
                 .innerJoin(rsi).on(rsi.CODE.eq(sri.RATING)).and(rsi.SCHEME_ID.eq(rs.ID))
-                .groupBy(rsi.ID);
+                .groupBy(rsi.SCHEME_ID, rsi.ID);
 
         return assessmentCounts
                 .union(measurableCounts)
