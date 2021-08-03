@@ -38,7 +38,7 @@ const allTabDefinitions = [
         template: "wass-summary-tab-content",
         excludeFor: ["DATA_TYPE"]
     }, {
-        name: "Flows Classification Scorecard",
+        name: "Flow Classification Scorecard",
         template: "wass-scorecard-tab-content"
     }, {
         name: "Rated Sources",
