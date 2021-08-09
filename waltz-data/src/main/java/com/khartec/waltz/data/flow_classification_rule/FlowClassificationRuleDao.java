@@ -303,9 +303,6 @@ public class FlowClassificationRuleDao {
     }
 
 
-    // Complicated stuff for calc
-
-
     public List<FlowClassificationRuleVantagePoint> findExpandedFlowClassificationRuleVantagePoints(Set<Long> orgIds) {
         SelectSeekStep3<Record7<Long, Integer, Long, Integer, Long, String, Long>, Integer, Integer, Long> select = dsl
                 .select(targetOrgUnitId,

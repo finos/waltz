@@ -231,8 +231,8 @@
         <uib-tab index="2"
                  ng-if="$ctrl.parentEntityRef.kind === 'APPLICATION'"
                  select="$ctrl.showTab(2)"
-                 disable="$ctrl.authSources | isEmpty"
-                 heading="Authority">
+                 disable="$ctrl.flowClassificationRules | isEmpty"
+                 heading="Flow Classification Rules">
 
             <div ng-if="$ctrl.visibility.dataTab == 2" style="padding-top: 1em;">
                 <waltz-flow-classification-rules-table rules="$ctrl.flowClassificationRules">

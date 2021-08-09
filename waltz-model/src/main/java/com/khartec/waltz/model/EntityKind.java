@@ -84,8 +84,11 @@ public enum EntityKind {
     TAG("Tag"),
 
     @Deprecated
-    CAPABILITY("Capability")  // TO BE REMOVED IN 1.5
-    ;
+    CAPABILITY("Capability"),  // TO BE REMOVED IN 1.5
+
+    @Deprecated
+    AUTHORITATIVE_SOURCE("Authoritative source");  // TO BE REMOVED IN 1.36
+
 
     private final String prettyName;
 
