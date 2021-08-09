@@ -17,6 +17,7 @@
  */
 
 import template from './welcome.html';
+import {sidebarVisible} from "../navbar/sidebar-store";
 
 
 const initialState = {
@@ -31,6 +32,8 @@ function controller($document,
                     localStorageService) {
 
     const vm = Object.assign(this, initialState);
+
+    vm.$onInit = () => sidebarVisible.set(false);
 
     appGroupStore
         .findMyGroupSubscriptions()

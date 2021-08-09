@@ -71,7 +71,7 @@
 @import "../client/measurable-relationship/components/viz/related-measurables-viz";
 @import "../client/measurable-rating/components/tree/measurable-rating-tree";
 @import "../client/measurable-rating/components/browser-tree-panel/measurable-ratings-browser-tree-panel";
-@import "../client/navbar/styles";
+@import "../client/navbar/sidebar";
 @import "../client/notification/components/notification-panel/outstanding-actions-notification-panel";
 @import "../client/org-units/pages/list-view/list-view";
 @import "../client/playpen/playpen";
@@ -293,6 +293,8 @@ textarea {
     border: 1px solid $waltz-border-color-lighter;
     padding: 1em;
     border-radius: 3px;
+    margin-left: $waltz-section-margin;
+    margin-right: $waltz-section-margin;
     @include waltz-box-shadow();
 }
 

@@ -25,15 +25,16 @@
 
 $expandedWidth: 280px;
 $collapsedWidth: 86px;
+$hiddenWidth: 8px;
 
 /* Style page content */
 .main {
-    padding: 0 10px;
+    padding-top: 10px;
     transition: margin-left linear $animation-speed;
 }
 
 .sidebar {
-    transition: width linear $animation-speed;
+    transition: width ease-in-out $animation-speed;
     height: 100%; /* Full-height: remove this if you want "auto" height */
     position: fixed; /* Fixed Sidebar (stay in place on scroll) */
     z-index: 1; /* Stay on top */
@@ -61,6 +62,16 @@ $collapsedWidth: 86px;
 
     .sidebar {
         width: $collapsedWidth;
+    }
+}
+
+.sidebar-hidden {
+    .main {
+        margin-left: $hiddenWidth;
+    }
+
+    .sidebar {
+        width: $hiddenWidth;
     }
 }
 

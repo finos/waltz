@@ -1,20 +1,21 @@
 import {writable} from "svelte/store";
-import {dynamicSections, dynamicSectionsByKind} from "../dynamic-section/dynamic-section-definitions";
+import {dynamicSectionsByKind} from "../dynamic-section/dynamic-section-definitions";
 
-const f = _.chain(dynamicSections)
-    .map(d => d.name)
-    .maxBy(d => d.length)
-    .value();
-console.log(f);
+export const sidebarExpanded = writable(true);
+export const sidebarVisible = writable(false);
 
 function createStore() {
     const {subscribe, set} = writable([]);
 
     return {
         subscribe,
-        loadForPageKind: (pageKind) => set(dynamicSectionsByKind[pageKind]),
+        loadForPageKind: (pageKind) => {
+            const sections = dynamicSectionsByKind[pageKind] || [];
+            sidebarVisible.set(! _.isEmpty(sections));
+            console.log({sections})
+            return set(sections);
+        },
     };
 }
 
 export const availableSections = createStore();
-export const sidebarExpanded = writable(true);
