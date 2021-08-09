@@ -1,14 +1,21 @@
 <script>
-    import {availableSections, sidebarExpanded} from "./sidebar-store";
+    import {sidebarExpanded} from "./sidebar-store";
+    import {availableSections, activeSections} from "../dynamic-section/section-store";
     import Icon from "../common/svelte/Icon.svelte";
 
     $: console.log({sections: $availableSections})
+
+    function activateSection(section) {
+        console.log("activate", {section})
+        activeSections.add(section);
+    }
 </script>
 
 <ul class="list-unstyled">
 {#each $availableSections as section}
     <li class="sidenav">
-        <a class="clickable no-overflow">
+        <a class="clickable no-overflow"
+           on:click={() => activateSection(section)}>
             <Icon size="lg"
                   name={section.icon}/>
             <span class="section-name "
@@ -21,6 +28,7 @@
 </ul>
 
 <a class="expansion-toggle"
+   style="margin-bottom: 1em"
    on:click={() => $sidebarExpanded = !$sidebarExpanded}>
     <Icon size="lg"
           name={$sidebarExpanded ? 'angle-double-left' : 'angle-double-right'}>

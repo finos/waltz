@@ -20,7 +20,7 @@ import {initialiseData} from "../../../common/index";
 
 import template from "./unit-view.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import {availableSections} from "../../../navbar/sidebar-store";
+import {pageKind} from "../../../dynamic-section/section-store";
 
 
 const initialState = {
@@ -48,7 +48,7 @@ function controller($stateParams,
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-        availableSections.loadForPageKind("ORG_UNIT");
+        pageKind.set("ORG_UNIT");
         const id = $stateParams.id;
         vm.parentEntityRef = { kind: "ORG_UNIT", id };
 

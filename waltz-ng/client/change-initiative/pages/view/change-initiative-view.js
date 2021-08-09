@@ -18,7 +18,7 @@
 import { CORE_API } from "../../../common/services/core-api-utils";
 import template from "./change-initiative-view.html";
 import { initialiseData } from "../../../common";
-import {availableSections} from "../../../navbar/sidebar-store";
+import {availableSections} from "../../../dynamic-section/section-store";
 
 
 const initialState = {

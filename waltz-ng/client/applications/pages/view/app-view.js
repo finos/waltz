@@ -19,7 +19,7 @@
 import { CORE_API } from "../../../common/services/core-api-utils";
 
 import template from "./app-view.html";
-import {availableSections} from "../../../navbar/sidebar-store";
+import {pageKind} from "../../../dynamic-section/section-store";
 
 
 const initialState = {
@@ -59,7 +59,7 @@ function controller($stateParams,
 
     // -- BOOT --
     vm.$onInit = () => {
-        availableSections.loadForPageKind("APPLICATION");
+        pageKind.set("APPLICATION");
         const id = $stateParams.id;
         const entityReference = { id, kind: "APPLICATION" };
         dynamicSectionManager.initialise("APPLICATION");

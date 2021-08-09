@@ -23,7 +23,7 @@ import _ from "lodash";
 import template from "./physical-flow-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
 import {toEntityRef} from "../common/entity-utils";
-import {availableSections} from "../navbar/sidebar-store";
+import {availableSections} from "../dynamic-section/section-store";
 
 
 const modes = {
