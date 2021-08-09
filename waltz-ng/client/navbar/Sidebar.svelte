@@ -8,12 +8,13 @@
 <ul class="list-unstyled">
 {#each $availableSections as section}
     <li class="sidenav">
-        <a class="no-overflow">
+        <a class="clickable no-overflow">
             <Icon size="lg"
                   name={section.icon}/>
-            {#if $sidebarExpanded}
+            <span class="section-name "
+                  style={`opacity: ${$sidebarExpanded ? 1 : 0}`}>
                 {section.name}
-            {/if}
+            </span>
         </a>
     </li>
 {/each}
@@ -41,5 +42,24 @@
         &:hover {
             color: $waltz-blue-background;;
         }
+    }
+
+    /* The navigation menu links */
+    .sidenav a {
+        text-decoration: none;
+        font-size: 18px;
+        color: $navbar-default-link-color;
+        padding-bottom: 1em;
+        padding-left: 1.8em;
+        display: inline-block;
+    }
+
+    .section-name {
+        transition: opacity ease-in-out 0.3s;
+    }
+
+    /* When you mouse over the navigation links, change their color */
+    .sidenav a:hover {
+        color: $navbar-default-link-hover-color;
     }
 </style>

@@ -64,20 +64,6 @@ $collapsedWidth: 86px;
     }
 }
 
-/* The navigation menu links */
-.sidenav a {
-    text-decoration: none;
-    font-size: 18px;
-    color: $navbar-default-link-color;
-    padding-bottom: 1em;
-    padding-left: 1.8em;
-    display: block;
-}
-
-/* When you mouse over the navigation links, change their color */
-.sidenav a:hover {
-    color: $navbar-default-link-hover-color;
-}
 
 .under-header {
     margin-top: 50px;
