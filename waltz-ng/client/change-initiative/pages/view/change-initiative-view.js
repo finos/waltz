@@ -18,6 +18,7 @@
 import { CORE_API } from "../../../common/services/core-api-utils";
 import template from "./change-initiative-view.html";
 import { initialiseData } from "../../../common";
+import {availableSections} from "../../../navbar/sidebar-store";
 
 
 const initialState = {
@@ -45,6 +46,8 @@ function controller($stateParams,
     };
 
     vm.$onInit = () => {
+        availableSections.loadForPageKind("CHANGE_INITIATIVE");
+
         const ciPromise = serviceBroker
             .loadViewData(CORE_API.ChangeInitiativeStore.getById, [id])
             .then(result => {

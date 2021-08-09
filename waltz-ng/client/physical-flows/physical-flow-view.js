@@ -23,6 +23,7 @@ import _ from "lodash";
 import template from "./physical-flow-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
 import {toEntityRef} from "../common/entity-utils";
+import {availableSections} from "../navbar/sidebar-store";
 
 
 const modes = {
@@ -117,6 +118,7 @@ function controller($q,
 
 
     vm.$onInit = () => {
+        availableSections.loadForPageKind("PHYSICAL_FLOW");
         dynamicSectionManager.initialise("PHYSICAL_FLOW");
         vm.parentEntityRef = entityReference;
 

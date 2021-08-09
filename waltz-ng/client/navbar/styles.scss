@@ -21,3 +21,64 @@
 @import "directives/navbar-profile";
 @import "components/browser-detect-banner/broswer-detect-banner";
 @import "components/issue-notification-banner/issue-notification-banner";
+@import "../../style/animations";
+
+$expandedWidth: 280px;
+$collapsedWidth: 86px;
+
+/* Style page content */
+.main {
+    padding: 0 10px;
+    transition: margin-left linear $animation-speed;
+}
+
+.sidebar {
+    transition: width linear $animation-speed;
+    height: 100%; /* Full-height: remove this if you want "auto" height */
+    position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+    z-index: 1; /* Stay on top */
+    top: 50px; /* Stay at the top */
+    left: 0;
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 40px;
+    background-color: $navbar-default-bg;
+}
+
+.sidebar-expanded {
+    .main {
+        margin-left: $expandedWidth;
+    }
+    .sidebar {
+        width: $expandedWidth;
+    }
+}
+
+
+.sidebar-collapsed {
+    .main {
+        margin-left: $collapsedWidth;
+    }
+
+    .sidebar {
+        width: $collapsedWidth;
+    }
+}
+
+/* The navigation menu links */
+.sidenav a {
+    text-decoration: none;
+    font-size: 18px;
+    color: $navbar-default-link-color;
+    padding-bottom: 1em;
+    padding-left: 1.8em;
+    display: block;
+}
+
+/* When you mouse over the navigation links, change their color */
+.sidenav a:hover {
+    color: $navbar-default-link-hover-color;
+}
+
+.under-header {
+    margin-top: 50px;
+}
