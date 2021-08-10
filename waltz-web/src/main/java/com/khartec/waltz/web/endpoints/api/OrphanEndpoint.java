@@ -58,9 +58,9 @@ public class OrphanEndpoint implements Endpoint {
     public void register() {
         String findApplicationsWithNonExistingOrgUnitPath = mkPath(BASE_URL, "application-non-existing-org-unit");
         String findOrphanMeasurableRatingsPath = mkPath(BASE_URL, "measurable-rating");
-        String findOrphanAuthoritativeSourcesByAppPath = mkPath(BASE_URL, "authoritative-source", "application");
-        String findOrphanAuthoritativeSourcesByOrgUnitPath = mkPath(BASE_URL, "authoritative-source", "org-unit");
-        String findOrphanAuthoritativeSourcesByDataTypePath = mkPath(BASE_URL, "authoritative-source", "data-type");
+        String findOrphanFlowClassificationRulesByAppPath = mkPath(BASE_URL, "flow-classification-rule", "application");
+        String findOrphanFlowClassificationRulesByOrgUnitPath = mkPath(BASE_URL, "flow-classification-rule", "org-unit");
+        String findOrphanFlowClassificationRulesByDataTypePath = mkPath(BASE_URL, "flow-classification-rule", "data-type");
         String findOrphanChangeInitiativesPath = mkPath(BASE_URL, "change-initiative");
         String findOrphanLogicalDataFlowsPath = mkPath(BASE_URL, "logical-flow");
         String findOrphanPhysicalFlowsPath = mkPath(BASE_URL, "physical-flow");
@@ -79,21 +79,21 @@ public class OrphanEndpoint implements Endpoint {
         };
 
 
-        ListRoute<OrphanRelationship> findOrphanAuthoritativeSourcesByAppRoute = (request, response) -> {
+        ListRoute<OrphanRelationship> findOrphanFlowClassificationRulesByAppRoute = (request, response) -> {
             requireRole(userRoleService, request, ADMIN);
-            return orphanService.findOrphanAuthoritativeSourceByApp();
+            return orphanService.findOrphanFlowClassificationRulesByApp();
         };
 
 
-        ListRoute<OrphanRelationship> findOrphanAuthoritativeSourcesByOrgUnitRoute = (request, response) -> {
+        ListRoute<OrphanRelationship> findOrphanFlowClassificationRulesByOrgUnitRoute = (request, response) -> {
             requireRole(userRoleService, request, ADMIN);
-            return orphanService.findOrphanAuthoritativeSourceByOrgUnit();
+            return orphanService.findOrphanFlowClassificationRulesByOrgUnit();
         };
 
 
-        ListRoute<OrphanRelationship> findOrphanAuthoritativeSourcesByDataTypeRoute = (request, response) -> {
+        ListRoute<OrphanRelationship> findOrphanFlowClassificationRulesByDataTypeRoute = (request, response) -> {
             requireRole(userRoleService, request, ADMIN);
-            return orphanService.findOrphanAuthoritiveSourceByDataType();
+            return orphanService.findOrphanFlowClassificationRulesByDataType();
         };
 
 
@@ -123,9 +123,9 @@ public class OrphanEndpoint implements Endpoint {
 
         getForList(findApplicationsWithNonExistingOrgUnitPath, findApplicationsWithNonExistingOrgUnitRoute);
         getForList(findOrphanMeasurableRatingsPath, findOrphanMeasurableRatingsRoute);
-        getForList(findOrphanAuthoritativeSourcesByAppPath, findOrphanAuthoritativeSourcesByAppRoute);
-        getForList(findOrphanAuthoritativeSourcesByOrgUnitPath, findOrphanAuthoritativeSourcesByOrgUnitRoute);
-        getForList(findOrphanAuthoritativeSourcesByDataTypePath, findOrphanAuthoritativeSourcesByDataTypeRoute);
+        getForList(findOrphanFlowClassificationRulesByAppPath, findOrphanFlowClassificationRulesByAppRoute);
+        getForList(findOrphanFlowClassificationRulesByOrgUnitPath, findOrphanFlowClassificationRulesByOrgUnitRoute);
+        getForList(findOrphanFlowClassificationRulesByDataTypePath, findOrphanFlowClassificationRulesByDataTypeRoute);
         getForList(findOrphanChangeInitiativesPath, findOrphanChangeInitiativesRoute);
         getForList(findOrphanLogicalDataFlowsPath, findOrphanLogicalDataFlowsRoute);
         getForList(findOrphanPhysicalFlowsPath, findOrphanPhysicalFlowsRoute);

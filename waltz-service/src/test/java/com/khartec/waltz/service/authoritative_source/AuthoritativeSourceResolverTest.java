@@ -19,19 +19,22 @@
 package com.khartec.waltz.service.authoritative_source;
 
 
-import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
-import com.khartec.waltz.model.authoritativesource.ImmutableAuthoritativeRatingVantagePoint;
+import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
+import com.khartec.waltz.model.flow_classification_rule.ImmutableFlowClassificationRuleVantagePoint;
 import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
+import com.khartec.waltz.service.flow_classification_rule.FlowClassificationRuleResolver;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.service.flow_classification_rule.FlowClassificationRuleResolver.getMostSpecificRanked;
 
 public class AuthoritativeSourceResolverTest {
 
@@ -50,10 +53,10 @@ public class AuthoritativeSourceResolverTest {
     @Test
     public void whenResolveWithMissingVantagePointThenReturnsNoOpinion() {
 
-        List<AuthoritativeRatingVantagePoint> vantagePoints = new ArrayList<>();
-        AuthoritativeSourceResolver authoritativeSourceResolver = new AuthoritativeSourceResolver(vantagePoints);
+        List<FlowClassificationRuleVantagePoint> vantagePoints = new ArrayList<>();
+        FlowClassificationRuleResolver flowClassificationRuleResolver = new FlowClassificationRuleResolver(vantagePoints);
 
-        AuthoritativenessRatingValue rating = authoritativeSourceResolver.resolve(vantagePoint, sourceApp, "REF_DATA");
+        AuthoritativenessRatingValue rating = flowClassificationRuleResolver.resolve(vantagePoint, sourceApp, 20L);
 
         Assert.assertEquals(AuthoritativenessRatingValue.NO_OPINION, rating);
     }
@@ -62,21 +65,20 @@ public class AuthoritativeSourceResolverTest {
     @Test
     public void whenResolveWithExistingVantageButMissingDataTypeThenReturnsNoOpinion() {
 
-        List<AuthoritativeRatingVantagePoint> vantagePoints = new ArrayList<>();
-        vantagePoints.add(ImmutableAuthoritativeRatingVantagePoint.builder()
+        List<FlowClassificationRuleVantagePoint> vantagePoints = new ArrayList<>();
+        vantagePoints.add(ImmutableFlowClassificationRuleVantagePoint.builder()
                 .vantagePoint(vantagePoint)
                 .vantagePointRank(1)
-                .dataTypeCode("TRADE_DATA")
                 .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 10))
                 .dataTypeRank(1)
                 .applicationId(200L)
-                .rating(AuthoritativenessRatingValue.of("SECONDARY"))
-                .authSourceId(1L)
+                .classificationCode(AuthoritativenessRatingValue.of("SECONDARY").value())
+                .ruleId(1L)
                 .build());
 
-        AuthoritativeSourceResolver authoritativeSourceResolver = new AuthoritativeSourceResolver(vantagePoints);
+        FlowClassificationRuleResolver flowClassificationRuleResolver = new FlowClassificationRuleResolver(vantagePoints);
 
-        AuthoritativenessRatingValue rating = authoritativeSourceResolver.resolve(vantagePoint, sourceApp, "REF_DATA");
+        AuthoritativenessRatingValue rating = flowClassificationRuleResolver.resolve(vantagePoint, sourceApp, 20L);
 
         Assert.assertEquals(AuthoritativenessRatingValue.NO_OPINION, rating);
     }
@@ -86,21 +88,20 @@ public class AuthoritativeSourceResolverTest {
     @Test
     public void existingVantageAndDataTypeAndDifferentSourceThenDiscouraged() {
 
-        List<AuthoritativeRatingVantagePoint> vantagePoints = new ArrayList<>();
-        vantagePoints.add(ImmutableAuthoritativeRatingVantagePoint.builder()
+        List<FlowClassificationRuleVantagePoint> vantagePoints = new ArrayList<>();
+        vantagePoints.add(ImmutableFlowClassificationRuleVantagePoint.builder()
                 .vantagePoint(vantagePoint)
                 .vantagePointRank(1)
-                .dataTypeCode("REF_DATA")
                 .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 20))
                 .dataTypeRank(1)
                 .applicationId(205L)
-                .rating(AuthoritativenessRatingValue.of("PRIMARY"))
-                .authSourceId(1L)
+                .classificationCode(AuthoritativenessRatingValue.of("PRIMARY").value())
+                .ruleId(1L)
                 .build());
 
-        AuthoritativeSourceResolver authoritativeSourceResolver = new AuthoritativeSourceResolver(vantagePoints);
+        FlowClassificationRuleResolver flowClassificationRuleResolver = new FlowClassificationRuleResolver(vantagePoints);
 
-        AuthoritativenessRatingValue rating = authoritativeSourceResolver.resolve(vantagePoint, sourceApp, "REF_DATA");
+        AuthoritativenessRatingValue rating = flowClassificationRuleResolver.resolve(vantagePoint, sourceApp, 20L);
 
         Assert.assertEquals(AuthoritativenessRatingValue.DISCOURAGED, rating);
     }
@@ -110,33 +111,31 @@ public class AuthoritativeSourceResolverTest {
     @Test
     public void existingEntriesThenReturnsMostSpecificRating() {
 
-        List<AuthoritativeRatingVantagePoint> vantagePoints = new ArrayList<>();
-        vantagePoints.add(ImmutableAuthoritativeRatingVantagePoint.builder()
+        List<FlowClassificationRuleVantagePoint> vantagePoints = new ArrayList<>();
+        vantagePoints.add(ImmutableFlowClassificationRuleVantagePoint.builder()
                 .vantagePoint(vantagePoint)
                 .vantagePointRank(1)
-                .dataTypeCode("REF_DATA")
                 .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 20))
                 .dataTypeRank(2)
                 .applicationId(205L)
-                .rating(AuthoritativenessRatingValue.of("PRIMARY"))
-                .authSourceId(1L)
+                .classificationCode(AuthoritativenessRatingValue.of("PRIMARY").value())
+                .ruleId(1L)
                 .build());
 
 
-        vantagePoints.add(ImmutableAuthoritativeRatingVantagePoint.builder()
+        vantagePoints.add(ImmutableFlowClassificationRuleVantagePoint.builder()
                 .vantagePoint(vantagePoint)
                 .vantagePointRank(2)
-                .dataTypeCode("REF_DATA")
                 .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 20))
                 .dataTypeRank(3)
                 .applicationId(200L)
-                .rating(AuthoritativenessRatingValue.of("SECONDARY"))
-                .authSourceId(1L)
+                .classificationCode(AuthoritativenessRatingValue.of("SECONDARY").value())
+                .ruleId(1L)
                 .build());
 
-        AuthoritativeSourceResolver authoritativeSourceResolver = new AuthoritativeSourceResolver(vantagePoints);
+        FlowClassificationRuleResolver flowClassificationRuleResolver = new FlowClassificationRuleResolver(vantagePoints);
 
-        AuthoritativenessRatingValue rating = authoritativeSourceResolver.resolve(vantagePoint, sourceApp, "REF_DATA");
+        AuthoritativenessRatingValue rating = flowClassificationRuleResolver.resolve(vantagePoint, sourceApp, 20L);
 
         Assert.assertEquals(AuthoritativenessRatingValue.of("SECONDARY"), rating);
 
@@ -146,24 +145,22 @@ public class AuthoritativeSourceResolverTest {
     @Test
     public void getBestRankedIsCorrect() {
 
-        ImmutableAuthoritativeRatingVantagePoint rank12 = ImmutableAuthoritativeRatingVantagePoint.builder()
+        ImmutableFlowClassificationRuleVantagePoint rank12 = ImmutableFlowClassificationRuleVantagePoint.builder()
                 .vantagePoint(vantagePoint)
                 .vantagePointRank(1)
-                .dataTypeCode("REF_DATA")
                 .dataType(EntityReference.mkRef(EntityKind.DATA_TYPE, 20))
                 .dataTypeRank(2)
                 .applicationId(205L)
-                .rating(AuthoritativenessRatingValue.of("PRIMARY"))
-                .authSourceId(1L)
+                .classificationCode(AuthoritativenessRatingValue.of("PRIMARY").value())
+                .ruleId(1L)
                 .build();
 
+        ImmutableFlowClassificationRuleVantagePoint rank22 = rank12.withVantagePointRank(2);
+        ImmutableFlowClassificationRuleVantagePoint rank11 = rank12.withDataTypeRank(1);
 
-        ImmutableAuthoritativeRatingVantagePoint rank22 = rank12.withVantagePointRank(2);
-        ImmutableAuthoritativeRatingVantagePoint rank11 = rank12.withDataTypeRank(1);
 
-
-        Optional<AuthoritativeRatingVantagePoint> bestRankedOrgUnit = AuthoritativeSourceResolver.getMostSpecificRanked(ListUtilities.newArrayList(rank12, rank22));
-        Optional<AuthoritativeRatingVantagePoint> bestRankedDataType = AuthoritativeSourceResolver.getMostSpecificRanked(ListUtilities.newArrayList(rank12, rank11));
+        Optional<FlowClassificationRuleVantagePoint> bestRankedOrgUnit = getMostSpecificRanked(newArrayList(rank12, rank22));
+        Optional<FlowClassificationRuleVantagePoint> bestRankedDataType = getMostSpecificRanked(newArrayList(rank12, rank11));
 
         Assert.assertTrue(bestRankedOrgUnit.isPresent());
         Assert.assertEquals(rank22, bestRankedOrgUnit.get());
@@ -177,8 +174,7 @@ public class AuthoritativeSourceResolverTest {
     @Test
     public void getBestRankedWorksWithEmpty() {
 
-        Optional<AuthoritativeRatingVantagePoint> bestRanked = AuthoritativeSourceResolver.getMostSpecificRanked(ListUtilities.newArrayList());
-
+        Optional<FlowClassificationRuleVantagePoint> bestRanked = getMostSpecificRanked(newArrayList());
 
         Assert.assertFalse(bestRanked.isPresent());
     }

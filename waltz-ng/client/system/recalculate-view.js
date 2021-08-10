@@ -28,7 +28,7 @@ function controller(notification,
     vm.recalcFlowRatings = () => {
         notification.info('Flow Ratings recalculation requested');
         serviceBroker
-            .execute(CORE_API.AuthSourcesStore.recalculateAll)
+            .execute(CORE_API.FlowClassificationRuleStore.recalculateAll)
             .then(() => notification.success('Flow Ratings recalculated'));
     };
 

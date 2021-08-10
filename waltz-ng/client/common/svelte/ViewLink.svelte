@@ -29,10 +29,6 @@
             path: ctx => `app-group/${ctx.id}`,
             title: "Application Group View"
         },
-        "main.authoritative-source.view": {
-            path: ctx => `authoritative-source/${ctx.id}`,
-            title: "Authoritative Source View"
-        },
         "main.change-initiative.view": {
             path: ctx => `change-initiative/${ctx.id}`,
             title: "Change Initiative View"
@@ -44,6 +40,10 @@
         "main.flow-diagram.view": {
             path: ctx => `flow-diagram/${ctx.id}`,
             title: "Flow Diagram View"
+        },
+        "main.flow-classification-rule.view": {
+            path: ctx => `flow-classification-rule/${ctx.id}`,
+            title: "Flow Classification Rule View"
         },
         "main.logical-flow.view": {
             path: ctx => `logical-flow/${ctx.id}`,

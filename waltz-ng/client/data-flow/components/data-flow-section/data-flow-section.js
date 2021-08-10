@@ -24,7 +24,7 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 
 import template from "./data-flow-section.html";
 import {entity} from "../../../common/services/enums/entity";
-import AuthRatingLegend from "../../../auth-sources/components/svelte/AuthRatingLegend.svelte";
+import FlowClassificationLegend from "../../../flow-classification-rule/components/svelte/FlowClassificationLegend.svelte";
 
 
 const bindings = {
@@ -33,7 +33,7 @@ const bindings = {
 
 
 const initialState = {
-    AuthRatingLegend,
+    FlowClassificationLegend,
     changeUnits: [],
     dataTypeUsages: [],
     logicalFlows: [],
@@ -60,7 +60,7 @@ function controller(serviceBroker) {
     function loadAdditionalAuthSourceData() {
 
         const orgUnitIds = _
-            .chain(vm.authSources)
+            .chain(vm.flowClassificationRules)
             .map("parentReference")
             .filter({ kind: "ORG_UNIT"})
             .map("id")
@@ -116,10 +116,10 @@ function controller(serviceBroker) {
 
         serviceBroker
             .loadViewData(
-                CORE_API.AuthSourcesStore.findByApp,
-                [ vm.parentEntityRef.id ])
+                CORE_API.FlowClassificationRuleStore.findByApp,
+                [ vm.parentEntityRef.id ], {force: true})
             .then(r => {
-                vm.authSources = r.data;
+                vm.flowClassificationRules = r.data;
             });
 
         serviceBroker

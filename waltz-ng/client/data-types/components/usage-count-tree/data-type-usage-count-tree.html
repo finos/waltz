@@ -97,12 +97,12 @@
             <table class="table table-condensed small">
                 <thead>
                 <tr>
-                    <th>Flow Ratings</th>
+                    <th>Flow Classification</th>
                     <th style="text-align:right">Count</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="rating in $ctrl.authSourceRatings">
+                <tr ng-repeat="classification in $ctrl.flowClassifications">
                     <td>
                         <span style="
                             display: inline-block;
@@ -111,12 +111,12 @@
                             width: 1em;
                             height: 1.1em;
                             border:1px solid #ccc;
-                            background-color: {{rating.iconColor}}">
+                            background-color: {{classification.color}}">
                         </span>
-                        <span ng-bind="rating.name"></span>
+                        <span ng-bind="classification.name"></span>
                     </td>
                     <td style="text-align:right">
-                        <span ng-bind="node.cumulativeCounts[rating.key]"></span>
+                        <span ng-bind="node.cumulativeCounts[classification.code]"></span>
                     </td>
                 </tr>
                 </tbody>

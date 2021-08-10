@@ -35,13 +35,231 @@
         </update>
     </changeSet>
 
-<!--    <changeSet id="20210722-5545-2"-->
-<!--               author="woodjes">-->
-<!--        <update tableName="settings">-->
-<!--            <column name="value"-->
-<!--                    value="Prod v1.36"/>-->
-<!--            <where>name='ui.logo.overlay.text'</where>-->
-<!--        </update>-->
-<!--    </changeSet>-->
+    <!-- 5554: move auth sources to flow classification table    -->
+    <changeSet id="20210726-5554-1"
+               author="woodjes">
+        <comment>5554: Create flow_classification_rule table</comment>
+        <createTable tableName="flow_classification_rule">
+            <column autoIncrement="true"
+                    name="id"
+                    type="${id.type}">
+                <constraints primaryKey="true"
+                             primaryKeyName="flow_classification_rule_id_pkey"/>
+            </column>
+            <column name="parent_kind"
+                    type="${enum.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="parent_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="application_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="data_type_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="flow_classification_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="last_updated_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_updated_by"
+                    type="${name.type}"
+                    defaultValue="admin">
+                <constraints nullable="false"/>
+            </column>
+            <column name="provenance"
+                    type="${provenance.type}"
+                    defaultValue="waltz">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20210726-5554-2"
+               author="woodjes">
+        <comment>5554: Create flow_classification table</comment>
+        <createTable tableName="flow_classification">
+            <column autoIncrement="true"
+                    name="id"
+                    type="${id.type}">
+                <constraints primaryKey="true"
+                             primaryKeyName="flow_classification_id_pkey"/>
+            </column>
+            <column name="name"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description"
+                    type="${description.type}">
+                <constraints nullable="true"/>
+            </column>
+            <column name="code"
+                    type="${external-id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="color"
+                    type="${name.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="position"
+                    type="${int.type}"
+                    defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="is_custom"
+                    type="boolean"
+                    defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20210726-5554-3"
+               author="woodjes">
+        <comment>5554: Create fk from flow_classification_rule to flow_classification</comment>
+        <addForeignKeyConstraint baseColumnNames="flow_classification_id"
+                                 baseTableName="flow_classification_rule"
+                                 constraintName="flow_classification_rule_classification_id_fkey"
+                                 onDelete="CASCADE"
+                                 referencedColumnNames="id"
+                                 referencedTableName="flow_classification"/>
+    </changeSet>
+
+    <changeSet id="20210727-5554-4"
+               author="woodjes">
+        <comment>5554: Create fk from flow_classification_rule to application</comment>
+        <addForeignKeyConstraint baseColumnNames="application_id"
+                                 baseTableName="flow_classification_rule"
+                                 constraintName="flow_classification_rule_application_id_fkey"
+                                 onDelete="CASCADE"
+                                 referencedColumnNames="id"
+                                 referencedTableName="application"/>
+    </changeSet>
+
+    <changeSet id="20210727-5554-5"
+               author="woodjes">
+        <comment>5554: Create fk from flow_classification_rule to data_type</comment>
+        <addForeignKeyConstraint baseColumnNames="data_type_id"
+                                 baseTableName="flow_classification_rule"
+                                 constraintName="flow_classification_rule_data_type_id_fkey"
+                                 onDelete="CASCADE"
+                                 referencedColumnNames="id"
+                                 referencedTableName="data_type"/>
+    </changeSet>
+
+    <changeSet id="20210726-5554-6"
+               author="woodjes">
+        <comment>5554: Create unique index</comment>
+        <createIndex indexName="idx_fcr_scope_dt_app"
+                     tableName="flow_classification_rule"
+                     unique="true">
+            <column name="parent_kind" type="${enum.type}"/>
+            <column name="parent_id" type="${id.type}"/>
+            <column name="application_id" type="${id.type}"/>
+            <column name="data_type_id" type="${id.type}"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20210727-5554-7"
+               author="woodjes">
+        <comment>5554: Insert authority ratings from enum_value into flow_classification</comment>
+        <sql>
+            INSERT INTO flow_classification (name, description, code, color, position, is_custom)
+            SELECT display_name, description, [key], icon_color, position, 0
+            FROM enum_value
+            WHERE type = 'AuthoritativenessRating'
+        </sql>
+    </changeSet>
+
+    <changeSet id="20210727-5554-8"
+               author="woodjes">
+        <comment>5554: Copy authoritative_source info into flow_classification_rule</comment>
+        <sql>
+            INSERT INTO flow_classification_rule (  parent_kind,
+                                                    parent_id,
+                                                    application_id,
+                                                    data_type_id,
+                                                    flow_classification_id,
+                                                    description,
+                                                    external_id,
+                                                    last_updated_at,
+                                                    last_updated_by,
+                                                    provenance)
+            SELECT  auth.parent_kind,
+                    auth.parent_id,
+                    auth.application_id,
+                    dt.id,
+                    fc.id,
+                    auth.description,
+                    auth.external_id,
+                    auth.last_updated_at,
+                    auth.last_updated_by,
+                    provenance
+            FROM authoritative_source auth
+            INNER JOIN data_type dt on auth.data_type = dt.code
+            INNER JOIN flow_classification fc on auth.rating = fc.code
+        </sql>
+    </changeSet>
+
+    <changeSet id="20210727-5554-9"
+               author="woodjes">
+        <dropForeignKeyConstraint baseTableName="logical_flow_decorator"
+                                  constraintName="lfd_auth_source_id_fkey"/>
+    </changeSet>
+
+    <changeSet id="20210727-5554-10"
+               author="woodjes">
+        <comment>5444: dropping auth_source_id column from logical flow decorator</comment>
+        <dropColumn tableName="logical_flow_decorator"
+                    columnName="auth_source_id" />
+    </changeSet>
+
+    <changeSet id="20210727-5554-11"
+               author="woodjes">
+        <comment>5444: adding flow_classification_rule_id column to logical flow decorator</comment>
+        <addColumn tableName="logical_flow_decorator">
+            <column name="flow_classification_rule_id"
+                    type="${id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20210727-5554-12"
+               author="woodjes">
+        <comment>5444: adding flow_classification_rule_id column to logical flow decorator</comment>
+        <addForeignKeyConstraint baseColumnNames="flow_classification_rule_id"
+                                 baseTableName="logical_flow_decorator"
+                                 constraintName="lfd_flow_classification_rule_id_fkey"
+                                 onDelete="SET NULL"
+                                 referencedColumnNames="id"
+                                 referencedTableName="flow_classification_rule"/>
+    </changeSet>
+
+    <!--    <changeSet id="20210722-5545-2"-->
+    <!--               author="woodjes">-->
+    <!--        <update tableName="settings">-->
+    <!--            <column name="value"-->
+    <!--                    value="Prod v1.36"/>-->
+    <!--            <where>name='ui.logo.overlay.text'</where>-->
+    <!--        </update>-->
+    <!--    </changeSet>-->
 
 </databaseChangeLog>

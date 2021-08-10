@@ -80,13 +80,6 @@ export const entity = {
         description: null,
         position: 67
     },
-    AUTHORITATIVE_SOURCE: {
-        key: "AUTHORITATIVE_SOURCE",
-        name: "Authoritative Source",
-        icon: "shield",
-        description: null,
-        position: 70
-    },
     BOOKMARK: {
         key: "BOOKMARK",
         name: "Bookmark",
@@ -156,6 +149,13 @@ export const entity = {
         icon: "picture-o",
         description: null,
         position: 140
+    },
+    FLOW_CLASSIFICATION_RULE: {
+        key: "FLOW_CLASSIFICATION_RULE",
+        name: "Flow Classification Rule",
+        icon: "shield",
+        description: null,
+        position: 145
     },
     INVOLVEMENT: {
         key: "INVOLVEMENT",

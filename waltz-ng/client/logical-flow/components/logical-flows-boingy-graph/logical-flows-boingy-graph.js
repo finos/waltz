@@ -25,8 +25,8 @@ import template from "./logical-flows-boingy-graph.html";
 import {buildHierarchies, findNode, flattenChildren} from "../../../common/hierarchy-utils";
 import {entity} from "../../../common/services/enums/entity";
 import {filterUtils, maybeAddUntaggedFlowsTag} from "../../logical-flow-utils";
-import {loadRatingColorScale} from "../../../auth-sources/auth-sources-utils";
-import AuthRatingLegend from "../../../auth-sources/components/svelte/AuthRatingLegend.svelte";
+import {loadFlowClassificationColorScale} from "../../../flow-classification-rule/flow-classification-utils";
+import FlowClassificationLegend from "../../../flow-classification-rule/components/svelte/FlowClassificationLegend.svelte";
 
 const bindings = {
     filters: "<",
@@ -54,7 +54,7 @@ const defaultOptions = {
 
 
 const initialState = {
-    AuthRatingLegend,
+    FlowClassificationLegend,
     applications: [],
     flows: [],
     decorators: [],
@@ -143,10 +143,10 @@ function getDataTypeIds(allDataTypes = [], decorators = []) {
 function prepareGraphTweakers(logicalFlowUtilityService,
                               applications = [],
                               decorators = [],
-                              authRatingColors = () => "grey")
+                              flowClassificationColors = () => "grey")
 {
     const appIds = _.map(applications, "id");
-    return logicalFlowUtilityService.buildGraphTweakers(appIds, decorators, authRatingColors);
+    return logicalFlowUtilityService.buildGraphTweakers(appIds, decorators, flowClassificationColors);
 }
 
 
@@ -219,7 +219,7 @@ function controller($scope,
             logicalFlowUtilityService,
             vm.applications,
             vm.filteredFlowData.decorators,
-            vm.authRatingColors);
+            vm.flowClassificationColors);
     };
 
 
@@ -239,7 +239,7 @@ function controller($scope,
             .loadAppData(CORE_API.DataTypeStore.findAll)
             .then(r => vm.allDataTypes = r.data);
 
-        loadRatingColorScale(serviceBroker).then(r => vm.authRatingColors = r);
+        loadFlowClassificationColorScale(serviceBroker).then(r => vm.flowClassificationColors = r);
     };
 
 }

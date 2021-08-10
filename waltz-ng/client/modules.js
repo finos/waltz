@@ -45,7 +45,6 @@ import Assessments from "./assessments";
 import AssetCost from "./asset-cost";
 import Attestation from "./attestation";
 import AttributeChange from "./attribute-change";
-import AuthSources from "./auth-sources";
 import Bookmarks from "./bookmarks";
 import ChangeInitiative from "./change-initiative";
 import ClientCacheKey from "./client_cache_key";
@@ -70,6 +69,7 @@ import EntityNamedNote from "./entity-named-note";
 import EntityRelationship from "./entity-relationship";
 import EntityStatistics from "./entity-statistics";
 import EntitySvgDiagram from "./entity-svg-diagram";
+import FlowClassificationRule from "./flow-classification-rule"
 import Tag from "./tag";
 import EnumValue from "./enum-value";
 import Examples from "./examples";
@@ -155,7 +155,6 @@ const dependencies = [
     AssetCost(),
     Attestation(),
     AttributeChange(),
-    AuthSources(),
     Bookmarks(),
     ChangeInitiative(),
     ClientCacheKey(),
@@ -180,6 +179,7 @@ const dependencies = [
     EntityRelationship(),
     EntityStatistics(),
     EntitySvgDiagram(),
+    FlowClassificationRule(),
     Tag(),
     EnumValue(),
     Examples(),

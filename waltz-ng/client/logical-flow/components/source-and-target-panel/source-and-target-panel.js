@@ -31,7 +31,7 @@ import {
 import template from "./source-and-target-panel.html";
 import {sameRef} from "../../../common/entity-utils";
 import {appLogicalFlowFilterExcludedTagIdsKey} from "../../../user";
-import {loadAuthSourceRatings} from "../../../auth-sources/auth-sources-utils";
+import {loadFlowClassificationRatings} from "../../../flow-classification-rule/flow-classification-utils";
 
 
 const bindings = {
@@ -63,7 +63,8 @@ const initialState = {
         nodeFilterApplied: false,
         tagFilterApplied: false
     },
-    tags: []
+    tags: [],
+    flowClassificationsByCode: []
 };
 
 
@@ -222,10 +223,8 @@ function controller($element,
     };
 
     vm.$onInit = () => {
-        loadAuthSourceRatings(serviceBroker)
-            .then(r => {
-                vm.authRatingsByKey = _.keyBy(r, d => d.key);
-            });
+        loadFlowClassificationRatings(serviceBroker)
+            .then(r => vm.flowClassificationsByCode = _.keyBy(r, d => d.code));
 
         serviceBroker
             .loadViewData(CORE_API.DataTypeStore.findAll)
@@ -233,6 +232,9 @@ function controller($element,
     };
 
     vm.$onChanges = (changes) => {
+
+        loadFlowClassificationRatings(serviceBroker)
+            .then(r => vm.flowClassificationsByCode = _.keyBy(r, d => d.code));
 
         if (changes.logicalFlows || changes.decorators) {
             vm.resetNodeAndTypeFilter();

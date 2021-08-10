@@ -21,10 +21,9 @@ import {select} from "d3-selection";
 import {scaleLinear} from "d3-scale";
 
 import {initialiseData} from "../../../common";
-import {authoritativeRatingBackgroundColorScale, authoritativeRatingColorScale} from "../../../common/colors";
 
 import template from "./application-flow-summary-graph.html";
-import {loadAuthSourceRatings, loadRatingColorScale} from "../../../auth-sources/auth-sources-utils";
+import {loadFlowClassificationRatings} from "../../../flow-classification-rule/flow-classification-utils";
 
 
 const bindings = {
@@ -120,7 +119,7 @@ function drawTitleBar(svg) {
 }
 
 
-function enrichData(data = [], ratings = []) {
+function enrichData(data = [], flowClassifications = []) {
     return _.chain(data)
         .flatMap((vs, k) => {
             return _.map(vs, (authCounts, rating) => {
@@ -131,7 +130,7 @@ function enrichData(data = [], ratings = []) {
                 };
             })
         })
-        .map(d => enrichCellData(d, _.map(ratings, d => d.key)))
+        .map(d => enrichCellData(d, _.map(flowClassifications, d => d.code)))
         .value(data);
 }
 
@@ -149,7 +148,7 @@ function enrichCellData(data = [], keys = []) {
 }
 
 
-function drawData(svg, data = [], ratings) {
+function drawData(svg, data = [], flowClassifications) {
 
     if (! svg) return;
 
@@ -189,7 +188,7 @@ function drawData(svg, data = [], ratings) {
         .attr("width", d => scale(d[1] - d[0]))
         .attr("stroke", "#ccc")
         .attr("stroke-width", 0.5)
-        .attr("fill", (d, idx) => ratings[idx].iconColor);
+        .attr("fill", (d, idx) => flowClassifications[idx].color);
 }
 
 
@@ -200,8 +199,8 @@ function controller($element, serviceBroker) {
     let svg = null;
     const redraw = () => drawData(
         svg,
-        enrichData(vm.summaryData, vm.authSourceRatings),
-        vm.authSourceRatings);
+        enrichData(vm.summaryData, vm.flowClassifications),
+        vm.flowClassifications);
 
     vm.$onChanges = () => redraw();
 
@@ -216,8 +215,8 @@ function controller($element, serviceBroker) {
         drawTitleBar(svg);
         drawCenterLabels(svg);
 
-        loadAuthSourceRatings(serviceBroker)
-            .then(xs => vm.authSourceRatings = xs)
+        loadFlowClassificationRatings(serviceBroker)
+            .then(xs => vm.flowClassifications = xs)
             .then(redraw);
     };
 }

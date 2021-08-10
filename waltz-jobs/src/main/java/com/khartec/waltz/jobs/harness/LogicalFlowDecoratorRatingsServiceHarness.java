@@ -24,11 +24,11 @@ import com.khartec.waltz.common.hierarchy.Forest;
 import com.khartec.waltz.common.hierarchy.HierarchyUtilities;
 import com.khartec.waltz.common.hierarchy.Node;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
-import com.khartec.waltz.model.authoritativesource.AuthoritativeSource;
+import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRule;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.authoritative_source.AuthoritativeSourceService;
 import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
+import com.khartec.waltz.service.flow_classification_rule.FlowClassificationRuleService;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -44,9 +44,9 @@ public class LogicalFlowDecoratorRatingsServiceHarness {
     public static void main(String[] args) throws SQLException {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
-        AuthoritativeSourceService authoritativeSourceService = ctx.getBean(AuthoritativeSourceService.class);
+        FlowClassificationRuleService authoritativeSourceService = ctx.getBean(FlowClassificationRuleService.class);
 
-        List<AuthoritativeSource> authSources = authoritativeSourceService.findAll();
+        List<FlowClassificationRule> authSources = authoritativeSourceService.findAll();
 
         OrganisationalUnitService organisationalUnitService = ctx.getBean(OrganisationalUnitService.class);
         OrganisationalUnitDao organisationalUnitDao = ctx.getBean(OrganisationalUnitDao.class);

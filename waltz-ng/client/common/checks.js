@@ -96,15 +96,15 @@ const serviceBrokerTargetShape = {
     serviceFnName: apiCheck.string
 };
 
-const authSourceUpdateCommand = {
+const flowClassificationRuleUpdateCommand = {
     description: apiCheck.string.optional,
-    rating: apiCheck.string,
+    classificationId: apiCheck.number,
     id: apiCheck.number
 };
 
-const authSourceCreateCommand = {
+const flowClassificationRuleCreateCommand = {
     description: apiCheck.string.optional,
-    rating: apiCheck.string,
+    classificationId: apiCheck.number,
     applicationId: apiCheck.number,
     dataTypeId: apiCheck.number,
     parentReference: apiCheck.shape(entityRefShape)
@@ -252,12 +252,12 @@ export const checkIsServiceBrokerTarget = (target) => {
     check(myApiCheck.shape(serviceBrokerTargetShape), target);
 };
 
-export const checkIsAuthSourceUpdateCommand = (target) => {
-    check(myApiCheck.shape(authSourceUpdateCommand), target);
+export const checkIsFlowClassificationRuleUpdateCommand = (target) => {
+    check(myApiCheck.shape(flowClassificationRuleUpdateCommand), target);
 };
 
-export const checkIsAuthSourceCreateCommand = (target) => {
-    check(myApiCheck.shape(authSourceCreateCommand), target);
+export const checkIsFlowClassificationRuleCreateCommand = (target) => {
+    check(myApiCheck.shape(flowClassificationRuleCreateCommand), target);
 };
 
 export const checkIsCustomEnvironment = (target) => {

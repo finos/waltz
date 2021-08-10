@@ -31,18 +31,18 @@ function service($http, BaseApiUrl) {
         .then(result => result.data);
 
 
-    const findOrphanAuthoritativeSourcesByApp = () => $http
-        .get(`${BASE}/authoritative-source/application`)
+    const findOrphanFlowClassificationRulesByApp = () => $http
+        .get(`${BASE}/flow-classification-rule/application`)
         .then(result => result.data);
 
 
-    const findOrphanAuthoritativeSourcesByOrgUnit = () => $http
-        .get(`${BASE}/authoritative-source/org-unit`)
+    const findOrphanFlowClassificationRulesByOrgUnit = () => $http
+        .get(`${BASE}/flow-classification-rule/org-unit`)
         .then(result => result.data);
 
 
-    const findOrphanAuthoritativeSourcesByDataType = () => $http
-        .get(`${BASE}/authoritative-source/data-type`)
+    const findOrphanFlowClassificationRulesByDataType = () => $http
+        .get(`${BASE}/flow-classification-rule/data-type`)
         .then(result => result.data);
 
 
@@ -69,9 +69,9 @@ function service($http, BaseApiUrl) {
     return {
         findAppsWithNonExistentOrgUnits,
         findOrphanMeasurableRatings,
-        findOrphanAuthoritativeSourcesByApp,
-        findOrphanAuthoritativeSourcesByOrgUnit,
-        findOrphanAuthoritativeSourcesByDataType,
+        findOrphanFlowClassificationRulesByApp,
+        findOrphanFlowClassificationRulesByOrgUnit,
+        findOrphanFlowClassificationRulesByDataType,
         findOrphanChangeInitiatives,
         findOrphanLogicalFlows,
         findOrphanPhysicalFlows,

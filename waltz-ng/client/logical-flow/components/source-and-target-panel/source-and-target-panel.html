@@ -18,7 +18,7 @@
 
 <div class="row waltz-source-and-target-panel">
     <div class="col-sm-12 waltz-visibility-parent">
-        <waltz-source-and-target-graph auth-ratings-by-key="$ctrl.authRatingsByKey"
+        <waltz-source-and-target-graph flow-classifications-by-code="$ctrl.flowClassificationsByCode"
                                        change-units="$ctrl.changeUnits"
                                        decorators="$ctrl.filteredFlowData.decorators"
                                        entity-ref="$ctrl.entityRef"
@@ -149,14 +149,14 @@
                 <li ng-repeat='type in $ctrl.selected.types'
                     style="padding-bottom: 2px">
                     <div style="display: inline-block; height: 1em; width: 1em; border:1px solid #ccc; border-radius: 2px;"
-                         ng-style="{'background-color': $ctrl.authRatingsByKey[type.rating].iconColor}">
+                         ng-style="{'background-color': $ctrl.flowClassificationsByCode[type.rating].color}">
                     </div>
                     <waltz-entity-link entity-ref="{kind: 'DATA_TYPE',
                                                     id: type.id,
                                                     name: type.name}"
                                        icon-placement="none"
                                        tooltip-placement="top"
-                                       additional-display-data="[{name: 'Rating', value: $ctrl.authRatingsByKey[type.rating].name}]">
+                                       additional-display-data="[{name: 'Rating', value: $ctrl.flowClassificationsByCode[type.rating].name}]">
                     </waltz-entity-link>
                 </li>
             </ul>

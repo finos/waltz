@@ -19,16 +19,16 @@
     <table class="table table-condensed">
         <colgroup>
             <col width="15%">
-            <col ng-repeat="rating in $ctrl.ratingItems"
+            <col ng-repeat="classification in $ctrl.flowClassifications"
                  width="{{$ctrl.colWidth}}%">
             <col width="5%">
         </colgroup>
         <thead>
         <tr>
             <th>Data Type</th>
-            <th ng-repeat="rating in $ctrl.ratingItems"
-                ng-click="$ctrl.columnClick($event, rating.key)">
-                <span ng-bind="rating.name"></span>
+            <th ng-repeat="classification in $ctrl.flowClassifications"
+                ng-click="$ctrl.columnClick($event, classification.code)">
+                <span ng-bind="classification.name"></span>
             </th>
             <th>Total</th>
         </tr>
@@ -40,16 +40,16 @@
                 <span ng-bind="decorator.name">
                 </span>
             </td>
-            <td ng-repeat="rating in $ctrl.ratingItems">
-                <span ng-if="$ctrl.totalCounts.get(decorator.id).get(rating.key) > 0">
-                    <waltz-rated-summary-cell direct-count="$ctrl.directCounts.get(decorator.id).get(rating.key)"
-                                              total-count="$ctrl.totalCounts.get(decorator.id).get(rating.key)"
-                                              rating="rating.key"
+            <td ng-repeat="classification in $ctrl.flowClassifications">
+                <span ng-if="$ctrl.totalCounts.get(decorator.id).get(classification.code) > 0">
+                    <waltz-rated-summary-cell direct-count="$ctrl.directCounts.get(decorator.id).get(classification.code)"
+                                              total-count="$ctrl.totalCounts.get(decorator.id).get(classification.code)"
+                                              rating="classification.code"
                                               max-count="$ctrl.maxCounts.get(decorator.id)"
                                               decorator="decorator"
-                                              ng-click="$ctrl.cellClick($event, decorator, rating.key)"
+                                              ng-click="$ctrl.cellClick($event, decorator, classification.code)"
                                               class="clickable"
-                                              style="fill: {{rating.iconColor}}">
+                                              style="fill: {{classification.color}}">
                     </waltz-rated-summary-cell>
                 </span>
             </td>

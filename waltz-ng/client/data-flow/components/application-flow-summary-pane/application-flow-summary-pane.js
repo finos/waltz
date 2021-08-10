@@ -17,19 +17,19 @@
  */
 
 import _ from "lodash";
-import { initialiseData } from "../../../common";
+import {initialiseData} from "../../../common";
 
-import { CORE_API } from "../../../common/services/core-api-utils";
-import { findUnknownDataTypeId } from "../../../data-types/data-type-utils";
-import { categorizeDirection } from "../../../logical-flow/logical-flow-utils";
-import { nest } from "d3-collection";
+import {CORE_API} from "../../../common/services/core-api-utils";
+import {findUnknownDataTypeId} from "../../../data-types/data-type-utils";
+import {categorizeDirection} from "../../../logical-flow/logical-flow-utils";
+import {nest} from "d3-collection";
 
 import template from "./application-flow-summary-pane.html";
 import {tallyBy} from "../../../common/tally-utils";
 import {color} from "d3-color";
 import indexByKeyForType from "../../../enum-value/enum-value-utilities";
 import {entity} from "../../../common/services/enums/entity";
-import {loadAuthSourceRatings} from "../../../auth-sources/auth-sources-utils";
+import {loadFlowClassificationRatings} from "../../../flow-classification-rule/flow-classification-utils";
 
 
 const bindings = {
@@ -181,8 +181,8 @@ function controller($q, serviceBroker) {
         loadUnknownDataType()
             .then(unknownDataType => reload(unknownDataType.id));
 
-        loadAuthSourceRatings(serviceBroker)
-            .then(xs => vm.authoritativeCols = xs);
+        loadFlowClassificationRatings(serviceBroker)
+            .then(xs => vm.flowClassificationCols = xs);
     }
 }
 
