@@ -77,14 +77,16 @@ public class PersonApplicationExtractor extends DirectQueryBasedDataExtractor {
                 .and(APPLICATION.IS_REMOVED.isFalse());
 
         SelectConditionStep<Record9<Long, String, String, String, String, String, String, String, String>> directInvolvementQry = mkBaseInvolvementSelect(dsl, empId)
-                .where(INVOLVEMENT.EMPLOYEE_ID.eq(empId)
-                        .and(appIsActive));
+                .where(dsl
+                        .renderInlined(INVOLVEMENT.EMPLOYEE_ID.eq(empId)
+                        .and(appIsActive)));
 
         SelectConditionStep<Record9<Long, String, String, String, String, String, String, String, String>> oversightInvolvementQry = mkBaseInvolvementSelect(dsl, empId)
                 .innerJoin(PERSON_HIERARCHY)
                 .on(PERSON_HIERARCHY.EMPLOYEE_ID.eq(INVOLVEMENT.EMPLOYEE_ID))
-                .where(PERSON_HIERARCHY.MANAGER_ID.eq(empId)
-                        .and(appIsActive));
+                .where(dsl
+                        .renderInlined(PERSON_HIERARCHY.MANAGER_ID.eq(empId)
+                        .and(appIsActive)));
 
         return oversightInvolvementQry.union(directInvolvementQry);
     }
