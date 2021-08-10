@@ -44,16 +44,6 @@
     </waltz-person-overview>
 
 
-    <!-- NAVIGATION -->
-    <div class="waltz-page-summary waltz-page-summary-attach">
-        <waltz-dynamic-section-navigation ng-if="ctrl.entityRef">
-        </waltz-dynamic-section-navigation>
-
-        <waltz-no-data ng-if="!ctrl.entityRef">
-            <message>No information for this person</message>
-        </waltz-no-data>
-    </div>
-
     <br>
 
     <waltz-dynamic-sections-view parent-entity-ref="ctrl.entityRef"

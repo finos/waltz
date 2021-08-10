@@ -17,7 +17,7 @@
  */
 
 import template from './welcome.html';
-import {sidebarVisible} from "../navbar/sidebar-store";
+import {pageKind} from "../dynamic-section/section-store";
 
 
 const initialState = {
@@ -33,7 +33,7 @@ function controller($document,
 
     const vm = Object.assign(this, initialState);
 
-    vm.$onInit = () => sidebarVisible.set(false);
+    vm.$onInit = () => pageKind.set("HOME");
 
     appGroupStore
         .findMyGroupSubscriptions()

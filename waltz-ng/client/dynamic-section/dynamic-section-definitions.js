@@ -433,6 +433,10 @@ function pack(section, children = []) {
 
 
 export const dynamicSectionsByKind = {
+    "ORG_UNIT_HOME": [],
+    "PERSON_HOME": [],
+    "DATA_TYPE_HOME": [],
+    "MEASURABLE_CATEGORY": [],
     "APPLICATION": [
         assessmentRatingSection,
         bookmarksSection,

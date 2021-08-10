@@ -18,7 +18,7 @@
 
 import {orgUnitsResolver, appTalliesResolver, endUserAppTalliesResolver} from "./resolvers.js";
 
-import ListView from "./pages/list-view/list-view";
+import HomeView from "./pages/home-view/home-view";
 import UnitView from "./pages/unit-view/unit-view";
 
 
@@ -30,9 +30,9 @@ const baseState = {
     }
 };
 
-const listState = {
+const homeState = {
     url: 'org-units',
-    views: {'content@': ListView}
+    views: {'content@': HomeView}
 };
 
 
@@ -47,7 +47,7 @@ const viewState = {
 function setup($stateProvider) {
     $stateProvider
         .state('main.org-unit', baseState)
-        .state('main.org-unit.list', listState)
+        .state('main.org-unit.list', homeState)
         .state('main.org-unit.view', viewState);
 }
 

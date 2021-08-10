@@ -22,6 +22,7 @@ import {initialiseData} from "../../../common";
 import template from "./measurable-view.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {toEntityRef} from "../../../common/entity-utils";
+import {pageKind} from "../../../dynamic-section/section-store";
 
 
 const initialState = {
@@ -40,7 +41,6 @@ function logHistory(measurable, historyStore) {
 
 function controller($q,
                     $stateParams,
-                    dynamicSectionManager,
                     serviceBroker,
                     historyStore) {
 
@@ -57,8 +57,7 @@ function controller($q,
     // -- BOOT ---
 
     vm.$onInit = () => {
-
-        dynamicSectionManager.initialise("MEASURABLE");
+        pageKind.set("MEASURABLE");
 
         serviceBroker
             .loadViewData(CORE_API.MeasurableStore.getById, [ id ])
@@ -83,7 +82,6 @@ function controller($q,
 controller.$inject = [
     "$q",
     "$stateParams",
-    "DynamicSectionManager",
     "ServiceBroker",
     "HistoryStore"
 ];

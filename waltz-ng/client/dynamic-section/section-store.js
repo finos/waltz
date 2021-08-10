@@ -68,7 +68,7 @@ function mkLocalStorageKey(kind) {
 }
 
 
-export const pageKind = writable("ORG_UNIT");
+export const pageKind = writable(null);
 
 export const availableSections = derived(pageKind, pk => {
     const sections = dynamicSectionsByKind[pk] || [];
@@ -117,13 +117,17 @@ export const activeSections = createActiveSectionStore();
 derived(
     [pageKind, activeSections],
     ([pk, sections]) => {
-        window.localStorage.setItem(
-            mkLocalStorageKey(pk),
-            JSON.stringify(_
+        if (_.isEmpty(pk)) {
+            return;
+        } else {
+            const top3SectionIds = JSON.stringify(_
                 .chain(sections)
                 .map(d => d.id)
                 .take(3)
-                .value()));
+                .value());
+
+            window.localStorage.setItem(mkLocalStorageKey(pk), top3SectionIds);
+        }
     })
     .subscribe(() => {});
 

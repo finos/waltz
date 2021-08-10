@@ -8,21 +8,40 @@
     }
 </script>
 
-<ul class="list-unstyled">
-{#each $availableSections as section}
-    <li class="sidenav">
-        <button class="btn-skinny no-overflow"
-           on:click={() => activateSection(section)}>
-            <Icon size="lg"
-                  name={section.icon}/>
-            <span class="section-name "
-                  style={`opacity: ${$sidebarExpanded ? 1 : 0}`}>
+<div class={$sidebarExpanded ? "sidebar-expanded" : "sidebar-collapsed" }>
+    <ul class="list-unstyled">
+        {#each $availableSections as section}
+            <li class="sidenav">
+                <button class="btn-skinny no-overflow"
+                        on:click={() => activateSection(section)}>
+                    <Icon size="lg"
+                          name={section.icon}/>
+                    <span class="section-name "
+                          style={`opacity: ${$sidebarExpanded ? 1 : 0}`}>
                 {section.name}
             </span>
-        </button>
-    </li>
-{/each}
-</ul>
+                </button>
+                {#if section.children}
+                    <ul class="child-list list-unstyled">
+                        {#each section.children as child}
+                            <li class="sidenav">
+                                <button class="btn-skinny no-overflow"
+                                        on:click={() => activateSection(child)}>
+                                    <Icon size="lg"
+                                          name={child.icon}/>
+                                    <span class="section-name "
+                                          style={`opacity: ${$sidebarExpanded ? 1 : 0}`}>
+                            {child.name}
+                        </span>
+                                </button>
+                            </li>
+                        {/each}
+                    </ul>
+                {/if}
+            </li>
+        {/each}
+    </ul>
+</div>
 
 <button class="btn-skinny expansion-toggle"
    style="margin-bottom: 1em"
@@ -32,8 +51,22 @@
     </Icon>
 </button>
 
+
 <style type="text/scss">
     @import "style/_variables";
+
+
+    .child-list {
+        transition: transform ease-in-out 1s;
+    }
+
+    .sidebar-expanded .child-list {
+        transform: translateX(18px);
+    }
+
+    .sidebar-collapsed .child-list {
+        transform: translateX(0px);
+    }
 
     .expansion-toggle {
         font-size: 64px;
@@ -64,7 +97,7 @@
     }
 
     /* When you mouse over the navigation links, change their color */
-    .sidenav a:hover {
+    .sidenav button:hover {
         color: $navbar-default-link-hover-color;
     }
 </style>

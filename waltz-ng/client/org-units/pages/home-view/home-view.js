@@ -21,20 +21,21 @@ import angular from "angular";
 import {termSearch} from "../../../common";
 import {buildHierarchies} from "../../../common/hierarchy-utils";
 import {buildPropertySummer} from "../../../common/tally-utils";
-import template from './list-view.html';
+import template from "./home-view.html";
+import {pageKind} from "../../../dynamic-section/section-store";
 
 
-const FIELDS_TO_SEARCH = ['name', 'description'];
+const FIELDS_TO_SEARCH = ["name", "description"];
 
 
 function setupBlockProcessor($state) {
     return b => {
         b.block.onclick = () =>
-            $state.go('main.org-unit.view', { id: b.value });
+            $state.go("main.org-unit.view", { id: b.value });
 
         angular
             .element(b.block)
-            .addClass('clickable');
+            .addClass("clickable");
     };
 }
 
@@ -42,7 +43,7 @@ function setupBlockProcessor($state) {
 function loadDiagrams(svgStore, vm, $state) {
 
     svgStore
-        .findByGroup('ORG_UNIT')
+        .findByGroup("ORG_UNIT")
         .then(xs => vm.diagrams = xs);
 
     vm.blockProcessor = setupBlockProcessor($state);
@@ -50,7 +51,7 @@ function loadDiagrams(svgStore, vm, $state) {
 
 
 function prepareOrgUnitTree(orgUnits, appTallies, endUserAppTallies) {
-    const orgUnitsById = _.keyBy(orgUnits, 'id');
+    const orgUnitsById = _.keyBy(orgUnits, "id");
 
     const enrichWithDirectCounts = (tallies, keyName) => {
         _.each(tallies, t => {
@@ -65,11 +66,11 @@ function prepareOrgUnitTree(orgUnits, appTallies, endUserAppTallies) {
     const rootUnits = buildHierarchies(orgUnits);
 
     const appCountSummer = buildPropertySummer("appCount",
-        "totalAppCount",
-        "childAppCount");
+                                               "totalAppCount",
+                                               "childAppCount");
     const endUserAppCountSummer = buildPropertySummer("endUserAppCount",
-        "totalEndUserAppCount",
-        "childEndUserAppCount");
+                                                      "totalEndUserAppCount",
+                                                      "childEndUserAppCount");
 
     _.each(rootUnits, appCountSummer);
     _.each(rootUnits, endUserAppCountSummer);
@@ -88,6 +89,8 @@ function controller(orgUnits,
 
     loadDiagrams(svgStore, vm, $state);
 
+    vm.$onInit = () => pageKind.set("ORG_UNIT_LIST");
+
     vm.filteredOrgUnits = [];
     vm.trees = prepareOrgUnitTree(orgUnits, appTallies, endUserAppTallies);
     vm.orgUnits = orgUnits;
@@ -105,16 +108,16 @@ function controller(orgUnits,
 
 
 controller.$inject = [
-    'orgUnits',
-    'appTallies',
-    'endUserAppTallies',
-    'SvgDiagramStore',
-    '$state'
+    "orgUnits",
+    "appTallies",
+    "endUserAppTallies",
+    "SvgDiagramStore",
+    "$state"
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };
