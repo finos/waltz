@@ -39,11 +39,9 @@ const addToHistory = (historyStore, app) => {
 
 
 function controller($stateParams,
-                    dynamicSectionManager,
                     serviceBroker,
                     historyStore) {
     const vm = Object.assign(this, initialState);
-
 
     function loadAll(id) {
         serviceBroker
@@ -62,7 +60,6 @@ function controller($stateParams,
         pageKind.set("APPLICATION");
         const id = $stateParams.id;
         const entityReference = { id, kind: "APPLICATION" };
-        dynamicSectionManager.initialise("APPLICATION");
         vm.parentEntityRef = entityReference;
         loadAll(id);
     };
@@ -75,7 +72,6 @@ function controller($stateParams,
 
 controller.$inject = [
     "$stateParams",
-    "DynamicSectionManager",
     "ServiceBroker",
     "HistoryStore"
 ];

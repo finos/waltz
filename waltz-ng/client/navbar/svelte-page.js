@@ -4,9 +4,15 @@ import {sidebarExpanded, sidebarVisible} from "./sidebar-store";
 
 function controller($scope) {
     const vm = this;
+
     vm.Sidebar = Sidebar;
-    sidebarExpanded.subscribe((d) => $scope.$applyAsync(() => vm.isExpanded = d));
-    sidebarVisible.subscribe((d) => $scope.$applyAsync(() => vm.isVisible = d));
+    const unsubExpand = sidebarExpanded.subscribe((d) => $scope.$applyAsync(() => vm.isExpanded = d));
+    const unsubVisible = sidebarVisible.subscribe((d) => $scope.$applyAsync(() => vm.isVisible = d));
+
+    vm.$onDestroy = () => {
+        unsubExpand();
+        unsubVisible();
+    };
 }
 
 controller.$inject = ["$scope"];

@@ -32,23 +32,20 @@ const initialState = {
 };
 
 
-function controller(dynamicSectionManager, $scope) {
+function controller($scope) {
     const vm = initialiseData(this, initialState);
 
-    activeSections.subscribe(d => $scope.$applyAsync(() => {
+    const unsub = activeSections.subscribe(d => $scope.$applyAsync(() => {
         vm.sections = d;
     }));
 
-    vm.$onInit = () => {
-        // vm.sections = dynamicSectionManager.getActive();
-    };
+    vm.$onDestroy = () => unsub();
 
-    vm.onRemove = (section) => dynamicSectionManager.close(section);
+    vm.onRemove = (section) => activeSections.remove(section);
 }
 
 
 controller.$inject = [
-    "DynamicSectionManager",
     "$scope"
 ];
 

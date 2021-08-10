@@ -3,10 +3,7 @@
     import {availableSections, activeSections} from "../dynamic-section/section-store";
     import Icon from "../common/svelte/Icon.svelte";
 
-    $: console.log({sections: $availableSections})
-
     function activateSection(section) {
-        console.log("activate", {section})
         activeSections.add(section);
     }
 </script>
@@ -14,7 +11,7 @@
 <ul class="list-unstyled">
 {#each $availableSections as section}
     <li class="sidenav">
-        <a class="clickable no-overflow"
+        <button class="btn-skinny no-overflow"
            on:click={() => activateSection(section)}>
             <Icon size="lg"
                   name={section.icon}/>
@@ -22,18 +19,18 @@
                   style={`opacity: ${$sidebarExpanded ? 1 : 0}`}>
                 {section.name}
             </span>
-        </a>
+        </button>
     </li>
 {/each}
 </ul>
 
-<a class="expansion-toggle"
+<button class="btn-skinny expansion-toggle"
    style="margin-bottom: 1em"
    on:click={() => $sidebarExpanded = !$sidebarExpanded}>
     <Icon size="lg"
           name={$sidebarExpanded ? 'angle-double-left' : 'angle-double-right'}>
     </Icon>
-</a>
+</button>
 
 <style type="text/scss">
     @import "style/_variables";
@@ -43,8 +40,8 @@
         width: 100%;
         display: inline-block;
         text-align: right;
-
         transition: color ease-in-out 0.3s;
+        transform: translateX(-10px);
 
         color: $waltz-blue;
         &:hover {
@@ -53,7 +50,7 @@
     }
 
     /* The navigation menu links */
-    .sidenav a {
+    .sidenav button {
         text-decoration: none;
         font-size: 18px;
         color: $navbar-default-link-color;
