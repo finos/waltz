@@ -23,7 +23,7 @@ import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifec
 
 import template from "./logical-flows-tabgroup.html";
 import {entity} from "../../../common/services/enums/entity";
-import {loadAuthSourceRatings} from "../../../auth-sources/auth-sources-utils";
+import {loadFlowClassificationRatings} from "../../../flow-classification-rule/flow-classification-utils";
 
 
 const bindings = {
@@ -92,8 +92,8 @@ function controller($q,
     };
 
     vm.$onChanges = (changes) => {
-        loadAuthSourceRatings(serviceBroker)
-            .then(xs => vm.ratingItems = xs);
+        loadFlowClassificationRatings(serviceBroker)
+            .then(xs => vm.flowClassifications = xs);
 
         if (vm.parentEntityRef) {
             vm.selector = mkSelectionOptions(

@@ -39,9 +39,9 @@ const appCostsSection = {
     id: 3,
 };
 
-const authSourcesSection = {
-    componentId: "auth-sources-section",
-    name: "Authoritative Sources",
+const flowClassificationRulesSection = {
+    componentId: "flow-classification-rules-section",
+    name: "Flow Classification Rules",
     icon: "shield",
     id: 4,
 };
@@ -378,7 +378,7 @@ export const dynamicSections = {
     assessmentRatingSection,
     assetCostsSection,
     attestationSummarySection,
-    authSourcesSection,
+    flowClassificationRulesSection,
     bookmarksSection,
     changeInitiativeSection,
     changeLogSection,
@@ -484,7 +484,7 @@ export const dynamicSectionsByKind = {
         measurableRatingsBrowserSection,
         reportGridViewSection,
         pack(logicalFlowsTabgroupSection,
-            [authSourcesSection]),
+            [flowClassificationRulesSection]),
         changeInitiativeSection,
         changeSetSection,
         involvedPeopleSection,
@@ -504,7 +504,7 @@ export const dynamicSectionsByKind = {
         changeSetSection,
         involvedPeopleSection,
         pack(logicalFlowsTabgroupSection,
-            [authSourcesSection]),
+            [flowClassificationRulesSection]),
         entityDiagramsSection,
         changeLogSection
     ],
@@ -517,7 +517,7 @@ export const dynamicSectionsByKind = {
         changeInitiativeSection,
         personChangeSetSection,
         pack(logicalFlowsTabgroupSection,
-            [authSourcesSection]),
+            [flowClassificationRulesSection]),
         surveySection,
         changeLogSection,
         measurableRatingsBrowserSection,
@@ -530,7 +530,7 @@ export const dynamicSectionsByKind = {
         bookmarksSection,
         entityDiagramsSection,
         involvedPeopleSection,
-        authSourcesSection,
+        flowClassificationRulesSection,
         dataTypeOriginatorsSection,
         logicalFlowsTabgroupSection,
         logicalDataElementsSection,
@@ -540,7 +540,7 @@ export const dynamicSectionsByKind = {
         pack(appsSection,
             [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
         pack(logicalFlowsTabgroupSection,
-            [authSourcesSection]),
+            [flowClassificationRulesSection]),
         attestationSummarySection,
         changeInitiativeSection,
         changeSetSection,
@@ -636,7 +636,7 @@ export const dynamicSectionsByKind = {
         bookmarksSection,
         changeLogSection,
     ],
-    "AUTHORITATIVE_SOURCE": [
+    "FLOW_CLASSIFICATION_RULE": [
         bookmarksSection,
         changeLogSection,
         entityNamedNotesSection,

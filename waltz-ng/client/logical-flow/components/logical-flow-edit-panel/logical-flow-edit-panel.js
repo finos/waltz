@@ -26,7 +26,7 @@ import {displayError} from "../../../common/error-utils";
 import {sameRef} from "../../../common/entity-utils";
 import {event} from "d3-selection";
 import {entity} from "../../../common/services/enums/entity";
-import {loadAuthSourceRatings} from "../../../auth-sources/auth-sources-utils";
+import {loadFlowClassificationRatings} from "../../../flow-classification-rule/flow-classification-utils";
 
 
 const bindings = {
@@ -144,9 +144,9 @@ function controller($element,
 
 
     vm.$onChanges = (changes) => {
-        loadAuthSourceRatings(serviceBroker)
+        loadFlowClassificationRatings(serviceBroker)
             .then(r => {
-                vm.authRatingsByKey = _.keyBy(r, d => d.key);
+                vm.flowClassificationsByCode = _.keyBy(r, d => d.code);
             });
 
         if(vm.parentEntityRef) {

@@ -43,9 +43,9 @@ function controller($q,
         $q
             .all([orphanStore.findAppsWithNonExistentOrgUnits(),
                 orphanStore.findOrphanMeasurableRatings(),
-                orphanStore.findOrphanAuthoritativeSourcesByOrgUnit(),
-                orphanStore.findOrphanAuthoritativeSourcesByApp(),
-                orphanStore.findOrphanAuthoritativeSourcesByDataType(),
+                orphanStore.findOrphanFlowClassificationRulesByOrgUnit(),
+                orphanStore.findOrphanFlowClassificationRulesByApp(),
+                orphanStore.findOrphanFlowClassificationRulesByDataType(),
                 orphanStore.findOrphanChangeInitiatives(),
                 orphanStore.findOrphanLogicalFlows(),
                 orphanStore.findOrphanPhysicalFlows(),
@@ -64,9 +64,9 @@ function controller($q,
                 vm.orphans = [
                     {description: 'Applications referencing non-existent Org Units', values: apps},
                     {description: 'Application Measurable Ratings mapping to non-existent Measurables or Apps', values: measurableRatings},
-                    {description: 'Authoritative Sources with non-existent Org Unit', values: authSourcesByOrgUnit},
-                    {description: 'Authoritative Sources with non-existent Application', values: authSourcesByApp},
-                    {description: 'Authoritative Sources with non-existent Data Type', values: authSourcesByDataType},
+                    {description: 'Flow Classification Rules with non-existent Org Unit', values: authSourcesByOrgUnit},
+                    {description: 'Flow Classification Rules with non-existent Application', values: authSourcesByApp},
+                    {description: 'Flow Classification Rules with non-existent Data Type', values: authSourcesByDataType},
                     {description: 'Change Initiatives with non-existent parent', values: changeInitiatives},
                     {description: 'Logical Flows referencing non-existent applications', values: logicalFlows},
                     {description: 'Physical Flows referencing non-existent logical flows or specifications', values: physicalFlows},
@@ -99,9 +99,9 @@ function controller($q,
     };
 
 
-    vm.cleanupAuthSources = () => {
+    vm.cleanupFlowClassificationRules = () => {
         serviceBroker
-            .execute(CORE_API.AuthSourcesStore.cleanupOrphans, [])
+            .execute(CORE_API.FlowClassificationRuleStore.cleanupOrphans, [])
             .then(r => notification.success(`Cleaned up ${r.data} auth sources/s`));
     };
 

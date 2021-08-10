@@ -107,18 +107,19 @@ public class OrphanDao {
     }
 
 
-    public List<OrphanRelationship> findOrphanAuthoritativeSourceByOrgUnit() {
-        Condition missingOrgUnit = AUTHORITATIVE_SOURCE.PARENT_ID
+    public List<OrphanRelationship> findOrphanFlowClassificationRulesByOrgUnit() {
+        Condition missingOrgUnit = FLOW_CLASSIFICATION_RULE.PARENT_ID
                 .notIn(select(ORGANISATIONAL_UNIT.ID)
                         .from(ORGANISATIONAL_UNIT))
-                .and(AUTHORITATIVE_SOURCE.PARENT_KIND.eq(EntityKind.ORG_UNIT.name()));
+                .and(FLOW_CLASSIFICATION_RULE.PARENT_KIND.eq(EntityKind.ORG_UNIT.name()));
 
-       return dsl.select(AUTHORITATIVE_SOURCE.ID,
-                AUTHORITATIVE_SOURCE.PARENT_ID)
-                .from(AUTHORITATIVE_SOURCE)
+       return dsl
+               .select(FLOW_CLASSIFICATION_RULE.ID,
+                       FLOW_CLASSIFICATION_RULE.PARENT_ID)
+                .from(FLOW_CLASSIFICATION_RULE)
                 .where(missingOrgUnit)
                 .fetch(r -> ImmutableOrphanRelationship.builder()
-                        .entityA(mkRef(EntityKind.AUTHORITATIVE_SOURCE, r.value1()))
+                        .entityA(mkRef(EntityKind.FLOW_CLASSIFICATION_RULE, r.value1()))
                         .entityB(mkRef(EntityKind.ORG_UNIT, r.value2()))
                         .orphanSide(OrphanSide.A)
                         .build());
@@ -126,40 +127,42 @@ public class OrphanDao {
     }
 
 
-    public List<OrphanRelationship> findOrphanAuthoritativeSourceByApp() {
-        Condition missingApplication = AUTHORITATIVE_SOURCE.APPLICATION_ID
+    public List<OrphanRelationship> findOrphanFlowClassificationRulesByApp() {
+        Condition missingApplication = FLOW_CLASSIFICATION_RULE.APPLICATION_ID
                 .notIn(select(APPLICATION.ID)
                         .from(APPLICATION)
                         .where(IS_ACTIVE));
 
 
-        return dsl.select(AUTHORITATIVE_SOURCE.ID,
-                AUTHORITATIVE_SOURCE.APPLICATION_ID)
-                .from(AUTHORITATIVE_SOURCE)
+        return dsl
+                .select(FLOW_CLASSIFICATION_RULE.ID,
+                        FLOW_CLASSIFICATION_RULE.APPLICATION_ID)
+                .from(FLOW_CLASSIFICATION_RULE)
                 .where(missingApplication)
                 .fetch(r -> ImmutableOrphanRelationship.builder()
-                        .entityA(mkRef(EntityKind.AUTHORITATIVE_SOURCE, r.value1()))
+                        .entityA(mkRef(EntityKind.FLOW_CLASSIFICATION_RULE, r.value1()))
                         .entityB(mkRef(EntityKind.APPLICATION, r.value2()))
                         .orphanSide(OrphanSide.A)
                         .build());
     }
 
 
-    public List<OrphanRelationship> findOrphanAuthoritiveSourceByDataType() {
-        Condition missingDataType = AUTHORITATIVE_SOURCE.DATA_TYPE
-                .notIn(select(DATA_TYPE.CODE)
+    public List<OrphanRelationship> findOrphanFlowClassificationRulesByDataType() {
+        Condition missingDataType = FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID
+                .notIn(select(DATA_TYPE.ID)
                         .from(DATA_TYPE));
 
 
-        return dsl.select(AUTHORITATIVE_SOURCE.ID,
-                DATA_TYPE.ID,
-                AUTHORITATIVE_SOURCE.DATA_TYPE)
-                .from(AUTHORITATIVE_SOURCE)
+        return dsl
+                .select(FLOW_CLASSIFICATION_RULE.ID,
+                        DATA_TYPE.ID,
+                        DATA_TYPE.CODE)
+                .from(FLOW_CLASSIFICATION_RULE)
                 .leftJoin(DATA_TYPE)
-                    .on(AUTHORITATIVE_SOURCE.DATA_TYPE.eq(DATA_TYPE.CODE))
+                    .on(FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID.eq(DATA_TYPE.ID))
                 .where(missingDataType)
                 .fetch(r -> ImmutableOrphanRelationship.builder()
-                        .entityA(mkRef(EntityKind.AUTHORITATIVE_SOURCE, r.value1()))
+                        .entityA(mkRef(EntityKind.FLOW_CLASSIFICATION_RULE, r.value1()))
                         .entityB(mkRef(EntityKind.DATA_TYPE, r.value2() != null ? r.value2() : -1, r.value3()))
                         .orphanSide(OrphanSide.A)
                         .build());

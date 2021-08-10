@@ -29,7 +29,6 @@ public enum EntityKind {
     ASSET_COST("Asset cost"),
     ATTESTATION("Attestation"),
     ATTESTATION_RUN("Attestation run"),
-    AUTHORITATIVE_SOURCE("Authoritative source"),
     BOOKMARK("Bookmark"),
     CHANGE_INITIATIVE("Change initiative"),
     CHANGE_SET("Change set"),
@@ -49,8 +48,10 @@ public enum EntityKind {
     ENTITY_NAMED_NOTE_TYPE("Entity named note type"),
     ENTITY_RELATIONSHIP("Entity relationship"),
     ENTITY_STATISTIC("Entity statistic"),
-    FLOW_DIAGRAM("Flow diagram"),
     FLOW_ANNOTATION("Flow annotation"),
+    FLOW_CLASSIFICATION_RULE("Flow classification rule"),
+    FLOW_CLASSIFICATION("Flow classification"),
+    FLOW_DIAGRAM("Flow diagram"),
     INVOLVEMENT("Involvement"),
     INVOLVEMENT_KIND("Involvement kind"),
     LICENCE("Licence"),
@@ -83,8 +84,11 @@ public enum EntityKind {
     TAG("Tag"),
 
     @Deprecated
-    CAPABILITY("Capability")  // TO BE REMOVED IN 1.5
-    ;
+    CAPABILITY("Capability"),  // TO BE REMOVED IN 1.5
+
+    @Deprecated
+    AUTHORITATIVE_SOURCE("Authoritative source");  // TO BE REMOVED IN 1.36
+
 
     private final String prettyName;
 

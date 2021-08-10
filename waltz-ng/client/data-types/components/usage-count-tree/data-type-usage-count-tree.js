@@ -20,7 +20,7 @@ import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {buildHierarchies, doSearch, prepareSearchNodes} from "../../../common/hierarchy-utils";
 import template from "./data-type-usage-count-tree.html";
-import {loadAuthSourceRatings} from "../../../auth-sources/auth-sources-utils";
+import {loadFlowClassificationRatings} from "../../../flow-classification-rule/flow-classification-utils";
 
 const bindings = {
     onSelection: "<"
@@ -28,7 +28,7 @@ const bindings = {
 
 
 function prepareTree(dataTypes = [],
-                     ratingSchemeItems = [],
+                     flowClassifications = [],
                      usageCounts = []) {
 
     const dataTypesById = _.keyBy(dataTypes, "id");
@@ -59,9 +59,9 @@ function prepareTree(dataTypes = [],
     _.forEach(hierarchy, root =>
         root.cumulativeCounts = _
             .reduce(
-                ratingSchemeItems,
+                flowClassifications,
                 (acc, d) => {
-                    const rating = d.key;
+                    const rating = d.code;
                     const count = sumBy(rating, root);
                     acc[rating] = count;
                     acc.total += count;
@@ -84,10 +84,10 @@ function controller($q, displayNameService, serviceBroker) {
     const vm = this;
 
     vm.$onInit = () => {
-        const ratingsPromise = loadAuthSourceRatings(serviceBroker)
+        const ratingsPromise = loadFlowClassificationRatings(serviceBroker)
             .then(rs => {
-                vm.authSourceRatings = rs;
-                vm.ratings = _.map(rs, d => ({color: d.iconColor, name: d.name, rating: d.key}))
+                vm.flowClassifications = rs;
+                vm.ratings = _.map(rs, d => ({color: d.color, name: d.name, rating: d.code}))
             });
 
         const dataTypesPromise = serviceBroker
@@ -105,7 +105,7 @@ function controller($q, displayNameService, serviceBroker) {
             .then(() => {
                 vm.hierarchy = prepareTree(
                     vm.dataTypes,
-                    vm.authSourceRatings,
+                    vm.flowClassifications,
                     vm.summaries);
 
                 vm.maxTotal = _

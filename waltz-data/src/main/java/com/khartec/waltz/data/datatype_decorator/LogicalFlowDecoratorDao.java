@@ -22,11 +22,11 @@ import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.authoritativesource.AuthoritativeRatingVantagePoint;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.datatype.DataTypeUsageCharacteristics;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeUsageCharacteristics;
+import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
 import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import com.khartec.waltz.schema.tables.LogicalFlowDecorator;
 import com.khartec.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
@@ -76,7 +76,7 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .isReadonly(record.getIsReadonly())
-                .authSourceId(Optional.ofNullable(record.getAuthSourceId()))
+                .flowClassificationRuleId(Optional.ofNullable(record.getFlowClassificationRuleId()))
                 .build();
     };
 
@@ -93,7 +93,7 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
         r.setLastUpdatedAt(Timestamp.valueOf(d.lastUpdatedAt()));
         r.setLastUpdatedBy(d.lastUpdatedBy());
         r.setIsReadonly(d.isReadonly());
-        d.authSourceId().ifPresent(r::setAuthSourceId);
+        d.flowClassificationRuleId().ifPresent(r::setFlowClassificationRuleId);
         return r;
     };
 
@@ -234,13 +234,13 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
     }
 
 
-    public int updateDecoratorsForAuthSource(AuthoritativeRatingVantagePoint ratingVantagePoint) {
+    public int updateDecoratorsForFlowClassificationRule(FlowClassificationRuleVantagePoint flowClassificationRuleVantagePoint) {
         LogicalFlowDecorator lfd = LOGICAL_FLOW_DECORATOR.as("lfd");
 
-        EntityReference vantagePoint = ratingVantagePoint.vantagePoint();
-        Long appId = ratingVantagePoint.applicationId();
-        EntityReference dataType = ratingVantagePoint.dataType();
-        AuthoritativenessRatingValue rating = ratingVantagePoint.rating();
+        EntityReference vantagePoint = flowClassificationRuleVantagePoint.vantagePoint();
+        Long appId = flowClassificationRuleVantagePoint.applicationId();
+        EntityReference dataType = flowClassificationRuleVantagePoint.dataType();
+        String classificationCode = flowClassificationRuleVantagePoint.classificationCode();
 
         SelectConditionStep<Record1<Long>> orgUnitSubselect = DSL
                 .select(ENTITY_HIERARCHY.ID)
@@ -254,13 +254,13 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                 .where(ENTITY_HIERARCHY.KIND.eq(DATA_TYPE.name()))
                 .and(ENTITY_HIERARCHY.ANCESTOR_ID.eq(dataType.id()));
 
-        Condition usingAuthSource = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(appId);
-        Condition notUsingAuthSource = LOGICAL_FLOW.SOURCE_ENTITY_ID.ne(appId);
+        Condition usingFlowClassificationRule = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(appId);
+        Condition notUsingFlowClassificationRule = LOGICAL_FLOW.SOURCE_ENTITY_ID.ne(appId);
 
         Function2<Condition, String, Update<LogicalFlowDecoratorRecord>> mkQuery = (appScopingCondition, ratingName) -> dsl
                 .update(LOGICAL_FLOW_DECORATOR)
                 .set(LOGICAL_FLOW_DECORATOR.RATING, ratingName)
-                .set(LOGICAL_FLOW_DECORATOR.AUTH_SOURCE_ID, ratingVantagePoint.authSourceId())
+                .set(LOGICAL_FLOW_DECORATOR.FLOW_CLASSIFICATION_RULE_ID, flowClassificationRuleVantagePoint.ruleId())
                 .where(LOGICAL_FLOW_DECORATOR.ID.in(
                         DSL.select(lfd.ID)
                                 .from(lfd)
@@ -280,11 +280,13 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                 ));
 
         Update<LogicalFlowDecoratorRecord> updateAuthSources = mkQuery.apply(
-                usingAuthSource,
-                rating.value());
+                usingFlowClassificationRule,
+                classificationCode);
+
         Update<LogicalFlowDecoratorRecord> updateNonAuthSources = mkQuery.apply(
-                notUsingAuthSource,
+                notUsingFlowClassificationRule,
                 AuthoritativenessRatingValue.DISCOURAGED.value());
+
         int authSourceUpdateCount = updateAuthSources.execute();
         int nonAuthSourceUpdateCount = updateNonAuthSources.execute();
         return authSourceUpdateCount + nonAuthSourceUpdateCount;

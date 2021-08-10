@@ -29,7 +29,6 @@ import {AttestationPreCheckStore_API as AttestationPreCheckStore} from "../../at
 import {AttestationRunStore_API as AttestationRunStore} from "../../attestation/services/attestation-run-store";
 import {AttributeChangeStore_API as AttributeChangeStore} from "../../attribute-change/services/attribute-change-store";
 import {AssetCostStore_API as AssetCostStore} from "../../asset-cost/services/asset-cost-store";
-import {AuthSourcesStore_API as AuthSourcesStore} from "../../auth-sources/services/auth-sources-store";
 import {BookmarkStore_API as BookmarkStore} from "../../bookmarks/services/bookmark-store";
 import {ChangeInitiativeStore_API as ChangeInitiativeStore} from "../../change-initiative/services/change-initiative-store";
 import {ChangeLogStore_API as ChangeLogStore} from "../../change-log/services/change-log-store";
@@ -55,6 +54,8 @@ import {EntityNamedNoteTypeStore_API as EntityNamedNoteTypeStore} from "../../en
 import {EntityRelationshipStore_API as EntityRelationshipStore} from "../../entity-relationship/services/entity-relationship-store";
 import {EntitySearchStore_API as EntitySearchStore} from "../../entity/services/entity-search-store";
 import {EntityStatisticStore_API as EntityStatisticStore} from "../../entity-statistics/services/entity-statistic-store";
+import {FlowClassificationRuleStore_API as FlowClassificationRuleStore} from "../../flow-classification-rule/services/flow-classification-rule-store";
+import {FlowClassificationStore_API as FlowClassificationStore} from "../../flow-classification-rule/services/flow-classification-store";
 import {TagStore_API as TagStore} from "../../tag/services/tag-store";
 import {EnumValueStore_API as EnumValueStore} from "../../enum-value/services/enum-value-store";
 import {EntitySvgDiagramStore_API as EntitySvgDiagramStore} from "../../entity-svg-diagram/services/entity-svg-diagram-store";
@@ -128,7 +129,6 @@ export const CORE_API = {
     AssetCostStore,
     AssessmentDefinitionStore,
     AssessmentRatingStore,
-    AuthSourcesStore,
     BookmarkStore,
     ChangeInitiativeStore,
     ChangeLogStore,
@@ -159,6 +159,8 @@ export const CORE_API = {
     ExternalIdentifierStore,
     FacetStore,
     FavouritesStore,
+    FlowClassificationStore,
+    FlowClassificationRuleStore,
     FlowDiagramStore,
     FlowDiagramAnnotationStore,
     FlowDiagramEntityStore,

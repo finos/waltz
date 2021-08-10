@@ -37,8 +37,8 @@
 @import "../client/asset-cost/components/graph/asset-costs-graph";
 @import "../client/attestation/attestation";
 @import "../client/attestation/components/confirmation/attestation-confirmation";
-@import "../client/auth-sources/components/non-auth-sources-panel/non-auth-sources-panel";
-@import "../client/auth-sources/components/table/auth-sources-table";
+@import "client/flow-classification-rule/components/discouraged-sources-panel/discouraged-sources-panel";
+@import "client/flow-classification-rule/components/table/flow-classification-rules-table";
 @import "../client/change-initiative/directives/change-initiative-selector";
 @import "../client/change-unit/components/data-type-change-panel/data-type-change-panel";
 @import "../client/common/common";

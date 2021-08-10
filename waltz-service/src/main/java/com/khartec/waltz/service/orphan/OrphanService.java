@@ -51,18 +51,18 @@ public class OrphanService {
     }
 
 
-    public Collection<OrphanRelationship> findOrphanAuthoritativeSourceByOrgUnit() {
-        return orphanDao.findOrphanAuthoritativeSourceByOrgUnit();
+    public Collection<OrphanRelationship> findOrphanFlowClassificationRulesByOrgUnit() {
+        return orphanDao.findOrphanFlowClassificationRulesByOrgUnit();
     }
 
 
-    public Collection<OrphanRelationship> findOrphanAuthoritativeSourceByApp() {
-        return orphanDao.findOrphanAuthoritativeSourceByApp();
+    public Collection<OrphanRelationship> findOrphanFlowClassificationRulesByApp() {
+        return orphanDao.findOrphanFlowClassificationRulesByApp();
     }
 
 
-    public Collection<OrphanRelationship> findOrphanAuthoritiveSourceByDataType() {
-        return orphanDao.findOrphanAuthoritiveSourceByDataType();
+    public Collection<OrphanRelationship> findOrphanFlowClassificationRulesByDataType() {
+        return orphanDao.findOrphanFlowClassificationRulesByDataType();
     }
 
 

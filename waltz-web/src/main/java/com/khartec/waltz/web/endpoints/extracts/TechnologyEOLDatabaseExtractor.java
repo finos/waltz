@@ -22,7 +22,6 @@ import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.schema.Tables;
 import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,7 +32,6 @@ import spark.Request;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.Tables.DATABASE_USAGE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.web.WebUtilities.getEntityReference;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
@@ -76,11 +74,11 @@ public class TechnologyEOLDatabaseExtractor extends DirectQueryBasedDataExtracto
                             DATABASE_INFORMATION.LIFECYCLE_STATUS.as("Lifecycle"))
                     .from(DATABASE_INFORMATION)
                     .innerJoin(DATABASE_USAGE)
-                    .on(DATABASE_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                            .and(DATABASE_USAGE.ENTITY_ID.eq(Tables.APPLICATION.ID)))
-                    .join(APPLICATION)
-                    .on(APPLICATION.ID.eq(DATABASE_USAGE.DATABASE_ID))
-                    .join(ORGANISATIONAL_UNIT)
+                    .on(DATABASE_USAGE.DATABASE_ID.eq(DATABASE_INFORMATION.ID))
+                    .innerJoin(APPLICATION)
+                    .on(APPLICATION.ID.eq(DATABASE_USAGE.ENTITY_ID))
+                    .and(DATABASE_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                    .innerJoin(ORGANISATIONAL_UNIT)
                     .on(ORGANISATIONAL_UNIT.ID.eq(APPLICATION.ORGANISATIONAL_UNIT_ID))
                     .where(APPLICATION.ID.in(appIdSelector))
                     .and(APPLICATION.LIFECYCLE_PHASE.notEqual("RETIRED"));

@@ -20,7 +20,7 @@
 
     <div class="row" style="padding-bottom: 20px">
         <div class="col-md-12">
-            <waltz-sub-section name="Authoritative Summary Stats">
+            <waltz-sub-section name="Flow Classification Summary Stats">
 
                 <content>
                     <div style="padding: 8px">
@@ -29,7 +29,7 @@
 
                         <p class="small help-block">
                             Chart showing incoming vs outgoing flow decorations which are mapped to a known data type and then
-                            categorized by their authoritativeness.
+                            categorized by their flow classification.
                         </p>
 
                         <!-- STATS TABLES -->
@@ -110,7 +110,7 @@
     <br>
     <strong>By Authoritativeness Rating</strong>
     <p class="small text-muted">
-        Incoming/Outgoing flow decorations by their authoritativeness.
+        Incoming/Outgoing flow decorations by their flow classification.
     </p>
 
     <table class="table table-condensed small">
@@ -120,7 +120,7 @@
         <thead>
         <tr>
             <th>Direction</th>
-            <th ng-repeat="col in $ctrl.authoritativeCols" style="border-bottom: 2px solid {{col.iconColor}};">
+            <th ng-repeat="col in $ctrl.flowClassificationCols" style="border-bottom: 2px solid {{col.color}};">
                 <span ng-bind="col.name"></span>
             </th>
         </tr>
@@ -128,14 +128,14 @@
         <tbody>
         <tr>
             <td>Inbound</td>
-            <td ng-repeat="col in $ctrl.authoritativeCols">
-                <span ng-bind="$ctrl.stats.byDirectionAndAuthoritativeness['INBOUND'][col.key].length || 0"></span>
+            <td ng-repeat="col in $ctrl.flowClassificationCols">
+                <span ng-bind="$ctrl.stats.byDirectionAndAuthoritativeness['INBOUND'][col.code].length || 0"></span>
             </td>
         </tr>
         <tr>
             <td>Outbound</td>
-            <td ng-repeat="col in $ctrl.authoritativeCols">
-                <span ng-bind="$ctrl.stats.byDirectionAndAuthoritativeness['OUTBOUND'][col.key].length || 0"></span>
+            <td ng-repeat="col in $ctrl.flowClassificationCols">
+                <span ng-bind="$ctrl.stats.byDirectionAndAuthoritativeness['OUTBOUND'][col.code].length || 0"></span>
             </td>
         </tr>
         </tbody>

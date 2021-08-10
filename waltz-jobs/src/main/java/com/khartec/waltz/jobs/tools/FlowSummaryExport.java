@@ -46,7 +46,6 @@ public class FlowSummaryExport {
 
         LogicalFlow logFlow = LogicalFlow.LOGICAL_FLOW.as("logFlow");
         PhysicalFlow physFlow = PhysicalFlow.PHYSICAL_FLOW.as("physFlow");
-        AuthoritativeSource auth = AuthoritativeSource.AUTHORITATIVE_SOURCE.as("auth");
         Application src = Application.APPLICATION.as("src");
         Application trg = Application.APPLICATION.as("trg");
         DataType dt = DataType.DATA_TYPE.as("dt");

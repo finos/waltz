@@ -36,6 +36,7 @@ import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
+import static com.khartec.waltz.schema.Tables.FLOW_CLASSIFICATION_RULE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
@@ -82,15 +83,32 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
                 return mkForTagBasedOnPhysicalFlowTags(options);
             case LOGICAL_DATA_FLOW:
                 return mkForLogicalFlow(options);
+            case FLOW_CLASSIFICATION_RULE:
+                return mkForFlowClassificationRule(options);
             default:
                 throw new UnsupportedOperationException("Cannot create physical specification selector from options: " + options);
         }
     }
 
+
+    private Select<Record1<Long>> mkForFlowClassificationRule(IdSelectionOptions options) {
+        return DSL
+                .select(LOGICAL_FLOW.ID)
+                .from(LOGICAL_FLOW)
+                .innerJoin(LOGICAL_FLOW_DECORATOR)
+                .on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID))
+                .innerJoin(FLOW_CLASSIFICATION_RULE)
+                .on(LOGICAL_FLOW_DECORATOR.FLOW_CLASSIFICATION_RULE_ID.eq(FLOW_CLASSIFICATION_RULE.ID))
+                .where(FLOW_CLASSIFICATION_RULE.ID.eq(options.entityReference().id())
+                        .and(mkLifecycleStatusCondition(options)));
+    }
+
+
     private Select<Record1<Long>> mkForLogicalFlow(IdSelectionOptions options) {
         checkTrue(options.scope() == EXACT, "Can only create selector for exact matches if given an LOGICAL_DATA_FLOW ref");
         return DSL.select(DSL.val(options.entityReference().id()));
     }
+
 
     private Select<Record1<Long>> mkForTagBasedOnPhysicalFlowTags(IdSelectionOptions options) {
         ensureScopeIsExact(options);
