@@ -16,8 +16,7 @@
  *
  */
 
-import template from './welcome.html';
-import {pageKind} from "../dynamic-section/section-store";
+import template from "./welcome.html";
 
 
 const initialState = {
@@ -33,29 +32,27 @@ function controller($document,
 
     const vm = Object.assign(this, initialState);
 
-    vm.$onInit = () => pageKind.set("HOME");
-
     appGroupStore
         .findMyGroupSubscriptions()
         .then(groupSubscriptions => vm.appGroupSubscriptions = groupSubscriptions);
 
     vm.history = localStorageService
-            .get('history_2') || [];
+        .get("history_2") || [];
 
-    $document[0].title = `Waltz`;
+    $document[0].title = "Waltz";
 
 }
 
 controller.$inject = [
-    '$document',
-    'AppGroupStore',
-    'localStorageService'
+    "$document",
+    "AppGroupStore",
+    "localStorageService"
 ];
 
 
 const view = {
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: "ctrl",
     template
 };
 

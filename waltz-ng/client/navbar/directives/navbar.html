@@ -37,7 +37,7 @@
                 ng-repeat="item in ctrl.navItemsForRole"
                 id="{{ item.id }}">
                 <a ui-sref="{{ item.uiSref }}">
-                    <waltz-icon name="{{ item.icon }}"></waltz-icon>
+                    <waltz-icon size="lg" name="{{ item.icon }}"></waltz-icon>
                     <span ng-bind="item.displayName"> </span>
                 </a>
             </li>

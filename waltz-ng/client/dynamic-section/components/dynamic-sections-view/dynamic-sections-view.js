@@ -36,7 +36,7 @@ function controller($scope) {
     const vm = initialiseData(this, initialState);
 
     const unsub = activeSections.subscribe(d => $scope.$applyAsync(() => {
-        vm.sections = d;
+        vm.sections = d.sections;
     }));
 
     vm.$onDestroy = () => unsub();

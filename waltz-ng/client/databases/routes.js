@@ -57,7 +57,9 @@ export default setup;
 function externalIdBouncer($state, $stateParams, serviceBroker) {
     const externalId = $stateParams.externalId;
     serviceBroker
-        .loadViewData(CORE_API.DatabaseStore.getByExternalId, [externalId])
+        .loadViewData(
+            CORE_API.DatabaseStore.findByExternalId,
+            [externalId])
         .then(r => {
             const element = r.data;
             if(element) {

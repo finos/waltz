@@ -48,7 +48,8 @@ function getSectionsFromURL() {
 
 
 function getSectionsFromLocalStorage(pk) {
-    const sectionIds = JSON.parse(window.localStorage.getItem(mkLocalStorageKey(pk))) || [];
+    const localStorageVal = window.localStorage.getItem(mkLocalStorageKey(pk)) || "[]";
+    const sectionIds = JSON.parse(localStorageVal);
     const sections = _
         .chain(sectionIds)
         .map(id => sectionsById[id])
@@ -67,83 +68,101 @@ function mkLocalStorageKey(kind) {
     return `ls.waltz-user-section-ids-${kind}`;
 }
 
-
-export const pageKind = writable(null);
-
-export const availableSections = derived(pageKind, pk => {
-    const sections = dynamicSectionsByKind[pk] || [];
-    sidebarVisible.set(! _.isEmpty(sections));
-    return sortSections(sections);
-});
-
+const baseActiveSectionState = {
+    pageKind: null,
+    sections: [],
+    previous: [],
+}
 
 function createActiveSectionStore() {
-    const {subscribe, set, update} = writable([]);
+    const {subscribe, set, update} = writable(baseActiveSectionState);
 
-    const clear = () => set([]);
-
-    const add = section => update(currentSections => {
-        const cleanedActiveSections = removeSectionFromList(currentSections, section);
-        return [section, ...cleanedActiveSections];
+    const clear = () => update(d => {
+        return {
+            pageKind: d.pageKind,
+            sections: [],
+            previous: d.sections
+        };
     });
 
-    const remove = section => update(currentSections => {
-        return removeSectionFromList(currentSections, section);
+    const add = (section) => update(d => {
+        const cleanedActiveSections = removeSectionFromList(d.sections, section);
+        return {
+            pageKind: d.pageKind,
+            sections: [section, ...cleanedActiveSections],
+            previous: d.sections
+        };
+
     });
 
-    pageKind.subscribe(pk => {
-        const localStorageSections = getSectionsFromLocalStorage(pk);
+    const remove = section => update(d => {
+        return {
+            pageKind: d.pageKind,
+            sections: removeSectionFromList(d.sections, section),
+            previous: d.sections
+        };
+    });
+
+    const setPageKind = pageKind => update(c => {
+        //debugger;
+        if (_.isEmpty(pageKind)) return;
+        const localStorageSections = getSectionsFromLocalStorage(pageKind);
         const urlSections = getSectionsFromURL();
         const sectionsToUse = _.isEmpty(urlSections)
             ? localStorageSections
             : urlSections;
-
-        set(sectionsToUse);
+        return {
+            pageKind,
+            sections: sectionsToUse,
+            previous: []
+        };
     });
+
+    const exitPage = () => {
+        const url = window.location.origin + window.location.pathname;
+        window.history.replaceState({path: url}, "", url);
+    };
 
     return {
         clear,
         add,
         remove,
+        setPageKind,
+        exitPage,
         subscribe,
     };
 }
 
 export const activeSections = createActiveSectionStore();
 
-/**
- * listen to page kind and sections, if they change persist to local storage
- */
-derived(
-    [pageKind, activeSections],
-    ([pk, sections]) => {
-        if (_.isEmpty(pk)) {
-            return;
-        } else {
-            const top3SectionIds = JSON.stringify(_
-                .chain(sections)
-                .map(d => d.id)
-                .take(3)
-                .value());
+export const availableSections = derived(activeSections, d => {
+    const sections = dynamicSectionsByKind[d.pageKind] || [];
+    sidebarVisible.set(! _.isEmpty(sections));
+    return sortSections(sections);
+});
 
-            window.localStorage.setItem(mkLocalStorageKey(pk), top3SectionIds);
-        }
-    })
-    .subscribe(() => {});
 
 derived(
     activeSections,
-    sections => {
-        const top3SectionIds = _
-            .chain(sections)
-            .compact()
-            .take(3)
-            .map(s => s.id)
-            .value();
+    d => {
+        if (_.isEmpty(d.pageKind)) {
+            return;
+        } else {
+            const top3SectionIds = _
+                .chain(d.sections)
+                .compact()
+                .take(3)
+                .map(s => s.id)
+                .value();
 
-        const paramValue = _.join(top3SectionIds, ";");
+            const paramValue = _.join(top3SectionIds, ";");
+            const url = window.location.origin + window.location.pathname + "?sections=" + paramValue;
 
-        const url = window.location.origin + window.location.pathname + "?sections=" + paramValue;
-        window.history.pushState({path: url}, "", url);
+
+            window.history.replaceState({path: url}, "", url);
+            window.localStorage.setItem(mkLocalStorageKey(d.pageKind), JSON.stringify(top3SectionIds));
+
+            window.localStorage.setItem("active", JSON.stringify(d))
+        }
     })
-    .subscribe(() => {})
+    .subscribe(() => {});

@@ -18,7 +18,6 @@
 
 import { initialiseData } from "../../../common";
 import { CORE_API } from "../../../common/services/core-api-utils";
-import { dynamicSections } from "../../../dynamic-section/dynamic-section-definitions";
 
 import template from "./database-view.html";
 
@@ -36,23 +35,22 @@ const addToHistory = (historyStore, database) => {
     if (! database) { return; }
     historyStore.put(
         database.databaseName,
-        'DATABASE',
-        'main.database.view',
+        "DATABASE",
+        "main.database.view",
         { id: database.id });
 };
 
 
-function controller($stateParams, historyStore, serviceBroker, dynamicSectionManager) {
+function controller($stateParams, historyStore, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
+
         vm.databaseId = $stateParams.id;
         vm.parentEntityRef = {
             kind: "DATABASE",
             id: vm.databaseId
         };
-
-        dynamicSectionManager.initialise("DATABASE");
 
         serviceBroker
             .loadViewData(CORE_API.DatabaseStore.getById, [vm.parentEntityRef.id])
@@ -67,8 +65,7 @@ function controller($stateParams, historyStore, serviceBroker, dynamicSectionMan
 controller.$inject = [
     "$stateParams",
     "HistoryStore",
-    "ServiceBroker",
-    "DynamicSectionManager"
+    "ServiceBroker"
 ];
 
 

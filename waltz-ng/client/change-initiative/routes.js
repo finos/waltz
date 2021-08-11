@@ -35,19 +35,10 @@ const viewByExternalIdState = {
     url: "/external-id/{externalId}",
     views: {
         "content@": ChangeInitiativeExternalIdView
-    },
-    resolve: { changeInitiatives: changeInitiativeResolver }
+    }
 };
 
 
-
-function changeInitiativeResolver(serviceBroker, $stateParams) {
-    return serviceBroker
-        .loadViewData(CORE_API.ChangeInitiativeStore.findByExternalId, [ $stateParams.externalId ])
-        .then(r => r.data);
-}
-
-changeInitiativeResolver.$inject = ["ServiceBroker", "$stateParams"];
 
 
 

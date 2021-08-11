@@ -431,219 +431,272 @@ function pack(section, children = []) {
 }
 
 
+const appSections = [
+    assessmentRatingSection,
+    bookmarksSection,
+    changeInitiativeSection,
+    changeSetSection,
+    dataFlowSection,
+    entityAttestationSection,
+    entityCostsSection,
+    entityDiagramsSection,
+    entityNamedNotesSection,
+    entityStatisticSection,
+    involvedPeopleSection,
+    measurableRatingAppSection,
+    surveySection,
+    technologySection,
+    changeLogSection
+];
+
+const actorSections = [
+    measurableRatingAppSection,
+    bookmarksSection,
+    entityNamedNotesSection,
+    involvedPeopleSection,
+    changeInitiativeSection,
+    entityDiagramsSection,
+    dataFlowSection,
+    appsSection,
+    technologySummarySection,
+    changeLogSection
+];
+
+const changeInitiativeSections = [
+    assessmentRatingSection,
+    bookmarksSection,
+    changeSetSection,
+    entityNamedNotesSection,
+    involvedPeopleSection,
+    relatedMeasurablesSection,
+    pack(
+        relatedAppsSection,
+        [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
+    relatedAppGroupsSection,
+    relatedDataTypesSection,
+    surveySection,
+    entityDiagramsSection,
+    logicalFlowsTabgroupSection,
+    changeLogSection
+];
+
+const orgUnitSections = [
+    pack(
+        appsSection,
+        [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
+    measurableRatingsBrowserSection,
+    reportGridViewSection,
+    pack(
+        logicalFlowsTabgroupSection,
+        [authSourcesSection]),
+    changeInitiativeSection,
+    changeSetSection,
+    involvedPeopleSection,
+    attestationSummarySection,
+    bookmarksSection,
+    changeLogSection,
+    orgUnitDirectMeasurableSection
+];
+
+const measurableSections = [
+    pack(
+        appsSection,
+        [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
+    entityNamedNotesSection,
+    measurableRatingExplorerSection,
+    reportGridViewSection,
+    relatedMeasurablesSection,
+    bookmarksSection,
+    changeSetSection,
+    involvedPeopleSection,
+    pack(
+        logicalFlowsTabgroupSection,
+        [authSourcesSection]),
+    entityDiagramsSection,
+    changeLogSection
+];
+
+const personSections = [
+    personHierarchySection,
+    pack(
+        personAppsSection,
+        [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
+    attestationSummarySection,
+    bookmarksSection,
+    changeInitiativeSection,
+    personChangeSetSection,
+    pack(
+        logicalFlowsTabgroupSection,
+        [authSourcesSection]),
+    surveySection,
+    changeLogSection,
+    measurableRatingsBrowserSection,
+    reportGridViewSection,
+    personMeasurableInvolvementsSection
+];
+
+const dataTypeSections = [
+    appsSection,
+    entityNamedNotesSection,
+    bookmarksSection,
+    entityDiagramsSection,
+    involvedPeopleSection,
+    authSourcesSection,
+    dataTypeOriginatorsSection,
+    logicalFlowsTabgroupSection,
+    logicalDataElementsSection,
+    changeLogSection
+];
+
+const appGroupSections = [
+    pack(
+        appsSection,
+        [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
+    pack(
+        logicalFlowsTabgroupSection,
+        [authSourcesSection]),
+    attestationSummarySection,
+    changeInitiativeSection,
+    changeSetSection,
+    measurableRatingsBrowserSection,
+    reportGridViewSection,
+    relatedAppGroupsSection,
+    bookmarksSection,
+    entityNamedNotesSection,
+    relatedDataTypesSection,
+    relatedMeasurablesSection,
+    involvedPeopleSection,
+    changeLogSection
+];
+
+const scenarioSections = [
+    changeInitiativeSection,
+    logicalFlowsTabgroupSection,
+    pack(
+        appsSection,
+        [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
+    bookmarksSection,
+    entityNamedNotesSection,
+    changeLogSection
+];
+
+const flowDiagramSections = [
+    pack(
+        appsSection,
+        [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
+    bookmarksSection,
+    changeLogSection,
+    measurableRatingsBrowserSection,
+    reportGridViewSection,
+    entityNamedNotesSection
+];
+
+const physicalFlowSections = [
+    assessmentRatingSection,
+    bookmarksSection,
+    changeLogSection,
+    entityDiagramsSection,
+    entityNamedNotesSection,
+    flowSpecDefinitionSection,
+    involvedPeopleSection,
+    physicalFlowParticipantsSection
+];
+
+const logicalDataFlowSections = [
+    assessmentRatingSection,
+    bookmarksSection,
+    changeLogSection,
+    entityDiagramsSection,
+    entityNamedNotesSection,
+    physicalFlowSection
+];
+
+const changeSetSections = [
+    assessmentRatingSection,
+    bookmarksSection,
+    changeLogSection,
+    changeUnitSection,
+    involvedPeopleSection
+];
+
+const licenceSections = [
+    appsSection,
+    assessmentRatingSection,
+    bookmarksSection,
+    changeLogSection,
+    entityNamedNotesSection,
+    softwarePackagesSection
+];
+
+const softwarePackageSections = [
+    appsSection,
+    assessmentRatingSection,
+    bookmarksSection,
+    changeLogSection,
+    entityNamedNotesSection,
+    entityStatisticSection,
+    licenceSection,
+    softwarePackageVersions
+];
+
+const physicalSpecificationSections = [
+    assessmentRatingSection,
+    bookmarksSection,
+    changeLogSection,
+    entityDiagramsSection,
+    physicalFlowSection,
+    specificationDefinitionSection
+];
+
+const entityRelationshipSections = [
+    assessmentRatingSection,
+    bookmarksSection,
+    changeLogSection,
+    entityNamedNotesSection,
+    involvedPeopleSection
+];
+
+const databaseSections = [
+    appsSection,
+    entityNamedNotesSection,
+    bookmarksSection,
+    changeLogSection,
+];
+
+const authoritativeSourceSections = [
+    bookmarksSection,
+    changeLogSection,
+    entityNamedNotesSection,
+    involvedPeopleSection
+];
 
 export const dynamicSectionsByKind = {
-    "ORG_UNIT_HOME": [],
-    "PERSON_HOME": [],
-    "DATA_TYPE_HOME": [],
-    "MEASURABLE_CATEGORY": [],
-    "APPLICATION": [
-        assessmentRatingSection,
-        bookmarksSection,
-        changeInitiativeSection,
-        changeSetSection,
-        dataFlowSection,
-        entityAttestationSection,
-        entityCostsSection,
-        entityDiagramsSection,
-        entityNamedNotesSection,
-        entityStatisticSection,
-        involvedPeopleSection,
-        measurableRatingAppSection,
-        surveySection,
-        technologySection,
-        changeLogSection
-    ],
-    "ACTOR": [
-        measurableRatingAppSection,
-        bookmarksSection,
-        entityNamedNotesSection,
-        involvedPeopleSection,
-        changeInitiativeSection,
-        entityDiagramsSection,
-        dataFlowSection,
-        appsSection,
-        technologySummarySection,
-        changeLogSection
-    ],
-    "CHANGE_INITIATIVE": [
-        assessmentRatingSection,
-        bookmarksSection,
-        changeSetSection,
-        entityNamedNotesSection,
-        involvedPeopleSection,
-        relatedMeasurablesSection,
-        pack(relatedAppsSection,
-            [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
-        relatedAppGroupsSection,
-        relatedDataTypesSection,
-        surveySection,
-        entityDiagramsSection,
-        logicalFlowsTabgroupSection,
-        changeLogSection
-    ],
-    "ORG_UNIT": [
-        pack(appsSection,
-            [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
-        measurableRatingsBrowserSection,
-        reportGridViewSection,
-        pack(logicalFlowsTabgroupSection,
-            [authSourcesSection]),
-        changeInitiativeSection,
-        changeSetSection,
-        involvedPeopleSection,
-        attestationSummarySection,
-        bookmarksSection,
-        changeLogSection,
-        orgUnitDirectMeasurableSection
-    ],
-    "MEASURABLE": [
-        pack(appsSection,
-            [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
-        entityNamedNotesSection,
-        measurableRatingExplorerSection,
-        reportGridViewSection,
-        relatedMeasurablesSection,
-        bookmarksSection,
-        changeSetSection,
-        involvedPeopleSection,
-        pack(logicalFlowsTabgroupSection,
-            [authSourcesSection]),
-        entityDiagramsSection,
-        changeLogSection
-    ],
-    "PERSON": [
-        personHierarchySection,
-        pack(personAppsSection,
-            [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
-        attestationSummarySection,
-        bookmarksSection,
-        changeInitiativeSection,
-        personChangeSetSection,
-        pack(logicalFlowsTabgroupSection,
-            [authSourcesSection]),
-        surveySection,
-        changeLogSection,
-        measurableRatingsBrowserSection,
-        reportGridViewSection,
-        personMeasurableInvolvementsSection
-    ],
-    "DATA_TYPE": [
-        appsSection,
-        entityNamedNotesSection,
-        bookmarksSection,
-        entityDiagramsSection,
-        involvedPeopleSection,
-        authSourcesSection,
-        dataTypeOriginatorsSection,
-        logicalFlowsTabgroupSection,
-        logicalDataElementsSection,
-        changeLogSection
-    ],
-    "APP_GROUP": [
-        pack(appsSection,
-            [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
-        pack(logicalFlowsTabgroupSection,
-            [authSourcesSection]),
-        attestationSummarySection,
-        changeInitiativeSection,
-        changeSetSection,
-        measurableRatingsBrowserSection,
-        reportGridViewSection,
-        relatedAppGroupsSection,
-        bookmarksSection,
-        entityNamedNotesSection,
-        relatedDataTypesSection,
-        relatedMeasurablesSection,
-        involvedPeopleSection,
-        changeLogSection
-    ],
-    "SCENARIO": [
-        changeInitiativeSection,
-        logicalFlowsTabgroupSection,
-        pack(appsSection,
-            [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
-        bookmarksSection,
-        entityNamedNotesSection,
-        changeLogSection
-    ],
-    "FLOW_DIAGRAM": [
-        pack(appsSection,
-            [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
-        bookmarksSection,
-        changeLogSection,
-        measurableRatingsBrowserSection,
-        reportGridViewSection,
-        entityNamedNotesSection
-    ],
-    "PHYSICAL_FLOW": [
-        assessmentRatingSection,
-        bookmarksSection,
-        changeLogSection,
-        entityDiagramsSection,
-        entityNamedNotesSection,
-        flowSpecDefinitionSection,
-        involvedPeopleSection,
-        physicalFlowParticipantsSection
-    ],
-    "LOGICAL_DATA_FLOW": [
-        assessmentRatingSection,
-        bookmarksSection,
-        changeLogSection,
-        entityDiagramsSection,
-        entityNamedNotesSection,
-        physicalFlowSection
-    ],
-    "CHANGE_SET": [
-        assessmentRatingSection,
-        bookmarksSection,
-        changeLogSection,
-        changeUnitSection,
-        involvedPeopleSection
-    ],
-    "LICENCE": [
-        appsSection,
-        assessmentRatingSection,
-        bookmarksSection,
-        changeLogSection,
-        entityNamedNotesSection,
-        softwarePackagesSection
-    ],
-    "SOFTWARE_PACKAGE": [
-        appsSection,
-        assessmentRatingSection,
-        bookmarksSection,
-        changeLogSection,
-        entityNamedNotesSection,
-        entityStatisticSection,
-        licenceSection,
-        softwarePackageVersions
-    ],
-    "PHYSICAL_SPECIFICATION": [
-        assessmentRatingSection,
-        bookmarksSection,
-        changeLogSection,
-        entityDiagramsSection,
-        physicalFlowSection,
-        specificationDefinitionSection
-    ],
-    "ENTITY_RELATIONSHIP": [
-        assessmentRatingSection,
-        bookmarksSection,
-        changeLogSection,
-        entityNamedNotesSection,
-        involvedPeopleSection
-    ],
-    "DATABASE": [
-        appsSection,
-        entityNamedNotesSection,
-        bookmarksSection,
-        changeLogSection,
-    ],
-    "AUTHORITATIVE_SOURCE": [
-        bookmarksSection,
-        changeLogSection,
-        entityNamedNotesSection,
-        involvedPeopleSection
-    ]
+    "main.actor.view": actorSections,
+    "main.app.view": appSections,
+    "main.app.asset-code": appSections,
+    "main.app.external-id": appSections,
+    "main.app-group.view": appGroupSections,
+    "main.org-unit.view": orgUnitSections,
+    "main.scenario.view": scenarioSections,
+    "main.change-initiative.view": changeInitiativeSections,
+    "main.change-initiative.external-id": changeInitiativeSections,
+    "main.measurable.view": measurableSections,
+    "main.person.id": personSections,
+    "main.person.view": personSections,
+    "main.person.userId": personSections,
+    "main.data-type.code": dataTypeSections,
+    "main.data-type.view": dataTypeSections,
+    "main.data-type.external-id": dataTypeSections,
+    "main.flow-diagram.view": flowDiagramSections,
+    "main.physical-flow.view": physicalFlowSections,
+    "main.logical-flow.view": logicalDataFlowSections,
+    "main.change-set.view": changeSetSections,
+    "main.licence.view": licenceSections,
+    "main.licence.external-id": licenceSections,
+    "main.software-package.view": softwarePackageSections,
+    "main.physical-specification.view": physicalSpecificationSections,
+    "main.entity-relationship.view": entityRelationshipSections,
+    "main.database.view": databaseSections,
+    "main.database.external-id": databaseSections,
+    "main.authoritative-source.view": authoritativeSourceSections
 };

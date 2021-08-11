@@ -18,6 +18,7 @@
 
 import _ from "lodash";
 
+
 import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./app-group-view.html";
@@ -30,7 +31,6 @@ const initialState = {
 
 
 function controller($stateParams,
-                    dynamicSectionManager,
                     serviceBroker,
                     historyStore) {
 
@@ -40,13 +40,11 @@ function controller($stateParams,
 
     vm.entityRef = {
         id,
-        kind: 'APP_GROUP'
+        kind: "APP_GROUP"
     };
 
     // -- BOOT --
     vm.$onInit = () => {
-
-        dynamicSectionManager.initialise("APP_GROUP");
 
         serviceBroker
             .loadViewData(CORE_API.AppGroupStore.getById, [id])
@@ -55,8 +53,8 @@ function controller($stateParams,
                 vm.entityRef = Object.assign({}, vm.entityRef, {name: vm.groupDetail.appGroup.name});
                 historyStore.put(
                     vm.groupDetail.appGroup.name,
-                    'APP_GROUP',
-                    'main.app-group.view',
+                    "APP_GROUP",
+                    "main.app-group.view",
                     { id });
             });
 
@@ -78,21 +76,20 @@ function controller($stateParams,
     // -- HELPER ---
 
     const isUserAnOwner = member =>
-        member.role === 'OWNER'
+        member.role === "OWNER"
         && member.userId === vm.user.userName;
 }
 
 
 controller.$inject = [
-    '$stateParams',
-    'DynamicSectionManager',
-    'ServiceBroker',
-    'HistoryStore'
+    "$stateParams",
+    "ServiceBroker",
+    "HistoryStore"
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };

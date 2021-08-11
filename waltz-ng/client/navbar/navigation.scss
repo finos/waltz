@@ -22,15 +22,20 @@
 @import "components/browser-detect-banner/broswer-detect-banner";
 @import "components/issue-notification-banner/issue-notification-banner";
 @import "../../style/animations";
+@import "../../style/variables";
 
 $expandedWidth: 280px;
 $collapsedWidth: 86px;
 $hiddenWidth: 8px;
 
+.navbar {
+    font-size: $waltz-navigation-font-size;
+}
+
 /* Style page content */
 .main {
     padding-top: 10px;
-    transition: margin-left linear $animation-speed;
+    xtransition: margin-left linear $animation-speed;
 }
 
 .sidebar {
@@ -53,7 +58,6 @@ $hiddenWidth: 8px;
         width: $expandedWidth;
     }
 }
-
 
 .sidebar-collapsed {
     .main {

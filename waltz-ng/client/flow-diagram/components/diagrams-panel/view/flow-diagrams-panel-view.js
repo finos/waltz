@@ -23,10 +23,7 @@ import template from "./flow-diagrams-panel-view.html";
 
 import {allEntityLifecycleStatuses, initialiseData} from "../../../../common/index";
 import {CORE_API} from "../../../../common/services/core-api-utils";
-import {mkSelectionOptions} from "../../../../common/selector-utils";
-import {dynamicSectionNavigationDefaultOffset} from "../../../../dynamic-section/components/dynamic-section-navigation/dynamic-section-navigation";
 import {pageHeaderDefaultOffset} from "../../../../widgets/page-header/page-header";
-import {displayError} from "../../../../common/error-utils";
 
 const bindings = {
     parentEntityRef: "<",
@@ -53,7 +50,7 @@ function determinePopupTopPosition(evt, scrollOffset, elementHeight) {
     // get the width and height of the element
     const navOffset = 60; // the nav bar margin (navbar.html)
     const pageHeaderOffset = scrollOffset > pageHeaderDefaultOffset ? 40 : 0;  // refer to page-header.js
-    const dynamicNavOffset = scrollOffset > dynamicSectionNavigationDefaultOffset ? 40 : 0; // refer to dynamic-section-navigation
+    const dynamicNavOffset = 40;
 
     const halfHeight = elementHeight / 2;
 

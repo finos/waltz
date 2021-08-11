@@ -22,7 +22,6 @@ import {termSearch} from "../../../common";
 import {buildHierarchies} from "../../../common/hierarchy-utils";
 import {buildPropertySummer} from "../../../common/tally-utils";
 import template from "./home-view.html";
-import {pageKind} from "../../../dynamic-section/section-store";
 
 
 const FIELDS_TO_SEARCH = ["name", "description"];
@@ -88,8 +87,6 @@ function controller(orgUnits,
     const vm = this;
 
     loadDiagrams(svgStore, vm, $state);
-
-    vm.$onInit = () => pageKind.set("ORG_UNIT_LIST");
 
     vm.filteredOrgUnits = [];
     vm.trees = prepareOrgUnitTree(orgUnits, appTallies, endUserAppTallies);

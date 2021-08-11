@@ -19,8 +19,6 @@
 import angular from "angular";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./person-home.html";
-import {pageKind} from "../../../dynamic-section/section-store";
-
 
 const initialState = {
     person: null
@@ -33,7 +31,6 @@ function controller($state,
     const vm = Object.assign(this, initialState);
 
     vm.$onInit = () => {
-        pageKind.set("PERSON_HOME");
         serviceBroker
             .loadAppData(
                 CORE_API.SvgDiagramStore.findByGroup,

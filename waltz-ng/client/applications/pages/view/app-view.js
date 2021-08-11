@@ -19,7 +19,6 @@
 import { CORE_API } from "../../../common/services/core-api-utils";
 
 import template from "./app-view.html";
-import {pageKind} from "../../../dynamic-section/section-store";
 
 
 const initialState = {
@@ -57,16 +56,12 @@ function controller($stateParams,
 
     // -- BOOT --
     vm.$onInit = () => {
-        pageKind.set("APPLICATION");
         const id = $stateParams.id;
         const entityReference = { id, kind: "APPLICATION" };
         vm.parentEntityRef = entityReference;
         loadAll(id);
     };
 
-    // -- INTERACT --
-    vm.addSection = (section) => vm.sections = dynamicSectionManager.openSection(section, "APPLICATION");
-    vm.removeSection = (section) => vm.sections = dynamicSectionManager.removeSection(section, "APPLICATION");
 }
 
 

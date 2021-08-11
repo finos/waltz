@@ -55,7 +55,6 @@
 <style type="text/scss">
     @import "style/_variables";
 
-
     .child-list {
         transition: transform ease-in-out 1s;
     }
@@ -85,10 +84,10 @@
     /* The navigation menu links */
     .sidenav button {
         text-decoration: none;
-        font-size: 18px;
+        font-size: $waltz-navigation-font-size;
         color: $navbar-default-link-color;
         padding-bottom: 1em;
-        padding-left: 1.8em;
+        padding-left: 2em;
         display: inline-block;
     }
 

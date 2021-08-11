@@ -20,6 +20,7 @@ import {orgUnitsResolver, appTalliesResolver, endUserAppTalliesResolver} from ".
 
 import HomeView from "./pages/home-view/home-view";
 import UnitView from "./pages/unit-view/unit-view";
+import {activeSections} from "../dynamic-section/section-store";
 
 
 const baseState = {
@@ -31,27 +32,27 @@ const baseState = {
 };
 
 const homeState = {
-    url: 'org-units',
-    views: {'content@': HomeView}
+    url: "org-units",
+    views: {"content@": HomeView},
 };
 
 
 const viewState = {
-    url: 'org-units/{id:int}',
+    url: "org-units/{id:int}",
     views: {
-        'content@': UnitView
-    }
+        "content@": UnitView
+    },
 };
 
 
 function setup($stateProvider) {
     $stateProvider
-        .state('main.org-unit', baseState)
-        .state('main.org-unit.list', homeState)
-        .state('main.org-unit.view', viewState);
+        .state("main.org-unit", baseState)
+        .state("main.org-unit.list", homeState)
+        .state("main.org-unit.view", viewState);
 }
 
-setup.$inject = ['$stateProvider'];
+setup.$inject = ["$stateProvider"];
 
 
 export default setup;

@@ -49,7 +49,6 @@
 @import "../client/data-types/components/usage-panel/data-type-usage-panel";
 @import "../client/data-type-usage/components/editor/app-data-type-usage-editor";
 @import "../client/data-type-usage/directives/app-data-type-usage-list";
-@import "../client/dynamic-section/components/dynamic-section-navigation/dynamic-section-navigation";
 @import "../client/dynamic-section/components/dynamic-section/dynamic-section";
 @import "../client/dynamic-section/components/dynamic-sections-view/waltz-dynamic-sections-view";
 @import "../client/entity-named-note/components/panel/entity-named-notes-panel";
@@ -71,7 +70,7 @@
 @import "../client/measurable-relationship/components/viz/related-measurables-viz";
 @import "../client/measurable-rating/components/tree/measurable-rating-tree";
 @import "../client/measurable-rating/components/browser-tree-panel/measurable-ratings-browser-tree-panel";
-@import "../client/navbar/sidebar";
+@import "../client/navbar/navigation";
 @import "../client/notification/components/notification-panel/outstanding-actions-notification-panel";
 @import "client/org-units/pages/home-view/home-view";
 @import "../client/playpen/playpen";

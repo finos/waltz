@@ -23,7 +23,6 @@ import {lastViewedMeasurableCategoryKey} from "../../../user";
 import roles from "../../../user/system-roles";
 import {dynamicSections} from "../../../dynamic-section/dynamic-section-definitions";
 import {toEntityRef} from "../../../common/entity-utils";
-import {pageKind} from "../../../dynamic-section/section-store";
 
 const initialState = {
     category: null,
@@ -49,8 +48,6 @@ function controller($q,
 
 
     vm.$onInit = () => {
-
-        pageKind.set("MEASURABLE_CATEGORY");
 
         // last category is used when initialising the route in route.js
         serviceBroker

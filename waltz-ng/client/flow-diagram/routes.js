@@ -24,20 +24,20 @@ const baseState = {
 
 
 const viewState = {
-    url: 'flow-diagram/{id:int}',
+    url: "flow-diagram/{id:int}",
     views: {
-        'content@': FlowDiagramView
+        "content@": FlowDiagramView
     }
 };
 
 
 function setup($stateProvider) {
     $stateProvider
-        .state('main.flow-diagram', baseState)
-        .state('main.flow-diagram.view', viewState);
+        .state("main.flow-diagram", baseState)
+        .state("main.flow-diagram.view", viewState);
 }
 
-setup.$inject = ['$stateProvider'];
+setup.$inject = ["$stateProvider"];
 
 
 export default setup;

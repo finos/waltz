@@ -18,7 +18,6 @@
 import { CORE_API } from "../../../common/services/core-api-utils";
 import template from "./change-initiative-view.html";
 import { initialiseData } from "../../../common";
-import {availableSections} from "../../../dynamic-section/section-store";
 
 
 const initialState = {
@@ -33,7 +32,6 @@ const initialState = {
 
 
 function controller($stateParams,
-                    dynamicSectionManager,
                     historyStore,
                     serviceBroker) {
 
@@ -46,7 +44,6 @@ function controller($stateParams,
     };
 
     vm.$onInit = () => {
-        availableSections.loadForPageKind("CHANGE_INITIATIVE");
 
         const ciPromise = serviceBroker
             .loadViewData(CORE_API.ChangeInitiativeStore.getById, [id])
@@ -70,8 +67,6 @@ function controller($stateParams,
                     "main.change-initiative.view",
                     { id: ci.id }));
 
-        dynamicSectionManager.initialise("CHANGE_INITIATIVE");
-
     };
 
     vm.onToggleDisplayRetiredCis = () => {
@@ -83,7 +78,6 @@ function controller($stateParams,
 
 controller.$inject = [
     "$stateParams",
-    "DynamicSectionManager",
     "HistoryStore",
     "ServiceBroker"
 ];

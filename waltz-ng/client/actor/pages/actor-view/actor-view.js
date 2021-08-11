@@ -30,8 +30,8 @@ const initialState = {
 function mkHistoryObj(actor) {
     return {
         name: actor.name,
-        kind: 'ACTOR',
-        state: 'main.actor.view',
+        kind: "ACTOR",
+        state: "main.actor.view",
         stateParams: { id: actor.id }
     };
 }
@@ -52,19 +52,15 @@ function addToHistory(historyStore, actor) {
 
 
 function controller($stateParams,
-                    dynamicSectionManager,
                     serviceBroker,
                     historyStore) {
 
     const vm = initialiseData(this, initialState);
 
     const id = $stateParams.id;
-    vm.entityRef = { kind: 'ACTOR', id };
+    vm.entityRef = { kind: "ACTOR", id };
 
     vm.$onInit = () => {
-
-        dynamicSectionManager.initialise("ACTOR");
-
         serviceBroker
             .loadViewData(
                 CORE_API.ActorStore.getById,
@@ -81,17 +77,16 @@ function controller($stateParams,
 
 
 controller.$inject = [
-    '$stateParams',
-    'DynamicSectionManager',
-    'ServiceBroker',
-    'HistoryStore',
+    "$stateParams",
+    "ServiceBroker",
+    "HistoryStore",
 ];
 
 
 const view = {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };
 
 export default view;

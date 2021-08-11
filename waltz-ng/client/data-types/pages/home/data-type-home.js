@@ -21,7 +21,6 @@ import angular from "angular";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./data-type-home.html";
-import {pageKind} from "../../../dynamic-section/section-store";
 
 
 const initialState = {
@@ -34,8 +33,6 @@ function controller($state,
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-        pageKind.set("DATA_TYPE_HOME");
-
         serviceBroker
             .loadAppData(CORE_API.SvgDiagramStore.findByGroup, ["DATA_TYPE"])
             .then(r => vm.diagrams = r.data);

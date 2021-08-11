@@ -40,7 +40,7 @@ const initialState = {
 };
 
 
-function controller($stateParams, historyStore, serviceBroker, dynamicSectionManager) {
+function controller($stateParams, historyStore, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const loadLicence = () => {
@@ -59,8 +59,6 @@ function controller($stateParams, historyStore, serviceBroker, dynamicSectionMan
             id: vm.licenceId
         };
 
-        dynamicSectionManager.initialise("LICENCE");
-
         loadLicence()
             .then(() => addToHistory(historyStore, vm.licence));
     };
@@ -70,8 +68,7 @@ function controller($stateParams, historyStore, serviceBroker, dynamicSectionMan
 controller.$inject = [
     "$stateParams",
     "HistoryStore",
-    "ServiceBroker",
-    "DynamicSectionManager"
+    "ServiceBroker"
 ];
 
 

@@ -4,13 +4,14 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import AuthSourceOverview from "../../components/svelte/AuthSourceOverview.svelte"
 
 const bindings = {
-    
+
 }
 
 const initialState = {
     AuthSourceOverview,
     parentEntityRef: null
 }
+
 
 const addToHistory = (historyStore, id, name) => {
     if (! id) { return; }
@@ -22,12 +23,11 @@ const addToHistory = (historyStore, id, name) => {
 };
 
 
-function controller($q, $stateParams, serviceBroker, historyStore, dynamicSectionManager){
+function controller($q, $stateParams, serviceBroker, historyStore){
 
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-
         const authSourceId = $stateParams.id;
 
         vm.parentEntityRef = {
@@ -35,8 +35,6 @@ function controller($q, $stateParams, serviceBroker, historyStore, dynamicSectio
             id: authSourceId,
             name: "?"
         };
-
-        dynamicSectionManager.initialise("AUTHORITATIVE_SOURCE");
 
         const dataTypesPromise = serviceBroker
             .loadAppData(CORE_API.DataTypeStore.findAll)
@@ -63,7 +61,6 @@ function controller($q, $stateParams, serviceBroker, historyStore, dynamicSectio
 
                 addToHistory(historyStore, authSource.id, authSourceName);
             });
-
     };
 }
 
@@ -71,9 +68,8 @@ controller.$inject = [
     "$q",
     "$stateParams",
     "ServiceBroker",
-    "HistoryStore",
-    "DynamicSectionManager"
-]
+    "HistoryStore"
+];
 
 
 const component = {

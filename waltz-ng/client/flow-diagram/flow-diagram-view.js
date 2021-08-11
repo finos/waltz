@@ -79,7 +79,6 @@ function controller(
     $stateParams,
     $timeout,
     displayNameService,
-    dynamicSectionManager,
     flowDiagramStateService,
     historyStore,
     serviceBroker)
@@ -89,7 +88,6 @@ function controller(
     vm.$onInit = () => {
         const id = $stateParams.id;
         const entityReference = { id, kind: "FLOW_DIAGRAM" };
-        dynamicSectionManager.initialise("FLOW_DIAGRAM");
         vm.parentEntityRef = entityReference;
 
         const selector = {
@@ -188,11 +186,6 @@ function controller(
         downloadTextFile(dataRows, ",", vm.diagram.name + "_flows.csv");
     };
 
-
-    // -- INTERACT --
-    vm.addSection = (section) => vm.sections = dynamicSectionManager.openSection(section, "FLOW_DIAGRAM");
-    vm.removeSection = (section) => vm.sections = dynamicSectionManager.removeSection(section, "FLOW_DIAGRAM");
-
 }
 
 controller.$inject = [
@@ -200,7 +193,6 @@ controller.$inject = [
     "$stateParams",
     "$timeout",
     "DisplayNameService",
-    "DynamicSectionManager",
     "FlowDiagramStateService",
     "HistoryStore",
     "ServiceBroker"

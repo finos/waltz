@@ -22,6 +22,7 @@ import template from "./data-type-view.html";
 import {toEntityRef} from "../../../common/entity-utils";
 
 
+
 const initialState = {
     dataType: null,
     entityRef: null,
@@ -30,7 +31,6 @@ const initialState = {
 
 
 function controller(dataType,
-                    dynamicSectionManager,
                     historyStore) {
 
     const vm = initialiseData(this, initialState);
@@ -41,7 +41,6 @@ function controller(dataType,
 
         // -- BOOT ---
         vm.$onInit = () => {
-            dynamicSectionManager.initialise("DATA_TYPE");
             historyStore.put(
                 dataType.name,
                 "DATA_TYPE",
@@ -59,7 +58,6 @@ function controller(dataType,
 
 controller.$inject = [
     "dataType",
-    "DynamicSectionManager",
     "HistoryStore"
 ];
 

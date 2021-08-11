@@ -19,7 +19,6 @@
 import { initialiseData } from "../../../common/index";
 import { mkRef } from "../../../common/entity-utils";
 import { CORE_API } from "../../../common/services/core-api-utils";
-import {pageKind} from "../../../dynamic-section/section-store";
 
 import template from "./person-view.html";
 
@@ -39,7 +38,6 @@ function controller($stateParams,
 
 
     vm.$onInit = () => {
-        pageKind.set("PERSON");
         const id = $stateParams.id;
 
         if (id) {

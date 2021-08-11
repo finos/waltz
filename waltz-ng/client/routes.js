@@ -18,6 +18,7 @@
 
 import {CORE_API} from "./common/services/core-api-utils";
 import WelcomeJs from "./welcome/welcome.js";
+import {activeSections} from "./dynamic-section/section-store";
 
 function warmUpCache($q, serviceBroker) {
     return $q
@@ -49,22 +50,15 @@ function configureRoutes($locationProvider, $stateProvider, $urlRouterProvider) 
             views: {
                 "header@": {template: "<waltz-navbar></waltz-navbar>"},
                 "content@": WelcomeJs
-            }
+            },
         })
         .state("main.home", {
             url: "home",
             views: {
                 "content@": WelcomeJs
-            }
+            },
+            onEnter: () => activeSections.setPageKind("HOME")
         })
-        .state("main.wibble", {
-            url: "wibble",
-            views: {
-                "header@": {template:"<div style='border: 1px solid green;'><h1>HEader</h1></div>"},
-                "content@": {template: "<div style='border: 1px solid red;'><h1>Content</h1></div>"},
-                "sidebar@": {template: "<div style='border: 1px solid blue;'><h1>Sidebar</h1></div>"}
-            }
-        });
 
     $locationProvider
         .html5Mode(true);
@@ -118,8 +112,21 @@ configureBetaNagMessageNotification.$inject = [
 
 // -- STATE CHANGE ---
 
-function configureStateChangeListener($transitions, $window, accessLogStore, dynamicSectionManager) {
-    $transitions.onExit({}, () => dynamicSectionManager.clear());
+function configureStateChangeListener($transitions, $window, $state, accessLogStore) {
+    $transitions.onExit({}, () => activeSections.exitPage());
+    $transitions.onSuccess({}, d => activeSections.setPageKind(d.targetState().name()));
+
+    activeSections.subscribe((d) => {
+        // const currState = $state.current.name;
+        // const newSections = _.difference(
+        //     _.map(d.sections, s => s.componentId),
+        //     _.map(d.previous, s => s.componentId));
+        //
+        // newSections.forEach(s => {
+        //     console.log(d.pageKind + "/" + currState + ":  section opened: "+s)
+        // })
+
+    })
 
     $transitions.onSuccess({}, (transition) => {
         const {name} = transition.to();
@@ -144,8 +151,8 @@ function configureStateChangeListener($transitions, $window, accessLogStore, dyn
 configureStateChangeListener.$inject = [
     "$transitions",
     "$window",
-    "AccessLogStore",
-    "DynamicSectionManager"
+    "$state",
+    "AccessLogStore"
 ];
 
 // -- ROUTE DEBUGGER ---
@@ -161,7 +168,7 @@ function configureRouteDebugging($transitions, $trace) {
     });
 
     // UNCOMMENT FOR FINE GRAINED LOGGING
-    // $trace.enable('TRANSITION');
+    //$trace.enable('TRANSITION');
 }
 
 configureRouteDebugging.$inject = [
