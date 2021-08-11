@@ -71,7 +71,30 @@ public class PersonApplicationExtractor extends DirectQueryBasedDataExtractor {
     }
 
 
-    private SelectConditionStep<Record9<Long, String, String, String, String, String, String, String, String>> prepareExtractQuery(String empId) {
+    private SelectOrderByStep<Record9<Long, String, String, String, String, String, String, String, String>> prepareExtractQuery(String empId) {
+
+        Condition appIsActive = APPLICATION.ENTITY_LIFECYCLE_STATUS.notEqual(EntityLifecycleStatus.REMOVED.name())
+                .and(APPLICATION.IS_REMOVED.isFalse());
+
+        SelectConditionStep<Record9<Long, String, String, String, String, String, String, String, String>> directInvolvementQry = mkBaseInvolvementSelect(dsl, empId)
+                .where(dsl
+                        .renderInlined(INVOLVEMENT.EMPLOYEE_ID.eq(empId)
+                        .and(appIsActive)));
+
+        SelectConditionStep<Record9<Long, String, String, String, String, String, String, String, String>> oversightInvolvementQry = mkBaseInvolvementSelect(dsl, empId)
+                .innerJoin(PERSON_HIERARCHY)
+                .on(PERSON_HIERARCHY.EMPLOYEE_ID.eq(INVOLVEMENT.EMPLOYEE_ID))
+                .where(dsl
+                        .renderInlined(PERSON_HIERARCHY.MANAGER_ID.eq(empId)
+                        .and(appIsActive)));
+
+        return oversightInvolvementQry.union(directInvolvementQry);
+    }
+
+
+    private SelectOnConditionStep<Record9<Long, String, String, String, String, String, String, String, String>> mkBaseInvolvementSelect(
+            DSLContext dsl,
+            String empId) {
 
         Condition isDirect = DSL.exists(DSL
                 .select(INVOLVEMENT.ENTITY_ID)
@@ -99,11 +122,6 @@ public class PersonApplicationExtractor extends DirectQueryBasedDataExtractor {
                 .on(INVOLVEMENT.ENTITY_ID.eq(APPLICATION.ID)
                         .and(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                 .innerJoin(ORGANISATIONAL_UNIT)
-                .on(ORGANISATIONAL_UNIT.ID.eq(APPLICATION.ORGANISATIONAL_UNIT_ID))
-                .innerJoin(PERSON_HIERARCHY)
-                .on(PERSON_HIERARCHY.EMPLOYEE_ID.eq(INVOLVEMENT.EMPLOYEE_ID))
-                .where(PERSON_HIERARCHY.MANAGER_ID.eq(empId)
-                        .and(APPLICATION.ENTITY_LIFECYCLE_STATUS.notEqual(EntityLifecycleStatus.REMOVED.name())));
-
+                .on(ORGANISATIONAL_UNIT.ID.eq(APPLICATION.ORGANISATIONAL_UNIT_ID));
     }
 }
