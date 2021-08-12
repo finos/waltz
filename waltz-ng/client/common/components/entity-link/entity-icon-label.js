@@ -90,7 +90,7 @@ const entityLoaders = {
         mkProps: (rule) => ([
             {
                 name: "Application",
-                value: rule.applicationReference?.name || "?"
+                value: _.get(rule, ["applicationReference", "name"], "?")
             }, {
                 name: "Datatype Code",
                 value: rule.dataType || "?"
