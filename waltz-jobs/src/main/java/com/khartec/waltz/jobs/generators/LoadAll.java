@@ -46,7 +46,7 @@ public class LoadAll {
             new MeasurableGenerator("REGULATION"),
             new MeasurableRatingGenerator(),
             SKIP_SLOW ? null : new EntityStatisticGenerator(),
-            new AuthSourceGenerator(),
+            new FlowClassificationRuleGenerator(),
             new AssessmentGenerator(),
             new RoadmapGenerator(),
             SKIP_SLOW ? null : new ServerGenerator(),

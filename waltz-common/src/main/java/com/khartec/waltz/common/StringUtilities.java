@@ -202,4 +202,18 @@ public class StringUtilities {
                 .replaceAll("/+", "/");
 
     }
+
+
+    public static String capitalise(String words){
+
+        List<String> collect = Arrays.stream(words
+                .split("\\s+"))
+                .map(w -> {
+                    String lower = w.toLowerCase().substring(1);
+                    char capital = w.charAt(0);
+                    return capital + lower + " ";
+                }).collect(Collectors.toList());
+
+        return String.join("", collect).trim();
+    }
 }
