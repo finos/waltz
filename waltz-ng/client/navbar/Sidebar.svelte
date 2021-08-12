@@ -68,7 +68,7 @@
     }
 
     .expansion-toggle {
-        font-size: 64px;
+        font-size: 60px;
         width: 100%;
         display: inline-block;
         text-align: right;
