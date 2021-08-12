@@ -23,21 +23,21 @@ const baseState = {
 };
 
 const viewState = {
-    url: 'logical-flow/{id:int}',
-    views: {'content@': LogicalFlowView },
+    url: "logical-flow/{id:int}",
+    views: {"content@": LogicalFlowView },
 };
 
 
 function setup($stateProvider) {
 
     $stateProvider
-        .state('main.logical-flow', baseState)
-        .state('main.logical-flow.view', viewState)
+        .state("main.logical-flow", baseState)
+        .state("main.logical-flow.view", viewState)
     ;
 }
 
 
-setup.$inject = ['$stateProvider'];
+setup.$inject = ["$stateProvider"];
 
 
 export default setup;

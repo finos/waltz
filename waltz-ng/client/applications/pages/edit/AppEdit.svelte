@@ -108,7 +108,6 @@
                 ? _.isNil(v)
                 : _.isEmpty(v));
 
-    $: console.log({rc: $recentlyCreated})
 </script>
 
 

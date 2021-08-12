@@ -182,7 +182,7 @@
         <comment>5554: Insert authority ratings from enum_value into flow_classification</comment>
         <sql>
             INSERT INTO flow_classification (name, description, code, color, position, is_custom)
-            SELECT display_name, description, [key], icon_color, position, 0
+            SELECT display_name, description, ${key.col}, icon_color, position, ${false.value}
             FROM enum_value
             WHERE type = 'AuthoritativenessRating'
         </sql>

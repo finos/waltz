@@ -4,13 +4,14 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import FlowClassificationRuleOverview from "../../components/svelte/FlowClassificationRuleOverview.svelte"
 
 const bindings = {
-    
+
 }
 
 const initialState = {
     FlowClassificationRuleOverview,
     parentEntityRef: null
 }
+
 
 const addToHistory = (historyStore, id, name) => {
     if (! id) { return; }
@@ -22,7 +23,7 @@ const addToHistory = (historyStore, id, name) => {
 };
 
 
-function controller($q, $stateParams, serviceBroker, historyStore, dynamicSectionManager){
+function controller($q, $stateParams, serviceBroker, historyStore){
 
     const vm = initialiseData(this, initialState);
 
@@ -35,8 +36,6 @@ function controller($q, $stateParams, serviceBroker, historyStore, dynamicSectio
             id: ruleId,
             name: "?"
         };
-
-        dynamicSectionManager.initialise("FLOW_CLASSIFICATION_RULE");
 
         const dataTypesPromise = serviceBroker
             .loadAppData(CORE_API.DataTypeStore.findAll)
@@ -63,7 +62,6 @@ function controller($q, $stateParams, serviceBroker, historyStore, dynamicSectio
 
                 addToHistory(historyStore, rule.id, flowClassificationRuleName);
             });
-
     };
 }
 
@@ -71,9 +69,8 @@ controller.$inject = [
     "$q",
     "$stateParams",
     "ServiceBroker",
-    "HistoryStore",
-    "DynamicSectionManager"
-]
+    "HistoryStore"
+];
 
 
 const component = {

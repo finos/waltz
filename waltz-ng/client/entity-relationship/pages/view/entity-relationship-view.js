@@ -22,8 +22,7 @@ const addToHistory = (historyStore, relationship) => {
 
 function controller($stateParams,
                     historyStore,
-                    serviceBroker,
-                    dynamicSectionManager) {
+                    serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
@@ -32,8 +31,6 @@ function controller($stateParams,
             kind: "ENTITY_RELATIONSHIP",
             id: $stateParams.id
         };
-
-        dynamicSectionManager.initialise("ENTITY_RELATIONSHIP");
 
         serviceBroker
             .loadViewData(CORE_API.EntityRelationshipStore.getById, [vm.parentEntityRef.id])
@@ -49,7 +46,6 @@ controller.$inject = [
     "$stateParams",
     "HistoryStore",
     "ServiceBroker",
-    "DynamicSectionManager"
 ];
 
 const component = {
@@ -59,6 +55,6 @@ const component = {
 };
 
 export default {
-    id: 'waltzEntityRelationshipView',
+    id: "waltzEntityRelationshipView",
     component
 }

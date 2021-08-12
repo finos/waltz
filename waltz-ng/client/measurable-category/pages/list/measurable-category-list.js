@@ -24,7 +24,6 @@ import roles from "../../../user/system-roles";
 import {dynamicSections} from "../../../dynamic-section/dynamic-section-definitions";
 import {toEntityRef} from "../../../common/entity-utils";
 
-
 const initialState = {
     category: null,
     visibility: {

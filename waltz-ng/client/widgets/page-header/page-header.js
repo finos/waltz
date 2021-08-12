@@ -18,6 +18,7 @@
 import _ from "lodash";
 import angular from "angular";
 import {initialiseData} from "../../common";
+import {sidebarState} from "../../navbar/sidebar-store";
 
 import template from "./page-header.html";
 

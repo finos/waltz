@@ -17,20 +17,17 @@
  */
 
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
-import {dynamicSectionNavigationDefaultOffset} from "../dynamic-section/components/dynamic-section-navigation/dynamic-section-navigation";
 import * as _ from "lodash";
+import {activeSections} from "../dynamic-section/section-store";
 
 
 /**
  * An attribute directive which allows
  * for create in page scroll to anchors.
  * Usage:  &lt;div waltz-jump-to='some-id'>&lt;/div>
- * @param $window
- * @param dynamicSectionManager
  * @returns directive
  */
-const directive = function($window,
-                           dynamicSectionManager) {
+const directive = function() {
     return {
         restrict: "A",
         link: (scope, elem, attrs) => {
@@ -40,8 +37,7 @@ const directive = function($window,
             elem.on("click", () => {
                 const section = _.find(dynamicSections, section => section.componentId === target);
                 if(section != null) {
-                    scope.$apply(() => (dynamicSectionManager.activate(section)));
-                    $window.scrollTo(0, dynamicSectionNavigationDefaultOffset);
+                    scope.$apply(() => activeSections.add(section));
                 } else {
                     console.log("waltz-jump-to section is null")
                 }
@@ -51,10 +47,7 @@ const directive = function($window,
 };
 
 
-directive.$inject=[
-    "$window",
-    "DynamicSectionManager"
-];
+directive.$inject=[];
 
 
 export default directive;

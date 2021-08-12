@@ -385,38 +385,38 @@ function controller($q,
         .then(() => notification.warning("Removed Change Initiative: " + changeInitiative.name));
 
     vm.saveChangeInitiatives = (results) => {
+        const changeInitiativeIdsToAdd = _.chain(results)
+            .filter(r => r.action === "ADD")
+            .map(r => r.entityRef.id)
+            .value();
 
-            const changeInitiativeIdsToAdd = _.chain(results)
-                .filter(r => r.action === "ADD")
-                .map(r => r.entityRef.id)
-                .value();
+        const changeInitiativeIdsToRemove = _.chain(results)
+            .filter(r => r.action === "REMOVE")
+            .map(r => r.entityRef.id)
+            .value();
 
-            const changeInitiativeIdsToRemove = _.chain(results)
-                .filter(r => r.action === "REMOVE")
-                .map(r => r.entityRef.id)
-                .value();
+        if (changeInitiativeIdsToAdd.length > 0) {
+            serviceBroker
+                .execute(
+                    CORE_API.AppGroupStore.addChangeInitiatives,
+                    [id, Object.assign({}, {changeInitiativeIds: changeInitiativeIdsToAdd})])
+                .then(r => r.data)
+                .then(changeInitiatives => vm.changeInitiatives = changeInitiatives, e => handleError(e))
+                .then(() => notification.success(`Added ${changeInitiativeIdsToAdd.length} change initiatives`));
+        }
 
-            if (changeInitiativeIdsToAdd.length > 0) {
-                serviceBroker
-                    .execute(CORE_API.AppGroupStore.addChangeInitiatives,
-                        [id, Object.assign({}, {changeInitiativeIds: changeInitiativeIdsToAdd})])
-                    .then(r => r.data)
-                    .then(changeInitiatives => vm.changeInitiatives = changeInitiatives, e => handleError(e))
-                    .then(() => notification.success(`Added ${changeInitiativeIdsToAdd.length} change initiatives`));
-            }
+        if (changeInitiativeIdsToRemove.length > 0) {
+            serviceBroker
+                .execute(CORE_API.AppGroupStore.removeChangeInitiatives, [id, changeInitiativeIdsToRemove])
+                .then(r => r.data)
+                .then(changeInitiatives => vm.changeInitiatives = changeInitiatives, e => handleError(e))
+                .then(() => notification.success(`Removed ${changeInitiativeIdsToRemove.length} change initiatives`));
+        }
 
-            if (changeInitiativeIdsToRemove.length > 0) {
-                serviceBroker
-                    .execute(CORE_API.AppGroupStore.removeChangeInitiatives, [id, changeInitiativeIdsToRemove])
-                    .then(r => r.data)
-                    .then(changeInitiatives => vm.changeInitiatives = changeInitiatives, e => handleError(e))
-                    .then(() => notification.success(`Removed ${changeInitiativeIdsToRemove.length} change initiatives`));
-            }
-
-            if (changeInitiativeIdsToAdd.length === 0 && changeInitiativeIdsToRemove.length === 0){
-                notification.info("There are no change initiatives to be added or removed");
-            }
-        };
+        if (changeInitiativeIdsToAdd.length === 0 && changeInitiativeIdsToRemove.length === 0){
+            notification.info("There are no change initiatives to be added or removed");
+        }
+    };
 
     serviceBroker
         .loadViewData(

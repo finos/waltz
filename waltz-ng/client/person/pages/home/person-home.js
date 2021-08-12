@@ -18,8 +18,7 @@
 
 import angular from "angular";
 import {CORE_API} from "../../../common/services/core-api-utils";
-import template from './person-home.html';
-
+import template from "./person-home.html";
 
 const initialState = {
     person: null
@@ -35,31 +34,31 @@ function controller($state,
         serviceBroker
             .loadAppData(
                 CORE_API.SvgDiagramStore.findByGroup,
-                [ 'ORG_TREE' ])
+                [ "ORG_TREE" ])
             .then(r => vm.diagrams = r.data);
     };
 
     vm.blockProcessor = b => {
-        b.block.onclick = () => $state.go('main.person.view', { empId: b.value });
-        angular.element(b.block).addClass('clickable');
+        b.block.onclick = () => $state.go("main.person.view", { empId: b.value });
+        angular.element(b.block).addClass("clickable");
     };
 
     vm.goToPerson = (person) => {
-        $state.go('main.person.id', { id: person.id });
+        $state.go("main.person.id", { id: person.id });
     };
 
 }
 
 
 controller.$inject = [
-    '$state',
-    'ServiceBroker'
+    "$state",
+    "ServiceBroker"
 ];
 
 
 const view = {
     template,
-    controllerAs: 'ctrl',
+    controllerAs: "ctrl",
     controller
 };
 

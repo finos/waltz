@@ -20,8 +20,7 @@ import angular from "angular";
 
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
-
-import template from './data-type-list.html';
+import template from "./data-type-home.html";
 
 
 const initialState = {
@@ -35,28 +34,28 @@ function controller($state,
 
     vm.$onInit = () => {
         serviceBroker
-            .loadAppData(CORE_API.SvgDiagramStore.findByGroup, ['DATA_TYPE'])
+            .loadAppData(CORE_API.SvgDiagramStore.findByGroup, ["DATA_TYPE"])
             .then(r => vm.diagrams = r.data);
     };
 
     vm.nodeSelected = (node) => vm.selectedNode = node;
 
     vm.blockProcessor = b => {
-        b.block.onclick = () => $state.go('main.data-type.code', { code: b.value });
-        angular.element(b.block).addClass('clickable');
+        b.block.onclick = () => $state.go("main.data-type.code", { code: b.value });
+        angular.element(b.block).addClass("clickable");
     };
 }
 
 
 controller.$inject = [
-    '$state',
-    'ServiceBroker'
+    "$state",
+    "ServiceBroker"
 ];
 
 
 const view = {
     template,
-    controllerAs: 'ctrl',
+    controllerAs: "ctrl",
     controller
 };
 

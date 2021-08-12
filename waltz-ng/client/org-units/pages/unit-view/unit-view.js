@@ -38,8 +38,8 @@ const addToHistory = (historyStore, orgUnit) => {
 };
 
 
+
 function controller($stateParams,
-                    dynamicSectionManager,
                     historyStore,
                     serviceBroker) {
 
@@ -49,7 +49,6 @@ function controller($stateParams,
         const id = $stateParams.id;
         vm.parentEntityRef = { kind: "ORG_UNIT", id };
 
-        dynamicSectionManager.initialise("ORG_UNIT");
         serviceBroker
             .loadViewData(CORE_API.OrgUnitStore.getById, [ id ])
             .then(r => vm.orgUnit = r.data)
@@ -69,7 +68,6 @@ function controller($stateParams,
 
 controller.$inject = [
     '$stateParams',
-    'DynamicSectionManager',
     'HistoryStore',
     'ServiceBroker'
 ];

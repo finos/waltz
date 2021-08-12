@@ -75,7 +75,6 @@ function loadFlowDiagrams(specId, $q, flowDiagramStore, flowDiagramEntityStore) 
 
 function controller($q,
                     $stateParams,
-                    dynamicSectionManager,
                     applicationStore,
                     flowDiagramStore,
                     flowDiagramEntityStore,
@@ -94,9 +93,6 @@ function controller($q,
     };
 
     vm.$onInit = () => {
-
-        dynamicSectionManager.initialise("PHYSICAL_SPECIFICATION");
-
         vm.entityReference = ref;
 
         // -- LOAD ---
@@ -138,7 +134,6 @@ function controller($q,
 controller.$inject = [
     "$q",
     "$stateParams",
-    "DynamicSectionManager",
     "ApplicationStore",
     "FlowDiagramStore",
     "FlowDiagramEntityStore",

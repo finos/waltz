@@ -63,13 +63,15 @@
     @import "../../../style/_variables";
 
     .header {
-        background-color: $waltz-section-background-color;
     }
 
     .header-free {
+        background-color: $waltz-section-background-color;
         padding: 6px 6px 6px 16px;
         border-radius: 3px;
         height: 80px;
+        margin-left: $waltz-section-margin;
+        margin-right: $waltz-section-margin;
         margin-bottom: 12px;
         border: 1px solid $waltz-border-color-lighter;
     }
@@ -85,7 +87,7 @@
         overflow: hidden;
         position: fixed;
         top: 50px;
-        left: 0;
+        left: auto;
         z-index: 999;
         border-bottom: 2px solid $waltz-border-color-lighter;
         opacity: 0;

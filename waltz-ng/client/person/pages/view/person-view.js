@@ -29,7 +29,6 @@ const initialState = {
 
 
 function controller($stateParams,
-                    dynamicSectionManager,
                     historyStore,
                     serviceBroker) {
 
@@ -55,7 +54,6 @@ function controller($stateParams,
                     }
                     vm.person = person;
 
-                    dynamicSectionManager.initialise("PERSON");
                     historyStore.put(
                         person.displayName,
                         "PERSON",
@@ -77,7 +75,6 @@ function controller($stateParams,
 
 controller.$inject = [
     "$stateParams",
-    "DynamicSectionManager",
     "HistoryStore",
     "ServiceBroker"
 ];

@@ -29,9 +29,11 @@ waltz-section {
 .waltz-section {
   border: 1px solid $waltz-border-color-lighter;
   border-radius: 3px;
-  margin-bottom: 24px;
   background: #fff;
   display: block;
+  margin-left: $waltz-section-margin;
+  margin-right: $waltz-section-margin;
+  margin-bottom: 24px;
   @include waltz-box-shadow()
 }
 

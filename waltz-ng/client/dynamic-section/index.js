@@ -17,29 +17,22 @@
  *
  */
 
-import angular from 'angular';
+import angular from "angular";
 
-import {registerComponents, registerServices} from "../common/module-utils";
+import {registerComponents} from "../common/module-utils";
 import DynamicSection from "./components/dynamic-section/dynamic-section";
-import DynamicSectionNavigation from "./components/dynamic-section-navigation/dynamic-section-navigation";
 import DynamicSectionWrapper from "./components/dynamic-section-wrapper/dynamic-section-wrapper";
 import DynamicSectionsView from "./components/dynamic-sections-view/dynamic-sections-view";
-import DynamicSectionManager from './services/dynamic-section-manager';
 
 
 export default () => {
 
-    const module = angular.module('waltz.dynamic-section', []);
+    const module = angular.module("waltz.dynamic-section", []);
 
     registerComponents(module, [
         DynamicSection,
-        DynamicSectionNavigation,
         DynamicSectionWrapper,
         DynamicSectionsView
-    ]);
-
-    registerServices(module, [
-        DynamicSectionManager
     ]);
 
     return module.name;

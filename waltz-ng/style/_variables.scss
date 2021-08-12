@@ -42,6 +42,8 @@ $waltz-base-background-color: #1F7FE0;
 $waltz-background-color: lighten($waltz-base-background-color, 50%);
 $waltz-section-background-color: lighten($waltz-base-background-color, 45%); //#ecf1ff;  // section header bars etc
 
+$waltz-section-margin: 12px;
+
 $waltz-font-color: #332B23;
 $waltz-link-color: #2C369D;
 $waltz-section-font-color: #332B23;
@@ -51,6 +53,7 @@ $font-size-base: 14px;
 
 $waltz-border-color: #9a99ad;
 $waltz-border-color-lighter: lighten($waltz-border-color, 20%);
+$waltz-navigation-font-size: 16px; /** controls navbar and sidebar */
 
 $navbar-default-color: white;
 $navbar-default-bg: darken($waltz-base-background-color, 30%);

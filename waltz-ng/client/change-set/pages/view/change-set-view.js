@@ -29,7 +29,7 @@ const initialState = {
 };
 
 
-function controller($stateParams, dynamicSectionManager) {
+function controller($stateParams) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
@@ -39,15 +39,12 @@ function controller($stateParams, dynamicSectionManager) {
             id: vm.changeSetId
         };
 
-        dynamicSectionManager.initialise("CHANGE_SET");
-
     };
 }
 
 
 controller.$inject = [
-    "$stateParams",
-    "DynamicSectionManager"
+    "$stateParams"
 ];
 
 
