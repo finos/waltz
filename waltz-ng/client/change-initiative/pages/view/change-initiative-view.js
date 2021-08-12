@@ -32,7 +32,6 @@ const initialState = {
 
 
 function controller($stateParams,
-                    dynamicSectionManager,
                     historyStore,
                     serviceBroker) {
 
@@ -45,6 +44,7 @@ function controller($stateParams,
     };
 
     vm.$onInit = () => {
+
         const ciPromise = serviceBroker
             .loadViewData(CORE_API.ChangeInitiativeStore.getById, [id])
             .then(result => {
@@ -67,8 +67,6 @@ function controller($stateParams,
                     "main.change-initiative.view",
                     { id: ci.id }));
 
-        dynamicSectionManager.initialise("CHANGE_INITIATIVE");
-
     };
 
     vm.onToggleDisplayRetiredCis = () => {
@@ -80,7 +78,6 @@ function controller($stateParams,
 
 controller.$inject = [
     "$stateParams",
-    "DynamicSectionManager",
     "HistoryStore",
     "ServiceBroker"
 ];

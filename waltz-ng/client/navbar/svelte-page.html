@@ -1,0 +1,19 @@
+<!-- Header -->
+<div ui-view="header">
+</div>
+
+<div class="under-header"
+     ng-class="{
+        'sidebar-expanded': $ctrl.isVisible && $ctrl.isExpanded,
+        'sidebar-collapsed': $ctrl.isVisible && !$ctrl.isExpanded,
+        'sidebar-hidden': !$ctrl.isVisible}">
+    <!-- Content -->
+    <aside class="sidebar">
+       <waltz-svelte-component component="$ctrl.Sidebar"></waltz-svelte-component>
+    </aside>
+
+    <main ui-view="content"
+          class="main">
+        Loading...
+    </main>
+</div>

@@ -28,13 +28,10 @@ const initialState = {
 };
 
 
-function controller($stateParams, dynamicSectionManager) {
+function controller($stateParams) {
     const vm = initialiseData(this, initialState);
 
-    dynamicSectionManager.initialise("SCENARIO");
-
     vm.$onInit = () => {
-        console.log("onInit");
         vm.scenarioId = $stateParams.id;
         vm.parentEntityRef = {
             kind: "SCENARIO",
@@ -47,8 +44,7 @@ function controller($stateParams, dynamicSectionManager) {
 
 
 controller.$inject = [
-    "$stateParams",
-    "DynamicSectionManager"
+    "$stateParams"
 ];
 
 

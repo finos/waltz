@@ -17,30 +17,30 @@
  */
 
 import template from "./app-asset-code-view.html";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 function controller($state,
                     $stateParams,
-                    resolvedAppsByAssetCode) {
+                    serviceBroker) {
 
-    const vm = this;
+    const goToApp = app => $state.go("main.app.view", { id: app.id }, { location: true });
 
-    vm.resolvedAppsByAssetCode = resolvedAppsByAssetCode || [];
-    vm.assetCode = $stateParams.assetCode;
-
-    const goToApp = app => $state.go("main.app.view", { id: app.id }, { location: false });
-
-    // if single app for asset code, navigate to the app now
-    if (vm.resolvedAppsByAssetCode.length === 1) {
-        goToApp(resolvedAppsByAssetCode[0]);
-    }
+    serviceBroker
+        .loadViewData(
+            CORE_API.ApplicationStore.findByAssetCode,
+            [$stateParams.assetCode])
+        .then(r => {
+            const app = _.first(r.data);
+            if (app) goToApp(app);
+        });
 }
 
 
 controller.$inject = [
     "$state",
     "$stateParams",
-    "resolvedAppsByAssetCode"
+    "ServiceBroker"
 ];
 
 

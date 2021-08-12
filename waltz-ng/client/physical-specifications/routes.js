@@ -15,7 +15,7 @@
  * See the License for the specific
  *
  */
-import View from './physical-specification-view';
+import View from "./physical-specification-view";
 
 
 const baseState = {
@@ -23,20 +23,20 @@ const baseState = {
 
 
 const viewState = {
-    url: 'physical-specification/{id:int}',
-    views: {'content@': View },
+    url: "physical-specification/{id:int}",
+    views: {"content@": View },
 };
 
 
 function setup($stateProvider) {
 
     $stateProvider
-        .state('main.physical-specification', baseState)
-        .state('main.physical-specification.view', viewState);
+        .state("main.physical-specification", baseState)
+        .state("main.physical-specification.view", viewState);
 }
 
 
-setup.$inject = ['$stateProvider'];
+setup.$inject = ["$stateProvider"];
 
 
 export default setup;

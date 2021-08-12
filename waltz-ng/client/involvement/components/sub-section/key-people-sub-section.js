@@ -21,7 +21,6 @@ import { initialiseData } from "../../../common";
 import template from "./key-people-sub-section.html";
 import { CORE_API } from "../../../common/services/core-api-utils";
 import { aggregatePeopleByKeyInvolvementKind } from "../../involvement-utils";
-import { dynamicSections } from "../../../dynamic-section/dynamic-section-definitions";
 
 const bindings = {
     parentEntityRef: "<",
@@ -31,7 +30,7 @@ const initialState = {
     keyPeople: []
 };
 
-function controller($q, serviceBroker, dynamicSectionManager) {
+function controller($q, serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
@@ -65,16 +64,11 @@ function controller($q, serviceBroker, dynamicSectionManager) {
             refresh();
         }
     };
-
-    vm.onSelect = () => {
-        dynamicSectionManager.activate(dynamicSections.involvedPeopleSection);
-    };
 }
 
 controller.$inject = [
     "$q",
-    "ServiceBroker",
-    "DynamicSectionManager"
+    "ServiceBroker"
 ];
 
 

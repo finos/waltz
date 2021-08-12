@@ -52,12 +52,12 @@ function store($http, BaseApiUrl) {
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
 
 export default {
     store,
-    serviceName: 'AccessLogStore'
+    serviceName: "AccessLogStore"
 };

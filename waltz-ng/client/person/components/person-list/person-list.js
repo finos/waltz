@@ -19,14 +19,12 @@
 
 import template from "./person-list.html";
 
-
 const bindings = {
     people: "<"
 };
 
 
 function controller() {
-
 }
 
 controller.$inject = [];

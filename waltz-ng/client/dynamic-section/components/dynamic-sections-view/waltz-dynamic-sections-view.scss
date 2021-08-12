@@ -24,38 +24,36 @@
     $wdsv-border: darken($waltz-background-color, 8);
 
     .wdsv-arrow_box {
-        border: 3px solid $wdsv-border;
-        background-color: $wdsv-background;
-        width: 100%;
         position: relative;
-        border-radius: 10px;
-        color: lighten($waltz-font-color, 32);
-
-        &:after, &:before {
-            bottom: 100%;
-            left: 50%;
-            border: solid transparent;
-            content: " ";
-            height: 0;
-            width: 0;
-            position: absolute;
-            pointer-events: none;
-        }
-
-        &:after {
-            border-bottom-color: $wdsv-background;
-            border-width: 30px;
-            margin-left: -30px;
-        }
-
-        &:before {
-            border-bottom-color: $wdsv-border;
-            border-width: 32px;
-            margin-left: -32px;
-        }
-
+        background: $wdsv-background;
+        border: 4px solid $wdsv-border;
+        padding: 2em;
+        margin: 2em 4em;
+    }
+    .wdsv-arrow_box:after, .wdsv-arrow_box:before {
+        right: 100%;
+        top: 50%;
+        border: solid transparent;
+        content: "";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
     }
 
+    .wdsv-arrow_box:after {
+        border-color: rgba(0, 0, 0, 0);
+        border-right-color: $wdsv-background;
+        border-width: 20px;
+        margin-top: -20px;
+    }
+
+    .wdsv-arrow_box:before {
+        border-color: rgba(0, 0, 0, 0);
+        border-right-color: $wdsv-border;
+        border-width: 26px;
+        margin-top: -26px;
+    }
 }
 
 .waltz-page-top-anchor {

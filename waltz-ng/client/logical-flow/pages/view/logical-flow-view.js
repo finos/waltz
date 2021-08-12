@@ -28,7 +28,6 @@ const initialState = {
 };
 
 
-
 function mkHistoryObj(flow) {
     return {
         name: `${flow.source.name} to ${flow.target.name}`,
@@ -66,21 +65,16 @@ function controller($state,
                     $stateParams,
                     historyStore,
                     notification,
-                    serviceBroker,
-                    dynamicSectionManager)
+                    serviceBroker)
 {
     const vm = initialiseData(this, initialState);
 
-
     vm.$onInit = () => {
-
         const flowId = $stateParams.id;
         vm.entityReference = {
             id: flowId,
             kind: "LOGICAL_DATA_FLOW"
         };
-
-        dynamicSectionManager.initialise("LOGICAL_DATA_FLOW");
 
         // -- LOAD ---
 
@@ -128,8 +122,7 @@ controller.$inject = [
     "$stateParams",
     "HistoryStore",
     "Notification",
-    "ServiceBroker",
-    "DynamicSectionManager"
+    "ServiceBroker"
 ];
 
 

@@ -40,7 +40,6 @@ function logHistory(measurable, historyStore) {
 
 function controller($q,
                     $stateParams,
-                    dynamicSectionManager,
                     serviceBroker,
                     historyStore) {
 
@@ -57,9 +56,6 @@ function controller($q,
     // -- BOOT ---
 
     vm.$onInit = () => {
-
-        dynamicSectionManager.initialise("MEASURABLE");
-
         serviceBroker
             .loadViewData(CORE_API.MeasurableStore.getById, [ id ])
             .then(r => {
@@ -83,7 +79,6 @@ function controller($q,
 controller.$inject = [
     "$q",
     "$stateParams",
-    "DynamicSectionManager",
     "ServiceBroker",
     "HistoryStore"
 ];

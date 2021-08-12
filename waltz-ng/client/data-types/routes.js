@@ -18,7 +18,7 @@
 
 import {loadDataTypes, dataTypeByCodeResolver, dataTypeByIdResolver} from "./resolvers";
 
-import HomePage from './pages/home/data-type-list';
+import HomePage from './pages/home/data-type-home';
 import ViewPage from './pages/view/data-type-view';
 
 

@@ -24,6 +24,7 @@ import NavFiltersOverlay from "./components/nav-filters-overlay/nav-filters-over
 import NavSearchOverlay from './components/nav-search-overlay/nav-search-overlay';
 import BrowserDetectBanner from './components/browser-detect-banner/browser-detect-banner';
 import IssueNotificationBanner from './components/issue-notification-banner/issue-notification-banner';
+import SveltePage from './svelte-page';
 
 import Navbar from './directives/navbar';
 import NavbarRecentlyViews from './directives/navbar-recently-viewed';
@@ -45,7 +46,8 @@ export default () => {
         NavFiltersOverlay,
         NavSearchOverlay,
         BrowserDetectBanner,
-        IssueNotificationBanner
+        IssueNotificationBanner,
+        SveltePage
     ]);
 
     return module.name;

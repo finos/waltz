@@ -1,0 +1,85 @@
+/*!
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
+ */
+
+@import "components/nav-filters-overlay/nav-filters-overlay";
+@import "components/nav-search-overlay/nav-search-overlay";
+@import "directives/navbar-profile";
+@import "components/browser-detect-banner/broswer-detect-banner";
+@import "components/issue-notification-banner/issue-notification-banner";
+@import "../../style/animations";
+@import "../../style/variables";
+
+$expandedWidth: 280px;
+$collapsedWidth: 86px;
+$hiddenWidth: 8px;
+
+.navbar {
+    font-size: $waltz-navigation-font-size;
+}
+
+/* Style page content */
+.main {
+    padding-top: 10px;
+    xtransition: margin-left linear $animation-speed;
+}
+
+.sidebar {
+    transition: width ease-in-out $animation-speed;
+    height: 100%; /* Full-height: remove this if you want "auto" height */
+    position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+    z-index: 1; /* Stay on top */
+    top: 50px; /* Stay at the top */
+    left: 0;
+    overflow-x: hidden; /* Disable horizontal scroll */
+    padding-top: 40px;
+    background-color: $navbar-default-bg;
+}
+
+.sidebar-expanded {
+    .main {
+        margin-left: $expandedWidth;
+    }
+    .sidebar {
+        width: $expandedWidth;
+    }
+}
+
+.sidebar-collapsed {
+    .main {
+        margin-left: $collapsedWidth;
+    }
+
+    .sidebar {
+        width: $collapsedWidth;
+    }
+}
+
+.sidebar-hidden {
+    .main {
+        margin-left: $hiddenWidth;
+    }
+
+    .sidebar {
+        width: $hiddenWidth;
+    }
+}
+
+
+.under-header {
+    margin-top: 50px;
+}

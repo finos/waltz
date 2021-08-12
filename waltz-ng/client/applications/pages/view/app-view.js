@@ -38,11 +38,9 @@ const addToHistory = (historyStore, app) => {
 
 
 function controller($stateParams,
-                    dynamicSectionManager,
                     serviceBroker,
                     historyStore) {
     const vm = Object.assign(this, initialState);
-
 
     function loadAll(id) {
         serviceBroker
@@ -60,20 +58,15 @@ function controller($stateParams,
     vm.$onInit = () => {
         const id = $stateParams.id;
         const entityReference = { id, kind: "APPLICATION" };
-        dynamicSectionManager.initialise("APPLICATION");
         vm.parentEntityRef = entityReference;
         loadAll(id);
     };
 
-    // -- INTERACT --
-    vm.addSection = (section) => vm.sections = dynamicSectionManager.openSection(section, "APPLICATION");
-    vm.removeSection = (section) => vm.sections = dynamicSectionManager.removeSection(section, "APPLICATION");
 }
 
 
 controller.$inject = [
     "$stateParams",
-    "DynamicSectionManager",
     "ServiceBroker",
     "HistoryStore"
 ];

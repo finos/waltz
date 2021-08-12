@@ -16,6 +16,7 @@
  *
  */
 import { initialiseData } from "../../../common/index";
+import {activeSections} from "../../section-store";
 
 import template from "./dynamic-sections-view.html";
 
@@ -31,18 +32,21 @@ const initialState = {
 };
 
 
-function controller(dynamicSectionManager) {
+function controller($scope) {
     const vm = initialiseData(this, initialState);
-    vm.$onInit = () => {
-        vm.sections = dynamicSectionManager.getActive();
-    };
 
-    vm.onRemove = (section) => dynamicSectionManager.close(section);
+    const unsub = activeSections.subscribe(d => $scope.$applyAsync(() => {
+        vm.sections = d.sections;
+    }));
+
+    vm.$onDestroy = () => unsub();
+
+    vm.onRemove = (section) => activeSections.remove(section);
 }
 
 
 controller.$inject = [
-    "DynamicSectionManager"
+    "$scope"
 ];
 
 const component = {

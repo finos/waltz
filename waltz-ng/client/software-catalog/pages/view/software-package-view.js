@@ -29,7 +29,7 @@ const initialState = {
 };
 
 
-function controller($stateParams, dynamicSectionManager) {
+function controller($stateParams) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
@@ -38,15 +38,12 @@ function controller($stateParams, dynamicSectionManager) {
             kind: "SOFTWARE",
             id: vm.packageId
         };
-
-        dynamicSectionManager.initialise("SOFTWARE_PACKAGE");
     };
 }
 
 
 controller.$inject = [
-    "$stateParams",
-    "DynamicSectionManager"
+    "$stateParams"
 ];
 
 

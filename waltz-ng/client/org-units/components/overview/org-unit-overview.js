@@ -25,7 +25,6 @@ import {mkSelectionOptions} from '../../../common/selector-utils';
 import {hierarchyQueryScope} from '../../../common/services/enums/hierarchy-query-scope';
 import {entityLifecycleStatus} from '../../../common/services/enums/entity-lifecycle-status';
 
-
 const bindings = {
     filters: "<",
     parentEntityRef: "<",

@@ -116,30 +116,20 @@
     </div>
 
 
-    <div id="waltz-app"
-         style="display:none;">
 
-        <div ui-view="all">
-            <div class="container-fluid waltz-body" >
+    <div ui-view="all"
+         id="waltz-app">
 
-                <!-- Header -->
-                <div ui-view="header"
-                     class="row">
-                </div>
+        <waltz-svelte-page>
 
-                <!-- Content -->
-                <div class="row">
-                    <div ui-view="content"
-                         class="waltz-content col-xs-12">
-                    </div>
-                </div>
-            </div>
-        </div>
+        </waltz-svelte-page>
+
 
         <div style="padding-bottom: 60px">
             <!-- prevents page jumping caused by collapsing header -->
         </div>
     </div>
+
     <waltz-common-svg-defs></waltz-common-svg-defs>
 </body>
 

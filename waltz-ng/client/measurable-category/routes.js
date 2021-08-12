@@ -21,6 +21,7 @@ import ListView from "./pages/list/measurable-category-list.js";
 import EditView from "./pages/edit/measurable-category-edit.js";
 import {lastViewedMeasurableCategoryKey} from "../user";
 import {CORE_API} from "../common/services/core-api-utils";
+import {activeSections} from "../dynamic-section/section-store";
 
 
 const baseState = {};
@@ -59,7 +60,7 @@ bouncer.$inject = ["$state", "$stateParams", "SettingsService", "ServiceBroker"]
 const bouncerState = {
     url: "measurable-category/",
     resolve: {
-        bouncer
+        bouncer,
     }
 };
 
@@ -67,14 +68,17 @@ const listState = {
     url: "measurable-category/{id:int}",
     views: {
         "content@": ListView
-    }
+    },
+    onEnter: () => activeSections.setPageKind("MEASURABLE_CATEGORY")
 };
 
 const editState = {
     url: "measurable-category/{id:int}/edit",
     views: {
         "content@": EditView
-    }
+    },
+    onEnter: () => activeSections.setPageKind("MEASURABLE_CATEGORY_EDIT")
+
 };
 
 

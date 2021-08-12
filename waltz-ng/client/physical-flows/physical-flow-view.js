@@ -19,7 +19,6 @@
 import {initialiseData} from "../common";
 import _ from "lodash";
 
-
 import template from "./physical-flow-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
 import {toEntityRef} from "../common/entity-utils";
@@ -103,7 +102,6 @@ function controller($q,
                     $stateParams,
                     historyStore,
                     notification,
-                    dynamicSectionManager,
                     physicalFlowStore,
                     physicalSpecificationStore,
                     serviceBroker)
@@ -117,7 +115,6 @@ function controller($q,
 
 
     vm.$onInit = () => {
-        dynamicSectionManager.initialise("PHYSICAL_FLOW");
         vm.parentEntityRef = entityReference;
 
         const physicalFlowPromise = serviceBroker
@@ -125,7 +122,6 @@ function controller($q,
                 CORE_API.PhysicalFlowStore.getById,
                 [ vm.parentEntityRef.id ])
             .then(r => vm.physicalFlow = r.data);
-
 
         physicalFlowPromise
             .then(() => serviceBroker
@@ -291,7 +287,6 @@ controller.$inject = [
     "$stateParams",
     "HistoryStore",
     "Notification",
-    "DynamicSectionManager",
     "PhysicalFlowStore",
     "PhysicalSpecificationStore",
     "ServiceBroker"

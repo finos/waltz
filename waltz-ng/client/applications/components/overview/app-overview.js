@@ -26,7 +26,6 @@ import {displayError} from "../../../common/error-utils";
 import {enrichComplexitiesWithKind, findDefaultComplexityKind} from "../../../complexity/services/complexity-utilities";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 
-
 const bindings = {
     parentEntityRef: "<"
 };

@@ -22,7 +22,7 @@ import AppViewAssetCode from "./pages/asset-code-view/app-asset-code-view";
 import AppEdit from "./pages/edit/app-edit";
 import AppRegistration from "./pages/registration/app-registration";
 import AppView from "./pages/view/app-view";
-
+import {activeSections} from "../dynamic-section/section-store";
 
 const base = {
     url: "application"
@@ -31,7 +31,7 @@ const base = {
 
 const appRegistrationState = {
     url: "/registration",
-    views: {"content@": AppRegistration }
+    views: {"content@": AppRegistration },
 };
 
 
@@ -40,7 +40,7 @@ const appViewState = {
     reloadOnSearch: false,
     views: {
         "content@": AppView
-    }
+    },
 };
 
 
@@ -49,7 +49,6 @@ const appViewByAssetCodeState = {
     views: {
         "content@": AppViewAssetCode
     },
-    resolve: { resolvedAppsByAssetCode: appByAssetCodeResolver }
 };
 
 
@@ -57,8 +56,7 @@ const appViewByExternalIdState = {
     url: "/external-id/{assetCode}",
     views: {
         "content@": AppViewAssetCode
-    },
-    resolve: { resolvedAppsByAssetCode: appByAssetCodeResolver }
+    }
 };
 
 
@@ -68,7 +66,7 @@ const appEditState = {
         app: appResolver,
         orgUnits: orgUnitsResolver
     },
-    views: {"content@": AppEdit}
+    views: {"content@": AppEdit},
 };
 
 

@@ -17,33 +17,36 @@
  */
 
 import template from "./change-initiative-external-id-view.html";
+import {CORE_API} from "../../../common/services/core-api-utils";
 
 
 function controller($state,
                     $stateParams,
-                    changeInitiatives) {
-
-    const vm = this;
-
-    vm.changeInitiatives = changeInitiatives || [];
-    vm.externalId = $stateParams.externalId;
+                    serviceBroker) {
 
     const goToCI = ci => $state.go(
         "main.change-initiative.view",
-        { id: ci.id },
-        { location: false });
+        { id: ci.id });
+
+    serviceBroker
+        .loadViewData(CORE_API.ChangeInitiativeStore.findByExternalId, [ $stateParams.externalId ])
+        .then(r => r.data)
+        .then(xs => {
+            if (xs.length === 1) {
+                goToCI(xs[0]);
+            }
+        });
+
 
     // if single app for asset code, navigate to the app now
-    if (vm.changeInitiatives.length === 1) {
-        goToCI(vm.changeInitiatives[0]);
-    }
+
 }
 
 
 controller.$inject = [
     "$state",
     "$stateParams",
-    "changeInitiatives"
+    "ServiceBroker"
 ];
 
 

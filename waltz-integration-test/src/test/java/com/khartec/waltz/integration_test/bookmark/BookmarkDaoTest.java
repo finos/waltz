@@ -24,6 +24,7 @@ import com.khartec.waltz.integration_test.BaseIntegrationTest;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.bookmark.Bookmark;
+import com.khartec.waltz.model.bookmark.BookmarkKindValue;
 import com.khartec.waltz.model.bookmark.ImmutableBookmark;
 import org.junit.Test;
 
@@ -132,7 +133,7 @@ public class BookmarkDaoTest extends BaseIntegrationTest {
                         .title(title)
                         .url("https://github.com/finos/waltz")
                         .parent(entity)
-                        .bookmarkKind("DOCUMENTATION")
+                        .bookmarkKind(BookmarkKindValue.of("DOCUMENTATION"))
                         .lastUpdatedBy("admin")
                         .lastUpdatedAt(DateTimeUtilities.today().atStartOfDay())
                         .build(),

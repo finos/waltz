@@ -28,9 +28,11 @@
 
 .waltz-page-header.wph-free {
     padding: 6px 6px 6px 16px;
+    margin-left: $waltz-section-margin;
+    margin-right: $waltz-section-margin;
+    margin-bottom: 12px;
     border-radius: 3px;
     height: 80px;
-    margin-bottom: 12px;
     border: 1px solid $waltz-border-color-lighter;
 
     h2 {
@@ -46,7 +48,8 @@
     overflow: hidden;
     position: fixed;
     top: 50px;
-    left: 0;
+    left: auto;
+    padding-left: -10px;
     z-index: 999;
     border-bottom: 2px solid $waltz-border-color-lighter;
     opacity: 0;
