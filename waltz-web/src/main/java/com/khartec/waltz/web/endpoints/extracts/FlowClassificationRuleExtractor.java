@@ -17,13 +17,13 @@ import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static spark.Spark.get;
 
 @Service
-public class AuthoritativeSourceExtractor extends DirectQueryBasedDataExtractor{
+public class FlowClassificationRuleExtractor extends DirectQueryBasedDataExtractor{
 
     public final static Application SUPPLIER_APP = Application.APPLICATION.as("supplier");
 
 
     @Autowired
-    public AuthoritativeSourceExtractor(DSLContext dsl) {
+    public FlowClassificationRuleExtractor(DSLContext dsl) {
         super(dsl);
     }
 

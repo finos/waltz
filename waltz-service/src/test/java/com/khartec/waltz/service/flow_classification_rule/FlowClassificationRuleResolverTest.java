@@ -16,7 +16,7 @@
  *
  */
 
-package com.khartec.waltz.service.authoritative_source;
+package com.khartec.waltz.service.flow_classification_rule;
 
 
 import com.khartec.waltz.model.EntityKind;
@@ -25,7 +25,6 @@ import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
 import com.khartec.waltz.model.flow_classification_rule.ImmutableFlowClassificationRuleVantagePoint;
 import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
-import com.khartec.waltz.service.flow_classification_rule.FlowClassificationRuleResolver;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -36,7 +35,7 @@ import java.util.Optional;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.service.flow_classification_rule.FlowClassificationRuleResolver.getMostSpecificRanked;
 
-public class AuthoritativeSourceResolverTest {
+public class FlowClassificationRuleResolverTest {
 
     private final ImmutableEntityReference vantagePoint = ImmutableEntityReference.builder()
             .kind(EntityKind.ORG_UNIT)
