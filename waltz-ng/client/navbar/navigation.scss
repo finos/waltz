@@ -35,14 +35,13 @@ $hiddenWidth: 8px;
 /* Style page content */
 .main {
     padding-top: 10px;
-    xtransition: margin-left linear $animation-speed;
 }
 
 .sidebar {
     transition: width ease-in-out $animation-speed;
     height: 100%; /* Full-height: remove this if you want "auto" height */
     position: fixed; /* Fixed Sidebar (stay in place on scroll) */
-    z-index: 1; /* Stay on top */
+    z-index: 1000; /* Stay on top */
     top: 50px; /* Stay at the top */
     left: 0;
     overflow-x: hidden; /* Disable horizontal scroll */
