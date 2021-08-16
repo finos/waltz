@@ -63,10 +63,18 @@ function createStore() {
         add(info);
     }
 
+    const confirmInfo = (message) => {
+        const infoNoTimeout = {
+            type: "info",
+            dismissible: true,
+            message: message
+        };
+        add(infoNoTimeout);
+    }
+
     const dismiss = (id) => {
         update((all) => all.filter((t) => t.id !== id));
     };
-
 
 
     return {
@@ -75,7 +83,8 @@ function createStore() {
         success,
         warning,
         error,
-        info
+        info,
+        confirmInfo
     }
 }
 

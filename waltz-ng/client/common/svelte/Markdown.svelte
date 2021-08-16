@@ -6,7 +6,7 @@
     let html = "";
 
     const converter = new showdown.Converter();
-    converter.setFlavor("github")
+    converter.setFlavor("github");
 
     $: html = converter.makeHtml(text);
 </script>
