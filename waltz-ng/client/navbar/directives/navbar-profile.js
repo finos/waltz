@@ -115,7 +115,6 @@ function controller($interval,
 
     $scope
         .$watch("notificationMessage", function (newValue) {
-            console.log({newValue});
             if(!_.isEmpty(newValue)){
                 ToastStore.confirmInfo(newValue);
             }
