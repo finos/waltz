@@ -1,22 +1,29 @@
 <script>
     import {sidebarExpanded} from "./sidebar-store";
-    import {availableSections, activeSections} from "../dynamic-section/section-store";
+    import {activeSections, availableSections} from "../dynamic-section/section-store";
     import Icon from "../common/svelte/Icon.svelte";
 
+    import _ from "lodash";
+
     function activateSection(section) {
-        activeSections.add(section);
+        activeSections.add(section)
     }
+
+    $: activeSectionIds = _.map($activeSections.sections, d => d.id);
+
 </script>
 
 <div class={$sidebarExpanded ? "sidebar-expanded" : "sidebar-collapsed" }>
     <ul class="list-unstyled">
         {#each $availableSections as section}
-            <li class="sidenav">
+            <li class={_.includes(activeSectionIds, section.id) ? "selected-sidenav" : "sidenav"}>
                 <button class="btn-skinny no-overflow"
+                        class:selected={_.includes(activeSections.sections, section)}
                         on:click={() => activateSection(section)}>
                     <Icon size="lg"
+                          style={`opacity: ${_.includes(activeSectionIds, section.id)} ? 1 : 0}`}
                           name={section.icon}/>
-                    <span class="section-name "
+                    <span class="section-name"
                           style={`opacity: ${$sidebarExpanded ? 1 : 0}`}>
                         {section.name}
                     </span>
@@ -24,10 +31,11 @@
                 {#if section.children}
                     <ul class="child-list list-unstyled">
                         {#each section.children as child}
-                            <li class="sidenav">
+                            <li class={_.includes(activeSectionIds, child.id) ? "selected-sidenav" : "sidenav"}>
                                 <button class="btn-skinny no-overflow"
                                         on:click={() => activateSection(child)}>
                                     <Icon size="lg"
+                                          style={`opacity: ${_.includes(activeSectionIds, child.id)} ? 1 : 0}`}
                                           name={child.icon}/>
                                     <span class="section-name "
                                           style={`opacity: ${$sidebarExpanded ? 1 : 0}`}>
@@ -56,15 +64,33 @@
     @import "style/_variables";
 
     .child-list {
-        transition: transform ease-in-out 1s;
+
+      button {
+        transition: padding-left ease-in-out 1s;
+      }
+
     }
 
     .sidebar-expanded .child-list {
-        transform: translateX(18px);
+
+      .selected-sidenav button {
+            padding-left: 3.75em;
+      }
+
+      .sidenav button {
+            padding-left: 3.75em;
+            border-left: $navbar-default-bg 0.25em solid;
+            color: $navbar-default-link-color;
+      }
     }
 
     .sidebar-collapsed .child-list {
-        transform: translateX(0px);
+
+      .sidenav button {
+        border-left: $navbar-default-bg 0.25em solid;
+        color: $navbar-default-link-color;
+      }
+
     }
 
     .expansion-toggle {
@@ -77,19 +103,36 @@
 
         color: $waltz-blue;
         &:hover {
-            color: $waltz-blue-background;;
+            color: $waltz-blue-background;
         }
     }
 
     /* The navigation menu links */
     .sidenav button {
+        padding-top: 0.5em;
+        text-align: center;
         text-decoration: none;
         font-size: $waltz-navigation-font-size;
         color: $navbar-default-link-color;
-        padding-bottom: 1em;
-        padding-left: 2em;
+        padding-bottom: 0.5em;
+        padding-left: 1.75em;
         display: inline-block;
+        border-left: $navbar-default-bg 0.25em solid;
+
     }
+
+
+    .selected-sidenav button {
+            padding-top: 0.5em;
+            text-decoration: none;
+            font-size: $waltz-navigation-font-size;
+            color: white;
+            padding-bottom: 0.5em;
+            padding-left: 1.75em;
+            display: inline-block;
+            border-left: white 0.25em solid;
+    }
+
 
     .section-name {
         transition: opacity ease-in-out 0.3s;

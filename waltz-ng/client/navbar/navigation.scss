@@ -44,7 +44,7 @@ $hiddenWidth: 8px;
     z-index: 1000; /* Stay on top */
     top: 50px; /* Stay at the top */
     left: 0;
-    overflow-x: hidden; /* Disable horizontal scroll */
+    overflow-x: hidden; /* Truncates long section titles */
     padding-top: 40px;
     background-color: $navbar-default-bg;
 }
@@ -53,6 +53,7 @@ $hiddenWidth: 8px;
     .main {
         margin-left: $expandedWidth;
     }
+
     .sidebar {
         width: $expandedWidth;
     }
@@ -81,4 +82,5 @@ $hiddenWidth: 8px;
 
 .under-header {
     margin-top: 50px;
+    overflow-x: hidden; /* Disable horizontal scroll */
 }

@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
@@ -17,6 +16,8 @@
  *
  */
 
+import ToastStore from "../notification/components/toaster/toast-store"
+
 const fallbackReasons = {
     404: "Not found",
     500: "Server error",
@@ -24,7 +25,7 @@ const fallbackReasons = {
 };
 
 
-function mkErrorMessage(message, e) {
+export function mkErrorMessage(message, e) {
     const fallbackReason = e
         ? fallbackReasons[e.status] || `Status Code: ${e.status}`
         : "Unknown reason";
@@ -47,7 +48,7 @@ function mkErrorMessage(message, e) {
  */
 export function displayError(notificationService, message, e) {
     const msg = mkErrorMessage(message, e);
-    notificationService.error(msg);
+    ToastStore.error(msg);
     console.log(msg, e);
     return msg;
 }
