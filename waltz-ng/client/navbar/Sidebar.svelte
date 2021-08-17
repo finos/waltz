@@ -25,6 +25,7 @@
         {#each $availableSections as section}
             <li class={_.includes(activeSectionIds, section.id) ? "selected-sidenav" : "sidenav"}>
                 <button class="btn-skinny no-overflow"
+                        title={section.description}
                         class:selected={_.includes(activeSections.sections, section)}
                         on:click={() => activateSection(section)}>
                     <span style={`color: ${colorScale(_.indexOf(activeSectionIds, section.id))}`}>
@@ -41,6 +42,7 @@
                         {#each section.children as child}
                             <li class={_.includes(activeSectionIds, child.id) ? "selected-sidenav" : "sidenav"}>
                                 <button class="btn-skinny no-overflow"
+                                        title={child.description}
                                         on:click={() => activateSection(child)}>
                                     <span style={`color: ${colorScale(_.indexOf(activeSectionIds, child.id))}`}>
                                         <Icon size="lg"
