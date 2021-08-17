@@ -117,12 +117,10 @@
                             <td>
                                 <span ng-if="!instance.attestedAt && ctrl.selectedAttestation !== instance
                                                 && instance.historic && instance.historic.length > 0">
-                                    Historic
                                     <span ng-bind="instance.historic[0].attestedBy"></span>
                                     (<waltz-from-now timestamp="instance.historic[0].attestedAt"></waltz-from-now>)
                                 </span>
                                 <span ng-if="instance.attestedAt">
-                                    Curr
                                     <span ng-bind="instance.attestedBy"></span>
                                     (<waltz-from-now timestamp="instance.attestedAt"></waltz-from-now>)
                                 </span>
