@@ -62,9 +62,10 @@ public class AttestationInstanceDao {
                         EntityKind.valueOf(record.getParentEntityKind()),
                         record.getParentEntityId(),
                         r.getValue(ENTITY_NAME_FIELD)))
-                .attestedAt(Optional.ofNullable(record.getAttestedAt()).map(ts -> ts.toLocalDateTime()))
+                .attestedAt(Optional.ofNullable(record.getAttestedAt()).map(Timestamp::toLocalDateTime))
                 .attestedBy(Optional.ofNullable(record.getAttestedBy()))
                 .attestedEntityKind(EntityKind.valueOf(record.getAttestedEntityKind()))
+                .attestedEntityId(r.get(ATTESTATION_RUN.ATTESTED_ENTITY_ID))
                 .build();
     };
 
@@ -78,9 +79,13 @@ public class AttestationInstanceDao {
 
     public AttestationInstance getById (long id) {
 
-        return dsl.select(ATTESTATION_INSTANCE.fields())
+        return dsl
+                .select(ATTESTATION_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
+                .select(ATTESTATION_RUN.ATTESTED_ENTITY_ID)
                 .from(ATTESTATION_INSTANCE)
+                .innerJoin(ATTESTATION_RUN)
+                .on(ATTESTATION_RUN.ID.eq(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID))
                 .where(ATTESTATION_INSTANCE.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
@@ -107,9 +112,13 @@ public class AttestationInstanceDao {
             condition = condition.and(ATTESTATION_INSTANCE.ATTESTED_AT.isNull());
         }
 
-        return dsl.select(ATTESTATION_INSTANCE.fields())
+        return dsl
+                .select(ATTESTATION_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
+                .select(ATTESTATION_RUN.ATTESTED_ENTITY_ID)
                 .from(ATTESTATION_INSTANCE)
+                .innerJoin(ATTESTATION_RUN)
+                .on(ATTESTATION_RUN.ID.eq(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID))
                 .innerJoin(ATTESTATION_INSTANCE_RECIPIENT)
                 .on(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(ATTESTATION_INSTANCE.ID))
                 .where(condition)
@@ -120,8 +129,8 @@ public class AttestationInstanceDao {
     /**
      * find historically completed attestations for all parent refs which are currently pending attestation
      * by the provided user
-     * @param userId
-     * @return
+     * @param userId  id of user
+     * @return List of attestation instances
      */
     public List<AttestationInstance> findHistoricalForPendingByUserId(String userId) {
         // fetch the parent refs for attestations currently pending for the user
@@ -137,7 +146,10 @@ public class AttestationInstanceDao {
         return dsl
                 .select(ATTESTATION_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
+                .select(ATTESTATION_RUN.ATTESTED_ENTITY_ID)
                 .from(ATTESTATION_INSTANCE)
+                .innerJoin(ATTESTATION_RUN)
+                .on(ATTESTATION_RUN.ID.eq(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID))
                 .innerJoin(currentlyPendingAttestationParentRefs)
                 .on(currentlyPendingAttestationParentRefs.field(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND).eq(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND)
                         .and(currentlyPendingAttestationParentRefs.field(ATTESTATION_INSTANCE.PARENT_ENTITY_ID).eq(ATTESTATION_INSTANCE.PARENT_ENTITY_ID))
@@ -152,7 +164,10 @@ public class AttestationInstanceDao {
         return dsl
                 .select(ATTESTATION_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
+                .select(ATTESTATION_RUN.ATTESTED_ENTITY_ID)
                 .from(ATTESTATION_INSTANCE)
+                .innerJoin(ATTESTATION_RUN)
+                .on(ATTESTATION_RUN.ID.eq(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID))
                 .where(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND.eq(ref.kind().name()))
                 .and(ATTESTATION_INSTANCE.PARENT_ENTITY_ID.eq(ref.id()))
                 .fetch(TO_DOMAIN_MAPPER);
@@ -173,7 +188,10 @@ public class AttestationInstanceDao {
         return dsl
                 .select(ATTESTATION_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
+                .select(ATTESTATION_RUN.ATTESTED_ENTITY_ID)
                 .from(ATTESTATION_INSTANCE)
+                .innerJoin(ATTESTATION_RUN)
+                .on(ATTESTATION_RUN.ID.eq(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID))
                 .where(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(runId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
@@ -212,6 +230,7 @@ public class AttestationInstanceDao {
         return dsl
                 .select(ATTESTATION_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
+                .select(ATTESTATION_RUN.ATTESTED_ENTITY_ID)
                 .from(ATTESTATION_INSTANCE)
                 .innerJoin(ATTESTATION_RUN)
                 .on(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID))
@@ -229,7 +248,10 @@ public class AttestationInstanceDao {
         return dsl
                 .select(ATTESTATION_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
+                .select(ATTESTATION_RUN.ATTESTED_ENTITY_ID)
                 .from(ATTESTATION_INSTANCE)
+                .innerJoin(ATTESTATION_RUN)
+                .on(ATTESTATION_RUN.ID.eq(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID))
                 .where(ATTESTATION_INSTANCE.ID.in(selector))
                 .and(ATTESTATION_INSTANCE.ATTESTED_AT.isNotNull())
                 .fetch(TO_DOMAIN_MAPPER);

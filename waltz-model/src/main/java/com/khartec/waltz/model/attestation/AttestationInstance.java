@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdProvider;
+import com.khartec.waltz.model.Nullable;
 import org.immutables.value.Value;
 
 import java.time.LocalDateTime;
@@ -39,5 +40,8 @@ public abstract class AttestationInstance implements IdProvider {
     public abstract Optional<LocalDateTime> attestedAt();
     public abstract Optional<String> attestedBy();
     public abstract EntityKind attestedEntityKind();
+
+    @Nullable
+    public abstract Long attestedEntityId();
 }
 

@@ -106,7 +106,7 @@ function mkGroupAttestationColumnDefs() {
                         <a ng-bind="COL_FIELD"
                            class="clickable"
                            ui-sref="main.attestation.run.view ({id: row.entity.id})">
-                        </a> 
+                        </a>
                 </div>`
         },
         attestedKindColumnDef,
@@ -156,7 +156,7 @@ function mkEntityAttestationColumnDefs() {
                         <a ng-bind="COL_FIELD"
                            class="clickable"
                            ui-sref="main.attestation.run.view ({id: row.entity.id})">
-                        </a> 
+                        </a>
                 </div>`
         },{
             field: 'selectionOptions.entityReference.name',
@@ -166,7 +166,7 @@ function mkEntityAttestationColumnDefs() {
                 <div class="ui-grid-cell-contents"
                      style="vertical-align: baseline;">
                         <div ng-bind="COL_FIELD"
-                        </div> 
+                        </div>
                 </div>`
         },
         attestedKindColumnDef,
@@ -178,7 +178,7 @@ function mkEntityAttestationColumnDefs() {
             cellTemplate: `
                     <div class="ui-grid-cell-contents"
                          style="vertical-align: baseline;">
-                         <div ng-bind="{{grid.appScope.responseSummaries[COL_FIELD].pendingCount}} == 0 ? 'Completed' : 'Pending'">
+                         <div ng-bind="(grid.appScope.responseSummaries[COL_FIELD].pendingCount == 0) ? 'Completed' : 'Pending'">
                          </div>
                      </div>`
         },

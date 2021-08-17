@@ -61,14 +61,20 @@ function controller($q,
                 const historicByParentRefByChildKind = nest()
                     .key(d => d.parentEntity.kind)
                     .key(d => d.parentEntity.id)
-                    .key(d => d.childEntityKind)
+                    .key(d => d.attestedEntityKind)
+                    .key(d => d.attestedEntityId)
                     .object(historicInstances);
 
-                const instancesWithHistoricByRunId = _.chain(instances)
+                const instancesWithHistoricByRunId = _
+                    .chain(instances)
                     .map(i => Object.assign(
                         {},
                         i,
-                        { historic: _.get(historicByParentRefByChildKind, [i.parentEntity.kind, i.parentEntity.id, i.childEntityKind], []) } ))
+                        { historic: _.get(
+                            historicByParentRefByChildKind,
+                            [i.parentEntity.kind, i.parentEntity.id, i.attestedEntityKind, i.attestedEntityId],
+                            [])
+                        }))
                     .groupBy("attestationRunId")
                     .value();
 
