@@ -21,7 +21,7 @@ import {CORE_API} from '../common/services/core-api-utils';
 
 export function loadDataTypes(serviceBroker) {
     return serviceBroker
-        .loadAppData(CORE_API.DataTypeStore.findAll, [])
+        .loadAppData(CORE_API.DataTypeStore.findAll)
         .then(r => r.data);
 }
 

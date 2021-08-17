@@ -25,6 +25,8 @@
     import {prepareSaveCmd} from "./panel-utils";
     import RemoveDiagramSubPanel from "./RemoveDiagramSubPanel.svelte";
     import Markdown from "../../../../common/svelte/Markdown.svelte";
+    import ToastStore from "../../../../notification/components/toaster/toast-store"
+    import {displayError} from "../../../../common/error-utils";
 
 
     export let diagramId;
@@ -63,7 +65,10 @@
             $diagramTransform,
             overlayGroupsByGraphId)
 
-        savePromise = flowDiagramStore.save(saveCmd);
+        savePromise = flowDiagramStore.save(saveCmd)
+            .then(() => ToastStore.success("Diagram saved successfully"))
+            .catch(e => displayError(null, "Could not save flow diagram", e.response));
+
         dirty.set(false);
     }
 

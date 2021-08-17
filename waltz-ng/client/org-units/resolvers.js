@@ -16,32 +16,34 @@
  *
  */
 
-import _ from "lodash";
+import {CORE_API} from "../common/services/core-api-utils";
 
 
-export function orgUnitResolver(orgUnits, params) {
-    return _.find(orgUnits, { id: params.id });
+export function orgUnitResolver(serviceBroker, params) {
+    return serviceBroker
+        .loadViewData(CORE_API.OrgUnitStore.getById, [params.id]);
 }
 
-orgUnitResolver.$inject = ['orgUnits', '$stateParams'];
+orgUnitResolver.$inject = ["ServiceBroker", "$stateParams"];
 
 
 export function appTalliesResolver(appStore) {
     return appStore.countByOrganisationalUnit();
 }
 
-appTalliesResolver.$inject = ['ApplicationStore'];
+appTalliesResolver.$inject = ["ApplicationStore"];
 
 
 export function endUserAppTalliesResolver(endUserAppStore) {
     return endUserAppStore.countByOrganisationalUnit();
 }
 
-endUserAppTalliesResolver.$inject = ['EndUserAppStore'];
+endUserAppTalliesResolver.$inject = ["EndUserAppStore"];
 
-
-export function orgUnitsResolver(orgUnitStore) {
-    return orgUnitStore.findAll();
+export function orgUnitsResolver(orgUnitStore, serviceBroker) {
+    return serviceBroker
+        .loadAppData(CORE_API.OrgUnitStore.findAll)
+        .then(r => r.data);
 }
 
-orgUnitsResolver.$inject = ['OrgUnitStore'];
+orgUnitsResolver.$inject = ["OrgUnitStore", "ServiceBroker"];

@@ -53,3 +53,15 @@ export function isDescendant(parentElement, childElement) {
     }
     return false;
 }
+
+
+export function parseParams(searchParams = "") {
+    const params = {};
+    searchParams
+        .replace(
+            /[?&]+([^=&]+)=([^&]*)/gi,
+            (overallMatch, key, value) => {
+                params[key] = value;
+            })
+    return params;
+}

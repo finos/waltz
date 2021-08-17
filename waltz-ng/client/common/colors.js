@@ -37,6 +37,7 @@ export const greyBgHex = "#F5F5F5";
 export const amberBgHex = "#FCF2D7";
 export const greenBgHex = "#DFF1D2";
 export const redBgHex = "#F2D7D7";
+export const blueBgHex = "#E2F0FD";
 
 export const black = rgb(blackHex);
 export const grey = rgb(greyHex);
@@ -55,6 +56,7 @@ export const amberBg = rgb(amberBgHex);
 export const greenBg = rgb(greenBgHex);
 export const redBg = rgb(redBgHex);
 export const greyBg = rgb(greyBgHex);
+export const blueBg = rgb(blueBgHex);
 export const actorBg = rgb("#EDE5EE");
 
 

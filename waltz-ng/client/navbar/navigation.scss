@@ -19,12 +19,10 @@
 @import "components/nav-filters-overlay/nav-filters-overlay";
 @import "components/nav-search-overlay/nav-search-overlay";
 @import "directives/navbar-profile";
-@import "components/browser-detect-banner/broswer-detect-banner";
-@import "components/issue-notification-banner/issue-notification-banner";
 @import "../../style/animations";
 @import "../../style/variables";
 
-$expandedWidth: 280px;
+$expandedWidth: 260px;
 $collapsedWidth: 86px;
 $hiddenWidth: 8px;
 
@@ -35,17 +33,16 @@ $hiddenWidth: 8px;
 /* Style page content */
 .main {
     padding-top: 10px;
-    xtransition: margin-left linear $animation-speed;
 }
 
 .sidebar {
     transition: width ease-in-out $animation-speed;
     height: 100%; /* Full-height: remove this if you want "auto" height */
     position: fixed; /* Fixed Sidebar (stay in place on scroll) */
-    z-index: 1; /* Stay on top */
+    z-index: 1000; /* Stay on top */
     top: 50px; /* Stay at the top */
     left: 0;
-    overflow-x: hidden; /* Disable horizontal scroll */
+    overflow-x: hidden; /* Truncates long section titles */
     padding-top: 40px;
     background-color: $navbar-default-bg;
 }
@@ -54,6 +51,7 @@ $hiddenWidth: 8px;
     .main {
         margin-left: $expandedWidth;
     }
+
     .sidebar {
         width: $expandedWidth;
     }
@@ -82,4 +80,5 @@ $hiddenWidth: 8px;
 
 .under-header {
     margin-top: 50px;
+    overflow-x: hidden; /* Disable horizontal scroll */
 }
