@@ -53,14 +53,14 @@ $font-size-base: 14px;
 
 $waltz-border-color: #9a99ad;
 $waltz-border-color-lighter: lighten($waltz-border-color, 20%);
-$waltz-navigation-font-size: 16px; /** controls navbar and sidebar */
+$waltz-navigation-font-size: 15px; /** controls navbar and sidebar */
 
 $navbar-default-color: white;
 $navbar-default-bg: darken($waltz-base-background-color, 30%);
 $navbar-default-link-active-bg: lighten($navbar-default-bg, 15%);
 $navbar-default-link-active-color: #fff;
 $navbar-default-link-color: #ddd;
-$navbar-default-link-hover-color: #fff;
+$navbar-default-link-hover-color: #ffffff;
 
 $waltz-selected-item-bg-color: #e2ffd9;
 

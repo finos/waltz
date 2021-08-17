@@ -5,9 +5,11 @@
     import Icon from "../../../common/svelte/Icon.svelte";
     import EntityLabel from "../../../common/svelte/EntityLabel.svelte";
     import DataTypeTreeSelector from "../../../common/svelte/DataTypeTreeSelector.svelte";
+    import ToastStore from "../../../notification/components/toaster/toast-store"
 
     import {mode, Modes, selectedClassificationRule} from "./editingFlowClassificationRulesState";
     import {flowClassificationStore} from "../../../svelte-stores/flow-classification-store";
+    import {displayError} from "../../../common/error-utils";
 
     export let doSave;
     export let doUpdate;
@@ -38,9 +40,14 @@
 
     function save() {
         if (workingCopy.id) {
-            submitUpdate();
+            submitUpdate()
+                .then(() => ToastStore.success("Flow classification rule updated"))
+                .catch(e => displayError(null, "Failed to update flow classification rule", e));
+
         } else {
             submitCreate()
+                .then(() => ToastStore.success("Flow classification rule created"))
+                .catch(e => displayError(null, "Failed to create new flow classification rule", e));
         }
     }
 
@@ -55,6 +62,8 @@
         };
 
         savePromise = doSave(cmd);
+
+        return savePromise
     }
 
     function submitUpdate() {
@@ -66,6 +75,7 @@
 
         $selectedClassificationRule = workingCopy;
         savePromise = doUpdate(cmd);
+        return savePromise;
     }
 
     function onSelectSource(evt) {

@@ -1,4 +1,4 @@
-/*!
+/*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
  * See README.md for more information
@@ -16,12 +16,20 @@
  *
  */
 
-@import "../../../../style/util";
-@import "../../../../style/variables";
+import {remote} from "./remote";
 
-.waltz-browser-detect-banner {
-    background-color: #fafafa;
-    text-align: center;
-    outline: none;
+export function mkSettingsStore() {
+    const loadAll = (force = false) => remote
+        .fetchAppList(
+            "GET",
+            "api/settings",
+            null,
+            {force});
+
+    return {
+        loadAll
+    };
 }
 
+
+export const settingsStore = mkSettingsStore();

@@ -20,6 +20,7 @@ import _ from "lodash";
 import {CORE_API, getApiReference} from "../../common/services/core-api-utils";
 import template from "./navbar-profile.html";
 import roles from "../../user/system-roles";
+import ToastStore from "../../notification/components/toaster/toast-store"
 
 const bindings = {
     logoOverlayText: "<"
@@ -110,10 +111,14 @@ function controller($interval,
 
     loadNotifications()
         .then(() => setupNotificationTimer());
-    
-    $scope.$watch('notificationMessage', function (newValue) {
-        $scope.$emit('notificationMessageChanged', newValue);
-    });
+
+
+    $scope
+        .$watch("notificationMessage", function (newValue) {
+            if(!_.isEmpty(newValue)){
+                ToastStore.confirmInfo(newValue);
+            }
+        });
 
     const reloadPage = () => $state.reload();
 

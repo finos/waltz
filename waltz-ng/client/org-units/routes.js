@@ -16,24 +16,23 @@
  *
  */
 
-import {orgUnitsResolver, appTalliesResolver, endUserAppTalliesResolver} from "./resolvers.js";
+import {appTalliesResolver, endUserAppTalliesResolver, orgUnitsResolver} from "./resolvers.js";
 
 import HomeView from "./pages/home-view/home-view";
 import UnitView from "./pages/unit-view/unit-view";
-import {activeSections} from "../dynamic-section/section-store";
 
 
 const baseState = {
-    resolve: {
-        appTallies: appTalliesResolver,
-        endUserAppTallies: endUserAppTalliesResolver,
-        orgUnits: orgUnitsResolver
-    }
 };
 
 const homeState = {
     url: "org-units",
     views: {"content@": HomeView},
+    resolve: {
+        appTallies: appTalliesResolver,
+        endUserAppTallies: endUserAppTalliesResolver,
+        orgUnits: orgUnitsResolver
+    }
 };
 
 
