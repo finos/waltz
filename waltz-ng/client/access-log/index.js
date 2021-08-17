@@ -16,16 +16,16 @@
  *
  */
 
-import angular from 'angular';
-import AccessLogStore from "./service/access-log-store";
+import angular from "angular";
+import * as accessLogStore from "./service/access-log-store";
 import {registerStores} from "../common/module-utils";
 
 
 export default () => {
 
-    const module = angular.module('waltz.access-log', []);
+    const module = angular.module("waltz.access-log", []);
 
-    registerStores(module, [AccessLogStore]);
+    registerStores(module, [accessLogStore]);
 
     return module.name;
 };
