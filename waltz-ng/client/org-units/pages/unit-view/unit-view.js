@@ -32,8 +32,8 @@ const addToHistory = (historyStore, orgUnit) => {
     if (! orgUnit) { return; }
     historyStore.put(
         orgUnit.name,
-        'ORG_UNIT',
-        'main.org-unit.view',
+        "ORG_UNIT",
+        "main.org-unit.view",
         { id: orgUnit.id });
 };
 
@@ -67,14 +67,14 @@ function controller($stateParams,
 
 
 controller.$inject = [
-    '$stateParams',
-    'HistoryStore',
-    'ServiceBroker'
+    "$stateParams",
+    "HistoryStore",
+    "ServiceBroker",
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };

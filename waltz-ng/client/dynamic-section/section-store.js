@@ -2,6 +2,7 @@ import {derived, writable} from "svelte/store";
 import {dynamicSections, dynamicSectionsByKind} from "./dynamic-section-definitions";
 import {sidebarVisible} from "../navbar/sidebar-store";
 import _ from "lodash";
+import {parseParams} from "../common/browser-utils";
 
 const sectionsById = _.keyBy(dynamicSections, d => d.id);
 
@@ -35,8 +36,10 @@ function sortSections(list) {
  * @returns  list of sections
  */
 function getSectionsFromURL() {
-    const params = (new URL(document.location)).searchParams;
-    const sectionsStr = params.get("sections");
+
+    const params = parseParams(window.location.href);
+    const sectionsStr = params.sections;
+
     return _.isEmpty(sectionsStr)
         ? []
         : sectionsStr

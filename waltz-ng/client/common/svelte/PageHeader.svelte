@@ -69,7 +69,7 @@
         background-color: $waltz-section-background-color;
         padding: 6px 6px 6px 16px;
         border-radius: 3px;
-        height: 80px;
+        height: 60px;
         margin-left: $waltz-section-margin;
         margin-right: $waltz-section-margin;
         margin-bottom: 12px;
@@ -79,6 +79,7 @@
     .header-free h2 {
         margin-top: 6px;
         margin-bottom: 4px;
+        font-size: 22px
     }
 
     .header-sticky {
