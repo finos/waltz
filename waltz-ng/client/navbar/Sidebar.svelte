@@ -4,12 +4,19 @@
     import Icon from "../common/svelte/Icon.svelte";
 
     import _ from "lodash";
+    import {scaleLinear} from "d3-scale";
+    import {yellow} from "../common/colors";
 
     function activateSection(section) {
         activeSections.add(section)
     }
 
     $: activeSectionIds = _.map($activeSections.sections, d => d.id);
+
+    const colorScale = scaleLinear()
+        .domain([-1, 0, 4])
+        .range(['#ddd', yellow, '#e5e5e5'])
+        .clamp(true);
 
 </script>
 
@@ -20,9 +27,10 @@
                 <button class="btn-skinny no-overflow"
                         class:selected={_.includes(activeSections.sections, section)}
                         on:click={() => activateSection(section)}>
-                    <Icon size="lg"
-                          style={`opacity: ${_.includes(activeSectionIds, section.id)} ? 1 : 0}`}
-                          name={section.icon}/>
+                    <span style={`color: ${colorScale(_.indexOf(activeSectionIds, section.id))}`}>
+                        <Icon size="lg"
+                              name={section.icon}/>
+                    </span>
                     <span class="section-name"
                           style={`opacity: ${$sidebarExpanded ? 1 : 0}`}>
                         {section.name}
@@ -34,9 +42,10 @@
                             <li class={_.includes(activeSectionIds, child.id) ? "selected-sidenav" : "sidenav"}>
                                 <button class="btn-skinny no-overflow"
                                         on:click={() => activateSection(child)}>
-                                    <Icon size="lg"
-                                          style={`opacity: ${_.includes(activeSectionIds, child.id)} ? 1 : 0}`}
-                                          name={child.icon}/>
+                                    <span style={`color: ${colorScale(_.indexOf(activeSectionIds, child.id))}`}>
+                                        <Icon size="lg"
+                                              name={child.icon}/>
+                                    </span>
                                     <span class="section-name "
                                           style={`opacity: ${$sidebarExpanded ? 1 : 0}`}>
                                         {child.name}
