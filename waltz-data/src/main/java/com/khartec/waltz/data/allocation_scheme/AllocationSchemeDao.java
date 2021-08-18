@@ -30,7 +30,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static com.khartec.waltz.schema.tables.AllocationScheme.ALLOCATION_SCHEME;
-import static java.util.Optional.ofNullable;
 
 @Repository
 public class AllocationSchemeDao {
@@ -45,8 +44,8 @@ public class AllocationSchemeDao {
                 .name(allocationSchemeRecord.getName())
                 .description(allocationSchemeRecord.getDescription())
                 .measurableCategoryId(allocationSchemeRecord.getMeasurableCategoryId())
-                .externalId(ofNullable(allocationSchemeRecord.getExternalId()))
                 .build();
+
     };
 
 
@@ -84,7 +83,6 @@ public class AllocationSchemeDao {
         record.setDescription(scheme.description());
         record.setMeasurableCategoryId(scheme.measurableCategoryId());
         record.setName(scheme.name());
-        record.setExternalId(scheme.externalId().orElse(""));
         record.insert();
         return record.getId();
     }
