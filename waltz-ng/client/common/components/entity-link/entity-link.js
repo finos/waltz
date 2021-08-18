@@ -28,7 +28,8 @@ const bindings = {
     additionalDisplayData: "<?",
     showExternalId: "<?",
     target: "@", /** if '_blank' the external icon is shown **/
-    isSecondaryLink: "<?"
+    isSecondaryLink: "<?",
+    popoverDelay: "<?"
 };
 
 
@@ -37,7 +38,8 @@ const initialState = {
     iconPlacement: "left", // can be left, right, none
     tooltipPlacement: "top", // left, top-left, top-right; refer to: (https://github.com/angular-ui/bootstrap/tree/master/src/tooltip)
     showExternalId: false,
-    isSecondaryLink: false
+    isSecondaryLink: false,
+    popoverDelay: 300
 };
 
 

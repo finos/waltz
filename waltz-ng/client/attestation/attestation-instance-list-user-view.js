@@ -24,12 +24,15 @@ import {initialiseData} from "../common/index";
 import template from "./attestation-instance-list-user-view.html";
 import {attest} from "./attestation-utils";
 import {displayError} from "../common/error-utils";
+import ToastStore from "../notification/components/toaster/toast-store"
+import {entity} from "../common/services/enums/entity";
 
 
 const initialState = {
     runsWithInstances: [],
     selectedAttestation: null,
-    showAttested: false
+    showAttested: false,
+    attestNext: false
 };
 
 
@@ -56,7 +59,9 @@ function controller($q,
             .loadViewData(CORE_API.AttestationInstanceStore.findHistoricalForPendingByUser, [], {force: true})
             .then(r => r.data);
 
-        $q.all([runsPromise, instancesPromise, historicalInstancesPromise])
+        serviceBroker.loadAppData(CORE_API.NotificationStore.findAll, [], { force: true });
+
+        return $q.all([runsPromise, instancesPromise, historicalInstancesPromise])
             .then(([runs, instances, historicInstances]) => {
                 const historicByParentRefByChildKind = nest()
                     .key(d => d.parentEntity.kind)
@@ -78,8 +83,6 @@ function controller($q,
                     .sortBy(r => r.dueDate)
                     .value();
             });
-
-        serviceBroker.loadAppData(CORE_API.NotificationStore.findAll, [], { force: true });
     };
 
     loadData();
@@ -87,14 +90,28 @@ function controller($q,
     // interaction
     vm.onAttestEntity = () => {
         const instance = vm.selectedAttestation;
+
         attest(serviceBroker, instance.parentEntity, instance.attestedEntityKind)
             .then(() => loadData())
-            .then(() => vm.selectedAttestation = null)
+            .then(() => {
+                const currentRun = _.find(vm.runsWithInstances, r => r.id === instance.attestationRunId);
+                const remainingInstances = currentRun.instances;
+
+                return vm.selectedAttestation = vm.attestNext && !_.isEmpty(remainingInstances)
+                    ? _.head(remainingInstances)
+                    : null
+            })
+            .then(() => ToastStore.success(`Attested ${_.get(entity, [instance.attestedEntityKind, "name"], "unknown subject")} for ${instance.parentEntity.name} successfully!`))
             .catch(e => displayError(notification, "Could not attest", e));
     };
 
+    vm.onToggle = () => {
+        vm.attestNext = !vm.attestNext;
+    }
+
     vm.onCancelAttestation = () => {
         vm.selectedAttestation = null;
+        vm.attestNext = false;
     };
 
     vm.onToggleFilter = () => {

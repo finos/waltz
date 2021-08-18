@@ -20,7 +20,7 @@
       uib-popover-template="$ctrl.popoverTemplate"
       popover-trigger="{{$ctrl.trigger}}"
       popover-enable="$ctrl.tooltipPlacement !== 'none'"
-      popover-popup-delay="300"
+      popover-popup-delay="{{$ctrl.popoverDelay}}"
       popover-append-to-body="true"
       popover-placement="{{ $ctrl.tooltipPlacement }}" >
     <waltz-icon fixed-width="true"

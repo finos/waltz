@@ -47,7 +47,7 @@
         <br>
 
         <!-- Pending attestations -->
-        <div ng-repeat="run in ctrl.runsWithInstances"
+        <div ng-repeat="run in ctrl.runsWithInstances track by run.id"
              class="waltz-display-section wailuv-run waltz-animate-repeat">
             <h4 ng-bind="run.name"></h4>
             <div class="row">
@@ -93,6 +93,17 @@
                     </table>
                 </div>
             </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <waltz-toggle state="ctrl.attestNext"
+                                  on-toggle="ctrl.onToggle()"
+                                  label-on="Automatically open next attestation to complete"
+                                  label-off="Automatically open next attestation to complete">
+                    </waltz-toggle>
+                </div>
+            </div>
+
             <div class="row">
                 <div class="col-sm-12">
                     <table class="table table-condensed">
@@ -109,10 +120,11 @@
                         </tr>
                         </thead>
 
-                        <tbody ng-repeat="instance in run.instances">
+                        <tbody ng-repeat="instance in run.instances track by instance.id">
                         <tr>
                             <td>
-                                <waltz-entity-link entity-ref="instance.parentEntity">
+                                <waltz-entity-link entity-ref="instance.parentEntity"
+                                                   popover-delay="1000">
                                 </waltz-entity-link>
                             </td>
                             <td>
