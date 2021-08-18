@@ -22,20 +22,15 @@ const appsSection = {
     componentId: "apps-section",
     name: "Applications",
     icon: "desktop",
+    description: "Applications related to this entity",
     id: 1
-};
-
-const assetCostsSection = {
-    componentId: "asset-costs-section",
-    name: "Costs",
-    icon: "money",
-    id: 2,
 };
 
 const appCostsSection = {
     componentId: "app-costs-section",
     name: "Costs",
     icon: "money",
+    description: "Costs related to this application",
     id: 3,
 };
 
@@ -43,6 +38,7 @@ const flowClassificationRulesSection = {
     componentId: "flow-classification-rules-section",
     name: "Flow Classification Rules",
     icon: "shield",
+    description: "Flow classification rules related to this entity via consuming applications",
     id: 4,
 };
 
@@ -51,6 +47,7 @@ const bookmarksSection = {
     componentId: "bookmarks-section",
     name: "Bookmarks",
     icon: "rocket",
+    description: "Bookmarks related to this entity",
     id: 5,
 };
 
@@ -58,6 +55,7 @@ const changeInitiativeSection = {
     componentId: "change-initiative-section",
     name: "Change Initiatives",
     icon: "paper-plane-o",
+    description: "Change initiatives which have been linked to this entity",
     id: 6,
 };
 
@@ -65,6 +63,7 @@ const changeLogSection = {
     componentId: "change-log-section",
     icon: "history",
     name: "Changes",
+    description: "A log of recent changes made to this entity, or other entities in waltz for which this is the parent",
     id: 7,
 };
 
@@ -72,6 +71,7 @@ const dataFlowSection = {
     componentId: "data-flow-section",
     name: "Data Flows",
     icon: "random",
+    description: "Logical and physical data flows related to this entity",
     id: 9,
 };
 
@@ -79,6 +79,7 @@ const entityNamedNotesSection = {
     componentId: "entity-named-notes-section",
     name: "Notes",
     icon: "sticky-note-o",
+    description: "Notes related to this entity",
     id: 10,
 };
 
@@ -86,6 +87,7 @@ const entityStatisticSection = {
     componentId: "entity-statistic-section",
     name: "Indicators",
     icon: "pie-chart",
+    description: "Statistics for this entity",
     id: 11,
 };
 
@@ -93,6 +95,7 @@ const entityDiagramsSection = {
     componentId: "entity-diagrams-section",
     name: "Diagrams",
     icon: "picture-o",
+    description: "Diagrams to which this entity has been associated, either by appearing in the diagram or as a related entity",
     id: 12
 };
 
@@ -100,6 +103,7 @@ const involvedPeopleSection = {
     componentId: "involved-people-section",
     name: "People",
     icon: "users",
+    description: "People with an involvement to this entity",
     id: 13,
 };
 
@@ -107,6 +111,7 @@ const logicalFlowsTabgroupSection = {
     componentId: "logical-flows-tabgroup-section",
     name: "Data Flows",
     icon: "random",
+    description: "Logical flow summary based upon applications",
     id: 14
 };
 
@@ -114,6 +119,7 @@ const measurableRatingAppSection = {
     componentId: "measurable-rating-app-section",
     name: "Ratings / Roadmaps",
     icon: "puzzle-piece",
+    description: "Measurables linked to this application with a rating",
     id: 15,
 };
 
@@ -121,6 +127,7 @@ const measurableRatingsBrowserSection = {
     componentId: "measurable-ratings-browser-section",
     name: "Ratings / Roadmaps",
     icon: "star-half-o",
+    description: "Summary of ratings, allocations and roadmaps related to this entity via applications",
     id: 16,
 };
 
@@ -128,6 +135,7 @@ const surveySection = {
     componentId: "survey-section",
     name: "Surveys",
     icon: "wpforms",
+    description: "Surveys issued against this entity or to this person",
     id: 17,
 };
 
@@ -135,6 +143,7 @@ const technologySection = {
     componentId: "technology-section",
     name: "Technology",
     icon: "server",
+    description: "Databases, servers, licences, software and custom environments linked to this application",
     id: 18,
 };
 
@@ -142,6 +151,7 @@ const technologySummarySection = {
     componentId: "technology-summary-section",
     name: "Technologies",
     icon: "server",
+    description: "Summary charts of databases, servers, licences and software used by applications related to this entity",
     id: 19,
 };
 
@@ -149,6 +159,7 @@ const entityStatisticSummarySection = {
     componentId: "entity-statistic-summary-section",
     name: "Indicators",
     icon: "pie-chart",
+    description: "Summarised statistics for apps related to this entity, can be used to drill down into history",
     id: 20
 };
 
@@ -156,6 +167,7 @@ const measurableRatingExplorerSection = {
     componentId: "measurable-rating-explorer-section",
     name: "Ratings",
     icon: "star-half-o",
+    description: "Ratings for applications that have been linked to this viewpoint",
     id: 21
 };
 
@@ -163,6 +175,7 @@ const relatedMeasurablesSection = {
     componentId: "related-measurables-section",
     name: "Viewpoints",
     icon: "link",
+    description: "Change initiative, viewpoint and app group relationships involving this entity",
     id: 22
 };
 
@@ -170,6 +183,7 @@ const relatedDataTypesSection = {
     componentId: "related-data-type-section",
     name: "Types",
     icon: "qrcode",
+    description: "Data types with a direct relationship to this entity",
     id: 23
 };
 
@@ -177,6 +191,7 @@ const relatedAppsSection = {
     componentId: "related-apps-section",
     name: "Apps",
     icon: "desktop",
+    description: "Applications with a direct relationship to this entity",
     id: 24
 };
 
@@ -184,6 +199,7 @@ const relatedAppGroupsSection = {
     componentId: "related-app-groups-section",
     name: "Groups",
     icon: "object-group",
+    description: "Application groups with a direct relationship to this entity",
     id: 25
 };
 
@@ -191,6 +207,7 @@ const personHierarchySection = {
     componentId: "person-hierarchy-section",
     name: "Hierarchy",
     icon: "address-book-o",
+    description: "Managers and direct reports of this person",
     id: 26
 };
 
@@ -198,6 +215,7 @@ const personAppsSection = {
     componentId: "person-apps-section",
     name: "Applications",
     icon: "desktop",
+    description: "Applications that are related to this person by an involvement kind",
     id: 27
 };
 
@@ -205,6 +223,7 @@ const dataTypeOriginatorsSection = {
     componentId: "data-type-originators",
     name: "Originators",
     icon: "inbox",
+    description: "Applications which are a source of the parent datatype",
     id: 28
 };
 
@@ -212,20 +231,22 @@ const dataTypeFlowSection = {
     componentId: "data-type-flow-section",
     name: "Data Flows",
     icon: "random",
-    id: 29,
+    id: 29 //unused?
 };
 
 const relatedPhysicalFieldSection = {
     componentId: "related-physical-spec-defn-field-section",
     name: "Physical Fields",
     icon: "file-code-o",
-    id: 40
+    description: "Physical specification definition fields",
+    id: 40 
 };
 
 const relatedOrgUnitSection = {
     componentId: "related-org-unit-section",
     name: "Organisation Units",
     icon: "sitemap",
+    description: "Organisational units with a direct relationship to this entity",
     id: 50
 };
 
@@ -233,6 +254,7 @@ const logicalDataElementsSection = {
     componentId: "logical-data-elements-section",
     name: "Logical Data Elements",
     icon: "asterisk",
+    description: "Logical data elements related to this entity",
     id: 60
 };
 
@@ -240,6 +262,7 @@ const physicalFlowParticipantsSection = {
     componentId: "physical-flow-participants-section",
     name: "Flow Participants",
     icon: "cubes",
+    description: "Servers related to applications involved in this flow",
     id: 70
 };
 
@@ -247,6 +270,7 @@ const changeSetSection = {
     componentId: "change-set-section",
     name: "Change Sets",
     icon: "hourglass-2",
+    description: "Change sets for which this entity is the parent",
     id: 80
 };
 
@@ -254,6 +278,7 @@ const personChangeSetSection = {
     componentId: "person-change-set-section",
     name: "Change Sets",
     icon: "hourglass-2",
+    description: "Direct involvements with a change set and indirect involvements inferred via the entities involved in the change unit",
     id: 90
 };
 
@@ -261,6 +286,7 @@ const licenceSection = {
     componentId: "licence-section",
     name: "Licences",
     icon: "id-card-o",
+    description: "Open source licences used by this software package",
     id: 100
 };
 
@@ -268,6 +294,7 @@ const flowSpecDefinitionSection = {
     componentId: "flow-spec-definition-section",
     name: "Specification Definition",
     icon: "file-code-o",
+    description: "Specification definitions related to this flow",
     id: 110
 };
 
@@ -275,6 +302,7 @@ const attestationSummarySection = {
     componentId: "attestation-summary-section",
     name: "Attestations",
     icon: "check-square-o",
+    description: "Summary of attestations for logical flows, physical flows and measurables against applications related to this entity",
     id: 120
 };
 
@@ -282,6 +310,7 @@ const softwarePackageVersions = {
     componentId: "software-package-versions",
     name: "Versions",
     icon: "clock-o",
+    description: "Software package versions used by this entity and their vulnerability counts",
     id: 130
 };
 
@@ -289,6 +318,7 @@ const softwarePackagesSection = {
     componentId: "software-packages-section",
     name: "Software Packages",
     icon: "gift",
+    description: "Software packages and the applications using them that are related to this entity",
     id: 140
 };
 
@@ -296,6 +326,7 @@ const orgUnitDirectMeasurableSection = {
     componentId: "org-unit-direct-measurable-section",
     name: "Direct Viewpoints",
     icon: "puzzle-piece",
+    description: "Measurables which have been directly associated to this entity",
     id: 150
 };
 
@@ -303,6 +334,7 @@ const personMeasurableInvolvementsSection = {
     componentId: "person-measurable-involvements-section",
     name: "Viewpoint Involvements",
     icon: "user-o",
+    description: "Viewpoints this person, or one of their reportees, has an involvement with",
     id: 160
 };
 
@@ -310,6 +342,7 @@ const reportGridViewSection = {
     componentId: "report-grid-view-section",
     name: "Reports",
     icon: "cloud",
+    description: "Reports composed of measurable ratings, assessment ratings and costs for applications related to this entity",
     id: 170
 };
 
@@ -318,6 +351,7 @@ const appCostsSummarySection = {
     componentId: "app-costs-summary-section",
     name: "Application Costs",
     icon: "money",
+    description: "Cost summaries based upon applications related to this entity",
     id: 180
 };
 
@@ -332,6 +366,7 @@ const assessmentRatingSection = {
     componentId: "assessment-rating-section",
     name: "Assessment Ratings",
     icon: "puzzle-piece",
+    description: "assessments related to this entity",
     id: 200
 };
 
@@ -339,6 +374,7 @@ const physicalFlowSection = {
     componentId: "physical-flow-section",
     name: "Physical Flows",
     icon: "qrcode",
+    description: "Physical flows related to this entity",
     id: 210
 };
 
@@ -353,6 +389,7 @@ const specificationDefinitionSection = {
     componentId: "physical-spec-definition-section",
     name: "Specification Definitions",
     icon: "file-code-o",
+    description: "Specification definitions that describe this physical specification",
     id: 230
 };
 
@@ -360,6 +397,7 @@ const appComplexitySummarySection = {
     componentId: "app-complexity-summary-section",
     name: "Application Complexity",
     icon: "sort-numeric-asc",
+    description: "Complexity summaries based upon applications related to this entity",
     id: 240
 };
 
@@ -367,6 +405,7 @@ const entityAttestationSection = {
     componentId: "attestation-section",
     name: "Attestations",
     icon: "check-square-o",
+    description: "Logical and physical flow attestations and measurable attestations for this application",
     id: 10001
 };
 
@@ -376,7 +415,6 @@ export const dynamicSections = {
     appComplexitySummarySection,
     appsSection,
     assessmentRatingSection,
-    assetCostsSection,
     attestationSummarySection,
     flowClassificationRulesSection,
     bookmarksSection,
@@ -450,14 +488,13 @@ const appSections = [
 ];
 
 const actorSections = [
-    measurableRatingAppSection,
+    appsSection,
     bookmarksSection,
+    changeInitiativeSection,
+    dataFlowSection,
+    entityDiagramsSection,
     entityNamedNotesSection,
     involvedPeopleSection,
-    changeInitiativeSection,
-    entityDiagramsSection,
-    dataFlowSection,
-    appsSection,
     technologySummarySection,
     changeLogSection
 ];
@@ -466,194 +503,213 @@ const changeInitiativeSections = [
     assessmentRatingSection,
     bookmarksSection,
     changeSetSection,
+    entityDiagramsSection,
     entityNamedNotesSection,
     involvedPeopleSection,
     relatedMeasurablesSection,
-    pack(
-        relatedAppsSection,
-        [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
+    pack(relatedAppsSection, 
+         [
+             appCostsSummarySection,
+             appComplexitySummarySection,
+             entityStatisticSummarySection,
+             technologySummarySection,
+             logicalFlowsTabgroupSection
+         ]),
     relatedAppGroupsSection,
     relatedDataTypesSection,
     surveySection,
-    entityDiagramsSection,
-    logicalFlowsTabgroupSection,
     changeLogSection
 ];
 
 const orgUnitSections = [
-    pack(
-        appsSection,
-        [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
-    measurableRatingsBrowserSection,
-    reportGridViewSection,
-    pack(
-        logicalFlowsTabgroupSection,
-        [flowClassificationRulesSection]),
+    pack(appsSection, 
+         [
+             appCostsSummarySection, 
+             appComplexitySummarySection,
+             attestationSummarySection,
+             entityStatisticSummarySection,
+             measurableRatingsBrowserSection,
+             reportGridViewSection,
+             technologySummarySection,
+         ]),
+    bookmarksSection,
     changeInitiativeSection,
     changeSetSection,
     involvedPeopleSection,
-    attestationSummarySection,
-    bookmarksSection,
-    changeLogSection,
-    orgUnitDirectMeasurableSection
+    pack(logicalFlowsTabgroupSection, [flowClassificationRulesSection]),
+    orgUnitDirectMeasurableSection,
+    changeLogSection
 ];
 
 const measurableSections = [
-    pack(
-        appsSection,
-        [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
-    entityNamedNotesSection,
-    measurableRatingExplorerSection,
-    reportGridViewSection,
-    relatedMeasurablesSection,
+    pack(appsSection, 
+         [
+             appCostsSummarySection,
+             appComplexitySummarySection, 
+             entityStatisticSummarySection,
+             reportGridViewSection,
+             technologySummarySection
+         ]),
     bookmarksSection,
     changeSetSection,
-    involvedPeopleSection,
-    pack(
-        logicalFlowsTabgroupSection,
-        [flowClassificationRulesSection]),
     entityDiagramsSection,
+    entityNamedNotesSection,
+    involvedPeopleSection,
+    pack(logicalFlowsTabgroupSection, [flowClassificationRulesSection]),
+    measurableRatingExplorerSection,
+    relatedMeasurablesSection,
     changeLogSection
 ];
 
 const personSections = [
-    personHierarchySection,
-    pack(
-        personAppsSection,
-        [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
-    attestationSummarySection,
     bookmarksSection,
     changeInitiativeSection,
+    pack(logicalFlowsTabgroupSection, [flowClassificationRulesSection]),
+    pack(personAppsSection,
+         [
+             appCostsSummarySection,
+             appComplexitySummarySection,
+             attestationSummarySection,
+             entityStatisticSummarySection,
+             measurableRatingsBrowserSection,
+             reportGridViewSection,
+             technologySummarySection
+         ]),
     personChangeSetSection,
-    pack(
-        logicalFlowsTabgroupSection,
-        [flowClassificationRulesSection]),
+    personHierarchySection,
     surveySection,
-    changeLogSection,
-    measurableRatingsBrowserSection,
-    reportGridViewSection,
-    personMeasurableInvolvementsSection
+    personMeasurableInvolvementsSection,
+    changeLogSection
 ];
 
 const dataTypeSections = [
     appsSection,
-    entityNamedNotesSection,
     bookmarksSection,
-    entityDiagramsSection,
-    involvedPeopleSection,
-    flowClassificationRulesSection,
     dataTypeOriginatorsSection,
-    logicalFlowsTabgroupSection,
+    entityDiagramsSection,
+    entityNamedNotesSection,
+    involvedPeopleSection,
     logicalDataElementsSection,
+    pack(logicalFlowsTabgroupSection, [flowClassificationRulesSection]),
     changeLogSection
 ];
 
 const appGroupSections = [
-    pack(
-        appsSection,
-        [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
-    pack(
-        logicalFlowsTabgroupSection,
-        [flowClassificationRulesSection]),
-    attestationSummarySection,
+    pack(appsSection, 
+         [
+             appCostsSummarySection,
+             appComplexitySummarySection,
+             attestationSummarySection,
+             entityStatisticSummarySection,
+             measurableRatingsBrowserSection,
+             reportGridViewSection,
+             technologySummarySection
+         ]),
+    bookmarksSection,
     changeInitiativeSection,
     changeSetSection,
-    measurableRatingsBrowserSection,
-    reportGridViewSection,
-    relatedAppGroupsSection,
-    bookmarksSection,
     entityNamedNotesSection,
+    involvedPeopleSection,
+    pack(logicalFlowsTabgroupSection, [flowClassificationRulesSection]),
+    relatedAppGroupsSection,
     relatedDataTypesSection,
     relatedMeasurablesSection,
-    involvedPeopleSection,
     changeLogSection
 ];
 
 const scenarioSections = [
-    changeInitiativeSection,
-    logicalFlowsTabgroupSection,
-    pack(
-        appsSection,
-        [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
+    pack(appsSection,
+         [
+             appCostsSummarySection,
+             appComplexitySummarySection,
+             entityStatisticSummarySection,
+             technologySummarySection
+         ]),
     bookmarksSection,
+    changeInitiativeSection,
     entityNamedNotesSection,
+    logicalFlowsTabgroupSection,
     changeLogSection
 ];
 
 const flowDiagramSections = [
-    pack(
-        appsSection,
-        [appCostsSummarySection, appComplexitySummarySection, entityStatisticSummarySection, technologySummarySection]),
+    pack(appsSection,
+         [
+             appCostsSummarySection,
+             appComplexitySummarySection,
+             entityStatisticSummarySection,
+             measurableRatingsBrowserSection,
+             reportGridViewSection,
+             technologySummarySection
+         ]),
     bookmarksSection,
-    changeLogSection,
-    measurableRatingsBrowserSection,
-    reportGridViewSection,
-    entityNamedNotesSection
+    entityNamedNotesSection,
+    changeLogSection
 ];
 
 const physicalFlowSections = [
     assessmentRatingSection,
     bookmarksSection,
-    changeLogSection,
     entityDiagramsSection,
     entityNamedNotesSection,
     flowSpecDefinitionSection,
     involvedPeopleSection,
-    physicalFlowParticipantsSection
+    physicalFlowParticipantsSection,
+    changeLogSection
 ];
 
 const logicalDataFlowSections = [
     assessmentRatingSection,
     bookmarksSection,
-    changeLogSection,
     entityDiagramsSection,
     entityNamedNotesSection,
-    physicalFlowSection
+    physicalFlowSection,
+    changeLogSection
 ];
 
 const changeSetSections = [
     assessmentRatingSection,
     bookmarksSection,
-    changeLogSection,
     changeUnitSection,
-    involvedPeopleSection
+    involvedPeopleSection,
+    changeLogSection
 ];
 
 const licenceSections = [
     appsSection,
     assessmentRatingSection,
     bookmarksSection,
-    changeLogSection,
     entityNamedNotesSection,
-    softwarePackagesSection
+    softwarePackagesSection,
+    changeLogSection
 ];
 
 const softwarePackageSections = [
     appsSection,
     assessmentRatingSection,
     bookmarksSection,
-    changeLogSection,
     entityNamedNotesSection,
     entityStatisticSection,
     licenceSection,
-    softwarePackageVersions
+    softwarePackageVersions,
+    changeLogSection
 ];
 
 const physicalSpecificationSections = [
     assessmentRatingSection,
     bookmarksSection,
-    changeLogSection,
     entityDiagramsSection,
     physicalFlowSection,
-    specificationDefinitionSection
+    specificationDefinitionSection,
+    changeLogSection
 ];
 
 const entityRelationshipSections = [
     assessmentRatingSection,
     bookmarksSection,
-    changeLogSection,
     entityNamedNotesSection,
-    involvedPeopleSection
+    involvedPeopleSection,
+    changeLogSection
 ];
 
 const databaseSections = [
@@ -665,9 +721,9 @@ const databaseSections = [
 
 const flowClassificationRuleSections = [
     bookmarksSection,
-    changeLogSection,
     entityNamedNotesSection,
-    involvedPeopleSection
+    involvedPeopleSection,
+    changeLogSection
 ];
 
 export const dynamicSectionsByKind = {

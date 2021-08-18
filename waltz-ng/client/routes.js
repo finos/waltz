@@ -112,25 +112,29 @@ configureBetaNagMessageNotification.$inject = [
 
 // -- STATE CHANGE ---
 
-function configureStateChangeListener($transitions, $window, $state, accessLogStore) {
+function configureStateChangeListener($transitions, $window, $state, serviceBroker) {
     $transitions.onExit({}, () => activeSections.exitPage());
     $transitions.onSuccess({}, d => activeSections.setPageKind(d.targetState().name()));
 
     activeSections.subscribe((d) => {
-        // const currState = $state.current.name;
-        // const newSections = _.difference(
-        //     _.map(d.sections, s => s.componentId),
-        //     _.map(d.previous, s => s.componentId));
-        //
-        // newSections.forEach(s => {
-        //     console.log(d.pageKind + "/" + currState + ":  section opened: "+s)
-        // })
 
-    })
+        const newSections = _.difference(
+            _.map(d.sections, s => s.componentId),
+            _.map(d.previous, s => s.componentId));
+
+        const params = $state.params;
+
+        newSections
+            .forEach(s => serviceBroker.execute(
+                CORE_API.AccessLogStore.write,
+                [`${d.pageKind}|${s}`, params]));
+    });
 
     $transitions.onSuccess({}, (transition) => {
         const {name} = transition.to();
-        const infoPromise = accessLogStore.write(name, transition.params());
+
+        const infoPromise = serviceBroker
+            .execute(CORE_API.AccessLogStore.write, [name, transition.params()]);
 
         if (__ENV__ === "prod") {
             infoPromise.then(info => {
@@ -152,7 +156,7 @@ configureStateChangeListener.$inject = [
     "$transitions",
     "$window",
     "$state",
-    "AccessLogStore"
+    "ServiceBroker"
 ];
 
 // -- ROUTE DEBUGGER ---

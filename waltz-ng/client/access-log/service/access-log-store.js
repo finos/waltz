@@ -19,7 +19,7 @@
 import _ from "lodash";
 
 
-function store($http, BaseApiUrl) {
+export function store($http, BaseApiUrl) {
     const BASE = `${BaseApiUrl}/access-log`;
 
     const write = (state, params) => {
@@ -57,7 +57,23 @@ store.$inject = [
 ];
 
 
-export default {
-    store,
-    serviceName: "AccessLogStore"
-};
+export const serviceName = "AccessLogStore";
+
+
+export const AccessLogStore_API = {
+    write: {
+        serviceName,
+        serviceFnName: "write",
+        description: "writes to access log table"
+    },
+    findActiveUsers: {
+        serviceName,
+        serviceFnName: "findActiveUsers",
+        description: "executes findActiveUsers"
+    },
+    findForUserName: {
+        serviceName,
+        serviceFnName: "findForUserName",
+        description: "executes findForUserName"
+    }
+}
