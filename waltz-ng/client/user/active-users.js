@@ -16,9 +16,10 @@
  *
  */
 
-import _ from 'lodash';
+import _ from "lodash";
 import {initialiseData} from "../common";
-import template from './active-users.html';
+import template from "./active-users.html";
+import {CORE_API} from "../common/services/core-api-utils";
 
 
 const initialState = {
@@ -26,34 +27,33 @@ const initialState = {
 };
 
 
-function controller($window,
-                    accessLogStore) {
+function controller($window, serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
     vm.onDurationChange = (minutes) => {
-        accessLogStore
-                .findActiveUsers(minutes)
-                .then(activeUsers => vm.activeUsers = activeUsers );
+        serviceBroker
+            .loadViewData(CORE_API.AccessLogStore.findActiveUsers, [minutes])
+            .then(activeUsers => vm.activeUsers = activeUsers.data);
     };
 
     vm.emailUsers = () => {
-        const users = _.map(vm.activeUsers, 'userId');
-        $window.open('mailto:?bcc=' + users.join('; '));
+        const users = _.map(vm.activeUsers, "userId");
+        $window.open("mailto:?bcc=" + users.join("; "));
     };
 }
 
 
 controller.$inject = [
-    '$window',
-    'AccessLogStore',
+    "$window",
+    "ServiceBroker"
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: "ctrl",
     bindToController: true,
     scope: {}
 };

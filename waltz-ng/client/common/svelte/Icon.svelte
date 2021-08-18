@@ -27,7 +27,6 @@
 <style>
     .icon {
         font-size: smaller;
-        opacity: 0.7;
     }
 </style>
 
