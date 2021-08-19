@@ -28,6 +28,7 @@ import {isGroupOwner} from "../../app-group-utils";
 import {getEditRoleForEntityKind} from "../../../common/role-utils";
 import {mkRel} from "../../../common/relationship-utils";
 import {displayError} from "../../../common/error-utils";
+import toasts from "../../../svelte-stores/toast-store";
 
 
 const bindings = {
@@ -108,7 +109,7 @@ function canGroupBeProposed(relationships = [], proposedGroup, selfRef) {
 }
 
 
-function controller($q, notification, serviceBroker, UserService) {
+function controller($q, serviceBroker, UserService) {
     const vm = initialiseData(this, initialState);
 
     const reload = () => loadRelationshipData($q, serviceBroker, vm.parentEntityRef)
@@ -132,10 +133,10 @@ function controller($q, notification, serviceBroker, UserService) {
         return serviceBroker
             .execute(CORE_API.EntityRelationshipStore.remove, [ rel ])
             .then(() => {
-                notification.info("Relationship removed");
+                toasts.info("Relationship removed");
                 reload();
             })
-            .catch(e => displayError(notification, "Failed to remove", e))
+            .catch(e => displayError(toasts, "Failed to remove", e))
     };
 
 
@@ -149,11 +150,11 @@ function controller($q, notification, serviceBroker, UserService) {
         return serviceBroker
             .execute(CORE_API.EntityRelationshipStore.create, [ newRel ])
             .then(() => {
-                notification.info("Relationship created");
+                toasts.info("Relationship created");
                 vm.currentlySelectedGroup = null;
                 reload();
             })
-            .catch(e => displayError(notification, "Failed to add", e))
+            .catch(e => displayError(toasts, "Failed to add", e))
     };
 
 
@@ -165,7 +166,6 @@ function controller($q, notification, serviceBroker, UserService) {
 
 controller.$inject = [
     "$q",
-    "Notification",
     "ServiceBroker",
     "UserService"
 ];

@@ -24,6 +24,8 @@ import { determineColorOfSubmitButton } from "../../../common/severity-utils";
 import { buildHierarchies } from "../../../common/hierarchy-utils";
 import { displayError } from "../../../common/error-utils";
 import {getValidationErrorIfMeasurableChangeIsNotValid} from "../../measurable-change-utils";
+import toasts from "../../../svelte-stores/toast-store";
+
 
 const modes = {
     MENU: "MENU",
@@ -58,8 +60,7 @@ const initialState = {
 };
 
 
-function controller(notification,
-                    serviceBroker,
+function controller(serviceBroker,
                     userService) {
 
     const vm = initialiseData(this, initialState);
@@ -173,7 +174,7 @@ function controller(notification,
                     <em>cumulative</em> values for the impacted branches.`,
                 onChange: (dest) => {
                     if (dest.id === vm.parent.id) {
-                        notification.warning("Same parent selected, ignoring....");
+                        toasts.warning("Same parent selected, ignoring....");
                         vm.commandParams.destination = null;
                         vm.submitDisabled = true;
                     } else {
@@ -308,7 +309,7 @@ function controller(notification,
             getValidationErrorIfMeasurableChangeIsNotValid(cmd, vm.measurable, vm.pendingChanges);
 
         if (errorMessage != null) {
-            notification.warning(errorMessage);
+            toasts.warning(errorMessage);
             vm.commandParams.destination = null;
             vm.submitDisabled = true;
             return;
@@ -316,13 +317,12 @@ function controller(notification,
 
         vm.onSubmitChange(cmd)
             .then(vm.onDismiss)
-            .catch(e => displayError(notification, "Error when submitting command", e));
+            .catch(e => displayError(toasts, "Error when submitting command", e));
     };
 }
 
 
 controller.$inject = [
-    "Notification",
     "ServiceBroker",
     "UserService"
 ];

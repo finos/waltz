@@ -27,7 +27,7 @@ import {sameRef} from "../../../common/entity-utils";
 import {event} from "d3-selection";
 import {entity} from "../../../common/services/enums/entity";
 import {loadFlowClassificationRatings} from "../../../flow-classification-rule/flow-classification-utils";
-
+import toasts from "../../../svelte-stores/toast-store";
 
 const bindings = {
     parentEntityRef: "<",
@@ -120,7 +120,6 @@ function controller($element,
                     $q,
                     $scope,
                     $window,
-                    notification,
                     serviceBroker) {
     const vm = initialiseData(this, initialState);
 
@@ -307,7 +306,7 @@ function controller($element,
                 CORE_API.DataTypeDecoratorStore.save,
                 [vm.parentEntityRef, command])
             .then(reload)
-            .then(() => notification.success("Data flow updated"));
+            .then(() => toasts.success("Data flow updated"));
     };
 
 
@@ -348,10 +347,10 @@ function controller($element,
                     CORE_API.LogicalFlowStore.removeFlow,
                     [flow.id])
                 .then(reload)
-                .then(() => notification.warning("Data flow removed"))
-                .catch(e => displayError(notification, "System error, please contact support", e));
+                .then(() => toasts.warning("Data flow removed"))
+                .catch(e => displayError(toasts, "System error, please contact support", e));
         } else {
-            notification.warning("This data flow has associated physical flows, please check and remove those first")
+            toasts.warning("This data flow has associated physical flows, please check and remove those first");
         }
     };
 
@@ -362,19 +361,19 @@ function controller($element,
                 CORE_API.DataTypeUsageStore.save,
                 [vm.parentEntityRef, dataTypeId, usages])
             .then(() => reload())
-            .then(() => notification.success("Data usage updated"));
+            .then(() => toasts.success("Data usage updated"));
     };
 
     const addSource = (kind, entity) => {
         const counterpartRef = { id: entity.id, kind, name: entity.name };
-        if (notifyIllegalFlow(notification, vm.parentEntityRef, counterpartRef)) return;
+        if (notifyIllegalFlow(toasts, vm.parentEntityRef, counterpartRef)) return;
         addFlow(mkNewFlow(counterpartRef, vm.parentEntityRef))
             .then(() => selectSource(counterpartRef));
     };
 
     const addTarget = (kind, entity) => {
         const counterpartRef = { id: entity.id, kind, name: entity.name };
-        if (notifyIllegalFlow(notification, vm.parentEntityRef, counterpartRef)) return;
+        if (notifyIllegalFlow(toasts, vm.parentEntityRef, counterpartRef)) return;
         addFlow(mkNewFlow(vm.parentEntityRef, counterpartRef))
             .then(() => selectTarget(counterpartRef));
     };
@@ -413,7 +412,6 @@ controller.$inject = [
     "$q",
     "$scope",
     "$window",
-    "Notification",
     "ServiceBroker"
 ];
 

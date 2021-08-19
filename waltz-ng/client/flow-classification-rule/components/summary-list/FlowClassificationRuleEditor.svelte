@@ -5,7 +5,7 @@
     import Icon from "../../../common/svelte/Icon.svelte";
     import EntityLabel from "../../../common/svelte/EntityLabel.svelte";
     import DataTypeTreeSelector from "../../../common/svelte/DataTypeTreeSelector.svelte";
-    import ToastStore from "../../../notification/components/toaster/toast-store"
+    import ToastStore from "../../../svelte-stores/toast-store"
 
     import {mode, Modes, selectedClassificationRule} from "./editingFlowClassificationRulesState";
     import {flowClassificationStore} from "../../../svelte-stores/flow-classification-store";

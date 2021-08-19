@@ -26,7 +26,7 @@ import {displayError} from "../../../common/error-utils";
 import * as surveyUtils from "../../survey-utils";
 import * as actions from "../../survey-actions";
 import moment from "moment";
-
+import toasts from "../../../svelte-stores/toast-store";
 
 const bindings = {
     instanceId: "<"
@@ -73,8 +73,7 @@ function controller($q,
                     $state,
                     $timeout,
                     serviceBroker,
-                    userService,
-                    notification) {
+                    userService) {
     const vm = initialiseData(this, initialState);
 
 
@@ -130,27 +129,26 @@ function controller($q,
 
     vm.onAddRecipient = p => {
         const cmd = mkCreateRecipientCommand(vm.instanceId, p);
-        notification.info(`Adding ${p.name} as a recipient`);
+        toasts.info(`Adding ${p.name} as a recipient`);
         return serviceBroker
             .execute(CORE_API.SurveyInstanceStore.addRecipient, [ vm.instanceId, cmd ])
             .then(r => {
                 if(r.data) {
                     reload(true);
-                    notification.success(`${p.name} added as a recipient`);
+                    toasts.success(`${p.name} added as a recipient`);
                 } else {
-                    notification.error(`${p.name} not added as a recipient`)
+                    toasts.error(`${p.name} not added as a recipient`)
                 }
             })
             .catch(e => displayError(
-                notification,
+                toasts,
                 `Could not add ${p.name} as a recipient`,
                 e));
     };
 
     vm.onRemoveRecipient = p => {
         const recipient = findMatchingRecipient(vm.surveyDetails.recipients, p);
-        notification.info(`Removing ${p.name} as a recipient`);
-        console.log({recipient})
+        toasts.info(`Removing ${p.name} as a recipient`);
         if (recipient) {
             return serviceBroker
                 .execute(
@@ -159,12 +157,12 @@ function controller($q,
                 .then(r => {
                     if(r.data) {
                         reload(true);
-                        notification.success(`Removed ${p.name} from recipients`);
+                        toasts.success(`Removed ${p.name} from recipients`);
                     } else {
-                        notification.error(`Failed to remove ${p.name}`);
+                        toasts.error(`Failed to remove ${p.name}`);
                     }
                 })
-                .catch(e => displayError(notification, `${p.name} not removed from recipients`, e));
+                .catch(e => displayError(toasts, `${p.name} not removed from recipients`, e));
         } else {
             // we couldn't find the recipient so lets reload in case something happened elsewhere
             return reload();
@@ -177,28 +175,28 @@ function controller($q,
             .execute(
                 CORE_API.SurveyInstanceStore.updateRecipient,
                 [vm.surveyInstance.id, cmd])
-            .then(() => notification.success("Updated survey recipient"))
-            .catch(e => displayError(notification, "Failed to update recipient", e))
+            .then(() => toasts.success("Updated survey recipient"))
+            .catch(e => displayError(toasts, "Failed to update recipient", e))
             .finally(() => loadRecipients(true));
     };
 
     vm.updateDueDate = (change, instanceId) => {
         if (!change.newVal) {
-            notification.error("Due date cannot be blank");
+            toasts.error("Due date cannot be blank");
         } else {
             serviceBroker
                 .execute(
                     CORE_API.SurveyInstanceStore.updateDueDate,
                     [ instanceId, {newDateVal: timeFormat("%Y-%m-%d")(change.newVal)}])
                 .then(() => {
-                    notification.success("Survey instance due date updated successfully");
+                    toasts.success("Survey instance due date updated successfully");
                     reload(true);
                 })
-                .catch(e => displayError(notification, "Failed to update survey instance due date", e));
+                .catch(e => displayError(toasts, "Failed to update survey instance due date", e));
         }
     };
 
-    vm.invokeStatusAction = actions.invokeStatusAction(serviceBroker, notification, reload, $timeout, $state)
+    vm.invokeStatusAction = actions.invokeStatusAction(serviceBroker, toasts, reload, $timeout, $state)
 
     // -- LIFECYCLE
 
@@ -215,8 +213,7 @@ controller.$inject = [
     "$state",
     "$timeout",
     "ServiceBroker",
-    "UserService",
-    "Notification"
+    "UserService"
 ];
 
 

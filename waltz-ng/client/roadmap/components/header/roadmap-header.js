@@ -19,7 +19,7 @@
 import template from "./roadmap-header.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
-
+import toasts from "../../../svelte-stores/toast-store";
 
 const bindings = {
     roadmapId: "<"
@@ -55,8 +55,7 @@ const addToHistory = (historyStore, roadmap) => {
 
 function controller($q,
                     historyStore,
-                    serviceBroker,
-                    notification)
+                    serviceBroker)
 {
     const vm = initialiseData(this, initialState);
 
@@ -72,21 +71,21 @@ function controller($q,
 
     vm.onSaveRoadmapName = (data, ctx) => {
         return updateField(
-                ctx.id,
-                CORE_API.RoadmapStore.updateName,
-                data,
-                true,
-                "Roadmap name updated")
+            ctx.id,
+            CORE_API.RoadmapStore.updateName,
+            data,
+            true,
+            "Roadmap name updated")
             .then(() => reloadAllData());
     };
 
     vm.onSaveRoadmapDescription = (data, ctx) => {
         return updateField(
-                ctx.id,
-                CORE_API.RoadmapStore.updateDescription,
-                data,
-                false,
-                "Roadmap description updated")
+            ctx.id,
+            CORE_API.RoadmapStore.updateDescription,
+            data,
+            false,
+            "Roadmap description updated")
             .then(() => reloadAllData());
     };
 
@@ -101,7 +100,7 @@ function controller($q,
             vm.roadmap.id,
             CORE_API.RoadmapStore.updateLifecycleStatus,
             {
-                newVal: 'ACTIVE',
+                newVal: "ACTIVE",
                 oldVal: vm.roadmap.entityLifecycleStatus
             },
             true,
@@ -114,7 +113,7 @@ function controller($q,
             vm.roadmap.id,
             CORE_API.RoadmapStore.updateLifecycleStatus,
             {
-                newVal: 'REMOVED',
+                newVal: "REMOVED",
                 oldVal: vm.roadmap.entityLifecycleStatus
             },
             true,
@@ -137,7 +136,7 @@ function controller($q,
                 .execute(
                     method,
                     [ roadmapId, data.newVal ])
-                .then(() => notification.success(message));
+                .then(() => toasts.success(message));
         } else {
             return Promise.reject("Nothing updated")
         }
@@ -169,7 +168,6 @@ controller.$inject = [
     "$q",
     "HistoryStore",
     "ServiceBroker",
-    "Notification"
 ];
 
 

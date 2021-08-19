@@ -19,6 +19,7 @@
 import _ from "lodash";
 import {initialiseData, invokeFunction} from "../../../common";
 import template from "./survey-dropdown-editor.html";
+import toasts from "../../../svelte-stores/toast-store";
 
 
 const bindings = {
@@ -53,7 +54,7 @@ function mkEntry(id, position, value) {
 }
 
 
-function controller(notification, $timeout) {
+function controller($timeout) {
     const vm = this;
 
     vm.$onInit = () => { initialiseData(vm, initialState); };
@@ -78,7 +79,7 @@ function controller(notification, $timeout) {
         if (!valueExists(newEntry.value)) {
             vm.entries = _.concat(vm.entries, [entry]);
         } else {
-            notification.warning(`\'${entry.value}\' already exists, will not add`)
+            toasts.warning(`\'${entry.value}\' already exists, will not add`)
         }
         vm.newEntry = null;
         vm.creatingEntry = false;
@@ -99,7 +100,7 @@ function controller(notification, $timeout) {
                 }
             });
         } else {
-            notification.warning(`\'${data.newVal}\' already exists, will not add`)
+            toasts.warning(`\'${data.newVal}\' already exists, will not add`)
         }
 
 
@@ -133,7 +134,6 @@ function controller(notification, $timeout) {
 
 
 controller.$inject = [
-    "Notification",
     "$timeout"
 ];
 

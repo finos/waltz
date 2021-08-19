@@ -26,7 +26,7 @@ import {indexRatingSchemes, mkRatingsKeyHandler} from "../../../ratings/rating-u
 import template from "./measurable-rating-edit-panel.html";
 import {displayError} from "../../../common/error-utils";
 import {alignDateToUTC} from "../../../common/date-utils";
-
+import toasts from "../../../svelte-stores/toast-store";
 
 const bindings = {
     allocations: "<",
@@ -70,7 +70,6 @@ const initialState = {
 
 function controller($q,
                     $state,
-                    notification,
                     serviceBroker,
                     userService) {
     const vm = initialiseData(this, initialState);
@@ -123,7 +122,7 @@ function controller($q,
                 vm.selected = Object.assign({}, vm.selected, { rating: newRating });
             })
             .catch(e => {
-                displayError(notification, "Could not save rating", e);
+                displayError(toasts, "Could not save rating", e);
                 throw e;
             })
     };
@@ -169,7 +168,7 @@ function controller($q,
     const saveDecommissionDate = (dateChange)  => {
 
         if(_.isNil(dateChange.newVal)){
-            notification.error("Could not save this decommission date. " +
+            toasts.error("Could not save this decommission date. " +
                 "Check the date entered is valid or to remove this decommission date use the 'Revoke' button below");
         } else {
             dateChange.newVal = alignDateToUTC(dateChange.newVal).toISOString();
@@ -181,9 +180,9 @@ function controller($q,
                 .then(r => {
                     const decom = Object.assign(r.data, {isValid: true});
                     vm.selected = Object.assign({}, vm.selected, {decommission: decom});
-                    notification.success(`Saved decommission date for ${vm.selected.measurable.name}`);
+                    toasts.success(`Saved decommission date for ${vm.selected.measurable.name}`);
                 })
-                .catch(e => displayError(notification, "Could not save decommission date", e))
+                .catch(e => displayError(toasts, "Could not save decommission date", e))
                 .finally(reloadDecommData);
         }
     };
@@ -215,9 +214,9 @@ function controller($q,
                 [replacement.decommissionId, replacement.id])
             .then(r => {
                 vm.selected = Object.assign({}, vm.selected, { replacementApps: r.data });
-                notification.success("Replacement app removed")
+                toasts.success("Replacement app removed")
             })
-            .catch(e  => displayError(notification, "Could not remove replacement app", e))
+            .catch(e  => displayError(toasts, "Could not remove replacement app", e))
             .finally(reloadDecommData);
     };
 
@@ -228,9 +227,9 @@ function controller($q,
                 [replacement.decommissionId, replacement])
             .then(r => {
                 vm.selected = Object.assign({}, vm.selected, { replacementApps: r.data });
-                notification.success("Successfully saved replacement app")
+                toasts.success("Successfully saved replacement app")
             })
-            .catch(e  => displayError(notification, "Could not add replacement app", e))
+            .catch(e  => displayError(toasts, "Could not add replacement app", e))
             .finally(reloadDecommData);
     };
 
@@ -249,7 +248,7 @@ function controller($q,
     vm.onSaveDecommissionDate = (dateChange) => {
 
         if (vm.application.entityLifecycleStatus === "REMOVED"){
-            notification.error("Decommission date cannot be set. This application is no longer active");
+            toasts.error("Decommission date cannot be set. This application is no longer active");
             return;
         }
 
@@ -260,7 +259,7 @@ function controller($q,
             const appDate = new Date(vm.application.plannedRetirementDate).toDateString();
 
             if (!confirm(`This decommission date is later then the planned retirement date of the application: ${appDate}. Are you sure you want to save it?`)){
-                notification.error("Decommission date was not saved");
+                toasts.error("Decommission date was not saved");
                 return;
             }
             saveDecommissionDate(dateChange)
@@ -269,7 +268,7 @@ function controller($q,
 
     vm.onRemoveDecommission = () => {
         if (!confirm("Are you sure you want to remove this decommission and any replacement apps?")) {
-            notification.info("Revocation of decommission cancelled");
+            toasts.info("Revocation of decommission cancelled");
             return;
         }
         serviceBroker
@@ -278,9 +277,9 @@ function controller($q,
                 [vm.selected.decommission.id])
             .then(() => {
                 vm.selected = Object.assign({}, vm.selected, { decommission: null, replacementApps: [] });
-                notification.success(`Removed decommission date and replacement applications for: ${vm.selected.measurable.name}`);
+                toasts.success(`Removed decommission date and replacement applications for: ${vm.selected.measurable.name}`);
             })
-            .catch(e => displayError(notification, "Could not remove decommission date", e))
+            .catch(e => displayError(toasts, "Could not remove decommission date", e))
             .finally(reloadDecommData);
     };
 
@@ -295,14 +294,14 @@ function controller($q,
 
         return r === "X"
             ? doRemove()
-                .then(() => notification.success(`Removed: ${vm.selected.measurable.name}`))
+                .then(() => toasts.success(`Removed: ${vm.selected.measurable.name}`))
             : doRatingSave(r, getDescription())
-                .then(() => notification.success(`Saved: ${vm.selected.measurable.name}`))
+                .then(() => toasts.success(`Saved: ${vm.selected.measurable.name}`))
     };
 
     vm.onSaveComment = (comment) => {
         return doRatingSave(getRating(), comment)
-            .then(() => notification.success(`Saved Comment for: ${vm.selected.measurable.name}`))
+            .then(() => toasts.success(`Saved Comment for: ${vm.selected.measurable.name}`))
     };
 
     vm.doCancel = () => {
@@ -316,13 +315,13 @@ function controller($q,
                     CORE_API.MeasurableRatingStore.removeByCategory,
                     [vm.parentEntityRef, categoryId])
                 .then(r => {
-                    notification.info("Removed all ratings for category");
+                    toasts.info("Removed all ratings for category");
                     vm.ratings = r.data;
                     recalcTabs();
                 })
                 .catch(e => {
                     const message = "Error removing all ratings for category: " + e.message;
-                    notification.error(message);
+                    toasts.error(message);
                 });
         }
     };
@@ -359,7 +358,6 @@ function controller($q,
 controller.$inject = [
     "$q",
     "$state",
-    "Notification",
     "ServiceBroker",
     "UserService"
 ];

@@ -20,6 +20,8 @@ import _ from "lodash";
 import {initialiseData} from "../common";
 import template from "./actors-view.html";
 import {displayError} from "../common/error-utils";
+import toasts from "../svelte-stores/toast-store";
+
 
 const initialState = {
     actors: [],
@@ -29,15 +31,14 @@ const initialState = {
 
 
 function controller($q,
-                    actorService,
-                    notification) {
+                    actorService) {
 
     const vm = initialiseData(this, initialState);
 
     function update(actor, change) {
         const updateCmd = Object.assign(change, { id: actor.id });
         return actorService.update(updateCmd)
-            .then(() => notification.success("Updated"));
+            .then(() => toasts.success("Updated"));
     }
 
     vm.updateName = (change, actor) => {
@@ -62,7 +63,7 @@ function controller($q,
         if(change.newVal === null) return $q.reject("No value provided");
         return update(actor, { externalId: change })
             .then(() => _.find(vm.actors, {"id": actor.id}).externalId = change.newVal)
-            .catch(e => displayError(notification, "Failed to save external id", e));
+            .catch(e => displayError(toasts, "Failed to save external id", e));
     };
 
 
@@ -74,13 +75,11 @@ function controller($q,
         actorService
             .create(vm.newActor)
             .then(() => {
-                notification.success("Created");
+                toasts.success("Created");
                 vm.creatingActor = false;
                 vm.newActor = {};
                 loadActors();
             });
-
-
     };
 
     vm.cancelNewActor = () => {
@@ -101,16 +100,13 @@ function controller($q,
 
     vm.selectActor = (actor) => {
         vm.selectedActor = actor;
-    }
-
-
+    };
 }
 
 
 controller.$inject = [
     "$q",
-    "ActorService",
-    "Notification",
+    "ActorService"
 ];
 
 

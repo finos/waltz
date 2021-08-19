@@ -9,7 +9,7 @@
         "warning": {iconName: "exclamation", color: amberBg},
         "error": {iconName: "exclamation", color: redBg},
         "info": {iconName: "info", color: blueBg},
-    }
+    };
 
     const dispatch = createEventDispatcher();
 
@@ -17,7 +17,6 @@
     export let dismissible = true;
 
     $: notificationType = NOTIFICATION_TYPES[type] || NOTIFICATION_TYPES.info;
-
 </script>
 
 <article style={`background: ${notificationType.color}`}
@@ -36,10 +35,7 @@
     {/if}
 </article>
 
-<style type="text/scss">
-
-  @import "./style/variables";
-
+<style>
     article {
         padding: 0.75rem 1.5rem;
         border-radius: 0.2rem;

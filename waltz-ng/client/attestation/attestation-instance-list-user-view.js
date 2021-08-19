@@ -35,8 +35,7 @@ const initialState = {
 
 function controller($q,
                     serviceBroker,
-                    userService,
-                    notification) {
+                    userService) {
     const vm = initialiseData(this, initialState);
 
     userService
@@ -96,7 +95,7 @@ function controller($q,
         attest(serviceBroker, instance.parentEntity, instance.attestedEntityKind)
             .then(() => loadData())
             .then(() => vm.selectedAttestation = null)
-            .catch(e => displayError(notification, "Could not attest", e));
+            .catch(e => displayError(null, "Could not attest", e));
     };
 
     vm.onCancelAttestation = () => {
@@ -115,7 +114,6 @@ controller.$inject = [
     "$q",
     "ServiceBroker",
     "UserService",
-    "Notification"
 ];
 
 

@@ -24,6 +24,8 @@ import template from "./flow-diagrams-panel-view.html";
 import {allEntityLifecycleStatuses, initialiseData} from "../../../../common/index";
 import {CORE_API} from "../../../../common/services/core-api-utils";
 import {pageHeaderDefaultOffset} from "../../../../widgets/page-header/page-header";
+import toasts from "../../../../svelte-stores/toast-store";
+
 
 const bindings = {
     parentEntityRef: "<",
@@ -95,8 +97,7 @@ function controller($element,
                     $window,
                     $timeout,
                     flowDiagramStateService,
-                    serviceBroker,
-                    notification) {
+                    serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const loadVisibility = () =>
@@ -116,20 +117,20 @@ function controller($element,
             execute: (diagram) => {
                 const newName = prompt("What should the cloned copy be called?", `Copy of ${diagram.name}`);
                 if (newName == null) {
-                    notification.warning("Clone cancelled");
+                    toasts.warning("Clone cancelled");
                     return;
                 }
                 if (_.isEmpty(newName.trim())) {
-                    notification.warning("Clone cancelled, no name given");
+                    toasts.warning("Clone cancelled, no name given");
                     return;
                 }
                 serviceBroker
                     .execute(CORE_API.FlowDiagramStore.clone, [diagram.id, newName])
                     .then(newId => {
-                        notification.success("Diagram cloned");
+                        toasts.success("Diagram cloned");
                         reload(newId.data);
                     })
-                    .catch(e => displayError(notification, "Failed to clone diagram", e));
+                    .catch(e => displayError(toasts, "Failed to clone diagram", e));
 
             }}
     ];
@@ -263,8 +264,7 @@ controller.$inject = [
     "$window",
     "$timeout",
     "FlowDiagramStateService",
-    "ServiceBroker",
-    "Notification"
+    "ServiceBroker"
 ];
 
 

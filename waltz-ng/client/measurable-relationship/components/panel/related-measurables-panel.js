@@ -26,6 +26,7 @@ import {sanitizeRelationships} from "../../measurable-relationship-utils";
 
 import template from "./related-measurables-panel.html";
 import {displayError} from "../../../common/error-utils";
+import toasts from "../../../svelte-stores/toast-store";
 
 
 /**
@@ -126,7 +127,7 @@ function mkGridData(selfRef,
 }
 
 
-function controller($q, $timeout, serviceBroker, notification) {
+function controller($q, $timeout, serviceBroker) {
     const vm = this;
 
     const calcGridData = () => {
@@ -213,13 +214,13 @@ function controller($q, $timeout, serviceBroker, notification) {
         if (confirm("Are you sure you want to delete this relationship ?")) {
             vm.onRemove(rel)
                 .then(() => {
-                    notification.warning("Relationship removed");
+                    toasts.warning("Relationship removed");
                     vm.cancelEditor();
                     vm.clearRowSelection();
                     loadRelationships();
                 })
                 .catch(e => {
-                    displayError(notification, "Relationship could not be removed", e)
+                    displayError(toasts, "Relationship could not be removed", e)
                 });
         }
     };
@@ -319,11 +320,11 @@ function controller($q, $timeout, serviceBroker, notification) {
             .then(() => {
                 vm.cancelEditor();
                 vm.clearRowSelection();
-                notification.success("Relationship saved");
+                toasts.success("Relationship saved");
                 vm.refresh();
             }).catch(e => {
                 const message = "Could not create relationship: " + e.message;
-                notification.error(message);
+                toasts.error(message);
             });
     };
 
@@ -339,8 +340,7 @@ function controller($q, $timeout, serviceBroker, notification) {
 controller.$inject = [
     "$q",
     "$timeout",
-    "ServiceBroker",
-    "Notification"
+    "ServiceBroker"
 ];
 
 

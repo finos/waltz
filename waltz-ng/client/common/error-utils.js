@@ -16,7 +16,7 @@
  *
  */
 
-import ToastStore from "../notification/components/toaster/toast-store"
+import ToastStore from "../svelte-stores/toast-store"
 
 const fallbackReasons = {
     404: "Not found",

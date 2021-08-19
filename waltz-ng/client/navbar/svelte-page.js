@@ -2,7 +2,7 @@ import template from "./svelte-page.html";
 import Sidebar from "./Sidebar.svelte";
 import {sidebarExpanded, sidebarVisible} from "./sidebar-store";
 import Toasts from "../notification/components/toaster/Toasts.svelte";
-import ToastStore from "../notification/components/toaster/toast-store"
+import ToastStore from "../svelte-stores/toast-store"
 import {isIE} from "../common/browser-utils";
 import _ from "lodash";
 

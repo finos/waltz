@@ -16,21 +16,21 @@
  *
  */
 
-import {mkChangeCommand} from '../involvement-utils';
+import {mkChangeCommand} from "../involvement-utils";
+import toasts from "../../svelte-stores/toast-store";
 
-
-function service(involvementStore, notification) {
+function service(involvementStore) {
 
     const addInvolvement = (entityRef, entityInvolvement) => {
 
         return involvementStore.changeInvolvement(
-                entityRef,
-                mkChangeCommand('ADD', entityInvolvement.entity, entityInvolvement.involvement))
+            entityRef,
+            mkChangeCommand("ADD", entityInvolvement.entity, entityInvolvement.involvement))
             .then(result => {
                 if(result) {
-                    notification.success("Involvement added successfully");
+                    toasts.success("Involvement added successfully");
                 } else {
-                    notification.warning("Failed to add involvement")
+                    toasts.warning("Failed to add involvement")
                 }
             });
     };
@@ -39,13 +39,13 @@ function service(involvementStore, notification) {
     const removeInvolvement = (entityRef, entityInvolvement) => {
 
         return involvementStore.changeInvolvement(
-                entityRef,
-                mkChangeCommand('REMOVE', entityInvolvement.entity, entityInvolvement.involvement))
+            entityRef,
+            mkChangeCommand("REMOVE", entityInvolvement.entity, entityInvolvement.involvement))
             .then(result => {
                 if(result) {
-                    notification.success("Involvement removed successfully");
+                    toasts.success("Involvement removed successfully");
                 } else {
-                    notification.warning("Failed to remove involvement")
+                    toasts.warning("Failed to remove involvement")
                 }
             });
     };
@@ -59,8 +59,7 @@ function service(involvementStore, notification) {
 
 
 service.$inject = [
-    'InvolvementStore',
-    'Notification'
+    "InvolvementStore",
 ];
 
 

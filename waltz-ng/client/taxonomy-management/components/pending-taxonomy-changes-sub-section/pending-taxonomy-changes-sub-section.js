@@ -43,7 +43,7 @@ const initialState = {
 };
 
 
-function controller(notification, serviceBroker) {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     function reload() {
@@ -92,7 +92,6 @@ function controller(notification, serviceBroker) {
 
 
 controller.$inject = [
-    "Notification",
     "ServiceBroker"
 ];
 

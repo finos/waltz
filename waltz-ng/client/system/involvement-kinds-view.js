@@ -18,7 +18,8 @@
 
 import _ from "lodash";
 import {initialiseData} from "../common";
-import template from './involvement-kinds-view.html';
+import template from "./involvement-kinds-view.html";
+import toasts from "../svelte-stores/toast-store";
 
 const initialState = {
     involvementKinds: [],
@@ -28,27 +29,26 @@ const initialState = {
 
 
 function controller($q,
-                    involvementKindService,
-                    notification) {
+                    involvementKindService) {
 
     const vm = initialiseData(this, initialState);
 
     function update(id, change) {
         const updateCmd = Object.assign(change, { id });
         return involvementKindService.update(updateCmd)
-            .then(() => notification.success('Updated'));
+            .then(() => toasts.success("Updated"));
     }
 
     vm.updateName = (change, kind) => {
         if(change.newVal === "") return $q.reject("Too short");
         return update(kind.id, { name: change })
-            .then(() => _.find(vm.involvementKinds, {'id': kind.id}).name = change.newVal);
+            .then(() => _.find(vm.involvementKinds, {"id": kind.id}).name = change.newVal);
     };
 
     vm.updateDescription = (change, kind) => {
         if(change.newVal === "") return $q.reject("Too short");
         return update(kind.id, { description: change })
-            .then(() => _.find(vm.involvementKinds, {'id': kind.id}).description = change.newVal);
+            .then(() => _.find(vm.involvementKinds, {"id": kind.id}).description = change.newVal);
     };
 
 
@@ -60,7 +60,7 @@ function controller($q,
         involvementKindService
             .create(vm.newinvolvementKind)
             .then(id => {
-                notification.success('Created');
+                toasts.success("Created");
                 vm.creatinginvolvementKind = false;
                 vm.newinvolvementKind = {};
                 loadInvolvementKinds();
@@ -85,16 +85,15 @@ function controller($q,
 
 
 controller.$inject = [
-    '$q',
-    'InvolvementKindService',
-    'Notification'
+    "$q",
+    "InvolvementKindService"
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: "ctrl",
     bindToController: true,
     scope: {}
 };

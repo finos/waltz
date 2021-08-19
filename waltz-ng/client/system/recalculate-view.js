@@ -16,42 +16,40 @@
  *
  */
 
-import template from './recalculate-view.html';
+import template from "./recalculate-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
+import toasts from "../svelte-stores/toast-store";
 
 
-function controller(notification,
-                    serviceBroker) {
+function controller(serviceBroker) {
     const vm = this;
 
-
     vm.recalcFlowRatings = () => {
-        notification.info('Flow Ratings recalculation requested');
+        toasts.info("Flow Ratings recalculation requested");
         serviceBroker
             .execute(CORE_API.FlowClassificationRuleStore.recalculateAll)
-            .then(() => notification.success('Flow Ratings recalculated'));
+            .then(() => toasts.success("Flow Ratings recalculated"));
     };
 
     vm.recalcDataTypeUsages = () => {
-        notification.info('Data Type Usage recalculation requested');
+        toasts.info("Data Type Usage recalculation requested");
         serviceBroker
             .execute(CORE_API.DataTypeUsageStore.recalculateAll)
-            .then(() => notification.success('Data Type Usage recalculated'));
+            .then(() => toasts.success("Data Type Usage recalculated"));
     };
 
 }
 
 
 controller.$inject = [
-    'Notification',
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 
 const page = {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };
 
 

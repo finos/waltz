@@ -19,15 +19,12 @@
 import {allEntityLifecycleStatuses, initialiseData} from "../../../common";
 import template from "./flow-diagram-editor.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
-
+import toasts from "../../../svelte-stores/toast-store";
 
 /**
  * @name waltz-flow-diagram-editor
  *
- * @description
- * This component ...
  */
-
 
 const bindings = {
     parentEntityRef: "<",
@@ -264,7 +261,6 @@ function controller($q,
                     $timeout,
                     flowDiagramStateService,
                     logicalFlowStore,
-                    notification,
                     physicalFlowStore,
                     physicalSpecificationStore,
                     preventNavigationService,
@@ -298,7 +294,7 @@ function controller($q,
         flowDiagramStateService
             .save()
             .then(r => vm.id = r)
-            .then(() => notification.success("Saved"))
+            .then(() => toasts.success("Saved"))
     };
 
     vm.$onChanges = () => {
@@ -322,7 +318,7 @@ function controller($q,
 
         flowDiagramStateService
             .updateName()
-            .then(() => notification.success("Saved Title"))
+            .then(() => toasts.success("Saved Title"))
     };
 
     vm.onSaveDescription = (d) => {
@@ -334,7 +330,7 @@ function controller($q,
 
         flowDiagramStateService
             .updateDescription()
-            .then(() => notification.success("Saved Description"))
+            .then(() => toasts.success("Saved Description"))
     };
 
     vm.doRemove = () => {
@@ -346,7 +342,7 @@ function controller($q,
                 .then(() => {
                     flowDiagramStateService.reset();
                     vm.onCancel();
-                    notification.warning("Diagram deleted");
+                    toasts.warning("Diagram deleted");
                 });
         }
     };
@@ -359,7 +355,6 @@ controller.$inject = [
     "$timeout",
     "FlowDiagramStateService",
     "LogicalFlowStore",
-    "Notification",
     "PhysicalFlowStore",
     "PhysicalSpecificationStore",
     "PreventNavigationService",

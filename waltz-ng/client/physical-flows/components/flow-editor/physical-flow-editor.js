@@ -19,6 +19,7 @@ import template from "./physical-flow-editor.html";
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {displayError} from "../../../common/error-utils";
+import toasts from "../../../svelte-stores/toast-store";
 
 
 const bindings = {
@@ -33,7 +34,7 @@ const initialState = {
 };
 
 
-function controller(notification, serviceBroker) {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const load = () => {
@@ -69,10 +70,10 @@ function controller(notification, serviceBroker) {
                 CORE_API.TagStore.update,
                 [vm.parentEntityRef, tags])
             .then(() => {
-                notification.success(successMessage);
+                toasts.success(successMessage);
                 return load();
             })
-            .catch(e => displayError(notification, "Could not update tags", e));
+            .catch(e => displayError(toasts, "Could not update tags", e));
     };
 
     const doSave = (name, value) => {
@@ -82,10 +83,10 @@ function controller(notification, serviceBroker) {
                 CORE_API.PhysicalFlowStore.updateAttribute,
                 [ vm.physicalFlow.id, cmd ])
             .then(r => {
-                notification.success(`Updated ${name}`);
+                toasts.success(`Updated ${name}`);
                 return load();
             })
-            .catch(e => displayError(notification, `Could not update ${name} value`, e))
+            .catch(e => displayError(toasts, `Could not update ${name} value`, e))
     };
 
 
@@ -103,7 +104,6 @@ function controller(notification, serviceBroker) {
 
 
 controller.$inject = [
-    "Notification",
     "ServiceBroker"
 ];
 

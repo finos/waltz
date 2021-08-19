@@ -22,6 +22,7 @@ import template from "./survey-section.html";
 import {timeFormat} from "d3-time-format";
 import {displayError} from "../../common/error-utils";
 import {isSurveyTargetKind} from "../survey-utils";
+import toasts from "../../svelte-stores/toast-store";
 
 
 const initialState = {
@@ -45,7 +46,7 @@ const bindings = {
 };
 
 
-function controller(notification, serviceBroker, userService) {
+function controller(serviceBroker, userService) {
 
     const vm = initialiseData(this, initialState);
 
@@ -55,7 +56,7 @@ function controller(notification, serviceBroker, userService) {
         vm.surveyRunForm.description = template.description;
     };
 
-    vm.onDeselectTemplate = (template) => {
+    vm.onDeselectTemplate = () => {
         vm.selectedTemplate = null;
     };
 
@@ -107,7 +108,7 @@ function controller(notification, serviceBroker, userService) {
         const recipientIds = _.map(vm.surveyRunForm.recipients, "id");
 
         if (_.isEmpty(recipientIds)) {
-            alert("Please provide at least one recipient");
+            toasts.error("Please provide at least one recipient");
             return;
         }
         const command = {
@@ -134,17 +135,16 @@ function controller(notification, serviceBroker, userService) {
             .then(runId => serviceBroker
                 .execute(CORE_API.SurveyRunStore.updateStatus, [runId, {newStatus: "ISSUED"}]))
             .then(() => {
-                notification.success("Survey issued successfully");
+                toasts.success("Survey issued successfully");
                 vm.onDismissCreateForm();
             })
-            .catch(e => displayError(notification, "Could not create survey", e));
+            .catch(e => displayError(toasts, "Could not create survey", e));
     }
 
 }
 
 
 controller.$inject = [
-    "Notification",
     "ServiceBroker",
     "UserService"
 ];

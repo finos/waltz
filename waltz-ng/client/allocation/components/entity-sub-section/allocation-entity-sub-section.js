@@ -24,7 +24,7 @@ import _ from "lodash";
 import {displayError} from "../../../common/error-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
-
+import toasts from "../../../svelte-stores/toast-store";
 
 const bindings = {
     entityReference: "<",
@@ -57,7 +57,7 @@ function findMeasurablesRelatedToScheme(ratings = [], measurablesById = {}, sche
 }
 
 
-function controller($q, notification, serviceBroker) {
+function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
     let items = [];
 
@@ -213,7 +213,7 @@ function controller($q, notification, serviceBroker) {
             }
             if (!_.isInteger(d.working.percentage)) {
                 const rounded = Math.round(d.working.percentage);
-                notification.warning(`Allocations must be whole numbers, therefore rounding: ${d.working.percentage} to: ${rounded}`);
+                toasts.warning(`Allocations must be whole numbers, therefore rounding: ${d.working.percentage} to: ${rounded}`);
                 d.working.percentage = rounded;
             }
         });
@@ -237,14 +237,14 @@ function controller($q, notification, serviceBroker) {
         vm.onSave(changes)
             .then(r => {
                 if (r === true) {
-                    notification.success("Updated allocations");
+                    toasts.success("Updated allocations");
                 } else {
-                    notification.warning("Could not update allocations");
+                    toasts.warning("Could not update allocations");
                 }
                 reload();
                 vm.setEditable(false);
             })
-            .catch(e => displayError(notification, "Could not update allocations", e));
+            .catch(e => displayError(null, "Could not update allocations", e));
     };
 
     vm.setEditable = (targetState) => {
@@ -254,7 +254,7 @@ function controller($q, notification, serviceBroker) {
     vm.onCancel = () => {
         vm.setEditable(false);
         return reload()
-            .then(() => notification.info("Edit cancelled: reverting to last saved"));
+            .then(() => toasts.info("Edit cancelled: reverting to last saved"));
     };
 
 }
@@ -262,7 +262,6 @@ function controller($q, notification, serviceBroker) {
 
 controller.$inject = [
     "$q",
-    "Notification",
     "ServiceBroker"
 ];
 

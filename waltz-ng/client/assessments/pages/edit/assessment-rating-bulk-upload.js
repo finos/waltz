@@ -23,7 +23,7 @@ import template from "./assessment-rating-bulk-upload.html";
 import {mkEntityLinkGridCell} from "../../../common/grid-utils";
 import {displayError} from "../../../common/error-utils";
 import {initialiseData} from "../../../common";
-
+import toasts from "../../../svelte-stores/toast-store";
 
 const ratingCellTemplate = `
     <div class="ui-grid-cell-contents">
@@ -54,7 +54,6 @@ const initialState = {
 
 function controller($q,
                     $stateParams,
-                    notification,
                     serviceBroker,
                     userService) {
 
@@ -126,20 +125,20 @@ function controller($q,
             serviceBroker
                 .execute(CORE_API.AssessmentRatingStore.bulkStore, [definitionId, ratingUpdateCommands])
                 .then(() => loadAll())
-                .then(() => notification.success(`Added/Updated ratings for ${ratingUpdateCommands.length} applications`))
-                .catch(e => displayError(notification, "Failed to save", e));
+                .then(() => toasts.success(`Added/Updated ratings for ${ratingUpdateCommands.length} applications`))
+                .catch(e => displayError(toasts, "Failed to save", e));
         }
 
         if (ratingRemoveCommands.length > 0) {
             serviceBroker
                 .execute(CORE_API.AssessmentRatingStore.bulkRemove, [definitionId, ratingRemoveCommands])
                 .then(() => loadAll())
-                .then(() => notification.success(`Removed ratings for ${ratingRemoveCommands.length} applications`))
-                .catch(e => displayError(notification, "Failed to remove assessment ratings", e));
+                .then(() => toasts.success(`Removed ratings for ${ratingRemoveCommands.length} applications`))
+                .catch(e => displayError(toasts, "Failed to remove assessment ratings", e));
         }
 
         if (ratingRemoveCommands.length === 0 && ratingUpdateCommands.length === 0){
-            notification.info("There are no rating changes found.");
+            toasts.info("There are no rating changes found.");
         }
     };
 
@@ -151,10 +150,10 @@ function controller($q,
                     [row.entityRef, definitionId])
                 .then(r => r.data)
                 .then(() => loadAll())
-                .then(() => notification.success("Assessment Rating Removed for application " + row.entityRef.name))
+                .then(() => toasts.success("Assessment Rating Removed for application " + row.entityRef.name))
                 .catch((e) =>
                     displayError(
-                        notification,
+                        toasts,
                         `Failed to delete assessment rating for application: ${e.data.message}`,
                         e));
         }
@@ -165,7 +164,6 @@ function controller($q,
 controller.$inject = [
     "$q",
     "$stateParams",
-    "Notification",
     "ServiceBroker",
     "UserService"
 ];

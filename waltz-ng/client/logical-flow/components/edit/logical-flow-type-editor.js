@@ -19,6 +19,7 @@
 import _ from "lodash";
 import template from "./logical-flow-type-editor.html";
 import {toEntityRef} from "../../../common/entity-utils";
+import toasts from "../../../svelte-stores/toast-store";
 
 
 const bindings = {
@@ -38,7 +39,7 @@ const initialState = {
 };
 
 
-function controller(notification) {
+function controller() {
 
     const vm = _.defaultsDeep(this, initialState);
 
@@ -69,7 +70,7 @@ function controller(notification) {
         if (vm.save) {
             vm.save()
                 .then(() => {
-                    notification.success("Data types updated successfully");
+                    toasts.success("Data types updated successfully");
                     vm.cancel(); //clear edit session
                     vm.onReload();
                 });
@@ -80,9 +81,7 @@ function controller(notification) {
 }
 
 
-controller.$inject = [
-    "Notification"
-];
+controller.$inject = [];
 
 const component = {
     bindings,

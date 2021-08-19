@@ -20,7 +20,7 @@ import _ from "lodash";
 import {initialiseData} from "../../../common/index";
 import {CORE_API} from "../../../common/services/core-api-utils";
 
-
+import toasts from "../../../svelte-stores/toast-store";
 import template from "./app-overview.html";
 import {displayError} from "../../../common/error-utils";
 import {enrichComplexitiesWithKind, findDefaultComplexityKind} from "../../../complexity/services/complexity-utilities";
@@ -47,7 +47,7 @@ const initialState = {
 };
 
 
-function controller($state, serviceBroker, notification) {
+function controller($state, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     function loadApp() {
@@ -76,13 +76,14 @@ function controller($state, serviceBroker, notification) {
 
     function loadComplexities() {
         return serviceBroker
-            .loadViewData(CORE_API.ComplexityKindStore.findBySelector,
-            ['APPLICATION', mkSelectionOptions(vm.parentEntityRef)])
+            .loadViewData(
+                CORE_API.ComplexityKindStore.findBySelector,
+                ["APPLICATION", mkSelectionOptions(vm.parentEntityRef)])
             .then(r => vm.complexityKinds = r.data)
             .then(() => serviceBroker
                 .loadViewData(CORE_API.ComplexityStore.findByEntityReference, [vm.parentEntityRef])
                 .then(r => {
-                    const defaultKindId = _.get(findDefaultComplexityKind(vm.complexityKinds), 'id', null);
+                    const defaultKindId = _.get(findDefaultComplexityKind(vm.complexityKinds), "id", null);
                     vm.complexities = enrichComplexitiesWithKind(r.data, vm.complexityKinds);
                     vm.overviewComplexity = _.find(vm.complexities, d => d.complexityKindId === defaultKindId);
                 }))
@@ -102,7 +103,7 @@ function controller($state, serviceBroker, notification) {
                 CORE_API.AppGroupStore.findRelatedByEntityRef,
                 [vm.parentEntityRef])
             .then(r => {
-                vm.appGroups = _.orderBy(r.data, ['appGroupKind', 'name'], ['desc', 'asc']);
+                vm.appGroups = _.orderBy(r.data, ["appGroupKind", "name"], ["desc", "asc"]);
 
                 if (vm.showAllAppGroups){
                     vm.appGroupsToDisplay = vm.appGroups
@@ -132,29 +133,32 @@ function controller($state, serviceBroker, notification) {
         .execute(
             CORE_API.AliasStore.update,
             [ vm.parentEntityRef, aliases ])
-        .then(r =>  vm.aliases = r.data);
+        .then(r => {
+            toasts.success("Updated aliases");
+            vm.aliases = r.data
+        })
+        .catch(e => displayError(toasts, "Could not update aliases", e));
 
     vm.saveTags = (tags = [], successMessage) => serviceBroker
         .execute(
             CORE_API.TagStore.update,
             [ vm.parentEntityRef, tags ])
         .then(r => {
-            notification.success(successMessage);
+            toasts.success(successMessage);
             vm.tags = r.data;
         })
-        .catch(e => displayError(notification, "Could not update tags", e));
+        .catch(e => displayError(toasts, "Could not update tags", e));
 
     vm.toggleAppGroupDisplay = () => {
         vm.showAllAppGroups = !vm.showAllAppGroups;
         loadAppGroups();
-    }
+    };
 }
 
 
 controller.$inject = [
     "$state",
-    "ServiceBroker",
-    "Notification"
+    "ServiceBroker"
 ];
 
 

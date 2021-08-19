@@ -22,7 +22,7 @@ import {mkLinkGridCell} from "../common/grid-utils";
 import template from "./survey-template-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
 import {displayError} from "../common/error-utils";
-
+import toasts from "../svelte-stores/toast-store";
 
 const initialState = {
     template: {},
@@ -37,7 +37,8 @@ const initialState = {
 
 function mkColumnDefs() {
     return [
-        Object.assign({},
+        Object.assign(
+            {},
             mkLinkGridCell("Name", "surveyRun.name", "surveyRun.id", "main.survey.run.view"),
             { width: "25%"}
         ),
@@ -126,7 +127,6 @@ function computePopoverTextForStats(surveyRun, stats) {
 function controller($q,
                     $state,
                     $stateParams,
-                    notification,
                     serviceBroker) {
     const vm = initialiseData(this, initialState);
 
@@ -189,12 +189,12 @@ function controller($q,
             .execute(
                 CORE_API.SurveyTemplateStore.updateStatus,
                 [ templateId, { newStatus }])
-            .then(r => {
+            .then(() => {
                 vm.template.status = newStatus;
-                notification.success(successMessage);
+                toasts.success(successMessage);
             })
             .catch(e => {
-                displayError(notification, `Could not update status to ${newStatus}`, e);
+                displayError(toasts, `Could not update status to ${newStatus}`, e);
             });
     };
 
@@ -225,7 +225,7 @@ function controller($q,
                     CORE_API.SurveyTemplateStore.clone,
                     [ templateId ])
                 .then(r => {
-                    notification.success("Survey template cloned successfully");
+                    toasts.success("Survey template cloned successfully");
                     $state.go("main.survey.template.view", {id: r.data});
                 });
         }
@@ -238,11 +238,11 @@ function controller($q,
                     CORE_API.SurveyRunStore.deleteById,
                     [ surveyRun.id ])
                 .then(() => {
-                    notification.warning("Survey run deleted");
+                    toasts.warning("Survey run deleted");
                     loadRuns();
                 })
                 .catch(e => {
-                    displayError(notification, "Survey run could not be deleted", e);
+                    displayError(toasts, "Survey run could not be deleted", e);
                 });
         }
     };
@@ -253,11 +253,11 @@ function controller($q,
             serviceBroker
                 .execute(CORE_API.SurveyTemplateStore.remove, [vm.template.id])
                 .then(() => {
-                    notification.warning("Survey template deleted");
+                    toasts.warning("Survey template deleted");
                     $state.go("main.survey.template.list");
                 })
                 .catch(e => {
-                    displayError(notification, "Survey template could not be deleted", e);
+                    displayError(toasts, "Survey template could not be deleted", e);
                 });
         }
     }
@@ -268,7 +268,6 @@ controller.$inject = [
     "$q",
     "$state",
     "$stateParams",
-    "Notification",
     "ServiceBroker"
 ];
 

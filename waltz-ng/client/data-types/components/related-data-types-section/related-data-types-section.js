@@ -22,6 +22,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
 import {toEntityRef} from "../../../common/entity-utils";
 import {mkRel} from "../../../common/relationship-utils";
+import toasts from "../../../svelte-stores/toast-store";
 
 const bindings = {
     parentEntityRef: "<"
@@ -41,7 +42,7 @@ function alreadyContains(relatedDataTypes = [], dt) {
 }
 
 
-function controller(serviceBroker, notification) {
+function controller(serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
@@ -70,7 +71,7 @@ function controller(serviceBroker, notification) {
         serviceBroker
             .loadAppData(CORE_API.DataTypeStore.findAll)
             .then(r => vm.dataTypes = r.data)
-            .then(r => refresh());
+            .then(refresh);
     };
 
     vm.$onRefresh = () => refresh();
@@ -98,7 +99,7 @@ function controller(serviceBroker, notification) {
                     ? "removed"
                     : "added";
                 const msg = `Relationship to ${vm.selectedDataType.name} ${verb}`;
-                notification.success(msg);
+                toasts.success(msg);
                 vm.selectedDataType = null;
                 refresh();
             });
@@ -109,7 +110,7 @@ function controller(serviceBroker, notification) {
 }
 
 
-controller.$inject= [ "ServiceBroker", "Notification"];
+controller.$inject= [ "ServiceBroker"];
 
 
 const component = {

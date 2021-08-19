@@ -22,7 +22,7 @@ import template from "./assessment-rating-list.html";
 import {mkAssessmentDefinitionsIdsKey} from "../../../user";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {displayError} from "../../../common/error-utils";
-
+import toasts from "../../../svelte-stores/toast-store";
 
 const bindings = {
     assessments: "<",
@@ -45,12 +45,12 @@ function getFavouriteAssessmentDefnIds(key, preferences, defaultList = []) {
         ? defaultList
         : _
             .chain(favouritesString.value)
-            .split(',')
+            .split(",")
             .map(idString => _.toNumber(idString))
             .value();
 }
 
-function controller(serviceBroker, notification) {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     function isFavourite(id) {
@@ -99,12 +99,13 @@ function controller(serviceBroker, notification) {
         const message = (alreadyFavourite)? "Removed from favourite assessments" : "Added to favourite assessments";
 
         serviceBroker
-            .execute(CORE_API.UserPreferenceStore.saveForUser,
+            .execute(
+                CORE_API.UserPreferenceStore.saveForUser,
                 [{key:  vm.favouritesKey, value: newFavouritesList.toString()}])
             .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(vm.favouritesKey, r.data, vm.defaultPrimaryList))
             .then(() => partitionAssessments())
-            .then(() => notification.info(message))
-            .catch(e => displayError(notification, "Could not modify favourite assessment list", e))
+            .then(() => toasts.info(message))
+            .catch(e => displayError(toasts, "Could not modify favourite assessment list", e))
     };
 
     vm.toggleExpandNotProvided = () => {
@@ -114,8 +115,7 @@ function controller(serviceBroker, notification) {
 
 
 controller.$inject = [
-    "ServiceBroker",
-    "Notification"
+    "ServiceBroker"
 ];
 
 
