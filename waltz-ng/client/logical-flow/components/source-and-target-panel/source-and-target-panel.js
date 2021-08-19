@@ -95,7 +95,6 @@ function calculateFlowData(allFlows = [],
 
     const flowFilterFn = buildFlowFilter(filterOptions, allFlows, decorators, allTags);
     const flows = _.filter(allFlows, flowFilterFn);
-
     return {flows, decorators};
 }
 
@@ -179,17 +178,14 @@ function scrollIntoView(element, $window) {
 
 
 function controller($element,
-                    $timeout,
+                    $scope,
                     $window,
                     displayNameService,
                     serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     function applyFilter(fn) {
-        $timeout(fn)
-            .then(filteredData => {
-                vm.filteredFlowData = filteredData;
-            });
+        $scope.$applyAsync(() => vm.filteredFlowData = fn());
     }
 
     const filterChanged = (filterOptions = vm.filterOptions) => {
@@ -287,13 +283,13 @@ function controller($element,
 
         const baseTweakers = {
             source: {
-                onSelect: (entity, evt) => $timeout(() => {
+                onSelect: (entity, evt) => $scope.$applyAsync(() => {
                     const flowId = keyedLogicalFlows.sourceFlowsByEntityId[entity.id];
                     vm.selected = select(entity, "source", flowId, evt);
                 })
             },
             target: {
-                onSelect: (entity, evt) => $timeout(() => {
+                onSelect: (entity, evt) => $scope.$applyAsync(() => {
                     const flowId = keyedLogicalFlows.targetFlowsByEntityId[entity.id];
                     vm.selected = select(entity, "target", flowId, evt);
                 })
@@ -430,7 +426,7 @@ function controller($element,
 
 controller.$inject = [
     "$element",
-    "$timeout",
+    "$scope",
     "$window",
     "DisplayNameService",
     "ServiceBroker"
