@@ -107,7 +107,6 @@ function createActiveSectionStore() {
     });
 
     const setPageKind = pageKind => update(c => {
-        //debugger;
         if (_.isEmpty(pageKind)) return;
         const localStorageSections = getSectionsFromLocalStorage(pageKind);
         const urlSections = getSectionsFromURL();
