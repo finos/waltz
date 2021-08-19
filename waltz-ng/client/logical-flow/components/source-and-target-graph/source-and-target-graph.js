@@ -454,12 +454,12 @@ function drawArcs(section, model, layoutFn, flowClassificationsByCode) {
         .classed(styles.ARC_REMOVED, d => d.entityLifecycleStatus === "REMOVED")
         .classed(styles.ARC_PENDING, d => d.entityLifecycleStatus === "PENDING")
         .attr("opacity", 0)
-        .attr("stroke", d => _.get(flowClassificationsByCode, [d.rating, "color"], "#fafafa"))
-        .attr("fill", d => color(_.get(flowClassificationsByCode, [d.rating, "color"], "#fafafa")).brighter());
 
     arcs
         .merge(newArcs)
         .classed(styles.HOVER, d => d.to === highlighted || d.from === highlighted)
+        .attr("stroke", d => _.get(flowClassificationsByCode, [d.rating, "color"], "#fafafa"))
+        .attr("fill", d => color(_.get(flowClassificationsByCode, [d.rating, "color"], "#fafafa")).brighter())
         .transition()
         .duration(animationDuration)
         .call(layoutFn)
@@ -651,9 +651,7 @@ function controller($element, $window, serviceBroker) {
                 .value();
         }
 
-        if(changes.flowClassificationsByCode) {
-            render();
-        }
+        debouncedRender();
     };
 
     vm.$onInit = () => angular
