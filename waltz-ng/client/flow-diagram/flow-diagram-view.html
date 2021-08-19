@@ -53,74 +53,13 @@
 
     <hr>
 
+    <waltz-grid-with-search ng-if="ctrl.flowData.length > 0"
+                            entries="ctrl.flowData"
+                            column-defs="ctrl.columnDefs">
+    </waltz-grid-with-search>
+
     <div class="row">
         <div class="col-md-12">
-            <table class="table table-condensed small">
-                <thead>
-                <tr>
-                    <th>Source</th>
-                    <th>Target</th>
-                    <th>Transport</th>
-                    <th>Frequency</th>
-                    <th>Specification</th>
-                    <th>Data Types</th>
-                </tr>
-                </thead>
-                <tbody ng-repeat="flow in ctrl.flows">
-                <!-- ONLY LOGICAL -->
-                <tr ng-if="flow.physicalFlows.length == 0"
-                    ng-class="{ 'waltz-highlighted-row' : ctrl.highlightIds.indexOf(flow.logicalFlow.id) > -1}">
-                    <td ng-class="{ 'waltz-highlighted-row' : ctrl.highlightIds.indexOf(flow.logicalFlow.source.id) > -1 }">
-                        <waltz-entity-link entity-ref="flow.logicalFlow.source"></waltz-entity-link>
-                    </td>
-                    <td>
-                        <waltz-entity-link entity-ref="flow.logicalFlow.target"></waltz-entity-link>
-                    </td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>-</td>
-                </tr>
-                <!-- PHYSICALS -->
-                <tr ng-repeat="physicalFlow in flow.physicalFlows"
-                    ng-if="flow.physicalFlows.length > 0"
-                    ng-class="{ 'waltz-highlighted-row' : ctrl.highlightIds.indexOf(flow.logicalFlow.id) > -1}">
-                    <td ng-class="{
-                                'waltz-highlighted-row' : ctrl.highlightIds.indexOf(flow.logicalFlow.source.id) > -1
-                            }">
-                        <waltz-entity-link entity-ref="flow.logicalFlow.source">
-                        </waltz-entity-link>
-                    </td>
-                    <td ng-class="{
-                                'waltz-highlighted-row' : ctrl.highlightIds.indexOf(flow.logicalFlow.target.id) > -1
-                            }">
-                        <waltz-entity-link entity-ref="flow.logicalFlow.target">
-                        </waltz-entity-link>
-                    </td>
-                    <td><span ng-bind="physicalFlow.transportName"></span></td>
-                    <td><span ng-bind="physicalFlow.frequencyName"></span></td>
-                    <td>
-                        <a ui-sref='main.physical-flow.view ({id: physicalFlow.id})'
-                           class="clickable"
-                           ng-bind="physicalFlow.specificationName">
-                        </a>
-                    </td>
-                    <td>
-                        <ul class="waltz-keyword-list"
-                            ng-if="physicalFlow.specificationDataTypes.length > 0">
-                            <li ng-repeat="specDataType in physicalFlow.specificationDataTypes"
-                                class="wkl-keyword">
-                                <span ng-bind="specDataType.dataTypeName">
-                                </span>
-                            </li>
-                        </ul>
-                        <span ng-if="physicalFlow.specificationDataTypes.length === 0">
-                            -
-                        </span>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
             <a ng-click="ctrl.exportDiagramTable()"
                class="small clickable pull-right"
                style="text-decoration: none;"

@@ -22,10 +22,45 @@ import {downloadTextFile} from "../common/file-utils";
 
 import template from "./flow-diagram-view.html";
 import {entity} from "../common/services/enums/entity";
+import {mkEntityLinkGridCell} from "../common/grid-utils";
+import {withWidth} from "../physical-flow/physical-flow-table-utilities";
 
 const initialState = {
     visibility: {},
 };
+
+const columnDefs = [
+    withWidth(mkEntityLinkGridCell("Source", "logicalFlow.source"), "20%"),
+    withWidth(mkEntityLinkGridCell("Target", "logicalFlow.target"), "20%"),
+    { field: "physicalFlow.transportName",
+      width: "10%",
+      name: "Transport",
+      cellTemplate:`
+                <div class="ui-grid-cell-contents"
+                    <span ng-bind="COL_FIELD || '-'">
+                    </span>
+                </div>`
+    },
+    { field: "physicalFlow.frequencyName",
+      name: "Frequency",
+      width: "10%",
+      cellTemplate:`
+                <div class="ui-grid-cell-contents"
+                    <span ng-bind="COL_FIELD || '-'">
+                    </span>
+                </div>`
+    },
+    withWidth(mkEntityLinkGridCell("Specification", "specification"), "20%"),
+    { field: "dataTypes",
+      name: "Data Types",
+      width: "20%",
+      cellTemplate:`
+                <div class="ui-grid-cell-contents"
+                    <span ng-bind="COL_FIELD || '-'">
+                    </span>
+                </div>`
+    },
+];
 
 
 const addToHistory = (historyStore, diagram) => {
@@ -48,27 +83,14 @@ function prepareDataForExport(flows = []) {
         "Data Types"
     ]];
 
-    const exportData = _.flatMap(flows, f => {
-        if (f.physicalFlows.length > 0) {
-            return _.map(f.physicalFlows, pf => [
-                f.logicalFlow.source.name,
-                f.logicalFlow.target.name,
-                pf.transportName,
-                pf.frequencyName,
-                pf.specificationName,
-                _.join(_.map(pf.specificationDataTypes, "dataTypeName"), ";")
-            ]);
-        } else {
-            return [[
-                f.logicalFlow.source.name,
-                f.logicalFlow.target.name,
-                "",
-                "",
-                "",
-                ""
-            ]];
-        }
-    });
+    const exportData = _.map(flows, f => [
+        f.logicalFlow.source.name,
+        f.logicalFlow.target.name,
+        _.get(f.physicalFlow, "transportName", "-"),
+        _.get(f.physicalFlow, "frequencyName", "-"),
+        _.get(f.specification, "name", "-"),
+        f.dataTypes || "-"
+    ]);
 
     return columnNames.concat(exportData);
 }
@@ -89,6 +111,8 @@ function controller(
         const id = $stateParams.id;
         const entityReference = { id, kind: "FLOW_DIAGRAM" };
         vm.parentEntityRef = entityReference;
+
+        vm.columnDefs = columnDefs;
 
         const selector = {
             entityReference: vm.parentEntityRef,
@@ -162,12 +186,28 @@ function controller(
                     }));
                 const enhancedPhysicalFlowsByLogicalId = _.groupBy(enhancedPhysicalFlows, "logicalFlowId");
 
-                vm.flows = _.map(logicalFlows, f => {
-                    return {
-                        logicalFlow: f,
-                        physicalFlows: enhancedPhysicalFlowsByLogicalId[f.id] || [],
+
+                vm.flowData = _.flatMap(logicalFlows, f => {
+
+                    const physicals = enhancedPhysicalFlowsByLogicalId[f.id] || [];
+
+                    if (_.isEmpty(physicals)){
+                        return Object.assign({}, {logicalFlow: f, physicalFlow: null, dataTypes: null});
+                    } else {
+                        return _.map(
+                            physicals,
+                            pf => {
+                                const dataTypes = _.join(_.map(pf.specificationDataTypes, "dataTypeName"), "; ")
+
+                                return Object.assign({}, {
+                                    logicalFlow: f,
+                                    physicalFlow: pf,
+                                    dataTypes,
+                                    specification: {id: pf.specificationId, kind: "PHYSICAL_SPECIFICATION", name: pf.specificationName}
+                                })
+                            });
                     }
-                });
+                })
             });
 
     };
@@ -182,7 +222,7 @@ function controller(
     };
 
     vm.exportDiagramTable = () => {
-        const dataRows = prepareDataForExport(vm.flows);
+        const dataRows = prepareDataForExport(vm.flowData);
         downloadTextFile(dataRows, ",", vm.diagram.name + "_flows.csv");
     };
 
