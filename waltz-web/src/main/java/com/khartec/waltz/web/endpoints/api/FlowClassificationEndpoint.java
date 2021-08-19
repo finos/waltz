@@ -64,7 +64,6 @@ public class FlowClassificationEndpoint implements Endpoint {
         // -- PATHS
 
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
-        String findAllPath = mkPath(BASE_URL);
 
 
         // -- ROUTES

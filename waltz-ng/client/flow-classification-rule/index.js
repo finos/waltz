@@ -21,6 +21,8 @@ import * as flowClassificationRuleStore from "./services/flow-classification-rul
 import * as flowClassificationStore from "./services/flow-classification-store";
 import * as FlowClassificationRulesTable from "./components/table/flow-classification-rules-table";
 import FlowClassificationRulesSummaryList from "./components/summary-list/flow-classification-rule-summary-list"
+import CompanionAppRulesSection from "./components/companion-app-rules/companion-app-rules-section"
+import CompanionDataTypeRulesSection from "./components/companion-data-type-rules/companion-data-type-rules-section"
 import FlowClassificationRuleView from "./pages/view/flow-classification-rule-view"
 import * as NonAuthSourcesPanel from "./components/discouraged-sources-panel/discouraged-sources-panel";
 import * as FlowClassificationRuleSection from "./components/section/flow-classification-rules-section";
@@ -50,7 +52,9 @@ export default () => {
             FlowClassificationRuleView,
             TreePicker,
             TreeFilter,
-            NonAuthSourcesPanel
+            NonAuthSourcesPanel,
+            CompanionAppRulesSection,
+            CompanionDataTypeRulesSection
         ]);
 
     return module.name;

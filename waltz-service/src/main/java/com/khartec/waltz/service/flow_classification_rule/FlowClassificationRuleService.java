@@ -55,8 +55,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.EntityKind.ACTOR;
-import static com.khartec.waltz.model.EntityKind.ORG_UNIT;
+import static com.khartec.waltz.model.EntityKind.*;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static java.lang.String.format;
@@ -455,4 +454,12 @@ public class FlowClassificationRuleService {
         changeLogService.write(authLog);
     }
 
+
+    public Set<FlowClassificationRule> findCompanionAppRules(long ruleId) {
+        return flowClassificationRuleDao.findCompanionAppRules(ruleId);
+    }
+
+    public Collection<FlowClassificationRule> findCompanionDataTypeRules(long ruleId) {
+        return flowClassificationRuleDao.findCompanionDataTypeRules(ruleId);
+    }
 }

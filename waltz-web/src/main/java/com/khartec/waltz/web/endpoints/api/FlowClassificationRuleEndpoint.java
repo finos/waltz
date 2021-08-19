@@ -81,6 +81,8 @@ public class FlowClassificationRuleEndpoint implements Endpoint {
         String calculateConsumersForDataTypeIdSelectorPath = mkPath(BASE_URL, "data-type", "consumers");
         String findByEntityReferencePath = mkPath(BASE_URL, "entity-ref", ":kind", ":id");
         String findByApplicationIdPath = mkPath(BASE_URL, "app", ":id");
+        String findCompanionAppRulesPath = mkPath(BASE_URL, "companion-rules", "app", "id", ":id");
+        String findCompanionDataTypeRulesPath = mkPath(BASE_URL, "companion-rules", "data-type", "id", ":id");
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String deletePath = mkPath(BASE_URL, "id", ":id");
         String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
@@ -103,6 +105,12 @@ public class FlowClassificationRuleEndpoint implements Endpoint {
         ListRoute<FlowClassificationRule> findAllRoute = (request, response)
                 -> flowClassificationRuleService.findAll();
 
+        ListRoute<FlowClassificationRule> findCompanionAppRulesRoute = (request, response)
+                -> flowClassificationRuleService.findCompanionAppRules(getId(request));
+
+        ListRoute<FlowClassificationRule> findCompanionDataTypeRulesRoute = (request, response)
+                -> flowClassificationRuleService.findCompanionDataTypeRules(getId(request));
+
         DatumRoute<FlowClassificationRule> getByIdRoute = (request, response)
                 -> flowClassificationRuleService.getById(getId(request));
 
@@ -115,6 +123,8 @@ public class FlowClassificationRuleEndpoint implements Endpoint {
         getForList(findByApplicationIdPath, findByApplicationIdRoute);
         postForList(findFlowClassificationRulesBySelectorPath, findFlowClassificationRulesBySelectorRoute);
         getForList(BASE_URL, findAllRoute);
+        getForList(findCompanionAppRulesPath, findCompanionAppRulesRoute);
+        getForList(findCompanionDataTypeRulesPath, findCompanionDataTypeRulesRoute);
         putForDatum(BASE_URL, this::updateRoute);
         deleteForDatum(deletePath, this::deleteRoute);
         postForDatum(BASE_URL, this::insertRoute);

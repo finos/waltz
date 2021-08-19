@@ -401,6 +401,22 @@ const appComplexitySummarySection = {
     id: 240
 };
 
+const companionAppRulesSection = {
+    componentId: "companion-app-rules-section",
+    name: "Companion App Rules",
+    icon: "desktop",
+    description: "Flow classification rules that share the same source application",
+    id: 250
+};
+
+const companionDataTypeRulesSection = {
+    componentId: "companion-data_type-rules-section",
+    name: "Companion Data Type Rules",
+    icon: "qrcode",
+    description: "Flow classification rules that share the same data type or one of its parents",
+    id: 260
+};
+
 const entityAttestationSection = {
     componentId: "attestation-section",
     name: "Attestations",
@@ -422,6 +438,8 @@ export const dynamicSections = {
     changeLogSection,
     changeSetSection,
     changeUnitSection,
+    companionAppRulesSection,
+    companionDataTypeRulesSection,
     dataFlowSection,
     dataTypeFlowSection,
     dataTypeOriginatorsSection,
@@ -721,6 +739,8 @@ const databaseSections = [
 
 const flowClassificationRuleSections = [
     bookmarksSection,
+    companionAppRulesSection,
+    companionDataTypeRulesSection,
     entityNamedNotesSection,
     involvedPeopleSection,
     changeLogSection
