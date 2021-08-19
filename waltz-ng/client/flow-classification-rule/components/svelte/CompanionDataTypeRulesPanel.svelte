@@ -61,7 +61,7 @@
                         {_.get(classificationsById, [rule.classificationId, 'name'], 'unknown')}</td>
                     <td>{rule.provenance}</td>
                     <td title={rule.description}>
-                        {truncate(rule.description) || "-"}
+                        {truncate(rule.description, 30) || "-"}
                     </td>
                 </tr>
             {/each}

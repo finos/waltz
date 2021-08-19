@@ -6,6 +6,7 @@
     import Icon from "../../../common/svelte/Icon.svelte";
     import EntityLink from "../../../common/svelte/EntityLink.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
+    import {truncate} from "../../../common/string-utils";
 
     export let primaryEntityRef;
 
@@ -59,7 +60,9 @@
                         </div>
                         {_.get(classificationsById, [rule.classificationId, 'name'], 'unknown')}</td>
                     <td>{rule.provenance}</td>
-                    <td>{rule.description || "-"}</td>
+                    <td title={rule.description}>
+                        {truncate(rule.description, 30) || "-"}
+                    </td>
                 </tr>
             {/each}
             </tbody>
