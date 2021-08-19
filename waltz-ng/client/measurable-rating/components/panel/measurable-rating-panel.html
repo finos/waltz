@@ -113,7 +113,8 @@
                     </div>
                 </div>
 
-                <div class="row" ng-if="$ctrl.selected.decommission || $ctrl.selected.replacingDecommissions">
+                <div class="row"
+                     ng-if="$ctrl.selected.decommission || $ctrl.selected.replacingDecommissions">
                     <waltz-planned-decommission-info planned-decommission="$ctrl.selected.decommission"
                                                      replacing-decommissions="$ctrl.selected.replacingDecommissions"
                                                      replacement-apps="$ctrl.selected.replacementApps"
