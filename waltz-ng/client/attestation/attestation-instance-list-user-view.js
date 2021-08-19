@@ -32,7 +32,7 @@ const initialState = {
     runsWithInstances: [],
     selectedAttestation: null,
     showAttested: false,
-    attestNext: false
+    attestNext: true
 };
 
 
@@ -95,9 +95,9 @@ function controller($q,
             .then(() => loadData())
             .then(() => {
                 const currentRun = _.find(vm.runsWithInstances, r => r.id === instance.attestationRunId);
-                const remainingInstances = currentRun.instances;
+                const remainingInstances = _.get(currentRun, "instances", []);
 
-                return vm.selectedAttestation = vm.attestNext && !_.isEmpty(remainingInstances)
+                vm.selectedAttestation = vm.attestNext && !_.isEmpty(remainingInstances)
                     ? _.head(remainingInstances)
                     : null
             })
