@@ -42,11 +42,23 @@ export function mkFlowClassificationRuleStore() {
         return remote.execute("POST", "api/flow-classification-rule", cmd)
     }
 
+    const findCompanionAppRulesById = (id, force = false) => {
+        return remote
+            .fetchViewList("GET", `api/flow-classification-rule/companion-rules/app/id/${id}`, null, {force})
+    }
+
+    const findCompanionDataTypeRulesById = (id, force = false) => {
+        return remote
+            .fetchViewList("GET", `api/flow-classification-rule/companion-rules/data-type/id/${id}`, null, {force})
+    }
+
     return {
         findAll,
         create,
         update,
-        getById
+        getById,
+        findCompanionAppRulesById,
+        findCompanionDataTypeRulesById
     };
 }
 

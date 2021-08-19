@@ -16,6 +16,7 @@
 
     export let ref = {};
     export let isSecondaryLink = false;
+    export let showIcon = true;
 
     let state = null
 
@@ -34,6 +35,6 @@
     {#if $$slots.default}
         <slot/>
     {:else}
-        <EntityLabel {ref}/>
+        <EntityLabel {ref} {showIcon}/>
     {/if}
 </ViewLink>
