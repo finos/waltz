@@ -646,7 +646,7 @@ function controller($element, $window, serviceBroker) {
     vm.$onChanges = (changes) => {
         if(changes.changeUnits) {
             vm.changeUnitsByPhysicalFlowId = _.chain(vm.changeUnits)
-                .filter(cu => cu.subjectEntity.kind = "PHYSICAL_FLOW")
+                .filter(cu => cu.subjectEntity.kind === "PHYSICAL_FLOW")
                 .keyBy(cu => cu.subjectEntity.id)
                 .value();
         }
