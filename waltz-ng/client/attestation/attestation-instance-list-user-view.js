@@ -24,19 +24,21 @@ import {initialiseData} from "../common/index";
 import template from "./attestation-instance-list-user-view.html";
 import {attest} from "./attestation-utils";
 import {displayError} from "../common/error-utils";
+import ToastStore from "../svelte-stores/toast-store"
+import {entity} from "../common/services/enums/entity";
 
 
 const initialState = {
     runsWithInstances: [],
     selectedAttestation: null,
-    showAttested: false
+    showAttested: false,
+    attestNext: true
 };
 
 
 function controller($q,
                     serviceBroker,
-                    userService,
-                    notification) {
+                    userService) {
     const vm = initialiseData(this, initialState);
 
     userService
@@ -56,7 +58,9 @@ function controller($q,
             .loadViewData(CORE_API.AttestationInstanceStore.findHistoricalForPendingByUser, [], {force: true})
             .then(r => r.data);
 
-        $q.all([runsPromise, instancesPromise, historicalInstancesPromise])
+        serviceBroker.loadAppData(CORE_API.NotificationStore.findAll, [], { force: true });
+
+        return $q.all([runsPromise, instancesPromise, historicalInstancesPromise])
             .then(([runs, instances, historicInstances]) => {
                 const historicByParentRefByChildKind = nest()
                     .key(d => d.parentEntity.kind)
@@ -84,8 +88,6 @@ function controller($q,
                     .sortBy(r => r.dueDate)
                     .value();
             });
-
-        serviceBroker.loadAppData(CORE_API.NotificationStore.findAll, [], { force: true });
     };
 
     loadData();
@@ -93,14 +95,28 @@ function controller($q,
     // interaction
     vm.onAttestEntity = () => {
         const instance = vm.selectedAttestation;
+
         attest(serviceBroker, instance.parentEntity, instance.attestedEntityKind)
             .then(() => loadData())
-            .then(() => vm.selectedAttestation = null)
-            .catch(e => displayError(notification, "Could not attest", e));
+            .then(() => {
+                const currentRun = _.find(vm.runsWithInstances, r => r.id === instance.attestationRunId);
+                const remainingInstances = _.get(currentRun, "instances", []);
+
+                vm.selectedAttestation = vm.attestNext && !_.isEmpty(remainingInstances)
+                    ? _.head(remainingInstances)
+                    : null
+            })
+            .then(() => ToastStore.success(`Attested ${_.get(entity, [instance.attestedEntityKind, "name"], "unknown subject")} for ${instance.parentEntity.name} successfully!`))
+            .catch(e => displayError("Could not attest", e));
     };
+
+    vm.onToggle = () => {
+        vm.attestNext = !vm.attestNext;
+    }
 
     vm.onCancelAttestation = () => {
         vm.selectedAttestation = null;
+        vm.attestNext = false;
     };
 
     vm.onToggleFilter = () => {
@@ -115,7 +131,6 @@ controller.$inject = [
     "$q",
     "ServiceBroker",
     "UserService",
-    "Notification"
 ];
 
 

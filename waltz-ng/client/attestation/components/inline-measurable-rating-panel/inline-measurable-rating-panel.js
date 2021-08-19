@@ -20,6 +20,7 @@ import {initialiseData} from "../../../common";
 
 import template from "./inline-measurable-rating-panel.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import {mkSelectionOptions} from "../../../common/selector-utils";
 
 
 const bindings = {
@@ -41,20 +42,27 @@ function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const loadData = () => {
-        serviceBroker
-            .loadAppData(CORE_API.MeasurableStore.findAll)
-            .then(r => vm.measurables = _
-                .filter(r.data, d => d.categoryId === vm.measurableCategoryRef.id));
+        const measurablesPromise = serviceBroker
+            .loadViewData(CORE_API.MeasurableStore.findMeasurablesBySelector,
+                [mkSelectionOptions(vm.parentEntityRef)])
+            .then(r => r.data);
 
-        serviceBroker
+        const measurableRatingsPromise = serviceBroker
             .loadViewData(CORE_API.MeasurableRatingStore.findForEntityReference,
                 [vm.parentEntityRef],
                 {force: true})
-            .then(r => vm.ratings = r.data);
+            .then(r => r.data);
 
-        serviceBroker.loadViewData(CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
+        const ratingsPromise = serviceBroker.loadViewData(CORE_API.RatingSchemeStore.findRatingsForEntityAndMeasurableCategory,
             [vm.parentEntityRef, vm.measurableCategoryRef.id])
-            .then(r => vm.ratingSchemeItems = r.data);
+            .then(r => r.data);
+
+        $q.all([measurablesPromise, measurableRatingsPromise, ratingsPromise])
+            .then(([measurables, measurableRatings, ratingSchemeItems]) => {
+                vm.measurables = _.filter(measurables, d => d.categoryId === vm.measurableCategoryRef.id);
+                vm.ratings = measurableRatings;
+                vm.ratingSchemeItems = ratingSchemeItems;
+            })
     };
 
 

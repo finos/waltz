@@ -20,6 +20,7 @@ import template from "./scenario-header.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import roles from "../../../user/system-roles";
+import toasts from "../../../svelte-stores/toast-store";
 
 
 const bindings = {
@@ -59,7 +60,6 @@ const addToHistory = (historyStore, scenario) => {
 
 function controller($q,
                     historyStore,
-                    notification,
                     serviceBroker,
                     userService) {
     const vm = initialiseData(this, initialState);
@@ -186,7 +186,7 @@ function controller($q,
                 .execute(
                     method,
                     [ roadmapId, data.newVal ])
-                .then(() => notification.success(message));
+                .then(() => toasts.success(message));
         } else {
             return Promise.reject("Nothing updated")
         }
@@ -201,7 +201,7 @@ function controller($q,
                 { force: true })
             .then(r => {
                 Object.assign(vm, r.data);
-                Object.assign(vm.roadmap, {kind: 'ROADMAP'});
+                Object.assign(vm.roadmap, {kind: "ROADMAP"});
             });
 
         return $q
@@ -213,7 +213,6 @@ function controller($q,
 controller.$inject = [
     "$q",
     "HistoryStore",
-    "Notification",
     "ServiceBroker",
     "UserService"
 ];

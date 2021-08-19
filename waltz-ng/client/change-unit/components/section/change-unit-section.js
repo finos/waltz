@@ -23,7 +23,7 @@ import {displayError} from "../../../common/error-utils";
 
 import template from "./change-unit-section.html";
 import * as _ from "lodash";
-
+import toasts from "../../../svelte-stores/toast-store";
 
 const bindings = {
     parentEntityRef: "<",
@@ -59,10 +59,10 @@ function mkAssessmentValuesString(changeUnit) {
 }
 
 
-function controller(notification, serviceBroker, $q) {
+function controller(serviceBroker, $q) {
     const vm = initialiseData(this, initialState);
 
-    const loadData = (force = false) => {
+    const loadData = () => {
         const physicalFlowChangeUnitPromise = serviceBroker
             .loadViewData(
                 CORE_API.ChangeUnitViewService.findPhysicalFlowChangeUnitsByChangeSetId,
@@ -100,9 +100,9 @@ function controller(notification, serviceBroker, $q) {
                 .then(r => r.data)
                 .then(() => {
                     loadData(true);
-                    notification.success("Change Unit Completed");
+                    toasts.success("Change Unit Completed");
                 })
-                .catch(e => displayError(notification, "Failed to complete change unit", e));
+                .catch(e => displayError("Failed to complete change unit", e));
         }
     };
 
@@ -114,9 +114,9 @@ function controller(notification, serviceBroker, $q) {
                 .then(r => r.data)
                 .then(() => {
                     loadData(true);
-                    notification.success("Change Unit Discarded");
+                    toasts.success("Change Unit Discarded");
                 })
-                .catch(e => displayError(notification, "Failed to discard change unit", e));
+                .catch(e => displayError("Failed to discard change unit", e));
         }
     };
 
@@ -172,7 +172,6 @@ function preparePhysicalFlowColumnDefs() {
 
 
 controller.$inject = [
-    "Notification",
     "ServiceBroker",
     "$q"
 ];

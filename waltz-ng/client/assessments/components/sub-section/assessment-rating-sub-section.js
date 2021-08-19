@@ -33,7 +33,7 @@ const initialState = {
 };
 
 
-function controller($q, notification, serviceBroker) {
+function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const loadAll = () => {
@@ -74,7 +74,7 @@ function controller($q, notification, serviceBroker) {
 
     vm.$onInit = () => {
         loadAll();
-        vm.useExternalEditorPage = _.includes(['CHANGE_UNIT'], vm.parentEntityRef.kind);
+        vm.useExternalEditorPage = _.includes(["CHANGE_UNIT"], vm.parentEntityRef.kind);
     };
 
 
@@ -83,7 +83,6 @@ function controller($q, notification, serviceBroker) {
 
 controller.$inject = [
     "$q",
-    "Notification",
     "ServiceBroker"
 ];
 

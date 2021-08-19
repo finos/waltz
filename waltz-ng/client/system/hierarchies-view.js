@@ -19,24 +19,26 @@
 import _ from "lodash";
 import {initialiseData} from "../common";
 import {kindToViewState} from "../common/link-utils";
-import template from './hierarchies-view.html';
+import template from "./hierarchies-view.html";
+import toasts from "../svelte-stores/toast-store";
+
 
 const initialState = {
     combinedTallies: [],
     kinds: [
-        'CHANGE_INITIATIVE',
-        'DATA_TYPE',
-        'ENTITY_STATISTIC',
-        'ORG_UNIT',
-        'MEASURABLE',
-        'PERSON'
+        "CHANGE_INITIATIVE",
+        "DATA_TYPE",
+        "ENTITY_STATISTIC",
+        "ORG_UNIT",
+        "MEASURABLE",
+        "PERSON"
     ]
 };
 
 
 function combineTallies(entryCounts = [], rootCounts = []) {
 
-    const rootTalliesKeyed = _.keyBy(rootCounts, 'id');
+    const rootTalliesKeyed = _.keyBy(rootCounts, "id");
 
     return _.chain(entryCounts)
         .map(t => {
@@ -53,8 +55,7 @@ function combineTallies(entryCounts = [], rootCounts = []) {
 
 function controller($q,
                     $state,
-                    hierarchiesStore,
-                    notification) {
+                    hierarchiesStore) {
 
     const vm = initialiseData(this, initialState);
 
@@ -66,7 +67,7 @@ function controller($q,
         ];
 
         $q.all(promises)
-            .then( ([tallies, rootTallies]) =>
+            .then(([tallies, rootTallies]) =>
                 vm.combinedTallies = combineTallies(tallies, rootTallies));
 
     };
@@ -74,7 +75,7 @@ function controller($q,
     vm.build = (kind) => {
         hierarchiesStore
             .buildForKind(kind)
-            .then((count) => notification.success(`Hierarchy rebuilt for ${kind} with ${count} records`))
+            .then((count) => toasts.success(`Hierarchy rebuilt for ${kind} with ${count} records`))
             .then(loadTallies);
     };
 
@@ -87,7 +88,7 @@ function controller($q,
 
 
     vm.goToRoot = (entityRef) => {
-        if(entityRef.kind === 'ENTITY_STATISTIC') return;
+        if(entityRef.kind === "ENTITY_STATISTIC") return;
         const stateName = kindToViewState(entityRef.kind);
         $state.go(stateName, { id: entityRef.id});
     };
@@ -98,17 +99,16 @@ function controller($q,
 
 
 controller.$inject = [
-    '$q',
-    '$state',
-    'HierarchiesStore',
-    'Notification',
+    "$q",
+    "$state",
+    "HierarchiesStore",
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: "ctrl",
     bindToController: true,
     scope: {}
 };

@@ -21,6 +21,7 @@ import {initialiseData} from "../common/index";
 
 import template from "./data-extract-link.html";
 import {displayError} from "../common/error-utils";
+import toasts from "../svelte-stores/toast-store";
 
 
 const bindings = {
@@ -64,7 +65,7 @@ function getFileNameFromHttpResponse(httpResponse) {
 }
 
 
-function controller($http, notification, baseExtractUrl) {
+function controller($http, baseExtractUrl) {
     const vm = initialiseData(this, initialState);
 
 
@@ -95,11 +96,11 @@ function controller($http, notification, baseExtractUrl) {
     };
 
     const doExport = (format) => {
-        notification.info("Exporting data");
+        toasts.info("Exporting data");
         vm.extracting = true;
         invokeExport(format)
-            .then(() => notification.success("Data exported"))
-            .catch(e => displayError(notification, "Data export failure", e))
+            .then(() => toasts.success("Data exported"))
+            .catch(e => displayError("Data export failure", e))
             .finally(() => vm.extracting = false);
     };
 
@@ -111,7 +112,6 @@ function controller($http, notification, baseExtractUrl) {
 
 controller.$inject = [
     "$http",
-    "Notification",
     "BaseExtractUrl"
 ];
 

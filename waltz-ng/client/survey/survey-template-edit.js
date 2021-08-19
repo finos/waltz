@@ -21,6 +21,7 @@ import {initialiseData} from "../common/index";
 import template from "./survey-template-edit.html";
 import {displayError} from "../common/error-utils";
 import {CORE_API} from "../common/services/core-api-utils";
+import toasts from "../svelte-stores/toast-store";
 
 /*
     Note: this list of functions/operators is derived from the capabilities of BigEval and the extension methods
@@ -94,7 +95,6 @@ const initialState = {
 
 function controller($q,
                     $stateParams,
-                    notification,
                     serviceBroker) {
 
     const vm = initialiseData(this, initialState);
@@ -132,7 +132,7 @@ function controller($q,
                     targetEntityKind: vm.surveyTemplate.targetEntityKind,
                     externalId: vm.surveyTemplate.externalId
                 }])
-            .then(() => notification.success("Survey template updated successfully"));
+            .then(() => toasts.success("Survey template updated successfully"));
     };
 
     vm.showAddQuestionForm = () => {
@@ -182,7 +182,7 @@ function controller($q,
         serviceBroker
             .execute(CORE_API.SurveyQuestionStore.create, [qi])
             .then(() => {
-                notification.success("Survey question created successfully");
+                toasts.success("Survey question created successfully");
                 loadQuestions();
                 vm.cancelQuestionForm();
             });
@@ -197,7 +197,7 @@ function controller($q,
         serviceBroker
             .execute(CORE_API.SurveyQuestionStore.update, [qi])
             .then(() => {
-                notification.success("Survey question updated successfully");
+                toasts.success("Survey question updated successfully");
                 loadQuestions();
                 vm.cancelQuestionForm();
             });
@@ -208,11 +208,11 @@ function controller($q,
             serviceBroker
                 .execute(CORE_API.SurveyQuestionStore.deleteQuestion, [qi.question.id])
                 .then(() => {
-                    notification.success("Survey question deleted successfully");
+                    toasts.success("Survey question deleted successfully");
                     loadQuestions();
                     vm.cancelQuestionForm();
                 })
-                .catch(e => displayError(notification, "Survey question was not deleted", e))
+                .catch(e => displayError("Survey question was not deleted", e))
         }
     };
 
@@ -232,7 +232,6 @@ function controller($q,
 controller.$inject = [
     "$q",
     "$stateParams",
-    "Notification",
     "ServiceBroker",
 ];
 

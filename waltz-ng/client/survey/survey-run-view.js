@@ -20,6 +20,7 @@ import template from "./survey-run-view.html";
 import {timeFormat} from "d3-time-format";
 import {initialiseData} from "../common";
 import {mkEntityLabelGridCell} from "../common/grid-utils";
+import toasts from "../svelte-stores/toast-store";
 
 const columnDefs = [
     mkEntityLabelGridCell("Entity", "surveyEntity", "left", "right"),
@@ -65,7 +66,6 @@ const initialState = {
 
 
 function controller($stateParams,
-                    notification,
                     surveyInstanceStore,
                     surveyRunStore,
                     surveyTemplateStore) {
@@ -93,20 +93,17 @@ function controller($stateParams,
 
     vm.updateDueDate = (newVal) => {
         if (!newVal) {
-            notification.error("Due date cannot be blank");
+            toasts.error("Due date cannot be blank");
         } else {
             if (confirm("This will update the due date of all the instances under this run. " +
                     "Are you sure you want to continue?")) {
-                surveyRunStore.updateDueDate(id, {
-                    newDateVal: timeFormat("%Y-%m-%d")(newVal)
-                })
+                surveyRunStore
+                    .updateDueDate(id, {newDateVal: timeFormat("%Y-%m-%d")(newVal)})
                     .then(r => {
-                        notification.success("Survey run due date updated successfully");
+                        toasts.success("Survey run due date updated successfully");
                         loadSurveyRun();
                         loadInstances();
-                    },
-                        r => notification.error("Failed to update survey run due date")
-                    );
+                    }, r => toasts.error("Failed to update survey run due date"));
             }
         }
     };
@@ -114,7 +111,6 @@ function controller($stateParams,
 
 controller.$inject = [
     "$stateParams",
-    "Notification",
     "SurveyInstanceStore",
     "SurveyRunStore",
     "SurveyTemplateStore",

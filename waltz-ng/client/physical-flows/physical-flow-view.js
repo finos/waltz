@@ -22,6 +22,7 @@ import _ from "lodash";
 import template from "./physical-flow-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
 import {toEntityRef} from "../common/entity-utils";
+import toasts from "../svelte-stores/toast-store";
 
 
 const modes = {
@@ -101,7 +102,6 @@ function controller($q,
                     $state,
                     $stateParams,
                     historyStore,
-                    notification,
                     physicalFlowStore,
                     physicalSpecificationStore,
                     serviceBroker)
@@ -151,9 +151,9 @@ function controller($q,
         physicalSpecificationStore.deleteById(vm.specification.id)
             .then(r => {
                 if (r.outcome === "SUCCESS") {
-                    notification.success(`Specification ${vm.specification.name} deleted`);
+                    toasts.success(`Specification ${vm.specification.name} deleted`);
                 } else {
-                    notification.error(r.message);
+                    toasts.error(r.message);
                 }
                 navigateToLastView($state, historyStore);
             })
@@ -164,9 +164,9 @@ function controller($q,
             .execute(CORE_API.LogicalFlowStore.removeFlow, [vm.physicalFlow.logicalFlowId])
             .then(r => {
                 if (r.outcome === "SUCCESS") {
-                    notification.success(`Logical Flow between ${vm.logicalFlow.source.name} and ${vm.logicalFlow.target.name} deleted`);
+                    toasts.success(`Logical Flow between ${vm.logicalFlow.source.name} and ${vm.logicalFlow.target.name} deleted`);
                 } else {
-                    notification.error(r.message);
+                    toasts.error(r.message);
                 }
                 navigateToLastView($state, historyStore);
             });
@@ -174,7 +174,7 @@ function controller($q,
 
     const handleDeleteFlowResponse = (response) => {
         if (response.outcome === "SUCCESS") {
-            notification.success("Physical flow deleted");
+            toasts.success("Physical flow deleted");
             removeFromHistory(historyStore, vm.physicalFlow, vm.specification);
 
             if (response.isSpecificationUnused || response.isLastPhysicalFlow) {
@@ -192,7 +192,7 @@ function controller($q,
                 navigateToLastView($state, historyStore);
             }
         } else {
-            notification.error(response.message);
+            toasts.error(response.message);
         }
     };
 
@@ -264,10 +264,10 @@ function controller($q,
                 .loadViewData(
                     CORE_API.PhysicalFlowStore.merge,
                     [ fromId , toId ])
-                .then(notification.warning("Flow has been marked as duplicate"))
+                .then(toasts.warning("Flow has been marked as duplicate"))
                 .then(() => $state.reload())
         } else {
-            notification.info("De-duplication cancelled");
+            toasts.info("De-duplication cancelled");
         }
     };
 
@@ -286,7 +286,6 @@ controller.$inject = [
     "$state",
     "$stateParams",
     "HistoryStore",
-    "Notification",
     "PhysicalFlowStore",
     "PhysicalSpecificationStore",
     "ServiceBroker"

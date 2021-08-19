@@ -20,46 +20,47 @@ import _ from "lodash";
 import {CORE_API} from "../common/services/core-api-utils";
 import {formats, initialiseData} from "../common/index";
 import moment from "moment";
-import template from './attestation-run-create.html';
+import template from "./attestation-run-create.html";
+import toasts from "../svelte-stores/toast-store";
 
 
 const exactScope = {
-    value: 'EXACT',
-    name: 'Exact'
+    value: "EXACT",
+    name: "Exact"
 };
 
 
 const childrenScope = {
-    value: 'CHILDREN',
-    name: 'Children'
+    value: "CHILDREN",
+    name: "Children"
 };
 
 const initialState = {
     attestationRun: {
-        targetEntityKind: 'APPLICATION',
-        selectorEntityKind: 'APP_GROUP',
-        selectorScope: 'EXACT'
+        targetEntityKind: "APPLICATION",
+        selectorEntityKind: "APP_GROUP",
+        selectorScope: "EXACT"
     },
     availableAttestedKinds: [ "LOGICAL_DATA_FLOW", "PHYSICAL_FLOW", "MEASURABLE_CATEGORY"],
     targetEntityKinds: [{
-        name: 'Application',
-        value: 'APPLICATION'
+        name: "Application",
+        value: "APPLICATION"
     }],
     allowedEntityKinds: [{
-        value: 'APP_GROUP',
-        name: 'Application Group'
+        value: "APP_GROUP",
+        name: "Application Group"
     },{
-        value: 'ORG_UNIT',
-        name: 'Org Unit'
+        value: "ORG_UNIT",
+        name: "Org Unit"
     },{
-        value: 'MEASURABLE',
-        name: 'Measurable'
+        value: "MEASURABLE",
+        name: "Measurable"
     }],
     allowedScopes: {
-        'APP_GROUP': [exactScope],
-        'CHANGE_INITIATIVE': [exactScope],
-        'ORG_UNIT': [exactScope, childrenScope],
-        'MEASURABLE': [exactScope, childrenScope]
+        "APP_GROUP": [exactScope],
+        "CHANGE_INITIATIVE": [exactScope],
+        "ORG_UNIT": [exactScope, childrenScope],
+        "MEASURABLE": [exactScope, childrenScope]
     },
     displaySummary: false,
     loadingSummary: false
@@ -91,7 +92,6 @@ function mkCreateCommand(attestationRun){
 
 
 function controller($state,
-                    notification,
                     serviceBroker,
                     involvementKindStore) {
 
@@ -99,10 +99,10 @@ function controller($state,
 
     involvementKindStore.findAll()
         .then(
-        involvementKinds => {
-            vm.availableInvolvementKinds = involvementKinds;
-        }
-    );
+            involvementKinds => {
+                vm.availableInvolvementKinds = involvementKinds;
+            }
+        );
 
     vm.onSelectorEntityKindChange = () => {
         vm.attestationRun.selectorEntity = null;
@@ -113,7 +113,7 @@ function controller($state,
     };
 
     vm.onAttestedKindChange = () => {
-        if(vm.attestationRun.attestedEntityKind === 'MEASURABLE_CATEGORY') {
+        if(vm.attestationRun.attestedEntityKind === "MEASURABLE_CATEGORY") {
             serviceBroker
                 .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
                 .then(r => vm.measurableCategories = r.data);
@@ -139,10 +139,10 @@ function controller($state,
         serviceBroker
             .execute(CORE_API.AttestationRunStore.create, [command])
             .then(res => {
-                notification.success('Attestation run created successfully');
+                toasts.success("Attestation run created successfully");
                 serviceBroker.loadAppData(CORE_API.NotificationStore.findAll, [], { force: true });
-                $state.go('main.attestation.run.view', {id: res.data.id});
-            }, () => notification.error('Failed to create attestation run'))
+                $state.go("main.attestation.run.view", {id: res.data.id});
+            }, () => toasts.error("Failed to create attestation run"))
     };
 
     vm.cancel = () => {
@@ -153,16 +153,15 @@ function controller($state,
 
 
 controller.$inject = [
-    '$state',
-    'Notification',
-    'ServiceBroker',
-    'InvolvementKindStore'
+    "$state",
+    "ServiceBroker",
+    "InvolvementKindStore"
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };
 

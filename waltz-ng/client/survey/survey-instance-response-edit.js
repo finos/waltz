@@ -24,7 +24,7 @@ import moment from "moment";
 import {dynamicSections} from "../dynamic-section/dynamic-section-definitions";
 import template from "./survey-instance-response-edit.html";
 import * as actions from "./survey-actions";
-
+import toasts from "../svelte-stores/toast-store";
 
 const initialState = {
     changeLogSection: dynamicSections.changeLogSection,
@@ -52,7 +52,6 @@ function controller($location,
                     $state,
                     $stateParams,
                     $timeout,
-                    notification,
                     serviceBroker,
                     userService) {
 
@@ -190,7 +189,7 @@ function controller($location,
                 saveParams);
     };
 
-    vm.invokeStatusAction = actions.invokeStatusAction(serviceBroker, notification, reload, $timeout, $state)
+    vm.invokeStatusAction = actions.invokeStatusAction(serviceBroker, toasts, reload, $timeout, $state)
 
     // --- BOOT
     reload();
@@ -203,7 +202,6 @@ controller.$inject = [
     "$state",
     "$stateParams",
     "$timeout",
-    "Notification",
     "ServiceBroker",
     "UserService"
 ];

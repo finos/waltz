@@ -6,7 +6,6 @@
     import {positions} from "../store/layout";
     import {createEventDispatcher} from "svelte";
     import Icon from "../../../../common/svelte/Icon.svelte";
-    import ToastStore from "../../../../notification/components/toaster/toast-store"
 
     const dispatch = createEventDispatcher();
 

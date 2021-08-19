@@ -24,7 +24,7 @@ import {mkEnrichedAssessmentDefinitions} from "../../assessment-utils";
 import {displayError} from "../../../common/error-utils";
 import {resolveResponses} from "../../../common/promise-utils";
 import _ from "lodash";
-
+import toasts from "../../../svelte-stores/toast-store";
 
 const bindings = {
     parentEntityRef: "<",
@@ -35,7 +35,7 @@ const initialState = {
 };
 
 
-function controller($q, notification, serviceBroker) {
+function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const loadAll = () => {
@@ -100,10 +100,10 @@ function controller($q, notification, serviceBroker) {
             .execute(CORE_API.AssessmentRatingStore.remove, [ vm.parentEntityRef, ctx.definition.id ])
             .then(() => {
                 vm.onClose();
-                notification.warning("Assessment removed");
+                toasts.warning("Assessment removed");
             })
             .catch(e => {
-                displayError(notification, "Failed to remove", e);
+                displayError("Failed to remove", e);
             });
     };
 
@@ -115,9 +115,9 @@ function controller($q, notification, serviceBroker) {
                 [vm.parentEntityRef, definitionId, ratingId, comments])
             .then(d => {
                 loadAll();
-                notification.success("Assessment saved");
+                toasts.success("Assessment saved");
             })
-            .catch(e => displayError(notification, "Failed to save", e));
+            .catch(e => displayError("Failed to save", e));
     };
 
 }
@@ -125,7 +125,6 @@ function controller($q, notification, serviceBroker) {
 
 controller.$inject = [
     "$q",
-    "Notification",
     "ServiceBroker"
 ];
 

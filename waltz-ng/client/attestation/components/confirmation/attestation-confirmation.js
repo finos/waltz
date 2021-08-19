@@ -32,6 +32,7 @@ const bindings = {
 
 const initialState = {
     disabled: false,
+    attesting: false,
     onConfirm: (attestation) => console.log("default onConfirm handler for attestation-confirmation: "+ attestation),
     onCancel: () => console.log("default onCancel handler for attestation-confirmation")
 };
@@ -77,6 +78,7 @@ function controller($q, serviceBroker) {
         if (vm.disabled) {
             return;
         }
+        vm.attesting = true;
         invokeFunction(vm.onConfirm, attestation);
     };
 

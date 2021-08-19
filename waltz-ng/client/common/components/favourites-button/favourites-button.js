@@ -20,6 +20,7 @@ import _ from "lodash";
 import {initialiseData} from "../../../common";
 import template from "./favourites-button.html";
 import {CORE_API} from "../../services/core-api-utils";
+import toasts from "../../../svelte-stores/toast-store";
 
 const bindings = {
     parentEntityRef: "<",
@@ -32,7 +33,7 @@ const initialState = {
 };
 
 
-function controller(serviceBroker, notification) {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     function loadFavourites() {
@@ -46,7 +47,7 @@ function controller(serviceBroker, notification) {
             .then(() => {
                 const favourite = _.find(vm.favourites, d => d.id === vm.parentEntityRef.id);
                 vm.isFavourite = !_.isUndefined(favourite);
-                vm.isReadOnly = _.get(favourite, 'isReadOnly', false);
+                vm.isReadOnly = _.get(favourite, "isReadOnly", false);
             });
     };
 
@@ -54,7 +55,7 @@ function controller(serviceBroker, notification) {
         serviceBroker
             .execute(CORE_API.FavouritesStore.addApplication, [vm.parentEntityRef.id])
             .then(() => {
-                notification.success("Added to favourites");
+                toasts.success("Added to favourites");
                 vm.isFavourite = true;
             })
     };
@@ -62,12 +63,12 @@ function controller(serviceBroker, notification) {
     vm.removeFavourite = () => {
 
         if (vm.isReadOnly){
-            notification.error("This app is a direct involvement and cannot be removed from favorites")
+            toasts.error("This app is a direct involvement and cannot be removed from favorites")
         } else {
             serviceBroker
                 .execute(CORE_API.FavouritesStore.removeApplication, [vm.parentEntityRef.id])
                 .then(() => {
-                    notification.info("Removed from favourites");
+                    toasts.info("Removed from favourites");
                     vm.isFavourite = false;
                 })
         }
@@ -76,8 +77,7 @@ function controller(serviceBroker, notification) {
 
 
 controller.$inject = [
-    "ServiceBroker",
-    "Notification"
+    "ServiceBroker"
 ];
 
 

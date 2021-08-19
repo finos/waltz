@@ -21,7 +21,7 @@ import {initialiseData} from "../../../common";
 import roles from "../../../user/system-roles";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import _ from "lodash";
-
+import toasts from "../../../svelte-stores/toast-store";
 
 const bindings = {
     parentEntityRef: "<"
@@ -58,7 +58,7 @@ function determineLoadMethod(kind) {
 }
 
 
-function controller(notification, serviceBroker, userService) {
+function controller(serviceBroker, userService) {
 
     const vm = initialiseData(this, initialState);
 
@@ -114,7 +114,7 @@ function controller(notification, serviceBroker, userService) {
                 CORE_API.RoadmapStore.addRoadmap,
                 [ commandWithLinkedEntity ])
             .then(() => {
-                notification.success(`Roadmap "${command.name}" created`);
+                toasts.success(`Roadmap "${command.name}" created`);
                 vm.mode = modes.LOADING;
                 reloadData();
             })
@@ -127,7 +127,6 @@ function controller(notification, serviceBroker, userService) {
 
 
 controller.$inject = [
-    "Notification",
     "ServiceBroker",
     "UserService"
 ];

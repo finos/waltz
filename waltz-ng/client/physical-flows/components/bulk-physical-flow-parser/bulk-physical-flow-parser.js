@@ -29,11 +29,11 @@ import {displayError} from "../../../common/error-utils";
 
 
 const bindings = {
-    columnMappings: '<',
-    sourceData: '<',
+    columnMappings: "<",
+    sourceData: "<",
 
-    onInitialise: '<',
-    onParseComplete: '<'
+    onInitialise: "<",
+    onParseComplete: "<"
 };
 
 
@@ -48,15 +48,15 @@ const initialState = {
     sourceData: [],
     summary: {},
 
-    onInitialise: (event) => console.log('default onInitialise handler for bulk-physical-flow-parser: ', event),
-    onParseComplete: (event) => console.log('default onParseComplete handler for bulk-physical-flow-parser: ', event)
+    onInitialise: (event) => console.log("default onInitialise handler for bulk-physical-flow-parser: ", event),
+    onParseComplete: (event) => console.log("default onParseComplete handler for bulk-physical-flow-parser: ", event)
 };
 
 
 
 function mkEntityLinkColumnDef(columnHeading, entityRefField) {
     return {
-        field: 'parsedFlow.' + entityRefField + '.name',
+        field: "parsedFlow." + entityRefField + ".name",
         displayName: columnHeading,
         cellTemplate: `
             <div class="ui-grid-cell-contents">
@@ -75,7 +75,7 @@ function mkEntityLinkColumnDef(columnHeading, entityRefField) {
 
 function mkColumnDef(columnHeading, entityRefField) {
     return {
-        field: 'parsedFlow.' + entityRefField,
+        field: "parsedFlow." + entityRefField,
         displayName: columnHeading,
         cellTemplate: `
             <div class="ui-grid-cell-contents">
@@ -93,20 +93,20 @@ function mkColumnDef(columnHeading, entityRefField) {
 
 function mkColumnDefs() {
     return [
-        mkEntityLinkColumnDef('Source', 'source'),
-        mkEntityLinkColumnDef('Target', 'target'),
-        Object.assign({}, mkColumnDef('Name', 'name'), {width: '30%'}),
-        mkColumnDef('Format', 'format'),
-        mkColumnDef('Frequency', 'frequency'),
-        mkColumnDef('Basis Offset', 'basisOffset'),
-        mkColumnDef('Transport', 'transport'),
-        mkColumnDef('Criticality', 'criticality'),
-        mkEntityLinkColumnDef('Data Type', 'dataType'),
-        mkColumnDef('External ID', 'externalId'),
+        mkEntityLinkColumnDef("Source", "source"),
+        mkEntityLinkColumnDef("Target", "target"),
+        Object.assign({}, mkColumnDef("Name", "name"), {width: "30%"}),
+        mkColumnDef("Format", "format"),
+        mkColumnDef("Frequency", "frequency"),
+        mkColumnDef("Basis Offset", "basisOffset"),
+        mkColumnDef("Transport", "transport"),
+        mkColumnDef("Criticality", "criticality"),
+        mkEntityLinkColumnDef("Data Type", "dataType"),
+        mkColumnDef("External ID", "externalId"),
         {
-            field: 'entityReference',
-            displayName: '',
-            width: '5%',
+            field: "entityReference",
+            displayName: "",
+            width: "5%",
             cellTemplate: `
                 <div class="ui-grid-cell-contents"
                      ng-if="!row.entity.hasParseErrors">
@@ -132,8 +132,8 @@ function mapColumns(columnMappings = {}, sourceData = []) {
             targetObj[targetColumn] = sourceObj[sourceColumn];
         });
 
-        targetObj['owner'] = targetObj['owner'] || targetObj['source'];
-        targetObj['description'] = targetObj['description'] || '';
+        targetObj["owner"] = targetObj["owner"] || targetObj["source"];
+        targetObj["description"] = targetObj["description"] || "";
         return targetObj;
     });
     return mappedObjects;
@@ -150,8 +150,8 @@ function mkParseSummary(data = []) {
             circularFlows: 0,
             nonCircularFlows: data.length
         },
-        _.countBy(data, r => r.outcome === 'SUCCESS' && r.entityReference === null ? 'newFlows' : 'existingFlows'),
-        _.countBy(data, r => r.parsedFlow.source && r.parsedFlow.target && sameRef(r.parsedFlow.source, r.parsedFlow.target) ? 'circularFlows' : 'nonCircularFlows'));
+        _.countBy(data, r => r.outcome === "SUCCESS" && r.entityReference === null ? "newFlows" : "existingFlows"),
+        _.countBy(data, r => r.parsedFlow.source && r.parsedFlow.target && sameRef(r.parsedFlow.source, r.parsedFlow.target) ? "circularFlows" : "nonCircularFlows"));
 
     summary.errors = summary.missingEntities + summary.circularFlows;
     return summary;
@@ -160,12 +160,12 @@ function mkParseSummary(data = []) {
 
 function mkFilterPredicate(criteria) {
     switch (criteria) {
-        case 'ERROR':
-            return (r) => r.outcome === 'FAILURE';
-        case 'NEW':
-            return (r) => r.outcome === 'SUCCESS' && r.entityReference === null;
-        case 'EXISTING':
-            return (r) => r.outcome === 'SUCCESS' && r.entityReference !== null;
+        case "ERROR":
+            return (r) => r.outcome === "FAILURE";
+        case "NEW":
+            return (r) => r.outcome === "SUCCESS" && r.entityReference === null;
+        case "EXISTING":
+            return (r) => r.outcome === "SUCCESS" && r.entityReference !== null;
         default:
             return (r) => true;
     }
@@ -175,13 +175,13 @@ function mkFilterPredicate(criteria) {
 function parseErrorCount(data = []) {
     return  _.sumBy(data, f => _.chain(f.errors)
         .keys()
-        .filter(k => k !== 'owner')
+        .filter(k => k !== "owner")
         .value()
         .length);
 }
 
 
-function controller($scope, serviceBroker, notification) {
+function controller($scope, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.columnDefs = mkColumnDefs();
@@ -214,7 +214,7 @@ function controller($scope, serviceBroker, notification) {
         return resolveFlows()
             .then(flows => {
                 vm.loading = false;
-                const hasParseErrors = _.some(flows, f => f.outcome === 'FAILURE');
+                const hasParseErrors = _.some(flows, f => f.outcome === "FAILURE");
                 vm.parsedData = _.map(flows, f => Object.assign({}, f, { hasParseErrors }));
                 vm.filteredData = filterResults();
                 vm.summary = mkParseSummary(vm.parsedData);
@@ -230,7 +230,7 @@ function controller($scope, serviceBroker, notification) {
 
                 vm.errorMessage = _.split(err.data.message, "/")[0].trim();
 
-                displayError(notification, "Physical flows could not be created", err);
+                displayError("Physical flows could not be created", err);
             });
     };
 
@@ -272,18 +272,18 @@ function controller($scope, serviceBroker, notification) {
 
         const dataRows = _
             .chain(vm.filteredData)
-            .filter(mkFilterPredicate('ERROR'))
+            .filter(mkFilterPredicate("ERROR"))
             .map(flow => {
                 return [
-                    getPropertyOrError(flow, 'source.name', 'source'),
-                    getPropertyOrError(flow, 'target.name', 'target'),
-                    getPropertyOrError(flow, 'name'),
-                    getPropertyOrError(flow, 'format'),
-                    getPropertyOrError(flow, 'frequency'),
-                    getPropertyOrError(flow, 'basisOffset'),
-                    getPropertyOrError(flow, 'transport'),
-                    getPropertyOrError(flow, 'criticality'),
-                    getPropertyOrError(flow, 'externalId')
+                    getPropertyOrError(flow, "source.name", "source"),
+                    getPropertyOrError(flow, "target.name", "target"),
+                    getPropertyOrError(flow, "name"),
+                    getPropertyOrError(flow, "format"),
+                    getPropertyOrError(flow, "frequency"),
+                    getPropertyOrError(flow, "basisOffset"),
+                    getPropertyOrError(flow, "transport"),
+                    getPropertyOrError(flow, "criticality"),
+                    getPropertyOrError(flow, "externalId")
                 ];
             })
             .value();
@@ -291,15 +291,14 @@ function controller($scope, serviceBroker, notification) {
         const rows = [header]
             .concat(dataRows);
 
-        downloadTextFile(rows, ",", `physical_flow_errors.csv`);
+        downloadTextFile(rows, ",", "physical_flow_errors.csv");
     };
 }
 
 
 controller.$inject = [
-    '$scope',
-    'ServiceBroker',
-    'Notification'
+    "$scope",
+    "ServiceBroker"
 ];
 
 
@@ -312,5 +311,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzBulkPhysicalFlowParser'
+    id: "waltzBulkPhysicalFlowParser"
 };

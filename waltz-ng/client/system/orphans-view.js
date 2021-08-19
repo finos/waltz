@@ -18,8 +18,8 @@
 
 import {initialiseData} from "../common";
 import {CORE_API} from "../common/services/core-api-utils";
-import template from './orphans-view.html';
-
+import template from "./orphans-view.html";
+import toasts from "../svelte-stores/toast-store";
 
 const initialState = {
     orphans: [],
@@ -27,7 +27,6 @@ const initialState = {
 
 
 function controller($q,
-                    notification,
                     orphanStore,
                     serviceBroker) {
 
@@ -62,15 +61,15 @@ function controller($q,
                 attestations
             ]) => {
                 vm.orphans = [
-                    {description: 'Applications referencing non-existent Org Units', values: apps},
-                    {description: 'Application Measurable Ratings mapping to non-existent Measurables or Apps', values: measurableRatings},
-                    {description: 'Flow Classification Rules with non-existent Org Unit', values: authSourcesByOrgUnit},
-                    {description: 'Flow Classification Rules with non-existent Application', values: authSourcesByApp},
-                    {description: 'Flow Classification Rules with non-existent Data Type', values: authSourcesByDataType},
-                    {description: 'Change Initiatives with non-existent parent', values: changeInitiatives},
-                    {description: 'Logical Flows referencing non-existent applications', values: logicalFlows},
-                    {description: 'Physical Flows referencing non-existent logical flows or specifications', values: physicalFlows},
-                    {description: 'Attestations referencing non-existent applications', values: attestations}
+                    {description: "Applications referencing non-existent Org Units", values: apps},
+                    {description: "Application Measurable Ratings mapping to non-existent Measurables or Apps", values: measurableRatings},
+                    {description: "Flow Classification Rules with non-existent Org Unit", values: authSourcesByOrgUnit},
+                    {description: "Flow Classification Rules with non-existent Application", values: authSourcesByApp},
+                    {description: "Flow Classification Rules with non-existent Data Type", values: authSourcesByDataType},
+                    {description: "Change Initiatives with non-existent parent", values: changeInitiatives},
+                    {description: "Logical Flows referencing non-existent applications", values: logicalFlows},
+                    {description: "Physical Flows referencing non-existent logical flows or specifications", values: physicalFlows},
+                    {description: "Attestations referencing non-existent applications", values: attestations}
                 ];
             });
 
@@ -81,50 +80,49 @@ function controller($q,
     vm.cleanupLogicalFlows = () => {
         serviceBroker
             .execute(CORE_API.LogicalFlowStore.cleanupOrphans, [])
-            .then(r => notification.success(`Cleaned up ${r.data} flow/s`));
+            .then(r => toasts.success(`Cleaned up ${r.data} flow/s`));
     };
 
 
     vm.cleanupSelfReferencingLogicalFlows = () => {
         serviceBroker
             .execute(CORE_API.LogicalFlowStore.cleanupSelfReferences, [])
-            .then(r => notification.success(`Cleaned up ${r.data} flow/s`));
+            .then(r => toasts.success(`Cleaned up ${r.data} flow/s`));
     };
 
 
     vm.cleanupPhysicalFlows = () => {
         serviceBroker
             .execute(CORE_API.PhysicalFlowStore.cleanupOrphans, [])
-            .then(r => notification.success(`Cleaned up ${r.data} flow/s`));
+            .then(r => toasts.success(`Cleaned up ${r.data} flow/s`));
     };
 
 
     vm.cleanupFlowClassificationRules = () => {
         serviceBroker
             .execute(CORE_API.FlowClassificationRuleStore.cleanupOrphans, [])
-            .then(r => notification.success(`Cleaned up ${r.data} auth sources/s`));
+            .then(r => toasts.success(`Cleaned up ${r.data} auth sources/s`));
     };
 
     vm.cleanupAttestations = () => {
         serviceBroker
             .execute(CORE_API.AttestationInstanceStore.cleanupOrphans, [])
-            .then(r => notification.success(`Cleaned up ${r.data} attestations/s`));
+            .then(r => toasts.success(`Cleaned up ${r.data} attestations/s`));
     };
 }
 
 
 controller.$inject = [
-    '$q',
-    'Notification',
-    'OrphanStore',
-    'ServiceBroker'
+    "$q",
+    "OrphanStore",
+    "ServiceBroker"
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: "ctrl",
     bindToController: true,
     scope: {}
 };

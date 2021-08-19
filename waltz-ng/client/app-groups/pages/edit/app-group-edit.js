@@ -21,7 +21,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./app-group-edit.html";
 import {mkSelectionOptions} from "../../../common/selector-utils";
-
+import toasts from "../../../svelte-stores/toast-store";
 
 const initialState = {
     changeInitiatives: [],
@@ -108,7 +108,6 @@ function controller($q,
                     historyStore,
                     logicalFlowStore,
                     localStorageService,
-                    notification,
                     serviceBroker,
                     userService) {
 
@@ -138,7 +137,7 @@ function controller($q,
             .execute(CORE_API.AppGroupStore.addApplication, [id, app.id])
             .then(r => r.data)
             .then(apps => vm.applications = apps, e => handleError(e))
-            .then(() => notification.success("Added: " + app.name));
+            .then(() => toasts.success("Added: " + app.name));
     };
 
     vm.addToCIGroup = (ci) => {
@@ -146,7 +145,7 @@ function controller($q,
             .execute(CORE_API.AppGroupStore.addChangeInitiative, [id, ci.id])
             .then(r => r.data)
             .then(cis => vm.changeInitiatives = cis, e => handleError(e))
-            .then(() => notification.success("Added: " + ci.name));
+            .then(() => toasts.success("Added: " + ci.name));
     };
 
 
@@ -155,7 +154,7 @@ function controller($q,
             .execute(CORE_API.AppGroupStore.removeApplication, [id, app.id])
             .then(r => r.data)
             .then(apps => vm.applications = apps, e => handleError(e))
-            .then(() => notification.warning("Removed: " + app.name));
+            .then(() => toasts.warning("Removed: " + app.name));
     };
 
     vm.addOrgUnitToGroup = (orgUnit) => {
@@ -163,7 +162,7 @@ function controller($q,
             .execute(CORE_API.AppGroupStore.addOrganisationalUnit, [id, orgUnit.id])
             .then(r => r.data)
             .then(orgUnits => vm.organisationalUnits = orgUnits, e => handleError(e))
-            .then(() => notification.success("Added: " + orgUnit.name));
+            .then(() => toasts.success("Added: " + orgUnit.name));
     };
 
 
@@ -172,7 +171,7 @@ function controller($q,
             .execute(CORE_API.AppGroupStore.removeOrganisationalUnit, [id, orgUnit.id])
             .then(r => r.data)
             .then(orgUnits => vm.organisationalUnits = orgUnits, e => handleError(e))
-            .then(() => notification.warning("Removed: " + orgUnit.name));
+            .then(() => toasts.warning("Removed: " + orgUnit.name));
     };
 
 
@@ -195,7 +194,7 @@ function controller($q,
         serviceBroker
             .execute(CORE_API.AppGroupStore.addOwner, [member.groupId, member.userId])
             .then(r => Object.assign(vm, recalcMembers(r.data)))
-            .then(() => notification.success(`User: ${member.userId} is now an owner of the group`));
+            .then(() => toasts.success(`User: ${member.userId} is now an owner of the group`));
     };
 
 
@@ -203,14 +202,14 @@ function controller($q,
         serviceBroker
             .execute(CORE_API.AppGroupStore.removeOwner, [member.groupId, member.userId])
             .then(r => Object.assign(vm, recalcMembers(r.data)))
-            .then(() => notification.success(`User: ${member.userId} is now an viewer of the group`));
+            .then(() => toasts.success(`User: ${member.userId} is now an viewer of the group`));
     };
 
 
     vm.updateGroupOverview = () => {
         serviceBroker
             .execute(CORE_API.AppGroupStore.updateGroupOverview, [id, vm.appGroup])
-            .then(() => notification.success("Group details updated"));
+            .then(() => toasts.success("Group details updated"));
     };
 
 
@@ -305,7 +304,7 @@ function controller($q,
                     [id, Object.assign({}, {applicationIds: appIdsToAdd, unknownIdentifiers: unknownIdentifiers})])
                 .then(r => r.data)
                 .then(apps => vm.applications = apps, e => handleError(e))
-                .then(() => notification.success(`Added ${appIdsToAdd.length} applications`));
+                .then(() => toasts.success(`Added ${appIdsToAdd.length} applications`));
         }
 
         if (appIdsToRemove.length > 0) {
@@ -313,11 +312,11 @@ function controller($q,
                 .execute(CORE_API.AppGroupStore.removeApplications, [id, appIdsToRemove])
                 .then(r => r.data)
                 .then(apps => vm.applications = apps, e => handleError(e))
-                .then(() => notification.success(`Removed ${appIdsToRemove.length} applications`));
+                .then(() => toasts.success(`Removed ${appIdsToRemove.length} applications`));
         }
 
         if (appIdsToRemove.length === 0 && appIdsToAdd.length === 0){
-            notification.info("There are no applications to be added or removed");
+            toasts.info("There are no applications to be added or removed");
         }
     };
 
@@ -327,7 +326,7 @@ function controller($q,
 
         serviceBroker
             .execute(CORE_API.AppGroupStore.deleteGroup, [id])
-            .then(() => notification.warning("Deleted group: " + vm.appGroup.name))
+            .then(() => toasts.warning("Deleted group: " + vm.appGroup.name))
             .then(() => {
                 removeFromHistory(historyStore, vm.appGroup);
                 navigateToLastView($state, historyStore);
@@ -374,7 +373,7 @@ function controller($q,
                 .execute(CORE_API.AppGroupStore.addChangeInitiative, [id, changeInitiative.id])
                 .then(r => r.data)
                 .then(cis => vm.changeInitiatives = cis)
-                .then(() => notification.success("Associated Change Initiative: " + changeInitiative.name));
+                .then(() => toasts.success("Associated Change Initiative: " + changeInitiative.name));
 
         });
 
@@ -382,7 +381,7 @@ function controller($q,
         .execute(CORE_API.AppGroupStore.removeChangeInitiative, [id, changeInitiative.id])
         .then(r => r.data)
         .then(cis => vm.changeInitiatives = cis)
-        .then(() => notification.warning("Removed Change Initiative: " + changeInitiative.name));
+        .then(() => toasts.warning("Removed Change Initiative: " + changeInitiative.name));
 
     vm.saveChangeInitiatives = (results) => {
         const changeInitiativeIdsToAdd = _.chain(results)
@@ -402,7 +401,7 @@ function controller($q,
                     [id, Object.assign({}, {changeInitiativeIds: changeInitiativeIdsToAdd})])
                 .then(r => r.data)
                 .then(changeInitiatives => vm.changeInitiatives = changeInitiatives, e => handleError(e))
-                .then(() => notification.success(`Added ${changeInitiativeIdsToAdd.length} change initiatives`));
+                .then(() => toasts.success(`Added ${changeInitiativeIdsToAdd.length} change initiatives`));
         }
 
         if (changeInitiativeIdsToRemove.length > 0) {
@@ -410,11 +409,11 @@ function controller($q,
                 .execute(CORE_API.AppGroupStore.removeChangeInitiatives, [id, changeInitiativeIdsToRemove])
                 .then(r => r.data)
                 .then(changeInitiatives => vm.changeInitiatives = changeInitiatives, e => handleError(e))
-                .then(() => notification.success(`Removed ${changeInitiativeIdsToRemove.length} change initiatives`));
+                .then(() => toasts.success(`Removed ${changeInitiativeIdsToRemove.length} change initiatives`));
         }
 
         if (changeInitiativeIdsToAdd.length === 0 && changeInitiativeIdsToRemove.length === 0){
-            notification.info("There are no change initiatives to be added or removed");
+            toasts.info("There are no change initiatives to be added or removed");
         }
     };
 
@@ -436,7 +435,6 @@ controller.$inject = [
     "HistoryStore",
     "LogicalFlowStore",
     "localStorageService",
-    "Notification",
     "ServiceBroker",
     "UserService"
 ];

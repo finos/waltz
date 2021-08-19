@@ -21,6 +21,7 @@ import {initialiseData} from "../../../common/index";
 
 import template from "./logical-flow-view.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import toasts from "../../../svelte-stores/toast-store";
 
 
 const initialState = {
@@ -64,7 +65,6 @@ function navigateToLastView($state, historyStore) {
 function controller($state,
                     $stateParams,
                     historyStore,
-                    notification,
                     serviceBroker)
 {
     const vm = initialiseData(this, initialState);
@@ -91,9 +91,9 @@ function controller($state,
             .execute(CORE_API.LogicalFlowStore.removeFlow, [vm.logicalFlow.id])
             .then(r => {
                 if (r.data > 0) {
-                    notification.success(`Logical Flow between ${vm.logicalFlow.source.name} and ${vm.logicalFlow.target.name} deleted`);
+                    toasts.success(`Logical Flow between ${vm.logicalFlow.source.name} and ${vm.logicalFlow.target.name} deleted`);
                 } else {
-                    notification.error(r.message);
+                    toasts.error(r.message);
                 }
                 navigateToLastView($state, historyStore);
             });
@@ -101,10 +101,10 @@ function controller($state,
 
     const handleDeleteFlowResponse = (response) => {
         if (response > 0) {
-            notification.success("Logical flow deleted");
+            toasts.success("Logical flow deleted");
             removeFromHistory(historyStore, vm.logicalFlow);
         } else {
-            notification.error(response.message);
+            toasts.error(response.message);
         }
     };
 
@@ -121,7 +121,6 @@ controller.$inject = [
     "$state",
     "$stateParams",
     "HistoryStore",
-    "Notification",
     "ServiceBroker"
 ];
 

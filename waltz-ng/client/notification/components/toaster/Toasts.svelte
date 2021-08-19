@@ -1,8 +1,7 @@
 <script>
     import Toast from "./Toast.svelte";
-    import Toasts from "./toast-store";
+    import Toasts from "../../../svelte-stores/toast-store";
     import Markdown from "../../../common/svelte/Markdown.svelte";
-
 </script>
 
 {#if $Toasts}
@@ -17,7 +16,7 @@
     </section>
 {/if}
 
-<style type="text/scss">
+<style>
     section {
         position: fixed;
         bottom: 0;
@@ -28,5 +27,4 @@
         flex-direction: column-reverse;
         z-index: 1000;
     }
-
 </style>

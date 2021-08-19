@@ -22,6 +22,7 @@ import { initialiseData } from "../../../common";
 
 import template from "./physical-flow-participants-section.html";
 import {displayError} from "../../../common/error-utils";
+import toasts from "../../../svelte-stores/toast-store";
 
 
 const bindings = {
@@ -34,7 +35,7 @@ const initialState = {
 };
 
 
-function controller(serviceBroker, notification) {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const onAddParticipant = (s, kind) => {
@@ -43,10 +44,10 @@ function controller(serviceBroker, notification) {
                 CORE_API.PhysicalFlowParticipantStore.add,
                 [ vm.physicalFlow.id, kind, { kind: "SERVER", id: s.id } ])
             .then(() => {
-                notification.success("Participant added");
+                toasts.success("Participant added");
                 reloadParticipants();
             })
-            .catch(e => displayError(notification, "Failed to add participant" , e));
+            .catch(e => displayError("Failed to add participant" , e));
     };
 
     function reloadParticipants() {
@@ -81,10 +82,10 @@ function controller(serviceBroker, notification) {
                 CORE_API.PhysicalFlowParticipantStore.remove,
                 [ vm.physicalFlow.id, p.kind, p.participant ])
             .then(() => {
-                notification.success("Participant removed");
+                toasts.success("Participant removed");
                 reloadParticipants();
             })
-            .catch(e => displayError(notification, "Failed to add participant" , e));
+            .catch(e => displayError("Failed to add participant" , e));
     };
 
     vm.onAddSourceParticipant = s => onAddParticipant(s, "SOURCE");
@@ -93,8 +94,7 @@ function controller(serviceBroker, notification) {
 
 
 controller.$inject = [
-    "ServiceBroker",
-    "Notification"
+    "ServiceBroker"
 ];
 
 

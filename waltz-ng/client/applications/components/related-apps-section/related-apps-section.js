@@ -30,8 +30,7 @@ import {
     changeRelationshipFunctionsByKind,
     fetchRelationshipFunctionsByKind
 } from "../../../common/relationship-utils";
-
-
+import toasts from "../../../svelte-stores/toast-store";
 import template from "./related-apps-section.html";
 
 
@@ -83,7 +82,6 @@ function mkChangeCommand(operation, entityRef, relKind) {
 
 function controller($q,
                     displayNameService,
-                    notification,
                     serviceBroker) {
     const vm = initialiseData(this, initialState);
 
@@ -153,9 +151,9 @@ function controller($q,
                 [vm.parentEntityRef.id, mkChangeCommand("ADD", entityRel.entity, entityRel.relationship)])
             .then(result => {
                 if(result.data) {
-                    notification.success("Relationship added successfully");
+                    toasts.success("Relationship added successfully");
                 } else {
-                    notification.warning("Failed to add relationship")
+                    toasts.warning("Failed to add relationship")
                 }
                 return loadData(true);
             });
@@ -169,9 +167,9 @@ function controller($q,
                 [vm.parentEntityRef.id, mkChangeCommand("REMOVE", entityRel.entity, entityRel.relationship)])
             .then(result => {
                 if(result.data) {
-                    notification.success("Relationship removed successfully");
+                    toasts.success("Relationship removed successfully");
                 } else {
-                    notification.warning("Failed to remove relationship")
+                    toasts.warning("Failed to remove relationship")
                 }
                 return loadData(true);
             });
@@ -182,7 +180,6 @@ function controller($q,
 controller.$inject = [
     "$q",
     "DisplayNameService",
-    "Notification",
     "ServiceBroker"
 ];
 

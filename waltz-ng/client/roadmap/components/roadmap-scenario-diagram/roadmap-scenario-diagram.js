@@ -29,7 +29,7 @@ import roles from "../../../user/system-roles";
 import template from "./roadmap-scenario-diagram.html";
 import {getDefaultRating} from "../../../ratings/rating-utils";
 import {kindToViewState} from "../../../common/link-utils";
-
+import toasts from "../../../svelte-stores/toast-store";
 
 const bindings = {
     scenarioId: "<",
@@ -165,7 +165,6 @@ function mkLayoutOptions(domainCols = [], suppliedColWidths = {}) {
 function controller($q,
                     $timeout,
                     localStorageService,
-                    notification,
                     serviceBroker,
                     userService,
                     $window,
@@ -254,7 +253,7 @@ function controller($q,
                 .execute(
                     CORE_API.ScenarioStore.removeRating,
                     [removeRatingScenarioCommand])
-                .then(() => notification.success("Item removed"))
+                .then(() => toasts.success("Item removed"))
                 .then(() => reload());
         });
 
@@ -307,7 +306,7 @@ function controller($q,
                 title: "Hide",
                 action: (elm, d) => $timeout(() => {
                     if (vm.hiddenAxes.length === 0) {
-                        notification.info("Axis has been removed from grid, you can restore from the 'Hidden Axes' menu in Diagram Controls");
+                        toasts.info("Axis has been removed from grid, you can restore from the 'Hidden Axes' menu in Diagram Controls");
                     }
                     vm.hiddenAxes.push(d);
                     vm.vizData = prepData();
@@ -506,7 +505,7 @@ function controller($q,
             .then(() => {
                 _.remove(vm.dialog.applicationPickList, a => a.id === app.id);
                 reload();
-                notification.success("Added rating");
+                toasts.success("Added rating");
             });
     };
 
@@ -526,7 +525,7 @@ function controller($q,
                 [changeScenarioCommand])
             .then(() => {
                 reload();
-                notification.success("Edited rating");
+                toasts.success("Edited rating");
                 vm.onCloseDialog();
                 vm.lastRatings[item.id] = workingState.rating;
             });
@@ -552,7 +551,6 @@ controller.$inject = [
     "$q",
     "$timeout",
     "localStorageService",
-    "Notification",
     "ServiceBroker",
     "UserService",
     "$window",

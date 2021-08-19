@@ -19,6 +19,7 @@
 import {CORE_API} from "./common/services/core-api-utils";
 import WelcomeJs from "./welcome/welcome.js";
 import {activeSections} from "./dynamic-section/section-store";
+import toasts from "./svelte-stores/toast-store";
 
 function warmUpCache($q, serviceBroker) {
     return $q
@@ -90,12 +91,11 @@ configureScrollToTopOnChange.$inject = [
 // -- NAG ---
 
 function configureBetaNagMessageNotification($transitions,
-                                             nagMessageService,
-                                             notification) {
+                                             nagMessageService) {
 
     const nagFunction = (message = "") => {
         $transitions.onSuccess({}, () => {
-            notification.info(message);
+            toasts.info(message);
         });
     };
 
@@ -105,8 +105,7 @@ function configureBetaNagMessageNotification($transitions,
 
 configureBetaNagMessageNotification.$inject = [
     "$transitions",
-    "NagMessageService",
-    "Notification"
+    "NagMessageService"
 ];
 
 
