@@ -32,6 +32,12 @@
         </div>
 
         <div>
+            <div style="display: inline-block;">
+                <waltz-loading-notification show="$ctrl.attesting"
+                                            name="Attesting...">
+                </waltz-loading-notification>
+            </div>
+
             <button class="btn btn-sm btn-success"
                     ng-class="{
                         'disabled': $ctrl.disabled

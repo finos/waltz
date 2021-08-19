@@ -30,7 +30,8 @@ const bindings = {
     iconPlacement: "@?",
     additionalDisplayData: "<?",
     showExternalId: "<?",
-    tooltipPlacement: "@?"
+    tooltipPlacement: "@?",
+    popoverDelay: "<?"
 };
 
 
@@ -41,7 +42,8 @@ const initialState = {
     trigger: "none",
     ready: false,
     additionalDisplayData: [],
-    genericAvatarDataUrl
+    genericAvatarDataUrl,
+    popoverDelay: 300
 };
 
 
