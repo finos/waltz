@@ -25,7 +25,7 @@
     import {prepareSaveCmd} from "./panel-utils";
     import RemoveDiagramSubPanel from "./RemoveDiagramSubPanel.svelte";
     import Markdown from "../../../../common/svelte/Markdown.svelte";
-    import ToastStore from "../../../../notification/components/toaster/toast-store"
+    import ToastStore from "../../../../svelte-stores/toast-store"
     import {displayError} from "../../../../common/error-utils";
 
 
@@ -67,7 +67,7 @@
 
         savePromise = flowDiagramStore.save(saveCmd)
             .then(() => ToastStore.success("Diagram saved successfully"))
-            .catch(e => displayError(null, "Could not save flow diagram", e.response));
+            .catch(e => displayError("Could not save flow diagram", e.response));
 
         dirty.set(false);
     }

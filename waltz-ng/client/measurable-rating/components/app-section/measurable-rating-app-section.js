@@ -61,8 +61,10 @@ function controller($q, serviceBroker) {
                 Object.assign(vm, r);
                 vm.tabs = mkTabs(vm, false);
                 const firstNonEmptyTab = determineStartingTab(vm.tabs);
-                vm.visibility.tab = firstNonEmptyTab ? firstNonEmptyTab.category.id : null;
-                vm.onTabChange(firstNonEmptyTab);
+                if (firstNonEmptyTab) {
+                    vm.visibility.tab = firstNonEmptyTab.category.id;
+                    vm.onTabChange(firstNonEmptyTab);
+                }
             });
     };
 

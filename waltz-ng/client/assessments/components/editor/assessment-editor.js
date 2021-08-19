@@ -44,7 +44,7 @@ const initialState = {
 };
 
 
-function controller(notification, userService) {
+function controller(userService) {
     const vm = initialiseData(this, initialState);
 
 
@@ -107,14 +107,13 @@ function controller(notification, userService) {
                     vm.isRemovable = !_.isNil(vm.assessment.rating);
                 }
             });
-            vm.mode = modes.VIEW;
+        vm.mode = modes.VIEW;
     }
 
 }
 
 
 controller.$inject = [
-    "Notification",
     "UserService"
 ];
 

@@ -20,7 +20,7 @@ import _ from "lodash";
 import {CORE_API, getApiReference} from "../../common/services/core-api-utils";
 import template from "./navbar-profile.html";
 import roles from "../../user/system-roles";
-import ToastStore from "../../notification/components/toaster/toast-store"
+import ToastStore from "../../svelte-stores/toast-store"
 
 const bindings = {
     logoOverlayText: "<"

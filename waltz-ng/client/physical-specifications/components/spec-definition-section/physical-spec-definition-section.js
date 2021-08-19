@@ -20,12 +20,13 @@ import _ from "lodash";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {initialiseData} from "../../../common";
 import {displayError} from "../../../common/error-utils";
+import toasts from "../../../svelte-stores/toast-store";
 
 import template from "./physical-spec-definition-section.html";
 
 
 const bindings = {
-    parentEntityRef: '<'
+    parentEntityRef: "<"
 };
 
 
@@ -45,7 +46,6 @@ function mkReleaseLifecycleStatusChangeCommand(newStatus) {
 
 
 function controller($q,
-                    notification,
                     serviceBroker) {
 
     const vm = initialiseData(this, initialState);
@@ -74,12 +74,12 @@ function controller($q,
         .then(r => r.data)
         .then(specDefs => vm.specDefinitions = specDefs)
         .then(specDefs => {
-            const activeSpec = _.find(specDefs, { status: 'ACTIVE'});
+            const activeSpec = _.find(specDefs, { status: "ACTIVE"});
             if (activeSpec) vm.selectSpecDefinition(activeSpec, force);
 
             const selectionOptions = {
-                scope: 'EXACT',
-                entityReference: { kind: 'PHYSICAL_SPECIFICATION', id: vm.parentEntityRef.id }
+                scope: "EXACT",
+                entityReference: { kind: "PHYSICAL_SPECIFICATION", id: vm.parentEntityRef.id }
             };
 
             serviceBroker
@@ -133,11 +133,11 @@ function controller($q,
                 }
             })
             .then(r => {
-                notification.success('Specification definition created successfully');
+                toasts.success("Specification definition created successfully");
                 loadSpecDefinitions(true);
                 vm.hideCreateSpecDefinition();
             })
-            .catch(e => displayError(notification, "Unable to create specification definition", e));
+            .catch(e => displayError("Unable to create specification definition", e));
     };
 
     vm.deleteSpec = (specDef) => {
@@ -146,38 +146,38 @@ function controller($q,
             .then(r => r.data)
             .then(result => {
                 if (result) {
-                    notification.success(`Deleted version ${specDef.version}`);
+                    toasts.success(`Deleted version ${specDef.version}`);
                     loadSpecDefinitions(true);
                 } else {
-                    notification.error(`Could not delete version ${specDef.version}`);
+                    toasts.error(`Could not delete version ${specDef.version}`);
                 }
             });
     };
 
     vm.activateSpec = (specDef) => {
         serviceBroker
-            .execute(CORE_API.PhysicalSpecDefinitionStore.updateStatus, [specDef.id, mkReleaseLifecycleStatusChangeCommand('ACTIVE')])
+            .execute(CORE_API.PhysicalSpecDefinitionStore.updateStatus, [specDef.id, mkReleaseLifecycleStatusChangeCommand("ACTIVE")])
             .then(r => r.data)
             .then(result => {
                 if (result) {
-                    notification.success(`Marked version ${specDef.version} as active`);
+                    toasts.success(`Marked version ${specDef.version} as active`);
                     loadSpecDefinitions(true);
                 } else {
-                    notification.error(`Could not mark version ${specDef.version} as active`);
+                    toasts.error(`Could not mark version ${specDef.version} as active`);
                 }
             });
     };
 
     vm.markSpecObsolete = (specDef) => {
         serviceBroker
-            .execute(CORE_API.PhysicalSpecDefinitionStore.updateStatus, [specDef.id, mkReleaseLifecycleStatusChangeCommand('OBSOLETE')])
+            .execute(CORE_API.PhysicalSpecDefinitionStore.updateStatus, [specDef.id, mkReleaseLifecycleStatusChangeCommand("OBSOLETE")])
             .then(r => r.data)
             .then(result => {
                 if (result) {
-                    notification.success(`Marked version ${specDef.version} as obsolete`);
+                    toasts.success(`Marked version ${specDef.version} as obsolete`);
                     loadSpecDefinitions(true);
                 } else {
-                    notification.error(`Could not mark version ${specDef.version} as obsolete`);
+                    toasts.error(`Could not mark version ${specDef.version} as obsolete`);
                 }
             });
     };
@@ -188,10 +188,10 @@ function controller($q,
             .execute(CORE_API.PhysicalSpecDefinitionFieldStore.updateDescription, [field.id, cmd])
             .then(result => {
                 if (result) {
-                    notification.success(`Updated description for field`);
+                    toasts.success("Updated description for field");
                     vm.selectSpecDefinition(vm.selectedSpecDefinition.def, true);
                 } else {
-                    notification.error(`Could not update field description`);
+                    toasts.error("Could not update field description");
                 }
             });
     };
@@ -202,11 +202,11 @@ function controller($q,
             .execute(CORE_API.PhysicalSpecDefinitionFieldStore.updateLogicalElement, [field.id, cmd])
             .then(result => {
                 if (result) {
-                    notification.success(`Updated logical data element for field`);
+                    toasts.success("Updated logical data element for field");
 
                     const selectionOptions = {
-                        scope: 'EXACT',
-                        entityReference: { kind: 'PHYSICAL_SPECIFICATION', id: vm.parentEntityRef.id }
+                        scope: "EXACT",
+                        entityReference: { kind: "PHYSICAL_SPECIFICATION", id: vm.parentEntityRef.id }
                     };
 
                     serviceBroker
@@ -215,7 +215,7 @@ function controller($q,
 
                     vm.selectSpecDefinition(vm.selectedSpecDefinition.def, true);
                 } else {
-                    notification.error(`Could not update logical data element`);
+                    toasts.error("Could not update logical data element");
                 }
             });
     };
@@ -223,9 +223,8 @@ function controller($q,
 
 
 controller.$inject = [
-    '$q',
-    'Notification',
-    'ServiceBroker'
+    "$q",
+    "ServiceBroker"
 ];
 
 
@@ -238,5 +237,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzPhysicalSpecDefinitionSection'
+    id: "waltzPhysicalSpecDefinitionSection"
 };

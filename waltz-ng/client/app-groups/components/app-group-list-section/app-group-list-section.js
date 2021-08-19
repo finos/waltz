@@ -20,6 +20,7 @@ import _ from "lodash";
 import template from "./app-group-list-section.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
+import toasts from "../../../svelte-stores/toast-store";
 
 const bindings = {
     groupSubscriptions: "<"
@@ -38,7 +39,7 @@ function removeUsedGroups(allGroups, existingSubscriptions) {
 }
 
 
-function controller(serviceBroker, notification, $scope, $state) {
+function controller(serviceBroker, $scope, $state) {
 
     const vm = initialiseData(this, initialData);
 
@@ -74,7 +75,7 @@ function controller(serviceBroker, notification, $scope, $state) {
         serviceBroker
             .execute(CORE_API.AppGroupStore.createNewGroup)
             .then(r => {
-                notification.success("New group created");
+                toasts.success("New group created");
                 $state.go("main.app-group.edit", { id: r.data })
             });
     };
@@ -83,7 +84,7 @@ function controller(serviceBroker, notification, $scope, $state) {
     vm.unsubscribe = (subscription) => {
         unsubscribeFromGroup(subscription)
             .then(groupSubscriptions => vm.groupSubscriptions = groupSubscriptions)
-            .then(() => notification.warning(`Unsubscribed from: ${subscription.appGroup.name}`));
+            .then(() => toasts.warning(`Unsubscribed from: ${subscription.appGroup.name}`));
     };
 
 
@@ -94,7 +95,7 @@ function controller(serviceBroker, notification, $scope, $state) {
             .execute(CORE_API.AppGroupStore.deleteGroup, [group.appGroup.id])
             .then(r => r.data)
             .then(groupSubscriptions => vm.groupSubscriptions = groupSubscriptions)
-            .then(() => notification.warning(`Deleted group: ${group.appGroup.name}`));
+            .then(() => toasts.warning(`Deleted group: ${group.appGroup.name}`));
 
     };
 
@@ -110,11 +111,11 @@ function controller(serviceBroker, notification, $scope, $state) {
 
     };
 
-    $scope.$watch('$ctrl.selectedPublicGroup', selected => {
+    $scope.$watch("$ctrl.selectedPublicGroup", selected => {
         if (selected && _.isObject(selected)) {
             subscribeToGroup(selected)
                 .then(groupSubscriptions => vm.groupSubscriptions = groupSubscriptions)
-                .then(() => notification.success(`Subscribed to: ${selected.name}`))
+                .then(() => toasts.success(`Subscribed to: ${selected.name}`))
                 .then(() => vm.selectedPublicGroup = null);
 
         }
@@ -123,7 +124,6 @@ function controller(serviceBroker, notification, $scope, $state) {
 
 controller.$inject = [
     "ServiceBroker",
-    "Notification",
     "$scope",
     "$state"
 ];

@@ -16,21 +16,22 @@
  *
  */
 
-import _ from 'lodash';
-import {initialiseData} from '../common';
-import {kindToViewState} from '../common/link-utils';
+import _ from "lodash";
+import {initialiseData} from "../common";
+import {kindToViewState} from "../common/link-utils";
 
 
-import template from './physical-flow-registration.html';
+import template from "./physical-flow-registration.html";
 import {CORE_API} from "../common/services/core-api-utils";
 import {loadEntity} from "../common/entity-utils";
 import {removeEnrichments} from "./physical-flow-utils";
 import {columnDef, withWidth} from "../physical-flow/physical-flow-table-utilities";
 import PhysicalFlowRegistrationView from "./svelte/PhysicalFlowRegistrationView.svelte";
+import toasts from "../svelte-stores/toast-store";
 
 
 const initialState = {
-    cancelLink: '#/',
+    cancelLink: "#/",
     existingSpecifications: [],
     flowAttributes: null,
     sourceEntity: null,
@@ -80,7 +81,6 @@ function controller(
     $scope,
     $state,
     $stateParams,
-    notification,
     serviceBroker,
     preventNavigationService) {
 
@@ -124,21 +124,20 @@ function controller(
     };
 
     vm.focusSpecification = () => {
-        vm.visibility.editor = 'SPECIFICATION';
+        vm.visibility.editor = "SPECIFICATION";
     };
 
     vm.focusFlowAttributes = () => {
-        vm.visibility.editor = 'FLOW-ATTRIBUTES';
+        vm.visibility.editor = "FLOW-ATTRIBUTES";
     };
 
     vm.focusTarget = () => {
-        vm.visibility.editor = 'TARGET-LOGICAL-FLOW';
+        vm.visibility.editor = "TARGET-LOGICAL-FLOW";
     };
 
     vm.focusClone = () => {
-        vm.visibility.editor = 'CLONE';
+        vm.visibility.editor = "CLONE";
         vm.visibility.loading = true;
-        console.log('focusClone', { vm })
     };
 
     vm.attributesChanged = (attributes) => {
@@ -158,7 +157,7 @@ function controller(
     };
 
     vm.editorDismiss = () => {
-        vm.visibility.editor = '';
+        vm.visibility.editor = "";
         vm.validation = doValidation();
     };
 
@@ -167,7 +166,7 @@ function controller(
         vm.flowAttributes = toAttributes(flow.physical);
         vm.targetLogicalFlow = flow.logical;
         vm.editorDismiss();
-        notification.info("Flow has been cloned, please make some changes before saving.")
+        toasts.info("Flow has been cloned, please make some changes before saving.")
     };
 
     vm.doSave = () => {
@@ -182,25 +181,25 @@ function controller(
                 .execute(CORE_API.PhysicalFlowStore.create, [cmd])
                 .then(r => {
                     const resp = r.data;
-                    if(resp.outcome == 'SUCCESS') {
+                    if(resp.outcome === "SUCCESS") {
                         const successMessage = vm.specification.isRemoved
                             ? "Created new flow and activated the selected specification."
                             : "Created new flow";
-                        notification.info(successMessage);
-                    } else if(resp.outcome == 'FAILURE') {
-                        notification.warning(resp.message + ", redirected to existing.")
+                        toasts.info(successMessage);
+                    } else if(resp.outcome === "FAILURE") {
+                        toasts.warning(resp.message + ", redirected to existing.")
                     }
                     if(resp.entityReference) {
                         //clear variables
                         vm.specification = null;
                         vm.flowAttributes = null;
                         vm.targetLogicalFlow = null;
-                        $state.go('main.physical-flow.view', {id: resp.entityReference.id});
+                        $state.go("main.physical-flow.view", {id: resp.entityReference.id});
                     }
                 });
         } else {
-            const messages =  _.join(validationResult.messages, '<br> - ');
-            notification.warning("Cannot save: <br> - " + messages);
+            const messages =  _.join(validationResult.messages, "<br> - ");
+            toasts.warning("Cannot save: <br> - " + messages);
         }
     };
 
@@ -218,23 +217,22 @@ function controller(
             vm.outboundLogicalFlows = _
                 .chain(r.data)
                 .filter(f => f.source.kind === sourceEntityRef.kind && f.source.id === sourceEntityRef.id)
-                .orderBy('target.name')
+                .orderBy("target.name")
                 .value());
 }
 
 
 controller.$inject = [
-    '$scope',
-    '$state',
-    '$stateParams',
-    'Notification',
-    'ServiceBroker',
-    'PreventNavigationService'
+    "$scope",
+    "$state",
+    "$stateParams",
+    "ServiceBroker",
+    "PreventNavigationService"
 ];
 
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl'
+    controllerAs: "ctrl"
 };

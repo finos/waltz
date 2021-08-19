@@ -5,7 +5,7 @@
     import Icon from "../../../common/svelte/Icon.svelte";
     import EntityLabel from "../../../common/svelte/EntityLabel.svelte";
     import DataTypeTreeSelector from "../../../common/svelte/DataTypeTreeSelector.svelte";
-    import ToastStore from "../../../notification/components/toaster/toast-store"
+    import ToastStore from "../../../svelte-stores/toast-store"
 
     import {mode, Modes, selectedClassificationRule} from "./editingFlowClassificationRulesState";
     import {flowClassificationStore} from "../../../svelte-stores/flow-classification-store";
@@ -42,12 +42,12 @@
         if (workingCopy.id) {
             submitUpdate()
                 .then(() => ToastStore.success("Flow classification rule updated"))
-                .catch(e => displayError(null, "Failed to update flow classification rule", e));
+                .catch(e => displayError("Failed to update flow classification rule", e));
 
         } else {
             submitCreate()
                 .then(() => ToastStore.success("Flow classification rule created"))
-                .catch(e => displayError(null, "Failed to create new flow classification rule", e));
+                .catch(e => displayError("Failed to create new flow classification rule", e));
         }
     }
 

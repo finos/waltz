@@ -18,14 +18,16 @@
 
 import {CORE_API} from "../common/services/core-api-utils";
 import template from "./custom-role.html";
-import {displayError} from "../../client/common/error-utils";
+import {displayError} from "../common/error-utils";
+import toasts from "../svelte-stores/toast-store";
 
-function controller(serviceBroker, notification) {
+
+function controller(serviceBroker) {
     const vm = this;
 
     const reload = () =>
         serviceBroker.loadViewData(CORE_API.RoleStore.findAllRoles, [])
-        .then(result => vm.roles = result.data);
+            .then(result => vm.roles = result.data);
 
     reload();
 
@@ -33,9 +35,9 @@ function controller(serviceBroker, notification) {
         vm.roleKey = vm.roleName
             ? vm.roleName
                 .toUpperCase()
-                .replace(/\s+/g,'_') //replacing whitespaces with _
-                .replace(/\W/g, '') //Remove any non alphanumeric character
-            : '';
+                .replace(/\s+/g,"_") //replacing whitespaces with _
+                .replace(/\W/g, "") //Remove any non alphanumeric character
+            : "";
     };
 
     vm.createRole = (roleName, description) => {
@@ -50,14 +52,14 @@ function controller(serviceBroker, notification) {
         serviceBroker.execute(CORE_API.RoleStore.createCustomRole, [payload])
             .then(
                 () => {
-                    notification.info("Role created successfully");
+                    toasts.info("Role created successfully");
                     reload();
                 })
-            .catch(e => displayError(notification, "Failed to create role! ", e))
+            .catch(e => displayError("Failed to create role! ", e));
     };
 }
 
-controller.$inject = ['ServiceBroker', 'Notification'];
+controller.$inject = ["ServiceBroker"];
 
 
 export default {

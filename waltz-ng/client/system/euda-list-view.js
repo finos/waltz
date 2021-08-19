@@ -15,11 +15,11 @@
  * See the License for the specific
  *
  */
-import template from './euda-list-view.html';
+import template from "./euda-list-view.html";
 import {CORE_API} from "../common/services/core-api-utils";
 import {initialiseData} from "../common";
 import * as _ from "lodash";
-
+import toasts from "../svelte-stores/toast-store";
 
 const initialState = {
     selectedEuda: null,
@@ -27,7 +27,7 @@ const initialState = {
 };
 
 
-function controller(serviceBroker, notification) {
+function controller(serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
@@ -54,14 +54,15 @@ function controller(serviceBroker, notification) {
     vm.promoteToApplication = (id) => {
         if (confirm("Are you sure you want to promote this End User Application to a Application in Waltz?")){
             return serviceBroker
-                .loadViewData(CORE_API.EndUserAppStore.promoteToApplication,
+                .loadViewData(
+                    CORE_API.EndUserAppStore.promoteToApplication,
                     [id] )
                 .then(r => {
                     vm.recentlyPromoted = _.concat(vm.recentlyPromoted, Object.assign({}, vm.selectedEuda, {appId: r.data.id}));
                     vm.selectedEuda = null;
                 })
-                .then(() => notification.success('EUDA successfully promoted'))
-                .catch(e => notification.error(`Could not promote EUDA: ${e.data.message}`))
+                .then(() => toasts.success("EUDA successfully promoted"))
+                .catch(e => toasts.error(`Could not promote EUDA: ${e.data.message}`))
                 .then(() => loadData());
         }
     }
@@ -101,8 +102,7 @@ function mkColumnDefs() {
 
 
 controller.$inject = [
-    "ServiceBroker",
-    "Notification"
+    "ServiceBroker"
 ];
 
 

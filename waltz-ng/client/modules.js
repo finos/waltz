@@ -21,7 +21,6 @@ import "angular-loading-bar";
 import "angular-local-storage";
 import "angular-sanitize";
 import "angular-tree-control";
-import "angular-ui-notification";
 import "angular-ui-grid/ui-grid";
 import "angular-ui-bootstrap";
 import "ng-tags-input";
@@ -131,7 +130,6 @@ const dependencies = [
     "ui.grid.resizeColumns",
     "ui.grid.selection",
     "ui.grid.pinning",
-    "ui-notification",
     "ngAnimate",
     "ngSanitize",
     "ngTagsInput",

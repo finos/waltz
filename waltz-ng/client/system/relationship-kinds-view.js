@@ -21,7 +21,7 @@ import {initialiseData} from "../common";
 import * as _ from "lodash";
 import {displayError} from "../common/error-utils";
 import {entity} from "../common/services/enums/entity";
-
+import toasts from "../svelte-stores/toast-store";
 
 const initialState = {
     relationshipKinds: [],
@@ -74,7 +74,7 @@ const columnDefs = [
 ];
 
 
-function controller(serviceBroker, $q, notification) {
+function controller(serviceBroker, $q) {
 
     const vm = initialiseData(this, initialState);
 
@@ -96,9 +96,9 @@ function controller(serviceBroker, $q, notification) {
                 vm.measurableCategories = measurableCategories;
 
                 vm.relationshipKinds = _.map(relationshipKinds,
-                        r => Object.assign({},
-                            r, {categoryA: _.get(categoriesById, r.categoryA, null),
-                                categoryB: _.get(categoriesById, r.categoryB, null)}));
+                                             r => Object.assign({},
+                                                                r, {categoryA: _.get(categoriesById, r.categoryA, null),
+                                                                    categoryB: _.get(categoriesById, r.categoryB, null)}));
             });
     }
 
@@ -162,9 +162,9 @@ function controller(serviceBroker, $q, notification) {
     vm.isValid = () => {
         return _.isUndefined(
             _.find(vm.relationshipKinds, {
-                'kindA': vm.form.kindA,
-                'kindB': vm.form.kindB,
-                'code': _.toUpper(_.replace(vm.form.name, /\s+/g, "_"))
+                "kindA": vm.form.kindA,
+                "kindB": vm.form.kindB,
+                "code": _.toUpper(_.replace(vm.form.name, /\s+/g, "_"))
             }));
     };
 
@@ -188,12 +188,12 @@ function controller(serviceBroker, $q, notification) {
 
         serviceBroker.execute(CORE_API.RelationshipKindStore.update, [ selectedRelationshipKindId, submission ])
             .then(() => {
-                notification.success("Updated relationship");
+                toasts.success("Updated relationship");
                 vm.onDismiss();
             })
             .then(() => loadData())
-            .then(() => vm.selectedRelationshipKind = _.find(vm.relationshipKinds, ['id', selectedRelationshipKindId]))
-            .catch(e => displayError(notification, "Could not update relationship", e))
+            .then(() => vm.selectedRelationshipKind = _.find(vm.relationshipKinds, ["id", selectedRelationshipKindId]))
+            .catch(e => displayError("Could not update relationship", e))
     };
 
 
@@ -204,10 +204,10 @@ function controller(serviceBroker, $q, notification) {
         return serviceBroker
             .execute(CORE_API.RelationshipKindStore.create, [ vm.form ])
             .then(() => {
-                notification.success("Relationship saved");
+                toasts.success("Relationship saved");
                 loadData();
                 vm.onDismiss();
-            }).catch(e => displayError(notification,"Could not create relationship", e));
+            }).catch(e => displayError("Could not create relationship", e));
     };
 
     vm.removeRelationshipKind = () => {
@@ -216,12 +216,12 @@ function controller(serviceBroker, $q, notification) {
                 CORE_API.RelationshipKindStore.remove,
                 [vm.selectedRelationshipKind.id])
                 .then(() => {
-                    notification.warning("Relationship removed");
+                    toasts.warning("Relationship removed");
                     loadData();
                     vm.selectedRelationshipKind = null;
                 })
                 .catch(e => {
-                    displayError(notification, "Relationship kind could not be removed", e)
+                    displayError("Relationship kind could not be removed", e);
                 });
         }
     }
@@ -229,8 +229,7 @@ function controller(serviceBroker, $q, notification) {
 
 controller.$inject = [
     "ServiceBroker",
-    "$q",
-    "Notification"
+    "$q"
 ];
 
 

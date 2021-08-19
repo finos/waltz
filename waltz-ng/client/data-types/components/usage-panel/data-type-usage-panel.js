@@ -20,6 +20,7 @@ import {initialiseData} from "../../../common/index";
 import template from "./data-type-usage-panel.html";
 import roles from "../../../user/system-roles";
 import {loadUsageData} from "../../data-type-utils";
+import toasts from "../../../svelte-stores/toast-store";
 
 
 const bindings = {
@@ -40,7 +41,7 @@ const initialState = {
 };
 
 
-function controller(notification, serviceBroker, userService, $q) {
+function controller(serviceBroker, userService, $q) {
     const vm = initialiseData(this, initialState);
 
     const reload = (force = false) => {
@@ -70,13 +71,13 @@ function controller(notification, serviceBroker, userService, $q) {
     vm.onSave = () => {
         if(!vm.isDirty)
             return;
-        if(vm.parentEntityRef.kind === 'PHYSICAL_SPECIFICATION' && !confirm("This will affect all associated physical flows. Do you want to continue?")){
+        if(vm.parentEntityRef.kind === "PHYSICAL_SPECIFICATION" && !confirm("This will affect all associated physical flows. Do you want to continue?")){
             return;
         }
         if (vm.save) {
             vm.save()
                 .then(() => {
-                    notification.success("Data types updated successfully");
+                    toasts.success("Data types updated successfully");
                     reload(true);
                     vm.onHideEdit();
                 });
@@ -96,7 +97,6 @@ function controller(notification, serviceBroker, userService, $q) {
 
 
 controller.$inject = [
-    "Notification",
     "ServiceBroker",
     "UserService",
     "$q"

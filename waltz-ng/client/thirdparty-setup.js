@@ -17,44 +17,44 @@
  */
 
 function uiSelectSetup(uiSelectConfig) {
-    uiSelectConfig.theme = 'bootstrap';
+    uiSelectConfig.theme = "bootstrap";
     uiSelectConfig.resetSearchInput = true;
     uiSelectConfig.appendToBody = true;
 }
 
-uiSelectSetup.$inject = ['uiSelectConfig'];
+uiSelectSetup.$inject = ["uiSelectConfig"];
 
 
 function authProviderSetup($authProvider, BaseUrl) {
     $authProvider.baseUrl = BaseUrl;
-    $authProvider.loginUrl = '/authentication/login';
+    $authProvider.loginUrl = "/authentication/login";
     $authProvider.withCredentials = false;
 
     $authProvider.google({
-        clientId: 'Google account'
+        clientId: "Google account"
     });
 
     $authProvider.github({
-        clientId: 'GitHub Client ID'
+        clientId: "GitHub Client ID"
     });
 
     $authProvider.linkedin({
-        clientId: 'LinkedIn Client ID'
+        clientId: "LinkedIn Client ID"
     });
 }
 
 authProviderSetup.$inject = [
-    '$authProvider',
-    'BaseUrl',
+    "$authProvider",
+    "BaseUrl",
 ];
 
 
 function showdownSetup($showdownProvider) {
     const customExtensions = () => {
         const tableStyle = {
-            type: 'output',
+            type: "output",
             regex: /<table>/g,
-            replace: '<table class="table table-condensed table-striped table-bordered">'
+            replace: "<table class=\"table table-condensed table-striped table-bordered\">"
         };
 
         return [tableStyle];
@@ -62,40 +62,30 @@ function showdownSetup($showdownProvider) {
 
     $showdownProvider.loadExtension(customExtensions);
 
-    $showdownProvider.setOption('excludeTrailingPunctuationFromURLs', true);
-    $showdownProvider.setOption('sanitize', true);
-    $showdownProvider.setOption('simplifiedAutoLink', true);
-    $showdownProvider.setOption('simpleLineBreaks', true);
-    $showdownProvider.setOption('strikethrough', true);
-    $showdownProvider.setOption('tables', true);
-    $showdownProvider.setOption('tasklists', true);
+    $showdownProvider.setOption("excludeTrailingPunctuationFromURLs", true);
+    $showdownProvider.setOption("sanitize", true);
+    $showdownProvider.setOption("simplifiedAutoLink", true);
+    $showdownProvider.setOption("simpleLineBreaks", true);
+    $showdownProvider.setOption("strikethrough", true);
+    $showdownProvider.setOption("tables", true);
+    $showdownProvider.setOption("tasklists", true);
 }
 
 showdownSetup.$inject  = [
-    '$showdownProvider'
+    "$showdownProvider"
 ];
 
 
-function configureNotification(notificationProvider) {
-    notificationProvider.setOptions({
-        positionX: 'right',
-        positionY: 'bottom'
-    });
-}
-
-configureNotification.$inject = [
-    'NotificationProvider'
-];
 
 
 function setup(module) {
     module
         .config(uiSelectSetup)
         .config(authProviderSetup)
-        .config(showdownSetup)
-        .config(configureNotification);
+        .config(showdownSetup);
 
     // for formly setup see: `formly/index.js`
+
 }
 
 

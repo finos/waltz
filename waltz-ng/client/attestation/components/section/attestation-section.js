@@ -22,7 +22,7 @@ import _ from "lodash";
 import template from "./attestation-section.html";
 import {attest} from "../../attestation-utils";
 import {displayError} from "../../../common/error-utils";
-
+import toasts from "../../../svelte-stores/toast-store";
 
 const bindings = {
     parentEntityRef: "<"
@@ -83,8 +83,7 @@ function mkAttestationSections(baseSections = [], attestations = [], unattestedC
 
 
 function controller($q,
-                    serviceBroker,
-                    notification) {
+                    serviceBroker) {
 
     const vm = initialiseData(this, initialState);
     const today = new Date();
@@ -157,11 +156,11 @@ function controller($q,
         if (confirm(msg)){
             attest(serviceBroker, vm.parentEntityRef, vm.activeAttestationSection.type)
                 .then(() => {
-                    notification.success("Attested successfully");
+                    toasts.success("Attested successfully");
                     loadAttestationData(vm.parentEntityRef);
                     vm.onCancelAttestation();
                 })
-                .catch(e => displayError(notification, "Could not attest", e));
+                .catch(e => displayError("Could not attest", e));
         }
     };
 
@@ -204,8 +203,7 @@ function controller($q,
 
 controller.$inject = [
     "$q",
-    "ServiceBroker",
-    "Notification"
+    "ServiceBroker"
 ];
 
 

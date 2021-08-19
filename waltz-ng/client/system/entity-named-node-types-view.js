@@ -19,8 +19,9 @@
 import _ from "lodash";
 import {initialiseData} from "../common";
 import {CORE_API, getApiReference} from "../common/services/core-api-utils";
-
+import toasts from "../svelte-stores/toast-store";
 import template from "./entity-named-node-types-view.html";
+import {displayError} from "../common/error-utils";
 
 
 const initialState = {
@@ -36,7 +37,6 @@ function splitEntityKinds(entityKinds) {
 
 
 function controller($q,
-                    notification,
                     serviceBroker) {
 
     const vm = initialiseData(this, initialState);
@@ -47,8 +47,9 @@ function controller($q,
             .execute(CORE_API.EntityNamedNoteTypeStore.update, [noteType.id, change])
             .then(() => {
                 loadNoteTypes(true);
-                notification.success("Updated");
-            });
+                toasts.success("Updated");
+            })
+            .catch(e => displayError("Failed to save note definition", e));
     }
 
     vm.updateName = (change, type) => {
@@ -97,7 +98,7 @@ function controller($q,
         return serviceBroker
             .execute(CORE_API.EntityNamedNoteTypeStore.create, params)
             .then(() => {
-                notification.success("Created new note type: "+ vm.newNoteType.name);
+                toasts.success("Created new note type: "+ vm.newNoteType.name);
                 vm.creatingNoteType = false;
                 vm.newNoteType = {};
                 loadNoteTypes(true);
@@ -110,10 +111,10 @@ function controller($q,
                 .execute(CORE_API.EntityNamedNoteTypeStore.remove, [id])
                 .then((r) => {
                     if (r.data) {
-                        notification.success("Deleted");
+                        toasts.success("Deleted");
                         loadNoteTypes(true);
                     } else {
-                        notification.error("Failed to delete, ensure that note type is not being used");
+                        toasts.error("Failed to delete, ensure that note type is not being used");
                     }
                 });
         }
@@ -156,7 +157,6 @@ function controller($q,
 
 controller.$inject = [
     "$q",
-    "Notification",
     "ServiceBroker"
 ];
 

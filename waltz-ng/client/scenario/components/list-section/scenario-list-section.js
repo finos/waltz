@@ -21,7 +21,7 @@ import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {releaseLifecycleStatus} from "../../../common/services/enums/release-lifecycle-status";
 import {confirmWithUser} from "../../../common/dialog-utils";
-
+import toasts from "../../../svelte-stores/toast-store";
 import template from "./scenario-list-section.html";
 
 const bindings = {
@@ -47,8 +47,7 @@ const initialState = {
 
 
 function controller($q,
-                    serviceBroker,
-                    notification)
+                    serviceBroker)
 {
     const vm = initialiseData(this, initialState);
 
@@ -62,7 +61,7 @@ function controller($q,
     // -- INTERACT --
 
     vm.onAddScenario = () => {
-        return ensureActiveRoadmap(notification, vm.roadmap)
+        return ensureActiveRoadmap(toasts, vm.roadmap)
             .then(() => {
                 const usedNames = _
                     .chain(vm.scenarios)
@@ -78,7 +77,7 @@ function controller($q,
                     const isNameAlreadyTaken = _.includes(usedNames, newName.toLowerCase());
                     if (isNameAlreadyTaken) {
                         const msg = "Cannot create a scenario with the same name as an existing scenario";
-                        notification.error(msg);
+                        toasts.error(msg);
                         return Promise.reject(msg);
                     } else {
                         return serviceBroker
@@ -86,7 +85,7 @@ function controller($q,
                                 CORE_API.RoadmapStore.addScenario,
                                 [ vm.roadmap.id, newName ])
                             .then(() => {
-                                notification.success("New scenario created");
+                                toasts.success("New scenario created");
                                 reloadAllData();
                             });
                     }
@@ -95,7 +94,7 @@ function controller($q,
     };
 
     vm.onCloneScenario = (scenario) => {
-        return ensureActiveRoadmap(notification, vm.roadmap)
+        return ensureActiveRoadmap(toasts, vm.roadmap)
             .then(() => {
                 const newName = prompt(
                     "Please enter a new name for the scenario",
@@ -107,72 +106,72 @@ function controller($q,
                             CORE_API.ScenarioStore.cloneById,
                             [ scenario.id, newName ])
                         .then(() => reloadAllData())
-                        .then(() => notification.success("Scenario cloned"));
+                        .then(() => toasts.success("Scenario cloned"));
                 }
             });
     };
 
     vm.onPublishScenario = (scenario) => {
-        return ensureActiveRoadmap(notification, vm.roadmap)
+        return ensureActiveRoadmap(toasts, vm.roadmap)
             .then(() => confirmWithUser(
-                    `PUBLISH: Please confirm that you want scenario: "${scenario.name}" to be published`,
-                    () => updateReleaseStatus(
-                        scenario.id,
-                        releaseLifecycleStatus.ACTIVE,
-                        "Scenario published",
-                        "Failed to publish scenario")));
+                `PUBLISH: Please confirm that you want scenario: "${scenario.name}" to be published`,
+                () => updateReleaseStatus(
+                    scenario.id,
+                    releaseLifecycleStatus.ACTIVE,
+                    "Scenario published",
+                    "Failed to publish scenario")));
     };
 
     vm.onRevertToDraftScenario = (scenario) => {
-        return ensureActiveRoadmap(notification, vm.roadmap)
+        return ensureActiveRoadmap(toasts, vm.roadmap)
             .then(() => confirmWithUser(
-                    `REVERT: Please confirm that you want to revert scenario: "${scenario.name}" back to draft`,
-                    () => updateReleaseStatus(
-                        scenario.id,
-                        releaseLifecycleStatus.DRAFT,
-                        "Scenario reverted to draft",
-                        "Failed to revert scenario to draft")));
+                `REVERT: Please confirm that you want to revert scenario: "${scenario.name}" back to draft`,
+                () => updateReleaseStatus(
+                    scenario.id,
+                    releaseLifecycleStatus.DRAFT,
+                    "Scenario reverted to draft",
+                    "Failed to revert scenario to draft")));
 
     };
 
     vm.onRetireScenario = (scenario) => {
-        return ensureActiveRoadmap(notification, vm.roadmap)
+        return ensureActiveRoadmap(toasts, vm.roadmap)
             .then(() => confirmWithUser(
-                    `RETIRE: Please confirm that you want scenario: "${scenario.name}" to be retired`,
-                    () => updateReleaseStatus(
-                        scenario.id,
-                        releaseLifecycleStatus.DEPRECATED,
-                        "Scenario retired",
-                        "Failed to retire scenario")));
+                `RETIRE: Please confirm that you want scenario: "${scenario.name}" to be retired`,
+                () => updateReleaseStatus(
+                    scenario.id,
+                    releaseLifecycleStatus.DEPRECATED,
+                    "Scenario retired",
+                    "Failed to retire scenario")));
 
     };
 
     vm.onRepublishScenario = (scenario) => {
-        return ensureActiveRoadmap(notification, vm.roadmap)
+        return ensureActiveRoadmap(toasts, vm.roadmap)
             .then(() => confirmWithUser(
-                    `REPUBLISH: Please confirm that you want scenario: "${scenario.name}" to be republished`,
-                    () => updateReleaseStatus(
-                        scenario.id,
-                        releaseLifecycleStatus.ACTIVE,
-                        "Scenario republished",
-                        "Failed to republish scenario")));
+                `REPUBLISH: Please confirm that you want scenario: "${scenario.name}" to be republished`,
+                () => updateReleaseStatus(
+                    scenario.id,
+                    releaseLifecycleStatus.ACTIVE,
+                    "Scenario republished",
+                    "Failed to republish scenario")));
 
     };
 
     vm.onDeleteScenario = (scenario) => {
-        return ensureActiveRoadmap(notification, vm.roadmap)
+        return ensureActiveRoadmap(toasts, vm.roadmap)
             .then(() => confirmWithUser(
-                    `DELETE: Please confirm that you want scenario: "${scenario.name}" to be deleted, it cannot be recovered`,
-                    () => serviceBroker
-                        .execute(
-                            CORE_API.ScenarioStore.removeScenario,
-                            [ scenario.id ])
-                        .then(() => reloadAllData())
-                        .then(() => notification.success("Scenario deleted"))
-                        .catch((e) => {
-                            console.log("WSLS: Failed to delete scenario", { error: e });
-                            return notification.warning(`Failed to delete scenario: ${e.message}`);
-                        })));
+                `DELETE: Please confirm that you want scenario: "${scenario.name}" to be deleted, it cannot be recovered`,
+                () => serviceBroker
+                    .execute(
+                        CORE_API.ScenarioStore.removeScenario,
+                        [ scenario.id ])
+                    .then(() => reloadAllData())
+                    .then(() => toasts.success("Scenario deleted"))
+                    .catch((e) => {
+                        console.log("WSLS: Failed to delete scenario", { error: e });
+                        return toasts.warning(`Failed to delete scenario: ${e.message}`);
+                    })));
 
     };
 
@@ -201,10 +200,10 @@ function controller($q,
                 CORE_API.ScenarioStore.updateReleaseStatus,
                 [ scenarioId, status.key ])
             .then(() => reloadAllData())
-            .then(() => notification.success(successMessage))
+            .then(() => toasts.success(successMessage))
             .catch((e) => {
                 console.log(`WSLS: ${failureMessage}`, { error: e });
-                return notification.warning(`${failureMessage}: ${e.message}`);
+                return toasts.warning(`${failureMessage}: ${e.message}`);
             });
     }
 
@@ -229,8 +228,7 @@ function controller($q,
 
 controller.$inject = [
     "$q",
-    "ServiceBroker",
-    "Notification"
+    "ServiceBroker"
 ];
 
 

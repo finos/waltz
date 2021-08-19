@@ -20,13 +20,14 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./update-related-measurable-editor.html";
 import {displayError} from "../../../common/error-utils";
+import toasts from "../../../svelte-stores/toast-store";
 
 
 const bindings = {
-    relationship: '<',
-    onCancel: '<',
-    onRefresh: '<',
-    relationshipKinds: '<'
+    relationship: "<",
+    onCancel: "<",
+    onRefresh: "<",
+    relationshipKinds: "<"
 };
 
 
@@ -34,12 +35,12 @@ const initialState = {
     form: {
         description: null
     },
-    onCancel: () => console.log('wurme: onCancel - default impl'),
-    onRefresh: () => console.log('wurme: onRefresh - default impl')
+    onCancel: () => console.log("wurme: onCancel - default impl"),
+    onRefresh: () => console.log("wurme: onRefresh - default impl")
 };
 
 
-function controller(notification, serviceBroker) {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
@@ -65,12 +66,12 @@ function controller(notification, serviceBroker) {
             };
             return save(key, changes)
                 .then(() => {
-                    notification.success("Relationship saved");
+                    toasts.success("Relationship saved");
                     vm.onRefresh();
                     vm.onCancel();
                 })
                 .catch(e => {
-                    displayError(notification, "Could not save because: ", e);
+                    displayError("Could not save because: ", e);
                 });
         }
     };
@@ -86,8 +87,7 @@ function controller(notification, serviceBroker) {
 
 
 controller.$inject = [
-    'Notification',
-    'ServiceBroker'
+    "ServiceBroker"
 ];
 
 

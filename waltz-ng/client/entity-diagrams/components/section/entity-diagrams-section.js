@@ -23,7 +23,7 @@ import {refToString, toEntityRef} from "../../../common/entity-utils";
 import {determineIfCreateAllowed} from "../../../flow-diagram/flow-diagram-utils";
 import {displayError} from "../../../common/error-utils";
 import {kindToViewState} from "../../../common/link-utils";
-
+import toasts from "../../../svelte-stores/toast-store";
 
 const bindings = {
     parentEntityRef: "<"
@@ -85,8 +85,7 @@ function selectInitialDiagram(diagrams = [], selectedDiagram) {
 
 function controller($q,
                     $state,
-                    serviceBroker,
-                    notification) {
+                    serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const loadFlowDiagrams = (force = true) => serviceBroker
@@ -110,20 +109,20 @@ function controller($q,
             execute: (diagram) => {
                 const newName = prompt("What shall the cloned copy be called ?", `Copy of ${diagram.name}`);
                 if (newName == null) {
-                    notification.warning("Clone cancelled");
+                    toasts.warning("Clone cancelled");
                     return;
                 }
                 if (_.isEmpty(newName.trim())) {
-                    notification.warning("Clone cancelled, no name given");
+                    toasts.warning("Clone cancelled, no name given");
                     return;
                 }
                 serviceBroker
                     .execute(CORE_API.FlowDiagramStore.clone, [diagram.ref.id, newName])
                     .then(() => {
-                        notification.success("Diagram cloned");
+                        toasts.success("Diagram cloned");
                         reload();
                     })
-                    .catch(e => displayError(notification, "Failed to clone diagram", e));
+                    .catch(e => displayError("Failed to clone diagram", e));
 
             }}
     ];
@@ -154,7 +153,7 @@ function controller($q,
         vm.selectedDiagram = diagram;
         vm.visibility.flowDiagramMode = "VIEW";
 
-        if(diagram.type === 'Flow'){
+        if(diagram.type === "Flow"){
             $state.go(kindToViewState("FLOW_DIAGRAM"), {id: diagram.ref.id});
         }
     };
@@ -175,11 +174,11 @@ function controller($q,
     vm.onMakeNewFlowDiagram = () => {
         const name = prompt("Please enter a name for the new diagram ?");
         if (name == null) {
-            notification.warning("Create cancelled");
+            toasts.warning("Create cancelled");
             return;
         }
         if (_.isEmpty(name.trim())) {
-            notification.warning("Create cancelled, no name given");
+            toasts.warning("Create cancelled, no name given");
             return;
         }
 
@@ -191,10 +190,10 @@ function controller($q,
                 return r.data;
             })
             .then(diagramId => {
-                notification.success("Diagram created, click edit if you wish to make changes");
+                toasts.success("Diagram created, click edit if you wish to make changes");
                 $state.go(kindToViewState("FLOW_DIAGRAM"), {id: diagramId});
             })
-            .catch(e => displayError(notification, "Failed to create new diagram", e));
+            .catch(e => displayError("Failed to create new diagram", e));
     };
 }
 
@@ -202,8 +201,7 @@ function controller($q,
 controller.$inject = [
     "$q",
     "$state",
-    "ServiceBroker",
-    "Notification"
+    "ServiceBroker"
 ];
 
 

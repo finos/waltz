@@ -21,6 +21,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 import {toEntityRef} from "../../../common/entity-utils";
 import {initialiseData} from "../../../common";
 import _ from "lodash";
+import toasts from "../../../svelte-stores/toast-store";
 
 
 const bindings = {
@@ -54,7 +55,7 @@ function getSelectableSpecDefinitions(specDefinitions = [], selectedSpecDef) {
 }
 
 
-function controller($q, notification, serviceBroker) {
+function controller($q, serviceBroker) {
 
     const vm = initialiseData(this, initialState);
 
@@ -146,7 +147,7 @@ function controller($q, notification, serviceBroker) {
                 .then(() => {
                     vm.physicalFlow.specificationDefinitionId = newSpecDef.id;
                     loadSpecDefinitions();
-                    notification.success("Specification definition version updated successfully");
+                    toasts.success("Specification definition version updated successfully");
                 });
         }
     };
@@ -157,10 +158,10 @@ function controller($q, notification, serviceBroker) {
             .execute(CORE_API.PhysicalSpecDefinitionFieldStore.updateDescription, [field.id, cmd])
             .then(result => {
                 if (result) {
-                    notification.success("Updated description for field");
+                    toasts.success("Updated description for field");
                     loadSpecDefinitions(true);
                 } else {
-                    notification.error("Could not update field description");
+                    toasts.error("Could not update field description");
                 }
             });
     };
@@ -172,10 +173,10 @@ function controller($q, notification, serviceBroker) {
             .execute(CORE_API.PhysicalSpecDefinitionFieldStore.updateLogicalElement, [field.id, cmd])
             .then(result => {
                 if (result) {
-                    notification.success("Updated logical data element for field");
+                    toasts.success("Updated logical data element for field");
                     loadSpecDefinitions(true);
                 } else {
-                    notification.error("Could not update logical data element");
+                    toasts.error("Could not update logical data element");
                 }
             });
     };
@@ -194,7 +195,6 @@ on-update-logical-data-element="$ctrl.updateLogicalDataElement">
 
 controller.$inject = [
     "$q",
-    "Notification",
     "ServiceBroker"
 ];
 

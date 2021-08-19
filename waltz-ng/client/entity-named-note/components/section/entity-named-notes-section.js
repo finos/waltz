@@ -16,17 +16,18 @@
  *
  */
 
-import _ from 'lodash';
-import {CORE_API, getApiReference} from '../../../common/services/core-api-utils';
-import {initialiseData} from '../../../common/index';
-import {getEditRoleForEntityKind} from '../../../common/role-utils';
+import _ from "lodash";
+import {CORE_API, getApiReference} from "../../../common/services/core-api-utils";
+import {initialiseData} from "../../../common/index";
+import {getEditRoleForEntityKind} from "../../../common/role-utils";
 
-import template from './entity-named-notes-section.html';
+import template from "./entity-named-notes-section.html";
 import {displayError} from "../../../common/error-utils";
+import toasts from "../../../svelte-stores/toast-store";
 
 
 const bindings = {
-    parentEntityRef: '<',
+    parentEntityRef: "<",
 };
 
 
@@ -40,7 +41,7 @@ const initialState = {
 
 
 function calcAvailableTypes(parentRef, noteTypes, notes) {
-    const usedTypes = _.map(notes, 'namedNoteTypeId');
+    const usedTypes = _.map(notes, "namedNoteTypeId");
 
     return _
         .chain(noteTypes)
@@ -51,9 +52,9 @@ function calcAvailableTypes(parentRef, noteTypes, notes) {
 }
 
 
-function controller($q, notification, serviceBroker, userService) {
+function controller($q, serviceBroker, userService) {
     const vm = initialiseData(this, initialState);
-    const componentId = 'entity-named-notes-section';
+    const componentId = "entity-named-notes-section";
 
     const recalcAvailableTypes = () => {
         vm.availableTypes = calcAvailableTypes(
@@ -86,7 +87,7 @@ function controller($q, notification, serviceBroker, userService) {
         return serviceBroker
             .loadViewData(CORE_API.EntityNamedNoteStore.findByEntityReference, [vm.parentEntityRef], options)
             .then(result => vm.notes = result.data)
-            .catch(e => displayError(notification, "Failed to load data", e));
+            .catch(e => displayError("Failed to load data", e));
     };
 
     const loadNoteTypes = () => {
@@ -108,7 +109,7 @@ function controller($q, notification, serviceBroker, userService) {
     };
 
     const cacheRefreshListener = (e) => {
-        if (e.eventType === 'REFRESH'
+        if (e.eventType === "REFRESH"
             && getApiReference(e.serviceName, e.serviceFnName) === CORE_API.EntityNamedNoteStore.findByEntityReference) {
 
             loadNamedNotes();
@@ -120,12 +121,12 @@ function controller($q, notification, serviceBroker, userService) {
 
         return serviceBroker
             .execute(CORE_API.EntityNamedNoteStore.save,
-                params)
+                     params)
             .then(rc => {
                 if (rc) {
-                    notification.success('Note saved successfully');
+                    toasts.success("Note saved successfully");
                 } else {
-                    notification.error('Failed to save note');
+                    toasts.error("Failed to save note");
                 }
             })
             .then(() => loadNamedNotes(true))
@@ -138,9 +139,9 @@ function controller($q, notification, serviceBroker, userService) {
         return serviceBroker.execute(CORE_API.EntityNamedNoteStore.remove, params)
             .then(rc => {
                 if (rc) {
-                    notification.success('Note deleted successfully');
+                    toasts.success("Note deleted successfully");
                 } else {
-                    notification.error('Failed to delete note');
+                    toasts.error("Failed to delete note");
                 }
             })
             .then(() => loadNamedNotes(true))
@@ -159,10 +160,9 @@ function controller($q, notification, serviceBroker, userService) {
 
 
 controller.$inject = [
-    '$q',
-    'Notification',
-    'ServiceBroker',
-    'UserService'
+    "$q",
+    "ServiceBroker",
+    "UserService"
 ];
 
 
@@ -175,5 +175,5 @@ const component = {
 
 export default {
     component,
-    id: 'waltzEntityNamedNotesSection'
+    id: "waltzEntityNamedNotesSection"
 };

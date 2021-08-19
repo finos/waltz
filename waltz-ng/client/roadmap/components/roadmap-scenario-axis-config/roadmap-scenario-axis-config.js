@@ -20,6 +20,7 @@ import template from "./roadmap-scenario-axis-config.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {move} from "../../../common/list-utils";
+import toasts from "../../../svelte-stores/toast-store";
 
 
 const bindings = {
@@ -57,7 +58,7 @@ const initialState = {
 };
 
 
-function controller($q, serviceBroker, notification) {
+function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     function prepareData() {
@@ -175,7 +176,7 @@ function controller($q, serviceBroker, notification) {
         const orderedIds = _.map(vm.usedItems, d => d.id);
         vm.onRepositionAxisItems(vm.scenarioId, vm.axisOrientation, orderedIds)
             .then(() => reloadData())
-            .then(() => notification.success("Axis reordered"));
+            .then(() => toasts.success("Axis reordered"));
     };
 
 }
@@ -183,8 +184,7 @@ function controller($q, serviceBroker, notification) {
 
 controller.$inject = [
     "$q",
-    "ServiceBroker",
-    "Notification"
+    "ServiceBroker"
 ];
 
 

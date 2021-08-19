@@ -24,6 +24,7 @@ import {refToString, toEntityRef} from "../../../common/entity-utils";
 
 import template from "./create-related-measurable-editor.html";
 import {displayError} from "../../../common/error-utils";
+import toasts from "../../../svelte-stores/toast-store";
 
 
 const bindings = {
@@ -65,15 +66,15 @@ function readCategoryId(compoundId) {
 }
 
 
-function controller(notification, serviceBroker) {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
-     const setDefaultRelationshipKind = (counterpart) => {
+    const setDefaultRelationshipKind = (counterpart) => {
         serviceBroker
             .loadViewData(
                 CORE_API.RelationshipKindStore.findRelationshipKindsBetweenEntities,
                 [vm.parentEntityRef, counterpart])
-            .then(r => vm.form.relationshipKind = _.first(_.sortBy(r.data, 'position')).code);
+            .then(r => vm.form.relationshipKind = _.first(_.sortBy(r.data, "position")).code);
     };
 
     const loadRelationships = (autoExpand = false) => {
@@ -190,7 +191,7 @@ function controller(notification, serviceBroker) {
 
         save(vm.form)
             .then(loadRelationships)
-            .catch(e => displayError(notification, "Could not save because: ", e));
+            .catch(e => displayError("Could not save because: ", e));
     };
 
     vm.onItemUncheck = (node) => {
@@ -200,13 +201,13 @@ function controller(notification, serviceBroker) {
             || (d.a.id === node && d.b.id === vm.parentEntityRef.id));
 
         vm.onRemove(relationshipToRemove)
-            .then(r => notification.warning("Relationship Removed"))
             .then(() => {
+                toasts.warning("Relationship Removed");
                 loadRelationships();
                 vm.onRefresh();
             })
             .catch(e => {
-                displayError(notification, "Could not remove relationship because: ", e);
+                displayError("Could not remove relationship because: ", e);
             });
     };
 
@@ -224,7 +225,7 @@ function controller(notification, serviceBroker) {
     vm.submit = () => {
         if (vm.isFormValid()) {
             save(vm.form)
-                .catch(e => displayError(notification, "Could not save because: ", e))
+                .catch(e => displayError("Could not save because: ", e))
                 .finally(() =>  vm.onCancel());
         }
     };
@@ -258,7 +259,7 @@ function controller(notification, serviceBroker) {
         return serviceBroker
             .execute(CORE_API.MeasurableRelationshipStore.create, [submission])
             .then(() => {
-                notification.success("Relationship saved");
+                toasts.success("Relationship saved");
                 vm.onRefresh();
             });
     };
@@ -267,7 +268,6 @@ function controller(notification, serviceBroker) {
 
 
 controller.$inject = [
-    "Notification",
     "ServiceBroker"
 ];
 

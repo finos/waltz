@@ -20,6 +20,7 @@ import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import template from "./measurable-category-edit.html";
 import {toEntityRef} from "../../../common/entity-utils";
+import toasts from "../../../svelte-stores/toast-store";
 
 
 const modes = {
@@ -56,7 +57,6 @@ function loadChangesByDomain(serviceBroker, changeDomain) {
 function controller($q,
                     $state,
                     $stateParams,
-                    notification,
                     serviceBroker) {
 
     const vm = initialiseData(this, initialState);
@@ -111,13 +111,13 @@ function controller($q,
                 CORE_API.TaxonomyManagementStore.removeById,
                 [ change.id ])
             .then(() => {
-                notification.info("Change discarded");
+                toasts.info("Change discarded");
                 reloadPending();
                 return true;
             })
             .catch(e => {
                 const msg = `Failed to discard change: ${e.message}`;
-                notification.error(msg);
+                toasts.error(msg);
                 console.error(msg, { e })
             });
     };
@@ -128,7 +128,7 @@ function controller($q,
                 CORE_API.TaxonomyManagementStore.applyPendingChange,
                 [ change.id ])
             .then(() => {
-                notification.info("Change applied");
+                toasts.info("Change applied");
                 reloadMeasurables();
                 reloadPending();
                 return true;
@@ -136,7 +136,7 @@ function controller($q,
             .catch(e => {
                 const message = `Error when applying command: ${_.get(e, ["data", "message"], "Unknown")}`;
                 console.log(message, e);
-                notification.error(message)
+                toasts.error(message)
             });
     };
 
@@ -146,7 +146,7 @@ function controller($q,
                 CORE_API.TaxonomyManagementStore.submitPendingChange,
                 [ change ])
             .then(() => {
-                notification.info("Change submitted");
+                toasts.info("Change submitted");
                 reloadPending();
             });
     };
@@ -167,7 +167,6 @@ controller.$inject = [
     "$q",
     "$state",
     "$stateParams",
-    "Notification",
     "ServiceBroker"
 ];
 

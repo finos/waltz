@@ -21,7 +21,7 @@ import template from "./external-identifier-editor-table.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkRef} from "../../../common/entity-utils";
 import {displayError} from "../../../common/error-utils";
-
+import toasts from "../../../svelte-stores/toast-store";
 
 const bindings = {
     physicalFlow: "<",
@@ -35,7 +35,7 @@ const initialState = {
 };
 
 
-function controller(notification, serviceBroker) {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const load = () => {
@@ -64,10 +64,10 @@ function controller(notification, serviceBroker) {
                         externalIdentifier.system
                     ])
                 .then(() => {
-                    notification.success(`Deleted External Id ${externalIdentifier.externalId}`);
+                    toasts.success(`Deleted External Id ${externalIdentifier.externalId}`);
                     return load();
                 })
-                .catch(e => displayError(notification, "Could not delete value", e))
+                .catch(e => displayError("Could not delete value", e))
         }
 
     };
@@ -79,17 +79,16 @@ function controller(notification, serviceBroker) {
                     CORE_API.ExternalIdentifierStore.addExternalIdentifier,
                     [vm.entityRef, vm.newExternalId])
                 .then(() => {
-                    notification.success(`Added External Id ${vm.newExternalId}`);
+                    toasts.success(`Added External Id ${vm.newExternalId}`);
                     vm.newExternalId = null;
                     load();
                 })
-                .catch(e => displayError(notification, "Could not add value", e))
+                .catch(e => displayError("Could not add value", e))
         }
     }
 }
 
 controller.$inject = [
-    "Notification",
     "ServiceBroker"
 ];
 
