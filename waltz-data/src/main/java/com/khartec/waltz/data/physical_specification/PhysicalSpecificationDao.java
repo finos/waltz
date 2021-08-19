@@ -19,13 +19,13 @@
 package com.khartec.waltz.data.physical_specification;
 
 import com.khartec.waltz.data.InlineSelectFieldFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.UserTimestamp;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.physical_flow.PhysicalFlowParsed;
 import com.khartec.waltz.model.physical_specification.DataFormatKind;
 import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
+import com.khartec.waltz.schema.tables.*;
+import com.khartec.waltz.schema.tables.DataType;
 import com.khartec.waltz.schema.tables.records.PhysicalSpecificationRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -43,14 +43,23 @@ import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
 import static com.khartec.waltz.data.physical_flow.PhysicalFlowDao.PHYSICAL_FLOW_NOT_REMOVED;
 import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG;
+import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static com.khartec.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static org.jooq.impl.DSL.*;
 
 @Repository
 public class PhysicalSpecificationDao {
 
+    private static final DataType dt = DATA_TYPE;
+    private static final PhysicalSpecDataType psdt = PHYSICAL_SPEC_DATA_TYPE;
+    private static final LogicalFlow lf = LOGICAL_FLOW;
+    private static final LogicalFlowDecorator lfd = LOGICAL_FLOW_DECORATOR;
+    private static final PhysicalFlow pf = PHYSICAL_FLOW;
 
     public static final Field<String> owningEntityNameField = InlineSelectFieldFactory.mkNameField(
                 PHYSICAL_SPECIFICATION.OWNING_ENTITY_ID,
@@ -223,4 +232,87 @@ public class PhysicalSpecificationDao {
                 .where(PHYSICAL_SPECIFICATION.ID.eq(specificationId))
                 .execute();
     }
+
+    /**
+     * Takes a specification id and a user enacting the change.
+     * This function ensures any logical flow associated to this specification has
+     * the same (or a superset) of datatypes associated to it.
+     *
+     * This prevents 'drift' where the spec and logical flows do not align.
+     *
+     * @param userName
+     * @param specificationId
+     * @return  number of updates made to logical flows
+     */
+    public int propagateDataTypesToLogicalFlows(String userName, long specificationId) {
+        return dsl.transactionResult(ctx -> {
+            DSLContext tx = ctx.dsl();
+
+            SelectConditionStep<Record3<Long, Long, String>> desiredQry = DSL
+                    .select(psdt.DATA_TYPE_ID, lf.ID, dt.NAME)
+                    .from(psdt)
+                    .innerJoin(pf).on(psdt.SPECIFICATION_ID.eq(pf.SPECIFICATION_ID))
+                    .innerJoin(lf).on(pf.LOGICAL_FLOW_ID.eq(lf.ID))
+                    .innerJoin(dt).on(dt.ID.eq(psdt.DATA_TYPE_ID))
+                    .where(pf.SPECIFICATION_ID.eq(specificationId))
+                    .and(lf.IS_REMOVED.isFalse())
+                    .and(pf.IS_REMOVED.isFalse())
+                    .and(lf.ENTITY_LIFECYCLE_STATUS.notEqual(EntityLifecycleStatus.REMOVED.name()))
+                    .and(pf.ENTITY_LIFECYCLE_STATUS.notEqual(EntityLifecycleStatus.REMOVED.name()));
+
+            SelectConditionStep<Record3<Long, Long, String>> existingQry = DSL
+                    .select(lfd.DECORATOR_ENTITY_ID, lfd.LOGICAL_FLOW_ID, dt.NAME)
+                    .from(lfd)
+                    .innerJoin(lf).on(lf.ID.eq(lfd.LOGICAL_FLOW_ID))
+                    .innerJoin(pf).on(pf.LOGICAL_FLOW_ID.eq(lf.ID))
+                    .innerJoin(dt).on(dt.ID.eq(lfd.DECORATOR_ENTITY_ID))
+                    .where(pf.SPECIFICATION_ID.eq(specificationId))
+                    .and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()));
+
+            SelectOrderByStep<Record3<Long, Long, String>> requiredQry = desiredQry
+                    .except(existingQry);
+
+            SelectJoinStep<? extends Record6<String, Long, String, String, String, String>> requiredChangeLogs = DSL
+                    .select(
+                        val(EntityKind.LOGICAL_DATA_FLOW.name()),
+                        requiredQry.field(1, Long.class), // logical flow id
+                        concat("Propagated data type from specification to flow: ", requiredQry.field(2, String.class)),
+                        val(userName),
+                        val(Severity.INFORMATION.name()),
+                        val(Operation.ADD.name()))
+                    .from(requiredQry);
+
+            SelectJoinStep<Record4<Long, String, Long, String>> requiredDecorators = DSL
+                    .select(
+                        requiredQry.field(1, Long.class),
+                        val(EntityKind.DATA_TYPE.name()),
+                        requiredQry.field(0, Long.class),
+                        val(userName))
+                    .from(requiredQry);
+
+            tx.insertInto(CHANGE_LOG)
+                    .columns(
+                            CHANGE_LOG.PARENT_KIND,
+                            CHANGE_LOG.PARENT_ID,
+                            CHANGE_LOG.MESSAGE,
+                            CHANGE_LOG.USER_ID,
+                            CHANGE_LOG.SEVERITY,
+                            CHANGE_LOG.OPERATION)
+                    .select(requiredChangeLogs)
+                    .execute();
+
+            int insertCount = tx
+                    .insertInto(lfd)
+                    .columns(
+                            lfd.LOGICAL_FLOW_ID,
+                            lfd.DECORATOR_ENTITY_KIND,
+                            lfd.DECORATOR_ENTITY_ID,
+                            lfd.LAST_UPDATED_BY)
+                    .select(requiredDecorators)
+                    .execute();
+
+            return insertCount;
+        });
+    }
+
 }

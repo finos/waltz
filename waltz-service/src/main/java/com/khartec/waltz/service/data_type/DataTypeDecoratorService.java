@@ -38,6 +38,7 @@ import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorRatings
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
+import com.khartec.waltz.service.physical_specification.PhysicalSpecificationService;
 import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -71,6 +72,7 @@ public class DataTypeDecoratorService {
     private final DataTypeService dataTypeService;
     private final GenericSelectorFactory genericSelectorFactory = new GenericSelectorFactory();
     private final PhysicalSpecificationDao physicalSpecificationDao;
+    private final PhysicalSpecificationService physicalSpecificationService;
 
 
     @Autowired
@@ -83,10 +85,12 @@ public class DataTypeDecoratorService {
                                     LogicalFlowDecoratorRatingsCalculator ratingsCalculator,
                                     DataTypeUsageService dataTypeUsageService,
                                     DataTypeService dataTypeService,
-                                    PhysicalSpecificationDao physicalSpecificationDao) {
+                                    PhysicalSpecificationDao physicalSpecificationDao,
+                                    PhysicalSpecificationService physicalSpecificationService) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(logicalFlowDecoratorService, "logicalFlowDecoratorService cannot be null");
         checkNotNull(physicalFlowService, "physicalFlowService cannot be null");
+        checkNotNull(physicalSpecificationService, "physicalSpecificationService cannot be null");
 
         this.changeLogService = changeLogService;
         this.physicalFlowService = physicalFlowService;
@@ -97,7 +101,9 @@ public class DataTypeDecoratorService {
         this.dataTypeService = dataTypeService;
         this.dataTypeDecoratorDaoSelectorFactory = dataTypeDecoratorDaoSelectorFactory;
         this.physicalSpecificationDao = physicalSpecificationDao;
+        this.physicalSpecificationService = physicalSpecificationService;
     }
+
 
     public boolean updateDecorators(String userName,
                                   EntityReference entityReference,
@@ -168,25 +174,12 @@ public class DataTypeDecoratorService {
                 entityReference, userName);
 
         recalculateDataTypeUsageForApplications(entityReference);
-        // now update logical flow data types
-        // find all physicals with this spec id, for each physical update it's logical decorators
+
         if (PHYSICAL_SPECIFICATION.equals(entityReference.kind())) {
-            updateDecoratorForLogicalFlow(userName, entityReference, dataTypeIds);
+            physicalSpecificationService.propagateDataTypesToLogicalFlows(userName, entityReference.id());
         }
 
         return result;
-    }
-
-    private void updateDecoratorForLogicalFlow(String userName, EntityReference entityReference, Set<Long> dataTypeIds) {
-        List<Long> logicalFlowIds = physicalFlowService
-                .findBySpecificationId(entityReference.id())
-                .stream()
-                .map(PhysicalFlow::logicalFlowId)
-                .collect(toList());
-
-        logicalFlowIds.forEach(lfId -> addDecorators(userName,
-                mkRef(LOGICAL_DATA_FLOW, lfId),
-                dataTypeIds));
     }
 
 
