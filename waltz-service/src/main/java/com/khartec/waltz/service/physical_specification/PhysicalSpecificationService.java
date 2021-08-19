@@ -174,4 +174,8 @@ public class PhysicalSpecificationService {
         }
         return result;
     }
+
+    public int propagateDataTypesToLogicalFlows(String userName, long id) {
+        return specificationDao.propagateDataTypesToLogicalFlows(userName, id);
+    }
 }

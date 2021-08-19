@@ -211,7 +211,8 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
     public int[] addDecorators(Collection<DataTypeDecorator> decorators) {
         checkNotNull(decorators, "decorators cannot be null");
 
-        List<LogicalFlowDecoratorRecord> records = decorators.stream()
+        List<LogicalFlowDecoratorRecord> records = decorators
+                .stream()
                 .map(TO_RECORD)
                 .collect(toList());
 
