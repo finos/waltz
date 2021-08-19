@@ -194,7 +194,7 @@ function controller($q,
                 toasts.success(successMessage);
             })
             .catch(e => {
-                displayError(toasts, `Could not update status to ${newStatus}`, e);
+                displayError(`Could not update status to ${newStatus}`, e);
             });
     };
 
@@ -242,7 +242,7 @@ function controller($q,
                     loadRuns();
                 })
                 .catch(e => {
-                    displayError(toasts, "Survey run could not be deleted", e);
+                    displayError("Survey run could not be deleted", e);
                 });
         }
     };
@@ -257,7 +257,7 @@ function controller($q,
                     $state.go("main.survey.template.list");
                 })
                 .catch(e => {
-                    displayError(toasts, "Survey template could not be deleted", e);
+                    displayError("Survey template could not be deleted", e);
                 });
         }
     }

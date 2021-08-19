@@ -87,7 +87,7 @@ function controller($q, serviceBroker, userService) {
         return serviceBroker
             .loadViewData(CORE_API.EntityNamedNoteStore.findByEntityReference, [vm.parentEntityRef], options)
             .then(result => vm.notes = result.data)
-            .catch(e => displayError(toasts, "Failed to load data", e));
+            .catch(e => displayError("Failed to load data", e));
     };
 
     const loadNoteTypes = () => {

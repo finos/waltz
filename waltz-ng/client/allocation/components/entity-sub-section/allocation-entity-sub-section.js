@@ -244,7 +244,7 @@ function controller($q, serviceBroker) {
                 reload();
                 vm.setEditable(false);
             })
-            .catch(e => displayError(null, "Could not update allocations", e));
+            .catch(e => displayError("Could not update allocations", e));
     };
 
     vm.setEditable = (targetState) => {

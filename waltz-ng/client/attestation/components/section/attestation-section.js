@@ -160,7 +160,7 @@ function controller($q,
                     loadAttestationData(vm.parentEntityRef);
                     vm.onCancelAttestation();
                 })
-                .catch(e => displayError(toasts, "Could not attest", e));
+                .catch(e => displayError("Could not attest", e));
         }
     };
 

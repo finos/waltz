@@ -193,7 +193,7 @@ function controller(serviceBroker, $q) {
             })
             .then(() => loadData())
             .then(() => vm.selectedRelationshipKind = _.find(vm.relationshipKinds, ["id", selectedRelationshipKindId]))
-            .catch(e => displayError(toasts, "Could not update relationship", e))
+            .catch(e => displayError("Could not update relationship", e))
     };
 
 
@@ -207,7 +207,7 @@ function controller(serviceBroker, $q) {
                 toasts.success("Relationship saved");
                 loadData();
                 vm.onDismiss();
-            }).catch(e => displayError(toasts,"Could not create relationship", e));
+            }).catch(e => displayError("Could not create relationship", e));
     };
 
     vm.removeRelationshipKind = () => {
@@ -221,7 +221,7 @@ function controller(serviceBroker, $q) {
                     vm.selectedRelationshipKind = null;
                 })
                 .catch(e => {
-                    displayError(toasts, "Relationship kind could not be removed", e)
+                    displayError("Relationship kind could not be removed", e);
                 });
         }
     }

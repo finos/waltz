@@ -348,7 +348,7 @@ function controller($element,
                     [flow.id])
                 .then(reload)
                 .then(() => toasts.warning("Data flow removed"))
-                .catch(e => displayError(toasts, "System error, please contact support", e));
+                .catch(e => displayError("System error, please contact support", e));
         } else {
             toasts.warning("This data flow has associated physical flows, please check and remove those first");
         }

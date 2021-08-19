@@ -141,7 +141,6 @@ function controller($q,
                 }
             })
             .catch(e => displayError(
-                toasts,
                 `Could not add ${p.name} as a recipient`,
                 e));
     };
@@ -162,7 +161,7 @@ function controller($q,
                         toasts.error(`Failed to remove ${p.name}`);
                     }
                 })
-                .catch(e => displayError(toasts, `${p.name} not removed from recipients`, e));
+                .catch(e => displayError(`${p.name} not removed from recipients`, e));
         } else {
             // we couldn't find the recipient so lets reload in case something happened elsewhere
             return reload();
@@ -176,7 +175,7 @@ function controller($q,
                 CORE_API.SurveyInstanceStore.updateRecipient,
                 [vm.surveyInstance.id, cmd])
             .then(() => toasts.success("Updated survey recipient"))
-            .catch(e => displayError(toasts, "Failed to update recipient", e))
+            .catch(e => displayError("Failed to update recipient", e))
             .finally(() => loadRecipients(true));
     };
 
@@ -192,7 +191,7 @@ function controller($q,
                     toasts.success("Survey instance due date updated successfully");
                     reload(true);
                 })
-                .catch(e => displayError(toasts, "Failed to update survey instance due date", e));
+                .catch(e => displayError("Failed to update survey instance due date", e));
         }
     };
 

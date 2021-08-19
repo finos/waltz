@@ -130,7 +130,7 @@ function controller($element,
                         toasts.success("Diagram cloned");
                         reload(newId.data);
                     })
-                    .catch(e => displayError(toasts, "Failed to clone diagram", e));
+                    .catch(e => displayError("Failed to clone diagram", e));
 
             }}
     ];

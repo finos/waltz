@@ -39,14 +39,13 @@ export function mkErrorMessage(message, e) {
 
 /**
  * Displays the given message as an error in the toaster.
- * If e is provided then the `e.data.message` attribute will be5
+ * If e is provided then the `e.data.message` attribute will be
  * included (if present).  Also prints the message to `console.log`
  *
- * @param notificationService
  * @param message
  * @param e
  */
-export function displayError(notificationService, message, e) {
+export function displayError(message, e) {
     const msg = mkErrorMessage(message, e);
     ToastStore.error(msg);
     console.log(msg, e);

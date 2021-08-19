@@ -126,7 +126,7 @@ function controller($q,
                 .execute(CORE_API.AssessmentRatingStore.bulkStore, [definitionId, ratingUpdateCommands])
                 .then(() => loadAll())
                 .then(() => toasts.success(`Added/Updated ratings for ${ratingUpdateCommands.length} applications`))
-                .catch(e => displayError(toasts, "Failed to save", e));
+                .catch(e => displayError("Failed to save", e));
         }
 
         if (ratingRemoveCommands.length > 0) {
@@ -134,7 +134,7 @@ function controller($q,
                 .execute(CORE_API.AssessmentRatingStore.bulkRemove, [definitionId, ratingRemoveCommands])
                 .then(() => loadAll())
                 .then(() => toasts.success(`Removed ratings for ${ratingRemoveCommands.length} applications`))
-                .catch(e => displayError(toasts, "Failed to remove assessment ratings", e));
+                .catch(e => displayError("Failed to remove assessment ratings", e));
         }
 
         if (ratingRemoveCommands.length === 0 && ratingUpdateCommands.length === 0){
@@ -153,7 +153,6 @@ function controller($q,
                 .then(() => toasts.success("Assessment Rating Removed for application " + row.entityRef.name))
                 .catch((e) =>
                     displayError(
-                        toasts,
                         `Failed to delete assessment rating for application: ${e.data.message}`,
                         e));
         }

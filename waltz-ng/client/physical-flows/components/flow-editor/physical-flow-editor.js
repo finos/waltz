@@ -73,7 +73,7 @@ function controller(serviceBroker) {
                 toasts.success(successMessage);
                 return load();
             })
-            .catch(e => displayError(toasts, "Could not update tags", e));
+            .catch(e => displayError("Could not update tags", e));
     };
 
     const doSave = (name, value) => {
@@ -86,7 +86,7 @@ function controller(serviceBroker) {
                 toasts.success(`Updated ${name}`);
                 return load();
             })
-            .catch(e => displayError(toasts, `Could not update ${name} value`, e))
+            .catch(e => displayError(`Could not update ${name} value`, e))
     };
 
 

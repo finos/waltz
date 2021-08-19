@@ -122,7 +122,7 @@ function controller($q,
                 vm.selected = Object.assign({}, vm.selected, { rating: newRating });
             })
             .catch(e => {
-                displayError(toasts, "Could not save rating", e);
+                displayError("Could not save rating", e);
                 throw e;
             })
     };
@@ -182,7 +182,7 @@ function controller($q,
                     vm.selected = Object.assign({}, vm.selected, {decommission: decom});
                     toasts.success(`Saved decommission date for ${vm.selected.measurable.name}`);
                 })
-                .catch(e => displayError(toasts, "Could not save decommission date", e))
+                .catch(e => displayError("Could not save decommission date", e))
                 .finally(reloadDecommData);
         }
     };
@@ -216,7 +216,7 @@ function controller($q,
                 vm.selected = Object.assign({}, vm.selected, { replacementApps: r.data });
                 toasts.success("Replacement app removed")
             })
-            .catch(e  => displayError(toasts, "Could not remove replacement app", e))
+            .catch(e  => displayError("Could not remove replacement app", e))
             .finally(reloadDecommData);
     };
 
@@ -229,7 +229,7 @@ function controller($q,
                 vm.selected = Object.assign({}, vm.selected, { replacementApps: r.data });
                 toasts.success("Successfully saved replacement app")
             })
-            .catch(e  => displayError(toasts, "Could not add replacement app", e))
+            .catch(e  => displayError("Could not add replacement app", e))
             .finally(reloadDecommData);
     };
 
@@ -279,7 +279,7 @@ function controller($q,
                 vm.selected = Object.assign({}, vm.selected, { decommission: null, replacementApps: [] });
                 toasts.success(`Removed decommission date and replacement applications for: ${vm.selected.measurable.name}`);
             })
-            .catch(e => displayError(toasts, "Could not remove decommission date", e))
+            .catch(e => displayError("Could not remove decommission date", e))
             .finally(reloadDecommData);
     };
 

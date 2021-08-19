@@ -67,7 +67,7 @@ function controller(serviceBroker) {
                     toasts.success(`Deleted External Id ${externalIdentifier.externalId}`);
                     return load();
                 })
-                .catch(e => displayError(toasts, "Could not delete value", e))
+                .catch(e => displayError("Could not delete value", e))
         }
 
     };
@@ -83,7 +83,7 @@ function controller(serviceBroker) {
                     vm.newExternalId = null;
                     load();
                 })
-                .catch(e => displayError(toasts, "Could not add value", e))
+                .catch(e => displayError("Could not add value", e))
         }
     }
 }

@@ -136,7 +136,7 @@ function controller($q, serviceBroker, UserService) {
                 toasts.info("Relationship removed");
                 reload();
             })
-            .catch(e => displayError(toasts, "Failed to remove", e))
+            .catch(e => displayError("Failed to remove", e))
     };
 
 
@@ -154,7 +154,7 @@ function controller($q, serviceBroker, UserService) {
                 vm.currentlySelectedGroup = null;
                 reload();
             })
-            .catch(e => displayError(toasts, "Failed to add", e))
+            .catch(e => displayError("Failed to add", e))
     };
 
 

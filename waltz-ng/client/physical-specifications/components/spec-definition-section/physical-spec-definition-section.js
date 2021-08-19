@@ -137,7 +137,7 @@ function controller($q,
                 loadSpecDefinitions(true);
                 vm.hideCreateSpecDefinition();
             })
-            .catch(e => displayError(toasts, "Unable to create specification definition", e));
+            .catch(e => displayError("Unable to create specification definition", e));
     };
 
     vm.deleteSpec = (specDef) => {

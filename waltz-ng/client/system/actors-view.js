@@ -63,7 +63,7 @@ function controller($q,
         if(change.newVal === null) return $q.reject("No value provided");
         return update(actor, { externalId: change })
             .then(() => _.find(vm.actors, {"id": actor.id}).externalId = change.newVal)
-            .catch(e => displayError(toasts, "Failed to save external id", e));
+            .catch(e => displayError("Failed to save external id", e));
     };
 
 

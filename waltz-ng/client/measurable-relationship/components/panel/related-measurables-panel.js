@@ -220,7 +220,7 @@ function controller($q, $timeout, serviceBroker) {
                     loadRelationships();
                 })
                 .catch(e => {
-                    displayError(toasts, "Relationship could not be removed", e)
+                    displayError("Relationship could not be removed", e)
                 });
         }
     };

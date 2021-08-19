@@ -49,7 +49,7 @@ function controller($q,
                 loadNoteTypes(true);
                 toasts.success("Updated");
             })
-            .catch(e => displayError(null, "Failed to save note definition", e));
+            .catch(e => displayError("Failed to save note definition", e));
     }
 
     vm.updateName = (change, type) => {

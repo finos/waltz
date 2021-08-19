@@ -137,7 +137,7 @@ function controller($state, serviceBroker) {
             toasts.success("Updated aliases");
             vm.aliases = r.data
         })
-        .catch(e => displayError(toasts, "Could not update aliases", e));
+        .catch(e => displayError("Could not update aliases", e));
 
     vm.saveTags = (tags = [], successMessage) => serviceBroker
         .execute(
@@ -147,7 +147,7 @@ function controller($state, serviceBroker) {
             toasts.success(successMessage);
             vm.tags = r.data;
         })
-        .catch(e => displayError(toasts, "Could not update tags", e));
+        .catch(e => displayError("Could not update tags", e));
 
     vm.toggleAppGroupDisplay = () => {
         vm.showAllAppGroups = !vm.showAllAppGroups;

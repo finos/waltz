@@ -147,7 +147,7 @@ function controller($element,
             .then(() => handleSearch(query, [entity.ACTOR.key, entity.MEASURABLE.key]))
             .then(() => handleSearch(query, [entity.PHYSICAL_SPECIFICATION.key, entity.DATA_TYPE.key, entity.SERVER.key]))
             .then(() => handleSearch(query, [entity.SOFTWARE.key, entity.ROADMAP.key, entity.LOGICAL_DATA_ELEMENT.key]))
-            .catch(e => displayError(null, "Failed to search"))
+            .catch(e => displayError("Failed to search"))
             .finally(() => vm.searching = false);
     };
 

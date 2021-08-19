@@ -55,7 +55,7 @@ function controller(serviceBroker) {
                     toasts.info("Role created successfully");
                     reload();
                 })
-            .catch(e => displayError(toasts, "Failed to create role! ", e))
+            .catch(e => displayError("Failed to create role! ", e));
     };
 }
 

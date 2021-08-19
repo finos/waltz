@@ -100,7 +100,7 @@ function controller($http, baseExtractUrl) {
         vm.extracting = true;
         invokeExport(format)
             .then(() => toasts.success("Data exported"))
-            .catch(e => displayError(toasts, "Data export failure", e))
+            .catch(e => displayError("Data export failure", e))
             .finally(() => vm.extracting = false);
     };
 

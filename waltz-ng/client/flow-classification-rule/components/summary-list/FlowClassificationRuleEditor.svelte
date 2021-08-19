@@ -42,12 +42,12 @@
         if (workingCopy.id) {
             submitUpdate()
                 .then(() => ToastStore.success("Flow classification rule updated"))
-                .catch(e => displayError(null, "Failed to update flow classification rule", e));
+                .catch(e => displayError("Failed to update flow classification rule", e));
 
         } else {
             submitCreate()
                 .then(() => ToastStore.success("Flow classification rule created"))
-                .catch(e => displayError(null, "Failed to create new flow classification rule", e));
+                .catch(e => displayError("Failed to create new flow classification rule", e));
         }
     }
 

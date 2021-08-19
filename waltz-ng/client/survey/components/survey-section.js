@@ -138,7 +138,7 @@ function controller(serviceBroker, userService) {
                 toasts.success("Survey issued successfully");
                 vm.onDismissCreateForm();
             })
-            .catch(e => displayError(toasts, "Could not create survey", e));
+            .catch(e => displayError("Could not create survey", e));
     }
 
 }

@@ -103,7 +103,7 @@ function controller($q, serviceBroker) {
                 toasts.warning("Assessment removed");
             })
             .catch(e => {
-                displayError(toasts, "Failed to remove", e);
+                displayError("Failed to remove", e);
             });
     };
 
@@ -117,7 +117,7 @@ function controller($q, serviceBroker) {
                 loadAll();
                 toasts.success("Assessment saved");
             })
-            .catch(e => displayError(toasts, "Failed to save", e));
+            .catch(e => displayError("Failed to save", e));
     };
 
 }

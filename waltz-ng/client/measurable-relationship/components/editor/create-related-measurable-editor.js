@@ -191,7 +191,7 @@ function controller(serviceBroker) {
 
         save(vm.form)
             .then(loadRelationships)
-            .catch(e => displayError(toasts, "Could not save because: ", e));
+            .catch(e => displayError("Could not save because: ", e));
     };
 
     vm.onItemUncheck = (node) => {
@@ -207,7 +207,7 @@ function controller(serviceBroker) {
                 vm.onRefresh();
             })
             .catch(e => {
-                displayError(toasts, "Could not remove relationship because: ", e);
+                displayError("Could not remove relationship because: ", e);
             });
     };
 
@@ -225,7 +225,7 @@ function controller(serviceBroker) {
     vm.submit = () => {
         if (vm.isFormValid()) {
             save(vm.form)
-                .catch(e => displayError(toasts, "Could not save because: ", e))
+                .catch(e => displayError("Could not save because: ", e))
                 .finally(() =>  vm.onCancel());
         }
     };

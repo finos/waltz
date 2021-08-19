@@ -95,7 +95,7 @@ function controller($q,
         attest(serviceBroker, instance.parentEntity, instance.attestedEntityKind)
             .then(() => loadData())
             .then(() => vm.selectedAttestation = null)
-            .catch(e => displayError(null, "Could not attest", e));
+            .catch(e => displayError("Could not attest", e));
     };
 
     vm.onCancelAttestation = () => {

@@ -212,7 +212,7 @@ function controller($q,
                     loadQuestions();
                     vm.cancelQuestionForm();
                 })
-                .catch(e => displayError(toasts, "Survey question was not deleted", e))
+                .catch(e => displayError("Survey question was not deleted", e))
         }
     };
 

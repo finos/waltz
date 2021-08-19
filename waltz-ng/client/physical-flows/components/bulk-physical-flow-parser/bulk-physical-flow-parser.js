@@ -230,7 +230,7 @@ function controller($scope, serviceBroker) {
 
                 vm.errorMessage = _.split(err.data.message, "/")[0].trim();
 
-                displayError(null, "Physical flows could not be created", err);
+                displayError("Physical flows could not be created", err);
             });
     };
 

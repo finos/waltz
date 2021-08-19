@@ -317,7 +317,7 @@ function controller(serviceBroker,
 
         vm.onSubmitChange(cmd)
             .then(vm.onDismiss)
-            .catch(e => displayError(toasts, "Error when submitting command", e));
+            .catch(e => displayError("Error when submitting command", e));
     };
 }
 

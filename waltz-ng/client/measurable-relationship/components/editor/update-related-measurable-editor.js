@@ -71,7 +71,7 @@ function controller(serviceBroker) {
                     vm.onCancel();
                 })
                 .catch(e => {
-                    displayError(toasts, "Could not save because: ", e);
+                    displayError("Could not save because: ", e);
                 });
         }
     };

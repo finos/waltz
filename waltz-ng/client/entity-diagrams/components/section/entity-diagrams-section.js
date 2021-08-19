@@ -122,7 +122,7 @@ function controller($q,
                         toasts.success("Diagram cloned");
                         reload();
                     })
-                    .catch(e => displayError(toasts, "Failed to clone diagram", e));
+                    .catch(e => displayError("Failed to clone diagram", e));
 
             }}
     ];
@@ -193,7 +193,7 @@ function controller($q,
                 toasts.success("Diagram created, click edit if you wish to make changes");
                 $state.go(kindToViewState("FLOW_DIAGRAM"), {id: diagramId});
             })
-            .catch(e => displayError(toasts, "Failed to create new diagram", e));
+            .catch(e => displayError("Failed to create new diagram", e));
     };
 }
 

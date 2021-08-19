@@ -47,7 +47,7 @@ function controller(serviceBroker) {
                 toasts.success("Participant added");
                 reloadParticipants();
             })
-            .catch(e => displayError(toasts, "Failed to add participant" , e));
+            .catch(e => displayError("Failed to add participant" , e));
     };
 
     function reloadParticipants() {
@@ -85,7 +85,7 @@ function controller(serviceBroker) {
                 toasts.success("Participant removed");
                 reloadParticipants();
             })
-            .catch(e => displayError(toasts, "Failed to add participant" , e));
+            .catch(e => displayError("Failed to add participant" , e));
     };
 
     vm.onAddSourceParticipant = s => onAddParticipant(s, "SOURCE");

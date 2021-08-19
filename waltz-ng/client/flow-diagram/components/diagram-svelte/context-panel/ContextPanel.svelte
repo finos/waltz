@@ -67,7 +67,7 @@
 
         savePromise = flowDiagramStore.save(saveCmd)
             .then(() => ToastStore.success("Diagram saved successfully"))
-            .catch(e => displayError(null, "Could not save flow diagram", e.response));
+            .catch(e => displayError("Could not save flow diagram", e.response));
 
         dirty.set(false);
     }

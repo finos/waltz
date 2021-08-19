@@ -105,7 +105,7 @@ function controller(serviceBroker) {
             .then(r => vm.favouriteAssessmentDefnIds = getFavouriteAssessmentDefnIds(vm.favouritesKey, r.data, vm.defaultPrimaryList))
             .then(() => partitionAssessments())
             .then(() => toasts.info(message))
-            .catch(e => displayError(toasts, "Could not modify favourite assessment list", e))
+            .catch(e => displayError("Could not modify favourite assessment list", e));
     };
 
     vm.toggleExpandNotProvided = () => {

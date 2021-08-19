@@ -102,7 +102,7 @@ function controller(serviceBroker, $q) {
                     loadData(true);
                     toasts.success("Change Unit Completed");
                 })
-                .catch(e => displayError(toasts, "Failed to complete change unit", e));
+                .catch(e => displayError("Failed to complete change unit", e));
         }
     };
 
@@ -116,7 +116,7 @@ function controller(serviceBroker, $q) {
                     loadData(true);
                     toasts.success("Change Unit Discarded");
                 })
-                .catch(e => displayError(toasts, "Failed to discard change unit", e));
+                .catch(e => displayError("Failed to discard change unit", e));
         }
     };
 
