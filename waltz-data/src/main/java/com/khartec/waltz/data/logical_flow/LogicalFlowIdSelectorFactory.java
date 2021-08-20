@@ -61,6 +61,8 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
     public Select<Record1<Long>> apply(IdSelectionOptions options) {
         checkNotNull(options, "options cannot be null");
         switch (options.entityReference().kind()) {
+            case ACTOR:
+                return mkForActor(options);
             case APPLICATION:
             case APP_GROUP:
             case CHANGE_INITIATIVE:
@@ -88,6 +90,22 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
             default:
                 throw new UnsupportedOperationException("Cannot create physical specification selector from options: " + options);
         }
+    }
+
+    private Select<Record1<Long>> mkForActor(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+
+        Condition sourceCondition = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(options.entityReference().id())
+                .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.ACTOR.name()));
+
+        Condition targetCondition = LOGICAL_FLOW.TARGET_ENTITY_ID.eq(options.entityReference().id())
+                .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.ACTOR.name()));
+
+        return DSL
+                .select(LOGICAL_FLOW.ID)
+                .from(LOGICAL_FLOW)
+                .where(sourceCondition.or(targetCondition))
+                .and(LOGICAL_NOT_REMOVED);
     }
 
 
