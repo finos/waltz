@@ -21,37 +21,49 @@
     <content>
         <div class="waltz-sub-section-content">
             <div style="padding: 5px 0">
-                    <div style="min-height: 1px;">
-                        <table class="waltz-field-table  waltz-field-table-border"
-                               style="width: 100%">
-                            <colgroup>
-                                <col width="30%">
-                                <col width="70%">
-                            </colgroup>
-                            <tbody>
-                            <tr ng-repeat="item in $ctrl.keyPeople" >
-                                <td class="wft-label" style="padding: 3px;">
-                                    <span ng-bind="item.roleName"></span>
-                                </td>
-                                <td>
-                                    <div>
-                                        <span ng-repeat="p in item.persons">
-                                            <waltz-entity-link entity-ref="p.person"></waltz-entity-link> -
-                                            <a ng-href="mailto:{{p.person.email}}">
-                                                <waltz-icon name="envelope-o"></waltz-icon>
-                                            </a>
-                                            <span ng-show="!$last">, </span>
-                                        </span>
-                                        <span class="wft-label small" ng-show="!item.persons.length">
-                                            Not defined
-                                        </span>
-                                    </div>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </div>
+                <div style="min-height: 1px;">
+                    <table class="waltz-field-table  waltz-field-table-border"
+                           style="width: 100%">
+                        <colgroup>
+                            <col width="30%">
+                            <col width="70%">
+                        </colgroup>
+                        <tbody>
+                        <tr ng-repeat="item in $ctrl.keyPeople" >
+                            <td class="wft-label" style="padding: 3px;">
+                                <span ng-bind="item.roleName"></span>
+                            </td>
+                            <td>
+                                <div>
+                                    <span ng-repeat="p in item.persons">
+                                        <waltz-entity-link entity-ref="p.person"></waltz-entity-link> -
+                                        <a ng-href="mailto:{{p.person.email}}">
+                                            <waltz-icon name="envelope-o"></waltz-icon>
+                                        </a>
+                                        <span ng-show="!$last">, </span>
+                                    </span>
+                                    <span class="wft-label small" ng-show="!item.persons.length">
+                                        Not defined
+                                    </span>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
+        </div>
+        <div class="waltz-sub-section-controls"
+             ng-if="$ctrl.keyPeople.length > 0">
+            <span uib-popover="Opens section to view/edit all involvements"
+                  popover-placement="left"
+                  popover-trigger="mouseenter"
+                  popover-popup-delay="300">
+                <a class="clickable pull-right"
+                   waltz-jump-to="involved-people-section">
+                    More
+                </a>
+            </span>
+        </div>
     </content>
 </waltz-sub-section>

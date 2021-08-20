@@ -27,7 +27,7 @@ const bindings = {
 };
 
 const initialState = {
-    keyPeople: []
+    keyPeople: [],
 };
 
 function controller($q, serviceBroker) {
