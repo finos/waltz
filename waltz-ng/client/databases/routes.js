@@ -18,6 +18,7 @@
 
 import { CORE_API } from "../common/services/core-api-utils";
 import DatabaseView from "./pages/view/database-view";
+import toasts from "../svelte-stores/toast-store"
 
 
 const baseState = {
@@ -66,6 +67,7 @@ function externalIdBouncer($state, $stateParams, serviceBroker) {
                 $state.go("main.database.view", {id: element.id});
             } else {
                 console.log(`Cannot find database corresponding to external id: ${externalId}`);
+                toasts.error(`Cannot find database with the external id: ${externalId}, redirecting to the Waltz home page`);
             }
         });
 }
