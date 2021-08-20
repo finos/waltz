@@ -28,17 +28,17 @@
             <label class="wt-label"
                    ng-model="$ctrl.activeTab"
                    for="flows">
-                <span>Flows</span>
+                <span>Data Flows</span>
             </label>
 
-<!--            <input type="radio"-->
-<!--                   value="viewpoints"-->
-<!--                   ng-model="$ctrl.activeTab"-->
-<!--                   id="viewpoints">-->
-<!--            <label class="wt-label"-->
-<!--                   for="viewpoints">-->
-<!--                <span>Viewpoints</span>-->
-<!--            </label>-->
+            <input type="radio"
+                   value="viewpoints"
+                   ng-model="$ctrl.activeTab"
+                   id="viewpoints">
+            <label class="wt-label"
+                   for="viewpoints">
+                <span>Viewpoint Ratings</span>
+            </label>
 
             <input type="radio"
                    ng-model="$ctrl.activeTab"
@@ -151,7 +151,17 @@
                         </message>
                     </waltz-no-data>
                 </div>
+                <div ng-if="$ctrl.activeTab === 'viewpoints'">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <waltz-svelte-component component="$ctrl.MeasurableAttestationPanel"
+                                                    primary-entity-ref="$ctrl.parentEntityRef">
+                            </waltz-svelte-component>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </div>
     </div>
 </div>
 
