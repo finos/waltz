@@ -119,7 +119,7 @@ const measurableRatingAppSection = {
     componentId: "measurable-rating-app-section",
     name: "Ratings / Roadmaps",
     icon: "puzzle-piece",
-    description: "Measurables linked to this application with a rating",
+    description: "Viewpoints linked to this application with a rating",
     id: 15,
 };
 
@@ -302,7 +302,7 @@ const attestationSummarySection = {
     componentId: "attestation-summary-section",
     name: "Attestations",
     icon: "check-square-o",
-    description: "Summary of attestations for logical flows, physical flows and measurables against applications related to this entity",
+    description: "Summary of attestations for logical flows, physical flows and viewpoints against applications related to this entity",
     id: 120
 };
 
@@ -326,7 +326,7 @@ const orgUnitDirectMeasurableSection = {
     componentId: "org-unit-direct-measurable-section",
     name: "Direct Viewpoints",
     icon: "puzzle-piece",
-    description: "Measurables which have been directly associated to this entity",
+    description: "Viewpoints which have been directly associated to this entity",
     id: 150
 };
 
@@ -342,7 +342,7 @@ const reportGridViewSection = {
     componentId: "report-grid-view-section",
     name: "Reports",
     icon: "cloud",
-    description: "Reports composed of measurable ratings, assessment ratings and costs for applications related to this entity",
+    description: "Reports composed of viewpoint ratings, assessment ratings and costs for applications related to this entity",
     id: 170
 };
 
@@ -421,7 +421,7 @@ const entityAttestationSection = {
     componentId: "attestation-section",
     name: "Attestations",
     icon: "check-square-o",
-    description: "Logical and physical flow attestations and measurable attestations for this application",
+    description: "Logical and physical flow attestations and viewpoint rating attestations for this application",
     id: 10001
 };
 

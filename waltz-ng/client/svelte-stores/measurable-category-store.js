@@ -2,10 +2,10 @@ import {remote} from "./remote";
 
 
 export function mkMeasurableCategoryStore() {
-    const findAll = (ref, force) => remote
-        .fetchViewList(
+    const findAll = (force) => remote
+        .fetchAppList(
             "GET",
-            `api/measurable-category/all`,
+            "api/measurable-category/all",
             null,
             {force});
 
