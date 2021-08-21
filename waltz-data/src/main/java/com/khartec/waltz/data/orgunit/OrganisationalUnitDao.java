@@ -21,8 +21,6 @@ package com.khartec.waltz.data.orgunit;
 import com.khartec.waltz.data.FindEntityReferencesByIdSelector;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableLeveledEntityReference;
-import com.khartec.waltz.model.LeveledEntityReference;
 import com.khartec.waltz.model.orgunit.ImmutableOrganisationalUnit;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.schema.tables.records.OrganisationalUnitRecord;
@@ -56,19 +54,6 @@ public class OrganisationalUnitDao implements FindEntityReferencesByIdSelector {
                 .id(orgUnitRecord.getId())
                 .parentId(ofNullable(orgUnitRecord.getParentId()))
                 .externalId(ofNullable(orgUnitRecord.getExternalId()))
-                .build();
-    };
-
-
-    private static final RecordMapper<Record, LeveledEntityReference> TO_LEVELED_ENTITY_REF_MAPPER = record -> {
-        EntityReference entityRef = EntityReference.mkRef(
-                EntityKind.ORG_UNIT,
-                record.getValue(ORGANISATIONAL_UNIT.ID),
-                record.getValue(ORGANISATIONAL_UNIT.NAME));
-
-        return ImmutableLeveledEntityReference.builder()
-                .entityReference(entityRef)
-                .level(record.getValue(ENTITY_HIERARCHY.LEVEL))
                 .build();
     };
 
@@ -157,37 +142,6 @@ public class OrganisationalUnitDao implements FindEntityReferencesByIdSelector {
                 .from(ou)
                 .where(condition)
                 .fetch(TO_DOMAIN_MAPPER);
-    }
-
-
-
-    public List<LeveledEntityReference> findImmediateHierarchy(long id) {
-
-        Select<Record3<Long, String, Integer>> immediateChildren = DSL.select(
-                    ORGANISATIONAL_UNIT.ID,
-                    ORGANISATIONAL_UNIT.NAME,
-                    ENTITY_HIERARCHY.LEVEL.plus(1).as(ENTITY_HIERARCHY.LEVEL))  // immediate children always at 'level + 1'
-                .from(ORGANISATIONAL_UNIT)
-                .innerJoin(ENTITY_HIERARCHY)
-                .on(ENTITY_HIERARCHY.ID.eq(ORGANISATIONAL_UNIT.ID)
-                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name())))
-                .where(ORGANISATIONAL_UNIT.PARENT_ID.eq(id))
-                .and(ENTITY_HIERARCHY.ANCESTOR_ID.eq(id));
-
-        Select<Record3<Long, String, Integer>> allParents = DSL.select(
-                    ORGANISATIONAL_UNIT.ID,
-                    ORGANISATIONAL_UNIT.NAME,
-                    ENTITY_HIERARCHY.LEVEL)
-                .from(ORGANISATIONAL_UNIT)
-                .innerJoin(ENTITY_HIERARCHY)
-                .on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(ORGANISATIONAL_UNIT.ID)
-                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name())))
-                .where(ENTITY_HIERARCHY.ID.eq(id));
-
-        return dsl.selectFrom(immediateChildren.asTable())
-                .unionAll(allParents)
-                .orderBy(ENTITY_HIERARCHY.LEVEL, ORGANISATIONAL_UNIT.NAME)
-                .fetch(TO_LEVELED_ENTITY_REF_MAPPER);
     }
 
 

@@ -35,7 +35,7 @@ import static com.khartec.waltz.model.utils.IdUtilities.toIds;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class OrgUnitTest extends InMemoryPoCTest {
+public class OrgUnitTest extends BaseInMemoryIntegrationTest {
 
     private static final OrganisationalUnitIdSelectorFactory ouSelectorFactory = new OrganisationalUnitIdSelectorFactory();
 

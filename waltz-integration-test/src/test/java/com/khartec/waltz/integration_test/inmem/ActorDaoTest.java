@@ -30,7 +30,7 @@ import java.util.List;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static org.junit.Assert.*;
 
-public class ActorDaoTest extends InMemoryPoCTest {
+public class ActorDaoTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void actorsCanBeCreated() {

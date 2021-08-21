@@ -30,11 +30,9 @@ import com.khartec.waltz.data.licence.LicenceDao;
 import com.khartec.waltz.data.logical_data_element.search.LogicalDataElementSearchDao;
 import com.khartec.waltz.data.measurable.MeasurableDao;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
-import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.LeveledEntityReference;
 import com.khartec.waltz.model.app_group.AppGroup;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
@@ -78,7 +76,6 @@ public class UnionHarness {
         licenceDao_countApplications(ctx);
         logicalDataElementSearch_search(ctx);
         measurableIdSelectorFactory_mkForFlowDiagram(ctx);
-        organisationalUnitDao_findImmediateHierarchy(ctx);
         physicalFlowDao_findByEntityRef(ctx);
     }
 
@@ -86,12 +83,6 @@ public class UnionHarness {
     private static void physicalFlowDao_findByEntityRef(ApplicationContext ctx) {
         List<PhysicalFlow> flows = ctx.getBean(PhysicalFlowDao.class).findByEntityReference(mkRef(EntityKind.APPLICATION, 12L));
         System.out.println(flows.size());
-    }
-
-
-    private static void organisationalUnitDao_findImmediateHierarchy(ApplicationContext ctx) {
-        List<LeveledEntityReference> hier = ctx.getBean(OrganisationalUnitDao.class).findImmediateHierarchy(100L);
-        System.out.println(hier.size());
     }
 
 

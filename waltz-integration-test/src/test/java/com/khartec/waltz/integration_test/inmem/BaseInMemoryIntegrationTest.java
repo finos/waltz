@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.ORGANISATIONAL_UNIT;
 
-public class InMemoryPoCTest {
+public class BaseInMemoryIntegrationTest {
 
     protected static AnnotationConfigApplicationContext ctx;
 
@@ -60,6 +60,7 @@ public class InMemoryPoCTest {
         LoggingUtilities.configureLogging();
         ctx = new AnnotationConfigApplicationContext(InMemoryTestConfiguration.class);
     }
+
 
     @Before
     public void baseSetup() {

@@ -253,11 +253,9 @@ public class BaseIntegrationTest {
     }
 
 
-
     public DSLContext getDsl() {
         return ctx.getBean(DSLContext.class);
     }
-
 
 
     public EntityReference mkNewAppRef() {

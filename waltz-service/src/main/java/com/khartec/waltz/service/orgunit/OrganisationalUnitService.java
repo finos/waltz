@@ -22,7 +22,6 @@ import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.data.orgunit.search.OrganisationalUnitSearchDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.LeveledEntityReference;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,11 +86,6 @@ public class OrganisationalUnitService {
 
     public List<OrganisationalUnit> search(EntitySearchOptions options) {
         return organisationalUnitSearchDao.search(options);
-    }
-
-
-    public List<LeveledEntityReference> findImmediateHierarchy(long id) {
-        return dao.findImmediateHierarchy(id);
     }
 
 
