@@ -33,7 +33,6 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
-import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static java.util.Optional.ofNullable;
@@ -144,18 +143,6 @@ public class OrganisationalUnitDao implements FindEntityReferencesByIdSelector {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
-
-    // can be re-written as a normal selector
-    @Deprecated
-    public List<OrganisationalUnit> findDescendants(long id) {
-        return dsl.select(ORGANISATIONAL_UNIT.fields())
-                .from(ORGANISATIONAL_UNIT)
-                .innerJoin(ENTITY_HIERARCHY)
-                .on(ENTITY_HIERARCHY.ID.eq(ORGANISATIONAL_UNIT.ID)
-                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name())))
-                .where(ENTITY_HIERARCHY.ANCESTOR_ID.eq(id))
-                .fetch(TO_DOMAIN_MAPPER);
-    }
 
 
     @Override

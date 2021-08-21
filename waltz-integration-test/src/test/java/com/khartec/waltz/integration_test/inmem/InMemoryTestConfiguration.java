@@ -70,7 +70,7 @@ public class InMemoryTestConfiguration {
         liquibase.setDropFirst(true);
 
         liquibase.setDataSource(dataSource);
-//        liquibase.setDefaultSchema("test");
+        liquibase.setDefaultSchema("public");
         liquibase.setChangeLog("file:../waltz-data/src/main/ddl/liquibase/db.changelog-master.xml");
         return liquibase;
     }

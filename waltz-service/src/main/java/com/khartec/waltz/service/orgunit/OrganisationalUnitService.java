@@ -19,11 +19,15 @@
 package com.khartec.waltz.service.orgunit;
 
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
+import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.search.OrganisationalUnitSearchDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +36,8 @@ import java.util.List;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.FunctionUtilities.time;
 import static com.khartec.waltz.common.StringUtilities.isEmpty;
+import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static java.util.Collections.emptyList;
 
 
@@ -40,6 +46,7 @@ public class OrganisationalUnitService {
 
     private final OrganisationalUnitDao dao;
     private final OrganisationalUnitSearchDao organisationalUnitSearchDao;
+    private final OrganisationalUnitIdSelectorFactory ouSelectorFactory = new OrganisationalUnitIdSelectorFactory();
 
 
     @Autowired
@@ -89,10 +96,12 @@ public class OrganisationalUnitService {
     }
 
 
-    // can be re-written as a normal selector
-    @Deprecated
+
     public List<OrganisationalUnit> findDescendants(long id) {
-        return dao.findDescendants(id);
+        Select<Record1<Long>> ouSelector = ouSelectorFactory.apply(mkOpts(
+                mkRef(EntityKind.ORG_UNIT, id),
+                HierarchyQueryScope.PARENTS));
+        return dao.findBySelector(ouSelector);
     }
 
 

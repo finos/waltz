@@ -16,11 +16,12 @@
  *
  */
 
-package com.khartec.waltz.integration_test.inmem;
+package com.khartec.waltz.integration_test.inmem.dao;
 
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
+import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
@@ -32,8 +33,7 @@ import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static com.khartec.waltz.model.utils.IdUtilities.toIds;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 public class OrgUnitTest extends BaseInMemoryIntegrationTest {
 
@@ -111,8 +111,10 @@ public class OrgUnitTest extends BaseInMemoryIntegrationTest {
                 toIds(dao.findAll()));
     }
 
+
     @Test
     public void ouDescriptionsCanBeUpdated() {
+        assertNotEquals("updated description", dao.getById(ouIds.a).description());
         dao.updateDescription(ouIds.a, "updated description");
         assertEquals("updated description", dao.getById(ouIds.a).description());
     }

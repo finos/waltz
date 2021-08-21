@@ -16,10 +16,11 @@
  *
  */
 
-package com.khartec.waltz.integration_test.inmem;
+package com.khartec.waltz.integration_test.inmem.dao;
 
 import com.khartec.waltz.data.actor.ActorDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
+import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.actor.Actor;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
