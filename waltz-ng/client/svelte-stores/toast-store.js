@@ -13,7 +13,7 @@ function createStore() {
             id,
             type: "info",
             dismissible: true,
-            timeout: 2000
+            timeout: 3000
         };
 
         // Push the toast to the top of the list of toasts
@@ -27,7 +27,7 @@ function createStore() {
         const success = {
             type: "success",
             dismissible: true,
-            timeout: 2000,
+            timeout: 3000,
             message: message
         };
         add(success);
@@ -37,7 +37,7 @@ function createStore() {
         const warning = {
             type: "warning",
             dismissible: true,
-            timeout: 2000,
+            timeout: 3000,
             message: message
         };
         add(warning);
@@ -47,7 +47,7 @@ function createStore() {
         const error = {
             type: "error",
             dismissible: true,
-            timeout: 2000,
+            timeout: 6000,
             message: message
         };
         add(error);
@@ -57,7 +57,7 @@ function createStore() {
         const info = {
             type: "info",
             dismissible: true,
-            timeout: 2000,
+            timeout: 3000,
             message: message
         };
         add(info);
