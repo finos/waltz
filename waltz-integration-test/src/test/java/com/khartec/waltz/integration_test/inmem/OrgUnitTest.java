@@ -1,0 +1,120 @@
+/*
+ * Waltz - Enterprise Architecture
+ * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
+ * See README.md for more information
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific
+ *
+ */
+
+package com.khartec.waltz.integration_test.inmem;
+
+import com.khartec.waltz.common.SetUtilities;
+import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
+import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.HierarchyQueryScope;
+import com.khartec.waltz.model.orgunit.OrganisationalUnit;
+import org.junit.Before;
+import org.junit.Test;
+
+import static com.khartec.waltz.common.SetUtilities.asSet;
+import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
+import static com.khartec.waltz.model.utils.IdUtilities.toIds;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+public class OrgUnitTest extends InMemoryPoCTest {
+
+    private static final OrganisationalUnitIdSelectorFactory ouSelectorFactory = new OrganisationalUnitIdSelectorFactory();
+
+    private OrganisationalUnitDao dao;
+
+    @Before
+    public void setupOuTest() {
+        System.out.println("ouTest::setup");
+        dao = ctx.getBean(OrganisationalUnitDao.class);
+    }
+
+
+    @Test
+    public void ouCanBeRetrievedById() {
+        OrganisationalUnit rootOU = dao.getById(ouIds.root);
+        assertNotNull(rootOU);
+    }
+
+
+    @Test
+    public void ousCanBeRetrievedByIds() {
+        assertEquals(
+                asSet(ouIds.root, ouIds.b),
+                toIds(dao.findByIds(ouIds.root, ouIds.b)));
+    }
+
+
+    @Test
+    public void ousCanBeRetrievedAsRefs_RatherThanAsFullObjects() {
+        assertEquals(
+                asSet(ouIds.a, ouIds.a1),
+                SetUtilities.map(
+                        dao.findByIdSelectorAsEntityReference(ouSelectorFactory.apply(
+                                mkOpts(
+                                    mkRef(EntityKind.ORG_UNIT, ouIds.a),
+                                    HierarchyQueryScope.CHILDREN))),
+                        EntityReference::id));
+    }
+
+
+    @Test
+    public void ousCanBeRetrievedBySelector() {
+        assertEquals(
+                asSet(ouIds.root, ouIds.a, ouIds.a1, ouIds.b),
+                toIds(dao.findBySelector(ouSelectorFactory.apply(mkOpts(
+                        mkRef(EntityKind.ORG_UNIT, ouIds.root),
+                        HierarchyQueryScope.CHILDREN)))));
+
+        assertEquals(
+                asSet(ouIds.a, ouIds.a1),
+                toIds(dao.findBySelector(ouSelectorFactory.apply(mkOpts(
+                        mkRef(EntityKind.ORG_UNIT, ouIds.a),
+                        HierarchyQueryScope.CHILDREN)))));
+
+        assertEquals(
+                asSet(ouIds.root, ouIds.a),
+                toIds(dao.findBySelector(ouSelectorFactory.apply(mkOpts(
+                        mkRef(EntityKind.ORG_UNIT, ouIds.a),
+                        HierarchyQueryScope.PARENTS)))));
+
+        assertEquals(
+                asSet(ouIds.a1),
+                toIds(dao.findBySelector(ouSelectorFactory.apply(mkOpts(
+                        mkRef(EntityKind.ORG_UNIT, ouIds.a1),
+                        HierarchyQueryScope.EXACT)))));
+    }
+
+
+    @Test
+    public void allOusCanLoadedViaFindAll() {
+        assertEquals(
+                asSet(ouIds.root, ouIds.a, ouIds.a1, ouIds.b),
+                toIds(dao.findAll()));
+    }
+
+    @Test
+    public void ouDescriptionsCanBeUpdated() {
+        dao.updateDescription(ouIds.a, "updated description");
+        assertEquals("updated description", dao.getById(ouIds.a).description());
+    }
+
+}

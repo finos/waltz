@@ -175,6 +175,7 @@
     </changeSet>
 
     <changeSet id="20210611-5395-7"
+               failOnError="false"
                author="alimuza">
         <comment>5395: Update custom environment usage with database usage references</comment>
         <sql>

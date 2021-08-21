@@ -95,12 +95,11 @@ public class OrganisationalUnitService {
     }
 
 
+    // can be re-written as a normal selector
+    @Deprecated
     public List<OrganisationalUnit> findDescendants(long id) {
         return dao.findDescendants(id);
     }
 
-    public OrganisationalUnit getByAppId(long id) {
-        return dao.getByAppId(id);
-    }
 
 }

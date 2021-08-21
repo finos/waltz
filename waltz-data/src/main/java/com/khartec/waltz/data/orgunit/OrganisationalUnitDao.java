@@ -35,7 +35,6 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
@@ -192,6 +191,8 @@ public class OrganisationalUnitDao implements FindEntityReferencesByIdSelector {
     }
 
 
+    // can be re-written as a normal selector
+    @Deprecated
     public List<OrganisationalUnit> findDescendants(long id) {
         return dsl.select(ORGANISATIONAL_UNIT.fields())
                 .from(ORGANISATIONAL_UNIT)
@@ -200,16 +201,6 @@ public class OrganisationalUnitDao implements FindEntityReferencesByIdSelector {
                         .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name())))
                 .where(ENTITY_HIERARCHY.ANCESTOR_ID.eq(id))
                 .fetch(TO_DOMAIN_MAPPER);
-    }
-
-
-    public OrganisationalUnit getByAppId(long id) {
-        return dsl.select(ORGANISATIONAL_UNIT.fields())
-                .from(ORGANISATIONAL_UNIT)
-                .innerJoin(APPLICATION)
-                .on(APPLICATION.ORGANISATIONAL_UNIT_ID.eq(ORGANISATIONAL_UNIT.ID))
-                .where(APPLICATION.ID.eq(id))
-                .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 

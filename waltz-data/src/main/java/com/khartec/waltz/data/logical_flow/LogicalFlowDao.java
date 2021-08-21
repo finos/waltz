@@ -265,7 +265,8 @@ public class LogicalFlowDao {
      * @return
      */
     private boolean restoreFlow(LogicalFlow flow, String username) {
-        return dsl.update(LOGICAL_FLOW)
+        return dsl
+                .update(LOGICAL_FLOW)
                 .set(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS, ACTIVE.name())
                 .set(LOGICAL_FLOW.LAST_UPDATED_BY, username)
                 .set(LOGICAL_FLOW.LAST_UPDATED_AT, Timestamp.valueOf(nowUtc()))
