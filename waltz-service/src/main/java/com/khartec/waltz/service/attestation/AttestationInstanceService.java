@@ -27,6 +27,7 @@ import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.attestation.AttestEntityCommand;
 import com.khartec.waltz.model.attestation.AttestationInstance;
 import com.khartec.waltz.model.attestation.AttestationRun;
+import com.khartec.waltz.model.attestation.LatestMeasurableAttestationInfo;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.external_identifier.ExternalIdValue;
 import com.khartec.waltz.model.person.Person;
@@ -40,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -194,6 +196,13 @@ public class AttestationInstanceService {
             return attestInstance(instanceId, username);
         }
     }
+
+
+    public Set<LatestMeasurableAttestationInfo> findLatestMeasurableAttestations(EntityReference ref){
+        return attestationInstanceDao.findLatestMeasurableAttestations(ref);
+    }
+
+
 
     private void checkAttestationPermission(String username, AttestEntityCommand createCommand) {
         boolean hasAttestationPermission = permissionGroupService.hasPermission(

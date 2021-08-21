@@ -23,6 +23,7 @@ import template from "./attestation-section.html";
 import {attest} from "../../attestation-utils";
 import {displayError} from "../../../common/error-utils";
 import toasts from "../../../svelte-stores/toast-store";
+import MeasurableAttestationPanel from "../../components/svelte/MeasurableAttestationPanel.svelte"
 
 const bindings = {
     parentEntityRef: "<"
@@ -40,7 +41,8 @@ const initialState = {
     attestationSections: [],
     mode: modes.VIEW,
     activeAttestationSection: null,
-    activeTab: "flows"
+    activeTab: "flows",
+    MeasurableAttestationPanel
 };
 
 

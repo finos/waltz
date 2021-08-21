@@ -22,9 +22,7 @@ import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.attestation.AttestEntityCommand;
-import com.khartec.waltz.model.attestation.AttestationInstance;
-import com.khartec.waltz.model.attestation.ImmutableAttestationInstance;
+import com.khartec.waltz.model.attestation.*;
 import com.khartec.waltz.schema.tables.records.AttestationInstanceRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -35,9 +33,12 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 
@@ -58,7 +59,7 @@ public class AttestationInstanceDao {
         return ImmutableAttestationInstance.builder()
                 .id(record.getId())
                 .attestationRunId(record.getAttestationRunId())
-                .parentEntity(EntityReference.mkRef(
+                .parentEntity(mkRef(
                         EntityKind.valueOf(record.getParentEntityKind()),
                         record.getParentEntityId(),
                         r.getValue(ENTITY_NAME_FIELD)))
@@ -255,5 +256,76 @@ public class AttestationInstanceDao {
                 .where(ATTESTATION_INSTANCE.ID.in(selector))
                 .and(ATTESTATION_INSTANCE.ATTESTED_AT.isNotNull())
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public Set<LatestMeasurableAttestationInfo> findLatestMeasurableAttestations(EntityReference ref){
+
+        Field<Long> latest_attestation = DSL
+                .firstValue(ATTESTATION_INSTANCE.ID)
+                .over()
+                .partitionBy(ATTESTATION_RUN.ATTESTED_ENTITY_ID)
+                .orderBy(ATTESTATION_INSTANCE.ATTESTED_AT.desc())
+                .as("latest_attestation");
+
+        Table<Record> attestationsWithCategory = dsl
+                .select(latest_attestation,
+                        MEASURABLE_CATEGORY.ID.as("category_id"),
+                        MEASURABLE_CATEGORY.NAME.as("category_name"),
+                        MEASURABLE_CATEGORY.DESCRIPTION)
+                .select(ATTESTATION_INSTANCE.ID.as("instance_id"),
+                        ATTESTATION_INSTANCE.ATTESTED_AT,
+                        ATTESTATION_INSTANCE.ATTESTED_BY)
+                .select(ATTESTATION_RUN.ID.as("run_id"),
+                        ATTESTATION_RUN.NAME.as("run_name"),
+                        ATTESTATION_RUN.ISSUED_ON,
+                        ATTESTATION_RUN.DUE_DATE)
+                .select(ENTITY_NAME_FIELD)
+                .from(ATTESTATION_INSTANCE)
+                .innerJoin(ATTESTATION_RUN)
+                .on(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID))
+                .innerJoin(MEASURABLE_CATEGORY)
+                .on(ATTESTATION_RUN.ATTESTED_ENTITY_KIND.eq(EntityKind.MEASURABLE_CATEGORY.name())
+                        .and(ATTESTATION_RUN.ATTESTED_ENTITY_ID.eq(MEASURABLE_CATEGORY.ID)))
+                .where(ATTESTATION_INSTANCE.PARENT_ENTITY_ID.eq(ref.id())
+                        .and(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND.eq(ref.kind().name())))
+                .asTable();
+
+        Result<Record> latestAttestationsWithCategory = dsl
+                .selectFrom(attestationsWithCategory)
+                .where(attestationsWithCategory.field(latest_attestation)
+                        .eq(attestationsWithCategory.field("instance_id", Long.class)))
+                .fetch();
+
+        return latestAttestationsWithCategory
+                .stream()
+                .map(r -> {
+
+                    EntityReference categoryRef = mkRef(
+                            EntityKind.MEASURABLE_CATEGORY,
+                            r.get("category_id", Long.class),
+                            r.get("category_name", String.class),
+                            r.get(MEASURABLE_CATEGORY.DESCRIPTION));
+
+                    EntityReference instanceRef = mkRef(EntityKind.ATTESTATION, r.get("instance_id", Long.class));
+
+                    EntityReference runRef = mkRef(
+                            EntityKind.ATTESTATION_RUN,
+                            r.get("run_id", Long.class),
+                            r.get("run_name", String.class));
+
+                    ImmutableLatestMeasurableAttestationInfo latestMeasurableAttestationInfo = ImmutableLatestMeasurableAttestationInfo.builder()
+                            .categoryRef(categoryRef)
+                            .attestationInstanceRef(instanceRef)
+                            .attestationRunRef(runRef)
+                            .issuedOn(r.get(ATTESTATION_RUN.ISSUED_ON))
+                            .dueDate(r.get(ATTESTATION_RUN.DUE_DATE))
+                            .attestedAt(r.get(ATTESTATION_INSTANCE.ATTESTED_AT))
+                            .attestedBy(r.get(ATTESTATION_INSTANCE.ATTESTED_BY))
+                            .build();
+
+                    return latestMeasurableAttestationInfo;
+                })
+                .collect(Collectors.toSet());
     }
 }

@@ -20,6 +20,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.attestation.AttestEntityCommand;
 import com.khartec.waltz.model.attestation.AttestationInstance;
+import com.khartec.waltz.model.attestation.LatestMeasurableAttestationInfo;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.attestation.AttestationInstanceService;
@@ -72,6 +73,7 @@ public class AttestationInstanceEndpoint implements Endpoint {
         String findHistoricalForPendingByUserPath = mkPath(BASE_URL, "historical", "user");
         String findPersonsByInstancePath = mkPath(BASE_URL, ":id", "person");
         String findBySelectorPath = mkPath(BASE_URL, "selector");
+        String findLatestMeasurableAttestationsPath = mkPath(BASE_URL, "latest", "measurable-category", "entity", ":kind", ":id");
         String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
 
         DatumRoute<Boolean> attestInstanceRoute =
@@ -102,6 +104,9 @@ public class AttestationInstanceEndpoint implements Endpoint {
         ListRoute<AttestationInstance> findBySelectorRoute = ((request, response)
                 -> attestationInstanceService.findByIdSelector(readIdSelectionOptionsFromBody(request)));
 
+        ListRoute<LatestMeasurableAttestationInfo> findLatestMeasurableAttestationsRoute = ((request, response)
+                -> attestationInstanceService.findLatestMeasurableAttestations(getEntityReference(request)));
+
         DatumRoute<Boolean> attestEntityForUserRoute =
                 (req, res) -> attestationInstanceService.attestForEntity(getUsername(req), readCreateCommand(req));
 
@@ -113,6 +118,7 @@ public class AttestationInstanceEndpoint implements Endpoint {
         getForList(findHistoricalForPendingByUserPath, findHistoricalForPendingByRecipientRoute);
         getForList(findByRunIdPath, findByRunIdRoute);
         getForList(findPersonsByInstancePath, findPersonsByInstanceRoute);
+        getForList(findLatestMeasurableAttestationsPath, findLatestMeasurableAttestationsRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
         getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
     }
