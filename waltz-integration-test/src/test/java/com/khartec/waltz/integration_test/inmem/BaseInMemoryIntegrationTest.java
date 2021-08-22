@@ -24,23 +24,27 @@ import com.khartec.waltz.schema.tables.records.MeasurableRecord;
 import com.khartec.waltz.schema.tables.records.OrganisationalUnitRecord;
 import com.khartec.waltz.schema.tables.records.RatingSchemeRecord;
 import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
+import org.h2.tools.Server;
 import org.jooq.DSLContext;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import java.sql.SQLException;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.Tables.RATING_SCHEME;
 
 public class BaseInMemoryIntegrationTest {
 
+    private static final AtomicLong ctr = new AtomicLong(1_000_000);
+
     protected static AnnotationConfigApplicationContext ctx;
 
-    private static final AtomicLong ctr = new AtomicLong(1_000_000);
     protected OuIds ouIds;
 
     protected static final String LAST_UPDATE_USER = "last";
@@ -63,7 +67,7 @@ public class BaseInMemoryIntegrationTest {
         ids.a1 = createOrgUnit("a1", ids.a);
         ids.b = createOrgUnit("b", ids.root);
 
-        rebuildHierarachy(EntityKind.ORG_UNIT);
+        rebuildHierarchy(EntityKind.ORG_UNIT);
         return ids;
     }
 
@@ -94,7 +98,7 @@ public class BaseInMemoryIntegrationTest {
     }
 
 
-    protected void rebuildHierarachy(EntityKind kind) {
+    protected void rebuildHierarchy(EntityKind kind) {
         EntityHierarchyService ehSvc = ctx.getBean(EntityHierarchyService.class);
         ehSvc.buildFor(kind);
     }
@@ -214,14 +218,34 @@ public class BaseInMemoryIntegrationTest {
                     return record.getId();
                 });
     }
-//
-//    @Test
-//    public void foo() {
-//        System.out.println("Hello world");
-//        assertTrue(1 == 1);
-//        DSLContext dsl = ctx.getBean(DSLContext.class);
-//        System.out.println(dsl.fetch("SHOW TABLES"));
-//
-//        dsl.selectFrom(LOGICAL_FLOW).fetch().format(System.out);
-//    }
+
+    @Test
+    public void dumpTableNames() {
+        DSLContext dsl = ctx.getBean(DSLContext.class);
+        dsl.fetch("SHOW TABLES").format(System.out);
+    }
+
+
+    /**
+     * DEBUG ONLY
+     *
+     * Uncomment the @After annotation to get the test executor
+     * to pause for 2 hours.  During this time you can
+     * attach an external database client to the in memory H2
+     * instance to see the current state of the database.
+     *
+     * The url to connect to is:
+     *    jdbc:h2:tcp://localhost/mem:waltz
+     */
+//    @After
+    public void stickAround() {
+        try {
+            System.out.println("Starting tcp server, connect with: jdbc:h2:tcp://localhost/mem:waltz");
+            Server.createTcpServer().start();
+            System.out.println("Sticking around for 2 hrs");
+            Thread.sleep(TimeUnit.HOURS.toMillis(2));
+        } catch (InterruptedException | SQLException e) {
+            e.printStackTrace();
+        }
+    }
 }

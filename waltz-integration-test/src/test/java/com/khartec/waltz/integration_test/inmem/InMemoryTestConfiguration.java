@@ -7,6 +7,8 @@ import com.zaxxer.hikari.HikariDataSource;
 import liquibase.integration.spring.SpringLiquibase;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
+import org.jooq.conf.RenderQuotedNames;
+import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DefaultConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +30,6 @@ import java.sql.SQLException;
 @EnableMBeanExport(registration = RegistrationPolicy.REPLACE_EXISTING)
 public class InMemoryTestConfiguration {
 
-
     @Bean
     public DBExecutorPoolInterface dbExecutorPool() {
         return new DBExecutorPool(2, 4);
@@ -40,10 +41,9 @@ public class InMemoryTestConfiguration {
         System.out.println("Setting up ds");
 
         HikariConfig dsConfig = new HikariConfig();
-        dsConfig.setJdbcUrl("jdbc:h2:mem:testdb;CASE_INSENSITIVE_IDENTIFIERS=TRUE");
+        dsConfig.setJdbcUrl("jdbc:h2:mem:waltz;CASE_INSENSITIVE_IDENTIFIERS=TRUE");
         dsConfig.setUsername("sa");
         dsConfig.setPassword("sa");
-        dsConfig.setSchema("PUBLIC");
         dsConfig.setMaximumPoolSize(5);
         dsConfig.setMinimumIdle(2);
         return new HikariDataSource(dsConfig);
@@ -54,9 +54,17 @@ public class InMemoryTestConfiguration {
     @Autowired
     public DSLContext dsl(DataSource dataSource) {
         System.out.println("Setting up dsl");
+        Settings dslSettings = new Settings()
+                .withRenderFormatted(true)
+                .withDebugInfoOnStackTrace(true)
+                .withRenderQuotedNames(RenderQuotedNames.NEVER)
+                .withExecuteLogging(true);
+
         org.jooq.Configuration configuration = new DefaultConfiguration()
                 .set(dataSource)
+                .set(dslSettings)
                 .set(SQLDialect.H2);
+
         return DSL.using(configuration);
     }
 
@@ -70,7 +78,7 @@ public class InMemoryTestConfiguration {
         liquibase.setDropFirst(true);
 
         liquibase.setDataSource(dataSource);
-        liquibase.setDefaultSchema("public");
+//        liquibase.setDefaultSchema("public");
         liquibase.setChangeLog("file:../waltz-data/src/main/ddl/liquibase/db.changelog-master.xml");
         return liquibase;
     }

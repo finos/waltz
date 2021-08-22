@@ -137,7 +137,7 @@ public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
         EntityReference app2Ref = createNewApp("a2", null);
         mkRatings(app2Ref, m1Id);
 
-        rebuildHierarachy(EntityKind.MEASURABLE);
+        rebuildHierarchy(EntityKind.MEASURABLE);
 
         IdSelectionOptions catOpts = mkOpts(mkRef(EntityKind.MEASURABLE_CATEGORY, categoryId), HierarchyQueryScope.EXACT);
         IdSelectionOptions m1Opts = mkOpts(mkRef(EntityKind.MEASURABLE, m1Id));

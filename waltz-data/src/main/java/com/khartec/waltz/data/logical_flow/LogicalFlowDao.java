@@ -175,7 +175,9 @@ public class LogicalFlowDao {
 
     public Collection<LogicalFlow> findUpstreamFlowsForEntityReferences(List<EntityReference> references) {
 
-        Map<EntityKind, Collection<EntityReference>> refsByKind = groupBy(ref -> ref.kind(), references);
+        Map<EntityKind, Collection<EntityReference>> refsByKind = groupBy(
+                EntityReference::kind,
+                references);
 
         Condition anyTargetMatches = refsByKind
                 .entrySet()
@@ -265,7 +267,7 @@ public class LogicalFlowDao {
      * @return
      */
     private boolean restoreFlow(LogicalFlow flow, String username) {
-        return dsl
+        UpdateConditionStep<LogicalFlowRecord> upd = dsl
                 .update(LOGICAL_FLOW)
                 .set(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS, ACTIVE.name())
                 .set(LOGICAL_FLOW.LAST_UPDATED_BY, username)
@@ -274,7 +276,9 @@ public class LogicalFlowDao {
                 .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(flow.source().id()))
                 .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(flow.source().kind().name()))
                 .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(flow.target().id()))
-                .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(flow.target().kind().name()))
+                .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(flow.target().kind().name()));
+        System.out.println(upd);
+        return upd
                 .execute() == 1;
     }
 
