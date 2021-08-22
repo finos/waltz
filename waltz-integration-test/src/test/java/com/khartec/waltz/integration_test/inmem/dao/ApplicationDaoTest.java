@@ -16,11 +16,11 @@
  *
  */
 
-package com.khartec.waltz.integration_test.application;
+package com.khartec.waltz.integration_test.inmem.dao;
 
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.integration_test.BaseIntegrationTest;
+import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
@@ -38,7 +38,7 @@ import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class ApplicationDaoTest extends BaseIntegrationTest {
+public class ApplicationDaoTest extends BaseInMemoryIntegrationTest {
 
     private final ApplicationIdSelectorFactory idSelectorFactory = new ApplicationIdSelectorFactory();
     private final ApplicationDao appDao = ctx.getBean(ApplicationDao.class);
@@ -59,7 +59,7 @@ public class ApplicationDaoTest extends BaseIntegrationTest {
         raaOu = createOrgUnit("raa", raOu);
         rbOu = createOrgUnit("rb", rootOu);
 
-        rebuildHierarachy(EntityKind.ORG_UNIT);
+        rebuildHierarchy(EntityKind.ORG_UNIT);
 
         r1 = createNewApp("r1", rootOu);
         ra2 = createNewApp("ra2", raOu);

@@ -16,7 +16,7 @@
  *
  */
 
-package com.khartec.waltz.integration_test;
+package com.khartec.waltz.integration_test.docker;
 
 import com.khartec.waltz.data.DBExecutorPool;
 import com.khartec.waltz.data.DBExecutorPoolInterface;

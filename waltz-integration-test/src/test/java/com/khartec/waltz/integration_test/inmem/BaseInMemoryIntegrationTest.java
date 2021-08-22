@@ -4,13 +4,22 @@ import com.khartec.waltz.common.CollectionUtilities;
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.LoggingUtilities;
 import com.khartec.waltz.data.actor.ActorDao;
+import com.khartec.waltz.data.app_group.AppGroupDao;
+import com.khartec.waltz.data.app_group.AppGroupEntryDao;
 import com.khartec.waltz.data.application.ApplicationDao;
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
+import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
+import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.measurable_category.MeasurableCategoryDao;
+import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.actor.ImmutableActorCreateCommand;
+import com.khartec.waltz.model.app_group.AppGroup;
+import com.khartec.waltz.model.app_group.AppGroupKind;
+import com.khartec.waltz.model.app_group.ImmutableAppGroup;
 import com.khartec.waltz.model.application.AppRegistrationResponse;
 import com.khartec.waltz.model.application.ApplicationKind;
 import com.khartec.waltz.model.application.ImmutableAppRegistrationRequest;
@@ -27,11 +36,10 @@ import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.h2.tools.Server;
 import org.jooq.DSLContext;
 import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -41,9 +49,18 @@ import static com.khartec.waltz.schema.Tables.*;
 
 public class BaseInMemoryIntegrationTest {
 
-    private static final AtomicLong ctr = new AtomicLong(1_000_000);
+    static {
+        LoggingUtilities.configureLogging();
+    }
 
-    protected static AnnotationConfigApplicationContext ctx;
+    protected static final AtomicLong counter = new AtomicLong(1_000_000);
+
+    protected static AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(InMemoryTestConfiguration.class);
+
+    protected static final OrganisationalUnitIdSelectorFactory ouSelectorFactory = new OrganisationalUnitIdSelectorFactory();
+    protected static final ApplicationIdSelectorFactory appSelectorFactory = new ApplicationIdSelectorFactory();
+    protected static final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
+    protected static final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
 
     protected OuIds ouIds;
 
@@ -71,17 +88,8 @@ public class BaseInMemoryIntegrationTest {
         return ids;
     }
 
-
-    @BeforeClass
-    public static void baseClassSetUp() {
-        LoggingUtilities.configureLogging();
-        ctx = new AnnotationConfigApplicationContext(InMemoryTestConfiguration.class);
-    }
-
-
     @Before
     public void baseSetup() {
-        System.out.println("base::setup");
         ouIds = setupOuTree();
     }
 
@@ -94,7 +102,7 @@ public class BaseInMemoryIntegrationTest {
     public EntityReference mkNewAppRef() {
         return mkRef(
                 EntityKind.APPLICATION,
-                ctr.incrementAndGet());
+                counter.incrementAndGet());
     }
 
 
@@ -130,7 +138,7 @@ public class BaseInMemoryIntegrationTest {
 
     public Long createOrgUnit(String nameStem, Long parentId) {
         OrganisationalUnitRecord record = getDsl().newRecord(ORGANISATIONAL_UNIT);
-        record.setId(ctr.incrementAndGet());
+        record.setId(counter.incrementAndGet());
         record.setName(nameStem + "Name");
         record.setDescription(nameStem + "Desc");
         record.setParentId(parentId);
@@ -219,10 +227,28 @@ public class BaseInMemoryIntegrationTest {
                 });
     }
 
-    @Test
-    public void dumpTableNames() {
-        DSLContext dsl = ctx.getBean(DSLContext.class);
-        dsl.fetch("SHOW TABLES").format(System.out);
+
+
+    public Long createAppGroupWithAppRefs(String groupName, Collection<EntityReference> appRefs) {
+        Collection<Long> appIds = CollectionUtilities.map(appRefs, EntityReference::id);
+        return createAppGroupWithAppIds(groupName, appIds);
+    }
+
+
+    public Long createAppGroupWithAppIds(String groupName, Collection<Long> appIds) {
+        AppGroup g = ImmutableAppGroup
+                .builder()
+                .name(groupName)
+                .appGroupKind(AppGroupKind.PUBLIC)
+                .build();
+
+        Long gId = ctx.getBean(AppGroupDao.class)
+                .insert(g);
+
+        ctx.getBean(AppGroupEntryDao.class)
+                .addApplications(gId, appIds);
+
+        return gId;
     }
 
 

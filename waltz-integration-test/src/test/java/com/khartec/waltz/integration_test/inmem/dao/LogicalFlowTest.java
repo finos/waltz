@@ -20,15 +20,21 @@ package com.khartec.waltz.integration_test.inmem.dao;
 
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
+import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdProvider;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
-import org.jooq.Record1;
-import org.jooq.SelectJoinStep;
 import org.junit.Before;
 import org.junit.Test;
 
-import static com.khartec.waltz.schema.Tables.APPLICATION;
-import static org.junit.Assert.assertNotNull;
+import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
+import static com.khartec.waltz.common.SetUtilities.asSet;
+import static com.khartec.waltz.common.SetUtilities.map;
+import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.model.HierarchyQueryScope.CHILDREN;
+import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class LogicalFlowTest extends BaseInMemoryIntegrationTest {
 
@@ -42,14 +48,67 @@ public class LogicalFlowTest extends BaseInMemoryIntegrationTest {
 
 
     @Test
-    public void foo() {
+    public void basicDirectAssociations() {
         EntityReference a = createNewApp("a", ouIds.a);
-        EntityReference b = createNewApp("b", ouIds.b);
-        SelectJoinStep<Record1<String>> qry = getDsl().select(APPLICATION.NAME).from(APPLICATION);
-        System.out.println(qry);
-        qry.fetch().format(System.out);
-        LogicalFlow lf = createLogicalFlow(a, b);
-        assertNotNull(lf);
+        EntityReference b = createNewApp("b", ouIds.a1);
+        EntityReference c = createNewApp("c", ouIds.b);
+        EntityReference d = createNewApp("c", ouIds.b);
+        // a -> b
+        // a -> d
+        // c
+        LogicalFlow ab = createLogicalFlow(a, b);
+        LogicalFlow ad = createLogicalFlow(a, d);
+
+        assertEquals(
+                "Can see flow associated to 'a'",
+                asSet(ab.id(), ad.id()),
+                map(dao.findByEntityReference(a), IdProvider::id));
+
+        assertEquals(
+                "Can sees flows associated to 'b'",
+                asSet(ab.id()),
+                map(dao.findByEntityReference(b), IdProvider::id));
+
+        assertEquals(
+                "Can sees flows associated to 'b'",
+                asSet(ad.id()),
+                map(dao.findByEntityReference(d), IdProvider::id));
+
+        assertTrue(
+                "Can sees nothing associated to 'c'",
+                isEmpty(dao.findByEntityReference(c)));
+    }
+
+
+    @Test
+    public void bySelector() {
+
+        EntityReference a = createNewApp("a", ouIds.a);
+        EntityReference b = createNewApp("b", ouIds.a1);
+        EntityReference d = createNewApp("c", ouIds.b);
+        // a -> b
+        // a -> d
+        // c
+        LogicalFlow ab = createLogicalFlow(a, b);
+        LogicalFlow ad = createLogicalFlow(a, d);
+
+        assertEquals("find by root ou gives all",
+                asSet(ab.id(), ad.id()),
+                map(dao.findBySelector(logicalFlowIdSelectorFactory.apply(
+                        mkOpts(
+                            mkRef(EntityKind.ORG_UNIT, ouIds.root),
+                            CHILDREN))),
+                    IdProvider::id));
+
+
+        assertEquals("find by ou 'b' gives only one flow",
+                asSet(ad.id()),
+                map(dao.findBySelector(logicalFlowIdSelectorFactory.apply(
+                            mkOpts(
+                                mkRef(EntityKind.ORG_UNIT, ouIds.b),
+                                CHILDREN))),
+                        IdProvider::id));
+
     }
 
 }

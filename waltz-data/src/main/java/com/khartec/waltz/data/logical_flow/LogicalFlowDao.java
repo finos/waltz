@@ -277,7 +277,6 @@ public class LogicalFlowDao {
                 .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(flow.source().kind().name()))
                 .and(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(flow.target().id()))
                 .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(flow.target().kind().name()));
-        System.out.println(upd);
         return upd
                 .execute() == 1;
     }

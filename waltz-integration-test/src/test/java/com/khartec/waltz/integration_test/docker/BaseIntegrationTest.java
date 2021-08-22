@@ -16,7 +16,7 @@
  *
  */
 
-package com.khartec.waltz.integration_test;
+package com.khartec.waltz.integration_test.docker;
 
 import com.khartec.waltz.common.CollectionUtilities;
 import com.khartec.waltz.common.DateTimeUtilities;

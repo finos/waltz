@@ -16,11 +16,11 @@
  *
  */
 
-package com.khartec.waltz.integration_test.bookmark;
+package com.khartec.waltz.integration_test.inmem.dao;
 
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.bookmark.BookmarkDao;
-import com.khartec.waltz.integration_test.BaseIntegrationTest;
+import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.bookmark.Bookmark;
@@ -29,7 +29,6 @@ import com.khartec.waltz.model.bookmark.ImmutableBookmark;
 import org.junit.Test;
 
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
 
 import static com.khartec.waltz.common.CollectionUtilities.first;
 import static com.khartec.waltz.model.EntityReference.mkRef;
@@ -37,8 +36,7 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class BookmarkDaoTest extends BaseIntegrationTest {
-    private static final AtomicLong refCounter = new AtomicLong();
+public class BookmarkDaoTest extends BaseInMemoryIntegrationTest {
     private final BookmarkDao dao = ctx.getBean(BookmarkDao.class);
 
 
@@ -142,7 +140,7 @@ public class BookmarkDaoTest extends BaseIntegrationTest {
 
 
     private EntityReference mkAppRef() {
-        return mkRef(EntityKind.APPLICATION, refCounter.incrementAndGet());
+        return mkRef(EntityKind.APPLICATION, counter.incrementAndGet());
     }
 
 }

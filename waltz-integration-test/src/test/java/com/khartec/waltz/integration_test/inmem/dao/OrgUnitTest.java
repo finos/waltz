@@ -36,10 +36,7 @@ import static com.khartec.waltz.model.utils.IdUtilities.toIds;
 import static org.junit.Assert.*;
 
 public class OrgUnitTest extends BaseInMemoryIntegrationTest {
-
-    private static final OrganisationalUnitIdSelectorFactory ouSelectorFactory = new OrganisationalUnitIdSelectorFactory();
-
-    private OrganisationalUnitDao dao;
+  private OrganisationalUnitDao dao;
 
     @Before
     public void setupOuTest() {

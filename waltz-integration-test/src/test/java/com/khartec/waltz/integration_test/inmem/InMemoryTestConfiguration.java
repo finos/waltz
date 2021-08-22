@@ -75,7 +75,7 @@ public class InMemoryTestConfiguration {
         SpringLiquibase liquibase = new SpringLiquibase();
 
         // we want to drop the database if it was created before to have immutable version
-        liquibase.setDropFirst(true);
+        liquibase.setDropFirst(false);
 
         liquibase.setDataSource(dataSource);
 //        liquibase.setDefaultSchema("public");

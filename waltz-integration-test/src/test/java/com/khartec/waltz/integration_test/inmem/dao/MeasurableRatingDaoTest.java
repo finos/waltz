@@ -19,7 +19,6 @@
 package com.khartec.waltz.integration_test.inmem.dao;
 
 import com.khartec.waltz.common.exception.NotFoundException;
-import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.model.*;
@@ -125,7 +124,6 @@ public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void multipleRatingsCanRetrievedBySelectors() {
-        MeasurableIdSelectorFactory selectorFactory = new MeasurableIdSelectorFactory();
 
         long categoryId = createMeasurableCategory("mc");
         long m1Id = createMeasurable("m1", categoryId);
@@ -146,7 +144,7 @@ public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
         assertEquals(
                 "Find by category selector gives everything",
                 3,
-                dao.findByMeasurableIdSelector(selectorFactory.apply(catOpts), catOpts).size());
+                dao.findByMeasurableIdSelector(measurableIdSelectorFactory.apply(catOpts), catOpts).size());
 
         assertEquals(
                 "Find by category id gives everything",
@@ -156,12 +154,12 @@ public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
         assertEquals(
                 "Find by specific measurable (m1) gives subset",
                 2,
-                dao.findByMeasurableIdSelector(selectorFactory.apply(m1Opts), m1Opts).size());
+                dao.findByMeasurableIdSelector(measurableIdSelectorFactory.apply(m1Opts), m1Opts).size());
 
         assertEquals(
                 "Find by specific measurable (m2) gives subset",
                 1,
-                dao.findByMeasurableIdSelector(selectorFactory.apply(m2Opts), m2Opts).size());
+                dao.findByMeasurableIdSelector(measurableIdSelectorFactory.apply(m2Opts), m2Opts).size());
     }
 
 
