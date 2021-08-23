@@ -108,7 +108,7 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
         checkNotNull(selector, "selector cannot be null");
         return dsl
                 .selectFrom(MEASURABLE)
-                .where(MEASURABLE.ID.in(selector))
+                .where(dsl.renderInlined(MEASURABLE.ID.in(selector)))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 

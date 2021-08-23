@@ -215,7 +215,7 @@ public class MeasurableRatingDao {
         Condition condition = MEASURABLE_RATING.ENTITY_ID.in(selector)
                 .and(MEASURABLE_RATING.ENTITY_KIND.eq(DSL.val(EntityKind.APPLICATION.name())));
         return mkBaseQuery()
-                .where(condition)
+                .where(dsl.renderInlined(condition))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -250,8 +250,8 @@ public class MeasurableRatingDao {
     public List<MeasurableRatingTally> statsByAppSelector(Select<Record1<Long>> selector) {
         return dsl.select(MEASURABLE_RATING.MEASURABLE_ID, MEASURABLE_RATING.RATING, DSL.count())
                 .from(MEASURABLE_RATING)
-                .where(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                .and(MEASURABLE_RATING.ENTITY_ID.in(selector))
+                .where(dsl.renderInlined(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                .and(MEASURABLE_RATING.ENTITY_ID.in(selector))))
                 .groupBy(MEASURABLE_RATING.MEASURABLE_ID, MEASURABLE_RATING.RATING)
                 .fetch(TO_TALLY_MAPPER);
     }

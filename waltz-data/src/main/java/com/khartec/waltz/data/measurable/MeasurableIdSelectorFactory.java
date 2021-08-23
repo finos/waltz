@@ -23,8 +23,10 @@ import com.khartec.waltz.data.IdSelectorFactory;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.schema.tables.MeasurableRating;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
@@ -245,6 +247,56 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
 
 
     private Select<Record1<Long>> mkForMeasurable(IdSelectionOptions options) {
+        if(options.joiningEntityKind().isPresent()) {
+            return mkForIndirectMeasurable(options);
+        } else {
+            return mkForDirectMeasurable(options);
+        }
+    }
+
+
+    private Select<Record1<Long>> mkForIndirectMeasurable(IdSelectionOptions options) {
+
+        if(options.joiningEntityKind().get() != EntityKind.APPLICATION){
+            throw new IllegalArgumentException(format(
+                    "The joining entity kind: %s, cannot be used to indirectly selecting measurables",
+                    options.joiningEntityKind().get()));
+        } else {
+            Select<Record1<Long>> selector = null;
+
+            switch (options.scope()) {
+                case CHILDREN:
+                    Select<Record1<Long>> directMeasurableIds = mkForDirectMeasurable(options);
+
+                    MeasurableRating dmr = MEASURABLE_RATING.as("directMeasurableRatings");
+
+                    SelectConditionStep<Record1<Long>> directAppIds = DSL
+                            .selectDistinct(dmr.ENTITY_ID)
+                            .from(dmr)
+                            .innerJoin(APPLICATION).on(dmr.ENTITY_ID.eq(APPLICATION.ID)
+                                    .and(APPLICATION.IS_REMOVED.isFalse())
+                                    .and(APPLICATION.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name())))
+                            .where(dmr.MEASURABLE_ID.in(directMeasurableIds)
+                                    .and(dmr.ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
+
+                    selector = mkBaseRatingBasedSelector()
+                            .where(MEASURABLE_RATING.ENTITY_ID.in(directAppIds)
+                            .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
+
+                    break;
+
+                default:
+                    throw new UnsupportedOperationException(format(
+                            "Cannot create indirect measurable selector with scope: %s",
+                            options.scope()));
+            }
+
+            return selector;
+        }
+    }
+
+
+    private Select<Record1<Long>> mkForDirectMeasurable(IdSelectionOptions options) {
         Select<Record1<Long>> selector = null;
         final Condition isMeasurable = ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name());
         switch (options.scope()) {
