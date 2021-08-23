@@ -20,6 +20,7 @@ package com.khartec.waltz.integration_test.inmem.dao;
 
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
+import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdProvider;
@@ -38,12 +39,15 @@ import static org.junit.Assert.assertTrue;
 
 public class LogicalFlowTest extends BaseInMemoryIntegrationTest {
 
-    private LogicalFlowDao dao;
+    private LogicalFlowDao lfDao;
+    private LogicalFlowHelper helper;
+
 
     @Before
     public void setupOuTest() {
+        lfDao = daos.logicalFlowDao;
+        helper = helpers.logicalFlowHelper;
         System.out.println("ouTest::setup");
-        dao = ctx.getBean(LogicalFlowDao.class);
     }
 
 
@@ -56,27 +60,27 @@ public class LogicalFlowTest extends BaseInMemoryIntegrationTest {
         // a -> b
         // a -> d
         // c
-        LogicalFlow ab = createLogicalFlow(a, b);
-        LogicalFlow ad = createLogicalFlow(a, d);
+        LogicalFlow ab = helper.createLogicalFlow(a, b);
+        LogicalFlow ad = helper.createLogicalFlow(a, d);
 
         assertEquals(
                 "Can see flow associated to 'a'",
                 asSet(ab.id(), ad.id()),
-                map(dao.findByEntityReference(a), IdProvider::id));
+                map(lfDao.findByEntityReference(a), IdProvider::id));
 
         assertEquals(
                 "Can sees flows associated to 'b'",
                 asSet(ab.id()),
-                map(dao.findByEntityReference(b), IdProvider::id));
+                map(lfDao.findByEntityReference(b), IdProvider::id));
 
         assertEquals(
                 "Can sees flows associated to 'd'",
                 asSet(ad.id()),
-                map(dao.findByEntityReference(d), IdProvider::id));
+                map(lfDao.findByEntityReference(d), IdProvider::id));
 
         assertTrue(
                 "Can sees nothing associated to 'c'",
-                isEmpty(dao.findByEntityReference(c)));
+                isEmpty(lfDao.findByEntityReference(c)));
     }
 
 
@@ -89,21 +93,20 @@ public class LogicalFlowTest extends BaseInMemoryIntegrationTest {
         // a -> b
         // a -> c
         // c
-        LogicalFlow ab = createLogicalFlow(a, b);
-        LogicalFlow ac = createLogicalFlow(a, c);
+        LogicalFlow ab = helper.createLogicalFlow(a, b);
+        LogicalFlow ac = helper.createLogicalFlow(a, c);
 
         assertEquals("find by root ou gives all",
                 asSet(ab.id(), ac.id()),
-                map(dao.findBySelector(logicalFlowIdSelectorFactory.apply(
+                map(lfDao.findBySelector(logicalFlowIdSelectorFactory.apply(
                         mkOpts(
                             mkRef(EntityKind.ORG_UNIT, ouIds.root),
                             CHILDREN))),
                     IdProvider::id));
 
-
         assertEquals("find by ou 'b' gives only one flow",
                 asSet(ac.id()),
-                map(dao.findBySelector(logicalFlowIdSelectorFactory.apply(
+                map(lfDao.findBySelector(logicalFlowIdSelectorFactory.apply(
                             mkOpts(
                                 mkRef(EntityKind.ORG_UNIT, ouIds.b),
                                 CHILDREN))),

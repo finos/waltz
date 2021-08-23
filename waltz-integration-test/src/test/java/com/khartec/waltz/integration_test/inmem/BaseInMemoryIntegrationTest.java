@@ -12,7 +12,9 @@ import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.measurable_category.MeasurableCategoryDao;
+import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
+import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
 import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -24,8 +26,6 @@ import com.khartec.waltz.model.application.AppRegistrationResponse;
 import com.khartec.waltz.model.application.ApplicationKind;
 import com.khartec.waltz.model.application.ImmutableAppRegistrationRequest;
 import com.khartec.waltz.model.application.LifecyclePhase;
-import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
-import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.model.measurable_category.MeasurableCategory;
 import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
@@ -53,20 +53,6 @@ public class BaseInMemoryIntegrationTest {
         LoggingUtilities.configureLogging();
     }
 
-    protected static final AtomicLong counter = new AtomicLong(1_000_000);
-
-    protected static AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIInMemoryTestConfiguration.class);
-
-    protected static final OrganisationalUnitIdSelectorFactory ouSelectorFactory = new OrganisationalUnitIdSelectorFactory();
-    protected static final ApplicationIdSelectorFactory appSelectorFactory = new ApplicationIdSelectorFactory();
-    protected static final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
-    protected static final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
-
-    protected OuIds ouIds;
-
-    protected static final String LAST_UPDATE_USER = "last";
-    protected static final String PROVENANCE = "test";
-
 
     public static class OuIds {
         public Long root;
@@ -75,6 +61,36 @@ public class BaseInMemoryIntegrationTest {
         public Long b;
     }
 
+
+    public static class Daos {
+        public LogicalFlowDao logicalFlowDao;
+        public OrganisationalUnitDao organisationalUnitDao;
+    }
+
+
+    public static class Helpers {
+        public LogicalFlowHelper logicalFlowHelper;
+    }
+
+
+    protected static final AtomicLong counter = new AtomicLong(1_000_000);
+
+    protected static AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIInMemoryTestConfiguration.class);
+
+    protected static final OrganisationalUnitIdSelectorFactory ouSelectorFactory = new OrganisationalUnitIdSelectorFactory();
+    protected static final ApplicationIdSelectorFactory appSelectorFactory = new ApplicationIdSelectorFactory();
+    protected static final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
+    protected static final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
+;
+
+    protected static final String LAST_UPDATE_USER = "last";
+    protected static final String PROVENANCE = "test";
+
+
+
+    protected OuIds ouIds;
+    protected Daos daos;
+    protected Helpers helpers;
 
     /**
      *   - root
@@ -97,6 +113,23 @@ public class BaseInMemoryIntegrationTest {
     @Before
     public void baseSetup() {
         ouIds = setupOuTree();
+        daos = setupDaos();
+        helpers = setupHelpers();
+    }
+
+
+    private Helpers setupHelpers() {
+        Helpers h = new Helpers();
+        h.logicalFlowHelper = new LogicalFlowHelper(daos.logicalFlowDao);
+        return h;
+    }
+
+
+    private Daos setupDaos() {
+        Daos d = new Daos();
+        d.logicalFlowDao = ctx.getBean(LogicalFlowDao.class);
+        d.organisationalUnitDao = ctx.getBean(OrganisationalUnitDao.class);
+        return d;
     }
 
 
@@ -115,17 +148,6 @@ public class BaseInMemoryIntegrationTest {
     protected void rebuildHierarchy(EntityKind kind) {
         EntityHierarchyService ehSvc = ctx.getBean(EntityHierarchyService.class);
         ehSvc.buildFor(kind);
-    }
-
-
-    public LogicalFlow createLogicalFlow(EntityReference refA, EntityReference refB) {
-        LogicalFlowDao dao = ctx.getBean(LogicalFlowDao.class);
-        return dao.addFlow(ImmutableLogicalFlow
-                .builder()
-                .source(refA)
-                .target(refB)
-                .lastUpdatedBy("admin")
-                .build());
     }
 
 
