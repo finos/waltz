@@ -1,5 +1,10 @@
 # Waltz Integration Tests
 
+## Note: Removed TestContainers temporarily
+
+As of 1.36 we have removed integration testing with TestContainers (using docker images).  This is due to requirements to run behind a corporate firewall with no dockerhub access.  We will restore Testcontainers when we determine how best to proceed.
+
+
 ## About
 
 Waltz uses [TestContainers](https://github.com/testcontainers/testcontainers-java)
