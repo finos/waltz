@@ -191,7 +191,6 @@ function controller($q, $state, serviceBroker) {
     };
 
     vm.onSelect = (d) => {
-        console.log("os", d);
         $state.go(
             "main.flow-classification-rule.view",
             { id: d.id });
