@@ -69,9 +69,6 @@ function controller($q, serviceBroker) {
         }
 
         const selectionOptions = mkSelectionOptions(vm.parentEntityRef);
-        const categoriesPromise = serviceBroker
-            .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
-            .then(r => vm.categories = r.data);
 
         const measurablesPromise = serviceBroker
             .loadAppData(CORE_API.MeasurableStore.findAll)
@@ -84,7 +81,6 @@ function controller($q, serviceBroker) {
             .then(r => vm.stats = r.data);
 
         const promises = [
-            categoriesPromise,
             measurablesPromise,
             statsPromise
         ];
