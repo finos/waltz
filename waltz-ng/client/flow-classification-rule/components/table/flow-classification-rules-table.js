@@ -190,9 +190,12 @@ function controller($q, $state, serviceBroker) {
         }
     };
 
-    vm.onSelect = (d) => $state.go(
-        "main.flow-classification-rules.view",
-        { id: d.id });
+    vm.onSelect = (d) => {
+        console.log("os", d);
+        $state.go(
+            "main.flow-classification-rule.view",
+            { id: d.id });
+    }
 
 }
 
