@@ -273,7 +273,8 @@
 
     <!-- 2623 - Unknown Data Type flag in data_type -->
     <changeSet id="20171024-2623-1"
-               author="kamransaleem">
+               author="kamransaleem"
+               dbms="!h2">
         <comment>2623: Unknown Data Type represented in data_type table</comment>
         <addColumn tableName="data_type">
             <column name="unknown"
@@ -300,10 +301,10 @@
 
     <changeSet id="20171024-2623-2"
                author="kamransaleem"
-               dbms="postgresql,h2">
+               dbms="postgresql">
         <sql>
             UPDATE data_type
-            SET unknown = TRUE
+            SET 'unknown' = TRUE
             WHERE id = (
                 SELECT cast(value as int)
                 FROM settings

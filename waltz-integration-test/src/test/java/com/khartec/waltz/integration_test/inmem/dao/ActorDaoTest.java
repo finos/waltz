@@ -16,10 +16,10 @@
  *
  */
 
-package com.khartec.waltz.integration_test.actor;
+package com.khartec.waltz.integration_test.inmem.dao;
 
 import com.khartec.waltz.data.actor.ActorDao;
-import com.khartec.waltz.integration_test.BaseIntegrationTest;
+import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.actor.Actor;
 import org.junit.Test;
@@ -27,7 +27,7 @@ import org.junit.Test;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static org.junit.Assert.*;
 
-public class ActorDaoTest extends BaseIntegrationTest {
+public class ActorDaoTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void actorsCanBeCreated() {
@@ -46,6 +46,8 @@ public class ActorDaoTest extends BaseIntegrationTest {
         ActorDao dao = ctx.getBean(ActorDao.class);
         int preCount = dao.findAll().size();
         Long id = createActor("canBeDeletedTest");
+
+        System.out.println("After creation: "+ dao.findAll());
         boolean deleted = dao.deleteIfNotUsed(id);
 
         assertTrue("Actor should be deleted as not used in flows", deleted);
@@ -59,7 +61,7 @@ public class ActorDaoTest extends BaseIntegrationTest {
         Long idA = createActor("cannotBeDeletedActorA");
         Long idB = createActor("cannotBeDeletedActorB");
 
-        createLogicalFlow(
+        helpers.logicalFlowHelper.createLogicalFlow(
                 mkRef(EntityKind.ACTOR, idA),
                 mkRef(EntityKind.ACTOR, idB));
 

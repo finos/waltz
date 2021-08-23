@@ -45,10 +45,7 @@ public class StreamUtilities {
 
 
     public static <T> Function<T, T> tap() {
-        return t -> {
-            System.out.println(t);
-            return t;
-        };
+        return tap(System.out::println);
     }
 
 

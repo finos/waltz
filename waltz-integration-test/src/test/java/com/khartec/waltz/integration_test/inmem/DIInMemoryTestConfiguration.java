@@ -1,22 +1,4 @@
-/*
- * Waltz - Enterprise Architecture
- * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
- * See README.md for more information
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific
- *
- */
-
-package com.khartec.waltz.integration_test;
+package com.khartec.waltz.integration_test.inmem;
 
 import com.khartec.waltz.data.DBExecutorPool;
 import com.khartec.waltz.data.DBExecutorPoolInterface;
@@ -25,6 +7,8 @@ import com.zaxxer.hikari.HikariDataSource;
 import liquibase.integration.spring.SpringLiquibase;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
+import org.jooq.conf.RenderQuotedNames;
+import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DefaultConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,13 +17,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableMBeanExport;
 import org.springframework.jmx.support.RegistrationPolicy;
-import org.testcontainers.containers.PostgreSQLContainer;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;
-import java.time.Duration;
-
-import static java.lang.String.format;
 
 @Configuration
 @ComponentScan(basePackages = {
@@ -48,15 +28,7 @@ import static java.lang.String.format;
         "com.khartec.waltz.service.person_hierarchy"
 })
 @EnableMBeanExport(registration = RegistrationPolicy.REPLACE_EXISTING)
-public class DITestingConfiguration {
-
-    private static PostgreSQLContainer postgreSQLContainer =(PostgreSQLContainer) new PostgreSQLContainer(
-            "postgres:10.3")
-            .withDatabaseName("test")
-            .withUsername("user")
-            .withPassword("pass")
-            .withStartupTimeout(Duration.ofSeconds(600));
-
+public class DIInMemoryTestConfiguration {
 
     @Bean
     public DBExecutorPoolInterface dbExecutorPool() {
@@ -66,16 +38,12 @@ public class DITestingConfiguration {
 
     @Bean
     public DataSource dataSource() {
+        System.out.println("Setting up ds");
+
         HikariConfig dsConfig = new HikariConfig();
-        postgreSQLContainer.start();
-        dsConfig.setJdbcUrl(format("jdbc:postgresql://%s:%s/%s",
-                postgreSQLContainer.getContainerIpAddress(),
-                postgreSQLContainer.getMappedPort(PostgreSQLContainer.POSTGRESQL_PORT),
-                postgreSQLContainer.getDatabaseName()));
-        dsConfig.setUsername(postgreSQLContainer.getUsername());
-        dsConfig.setPassword(postgreSQLContainer.getPassword());
-        dsConfig.setSchema("test");
-        dsConfig.setDriverClassName("org.postgresql.Driver");
+        dsConfig.setJdbcUrl("jdbc:h2:mem:waltz;CASE_INSENSITIVE_IDENTIFIERS=TRUE");
+        dsConfig.setUsername("sa");
+        dsConfig.setPassword("sa");
         dsConfig.setMaximumPoolSize(5);
         dsConfig.setMinimumIdle(2);
         return new HikariDataSource(dsConfig);
@@ -85,23 +53,30 @@ public class DITestingConfiguration {
     @Bean
     @Autowired
     public DSLContext dsl(DataSource dataSource) {
+        System.out.println("Setting up dsl");
+        Settings dslSettings = new Settings()
+                .withRenderFormatted(true)
+                .withDebugInfoOnStackTrace(true)
+                .withRenderQuotedNames(RenderQuotedNames.NEVER)
+                .withExecuteLogging(true);
+
         org.jooq.Configuration configuration = new DefaultConfiguration()
                 .set(dataSource)
-                .set(SQLDialect.POSTGRES);
+                .set(dslSettings)
+                .set(SQLDialect.H2);
+
         return DSL.using(configuration);
     }
 
 
     @Bean
     public SpringLiquibase springLiquibase(DataSource dataSource, DSLContext dsl) throws SQLException {
-        dsl.createSchemaIfNotExists("test").execute();
+        System.out.println("Setting up liquibase");
         SpringLiquibase liquibase = new SpringLiquibase();
 
-        // we want to drop the database if it was created before to have immutable version
         liquibase.setDropFirst(true);
 
         liquibase.setDataSource(dataSource);
-        liquibase.setDefaultSchema("test");
         liquibase.setChangeLog("file:../waltz-data/src/main/ddl/liquibase/db.changelog-master.xml");
         return liquibase;
     }

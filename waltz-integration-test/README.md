@@ -1,5 +1,8 @@
 # Waltz Integration Tests
 
+## Note: We are not currently using `testContainers`
+We have switched to testing using an in-memory database.
+
 ## About
 
 Waltz uses [TestContainers](https://github.com/testcontainers/testcontainers-java)
