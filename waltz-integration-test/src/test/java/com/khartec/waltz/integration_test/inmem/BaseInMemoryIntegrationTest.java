@@ -55,7 +55,7 @@ public class BaseInMemoryIntegrationTest {
 
     protected static final AtomicLong counter = new AtomicLong(1_000_000);
 
-    protected static AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(InMemoryTestConfiguration.class);
+    protected static AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIInMemoryTestConfiguration.class);
 
     protected static final OrganisationalUnitIdSelectorFactory ouSelectorFactory = new OrganisationalUnitIdSelectorFactory();
     protected static final ApplicationIdSelectorFactory appSelectorFactory = new ApplicationIdSelectorFactory();
@@ -76,6 +76,12 @@ public class BaseInMemoryIntegrationTest {
     }
 
 
+    /**
+     *   - root
+     *   -- a
+     *   --- a1
+     *   -- b
+     */
     private OuIds setupOuTree() {
         getDsl().deleteFrom(ORGANISATIONAL_UNIT).execute();
         OuIds ids = new OuIds();
@@ -266,9 +272,9 @@ public class BaseInMemoryIntegrationTest {
 //    @After
     public void stickAround() {
         try {
-            System.out.println("Starting tcp server, connect with: jdbc:h2:tcp://localhost/mem:waltz");
+            System.err.println("Starting tcp server, connect with: jdbc:h2:tcp://localhost/mem:waltz");
             Server.createTcpServer().start();
-            System.out.println("Sticking around for 2 hrs");
+            System.err.println("Sticking around for 2 hrs");
             Thread.sleep(TimeUnit.HOURS.toMillis(2));
         } catch (InterruptedException | SQLException e) {
             e.printStackTrace();

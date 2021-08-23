@@ -28,7 +28,7 @@ import java.sql.SQLException;
         "com.khartec.waltz.service.person_hierarchy"
 })
 @EnableMBeanExport(registration = RegistrationPolicy.REPLACE_EXISTING)
-public class InMemoryTestConfiguration {
+public class DIInMemoryTestConfiguration {
 
     @Bean
     public DBExecutorPoolInterface dbExecutorPool() {
@@ -74,11 +74,9 @@ public class InMemoryTestConfiguration {
         System.out.println("Setting up liquibase");
         SpringLiquibase liquibase = new SpringLiquibase();
 
-        // we want to drop the database if it was created before to have immutable version
-        liquibase.setDropFirst(false);
+        liquibase.setDropFirst(true);
 
         liquibase.setDataSource(dataSource);
-//        liquibase.setDefaultSchema("public");
         liquibase.setChangeLog("file:../waltz-data/src/main/ddl/liquibase/db.changelog-master.xml");
         return liquibase;
     }

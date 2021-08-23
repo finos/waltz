@@ -70,7 +70,7 @@ public class LogicalFlowTest extends BaseInMemoryIntegrationTest {
                 map(dao.findByEntityReference(b), IdProvider::id));
 
         assertEquals(
-                "Can sees flows associated to 'b'",
+                "Can sees flows associated to 'd'",
                 asSet(ad.id()),
                 map(dao.findByEntityReference(d), IdProvider::id));
 
@@ -85,15 +85,15 @@ public class LogicalFlowTest extends BaseInMemoryIntegrationTest {
 
         EntityReference a = createNewApp("a", ouIds.a);
         EntityReference b = createNewApp("b", ouIds.a1);
-        EntityReference d = createNewApp("c", ouIds.b);
+        EntityReference c = createNewApp("c", ouIds.b);
         // a -> b
-        // a -> d
+        // a -> c
         // c
         LogicalFlow ab = createLogicalFlow(a, b);
-        LogicalFlow ad = createLogicalFlow(a, d);
+        LogicalFlow ac = createLogicalFlow(a, c);
 
         assertEquals("find by root ou gives all",
-                asSet(ab.id(), ad.id()),
+                asSet(ab.id(), ac.id()),
                 map(dao.findBySelector(logicalFlowIdSelectorFactory.apply(
                         mkOpts(
                             mkRef(EntityKind.ORG_UNIT, ouIds.root),
@@ -102,13 +102,12 @@ public class LogicalFlowTest extends BaseInMemoryIntegrationTest {
 
 
         assertEquals("find by ou 'b' gives only one flow",
-                asSet(ad.id()),
+                asSet(ac.id()),
                 map(dao.findBySelector(logicalFlowIdSelectorFactory.apply(
                             mkOpts(
                                 mkRef(EntityKind.ORG_UNIT, ouIds.b),
                                 CHILDREN))),
                         IdProvider::id));
-
     }
 
 }

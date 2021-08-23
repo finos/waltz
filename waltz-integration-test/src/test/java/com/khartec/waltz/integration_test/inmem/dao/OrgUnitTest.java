@@ -20,7 +20,6 @@ package com.khartec.waltz.integration_test.inmem.dao;
 
 import com.khartec.waltz.common.SetUtilities;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
-import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -40,7 +39,6 @@ public class OrgUnitTest extends BaseInMemoryIntegrationTest {
 
     @Before
     public void setupOuTest() {
-        System.out.println("ouTest::setup");
         dao = ctx.getBean(OrganisationalUnitDao.class);
     }
 
