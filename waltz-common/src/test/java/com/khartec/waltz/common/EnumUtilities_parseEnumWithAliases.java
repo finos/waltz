@@ -1,57 +1,81 @@
 package com.khartec.waltz.common;
 
+import org.junit.Before;
 import org.junit.Test;
 
+import static com.khartec.waltz.common.EnumUtilities.parseEnumWithAliases;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+
 public class EnumUtilities_parseEnumWithAliases {
+
     private enum MyEnum {
         A,
         B
     }
 
+    private Aliases<MyEnum> al = new Aliases();
+
+
+    @Before
+    public void before() {
+        al.register(MyEnum.A, "a", "synonym-for-a");
+        al.register(MyEnum.B, "b");
+    }
+
+
     @Test(expected = IllegalArgumentException.class)
     public void parseWithNullValue(){
-        Aliases al = new Aliases();
-        al.register(MyEnum.A, "a");
-        al.register(MyEnum.B, "b");
-        EnumUtilities.parseEnumWithAliases(null, MyEnum.class, null, al);
+        assertNull(parseEnumWithAliases(null, MyEnum.class, null, al));
     }
+
 
     @Test(expected = IllegalArgumentException.class)
     public void parseWithEmptyValue(){
-        Aliases al = new Aliases();
-        al.register(MyEnum.A, "a");
-        al.register(MyEnum.B, "b");
-        EnumUtilities.parseEnumWithAliases("", MyEnum.class, null, al);
+        assertNull(parseEnumWithAliases("", MyEnum.class, null, al));
     }
+
 
     @Test(expected = IllegalArgumentException.class)
     public void parseWithNullEnumClass(){
-        Aliases al = new Aliases();
-        al.register(MyEnum.A, "a");
-        al.register(MyEnum.B, "b");
-        EnumUtilities.parseEnumWithAliases("a", null, null, al);
+        assertEquals(
+                MyEnum.A,
+                parseEnumWithAliases("a", null, null, al));
     }
+
 
     @Test
     public void parseWithNullAlias(){
-        EnumUtilities.parseEnumWithAliases("a", MyEnum.class, null, null);
+        assertEquals(
+                MyEnum.A,
+                parseEnumWithAliases("a", MyEnum.class, null, null));
     }
+
 
     @Test(expected = IllegalArgumentException.class)
     public void parseWithAllNullParams(){
-        EnumUtilities.parseEnumWithAliases(null, null, null, null);
+        parseEnumWithAliases(null, null, null, null);
     }
+
 
     @Test(expected = IllegalArgumentException.class)
     public void parseWithEmptyValAndNullOtherParams(){
-        EnumUtilities.parseEnumWithAliases("", null, null, null);
+        parseEnumWithAliases("", null, null, null);
     }
+
 
     @Test
     public void parseWithNonNullParams(){
-        Aliases al = new Aliases();
-        al.register(MyEnum.A, "a");
-        al.register(MyEnum.B, "b");
-        EnumUtilities.parseEnumWithAliases("a", MyEnum.class, null, al);
+        assertEquals(
+                MyEnum.A,
+                parseEnumWithAliases("synonym-for-a", MyEnum.class, null, al));
+    }
+
+
+    @Test
+    public void parseWithNonFallback(){
+        assertEquals(
+                MyEnum.B,
+                parseEnumWithAliases("wibble", MyEnum.class, x -> MyEnum.B, al));
     }
 }

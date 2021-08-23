@@ -16,16 +16,13 @@
  *
  */
 
-package com.khartec.waltz.integration_test.app_group;
+package com.khartec.waltz.integration_test.inmem.dao;
 
-import com.khartec.waltz.common.CollectionUtilities;
-import com.khartec.waltz.data.app_group.AppGroupOrganisationalUnitDao;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.integration_test.BaseIntegrationTest;
+import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.app_group.AppGroupEntry;
 import com.khartec.waltz.model.application.Application;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,81 +32,57 @@ import java.util.List;
 
 import static com.khartec.waltz.common.CollectionUtilities.any;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static java.lang.String.format;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class AppGroupDaoTest extends BaseIntegrationTest {
+public class ApplicationDaoTest extends BaseInMemoryIntegrationTest {
 
     private final ApplicationIdSelectorFactory idSelectorFactory = new ApplicationIdSelectorFactory();
     private final ApplicationDao appDao = ctx.getBean(ApplicationDao.class);
+    private Long rbOu;
+    private Long raaOu;
     private Long raOu;
+    private Long rootOu;
     private EntityReference r1;
     private EntityReference ra2;
     private EntityReference raa3;
-    private AppGroupOrganisationalUnitDao appGroupOuDao;
+    private EntityReference rb4;
 
 
     @Before
     public void before() {
-        Long rootOu = createOrgUnit("r", null);
+        rootOu = createOrgUnit("r", null);
         raOu = createOrgUnit("ra", rootOu);
-        Long raaOu = createOrgUnit("raa", raOu);
-        Long rbOu = createOrgUnit("rb", rootOu);
+        raaOu = createOrgUnit("raa", raOu);
+        rbOu = createOrgUnit("rb", rootOu);
 
-        rebuildHierarachy(EntityKind.ORG_UNIT);
+        rebuildHierarchy(EntityKind.ORG_UNIT);
 
         r1 = createNewApp("r1", rootOu);
         ra2 = createNewApp("ra2", raOu);
         raa3 = createNewApp("raa3", raaOu);
-        EntityReference rb4 = createNewApp("rb4", rbOu);
-        appGroupOuDao = ctx.getBean(AppGroupOrganisationalUnitDao.class);
+        rb4 = createNewApp("rb4", rbOu);
     }
 
 
     @Test
-    public void usingAppSelectorWithAPlainAppGroupWorks() {
-        Long gId = createAppGroupWithAppRefs("t1", asSet(r1, ra2));
-        checkAppIdSelectorForRef(mkRef(EntityKind.APP_GROUP, gId), r1, ra2);
+    public void usingAppSelectorWithAnOrgUnitWorks() {
+        checkAppIdSelectorForOrgUnit(rootOu, r1, ra2, raa3, rb4);
+        checkAppIdSelectorForOrgUnit(raOu, ra2, raa3);
+        checkAppIdSelectorForOrgUnit(rbOu, rb4);
     }
 
 
-    @Test
-    public void usingAppSelectorWithAComplexAppGroupWorks() {
-        Long gId = createAppGroupWithAppRefs("t2", asSet(r1));
-        appGroupOuDao.addOrgUnit(gId, raOu);
+
+    private void checkAppIdSelectorForOrgUnit(Long ouId,
+                                              EntityReference... expectedRefs) {
         checkAppIdSelectorForRef(
-                mkRef(EntityKind.APP_GROUP, gId),
-                r1,
-                ra2,
-                raa3);
+                mkRef(EntityKind.ORG_UNIT, ouId),
+                expectedRefs);
     }
-
-
-    @Test
-    public void canAddOrgUnitsToGroups() {
-        Long gId = createAppGroupWithAppRefs("t3", asSet(r1));
-        appGroupOuDao.addOrgUnit(gId, raOu);
-        List<AppGroupEntry> ouEntries = appGroupOuDao.getEntriesForGroup(gId);
-        assertEquals(1, ouEntries.size());
-        AppGroupEntry entry = CollectionUtilities.first(ouEntries);
-        assertEquals(EntityKind.ORG_UNIT, entry.kind());
-        assertEquals(raOu, Long.valueOf(entry.id()));
-    }
-
-
-    @Test
-    public void canRemoveOrgUnitsFromGroups() {
-        Long gId = createAppGroupWithAppRefs("t3", asSet(r1));
-        appGroupOuDao.addOrgUnit(gId, raOu);
-        assertEquals(1, appGroupOuDao.getEntriesForGroup(gId).size());
-        appGroupOuDao.removeOrgUnit(gId, raOu);
-        assertEquals(0, appGroupOuDao.getEntriesForGroup(gId).size());
-    }
-
 
 
     private void checkAppIdSelectorForRef(EntityReference selectorRef,

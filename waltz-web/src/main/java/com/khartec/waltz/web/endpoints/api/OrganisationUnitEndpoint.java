@@ -18,7 +18,6 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.LeveledEntityReference;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
@@ -70,21 +69,17 @@ public class OrganisationUnitEndpoint implements Endpoint {
         String findRelatedByEntityRefPath = mkPath(BASE_URL, "related", ":kind", ":id");
         String getByIdPath = mkPath(BASE_URL, ":id");
         String findDescendantsPath = mkPath(BASE_URL, ":id", "descendants");
-        String findImmediateHierarchyPath = mkPath(BASE_URL, ":id", "immediate-hierarchy");
 
         ListRoute<OrganisationalUnit> findAllRoute = (request, response) -> service.findAll();
         ListRoute<OrganisationalUnit> searchRoute = (request, response) -> service.search(request.params("query"));
         ListRoute<OrganisationalUnit> findByIdsRoute = (req, res) -> service.findByIds(readBody(req, Long[].class));
         ListRoute<OrganisationalUnit> findRelatedByEntityRefRoute = (req, res) -> service.findRelatedByEntityRef(getEntityReference(req));
-        ListRoute<LeveledEntityReference> findImmediateHierarchyRoute = (req, res) -> service.findImmediateHierarchy(getId(req));
         ListRoute<OrganisationalUnit> findDescendantsRoute = (req, res) -> service.findDescendants(getId(req));
 
         DatumRoute<OrganisationalUnit> getByIdRoute = (request, response) -> service.getById(getId(request));
 
-
         getForList(findAllPath, findAllRoute);
         getForList(searchPath, searchRoute);
-        getForList(findImmediateHierarchyPath, findImmediateHierarchyRoute);
         getForList(findDescendantsPath, findDescendantsRoute);
         postForList(findByIdsPath, findByIdsRoute);
         getForList(findRelatedByEntityRefPath, findRelatedByEntityRefRoute);

@@ -56,5 +56,13 @@ public class EnumUtilities_names {
     public void namesWithNoValues() {
         assertNotNull(EnumUtilities.names());
     }
+
+
+    @Test
+    public void namesViaCollectionOfEnums() {
+        assertEquals(
+                asSet("A", "D"),
+                EnumUtilities.names(asSet(MyEnum.A, MyEnum.D)));
+    }
 }
 

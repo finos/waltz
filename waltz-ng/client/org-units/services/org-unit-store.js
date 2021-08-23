@@ -46,15 +46,6 @@ export function store($http, BaseApiUrl) {
         .then(result => result.data);
 
 
-    /**
-     * id -> [{level, entityReference}...]
-     * @param id
-     */
-    const findImmediateHierarchy = (id) => $http
-        .get(`${BASE}/${id}/immediate-hierarchy`)
-        .then(result => result.data);
-
-
     const search = (query) => $http
         .get(`${BASE}/search/${query}`)
         .then(x => x.data);
@@ -66,7 +57,6 @@ export function store($http, BaseApiUrl) {
         findByIds,
         findRelatedByEntityRef,
         findDescendants,
-        findImmediateHierarchy,
         search
     };
 

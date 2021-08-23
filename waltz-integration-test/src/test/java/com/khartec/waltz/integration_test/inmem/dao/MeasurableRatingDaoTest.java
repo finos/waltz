@@ -16,12 +16,11 @@
  *
  */
 
-package com.khartec.waltz.integration_test.measurable_rating;
+package com.khartec.waltz.integration_test.inmem.dao;
 
 import com.khartec.waltz.common.exception.NotFoundException;
-import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
-import com.khartec.waltz.integration_test.BaseIntegrationTest;
+import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.measurable_rating.ImmutableSaveMeasurableRatingCommand;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
@@ -39,12 +38,12 @@ import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertThrows;
 
-public class MeasurableRatingDaoTest extends BaseIntegrationTest {
+public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
 
     private final MeasurableRatingDao dao = ctx.getBean(MeasurableRatingDao.class);
 
     @Before
-    public void before() {
+    public void beforeMeasurableRatingTests() {
         getDsl().deleteFrom(Tables.MEASURABLE_RATING).execute();
         getDsl().deleteFrom(Tables.APPLICATION).execute();
         getDsl().deleteFrom(Tables.MEASURABLE).execute();
@@ -125,7 +124,6 @@ public class MeasurableRatingDaoTest extends BaseIntegrationTest {
 
     @Test
     public void multipleRatingsCanRetrievedBySelectors() {
-        MeasurableIdSelectorFactory selectorFactory = new MeasurableIdSelectorFactory();
 
         long categoryId = createMeasurableCategory("mc");
         long m1Id = createMeasurable("m1", categoryId);
@@ -137,7 +135,7 @@ public class MeasurableRatingDaoTest extends BaseIntegrationTest {
         EntityReference app2Ref = createNewApp("a2", null);
         mkRatings(app2Ref, m1Id);
 
-        rebuildHierarachy(EntityKind.MEASURABLE);
+        rebuildHierarchy(EntityKind.MEASURABLE);
 
         IdSelectionOptions catOpts = mkOpts(mkRef(EntityKind.MEASURABLE_CATEGORY, categoryId), HierarchyQueryScope.EXACT);
         IdSelectionOptions m1Opts = mkOpts(mkRef(EntityKind.MEASURABLE, m1Id));
@@ -146,7 +144,7 @@ public class MeasurableRatingDaoTest extends BaseIntegrationTest {
         assertEquals(
                 "Find by category selector gives everything",
                 3,
-                dao.findByMeasurableIdSelector(selectorFactory.apply(catOpts), catOpts).size());
+                dao.findByMeasurableIdSelector(measurableIdSelectorFactory.apply(catOpts), catOpts).size());
 
         assertEquals(
                 "Find by category id gives everything",
@@ -156,12 +154,12 @@ public class MeasurableRatingDaoTest extends BaseIntegrationTest {
         assertEquals(
                 "Find by specific measurable (m1) gives subset",
                 2,
-                dao.findByMeasurableIdSelector(selectorFactory.apply(m1Opts), m1Opts).size());
+                dao.findByMeasurableIdSelector(measurableIdSelectorFactory.apply(m1Opts), m1Opts).size());
 
         assertEquals(
                 "Find by specific measurable (m2) gives subset",
                 1,
-                dao.findByMeasurableIdSelector(selectorFactory.apply(m2Opts), m2Opts).size());
+                dao.findByMeasurableIdSelector(measurableIdSelectorFactory.apply(m2Opts), m2Opts).size());
     }
 
 
