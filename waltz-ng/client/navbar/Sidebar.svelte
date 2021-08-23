@@ -105,12 +105,12 @@
     }
 
     .expansion-toggle {
-        font-size: 60px;
+        font-size: 50px;
         width: 100%;
         display: inline-block;
         text-align: right;
         transition: color ease-in-out 0.3s;
-        transform: translateX(-10px);
+        transform: translateX(-4px);
 
         color: $waltz-blue;
         &:hover {

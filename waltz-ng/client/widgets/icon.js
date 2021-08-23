@@ -19,8 +19,8 @@
 const bindings = {
     name: "@",
     size: "@",          // lg | 2x | 3x | 4x | 5x
-    flip: "@",          // 90 | 180 | 270
-    rotate: "@",        // horizontal | vertical
+    flip: "@",          // horizontal | vertical
+    rotate: "@",        // 90 | 180 | 270
     stack: "@",
     fixedWidth: "@",
     inverse: "@",
