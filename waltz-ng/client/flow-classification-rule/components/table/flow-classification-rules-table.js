@@ -191,8 +191,9 @@ function controller($q, $state, serviceBroker) {
     };
 
     vm.onSelect = (d) => $state.go(
-        "main.flow-classification-rules.view",
+        "main.flow-classification-rule.view",
         { id: d.id });
+
 
 }
 
