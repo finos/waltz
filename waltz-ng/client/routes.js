@@ -136,11 +136,11 @@ function configureStateChangeListener($transitions, $window, $state, serviceBrok
             .execute(CORE_API.AccessLogStore.write, [name, transition.params()]);
 
         if (__ENV__ === "prod") {
-            infoPromise.then(info => {
-                if (info.revision !== __REVISION__) {
+            infoPromise.then(r => {
+                if (r.data.revision !== __REVISION__) {
                     console.log(
                         "Waltz reloading as server reported version does not match client. Server:",
-                        info,
+                        r,
                         "client: ",
                         __REVISION__);
                     $window.location.reload();

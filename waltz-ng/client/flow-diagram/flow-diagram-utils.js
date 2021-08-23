@@ -59,46 +59,6 @@ export function toGraphFlow(flow) {
 }
 
 
-export function drawNodeShape(selection, state) {
-    selection
-        .select("path")
-        .attr("d", d => shapeFor(state, d).path)
-        .attr("stroke", "#ccc")
-        .attr("fill", d => {
-            switch (d.data.kind) {
-                case "ACTOR":
-                    return "#dfd7ee";
-                case "APPLICATION":
-                    const application = state.detail.applicationsById[d.data.id];
-                    if (application) {
-                        return application.kind === "EUC" ? "#f1d0d0" : "#dff1d2";
-                    } else {
-                        return "#dff1d2";
-                    }
-                default:
-                    return "#dff1d2";
-            };
-        });
-}
-
-
-
-function initialisePosition(state, graphNodeId) {
-    const position =  { x: 0, y: 0 };
-    state.layout.positions[graphNodeId] = position;
-    return position;
-}
-
-
-export function positionFor(state, graphNode) {
-    const id = _.isString(graphNode)
-        ? graphNode
-        : graphNode.id;
-
-    return state.layout.positions[id] || initialisePosition(state, id);
-}
-
-
 export function shapeFor(ref) {
     switch (ref.kind) {
         case "LOGICAL_DATA_FLOW":
@@ -144,20 +104,3 @@ const shapes = {
     EUC: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), { icon: "\uf109" }), // laptop
     DEFAULT: (widthHint = 100) => Object.assign({}, mkRectShape(widthHint), { icon: "\uf096" })
 };
-
-
-/**
- * Given a nodes model element kind (node.data.kind) will return
- * an object describing a shape which represents the node.
- * The object contains `{ path: '', cx, cy, title: { dx, dy } }`
- * where cx,cy are the center points of the shape.  Title dx,dy
- * give offsets to locate the title in an appropriate position.
- */
-export function toNodeShape(d, widthHint = 100) {
-    const kind = _.isObject(d) ? d.kind : d;
-    const mkShapeFn = shapes[kind];
-    if (!mkShapeFn) {
-        console.error("Cannot determine shape function for node", d)
-    }
-    return mkShapeFn(widthHint);
-}
