@@ -33,6 +33,7 @@ import com.khartec.waltz.schema.tables.records.MeasurableRecord;
 import com.khartec.waltz.schema.tables.records.OrganisationalUnitRecord;
 import com.khartec.waltz.schema.tables.records.RatingSchemeRecord;
 import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
+import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import org.h2.tools.Server;
 import org.jooq.DSLContext;
 import org.junit.Before;
@@ -68,6 +69,11 @@ public class BaseInMemoryIntegrationTest {
     }
 
 
+    public static class Services {
+        public LogicalFlowService logicalFlowService;
+    }
+
+
     public static class Helpers {
         public LogicalFlowHelper logicalFlowHelper;
     }
@@ -91,6 +97,7 @@ public class BaseInMemoryIntegrationTest {
     protected OuIds ouIds;
     protected Daos daos;
     protected Helpers helpers;
+    protected Services services;
 
     /**
      *   - root
@@ -115,6 +122,14 @@ public class BaseInMemoryIntegrationTest {
         ouIds = setupOuTree();
         daos = setupDaos();
         helpers = setupHelpers();
+        services = setupServices();
+    }
+
+
+    private Services setupServices() {
+        Services s = new Services();
+        s.logicalFlowService = ctx.getBean(LogicalFlowService.class);
+        return s;
     }
 
 

@@ -1,5 +1,6 @@
 package com.khartec.waltz.integration_test.inmem;
 
+import com.khartec.waltz.common.ExcludeFromIntegrationTesting;
 import com.khartec.waltz.data.DBExecutorPool;
 import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.zaxxer.hikari.HikariConfig;
@@ -12,10 +13,7 @@ import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DefaultConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.EnableMBeanExport;
+import org.springframework.context.annotation.*;
 import org.springframework.jmx.support.RegistrationPolicy;
 
 import javax.sql.DataSource;
@@ -24,9 +22,9 @@ import java.sql.SQLException;
 @Configuration
 @ComponentScan(basePackages = {
         "com.khartec.waltz.data",
-        "com.khartec.waltz.service.entity_hierarchy",
-        "com.khartec.waltz.service.person_hierarchy"
-})
+        "com.khartec.waltz.service"
+
+}, excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = ExcludeFromIntegrationTesting.class))
 @EnableMBeanExport(registration = RegistrationPolicy.REPLACE_EXISTING)
 public class DIInMemoryTestConfiguration {
 

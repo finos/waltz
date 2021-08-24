@@ -41,6 +41,8 @@ import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.lambda.Unchecked;
 import org.jooq.lambda.tuple.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -68,6 +70,8 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Service
 public class LogicalFlowService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(LogicalFlowService.class);
 
     private final ChangeLogService changeLogService;
     private final DataTypeService dataTypeService;
@@ -124,6 +128,7 @@ public class LogicalFlowService {
     }
 
 
+    @Deprecated
     public Collection<LogicalFlow> findAllByFlowIds(Collection<Long> ids) {
         return logicalFlowDao.findAllByFlowIds(ids);
     }
@@ -244,19 +249,27 @@ public class LogicalFlowService {
      * @return number of flows removed
      */
     public int removeFlow(Long flowId, String username) {
+
         LogicalFlow logicalFlow = logicalFlowDao.getByFlowId(flowId);
 
-        int deleted = logicalFlowDao.removeFlow(flowId, username);
+        if(logicalFlow == null){
+            LOG.warn("Logical flow cannot be found, no flows will be updated");
+            return 0;
 
-        Set<EntityReference> affectedEntityRefs = SetUtilities.fromArray(logicalFlow.source(), logicalFlow.target());
+        } else {
 
-        dataTypeUsageService.recalculateForApplications(affectedEntityRefs);
+            int deleted = logicalFlowDao.removeFlow(flowId, username);
 
-        changeLogService.writeChangeLogEntries(logicalFlow, username,
-                "Removed : datatypes [" + getAssociatedDatatypeNamesAsCsv(flowId) + "]",
-                Operation.REMOVE);
+            Set<EntityReference> affectedEntityRefs = SetUtilities.fromArray(logicalFlow.source(), logicalFlow.target());
 
-        return deleted;
+            dataTypeUsageService.recalculateForApplications(affectedEntityRefs);
+
+            changeLogService.writeChangeLogEntries(logicalFlow, username,
+                    "Removed : datatypes [" + getAssociatedDatatypeNamesAsCsv(flowId) + "]",
+                    Operation.REMOVE);
+
+            return deleted;
+        }
     }
 
 
