@@ -116,7 +116,6 @@ function controller($q,
 
     vm.onCancelAttestation = () => {
         vm.selectedAttestation = null;
-        vm.attestNext = false;
     };
 
     vm.onToggleFilter = () => {
