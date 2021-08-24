@@ -37,7 +37,7 @@ const bindings = {
     categories: '<',
     ratingTallies: '<',
     onSelect: '<',
-    onSelectUnmapped: '<',
+    onSelectUnmapped: '<?',
     onCategorySelect: '<',
     scrollHeight: '<'
 };
@@ -59,6 +59,7 @@ const initialState = {
         }
     },
     onSelect: (d) => console.log('wmrb: default on-select', d),
+    onSelectUnmapped: null, // This will cause the 'view unmapped measurables' label not to render
     visibility: {
         tab: null
     }
