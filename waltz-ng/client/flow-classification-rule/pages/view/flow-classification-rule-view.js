@@ -38,17 +38,20 @@ function controller($q, $stateParams, serviceBroker, historyStore){
         };
 
         const dataTypesPromise = serviceBroker
-            .loadAppData(CORE_API.DataTypeStore.findAll)
+            .loadAppData(
+                CORE_API.DataTypeStore.findAll)
             .then(r => _.keyBy(r.data, d => d.id));
 
-        const authSourcePromise = serviceBroker
-            .loadViewData(CORE_API.FlowClassificationRuleStore.getById, [ruleId])
+        const rulePromise = serviceBroker
+            .loadViewData(
+                CORE_API.FlowClassificationRuleStore.getById,
+                [ruleId])
             .then(r =>  r.data);
 
-        $q.all([dataTypesPromise, authSourcePromise])
-            .then(([datatypesById, rule]) => {
+        $q.all([dataTypesPromise, rulePromise])
+            .then(([dataTypesById, rule]) => {
 
-                const datatype = datatypesById[rule.dataTypeId];
+                const datatype = dataTypesById[rule.dataTypeId];
                 const flowClassificationRuleName =
                     rule.applicationReference.name
                     + " - "
@@ -60,7 +63,10 @@ function controller($q, $stateParams, serviceBroker, historyStore){
                     name: flowClassificationRuleName
                 };
 
-                addToHistory(historyStore, rule.id, flowClassificationRuleName);
+                addToHistory(
+                    historyStore,
+                    rule.id,
+                    flowClassificationRuleName);
             });
     };
 }

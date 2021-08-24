@@ -21,7 +21,7 @@ import {remote} from "./remote";
 export function mkFlowClassificationStore() {
 
     const findAll = (force = false) => {
-        return remote.fetchAppList("GET", "api/flow-classification", null, {force})
+        return remote.fetchAppList("GET", "api/flow-classification", [], {force})
     }
 
     const getById = (id) => {
