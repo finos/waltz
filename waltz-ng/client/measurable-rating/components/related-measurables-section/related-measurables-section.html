@@ -42,32 +42,10 @@
 
         <div class="row"
              ng-if="$ctrl.relatedMeasurables.length > 1">
-            <div class="col-sm-7">
-                <waltz-measurable-ratings-browser rating-tallies="$ctrl.stats"
-                                                  measurables="$ctrl.relatedMeasurables"
-                                                  categories="$ctrl.categories"
-                                                  on-select="$ctrl.onSelect"
-                                                  scroll-height="400">
-                </waltz-measurable-ratings-browser>
-            </div>
-
-            <div class="col-sm-5">
-                <div ng-if="$ctrl.selectedMeasurable"
-                     class="waltz-fade-if"
-                     style="padding-top: 4em">
-                    <h4>
-                        <span ng-bind="$ctrl.selectedMeasurable.name">
-                        </span>
-                        <small ng-bind="$ctrl.selectedMeasurable.categoryId | toDisplayName:'measurableCategory'">
-                        </small>
-                    </h4>
-
-                    <p ng-bind="$ctrl.selectedMeasurable.description"></p>
-                    <a ui-sref="main.measurable.view ({ id: $ctrl.selectedMeasurable.id })">
-                        More &raquo;
-                    </a>
-                </div>
-            </div>
+            <waltz-measurable-ratings-browser-tree-panel parent-entity-ref="$ctrl.parentEntityRef"
+                                                         filters="$ctrl.filters"
+                                                         on-measurable-category-select="$ctrl.onCategorySelect">
+            </waltz-measurable-ratings-browser-tree-panel>
         </div>
 
         <div class="row"
