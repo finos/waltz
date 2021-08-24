@@ -20,19 +20,19 @@
 
     $: datatypes = $datatypesCall.data
     $: datatypesById = _.keyBy(datatypes, d => d.id);
-    $: datatype = Object.assign({}, datatypesById[classificationRule.dataTypeId], {kind: "DATA_TYPE"});
-    $: datatypeName = _.get(datatypesById, [classificationRule.dataTypeId, "name"], "unknown");
-    $: rating = classificationsById[classificationRule.classificationId];
+    $: datatype = Object.assign({}, _.get(datatypesById, [classificationRule, "dataTypeId"]), {kind: "DATA_TYPE"});
+    $: datatypeName = _.get(datatypesById, [classificationRule, "dataTypeId", "name"], "unknown");
+    $: rating = _.get(classificationsById, [classificationRule, "classificationId"]);
 </script>
 
 <PageHeader icon="shield"
-            name={`Flow Classification Rule: ${classificationRule.applicationReference?.name}`}
+            name={`Flow Classification Rule: ${classificationRule?.applicationReference?.name}`}
             small={datatypeName}>
     <div slot="breadcrumbs">
         <ol class="waltz-breadcrumbs">
             <li><ViewLink state="main">Home</ViewLink></li>
             <li><ViewLink state="main.system.list">Flow Classification Rule</ViewLink></li>
-            <li><EntityLink ref={classificationRule.applicationReference}/></li>
+            <li><EntityLink ref={classificationRule?.applicationReference}/></li>
             <li><EntityLink ref={datatype}/></li>
         </ol>
     </div>
@@ -67,7 +67,7 @@
                 Source Application:
             </div>
             <div class="col-sm-4">
-                <EntityLink ref={classificationRule.applicationReference}/>
+                <EntityLink ref={classificationRule?.applicationReference}/>
             </div>
         </div>
 
@@ -83,7 +83,7 @@
                 Datatype Description:
             </div>
             <div class="col-sm-4">
-                    {datatype.description || "-"}
+                    {datatype?.description || "-"}
             </div>
         </div>
 
@@ -92,7 +92,7 @@
                 Scope:
             </div>
             <div class="col-sm-4">
-                <EntityLink ref={classificationRule.parentReference}/>
+                <EntityLink ref={classificationRule?.parentReference}/>
             </div>
         </div>
 
@@ -101,7 +101,7 @@
                 Description:
             </div>
             <div class="col-sm-4">
-                {classificationRule.description || "-"}
+                {classificationRule?.description || "-"}
             </div>
         </div>
 
@@ -110,7 +110,7 @@
                 Provenance:
             </div>
             <div class="col-sm-4">
-                {classificationRule.provenance}
+                {classificationRule?.provenance}
             </div>
         </div>
 
@@ -119,7 +119,7 @@
                 External Id:
             </div>
             <div class="col-sm-4">
-                {classificationRule.externalId || "-"}
+                {classificationRule?.externalId || "-"}
             </div>
         </div>
 
