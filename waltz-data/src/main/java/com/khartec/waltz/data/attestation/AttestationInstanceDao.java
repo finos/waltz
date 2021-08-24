@@ -265,7 +265,7 @@ public class AttestationInstanceDao {
                 .firstValue(ATTESTATION_INSTANCE.ID)
                 .over()
                 .partitionBy(ATTESTATION_RUN.ATTESTED_ENTITY_ID)
-                .orderBy(ATTESTATION_INSTANCE.ATTESTED_AT.desc())
+                .orderBy(ATTESTATION_INSTANCE.ATTESTED_AT.desc().nullsLast())
                 .as("latest_attestation");
 
         Table<Record> attestationsWithCategory = dsl
