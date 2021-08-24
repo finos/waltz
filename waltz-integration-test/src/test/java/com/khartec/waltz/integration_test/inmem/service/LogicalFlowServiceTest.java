@@ -135,18 +135,18 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
     public void removeFlowTest(){
         EntityReference a = createNewApp("a", ouIds.a);
         EntityReference b = createNewApp("b", ouIds.a1);
+        EntityReference c = createNewApp("c", ouIds.b);
         // a -> b
         // a -> c
         LogicalFlow ab = helper.createLogicalFlow(a, b);
+        LogicalFlow ac = helper.createLogicalFlow(a, b);
 
-        int removedForNoIdCount = lfSvc.removeFlow(-1L, "logicalFlowServiceTestRemoveFlow");
+        assertThrows("Expect no flows to be removed where id cannot be found",
+                IllegalArgumentException.class,
+                () -> lfSvc.removeFlow(-1L, "logicalFlowServiceTestRemoveFlow"));
 
-        assertEquals("Expect no flows to be removed where id cannot be found", removedForNoIdCount, 0);
-
-//        int removedForExistingIdCount = lfSvc.removeFlow(ab.id().get(), "logicalFlowServiceTestRemoveFlow");
-
-//        assertEquals("Expect only one flow to be removed", removedForExistingIdCount, 1);
-
+        int removedForExistingIdCount = lfSvc.removeFlow(ab.id().get(), "logicalFlowServiceTestRemoveFlow");
+        assertEquals("Expect only one flow to be removed", removedForExistingIdCount, 1);
 
     }
 

@@ -63,6 +63,7 @@ import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
 import static com.khartec.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 import static com.khartec.waltz.model.EntityReference.mkRef;
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.jooq.lambda.tuple.Tuple.tuple;
@@ -196,7 +197,7 @@ public class LogicalFlowService {
                             .parentReference(cmd.source())
                             .severity(Severity.INFORMATION)
                             .userId(username)
-                            .message(String.format(
+                            .message(format(
                                     "Flow %s between: %s and %s",
                                     "added",
                                     cmd.source().name().orElse(Long.toString(cmd.source().id())),
@@ -254,10 +255,8 @@ public class LogicalFlowService {
 
         if(logicalFlow == null){
             LOG.warn("Logical flow cannot be found, no flows will be updated");
-            return 0;
-
+            throw new IllegalArgumentException(format("Cannot find flow with id: %d, no logical flow removed", flowId));
         } else {
-
             int deleted = logicalFlowDao.removeFlow(flowId, username);
 
             Set<EntityReference> affectedEntityRefs = SetUtilities.fromArray(logicalFlow.source(), logicalFlow.target());
