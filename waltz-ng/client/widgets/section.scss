@@ -34,14 +34,14 @@ waltz-section {
   margin-left: $waltz-section-margin;
   margin-right: $waltz-section-margin;
   margin-bottom: 24px;
-  @include waltz-box-shadow()
+  @include waltz-box-shadow();
 }
 
 
 .waltz-section-header {
   border-radius: 3px 3px 0 0;
   margin-top: 0;
-    color: $waltz-section-font-color;
+  color: $waltz-section-font-color;
 }
 
 

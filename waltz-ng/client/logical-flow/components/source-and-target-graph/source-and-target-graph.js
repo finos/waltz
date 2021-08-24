@@ -28,6 +28,7 @@ import {CORE_API} from "../../../common/services/core-api-utils";
 
 import template from "./source-and-target-graph.html"
 import {amberHex} from "../../../common/colors";
+import {sidebarExpanded} from "../../../navbar/sidebar-store";
 
 
 const bindings = {
@@ -276,8 +277,8 @@ function translate(elem, dx = 0, dy = 0) {
 
 function setupSizing(sections, dimensions) {
     sections.svg
-        .attr("width", dimensions.graph.width)
-        .attr("height", dimensions.graph.height);
+       .attr("width", dimensions.graph.width)
+       .attr("height", dimensions.graph.height);
 
     const sdx = dimensions.margin.left + dimensions.label.width;
     const sdy = dimensions.margin.top;
@@ -613,7 +614,8 @@ function update(sections,
 function controller($element, $window, serviceBroker) {
 
     const vm = initialiseData(this, initialState);
-    const svg = select($element.find("svg")[0]);
+    const svgDomElem = $element.find("svg")[0];
+    const svg = select(svgDomElem);
 
     const svgSections = prepareGraph(svg);
 
@@ -654,13 +656,27 @@ function controller($element, $window, serviceBroker) {
         debouncedRender();
     };
 
-    vm.$onInit = () => angular
-        .element($window)
-        .on("resize", debouncedRender);
 
-    vm.$onDestroy = () => angular
-        .element($window)
-        .off("resize", debouncedRender);
+    let sidebarListenerUnregisterFn = null;
+
+
+    vm.$onInit = () => {
+        angular
+            .element($window)
+            .on("resize", debouncedRender);
+
+        sidebarListenerUnregisterFn = sidebarExpanded.subscribe(debouncedRender);
+    };
+
+    vm.$onDestroy = () => {
+        angular
+            .element($window)
+            .off("resize", debouncedRender);
+
+        if (sidebarListenerUnregisterFn) {
+            sidebarListenerUnregisterFn();
+        }
+    };
 }
 
 

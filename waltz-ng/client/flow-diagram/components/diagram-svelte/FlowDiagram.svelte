@@ -89,7 +89,7 @@
     const isIE = _.includes(ua, "MSIE") || _.includes(ua, "Trident/");
 
     $: svgWidth = isIE
-        ? windowWidth * 0.6 + "px"
+        ? "100%"
         : "100%";
 
     $: svgHeight = isIE
