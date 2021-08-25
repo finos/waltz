@@ -30,11 +30,13 @@
 
 </script>
 
-<ViewLink {state} {isSecondaryLink}
-          ctx={ref}>
-    {#if $$slots.default}
-        <slot/>
-    {:else}
-        <EntityLabel {ref} {showIcon}/>
-    {/if}
-</ViewLink>
+{#if ref}
+    <ViewLink {state} {isSecondaryLink}
+              ctx={ref}>
+        {#if $$slots.default}
+            <slot/>
+        {:else}
+            <EntityLabel {ref} {showIcon}/>
+        {/if}
+    </ViewLink>
+{/if}
