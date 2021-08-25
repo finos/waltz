@@ -25,18 +25,23 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdProvider;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
+import org.jooq.lambda.tuple.Tuple2;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
+import static com.khartec.waltz.common.ListUtilities.asList;
 import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.HierarchyQueryScope.CHILDREN;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
+import static java.util.Collections.emptyList;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 import static org.junit.Assert.*;
 
 public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
@@ -176,8 +181,39 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         Set<Long> activeFlowIds = map(activeFlows, r -> r.id().get());
 
         assertEquals(activeFlows.size(), 2);
-
         assertEquals("", asSet(ad.id().get(), ac.id().get()), activeFlowIds);
+        assertEquals("", asSet(ac.id().get(), ad.id().get()), activeFlowIds);
+    }
+
+
+    @Test
+    public void findBySourceAndTargetEntityReferences(){
+
+        EntityReference a = createNewApp("a", ouIds.a);
+        EntityReference b = createNewApp("b", ouIds.a1);
+        EntityReference c = createNewApp("c", ouIds.b);
+
+        // a -> b
+        // a -> c
+        LogicalFlow ab = helper.createLogicalFlow(a, b);
+        LogicalFlow ac = helper.createLogicalFlow(a, c);
+
+        Tuple2<EntityReference, EntityReference> abSrcTarget = tuple(a, b);
+        Tuple2<EntityReference, EntityReference> acSrcTarget = tuple(a, c);
+        Tuple2<EntityReference, EntityReference> bcSrcTarget = tuple(b, c);
+
+        List<LogicalFlow> flowsFromEmptySearch = lfSvc.findBySourceAndTargetEntityReferences(emptyList());
+        assertEquals(emptyList(), flowsFromEmptySearch);
+
+        List<LogicalFlow> abFlowSearch = lfSvc.findBySourceAndTargetEntityReferences(asList(abSrcTarget));
+        assertEquals(abFlowSearch.size(),  1);
+
+        List<LogicalFlow> abacFlowSearch = lfSvc.findBySourceAndTargetEntityReferences(asList(abSrcTarget, acSrcTarget));
+        assertEquals(abacFlowSearch.size(),  2);
+
+        List<LogicalFlow> flowSearchWhereSrcTrgNotFound = lfSvc.findBySourceAndTargetEntityReferences(asList(abSrcTarget, acSrcTarget, bcSrcTarget));
+        assertEquals(flowSearchWhereSrcTrgNotFound.size(),  2);
+
     }
 
 }
