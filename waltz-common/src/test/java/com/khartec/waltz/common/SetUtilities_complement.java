@@ -88,23 +88,4 @@ public class SetUtilities_complement {
         assertTrue(result.isEmpty());
     }
 
-
-
-
-
-   /* @Test
-    public void intersectionOfSetsGivesOnlyElementsThatAreInBoth() {
-        assertEquals(
-                "partial intersection",
-                asSet("b"),
-                intersection(asSet("a", "b"), asSet("b", "c")));
-
-        assertEquals(
-                "total intersection",
-                asSet("a", "b"),
-                intersection(asSet("a", "b"), asSet("b", "c", "a")));
-    }
-
-
-   */
 }
