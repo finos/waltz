@@ -154,7 +154,7 @@ function controller($q,
 
 
     vm.attestEntity = () => {
-        const msg = "By clicking confirm, you are attesting that all data flows are present, correct and accurately reflected for this entity, and thereby accountable for this validation.";
+        const msg = "By clicking 'OK', you are attesting that all data flows are present, correct and accurately reflected for this entity, and thereby accountable for this validation.";
         if (confirm(msg)){
             attest(serviceBroker, vm.parentEntityRef, vm.activeAttestationSection.type)
                 .then(() => {

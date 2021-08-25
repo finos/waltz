@@ -42,10 +42,12 @@
 
         <div class="row"
              ng-if="$ctrl.relatedMeasurables.length > 1">
-            <waltz-measurable-ratings-browser-tree-panel parent-entity-ref="$ctrl.parentEntityRef"
-                                                         filters="$ctrl.filters"
-                                                         on-measurable-category-select="$ctrl.onCategorySelect">
-            </waltz-measurable-ratings-browser-tree-panel>
+            <div class="col-sm-12">
+                <waltz-measurable-ratings-browser-tree-panel parent-entity-ref="$ctrl.parentEntityRef"
+                                                             filters="$ctrl.filters"
+                                                             on-measurable-category-select="$ctrl.onCategorySelect">
+                </waltz-measurable-ratings-browser-tree-panel>
+            </div>
         </div>
 
         <div class="row"
