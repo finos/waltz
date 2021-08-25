@@ -36,6 +36,11 @@ const initialState = {
 };
 
 
+function getInstancesForRun(runsWithInstances, runId) {
+    const currentRun = _.find(runsWithInstances, r => r.id === runId);
+    return  _.get(currentRun, "instances", []);
+}
+
 function controller($q,
                     serviceBroker,
                     userService) {
@@ -79,6 +84,7 @@ function controller($q,
                             [i.parentEntity.kind, i.parentEntity.id, i.attestedEntityKind, i.attestedEntityId],
                             [])
                         }))
+                    .sortBy(i => i.parentEntity.name)
                     .groupBy("attestationRunId")
                     .value();
 
@@ -96,14 +102,17 @@ function controller($q,
     vm.onAttestEntity = () => {
         const instance = vm.selectedAttestation;
 
+        const instances = getInstancesForRun(vm.runsWithInstances, instance.attestationRunId)
+        const index = _.findIndex(instances, i => i.id === instance.id)
+        const nextInstanceId =  _.get(instances, [index + 1, "id"]);
+
         attest(serviceBroker, instance.parentEntity, instance.attestedEntityKind)
             .then(() => loadData())
             .then(() => {
-                const currentRun = _.find(vm.runsWithInstances, r => r.id === instance.attestationRunId);
-                const remainingInstances = _.get(currentRun, "instances", []);
+                const remainingInstances = getInstancesForRun(vm.runsWithInstances, instance.attestationRunId);
 
                 vm.selectedAttestation = vm.attestNext && !_.isEmpty(remainingInstances)
-                    ? _.head(remainingInstances)
+                    ? _.find(remainingInstances, d => d.id === nextInstanceId) || _.head(remainingInstances)
                     : null
             })
             .then(() => ToastStore.success(`Attested ${_.get(entity, [instance.attestedEntityKind, "name"], "unknown subject")} for ${instance.parentEntity.name} successfully!`))
