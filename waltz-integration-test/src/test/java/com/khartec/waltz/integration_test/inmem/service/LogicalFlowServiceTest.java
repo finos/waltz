@@ -28,6 +28,9 @@ import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collection;
+import java.util.Set;
+
 import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
 import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.common.SetUtilities.map;
@@ -150,29 +153,31 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
     }
 
-//
-//    @Test
-//    public void findActiveByFlowIdsTest(){
-//
-//        EntityReference a = createNewApp("a", ouIds.a);
-//        EntityReference b = createNewApp("b", ouIds.a1);
-//        EntityReference c = createNewApp("c", ouIds.b);
-//        EntityReference d = createNewApp("d", ouIds.b);
-//
-//        // a -> b
-//        // a -> c
-//        LogicalFlow ab = helper.createLogicalFlow(a, b);
-//        LogicalFlow ac = helper.createLogicalFlow(a, c);
-//        LogicalFlow ad = helper.createLogicalFlow(a, d);
-//
-//        LogicalFlow logFlow = lfSvc.getById(ab.id().get());
-//
-//        assertEquals("Retrieved flow has correct source", ab.source(), logFlow.source());
-//        assertEquals("Retrieved flow has correct target", ab.target(), logFlow.target());
-//
-//        LogicalFlow impossibleIdFlow = lfSvc.getById(-1L);
-//
-//        assertNull("Returns null if id not found", impossibleIdFlow);
-//    }
+
+    @Test
+    public void findActiveByFlowIdsTest(){
+
+        EntityReference a = createNewApp("a", ouIds.a);
+        EntityReference b = createNewApp("b", ouIds.a1);
+        EntityReference c = createNewApp("c", ouIds.b);
+        EntityReference d = createNewApp("d", ouIds.b);
+
+        // a -> b
+        // a -> c
+        LogicalFlow ab = helper.createLogicalFlow(a, b);
+        LogicalFlow ac = helper.createLogicalFlow(a, c);
+        LogicalFlow ad = helper.createLogicalFlow(a, d);
+
+        int removedFlowCount = lfSvc.removeFlow(ab.id().get(), "logicalFlowServiceTestRemoveFlow");
+
+        Collection<LogicalFlow> activeFlows = lfSvc
+                .findActiveByFlowIds(asSet(ab.id().get(), ac.id().get(), ad.id().get()));
+
+        Set<Long> activeFlowIds = map(activeFlows, r -> r.id().get());
+
+        assertEquals(activeFlows.size(), 2);
+
+        assertEquals("", asSet(ad.id().get(), ac.id().get()), activeFlowIds);
+    }
 
 }
