@@ -23,17 +23,16 @@
 
 
     <profiles>
+     
         <profile>
             <id>build-h2</id>
-            <activation><activeByDefault>true</activeByDefault></activation>
             <properties>
-                <database.url>jdbc:h2:file/./waltzdb2;DATABASE_TO_UPPER=false</database.url>
-                <database.user>root</database.user>
-                <database.password></database.password>
-                <database.schema>PUBLIC</database.schema>
-                <database.catalog></database.catalog>
+                <database.url>jdbc:h2:mem:waltz;CASE_INSENSITIVE_IDENTIFIERS=TRUE</database.url>
+                <database.user>sa</database.user>
+                <database.password>sa</database.password>
             </properties>
         </profile>
+
 
         <profile>
             <id>build-postgres</id>
