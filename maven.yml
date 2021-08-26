@@ -6,8 +6,6 @@ name: Java CI with Maven
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 
 jobs:
   build:
@@ -22,4 +20,4 @@ jobs:
         java-version: '11'
         distribution: 'adopt'
     - name: Build with Maven
-      run: mvn -B -s .build.settings.xml -Pbuild-postgres,waltz-postgres,ci clean package;
+      run: mvn -B -s  -Pci,dev-h2-inmem,waltz-h2 clean package;
