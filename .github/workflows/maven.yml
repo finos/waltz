@@ -4,8 +4,6 @@
 name: Waltz H2
 
 
-
-
 on:
   push:
     branches: [ master ]
@@ -16,12 +14,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Setup postgres
-      uses: Harmon758/postgresql-action@v1.0.0
-      with:
-        postgresql db: waltz
-        postgresql user: postgres
-
     - uses: actions/checkout@v2
 
     - name: Set up JDK 11
@@ -38,4 +30,4 @@ jobs:
         restore-keys: ${{ runner.os }}-m2
 
     - name: Build with Maven
-      run: mvn -B -Pci,dev-h2-inmen,waltz-h2 clean package;
+      run: mvn -B -Pci,dev-h2-inmem,waltz-h2 clean package;
