@@ -30,4 +30,4 @@ jobs:
         restore-keys: ${{ runner.os }}-m2
 
     - name: Build with Maven
-      run: mvn -B -s -s .build.settings.xml -Pci,build-h2,waltz-h2 clean package;
+      run: mvn -B -s .build.settings.xml -Pci,build-h2,waltz-h2 clean package;
