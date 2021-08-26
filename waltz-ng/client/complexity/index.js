@@ -17,17 +17,16 @@
  */
 import angular from "angular";
 import {registerComponents, registerStores} from "../common/module-utils";
-import * as ComplexityScoreStore from './services/complexity-score-store';
-import * as ComplexityStore from './services/complexity-store';
-import * as ComplexityKindStore from './services/complexity-kind-store';
-import * as ComplexityBarChart from './components/chart/complexity-bar-chart';
-import ComplexityBasicInfoTile from './components/basic-info-tile/complexity-basic-info-tile';
+import * as ComplexityScoreStore from "./services/complexity-score-store";
+import * as ComplexityStore from "./services/complexity-store";
+import * as ComplexityKindStore from "./services/complexity-kind-store";
+import ComplexityBasicInfoTile from "./components/basic-info-tile/complexity-basic-info-tile";
 import * as AppComplexitySummarySection
-    from './components/app-complexity-summary-section/app-complexity-summary-section'
-import ComplexityGraph from './components/graph/complexity-graph'
+    from "./components/app-complexity-summary-section/app-complexity-summary-section"
+import ComplexityGraph from "./components/graph/complexity-graph"
 
 export default () => {
-    const module = angular.module('waltz.complexity', []);
+    const module = angular.module("waltz.complexity", []);
 
     registerStores(module, [
         ComplexityScoreStore,
@@ -35,7 +34,6 @@ export default () => {
         ComplexityStore ]);
 
     registerComponents(module, [
-        ComplexityBarChart,
         ComplexityBasicInfoTile,
         AppComplexitySummarySection,
         ComplexityGraph]);
