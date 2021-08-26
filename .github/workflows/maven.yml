@@ -27,14 +27,7 @@ jobs:
           --health-timeout 5s 
           --health-retries 5
 
-    steps:
-    - name: Setup postgres
-      uses: Harmon758/postgresql-action@v1.0.0
-      with:
-        postgresql db: waltz
-        postgresql user: postgres
-        
-        
+    steps:     
     - uses: actions/checkout@v2
 
     - name: Set up JDK 11
