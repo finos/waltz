@@ -15,7 +15,7 @@ Getting started
  - [Running](waltz-web/README.md)
 
 ---
-
+![example workflow](https://github.com/finos/waltz/actions/workflows/maven.yml/badge.svg)
 [![Build Status](https://travis-ci.com/finos/waltz.svg?branch=master)](https://travis-ci.org/finos/waltz) 
 [![Language Grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/khartec/waltz.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/khartec/waltz/context:javascript) 
 [![Language Grade: Java](https://img.shields.io/lgtm/grade/java/g/khartec/waltz.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/khartec/waltz/context:java)
