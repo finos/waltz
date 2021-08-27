@@ -54,4 +54,7 @@ public abstract class LogicalFlow implements
 
     @Value.Default
     public boolean isReadOnly() { return false; }
+
+    @Value.Default
+    public boolean isRemoved() { return false; }
 }

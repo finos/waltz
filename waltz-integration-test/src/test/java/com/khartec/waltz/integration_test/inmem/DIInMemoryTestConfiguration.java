@@ -55,7 +55,7 @@ public class DIInMemoryTestConfiguration {
         Settings dslSettings = new Settings()
                 .withRenderFormatted(true)
                 .withDebugInfoOnStackTrace(true)
-                .withRenderQuotedNames(RenderQuotedNames.NEVER)
+                .withRenderQuotedNames(RenderQuotedNames.EXPLICIT_DEFAULT_UNQUOTED)
                 .withExecuteLogging(true);
 
         org.jooq.Configuration configuration = new DefaultConfiguration()

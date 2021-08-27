@@ -60,6 +60,7 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.common.SetUtilities.fromCollection;
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
 import static com.khartec.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 import static com.khartec.waltz.model.EntityReference.mkRef;
@@ -188,9 +189,16 @@ public class LogicalFlowService {
 
 
     public List<LogicalFlow> addFlows(List<AddLogicalFlowCommand> addCmds, String username) {
+
+        if(addCmds.isEmpty()){
+            return emptyList();
+        }
+
         addCmds.forEach(this::rejectIfSelfLoop);
 
-        List<ChangeLog> logEntries = addCmds
+        Set<AddLogicalFlowCommand> toAdd = fromCollection(addCmds);
+
+        List<ChangeLog> logEntries = toAdd
                 .stream()
                 .flatMap(cmd -> {
                     ImmutableChangeLog addedSourceParent = ImmutableChangeLog.builder()
@@ -213,7 +221,7 @@ public class LogicalFlowService {
         changeLogService.write(logEntries);
 
         LocalDateTime now = nowUtc();
-        List<LogicalFlow> flowsToAdd = addCmds
+        List<LogicalFlow> flowsToAdd = toAdd
                 .stream()
                 .map(addCmd -> ImmutableLogicalFlow.builder()
                         .source(addCmd.source())

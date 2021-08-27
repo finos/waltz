@@ -25,7 +25,6 @@ import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.schema.tables.records.LogicalFlowRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
-import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,8 +40,10 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.map;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.EnumUtilities.readEnum;
+import static com.khartec.waltz.common.ListUtilities.filter;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
+import static com.khartec.waltz.common.MapUtilities.indexBy;
 import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.model.EntityLifecycleStatus.ACTIVE;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
@@ -52,6 +53,7 @@ import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
 @Repository
@@ -94,6 +96,7 @@ public class LogicalFlowDao {
                 .created(UserTimestamp.mkForUser(record.getCreatedBy(), record.getCreatedAt()))
                 .provenance(record.getProvenance())
                 .isReadOnly(record.getIsReadonly())
+                .isRemoved(record.getIsRemoved())
                 .build();
     };
 
@@ -113,6 +116,7 @@ public class LogicalFlowDao {
         record.setCreatedAt(flow.created().map(c -> c.atTimestamp()).orElse(Timestamp.valueOf(flow.lastUpdatedAt())));
         record.setCreatedBy(flow.created().map(c -> c.by()).orElse(flow.lastUpdatedBy()));
         record.setIsReadonly(flow.isReadOnly());
+        record.setIsRemoved(flow.isRemoved());
         return record;
     };
 
@@ -219,31 +223,33 @@ public class LogicalFlowDao {
 
 
     public List<LogicalFlow> addFlows(List<LogicalFlow> flows, String user) {
+
         Condition condition = flows
                 .stream()
                 .map(t -> isSourceCondition(t.source())
-                        .and(isTargetCondition(t.target()))
-                        .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.eq(REMOVED.name())
-                                .or(LOGICAL_FLOW.IS_REMOVED)))
+                        .and(isTargetCondition(t.target())))
                 .reduce((a, b) -> a.or(b))
                 .get();
 
-        List<LogicalFlow> removedFlows = baseQuery()
+        List<LogicalFlow> existingFlows = baseQuery()
                 .where(condition)
                 .fetch(TO_DOMAIN_MAPPER);
+
+        List<LogicalFlow> removedFlows = filter(
+                f -> f.entityLifecycleStatus().equals(REMOVED) || f.isRemoved(),
+                existingFlows);
 
         if(removedFlows.size() > 0) {
             restoreFlows(removedFlows, user);
         }
 
-        Map<Tuple2<EntityReference, EntityReference>, LogicalFlow> existing = removedFlows
-                .stream()
-                .collect(Collectors.toMap(f -> Tuple.tuple(f.source(), f.target()), f -> f));
-
+        Map<Tuple2<EntityReference, EntityReference>, LogicalFlow> existing = indexBy(
+                existingFlows,
+                f -> tuple(f.source(), f.target()));
 
         List<LogicalFlow> addedFlows = flows
                 .stream()
-                .filter(f -> !existing.containsKey(Tuple.tuple(f.source(), f.target())))
+                .filter(f -> !existing.containsKey(tuple(f.source(), f.target())))
                 .map(f -> {
                     LogicalFlowRecord record = TO_RECORD_MAPPER.apply(f, dsl);
                     record.store();
@@ -255,6 +261,7 @@ public class LogicalFlowDao {
 
 
         addedFlows.addAll(removedFlows);
+
         return addedFlows;
     }
 
@@ -330,7 +337,8 @@ public class LogicalFlowDao {
         Select<Record1<Long>> appIds = DSL
                 .select(APPLICATION.ID)
                 .from(APPLICATION)
-                .where(IS_ACTIVE);
+                .where(IS_ACTIVE)
+                .and(APPLICATION.IS_REMOVED.isFalse());
 
         Condition sourceAppNotFound = LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
                 .and(LOGICAL_FLOW.SOURCE_ENTITY_ID.notIn(appIds));

@@ -17,15 +17,13 @@ import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
 import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.actor.ImmutableActorCreateCommand;
 import com.khartec.waltz.model.app_group.AppGroup;
 import com.khartec.waltz.model.app_group.AppGroupKind;
 import com.khartec.waltz.model.app_group.ImmutableAppGroup;
-import com.khartec.waltz.model.application.AppRegistrationResponse;
-import com.khartec.waltz.model.application.ApplicationKind;
-import com.khartec.waltz.model.application.ImmutableAppRegistrationRequest;
-import com.khartec.waltz.model.application.LifecyclePhase;
+import com.khartec.waltz.model.application.*;
 import com.khartec.waltz.model.measurable_category.MeasurableCategory;
 import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
@@ -36,6 +34,7 @@ import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import org.h2.tools.Server;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 import org.junit.Before;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -209,6 +208,17 @@ public class BaseInMemoryIntegrationTest {
     }
 
 
+    protected void removeApp(Long appId){
+        ApplicationDao appDao = ctx.getBean(ApplicationDao.class);
+        Application app = appDao.getById(appId);
+        appDao
+                .update(ImmutableApplication
+                        .copyOf(app)
+                        .withIsRemoved(true)
+                        .withEntityLifecycleStatus(EntityLifecycleStatus.REMOVED));
+    }
+
+
     protected long createMeasurableCategory(String name) {
         MeasurableCategoryDao dao = ctx.getBean(MeasurableCategoryDao.class);
         Set<MeasurableCategory> categories = dao.findByExternalId(name);
@@ -271,6 +281,25 @@ public class BaseInMemoryIntegrationTest {
     }
 
 
+    public void createUnknownDatatype(){
+
+        DSLContext dsl = getDsl();
+
+        dsl.deleteFrom(DATA_TYPE).execute();
+
+        dsl.insertInto(DATA_TYPE)
+                .columns(
+                        DATA_TYPE.ID,
+                        DATA_TYPE.NAME,
+                        DATA_TYPE.DESCRIPTION,
+                        DATA_TYPE.CODE,
+                        DATA_TYPE.CONCRETE,
+                        DATA_TYPE.UNKNOWN.as(DSL.quotedName("unknown"))) //TODO: as part of #5639 can drop quotedName
+                .values(1L, "Unknown", "Unknown data type", "UNKNOWN", false, true)
+                .execute();
+    }
+
+
 
     public Long createAppGroupWithAppRefs(String groupName, Collection<EntityReference> appRefs) {
         Collection<Long> appIds = CollectionUtilities.map(appRefs, EntityReference::id);
@@ -294,6 +323,10 @@ public class BaseInMemoryIntegrationTest {
         return gId;
     }
 
+
+    public void clearAllFlows(){
+        getDsl().deleteFrom(LOGICAL_FLOW).execute();
+    }
 
     /**
      * DEBUG ONLY
