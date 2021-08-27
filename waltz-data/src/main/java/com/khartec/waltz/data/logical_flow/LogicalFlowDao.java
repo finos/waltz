@@ -229,7 +229,7 @@ public class LogicalFlowDao {
                 .map(t -> isSourceCondition(t.source())
                         .and(isTargetCondition(t.target())))
                 .reduce((a, b) -> a.or(b))
-                .get();
+                .orElse(DSL.falseCondition());
 
         List<LogicalFlow> existingFlows = baseQuery()
                 .where(condition)

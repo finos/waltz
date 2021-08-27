@@ -190,10 +190,6 @@ public class LogicalFlowService {
 
     public List<LogicalFlow> addFlows(List<AddLogicalFlowCommand> addCmds, String username) {
 
-        if(addCmds.isEmpty()){
-            return emptyList();
-        }
-
         addCmds.forEach(this::rejectIfSelfLoop);
 
         Set<AddLogicalFlowCommand> toAdd = fromCollection(addCmds);

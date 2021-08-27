@@ -291,10 +291,18 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         List<LogicalFlow> newFlows = lfSvc.addFlows(asList(abCreateCommand, baCreateCommand), "addFlowsTest");
         assertEquals("2 valid create commands should create 2 flows", 2, newFlows.size());
 
+        assertEquals("Source and targets in returned set match",
+                asSet(tuple(a, b), tuple(b, a)),
+                map(newFlows, f -> tuple(f.source(), f.target())));
+
         List<LogicalFlow> duplicatedFlows = lfSvc.addFlows(asList(bcCreateCommand, bcCreateCommand), "addFlowsTest");
         assertEquals("multiple create commands for same source and target should not create multiple flows",
                 1,
                 duplicatedFlows.size());
+
+        assertEquals("multiple create commands for same source and target should not create multiple flows",
+                asSet(tuple(b, c)),
+                map(duplicatedFlows, f -> tuple(f.source(), f.target())));
 
         List<LogicalFlow> existingFlows = lfSvc.addFlows(asList(bcCreateCommand, abCreateCommand), "addFlowsTest");
         assertTrue("should not create flow if flow already exists", existingFlows.isEmpty());

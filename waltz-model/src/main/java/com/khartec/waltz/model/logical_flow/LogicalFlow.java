@@ -35,7 +35,9 @@ public abstract class LogicalFlow implements
         LastUpdatedProvider,
         LastAttestedProvider,
         WaltzEntity,
-        EntityKindProvider {
+        EntityKindProvider,
+        IsRemovedProvider,
+        IsReadOnlyProvider {
 
     public abstract EntityReference source();
     public abstract EntityReference target();
@@ -52,9 +54,4 @@ public abstract class LogicalFlow implements
         return EntityKind.LOGICAL_DATA_FLOW;
     }
 
-    @Value.Default
-    public boolean isReadOnly() { return false; }
-
-    @Value.Default
-    public boolean isRemoved() { return false; }
 }
