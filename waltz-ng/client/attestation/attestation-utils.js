@@ -23,10 +23,11 @@ import {mkDateGridCell, mkEntityLinkGridCell} from "../common/grid-utils";
 import {mapToDisplayNames} from "../applications/application-utils";
 
 
-function mkAttestationCommand(attestedEntityRef, attestationKind){
+function mkAttestationCommand(parentRef, attestedEntityKind, attestedEntityId){
     return {
-        entityReference: attestedEntityRef,
-        attestedEntityKind: attestationKind
+        entityReference: parentRef,
+        attestedEntityKind: attestedEntityKind,
+        attestedEntityId: attestedEntityId
     };
 }
 
@@ -35,14 +36,17 @@ function mkAttestationCommand(attestedEntityRef, attestationKind){
  * Sends an attestation to the server and returns a promise.
  *
  * @param serviceBroker
- * @param attestedEntityRef
- * @param attestationKind
+ * @param parentEntityRef
+ * @param attestedEntityKind
  * @return Promise
  */
-export function attest(serviceBroker, attestedEntityRef, attestationKind) {
+export function attest(serviceBroker, parentEntityRef, attestedEntityKind, attestedEntityRef) {
+
     const attestationCommand = mkAttestationCommand(
-        attestedEntityRef,
-        attestationKind);
+        parentEntityRef,
+        attestedEntityKind,
+        attestedEntityRef);
+
     return serviceBroker
         .execute(
             CORE_API.AttestationInstanceStore.attestEntityForUser,
