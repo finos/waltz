@@ -105,7 +105,14 @@
     <!-- TABS -->
     <uib-tabset active="active"
                 ng-if="!$ctrl.isAnyEditorVisible()">
+        <uib-tab index="-1"
+                 heading="Fancy"
+                 select="$ctrl.showTab(-1)">
+            <div class="waltz-panel-content">
 
+                    <H1>hELLO mUM</H1>
+            </div>
+        </uib-tab>
         <!-- LOGICAL FLOW TAB -->
         <uib-tab index="0"
                  select="$ctrl.showTab(0)"
