@@ -20,25 +20,28 @@ package com.khartec.waltz.data.logical_flow;
 
 import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlowMeasures;
-import com.khartec.waltz.model.logical_flow.LogicalFlowMeasures;
+import com.khartec.waltz.model.FlowDirection;
+import com.khartec.waltz.model.logical_flow.*;
 import com.khartec.waltz.model.tally.ImmutableTally;
 import com.khartec.waltz.model.tally.ImmutableTallyPack;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.model.tally.TallyPack;
+import com.khartec.waltz.schema.Tables;
+import com.khartec.waltz.schema.tables.DataType;
 import com.khartec.waltz.schema.tables.LogicalFlow;
-import com.khartec.waltz.schema.tables.LogicalFlowDecorator;
+import com.khartec.waltz.schema.tables.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.Unchecked;
-import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
@@ -47,11 +50,13 @@ import static com.khartec.waltz.data.JooqUtilities.safeGet;
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
 import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.model.FlowDirection.INBOUND;
+import static com.khartec.waltz.model.FlowDirection.OUTBOUND;
+import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.stream.Collectors.*;
 import static org.jooq.impl.DSL.*;
-import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
 @Repository
@@ -59,8 +64,11 @@ public class LogicalFlowStatsDao {
 
     private final DSLContext dsl;
     private static final LogicalFlow lf = LOGICAL_FLOW.as("lf");
-
     private static final com.khartec.waltz.schema.tables.LogicalFlowDecorator lfd = LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR.as("lfd");
+    private static final Application counterpart_app = APPLICATION.as("counterpart_app");
+    private static final Actor counterpart_actor = ACTOR.as("counterpart_actor");
+    private static final DataType rollup_dt = Tables.DATA_TYPE.as("rollup_dt");
+    private static final DataType actual_dt = Tables.DATA_TYPE.as("actual_dt");
 
     private static final Condition BOTH_APPS =
             lf.SOURCE_ENTITY_KIND.eq(inline(EntityKind.APPLICATION.name()))
@@ -232,6 +240,106 @@ public class LogicalFlowStatsDao {
                 .from(lf)
                 .where(dsl.renderInlined(condition));
 
+    }
+
+
+
+
+
+    public LogicalFlowGraphSummary getFlowInfoByDirection(EntityReference ref, Long datatypeId){
+
+        Condition sourceAppCondition = lf.SOURCE_ENTITY_ID.eq(counterpart_app.ID).and(lf.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+        Condition sourceActorCondition = lf.SOURCE_ENTITY_ID.eq(counterpart_actor.ID).and(lf.SOURCE_ENTITY_KIND.eq(EntityKind.ACTOR.name()));
+        Condition targetAppCondition = lf.TARGET_ENTITY_ID.eq(counterpart_app.ID).and(lf.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+        Condition targetActorCondition = lf.TARGET_ENTITY_ID.eq(counterpart_actor.ID).and(lf.TARGET_ENTITY_KIND.eq(EntityKind.ACTOR.name()));
+
+        Condition dataTypeCondition = datatypeId == null ? rollup_dt.PARENT_ID.isNull() : rollup_dt.ID.eq(datatypeId);
+
+        Condition isUpstream = lf.SOURCE_ENTITY_ID.eq(ref.id()).and(lf.SOURCE_ENTITY_KIND.eq(ref.kind().name()));
+        Condition isDownstream = lf.TARGET_ENTITY_ID.eq(ref.id()).and(lf.TARGET_ENTITY_KIND.eq(ref.kind().name()));
+
+        SelectConditionStep<Record10<Long, String, Long, Long, String, String, Long, String, String, String>> sourceQry = mkDirectionalQuery(
+                sourceAppCondition,
+                sourceActorCondition,
+                dataTypeCondition,
+                isDownstream,
+                INBOUND);
+
+        SelectConditionStep<Record10<Long, String, Long, Long, String, String, Long, String, String, String>> targetQry = mkDirectionalQuery(
+                targetAppCondition,
+                targetActorCondition,
+                dataTypeCondition,
+                isUpstream,
+                OUTBOUND);
+
+        SelectOrderByStep<Record10<Long, String, Long, Long, String, String, Long, String, String, String>> unionedData =
+                sourceQry
+                        .union(targetQry);
+
+        System.out.println(unionedData);
+
+        Map<FlowDirection, Set<FlowInfo>> data = unionedData
+                .fetch()
+                .stream()
+                .collect(groupingBy(r -> FlowDirection.valueOf(r.get("direction", String.class)),
+                        mapping(r -> {
+
+                            EntityReference rollupDtRef = mkRef(DATA_TYPE, r.get(rollup_dt.ID), r.get(rollup_dt.NAME));
+                            EntityReference actualDtRef = mkRef(DATA_TYPE, r.get(actual_dt.ID), r.get(actual_dt.NAME));
+
+                            EntityReference counterpartRef = mkRef(
+                                    EntityKind.valueOf(r.get("counterpart_kind", String.class)),
+                                    r.get("counterpart_id", Long.class),
+                                    r.get("counterpart_name", String.class));
+
+                            return ImmutableFlowInfo.builder()
+                                    .classificationId(r.get(FLOW_CLASSIFICATION.ID))
+                                    .rollupDataType(rollupDtRef)
+                                    .actualDataType(actualDtRef)
+                                    .counterpart(counterpartRef)
+                                    .flowEntityLifecycleStatus(EntityLifecycleStatus.valueOf(r.get(lf.ENTITY_LIFECYCLE_STATUS)))
+                                    .build();
+
+                        }, toSet())));
+
+        ImmutableLogicalFlowGraphSummary summary = ImmutableLogicalFlowGraphSummary
+                .builder()
+                .flowInfoByDirection(data)
+                .build();
+
+        return summary;
+    }
+
+    private SelectConditionStep<Record10<Long, String, Long, Long, String, String, Long, String, String, String>> mkDirectionalQuery(Condition appDirectionCondition,
+                                                                                                                                     Condition actorDirectionCondition,
+                                                                                                                                     Condition dataTypeCondition,
+                                                                                                                                     Condition parentDirection,
+                                                                                                                                     FlowDirection direction) {
+
+        return dsl
+                .select(rollup_dt.ID,
+                        rollup_dt.NAME,
+                        FLOW_CLASSIFICATION.ID,
+                        actual_dt.ID,
+                        actual_dt.NAME,
+                        DSL.when(counterpart_app.ID.isNotNull(), DSL.val("APPLICATION")).otherwise(DSL.val("ACTOR")).as("counterpart_kind"),
+                        DSL.coalesce(counterpart_app.ID, counterpart_actor.ID).as("counterpart_id"),
+                        lf.ENTITY_LIFECYCLE_STATUS,
+                        DSL.coalesce(counterpart_app.NAME, counterpart_actor.NAME).as("counterpart_name"),
+                        DSL.val(direction.name()).as("direction"))
+                .from(lf)
+                .innerJoin(lfd).on(lf.ID.eq(lfd.LOGICAL_FLOW_ID))
+                .innerJoin(ENTITY_HIERARCHY).on(lfd.DECORATOR_ENTITY_ID.eq(ENTITY_HIERARCHY.ID)
+                        .and(ENTITY_HIERARCHY.KIND.eq(DATA_TYPE.name())
+                                .and(lfd.DECORATOR_ENTITY_KIND.eq(DATA_TYPE.name()))))
+                .innerJoin(rollup_dt).on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(rollup_dt.ID))
+                .innerJoin(actual_dt).on(ENTITY_HIERARCHY.ID.eq(actual_dt.ID))
+                .innerJoin(FLOW_CLASSIFICATION).on(lfd.RATING.eq(FLOW_CLASSIFICATION.CODE))
+                .leftJoin(counterpart_app).on(appDirectionCondition)
+                .leftJoin(counterpart_actor).on(actorDirectionCondition)
+                .where(NOT_REMOVED)
+                .and(dataTypeCondition)
+                .and(parentDirection);
     }
 
 }

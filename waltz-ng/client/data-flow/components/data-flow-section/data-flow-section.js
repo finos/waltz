@@ -25,7 +25,7 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 import template from "./data-flow-section.html";
 import {entity} from "../../../common/services/enums/entity";
 import FlowClassificationLegend from "../../../flow-classification-rule/components/svelte/FlowClassificationLegend.svelte";
-
+import LogicalFlowScrollPanel from "../svelte/LogicalFlowScrollPanel.svelte"
 
 const bindings = {
     parentEntityRef: "<",
@@ -34,6 +34,7 @@ const bindings = {
 
 const initialState = {
     FlowClassificationLegend,
+    LogicalFlowScrollPanel,
     changeUnits: [],
     dataTypeUsages: [],
     logicalFlows: [],
@@ -48,9 +49,14 @@ const initialState = {
             logicalFlows: false,
             bulkLogicalFlows: false,
             bulkPhysicalFlows: false
-        }
-
-    }
+        },
+    },
+    tabs: [
+        {id: "LOGICAL_FLOW_SCROLL", name: "Logical Flows (Beta View)"},
+        {id: "SUMMARY", name: "Logical Flows"},
+        {id: "PHYSICAL", name: "Physical Flow Detail"},
+        {id: "FLOW_CLASSIFICATION_RULES", name: "Flow Classification Rules"}
+    ]
 };
 
 
@@ -138,6 +144,7 @@ function controller(serviceBroker) {
 
     vm.$onInit = () => {
         loadData();
+        vm.activeTab = vm.tabs[0];
     };
 
     vm.showTab = (idx) => {

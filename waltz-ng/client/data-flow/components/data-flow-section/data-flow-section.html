@@ -102,21 +102,21 @@
                                entities="['LOGICAL_DATA_FLOW', 'PHYSICAL_SPECIFICATION', 'PHYSICAL_FLOW']">
     </waltz-source-data-overlay>
 
-    <!-- TABS -->
-    <uib-tabset active="active"
-                ng-if="!$ctrl.isAnyEditorVisible()">
-        <uib-tab index="-1"
-                 heading="Fancy"
-                 select="$ctrl.showTab(-1)">
-            <div class="waltz-panel-content">
+    <div class="waltz-tabs">
+        <input ng-repeat-start="tab in $ctrl.tabs track by tab.id"
+               type="radio"
+               ng-change="$ctrl.onTabChange()"
+               ng-model="$ctrl.activeTab"
+               ng-value="tab"
+               id="{{ tab.id + '_' + $id }}">
+        <label class="wt-label"
+               for="{{ tab.id + '_' + $id }}"
+               ng-repeat-end>
+            <span ng-bind="tab.name"></span>
+        </label>
 
-                    <H1>hELLO mUM</H1>
-            </div>
-        </uib-tab>
-        <!-- LOGICAL FLOW TAB -->
-        <uib-tab index="0"
-                 select="$ctrl.showTab(0)"
-                 heading="Summary">
+        <div class="wt-tab wt-active"
+             ng-if="$ctrl.activeTab.id === 'SUMMARY'">
             <div class="waltz-panel-content">
                 <!-- NO DATA, BOTH FLOWS AND TYPES -->
                 <div ng-if="$ctrl.dataTypeUsages.length == 0 && $ctrl.logicalFlows.length == 0">
@@ -127,12 +127,12 @@
                             </strong>
                             registered for this application.
                             <span waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
-                                Add them
-                                <a ng-click="$ctrl.visibility.editor.logicalFlow = true"
-                                   class="clickable">
-                                    here.
-                                </a>
-                            </span>
+                                    Add them
+                                    <a ng-click="$ctrl.visibility.editor.logicalFlow = true"
+                                       class="clickable">
+                                        here.
+                                    </a>
+                                </span>
                         </message>
                     </waltz-no-data>
                 </div>
@@ -148,12 +148,12 @@
                                 </strong>
                                 registered for this application.
                                 <span waltz-has-role="LOGICAL_DATA_FLOW_EDITOR">
-                                        Add one
-                                        <a ng-click="$ctrl.visibility.editor.logicalFlow = true"
-                                           class="clickable">
-                                            here.
-                                        </a>
-                                    </span>
+                                            Add one
+                                            <a ng-click="$ctrl.visibility.editor.logicalFlow = true"
+                                               class="clickable">
+                                                here.
+                                            </a>
+                                        </span>
                             </message>
                         </waltz-no-data>
 
@@ -216,38 +216,41 @@
 
                 </div>
             </div>
+        </div>
 
-        </uib-tab>
+        <div class="wt-tab wt-active"
+             ng-if="$ctrl.activeTab.id === 'PHYSICAL'">
+            <br>
+            <waltz-physical-data-section specifications="$ctrl.physicalSpecifications"
+                                         logical-flows="$ctrl.logicalFlows"
+                                         primary-ref="$ctrl.parentEntityRef"
+                                         physical-flows="$ctrl.physicalFlows">
+            </waltz-physical-data-section>
+        </div>
 
-        <!-- PHYSICAL FLOW TAB -->
-        <uib-tab index="1"
-                 select="$ctrl.showTab(1)"
-                 heading="Physical Flow Detail">
-            <div ng-if="$ctrl.visibility.dataTab == 1">
-                <br>
-                <waltz-physical-data-section specifications="$ctrl.physicalSpecifications"
-                                             logical-flows="$ctrl.logicalFlows"
-                                             primary-ref="$ctrl.parentEntityRef"
-                                             physical-flows="$ctrl.physicalFlows">
-                </waltz-physical-data-section>
-            </div>
-        </uib-tab>
+        <div class="wt-tab wt-active"
+             ng-if="$ctrl.activeTab.id === 'FLOW_CLASSIFICATION_RULES'">
+            <waltz-flow-classification-rules-table rules="$ctrl.flowClassificationRules">
+            </waltz-flow-classification-rules-table>
+        </div>
+
+        <div class="wt-tab wt-active"
+             ng-if="$ctrl.activeTab.id === 'LOGICAL_FLOW_SCROLL'">
+            <waltz-svelte-component component="$ctrl.LogicalFlowScrollPanel"
+                                    primary-entity-ref="$ctrl.parentEntityRef">
+            </waltz-svelte-component>
+
+            <p class="help-block">
+                This diagram shows inbound or outbound flows categorized by data type to this application
+            </p>
+            <p class="help-block">
+                Legend:
+                <waltz-svelte-component component="$ctrl.FlowClassificationLegend"></waltz-svelte-component>
+            </p>
+        </div>
 
 
-        <!-- AUTH SOURCE TAB -->
-        <uib-tab index="2"
-                 ng-if="$ctrl.parentEntityRef.kind === 'APPLICATION'"
-                 select="$ctrl.showTab(2)"
-                 disable="$ctrl.flowClassificationRules | isEmpty"
-                 heading="Flow Classification Rules">
-
-            <div ng-if="$ctrl.visibility.dataTab == 2" style="padding-top: 1em;">
-                <waltz-flow-classification-rules-table rules="$ctrl.flowClassificationRules">
-                </waltz-flow-classification-rules-table>
-            </div>
-
-        </uib-tab>
-    </uib-tabset>
+    </div>
 
 
     <!-- Editing -->
