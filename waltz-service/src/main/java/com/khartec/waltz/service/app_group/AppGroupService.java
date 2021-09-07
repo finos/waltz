@@ -43,10 +43,7 @@ import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
@@ -103,8 +100,12 @@ public class AppGroupService {
 
 
     public AppGroupDetail getGroupDetailById(long groupId) {
-        return ImmutableAppGroupDetail.builder()
-                .appGroup(appGroupDao.getGroup(groupId))
+        AppGroup group = appGroupDao.getGroup(groupId);
+        if (group == null) return null;
+
+        return ImmutableAppGroupDetail
+                .builder()
+                .appGroup(group)
                 .applications(appGroupEntryDao.findEntriesForGroup(groupId))
                 .members(appGroupMemberDao.getMembers(groupId))
                 .organisationalUnits(appGroupOrganisationalUnitDao.getEntriesForGroup(groupId))
@@ -112,8 +113,8 @@ public class AppGroupService {
     }
 
 
-    public List<AppGroupSubscription> findGroupSubscriptionsForUser(String userId) {
-        List<AppGroupMember> subscriptions = appGroupMemberDao.getSubscriptions(userId);
+    public Set<AppGroupSubscription> findGroupSubscriptionsForUser(String userId) {
+        Set<AppGroupMember> subscriptions = appGroupMemberDao.getSubscriptions(userId);
         Map<Long, AppGroupMemberRole> roleByGroup = indexBy(
                 AppGroupMember::groupId,
                 AppGroupMember::role,
@@ -127,7 +128,7 @@ public class AppGroupService {
                         .appGroup(g)
                         .role(roleByGroup.get(g.id().get()))
                         .build())
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
     }
 
 
@@ -176,7 +177,7 @@ public class AppGroupService {
     }
 
 
-    public List<AppGroupSubscription> deleteGroup(String userId, long groupId) throws InsufficientPrivelegeException {
+    public Set<AppGroupSubscription> deleteGroup(String userId, long groupId) throws InsufficientPrivelegeException {
         verifyUserCanUpdateGroup(userId, groupId);
         appGroupDao.deleteGroup(groupId);
         entityRelationshipDao.removeAnyInvolving(mkRef(EntityKind.APP_GROUP, groupId));
@@ -308,7 +309,7 @@ public class AppGroupService {
     }
 
 
-    public List<AppGroupMember> getMembers(long groupId) {
+    public Set<AppGroupMember> getMembers(long groupId) {
         return appGroupMemberDao.getMembers(groupId);
     }
 
@@ -397,7 +398,7 @@ public class AppGroupService {
                 .message(format("Associated change initiative: %d", ci))
                 .userId(userId)
                 .parentReference(ImmutableEntityReference.builder().id(groupId).kind(EntityKind.APP_GROUP).build())
-                .childKind(Optional.ofNullable(EntityKind.CHANGE_INITIATIVE))
+                .childKind(Optional.of(EntityKind.CHANGE_INITIATIVE))
                 .operation(Operation.ADD)
                 .build())
         .collect(Collectors.toList());
@@ -421,7 +422,7 @@ public class AppGroupService {
                         .message(format("Removed associated change initiative: %d", ci))
                         .userId(userId)
                         .parentReference(ImmutableEntityReference.builder().id(groupId).kind(EntityKind.APP_GROUP).build())
-                        .childKind(Optional.ofNullable(EntityKind.CHANGE_INITIATIVE))
+                        .childKind(Optional.of(EntityKind.CHANGE_INITIATIVE))
                         .operation(Operation.REMOVE)
                         .build())
                 .collect(Collectors.toList());

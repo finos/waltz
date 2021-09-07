@@ -187,9 +187,11 @@ function controller($q,
         vm.currentOrgUnit = entity;
         vm.addOrgUnitToGroup(entity);
     };
+
     vm.orgUnitSelectionFilter = (orgUnit) => {
         return (vm.currentOrgUnit && orgUnit.id !== vm.currentOrgUnit.id) || !vm.organisationalUnits.map(e=>e.id).includes(orgUnit.id);
     };
+
     vm.promoteToOwner = (member) => {
         serviceBroker
             .execute(CORE_API.AppGroupStore.addOwner, [member.groupId, member.userId])
