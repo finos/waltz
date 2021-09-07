@@ -31,6 +31,7 @@ import com.khartec.waltz.schema.tables.records.MeasurableRecord;
 import com.khartec.waltz.schema.tables.records.OrganisationalUnitRecord;
 import com.khartec.waltz.schema.tables.records.RatingSchemeRecord;
 import com.khartec.waltz.service.app_group.AppGroupService;
+import com.khartec.waltz.service.bookmark.BookmarkService;
 import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import org.h2.tools.Server;
@@ -72,6 +73,7 @@ public class BaseInMemoryIntegrationTest {
     public static class Services {
         public LogicalFlowService logicalFlowService;
         public AppGroupService appGroupService;
+        public BookmarkService bookmarkService;
     }
 
 
@@ -131,6 +133,7 @@ public class BaseInMemoryIntegrationTest {
         Services s = new Services();
         s.logicalFlowService = ctx.getBean(LogicalFlowService.class);
         s.appGroupService = ctx.getBean(AppGroupService.class);
+        s.bookmarkService = ctx.getBean(BookmarkService.class);
         return s;
     }
 
@@ -355,14 +358,19 @@ public class BaseInMemoryIntegrationTest {
     }
 
 
-
     public String mkUserId(String stem) {
-        return stem + counter.incrementAndGet();
+        return mkName(stem);
     }
 
 
     public String mkUserId() {
-        return "testuser" + counter.incrementAndGet();
+        return mkName("testuser");
     }
+
+
+    public String mkName(String stem) {
+        return stem + "_" + counter.incrementAndGet();
+    }
+
 
 }
