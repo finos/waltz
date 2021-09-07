@@ -234,10 +234,12 @@ public class AppGroupDao implements SearchDao<AppGroup> {
 
 
     public int update(AppGroup appGroup) {
-        return dsl.update(APPLICATION_GROUP)
+        return dsl
+                .update(APPLICATION_GROUP)
                 .set(APPLICATION_GROUP.DESCRIPTION, appGroup.description())
                 .set(APPLICATION_GROUP.NAME, appGroup.name())
                 .set(APPLICATION_GROUP.KIND, appGroup.appGroupKind().name())
+                .set(APPLICATION_GROUP.EXTERNAL_ID, appGroup.externalId().orElse(null))
                 .where(APPLICATION_GROUP.ID.eq(appGroup.id().get()))
                 .execute();
     }
