@@ -1,6 +1,6 @@
 <script>
     import {platformStrategy, afcGovernance, situationalAppraisal} from "./demo-data";
-    import {calcRectAttrs, calcViewBox, toComp} from "./process-diagram-utils";
+    import {calcViewBox, mkLayoutData} from "./process-diagram-utils";
     import Defs from "./Defs.svelte";
     import Objects from "./Objects.svelte";
     import Connections from "./Connections.svelte";
@@ -9,27 +9,15 @@
 
     let viewBox = calcViewBox(process.objects);
 
-    const objects = _
-        .chain(process.objects)
-        .map(d => Object.assign({}, d, calcRectAttrs(d)))
-        .value();
+    const layoutDataById = mkLayoutData(process.objects);
 
-    const objectsById = _.keyBy(objects, d => d.objectId);
+    console.log(layoutDataById);
 
-    const connections = _
-        .chain(process.connections)
-        .map(conn => {
-            const connObjects = {
-                startObject: objectsById[conn.startObjectId],
-                endObject: objectsById[conn.endObjectId]
-            };
-            return Object.assign(
-                {},
-                conn,
-                connObjects);
-        })
-        .filter(conn => conn.startObject && conn.endObject)
-        .value();
+
+    const connections = _.filter(
+        process.connections,
+        conn => layoutDataById[conn.startObjectId] && layoutDataById[conn.endObjectId]); // ditch conns w/o objs
+
 
 </script>
 
@@ -39,8 +27,8 @@
      {viewBox}>
 
     <Defs/>
-    <Objects {objects}/>
-    <Connections {connections}/>
+    <Objects objects={process.objects} {layoutDataById}/>
+    <Connections {connections} {layoutDataById}/>
 
 </svg>
 

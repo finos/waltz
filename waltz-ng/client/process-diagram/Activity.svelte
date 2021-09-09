@@ -2,6 +2,7 @@
     import {calcRectAttrs} from "./process-diagram-utils";
 
     export let obj;
+    export let layoutData;
 
     function onMouseEnter() {
         console.log("a:me:", obj);
@@ -12,15 +13,15 @@
 
 <rect rx="10"
       ry="10"
-      width={obj.width}
-      height={obj.height}
+      width={layoutData.width}
+      height={layoutData.height}
       on:mouseenter={onMouseEnter}>
 </rect>
 
-<foreignObject width={obj.width}
-               height={obj.height}
+<foreignObject width={layoutData.width}
+               height={layoutData.height}
                style="pointer-events: none"
-               y={obj.height / 6}>
+               y={layoutData.height / 6}>
     <div>
         {obj.name}
     </div>
