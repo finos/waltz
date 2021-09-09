@@ -20,9 +20,7 @@
 import template from "./playpen1.html";
 import {initialiseData} from "../../common";
 import {mkRef} from "../../common/entity-utils";
-import BookmarkPanel from "../../bookmarks/svelte/BookmarkPanel.svelte";
-import DatatypeTreeSelector from "../../common/svelte/DataTypeTreeSelector.svelte"
-import Wrapper from "./Wrapper.svelte"
+import ProcessDiagram from "../../process-diagram/ProcessDiagram.svelte"
 
 const initData = {
     ref: mkRef("APPLICATION", 840),
@@ -30,9 +28,7 @@ const initData = {
     ref2: mkRef("APPLICATION", 842),
     ref3: mkRef("APPLICATION", 212),
     ref4: mkRef("APPLICATION", 913),
-    BookmarkPanel,
-    DatatypeTreeSelector,
-    Wrapper
+    ProcessDiagram
 };
 
 
