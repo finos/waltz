@@ -5,13 +5,29 @@ import {max, min} from "d3-array";
 
 
 export function calcViewBox(objects = []) {
-    const minX = min(objects, d => d.topLeft.x);
-    const maxX = max(objects, d => d.bottomRight.x);
-    const minY = min(objects, d => d.topLeft.y);
-    const maxY = max(objects, d => d.bottomRight.y);
-
-    return `${minX - 100} ${minY - 100} ${(maxX - minX) + 100} ${(maxY - minY) + 100}`;
+    const bounds = calcBounds(objects);
+    return `${bounds.x1 - 100} ${bounds.y1 - 100} ${bounds.width + 200} ${bounds.height + 200}`;
 }
+
+
+export function calcBounds(objects = []) {
+    const x1 = min(objects, d => d.topLeft.x);
+    const y1 = min(objects, d => d.topLeft.y);
+    const x2 = max(objects, d => d.bottomRight.x);
+    const y2 = max(objects, d => d.bottomRight.y);
+    return {
+        x1,
+        y1,
+        x2,
+        y2,
+        width: x2 - x1,
+        height: y2 - y1
+    };
+
+}
+
+
+
 
 
 export function toComp(obj) {
