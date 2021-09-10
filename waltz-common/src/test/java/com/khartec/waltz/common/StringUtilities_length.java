@@ -17,6 +17,11 @@ public class StringUtilities_length {
     }
 
     @Test
+    public void simpleLengthWithWhitespaceStr(){
+        assertEquals(4, StringUtilities.length("    "));
+    }
+
+    @Test
     public void simpleLengthWithNullStr(){
         assertEquals(0, StringUtilities.length(null));
     }

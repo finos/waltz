@@ -205,15 +205,23 @@ public class StringUtilities {
 
 
     public static String capitalise(String words){
+        if (StringUtilities.isEmpty(words)) {
+            return "";
+        }
 
-        List<String> collect = Arrays.stream(words
-                .split("\\s+"))
+        List<String> collect = Arrays
+                .stream(words.split("\\s+"))
                 .map(w -> {
                     String lower = w.toLowerCase().substring(1);
-                    char capital = w.charAt(0);
-                    return capital + lower + " ";
-                }).collect(Collectors.toList());
 
-        return String.join("", collect).trim();
+                    char firstLetter = Character.toUpperCase(w.charAt(0));
+                    return firstLetter + lower;
+                })
+                .collect(Collectors.toList());
+
+
+
+        return String.join(" ", collect);
     }
 }
+
