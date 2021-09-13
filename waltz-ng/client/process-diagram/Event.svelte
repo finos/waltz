@@ -3,7 +3,7 @@
     export let layoutData;
 
     function onMouseEnter() {
-        console.log("ie:me:", obj);
+        console.log("event:me:", obj);
     }
 </script>
 
@@ -19,7 +19,7 @@
 
     <foreignObject width={layoutData.width * 4}
                    height="200"
-                   transform={`translate(${layoutData.width * -1}, ${layoutData.width * 1.5})`}>
+                   transform={`translate(${layoutData.width * -1}, ${layoutData.height * 0.4})`}>
         <div style="text-align: left; font-size: smaller">
             {obj.name}
         </div>

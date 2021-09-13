@@ -1,23 +1,41 @@
 <script>
-    import {platformStrategy, afcGovernance, situationalAppraisal} from "./demo-data";
-    import {calcViewBox, mkLayoutData} from "./process-diagram-utils";
+    import {platformStrategy, afcGovernance, situationalAppraisal, singlePayments} from "./demo-data";
+    import {calcBounds, calcViewBox, mkLayoutData} from "./process-diagram-utils";
     import Defs from "./Defs.svelte";
     import Objects from "./Objects.svelte";
     import Connections from "./Connections.svelte";
+    import {scaleLinear} from "d3-scale";
+    import {zoom} from "d3-zoom";
+    import {event, select} from "d3-selection";
 
-    const process = platformStrategy;
+
+    const process = singlePayments;
 
     let viewBox = calcViewBox(process.objects);
+    let bounds = calcBounds(process.objects);
+
+    const y = scaleLinear()
+        .domain([bounds.y1, bounds.y2])
+        .range([bounds.y2, bounds.y1]);
 
     const layoutDataById = mkLayoutData(process.objects);
 
-    console.log(layoutDataById);
+    const connections = _
+        .chain(process.connections)
+        .reject(conn => conn.hidden)
+        .filter(conn => layoutDataById[conn.startObjectId] && layoutDataById[conn.endObjectId])
+        .value(); // ditch conns w/o objs
 
+    // pan + zoom
+    function zoomed() {
+        const t = event.transform;
+        svgElem.attr("transform", t);
+    }
 
-    const connections = _.filter(
-        process.connections,
-        conn => layoutDataById[conn.startObjectId] && layoutDataById[conn.endObjectId]); // ditch conns w/o objs
+    let elem;
+    $: svgElem = select(elem);
 
+    $: svgElem.call(zoom().on("zoom", zoomed))
 
 </script>
 
@@ -27,8 +45,15 @@
      {viewBox}>
 
     <Defs/>
-    <Objects objects={process.objects} {layoutDataById}/>
-    <Connections {connections} {layoutDataById}/>
+
+    <g transform=""
+       bind:this={elem}>
+        <Connections {connections}
+                     {layoutDataById}/>
+
+        <Objects objects={process.objects}
+                 {layoutDataById}/>
+    </g>
 
 </svg>
 

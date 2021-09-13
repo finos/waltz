@@ -3,7 +3,7 @@
     export let layoutData;
 
     function onMouseEnter() {
-        console.log("nc:me:", obj);
+        console.log("textCell:me:", obj);
     }
 
 </script>

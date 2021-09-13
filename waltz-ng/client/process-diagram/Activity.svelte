@@ -5,7 +5,7 @@
     export let layoutData;
 
     function onMouseEnter() {
-        console.log("a:me:", obj);
+        console.log("activity:me:", obj);
     }
 
 </script>
