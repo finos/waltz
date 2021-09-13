@@ -105,7 +105,7 @@
             </column>
             <column name="external_id"
                     type="${external-id.type}">
-                <constraints nullable="false"/>
+                <constraints nullable="true"/>
             </column>
             <column name="provenance"
                     type="${provenance.type}">
