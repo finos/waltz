@@ -56,7 +56,6 @@
     </changeSet>
 
 
-    <!-- 1906 -->
     <changeSet id="20210913-5650-1"
                author="davidwatkins73">
         <comment>5650: The process diagram table represents the metadata and layout data associated with a process diagram</comment>
