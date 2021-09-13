@@ -143,6 +143,30 @@
                        columnNames="diagram_id, entity_id, entity_kind"/>
     </changeSet>
 
+    <changeSet id="20210913-5652-1"
+               author="davidwatkins73">
+        <comment>5652: flow classification rule: add user_selectable (option can be picked by user when creating a new rule)</comment>
+        <addColumn tableName="flow_classification">
+            <column name="user_selectable"
+                    type="BOOLEAN"
+                    defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20210913-5652-2"
+               author="davidwatkins73">
+        <comment>5652: flow classification rule: add read_only (rule can cannot be edited - i.e. to limit modifications of externally provided rules)</comment>
+        <addColumn tableName="flow_classification_rule">
+            <column name="is_readonly"
+                    type="BOOLEAN"
+                    defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 
     <!--    <changeSet id="20210818-5585-2"-->
 <!--               author="woodjes">-->
