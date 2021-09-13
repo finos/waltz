@@ -30,8 +30,8 @@ import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 
@@ -108,16 +108,17 @@ public class BookmarkService {
     }
 
 
-
-    public Collection<Bookmark> findByBookmarkIdSelector(IdSelectionOptions selectionOptions) {
+    public Set<Bookmark> findByBookmarkIdSelector(IdSelectionOptions selectionOptions) {
         return bookmarkDao.findByBookmarkIdSelector(bookmarkIdSelectorFactory.apply(selectionOptions));
     }
+
 
     public int deleteByBookmarkIdSelector(IdSelectionOptions selectionOptions) {
         GenericSelector selector = genericSelectorFactory.apply(selectionOptions);
         return bookmarkDao
                 .deleteByParentSelector(selector);
     }
+
 
     private String getEntityName(EntityReference entityReference) {
         return (entityReference.name().isPresent()

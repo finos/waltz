@@ -285,6 +285,24 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="20171024-2623-1"
+               author="woodjes"
+               dbms="h2">
+        <comment>2623: Unknown Data Type represented in data_type table</comment>
+        <sql>
+            ALTER TABLE data_type
+            ADD "unknown" BOOLEAN
+        </sql>
+
+        <sql>
+            ALTER TABLE data_type ALTER COLUMN "unknown" SET DEFAULT false
+        </sql>
+
+        <sql>
+            ALTER TABLE data_type ALTER COLUMN "unknown" SET NOT NULL
+        </sql>
+    </changeSet>
+
     <changeSet id="20171024-2623-2"
                author="kamransaleem"
                dbms="mssql,mysql">

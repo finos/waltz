@@ -296,7 +296,7 @@
             <properties>
                 <jdbc.group>com.h2database</jdbc.group>
                 <jdbc.artifact>h2</jdbc.artifact>
-                <jdbc.version>1.3.176</jdbc.version>
+                <jdbc.version>1.4.200</jdbc.version>
                 <jdbc.driver>org.h2.Driver</jdbc.driver>
                 <jooq.dialect>H2</jooq.dialect>
                 <jooq.group>org.jooq</jooq.group>
@@ -425,11 +425,19 @@
             </dependencies>
         </profile>
 
+        <profile>
+            <id>dev-h2-inmem</id>
+            <properties>
+                <database.url>jdbc:h2:tcp://localhost/mem:waltz;CASE_INSENSITIVE_IDENTIFIERS=TRUE</database.url>
+                <database.user>sa</database.user>
+                <database.password>sa</database.password>
+            </properties>
+        </profile>
+
         <!-- profiles for travis -->
         <profile>
             <id>travis-postgres</id>
             <properties>
-                <database.url>jdbc:mysql://127.0.0.1:3306/waltz</database.url>
                 <database.url>jdbc:postgresql://localhost:5432/waltz</database.url>
                 <database.user>postgres</database.user>
                 <database.password></database.password>

@@ -17,24 +17,26 @@ import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
 import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.actor.ImmutableActorCreateCommand;
 import com.khartec.waltz.model.app_group.AppGroup;
 import com.khartec.waltz.model.app_group.AppGroupKind;
 import com.khartec.waltz.model.app_group.ImmutableAppGroup;
-import com.khartec.waltz.model.application.AppRegistrationResponse;
-import com.khartec.waltz.model.application.ApplicationKind;
-import com.khartec.waltz.model.application.ImmutableAppRegistrationRequest;
-import com.khartec.waltz.model.application.LifecyclePhase;
+import com.khartec.waltz.model.application.*;
 import com.khartec.waltz.model.measurable_category.MeasurableCategory;
 import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
 import com.khartec.waltz.schema.tables.records.MeasurableRecord;
 import com.khartec.waltz.schema.tables.records.OrganisationalUnitRecord;
 import com.khartec.waltz.schema.tables.records.RatingSchemeRecord;
+import com.khartec.waltz.service.app_group.AppGroupService;
+import com.khartec.waltz.service.bookmark.BookmarkService;
 import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
+import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import org.h2.tools.Server;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 import org.junit.Before;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -68,6 +70,13 @@ public class BaseInMemoryIntegrationTest {
     }
 
 
+    public static class Services {
+        public LogicalFlowService logicalFlowService;
+        public AppGroupService appGroupService;
+        public BookmarkService bookmarkService;
+    }
+
+
     public static class Helpers {
         public LogicalFlowHelper logicalFlowHelper;
     }
@@ -91,6 +100,7 @@ public class BaseInMemoryIntegrationTest {
     protected OuIds ouIds;
     protected Daos daos;
     protected Helpers helpers;
+    protected Services services;
 
     /**
      *   - root
@@ -115,6 +125,16 @@ public class BaseInMemoryIntegrationTest {
         ouIds = setupOuTree();
         daos = setupDaos();
         helpers = setupHelpers();
+        services = setupServices();
+    }
+
+
+    private Services setupServices() {
+        Services s = new Services();
+        s.logicalFlowService = ctx.getBean(LogicalFlowService.class);
+        s.appGroupService = ctx.getBean(AppGroupService.class);
+        s.bookmarkService = ctx.getBean(BookmarkService.class);
+        return s;
     }
 
 
@@ -194,6 +214,17 @@ public class BaseInMemoryIntegrationTest {
     }
 
 
+    protected void removeApp(Long appId){
+        ApplicationDao appDao = ctx.getBean(ApplicationDao.class);
+        Application app = appDao.getById(appId);
+        appDao
+                .update(ImmutableApplication
+                        .copyOf(app)
+                        .withIsRemoved(true)
+                        .withEntityLifecycleStatus(EntityLifecycleStatus.REMOVED));
+    }
+
+
     protected long createMeasurableCategory(String name) {
         MeasurableCategoryDao dao = ctx.getBean(MeasurableCategoryDao.class);
         Set<MeasurableCategory> categories = dao.findByExternalId(name);
@@ -256,6 +287,25 @@ public class BaseInMemoryIntegrationTest {
     }
 
 
+    public void createUnknownDatatype(){
+
+        DSLContext dsl = getDsl();
+
+        dsl.deleteFrom(DATA_TYPE).execute();
+
+        dsl.insertInto(DATA_TYPE)
+                .columns(
+                        DATA_TYPE.ID,
+                        DATA_TYPE.NAME,
+                        DATA_TYPE.DESCRIPTION,
+                        DATA_TYPE.CODE,
+                        DATA_TYPE.CONCRETE,
+                        DATA_TYPE.UNKNOWN.as(DSL.quotedName("unknown"))) //TODO: as part of #5639 can drop quotedName
+                .values(1L, "Unknown", "Unknown data type", "UNKNOWN", false, true)
+                .execute();
+    }
+
+
 
     public Long createAppGroupWithAppRefs(String groupName, Collection<EntityReference> appRefs) {
         Collection<Long> appIds = CollectionUtilities.map(appRefs, EntityReference::id);
@@ -280,6 +330,10 @@ public class BaseInMemoryIntegrationTest {
     }
 
 
+    public void clearAllFlows(){
+        getDsl().deleteFrom(LOGICAL_FLOW).execute();
+    }
+
     /**
      * DEBUG ONLY
      *
@@ -302,4 +356,21 @@ public class BaseInMemoryIntegrationTest {
             e.printStackTrace();
         }
     }
+
+
+    public String mkUserId(String stem) {
+        return mkName(stem);
+    }
+
+
+    public String mkUserId() {
+        return mkName("testuser");
+    }
+
+
+    public String mkName(String stem) {
+        return stem + "_" + counter.incrementAndGet();
+    }
+
+
 }

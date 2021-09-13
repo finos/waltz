@@ -95,7 +95,7 @@ public class ChangeUnitViewService {
 
         Collection<PhysicalFlow> physicalFlows = physicalFlowService.findBySelector(idSelectionOptions);
         Collection<PhysicalSpecification> physicalSpecs = physicalSpecificationService.findByIds(map(physicalFlows, PhysicalFlow::specificationId));
-        Collection<LogicalFlow> logicalFlows = logicalFlowService.findAllByFlowIds(map(physicalFlows, PhysicalFlow::logicalFlowId));
+        Collection<LogicalFlow> logicalFlows = logicalFlowService.findAllByFlowIds(map(physicalFlows, PhysicalFlow::logicalFlowId)); //TODO: Move to a logical flow selector based upon change set #5626
         List<AssessmentRating> assessmentRatings = assessmentRatingService.findByTargetKindForRelatedSelector(EntityKind.CHANGE_UNIT, idSelectionOptions);
 
         Map<Long, RatingSchemeItem> ratingSchemeItemsById = indexBy(ratingSchemeService.getAllRatingSchemeItems(), item -> item.id().get());
