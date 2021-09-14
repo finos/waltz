@@ -52,7 +52,7 @@ const initialState = {
         },
     },
     tabs: [
-        {id: "LOGICAL_FLOW_SCROLL", name: "Logical Flows (Beta View)"},
+        {id: "LOGICAL_FLOW_SCROLL", name: "Logical Flows (Beta View)", requiredRole: "BETA_TESTER"},
         {id: "SUMMARY", name: "Logical Flows"},
         {id: "PHYSICAL", name: "Physical Flow Detail"},
         {id: "FLOW_CLASSIFICATION_RULES", name: "Flow Classification Rules"}
@@ -60,7 +60,7 @@ const initialState = {
 };
 
 
-function controller(serviceBroker) {
+function controller(serviceBroker, userService) {
     const vm = initialiseData(this, initialState);
 
     function loadAdditionalAuthSourceData() {
@@ -143,8 +143,15 @@ function controller(serviceBroker) {
 
 
     vm.$onInit = () => {
+
+        userService
+            .whoami()
+            .then(user => {
+                vm.displayedTabs = _.filter(vm.tabs, t => _.isEmpty(t.requiredRole) || _.includes(user.roles, t.requiredRole));
+                vm.activeTab = vm.displayedTabs[0];
+            });
+
         loadData();
-        vm.activeTab = vm.tabs[0];
     };
 
     vm.showTab = (idx) => {
@@ -167,7 +174,8 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
-    "ServiceBroker"
+    "ServiceBroker",
+    "UserService"
 ];
 
 

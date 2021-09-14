@@ -1,12 +1,12 @@
 export const dimensions = {
     client: {
         height: 25,
-        width: 200,
+        width: 250,
         iconPadding: 30
     },
     category: {
         height: 40,
-        width: 200,
+        width: 250,
         iconPadding: 0
     },
     clientList: {
@@ -15,7 +15,7 @@ export const dimensions = {
     },
     diagram: {
         height: 750,
-        width: 700
+        width: 900
     }
 };
 

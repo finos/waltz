@@ -31,8 +31,15 @@
                 const showing = pos > start && pos < end;
                 const horizon = (pos <= start && pos > start - 100) || (pos >= end && pos < end + 100); // just outside of the scroll area
 
-                const defId = `url(#static_grad_${a.id})`;
+                const y1 = calcY(left, a);
+                const y2 = calcY(right, a);
+
+                const isLinear = y1 === y2;
+
+                const defId = isLinear ? `url(#static_linear_grad_${a.id})`: `url(#static_grad_${a.id})`;
+
                 const color = lineColorScale(a.ratingId);
+
 
                 let classes = _.compact([
                     "arc",
@@ -41,12 +48,11 @@
                     `category_${a.categoryId}`,
                     `client_${a.clientId}`
                 ]);
-
                 return {
                     x1: left.dimensions.width,
                     x2: dimensions.diagram.width - right.dimensions.width,
-                    y1: calcY(left, a),
-                    y2: calcY(right, a),
+                    y1,
+                    y2,
                     stroke: showing ? defId : color,
                     classes,
                     defId,
@@ -68,18 +74,19 @@
                 .each(function(d, i){
                     const elem = select(this);
                     const arcId = elem.attr("data-arc-id");
-                    elem.attr("stroke", `url(#dynamic_grad_${arcId})`);
+                    const isLinear = elem.attr("linear");
+                    elem.attr("stroke", isLinear === "true" ? `url(#dynamic_linear_grad_${arcId})` : `url(#dynamic_grad_${arcId})`);
                 });
         } else {
             selectAll(`.arc.showing.highlight`)
                 .each(function(d, i){
                     const elem = select(this);
                     const arcId = elem.attr("data-arc-id");
-                    elem.attr("stroke", `url(#static_grad_${arcId})`);
+                    const isLinear = elem.attr("linear");
+                    elem.attr("stroke", isLinear === "true" ? `url(#static_linear_grad_${arcId})` : `url(#static_grad_${arcId})`);
                 })
-
-            selectAll(".arc").classed("highlight", false).classed("faded", false);
             rainbowTipProportion.set(0.05, {delay: 0, duration: 0});
+            selectAll(".arc").classed("highlight", false).classed("faded", false);
         }
     }
 
@@ -135,7 +142,9 @@
 
 <defs>
     {#each screenDefs as def}
-        <linearGradient id={`dynamic_grad_${def.defId}`} gradientUnits="userSpaceOnUse">
+
+        <!-- DYNAMIC -->
+        <linearGradient id={`dynamic_grad_${def.defId}`} gradientUnits="objectBoundingBox">
             {#each reverse(def.colorStops) as colorStop}
                 <stop stop-color={colorStop.color} offset={(0 + $rainbowTipProportion) - colorStop.offsetEnd * $rainbowTipProportion}/>
                 <stop stop-color={colorStop.color} offset={(0 + $rainbowTipProportion) - colorStop.offsetStart * $rainbowTipProportion}/>
@@ -147,7 +156,33 @@
                 <stop stop-color={colorStop.color} offset={(1 - $rainbowTipProportion) + colorStop.offsetEnd * $rainbowTipProportion}/>
             {/each}
         </linearGradient>
-        <linearGradient id={`static_grad_${def.defId}`} gradientUnits="userSpaceOnUse" >
+        <linearGradient id={`dynamic_linear_grad_${def.defId}`} gradientUnits="userSpaceOnUse">
+            {#each reverse(def.colorStops) as colorStop}
+                <stop stop-color={colorStop.color} offset={(0 + $rainbowTipProportion + 0.1) - colorStop.offsetEnd * ($rainbowTipProportion + 0.1)}/>
+                <stop stop-color={colorStop.color} offset={(0 + $rainbowTipProportion + 0.1) - colorStop.offsetStart * ($rainbowTipProportion + 0.1)}/>
+            {/each}
+            <stop stop-color={def.color} offset={0 + $rainbowTipProportion + 0.1}/> <!-- middle of bar is solid color -->
+            <stop stop-color={def.color} offset={1 - $rainbowTipProportion - 0.1}/> <!-- rainbow tip - main color - rainbow tip -->
+            {#each def.colorStops as colorStop}
+                <stop stop-color={colorStop.color} offset={(1 - $rainbowTipProportion - 0.1) + colorStop.offsetStart * ($rainbowTipProportion + 0.1)}/>
+                <stop stop-color={colorStop.color} offset={(1 - $rainbowTipProportion - 0.1) + colorStop.offsetEnd * ($rainbowTipProportion + 0.1)}/>
+            {/each}
+        </linearGradient>
+
+        <!-- STATIC -->
+        <linearGradient id={`static_linear_grad_${def.defId}`} gradientUnits="userSpaceOnUse">
+            {#each reverse(def.colorStops) as colorStop}
+                <stop stop-color={colorStop.color} offset={0.3 - colorStop.offsetEnd * 0.3}/>
+                <stop stop-color={colorStop.color} offset={0.3 - colorStop.offsetStart * 0.3}/>
+            {/each}
+            <stop stop-color={def.color} offset="0.35"/>
+            <stop stop-color={def.color} offset="0.65"/>
+            {#each def.colorStops as colorStop}
+                <stop stop-color={colorStop.color} offset={0.7 + colorStop.offsetStart * 0.3}/>
+                <stop stop-color={colorStop.color} offset={0.7 + colorStop.offsetEnd * 0.3}/>
+            {/each}
+        </linearGradient>
+        <linearGradient id={`static_grad_${def.defId}`} gradientUnits="objectBoundingBox">
             {#each reverse(def.colorStops) as colorStop}
                 <stop stop-color={colorStop.color} offset={0.05 - colorStop.offsetEnd * 0.05}/>
                 <stop stop-color={colorStop.color} offset={0.05 - colorStop.offsetStart * 0.05}/>
@@ -169,18 +204,19 @@
           y2={arc.y2}
           class={arc.classes.join(" ")}
           stroke={arc.stroke}
-          data-arc-id={arc.arc.id}/>
+          data-arc-id={arc.arc.id}
+          linear={arc.y1 === arc.y2}/>
 {/each}
 
 <style>
     line {
         opacity: 0.2;
-        stroke-width: 1.5;
+        stroke-width: 1;
         transition: stroke-width 600ms, opacity 300ms;
     }
 
     line.showing {
-        opacity: 0.6;
+        opacity: 0.8;
         stroke-width: 1.5;
     }
 
@@ -189,12 +225,12 @@
         stroke-width: 1;
     }
 
-    .highlight {
+    line.highlight {
         opacity: 1;
         stroke-width: 2.5;
     }
 
-    .faded {
+    line.faded {
         opacity: 0.3;
     }
 </style>

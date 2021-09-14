@@ -236,7 +236,7 @@
             <svg bind:this={svgElem}
                  viewBox={`0 0 ${dimensions.diagram.width} ${dimensions.diagram.height}`}
                  width="100%"
-                 height="600">
+                 height="550">
 
                 <clipPath id="row-clip">
                     <rect x="0"
