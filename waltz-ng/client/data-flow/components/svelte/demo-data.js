@@ -1,66 +1,43 @@
 import _ from "lodash";
-import {randomPick} from "./scroll-utils";
+import {selectedClient} from "./scroll-store";
 
-export function mkClientsOld(){
-    return _
-        .range(0, 80)
-        .map(d => ({
-            name: `C${d}`,
-            id: d
-        }))
-}
 
-export function mkClients(flowInfo){
+export function mkClients(summarisedFlows, physicalFlows = []){
     return _
-        .chain(flowInfo)
-        .map(d => ({
-            name: d.counterpart.name,
-            id: d.counterpart.id
-        }))
+        .chain(summarisedFlows)
+        .map(d => {
+
+            const flowIds = _
+                .chain(summarisedFlows) //summarised flows are keyed by dt and counterpart app
+                .filter(f => f.client.id === d.client.id)
+                .map(f => f.flowId)
+                .value();
+
+            const physFlows = _
+                .chain(physicalFlows)
+                .filter(f => _.includes(flowIds, f.logicalFlowId))
+                .value();
+
+            return {
+                name: d.client.name,
+                id: d.client.id,
+                kind: d.client.kind,
+                physicalFlows: physFlows,
+            }
+        })
         .uniq()
         .value()
 }
 
-export function mkCategoriesOld(){
+export function mkCategories(summarisedFlows){
     return _
-        .range(1, 15)
+        .chain(summarisedFlows)
         .map(d => ({
-            name: `Category ${d}`,
-            id: d,
-            hasChildren: d % 3 === 0
-        }));
-}
-
-export function mkCategories(flowInfo){
-    console.log({flowInfo});
-    return _
-        .chain(flowInfo)
-        .map(d => ({
-            name: d.rollupDataType.name,
-            id: d.rollupDataType.id,
-            hasChildren: false
+            name: d.category.name,
+            id: d.category.id,
+            hasChildren: d.hasChildren
         }))
         .uniq()
-        .value();
-}
-
-
-export function mkArcsOld(clients, categories){
-
-    let id = 0;
-
-    return _
-        .chain(clients)
-        .flatMap(d => _.map(
-            _.range(Math.ceil(Math.random() * 5)),
-            () => ({
-                id: id++,
-                clientId: d.id,
-                categoryId: randomPick(_.map(categories, d => d.id)),
-                ratingId: Math.ceil(Math.random() * 6), // overall flow rating
-                tipRatings: mkTipRatings()
-            })))
-        .uniqBy(d => d.clientId + "_" + d.categoryId)
         .value();
 }
 
@@ -70,8 +47,8 @@ export function mkArcs(summarisedFlows){
         .chain(summarisedFlows)
         .map(d => ({
             id: d.key,
-            clientId: d.clientId,
-            categoryId: d.categoryId,
+            clientId: d.client.id,
+            categoryId: d.category.id,
             ratingId: d.lineRating, // overall flow rating
             tipRatings: mkTipRatings(d.ratingCounts)
         }))

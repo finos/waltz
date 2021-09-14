@@ -253,30 +253,28 @@ public class LogicalFlowStatsDao {
         Condition targetAppCondition = lf.TARGET_ENTITY_ID.eq(counterpart_app.ID).and(lf.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
         Condition targetActorCondition = lf.TARGET_ENTITY_ID.eq(counterpart_actor.ID).and(lf.TARGET_ENTITY_KIND.eq(EntityKind.ACTOR.name()));
 
-        Condition dataTypeCondition = datatypeId == null ? rollup_dt.PARENT_ID.isNull() : rollup_dt.ID.eq(datatypeId);
+        Condition dataTypeCondition = datatypeId == null ? rollup_dt.PARENT_ID.isNull() : rollup_dt.PARENT_ID.eq(datatypeId);
 
         Condition isUpstream = lf.SOURCE_ENTITY_ID.eq(ref.id()).and(lf.SOURCE_ENTITY_KIND.eq(ref.kind().name()));
         Condition isDownstream = lf.TARGET_ENTITY_ID.eq(ref.id()).and(lf.TARGET_ENTITY_KIND.eq(ref.kind().name()));
 
-        SelectConditionStep<Record10<Long, String, Long, Long, String, String, Long, String, String, String>> sourceQry = mkDirectionalQuery(
+        SelectConditionStep<Record11<Long, Long, String, Long, Long, String, String, Long, String, String, String>> sourceQry = mkDirectionalQuery(
                 sourceAppCondition,
                 sourceActorCondition,
                 dataTypeCondition,
                 isDownstream,
                 INBOUND);
 
-        SelectConditionStep<Record10<Long, String, Long, Long, String, String, Long, String, String, String>> targetQry = mkDirectionalQuery(
+        SelectConditionStep<Record11<Long, Long, String, Long, Long, String, String, Long, String, String, String>> targetQry = mkDirectionalQuery(
                 targetAppCondition,
                 targetActorCondition,
                 dataTypeCondition,
                 isUpstream,
                 OUTBOUND);
 
-        SelectOrderByStep<Record10<Long, String, Long, Long, String, String, Long, String, String, String>> unionedData =
+        SelectOrderByStep<Record11<Long, Long, String, Long, Long, String, String, Long, String, String, String>> unionedData =
                 sourceQry
                         .union(targetQry);
-
-        System.out.println(unionedData);
 
         Map<FlowDirection, Set<FlowInfo>> data = unionedData
                 .fetch()
@@ -298,6 +296,7 @@ public class LogicalFlowStatsDao {
                                     .actualDataType(actualDtRef)
                                     .counterpart(counterpartRef)
                                     .flowEntityLifecycleStatus(EntityLifecycleStatus.valueOf(r.get(lf.ENTITY_LIFECYCLE_STATUS)))
+                                    .flowId(r.get(lf.ID))
                                     .build();
 
                         }, toSet())));
@@ -310,14 +309,15 @@ public class LogicalFlowStatsDao {
         return summary;
     }
 
-    private SelectConditionStep<Record10<Long, String, Long, Long, String, String, Long, String, String, String>> mkDirectionalQuery(Condition appDirectionCondition,
-                                                                                                                                     Condition actorDirectionCondition,
-                                                                                                                                     Condition dataTypeCondition,
-                                                                                                                                     Condition parentDirection,
-                                                                                                                                     FlowDirection direction) {
+    private SelectConditionStep<Record11<Long, Long, String, Long, Long, String, String, Long, String, String, String>> mkDirectionalQuery(Condition appDirectionCondition,
+                                                                                                                                           Condition actorDirectionCondition,
+                                                                                                                                           Condition dataTypeCondition,
+                                                                                                                                           Condition parentDirection,
+                                                                                                                                           FlowDirection direction) {
 
         return dsl
-                .select(rollup_dt.ID,
+                .select(lf.ID,
+                        rollup_dt.ID,
                         rollup_dt.NAME,
                         FLOW_CLASSIFICATION.ID,
                         actual_dt.ID,

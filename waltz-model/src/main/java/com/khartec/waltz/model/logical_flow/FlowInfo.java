@@ -31,6 +31,7 @@ import org.immutables.value.Value;
 public abstract class FlowInfo {
 
     public abstract Long classificationId();
+    public abstract Long flowId();
     public abstract EntityLifecycleStatus flowEntityLifecycleStatus();
     public abstract EntityReference counterpart();
     public abstract EntityReference rollupDataType();

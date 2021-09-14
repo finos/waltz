@@ -143,5 +143,29 @@ describe("common/list-utils", () => {
             assert.deepEqual(lu.mkChunks(abc, 4), [["a", "b", "c"]]);
         });
     });
+
+
+    describe("reverse", () => {
+        it("works for empty arrays", () => {
+            // const copy = [...orig]; return copy.reverse();
+            assert.isEmpty(lu.reverse([]));
+        });
+        it("works for undefined arrays", () => {
+            assert.deepEqual([], lu.reverse(undefined));
+        });
+        it("works for arrays with one item", () => {
+            assert.deepEqual(["a"], lu.reverse(["a"]));
+        });
+        it("works for arrays with more than one entry", () => {
+            assert.deepEqual(["b", "a"], lu.reverse(["a", "b"]))
+        })
+        it("produces a reverse array without altering the initial array", () => {
+
+            const initialArray = ["a", "b", "c"];
+
+            assert.deepEqual(["c", "b", "a"], lu.reverse(initialArray))
+            assert.deepEqual(["a", "b", "c"], initialArray);
+        })
+    })
 });
 

@@ -1,18 +1,20 @@
 export const dimensions = {
     client: {
-        height: 20,
-        width: 200
+        height: 25,
+        width: 200,
+        iconPadding: 30
     },
     category: {
         height: 40,
-        width: 200
+        width: 200,
+        iconPadding: 0
     },
     clientList: {
         paddingTop: 20,
         innerPadding: 1.4
     },
     diagram: {
-        height: 500,
+        height: 750,
         width: 700
     }
 };

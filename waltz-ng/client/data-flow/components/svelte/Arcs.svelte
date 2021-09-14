@@ -6,19 +6,19 @@
         filteredArcs,
         highlightClass,
         layout,
-        rainbowTipProportion,
-        ratingColors
+        rainbowTipProportion
     } from "./scroll-store";
     import _ from "lodash";
     import {dimensions} from "./scroll-utils";
     import {select, selectAll} from "d3-selection";
     import {scaleOrdinal} from "d3-scale";
     import {flowClassificationStore} from "../../../svelte-stores/flow-classification-store";
+    const {reverse} = require("../../../common/list-utils");
 
+    function calcScreenArcs(offset, clientY, categoryY, lineColorScale, arcs) {
 
-    function calcScreenArcs(offset, clientY, categoryY, arcs) {
         const start = (offset * -1) - 10;
-        const end = (offset * -1) + 490;
+        const end = (offset * -1) + dimensions.diagram.height - 10;
         return _.map(
             arcs,
             a => {
@@ -83,12 +83,11 @@
         }
     }
 
-    const dominantProportion = 0.9;
-
     $: screenArcs = calcScreenArcs(
         $clientScrollOffset,
         $clientScale,
         $categoryScale,
+        lineColorScale,
         $filteredArcs);
 
     $: screenDefs = _
@@ -107,9 +106,9 @@
                 .filter(t => t.count > 0)
                 .map(t => {
                     const colorSpaceNeeded = t.count / total;
-                    return { color: lineColorScale(t.ratingId), colorSpaceNeeded }
+                    return { color: lineColorScale(t.ratingId), colorSpaceNeeded, ratingId: t.ratingId}
                 })
-                .orderBy(d => d.colorSpaceNeeded, 'desc')
+                .orderBy(d => d.ratingId)
                 .map(d => {
                     const offsetStart = currentStop;
                     currentStop = currentStop + d.colorSpaceNeeded;
@@ -120,7 +119,7 @@
             return {
                 defId: d.arc.id,
                 color: d.color,
-                colorStops: colorStops,
+                colorStops,
             };
         })
         .value();
@@ -128,26 +127,32 @@
     $: flowClassificationCall = flowClassificationStore.findAll()
     $: flowClassifications = $flowClassificationCall.data;
 
-    $: console.log({flowClassifications})
-
     $: lineColorScale = scaleOrdinal()
         .domain(_.map(flowClassifications, d => d.id))
-        .range(_.map(flowClassifications, d => d.color))
+        .range(_.map(flowClassifications, d => d.color));
 
 </script>
 
 <defs>
     {#each screenDefs as def}
-        <linearGradient id={`dynamic_grad_${def.defId}`}>
-            <stop stop-color={def.color} offset="0"/>
-            <stop stop-color={def.color} offset={1 - $rainbowTipProportion}/>
+        <linearGradient id={`dynamic_grad_${def.defId}`} gradientUnits="userSpaceOnUse">
+            {#each reverse(def.colorStops) as colorStop}
+                <stop stop-color={colorStop.color} offset={(0 + $rainbowTipProportion) - colorStop.offsetEnd * $rainbowTipProportion}/>
+                <stop stop-color={colorStop.color} offset={(0 + $rainbowTipProportion) - colorStop.offsetStart * $rainbowTipProportion}/>
+            {/each}
+            <stop stop-color={def.color} offset={0 + $rainbowTipProportion}/> <!-- middle of bar is solid color -->
+            <stop stop-color={def.color} offset={1 - $rainbowTipProportion}/> <!-- rainbow tip - main color - rainbow tip -->
             {#each def.colorStops as colorStop}
                 <stop stop-color={colorStop.color} offset={(1 - $rainbowTipProportion) + colorStop.offsetStart * $rainbowTipProportion}/>
                 <stop stop-color={colorStop.color} offset={(1 - $rainbowTipProportion) + colorStop.offsetEnd * $rainbowTipProportion}/>
             {/each}
         </linearGradient>
-        <linearGradient id={`static_grad_${def.defId}`}>
-            <stop stop-color={def.color} offset="0"/>
+        <linearGradient id={`static_grad_${def.defId}`} gradientUnits="userSpaceOnUse" >
+            {#each reverse(def.colorStops) as colorStop}
+                <stop stop-color={colorStop.color} offset={0.05 - colorStop.offsetEnd * 0.05}/>
+                <stop stop-color={colorStop.color} offset={0.05 - colorStop.offsetStart * 0.05}/>
+            {/each}
+            <stop stop-color={def.color} offset="0.1"/>
             <stop stop-color={def.color} offset="0.9"/>
             {#each def.colorStops as colorStop}
                 <stop stop-color={colorStop.color} offset={0.95 + colorStop.offsetStart * 0.05}/>
@@ -170,7 +175,7 @@
 <style>
     line {
         opacity: 0.2;
-        stroke-width: 0.5;
+        stroke-width: 1.5;
         transition: stroke-width 600ms, opacity 300ms;
     }
 

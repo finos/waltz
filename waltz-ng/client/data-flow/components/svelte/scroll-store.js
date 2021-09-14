@@ -2,7 +2,7 @@ import {derived, writable} from "svelte/store";
 import _ from "lodash";
 import {dimensions} from "./scroll-utils"
 import {tweened} from "svelte/motion";
-import {scaleBand, scaleOrdinal} from "d3-scale";
+import {scaleBand} from "d3-scale";
 
 
 export const layoutDirections = {
@@ -10,25 +10,38 @@ export const layoutDirections = {
     clientToCategory: "clientToCategory"
 }
 
+
+export const flowDirections = {
+    OUTBOUND: "OUTBOUND",
+    INBOUND: "INBOUND"
+}
+
 export const categories = writable([]);
 export const clients = writable([]);
 export const arcs = writable([]);
-export const clientQry = writable(null);
-export const categoryQry = writable(null);
-export const layoutDirection = writable(layoutDirections.categoryToClient)
+export const clientFilter = writable(() => true);
+export const categoryFilter = writable(() => true);
+export const layoutDirection = writable(layoutDirections.clientToCategory)
 export const highlightClass = writable(null);
 export const rainbowTipProportion = tweened(0.2, { duration: 600, delay: 600 });
 
-export const filteredCategories = derived([categoryQry, categories], ([q, cats]) => {
-    return q == null
-        ? cats
-        : _.filter(cats, c => c.name.indexOf(q) !== -1);
+export const selectedClient = writable(null);
+export const focusClient = writable(null);
+
+export const flowDirection = derived(layoutDirection, (direction) => {
+    return direction === layoutDirections.categoryToClient ? flowDirections.OUTBOUND : flowDirections.INBOUND
 })
 
-export const filteredClients = derived([clientQry, clients], ([q, cs]) => {
+export const filteredCategories = derived([categoryFilter, categories], ([q, cats]) => {
+    return q == null
+        ? cats
+        : _.filter(cats, q);
+})
+
+export const filteredClients = derived([clientFilter, clients], ([q, cs]) => {
     return q === null
         ? cs
-        : _.filter(cs, c => c.name.indexOf(q) !== -1)
+        : _.filter(cs, q)
 });
 
 export const filteredArcs = derived([arcs, filteredClients, filteredCategories], ([acs, fcs, fcats]) => {
@@ -37,18 +50,17 @@ export const filteredArcs = derived([arcs, filteredClients, filteredCategories],
 
     const filteredClientIds = _.map(fcs, c => c.id);
     const filteredCatIds = _.map(fcats, c => c.id);
-    return _.filter(acs, a => _.includes(filteredClientIds, a.clientId) && _.includes(filteredCatIds, a.categoryId));
+
+    const filteredArcList = _.filter(acs, a => _.includes(filteredClientIds, a.clientId) && _.includes(filteredCatIds, a.categoryId));
+
+    return filteredArcList;
 });
 
-
-export const ratingColors = scaleOrdinal()
-    .domain([0, 1, 2, 3, 4, 5])
-    .range(["grey", "red", "green", "cyan", "blue", "purple"])
 
 export const clientScale = derived(filteredClients, (c) => scaleBand()
     .padding(0.2)
     .domain(_.map(c, "id"))
-    .range([0, _.max([c.length * dimensions.client.height, dimensions.diagram.height])]));
+    .range([0, _.max([c.length * dimensions.client.height , dimensions.diagram.height])]));
 
 export const categoryScale = derived(filteredCategories, c => scaleBand()
     .padding(0.2)

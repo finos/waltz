@@ -1,8 +1,13 @@
 <script>
-    import {filteredCategories, categoryScale, highlightClass} from "./scroll-store";
+    import {categoryScale, filteredCategories, highlightClass} from "./scroll-store";
     import {dimensions} from "./scroll-utils"
     import {truncateMiddle} from "../../../common/string-utils";
+    import {symbol, symbolCross, symbolCircle} from "d3-shape";
+    import {createEventDispatcher} from "svelte";
+    import {layoutDirection, layoutDirections} from "./scroll-store";
 
+
+    let dispatch = createEventDispatcher();
 
     function onMouseEnter(category) {
         $highlightClass = `category_${category.id}`;
@@ -10,6 +15,10 @@
 
     function onMouseLeave() {
         $highlightClass = null;
+    }
+
+    function drillDownCategory(category){
+        dispatch("select", category)
     }
 
 </script>
@@ -24,9 +33,37 @@
               width={dimensions.category.width}
               height={$categoryScale.bandwidth()}/>
         <text dx="16"
-              dy={$categoryScale.bandwidth() / 2 + 8}
+              transform={`translate(${$layoutDirection === layoutDirections.categoryToClient ? 0 : 20} )`}
+              dy={$categoryScale.bandwidth() / 2 + 5}
               pointer-events="none">
-             {truncateMiddle(category.name, 24)}
+             {truncateMiddle(category.name, 22)}
         </text>
+        {#if category.hasChildren}
+            <g transform={`translate(${$layoutDirection === layoutDirections.categoryToClient ? dimensions.category.width - 20 : 20 }, ${$categoryScale.bandwidth() / 2})`}>
+                <path d={symbol().type(symbolCircle).size(500)()}
+                      on:click={() => drillDownCategory(category)}
+                      class="clickable drilldown"
+                      fill="#f4fff0"
+                      style="stroke: #bbb; stroke-dasharray: 2,2"
+                      stroke-opacity="0">
+                </path>
+                <path d={symbol().type(symbolCross).size(40)()}
+                      pointer-events="none"
+                      fill="#AFDE96"
+                      stroke="#aaa">
+                </path>
+            </g>
+        {/if}
     </g>
 {/each}
+
+
+<style>
+
+    .drilldown:hover {
+        stroke-opacity: 1;
+        fill: #f9fff7;
+        transition: stroke-opacity 300ms linear;
+    }
+
+</style>

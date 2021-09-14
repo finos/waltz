@@ -27,7 +27,7 @@ export function mkPhysicalFlowStore() {
 
 
     return {
-        findBySelector
+        findBySelector,
     };
 }
 
