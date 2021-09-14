@@ -1,620 +1,412 @@
-export const singlePayments = {
+export const dailyRisk = {
     "objects" : [ {
-        "stereotype" : "Gateway",
-        "objectType" : "Decision",
-        "objectId" : 1073232,
-        "externalId" : "{9CEA8A08-5540-4f5a-AAEA-C08F5145B087}",
-        "topLeft" : {
-            "x" : 2216,
-            "y" : -202
-        },
-        "bottomRight" : {
-            "x" : 2258,
-            "y" : -244
-        },
-        "name" : "Type of Counterparty?"
-    }, {
-        "stereotype" : "Gateway",
-        "objectType" : "Decision",
-        "objectId" : 1011746,
-        "externalId" : "{1489F677-756A-4537-9284-1807B83DCA49}",
-        "topLeft" : {
-            "x" : 415,
-            "y" : -202
-        },
-        "bottomRight" : {
-            "x" : 457,
-            "y" : -244
-        },
-        "name" : "Electronic or Manual Payment?"
-    }, {
-        "stereotype" : "Gateway",
-        "objectType" : "Decision",
-        "objectId" : 993396,
-        "externalId" : "{D68065D1-BB31-4571-90DA-91A03F22ACA1}",
-        "topLeft" : {
-            "x" : 2061,
-            "y" : -202
-        },
-        "bottomRight" : {
-            "x" : 2103,
-            "y" : -244
-        },
-        "name" : "Single Payment Entries"
-    }, {
-        "stereotype" : "Gateway",
-        "objectType" : "Decision",
-        "objectId" : 1213847,
-        "externalId" : "{4608C5B0-4FA6-48a4-8899-A1A05C04CC3B}",
-        "topLeft" : {
-            "x" : 2611,
-            "y" : -305
-        },
-        "bottomRight" : {
-            "x" : 2653,
-            "y" : -347
-        },
-        "name" : "Cash Accounting and Billing Entries"
-    }, {
         "stereotype" : "IntermediateEvent",
         "objectType" : "Event",
-        "objectId" : 996158,
-        "externalId" : "{25628DC0-6857-410e-94C9-032787872C45}",
-        "topLeft" : {
-            "x" : 846,
-            "y" : -208
-        },
-        "bottomRight" : {
-            "x" : 876,
-            "y" : -238
-        },
-        "name" : "Payment Instruction Available in Single Payment System"
-    }, {
-        "stereotype" : "Gateway",
-        "objectType" : "Decision",
-        "objectId" : 1073610,
-        "externalId" : "{D786EC8C-1C59-4c28-B6AC-FC88ED3654EA}",
-        "topLeft" : {
-            "x" : 2863,
-            "y" : -315
-        },
-        "bottomRight" : {
-            "x" : 2905,
-            "y" : -357
-        },
-        "name" : "Collate Payment Activities to Complete Delivery"
+        "objectId" : 1123284,
+        "externalId" : "{98B8CE71-F7EC-4317-BB5E-5216628E89BF}",
+        "name" : "Daily Risk and P&L Managed"
     }, {
         "stereotype" : "Activity",
         "objectType" : "Activity",
-        "objectId" : 995647,
-        "externalId" : "{9AF7D35C-70D1-4107-9E9C-AE2ADAFE3AF2}",
-        "topLeft" : {
-            "x" : 1160,
-            "y" : -412
-        },
-        "bottomRight" : {
-            "x" : 1278,
-            "y" : -485
-        },
-        "name" : "Verify Funds Availability for Payment Debtor"
-    }, {
-        "stereotype" : "Activity",
-        "objectType" : "Activity",
-        "objectId" : 995648,
-        "externalId" : "{3298CA12-ED8D-4a7c-AF75-EB6479598564}",
-        "topLeft" : {
-            "x" : 1160,
-            "y" : -331
-        },
-        "bottomRight" : {
-            "x" : 1278,
-            "y" : -404
-        },
-        "name" : "Verify Compliance with Embargo & Sanction Requirements"
-    }, {
-        "stereotype" : "Gateway",
-        "objectType" : "Decision",
-        "objectId" : 1073233,
-        "externalId" : "{E96BA978-6355-4664-9FE3-84F313D87AA4}",
-        "topLeft" : {
-            "x" : 2537,
-            "y" : -202
-        },
-        "bottomRight" : {
-            "x" : 2579,
-            "y" : -244
-        },
-        "name" : "Clearing, Accounting & Billing"
-    }, {
-        "stereotype" : "Activity",
-        "objectType" : "Activity",
-        "objectId" : 993387,
-        "externalId" : "{CC5FFA97-56A5-4c07-A042-7D783A9EC620}",
-        "topLeft" : {
-            "x" : 1917,
-            "y" : -187
-        },
-        "bottomRight" : {
-            "x" : 2035,
-            "y" : -260
-        },
-        "name" : "Generate Single Payment Settlement Entries for Instructing Client"
-    }, {
-        "stereotype" : "IntermediateEvent",
-        "objectType" : "Event",
-        "objectId" : 1203501,
-        "externalId" : "{80B0243F-0057-4f4b-B2BC-7ACDCD4EF250}",
-        "topLeft" : {
-            "x" : 303,
-            "y" : -163
-        },
-        "bottomRight" : {
-            "x" : 333,
-            "y" : -193
-        },
-        "name" : "DB is Prepared to Deliver Payments "
-    }, {
-        "stereotype" : "Activity",
-        "objectType" : "Activity",
-        "objectId" : 994998,
-        "externalId" : "{134B66C5-4272-4c39-95A0-8C50A0473575}",
-        "topLeft" : {
-            "x" : 674,
-            "y" : -287
-        },
-        "bottomRight" : {
-            "x" : 792,
-            "y" : -360
-        },
-        "name" : "Prepare Electronic Payment Instruction"
-    }, {
-        "stereotype" : "IntermediateEvent",
-        "objectType" : "Event",
-        "objectId" : 995210,
-        "externalId" : "{68BD56EE-EE32-4975-8BAD-EFE8AA58FE10}",
-        "topLeft" : {
-            "x" : 2761,
-            "y" : -517
-        },
-        "bottomRight" : {
-            "x" : 2791,
-            "y" : -547
-        },
-        "name" : "Billing Items Available"
-    }, {
-        "stereotype" : "IntermediateEvent",
-        "objectType" : "Event",
-        "objectId" : 1000972,
-        "externalId" : "{7D169926-09A2-4bed-95F0-C54309BF38D4}",
-        "topLeft" : {
-            "x" : 2141,
-            "y" : -208
-        },
-        "bottomRight" : {
-            "x" : 2171,
-            "y" : -238
-        },
-        "name" : "Payment Ready for Clearing and Settlement with Counterparty"
-    }, {
-        "stereotype" : "Activity",
-        "objectType" : "Activity",
-        "objectId" : 1201963,
-        "externalId" : "{17658C5F-979E-4ddd-9CBA-6FE4099EC1DD}",
-        "topLeft" : {
-            "x" : 922,
-            "y" : -187
-        },
-        "bottomRight" : {
-            "x" : 1040,
-            "y" : -260
-        },
-        "name" : "Qualify Payment#Single Payment"
-    }, {
-        "stereotype" : "Activity",
-        "objectType" : "Activity",
-        "objectId" : 1113416,
-        "externalId" : "{54C07BEB-C5C3-4db7-96B2-1B9673414499}",
-        "topLeft" : {
-            "x" : 1160,
-            "y" : -492
-        },
-        "bottomRight" : {
-            "x" : 1278,
-            "y" : -565
-        },
-        "name" : "Perform Payment Fraud Checks"
-    }, {
-        "stereotype" : "Activity",
-        "objectType" : "Activity",
-        "objectId" : 995205,
-        "externalId" : "{F789E8CF-B8DA-4d32-8BB2-B3FE0A0E8614}",
-        "topLeft" : {
-            "x" : 2336,
-            "y" : -80
-        },
-        "bottomRight" : {
-            "x" : 2471,
-            "y" : -153
-        },
-        "name" : "Generate Entries for Bank Draft Issuance"
-    }, {
-        "stereotype" : "NavigationCell",
-        "objectType" : "Text",
-        "objectId" : 1392196,
-        "externalId" : "{EAD98FA4-EB6E-4690-BBE0-E68143AD2EE3}",
-        "topLeft" : {
-            "x" : 3047,
-            "y" : -178
-        },
-        "bottomRight" : {
-            "x" : 3165,
-            "y" : -251
-        },
-        "name" : "?"
-    }, {
-        "stereotype" : "Activity",
-        "objectType" : "Activity",
-        "objectId" : 1202383,
-        "externalId" : "{3CA1A03E-66F5-4be8-8D4A-60D7ABD98609}",
-        "topLeft" : {
-            "x" : 1738,
-            "y" : -652
-        },
-        "bottomRight" : {
-            "x" : 1856,
-            "y" : -727
-        },
-        "name" : "Handle Exception during Payment Execution#Single Payment Repair"
-    }, {
-        "stereotype" : "Activity",
-        "objectType" : "Activity",
-        "objectId" : 995003,
-        "externalId" : "{DFF1A178-E9BD-4a0e-94CD-7D041A7D0280}",
-        "topLeft" : {
-            "x" : 674,
-            "y" : -187
-        },
-        "bottomRight" : {
-            "x" : 792,
-            "y" : -260
-        },
-        "name" : "Capture Payment Instruction Manually#Single Payment"
-    }, {
-        "stereotype" : "Activity",
-        "objectType" : "Activity",
-        "objectId" : 995201,
-        "externalId" : "{2AEFAD73-AF8F-4431-AFF8-10FC50BDA109}",
-        "topLeft" : {
-            "x" : 2336,
-            "y" : -187
-        },
-        "bottomRight" : {
-            "x" : 2471,
-            "y" : -260
-        },
-        "name" : "Generate Single Payment Settlement and Clearing Entries for Receiving Clearing Partner"
-    }, {
-        "stereotype" : "IntermediateEvent",
-        "objectType" : "Event",
-        "objectId" : 993434,
-        "externalId" : "{BF26AF03-ED15-4702-B570-14A45F0A50AF}",
-        "topLeft" : {
-            "x" : 303,
-            "y" : -312
-        },
-        "bottomRight" : {
-            "x" : 333,
-            "y" : -342
-        },
-        "name" : "Transaction Released for Cash Settlement"
-    }, {
-        "stereotype" : "Activity",
-        "objectType" : "Activity",
-        "objectId" : 993452,
-        "externalId" : "{40DEBDAC-CF00-4cb0-80A3-6AE43015CE2C}",
-        "topLeft" : {
-            "x" : 506,
-            "y" : -187
-        },
-        "bottomRight" : {
-            "x" : 624,
-            "y" : -260
-        },
-        "name" : "Authenticate Manual Payment Instruction"
+        "objectId" : 1123582,
+        "externalId" : "{9C13891A-E12B-4081-A132-622BD3DC9A42}",
+        "name" : "Perform End of Day Risk Sign-off"
     }, {
         "stereotype" : "StartEvent",
         "objectType" : "Event",
-        "objectId" : 994843,
-        "externalId" : "{342D29E1-EE06-4042-A685-D6E9174C56AA}",
-        "topLeft" : {
-            "x" : 303,
-            "y" : -244
-        },
-        "bottomRight" : {
-            "x" : 333,
-            "y" : -274
-        },
-        "name" : "Payment Instruction (File) Received from Client"
+        "objectId" : 1123283,
+        "externalId" : "{CB2BB135-184F-463f-A108-DD6DA125FE0C}",
+        "name" : "Time to Perform Risk and P&L Management"
     }, {
         "stereotype" : "Activity",
         "objectType" : "Activity",
-        "objectId" : 995202,
-        "externalId" : "{478CCD15-74C4-4d32-A154-5B9A90CC3C62}",
-        "topLeft" : {
-            "x" : 2336,
-            "y" : -290
-        },
-        "bottomRight" : {
-            "x" : 2471,
-            "y" : -363
-        },
-        "name" : "Generate Settlement Entries and Settle Single Payment for Beneficiary"
-    }, {
-        "stereotype" : "IntermediateEvent",
-        "objectType" : "Event",
-        "objectId" : 995447,
-        "externalId" : "{F05A3BEB-CF5C-4812-B001-39F1ECC6E98D}",
-        "topLeft" : {
-            "x" : 2938,
-            "y" : -320
-        },
-        "bottomRight" : {
-            "x" : 2968,
-            "y" : -350
-        },
-        "name" : "Payment Delivery Completed"
+        "objectId" : 1123581,
+        "externalId" : "{EB71B97D-08DD-4bfd-AF19-4EDFEFADEFF0}",
+        "name" : "Perform Expected P&L Sign-off"
     }, {
         "stereotype" : "Activity",
         "objectType" : "Activity",
-        "objectId" : 1261396,
-        "externalId" : "{D1995AAE-2D9C-4b59-925B-0AA5F81BB75B}",
+        "objectId" : 1123583,
+        "externalId" : "{053F4909-5EB2-422d-8470-F0D95C36A40F}",
+        "name" : "Perform Final P&L Sign-off"
+    } ],
+    "connections" : [ {
+        "startObjectId" : 1123582,
+        "endObjectId" : 1123583,
+        "connectorId" : 1779949,
+        "connectorType" : "ControlFlow",
+        "hidden" : false,
+        "instanceId" : 1022579,
+        "externalId" : "{7B538B66-6602-4b63-9F20-E6BD39E0DA24}",
+        "name" : ""
+    }, {
+        "startObjectId" : 1123583,
+        "endObjectId" : 1123284,
+        "connectorId" : 1779953,
+        "connectorType" : "ControlFlow",
+        "hidden" : false,
+        "instanceId" : 1022580,
+        "externalId" : "{28181B15-A292-4498-A6AF-B908032F294A}",
+        "name" : ""
+    }, {
+        "startObjectId" : 1123581,
+        "endObjectId" : 1123582,
+        "connectorId" : 1779948,
+        "connectorType" : "ControlFlow",
+        "hidden" : false,
+        "instanceId" : 1022578,
+        "externalId" : "{4CC7BDB4-058C-45ad-9329-03DB41E907A6}",
+        "name" : ""
+    }, {
+        "startObjectId" : 1123284,
+        "endObjectId" : 1123256,
+        "connectorId" : 1779954,
+        "connectorType" : "NoteLink",
+        "hidden" : false,
+        "instanceId" : 1022586,
+        "externalId" : "{7CEF52A8-7590-45cd-8DE3-48CA5C1F76B1}",
+        "name" : ""
+    }, {
+        "startObjectId" : 1123283,
+        "endObjectId" : 1123581,
+        "connectorId" : 1779947,
+        "connectorType" : "ControlFlow",
+        "hidden" : false,
+        "instanceId" : 1022577,
+        "externalId" : "{AF981E1B-E164-4da7-B74C-2145B0AF07D2}",
+        "name" : ""
+    } ],
+    "positions" : [ {
+        "objectId" : 1123581,
         "topLeft" : {
-            "x" : 1871,
-            "y" : -652
+            "x" : 264,
+            "y" : -294
         },
         "bottomRight" : {
-            "x" : 1989,
-            "y" : -727
-        },
-        "name" : "Handle Exception During Payment Clearing and Settlement#Single Payment"
+            "x" : 374,
+            "y" : -354
+        }
     }, {
+        "objectId" : 1123284,
+        "topLeft" : {
+            "x" : 891,
+            "y" : -306
+        },
+        "bottomRight" : {
+            "x" : 921,
+            "y" : -336
+        }
+    }, {
+        "objectId" : 1123283,
+        "topLeft" : {
+            "x" : 163,
+            "y" : -310
+        },
+        "bottomRight" : {
+            "x" : 193,
+            "y" : -340
+        }
+    }, {
+        "objectId" : 1123583,
+        "topLeft" : {
+            "x" : 710,
+            "y" : -294
+        },
+        "bottomRight" : {
+            "x" : 820,
+            "y" : -354
+        }
+    }, {
+        "objectId" : 1123582,
+        "topLeft" : {
+            "x" : 487,
+            "y" : -294
+        },
+        "bottomRight" : {
+            "x" : 597,
+            "y" : -354
+        }
+    } ]
+};
+
+
+export const singlePayments = {
+    "objects" : [ {
         "stereotype" : "Activity",
         "objectType" : "Activity",
-        "objectId" : 1221829,
-        "externalId" : "{38048C57-5D69-4fc5-9D05-E5CA7852CE56}",
-        "topLeft" : {
-            "x" : 1472,
-            "y" : -652
-        },
-        "bottomRight" : {
-            "x" : 1590,
-            "y" : -727
-        },
-        "name" : "Handle Exception during Payment Initiation#EB Channel"
-    }, {
-        "stereotype" : "NavigationCell",
-        "objectType" : "Text",
-        "objectId" : 1201309,
-        "externalId" : "{6C7E4634-A0C3-4f37-A9A4-7810F5A714DC}",
-        "topLeft" : {
-            "x" : 3047,
-            "y" : -494
-        },
-        "bottomRight" : {
-            "x" : 3165,
-            "y" : -567
-        },
-        "name" : "Perform Client Billing"
-    }, {
-        "stereotype" : "IntermediateEvent",
-        "objectType" : "Event",
-        "objectId" : 995208,
-        "externalId" : "{7096EFD7-853D-4dd2-AC1B-743EFDAD3E10}",
-        "topLeft" : {
-            "x" : 2761,
-            "y" : -209
-        },
-        "bottomRight" : {
-            "x" : 2791,
-            "y" : -239
-        },
-        "name" : "Single Payment Cleared and Settled"
+        "objectId" : 998497,
+        "externalId" : "{DDB00C3B-A776-4523-90C0-5C8FC094927D}",
+        "name" : "Release Payment for Execution"
     }, {
         "stereotype" : "Activity",
         "objectType" : "Activity",
         "objectId" : 993414,
         "externalId" : "{481B9744-DD94-4650-BD8B-5C0297280C19}",
-        "topLeft" : {
-            "x" : 510,
-            "y" : -287
-        },
-        "bottomRight" : {
-            "x" : 628,
-            "y" : -360
-        },
         "name" : "Authenticate Electronic Payment Instruction"
-    }, {
-        "stereotype" : "StartEvent",
-        "objectType" : "Event",
-        "objectId" : 1011822,
-        "externalId" : "{41C0162B-3286-491c-9908-42E8EC411844}",
-        "topLeft" : {
-            "x" : 303,
-            "y" : -469
-        },
-        "bottomRight" : {
-            "x" : 333,
-            "y" : -501
-        },
-        "name" : "FX Pre-Deal Instruction Received from Client"
-    }, {
-        "stereotype" : "StartEvent",
-        "objectType" : "Event",
-        "objectId" : 1011821,
-        "externalId" : "{ADC46453-8E50-4c3f-A8CF-C2F46D4F5EA7}",
-        "topLeft" : {
-            "x" : 303,
-            "y" : -390
-        },
-        "bottomRight" : {
-            "x" : 333,
-            "y" : -421
-        },
-        "name" : "Time to Initiate Standing Order"
-    }, {
-        "stereotype" : "Gateway",
-        "objectType" : "Decision",
-        "objectId" : 1019318,
-        "externalId" : "{0A1D2D06-16D4-4209-A8A0-0036B63AFBBD}",
-        "topLeft" : {
-            "x" : 1709,
-            "y" : -198
-        },
-        "bottomRight" : {
-            "x" : 1751,
-            "y" : -248
-        },
-        "name" : "Currency Conversion needed for Payment?"
     }, {
         "stereotype" : "Activity",
         "objectType" : "Activity",
         "objectId" : 1337638,
         "externalId" : "{4B4124E1-431E-4981-8529-931A586F0F9F}",
-        "topLeft" : {
-            "x" : 1605,
-            "y" : -652
-        },
-        "bottomRight" : {
-            "x" : 1723,
-            "y" : -727
-        },
         "name" : "Handle Exception during Payment Initiation#Financial Network"
+    }, {
+        "stereotype" : "Gateway",
+        "objectType" : "Decision",
+        "objectId" : 1073610,
+        "externalId" : "{D786EC8C-1C59-4c28-B6AC-FC88ED3654EA}",
+        "name" : "Collate Payment Activities to Complete Delivery"
     }, {
         "stereotype" : "IntermediateEvent",
         "objectType" : "Event",
-        "objectId" : 1211670,
-        "externalId" : "{AFBB6459-58AA-48ca-B7E9-317708241FBC}",
-        "topLeft" : {
-            "x" : 2761,
-            "y" : -100
-        },
-        "bottomRight" : {
-            "x" : 2791,
-            "y" : -130
-        },
-        "name" : "Payment Submitted to Cheque Issuance and Printing"
+        "objectId" : 995210,
+        "externalId" : "{68BD56EE-EE32-4975-8BAD-EFE8AA58FE10}",
+        "name" : "Billing Items Available"
     }, {
-        "stereotype" : "Activity",
-        "objectType" : "Activity",
-        "objectId" : 993392,
-        "externalId" : "{8FF2BDEA-6594-48f6-AC39-C975C94AB0A3}",
-        "topLeft" : {
-            "x" : 1759,
-            "y" : -290
-        },
-        "bottomRight" : {
-            "x" : 1877,
-            "y" : -363
-        },
-        "name" : "Convert Payment Currency"
+        "stereotype" : "IntermediateEvent",
+        "objectType" : "Event",
+        "objectId" : 995208,
+        "externalId" : "{7096EFD7-853D-4dd2-AC1B-743EFDAD3E10}",
+        "name" : "Single Payment Cleared and Settled"
     }, {
-        "stereotype" : "Activity",
-        "objectType" : "Activity",
-        "objectId" : 995216,
-        "externalId" : "{FFC62FBB-1A0A-4c74-ADA1-69967DA4CA40}",
-        "topLeft" : {
-            "x" : 2610,
-            "y" : -188
-        },
-        "bottomRight" : {
-            "x" : 2728,
-            "y" : -261
-        },
-        "name" : "Clear and Settle Single Payment with Receiving Clearing Partner"
+        "stereotype" : "StartEvent",
+        "objectType" : "Event",
+        "objectId" : 1019291,
+        "externalId" : "{306A2A72-8F0C-4c55-AC87-7537BB15EB1A}",
+        "name" : "Payment Investigation Request Received"
     }, {
-        "stereotype" : "Activity",
-        "objectType" : "Activity",
-        "objectId" : 998497,
-        "externalId" : "{DDB00C3B-A776-4523-90C0-5C8FC094927D}",
-        "topLeft" : {
-            "x" : 1548,
-            "y" : -187
-        },
-        "bottomRight" : {
-            "x" : 1666,
-            "y" : -260
-        },
-        "name" : "Release Payment for Execution"
+        "stereotype" : "StartEvent",
+        "objectType" : "Event",
+        "objectId" : 1011821,
+        "externalId" : "{ADC46453-8E50-4c3f-A8CF-C2F46D4F5EA7}",
+        "name" : "Time to Initiate Standing Order"
     }, {
         "stereotype" : "Gateway",
         "objectType" : "Decision",
         "objectId" : 1337636,
         "externalId" : "{393C0525-117B-462c-8A23-340986342758}",
-        "topLeft" : {
-            "x" : 1317,
-            "y" : -202
-        },
-        "bottomRight" : {
-            "x" : 1359,
-            "y" : -244
-        },
         "name" : "Beartrap hold?"
-    }, {
-        "stereotype" : "IntermediateEvent",
-        "objectType" : "Event",
-        "objectId" : 995209,
-        "externalId" : "{DB96E4A2-4E7F-4361-B431-EBC2509920DB}",
-        "topLeft" : {
-            "x" : 2761,
-            "y" : -434
-        },
-        "bottomRight" : {
-            "x" : 2791,
-            "y" : -464
-        },
-        "name" : "Cash Accounting Entries Available"
     }, {
         "stereotype" : "Activity",
         "objectType" : "Activity",
-        "objectId" : 995642,
-        "externalId" : "{CE78C1E0-7099-4c84-8EE1-BEB47A2EB603}",
-        "topLeft" : {
-            "x" : 1359,
-            "y" : -273
-        },
-        "bottomRight" : {
-            "x" : 1477,
-            "y" : -349
-        },
-        "name" : "Obtain Authorisation for Outgoing Payment above Threshold (Beartrap)"
+        "objectId" : 1201963,
+        "externalId" : "{17658C5F-979E-4ddd-9CBA-6FE4099EC1DD}",
+        "name" : "Qualify Payment#Single Payment"
     }, {
         "stereotype" : "Gateway",
         "objectType" : "Decision",
         "objectId" : 1073141,
         "externalId" : "{47B6741C-7893-49c9-A506-F6D7C82893B6}",
-        "topLeft" : {
-            "x" : 1073,
-            "y" : -202
-        },
-        "bottomRight" : {
-            "x" : 1115,
-            "y" : -244
-        },
         "name" : "Payment Filter after Qualification?"
+    }, {
+        "stereotype" : "Activity",
+        "objectType" : "Activity",
+        "objectId" : 995642,
+        "externalId" : "{CE78C1E0-7099-4c84-8EE1-BEB47A2EB603}",
+        "name" : "Obtain Authorisation for Outgoing Payment above Threshold (Beartrap)"
+    }, {
+        "stereotype" : "Activity",
+        "objectType" : "Activity",
+        "objectId" : 995647,
+        "externalId" : "{9AF7D35C-70D1-4107-9E9C-AE2ADAFE3AF2}",
+        "name" : "Verify Funds Availability for Payment Debtor"
+    }, {
+        "stereotype" : "Gateway",
+        "objectType" : "Decision",
+        "objectId" : 1019318,
+        "externalId" : "{0A1D2D06-16D4-4209-A8A0-0036B63AFBBD}",
+        "name" : "Currency Conversion needed for Payment?"
+    }, {
+        "stereotype" : "Activity",
+        "objectType" : "Activity",
+        "objectId" : 1261396,
+        "externalId" : "{D1995AAE-2D9C-4b59-925B-0AA5F81BB75B}",
+        "name" : "Handle Exception During Payment Clearing and Settlement#Single Payment"
+    }, {
+        "stereotype" : "Activity",
+        "objectType" : "Activity",
+        "objectId" : 995003,
+        "externalId" : "{DFF1A178-E9BD-4a0e-94CD-7D041A7D0280}",
+        "name" : "Capture Payment Instruction Manually#Single Payment"
+    }, {
+        "stereotype" : "IntermediateEvent",
+        "objectType" : "Event",
+        "objectId" : 1262943,
+        "externalId" : "{74F8FDB5-8DFA-42c7-8F0A-24CB28D06F1A}",
+        "name" : "Payment not Executable"
+    }, {
+        "stereotype" : "Activity",
+        "objectType" : "Activity",
+        "objectId" : 995216,
+        "externalId" : "{FFC62FBB-1A0A-4c74-ADA1-69967DA4CA40}",
+        "name" : "Clear and Settle Single Payment with Receiving Clearing Partner"
+    }, {
+        "stereotype" : "Activity",
+        "objectType" : "Activity",
+        "objectId" : 993452,
+        "externalId" : "{40DEBDAC-CF00-4cb0-80A3-6AE43015CE2C}",
+        "name" : "Authenticate Manual Payment Instruction"
+    }, {
+        "stereotype" : "Activity",
+        "objectType" : "Activity",
+        "objectId" : 993387,
+        "externalId" : "{CC5FFA97-56A5-4c07-A042-7D783A9EC620}",
+        "name" : "Generate Single Payment Settlement Entries for Instructing Client"
+    }, {
+        "stereotype" : "Activity",
+        "objectType" : "Activity",
+        "objectId" : 995205,
+        "externalId" : "{F789E8CF-B8DA-4d32-8BB2-B3FE0A0E8614}",
+        "name" : "Generate Entries for Bank Draft Issuance"
+    }, {
+        "stereotype" : "Gateway",
+        "objectType" : "Decision",
+        "objectId" : 1073233,
+        "externalId" : "{E96BA978-6355-4664-9FE3-84F313D87AA4}",
+        "name" : "Clearing, Accounting & Billing"
+    }, {
+        "stereotype" : "IntermediateEvent",
+        "objectType" : "Event",
+        "objectId" : 1000972,
+        "externalId" : "{7D169926-09A2-4bed-95F0-C54309BF38D4}",
+        "name" : "Payment Ready for Clearing and Settlement with Counterparty"
+    }, {
+        "stereotype" : "Gateway",
+        "objectType" : "Decision",
+        "objectId" : 1011746,
+        "externalId" : "{1489F677-756A-4537-9284-1807B83DCA49}",
+        "name" : "Electronic or Manual Payment?"
+    }, {
+        "stereotype" : "NavigationCell",
+        "objectType" : "Text",
+        "objectId" : 1392196,
+        "externalId" : "{EAD98FA4-EB6E-4690-BBE0-E68143AD2EE3}",
+        "name" : "?"
+    }, {
+        "stereotype" : "IntermediateEvent",
+        "objectType" : "Event",
+        "objectId" : 996158,
+        "externalId" : "{25628DC0-6857-410e-94C9-032787872C45}",
+        "name" : "Payment Instruction Available in Single Payment System"
+    }, {
+        "stereotype" : "Activity",
+        "objectType" : "Activity",
+        "objectId" : 993392,
+        "externalId" : "{8FF2BDEA-6594-48f6-AC39-C975C94AB0A3}",
+        "name" : "Convert Payment Currency"
+    }, {
+        "stereotype" : "IntermediateEvent",
+        "objectType" : "Event",
+        "objectId" : 993434,
+        "externalId" : "{BF26AF03-ED15-4702-B570-14A45F0A50AF}",
+        "name" : "Transaction Released for Cash Settlement"
+    }, {
+        "stereotype" : "Activity",
+        "objectType" : "Activity",
+        "objectId" : 995201,
+        "externalId" : "{2AEFAD73-AF8F-4431-AFF8-10FC50BDA109}",
+        "name" : "Generate Single Payment Settlement and Clearing Entries for Receiving Clearing Partner"
+    }, {
+        "stereotype" : "Activity",
+        "objectType" : "Activity",
+        "objectId" : 994998,
+        "externalId" : "{134B66C5-4272-4c39-95A0-8C50A0473575}",
+        "name" : "Prepare Electronic Payment Instruction"
+    }, {
+        "stereotype" : "Activity",
+        "objectType" : "Activity",
+        "objectId" : 1202383,
+        "externalId" : "{3CA1A03E-66F5-4be8-8D4A-60D7ABD98609}",
+        "name" : "Handle Exception during Payment Execution#Single Payment Repair"
+    }, {
+        "stereotype" : "IntermediateEvent",
+        "objectType" : "Event",
+        "objectId" : 1203501,
+        "externalId" : "{80B0243F-0057-4f4b-B2BC-7ACDCD4EF250}",
+        "name" : "DB is Prepared to Deliver Payments "
+    }, {
+        "stereotype" : "Activity",
+        "objectType" : "Activity",
+        "objectId" : 1221829,
+        "externalId" : "{38048C57-5D69-4fc5-9D05-E5CA7852CE56}",
+        "name" : "Handle Exception during Payment Initiation#EB Channel"
+    }, {
+        "stereotype" : "Activity",
+        "objectType" : "Activity",
+        "objectId" : 995202,
+        "externalId" : "{478CCD15-74C4-4d32-A154-5B9A90CC3C62}",
+        "name" : "Generate Settlement Entries and Settle Single Payment for Beneficiary"
+    }, {
+        "stereotype" : "Gateway",
+        "objectType" : "Decision",
+        "objectId" : 1073232,
+        "externalId" : "{9CEA8A08-5540-4f5a-AAEA-C08F5145B087}",
+        "name" : "Type of Counterparty?"
+    }, {
+        "stereotype" : "Gateway",
+        "objectType" : "Decision",
+        "objectId" : 993396,
+        "externalId" : "{D68065D1-BB31-4571-90DA-91A03F22ACA1}",
+        "name" : "Single Payment Entries"
     }, {
         "stereotype" : "Activity",
         "objectType" : "Activity",
         "objectId" : 995098,
         "externalId" : "{28E39BFC-A181-4bb7-845C-341442AAA0F1}",
-        "topLeft" : {
-            "x" : 1160,
-            "y" : -187
-        },
-        "bottomRight" : {
-            "x" : 1278,
-            "y" : -260
-        },
         "name" : "Perform Internal and Business Intervention Filtering of Payment"
+    }, {
+        "stereotype" : "NavigationCell",
+        "objectType" : "Text",
+        "objectId" : 1201309,
+        "externalId" : "{6C7E4634-A0C3-4f37-A9A4-7810F5A714DC}",
+        "name" : "Perform Client Billing"
+    }, {
+        "stereotype" : "Activity",
+        "objectType" : "Activity",
+        "objectId" : 1113416,
+        "externalId" : "{54C07BEB-C5C3-4db7-96B2-1B9673414499}",
+        "name" : "Perform Payment Fraud Checks"
+    }, {
+        "stereotype" : "Gateway",
+        "objectType" : "Decision",
+        "objectId" : 1213847,
+        "externalId" : "{4608C5B0-4FA6-48a4-8899-A1A05C04CC3B}",
+        "name" : "Cash Accounting and Billing Entries"
+    }, {
+        "stereotype" : "StartEvent",
+        "objectType" : "Event",
+        "objectId" : 994843,
+        "externalId" : "{342D29E1-EE06-4042-A685-D6E9174C56AA}",
+        "name" : "Payment Instruction (File) Received from Client"
+    }, {
+        "stereotype" : "Activity",
+        "objectType" : "Activity",
+        "objectId" : 995648,
+        "externalId" : "{3298CA12-ED8D-4a7c-AF75-EB6479598564}",
+        "name" : "Verify Compliance with Embargo & Sanction Requirements"
+    }, {
+        "stereotype" : "IntermediateEvent",
+        "objectType" : "Event",
+        "objectId" : 995447,
+        "externalId" : "{F05A3BEB-CF5C-4812-B001-39F1ECC6E98D}",
+        "name" : "Payment Delivery Completed"
+    }, {
+        "stereotype" : "StartEvent",
+        "objectType" : "Event",
+        "objectId" : 1011822,
+        "externalId" : "{41C0162B-3286-491c-9908-42E8EC411844}",
+        "name" : "FX Pre-Deal Instruction Received from Client"
+    }, {
+        "stereotype" : "IntermediateEvent",
+        "objectType" : "Event",
+        "objectId" : 995209,
+        "externalId" : "{DB96E4A2-4E7F-4361-B431-EBC2509920DB}",
+        "name" : "Cash Accounting Entries Available"
+    }, {
+        "stereotype" : "IntermediateEvent",
+        "objectType" : "Event",
+        "objectId" : 1211670,
+        "externalId" : "{AFBB6459-58AA-48ca-B7E9-317708241FBC}",
+        "name" : "Payment Submitted to Cheque Issuance and Printing"
     } ],
     "connections" : [ {
         "startObjectId" : 1019318,
@@ -842,15 +634,6 @@ export const singlePayments = {
         "externalId" : "{973C0387-427D-451f-B4C6-77236AA7FB9D}",
         "name" : ""
     }, {
-        "startObjectId" : 995210,
-        "endObjectId" : 1201309,
-        "connectorId" : 2769707,
-        "connectorType" : "Dependency",
-        "hidden" : false,
-        "instanceId" : 1142012,
-        "externalId" : "{18AFB53D-85A5-4315-B8FD-73C7AD034019}",
-        "name" : ""
-    }, {
         "startObjectId" : 993396,
         "endObjectId" : 995209,
         "connectorId" : 2041526,
@@ -867,6 +650,15 @@ export const singlePayments = {
         "hidden" : true,
         "instanceId" : 984616,
         "externalId" : "{A2C13291-E381-4796-B99C-FEE86B1E31D6}",
+        "name" : ""
+    }, {
+        "startObjectId" : 995210,
+        "endObjectId" : 1201309,
+        "connectorId" : 1992092,
+        "connectorType" : "NoteLink",
+        "hidden" : false,
+        "instanceId" : 1053506,
+        "externalId" : "{5EE3AB23-E09B-4f00-9BF7-B02144150278}",
         "name" : ""
     }, {
         "startObjectId" : 1392193,
@@ -912,6 +704,15 @@ export const singlePayments = {
         "hidden" : false,
         "instanceId" : 1131249,
         "externalId" : "{907B8D4D-03BB-4aa5-8981-0DC4874A9652}",
+        "name" : ""
+    }, {
+        "startObjectId" : 1019291,
+        "endObjectId" : 1392198,
+        "connectorId" : 2559553,
+        "connectorType" : "Dependency",
+        "hidden" : false,
+        "instanceId" : 1131247,
+        "externalId" : "{2CA794F3-FA23-42e1-850E-0AD00D025146}",
         "name" : ""
     }, {
         "startObjectId" : 1019318,
@@ -1310,6 +1111,15 @@ export const singlePayments = {
         "externalId" : "{F0215ED1-3044-4015-930F-CE2D8E23CB13}",
         "name" : "Billing"
     }, {
+        "startObjectId" : 1262943,
+        "endObjectId" : 1392198,
+        "connectorId" : 2559554,
+        "connectorType" : "Dependency",
+        "hidden" : false,
+        "instanceId" : 1131248,
+        "externalId" : "{B63032C7-65D0-40d0-833D-BF76140ED23E}",
+        "name" : ""
+    }, {
         "startObjectId" : 1011822,
         "endObjectId" : 993414,
         "connectorId" : 1959785,
@@ -1318,66 +1128,679 @@ export const singlePayments = {
         "instanceId" : 1047088,
         "externalId" : "{C960DC99-31B3-4cb3-902A-CA03D3C6E3FE}",
         "name" : ""
+    } ],
+    "positions" : [ {
+        "objectId" : 1113416,
+        "topLeft" : {
+            "x" : 1118,
+            "y" : -460
+        },
+        "bottomRight" : {
+            "x" : 1236,
+            "y" : -533
+        }
+    }, {
+        "objectId" : 995098,
+        "topLeft" : {
+            "x" : 1119,
+            "y" : -155
+        },
+        "bottomRight" : {
+            "x" : 1237,
+            "y" : -228
+        }
+    }, {
+        "objectId" : 1261396,
+        "topLeft" : {
+            "x" : 2591,
+            "y" : -569
+        },
+        "bottomRight" : {
+            "x" : 2709,
+            "y" : -644
+        }
+    }, {
+        "objectId" : 1011746,
+        "topLeft" : {
+            "x" : 374,
+            "y" : -170
+        },
+        "bottomRight" : {
+            "x" : 416,
+            "y" : -212
+        }
+    }, {
+        "objectId" : 1011822,
+        "topLeft" : {
+            "x" : 292,
+            "y" : -437
+        },
+        "bottomRight" : {
+            "x" : 322,
+            "y" : -469
+        }
+    }, {
+        "objectId" : 995447,
+        "topLeft" : {
+            "x" : 2877,
+            "y" : -288
+        },
+        "bottomRight" : {
+            "x" : 2907,
+            "y" : -318
+        }
+    }, {
+        "objectId" : 993434,
+        "topLeft" : {
+            "x" : 292,
+            "y" : -280
+        },
+        "bottomRight" : {
+            "x" : 322,
+            "y" : -310
+        }
+    }, {
+        "objectId" : 1213847,
+        "topLeft" : {
+            "x" : 2570,
+            "y" : -273
+        },
+        "bottomRight" : {
+            "x" : 2612,
+            "y" : -315
+        }
+    }, {
+        "objectId" : 1337638,
+        "topLeft" : {
+            "x" : 665,
+            "y" : -568
+        },
+        "bottomRight" : {
+            "x" : 783,
+            "y" : -643
+        }
+    }, {
+        "objectId" : 995202,
+        "topLeft" : {
+            "x" : 2295,
+            "y" : -258
+        },
+        "bottomRight" : {
+            "x" : 2430,
+            "y" : -331
+        }
+    }, {
+        "objectId" : 995209,
+        "topLeft" : {
+            "x" : 2720,
+            "y" : -402
+        },
+        "bottomRight" : {
+            "x" : 2750,
+            "y" : -432
+        }
+    }, {
+        "objectId" : 1019291,
+        "topLeft" : {
+            "x" : 2853,
+            "y" : -558
+        },
+        "bottomRight" : {
+            "x" : 2883,
+            "y" : -588
+        }
+    }, {
+        "objectId" : 1011821,
+        "topLeft" : {
+            "x" : 292,
+            "y" : -358
+        },
+        "bottomRight" : {
+            "x" : 322,
+            "y" : -389
+        }
+    }, {
+        "objectId" : 1392196,
+        "topLeft" : {
+            "x" : 2936,
+            "y" : -146
+        },
+        "bottomRight" : {
+            "x" : 3054,
+            "y" : -219
+        }
+    }, {
+        "objectId" : 1201309,
+        "topLeft" : {
+            "x" : 2936,
+            "y" : -462
+        },
+        "bottomRight" : {
+            "x" : 3054,
+            "y" : -535
+        }
+    }, {
+        "objectId" : 1221829,
+        "topLeft" : {
+            "x" : 518,
+            "y" : -568
+        },
+        "bottomRight" : {
+            "x" : 636,
+            "y" : -643
+        }
+    }, {
+        "objectId" : 1202383,
+        "topLeft" : {
+            "x" : 1810,
+            "y" : -569
+        },
+        "bottomRight" : {
+            "x" : 1928,
+            "y" : -644
+        }
+    }, {
+        "objectId" : 1203501,
+        "topLeft" : {
+            "x" : 292,
+            "y" : -124
+        },
+        "bottomRight" : {
+            "x" : 322,
+            "y" : -154
+        }
+    }, {
+        "objectId" : 995210,
+        "topLeft" : {
+            "x" : 2720,
+            "y" : -485
+        },
+        "bottomRight" : {
+            "x" : 2750,
+            "y" : -515
+        }
+    }, {
+        "objectId" : 1201963,
+        "topLeft" : {
+            "x" : 881,
+            "y" : -155
+        },
+        "bottomRight" : {
+            "x" : 999,
+            "y" : -228
+        }
+    }, {
+        "objectId" : 1019318,
+        "topLeft" : {
+            "x" : 1668,
+            "y" : -166
+        },
+        "bottomRight" : {
+            "x" : 1710,
+            "y" : -216
+        }
+    }, {
+        "objectId" : 1000972,
+        "topLeft" : {
+            "x" : 2100,
+            "y" : -176
+        },
+        "bottomRight" : {
+            "x" : 2130,
+            "y" : -206
+        }
+    }, {
+        "objectId" : 993387,
+        "topLeft" : {
+            "x" : 1876,
+            "y" : -155
+        },
+        "bottomRight" : {
+            "x" : 1994,
+            "y" : -228
+        }
+    }, {
+        "objectId" : 993452,
+        "topLeft" : {
+            "x" : 465,
+            "y" : -155
+        },
+        "bottomRight" : {
+            "x" : 583,
+            "y" : -228
+        }
+    }, {
+        "objectId" : 996158,
+        "topLeft" : {
+            "x" : 805,
+            "y" : -176
+        },
+        "bottomRight" : {
+            "x" : 835,
+            "y" : -206
+        }
+    }, {
+        "objectId" : 995208,
+        "topLeft" : {
+            "x" : 2720,
+            "y" : -177
+        },
+        "bottomRight" : {
+            "x" : 2750,
+            "y" : -207
+        }
+    }, {
+        "objectId" : 994843,
+        "topLeft" : {
+            "x" : 292,
+            "y" : -202
+        },
+        "bottomRight" : {
+            "x" : 322,
+            "y" : -232
+        }
+    }, {
+        "objectId" : 998497,
+        "topLeft" : {
+            "x" : 1507,
+            "y" : -155
+        },
+        "bottomRight" : {
+            "x" : 1625,
+            "y" : -228
+        }
+    }, {
+        "objectId" : 995642,
+        "topLeft" : {
+            "x" : 1318,
+            "y" : -241
+        },
+        "bottomRight" : {
+            "x" : 1436,
+            "y" : -317
+        }
+    }, {
+        "objectId" : 995003,
+        "topLeft" : {
+            "x" : 633,
+            "y" : -155
+        },
+        "bottomRight" : {
+            "x" : 751,
+            "y" : -228
+        }
+    }, {
+        "objectId" : 1073141,
+        "topLeft" : {
+            "x" : 1032,
+            "y" : -170
+        },
+        "bottomRight" : {
+            "x" : 1074,
+            "y" : -212
+        }
+    }, {
+        "objectId" : 993392,
+        "topLeft" : {
+            "x" : 1718,
+            "y" : -258
+        },
+        "bottomRight" : {
+            "x" : 1836,
+            "y" : -331
+        }
+    }, {
+        "objectId" : 1073232,
+        "topLeft" : {
+            "x" : 2175,
+            "y" : -170
+        },
+        "bottomRight" : {
+            "x" : 2217,
+            "y" : -212
+        }
+    }, {
+        "objectId" : 995647,
+        "topLeft" : {
+            "x" : 1119,
+            "y" : -380
+        },
+        "bottomRight" : {
+            "x" : 1237,
+            "y" : -453
+        }
+    }, {
+        "objectId" : 993396,
+        "topLeft" : {
+            "x" : 2020,
+            "y" : -170
+        },
+        "bottomRight" : {
+            "x" : 2062,
+            "y" : -212
+        }
+    }, {
+        "objectId" : 1337636,
+        "topLeft" : {
+            "x" : 1276,
+            "y" : -170
+        },
+        "bottomRight" : {
+            "x" : 1318,
+            "y" : -212
+        }
+    }, {
+        "objectId" : 995201,
+        "topLeft" : {
+            "x" : 2295,
+            "y" : -155
+        },
+        "bottomRight" : {
+            "x" : 2430,
+            "y" : -228
+        }
+    }, {
+        "objectId" : 995648,
+        "topLeft" : {
+            "x" : 1118,
+            "y" : -299
+        },
+        "bottomRight" : {
+            "x" : 1236,
+            "y" : -372
+        }
+    }, {
+        "objectId" : 995216,
+        "topLeft" : {
+            "x" : 2569,
+            "y" : -156
+        },
+        "bottomRight" : {
+            "x" : 2687,
+            "y" : -229
+        }
+    }, {
+        "objectId" : 1073610,
+        "topLeft" : {
+            "x" : 2802,
+            "y" : -283
+        },
+        "bottomRight" : {
+            "x" : 2844,
+            "y" : -325
+        }
+    }, {
+        "objectId" : 1073233,
+        "topLeft" : {
+            "x" : 2496,
+            "y" : -170
+        },
+        "bottomRight" : {
+            "x" : 2538,
+            "y" : -212
+        }
+    }, {
+        "objectId" : 995205,
+        "topLeft" : {
+            "x" : 2295,
+            "y" : -48
+        },
+        "bottomRight" : {
+            "x" : 2430,
+            "y" : -121
+        }
+    }, {
+        "objectId" : 1211670,
+        "topLeft" : {
+            "x" : 2720,
+            "y" : -68
+        },
+        "bottomRight" : {
+            "x" : 2750,
+            "y" : -98
+        }
+    }, {
+        "objectId" : 994998,
+        "topLeft" : {
+            "x" : 633,
+            "y" : -255
+        },
+        "bottomRight" : {
+            "x" : 751,
+            "y" : -328
+        }
+    }, {
+        "objectId" : 1262943,
+        "topLeft" : {
+            "x" : 2853,
+            "y" : -637
+        },
+        "bottomRight" : {
+            "x" : 2883,
+            "y" : -667
+        }
+    }, {
+        "objectId" : 993414,
+        "topLeft" : {
+            "x" : 469,
+            "y" : -255
+        },
+        "bottomRight" : {
+            "x" : 587,
+            "y" : -328
+        }
     } ]
 };
 
 
-export const afcGovernance ={
+export const afcGovernance = {
     "objects" : [ {
         "stereotype" : "Activity",
         "objectType" : "Activity",
-        "objectId" : 1225612,
-        "topLeft" : {
-            "x" : 348,
-            "y" : -77
-        },
-        "bottomRight" : {
-            "x" : 458,
-            "y" : -137
-        },
-        "name" : "Send Email Validation Request to Forum Secretaries"
-    }, {
-        "stereotype" : "Gateway",
-        "objectType" : "Decision",
-        "objectId" : 1225617,
-        "topLeft" : {
-            "x" : 1011,
-            "y" : -86
-        },
-        "bottomRight" : {
-            "x" : 1053,
-            "y" : -128
-        },
-        "name" : "?"
-    }, {
-        "stereotype" : "Activity",
-        "objectType" : "Activity",
-        "objectId" : 1225621,
-        "topLeft" : {
-            "x" : 1105,
-            "y" : -79
-        },
-        "bottomRight" : {
-            "x" : 1215,
-            "y" : -139
-        },
-        "name" : "Escalate to AFC ExCo for Decision"
+        "objectId" : 1225620,
+        "externalId" : "{B4834D68-0F89-41f8-80CB-463AFF8B381D}",
+        "name" : "Send Recertification of AFC Goverance Framework to Forum Secretaries"
     }, {
         "stereotype" : "Activity",
         "objectType" : "Activity",
         "objectId" : 1225613,
-        "topLeft" : {
-            "x" : 529,
-            "y" : -376
-        },
-        "bottomRight" : {
-            "x" : 639,
-            "y" : -436
-        },
+        "externalId" : "{4E377E02-02AA-4d86-AB5F-F5EB6E70A42D}",
         "name" : "Respond to AFC COO's Validation Request"
+    }, {
+        "stereotype" : "IntermediateEvent",
+        "objectType" : "Event",
+        "objectId" : 1279188,
+        "externalId" : "{5F42FA93-CAF0-4296-BC52-29147E7F9AFB}",
+        "name" : "L1 Sanctions Alert Received"
+    }, {
+        "stereotype" : "StartEvent",
+        "objectType" : "Event",
+        "objectId" : 1225608,
+        "externalId" : "{BC202984-9166-4920-9D45-85E39D3AFF40}",
+        "name" : "Time for Annual Review / Event Driven Change"
     }, {
         "stereotype" : "Activity",
         "objectType" : "Activity",
+        "objectId" : 1225612,
+        "externalId" : "{E888127E-72A1-49d8-9721-73BB287ACEF0}",
+        "name" : "Send Email Validation Request to Forum Secretaries"
+    }, {
+        "stereotype" : "Activity",
+        "objectType" : "Activity",
+        "objectId" : 1225618,
+        "externalId" : "{9E275F43-9982-4696-86C7-844B742269FD}",
+        "name" : "Perform Recertification"
+    }, {
+        "stereotype" : "Activity",
+        "objectType" : "Activity",
+        "objectId" : 1225615,
+        "externalId" : "{8F0C9A4D-94C8-41f8-B993-DA25ADB12E2D}",
+        "name" : "Determine if Every Individual Forum Secretary Confirms the Requirements"
+    }, {
+        "stereotype" : "Activity",
+        "objectType" : "Activity",
+        "objectId" : 1225621,
+        "externalId" : "{765D3756-E6B2-41d7-8DB9-DA5D50FEC443}",
+        "name" : "Escalate to AFC ExCo for Decision"
+    }, {
+        "stereotype" : "Activity",
+        "objectType" : "Activity",
+        "objectId" : 1225610,
+        "externalId" : "{80C33B8E-A665-499a-8BC5-C8644836CCD0}",
+        "name" : "Document Changes or Proposals and Inform Relevant Stakeholders"
+    }, {
+        "stereotype" : "Activity",
+        "objectType" : "Activity",
+        "objectId" : 1279187,
+        "externalId" : "{2D413FF5-CA57-4d7f-8194-A16B70822F9E}",
+        "name" : "Perform Level 1 Alert Generation Sanctions Process"
+    }, {
+        "stereotype" : "StartEvent",
+        "objectType" : "Event",
+        "objectId" : 1225609,
+        "externalId" : "{F09D3753-A15D-40e0-8944-77F4A4B7755E}",
+        "name" : "Received Notification of Changes by DB House Governance; Received Proposal of Material Changes from Forum Secretary"
+    }, {
+        "stereotype" : "Gateway",
+        "objectType" : "Decision",
+        "objectId" : 1225617,
+        "externalId" : "{1E10530C-B5F2-44f1-858C-695588FF6CF6}",
+        "name" : "?"
+    }, {
+        "stereotype" : "Activity",
+        "objectType" : "Activity",
+        "objectId" : 1225614,
+        "externalId" : "{355949D1-66DF-4971-AA37-0983010984B2}",
+        "name" : "Review Response from Forum Secretary"
+    } ],
+    "connections" : [ {
+        "startObjectId" : 1225620,
+        "endObjectId" : 1225622,
+        "connectorId" : 2099101,
+        "connectorType" : "ControlFlow",
+        "hidden" : false,
+        "instanceId" : 1074164,
+        "externalId" : "{4754419C-C0BE-4a9e-8ABB-68E175CD2D88}",
+        "name" : ""
+    }, {
+        "startObjectId" : 1225609,
+        "endObjectId" : 1225612,
+        "connectorId" : 2099092,
+        "connectorType" : "ControlFlow",
+        "hidden" : false,
+        "instanceId" : 1074155,
+        "externalId" : "{95AF1F59-B84A-44d2-9F3E-98800F65EE6F}",
+        "name" : ""
+    }, {
+        "startObjectId" : 1225617,
+        "endObjectId" : 1225618,
+        "connectorId" : 2099098,
+        "connectorType" : "ControlFlow",
+        "hidden" : false,
+        "instanceId" : 1074161,
+        "externalId" : "{E47E9898-0B7B-495f-B08F-551AA73E5119}",
+        "name" : "Yes"
+    }, {
+        "startObjectId" : 1225608,
+        "endObjectId" : 1225610,
+        "connectorId" : 2099090,
+        "connectorType" : "ControlFlow",
+        "hidden" : false,
+        "instanceId" : 1074153,
+        "externalId" : "{A85CC865-8FB7-4866-8409-D0BC260E5035}",
+        "name" : ""
+    }, {
+        "startObjectId" : 1279187,
+        "endObjectId" : 1279189,
+        "connectorId" : 2375128,
+        "connectorType" : "ControlFlow",
+        "hidden" : false,
+        "instanceId" : 1098401,
+        "externalId" : "{8FCAAD14-9E66-4269-9EA3-F6237947F8A6}",
+        "name" : ""
+    }, {
+        "startObjectId" : 1225615,
+        "endObjectId" : 1225617,
+        "connectorId" : 2099096,
+        "connectorType" : "ControlFlow",
+        "hidden" : false,
+        "instanceId" : 1074159,
+        "externalId" : "{5B51E970-5B39-4291-BB4E-00F224DAAF39}",
+        "name" : ""
+    }, {
+        "startObjectId" : 1225618,
+        "endObjectId" : 1225620,
+        "connectorId" : 2099099,
+        "connectorType" : "ControlFlow",
+        "hidden" : false,
+        "instanceId" : 1074162,
+        "externalId" : "{5F32DAFE-AA39-41c9-8DBF-9AEE6926DC64}",
+        "name" : ""
+    }, {
+        "startObjectId" : 1225621,
+        "endObjectId" : 1225620,
+        "connectorId" : 2099156,
+        "connectorType" : "ControlFlow",
+        "hidden" : false,
+        "instanceId" : 1074166,
+        "externalId" : "{E6F45EB8-75CD-476f-BAFC-1268333ACC08}",
+        "name" : ""
+    }, {
+        "startObjectId" : 1225612,
+        "endObjectId" : 1225613,
+        "connectorId" : 2099093,
+        "connectorType" : "ControlFlow",
+        "hidden" : false,
+        "instanceId" : 1074156,
+        "externalId" : "{E77EFE5E-0536-410d-9029-AB649E78D141}",
+        "name" : ""
+    }, {
+        "startObjectId" : 1225610,
+        "endObjectId" : 1225612,
+        "connectorId" : 2099091,
+        "connectorType" : "ControlFlow",
+        "hidden" : false,
+        "instanceId" : 1074154,
+        "externalId" : "{D5946D9B-890D-4b5e-A358-154DA343A580}",
+        "name" : ""
+    }, {
+        "startObjectId" : 1279188,
+        "endObjectId" : 1279187,
+        "connectorId" : 2375129,
+        "connectorType" : "ControlFlow",
+        "hidden" : false,
+        "instanceId" : 1098400,
+        "externalId" : "{21789C77-BB0C-4ebd-9118-DE1767CF0ADA}",
+        "name" : ""
+    }, {
+        "startObjectId" : 1225617,
+        "endObjectId" : 1225621,
+        "connectorId" : 2099097,
+        "connectorType" : "ControlFlow",
+        "hidden" : false,
+        "instanceId" : 1074160,
+        "externalId" : "{C8BD6C58-F811-4637-85ED-17BF20BD387B}",
+        "name" : "No"
+    }, {
+        "startObjectId" : 1225614,
+        "endObjectId" : 1225615,
+        "connectorId" : 2099095,
+        "connectorType" : "ControlFlow",
+        "hidden" : false,
+        "instanceId" : 1074158,
+        "externalId" : "{BC6B5B4E-42FE-4bb9-87C6-42FE14FADF0E}",
+        "name" : ""
+    }, {
+        "startObjectId" : 1225613,
+        "endObjectId" : 1225614,
+        "connectorId" : 2099094,
+        "connectorType" : "ControlFlow",
+        "hidden" : false,
+        "instanceId" : 1074157,
+        "externalId" : "{F6CEBAF4-C65F-4363-833B-4F6B1EEF5435}",
+        "name" : ""
+    } ],
+    "positions" : [ {
         "objectId" : 1225618,
         "topLeft" : {
             "x" : 1104,
@@ -1386,76 +1809,18 @@ export const afcGovernance ={
         "bottomRight" : {
             "x" : 1214,
             "y" : -257
-        },
-        "name" : "Perform Recertification"
+        }
     }, {
-        "stereotype" : "Activity",
-        "objectType" : "Activity",
-        "objectId" : 1225610,
+        "objectId" : 1225612,
         "topLeft" : {
-            "x" : 177,
-            "y" : -74
+            "x" : 348,
+            "y" : -77
         },
         "bottomRight" : {
-            "x" : 287,
-            "y" : -134
-        },
-        "name" : "Document Changes or Proposals and Inform Relevant Stakeholders"
+            "x" : 458,
+            "y" : -137
+        }
     }, {
-        "stereotype" : "StartEvent",
-        "objectType" : "Event",
-        "objectId" : 1225609,
-        "topLeft" : {
-            "x" : 92,
-            "y" : -205
-        },
-        "bottomRight" : {
-            "x" : 122,
-            "y" : -235
-        },
-        "name" : "Received Notification of Changes by DB House Governance; Received Proposal of Material Changes from Forum Secretary"
-    }, {
-        "stereotype" : "Activity",
-        "objectType" : "Activity",
-        "objectId" : 1279187,
-        "topLeft" : {
-            "x" : 308,
-            "y" : -603
-        },
-        "bottomRight" : {
-            "x" : 418,
-            "y" : -663
-        },
-        "name" : "Perform Level 1 Alert Generation Sanctions Process"
-    }, {
-        "stereotype" : "StartEvent",
-        "objectType" : "Event",
-        "objectId" : 1225608,
-        "topLeft" : {
-            "x" : 94,
-            "y" : -88
-        },
-        "bottomRight" : {
-            "x" : 124,
-            "y" : -118
-        },
-        "name" : "Time for Annual Review / Event Driven Change"
-    }, {
-        "stereotype" : "Activity",
-        "objectType" : "Activity",
-        "objectId" : 1225615,
-        "topLeft" : {
-            "x" : 865,
-            "y" : -76
-        },
-        "bottomRight" : {
-            "x" : 975,
-            "y" : -136
-        },
-        "name" : "Determine if Every Individual Forum Secretary Confirms the Requirements"
-    }, {
-        "stereotype" : "Activity",
-        "objectType" : "Activity",
         "objectId" : 1225614,
         "topLeft" : {
             "x" : 700,
@@ -1464,11 +1829,18 @@ export const afcGovernance ={
         "bottomRight" : {
             "x" : 810,
             "y" : -135
-        },
-        "name" : "Review Response from Forum Secretary"
+        }
     }, {
-        "stereotype" : "Activity",
-        "objectType" : "Activity",
+        "objectId" : 1279187,
+        "topLeft" : {
+            "x" : 308,
+            "y" : -603
+        },
+        "bottomRight" : {
+            "x" : 418,
+            "y" : -663
+        }
+    }, {
         "objectId" : 1225620,
         "topLeft" : {
             "x" : 1264,
@@ -1477,11 +1849,28 @@ export const afcGovernance ={
         "bottomRight" : {
             "x" : 1374,
             "y" : -257
-        },
-        "name" : "Send Recertification of AFC Goverance Framework to Forum Secretaries"
+        }
     }, {
-        "stereotype" : "IntermediateEvent",
-        "objectType" : "Event",
+        "objectId" : 1225621,
+        "topLeft" : {
+            "x" : 1105,
+            "y" : -79
+        },
+        "bottomRight" : {
+            "x" : 1215,
+            "y" : -139
+        }
+    }, {
+        "objectId" : 1225608,
+        "topLeft" : {
+            "x" : 94,
+            "y" : -88
+        },
+        "bottomRight" : {
+            "x" : 124,
+            "y" : -118
+        }
+    }, {
         "objectId" : 1279188,
         "topLeft" : {
             "x" : 201,
@@ -1490,107 +1879,57 @@ export const afcGovernance ={
         "bottomRight" : {
             "x" : 231,
             "y" : -648
+        }
+    }, {
+        "objectId" : 1225609,
+        "topLeft" : {
+            "x" : 92,
+            "y" : -205
         },
-        "name" : "L1 Sanctions Alert Received"
-    } ],
-    "connections" : [ {
-        "startObjectId" : 1225613,
-        "endObjectId" : 1225614,
-        "connectorId" : 2099094,
-        "connectorType" : "ControlFlow",
-        "hidden" : false,
-        "instanceId" : 1074157
+        "bottomRight" : {
+            "x" : 122,
+            "y" : -235
+        }
     }, {
-        "startObjectId" : 1225618,
-        "endObjectId" : 1225620,
-        "connectorId" : 2099099,
-        "connectorType" : "ControlFlow",
-        "hidden" : false,
-        "instanceId" : 1074162
+        "objectId" : 1225610,
+        "topLeft" : {
+            "x" : 177,
+            "y" : -74
+        },
+        "bottomRight" : {
+            "x" : 287,
+            "y" : -134
+        }
     }, {
-        "startObjectId" : 1279187,
-        "endObjectId" : 1279189,
-        "connectorId" : 2375128,
-        "connectorType" : "ControlFlow",
-        "hidden" : false,
-        "instanceId" : 1098401
+        "objectId" : 1225613,
+        "topLeft" : {
+            "x" : 529,
+            "y" : -376
+        },
+        "bottomRight" : {
+            "x" : 639,
+            "y" : -436
+        }
     }, {
-        "startObjectId" : 1225617,
-        "endObjectId" : 1225621,
-        "connectorId" : 2099097,
-        "connectorType" : "ControlFlow",
-        "hidden" : false,
-        "instanceId" : 1074160
+        "objectId" : 1225615,
+        "topLeft" : {
+            "x" : 865,
+            "y" : -76
+        },
+        "bottomRight" : {
+            "x" : 975,
+            "y" : -136
+        }
     }, {
-        "startObjectId" : 1225621,
-        "endObjectId" : 1225620,
-        "connectorId" : 2099156,
-        "connectorType" : "ControlFlow",
-        "hidden" : false,
-        "instanceId" : 1074166
-    }, {
-        "startObjectId" : 1225610,
-        "endObjectId" : 1225612,
-        "connectorId" : 2099091,
-        "connectorType" : "ControlFlow",
-        "hidden" : false,
-        "instanceId" : 1074154
-    }, {
-        "startObjectId" : 1225615,
-        "endObjectId" : 1225617,
-        "connectorId" : 2099096,
-        "connectorType" : "ControlFlow",
-        "hidden" : false,
-        "instanceId" : 1074159
-    }, {
-        "startObjectId" : 1279188,
-        "endObjectId" : 1279187,
-        "connectorId" : 2375129,
-        "connectorType" : "ControlFlow",
-        "hidden" : false,
-        "instanceId" : 1098400
-    }, {
-        "startObjectId" : 1225608,
-        "endObjectId" : 1225610,
-        "connectorId" : 2099090,
-        "connectorType" : "ControlFlow",
-        "hidden" : false,
-        "instanceId" : 1074153
-    }, {
-        "startObjectId" : 1225617,
-        "endObjectId" : 1225618,
-        "connectorId" : 2099098,
-        "connectorType" : "ControlFlow",
-        "hidden" : false,
-        "instanceId" : 1074161
-    }, {
-        "startObjectId" : 1225614,
-        "endObjectId" : 1225615,
-        "connectorId" : 2099095,
-        "connectorType" : "ControlFlow",
-        "hidden" : false,
-        "instanceId" : 1074158
-    }, {
-        "startObjectId" : 1225609,
-        "endObjectId" : 1225612,
-        "connectorId" : 2099092,
-        "connectorType" : "ControlFlow",
-        "hidden" : false,
-        "instanceId" : 1074155
-    }, {
-        "startObjectId" : 1225620,
-        "endObjectId" : 1225622,
-        "connectorId" : 2099101,
-        "connectorType" : "ControlFlow",
-        "hidden" : false,
-        "instanceId" : 1074164
-    }, {
-        "startObjectId" : 1225612,
-        "endObjectId" : 1225613,
-        "connectorId" : 2099093,
-        "connectorType" : "ControlFlow",
-        "hidden" : false,
-        "instanceId" : 1074156
+        "objectId" : 1225617,
+        "topLeft" : {
+            "x" : 1011,
+            "y" : -86
+        },
+        "bottomRight" : {
+            "x" : 1053,
+            "y" : -128
+        }
     } ]
 };
 

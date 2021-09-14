@@ -5,11 +5,11 @@ import TextCell from "./TextCell.svelte";
 import {max, min} from "d3-array";
 
 
-export function calcBounds(objects = []) {
-    const x1 = min(objects, d => d.topLeft.x);
-    const y1 = min(objects, d => d.topLeft.y);
-    const x2 = max(objects, d => d.bottomRight.x);
-    const y2 = max(objects, d => d.bottomRight.y);
+export function calcBounds(positions = []) {
+    const x1 = min(positions, d => d.topLeft.x);
+    const y1 = min(positions, d => d.topLeft.y);
+    const x2 = max(positions, d => d.bottomRight.x);
+    const y2 = max(positions, d => d.bottomRight.y);
     return {
         x1,
         y1,
@@ -21,8 +21,8 @@ export function calcBounds(objects = []) {
 }
 
 
-export function calcViewBox(objects = []) {
-    const bounds = calcBounds(objects);
+export function calcViewBox(positions = []) {
+    const bounds = calcBounds(positions);
     return `${bounds.x1 - 100} ${bounds.y2 - bounds.y1 - 50} ${bounds.width + 200} ${bounds.height}`;
 }
 
@@ -108,19 +108,21 @@ const objectLayoutAdjustments = {
 
 
 
-export function mkLayoutData(objects) {
-    const bounds = calcBounds(objects);
+export function mkLayoutData(objects = [], positions = []) {
+    const bounds = calcBounds(positions);
+    const positionsByObjectId = _.keyBy(positions, d => d.objectId);
 
     return _
         .chain(objects)
         .map(d => {
             const adjustment =  objectLayoutAdjustments[d.objectType];
+            const basePosition = positionsByObjectId[d.objectId];
             return {
                 id: d.objectId,
-                x: d.topLeft.x + _.get(adjustment, ["x"], 0),
-                y: bounds.height - (d.topLeft.y + _.get(adjustment, ["y"], 0)),
-                width: Math.abs(d.bottomRight.x - d.topLeft.x) + _.get(adjustment, ["width"], 0),
-                height: Math.abs(d.bottomRight.y - d.topLeft.y) + _.get(adjustment, ["height"], 0),
+                x: basePosition.topLeft.x + _.get(adjustment, ["x"], 0),
+                y: bounds.height - (basePosition.topLeft.y + _.get(adjustment, ["y"], 0)),
+                width: Math.abs(basePosition.bottomRight.x - basePosition.topLeft.x) + _.get(adjustment, ["width"], 0),
+                height: Math.abs(basePosition.bottomRight.y - basePosition.topLeft.y) + _.get(adjustment, ["height"], 0),
                 data: d
             };
         })

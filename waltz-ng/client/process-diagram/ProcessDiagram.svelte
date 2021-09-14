@@ -1,5 +1,5 @@
 <script>
-    import {platformStrategy, afcGovernance, situationalAppraisal, singlePayments} from "./demo-data";
+    import {platformStrategy, afcGovernance, situationalAppraisal, singlePayments, dailyRisk} from "./demo-data";
     import {calcBounds, calcViewBox, mkLayoutData} from "./process-diagram-utils";
     import Defs from "./Defs.svelte";
     import Objects from "./Objects.svelte";
@@ -8,17 +8,16 @@
     import {zoom} from "d3-zoom";
     import {event, select} from "d3-selection";
 
-
     const process = singlePayments;
 
-    let viewBox = calcViewBox(process.objects);
-    let bounds = calcBounds(process.objects);
+    let viewBox = calcViewBox(process.positions);
+    let bounds = calcBounds(process.positions);
 
     const y = scaleLinear()
         .domain([bounds.y1, bounds.y2])
         .range([bounds.y2, bounds.y1]);
 
-    const layoutDataById = mkLayoutData(process.objects);
+    const layoutDataById = mkLayoutData(process.objects, process.positions);
 
     const connections = _
         .chain(process.connections)
@@ -35,7 +34,7 @@
     let elem;
     $: svgElem = select(elem);
 
-    $: svgElem.call(zoom().on("zoom", zoomed))
+    $: svgElem.call(zoom().on("zoom", zoomed));
 
 </script>
 
