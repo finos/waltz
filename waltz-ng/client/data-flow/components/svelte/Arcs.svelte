@@ -158,28 +158,28 @@
         </linearGradient>
         <linearGradient id={`dynamic_linear_grad_${def.defId}`} gradientUnits="userSpaceOnUse">
             {#each reverse(def.colorStops) as colorStop}
-                <stop stop-color={colorStop.color} offset={(0 + $rainbowTipProportion + 0.1) - colorStop.offsetEnd * ($rainbowTipProportion + 0.1)}/>
-                <stop stop-color={colorStop.color} offset={(0 + $rainbowTipProportion + 0.1) - colorStop.offsetStart * ($rainbowTipProportion + 0.1)}/>
+                <stop stop-color={colorStop.color} offset={(0 + $rainbowTipProportion + 0.08) - colorStop.offsetEnd * ($rainbowTipProportion + 0.08)}/>
+                <stop stop-color={colorStop.color} offset={(0 + $rainbowTipProportion + 0.08) - colorStop.offsetStart * ($rainbowTipProportion + 0.08)}/>
             {/each}
             <stop stop-color={def.color} offset={0 + $rainbowTipProportion + 0.1}/> <!-- middle of bar is solid color -->
             <stop stop-color={def.color} offset={1 - $rainbowTipProportion - 0.1}/> <!-- rainbow tip - main color - rainbow tip -->
             {#each def.colorStops as colorStop}
-                <stop stop-color={colorStop.color} offset={(1 - $rainbowTipProportion - 0.1) + colorStop.offsetStart * ($rainbowTipProportion + 0.1)}/>
-                <stop stop-color={colorStop.color} offset={(1 - $rainbowTipProportion - 0.1) + colorStop.offsetEnd * ($rainbowTipProportion + 0.1)}/>
+                <stop stop-color={colorStop.color} offset={(1 - $rainbowTipProportion - 0.08) + colorStop.offsetStart * ($rainbowTipProportion + 0.08)}/>
+                <stop stop-color={colorStop.color} offset={(1 - $rainbowTipProportion - 0.08) + colorStop.offsetEnd * ($rainbowTipProportion + 0.08)}/>
             {/each}
         </linearGradient>
 
         <!-- STATIC -->
         <linearGradient id={`static_linear_grad_${def.defId}`} gradientUnits="userSpaceOnUse">
             {#each reverse(def.colorStops) as colorStop}
-                <stop stop-color={colorStop.color} offset={0.3 - colorStop.offsetEnd * 0.3}/>
-                <stop stop-color={colorStop.color} offset={0.3 - colorStop.offsetStart * 0.3}/>
+                <stop stop-color={colorStop.color} offset={0.35 - colorStop.offsetEnd * 0.35}/>
+                <stop stop-color={colorStop.color} offset={0.35 - colorStop.offsetStart * 0.35}/>
             {/each}
-            <stop stop-color={def.color} offset="0.35"/>
-            <stop stop-color={def.color} offset="0.65"/>
+            <stop stop-color={def.color} offset="0.37"/>
+            <stop stop-color={def.color} offset="0.63"/>
             {#each def.colorStops as colorStop}
-                <stop stop-color={colorStop.color} offset={0.7 + colorStop.offsetStart * 0.3}/>
-                <stop stop-color={colorStop.color} offset={0.7 + colorStop.offsetEnd * 0.3}/>
+                <stop stop-color={colorStop.color} offset={0.65 + colorStop.offsetStart * 0.35}/>
+                <stop stop-color={colorStop.color} offset={0.65 + colorStop.offsetEnd * 0.35}/>
             {/each}
         </linearGradient>
         <linearGradient id={`static_grad_${def.defId}`} gradientUnits="objectBoundingBox">
