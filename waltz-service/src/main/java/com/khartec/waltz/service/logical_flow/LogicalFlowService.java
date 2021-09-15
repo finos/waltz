@@ -41,6 +41,8 @@ import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.lambda.Unchecked;
 import org.jooq.lambda.tuple.Tuple2;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -58,9 +60,11 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.common.SetUtilities.fromCollection;
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
 import static com.khartec.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 import static com.khartec.waltz.model.EntityReference.mkRef;
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.jooq.lambda.tuple.Tuple.tuple;
@@ -68,6 +72,8 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Service
 public class LogicalFlowService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(LogicalFlowService.class);
 
     private final ChangeLogService changeLogService;
     private final DataTypeService dataTypeService;
@@ -124,6 +130,7 @@ public class LogicalFlowService {
     }
 
 
+    @Deprecated
     public Collection<LogicalFlow> findAllByFlowIds(Collection<Long> ids) {
         return logicalFlowDao.findAllByFlowIds(ids);
     }
@@ -182,16 +189,19 @@ public class LogicalFlowService {
 
 
     public List<LogicalFlow> addFlows(List<AddLogicalFlowCommand> addCmds, String username) {
+
         addCmds.forEach(this::rejectIfSelfLoop);
 
-        List<ChangeLog> logEntries = addCmds
+        Set<AddLogicalFlowCommand> toAdd = fromCollection(addCmds);
+
+        List<ChangeLog> logEntries = toAdd
                 .stream()
                 .flatMap(cmd -> {
                     ImmutableChangeLog addedSourceParent = ImmutableChangeLog.builder()
                             .parentReference(cmd.source())
                             .severity(Severity.INFORMATION)
                             .userId(username)
-                            .message(String.format(
+                            .message(format(
                                     "Flow %s between: %s and %s",
                                     "added",
                                     cmd.source().name().orElse(Long.toString(cmd.source().id())),
@@ -207,7 +217,7 @@ public class LogicalFlowService {
         changeLogService.write(logEntries);
 
         LocalDateTime now = nowUtc();
-        List<LogicalFlow> flowsToAdd = addCmds
+        List<LogicalFlow> flowsToAdd = toAdd
                 .stream()
                 .map(addCmd -> ImmutableLogicalFlow.builder()
                         .source(addCmd.source())
@@ -244,19 +254,25 @@ public class LogicalFlowService {
      * @return number of flows removed
      */
     public int removeFlow(Long flowId, String username) {
+
         LogicalFlow logicalFlow = logicalFlowDao.getByFlowId(flowId);
 
-        int deleted = logicalFlowDao.removeFlow(flowId, username);
+        if(logicalFlow == null){
+            LOG.warn("Logical flow cannot be found, no flows will be updated");
+            throw new IllegalArgumentException(format("Cannot find flow with id: %d, no logical flow removed", flowId));
+        } else {
+            int deleted = logicalFlowDao.removeFlow(flowId, username);
 
-        Set<EntityReference> affectedEntityRefs = SetUtilities.fromArray(logicalFlow.source(), logicalFlow.target());
+            Set<EntityReference> affectedEntityRefs = SetUtilities.fromArray(logicalFlow.source(), logicalFlow.target());
 
-        dataTypeUsageService.recalculateForApplications(affectedEntityRefs);
+            dataTypeUsageService.recalculateForApplications(affectedEntityRefs);
 
-        changeLogService.writeChangeLogEntries(logicalFlow, username,
-                "Removed : datatypes [" + getAssociatedDatatypeNamesAsCsv(flowId) + "]",
-                Operation.REMOVE);
+            changeLogService.writeChangeLogEntries(logicalFlow, username,
+                    "Removed : datatypes [" + getAssociatedDatatypeNamesAsCsv(flowId) + "]",
+                    Operation.REMOVE);
 
-        return deleted;
+            return deleted;
+        }
     }
 
 

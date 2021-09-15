@@ -39,7 +39,7 @@ export function store($http, baseApiUrl) {
     };
 
     const findByUser = (all = false) => {
-        const filter = all ? 'all' : 'unattested';
+        const filter = all ? "all" : "unattested";
         return $http
             .get(`${base}/${filter}/user`)
             .then(result => result.data);
@@ -90,49 +90,49 @@ export function store($http, baseApiUrl) {
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
 
-export const serviceName = 'AttestationInstanceStore';
+export const serviceName = "AttestationInstanceStore";
 
 
 export const AttestationInstanceStore_API = {
     attestInstance: {
         serviceName,
-        serviceFnName: 'attestInstance',
-        description: 'create an attestation'
+        serviceFnName: "attestInstance",
+        description: "create an attestation"
     },
     attestEntityForUser: {
         serviceName,
-        serviceFnName: 'attestEntityForUser',
-        description: 'attest existing/create new attestation for user'
+        serviceFnName: "attestEntityForUser",
+        description: "attest existing/create new attestation for user"
     },
     findByRunId: {
         serviceName,
-        serviceFnName: 'findByRunId',
-        description: 'find attestations by a run id'
+        serviceFnName: "findByRunId",
+        description: "find attestations by a run id"
     },
     findByUser: {
         serviceName,
-        serviceFnName: 'findByUser',
-        description: 'find attestations for a user'
+        serviceFnName: "findByUser",
+        description: "find attestations for a user"
     },
     findHistoricalForPendingByUser: {
         serviceName,
-        serviceFnName: 'findHistoricalForPendingByUser',
-        description: 'find historical attestations for pending attestations for which this user has to attest'
+        serviceFnName: "findHistoricalForPendingByUser",
+        description: "find historical attestations for pending attestations for which this user has to attest"
     },
     findPersonsById: {
         serviceName,
-        serviceFnName: 'findPersonsById',
-        description: 'find recipients (person) for an instance'
+        serviceFnName: "findPersonsById",
+        description: "find recipients (person) for an instance"
     },
     findByEntityRef: {
         serviceName,
-        serviceFnName: 'findByEntityRef',
-        description: 'find instances for an entity'
+        serviceFnName: "findByEntityRef",
+        description: "find instances for an entity"
     },
     findBySelector: {
         serviceName,
@@ -141,7 +141,7 @@ export const AttestationInstanceStore_API = {
     },
     cleanupOrphans: {
         serviceName,
-        serviceFnName: 'cleanupOrphans',
-        description: 'clean up orphan attestations and recipients for applications that no longer exist'
+        serviceFnName: "cleanupOrphans",
+        description: "clean up orphan attestations and recipients for applications that no longer exist"
     }
 };

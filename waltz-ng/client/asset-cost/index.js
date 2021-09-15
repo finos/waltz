@@ -16,25 +16,23 @@
  *
  */
 
-import angular from 'angular';
-import {registerComponents, registerStores} from '../common/module-utils';
-import * as AssetCostStore from './services/asset-cost-store';
-import AssetCostsSection from './components/section/asset-costs-section';
-import AssetCostsGraph from './components/graph/asset-costs-graph';
-import AssetCostsBasicInfoTile from './components/basic-info-tile/asset-costs-basic-info-tile';
-import AssetCostTable from './components/table/asset-cost-table';
+import angular from "angular";
+import {registerComponents, registerStores} from "../common/module-utils";
+import * as AssetCostStore from "./services/asset-cost-store";
+import AssetCostsSection from "./components/section/asset-costs-section";
+import AssetCostsBasicInfoTile from "./components/basic-info-tile/asset-costs-basic-info-tile";
+import AssetCostTable from "./components/table/asset-cost-table";
 
 
 export default () => {
 
-    const module = angular.module('waltz.asset.cost', []);
+    const module = angular.module("waltz.asset.cost", []);
 
     registerStores(module, [
         AssetCostStore ]);
 
     registerComponents(module, [
         AssetCostsBasicInfoTile,
-        AssetCostsGraph,
         AssetCostsSection,
         AssetCostTable]);
 

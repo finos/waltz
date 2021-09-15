@@ -32,9 +32,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.*;
 import static com.khartec.waltz.schema.tables.Bookmark.BOOKMARK;
@@ -46,7 +46,7 @@ public class BookmarkDao {
 
     private final DSLContext dsl;
 
-    private RecordMapper<? super Record, Bookmark> TO_DOMAIN_MAPPER = r -> {
+    private final RecordMapper<? super Record, Bookmark> TO_DOMAIN_MAPPER = r -> {
         BookmarkRecord record = r.into(BookmarkRecord.class);
 
         EntityReference parentRef = ImmutableEntityReference.builder()
@@ -172,11 +172,11 @@ public class BookmarkDao {
      * @param selector A sub-query that returns the set of bookmark ids that need to be retrieved
      * @return A collection of bookmarks corresponding to the selector.
      */
-    public Collection<Bookmark> findByBookmarkIdSelector(Select<Record1<Long>> selector) {
+    public Set<Bookmark> findByBookmarkIdSelector(Select<Record1<Long>> selector) {
         return dsl
                 .selectFrom(BOOKMARK)
                 .where(BOOKMARK.ID.in(selector))
-                .fetch(TO_DOMAIN_MAPPER);
+                .fetchSet(TO_DOMAIN_MAPPER);
     }
 
 

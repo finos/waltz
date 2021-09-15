@@ -36,7 +36,6 @@ import com.khartec.waltz.service.taxonomy_management.TaxonomyCommandProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -167,7 +166,7 @@ public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcesso
 
     private void previewBookmarkRemovals(ImmutableTaxonomyChangePreview.Builder preview,
                                          IdSelectionOptions selectionOptions) {
-        Collection<Bookmark> bookmarks = bookmarkService.findByBookmarkIdSelector(selectionOptions);
+        Set<Bookmark> bookmarks = bookmarkService.findByBookmarkIdSelector(selectionOptions);
         addToPreview(
                 preview,
                 map(bookmarks, Bookmark::entityReference),

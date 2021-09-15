@@ -223,7 +223,9 @@ public class AttestationInstanceDao {
     }
 
 
-    public List<AttestationInstance> findForEntityByRecipient(AttestEntityCommand command, String userId, boolean unattestedOnly) {
+    public List<AttestationInstance> findForEntityByRecipient(AttestEntityCommand command,
+                                                              String userId,
+                                                              boolean unattestedOnly) {
         Condition maybeUnattestedOnlyCondition = unattestedOnly
                 ? ATTESTATION_INSTANCE.ATTESTED_AT.isNull()
                 : DSL.trueCondition();
@@ -239,6 +241,7 @@ public class AttestationInstanceDao {
                 .on(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(ATTESTATION_INSTANCE.ID))
                 .where(ATTESTATION_INSTANCE_RECIPIENT.USER_ID.eq(userId))
                 .and(ATTESTATION_RUN.ATTESTED_ENTITY_KIND.eq(command.attestedEntityKind().name())
+                .and(ATTESTATION_RUN.ATTESTED_ENTITY_ID.eq(command.attestedEntityId()))
                 .and(ATTESTATION_INSTANCE.PARENT_ENTITY_ID.eq(command.entityReference().id()))
                 .and(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND.eq(command.entityReference().kind().name())))
                 .and(maybeUnattestedOnlyCondition)

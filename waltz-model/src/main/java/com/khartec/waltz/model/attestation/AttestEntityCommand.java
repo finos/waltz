@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.Nullable;
 import com.khartec.waltz.model.command.Command;
 import org.immutables.value.Value;
 
@@ -32,4 +33,8 @@ public abstract class AttestEntityCommand implements Command {
 
     public abstract EntityKind attestedEntityKind(); // LOGICAL or PHYSICAL flows
     public abstract EntityReference entityReference(); // The entity for which the above kind is being attested
+
+    @Nullable
+    public abstract Long attestedEntityId();
+
 }

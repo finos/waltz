@@ -126,4 +126,12 @@ public class SetUtilities {
         values.forEach(result::addAll);
         return result;
     }
+
+    public static <T> Set<T> complement(Set<T> xs, Set<T> ys) {
+        checkNotNull(xs, "xs cannot be null");
+        checkNotNull(ys, "ys cannot be null");
+
+        return minus(union(xs,ys), intersection(xs,ys));
+
+    }
 }

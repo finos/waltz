@@ -28,7 +28,7 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
+import java.util.Set;
 
 import static com.khartec.waltz.schema.tables.ApplicationGroupMember.APPLICATION_GROUP_MEMBER;
 
@@ -44,7 +44,7 @@ public class AppGroupMemberDao {
     }
 
 
-    public List<AppGroupMember> getMembers(long groupId) {
+    public Set<AppGroupMember> getMembers(long groupId) {
         return getWhere(APPLICATION_GROUP_MEMBER.GROUP_ID.eq(groupId));
     }
 
@@ -66,7 +66,7 @@ public class AppGroupMemberDao {
     }
 
 
-    public List<AppGroupMember> getSubscriptions(String userId) {
+    public Set<AppGroupMember> getSubscriptions(String userId) {
         return getWhere(APPLICATION_GROUP_MEMBER.USER_ID.eq(userId));
     }
 
@@ -89,11 +89,11 @@ public class AppGroupMemberDao {
     }
 
 
-    private List<AppGroupMember> getWhere(Condition condition) {
+    private Set<AppGroupMember> getWhere(Condition condition) {
         return dsl.select(APPLICATION_GROUP_MEMBER.fields())
                 .from(APPLICATION_GROUP_MEMBER)
                 .where(condition)
-                .fetch(r -> {
+                .fetchSet(r -> {
                     ApplicationGroupMemberRecord record = r.into(APPLICATION_GROUP_MEMBER);
                     return ImmutableAppGroupMember.builder()
                             .userId(record.getUserId())
