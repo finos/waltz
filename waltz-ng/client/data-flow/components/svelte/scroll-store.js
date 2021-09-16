@@ -3,6 +3,8 @@ import _ from "lodash";
 import {dimensions} from "./scroll-utils"
 import {tweened} from "svelte/motion";
 import {scaleBand} from "d3-scale";
+import {termSearch} from "../../../common";
+import {containsAll} from "../../../common/list-utils";
 
 
 export const layoutDirections = {
@@ -19,8 +21,10 @@ export const flowDirections = {
 export const categories = writable([]);
 export const clients = writable([]);
 export const arcs = writable([]);
-export const clientFilter = writable(() => true);
-export const categoryFilter = writable(() => true);
+export const clientQuery = writable(null);
+export const categoryQuery = writable(null);
+export const entityKindFilter = writable(() => true);
+export const assessmentRatingFilter = writable(() => true);
 export const layoutDirection = writable(layoutDirections.clientToCategory)
 export const highlightClass = writable(null);
 export const rainbowTipProportion = tweened(0.2, { duration: 600, delay: 600 });
@@ -32,16 +36,25 @@ export const flowDirection = derived(layoutDirection, (direction) => {
     return direction === layoutDirections.categoryToClient ? flowDirections.OUTBOUND : flowDirections.INBOUND
 })
 
-export const filteredCategories = derived([categoryFilter, categories], ([q, cats]) => {
-    return q == null
+export const filteredCategories = derived([categoryQuery, categories], ([catQry, cats]) => {
+
+    return _.isEmpty(catQry)
         ? cats
-        : _.filter(cats, q);
+        : termSearch(cats, catQry, ["name"]);
 })
 
-export const filteredClients = derived([clientFilter, clients], ([q, cs]) => {
-    return q === null
+export const filteredClients = derived([clientQuery, entityKindFilter, assessmentRatingFilter, clients], ([clientQry, entityKindFilter, assessmentRatingFilter, cs]) => {
+
+    const filtered = _.isEmpty(clientQry)
         ? cs
-        : _.filter(cs, q)
+        : termSearch(cs, clientQry, ["name"]);
+
+    return entityKindFilter === null
+        ? filtered
+        : _.chain(filtered)
+            .filter(entityKindFilter)
+            .filter(assessmentRatingFilter)
+            .value();
 });
 
 export const filteredArcs = derived([arcs, filteredClients, filteredCategories], ([acs, fcs, fcats]) => {
@@ -55,6 +68,11 @@ export const filteredArcs = derived([arcs, filteredClients, filteredCategories],
 
     return filteredArcList;
 });
+
+
+export const filterApplied = derived([clients, filteredClients, categories, filteredCategories], ([cs, fcs, cats, fcats]) => {
+    return !containsAll(fcs, cs) || !containsAll(fcats, cats);
+})
 
 
 export const clientScale = derived(filteredClients, (c) => scaleBand()

@@ -1,19 +1,12 @@
 <script>
     import Icon from "../../../common/svelte/Icon.svelte";
-    import {
-        categoryFilter,
-        clientFilter,
-        flowDirection,
-        flowDirections,
-        layoutDirection,
-        layoutDirections,
-        selectedClient
-    } from "./scroll-store";
+    import {flowDirection, flowDirections, layoutDirection, layoutDirections, selectedClient} from "./scroll-store";
     import Toggle from "../../../common/svelte/Toggle.svelte";
     import _ from "lodash";
     import PhysicalFlowDetailTable from "./PhysicalFlowDetailTable.svelte";
     import {createEventDispatcher} from "svelte";
     import EntityLink from "../../../common/svelte/EntityLink.svelte";
+    import FlowDecoratorGraphFilters from "./FlowDecoratorGraphFilters.svelte";
 
     export let parentEntity;
     export let flowInfo;
@@ -21,19 +14,11 @@
     let selectedTab = "context";
     let dispatch = createEventDispatcher();
 
-    let categoryQryValue = "";
-    let clientQryValue = "";
-
-    $: $categoryFilter = c => c.name.indexOf(categoryQryValue) !== -1;
-    $: $clientFilter = c => c.name.indexOf(clientQryValue) !== -1;
-
     function toggleDirection() {
         $layoutDirection = $layoutDirection === layoutDirections.categoryToClient
             ? layoutDirections.clientToCategory
             : layoutDirections.categoryToClient
     }
-
-    let counterpartKinds = ["ACTOR", "APPLICATION"];
 
     function focusOnEntity(selectedEntity) {
         dispatch('select', selectedEntity);
@@ -115,30 +100,7 @@
             {/if}
 
         {:else if selectedTab === 'filters'}
-            <div>
-                Filter categories: <input type="text" bind:value={categoryQryValue}/>
-            </div>
-            <div>
-                Filter clients: <input type="text" bind:value={clientQryValue}/>
-            </div>
-<!--            <div>-->
-<!--                Filter by counterpart entity kind:-->
-<!--                <div class="checkbox">-->
-<!--                    <label>-->
-<!--                        <input type="checkbox"-->
-<!--                               bind:checked={_.includes(counterpartKinds, 'APPLICATION')}>-->
-<!--                        Applications-->
-<!--                    </label>-->
-<!--                    <label>-->
-<!--                        <input type="checkbox"-->
-<!--                               bind:checked={_.includes(counterpartKinds, 'APPLICATION')}>-->
-<!--                        Actors-->
-<!--                    </label>-->
-<!--                    <div class="help-block">-->
-<!--                        Use this flag to indicate if visitors may need special permissions to access the link-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
+            <FlowDecoratorGraphFilters/>
         {/if}
     </div>
 </div>
