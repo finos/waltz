@@ -40,8 +40,8 @@
                   on:mouseleave={() => onMouseLeave()}
                   rx={dimensions.client.height / 2}
                   width={dimensions.client.width - dimensions.client.iconPadding}
-                  height={$clientScale.bandwidth() /2}
-                  transform={`translate(${$layoutDirection === layoutDirections.clientToCategory ? 0 : dimensions.client.iconPadding}, ${$clientScale.bandwidth() / 4 - 2})`}/>
+                  height={dimensions.client.height}
+                  transform={`translate(${$layoutDirection === layoutDirections.clientToCategory ? 0 : dimensions.client.iconPadding}, ${$clientScale.bandwidth() / 2 - 13})`}/>
             <text dx={$layoutDirection === layoutDirections.clientToCategory ? 10 : dimensions.client.iconPadding + 10}
                   pointer-events="none"
                   dy={$clientScale.bandwidth() / 2 + 5}>

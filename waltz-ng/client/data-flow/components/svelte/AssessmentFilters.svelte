@@ -6,6 +6,7 @@
     import Icon from "../../../common/svelte/Icon.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
     import {createEventDispatcher} from "svelte";
+    import {entity} from "../../../common/services/enums/entity";
 
     const Modes = {
         DEFINITION: "DEFINITION",
@@ -77,11 +78,20 @@
                 <div>
                     <div class="waltz-scroll-region-250">
                         <table class="table table-condensed table-hover small">
+                            <thead>
+                            <th></th>
+                            <th>Assessment Definition</th>
+                            <th>Entity Count</th>
+                            </thead>
                             <tbody>
                             {#each groupedAssessments as assessmentInfo}
                                 <tr on:click={() => selectDefinition(assessmentInfo)}
                                     class="clickable">
+                                    <td>
+                                        <Icon name={entity[assessmentInfo.assessmentDefinition.entityKind].icon}/>
+                                    </td>
                                     <td>{assessmentInfo.assessmentDefinition.name}</td>
+                                    <td>{_.sumBy(assessmentInfo.ratingEntityLists, d => _.size(d.entityReferences))}</td>
                                 </tr>
                             {/each}
                             </tbody>
@@ -92,6 +102,7 @@
                 <NoData>There are no assessments for the current entity list and selected kind</NoData>
             {/if}
         </div>
+        <br>
         <div class="col-sm-12">
             <div style="border-top: 1px dotted #eee; padding-top: 0.2em; margin-top: 0.2em">
                 <button class="btn btn-skinny"
@@ -123,6 +134,7 @@
                 </table>
             </div>
         </div>
+        <br>
         <div class="col-sm-12">
             <div  style="border-top: 1px dotted #eee; padding-top: 0.2em; margin-top: 0.2em">
                 <button class="btn btn-skinny"

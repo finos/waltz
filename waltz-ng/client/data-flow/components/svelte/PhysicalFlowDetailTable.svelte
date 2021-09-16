@@ -15,7 +15,7 @@
 </script>
 
 {#if !_.isEmpty(physicalFlows)}
-    <div>
+    <div class="small help-block">
         Physical Flows from {source} to {target}:
     </div>
     <div class:waltz-scroll-region-250={_.size(physicalFlows) > 6}>
@@ -40,7 +40,7 @@
                     <td title={physFlow.externalId}>
                         <EntityLink ref={Object.assign({}, physFlow, { name: truncate(physFlow.externalId, 12) || "-" })}/>
                     </td>
-                    <td title={physFlow.transport}>{truncate(physFlow.transport, 12)}</td>
+                    <td title={physFlow.transportKind}>{truncate(physFlow.transport, 12)}</td>
                     <td title={physFlow.frequency}>{physFlow.frequency}</td>
                     <td title={physFlow.criticality}>{physFlow.criticality}</td>
                 </tr>

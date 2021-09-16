@@ -64,9 +64,7 @@ export const filteredArcs = derived([arcs, filteredClients, filteredCategories],
     const filteredClientIds = _.map(fcs, c => c.id);
     const filteredCatIds = _.map(fcats, c => c.id);
 
-    const filteredArcList = _.filter(acs, a => _.includes(filteredClientIds, a.clientId) && _.includes(filteredCatIds, a.categoryId));
-
-    return filteredArcList;
+    return _.filter(acs, a => _.includes(filteredClientIds, a.clientId) && _.includes(filteredCatIds, a.categoryId));
 });
 
 
@@ -78,7 +76,7 @@ export const filterApplied = derived([clients, filteredClients, categories, filt
 export const clientScale = derived(filteredClients, (c) => scaleBand()
     .padding(0.2)
     .domain(_.map(c, "id"))
-    .range([0, _.max([c.length * dimensions.client.height , dimensions.diagram.height])]));
+    .range([0, _.max([(c.length - 1) * (dimensions.client.height * 1.2), dimensions.diagram.height])]));
 
 export const categoryScale = derived(filteredCategories, c => scaleBand()
     .padding(0.2)

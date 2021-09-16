@@ -40,11 +40,11 @@
 
                 const color = lineColorScale(a.ratingId);
 
-
                 let classes = _.compact([
                     "arc",
                     showing ? "showing" : null,
                     horizon ? "horizon" : null,
+                    a.lifecycleStatus === 'PENDING' ? "pending" : null,
                     `category_${a.categoryId}`,
                     `client_${a.clientId}`
                 ]);
@@ -232,5 +232,9 @@
 
     line.faded {
         opacity: 0.3;
+    }
+
+    line.pending {
+        stroke-dasharray: 8, 4;
     }
 </style>

@@ -7,6 +7,7 @@
     import {createEventDispatcher} from "svelte";
     import EntityLink from "../../../common/svelte/EntityLink.svelte";
     import FlowDecoratorGraphFilters from "./FlowDecoratorGraphFilters.svelte";
+    import DataTypeDetailTable from "./DataTypeDetailTable.svelte";
 
     export let parentEntity;
     export let flowInfo;
@@ -79,8 +80,16 @@
                 </h4>
 
                 <div>
+                    <DataTypeDetailTable {flowInfo} {parentEntity}/>
+                </div>
+
+                <br>
+
+                <div>
                     <PhysicalFlowDetailTable {flowInfo} {parentEntity}/>
                 </div>
+
+                <br>
 
                 <div style="border-top: 1px dotted #eee; padding-top: 0.2em; margin-top: 0.2em">
                     <ul>

@@ -1,27 +1,9 @@
 <script>
 
-    import _ from "lodash";
-    import {categoryQuery, clientQuery, entityKindFilter, filterApplied} from "./scroll-store";
+    import {filterApplied} from "./scroll-store";
     import AssessmentFilters from "./AssessmentFilters.svelte";
     import DefaultFilters from "./DefaultFilters.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
-
-    let categoryQryValue = "";
-    let clientQryValue = "";
-
-    $: $categoryQuery = categoryQryValue;
-    $: $clientQuery = clientQryValue;
-
-    let counterpartKinds = ["ACTOR", "APPLICATION"];
-    let filteredKinds = [];
-
-    function addOrRemoveKindFromFilter(kind) {
-        filteredKinds = _.includes(filteredKinds, kind)
-            ? _.without(filteredKinds, kind)
-            : _.concat(filteredKinds, kind)
-    }
-
-    $: $entityKindFilter = c => !_.includes(filteredKinds, c.kind);
 
     const Modes = {
         DEFAULT: "DEFAULT",
@@ -60,9 +42,7 @@
     .warning-block {
         background: #fffdfa;
         background: linear-gradient(90deg, #fffdfa 0%, rgba(255,255,255,1) 100%);
-        //color: $waltz-font-color;
         padding: 15px;
-        //margin-bottom: 1em;
         border-radius: 3px;
         box-shadow: 0 0 2px 0 hsla(0, 0%, 0%, 0.2);
         border-left: 4px solid $waltz-amber;

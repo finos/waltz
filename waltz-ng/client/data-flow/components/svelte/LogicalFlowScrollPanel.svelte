@@ -27,6 +27,7 @@
     import {mkSelectionOptions} from "../../../common/selector-utils";
     import Icon from "../../../common/svelte/Icon.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
+    import {flowClassificationStore} from "../../../svelte-stores/flow-classification-store";
 
     function onScroll() {
         clientScrollOffset.update(origValue => {
@@ -75,7 +76,10 @@
         .chain(flowInfo)
         .map(d => Object.assign({}, d, {key: `cat_${d.rollupDataType.id}_cli_${d.counterpart.id}`}))
         .groupBy(d => d.key)
-        .value()
+        .value();
+
+    $: flowClassificationCall = flowClassificationStore.findAll()
+    $: noOpinionRating = _.find($flowClassificationCall.data, d => d.code === 'NO_OPINION');
 
     $: summarisedFlows = _
         .chain(groupedFlowInfo)
@@ -91,7 +95,7 @@
 
             const exactFlow = _.find(v, d => d.actualDataType.id === d.rollupDataType.id);
 
-            const lineRating = _.get(exactFlow, "classificationId", 2); //TODO: make this the no opinion id
+            const lineRating = _.get(exactFlow, "classificationId", noOpinionRating?.id); //TODO: make this the no opinion id
 
             const lineLifecycleStatus = _.get(exactFlow, "flowEntityLifecycleStatus", "ACTIVE");
 

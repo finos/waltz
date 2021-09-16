@@ -1,5 +1,4 @@
 import _ from "lodash";
-import {selectedClient} from "./scroll-store";
 
 
 export function mkClients(summarisedFlows, physicalFlows = []){
@@ -42,33 +41,19 @@ export function mkCategories(summarisedFlows){
 }
 
 export function mkArcs(summarisedFlows){
-
     return _
         .chain(summarisedFlows)
         .map(d => ({
             id: d.key,
             clientId: d.client.id,
             categoryId: d.category.id,
+            flowId: d.flowId,
             ratingId: d.lineRating, // overall flow rating
+            lifecycleStatus: d.lineLifecycleStatus,
             tipRatings: mkTipRatings(d.ratingCounts)
         }))
         .value();
 }
-
-
-function mkTipRatingsOld() {
-    if (Math.random() > 0.5) {
-        return null;
-    } else {
-        return [
-            {ratingId: 0, count: Math.floor(Math.random() * 4)},
-            {ratingId: 1, count: Math.floor(Math.random() * 8)},
-            {ratingId: 2, count: Math.floor(Math.random() * 16)},
-            {ratingId: 3, count: Math.floor(Math.random() * 4)}
-        ]
-    }
-}
-    
     
 function mkTipRatings(ratingCounts){
     return _.map(ratingCounts, (v, k) => ({ ratingId: k, count: v }));
