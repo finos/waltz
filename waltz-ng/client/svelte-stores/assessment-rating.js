@@ -7,8 +7,16 @@ export function mkAssessmentRatingStore() {
             "GET",
             `api/assessment-rating/definition-id/${id}`);
 
+    const findByEntityKind = (kind, force = false) => remote
+        .fetchViewList(
+            "GET",
+            `api/assessment-rating/entity-kind/${kind}`,
+            null,
+            {force});
+
     return {
-        findByDefinitionId
+        findByDefinitionId,
+        findByEntityKind
     };
 }
 

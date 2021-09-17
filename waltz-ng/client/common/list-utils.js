@@ -107,3 +107,9 @@ export function mkChunks(entries = [], chunkSize) {
     }
     return chunkedEntries;
 }
+
+
+export function reverse(array = []){
+    const newArray = _.clone(array);
+    return newArray.reverse();
+}

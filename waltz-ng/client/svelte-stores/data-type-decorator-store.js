@@ -17,18 +17,23 @@
  */
 
 import {remote} from "./remote";
+import {entity} from "../common/services/enums/entity";
 
-export function mkPhysicalFlowStore() {
+export function mkDataTypeDecoratorStore() {
 
-    const findBySelector = (selector) => {
-        return remote
-            .fetchViewList("POST", "api/physical-flow/selector", selector);
+    // ONLY FOR LOGICAL FLOWS
+    const findByFlowIds = (flowIds = [], kind = entity.LOGICAL_DATA_FLOW.key, force = false) => {
+        return remote.fetchViewData(
+            "POST",
+            `api/data-type-decorator/flow-ids/kind/${kind}`,
+            flowIds,
+            [],
+            {force})
     };
 
-
     return {
-        findBySelector,
+        findByFlowIds
     };
 }
 
-export const physicalFlowStore = mkPhysicalFlowStore();
+export const dataTypeDecoratorStore = mkDataTypeDecoratorStore();

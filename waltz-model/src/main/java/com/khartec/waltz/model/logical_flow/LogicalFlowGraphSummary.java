@@ -16,19 +16,20 @@
  *
  */
 
-import {remote} from "./remote";
+package com.khartec.waltz.model.logical_flow;
 
-export function mkPhysicalFlowStore() {
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.FlowDirection;
+import org.immutables.value.Value;
 
-    const findBySelector = (selector) => {
-        return remote
-            .fetchViewList("POST", "api/physical-flow/selector", selector);
-    };
+import java.util.Map;
+import java.util.Set;
 
+@Value.Immutable
+@JsonSerialize(as = ImmutableLogicalFlowGraphSummary.class)
+@JsonDeserialize(as = ImmutableLogicalFlowGraphSummary.class)
+public abstract class LogicalFlowGraphSummary {
 
-    return {
-        findBySelector,
-    };
+    public abstract Map<FlowDirection, Set<FlowInfo>> flowInfoByDirection();
 }
-
-export const physicalFlowStore = mkPhysicalFlowStore();

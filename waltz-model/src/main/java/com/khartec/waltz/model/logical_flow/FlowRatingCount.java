@@ -16,19 +16,18 @@
  *
  */
 
-import {remote} from "./remote";
+package com.khartec.waltz.model.logical_flow;
 
-export function mkPhysicalFlowStore() {
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.immutables.value.Value;
 
-    const findBySelector = (selector) => {
-        return remote
-            .fetchViewList("POST", "api/physical-flow/selector", selector);
-    };
+@Value.Immutable
+@JsonSerialize(as = ImmutableFlowRatingCount.class)
+@JsonDeserialize(as = ImmutableFlowRatingCount.class)
+public abstract class FlowRatingCount {
 
+    public abstract Long rating();
+    public abstract int flowCount();
 
-    return {
-        findBySelector,
-    };
 }
-
-export const physicalFlowStore = mkPhysicalFlowStore();
