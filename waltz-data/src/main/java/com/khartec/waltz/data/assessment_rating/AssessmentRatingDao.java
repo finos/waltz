@@ -139,21 +139,13 @@ public class AssessmentRatingDao {
 
 
     public List<AssessmentRating> findByEntityKind(EntityKind kind) {
-
-        SelectConditionStep<Record> fetch = dsl
+        return dsl
                 .select(ASSESSMENT_RATING.fields())
                 .select(ENTITY_NAME_FIELD)
                 .from(ASSESSMENT_RATING)
                 .innerJoin(ASSESSMENT_DEFINITION).on(ASSESSMENT_DEFINITION.ID.eq(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID))
-                .where(ASSESSMENT_RATING.ENTITY_KIND.eq(kind.name()));
-
-
-        System.out.println(fetch);
-
-        List<AssessmentRating> fetch1 = fetch
+                .where(ASSESSMENT_RATING.ENTITY_KIND.eq(kind.name()))
                 .fetch(TO_DOMAIN_MAPPER);
-
-        return fetch1;
     }
 
 
@@ -238,18 +230,16 @@ public class AssessmentRatingDao {
                 .from(ASSESSMENT_RATING)
                 .innerJoin(RATING_SCHEME_ITEM).on(ASSESSMENT_RATING.RATING_ID.eq(RATING_SCHEME_ITEM.ID))
                 .where(dsl.renderInlined(entityCondition))
-                .fetch(); //Groups(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID);
-
+                .fetch();
 
         Map<Long, Collection<Tuple2<String, EntityReference>>> groupedByDef = groupBy(data,
                 r -> r.get(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID),
                 r -> tuple(r.get(RATING_SCHEME_ITEM.NAME), mkRef(EntityKind.valueOf(r.get(ASSESSMENT_RATING.ENTITY_KIND)), r.get(ASSESSMENT_RATING.ENTITY_ID), r.get(ENTITY_NAME_FIELD))));
 
-        Set<Tuple2<Long, Set<ImmutableRatingEntityList>>> collect = groupedByDef
+        return groupedByDef
                 .entrySet()
                 .stream()
                 .map(es -> {
-
                     Map<String, Collection<EntityReference>> entitiesByOutcome = groupBy(es.getValue(), t -> t.v1, t -> t.v2);
 
                     return tuple(
@@ -262,9 +252,5 @@ public class AssessmentRatingDao {
                                             .build()));
                 })
                 .collect(toSet());
-
-
-        return collect;
-
     }
 }

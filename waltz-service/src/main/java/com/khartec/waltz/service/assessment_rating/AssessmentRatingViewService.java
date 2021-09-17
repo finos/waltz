@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
 import static com.khartec.waltz.common.MapUtilities.indexBy;
 import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.schema.Tables.ASSESSMENT_RATING;
@@ -69,13 +70,14 @@ public class AssessmentRatingViewService {
 
     public Collection<AssessmentGroupedEntities> findGroupedByDefinitionAndOutcomes(EntityKind kind, List<Long> entityIds) {
 
-        Condition entityCondition =  entityIds.size() == 0
+        Condition entityCondition = isEmpty(entityIds)
                 ? ASSESSMENT_RATING.ENTITY_KIND.eq(kind.name())
-                : ASSESSMENT_RATING.ENTITY_KIND.eq(kind.name()).and(ASSESSMENT_RATING.ENTITY_ID.in(entityIds)); // taking a long time, try and limit by the client list
+                : ASSESSMENT_RATING.ENTITY_KIND.eq(kind.name()).and(ASSESSMENT_RATING.ENTITY_ID.in(entityIds));
 
         Map<Long, AssessmentDefinition> definitionsById = indexBy(assessmentDefinitionDao.findAll(), def -> def.id().get());
 
-        Set<Tuple2<Long, Set<ImmutableRatingEntityList>>> groupedByDefinitionAndOutcome = assessmentRatingDao.findGroupedByDefinitionAndOutcome(entityCondition);
+        Set<Tuple2<Long, Set<ImmutableRatingEntityList>>> groupedByDefinitionAndOutcome = assessmentRatingDao
+                .findGroupedByDefinitionAndOutcome(entityCondition);
 
         return map(
                 groupedByDefinitionAndOutcome,
