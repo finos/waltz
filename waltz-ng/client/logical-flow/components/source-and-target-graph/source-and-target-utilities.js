@@ -29,17 +29,6 @@ const iconCodes = {
     hourglass: "\uf252",
 };
 
-const svgIconCodes = {
-    // codes from: http://fontawesome.io/cheatsheet/  (conversion: &#x1234; -> \u1234)
-    files: "&#xf0c5;",
-    file: "&#xf016;",
-    question: "&#xf128;",
-    questionCircle: "&#xf29c;",
-    folder: "&#xf115;",
-    hourglass: "&#xf252;",
-};
-
-
 function toIcon(count = 0) {
     switch (count) {
         case 0:
@@ -68,55 +57,6 @@ function toIcon(count = 0) {
             };
     }
 }
-
-
-export function toSvgIcon(count = 0) {
-    switch (count) {
-        case 0:
-            return {
-                code: svgIconCodes.questionCircle,
-                description: "No physical files specified",
-                color: colors.amber
-            };
-        case 1:
-            return {
-                code: svgIconCodes.file,
-                description: "One linked physical files",
-                color: colors.black
-            };
-        case 2:
-            return {
-                code: "&#xf115;",
-                description: "Two linked physical files",
-                color: colors.black
-            };
-        default:
-            return {
-                code: "&#xf115;",
-                description: "Several linked physical files",
-                color: colors.black
-            };
-    }
-}
-
-
-function toCUIcon(count = 0) {
-    switch (count) {
-        case 0:
-            return {
-                code: "",
-                description: "",
-                color: "#000"
-            };
-        default:
-            return {
-                code: iconCodes.hourglass,
-                description: "Changes are associated with this flow",
-                color: "#000"
-            };
-    }
-}
-
 
 export function mkTweakers(tweakers = {},
                            physicalFlows = [],
