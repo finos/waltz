@@ -19,12 +19,6 @@
 <div>
 
     <waltz-section-actions>
-        <button class="btn btn-xs btn-primary"
-                ng-disabled="$ctrl.tableData.length == 0 "
-                ng-click="$ctrl.exportData()">
-            <waltz-icon name="cloud-download"></waltz-icon>
-            Export
-        </button>
         <button class="btn btn-xs waltz-btn-transparent"
                 ng-click="$ctrl.visibility.ratingOverlay = ! $ctrl.visibility.ratingOverlay">
             <waltz-icon name="map-signs"></waltz-icon>
@@ -66,9 +60,18 @@
 
             <div ng-if="$ctrl.tableData.length > 0">
                 <waltz-grid-with-search column-defs="$ctrl.columnDefs"
-                                        entries="$ctrl.tableData"
-                                        on-initialise="$ctrl.onGridInitialise">
+                                        entries="$ctrl.tableData">
                 </waltz-grid-with-search>
+            </div>
+
+            <div class="pull-right">
+                <waltz-data-extract-link name="Export"
+                                         styling="link"
+                                         filename="ratings.csv"
+                                         extract="allocations/measurable-category/{{$ctrl.measurableCategory.id}}"
+                                         method="POST"
+                                         request-body="$ctrl.selector">
+                </waltz-data-extract-link>
             </div>
 
         </div>
