@@ -46,10 +46,7 @@
         border-radius: 3px;
         box-shadow: 0 0 2px 0 hsla(0, 0%, 0%, 0.2);
         border-left: 4px solid $waltz-amber;
-
-      .warning-icon {
-        color: $waltz-amber;
-      }
     }
+
 
 </style>
