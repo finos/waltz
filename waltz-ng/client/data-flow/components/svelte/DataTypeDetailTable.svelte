@@ -1,5 +1,5 @@
 <script>
-    import {filteredArcs, layoutDirection, layoutDirections, selectedClient} from "./scroll-store";
+    import {filteredArcs, layoutDirection, layoutDirections, selectedClient} from "./flow-decorator-store";
     import _ from "lodash";
     import {dataTypeDecoratorStore} from "../../../svelte-stores/data-type-decorator-store";
     import {flowClassificationStore} from "../../../svelte-stores/flow-classification-store";

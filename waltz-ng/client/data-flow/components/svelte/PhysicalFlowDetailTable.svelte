@@ -1,5 +1,5 @@
 <script>
-    import {selectedClient, layoutDirection, layoutDirections} from "./scroll-store";
+    import {selectedClient, layoutDirection, layoutDirections} from "./flow-decorator-store";
     import _ from "lodash";
     import {truncate} from "../../../common/string-utils";
     import EntityLink from "../../../common/svelte/EntityLink.svelte";

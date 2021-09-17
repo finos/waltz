@@ -1,7 +1,7 @@
 <script>
 
     import _ from "lodash";
-    import {assessmentRatingFilter, filteredClients} from "./scroll-store";
+    import {assessmentRatingFilter, filteredClients} from "./flow-decorator-store";
     import {assessmentRatingViewStore} from "../../../svelte-stores/assessment-rating-view-service";
     import Icon from "../../../common/svelte/Icon.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";

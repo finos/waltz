@@ -25,7 +25,7 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 import template from "./data-flow-section.html";
 import {entity} from "../../../common/services/enums/entity";
 import FlowClassificationLegend from "../../../flow-classification-rule/components/svelte/FlowClassificationLegend.svelte";
-import LogicalFlowScrollPanel from "../svelte/LogicalFlowScrollPanel.svelte"
+import LogicalFlowScrollPanel from "../svelte/FlowDecoratorExplorerPanel.svelte"
 
 const bindings = {
     parentEntityRef: "<",

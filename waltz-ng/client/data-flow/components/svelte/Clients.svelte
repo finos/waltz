@@ -6,8 +6,8 @@
         selectedClient,
         layoutDirection,
         layoutDirections
-    } from "./scroll-store";
-    import {dimensions} from "./scroll-utils"
+    } from "./flow-decorator-store";
+    import {dimensions} from "./flow-decorator-utils"
     import {truncateMiddle} from "../../../common/string-utils";
 
     import _ from "lodash";

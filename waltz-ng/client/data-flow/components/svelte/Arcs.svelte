@@ -7,9 +7,9 @@
         highlightClass,
         layout,
         rainbowTipProportion
-    } from "./scroll-store";
+    } from "./flow-decorator-store";
     import _ from "lodash";
-    import {dimensions} from "./scroll-utils";
+    import {dimensions} from "./flow-decorator-utils";
     import {select, selectAll} from "d3-selection";
     import {scaleOrdinal} from "d3-scale";
     import {flowClassificationStore} from "../../../svelte-stores/flow-classification-store";

@@ -1,7 +1,7 @@
 <script>
 
     import _ from "lodash";
-    import {categoryQuery, clientQuery, entityKindFilter} from "./scroll-store";
+    import {categoryQuery, clientQuery, entityKindFilter} from "./flow-decorator-store";
     import AssessmentFilters from "./AssessmentFilters.svelte";
     import {createEventDispatcher} from "svelte";
     import Icon from "../../../common/svelte/Icon.svelte";

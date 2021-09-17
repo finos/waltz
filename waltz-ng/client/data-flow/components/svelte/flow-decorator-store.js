@@ -1,6 +1,6 @@
 import {derived, writable} from "svelte/store";
 import _ from "lodash";
-import {dimensions} from "./scroll-utils"
+import {dimensions} from "./flow-decorator-utils"
 import {tweened} from "svelte/motion";
 import {scaleBand} from "d3-scale";
 import {termSearch} from "../../../common";

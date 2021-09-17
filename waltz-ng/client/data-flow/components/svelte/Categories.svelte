@@ -1,10 +1,10 @@
 <script>
-    import {categoryScale, filteredCategories, highlightClass} from "./scroll-store";
-    import {dimensions} from "./scroll-utils"
+    import {categoryScale, filteredCategories, highlightClass} from "./flow-decorator-store";
+    import {dimensions} from "./flow-decorator-utils"
     import {truncateMiddle} from "../../../common/string-utils";
     import {symbol, symbolCross, symbolCircle} from "d3-shape";
     import {createEventDispatcher} from "svelte";
-    import {layoutDirection, layoutDirections} from "./scroll-store";
+    import {layoutDirection, layoutDirections} from "./flow-decorator-store";
 
 
     let dispatch = createEventDispatcher();

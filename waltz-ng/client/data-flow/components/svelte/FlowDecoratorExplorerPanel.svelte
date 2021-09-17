@@ -10,10 +10,10 @@
         flowDirections, focusClient,
         layout,
         selectedClient
-    } from "./scroll-store";
+    } from "./flow-decorator-store";
     import Categories from "./Categories.svelte";
     import Clients from "./Clients.svelte";
-    import {dimensions} from "./scroll-utils";
+    import {dimensions} from "./flow-decorator-utils";
     import {mkArcs, mkCategories, mkClients} from "./demo-data";
     import _ from "lodash";
     import Arcs from "./Arcs.svelte";

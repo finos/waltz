@@ -1,6 +1,6 @@
 <script>
     import Icon from "../../../common/svelte/Icon.svelte";
-    import {flowDirection, flowDirections, layoutDirection, layoutDirections, selectedClient} from "./scroll-store";
+    import {flowDirection, flowDirections, layoutDirection, layoutDirections, selectedClient} from "./flow-decorator-store";
     import Toggle from "../../../common/svelte/Toggle.svelte";
     import _ from "lodash";
     import PhysicalFlowDetailTable from "./PhysicalFlowDetailTable.svelte";

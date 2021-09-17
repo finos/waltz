@@ -1,6 +1,6 @@
 <script>
 
-    import {filterApplied} from "./scroll-store";
+    import {filterApplied} from "./flow-decorator-store";
     import AssessmentFilters from "./AssessmentFilters.svelte";
     import DefaultFilters from "./DefaultFilters.svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
