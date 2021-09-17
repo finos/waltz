@@ -23,44 +23,46 @@ function createStore() {
         if (toast.timeout) setTimeout(() => dismiss(id), toast.timeout);
     };
 
-    const success = (message) => {
-        const success = {
+    const success = (message, overrideOptions = {}) => {
+        const defaults = {
             type: "success",
             dismissible: true,
             timeout: 3000,
             message: message
         };
-        add(success);
+        add(Object.assign(defaults, overrideOptions));
     };
 
-    const warning = (message) => {
-        const warning = {
+    const warning = (message, overrideOptions = {}) => {
+        const defaults = {
             type: "warning",
             dismissible: true,
             timeout: 3000,
             message: message
         };
-        add(warning);
+        add(Object.assign(defaults, overrideOptions));
     }
 
-    const error = (message) => {
-        const error = {
+    const error = (message, overrideOptions = {}) => {
+        const defaults = {
             type: "error",
             dismissible: true,
             timeout: 6000,
             message: message
         };
-        add(error);
+
+        add(Object.assign(defaults, overrideOptions));
     }
 
-    const info = (message) => {
-        const info = {
+    const info = (message, overrideOptions = {}) => {
+        const defaults = {
             type: "info",
             dismissible: true,
             timeout: 3000,
             message: message
         };
-        add(info);
+
+        add(Object.assign(defaults, overrideOptions));
     }
 
     const confirmInfo = (message) => {

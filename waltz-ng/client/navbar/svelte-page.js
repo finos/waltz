@@ -32,7 +32,7 @@ function controller($scope, $timeout, settingsService, $rootScope) {
                 .findOrDefault(
                     "ui.banner.message",
                     "Waltz is optimised for use in modern browsers. For example Google Chrome, Firefox and Microsoft Edge")
-                .then(ToastStore.info);
+                .then(m => ToastStore.info(m, {timeout: 10000}));
         }
     }
 }
