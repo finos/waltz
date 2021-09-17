@@ -24,28 +24,33 @@ import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.assessment_rating.AssessmentRating;
-import com.khartec.waltz.model.assessment_rating.ImmutableAssessmentRating;
-import com.khartec.waltz.model.assessment_rating.RemoveAssessmentRatingCommand;
-import com.khartec.waltz.model.assessment_rating.SaveAssessmentRatingCommand;
+import com.khartec.waltz.model.assessment_rating.*;
 import com.khartec.waltz.schema.tables.records.AssessmentRatingRecord;
 import org.jooq.*;
+import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.common.MapUtilities.groupBy;
+import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.common.StringUtilities.mkSafe;
+import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.schema.Tables.RATING_SCHEME_ITEM;
 import static com.khartec.waltz.schema.tables.AssessmentDefinition.ASSESSMENT_DEFINITION;
 import static com.khartec.waltz.schema.tables.AssessmentRating.ASSESSMENT_RATING;
 import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toSet;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
 public class AssessmentRatingDao {
@@ -58,7 +63,7 @@ public class AssessmentRatingDao {
     private static final RecordMapper<? super Record, AssessmentRating> TO_DOMAIN_MAPPER = r -> {
         AssessmentRatingRecord record = r.into(ASSESSMENT_RATING);
         return ImmutableAssessmentRating.builder()
-                .entityReference(EntityReference.mkRef(EntityKind.valueOf(record.getEntityKind()), record.getEntityId()))
+                .entityReference(mkRef(EntityKind.valueOf(record.getEntityKind()), record.getEntityId()))
                 .assessmentDefinitionId(record.getAssessmentDefinitionId())
                 .ratingId(record.getRatingId())
                 .comment(mkSafe(record.getDescription()))
@@ -134,7 +139,9 @@ public class AssessmentRatingDao {
 
 
     public List<AssessmentRating> findByEntityKind(EntityKind kind) {
-        return dsl.select(ASSESSMENT_RATING.fields())
+        return dsl
+                .select(ASSESSMENT_RATING.fields())
+                .select(ENTITY_NAME_FIELD)
                 .from(ASSESSMENT_RATING)
                 .innerJoin(ASSESSMENT_DEFINITION).on(ASSESSMENT_DEFINITION.ID.eq(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID))
                 .where(ASSESSMENT_RATING.ENTITY_KIND.eq(kind.name()))
@@ -209,6 +216,41 @@ public class AssessmentRatingDao {
         return assessmentRatings
                 .stream()
                 .map(TO_RECORD_UNMAPPER::unmap)
-                .collect(Collectors.toSet());
+                .collect(toSet());
+    }
+
+
+    public Set<Tuple2<Long, Set<ImmutableRatingEntityList>>> findGroupedByDefinitionAndOutcome(Condition entityCondition) {
+        Result<Record> data = dsl
+                .select(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID,
+                        RATING_SCHEME_ITEM.NAME,
+                        ASSESSMENT_RATING.ENTITY_ID,
+                        ASSESSMENT_RATING.ENTITY_KIND)
+                .select(ENTITY_NAME_FIELD)
+                .from(ASSESSMENT_RATING)
+                .innerJoin(RATING_SCHEME_ITEM).on(ASSESSMENT_RATING.RATING_ID.eq(RATING_SCHEME_ITEM.ID))
+                .where(dsl.renderInlined(entityCondition))
+                .fetch();
+
+        Map<Long, Collection<Tuple2<String, EntityReference>>> groupedByDef = groupBy(data,
+                r -> r.get(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID),
+                r -> tuple(r.get(RATING_SCHEME_ITEM.NAME), mkRef(EntityKind.valueOf(r.get(ASSESSMENT_RATING.ENTITY_KIND)), r.get(ASSESSMENT_RATING.ENTITY_ID), r.get(ENTITY_NAME_FIELD))));
+
+        return groupedByDef
+                .entrySet()
+                .stream()
+                .map(es -> {
+                    Map<String, Collection<EntityReference>> entitiesByOutcome = groupBy(es.getValue(), t -> t.v1, t -> t.v2);
+
+                    return tuple(
+                            es.getKey(),
+                            map(entitiesByOutcome.entrySet(),
+                                    entrySet -> ImmutableRatingEntityList
+                                            .builder()
+                                            .rating(entrySet.getKey())
+                                            .entityReferences(entrySet.getValue())
+                                            .build()));
+                })
+                .collect(toSet());
     }
 }

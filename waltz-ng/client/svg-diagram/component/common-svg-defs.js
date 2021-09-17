@@ -84,7 +84,7 @@ function addOutliner(defs) {
         .attr("id","waltz-outline");
 
     filter.append('feFlood')
-        .attr('flood-color', '#fff')
+        .attr('flood-color', '#afde96')
         .attr('result', 'base');
 
     filter.append('feMorphology')

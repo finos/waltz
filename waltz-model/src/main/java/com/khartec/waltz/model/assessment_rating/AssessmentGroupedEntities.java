@@ -16,19 +16,23 @@
  *
  */
 
-import {remote} from "./remote";
+package com.khartec.waltz.model.assessment_rating;
 
-export function mkPhysicalFlowStore() {
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
+import org.immutables.value.Value;
 
-    const findBySelector = (selector) => {
-        return remote
-            .fetchViewList("POST", "api/physical-flow/selector", selector);
-    };
+import java.util.Set;
 
 
-    return {
-        findBySelector,
-    };
+@Value.Immutable
+@JsonSerialize(as = ImmutableAssessmentGroupedEntities.class)
+@JsonDeserialize(as = ImmutableAssessmentGroupedEntities.class)
+public abstract class AssessmentGroupedEntities {
+
+    public abstract AssessmentDefinition assessmentDefinition();
+    public abstract Set<RatingEntityList> ratingEntityLists();
+
+
 }
-
-export const physicalFlowStore = mkPhysicalFlowStore();

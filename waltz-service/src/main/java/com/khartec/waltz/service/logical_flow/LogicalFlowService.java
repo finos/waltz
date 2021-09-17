@@ -352,8 +352,13 @@ public class LogicalFlowService {
     }
 
 
+    public LogicalFlowGraphSummary getFlowInfoByDirection(EntityReference ref, Long datatypeId) {
+        return logicalFlowStatsDao.getFlowInfoByDirection(ref, datatypeId);
+    }
 
-    private void attemptToAddUnknownDecoration(LogicalFlow logicalFlow, String username) {
+
+
+        private void attemptToAddUnknownDecoration(LogicalFlow logicalFlow, String username) {
         dataTypeService
                 .getUnknownDataType()
                 .flatMap(IdProvider::id)

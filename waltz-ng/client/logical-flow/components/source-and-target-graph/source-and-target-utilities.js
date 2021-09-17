@@ -29,7 +29,6 @@ const iconCodes = {
     hourglass: "\uf252",
 };
 
-
 function toIcon(count = 0) {
     switch (count) {
         case 0:

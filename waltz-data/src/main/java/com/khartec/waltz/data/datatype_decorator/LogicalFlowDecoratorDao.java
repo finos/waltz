@@ -19,6 +19,7 @@
 package com.khartec.waltz.data.datatype_decorator;
 
 import com.khartec.waltz.common.SetUtilities;
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
@@ -44,6 +45,7 @@ import java.util.Set;
 import java.util.function.Function;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
 import static com.khartec.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
@@ -61,6 +63,11 @@ import static java.util.stream.Collectors.toList;
 @Repository
 public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
 
+    private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+            LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID,
+            LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND,
+            newArrayList(EntityKind.DATA_TYPE));
+
 
     private static final RecordMapper<Record, DataTypeDecorator> TO_DECORATOR_MAPPER = r -> {
         LogicalFlowDecoratorRecord record = r.into(LOGICAL_FLOW_DECORATOR);
@@ -70,7 +77,8 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                 .entityReference(mkRef(LOGICAL_DATA_FLOW, record.getLogicalFlowId()))
                 .decoratorEntity(mkRef(
                         DATA_TYPE,
-                        record.getDecoratorEntityId()))
+                        record.getDecoratorEntityId(),
+                        r.get(ENTITY_NAME_FIELD)))
                 .rating(AuthoritativenessRatingValue.ofNullable(record.getRating()))
                 .provenance(record.getProvenance())
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
@@ -111,7 +119,8 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
     public DataTypeDecorator getByEntityIdAndDataTypeId(long flowId, long dataTypeId) {
 
         return dsl
-                .selectFrom(LOGICAL_FLOW_DECORATOR)
+                .select(LOGICAL_FLOW_DECORATOR.fields())
+                .select(ENTITY_NAME_FIELD)
                 .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(flowId))
                 .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(DATA_TYPE.name()))
                 .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(dataTypeId))
@@ -123,7 +132,9 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
         Condition condition = LOGICAL_FLOW.TARGET_ENTITY_ID.in(appIdSelector)
                 .or(LOGICAL_FLOW.SOURCE_ENTITY_ID.in(appIdSelector));
 
-        return dsl.select(LOGICAL_FLOW_DECORATOR.fields())
+        return dsl
+                .select(LOGICAL_FLOW_DECORATOR.fields())
+                .select(ENTITY_NAME_FIELD)
                 .from(LOGICAL_FLOW_DECORATOR)
                 .innerJoin(LOGICAL_FLOW)
                 .on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID))
@@ -141,6 +152,7 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
 
         return dsl
                 .select(LOGICAL_FLOW_DECORATOR.fields())
+                .select(ENTITY_NAME_FIELD)
                 .from(LOGICAL_FLOW_DECORATOR)
                 .innerJoin(LOGICAL_FLOW)
                 .on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID))
@@ -161,7 +173,8 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
 
     public List<DataTypeDecorator> findAll() {
         return dsl
-                .selectFrom(LOGICAL_FLOW_DECORATOR)
+                .select(LOGICAL_FLOW_DECORATOR.fields())
+                .select(ENTITY_NAME_FIELD)
                 .fetch(TO_DECORATOR_MAPPER);
     }
 
@@ -169,7 +182,8 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
     @Override
     public List<DataTypeDecorator> findByEntityId(long entityId) {
         return dsl
-                .selectFrom(LOGICAL_FLOW_DECORATOR)
+                .select(LOGICAL_FLOW_DECORATOR.fields())
+                .select(ENTITY_NAME_FIELD)
                 .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(entityId))
                 .fetch(TO_DECORATOR_MAPPER);
     }
@@ -182,6 +196,7 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
 
             return dsl
                     .select(LOGICAL_FLOW_DECORATOR.fields())
+                    .select(ENTITY_NAME_FIELD)
                     .from(LOGICAL_FLOW_DECORATOR)
                     .innerJoin(LOGICAL_FLOW)
                     .on(LOGICAL_FLOW.ID.eq(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID))
@@ -338,6 +353,7 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
     private List<DataTypeDecorator> findByCondition(Condition condition) {
         return dsl
                 .select(LOGICAL_FLOW_DECORATOR.fields())
+                .select(ENTITY_NAME_FIELD)
                 .from(LOGICAL_FLOW_DECORATOR)
                 .where(dsl.renderInlined(condition))
                 .fetch(TO_DECORATOR_MAPPER);
