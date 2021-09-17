@@ -52,8 +52,8 @@ const initialState = {
         },
     },
     tabs: [
-        {id: "LOGICAL_FLOW_SCROLL", name: "Logical Flows (Beta View)", requiredRole: "BETA_TESTER"},
         {id: "SUMMARY", name: "Logical Flows"},
+        {id: "LOGICAL_FLOW_SCROLL", name: "Logical Flows (Beta View)"},
         {id: "PHYSICAL", name: "Physical Flow Detail"},
         {id: "FLOW_CLASSIFICATION_RULES", name: "Flow Classification Rules"}
     ]
@@ -143,7 +143,6 @@ function controller(serviceBroker, userService) {
 
 
     vm.$onInit = () => {
-
         userService
             .whoami()
             .then(user => {
@@ -154,12 +153,6 @@ function controller(serviceBroker, userService) {
         loadData();
     };
 
-    vm.showTab = (idx) => {
-        vm.visibility.dataTab = idx;
-        if (idx === 2) {
-            loadAdditionalAuthSourceData();
-        }
-    };
 
     vm.isAnyEditorVisible = () => {
         return _.some(vm.visibility.editor, r => r);

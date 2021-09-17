@@ -236,7 +236,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <div class="col-md-8">
+        <div class="col-md-7">
             <svg bind:this={svgElem}
                  viewBox={`0 0 ${dimensions.diagram.width} ${dimensions.diagram.height}`}
                  width="100%"
@@ -271,7 +271,7 @@
                 </NoData>
             {/if}
         </div>
-        <div class="col-md-4">
+        <div class="col-md-5">
             <FlowContextPanel parentEntity={entity}
                               {flowInfo}
                               on:select={selectClient}/>

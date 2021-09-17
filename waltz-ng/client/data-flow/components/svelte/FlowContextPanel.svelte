@@ -4,10 +4,11 @@
     import Toggle from "../../../common/svelte/Toggle.svelte";
     import _ from "lodash";
     import PhysicalFlowDetailTable from "./PhysicalFlowDetailTable.svelte";
-    import {createEventDispatcher} from "svelte";
+    import {createEventDispatcher, onMount} from "svelte";
     import EntityLink from "../../../common/svelte/EntityLink.svelte";
     import FlowDecoratorGraphFilters from "./FlowDecoratorGraphFilters.svelte";
     import DataTypeDetailTable from "./DataTypeDetailTable.svelte";
+    import ToastStore from "../../../svelte-stores/toast-store";
 
     export let parentEntity;
     export let flowInfo;
@@ -24,6 +25,8 @@
     function focusOnEntity(selectedEntity) {
         dispatch('select', selectedEntity);
     }
+
+    onMount(() => ToastStore.info("This is a beta view, we'd love to hear feedback!"));
 
 </script>
 
