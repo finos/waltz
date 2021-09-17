@@ -86,7 +86,6 @@ public class AssessmentRatingViewService {
                         .assessmentDefinition(definitionsById.get(rel.v1))
                         .ratingEntityLists(rel.v2)
                         .build());
-
     }
 
 }

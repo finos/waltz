@@ -243,9 +243,6 @@ public class LogicalFlowStatsDao {
     }
 
 
-
-
-
     public LogicalFlowGraphSummary getFlowInfoByDirection(EntityReference ref, Long datatypeId){
 
         Condition sourceAppCondition = lf.SOURCE_ENTITY_ID.eq(counterpart_app.ID).and(lf.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
@@ -301,13 +298,12 @@ public class LogicalFlowStatsDao {
 
                         }, toSet())));
 
-        ImmutableLogicalFlowGraphSummary summary = ImmutableLogicalFlowGraphSummary
+        return ImmutableLogicalFlowGraphSummary
                 .builder()
                 .flowInfoByDirection(data)
                 .build();
-
-        return summary;
     }
+
 
     private SelectConditionStep<Record11<Long, Long, String, Long, Long, String, String, Long, String, String, String>> mkDirectionalQuery(Condition appDirectionCondition,
                                                                                                                                            Condition actorDirectionCondition,
