@@ -58,6 +58,25 @@ function toIcon(count = 0) {
     }
 }
 
+
+function toCUIcon(count = 0) {
+    switch (count) {
+        case 0:
+            return {
+                code: "",
+                description: "",
+                color: "#000"
+            };
+        default:
+            return {
+                code: iconCodes.hourglass,
+                description: "Changes are associated with this flow",
+                color: "#000"
+            };
+    }
+}
+
+
 export function mkTweakers(tweakers = {},
                            physicalFlows = [],
                            logicalFlows = [],
