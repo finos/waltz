@@ -18,28 +18,25 @@
 
 package com.khartec.waltz.jobs.harness;
 
+import com.khartec.waltz.data.logical_flow.LogicalFlowStatsDao;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.logical_flow.LogicalFlowGraphSummary;
 import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import org.jooq.DSLContext;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import static com.khartec.waltz.model.EntityReference.mkRef;
 
 public class LogicalFlowStatsHarness {
     public static void main(String[] args) throws ParseException {
 
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
         DSLContext dsl = ctx.getBean(DSLContext.class);
-        LogicalFlowService service = ctx.getBean(LogicalFlowService.class);
+        LogicalFlowStatsDao dao = ctx.getBean(LogicalFlowStatsDao.class);
 
-        IdSelectionOptions options = IdSelectionOptions.mkOpts(
-                EntityReference.mkRef(EntityKind.ORG_UNIT, 50L),
-                HierarchyQueryScope.CHILDREN);
+        LogicalFlowGraphSummary flowInfoByDirection = dao.getFlowInfoByDirection(mkRef(EntityKind.APPLICATION, 20506L), null);
 
-        service.calculateStats(options);
         System.out.println("--done");
 
     }

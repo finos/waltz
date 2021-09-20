@@ -43,6 +43,8 @@ const bindings = {
 
 const initialState = {
     measurables: [],
+    category: [],
+    selector: null,
     query: "",
     pie: null,
     ratings: [],
@@ -65,7 +67,7 @@ function preparePie(ratings = [],
             key: schemeItem.rating,
             count: counts[schemeItem.rating] || 0
         }))
-        .orderBy('count','asc')
+        .orderBy("count", "asc")
         .value();
 
     return {
@@ -121,8 +123,7 @@ function prepareColumnDefs(measurableCategory, measurables) {
             field: "rating",
             name: "Rating",
             cellTemplate: ratingCellTemplate,
-            sortingAlgorithm: (a, b) => a.name.localeCompare(b.name),
-            exportFormatter: (input) => input.name
+            sortingAlgorithm: (a, b) => a.name.localeCompare(b.name)
         }
     ];
 
@@ -159,8 +160,8 @@ function controller($q, serviceBroker) {
 
         vm.pie.selectedSegmentKey = d ? d.key : null;
         const ratings = d
-                ? _.filter(vm.ratings, r => r.rating === d.key)
-                : vm.ratings;
+            ? _.filter(vm.ratings, r => r.rating === d.key)
+            : vm.ratings;
 
         vm.tableData = prepareTableData(
             ratings,
@@ -170,14 +171,9 @@ function controller($q, serviceBroker) {
     };
 
     const loadData = () => {
-        const selector = mkSelectionOptions(
-            vm.parentEntityRef,
-            undefined,
-            undefined,
-            vm.filters);
 
         const appsPromise = serviceBroker
-            .loadViewData(CORE_API.ApplicationStore.findBySelector, [ selector ])
+            .loadViewData(CORE_API.ApplicationStore.findBySelector, [ vm.selector ])
             .then(r => vm.appsById = _.keyBy(r.data, "id"));
 
         const schemePromise = serviceBroker
@@ -187,7 +183,7 @@ function controller($q, serviceBroker) {
         const ratingsPromise = serviceBroker
             .loadViewData(
                 CORE_API.MeasurableRatingStore.findByMeasurableSelector,
-                [ selector ])
+                [ vm.selector ])
             .then(r => vm.ratings = r.data);
 
         const measurablesPromise = serviceBroker
@@ -203,11 +199,11 @@ function controller($q, serviceBroker) {
 
     const processData = () => {
         const measurable = _.find(vm.measurables, { id: vm.parentEntityRef.id });
-        const measurableCategory = _.find(vm.measurableCategories, { id: measurable.categoryId });
-        vm.ratingScheme = _.find(vm.ratingSchemes, { id: measurableCategory.ratingSchemeId });
+        vm.measurableCategory = _.find(vm.measurableCategories, { id: measurable.categoryId });
+        vm.ratingScheme = _.find(vm.ratingSchemes, { id: vm.measurableCategory.ratingSchemeId });
 
         vm.columnDefs = prepareColumnDefs(
-            measurableCategory,
+            vm.measurableCategory,
             vm.measurables);
         vm.pie = preparePie(
             vm.ratings,
@@ -223,11 +219,17 @@ function controller($q, serviceBroker) {
     vm.$onInit = () => loadData()
         .then(() => processData());
 
-    vm.$onChanges = () => loadData()
-        .then(() => processData());
+    vm.$onChanges = () => {
+        vm.selector = mkSelectionOptions(
+            vm.parentEntityRef,
+            undefined,
+            undefined,
+            vm.filters);
 
-    vm.onGridInitialise = (cfg) =>
-        vm.exportData = () => cfg.exportFn("measurable-ratings.csv");
+        loadData()
+            .then(() => processData());
+    }
+
 }
 
 

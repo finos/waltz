@@ -18,9 +18,11 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.logical_flow.AddLogicalFlowCommand;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
+import com.khartec.waltz.model.logical_flow.LogicalFlowGraphSummary;
 import com.khartec.waltz.model.logical_flow.LogicalFlowStatistics;
 import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
@@ -84,6 +86,7 @@ public class LogicalFlowEndpoint implements Endpoint {
         String cleanupSelfReferencesPath = mkPath(BASE_URL, "cleanup-self-references");
         String addFlowPath = mkPath(BASE_URL);
         String addFlowsPath = mkPath(BASE_URL, "list");
+        String getFlowGraphSummaryPath = mkPath(BASE_URL, "entity", ":kind", ":id", "data-type", ":dtId", "graph-summary");
 
         ListRoute<LogicalFlow> getByEntityRef = (request, response)
                 -> logicalFlowService.findByEntityReference(getEntityReference(request));
@@ -105,10 +108,17 @@ public class LogicalFlowEndpoint implements Endpoint {
         DatumRoute<LogicalFlow> getByIdRoute = (request, response)
                 -> logicalFlowService.getById(getId(request));
 
+        DatumRoute<LogicalFlowGraphSummary> getGraphSummaryRoute = (request, response) -> {
+            String dtIdString = request.params("dtId");
+            Long dtId = StringUtilities.parseLong(dtIdString, null);
+            return logicalFlowService.getFlowInfoByDirection(getEntityReference(request), dtId);
+        };
+
         getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
         getForDatum(cleanupSelfReferencesPath, this::cleanupSelfReferencingFlowsRoute);
         getForList(findByEntityPath, getByEntityRef);
         getForDatum(getByIdPath, getByIdRoute);
+        getForDatum(getFlowGraphSummaryPath, getGraphSummaryRoute);
         postForList(findByIdsPath, findByIdsRoute);
         postForList(findUpstreamFlowsForEntityReferencesPath, findUpstreamFlowsForEntityReferencesRoute);
         postForList(findBySelectorPath, findBySelectorRoute);

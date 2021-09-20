@@ -25,7 +25,7 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 import template from "./data-flow-section.html";
 import {entity} from "../../../common/services/enums/entity";
 import FlowClassificationLegend from "../../../flow-classification-rule/components/svelte/FlowClassificationLegend.svelte";
-
+import LogicalFlowScrollPanel from "../svelte/FlowDecoratorExplorerPanel.svelte"
 
 const bindings = {
     parentEntityRef: "<",
@@ -34,6 +34,7 @@ const bindings = {
 
 const initialState = {
     FlowClassificationLegend,
+    LogicalFlowScrollPanel,
     changeUnits: [],
     dataTypeUsages: [],
     logicalFlows: [],
@@ -48,13 +49,18 @@ const initialState = {
             logicalFlows: false,
             bulkLogicalFlows: false,
             bulkPhysicalFlows: false
-        }
-
-    }
+        },
+    },
+    tabs: [
+        {id: "SUMMARY", name: "Logical Flows"},
+        {id: "LOGICAL_FLOW_SCROLL", name: "Logical Flows (Beta View)"},
+        {id: "PHYSICAL", name: "Physical Flow Detail"},
+        {id: "FLOW_CLASSIFICATION_RULES", name: "Flow Classification Rules"}
+    ]
 };
 
 
-function controller(serviceBroker) {
+function controller(serviceBroker, userService) {
     const vm = initialiseData(this, initialState);
 
     function loadAdditionalAuthSourceData() {
@@ -137,15 +143,16 @@ function controller(serviceBroker) {
 
 
     vm.$onInit = () => {
+        userService
+            .whoami()
+            .then(user => {
+                vm.displayedTabs = _.filter(vm.tabs, t => _.isEmpty(t.requiredRole) || _.includes(user.roles, t.requiredRole));
+                vm.activeTab = vm.displayedTabs[0];
+            });
+
         loadData();
     };
 
-    vm.showTab = (idx) => {
-        vm.visibility.dataTab = idx;
-        if (idx === 2) {
-            loadAdditionalAuthSourceData();
-        }
-    };
 
     vm.isAnyEditorVisible = () => {
         return _.some(vm.visibility.editor, r => r);
@@ -160,7 +167,8 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
-    "ServiceBroker"
+    "ServiceBroker",
+    "UserService"
 ];
 
 

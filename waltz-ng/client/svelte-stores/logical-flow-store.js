@@ -17,6 +17,7 @@
  */
 
 import {remote} from "./remote";
+import {checkIsEntityRef} from "../common/checks";
 
 export function mkLogicalFlowStore() {
 
@@ -33,9 +34,22 @@ export function mkLogicalFlowStore() {
     }
 
 
+    const getFlowGraphSummary = (ref, dtId, force = false) => {
+        checkIsEntityRef(ref);
+        return remote
+            .fetchViewData(
+                "GET",
+                `api/logical-flow/entity/${ref.kind}/${ref.id}/data-type/${dtId}/graph-summary`,
+                null,
+                {},
+                {force: force});
+    }
+
+
     return {
         findByEntityReference,
-        findBySelector
+        findBySelector,
+        getFlowGraphSummary
     };
 }
 
