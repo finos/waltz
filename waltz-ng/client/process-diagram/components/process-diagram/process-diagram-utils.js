@@ -6,6 +6,9 @@ import {max, min} from "d3-array";
 
 
 export function calcBounds(positions = []) {
+    if (positions.length === 0) {
+        return { x1: 0, x2: 100, y1: 0, y2: 100, width: 100, height: 100};
+    }
     const x1 = min(positions, d => d.topLeft.x);
     const y1 = min(positions, d => d.topLeft.y);
     const x2 = max(positions, d => d.bottomRight.x);

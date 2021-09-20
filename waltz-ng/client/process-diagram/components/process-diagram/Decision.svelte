@@ -1,6 +1,6 @@
 <script>
     export let obj;
-    export let layoutData;
+    export let layout;
 
     function onMouseEnter() {
         console.log("decision:me:", obj);
@@ -8,8 +8,8 @@
 
     let points = "";
     $: {
-        const w = layoutData.width;
-        const h = layoutData.height;
+        const w = layout.width;
+        const h = layout.height;
         points = `
             ${w/2},0
             0,${h/2}
@@ -17,7 +17,7 @@
             ${w},${h/2}
             ${w/2},0
         `;
-    };
+    }
 
 </script>
 
@@ -26,9 +26,9 @@
 
     <polyline {points}></polyline>
 
-    <foreignObject width={layoutData.width * 2}
+    <foreignObject width={layout.width * 2}
                    height="200"
-                   transform={`translate(${layoutData.width * -0.7}, ${layoutData.height * 1})`}>
+                   transform={`translate(${layout.width * -0.7}, ${layout.height * 1})`}>
         <div style="text-align: left; font-size: smaller">
             {obj.name}
         </div>

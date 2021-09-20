@@ -1,6 +1,6 @@
 <script>
     export let obj;
-    export let layoutData;
+    export let layout;
 
     function onMouseEnter() {
         console.log("textCell:me:", obj);
@@ -9,17 +9,17 @@
 </script>
 
 
-<rect width={layoutData.width}
-      height={layoutData.height}
+<rect width={layout.width}
+      height={layout.height}
       rx="10"
       ry="10"
       on:mouseenter={onMouseEnter}>
 </rect>
 
-<foreignObject width={layoutData.width}
-               height={layoutData.height}
+<foreignObject width={layout.width}
+               height={layout.height}
                style="pointer-events: none"
-               y={layoutData.height / 6}>
+               y={layout.height / 6}>
     <div>
         {obj.name}
     </div>

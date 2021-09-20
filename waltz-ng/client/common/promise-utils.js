@@ -45,3 +45,17 @@ export function resolveResponses(responses = []) {
     return _.map(responses, r => r.data);
 }
 
+
+export function svelteCallToPromise(call) {
+    return new Promise((resolve, reject) => {
+        call.subscribe(d => {
+            console.log(d)
+            if (d.status === 'loaded') {
+                resolve(d.data);
+            }
+            if (d.status === 'error') {
+                reject(d.error);
+            }
+        })
+    });
+}

@@ -1,8 +1,6 @@
 <script>
-    import {calcRectAttrs} from "./process-diagram-utils";
-
     export let obj;
-    export let layoutData;
+    export let layout;
 
     function onMouseEnter() {
         console.log("activity:me:", obj);
@@ -13,15 +11,15 @@
 
 <rect rx="10"
       ry="10"
-      width={layoutData.width}
-      height={layoutData.height}
+      width={layout.width}
+      height={layout.height}
       on:mouseenter={onMouseEnter}>
 </rect>
 
-<foreignObject width={layoutData.width}
-               height={layoutData.height}
+<foreignObject width={layout.width}
+               height={layout.height}
                style="pointer-events: none"
-               y={layoutData.height / 6}>
+               y={layout.height / 6}>
     <div>
         {obj.name}
     </div>
@@ -30,6 +28,7 @@
 
 <style>
     rect {
+        opacity: 0.8;
         stroke: #ccc;
         fill: url(#Activity-gradient);
     }

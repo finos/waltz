@@ -1,6 +1,6 @@
 <script>
     export let obj;
-    export let layoutData;
+    export let layout;
 
     function onMouseEnter() {
         console.log("event:me:", obj);
@@ -9,17 +9,17 @@
 
 
 <g on:mouseenter={onMouseEnter}>
-    <circle cx={layoutData.width / 2}
-            r={layoutData.width / 1.5}>
+    <circle cx={layout.width / 2}
+            r={layout.width / 1.5}>
     </circle>
 
-    <circle cx={layoutData.width / 2}
-            r={layoutData.width / 1.8}>
+    <circle cx={layout.width / 2}
+            r={layout.width / 1.8}>
     </circle>
 
-    <foreignObject width={layoutData.width * 4}
-                   height="200"
-                   transform={`translate(${layoutData.width * -1}, ${layoutData.height * 0.4})`}>
+    <foreignObject width={layout.width * 4}
+                   border="1px solid red"
+                   transform={`translate(${layout.width * -1}, ${layout.height * 0.4})`}>
         <div style="text-align: left; font-size: smaller">
             {obj.name}
         </div>

@@ -20,7 +20,7 @@
 import template from "./playpen1.html";
 import {initialiseData} from "../../common";
 import {mkRef} from "../../common/entity-utils";
-import ProcessDiagram from "../../process-diagram/ProcessDiagram.svelte"
+import ProcessDiagram from "../../process-diagram/components/process-diagram/ProcessDiagram.svelte"
 
 const initData = {
     ref: mkRef("APPLICATION", 840),
