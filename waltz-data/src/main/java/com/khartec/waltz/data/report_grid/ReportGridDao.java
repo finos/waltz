@@ -44,6 +44,7 @@ import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.common.SetUtilities.union;
+import static com.khartec.waltz.common.StringUtilities.join;
 import static com.khartec.waltz.model.EntityKind.APPLICATION;
 import static com.khartec.waltz.model.EntityKind.PERSON;
 import static com.khartec.waltz.model.EntityReference.mkRef;
@@ -51,6 +52,7 @@ import static com.khartec.waltz.model.survey.SurveyInstanceStatus.APPROVED;
 import static com.khartec.waltz.model.survey.SurveyInstanceStatus.COMPLETED;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
@@ -515,6 +517,20 @@ public class ReportGridDao {
                             .and(SURVEY_INSTANCE.ENTITY_KIND.eq(APPLICATION.name())))
                     .asTable();
 
+
+            Map<Tuple2<Long, Long>, List<String>> responsesByInstanceQuestionKey = dsl
+                    .select(SURVEY_QUESTION_LIST_RESPONSE.SURVEY_INSTANCE_ID,
+                            SURVEY_QUESTION_LIST_RESPONSE.QUESTION_ID,
+                            SURVEY_QUESTION_LIST_RESPONSE.RESPONSE)
+                    .from(SURVEY_QUESTION_LIST_RESPONSE)
+                    .innerJoin(SURVEY_INSTANCE).on(SURVEY_QUESTION_LIST_RESPONSE.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
+                    .where(SURVEY_QUESTION_LIST_RESPONSE.QUESTION_ID.in(requiredSurveyQuestionIds))
+                    .and(SURVEY_INSTANCE.ENTITY_ID.in(appSelector))
+                    .and(SURVEY_INSTANCE.ENTITY_KIND.eq(APPLICATION.name()))
+                    .fetchGroups(
+                            k -> tuple(k.get(SURVEY_QUESTION_LIST_RESPONSE.SURVEY_INSTANCE_ID), k.get(SURVEY_QUESTION_LIST_RESPONSE.QUESTION_ID)),
+                            v -> v.get(SURVEY_QUESTION_LIST_RESPONSE.RESPONSE));
+
             SelectConditionStep<Record> qry = dsl
                     .selectFrom(responsesWithQuestionTypeAndEntity)
                     .where(responsesWithQuestionTypeAndEntity.field(latest_instance)
@@ -524,18 +540,37 @@ public class ReportGridDao {
                     .fetchSet(r -> {
                         String fieldType = r.get(SURVEY_QUESTION.FIELD_TYPE);
 
-                        String text = fieldType.equalsIgnoreCase(PERSON.name()) || fieldType.equalsIgnoreCase(APPLICATION.name())
-                                ? r.get(ENTITY_NAME_FIELD)
-                                : r.get("response", String.class);
+                        Long instanceId = r.get("sid", Long.class);
+                        Long questionId = r.get(SURVEY_QUESTION.ID, Long.class);
+                        String entityName = r.get(ENTITY_NAME_FIELD);
+                        String response = r.get("response", String.class);
+
+                        List<String> listResponses = responsesByInstanceQuestionKey.getOrDefault(tuple(instanceId, questionId), emptyList());
 
                         return ImmutableReportGridCell.builder()
                                 .applicationId(r.get(SURVEY_INSTANCE.ENTITY_ID))
-                                .columnEntityId(r.get(SURVEY_QUESTION.ID))
+                                .columnEntityId(questionId)
                                 .columnEntityKind(EntityKind.SURVEY_QUESTION)
-                                .text(text)
+                                .text(determineDisplayText(fieldType, entityName, response, listResponses))
                                 .comment(r.get(SURVEY_QUESTION_RESPONSE.COMMENT))
                                 .build();
                     });
+        }
+    }
+
+
+    private String determineDisplayText(String fieldType,
+                                        String entityName,
+                                        String response,
+                                        List<String> listResponses) {
+        switch (fieldType) {
+            case "PERSON":
+            case "APPLICATION":
+                return entityName;
+            case "MEASURABLE_MULTI_SELECT":
+                return join(listResponses, "; ");
+            default:
+                return response;
         }
     }
 
