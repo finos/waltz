@@ -51,7 +51,7 @@ const extIdCol = { field: "application.externalId", displayName: "Ext. Id", widt
 
 const unknownRating = {
     id: -1,
-    color: '#f7f9f9',
+    color: "#f7f9f9",
     description: "This rating has not been provided",
     name: "Unknown",
     rating: "Z",
@@ -85,7 +85,7 @@ function prepareColumnDefs(gridData) {
 
     const mkColumnCustomProps = (c) =>  {
         switch (c.columnEntityReference.kind) {
-            case 'COST_KIND':
+            case "COST_KIND":
                 return {
                     allowSummary: false,
                     cellTemplate:`
@@ -97,14 +97,16 @@ function prepareColumnDefs(gridData) {
                                 <waltz-currency-amount amount="COL_FIELD.value"></waltz-currency-amount>
                         </div>`
                 };
-            case 'INVOLVEMENT_KIND':
+            case "INVOLVEMENT_KIND":
+            case "SURVEY_QUESTION":
                 return {
                     allowSummary: false,
                     width: 150,
                     toSearchTerm: d => _.get(d, [mkPropNameForRef(c.columnEntityReference), "text"], ""),
                     cellTemplate:`
                         <div class="waltz-grid-report-cell"
-                             ng-class="{'wgrc-involvement-cell': COL_FIELD.text,
+                             ng-class="{'wgrc-involvement-cell': COL_FIELD.text && ${c.columnEntityReference.kind === 'INVOLVEMENT_KIND'},
+                                        'wgrc-survey-question-cell': COL_FIELD.text && ${c.columnEntityReference.kind === 'SURVEY_QUESTION'},
                                         'wgrc-no-data-cell': !COL_FIELD.text}"
                             <span ng-bind="COL_FIELD.text || '-'"
                                   ng-attr-title="{{COL_FIELD.text}}">
@@ -189,7 +191,7 @@ function prepareTableData(gridData) {
 
     const costColorScalesByColumnEntityId = _
         .chain(gridData.instance.cellData)
-        .filter(d => d.columnEntityKind === 'COST_KIND')
+        .filter(d => d.columnEntityKind === "COST_KIND")
         .groupBy(d => d.columnEntityId)
         .mapValues(v => scaleLinear()
             .domain(extent(v, d => d.value))
@@ -198,12 +200,13 @@ function prepareTableData(gridData) {
 
     function mkTableCell(x) {
         switch(x.columnEntityKind) {
-            case 'COST_KIND':
+            case "COST_KIND":
                 const color = costColorScalesByColumnEntityId[x.columnEntityId](x.value);
                 return {
                     color: color,
                     value: x.value };
-            case 'INVOLVEMENT_KIND':
+            case "INVOLVEMENT_KIND":
+            case "SURVEY_QUESTION":
                 return {
                     text: x.text };
             default:

@@ -20,6 +20,7 @@ package com.khartec.waltz.data.report_grid;
 
 
 import com.khartec.waltz.common.SetUtilities;
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.report_grid.*;
@@ -39,10 +40,15 @@ import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.common.SetUtilities.union;
+import static com.khartec.waltz.model.EntityKind.APPLICATION;
+import static com.khartec.waltz.model.EntityKind.PERSON;
 import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.model.survey.SurveyInstanceStatus.APPROVED;
+import static com.khartec.waltz.model.survey.SurveyInstanceStatus.COMPLETED;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
 import static java.util.Collections.emptySet;
@@ -68,8 +74,14 @@ public class ReportGridDao {
     private final com.khartec.waltz.schema.tables.Cost c = COST.as("c");
     private final com.khartec.waltz.schema.tables.Involvement inv = INVOLVEMENT.as("inv");
     private final com.khartec.waltz.schema.tables.InvolvementKind ik  = INVOLVEMENT_KIND.as("ik");
-    private final com.khartec.waltz.schema.tables.Person p = PERSON.as("p");
+    private final com.khartec.waltz.schema.tables.Person p = Tables.PERSON.as("p");
+    private final com.khartec.waltz.schema.tables.SurveyQuestion sq = SURVEY_QUESTION.as("sq");
 
+    private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+            SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_ID,
+            SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_KIND,
+            newArrayList(PERSON, APPLICATION))
+            .as("entity_name");
 
     @Autowired
     public ReportGridDao(DSLContext dsl) {
@@ -150,11 +162,20 @@ public class ReportGridDao {
                 ik.DESCRIPTION,
                 condition);
 
+        SelectConditionStep<Record7<String, Long, String, String, Integer, String, String>> surveyQuestionColumns = mkColumnDefinitionQuery(
+                EntityKind.SURVEY_QUESTION,
+                sq,
+                sq.ID,
+                sq.QUESTION_TEXT,
+                sq.HELP_TEXT,
+                condition);
+
         return assessmentDefinitionColumns
                 .unionAll(measurableColumns)
                 .unionAll(costKindColumns)
                 .unionAll(involvementKindColumns)
-                .orderBy(rgcd.POSITION, DSL.field("name"))
+                .unionAll(surveyQuestionColumns)
+                .orderBy(rgcd.POSITION, DSL.field("name", String.class))
                 .fetch(r -> ImmutableReportGridColumnDefinition.builder()
                         .columnEntityReference(mkRef(
                                 EntityKind.valueOf(r.get(rgcd.COLUMN_ENTITY_KIND)),
@@ -226,13 +247,18 @@ public class ReportGridDao {
                 colsByKind.getOrDefault(EntityKind.INVOLVEMENT_KIND, emptySet()),
                 cd -> cd.columnEntityReference().id());
 
+        Set<Long> requiredSurveyQuestionIds = map(
+                colsByKind.getOrDefault(EntityKind.SURVEY_QUESTION, emptySet()),
+                cd -> cd.columnEntityReference().id());
+
 
         return union(
                 fetchSummaryMeasurableData(appSelector, summaryMeasurableIdsUsingHighest, summaryMeasurableIdsUsingLowest),
                 fetchAssessmentData(appSelector, requiredAssessmentDefinitions),
                 fetchExactMeasurableData(appSelector, exactMeasurableIds),
                 fetchCostData(appSelector, requiredCostKinds),
-                fetchInvolvementData(appSelector, requiredInvolvementKinds));
+                fetchInvolvementData(appSelector, requiredInvolvementKinds),
+                fetchSurveyQuestionResponseData(appSelector, requiredSurveyQuestionIds));
     }
 
 
@@ -248,7 +274,7 @@ public class ReportGridDao {
                             p.EMAIL)
                     .from(inv)
                     .innerJoin(p).on(p.EMPLOYEE_ID.eq(inv.EMPLOYEE_ID))
-                    .where(inv.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                    .where(inv.ENTITY_KIND.eq(APPLICATION.name()))
                     .and(inv.ENTITY_ID.in(appSelector))
                     .and(inv.KIND_ID.in(requiredInvolvementKinds))
                     .and(p.IS_REMOVED.isFalse())
@@ -284,7 +310,7 @@ public class ReportGridDao {
                     .select(COST.COST_KIND_ID, DSL.max(COST.YEAR).as("latest_year"))
                     .from(COST)
                     .where(dsl.renderInlined(COST.ENTITY_ID.in(appSelector)
-                            .and(COST.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))))
+                            .and(COST.ENTITY_KIND.eq(APPLICATION.name()))))
                     .groupBy(COST.COST_KIND_ID);
 
             Condition latestYearForKind = c.COST_KIND_ID.eq(costKindLastestYear.field(COST.COST_KIND_ID))
@@ -297,7 +323,7 @@ public class ReportGridDao {
                     .from(c)
                     .innerJoin(costKindLastestYear).on(latestYearForKind)
                     .where(dsl.renderInlined(c.COST_KIND_ID.in(requiredCostKinds)
-                            .and(c.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                            .and(c.ENTITY_KIND.eq(APPLICATION.name()))
                             .and(c.ENTITY_ID.in(appSelector))))
                     .fetchSet(r -> ImmutableReportGridCell.builder()
                             .applicationId(r.get(c.ENTITY_ID))
@@ -344,7 +370,7 @@ public class ReportGridDao {
                 .innerJoin(ratingSchemeItems)
                     .on(m.MEASURABLE_CATEGORY_ID.eq(ratingSchemeItems.field("mcId", Long.class)))
                     .and(mr.RATING.eq(ratingSchemeItems.field("rsiCode", String.class)))
-                .where(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                .where(mr.ENTITY_KIND.eq(APPLICATION.name()))
                 .and(mr.ENTITY_ID.in(appSelector))
                 .and(m.ID.in(union(measurableIdsUsingHighest, measurableIdsUsingLowest)));
 
@@ -352,7 +378,7 @@ public class ReportGridDao {
                 .resultQuery(dsl.renderInlined(ratings))
                 .fetchGroups(
                         r -> tuple(
-                                mkRef(EntityKind.APPLICATION, r.get(mr.ENTITY_ID)),
+                                mkRef(APPLICATION, r.get(mr.ENTITY_ID)),
                                 r.get(m.ID)),
                         r -> tuple(
                                 r.get("rsiId", Long.class),
@@ -411,7 +437,7 @@ public class ReportGridDao {
                 .innerJoin(rsi).on(rsi.CODE.eq(mr.RATING)).and(rsi.SCHEME_ID.eq(mc.RATING_SCHEME_ID))
                 .where(mr.MEASURABLE_ID.in(exactMeasurableIds))
                 .and(mr.ENTITY_ID.in(appSelector))
-                .and(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
+                .and(mr.ENTITY_KIND.eq(APPLICATION.name()));
 
         return  dsl
                 .resultQuery(dsl.renderInlined(qry))
@@ -437,7 +463,7 @@ public class ReportGridDao {
                             ar.DESCRIPTION)
                     .from(ar)
                     .where(ar.ASSESSMENT_DEFINITION_ID.in(requiredAssessmentDefinitionIds)
-                            .and(ar.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                            .and(ar.ENTITY_KIND.eq(APPLICATION.name()))
                             .and(ar.ENTITY_ID.in(appSelector)))
                     .fetchSet(r -> ImmutableReportGridCell.builder()
                             .applicationId(r.get(ar.ENTITY_ID))
@@ -446,6 +472,70 @@ public class ReportGridDao {
                             .ratingId(r.get(ar.RATING_ID))
                             .comment(r.get(ar.DESCRIPTION))
                             .build());
+        }
+    }
+
+
+    private Set<ReportGridCell> fetchSurveyQuestionResponseData(Select<Record1<Long>> appSelector,
+                                                                Set<Long> requiredSurveyQuestionIds) {
+        if (requiredSurveyQuestionIds.size() == 0) {
+            return emptySet();
+        } else {
+
+            Field<Long> latest_instance = DSL
+                    .firstValue(SURVEY_INSTANCE.ID)
+                    .over()
+                    .partitionBy(SURVEY_INSTANCE.ENTITY_ID, SURVEY_INSTANCE.ENTITY_KIND, SURVEY_QUESTION.ID)
+                    .orderBy(SURVEY_INSTANCE.APPROVED_AT.desc().nullsLast())
+                    .as("latest_instance");
+
+            Table<Record> responsesWithQuestionTypeAndEntity = dsl
+                    .select(latest_instance)
+                    .select(SURVEY_INSTANCE.ID.as("sid"),
+                            SURVEY_INSTANCE.ENTITY_ID,
+                            SURVEY_INSTANCE.ENTITY_KIND,
+                            SURVEY_QUESTION.ID)
+                    .select(SURVEY_QUESTION.FIELD_TYPE)
+                    .select(ENTITY_NAME_FIELD)
+                    .select(SURVEY_QUESTION_RESPONSE.COMMENT)
+                    .select(DSL.coalesce(
+                            SURVEY_QUESTION_RESPONSE.STRING_RESPONSE,
+                            DSL.cast(SURVEY_QUESTION_RESPONSE.BOOLEAN_RESPONSE, String.class),
+                            DSL.cast(SURVEY_QUESTION_RESPONSE.NUMBER_RESPONSE, String.class),
+                            DSL.cast(SURVEY_QUESTION_RESPONSE.DATE_RESPONSE, String.class),
+                            DSL.cast(SURVEY_QUESTION_RESPONSE.LIST_RESPONSE_CONCAT, String.class)).as("response")) // for entity responses need to join entity name field
+                    .from(SURVEY_QUESTION)
+                    .innerJoin(SURVEY_QUESTION_RESPONSE)
+                    .on(SURVEY_QUESTION.ID.eq(SURVEY_QUESTION_RESPONSE.QUESTION_ID))
+                    .innerJoin(SURVEY_INSTANCE)
+                    .on(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
+                    .where(SURVEY_INSTANCE.STATUS.in(APPROVED.name(), COMPLETED.name())
+                            .and(SURVEY_QUESTION.ID.in(requiredSurveyQuestionIds))
+                            .and(SURVEY_INSTANCE.ENTITY_ID.in(appSelector))
+                            .and(SURVEY_INSTANCE.ENTITY_KIND.eq(APPLICATION.name())))
+                    .asTable();
+
+            SelectConditionStep<Record> qry = dsl
+                    .selectFrom(responsesWithQuestionTypeAndEntity)
+                    .where(responsesWithQuestionTypeAndEntity.field(latest_instance)
+                            .eq(responsesWithQuestionTypeAndEntity.field("sid", Long.class)));
+
+            return qry
+                    .fetchSet(r -> {
+                        String fieldType = r.get(SURVEY_QUESTION.FIELD_TYPE);
+
+                        String text = fieldType.equalsIgnoreCase(PERSON.name()) || fieldType.equalsIgnoreCase(APPLICATION.name())
+                                ? r.get(ENTITY_NAME_FIELD)
+                                : r.get("response", String.class);
+
+                        return ImmutableReportGridCell.builder()
+                                .applicationId(r.get(SURVEY_INSTANCE.ENTITY_ID))
+                                .columnEntityId(r.get(SURVEY_QUESTION.ID))
+                                .columnEntityKind(EntityKind.SURVEY_QUESTION)
+                                .text(text)
+                                .comment(r.get(SURVEY_QUESTION_RESPONSE.COMMENT))
+                                .build();
+                    });
         }
     }
 
