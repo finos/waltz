@@ -49,6 +49,17 @@ const nameCol = mkEntityLinkGridCell(
 
 const extIdCol = { field: "application.externalId", displayName: "Ext. Id", width: 100, pinnedLeft:true};
 
+const lifecyclePhaseCol = {
+    field: "application.lifecyclePhase",
+    displayName: "Lifecycle Phase",
+    width: 100,
+    pinnedLeft: true,
+    cellTemplate:`
+        <div class="waltz-grid-report-cell"
+            <span ng-bind="COL_FIELD | toDisplayName:'lifecyclePhase'"></span>
+        </div>`
+};
+
 const unknownRating = {
     id: -1,
     color: "#f7f9f9",
@@ -151,7 +162,7 @@ function prepareColumnDefs(gridData) {
         })
         .value();
 
-    return _.concat([nameCol, extIdCol], additionalColumns);
+    return _.concat([nameCol, extIdCol, lifecyclePhaseCol], additionalColumns);
 }
 
 
