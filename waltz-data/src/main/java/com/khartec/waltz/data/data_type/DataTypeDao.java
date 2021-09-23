@@ -93,7 +93,8 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
     public DataType getByCode(String code) {
         checkNotEmpty(code, "Code cannot be null/empty");
         return dsl
-                .selectFrom(DATA_TYPE)
+                .select(DATA_TYPE.fields())
+                .from(DATA_TYPE)
                 .where(DATA_TYPE.CODE.eq(code))
                 .fetchOne(TO_DOMAIN);
     }
@@ -101,7 +102,8 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
 
     public DataType getById(long dataTypeId) {
         return dsl
-                .selectFrom(DATA_TYPE)
+                .select(DATA_TYPE.fields())
+                .from(DATA_TYPE)
                 .where(DATA_TYPE.ID.eq(dataTypeId))
                 .fetchOne(TO_DOMAIN);
     }
@@ -109,7 +111,8 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
 
     public List<DataType> findByIds(Collection<Long> ids) {
         return dsl
-                .selectFrom(DATA_TYPE)
+                .select(DATA_TYPE.fields())
+                .from(DATA_TYPE)
                 .where(DATA_TYPE.ID.in(ids))
                 .fetch(TO_DOMAIN);
     }

@@ -60,14 +60,16 @@ public class ComplexityKindDao {
 
     public Set<ComplexityKind> findAll(){
         return dsl
-                .selectFrom(COMPLEXITY_KIND)
+                .select(COMPLEXITY_KIND.fields())
+                .from(COMPLEXITY_KIND)
                 .fetchSet(TO_COMPLEXITY_KIND_MAPPER);
     }
 
 
     public ComplexityKind getById(Long complexityKindId) {
         return dsl
-                .selectFrom(COMPLEXITY_KIND)
+                .select(COMPLEXITY_KIND.fields())
+                .from(COMPLEXITY_KIND)
                 .where(COMPLEXITY_KIND.ID.eq(complexityKindId))
                 .fetchOne(TO_COMPLEXITY_KIND_MAPPER);
     }

@@ -91,7 +91,8 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
 
     public Collection<ChangeInitiative> findForSelector(Select<Record1<Long>> selector) {
         return dsl
-                .selectFrom(CHANGE_INITIATIVE)
+                .select(CHANGE_INITIATIVE.fields())
+                .from(CHANGE_INITIATIVE)
                 .where(CHANGE_INITIATIVE.ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
     }
@@ -118,14 +119,16 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
 
     public Collection<ChangeInitiative> findByExternalId(String externalId) {
         return dsl
-                .selectFrom(CHANGE_INITIATIVE)
+                .select(CHANGE_INITIATIVE.fields())
+                .from(CHANGE_INITIATIVE)
                 .where(CHANGE_INITIATIVE.EXTERNAL_ID.eq(externalId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
     public Collection<ChangeInitiative> findAll() {
         return dsl
-                .selectFrom(CHANGE_INITIATIVE)
+                .select(CHANGE_INITIATIVE.fields())
+                .from(CHANGE_INITIATIVE)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 }

@@ -82,7 +82,8 @@ public class EndUserAppDao {
 
 
     public List<EndUserApplication> findBySelector(Select<Record1<Long>> selector) {
-        return dsl.selectFrom(END_USER_APPLICATION)
+        return dsl.select(END_USER_APPLICATION.fields())
+                .from(END_USER_APPLICATION)
                 .where(END_USER_APPLICATION.ID.in(selector)
                         .and(END_USER_APPLICATION.IS_PROMOTED.isFalse()))
                 .fetch(TO_DOMAIN_MAPPER);
@@ -99,7 +100,8 @@ public class EndUserAppDao {
 
     public EndUserApplication getById(Long id) {
         return dsl
-                .selectFrom(END_USER_APPLICATION)
+                .select(END_USER_APPLICATION.fields())
+                .from(END_USER_APPLICATION)
                 .where(END_USER_APPLICATION.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
@@ -107,7 +109,8 @@ public class EndUserAppDao {
 
     public List<EndUserApplication> findAll() {
         return dsl
-                .selectFrom(END_USER_APPLICATION)
+                .select(END_USER_APPLICATION.fields())
+                .from(END_USER_APPLICATION)
                 .where(END_USER_APPLICATION.IS_PROMOTED.isFalse())
                 .fetch(TO_DOMAIN_MAPPER);
     }

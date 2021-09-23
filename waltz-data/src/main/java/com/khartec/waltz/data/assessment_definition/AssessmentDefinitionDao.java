@@ -74,20 +74,26 @@ public class AssessmentDefinitionDao {
 
 
     public AssessmentDefinition getById(long id) {
-        return dsl.selectFrom(ASSESSMENT_DEFINITION)
+        return dsl
+                .select(ASSESSMENT_DEFINITION.fields())
+                .from(ASSESSMENT_DEFINITION)
                 .where(ASSESSMENT_DEFINITION.ID.eq(id))
                 .fetchOne(TO_DOMAIN);
     }
 
 
     public List<AssessmentDefinition> findAll() {
-        return dsl.selectFrom(ASSESSMENT_DEFINITION)
+        return dsl
+                .select(ASSESSMENT_DEFINITION.fields())
+                .from(ASSESSMENT_DEFINITION)
                 .fetch(TO_DOMAIN);
     }
 
 
     public List<AssessmentDefinition> findByEntityKind(EntityKind kind) {
-        return dsl.selectFrom(ASSESSMENT_DEFINITION)
+        return dsl
+                .select(ASSESSMENT_DEFINITION.fields())
+                .from(ASSESSMENT_DEFINITION)
                 .where(ASSESSMENT_DEFINITION.ENTITY_KIND.eq(kind.name()))
                 .fetch(TO_DOMAIN);
     }
