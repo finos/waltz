@@ -98,14 +98,16 @@ public class ActorDao {
 
 
     public List<Actor> findAll() {
-        return dsl.select(actor.fields())
+        return dsl
+                .select(actor.fields())
                 .from(actor)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
     public Actor getById(long id) {
-        ActorRecord record = dsl.select(ACTOR.fields())
+        ActorRecord record = dsl
+                .select(ACTOR.fields())
                 .from(ACTOR)
                 .where(ACTOR.ID.eq(id))
                 .fetchOneInto(ActorRecord.class);
@@ -159,7 +161,8 @@ public class ActorDao {
     public boolean deleteIfNotUsed(long id) {
         Condition notMentionedInFlows = DSL
                 .notExists(DSL
-                        .selectFrom(LOGICAL_FLOW)
+                        .select(LOGICAL_FLOW.ID)
+                        .from(LOGICAL_FLOW)
                         .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(id)
                             .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.ACTOR.name()))
                             .or(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(id)
@@ -167,7 +170,8 @@ public class ActorDao {
 
         Condition notMentionedInInvolvements = DSL
                 .notExists(DSL
-                        .selectFrom(INVOLVEMENT)
+                        .select(INVOLVEMENT.fields())
+                        .from(INVOLVEMENT)
                         .where(INVOLVEMENT.KIND_ID.eq(id)));
 
         return dsl
