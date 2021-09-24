@@ -112,7 +112,8 @@ public class InvolvementDao {
      */
     public Collection<Involvement> findByGenericEntitySelector(GenericSelector genericSelector) {
         return dsl
-                .selectFrom(INVOLVEMENT)
+                .select(INVOLVEMENT.fields())
+                .from(INVOLVEMENT)
                 .where(INVOLVEMENT.ENTITY_KIND.eq(genericSelector.kind().name()))
                 .and(INVOLVEMENT.ENTITY_ID.in(genericSelector.selector()))
                 .fetch(TO_MODEL_MAPPER);
@@ -153,12 +154,12 @@ public class InvolvementDao {
     @Deprecated
     public List<Application> findAllApplicationsByEmployeeId(String employeeId) {
         SelectOrderByStep<Record1<String>> employeeIds = DSL
-                .selectFrom(DSL
                     .selectDistinct(PERSON_HIERARCHY.EMPLOYEE_ID)
                     .from(PERSON_HIERARCHY)
                     .where(PERSON_HIERARCHY.MANAGER_ID.eq(employeeId))
-                    .union(DSL.select(DSL.value(employeeId))
-                            .from(PERSON_HIERARCHY)).asTable());
+                    .union(DSL
+                            .select(DSL.value(employeeId))
+                            .from(PERSON_HIERARCHY));
 
         SelectConditionStep<Record1<Long>> applicationIds = DSL
                 .selectDistinct(INVOLVEMENT.ENTITY_ID)

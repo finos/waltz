@@ -223,7 +223,9 @@ public class PhysicalFlowDao {
                 ? PHYSICAL_FLOW.ID.eq(flow.id().get())
                 : DSL.trueCondition();
 
-        return dsl.selectFrom(PHYSICAL_FLOW)
+        return dsl
+                .select(PHYSICAL_FLOW.fields())
+                .from(PHYSICAL_FLOW)
                 .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(flow.logicalFlowId()))
                 .and(PHYSICAL_FLOW.SPECIFICATION_ID.eq(flow.specificationId()))
                 .and(PHYSICAL_FLOW.BASIS_OFFSET.eq(flow.basisOffset()))
@@ -440,7 +442,9 @@ public class PhysicalFlowDao {
 
 
     public boolean hasPhysicalFlows(long logicalFlowId) {
-        return dsl.fetchCount(DSL.selectFrom(PHYSICAL_FLOW)
+        return dsl.fetchCount(DSL
+                .select(PHYSICAL_FLOW.ID)
+                .from(PHYSICAL_FLOW)
                 .where(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(logicalFlowId))
                 .and(PHYSICAL_FLOW.IS_REMOVED.eq(false))) > 0;
     }

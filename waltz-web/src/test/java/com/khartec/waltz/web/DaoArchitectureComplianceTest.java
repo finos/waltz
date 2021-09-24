@@ -19,7 +19,6 @@
 package com.khartec.waltz.web;
 
 import com.tngtech.archunit.lang.ArchRule;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.stereotype.Repository;
 
@@ -58,7 +57,6 @@ public class DaoArchitectureComplianceTest extends BaseArchitectureComplianceTes
 
 
     @Test
-    @Ignore
     public void daoMethodsShouldNotUseSelectFrom() {
 
         ArchRule rule = classes().that()

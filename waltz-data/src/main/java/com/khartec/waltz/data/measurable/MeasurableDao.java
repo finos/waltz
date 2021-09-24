@@ -87,7 +87,8 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
 
     public List<Measurable> findAll() {
         return dsl
-                .selectFrom(MEASURABLE)
+                .select(MEASURABLE.fields())
+                .from(MEASURABLE)
                 .where(MEASURABLE.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))
                 .fetch(TO_DOMAIN_MAPPER);
     }
@@ -107,7 +108,8 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
     public List<Measurable> findByMeasurableIdSelector(Select<Record1<Long>> selector) {
         checkNotNull(selector, "selector cannot be null");
         return dsl
-                .selectFrom(MEASURABLE)
+                .select(MEASURABLE.fields())
+                .from(MEASURABLE)
                 .where(dsl.renderInlined(MEASURABLE.ID.in(selector)))
                 .fetch(TO_DOMAIN_MAPPER);
     }
@@ -115,7 +117,8 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
 
     public Measurable getById(long id) {
         return dsl
-                .selectFrom(MEASURABLE)
+                .select(MEASURABLE.fields())
+                .from(MEASURABLE)
                 .where(MEASURABLE.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
@@ -123,7 +126,8 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
 
     public Collection<Measurable> findByExternalId(String extId) {
         return dsl
-                .selectFrom(MEASURABLE)
+                .select(MEASURABLE.fields())
+                .from(MEASURABLE)
                 .where(MEASURABLE.EXTERNAL_ID.eq(extId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
@@ -222,7 +226,8 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
 
     public List<Measurable> findByCategoryId(Long categoryId) {
         return dsl
-                .selectFrom(MEASURABLE)
+                .select(MEASURABLE.fields())
+                .from(MEASURABLE)
                 .where(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId))
                 .and(MEASURABLE.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))
                 .fetch(TO_DOMAIN_MAPPER);
@@ -283,7 +288,8 @@ public class MeasurableDao implements FindEntityReferencesByIdSelector {
                         .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.ORG_UNIT.name())));
 
         return dsl
-                .selectFrom(MEASURABLE)
+                .select(MEASURABLE.fields())
+                .from(MEASURABLE)
                 .where(MEASURABLE.ORGANISATIONAL_UNIT_ID.in(orgUnitOrChildIds))
                 .fetch(TO_DOMAIN_MAPPER);
     }

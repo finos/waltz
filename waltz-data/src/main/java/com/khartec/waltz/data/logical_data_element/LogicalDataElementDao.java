@@ -91,7 +91,8 @@ public class LogicalDataElementDao {
 
     public List<LogicalDataElement> findBySelector(Select<Record1<Long>> selector) {
         return dsl
-                .selectFrom(LOGICAL_DATA_ELEMENT)
+                .select(LOGICAL_DATA_ELEMENT.fields())
+                .from(LOGICAL_DATA_ELEMENT)
                 .where(LOGICAL_DATA_ELEMENT.ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
     }
