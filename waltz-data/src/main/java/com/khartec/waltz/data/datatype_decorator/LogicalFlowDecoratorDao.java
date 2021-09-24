@@ -121,6 +121,7 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
         return dsl
                 .select(LOGICAL_FLOW_DECORATOR.fields())
                 .select(ENTITY_NAME_FIELD)
+                .from(LOGICAL_FLOW_DECORATOR)
                 .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(flowId))
                 .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(DATA_TYPE.name()))
                 .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(dataTypeId))
@@ -175,6 +176,7 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
         return dsl
                 .select(LOGICAL_FLOW_DECORATOR.fields())
                 .select(ENTITY_NAME_FIELD)
+                .from(LOGICAL_FLOW_DECORATOR)
                 .fetch(TO_DECORATOR_MAPPER);
     }
 
@@ -184,6 +186,7 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
         return dsl
                 .select(LOGICAL_FLOW_DECORATOR.fields())
                 .select(ENTITY_NAME_FIELD)
+                .from(LOGICAL_FLOW_DECORATOR)
                 .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(entityId))
                 .fetch(TO_DECORATOR_MAPPER);
     }
