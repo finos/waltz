@@ -19,6 +19,8 @@
 package com.khartec.waltz.integration_test.inmem.service;
 
 import com.khartec.waltz.common.DateTimeUtilities;
+import com.khartec.waltz.common.OptionalUtilities;
+import com.khartec.waltz.common.OptionalUtilities;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.integration_test.inmem.helpers.InvolvementHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.PersonHelper;
@@ -31,6 +33,10 @@ import com.khartec.waltz.service.attestation.AttestationRunService;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.List;
+import java.util.Optional;
+
+import static com.khartec.waltz.common.CollectionUtilities.first;
 import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
@@ -58,7 +64,7 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
     @Test
     public void basicRunCreation() {
 
-        long invId = involvementHelper.mkInvolvement(mkName("basicRunCreationInvolvement"));
+        long invId = involvementHelper.mkInvolvementKind(mkName("basicRunCreationInvolvement"));
 
         AttestationRunCreateCommand cmd = ImmutableAttestationRunCreateCommand.builder()
                 .dueDate(DateTimeUtilities.today().plusMonths(1))
@@ -93,9 +99,11 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
     public void runCreationPreview() {
 
         EntityReference app = createNewApp("a", ouIds.a);
+        String involvementKindName = mkName("runCreationPreview");
+        String involvedUser = mkName("runCreationPreviewUser");
 
-        long invId = involvementHelper.mkInvolvement(mkName("runCreationPreview"));
-        Long pId = personHelper.createPerson(mkName("runCreationPreviewUser"));
+        long invId = involvementHelper.mkInvolvementKind(involvementKindName);
+        Long pId = personHelper.createPerson(involvedUser);
         involvementHelper.createInvolvement(pId, invId, app);
 
         AttestationRunCreateCommand cmd = ImmutableAttestationRunCreateCommand.builder()
@@ -113,6 +121,52 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
         assertEquals(1, summary.entityCount());
         assertEquals(1, summary.instanceCount());
         assertEquals(1, summary.recipientCount());
+
+        String runCreationUser = mkUserId("runCreationUser");
+
+        IdCommandResponse resp = arSvc.create(
+                runCreationUser,
+                cmd);
+
+        resp.id().ifPresent(runId -> {
+            List<AttestationInstance> instances = aiSvc.findByRunId(runId);
+            assertEquals("expected only one instance", 1, instances.size());
+
+            AttestationInstance instance = first(instances);
+            assertEquals(app, instance.parentEntity());
+            assertEquals(EntityKind.LOGICAL_DATA_FLOW, instance.attestedEntityKind());
+            assertTrue("Should not have been attested", OptionalUtilities.isEmpty(instance.attestedAt()));
+            assertTrue("Should not have been attested", OptionalUtilities.isEmpty(instance.attestedBy()));
+            assertEquals(runId, instance.attestationRunId());
+
+            assertTrue(instance.id().isPresent());
+
+            String attestor = mkUserId("attestor");
+            boolean attestationResult = aiSvc.attestInstance(
+                    instance.id().get(),
+                    attestor);
+
+            assertTrue(attestationResult);
+
+            AttestationInstance attestedInstance = first(aiSvc.findByRunId(runId));
+            assertEquals(Optional.of(attestor), attestedInstance.attestedBy());
+            assertTrue(attestedInstance.attestedAt().isPresent());
+
+            List<AttestationInstance> instancesForApp = aiSvc.findByEntityReference(app);
+            assertEquals(1, instancesForApp.size());
+            AttestationInstance instanceForApp = first(instancesForApp);
+            assertEquals(instanceForApp, attestedInstance);
+
+            List<AttestationRun> runsForApp = arSvc.findByEntityReference(app);
+            assertEquals("Can find runs via entity refs, e.g. for apps", 1, runsForApp.size());
+            AttestationRun runForApp = first(runsForApp);
+            assertEquals(Optional.of(runId), runForApp.id());
+            assertEquals(runCreationUser, runForApp.issuedBy());
+            assertEquals(AttestationStatus.ISSUED, runForApp.status());
+
+            List<AttestationRun> runForUser = arSvc.findByRecipient(involvedUser);
+            assertEquals(runsForApp, runForUser);
+        });
     }
 
 

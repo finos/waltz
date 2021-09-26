@@ -25,7 +25,7 @@ public class InvolvementHelper {
     }
 
 
-    public long mkInvolvement(String name) {
+    public long mkInvolvementKind(String name) {
         InvolvementKindCreateCommand cmd = ImmutableInvolvementKindCreateCommand.builder()
                 .description(name)
                 .name(name)
