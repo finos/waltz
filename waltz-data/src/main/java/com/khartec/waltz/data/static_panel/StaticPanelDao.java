@@ -65,7 +65,8 @@ public class StaticPanelDao {
 
     public List<StaticPanel> findByGroups(String... groups) {
         return dsl
-                .selectFrom(STATIC_PANEL)
+                .select(STATIC_PANEL.fields())
+                .from(STATIC_PANEL)
                 .where(STATIC_PANEL.GROUP.in(groups))
                 .orderBy(STATIC_PANEL.PRIORITY.asc())
                 .fetch(panelMapper);
@@ -74,7 +75,8 @@ public class StaticPanelDao {
 
     public List<StaticPanel> findAll() {
         return dsl
-                .selectFrom(STATIC_PANEL)
+                .select(STATIC_PANEL.fields())
+                .from(STATIC_PANEL)
                 .fetch(panelMapper);
     }
 

@@ -115,7 +115,8 @@ public class ServerUsageDao {
     private List<ServerUsage> findByCondition(Condition condition) {
         checkNotNull(condition, "condition cannot be null");
         return dsl
-                .selectFrom(SERVER_USAGE)
+                .select(SERVER_USAGE.fields())
+                .from(SERVER_USAGE)
                 .where(condition)
                 .fetch(TO_DOMAIN_MAPPER);
     }

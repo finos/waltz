@@ -88,7 +88,8 @@ public class ServerInformationDao {
 
 
     public List<ServerInformation> findByAssetCode(String assetCode) {
-        return dsl.select()
+        return dsl
+                .select()
                 .from(SERVER_INFORMATION)
                 .join(SERVER_USAGE)
                     .on(SERVER_USAGE.SERVER_ID.eq(SERVER_INFORMATION.ID))
@@ -113,21 +114,27 @@ public class ServerInformationDao {
 
 
     public ServerInformation getById(long id) {
-        return dsl.selectFrom(SERVER_INFORMATION)
+        return dsl
+                .select(SERVER_INFORMATION.fields())
+                .from(SERVER_INFORMATION)
                 .where(SERVER_INFORMATION.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 
     public ServerInformation getByExternalId(String externalId) {
-        return dsl.selectFrom(SERVER_INFORMATION)
+        return dsl
+                .select(SERVER_INFORMATION.fields())
+                .from(SERVER_INFORMATION)
                 .where(SERVER_INFORMATION.EXTERNAL_ID.eq(externalId))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 
     public ServerInformation getByHostname(String hostname) {
-        return dsl.selectFrom(SERVER_INFORMATION)
+        return dsl
+                .select(SERVER_INFORMATION.fields())
+                .from(SERVER_INFORMATION)
                 .where(SERVER_INFORMATION.HOSTNAME.eq(hostname))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }

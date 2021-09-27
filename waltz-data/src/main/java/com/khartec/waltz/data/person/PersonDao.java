@@ -103,7 +103,8 @@ public class PersonDao {
     public Person getByUserEmail(String email) {
         checkNotEmpty(email, "Cannot find person without a email");
         return dsl
-                .selectFrom(PERSON)
+                .select(PERSON.fields())
+                .from(PERSON)
                 .where(PERSON.EMAIL.eq(email)) // TODO: change as part of 247
                 .orderBy(PERSON.IS_REMOVED)
                 .limit(1)
@@ -114,7 +115,8 @@ public class PersonDao {
     public Person getActiveByUserEmail(String email) {
         checkNotEmpty(email, "Cannot find person without a email");
         return dsl
-                .selectFrom(PERSON)
+                .select(PERSON.fields())
+                .from(PERSON)
                 .where(PERSON.EMAIL.eq(email))
                 .andNot(PERSON.IS_REMOVED)
                 .fetchOne(personMapper);
@@ -226,7 +228,8 @@ public class PersonDao {
     public Set<Person> findByEmployeeIds(Set<String> empIds) {
 
         return dsl
-                .selectFrom(PERSON)
+                .select(PERSON.fields())
+                .from(PERSON)
                 .where(PERSON.EMPLOYEE_ID.in(empIds)
                         .and(PERSON.IS_REMOVED.isFalse()))
                 .fetchSet(personMapper);
@@ -235,7 +238,8 @@ public class PersonDao {
 
     public Set<Person> findActivePeopleByEmails(Set<String> emails) {
         return dsl
-                .selectFrom(PERSON)
+                .select(PERSON.fields())
+                .from(PERSON)
                 .where(PERSON.EMAIL.in(emails)
                         .and(PERSON.IS_REMOVED.isFalse()))
                 .fetchSet(personMapper);

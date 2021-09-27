@@ -135,10 +135,11 @@ public class MeasurableRatingDao {
 
         boolean exists = dsl
                 .fetchExists(DSL
-                    .selectFrom(MEASURABLE_RATING)
-                    .where(MEASURABLE_RATING.MEASURABLE_ID.eq(command.measurableId()))
-                    .and(MEASURABLE_RATING.ENTITY_ID.eq(command.entityReference().id()))
-                    .and(MEASURABLE_RATING.ENTITY_KIND.eq(command.entityReference().kind().name())));
+                        .select(MEASURABLE_RATING.fields())
+                        .from(MEASURABLE_RATING)
+                        .where(MEASURABLE_RATING.MEASURABLE_ID.eq(command.measurableId()))
+                        .and(MEASURABLE_RATING.ENTITY_ID.eq(command.entityReference().id()))
+                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(command.entityReference().kind().name())));
 
 
         if (exists) {

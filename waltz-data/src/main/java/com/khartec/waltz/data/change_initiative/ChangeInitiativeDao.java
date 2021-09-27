@@ -91,7 +91,8 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
 
     public Collection<ChangeInitiative> findForSelector(Select<Record1<Long>> selector) {
         return dsl
-                .selectFrom(CHANGE_INITIATIVE)
+                .select(CHANGE_INITIATIVE.fields())
+                .from(CHANGE_INITIATIVE)
                 .where(CHANGE_INITIATIVE.ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
     }
@@ -110,7 +111,7 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
                 .where(ENTITY_HIERARCHY.ANCESTOR_ID.in(selector)
                         .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.CHANGE_INITIATIVE.name())));
 
-        SelectOrderByStep<Record1<Long>> hierarchySelector = DSL.selectFrom(descendants.union(ancestors).asTable());
+        SelectOrderByStep<Record1<Long>> hierarchySelector = descendants.union(ancestors);
 
         return findForSelector(hierarchySelector);
     }
@@ -118,14 +119,16 @@ public class ChangeInitiativeDao implements FindEntityReferencesByIdSelector {
 
     public Collection<ChangeInitiative> findByExternalId(String externalId) {
         return dsl
-                .selectFrom(CHANGE_INITIATIVE)
+                .select(CHANGE_INITIATIVE.fields())
+                .from(CHANGE_INITIATIVE)
                 .where(CHANGE_INITIATIVE.EXTERNAL_ID.eq(externalId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
     public Collection<ChangeInitiative> findAll() {
         return dsl
-                .selectFrom(CHANGE_INITIATIVE)
+                .select(CHANGE_INITIATIVE.fields())
+                .from(CHANGE_INITIATIVE)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 }

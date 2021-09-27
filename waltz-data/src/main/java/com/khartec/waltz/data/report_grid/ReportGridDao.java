@@ -79,8 +79,9 @@ public class ReportGridDao {
 
     public Set<ReportGridDefinition> findAll(){
         return dsl
-                .selectFrom(rg)
-                .fetchSet(r -> mkReportGridDefinition(rgcd.REPORT_GRID_ID.eq(r.get(rg.ID)), r));
+                .select(rg.fields())
+                .from(rg)
+                .fetchSet(r -> mkReportGridDefinition(rgcd.REPORT_GRID_ID.eq(r.get(rg.ID)), r.into(REPORT_GRID)));
     }
 
 
@@ -110,9 +111,10 @@ public class ReportGridDao {
 
     private ReportGridDefinition getGridDefinitionByCondition(Condition condition) {
         return dsl
-                .selectFrom(rg)
+                .select(rg.fields())
+                .from(rg)
                 .where(condition)
-                .fetchOne(r -> mkReportGridDefinition(condition, r));
+                .fetchOne(r -> mkReportGridDefinition(condition, r.into(REPORT_GRID)));
     }
 
 
@@ -154,7 +156,7 @@ public class ReportGridDao {
                 .unionAll(measurableColumns)
                 .unionAll(costKindColumns)
                 .unionAll(involvementKindColumns)
-                .orderBy(rgcd.POSITION, DSL.field("name"))
+                .orderBy(rgcd.POSITION, DSL.field("name", String.class))
                 .fetch(r -> ImmutableReportGridColumnDefinition.builder()
                         .columnEntityReference(mkRef(
                                 EntityKind.valueOf(r.get(rgcd.COLUMN_ENTITY_KIND)),

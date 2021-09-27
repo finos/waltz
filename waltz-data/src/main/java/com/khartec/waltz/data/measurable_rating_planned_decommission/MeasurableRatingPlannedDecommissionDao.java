@@ -154,10 +154,12 @@ public class MeasurableRatingPlannedDecommissionDao {
         checkIfReadOnly(entityReference, measurableId);
 
         MeasurableRatingPlannedDecommissionRecord existingRecord = dsl
-                .selectFrom(MEASURABLE_RATING_PLANNED_DECOMMISSION)
+                .select(MEASURABLE_RATING_PLANNED_DECOMMISSION.fields())
+                .from(MEASURABLE_RATING_PLANNED_DECOMMISSION)
                 .where(mkRefCondition(entityReference)
                         .and(MEASURABLE_RATING_PLANNED_DECOMMISSION.MEASURABLE_ID.eq(measurableId)))
-                .fetchOne();
+                .fetchOne()
+                .into(MEASURABLE_RATING_PLANNED_DECOMMISSION);
 
         if (existingRecord != null) {
             updateDecommDateOnRecord(existingRecord, dateChange, userName);

@@ -35,6 +35,7 @@ import java.util.Set;
 
 import static com.khartec.waltz.common.CollectionUtilities.any;
 import static com.khartec.waltz.common.LoggingUtilities.configureLogging;
+import static com.khartec.waltz.common.SetUtilities.map;
 
 /**
  * It is advisable to add a rule into your logback config to switch
@@ -76,5 +77,24 @@ public class BaseArchitectureComplianceTest {
                         });
             }
         };
+
+
+    static ArchCondition<JavaClass> notHaveDaoMethodsWhichCallSelectFrom =
+            new ArchCondition<JavaClass>("not have methods that contain 'selectFrom()") {
+                @Override
+                public void check(JavaClass item, ConditionEvents events) {
+                    item.getMethods()
+                            .stream()
+                            .filter(m -> map(m.getMethodCallsFromSelf(), d -> d.getTarget().getName()).contains("selectFrom"))
+                            .forEach(m -> {
+                                String message = String.format(
+                                        "Method %s.%s calls selectFrom()",
+                                        item.getName(),
+                                        m.getName());
+
+                                events.add(SimpleConditionEvent.violated(item, message));
+                            });
+                }
+            };
 
 }
