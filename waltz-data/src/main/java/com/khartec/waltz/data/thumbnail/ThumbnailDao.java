@@ -86,7 +86,9 @@ public class ThumbnailDao {
 
 
     public Thumbnail getByReference(EntityReference reference) {
-        return dsl.selectFrom(THUMBNAIL)
+        return dsl
+                .select(THUMBNAIL.fields())
+                .from(THUMBNAIL)
                 .where(THUMBNAIL.PARENT_ENTITY_KIND.eq(reference.kind().name()))
                 .and(THUMBNAIL.PARENT_ENTITY_ID.eq(reference.id()))
                 .fetchOne(TO_DOMAIN_MAPPER);
@@ -96,7 +98,8 @@ public class ThumbnailDao {
 
     public int create(Thumbnail thumbnail) {
         ThumbnailRecord record = TO_RECORD_MAPPER.apply(thumbnail);
-        return dsl.insertInto(THUMBNAIL)
+        return dsl
+                .insertInto(THUMBNAIL)
                 .set(record)
                 .execute();
     }
@@ -111,7 +114,8 @@ public class ThumbnailDao {
 
 
     public int deleteByReference(EntityReference ref) {
-        return dsl.deleteFrom(THUMBNAIL)
+        return dsl
+                .deleteFrom(THUMBNAIL)
                 .where(THUMBNAIL.PARENT_ENTITY_ID.eq(ref.id()))
                 .and(THUMBNAIL.PARENT_ENTITY_KIND.eq(ref.kind().name()))
                 .execute();

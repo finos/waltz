@@ -56,7 +56,6 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
     public void setupOuTest() {
         lfSvc = services.logicalFlowService;
         helper = helpers.logicalFlowHelper;
-        System.out.println("ouTest::setup");
     }
 
 

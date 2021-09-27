@@ -24,8 +24,6 @@ import com.khartec.waltz.schema.tables.records.RoleRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -54,7 +52,10 @@ public class RoleDao {
     }
 
     public Set<Role> findAllRoles() {
-        return dsl.selectFrom(ROLE).fetchSet(TO_ROLE_RECORD);
+        return dsl
+                .select(ROLE.fields())
+                .from(ROLE)
+                .fetchSet(TO_ROLE_RECORD);
     }
 
     private final static RecordMapper<Record, Role> TO_ROLE_RECORD = r -> {

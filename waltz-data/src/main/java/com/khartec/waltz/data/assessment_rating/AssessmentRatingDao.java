@@ -131,7 +131,9 @@ public class AssessmentRatingDao {
 
     public List<AssessmentRating> findForEntity(EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
-        return dsl.selectFrom(ASSESSMENT_RATING)
+        return dsl
+                .select(ASSESSMENT_RATING.fields())
+                .from(ASSESSMENT_RATING)
                 .where(ASSESSMENT_RATING.ENTITY_KIND.eq(ref.kind().name()))
                 .and(ASSESSMENT_RATING.ENTITY_ID.eq(ref.id()))
                 .fetch(TO_DOMAIN_MAPPER);
@@ -150,13 +152,15 @@ public class AssessmentRatingDao {
 
 
     public List<AssessmentRating> findByDefinitionId(long definitionId) {
-        return dsl.select(ASSESSMENT_RATING.fields())
+        return dsl
+                .select(ASSESSMENT_RATING.fields())
                 .select(ENTITY_NAME_FIELD)
                 .from(ASSESSMENT_RATING)
                 .innerJoin(ASSESSMENT_DEFINITION).on(ASSESSMENT_DEFINITION.ID.eq(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID))
                 .and(ASSESSMENT_DEFINITION.ID.eq(definitionId))
                 .fetch(TO_DOMAIN_MAPPER_WITH_ENTITY_DETAILS);
     }
+
 
     public List<AssessmentRating> findByGenericSelector(GenericSelector genericSelector) {
         return dsl
@@ -176,7 +180,8 @@ public class AssessmentRatingDao {
         AssessmentRatingRecord record = TO_RECORD_MAPPER.apply(command);
         EntityReference ref = command.entityReference();
         boolean isUpdate = dsl.fetchExists(dsl
-                .selectFrom(ASSESSMENT_RATING)
+                .select(ASSESSMENT_RATING.fields())
+                .from(ASSESSMENT_RATING)
                 .where(ASSESSMENT_RATING.ENTITY_KIND.eq(ref.kind().name()))
                 .and(ASSESSMENT_RATING.ENTITY_ID.eq(ref.id()))
                 .and(ASSESSMENT_RATING.ASSESSMENT_DEFINITION_ID.eq(command.assessmentDefinitionId())));

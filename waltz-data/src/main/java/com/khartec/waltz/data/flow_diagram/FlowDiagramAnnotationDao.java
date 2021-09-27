@@ -82,7 +82,8 @@ public class FlowDiagramAnnotationDao {
 
     public List<FlowDiagramAnnotation> findByDiagramId(long diagramId) {
         return dsl
-                .selectFrom(FLOW_DIAGRAM_ANNOTATION)
+                .select(FLOW_DIAGRAM_ANNOTATION.fields())
+                .from(FLOW_DIAGRAM_ANNOTATION)
                 .where(FLOW_DIAGRAM_ANNOTATION.DIAGRAM_ID.eq(diagramId))
                 .fetch(TO_DOMAIN_MAPPER);
     }

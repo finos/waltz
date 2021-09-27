@@ -26,6 +26,7 @@ import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.records.EnumValueRecord;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,8 +41,9 @@ import static com.khartec.waltz.schema.tables.EnumValue.ENUM_VALUE;
 public class EnumValueDao {
 
 
-    private static final RecordMapper<? super EnumValueRecord, EnumValue> TO_DOMAIN_MAPPER = r ->
-            ImmutableEnumValue
+    private static final RecordMapper<? super Record, EnumValue> TO_DOMAIN_MAPPER = record -> {
+        EnumValueRecord r = record.into(ENUM_VALUE);
+        return ImmutableEnumValue
                 .builder()
                 .type(r.getType())
                 .key(r.getKey())
@@ -51,11 +53,13 @@ public class EnumValueDao {
                 .iconColor(r.getIconColor())
                 .position(r.getPosition())
                 .build();
+    };
 
 
     public static Condition mkExistsCondition(EnumValueKind kind, String key) {
         return DSL.exists(
-                DSL.selectFrom(Tables.ENUM_VALUE)
+                DSL.select(ENUM_VALUE.fields())
+                        .from(Tables.ENUM_VALUE)
                         .where(Tables.ENUM_VALUE.TYPE.eq(kind.dbValue()))
                         .and(Tables.ENUM_VALUE.KEY.eq(key)));
     }
@@ -72,7 +76,9 @@ public class EnumValueDao {
 
 
     public List<EnumValue> findAll() {
-        return dsl.selectFrom(ENUM_VALUE)
+        return dsl
+                .select(ENUM_VALUE.fields())
+                .from(ENUM_VALUE)
                 .fetch()
                 .map(TO_DOMAIN_MAPPER);
     }

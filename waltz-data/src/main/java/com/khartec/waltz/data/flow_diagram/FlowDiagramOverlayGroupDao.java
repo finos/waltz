@@ -96,7 +96,8 @@ public class FlowDiagramOverlayGroupDao {
 
     public FlowDiagramOverlayGroup getById(Long id){
         return dsl
-                .selectFrom(FLOW_DIAGRAM_OVERLAY_GROUP)
+                .select(FLOW_DIAGRAM_OVERLAY_GROUP.fields())
+                .from(FLOW_DIAGRAM_OVERLAY_GROUP)
                 .where(FLOW_DIAGRAM_OVERLAY_GROUP.ID.eq(id))
                 .fetchOne(TO_GROUP_MAPPER);
     }

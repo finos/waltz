@@ -92,14 +92,17 @@ public class OrganisationalUnitDao implements FindEntityReferencesByIdSelector {
                 .on(joinOnA.or(joinOnB))
                 .where((aMatchesEntity.or(bMatchesEntity)));
 
-        return dsl.selectFrom(ou)
+        return dsl
+                .select(ou.fields())
+                .from(ou)
                 .where(ou.ID.in(qry))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
     public OrganisationalUnit getById(long id) {
-        return dsl.select(ou.fields())
+        return dsl
+                .select(ou.fields())
                 .from(ou)
                 .where(ou.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);

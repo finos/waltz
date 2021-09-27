@@ -79,8 +79,8 @@ public class OrphanDao {
 
         Condition isApplicationCondition = MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name());
 
-        List<OrphanRelationship> missingMeasurablesForApps = dsl.select(MEASURABLE_RATING.MEASURABLE_ID,
-                MEASURABLE_RATING.ENTITY_ID)
+        List<OrphanRelationship> missingMeasurablesForApps = dsl
+                .select(MEASURABLE_RATING.MEASURABLE_ID, MEASURABLE_RATING.ENTITY_ID)
                 .from(MEASURABLE_RATING)
                 .where(missingCapability)
                 .and(isApplicationCondition)
@@ -91,8 +91,8 @@ public class OrphanDao {
                         .build());
 
 
-        List<OrphanRelationship> missingAppsForMeasurables = dsl.select(MEASURABLE_RATING.MEASURABLE_ID,
-                MEASURABLE_RATING.ENTITY_ID)
+        List<OrphanRelationship> missingAppsForMeasurables = dsl
+                .select(MEASURABLE_RATING.MEASURABLE_ID, MEASURABLE_RATING.ENTITY_ID)
                 .from(MEASURABLE_RATING)
                 .where(missingApplication)
                 .and(isApplicationCondition)
@@ -101,7 +101,6 @@ public class OrphanDao {
                         .entityB(mkRef(EntityKind.APPLICATION, r.value2()))
                         .orphanSide(OrphanSide.A)
                         .build());
-
 
         return ListUtilities.concat(missingAppsForMeasurables, missingMeasurablesForApps);
     }
@@ -189,7 +188,7 @@ public class OrphanDao {
 
     public List<OrphanRelationship> findOrphanLogicalDataFlows() {
         BiFunction<Field<String>, Field<Long>, Select<Record2<Long, Long>>> queryFactory = (kindField, idField) ->
-                DSL.select(LOGICAL_FLOW.ID, idField)
+                dsl.select(LOGICAL_FLOW.ID, idField)
                         .from(LOGICAL_FLOW)
                         .where(idField.notIn(
                                 select(APPLICATION.ID)
@@ -198,7 +197,7 @@ public class OrphanDao {
                         .and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name()))
                         .and(kindField.eq(EntityKind.APPLICATION.name()));
 
-        return dsl.selectFrom(queryFactory.apply(LOGICAL_FLOW.SOURCE_ENTITY_KIND, LOGICAL_FLOW.SOURCE_ENTITY_ID).asTable())
+        return queryFactory.apply(LOGICAL_FLOW.SOURCE_ENTITY_KIND, LOGICAL_FLOW.SOURCE_ENTITY_ID)
                 .unionAll(queryFactory.apply(LOGICAL_FLOW.TARGET_ENTITY_KIND, LOGICAL_FLOW.TARGET_ENTITY_ID))
                 .fetch(r -> ImmutableOrphanRelationship.builder()
                         .entityA(mkRef(EntityKind.LOGICAL_DATA_FLOW, r.value1()))

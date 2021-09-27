@@ -92,7 +92,8 @@ public class SurveyRunDao {
 
 
     public List<SurveyRun> findForRecipient(long personId) {
-        return dsl.select(SURVEY_RUN.fields())
+        return dsl
+                .select(SURVEY_RUN.fields())
                 .from(SURVEY_RUN)
                 .innerJoin(SURVEY_INSTANCE)
                 .on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
@@ -126,7 +127,8 @@ public class SurveyRunDao {
 
 
     public int delete(long surveyRunId) {
-        return dsl.delete(SURVEY_RUN)
+        return dsl
+                .delete(SURVEY_RUN)
                 .where(SURVEY_RUN.ID.eq(surveyRunId))
                 .execute();
     }
@@ -135,7 +137,8 @@ public class SurveyRunDao {
     public int update(long surveyRunId, SurveyRunChangeCommand command) {
         checkNotNull(command, "command cannot be null");
 
-        return dsl.update(SURVEY_RUN)
+        return dsl
+                .update(SURVEY_RUN)
                 .set(SURVEY_RUN.NAME, command.name())
                 .set(SURVEY_RUN.DESCRIPTION, command.description())
                 .set(SURVEY_RUN.SELECTOR_ENTITY_KIND, command.selectionOptions().entityReference().kind().name())
@@ -153,7 +156,8 @@ public class SurveyRunDao {
     public int updateStatus(long surveyRunId, SurveyRunStatus newStatus) {
         checkNotNull(newStatus, "newStatus cannot be null");
 
-        return dsl.update(SURVEY_RUN)
+        return dsl
+                .update(SURVEY_RUN)
                 .set(SURVEY_RUN.STATUS, newStatus.name())
                 .where(SURVEY_RUN.ID.eq(surveyRunId))
                 .execute();
@@ -161,7 +165,8 @@ public class SurveyRunDao {
 
 
     public int updateDueDate(long surveyRunId, LocalDate newDueDate) {
-        return dsl.update(SURVEY_RUN)
+        return dsl
+                .update(SURVEY_RUN)
                 .set(SURVEY_RUN.DUE_DATE, toSqlDate(newDueDate))
                 .where(SURVEY_RUN.ID.eq(surveyRunId))
                 .execute();
@@ -169,7 +174,8 @@ public class SurveyRunDao {
 
 
     public int issue(long surveyRunId) {
-        return dsl.update(SURVEY_RUN)
+        return dsl
+                .update(SURVEY_RUN)
                 .set(SURVEY_RUN.STATUS, SurveyRunStatus.ISSUED.name())
                 .set(SURVEY_RUN.ISSUED_ON, java.sql.Date.valueOf(DateTimeUtilities.nowUtc().toLocalDate()))
                 .where(SURVEY_RUN.ID.eq(surveyRunId))
@@ -188,11 +194,11 @@ public class SurveyRunDao {
 
 
     public List<SurveyRun> findByTemplateId(long templateId) {
-        List<SurveyRun> runs = dsl
-                .selectFrom(SURVEY_RUN)
+        return dsl
+                .select(SURVEY_RUN.fields())
+                .from(SURVEY_RUN)
                 .where(SURVEY_RUN.SURVEY_TEMPLATE_ID.eq(templateId))
                 .fetch(TO_DOMAIN_MAPPER);
-        return runs;
     }
 
 }
