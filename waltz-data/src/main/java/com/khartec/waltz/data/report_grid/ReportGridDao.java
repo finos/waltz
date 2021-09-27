@@ -45,8 +45,6 @@ import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.common.SetUtilities.union;
 import static com.khartec.waltz.common.StringUtilities.join;
-import static com.khartec.waltz.model.EntityKind.APPLICATION;
-import static com.khartec.waltz.model.EntityKind.PERSON;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.survey.SurveyInstanceStatus.APPROVED;
 import static com.khartec.waltz.model.survey.SurveyInstanceStatus.COMPLETED;
@@ -82,7 +80,7 @@ public class ReportGridDao {
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_ID,
             SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_KIND,
-            newArrayList(PERSON, APPLICATION))
+            newArrayList(EntityKind.PERSON, EntityKind.APPLICATION))
             .as("entity_name");
 
     @Autowired
@@ -276,7 +274,7 @@ public class ReportGridDao {
                             p.EMAIL)
                     .from(inv)
                     .innerJoin(p).on(p.EMPLOYEE_ID.eq(inv.EMPLOYEE_ID))
-                    .where(inv.ENTITY_KIND.eq(APPLICATION.name()))
+                    .where(inv.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                     .and(inv.ENTITY_ID.in(appSelector))
                     .and(inv.KIND_ID.in(requiredInvolvementKinds))
                     .and(p.IS_REMOVED.isFalse())
@@ -312,7 +310,7 @@ public class ReportGridDao {
                     .select(COST.COST_KIND_ID, DSL.max(COST.YEAR).as("latest_year"))
                     .from(COST)
                     .where(dsl.renderInlined(COST.ENTITY_ID.in(appSelector)
-                            .and(COST.ENTITY_KIND.eq(APPLICATION.name()))))
+                            .and(COST.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))))
                     .groupBy(COST.COST_KIND_ID);
 
             Condition latestYearForKind = c.COST_KIND_ID.eq(costKindLastestYear.field(COST.COST_KIND_ID))
@@ -325,7 +323,7 @@ public class ReportGridDao {
                     .from(c)
                     .innerJoin(costKindLastestYear).on(latestYearForKind)
                     .where(dsl.renderInlined(c.COST_KIND_ID.in(requiredCostKinds)
-                            .and(c.ENTITY_KIND.eq(APPLICATION.name()))
+                            .and(c.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                             .and(c.ENTITY_ID.in(appSelector))))
                     .fetchSet(r -> ImmutableReportGridCell.builder()
                             .applicationId(r.get(c.ENTITY_ID))
@@ -372,7 +370,7 @@ public class ReportGridDao {
                 .innerJoin(ratingSchemeItems)
                     .on(m.MEASURABLE_CATEGORY_ID.eq(ratingSchemeItems.field("mcId", Long.class)))
                     .and(mr.RATING.eq(ratingSchemeItems.field("rsiCode", String.class)))
-                .where(mr.ENTITY_KIND.eq(APPLICATION.name()))
+                .where(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                 .and(mr.ENTITY_ID.in(appSelector))
                 .and(m.ID.in(union(measurableIdsUsingHighest, measurableIdsUsingLowest)));
 
@@ -380,7 +378,7 @@ public class ReportGridDao {
                 .resultQuery(dsl.renderInlined(ratings))
                 .fetchGroups(
                         r -> tuple(
-                                mkRef(APPLICATION, r.get(mr.ENTITY_ID)),
+                                mkRef(EntityKind.APPLICATION, r.get(mr.ENTITY_ID)),
                                 r.get(m.ID)),
                         r -> tuple(
                                 r.get("rsiId", Long.class),
@@ -439,7 +437,7 @@ public class ReportGridDao {
                 .innerJoin(rsi).on(rsi.CODE.eq(mr.RATING)).and(rsi.SCHEME_ID.eq(mc.RATING_SCHEME_ID))
                 .where(mr.MEASURABLE_ID.in(exactMeasurableIds))
                 .and(mr.ENTITY_ID.in(appSelector))
-                .and(mr.ENTITY_KIND.eq(APPLICATION.name()));
+                .and(mr.ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
 
         return  dsl
                 .resultQuery(dsl.renderInlined(qry))
@@ -465,7 +463,7 @@ public class ReportGridDao {
                             ar.DESCRIPTION)
                     .from(ar)
                     .where(ar.ASSESSMENT_DEFINITION_ID.in(requiredAssessmentDefinitionIds)
-                            .and(ar.ENTITY_KIND.eq(APPLICATION.name()))
+                            .and(ar.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                             .and(ar.ENTITY_ID.in(appSelector)))
                     .fetchSet(r -> ImmutableReportGridCell.builder()
                             .applicationId(r.get(ar.ENTITY_ID))
@@ -514,7 +512,7 @@ public class ReportGridDao {
                     .where(SURVEY_INSTANCE.STATUS.in(APPROVED.name(), COMPLETED.name())
                             .and(SURVEY_QUESTION.ID.in(requiredSurveyQuestionIds))
                             .and(SURVEY_INSTANCE.ENTITY_ID.in(appSelector))
-                            .and(SURVEY_INSTANCE.ENTITY_KIND.eq(APPLICATION.name())))
+                            .and(SURVEY_INSTANCE.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
                     .asTable();
 
 
@@ -526,13 +524,14 @@ public class ReportGridDao {
                     .innerJoin(SURVEY_INSTANCE).on(SURVEY_QUESTION_LIST_RESPONSE.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
                     .where(SURVEY_QUESTION_LIST_RESPONSE.QUESTION_ID.in(requiredSurveyQuestionIds))
                     .and(SURVEY_INSTANCE.ENTITY_ID.in(appSelector))
-                    .and(SURVEY_INSTANCE.ENTITY_KIND.eq(APPLICATION.name()))
+                    .and(SURVEY_INSTANCE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
                     .fetchGroups(
                             k -> tuple(k.get(SURVEY_QUESTION_LIST_RESPONSE.SURVEY_INSTANCE_ID), k.get(SURVEY_QUESTION_LIST_RESPONSE.QUESTION_ID)),
                             v -> v.get(SURVEY_QUESTION_LIST_RESPONSE.RESPONSE));
 
             SelectConditionStep<Record> qry = dsl
-                    .selectFrom(responsesWithQuestionTypeAndEntity)
+                    .select(responsesWithQuestionTypeAndEntity.fields())
+                    .from(responsesWithQuestionTypeAndEntity)
                     .where(responsesWithQuestionTypeAndEntity.field(latest_instance)
                             .eq(responsesWithQuestionTypeAndEntity.field("sid", Long.class)));
 
