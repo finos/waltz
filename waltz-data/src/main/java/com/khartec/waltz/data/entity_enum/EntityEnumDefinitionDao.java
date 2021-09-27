@@ -61,7 +61,9 @@ public class EntityEnumDefinitionDao {
 
 
     public List<EntityEnumDefinition> findByEntityKind(EntityKind kind) {
-        return dsl.selectFrom(ENTITY_ENUM_DEFINITION)
+        return dsl
+                .select(ENTITY_ENUM_DEFINITION.fields())
+                .from(ENTITY_ENUM_DEFINITION)
                 .where(ENTITY_ENUM_DEFINITION.ENTITY_KIND.eq(kind.name()))
                 .fetch(TO_DOMAIN_MAPPER);
     }

@@ -80,7 +80,8 @@ public class BookmarkDao {
 
     public List<Bookmark> findByReference(EntityReference reference) {
         return dsl
-                .selectFrom(BOOKMARK)
+                .select(BOOKMARK.fields())
+                .from(BOOKMARK)
                 .where(BOOKMARK.PARENT_ID.eq(reference.id()))
                 .and(BOOKMARK.PARENT_KIND.eq(reference.kind().name()))
                 .orderBy(BOOKMARK.IS_PRIMARY.desc(), BOOKMARK.TITLE.asc())
@@ -90,7 +91,8 @@ public class BookmarkDao {
 
     public Bookmark getById(long bookmarkId) {
         return dsl
-                .selectFrom(BOOKMARK)
+                .select(BOOKMARK.fields())
+                .from(BOOKMARK)
                 .where(BOOKMARK.ID.eq(bookmarkId))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
@@ -174,7 +176,8 @@ public class BookmarkDao {
      */
     public Set<Bookmark> findByBookmarkIdSelector(Select<Record1<Long>> selector) {
         return dsl
-                .selectFrom(BOOKMARK)
+                .select(BOOKMARK.fields())
+                .from(BOOKMARK)
                 .where(BOOKMARK.ID.in(selector))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }

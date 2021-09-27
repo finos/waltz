@@ -91,7 +91,8 @@ public class FlowDiagramDao {
 
     public FlowDiagram getById(long id) {
         return dsl
-                .selectFrom(FLOW_DIAGRAM)
+                .select(FLOW_DIAGRAM.fields())
+                .from(FLOW_DIAGRAM)
                 .where(FLOW_DIAGRAM.ID.eq(id))
                 .and(notRemoved)
                 .fetchOne(TO_DOMAIN_MAPPER);

@@ -384,11 +384,12 @@ public class DataTypeUsageDao {
                 .set(DATA_TYPE_USAGE.IS_SELECTED, true)
                 .where(DATA_TYPE_USAGE.IS_SELECTED.eq(false))
                 .and(exists(
-                        selectFrom(flowTable)
-                            .where(DATA_TYPE_USAGE.ENTITY_ID.eq(nodeIdInner))
-                            .and(DATA_TYPE_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
-                            .and(DATA_TYPE_USAGE.DATA_TYPE_ID.eq(dataTypeIdInner))
-                            .and(DATA_TYPE_USAGE.USAGE_KIND.eq(usageKindInner))))
+                        select(flowTable.fields())
+                                .from(flowTable)
+                                .where(DATA_TYPE_USAGE.ENTITY_ID.eq(nodeIdInner))
+                                .and(DATA_TYPE_USAGE.ENTITY_KIND.eq(EntityKind.APPLICATION.name()))
+                                .and(DATA_TYPE_USAGE.DATA_TYPE_ID.eq(dataTypeIdInner))
+                                .and(DATA_TYPE_USAGE.USAGE_KIND.eq(usageKindInner))))
                 .execute();
     }
 
@@ -503,7 +504,8 @@ public class DataTypeUsageDao {
                 .and(dtu.ENTITY_KIND.eq(nodeKind.name()))
                 .and(dtu.USAGE_KIND.eq(UsageKind.DISTRIBUTOR.name()))
                 .and(dtu.IS_SELECTED.eq(true))
-                .and(DSL.notExists(DSL.selectFrom(dtuConsumer)
+                .and(DSL.notExists(DSL.select(dtuConsumer.fields())
+                        .from(dtuConsumer)
                         .where(dtuConsumer.ENTITY_ID.eq(dtu.ENTITY_ID))
                         .and(dtuConsumer.ENTITY_KIND.eq(dtu.ENTITY_KIND))
                         .and(dtuConsumer.DATA_TYPE_ID.eq(dtu.DATA_TYPE_ID))

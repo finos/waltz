@@ -61,14 +61,16 @@ public class FlowClassificationDao {
 
     public Set<FlowClassification> findAll() {
         return dsl
-                .selectFrom(FLOW_CLASSIFICATION)
+                .select(FLOW_CLASSIFICATION.fields())
+                .from(FLOW_CLASSIFICATION)
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 
 
     public FlowClassification getById(long id) {
         return dsl
-                .selectFrom(FLOW_CLASSIFICATION)
+                .select(FLOW_CLASSIFICATION.fields())
+                .from(FLOW_CLASSIFICATION)
                 .where(FLOW_CLASSIFICATION.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }

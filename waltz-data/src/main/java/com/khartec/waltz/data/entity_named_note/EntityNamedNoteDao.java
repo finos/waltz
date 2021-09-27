@@ -25,6 +25,7 @@ import com.khartec.waltz.model.entity_named_note.EntityNamedNote;
 import com.khartec.waltz.model.entity_named_note.ImmutableEntityNamedNote;
 import com.khartec.waltz.schema.tables.records.EntityNamedNoteRecord;
 import org.jooq.DSLContext;
+import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -38,7 +39,8 @@ import static com.khartec.waltz.schema.tables.EntityNamedNote.ENTITY_NAMED_NOTE;
 @Repository
 public class EntityNamedNoteDao {
 
-    private static final RecordMapper<EntityNamedNoteRecord, EntityNamedNote> TO_DOMAIN_MAPPER = r -> {
+    private static final RecordMapper<Record, EntityNamedNote> TO_DOMAIN_MAPPER = record -> {
+        EntityNamedNoteRecord r = record.into(ENTITY_NAMED_NOTE);
         return ImmutableEntityNamedNote
                 .builder()
                 .entityReference(EntityReference.mkRef(
@@ -67,7 +69,8 @@ public class EntityNamedNoteDao {
         checkNotNull(ref, "ref cannot be null");
 
         return dsl
-                .selectFrom(ENTITY_NAMED_NOTE)
+                .select(ENTITY_NAMED_NOTE.fields())
+                .from(ENTITY_NAMED_NOTE)
                 .where(ENTITY_NAMED_NOTE.ENTITY_KIND.eq(ref.kind().name()))
                 .and(ENTITY_NAMED_NOTE.ENTITY_ID.eq(ref.id()))
                 .fetch(TO_DOMAIN_MAPPER);

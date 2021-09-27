@@ -25,6 +25,7 @@ import com.khartec.waltz.model.entity_named_note.EntityNamedNoteTypeChangeComman
 import com.khartec.waltz.model.entity_named_note.ImmutableEntityNamedNodeType;
 import com.khartec.waltz.schema.tables.records.EntityNamedNoteTypeRecord;
 import org.jooq.DSLContext;
+import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
@@ -47,7 +48,10 @@ public class EntityNamedNoteTypeDao {
     private static final String SEPARATOR = ";";
 
 
-    private static final RecordMapper<EntityNamedNoteTypeRecord, EntityNamedNodeType> TO_DOMAIN_MAPPER = r -> {
+    private static final RecordMapper<Record, EntityNamedNodeType> TO_DOMAIN_MAPPER = record -> {
+
+        EntityNamedNoteTypeRecord r = record.into(ENTITY_NAMED_NOTE_TYPE);
+
         List<EntityKind> applicableEntityKinds = splitThenMap(
                 r.getApplicableEntityKinds(),
                 SEPARATOR,
@@ -78,7 +82,8 @@ public class EntityNamedNoteTypeDao {
 
     public List<EntityNamedNodeType> findAll() {
         return dsl
-                .selectFrom(ENTITY_NAMED_NOTE_TYPE)
+                .select(ENTITY_NAMED_NOTE_TYPE.fields())
+                .from(ENTITY_NAMED_NOTE_TYPE)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
@@ -154,7 +159,8 @@ public class EntityNamedNoteTypeDao {
 
 
     public EntityNamedNodeType getById(long namedNoteTypeId) {
-        return dsl.selectFrom(ENTITY_NAMED_NOTE_TYPE)
+        return dsl.select(ENTITY_NAMED_NOTE_TYPE.fields())
+                .from(ENTITY_NAMED_NOTE_TYPE)
                 .where(ENTITY_NAMED_NOTE_TYPE.ID.eq(namedNoteTypeId))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }

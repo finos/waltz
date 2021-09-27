@@ -92,7 +92,9 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
 
     @Override
     public DataTypeDecorator getByEntityIdAndDataTypeId(long specId, long dataTypeId) {
-        return dsl.selectFrom(PHYSICAL_SPEC_DATA_TYPE)
+        return dsl
+                .select(PHYSICAL_SPEC_DATA_TYPE.fields())
+                .from(PHYSICAL_SPEC_DATA_TYPE)
                 .where(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(specId))
                 .and(PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID.eq(dataTypeId))
                 .fetchOne(TO_DOMAIN_MAPPER);
@@ -101,7 +103,9 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
 
     @Override
     public List<DataTypeDecorator> findByEntityId(long specId) {
-        return dsl.selectFrom(PHYSICAL_SPEC_DATA_TYPE)
+        return dsl
+                .select(PHYSICAL_SPEC_DATA_TYPE.fields())
+                .from(PHYSICAL_SPEC_DATA_TYPE)
                 .where(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(specId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
@@ -110,7 +114,9 @@ public class PhysicalSpecDecoratorDao extends DataTypeDecoratorDao {
     @Override
     public List<DataTypeDecorator> findByEntityIdSelector(Select<Record1<Long>> specIdSelector,
                                                           Optional<EntityKind> entityKind) {
-        return dsl.selectFrom(PHYSICAL_SPEC_DATA_TYPE)
+        return dsl
+                .select(PHYSICAL_SPEC_DATA_TYPE.fields())
+                .from(PHYSICAL_SPEC_DATA_TYPE)
                 .where(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.in(specIdSelector))
                 .fetch(TO_DOMAIN_MAPPER);
     }

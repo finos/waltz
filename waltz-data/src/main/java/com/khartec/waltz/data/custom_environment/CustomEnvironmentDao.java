@@ -79,14 +79,16 @@ public class CustomEnvironmentDao {
 
     public Set<CustomEnvironment> findAll(){
         return dsl
-            .selectFrom(CUSTOM_ENVIRONMENT)
-            .fetchSet(TO_CUSTOM_ENV_MAPPER);
+                .select(CUSTOM_ENVIRONMENT.fields())
+                .from(CUSTOM_ENVIRONMENT)
+                .fetchSet(TO_CUSTOM_ENV_MAPPER);
     }
 
 
     public Set<CustomEnvironment> findByOwningEntityRef(EntityReference ref){
         return dsl
-                .selectFrom(CUSTOM_ENVIRONMENT)
+                .select(CUSTOM_ENVIRONMENT.fields())
+                .from(CUSTOM_ENVIRONMENT)
                 .where(CUSTOM_ENVIRONMENT.OWNING_ENTITY_ID.eq(ref.id())
                         .and(CUSTOM_ENVIRONMENT.OWNING_ENTITY_KIND.eq(ref.kind().name())))
                 .fetchSet(TO_CUSTOM_ENV_MAPPER);
@@ -122,7 +124,8 @@ public class CustomEnvironmentDao {
 
     public CustomEnvironment getById(Long id) {
         return dsl
-                .selectFrom(CUSTOM_ENVIRONMENT)
+                .select(CUSTOM_ENVIRONMENT.fields())
+                .from(CUSTOM_ENVIRONMENT)
                 .where(CUSTOM_ENVIRONMENT.ID.eq(id))
                 .fetchOne(TO_CUSTOM_ENV_MAPPER);
     }

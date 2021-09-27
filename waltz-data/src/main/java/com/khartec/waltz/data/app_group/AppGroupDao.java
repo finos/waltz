@@ -96,7 +96,8 @@ public class AppGroupDao implements SearchDao<AppGroup> {
     public List<AppGroup> findPrivateGroupsByOwner(String userId) {
         SelectConditionStep<Record1<Long>> groupIds = getPrivateGroupIdByOwner(userId);
 
-        return dsl.select(APPLICATION_GROUP.fields())
+        return dsl
+                .select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.ID.in(groupIds)
                     .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PRIVATE.name())))
@@ -108,7 +109,8 @@ public class AppGroupDao implements SearchDao<AppGroup> {
     public AppGroup getFavouritesGroupForOwner(String userId) {
         SelectConditionStep<Record1<Long>> groupIds = getPrivateGroupIdByOwner(userId);
 
-        return dsl.select(APPLICATION_GROUP.fields())
+        return dsl
+                .select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.ID.in(groupIds)
                         .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PRIVATE.name())
@@ -137,8 +139,8 @@ public class AppGroupDao implements SearchDao<AppGroup> {
                 .from(APPLICATION_GROUP_OU_ENTRY)
                 .where(APPLICATION_GROUP_OU_ENTRY.ORG_UNIT_ID.in(orgUnitIds));
 
-        SelectWhereStep<Record1<Long>> appGroups = DSL
-                .selectFrom(groupsFromAppGroupEntry.union(groupsFromAppGroupOUEntry).asTable());
+        SelectOrderByStep<Record1<Long>> appGroups = groupsFromAppGroupEntry
+                .union(groupsFromAppGroupOUEntry);
 
         return dsl
                 .select(APPLICATION_GROUP.fields())
@@ -173,7 +175,9 @@ public class AppGroupDao implements SearchDao<AppGroup> {
                         .or(APPLICATION_GROUP.ID.in(getPrivateGroupIdByOwner(username))))
                 .and(notRemoved);
 
-        return dsl.selectFrom(APPLICATION_GROUP)
+        return dsl
+                .select(APPLICATION_GROUP.fields())
+                .from(APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.ID.in(qry))
                 .fetch(TO_DOMAIN);
     }

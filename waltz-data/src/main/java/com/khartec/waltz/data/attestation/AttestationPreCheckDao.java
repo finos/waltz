@@ -61,7 +61,9 @@ public class AttestationPreCheckDao {
                         .select(DSL.val("UNKNOWN").as("check"),
                                 DSL.count().as("count"))
                         .from(lfd)
-                        .where(lfd.LOGICAL_FLOW_ID.in(DSL.selectFrom(upstreamFlows)))
+                        .where(lfd.LOGICAL_FLOW_ID.in(DSL
+                                .select(upstreamFlows.field(0, Long.class))
+                                .from(upstreamFlows)))
                         .and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
                         .and(lfd.DECORATOR_ENTITY_ID.in(DSL.select(dt.ID).from(dt).where(dt.UNKNOWN.isTrue()))));
 
@@ -71,7 +73,9 @@ public class AttestationPreCheckDao {
                         .select(DSL.val("DEPRECATED").as("check"),
                                 DSL.count().as("count"))
                         .from(lfd)
-                        .where(lfd.LOGICAL_FLOW_ID.in(DSL.selectFrom(upstreamFlows)))
+                        .where(lfd.LOGICAL_FLOW_ID.in(DSL
+                                .select(upstreamFlows.field(0, long.class))
+                                .from(upstreamFlows)))
                         .and(lfd.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
                         .and(lfd.DECORATOR_ENTITY_ID.in(DSL.select(dt.ID).from(dt).where(dt.DEPRECATED.isTrue()))));
 

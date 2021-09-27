@@ -81,7 +81,8 @@ public class DatabaseUsageDao {
     // -- helpers ---
     private List<DatabaseUsage> findByCondition(Condition condition) {
         return dsl
-                .selectFrom(DATABASE_USAGE)
+                .select(DATABASE_USAGE.fields())
+                .from(DATABASE_USAGE)
                 .where(condition)
                 .fetch(TO_DOMAIN_MAPPER);
     }

@@ -27,7 +27,6 @@ import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -70,7 +69,9 @@ public class PhysicalSpecDefinitionSampleFileDao {
 
 
     public Optional<PhysicalSpecDefinitionSampleFile> findForSpecDefinition(long specDefinitionId) {
-        return dsl.selectFrom(PHYSICAL_SPEC_DEFN_SAMPLE_FILE)
+        return dsl
+                .select(PHYSICAL_SPEC_DEFN_SAMPLE_FILE.fields())
+                .from(PHYSICAL_SPEC_DEFN_SAMPLE_FILE)
                 .where(PHYSICAL_SPEC_DEFN_SAMPLE_FILE.SPEC_DEFN_ID.eq(specDefinitionId))
                 .fetchOptional(TO_DOMAIN_MAPPER);
     }

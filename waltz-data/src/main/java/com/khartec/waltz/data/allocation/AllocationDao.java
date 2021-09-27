@@ -35,12 +35,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.data.JooqUtilities.readRef;
-import static com.khartec.waltz.schema.Tables.*;
+import static com.khartec.waltz.schema.Tables.ALLOCATION;
 
 @Repository
 public class AllocationDao {
@@ -72,7 +70,8 @@ public class AllocationDao {
 
     public List<Allocation> findByEntity(EntityReference ref) {
         return dsl
-                .selectFrom(ALLOCATION)
+                .select(ALLOCATION.fields())
+                .from(ALLOCATION)
                 .where(ALLOCATION.ENTITY_KIND.eq(ref.kind().name()))
                 .and(ALLOCATION.ENTITY_ID.eq(ref.id()))
                 .fetch(TO_DOMAIN_MAPPER);
@@ -82,7 +81,8 @@ public class AllocationDao {
     public List<Allocation> findByEntityAndScheme(EntityReference ref,
                                                   long schemeId){
         return dsl
-                .selectFrom(ALLOCATION)
+                .select(ALLOCATION.fields())
+                .from(ALLOCATION)
                 .where(ALLOCATION.ALLOCATION_SCHEME_ID.eq(schemeId))
                 .and(ALLOCATION.ENTITY_KIND.eq(ref.kind().name()))
                 .and(ALLOCATION.ENTITY_ID.eq(ref.id()))
@@ -92,7 +92,8 @@ public class AllocationDao {
 
     public List<Allocation> findByMeasurableIdAndScheme(long measurableId, long schemeId){
         return dsl
-                .selectFrom(ALLOCATION)
+                .select(ALLOCATION.fields())
+                .from(ALLOCATION)
                 .where(ALLOCATION.MEASURABLE_ID.eq(measurableId))
                 .and(ALLOCATION.ALLOCATION_SCHEME_ID.eq(schemeId))
                 .fetch(TO_DOMAIN_MAPPER);

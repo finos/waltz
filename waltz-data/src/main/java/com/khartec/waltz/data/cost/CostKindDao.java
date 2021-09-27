@@ -62,7 +62,8 @@ public class CostKindDao {
 
     public Set<EntityCostKind> findAll(){
         return dsl
-                .selectFrom(COST_KIND)
+                .select(COST_KIND.fields())
+                .from(COST_KIND)
                 .fetchSet(TO_COST_KIND_MAPPER);
     }
 
@@ -82,7 +83,8 @@ public class CostKindDao {
 
     public EntityCostKind getById(Long costKindId) {
         return dsl
-                .selectFrom(COST_KIND)
+                .select(COST_KIND.fields())
+                .from(COST_KIND)
                 .where(COST_KIND.ID.eq(costKindId))
                 .fetchOne(TO_COST_KIND_MAPPER);
     }

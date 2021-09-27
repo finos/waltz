@@ -164,7 +164,8 @@ public class SurveyQuestionDao {
 
     public boolean hasResponses(long questionId) {
         return dsl.fetchExists(DSL
-                .selectFrom(SURVEY_QUESTION_RESPONSE)
+                .select(SURVEY_QUESTION_RESPONSE.fields())
+                .from(SURVEY_QUESTION_RESPONSE)
                 .where(SURVEY_QUESTION_RESPONSE.QUESTION_ID.eq(questionId))
         );
     }
@@ -179,7 +180,9 @@ public class SurveyQuestionDao {
 
 
     private List<SurveyQuestion> findForTemplateIdSelector(Select<Record1<Long>> templateIdSelector) {
-        return dsl.selectFrom(SURVEY_QUESTION)
+        return dsl
+                .select(SURVEY_QUESTION.fields())
+                .from(SURVEY_QUESTION)
                 .where(SURVEY_QUESTION.SURVEY_TEMPLATE_ID.in(templateIdSelector))
                 .orderBy(SURVEY_QUESTION.POSITION.asc(), SURVEY_QUESTION.QUESTION_TEXT)
                 .fetch(TO_DOMAIN_MAPPER);
