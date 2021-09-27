@@ -13,6 +13,7 @@ Learn more
 Getting started
  - [Building](docs/development/build.md) 
  - [Running](waltz-web/README.md)
+ - [Docker](docker/DOCKER.md)
 
 ---
 [![postgres build](https://github.com/finos/waltz/actions/workflows/maven.yml/badge.svg)](https://github.com/finos/waltz/actions)
