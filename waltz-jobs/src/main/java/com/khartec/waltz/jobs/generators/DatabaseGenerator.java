@@ -74,6 +74,8 @@ public class DatabaseGenerator implements SampleDataGenerator {
             }
         }
 
+        dsl.batchStore(databaseRecords).execute();
+
         // create Database usages
         List<Long> appIds = getAppIds(dsl);
         List<Long> databaseIds = getDatabaseIds(dsl);
@@ -82,7 +84,9 @@ public class DatabaseGenerator implements SampleDataGenerator {
 
         IntStream.range(0, 20_000)
                 .forEach(i -> {
-                    databaseAppMappings.add(Tuple.tuple(randomPick(databaseIds), randomPick(appIds)));
+                    Long dbId = randomPick(databaseIds);
+                    Long appId = randomPick(appIds);
+                    databaseAppMappings.add(Tuple.tuple(dbId, appId));
                 });
 
         List<DatabaseUsageRecord> databaseUsage = databaseAppMappings

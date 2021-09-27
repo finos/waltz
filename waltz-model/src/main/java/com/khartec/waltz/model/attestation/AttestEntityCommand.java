@@ -35,6 +35,6 @@ public abstract class AttestEntityCommand implements Command {
     public abstract EntityReference entityReference(); // The entity for which the above kind is being attested
 
     @Nullable
-    public abstract Long attestedEntityId();
+    public abstract Long attestedEntityId(); // optional qualifier (e.g. for MEASURABLE_CATEGORY)
 
 }
