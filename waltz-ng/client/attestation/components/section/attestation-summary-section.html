@@ -19,34 +19,84 @@
 
 <div class="row"
      ng-if="$ctrl.applications.length > 0">
-    <div class="col-md-4">
-        <waltz-static-panels group-key="SECTION.ATTESTATION_SUMMARY.ABOUT"
-                             class="small"
-                             render-mode="minimal-border">
-        </waltz-static-panels>
-    </div>
-    <div class="col-md-4">
-        <waltz-pie-table data="$ctrl.summaryData.logical"
-                         config="$ctrl.config.logical"
-                         name="Logical Flow Attestation summary for Applications">
-        </waltz-pie-table>
-    </div>
-    <div class="col-md-4">
-        <waltz-pie-table data="$ctrl.summaryData.physical"
-                         config="$ctrl.config.physical"
-                         name="Physical Flow Attestation summary for Applications">
-        </waltz-pie-table>
-    </div>
-</div>
 
-<!-- THE GRID -->
-<div class="row"
-     ng-if="$ctrl.visibility.tableView">
-    <div class="col-md-12">
-        <waltz-grid-with-search entries="$ctrl.gridDataToDisplay"
-                                column-defs="$ctrl.columnDefs">
-        </waltz-grid-with-search>
-    </div>
+    <div class="waltz-tabs col-md-12">
+        <!-- TAB HEADERS -->
+        <input type="radio"
+               value="summary"
+               ng-model="$ctrl.activeTab"
+               id="summary">
+        <label class="wt-label"
+               ng-model="$ctrl.activeTab"
+               for="summary">
+            <span>Summary</span>
+        </label>
+
+        <input type="radio"
+               value="logicals"
+               ng-model="$ctrl.activeTab"
+               id="logicals">
+        <label class="wt-label"
+               for="logicals">
+            <span>Logical Flows</span>
+        </label>
+
+        <input type="radio"
+               ng-model="$ctrl.activeTab"
+               value="physicals"
+               id="physicals">
+        <label class="wt-label"
+               for="physicals">
+            <span>Physical Flows</span>
+        </label>
+
+        <input type="radio"
+               ng-model="$ctrl.activeTab"
+               value="measurables"
+               id="measurables">
+        <label class="wt-label"
+               for="measurables">
+            <span>Measurables</span>
+        </label>
+
+        <div class="wt-tab wt-active">
+            <!-- SERVERS -->
+            <div ng-if="$ctrl.activeTab === 'summary'"
+                 class="row"
+                 style="padding-top: 1em; padding-bottom: 0.7em; padding-left:1em">
+
+                <div class="col-md-4">
+                    <waltz-static-panels group-key="SECTION.ATTESTATION_SUMMARY.ABOUT"
+                                         class="small"
+                                         render-mode="minimal-border">
+                    </waltz-static-panels>
+                </div>
+                <div class="col-md-4">
+                    <waltz-pie-table data="$ctrl.summaryData.logical"
+                                     config="$ctrl.config.logical"
+                                     name="Logical Flow Attestation summary for Applications">
+                    </waltz-pie-table>
+                </div>
+                <div class="col-md-4">
+                    <waltz-pie-table data="$ctrl.summaryData.physical"
+                                     config="$ctrl.config.physical"
+                                     name="Physical Flow Attestation summary for Applications">
+                    </waltz-pie-table>
+                </div>
+            </div>
+
+
+            <div ng-if="$ctrl.activeTab === 'logicals'"
+                 class="row"
+                 style="padding-top: 1em; padding-bottom: 0.7em; padding-left:1em">
+
+                <div class="col-md-12">
+                    <waltz-grid-with-search entries="$ctrl.gridData"
+                                            column-defs="$ctrl.columnDefs">
+                    </waltz-grid-with-search>
+                </div>
+            </div>
+        </div>
 </div>
 
 <!-- YEAR, LIFECYCLE && DOWNLOAD -->

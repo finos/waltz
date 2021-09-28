@@ -21,25 +21,26 @@ package com.khartec.waltz.service.attestation;
 import com.khartec.waltz.common.exception.UpdateFailedException;
 import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.GenericSelectorFactory;
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.attestation.AttestationInstanceDao;
 import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.attestation.AttestEntityCommand;
-import com.khartec.waltz.model.attestation.AttestationInstance;
-import com.khartec.waltz.model.attestation.AttestationRun;
-import com.khartec.waltz.model.attestation.LatestMeasurableAttestationInfo;
+import com.khartec.waltz.model.attestation.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.external_identifier.ExternalIdValue;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.permission.PermissionGroupService;
+import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
+import org.jooq.impl.DSL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 
@@ -47,7 +48,9 @@ import static com.khartec.waltz.common.Checks.checkNotEmpty;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.first;
 import static com.khartec.waltz.common.CollectionUtilities.notEmpty;
-import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
+import static com.khartec.waltz.common.DateTimeUtilities.*;
+import static com.khartec.waltz.schema.Tables.APPLICATION;
+import static com.khartec.waltz.schema.Tables.ATTESTATION_INSTANCE;
 
 
 @Service
@@ -109,7 +112,7 @@ public class AttestationInstanceService {
         checkNotEmpty(attestedBy, "attestedBy must be provided");
 
         boolean success = attestationInstanceDao.attestInstance(instanceId, attestedBy, nowUtc());
-        if(success) {
+        if (success) {
             AttestationInstance instance = attestationInstanceDao.getById(instanceId);
             AttestationRun run = attestationRunService.getById(instance.attestationRunId());
             logChange(attestedBy, instance, run.attestedEntityKind());
@@ -144,15 +147,15 @@ public class AttestationInstanceService {
         return genericSelector.selector();
     }
 
-    private void logChange (String username, AttestationInstance instance, EntityKind attestedKind) {
+    private void logChange(String username, AttestationInstance instance, EntityKind attestedKind) {
 
         String logMessage = EntityKind.APPLICATION.equals(instance.parentEntity().kind())
                 ? String.format("Attestation of %s for application %s",
-                    attestedKind,
-                    ExternalIdValue.orElse(
+                attestedKind,
+                ExternalIdValue.orElse(
                         applicationService
-                            .getById(instance.parentEntity().id())
-                            .assetCode(),
+                                .getById(instance.parentEntity().id())
+                                .assetCode(),
                         "UNKNOWN"))
                 : String.format("Attestation of %s ", attestedKind);
 
@@ -176,7 +179,7 @@ public class AttestationInstanceService {
                         username,
                         true);
 
-        if (notEmpty(instancesForEntityForUser)){
+        if (notEmpty(instancesForEntityForUser)) {
             instancesForEntityForUser
                     .forEach(attestation -> {
                         try {
@@ -198,10 +201,9 @@ public class AttestationInstanceService {
     }
 
 
-    public Set<LatestMeasurableAttestationInfo> findLatestMeasurableAttestations(EntityReference ref){
+    public Set<LatestMeasurableAttestationInfo> findLatestMeasurableAttestations(EntityReference ref) {
         return attestationInstanceDao.findLatestMeasurableAttestations(ref);
     }
-
 
 
     private void checkAttestationPermission(String username, AttestEntityCommand createCommand) {
@@ -218,12 +220,62 @@ public class AttestationInstanceService {
 
     private Long getRunId(IdCommandResponse idCommandResponse) throws IllegalStateException {
         return idCommandResponse.id()
-                        .orElseThrow(() -> new IllegalStateException("Unable to get identifier for this run"));
+                .orElseThrow(() -> new IllegalStateException("Unable to get identifier for this run"));
     }
 
     private Long getInstanceId(AttestationInstance attestation) throws IllegalStateException {
         return attestation
                 .id()
                 .orElseThrow(() -> new IllegalStateException("Unable to get identifier for this instance"));
+    }
+
+
+    public Set<ApplicationAttestationInstanceSummary> findApplicationAttestationInstancesForKindAndSelector(
+            EntityKind attestedKind,
+            Long attestedId,
+            ApplicationAttestationInstanceInfo attestationInfo) {
+
+        ApplicationAttestationSummaryFilters filters = attestationInfo.filters();
+
+        Condition condition = getApplicationAttestationFilterCondition(filters);
+
+        ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
+
+        Select<Record1<Long>> appIds = applicationIdSelectorFactory.apply(attestationInfo.selectionOptions());
+
+        return attestationInstanceDao.findApplicationAttestationInstancesForKindAndSelector(
+                attestedKind,
+                attestedId,
+                appIds,
+                condition);
+    }
+
+
+    public Set<ApplicationAttestationSummaryCounts> findAttestationInstanceSummaryForSelector(ApplicationAttestationInstanceInfo applicationAttestationInstanceInfo) {
+
+        Condition condition = getApplicationAttestationFilterCondition(applicationAttestationInstanceInfo.filters());
+
+        ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
+
+        Select<Record1<Long>> appIds = applicationIdSelectorFactory.apply(applicationAttestationInstanceInfo.selectionOptions());
+
+        return attestationInstanceDao.findAttestationInstanceSummaryForSelector(appIds, condition);
+    }
+
+
+    private Condition getApplicationAttestationFilterCondition(ApplicationAttestationSummaryFilters filters) {
+        Condition criticalityCondition = filters.appCriticality()
+                .map(criticality -> APPLICATION.BUSINESS_CRITICALITY.eq(criticality.name()))
+                .orElse(DSL.trueCondition());
+
+        Condition lifecyclePhaseCondition = filters.appLifecyclePhase()
+                .map(lifecyclePhase -> APPLICATION.LIFECYCLE_PHASE.eq(lifecyclePhase.name()))
+                .orElse(DSL.trueCondition());
+
+        Condition dateCondition = filters.attestationsFromDate()
+                .map(fromDate -> ATTESTATION_INSTANCE.ATTESTED_AT.ge(Timestamp.valueOf(toLocalDateTime(toSqlDate(fromDate)))))
+                .orElse(DSL.trueCondition());
+
+        return dateCondition.and(lifecyclePhaseCondition.and(criticalityCondition));
     }
 }

@@ -18,12 +18,22 @@
 
 package com.khartec.waltz.jobs.harness;
 
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.attestation.AttestationInstanceDao;
-import com.khartec.waltz.model.attestation.AttestationInstance;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.application.LifecyclePhase;
+import com.khartec.waltz.model.attestation.*;
 import com.khartec.waltz.service.DIConfiguration;
+import com.khartec.waltz.service.attestation.AttestationInstanceService;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.util.List;
+import java.util.Set;
+
+import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 
 
 public class AttestationInstanceHarness {
@@ -33,14 +43,60 @@ public class AttestationInstanceHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
         AttestationInstanceDao attestationInstanceDao = ctx.getBean(AttestationInstanceDao.class);
+        AttestationInstanceService svc = ctx.getBean(AttestationInstanceService.class);
+
+        IdSelectionOptions opts = mkOpts(mkRef(EntityKind.APPLICATION, 20506L));
+        IdSelectionOptions group = mkOpts(mkRef(EntityKind.APP_GROUP, 433L));
+        ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
+        Select<Record1<Long>> appIds = applicationIdSelectorFactory.apply(opts);
 
         long st = System.currentTimeMillis();
         System.out.println("-- start");
 
-        List<AttestationInstance> instances = attestationInstanceDao.findByRecipient("kamran.saleem@db.com", true);
-        List<AttestationInstance> instancesAll = attestationInstanceDao.findByRecipient("kamran.saleem@db.com", false);
+        ApplicationAttestationSummaryFilters filters = ImmutableApplicationAttestationSummaryFilters.builder()
+                .appLifecyclePhase(LifecyclePhase.PRODUCTION)
+                .build();
 
-        System.out.println("-- end, dur: " + (System.currentTimeMillis() - st));
+        ImmutableApplicationAttestationInstanceInfo info = ImmutableApplicationAttestationInstanceInfo.builder()
+                .attestedEntityId(null)
+                .attestedEntityKind(EntityKind.LOGICAL_DATA_FLOW)
+                .filters(filters)
+                .selectionOptions(group)
+                .build();
+
+        Set<ApplicationAttestationInstanceSummary> sumaries = svc.findApplicationAttestationInstancesForKindAndSelector(
+                EntityKind.LOGICAL_DATA_FLOW,
+                null,
+                info);
+
+        System.out.println(sumaries);
+
+        Set<ApplicationAttestationSummaryCounts> summary = svc
+                .findAttestationInstanceSummaryForSelector(info);
+
+        System.out.println(summary);
+
+//        Set<ApplicationAttestationInstanceSummary> summary2 = attestationInstanceDao
+//                .findAttestationInstancesForApplicationSummaryGrid(
+//                        EntityKind.MEASURABLE_CATEGORY,
+//                        12L,
+//                        appIds,
+//                        );
+//
+//        Set<ApplicationAttestationInstanceSummary> physFlow = attestationInstanceDao
+//                .findAttestationInstancesForApplicationSummaryGrid(
+//                        EntityKind.PHYSICAL_FLOW,
+//                        null,
+//                        appIds,
+//                        DSL.trueCondition());
+//
+
+//        System.out.println(summary);
+
+//        List<AttestationInstance> instances = attestationInstanceDao.findByRecipient("kamran.saleem@db.com", true);
+//        List<AttestationInstance> instancesAll = attestationInstanceDao.findByRecipient("kamran.saleem@db.com", false);
+
+//        System.out.println("-- end, dur: " + (System.currentTimeMillis() - st));
 
 
     }

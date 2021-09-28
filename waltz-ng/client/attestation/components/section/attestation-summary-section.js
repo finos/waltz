@@ -44,7 +44,10 @@ const initialState = {
 
     visibility : {
         tableView: false
-    }
+    },
+
+    activeTab: "summary",
+    gridData: []
 };
 
 
@@ -92,13 +95,13 @@ function calcGridData(segment, gridData, year, lifecycle) {
         // return everything as no segments have been selected (i.e. total was clicked)
         return gridData;
     } else if (segment.key === "NEVER_ATTESTED" && lifecycle === 0) {
-        // the unattested segment was clicked, so show only rows without an attestation and with all lifecycle phasea
+        // the unattested segment was clicked, so show only rows without an attestation and with all lifecycle phases
         return _.filter(gridData, d => _.isNil(d.attestation));
     } else if (segment.key === "NEVER_ATTESTED" && lifecycle !== 0) {
         // the unattested segment was clicked, so show only rows without an attestation and with selected lifecycle phase
         return _.filter(gridData, d => _.isNil(d.attestation) && d.application.lifecyclePhase === lifecycle);
     } else if (year === ALL_YEARS && lifecycle === 0){
-        // the attested segment was clicked, so show only rows with an attestation and with all lifecycle phasea
+        // the attested segment was clicked, so show only rows with an attestation and with all lifecycle phases
         return _.filter(gridData, d => !_.isNil(d.attestation));
     } else if (year === ALL_YEARS && lifecycle !== 0){
         // the attested segment was clicked, so show only rows with an attestation and with selected lifecycle phase
@@ -142,14 +145,35 @@ function controller($q,
                 [vm.selectionOptions])
             .then(r => r.data);
 
+
+        const summaryObject = {
+            attestedEntityKind: "LOGICAL_DATA_FLOW",
+            attestedEntityId: null,
+            selectionOptions: vm.selectionOptions,
+            filters: {}
+        }
+
+        const attestationInstanceSummaryPromise = serviceBroker
+            .loadViewData(
+                CORE_API.AttestationInstanceStore.findApplicationInstancesForKindAndSelector,
+                [summaryObject.attestedEntityKind, summaryObject.attestedEntityId, summaryObject])
+            .then(r => console.log("instances", r.data) || r.data);
+
+
+        const attestationSummaryPromise = serviceBroker
+            .loadViewData(
+                CORE_API.AttestationInstanceStore.findApplicationAttestationSummary,
+                [summaryObject])
+            .then(r => console.log("summary", r.data) || r.data);
+
         const appPromise = serviceBroker
             .loadViewData(
                 CORE_API.ApplicationStore.findBySelector,
                 [vm.selectionOptions])
             .then(r => r.data);
 
-        $q.all([attestationInstancePromise, appPromise])
-            .then(([attestationInstances, applications]) => {
+        $q.all([attestationInstancePromise, appPromise, attestationInstanceSummaryPromise])
+            .then(([attestationInstances, applications, appSummaryInfo]) => {
                 vm.applications = applications;
                 const instancesByKind = _.groupBy(attestationInstances, d => d.attestedEntityKind);
                 vm.gridDataByLogicalFlow = mkAttestationSummaryDataForApps(applications, instancesByKind[entity.LOGICAL_DATA_FLOW.key], displayNameService);
@@ -159,6 +183,11 @@ function controller($q,
                     logical: prepareSummaryData(vm.gridDataByLogicalFlow, vm.selectedYear),
                     physical: prepareSummaryData(vm.gridDataByPhysicalFlow, vm.selectedYear)
                 };
+
+                vm.gridData = appSummaryInfo;
+
+                console.log({gd: vm.gridData});
+                console.log({sumData: vm.summaryData});
             });
     };
 

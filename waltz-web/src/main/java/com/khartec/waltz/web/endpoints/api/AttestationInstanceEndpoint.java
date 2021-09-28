@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.attestation.AttestEntityCommand;
-import com.khartec.waltz.model.attestation.AttestationInstance;
-import com.khartec.waltz.model.attestation.LatestMeasurableAttestationInfo;
+import com.khartec.waltz.common.StringUtilities;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.attestation.*;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.attestation.AttestationInstanceService;
@@ -74,6 +74,8 @@ public class AttestationInstanceEndpoint implements Endpoint {
         String findPersonsByInstancePath = mkPath(BASE_URL, ":id", "person");
         String findBySelectorPath = mkPath(BASE_URL, "selector");
         String findLatestMeasurableAttestationsPath = mkPath(BASE_URL, "latest", "measurable-category", "entity", ":kind", ":id");
+        String findApplicationAttestationInstancesForKindAndSelectorPath = mkPath(BASE_URL, "applications", "attested-entity", ":kind", ":id");
+        String findApplicationAttestationSummaryForSelectorPath = mkPath(BASE_URL, "app-summary");
         String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
 
         DatumRoute<Boolean> attestInstanceRoute =
@@ -107,6 +109,20 @@ public class AttestationInstanceEndpoint implements Endpoint {
         ListRoute<LatestMeasurableAttestationInfo> findLatestMeasurableAttestationsRoute = ((request, response)
                 -> attestationInstanceService.findLatestMeasurableAttestations(getEntityReference(request)));
 
+        ListRoute<ApplicationAttestationInstanceSummary> findApplicationAttestationInstancesForKindAndSelectorRoute = ((request, response) -> {
+            EntityKind attestedKind = getKind(request);
+            Long attestedId = StringUtilities.parseLong(request.params("id"), null);
+            ApplicationAttestationInstanceInfo applicationAttestationInstanceInfo = readBody(request, ApplicationAttestationInstanceInfo.class);
+
+            return attestationInstanceService.findApplicationAttestationInstancesForKindAndSelector(
+                    attestedKind,
+                    attestedId,
+                    applicationAttestationInstanceInfo);
+        });
+
+        ListRoute<ApplicationAttestationSummaryCounts> findApplicationAttestationSummaryForSelectorRoute = ((request, response)
+                -> attestationInstanceService.findAttestationInstanceSummaryForSelector(readBody(request, ApplicationAttestationInstanceInfo.class)));
+
         DatumRoute<Boolean> attestEntityForUserRoute =
                 (req, res) -> attestationInstanceService.attestForEntity(getUsername(req), readCreateCommand(req));
 
@@ -120,6 +136,8 @@ public class AttestationInstanceEndpoint implements Endpoint {
         getForList(findPersonsByInstancePath, findPersonsByInstanceRoute);
         getForList(findLatestMeasurableAttestationsPath, findLatestMeasurableAttestationsRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
+        postForList(findApplicationAttestationInstancesForKindAndSelectorPath, findApplicationAttestationInstancesForKindAndSelectorRoute);
+        postForList(findApplicationAttestationSummaryForSelectorPath, findApplicationAttestationSummaryForSelectorRoute);
         getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
     }
 

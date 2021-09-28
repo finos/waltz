@@ -69,6 +69,14 @@ export function store($http, baseApiUrl) {
         .post(`${base}/selector`, options)
         .then(x => x.data);
 
+    const findApplicationAttestationSummary = (appAttestationInstanceInfo) => $http
+        .post(`${base}/app-summary`, appAttestationInstanceInfo)
+        .then(x => x.data);
+
+    const findApplicationInstancesForKindAndSelector = (attestedKind, attestedId, appAttestationInstanceInfo) => $http
+        .post(`${base}/applications/attested-entity/${attestedKind}/${attestedId}`, appAttestationInstanceInfo)
+        .then(x => x.data);
+
     const cleanupOrphans = () => {
         return $http
             .get(`${base}/cleanup-orphans`)
@@ -84,6 +92,8 @@ export function store($http, baseApiUrl) {
         findPersonsById,
         findByEntityRef,
         findBySelector,
+        findApplicationInstancesForKindAndSelector,
+        findApplicationAttestationSummary,
         cleanupOrphans
     };
 }
@@ -138,6 +148,16 @@ export const AttestationInstanceStore_API = {
         serviceName,
         serviceFnName: "findBySelector",
         description: "find instances for the given selector options"
+    },
+    findApplicationInstancesForKindAndSelector: {
+        serviceName,
+        serviceFnName: "findApplicationInstancesForKindAndSelector",
+        description: "findApplicationInstancesForKindAndSelector"
+    },
+    findApplicationAttestationSummary: {
+        serviceName,
+        serviceFnName: "findApplicationAttestationSummary",
+        description: "findApplicationAttestationSummary"
     },
     cleanupOrphans: {
         serviceName,
