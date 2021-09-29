@@ -20,9 +20,7 @@ package com.khartec.waltz.model.attestation;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.Nullable;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -30,13 +28,7 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableApplicationAttestationInstanceInfo.class)
 public abstract class ApplicationAttestationInstanceInfo {
 
-    public abstract EntityKind attestedEntityKind();
-
-    @Nullable
-    public abstract Long attestedEntityId();
-
     public abstract IdSelectionOptions selectionOptions();
-
     public abstract ApplicationAttestationSummaryFilters filters();
 }
 

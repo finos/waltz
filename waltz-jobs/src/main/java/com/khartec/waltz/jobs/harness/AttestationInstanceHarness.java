@@ -32,6 +32,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.util.Set;
 
+import static com.khartec.waltz.common.FunctionUtilities.time;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 
@@ -58,46 +59,19 @@ public class AttestationInstanceHarness {
                 .build();
 
         ImmutableApplicationAttestationInstanceInfo info = ImmutableApplicationAttestationInstanceInfo.builder()
-                .attestedEntityId(null)
-                .attestedEntityKind(EntityKind.LOGICAL_DATA_FLOW)
                 .filters(filters)
                 .selectionOptions(group)
                 .build();
 
-        Set<ApplicationAttestationInstanceSummary> sumaries = svc.findApplicationAttestationInstancesForKindAndSelector(
+        Set<ApplicationAttestationInstanceSummary> sumaries = time("instacnes", () -> svc.findApplicationAttestationInstancesForKindAndSelector(
                 EntityKind.LOGICAL_DATA_FLOW,
                 null,
-                info);
+                info));
 
         System.out.println(sumaries);
 
-        Set<ApplicationAttestationSummaryCounts> summary = svc
-                .findAttestationInstanceSummaryForSelector(info);
-
-        System.out.println(summary);
-
-//        Set<ApplicationAttestationInstanceSummary> summary2 = attestationInstanceDao
-//                .findAttestationInstancesForApplicationSummaryGrid(
-//                        EntityKind.MEASURABLE_CATEGORY,
-//                        12L,
-//                        appIds,
-//                        );
-//
-//        Set<ApplicationAttestationInstanceSummary> physFlow = attestationInstanceDao
-//                .findAttestationInstancesForApplicationSummaryGrid(
-//                        EntityKind.PHYSICAL_FLOW,
-//                        null,
-//                        appIds,
-//                        DSL.trueCondition());
-//
-
-//        System.out.println(summary);
-
-//        List<AttestationInstance> instances = attestationInstanceDao.findByRecipient("kamran.saleem@db.com", true);
-//        List<AttestationInstance> instancesAll = attestationInstanceDao.findByRecipient("kamran.saleem@db.com", false);
-
-//        System.out.println("-- end, dur: " + (System.currentTimeMillis() - st));
-
+        Set<ApplicationAttestationSummaryCounts> summary = time("summary", () -> svc
+                .findAttestationInstanceSummaryForSelector(info));
 
     }
 

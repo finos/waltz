@@ -230,17 +230,13 @@ public class AttestationInstanceService {
     }
 
 
-    public Set<ApplicationAttestationInstanceSummary> findApplicationAttestationInstancesForKindAndSelector(
-            EntityKind attestedKind,
-            Long attestedId,
-            ApplicationAttestationInstanceInfo attestationInfo) {
+    public Set<ApplicationAttestationInstanceSummary> findApplicationAttestationInstancesForKindAndSelector(EntityKind attestedKind,
+                                                                                                            Long attestedId,
+                                                                                                            ApplicationAttestationInstanceInfo attestationInfo) {
 
-        ApplicationAttestationSummaryFilters filters = attestationInfo.filters();
-
-        Condition condition = getApplicationAttestationFilterCondition(filters);
+        Condition condition = getApplicationAttestationFilterCondition(attestationInfo.filters());
 
         ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
-
         Select<Record1<Long>> appIds = applicationIdSelectorFactory.apply(attestationInfo.selectionOptions());
 
         return attestationInstanceDao.findApplicationAttestationInstancesForKindAndSelector(
@@ -256,7 +252,6 @@ public class AttestationInstanceService {
         Condition condition = getApplicationAttestationFilterCondition(applicationAttestationInstanceInfo.filters());
 
         ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
-
         Select<Record1<Long>> appIds = applicationIdSelectorFactory.apply(applicationAttestationInstanceInfo.selectionOptions());
 
         return attestationInstanceDao.findAttestationInstanceSummaryForSelector(appIds, condition);

@@ -27,7 +27,7 @@ import org.immutables.value.Value;
 @JsonDeserialize(as = ImmutableAttestationCount.class)
 public abstract class AttestationCount {
 
-    public abstract String attestationStatus(); //ATTESTED or UNATTESTED
+    public abstract String key(); //ATTESTED or UNATTESTED
     public abstract Integer count();
 
 }

@@ -448,7 +448,7 @@ public class AttestationInstanceDao {
                         attestations.field(ATTESTATION_INSTANCE.ATTESTED_BY).as("attested_by"),
                         attestations.field(ATTESTATION_INSTANCE.PARENT_ENTITY_ID).as("appId"),
                         DSL
-                                .when(attestations.field(ATTESTATION_INSTANCE.ATTESTED_AT).as("attested_at").isNull(), DSL.val("UNATTESTED"))
+                                .when(attestations.field(ATTESTATION_INSTANCE.ATTESTED_AT).as("attested_at").isNull(), DSL.val("NEVER_ATTESTED"))
                                 .otherwise(DSL.val("ATTESTED")).as("is_attested"))
                 .from(attestations)
                 .where(attestations.field(latest_attestation).eq(attestations.field("instance_id", Long.class)))
@@ -481,7 +481,7 @@ public class AttestationInstanceDao {
                 .collect(groupingBy(
                         t -> tuple(t.v1, t.v2),
                         mapping(t -> ImmutableAttestationCount.builder()
-                                .attestationStatus(t.v3)
+                                .key(t.v3)
                                 .count(t.v4)
                                 .build(),
                                 toSet())));

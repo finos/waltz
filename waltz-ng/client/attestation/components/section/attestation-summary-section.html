@@ -18,13 +18,16 @@
   -->
 
 <div class="row"
-     ng-if="$ctrl.applications.length > 0">
+     ng-if="$ctrl.attestationSummaries.length > 0">
+
+    <pre ng-bind="$ctrl.activeTab | json"></pre>
 
     <div class="waltz-tabs col-md-12">
         <!-- TAB HEADERS -->
         <input type="radio"
                value="summary"
                ng-model="$ctrl.activeTab"
+               ng-change="$ctrl.changeTab(null)"
                id="summary">
         <label class="wt-label"
                ng-model="$ctrl.activeTab"
@@ -33,34 +36,18 @@
         </label>
 
         <input type="radio"
-               value="logicals"
+               ng-repeat="summary in $ctrl.attestationSummaries"
+               value="{{summary.key}}"
+               ng-change="$ctrl.changeTab(summary)"
                ng-model="$ctrl.activeTab"
-               id="logicals">
+               id="{{summary.key}}">
         <label class="wt-label"
-               for="logicals">
-            <span>Logical Flows</span>
-        </label>
-
-        <input type="radio"
-               ng-model="$ctrl.activeTab"
-               value="physicals"
-               id="physicals">
-        <label class="wt-label"
-               for="physicals">
-            <span>Physical Flows</span>
-        </label>
-
-        <input type="radio"
-               ng-model="$ctrl.activeTab"
-               value="measurables"
-               id="measurables">
-        <label class="wt-label"
-               for="measurables">
-            <span>Measurables</span>
+               ng-repeat="summary in $ctrl.attestationSummaries"
+               for="{{summary.key}}">
+            <span>{{summary.name}}</span>
         </label>
 
         <div class="wt-tab wt-active">
-            <!-- SERVERS -->
             <div ng-if="$ctrl.activeTab === 'summary'"
                  class="row"
                  style="padding-top: 1em; padding-bottom: 0.7em; padding-left:1em">
@@ -71,22 +58,17 @@
                                          render-mode="minimal-border">
                     </waltz-static-panels>
                 </div>
-                <div class="col-md-4">
-                    <waltz-pie-table data="$ctrl.summaryData.logical"
-                                     config="$ctrl.config.logical"
-                                     name="Logical Flow Attestation summary for Applications">
-                    </waltz-pie-table>
-                </div>
-                <div class="col-md-4">
-                    <waltz-pie-table data="$ctrl.summaryData.physical"
-                                     config="$ctrl.config.physical"
-                                     name="Physical Flow Attestation summary for Applications">
+                <div class="col-md-4"
+                     style="height: 200px;"
+                     ng-repeat="summary in $ctrl.attestationSummaries">
+                    <waltz-pie-table data="summary.attestationCounts"
+                                     config="$ctrl.config"
+                                     name="Attestation summary for {{summary.name}}">
                     </waltz-pie-table>
                 </div>
             </div>
 
-
-            <div ng-if="$ctrl.activeTab === 'logicals'"
+            <div ng-if="$ctrl.activeTab != 'summary'"
                  class="row"
                  style="padding-top: 1em; padding-bottom: 0.7em; padding-left:1em">
 
@@ -97,11 +79,11 @@
                 </div>
             </div>
         </div>
+    </div>
 </div>
 
 <!-- YEAR, LIFECYCLE && DOWNLOAD -->
-<div class="row"
-     ng-if="$ctrl.visibility.tableView">
+<div class="row">
     <div class="col-md-3">
         <!-- LIFECYCLE SELECTION -->
         <div style="padding-top: 0.5em;">
@@ -188,20 +170,21 @@
         </div>
     </div>
     <div class="col-md-6"
+         ng-if="$ctrl.selectedTab"
          style="padding-top: 0.5em;">
-        <waltz-data-extract-link name="Download {{$ctrl.exportFlowType | toDisplayName:'entity'}} Attestations"
+        <waltz-data-extract-link name="Download {{$ctrl.activeTab.name}} Attestations"
                                  styling="link"
                                  filename="Attestations.csv"
-                                 extract="{{$ctrl.extractUrl}}"
+                                 extract="attestations/{{$ctrl.selectedTab.attestedKind}}/{{$ctrl.selectedTab.attestedId}}}"
                                  method="POST"
-                                 request-body="$ctrl.selectionOptions"
+                                 request-body="$ctrl.appAttestationInfo"
                                  class="pull-right">
         </waltz-data-extract-link>
     </div>
 </div>
 
 <div class="row"
-     ng-if="$ctrl.applications.length === 0">
+     ng-if="$ctrl.attestationSummaries.length === 0">
     <div class="col-md-12">
         <waltz-no-data >
             <message>
