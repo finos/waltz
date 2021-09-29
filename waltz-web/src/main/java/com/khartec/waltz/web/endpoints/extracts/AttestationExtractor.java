@@ -20,7 +20,6 @@ package com.khartec.waltz.web.endpoints.extracts;
 
 import com.khartec.waltz.common.ListUtilities;
 import com.khartec.waltz.common.StringUtilities;
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.attestation.ApplicationAttestationInstanceInfo;
@@ -67,8 +66,6 @@ import static spark.Spark.post;
 
 @Service
 public class AttestationExtractor extends DirectQueryBasedDataExtractor {
-
-    private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
 
     private final AttestationInstanceService attestationInstanceService;
 
@@ -215,7 +212,7 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
         reportRows.forEach(unchecked(r -> {
             List<Object> values = asList(
                     r.appRef().id(),
-                    r.appRef().name(),
+                    r.appRef().name().get(),
                     r.appAssetCode(),
                     r.appCriticality(),
                     r.appLifecyclePhase(),
@@ -253,7 +250,7 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
 
             List<Object> values = asList(
                     r.appRef().id(),
-                    r.appRef().name(),
+                    r.appRef().name().get(),
                     r.appAssetCode(),
                     r.appCriticality(),
                     r.appLifecyclePhase(),

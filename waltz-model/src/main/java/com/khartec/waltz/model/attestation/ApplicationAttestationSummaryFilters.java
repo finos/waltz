@@ -35,6 +35,7 @@ public abstract class ApplicationAttestationSummaryFilters {
     public abstract Optional<LocalDate> attestationsFromDate();
     public abstract Optional<LifecyclePhase> appLifecyclePhase();
     public abstract Optional<Criticality> appCriticality();
+    public abstract Optional<AttestationState> attestationState();
 
 }
 

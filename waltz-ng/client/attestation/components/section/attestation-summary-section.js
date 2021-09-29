@@ -20,48 +20,37 @@ import template from "./attestation-summary-section.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {determineDownwardsScopeForKind, mkSelectionOptions} from "../../../common/selector-utils";
-import {attestationPieConfig, prepareSummaryData} from "../../attestation-pie-utils";
+import {attestationPieConfig} from "../../attestation-pie-utils";
 import {attestationSummaryColumnDefs} from "../../attestation-utils";
 import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 import {lifecyclePhase} from "../../../common/services/enums/lifecycle-phase";
 import * as _ from "lodash";
-import moment from "moment";
+import {criticality} from "../../../common/services/enums/criticality";
+import {attestationStatus} from "../../../common/services/enums/attestation-status";
 
 
 const initialState = {
     columnDefs: attestationSummaryColumnDefs,
-    rawGridData: [],
-    gridDataToDisplay: [],
-
-    selectedFlowType: null,
-    selectedYear: null,
     selectedLifecycle: null,
-    selectedSegment: null,
-    selectedAttestationType: null,
-
-    extractUrl: null,
-
-    visibility : {
-        tableView: false
-    },
-
+    selectedCriticality: null,
     activeTab: "summary",
     gridData: [],
     gridFilters: {},
-    selectedTab: null
+    selectedTab: null,
+    selectedDate: null,
+    selectedStatus: null,
+    editingDate: false
 };
 
 
 const bindings = {
     parentEntityRef: "<",
     filters: "<",
-    selectedYear: "<",
-    selectedLifecycle: "<",
-    selectedAppsByYear: "<"
 };
 
-const ALL_YEARS = 0;
 const ALL_LIFECYCLES = 0;
+const ALL_CRITICALITIES = 0;
+const ALL_STATUSES = 0;
 
 
 
@@ -88,11 +77,11 @@ function controller($q, serviceBroker) {
             filters: vm.gridFilters
         }
 
-        const attestationInstanceSummaryPromise = serviceBroker
+        serviceBroker
             .loadViewData(
                 CORE_API.AttestationInstanceStore.findApplicationInstancesForKindAndSelector,
                 [attestedKind, attestedId, vm.appAttestationInfo])
-            .then(r => vm.gridData = console.log("done") ||  r.data);
+            .then(r => vm.gridData = r.data);
     }
 
     const loadSummaryData = () => {
@@ -106,7 +95,7 @@ function controller($q, serviceBroker) {
             .loadViewData(
                 CORE_API.AttestationInstanceStore.findApplicationAttestationSummary,
                 [vm.appAttestationInfo])
-            .then(r => console.log("summary", r.data) || r.data);
+            .then(r => r.data);
 
 
         const measurableCategoriesPromise = serviceBroker
@@ -123,27 +112,20 @@ function controller($q, serviceBroker) {
                     .map(i => Object.assign({}, i, {name: determineName(i, categoriesById), key: `${i.attestedKind}_${i.attestedId}`}))
                     .sortBy("name")
                     .value();
-
-                console.log({gd: vm.gridData});
-                console.log({summary: vm.attestationSummaries});
             });
     };
 
 
     vm.$onInit = () => {
 
-        const currentYear = moment().year();
-
-        vm.yearOptions = [
-            ALL_YEARS,
-            currentYear,
-            currentYear - 1,
-            currentYear - 2,
-            currentYear - 3
-        ];
-        vm.selectedYear = ALL_YEARS;
         vm.lifecycleOptions = _.concat(ALL_LIFECYCLES, _.values(_.mapValues(lifecyclePhase, function(l) { return l.key })));
         vm.selectedLifecycle = ALL_LIFECYCLES;
+
+        vm.criticalityOptions = _.concat(ALL_CRITICALITIES, _.values(_.mapValues(criticality, function(l) { return l.key })));
+        vm.selectedCriticality = ALL_CRITICALITIES;
+
+        vm.statusOptions = _.concat(ALL_CRITICALITIES, _.values(_.mapValues(attestationStatus, function(l) { return l.key })));
+        vm.selectedStatus = ALL_STATUSES;
 
         vm.config = attestationPieConfig
 
@@ -160,11 +142,11 @@ function controller($q, serviceBroker) {
             vm.filters);
 
         if(changes.filters) {
-            loadSummaryData();
-        }
-
-        if(changes.activeTab){
-            loadGridData();
+            if(!_.isEmpty(vm.selectedTab)){
+                loadGridData(vm.selectedTab.attestedKind, vm.selectedTab.attestedId);
+            } else {
+                loadSummaryData();
+            }
         }
     };
 
@@ -178,9 +160,40 @@ function controller($q, serviceBroker) {
         }
     }
 
-    vm.onChangeYear = (year) => {
-        vm.selectedYear = Number(year);
-        loadSummaryData();
+    vm.onChangeDate = () => {
+        vm.gridFilters.attestationsFromDate = vm.selectedDate;
+
+        if(!_.isEmpty(vm.selectedTab)){
+            loadGridData(vm.selectedTab.attestedKind, vm.selectedTab.attestedId);
+        } else {
+            loadSummaryData();
+        }
+    };
+
+    vm.clearSelectedDate = () => {
+        vm.selectedDate = null;
+        vm.gridFilters.attestationsFromDate = vm.selectedDate;
+
+        if(!_.isEmpty(vm.selectedTab)){
+            loadGridData(vm.selectedTab.attestedKind, vm.selectedTab.attestedId);
+        } else {
+            loadSummaryData();
+        }
+    };
+
+
+    vm.clearAllFilters = () => {
+        vm.selectedDate = null;
+        vm.selectedStatus = ALL_STATUSES;
+        vm.selectedLifecycle = ALL_LIFECYCLES;
+        vm.selectedCriticality = ALL_CRITICALITIES
+        vm.gridFilters = {};
+
+        if(!_.isEmpty(vm.selectedTab)){
+            loadGridData(vm.selectedTab.attestedKind, vm.selectedTab.attestedId);
+        } else {
+            loadSummaryData();
+        }
     };
 
     vm.onChangeLifecycle = (lifecycle) => {
@@ -193,6 +206,43 @@ function controller($q, serviceBroker) {
             loadSummaryData();
         }
     };
+
+    vm.onChangeCriticality = (criticality) => {
+        vm.gridFilters.appCriticality = criticality;
+        vm.selectedCriticality = criticality;
+
+        if(!_.isEmpty(vm.selectedTab)){
+            loadGridData(vm.selectedTab.attestedKind, vm.selectedTab.attestedId);
+        } else {
+            loadSummaryData();
+        }
+    };
+
+    vm.onChangeStatus = (status) => {
+        vm.gridFilters.attestationState = status;
+        vm.selectedStatus = status;
+
+        if(!_.isEmpty(vm.selectedTab)){
+            loadGridData(vm.selectedTab.attestedKind, vm.selectedTab.attestedId);
+        } else {
+            loadSummaryData();
+        }
+    };
+
+    vm.toggleEditDate = () => {
+        vm.editingDate = true;
+    }
+
+    vm.saveDate = () => {
+        vm.gridFilters.attestationsFromDate = vm.selectedDate;
+        vm.editingDate = false;
+
+        if(!_.isEmpty(vm.selectedTab)){
+            loadGridData(vm.selectedTab.attestedKind, vm.selectedTab.attestedId);
+        } else {
+            loadSummaryData();
+        }
+    }
 }
 
 

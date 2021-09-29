@@ -22,7 +22,6 @@ import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.attestation.AttestationInstanceDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.application.LifecyclePhase;
 import com.khartec.waltz.model.attestation.*;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.attestation.AttestationInstanceService;
@@ -48,6 +47,7 @@ public class AttestationInstanceHarness {
 
         IdSelectionOptions opts = mkOpts(mkRef(EntityKind.APPLICATION, 20506L));
         IdSelectionOptions group = mkOpts(mkRef(EntityKind.APP_GROUP, 433L));
+        IdSelectionOptions org = mkOpts(mkRef(EntityKind.ORG_UNIT, 6811));
         ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
         Select<Record1<Long>> appIds = applicationIdSelectorFactory.apply(opts);
 
@@ -55,12 +55,11 @@ public class AttestationInstanceHarness {
         System.out.println("-- start");
 
         ApplicationAttestationSummaryFilters filters = ImmutableApplicationAttestationSummaryFilters.builder()
-                .appLifecyclePhase(LifecyclePhase.PRODUCTION)
                 .build();
 
         ImmutableApplicationAttestationInstanceInfo info = ImmutableApplicationAttestationInstanceInfo.builder()
                 .filters(filters)
-                .selectionOptions(group)
+                .selectionOptions(org)
                 .build();
 
         Set<ApplicationAttestationInstanceSummary> sumaries = time("instacnes", () -> svc.findApplicationAttestationInstancesForKindAndSelector(
@@ -72,6 +71,8 @@ public class AttestationInstanceHarness {
 
         Set<ApplicationAttestationSummaryCounts> summary = time("summary", () -> svc
                 .findAttestationInstanceSummaryForSelector(info));
+
+        System.out.println(summary);
 
     }
 

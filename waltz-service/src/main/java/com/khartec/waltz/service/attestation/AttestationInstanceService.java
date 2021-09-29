@@ -50,7 +50,6 @@ import static com.khartec.waltz.common.CollectionUtilities.first;
 import static com.khartec.waltz.common.CollectionUtilities.notEmpty;
 import static com.khartec.waltz.common.DateTimeUtilities.*;
 import static com.khartec.waltz.schema.Tables.APPLICATION;
-import static com.khartec.waltz.schema.Tables.ATTESTATION_INSTANCE;
 
 
 @Service
@@ -267,10 +266,16 @@ public class AttestationInstanceService {
                 .map(lifecyclePhase -> APPLICATION.LIFECYCLE_PHASE.eq(lifecyclePhase.name()))
                 .orElse(DSL.trueCondition());
 
-        Condition dateCondition = filters.attestationsFromDate()
-                .map(fromDate -> ATTESTATION_INSTANCE.ATTESTED_AT.ge(Timestamp.valueOf(toLocalDateTime(toSqlDate(fromDate)))))
+        Condition attestationStateCondition = filters.attestationState()
+                .map(state -> AttestationState.ATTESTED.equals(state)
+                        ? DSL.field("attested_at", Timestamp.class).isNotNull()
+                        : DSL.field("attested_at", Timestamp.class).isNull())
                 .orElse(DSL.trueCondition());
 
-        return dateCondition.and(lifecyclePhaseCondition.and(criticalityCondition));
+        Condition dateCondition = filters.attestationsFromDate()
+                .map(fromDate -> DSL.field("attested_at", Timestamp.class).ge(Timestamp.valueOf(toLocalDateTime(toSqlDate(fromDate)))))
+                .orElse(DSL.trueCondition());
+
+        return dateCondition.and(lifecyclePhaseCondition.and(criticalityCondition).and(attestationStateCondition));
     }
 }
