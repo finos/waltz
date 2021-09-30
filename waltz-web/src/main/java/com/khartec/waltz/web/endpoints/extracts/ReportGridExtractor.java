@@ -150,8 +150,10 @@ public class ReportGridExtractor implements DataExtractor {
 
                     ArrayList<Object> reportRow = new ArrayList<>();
 
+                    Collection<ReportGridCell> cells = r.getValue();
+
                     Map<Tuple2<Long, EntityKind>, Object> callValuesByColumnRefForApp = indexBy(
-                            r.getValue(),
+                            cells,
                             k -> tuple(k.columnEntityId(), k.columnEntityKind()),
                             v -> getValueFromReportRow(ratingsById, v));
 
@@ -177,7 +179,8 @@ public class ReportGridExtractor implements DataExtractor {
             case COST_KIND:
                 return reportGridCell.value();
             case INVOLVEMENT_KIND:
-                return reportGridCell.text();
+            case SURVEY_QUESTION:
+                return Optional.ofNullable(reportGridCell.text()).orElse("-");
             case MEASURABLE:
             case ASSESSMENT_DEFINITION:
                 return maybeGet(ratingsById, reportGridCell.ratingId())
