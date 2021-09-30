@@ -80,6 +80,7 @@
     </div>
 
     <div class="col-md-9"
+         style="padding-top: 2em"
          ng-if="$ctrl.attestationSummaries.length === 0">
         <waltz-no-data>
             <message>
@@ -109,8 +110,9 @@
                         <div ng-include="'wass-date-picker'"></div>
                     </div>
                     <div style="padding-top: 1.5em;">
-                        <button class="btn btn-info"
+                        <button class="btn btn-skinny"
                                 ng-click="$ctrl.clearAllFilters()">
+                            <waltz-icon name="ban"></waltz-icon>
                             Clear All Filters
                         </button>
                     </div>
@@ -129,7 +131,7 @@
             </content>
         </waltz-sub-section>
         <br>
-        <waltz-warning ng-if="$ctrl.selectedDate || $ctrl.selectedLifecycle">
+        <waltz-warning ng-if="$ctrl.filtersApplied()">
             <message>Filters have been applied!</message>
             <content></content>
         </waltz-warning>

@@ -71,12 +71,6 @@ function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
     const loadGridData = (attestedKind, attestedId) => {
-
-        vm.appAttestationInfo = {
-            selectionOptions: vm.selectionOptions,
-            filters: vm.gridFilters
-        }
-
         serviceBroker
             .loadViewData(
                 CORE_API.AttestationInstanceStore.findApplicationInstancesForKindAndSelector,
@@ -86,17 +80,11 @@ function controller($q, serviceBroker) {
 
     const loadSummaryData = () => {
 
-        vm.appAttestationInfo = {
-            selectionOptions: vm.selectionOptions,
-            filters: vm.gridFilters
-        }
-
         const attestationSummaryPromise = serviceBroker
             .loadViewData(
                 CORE_API.AttestationInstanceStore.findApplicationAttestationSummary,
                 [vm.appAttestationInfo])
             .then(r => r.data);
-
 
         const measurableCategoriesPromise = serviceBroker
             .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
@@ -115,7 +103,6 @@ function controller($q, serviceBroker) {
             });
     };
 
-
     vm.$onInit = () => {
 
         vm.lifecycleOptions = _.concat(ALL_LIFECYCLES, _.values(_.mapValues(lifecyclePhase, function(l) { return l.key })));
@@ -127,11 +114,10 @@ function controller($q, serviceBroker) {
         vm.statusOptions = _.concat(ALL_CRITICALITIES, _.values(_.mapValues(attestationStatus, function(l) { return l.key })));
         vm.selectedStatus = ALL_STATUSES;
 
-        vm.config = attestationPieConfig
+        vm.config = attestationPieConfig;
 
         loadSummaryData();
     };
-
 
     vm.$onChanges = (changes) => {
 
@@ -142,45 +128,14 @@ function controller($q, serviceBroker) {
             vm.filters);
 
         if(changes.filters) {
-            if(!_.isEmpty(vm.selectedTab)){
-                loadGridData(vm.selectedTab.attestedKind, vm.selectedTab.attestedId);
-            } else {
-                loadSummaryData();
-            }
+            vm.loadData();
         }
     };
 
     vm.changeTab = (summary) => {
         vm.selectedTab = summary;
-
-        if(!_.isEmpty(summary)){
-            loadGridData(summary.attestedKind, summary.attestedId);
-        } else {
-            loadSummaryData();
-        }
+        vm.loadData();
     }
-
-    vm.onChangeDate = () => {
-        vm.gridFilters.attestationsFromDate = vm.selectedDate;
-
-        if(!_.isEmpty(vm.selectedTab)){
-            loadGridData(vm.selectedTab.attestedKind, vm.selectedTab.attestedId);
-        } else {
-            loadSummaryData();
-        }
-    };
-
-    vm.clearSelectedDate = () => {
-        vm.selectedDate = null;
-        vm.gridFilters.attestationsFromDate = vm.selectedDate;
-
-        if(!_.isEmpty(vm.selectedTab)){
-            loadGridData(vm.selectedTab.attestedKind, vm.selectedTab.attestedId);
-        } else {
-            loadSummaryData();
-        }
-    };
-
 
     vm.clearAllFilters = () => {
         vm.selectedDate = null;
@@ -188,45 +143,25 @@ function controller($q, serviceBroker) {
         vm.selectedLifecycle = ALL_LIFECYCLES;
         vm.selectedCriticality = ALL_CRITICALITIES
         vm.gridFilters = {};
-
-        if(!_.isEmpty(vm.selectedTab)){
-            loadGridData(vm.selectedTab.attestedKind, vm.selectedTab.attestedId);
-        } else {
-            loadSummaryData();
-        }
+        vm.loadData();
     };
 
     vm.onChangeLifecycle = (lifecycle) => {
-        vm.gridFilters.appLifecyclePhase = lifecycle;
+        vm.gridFilters.appLifecyclePhase = lifecycle === ALL_LIFECYCLES ? null : lifecycle;
         vm.selectedLifecycle = lifecycle;
-
-        if(!_.isEmpty(vm.selectedTab)){
-            loadGridData(vm.selectedTab.attestedKind, vm.selectedTab.attestedId);
-        } else {
-            loadSummaryData();
-        }
+        vm.loadData();
     };
 
     vm.onChangeCriticality = (criticality) => {
-        vm.gridFilters.appCriticality = criticality;
+        vm.gridFilters.appCriticality = criticality === ALL_CRITICALITIES ? null : criticality;
         vm.selectedCriticality = criticality;
-
-        if(!_.isEmpty(vm.selectedTab)){
-            loadGridData(vm.selectedTab.attestedKind, vm.selectedTab.attestedId);
-        } else {
-            loadSummaryData();
-        }
+        vm.loadData();
     };
 
     vm.onChangeStatus = (status) => {
-        vm.gridFilters.attestationState = status;
+        vm.gridFilters.attestationState = status === ALL_STATUSES ? null : status;
         vm.selectedStatus = status;
-
-        if(!_.isEmpty(vm.selectedTab)){
-            loadGridData(vm.selectedTab.attestedKind, vm.selectedTab.attestedId);
-        } else {
-            loadSummaryData();
-        }
+        vm.loadData();
     };
 
     vm.toggleEditDate = () => {
@@ -236,12 +171,24 @@ function controller($q, serviceBroker) {
     vm.saveDate = () => {
         vm.gridFilters.attestationsFromDate = vm.selectedDate;
         vm.editingDate = false;
+        vm.loadData();
+    }
+
+    vm.loadData = () => {
+        vm.appAttestationInfo = {
+            selectionOptions: vm.selectionOptions,
+            filters: vm.gridFilters
+        }
 
         if(!_.isEmpty(vm.selectedTab)){
             loadGridData(vm.selectedTab.attestedKind, vm.selectedTab.attestedId);
         } else {
             loadSummaryData();
         }
+    }
+
+    vm.filtersApplied = () => {
+        return vm.selectedStatus || vm.selectedCriticality || vm.selectedLifecycle || vm.selectedDate
     }
 }
 
