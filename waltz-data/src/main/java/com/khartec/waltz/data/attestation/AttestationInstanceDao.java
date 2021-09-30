@@ -435,8 +435,8 @@ public class AttestationInstanceDao {
                         .and((possibleAttestationKinds.field(ATTESTATION_RUN.ATTESTED_ENTITY_ID).eq(appAttestations.field("attested_entity_id", Long.class)))
                                 .or(possibleAttestationKinds.field(ATTESTATION_RUN.ATTESTED_ENTITY_ID).isNull())));
 
-        //FOr each combination of app and possible attestation target entity, join the existing attestation instance
-        Map<Tuple3<EntityKind, Long, String>, Long> fetch = dsl
+        //For each combination of app and possible attestation target entity, join the existing attestation instance
+        Map<Tuple3<EntityKind, Long, String>, Long> appCountsForAttestationTargetEntityAndAttestationStatus = dsl
                 .select(possibleAttestationKinds.field(ATTESTATION_RUN.ATTESTED_ENTITY_KIND),
                         possibleAttestationKinds.field(ATTESTATION_RUN.ATTESTED_ENTITY_ID),
                         isAttestedField,
@@ -455,7 +455,7 @@ public class AttestationInstanceDao {
                 .stream()
                 .collect(groupingBy(Tuple4::limit3, counting()));
 
-        Map<Tuple2<EntityKind, Long>, Set<AttestationCount>> collect = fetch
+        Map<Tuple2<EntityKind, Long>, Set<AttestationCount>> attestationCountsByTargetEntity = appCountsForAttestationTargetEntityAndAttestationStatus
                 .entrySet()
                 .stream()
                 .collect(groupingBy(
@@ -466,7 +466,7 @@ public class AttestationInstanceDao {
                                 .build(),
                                 toSet())));
 
-        return collect
+        return attestationCountsByTargetEntity
                 .entrySet()
                 .stream()
                 .map(e -> ImmutableApplicationAttestationSummaryCounts.builder()
