@@ -6,6 +6,7 @@
     import {dataTypeStore} from "../../../svelte-stores/data-type-store";
     import EntityLink from "../../../common/svelte/EntityLink.svelte";
     import LastEdited from "../../../common/svelte/LastEdited.svelte";
+    import Icon from "../../../common/svelte/Icon.svelte";
 
     export let primaryEntityRef;
 
@@ -127,6 +128,19 @@
                 </div>
                 <div class="col-sm-4">
                     {classificationRule?.externalId || "-"}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-2 waltz-display-field-label">
+                    Read Only:
+                </div>
+                <div class="col-sm-4 text-muted">
+                    {#if classificationRule?.isReadonly}
+                        <Icon name="lock"/> This rule is read only
+                    {:else}
+                        <Icon name="unlock"/> This rule can be edited
+                    {/if}
                 </div>
             </div>
 

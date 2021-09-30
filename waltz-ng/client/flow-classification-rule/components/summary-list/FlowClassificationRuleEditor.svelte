@@ -104,6 +104,7 @@
 
     $: classifications = _
         .chain($classificationCall.data)
+        .filter(c => c.userSelectable || c.id === $selectedClassificationRule?.classification?.id)
         .sortBy("position", "display_name")
         .value();
 
@@ -173,12 +174,19 @@
             <div class="radio">
                 <label>
                     <input type=radio
+                           disabled={!classification.userSelectable}
                            bind:group={workingCopy.classificationId}
                            value={classification.id}>
                     <div class="rating-indicator-block"
                          style="background-color: {classification.color}">&nbsp;</div>
                     {classification.name}
                     <span class="help-block">{classification.description}</span>
+                    {#if !classification.userSelectable}
+                        <span class="help-block warning-icon">
+                            <div style="display: inline-block"><Icon name="exclamation-triangle"/></div>
+                            This classification is not user selectable
+                        </span>
+                    {/if}
                 </label>
             </div>
         {/each}
@@ -223,7 +231,10 @@
 {/if}
 
 
-<style>
+<style type="text/scss">
+
+  @import "../../../../style/_variables";
+
     .rating-indicator-block {
         display: inline-block;
         width: 1em;
@@ -232,5 +243,9 @@
         border-radius: 2px;
         position: relative;
         top: 2px;
+    }
+
+    .warning-icon div {
+        color: $waltz-amber
     }
 </style>

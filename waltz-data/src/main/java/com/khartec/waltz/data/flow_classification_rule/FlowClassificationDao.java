@@ -48,6 +48,7 @@ public class FlowClassificationDao {
                 .color(record.getColor())
                 .position(record.getPosition())
                 .isCustom(record.getIsCustom())
+                .userSelectable(record.getUserSelectable())
                 .build();
     };
 

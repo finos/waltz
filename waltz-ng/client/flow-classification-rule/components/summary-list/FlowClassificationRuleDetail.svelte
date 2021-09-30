@@ -74,7 +74,7 @@
     </div>
 {/if}
 
-{#if canEdit}
+{#if canEdit && !$selectedClassificationRule?.isReadonly}
 <button class="btn btn-success"
         on:click={editRule}>
     Edit
