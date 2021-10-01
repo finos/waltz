@@ -23,10 +23,7 @@ import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.measurable_category.ImmutableMeasurableCategory;
 import com.khartec.waltz.model.measurable_category.MeasurableCategory;
 import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
-import org.jooq.DSLContext;
-import org.jooq.Record1;
-import org.jooq.RecordMapper;
-import org.jooq.SelectConditionStep;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -42,8 +39,8 @@ import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATE
 @Repository
 public class MeasurableCategoryDao {
 
-    private static final RecordMapper<MeasurableCategoryRecord, MeasurableCategory> TO_DOMAIN_MAPPER = r -> {
-
+    private static final RecordMapper<Record, MeasurableCategory> TO_DOMAIN_MAPPER = record -> {
+        MeasurableCategoryRecord r = record.into(MEASURABLE_CATEGORY);
         return ImmutableMeasurableCategory.builder()
                 .ratingSchemeId(r.getRatingSchemeId())
                 .id(r.getId())
@@ -70,7 +67,8 @@ public class MeasurableCategoryDao {
 
     public Collection<MeasurableCategory> findAll() {
         return dsl
-                .selectFrom(MEASURABLE_CATEGORY)
+                .select(MEASURABLE_CATEGORY.fields())
+                .from(MEASURABLE_CATEGORY)
                 .orderBy(MEASURABLE_CATEGORY.NAME)
                 .fetch(TO_DOMAIN_MAPPER);
     }
@@ -78,14 +76,16 @@ public class MeasurableCategoryDao {
 
     public MeasurableCategory getById(long id) {
         return dsl
-                .selectFrom(MEASURABLE_CATEGORY)
+                .select(MEASURABLE_CATEGORY.fields())
+                .from(MEASURABLE_CATEGORY)
                 .where(MEASURABLE_CATEGORY.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
     public Set<MeasurableCategory> findByExternalId(String extId) {
         return dsl
-                .selectFrom(MEASURABLE_CATEGORY)
+                .select(MEASURABLE_CATEGORY.fields())
+                .from(MEASURABLE_CATEGORY)
                 .where(MEASURABLE_CATEGORY.EXTERNAL_ID.eq(extId))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
@@ -102,7 +102,8 @@ public class MeasurableCategoryDao {
                                 .and(MEASURABLE.ENTITY_LIFECYCLE_STATUS.eq(EntityLifecycleStatus.ACTIVE.name()))));
 
         return dsl
-                .selectFrom(MEASURABLE_CATEGORY)
+                .select(MEASURABLE_CATEGORY.fields())
+                .from(MEASURABLE_CATEGORY)
                 .where(MEASURABLE_CATEGORY.ID.in(categoryIds))
                 .fetch(TO_DOMAIN_MAPPER);
     }

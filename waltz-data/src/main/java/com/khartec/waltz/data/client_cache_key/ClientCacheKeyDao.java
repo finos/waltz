@@ -60,14 +60,16 @@ public class ClientCacheKeyDao {
 
     public List<ClientCacheKey> findAll() {
         return dsl
-                .selectFrom(CLIENT_CACHE_KEY)
+                .select(CLIENT_CACHE_KEY.fields())
+                .from(CLIENT_CACHE_KEY)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
     public ClientCacheKey getByKey(String key) {
         return dsl
-                .selectFrom(CLIENT_CACHE_KEY)
+                .select(CLIENT_CACHE_KEY.fields())
+                .from(CLIENT_CACHE_KEY)
                 .where(CLIENT_CACHE_KEY.KEY.eq(key))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }

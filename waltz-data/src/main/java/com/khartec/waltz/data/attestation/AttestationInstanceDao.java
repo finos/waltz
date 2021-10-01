@@ -297,7 +297,8 @@ public class AttestationInstanceDao {
                 .asTable();
 
         Result<Record> latestAttestationsWithCategory = dsl
-                .selectFrom(attestationsWithCategory)
+                .select(attestationsWithCategory.fields())
+                .from(attestationsWithCategory)
                 .where(attestationsWithCategory.field(latest_attestation)
                         .eq(attestationsWithCategory.field("instance_id", Long.class)))
                 .fetch();

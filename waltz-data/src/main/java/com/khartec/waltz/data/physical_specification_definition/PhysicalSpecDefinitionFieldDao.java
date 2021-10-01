@@ -18,10 +18,9 @@
 
 package com.khartec.waltz.data.physical_specification_definition;
 
-import com.khartec.waltz.model.logical_data_element.LogicalDataElement;
+import com.khartec.waltz.model.FieldDataType;
 import com.khartec.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinitionField;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionField;
-import com.khartec.waltz.model.FieldDataType;
 import com.khartec.waltz.schema.tables.records.PhysicalSpecDefnFieldRecord;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,14 +80,18 @@ public class PhysicalSpecDefinitionFieldDao {
 
 
     public List<PhysicalSpecDefinitionField> findForSpecDefinition(long specDefinitionId) {
-        return dsl.selectFrom(PHYSICAL_SPEC_DEFN_FIELD)
+        return dsl
+                .select(PHYSICAL_SPEC_DEFN_FIELD.fields())
+                .from(PHYSICAL_SPEC_DEFN_FIELD)
                 .where(PHYSICAL_SPEC_DEFN_FIELD.SPEC_DEFN_ID.eq(specDefinitionId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
     public List<PhysicalSpecDefinitionField> findBySelector(Select<Record1<Long>> selector) {
-        return dsl.selectFrom(PHYSICAL_SPEC_DEFN_FIELD)
+        return dsl
+                .select(PHYSICAL_SPEC_DEFN_FIELD.fields())
+                .from(PHYSICAL_SPEC_DEFN_FIELD)
                 .where(PHYSICAL_SPEC_DEFN_FIELD.ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
     }

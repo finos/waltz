@@ -25,7 +25,6 @@ import com.khartec.waltz.model.entity_hierarchy.EntityHierarchyItem;
 import com.khartec.waltz.model.entity_hierarchy.ImmutableEntityHierarchyItem;
 import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.EntityHierarchy;
-import com.khartec.waltz.schema.tables.records.ApplicationRecord;
 import com.khartec.waltz.schema.tables.records.EntityHierarchyRecord;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -121,7 +120,8 @@ public class EntityHierarchyDao {
     public List<EntityHierarchyItem> findDesendents(EntityReference ref) {
         checkNotNull(ref, "ref cannot be null");
         return dsl
-                .selectFrom(ENTITY_HIERARCHY)
+                .select(ENTITY_HIERARCHY.fields())
+                .from(ENTITY_HIERARCHY)
                 .where(ENTITY_HIERARCHY.KIND.eq(ref.kind().name()))
                 .and(ENTITY_HIERARCHY.ANCESTOR_ID.eq(ref.id()))
                 .fetch(TO_DOMAIN_MAPPER);

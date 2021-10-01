@@ -155,7 +155,10 @@ public class InvolvementKindDao {
     public boolean deleteIfNotUsed(long id) {
         return dsl.deleteFrom(INVOLVEMENT_KIND)
                 .where(INVOLVEMENT_KIND.ID.eq(id))
-                .and(DSL.notExists(DSL.selectFrom(INVOLVEMENT).where(INVOLVEMENT.KIND_ID.eq(id))))
+                .and(DSL.notExists(DSL
+                        .select(INVOLVEMENT.fields())
+                        .from(INVOLVEMENT)
+                        .where(INVOLVEMENT.KIND_ID.eq(id))))
                 .execute() > 0;
     }
 

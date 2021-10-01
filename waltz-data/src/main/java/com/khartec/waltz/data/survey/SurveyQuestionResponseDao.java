@@ -110,10 +110,11 @@ public class SurveyQuestionResponseDao {
     public List<SurveyInstanceQuestionResponse> findForInstance(long surveyInstanceId) {
         // fetch list responses
         List<SurveyQuestionListResponseRecord> listResponses = dsl
-                .selectFrom(SURVEY_QUESTION_LIST_RESPONSE)
+                .select(SURVEY_QUESTION_LIST_RESPONSE.fields())
+                .from(SURVEY_QUESTION_LIST_RESPONSE)
                 .where(SURVEY_QUESTION_LIST_RESPONSE.SURVEY_INSTANCE_ID.eq(surveyInstanceId))
                 .orderBy(SURVEY_QUESTION_LIST_RESPONSE.POSITION)
-                .fetch();
+                .fetch(r -> r.into(SURVEY_QUESTION_LIST_RESPONSE));
 
         Map<Long, List<EntityReference>> entityListResponsesByQuestionId = listResponses
                 .stream()
@@ -192,9 +193,10 @@ public class SurveyQuestionResponseDao {
 
         Condition responseExistsCondition = DSL
                 .exists(DSL
-                    .selectFrom(SURVEY_QUESTION_RESPONSE)
-                    .where(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.eq(response.surveyInstanceId())
-                        .and(SURVEY_QUESTION_RESPONSE.QUESTION_ID.eq(response.questionResponse().questionId()))));
+                        .select(SURVEY_QUESTION_RESPONSE.fields())
+                        .from(SURVEY_QUESTION_RESPONSE)
+                        .where(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.eq(response.surveyInstanceId())
+                            .and(SURVEY_QUESTION_RESPONSE.QUESTION_ID.eq(response.questionResponse().questionId()))));
 
         // save survey_question_response record
         Boolean responseExists = dsl
@@ -310,7 +312,8 @@ public class SurveyQuestionResponseDao {
                 .collect(toList());
 
         List<SurveyQuestionListResponseRecord> listResponseRecords = dsl
-                .selectFrom(SURVEY_QUESTION_LIST_RESPONSE)
+                .select(SURVEY_QUESTION_LIST_RESPONSE.fields())
+                .from(SURVEY_QUESTION_LIST_RESPONSE)
                 .where(SURVEY_QUESTION_LIST_RESPONSE.SURVEY_INSTANCE_ID.eq(sourceSurveyInstanceId))
                 .fetchInto(SURVEY_QUESTION_LIST_RESPONSE)
                 .stream()
@@ -334,12 +337,14 @@ public class SurveyQuestionResponseDao {
 
 
     public int deleteForSurveyRun(long surveyRunId) {
-        Select<Record1<Long>> surveyInstanceIdSelector = dsl.select(SURVEY_INSTANCE.ID)
+        Select<Record1<Long>> surveyInstanceIdSelector = dsl
+                .select(SURVEY_INSTANCE.ID)
                 .from(SURVEY_INSTANCE)
                 .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId));
 
         // this will also auto delete any survey_question_list_response records (fk delete cascade)
-        return dsl.delete(SURVEY_QUESTION_RESPONSE)
+        return dsl
+                .delete(SURVEY_QUESTION_RESPONSE)
                 .where(SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID.in(surveyInstanceIdSelector))
                 .execute();
     }

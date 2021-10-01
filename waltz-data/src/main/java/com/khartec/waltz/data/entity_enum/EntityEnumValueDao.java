@@ -61,7 +61,9 @@ public class EntityEnumValueDao {
 
 
     public List<EntityEnumValue> findByEntity(EntityReference ref) {
-        return dsl.selectFrom(ENTITY_ENUM_VALUE)
+        return dsl
+                .select(ENTITY_ENUM_VALUE.fields())
+                .from(ENTITY_ENUM_VALUE)
                 .where(ENTITY_ENUM_VALUE.ENTITY_ID.eq(ref.id()))
                 .and(ENTITY_ENUM_VALUE.ENTITY_KIND.eq(ref.kind().name()))
                 .fetch(TO_DOMAIN_MAPPER);

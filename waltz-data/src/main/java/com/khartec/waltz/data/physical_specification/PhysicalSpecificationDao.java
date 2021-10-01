@@ -161,7 +161,8 @@ public class PhysicalSpecificationDao {
 
     public boolean isUsed(long id) {
         Field<Boolean> specUsed = DSL.when(
-                    exists(selectFrom(PHYSICAL_FLOW)
+                    exists(select(PHYSICAL_FLOW.ID)
+                            .from(PHYSICAL_FLOW)
                             .where(PHYSICAL_FLOW.SPECIFICATION_ID.eq(id))
                             .and(PHYSICAL_FLOW_NOT_REMOVED)),
                     val(true))
@@ -203,7 +204,8 @@ public class PhysicalSpecificationDao {
         return dsl.update(PHYSICAL_SPECIFICATION)
                 .set(PHYSICAL_SPECIFICATION.IS_REMOVED, true)
                 .where(PHYSICAL_SPECIFICATION.ID.eq(specId))
-                .and(notExists(selectFrom(PHYSICAL_FLOW)
+                .and(notExists(select(PHYSICAL_FLOW.ID)
+                        .from(PHYSICAL_FLOW)
                         .where(PHYSICAL_FLOW.SPECIFICATION_ID.eq(specId))
                         .and(PHYSICAL_FLOW_NOT_REMOVED))
                 )

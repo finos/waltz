@@ -85,7 +85,8 @@ public class RelationshipKindDao {
 
     public Set<RelationshipKind> findAll() {
         return dsl
-                .selectFrom(RELATIONSHIP_KIND)
+                .select(RELATIONSHIP_KIND.fields())
+                .from(RELATIONSHIP_KIND)
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 
@@ -100,7 +101,9 @@ public class RelationshipKindDao {
                 ? RELATIONSHIP_KIND.CATEGORY_B.isNull().or(RELATIONSHIP_KIND.CATEGORY_B.eq(getCategory(target.id())))
                 : RELATIONSHIP_KIND.CATEGORY_B.isNull();
 
-        return dsl.selectFrom(RELATIONSHIP_KIND)
+        return dsl
+                .select(RELATIONSHIP_KIND.fields())
+                .from(RELATIONSHIP_KIND)
                 .where(RELATIONSHIP_KIND.KIND_A.eq(parent.kind().name())
                         .and(RELATIONSHIP_KIND.KIND_B.eq(target.kind().name())
                                 .and(categoryACondition)

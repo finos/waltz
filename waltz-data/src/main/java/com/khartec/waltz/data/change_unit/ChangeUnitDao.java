@@ -100,14 +100,17 @@ public class ChangeUnitDao {
 
     public ChangeUnit getById(long id) {
         return dsl
-                .selectFrom(CHANGE_UNIT)
+                .select(CHANGE_UNIT.fields())
+                .from(CHANGE_UNIT)
                 .where(CHANGE_UNIT.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 
     public List<ChangeUnit> findBySubjectRef(EntityReference ref) {
-        return dsl.selectFrom(CHANGE_UNIT)
+        return dsl
+                .select(CHANGE_UNIT.fields())
+                .from(CHANGE_UNIT)
                 .where(CHANGE_UNIT.SUBJECT_ENTITY_ID.eq(ref.id()))
                 .and(CHANGE_UNIT.SUBJECT_ENTITY_KIND.eq(ref.kind().name()))
                 .fetch(TO_DOMAIN_MAPPER);
@@ -115,14 +118,18 @@ public class ChangeUnitDao {
 
 
     public List<ChangeUnit> findByChangeSetId(long id) {
-        return dsl.selectFrom(CHANGE_UNIT)
+        return dsl
+                .select(CHANGE_UNIT.fields())
+                .from(CHANGE_UNIT)
                 .where(CHANGE_UNIT.CHANGE_SET_ID.eq(id))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
     public List<ChangeUnit> findBySelector(Select<Record1<Long>> selector) {
-        return dsl.selectFrom(CHANGE_UNIT)
+        return dsl
+                .select(CHANGE_UNIT.fields())
+                .from(CHANGE_UNIT)
                 .where(CHANGE_UNIT.ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
     }
