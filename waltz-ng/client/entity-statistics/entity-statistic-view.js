@@ -126,8 +126,7 @@ function controller($q,
     }
 
     function loadHistory() {
-        const selector =
-            mkStatisticSelector(vm.parentRef, vm.filters);
+        const selector = mkStatisticSelector(vm.parentRef, vm.filters);
 
         serviceBroker
             .loadViewData(
