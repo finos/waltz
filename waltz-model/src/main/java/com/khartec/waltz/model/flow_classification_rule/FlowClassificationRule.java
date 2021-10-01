@@ -51,5 +51,10 @@ public abstract class FlowClassificationRule implements
         return EntityKind.FLOW_CLASSIFICATION_RULE;
     }
 
+    @Value.Default
+    public boolean isReadonly() {
+        return false;
+    }
+
 
 }
