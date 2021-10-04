@@ -1,4 +1,4 @@
-# Standard Loader  
+# Standard Loader (Application example)
 
 ![](dataloader_anatomy.png)
 
