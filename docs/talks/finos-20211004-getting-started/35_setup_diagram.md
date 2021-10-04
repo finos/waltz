@@ -1,7 +1,7 @@
 # Deployment Diagram
 
 ----
-# Image goes here
+![](typical_setup.png)
 
 
 ----
