@@ -1,11 +1,8 @@
-# Deployment Setup
+# Deployment Diagram
 
 ----
+# Image goes here
 
-## Options:
-### - Web Container (Tomcat)
-### - Docker
-### - Uber Jar
 
 ----
 
