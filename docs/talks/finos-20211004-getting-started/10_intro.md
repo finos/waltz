@@ -4,11 +4,11 @@
 
 ## Introductions:
 
+### - Dave Watkins
+
 ### - Jessica Woodland-Scott
 
 ### - Kamran Saleem
-
-### - Dave Watkins
 
 ----
 _[next](20_overview.md)_
