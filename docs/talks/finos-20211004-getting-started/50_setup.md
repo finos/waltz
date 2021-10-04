@@ -1,7 +1,5 @@
 # Setting up Waltz 
 
-----
-
 ## Tasks:
 
 ### [ ] Create database
