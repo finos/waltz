@@ -1,7 +1,5 @@
 # Standard Loader  
 
-----
-
 ## Data loaders are similar to ETL jobs
 ### Follow a common pattern:
 
