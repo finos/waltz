@@ -5,8 +5,9 @@
 
 ## Basic Entity Creation
 ### - Dataloaders not included
+### - Dataextractors (public API) not included
 ### - ... integration opportunities
-
+#### - e.g. Sparx, Collibra, Legend, Solidatus etc
 ----
 
 _[prev](30_deployment_setup.md)_ |
