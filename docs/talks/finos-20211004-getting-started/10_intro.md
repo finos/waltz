@@ -1,6 +1,5 @@
 # Getting Started With [Waltz](https://github.com/finos/waltz)
 
-----
 
 ## Introductions:
 
