@@ -1,7 +1,5 @@
 # What's included
 
-----
-
 ## Waltz 'Core'
 ### - Server, Schema, UI
 
