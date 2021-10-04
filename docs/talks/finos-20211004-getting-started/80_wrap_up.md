@@ -1,6 +1,5 @@
 # Wrap Up
 
-----
 ## More info:
 ### - [Waltz info site](https://waltz.finos.org/)
 ### - [Blog](https://waltz.finos.org/blog/index.html)
