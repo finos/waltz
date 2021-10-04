@@ -10,5 +10,5 @@
 
 ----
 
-_[prev](35_deployment_diagram.md)_ |
+_[prev](35_setup_diagram.md)_ |
 _[next](50_setup.md)_
