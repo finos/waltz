@@ -1,6 +1,5 @@
 # What is Waltz ?
 
-----
 
 ### - 6 years old, part of FINOS since 2019
 ### - Enterprise Information System
