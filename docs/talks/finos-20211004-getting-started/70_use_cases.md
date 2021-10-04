@@ -1,6 +1,5 @@
 # Entities / Use Cases 
 
-----
 
 ## Interactive Demo : [Waltz Explorer](https://waltz-explorer.surge.sh/)
 
