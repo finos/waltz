@@ -1,5 +1,7 @@
 # Standard Loader  
 
+![](dataloader_anatomy.png)
+
 ## Data loaders are similar to ETL jobs
 ### Follow a common pattern:
 
