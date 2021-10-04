@@ -7,7 +7,5 @@
 
 ### - Jessica Woodland-Scott
 
-### - Kamran Saleem
-
 ----
 _[next](20_overview.md)_
