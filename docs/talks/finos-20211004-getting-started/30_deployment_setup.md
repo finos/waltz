@@ -1,7 +1,5 @@
 # Deployment Setup
 
-----
-
 ## Options:
 ### - Web Container (Tomcat)
 ### - Docker
