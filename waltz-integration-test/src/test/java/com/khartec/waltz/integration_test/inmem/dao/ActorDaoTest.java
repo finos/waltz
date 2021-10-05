@@ -24,6 +24,7 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.actor.Actor;
 import org.junit.Test;
 
+import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static org.junit.Assert.*;
 
@@ -31,12 +32,13 @@ public class ActorDaoTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void actorsCanBeCreated() {
-        Long id = createActor("creationTest");
+        String name = mkName("actorsCanBeCreated");
+        Long id = createActor(name);
 
         ActorDao dao = ctx.getBean(ActorDao.class);
         Actor retrieved = dao.getById(id);
-        assertEquals("creationTestName", retrieved.name());
-        assertEquals("creationTestDesc", retrieved.description());
+        assertEquals(name, retrieved.name());
+        assertEquals(name + " Desc", retrieved.description());
         assertTrue(retrieved.isExternal());
     }
 
@@ -45,7 +47,7 @@ public class ActorDaoTest extends BaseInMemoryIntegrationTest {
     public void actorsCanBeDeletedIfNotUsed() {
         ActorDao dao = ctx.getBean(ActorDao.class);
         int preCount = dao.findAll().size();
-        Long id = createActor("canBeDeletedTest");
+        Long id = createActor(mkName("canBeDeletedTest"));
 
         System.out.println("After creation: "+ dao.findAll());
         boolean deleted = dao.deleteIfNotUsed(id);
@@ -58,8 +60,8 @@ public class ActorDaoTest extends BaseInMemoryIntegrationTest {
     @Test
     public void actorsCannotBeDeletedIfUsed() {
         ActorDao dao = ctx.getBean(ActorDao.class);
-        Long idA = createActor("cannotBeDeletedActorA");
-        Long idB = createActor("cannotBeDeletedActorB");
+        Long idA = createActor(mkName("cannotBeDeletedActorA"));
+        Long idB = createActor(mkName("cannotBeDeletedActorB"));
 
         helpers.logicalFlowHelper.createLogicalFlow(
                 mkRef(EntityKind.ACTOR, idA),
