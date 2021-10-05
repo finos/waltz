@@ -173,7 +173,7 @@ public class ActorDao {
                         .select(INVOLVEMENT.fields())
                         .from(INVOLVEMENT)
                         .where(INVOLVEMENT.ENTITY_ID.eq(id))
-                        .and(INVOLVEMENT.ENTITY_ID.eq(id)));
+                        .and(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.ACTOR.name())));
 
         return dsl
                 .deleteFrom(ACTOR)
