@@ -124,6 +124,7 @@ public class FlowClassificationRuleDao {
                 .lastUpdatedAt(toLocalDateTime(record.getLastUpdatedAt()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .externalId(Optional.ofNullable(record.getExternalId()))
+                .isReadonly(record.getIsReadonly())
                 .build();
     };
 

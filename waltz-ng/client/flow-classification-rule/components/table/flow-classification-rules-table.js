@@ -152,7 +152,8 @@ function controller($q, $state, serviceBroker) {
                 parentReference: d.parentReference,
                 description: d.description,
                 classification: vm.classificationsById[d.classificationId],
-                consumers: vm.consumersByAuthSourceId[d.id] || []
+                consumers: vm.consumersByAuthSourceId[d.id] || [],
+                isReadonly: d.isReadonly
             };
         });
     }

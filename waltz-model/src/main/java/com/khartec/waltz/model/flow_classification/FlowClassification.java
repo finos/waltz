@@ -15,6 +15,7 @@ public abstract class FlowClassification implements IdProvider, NameProvider, De
     public abstract String color();
     public abstract int position();
     public abstract boolean isCustom();
+    public abstract boolean userSelectable();
 
     @Value.Default
     public EntityKind kind() {
