@@ -107,6 +107,10 @@ Note: The count of `deprecated`/`unknown` data types removed is calculated using
 time the query is run, this may be different to the list of `deprecated`/`unknown` data types at the time the 
 change log was written. 
 
+Note: The message stored in the change log has changed over time, this query uses the current 
+message generated when editing flow decorators via the gui. If querying older timeframes or independent loaders have
+created logs the message pattern may need to be updated, or query extended to match on two patterns.
+
 
 ### Other
 
@@ -127,4 +131,3 @@ Other useful stats (to be calculated using previous queries):
 ```
 Avg hits per user = totalHitsToDate / totalUsersToDate
 ```
-
