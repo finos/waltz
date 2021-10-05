@@ -166,13 +166,14 @@ public class ActorDao {
                         .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(id)
                             .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.ACTOR.name()))
                             .or(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(id)
-                                    .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.ACTOR.name())))));
+                                    .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.ACTOR.name())))));
 
         Condition notMentionedInInvolvements = DSL
                 .notExists(DSL
                         .select(INVOLVEMENT.fields())
                         .from(INVOLVEMENT)
-                        .where(INVOLVEMENT.KIND_ID.eq(id)));
+                        .where(INVOLVEMENT.ENTITY_ID.eq(id))
+                        .and(INVOLVEMENT.ENTITY_ID.eq(id)));
 
         return dsl
                 .deleteFrom(ACTOR)
