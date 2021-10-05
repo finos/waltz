@@ -52,3 +52,10 @@ jobs:
         name: waltz-web.war
         path: waltz-web/target/waltz-web.war
 
+    - name: Publish liquibase changelogs
+      uses: actions/upload-artifact@v2
+      with:
+        name: liquibase-changelogs
+        path: waltz-data/src/main/ddl/liquibase/
+
+
