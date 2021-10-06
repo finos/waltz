@@ -29,7 +29,7 @@ import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static org.junit.Assert.*;
 
-@Ignore
+//@Ignore
 public class ActorDaoTest extends BaseInMemoryIntegrationTest {
 
     @Test
