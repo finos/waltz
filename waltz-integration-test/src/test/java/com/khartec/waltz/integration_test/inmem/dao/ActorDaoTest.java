@@ -22,14 +22,13 @@ import com.khartec.waltz.data.actor.ActorDao;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.actor.Actor;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static org.junit.Assert.*;
 
-@Ignore
+
 public class ActorDaoTest extends BaseInMemoryIntegrationTest {
 
     @Test

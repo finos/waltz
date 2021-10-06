@@ -17,7 +17,10 @@ import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.integration_test.inmem.helpers.InvolvementHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.PersonHelper;
-import com.khartec.waltz.model.*;
+import com.khartec.waltz.model.Criticality;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityLifecycleStatus;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.actor.ImmutableActorCreateCommand;
 import com.khartec.waltz.model.app_group.AppGroup;
 import com.khartec.waltz.model.app_group.AppGroupKind;
@@ -33,6 +36,8 @@ import com.khartec.waltz.service.app_group.AppGroupService;
 import com.khartec.waltz.service.attestation.AttestationInstanceService;
 import com.khartec.waltz.service.attestation.AttestationRunService;
 import com.khartec.waltz.service.bookmark.BookmarkService;
+import com.khartec.waltz.service.data_type.DataTypeDecoratorService;
+import com.khartec.waltz.service.data_type.DataTypeService;
 import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import com.khartec.waltz.service.involvement.InvolvementService;
 import com.khartec.waltz.service.involvement_kind.InvolvementKindService;
@@ -76,6 +81,8 @@ public class BaseInMemoryIntegrationTest {
 
     public static class Services {
         public LogicalFlowService logicalFlowService;
+        public DataTypeDecoratorService dataTypeDecoratorService;
+        public DataTypeService dataTypeService;
         public AppGroupService appGroupService;
         public BookmarkService bookmarkService;
         public AttestationInstanceService attestationInstanceService;
@@ -139,6 +146,8 @@ public class BaseInMemoryIntegrationTest {
     private Services setupServices() {
         Services s = new Services();
         s.logicalFlowService = ctx.getBean(LogicalFlowService.class);
+        s.dataTypeDecoratorService = ctx.getBean(DataTypeDecoratorService.class);
+        s.dataTypeService = ctx.getBean(DataTypeService.class);
         s.appGroupService = ctx.getBean(AppGroupService.class);
         s.bookmarkService = ctx.getBean(BookmarkService.class);
         s.attestationInstanceService = ctx.getBean(AttestationInstanceService.class);
@@ -306,6 +315,26 @@ public class BaseInMemoryIntegrationTest {
 
         dsl.deleteFrom(DATA_TYPE).execute();
 
+        dsl.insertInto(DATA_TYPE)
+                .columns(
+                        DATA_TYPE.ID,
+                        DATA_TYPE.NAME,
+                        DATA_TYPE.DESCRIPTION,
+                        DATA_TYPE.CODE,
+                        DATA_TYPE.CONCRETE,
+                        DATA_TYPE.UNKNOWN.as(DSL.quotedName("unknown"))) //TODO: as part of #5639 can drop quotedName
+                .values(1L, "Unknown", "Unknown data type", "UNKNOWN", false, true)
+                .execute();
+    }
+
+
+    public void createDatatype(){
+
+        DSLContext dsl = getDsl();
+
+        dsl.deleteFrom(DATA_TYPE).execute();
+
+        mkName();
         dsl.insertInto(DATA_TYPE)
                 .columns(
                         DATA_TYPE.ID,
