@@ -1,6 +1,7 @@
 <script>
-    import {layoutDataById, objects} from "./diagram-store";
+    import {appCountsByDiagramMeasurableId, layoutDataById, objects} from "./diagram-store";
     import {toComp} from "./process-diagram-utils";
+    import _ from "lodash";
 
     $: objs = _.map(
         $objects,
@@ -13,6 +14,15 @@
                 layout
             };
         });
+
+    $: aligns = $appCountsByDiagramMeasurableId;
+
+    $: console.log({aligns, objs});
+
+    function getAppCount(obj){
+        return _.get($appCountsByDiagramMeasurableId, [obj.waltzReference?.id], 0);
+    }
+
 </script>
 
 {#each objs as d}
@@ -20,6 +30,7 @@
        class={`object ${d.obj.stereotype}`}>
         <svelte:component obj={d.obj}
                           layout={d.layout}
-                          this={d.comp}/>
+                          this={d.comp}
+                          appCount={getAppCount(d.obj)}/>
     </g>
 {/each}

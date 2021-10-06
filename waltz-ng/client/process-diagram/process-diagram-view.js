@@ -21,6 +21,7 @@ import template from "./process-diagram-view.html";
 import {svelteCallToPromise} from "../common/promise-utils";
 import {processDiagramStore} from "../svelte-stores/process-diagram-store";
 import {initData} from "./components/process-diagram/diagram-store";
+import {processDiagramEntityStore} from "../svelte-stores/process-diagram-entity-store";
 
 const initialState = {
     visibility: {},
@@ -39,7 +40,7 @@ const addToHistory = (historyStore, diagram) => {
 
 
 
-function controller($stateParams, historyStore)
+function controller($q, $stateParams, historyStore)
 {
     const vm = initialiseData(this, initialState);
 
@@ -47,21 +48,27 @@ function controller($stateParams, historyStore)
         const id = $stateParams.id;
         vm.parentEntityRef = { id, kind: "PROCESS_DIAGRAM" };
 
-        svelteCallToPromise(processDiagramStore.getById(id))
-            .then(d => {
+        const diagrmaPromise = svelteCallToPromise(processDiagramStore.getById(id));
+        const alignmentPromise = svelteCallToPromise(processDiagramEntityStore.findApplicationAlignmentsByDiagramId(id));
+
+
+        $q.all([diagrmaPromise, alignmentPromise])
+            .then(([d, alignments]) => {
                 vm.diagram = d.diagram;
                 vm.entities = d.entities;
                 addToHistory(historyStore, d.diagram);
                 console.log({vm})
                 const layout = JSON.parse(vm.diagram.layoutData);
                 if (layout) {
-                    initData(layout);
+                    initData(diagram, layout, alignments);
                 }
             });
+
     }
 }
 
 controller.$inject = [
+    "$q",
     "$stateParams",
     "HistoryStore",
 ];

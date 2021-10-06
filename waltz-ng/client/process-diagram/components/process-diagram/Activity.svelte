@@ -1,11 +1,13 @@
 <script>
     export let obj;
     export let layout;
+    export let appCount;
 
     function onMouseEnter() {
         console.log("activity:me:", obj);
     }
 
+    $: console.log({appCount, obj});
 </script>
 
 
@@ -25,6 +27,16 @@
     </div>
 </foreignObject>
 
+{#if appCount > 0}
+    <g  class="app-count"
+        transform="translate({layout.width})">
+        <circle cx="-2" cy="5" r="12">
+        </circle>
+        <text dx="-2" dy="10" text-anchor="middle">
+            {appCount}
+        </text>
+    </g>
+{/if}
 
 <style>
     rect {
@@ -36,5 +48,10 @@
     foreignObject div {
         text-align: center;
         font-size: smaller
+    }
+
+    .app-count circle{
+        fill: #d5fffc;
+        stroke: #84a5a4;
     }
 </style>

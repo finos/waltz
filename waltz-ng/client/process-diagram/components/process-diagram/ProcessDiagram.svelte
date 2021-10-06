@@ -6,7 +6,9 @@
     import {scaleLinear} from "d3-scale";
     import {zoom} from "d3-zoom";
     import {event, select} from "d3-selection";
-    import {positions} from "./diagram-store";
+    import {appAlignments, diagramInfo, positions} from "./diagram-store";
+    import {onMount} from "svelte";
+    import {processDiagramEntityStore} from "../../../svelte-stores/process-diagram-entity-store";
 
     // pan + zoom
     function zoomed() {
@@ -25,6 +27,8 @@
 
     $: svgElem = select(elem);
     $: svgElem.call(zoom().on("zoom", zoomed));
+
+    $: console.log({appAlignments: $appAlignments});
 </script>
 
 

@@ -136,7 +136,6 @@ export function mkLayoutData(objects = [], positions = []) {
 
 
 export function toComp(obj) {
-    console.log(obj.objectType)
     switch (obj.objectType) {
         case "Activity":
             return Activity;

@@ -62,6 +62,8 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                 return mkForScenario(options);
             case ORG_UNIT:
                 return mkForOrgUnit(options);
+            case PROCESS_DIAGRAM:
+                return mkForProcessDiagram(options);
             case ACTOR:
             case APPLICATION:
                 return mkForDirectEntityKind(options);
@@ -70,6 +72,15 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                         "Cannot create measurable selector from kind: %s",
                         options.entityReference().kind()));
         }
+    }
+
+
+    private Select<Record1<Long>> mkForProcessDiagram(IdSelectionOptions options) {
+        return DSL
+                .select(PROCESS_DIAGRAM_ENTITY.ENTITY_ID)
+                .from(PROCESS_DIAGRAM_ENTITY)
+                .where(PROCESS_DIAGRAM_ENTITY.DIAGRAM_ID.eq(options.entityReference().id())
+                .and(PROCESS_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.MEASURABLE.name())));
     }
 
 
