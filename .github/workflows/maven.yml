@@ -57,5 +57,9 @@ jobs:
       with:
         name: liquibase-changelogs
         path: waltz-data/src/main/ddl/liquibase/
+    
+    - name: Publish Test Report
+      if: ${{ always() }}
+      uses: scacap/action-surefire-report@v1
 
 
