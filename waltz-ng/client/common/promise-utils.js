@@ -49,7 +49,6 @@ export function resolveResponses(responses = []) {
 export function svelteCallToPromise(call) {
     return new Promise((resolve, reject) => {
         call.subscribe(d => {
-            console.log(d)
             if (d.status === 'loaded') {
                 resolve(d.data);
             }

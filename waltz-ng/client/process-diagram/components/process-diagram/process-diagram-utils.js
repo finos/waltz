@@ -2,6 +2,7 @@ import Activity from "./Activity.svelte";
 import Event from "./Event.svelte";
 import Decision from "./Decision.svelte";
 import TextCell from "./TextCell.svelte";
+import Boundary from "./Boundary.svelte";
 import {max, min} from "d3-array";
 
 
@@ -135,15 +136,19 @@ export function mkLayoutData(objects = [], positions = []) {
 
 
 export function toComp(obj) {
+    console.log(obj.objectType)
     switch (obj.objectType) {
         case "Activity":
             return Activity;
         case "Event":
             return Event;
+        case "NavigationCell":
         case "Text":
             return TextCell;
         case "Decision":
             return Decision;
+        case "Boundary":
+            return Boundary;
     }
 }
 

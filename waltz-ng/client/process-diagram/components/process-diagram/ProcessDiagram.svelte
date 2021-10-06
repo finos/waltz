@@ -6,7 +6,7 @@
     import {scaleLinear} from "d3-scale";
     import {zoom} from "d3-zoom";
     import {event, select} from "d3-selection";
-    import {positions, initData} from "./diagram-store";
+    import {positions} from "./diagram-store";
 
     // pan + zoom
     function zoomed() {
@@ -28,19 +28,27 @@
 </script>
 
 
-<svg bind:this={elem}
-     width="100%"
-     height="700"
-     preserveAspectRatio="xMinYMin"
-     {viewBox}>
+<div class="row">
+    <div class="col-md-9">
+        <svg bind:this={elem}
+             width="100%"
+             height="700"
+             preserveAspectRatio="xMinYMin"
+             {viewBox}>
 
-    <Defs/>
+            <Defs/>
 
-    <g>
-        <Connections/>
-        <Objects/>
-    </g>
-</svg>
+            <g>
+                <Connections/>
+                <Objects/>
+            </g>
+        </svg>
+
+    </div>
+    <div class="col-md-3">
+        <h1>Context Panel</h1>
+    </div>
+</div>
 
 
 <style>

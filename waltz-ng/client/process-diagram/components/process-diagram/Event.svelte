@@ -18,8 +18,9 @@
     </circle>
 
     <foreignObject width={layout.width * 4}
+                   height={layout.height}
                    border="1px solid red"
-                   transform={`translate(${layout.width * -1}, ${layout.height * 0.4})`}>
+                   transform={`translate(${layout.width * -1}, ${layout.height * 0.5})`}>
         <div style="text-align: left; font-size: smaller">
             {obj.name}
         </div>
@@ -31,5 +32,10 @@
     circle {
         stroke: #aaa;
         fill: #d3ecde;
+    }
+
+    foreignObject div {
+        text-align: center;
+        font-size: smaller
     }
 </style>
