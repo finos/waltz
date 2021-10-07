@@ -60,7 +60,7 @@ function controller($q, $stateParams, historyStore)
                 console.log({vm})
                 const layout = JSON.parse(vm.diagram.layoutData);
                 if (layout) {
-                    initData(diagram, layout, alignments);
+                    initData(d.diagram, layout, alignments);
                 }
             });
 

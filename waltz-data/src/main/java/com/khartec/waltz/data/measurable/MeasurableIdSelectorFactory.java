@@ -73,8 +73,7 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
                         options.entityReference().kind()));
         }
     }
-
-
+    
     private Select<Record1<Long>> mkForProcessDiagram(IdSelectionOptions options) {
         return DSL
                 .select(PROCESS_DIAGRAM_ENTITY.ENTITY_ID)

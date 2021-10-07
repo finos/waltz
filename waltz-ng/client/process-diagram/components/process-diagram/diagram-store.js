@@ -26,7 +26,10 @@ export function initData(diagram, layout, alignments) {
         .chain(layout.connections)
         .reject(conn => conn.hidden)
         .filter(conn => layoutData[conn.startObjectId] && layoutData[conn.endObjectId])
-        .value()
+        .value();
+
+
+    console.log({diagram, layout, alignments});
 
     positions.set(layout.positions);
     objects.set(objs);
@@ -39,7 +42,7 @@ export function initData(diagram, layout, alignments) {
 export const appCountsByDiagramMeasurableId = derived([appAlignments], ([$appAlignments]) =>  {
     return _
         .chain($appAlignments)
-        .map(a => Object.assign({}, { diagramEntityId: a.diagramEntityRef.id, app: a.applicationRef }))
+        .map(a => Object.assign({}, { diagramEntityId: a.diagramMeasurableRef.id, app: a.applicationRef }))
         .uniq()
         .countBy(t => t.diagramEntityId)
         .value()
