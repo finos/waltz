@@ -26,6 +26,11 @@ public class ProcessDiagramService {
     }
 
 
+    public ProcessDiagram getByExternalId(String externalId) {
+        return dao.getDiagramByExternalId(externalId);
+    }
+
+
     public Set<ProcessDiagram> findByGenericSelector(EntityKind targetKind,
                                                      IdSelectionOptions selectionOptions) {
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, selectionOptions);

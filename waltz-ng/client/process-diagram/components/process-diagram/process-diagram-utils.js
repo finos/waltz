@@ -1,8 +1,8 @@
-import Activity from "./Activity.svelte";
-import Event from "./Event.svelte";
-import Decision from "./Decision.svelte";
-import TextCell from "./TextCell.svelte";
-import Boundary from "./Boundary.svelte";
+import Activity from "./svg-elems/Activity.svelte";
+import Event from "./svg-elems/Event.svelte";
+import Decision from "./svg-elems/Decision.svelte";
+import NavigationCell from "./svg-elems/NavigationCell.svelte";
+import Boundary from "./svg-elems/Boundary.svelte";
 import {max, min} from "d3-array";
 import _ from "lodash";
 
@@ -140,9 +140,8 @@ export function toComp(obj) {
             return Activity;
         case "Event":
             return Event;
-        case "NavigationCell":
         case "Text":
-            return TextCell;
+            return NavigationCell;
         case "Decision":
             return Decision;
         case "Boundary":
@@ -162,4 +161,19 @@ export function calcRectAttrs(obj) {
 export function findAssociatedApps(appsByDiagramMeasurableId, obj){
     const waltzId = _.get(obj, ['waltzReference', 'id']);
     return _.get(appsByDiagramMeasurableId, [waltzId], []);
+}
+
+
+export function toLinkExtId(obj) {
+    if (_.isNull(obj)){
+        return null;
+    }
+
+    const extId = obj.diagramLinkExtId;
+
+    return _.isEmpty(extId)
+        ? null
+        : extId
+            .replace("{", "")
+            .replace("}", "");
 }

@@ -8,14 +8,20 @@
 </script>
 
 
-<g on:mouseenter={onMouseEnter}>
-    <circle cx={layout.width / 2}
-            r={layout.width / 1.5}>
-    </circle>
+<g on:mouseenter={onMouseEnter}
+   class={obj.stereotype}>
 
     <circle cx={layout.width / 2}
-            r={layout.width / 1.8}>
+            r={layout.width / 1.5}
+            class="outer">
     </circle>
+
+    {#if obj.stereotype !== 'StartEvent'}
+        <circle cx={layout.width / 2}
+                r={layout.width / 1.8}
+                class="inner">
+        </circle>
+    {/if}
 
     <foreignObject width={layout.width * 4}
                    height={layout.height}
@@ -31,11 +37,27 @@
 <style>
     circle {
         stroke: #aaa;
-        fill: #d3ecde;
     }
 
     foreignObject div {
         text-align: center;
         font-size: smaller
     }
+
+    .EndEvent .inner {
+        fill: #fff4f4;
+    }
+
+    .EndEvent .outer {
+        fill: #ff8686;
+    }
+
+    .IntermediateEvent {
+        fill: #ffffe0;
+    }
+
+    .StartEvent {
+        fill: #e1ffe0;
+    }
+
 </style>

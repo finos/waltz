@@ -1,6 +1,6 @@
 <script>
-    import {connections, layoutDataById} from "./diagram-store";
-    import {mkConnectorPath} from "./process-diagram-utils";
+    import {connections, layoutDataById} from "../diagram-store";
+    import {mkConnectorPath} from "../process-diagram-utils";
 
 </script>
 

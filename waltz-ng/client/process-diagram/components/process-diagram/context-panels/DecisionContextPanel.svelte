@@ -1,6 +1,6 @@
 <script>
 
-    import {highlightedConnections, selectedObject} from "./diagram-store";
+    import {highlightedConnections, selectedObject} from "../diagram-store";
 
     let inbound = [];
     let outbound = [];

@@ -1,13 +1,14 @@
 <script>
 
-    import {findAssociatedApps} from "./process-diagram-utils";
-    import {appsByDiagramMeasurableId, selectedObject} from "./diagram-store";
+    import {findAssociatedApps} from "../process-diagram-utils";
+    import {appsByDiagramMeasurableId, selectedObject} from "../diagram-store";
     import _ from "lodash";
     import ActivityContextPanel from "./ActivityContextPanel.svelte";
     import DecisionContextPanel from "./DecisionContextPanel.svelte";
     import DefaultContextPanel from "./DefaultContextPanel.svelte"
-    import Activity from "./Activity.svelte";
-    import Decision from "./Decision.svelte";
+    import NavigationCellContextPanel from "./NavigationCellContextPanel.svelte";
+    import Activity from "../svg-elems/Activity.svelte";
+    import Decision from "../svg-elems/Decision.svelte";
 
     $: appsToDisplay = _
         .chain(findAssociatedApps($appsByDiagramMeasurableId, $selectedObject))
@@ -22,9 +23,8 @@
                 return ActivityContextPanel;
             // case "Event":
             //     return Event;
-            // case "NavigationCell":
-            // case "Text":
-            //     return TextCell;
+            case "Text":
+                return NavigationCellContextPanel;
             case "Decision":
                 return DecisionContextPanel;
             // case "Boundary":

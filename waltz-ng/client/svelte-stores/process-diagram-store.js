@@ -25,6 +25,16 @@ export function mkProcessDiagramStore() {
             .fetchViewData("GET", `api/process-diagram/id/${id}`, null, {}, {force: force});
     };
 
+    const getByExternalId = (externalId, force = false) => {
+        return remote
+            .fetchViewData(
+                "GET", 
+                `api/process-diagram/external-id/${externalId}`,
+                null,
+                {},
+                {force: force});
+    };
+
     const findByGenericSelector = (kind, idSelectionOptions, force = false) => {
         return remote
             .fetchViewData("POST", `api/process-diagram/selector/${kind}`, idSelectionOptions, [], {force})
@@ -32,6 +42,7 @@ export function mkProcessDiagramStore() {
 
     return {
         getById,
+        getByExternalId,
         findByGenericSelector
     };
 }

@@ -1,6 +1,6 @@
 <script>
-    import {appsByDiagramMeasurableId, layoutDataById, objects, selectedObject} from "./diagram-store";
-    import {findAssociatedApps, toComp} from "./process-diagram-utils";
+    import {appsByDiagramMeasurableId, layoutDataById, objects, selectedObject} from "../diagram-store";
+    import {findAssociatedApps, toComp} from "../process-diagram-utils";
     import _ from "lodash";
 
     $: objs = _.map(

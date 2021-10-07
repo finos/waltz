@@ -73,6 +73,15 @@ public class ProcessDiagramDao {
     }
 
 
+    public ProcessDiagram getDiagramByExternalId(String externalId) {
+        return dsl
+                .select(PROCESS_DIAGRAM.fields())
+                .from(PROCESS_DIAGRAM)
+                .where(PROCESS_DIAGRAM.EXTERNAL_ID.eq(externalId))
+                .fetchOne(RECORD_TO_DIAGRAM_MAPPER);
+    }
+
+
     public Set<ProcessDiagramEntity> findDiagramEntitiesById(long diagramId) {
         return dsl
                 .select(PROCESS_DIAGRAM_ENTITY.fields())
