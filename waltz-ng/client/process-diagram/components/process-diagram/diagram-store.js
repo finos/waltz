@@ -23,10 +23,13 @@ export function initData(diagram, layout, alignments) {
     const layoutData = mkLayoutData(
         objs, layout.positions);
 
+    const objectsById =  _.keyBy(objs, o =>  o.objectId);
+
     const conns = _
         .chain(layout.connections)
         .reject(conn => conn.hidden)
         .filter(conn => layoutData[conn.startObjectId] && layoutData[conn.endObjectId])
+        .map(conn => Object.assign({}, conn, {startObject: objectsById[conn.startObjectId] , endObject: objectsById[conn.endObjectId]}))
         .value();
 
 
@@ -40,11 +43,20 @@ export function initData(diagram, layout, alignments) {
     appAlignments.set(alignments)
 }
 
+
 export const appsByDiagramMeasurableId = derived([appAlignments], ([$appAlignments]) =>  {
     return _
         .chain($appAlignments)
         .map(a => Object.assign({}, { diagramEntityId: a.diagramMeasurableRef.id, applicationRef: a.applicationRef }))
         .uniq()
         .groupBy(t => t.diagramEntityId)
-        .value()
-})
+        .value();
+});
+
+
+export const highlightedConnections = derived([connections, selectedObject], ([$connections, $selectedObject]) => {
+    return _
+        .chain($connections)
+        .filter(c => c.startObjectId === $selectedObject.objectId || c.endObjectId === $selectedObject.objectId)
+        .value();
+});
