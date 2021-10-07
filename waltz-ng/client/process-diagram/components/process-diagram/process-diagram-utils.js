@@ -52,8 +52,6 @@ export function mkConnectorPoints(layoutById, conn) {
     const x2 = end.x + _.get(endAdjustment, ["x"] , 0);
     const y2 = end.y + end.height / 2 + _.get(endAdjustment, ["y"] , 0);
 
-    console.log({start, end, startAdjustment, endAdjustment})
-
     return `${x1},${y1} ${x2},${y2}`;
 }
 

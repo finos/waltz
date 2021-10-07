@@ -11,12 +11,9 @@
         .sortBy(d => d.name)
         .value();
 
-
-    $: console.log({appsToDisplay});
-
-
 </script>
 
+<h4><EntityLink ref={$selectedObject.waltzReference}/></h4>
 
 <table class="table table-condensed">
     <thead>

@@ -10,7 +10,15 @@ export const appAlignments = writable([]);
 export const diagramInfo = writable(null);
 export const selectedObject = writable(null);
 
+
+function resetStore() {
+    selectedObject.set(null);
+}
+
 export function initData(diagram, layout, alignments) {
+
+    resetStore();
+
     const positionsById = _.keyBy(
         layout.positions,
         d => d.objectId);
@@ -31,9 +39,6 @@ export function initData(diagram, layout, alignments) {
         .filter(conn => layoutData[conn.startObjectId] && layoutData[conn.endObjectId])
         .map(conn => Object.assign({}, conn, {startObject: objectsById[conn.startObjectId] , endObject: objectsById[conn.endObjectId]}))
         .value();
-
-
-    console.log({diagram, layout, alignments});
 
     positions.set(layout.positions);
     objects.set(objs);

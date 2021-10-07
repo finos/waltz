@@ -2,15 +2,11 @@
 
     import {highlightedConnections, selectedObject} from "./diagram-store";
 
-    $: console.log({highlightedConnections: $highlightedConnections});
-
     let inbound = [];
     let outbound = [];
 
     $:  [outbound, inbound] = _.partition($highlightedConnections, c => c.startObjectId === $selectedObject?.objectId);
 
-
-    $: console.log({inbound, outbound});
 </script>
 
 <h1>Decision selected</h1>

@@ -16,8 +16,6 @@
         .value();
 
 
-    $: console.log({appsToDisplay});
-
     function determineContextPanel(selectedObject) {
         switch (selectedObject?.objectType) {
             case "Activity":

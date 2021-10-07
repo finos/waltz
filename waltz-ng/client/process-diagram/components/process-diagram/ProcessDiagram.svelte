@@ -29,7 +29,6 @@
     $: svgElem = select(elem);
     $: svgElem.call(zoom().on("zoom", zoomed));
 
-    $: console.log({appAlignments: $appAlignments, selectedObj: $selectedObject});
 </script>
 
 
