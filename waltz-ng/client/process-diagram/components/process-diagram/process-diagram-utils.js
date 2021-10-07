@@ -4,6 +4,7 @@ import Decision from "./Decision.svelte";
 import TextCell from "./TextCell.svelte";
 import Boundary from "./Boundary.svelte";
 import {max, min} from "d3-array";
+import _ from "lodash";
 
 
 export function calcBounds(positions = []) {
@@ -157,4 +158,10 @@ export function calcRectAttrs(obj) {
         height: Math.abs(obj.bottomRight.y - obj.topLeft.y),
         width: Math.abs(obj.bottomRight.x - obj.topLeft.x)
     };
+}
+
+
+export function findAssociatedApps(appsByDiagramMeasurableId, obj){
+    const waltzId = _.get(obj, ['waltzReference', 'id']);
+    return _.get(appsByDiagramMeasurableId, [waltzId], []);
 }

@@ -6,9 +6,10 @@
     import {scaleLinear} from "d3-scale";
     import {zoom} from "d3-zoom";
     import {event, select} from "d3-selection";
-    import {appAlignments, diagramInfo, positions} from "./diagram-store";
+    import {appAlignments, diagramInfo, positions, selectedObject} from "./diagram-store";
     import {onMount} from "svelte";
     import {processDiagramEntityStore} from "../../../svelte-stores/process-diagram-entity-store";
+    import ProcessDiagramContextPanel from "./ProcessDiagramContextPanel.svelte";
 
     // pan + zoom
     function zoomed() {
@@ -28,7 +29,7 @@
     $: svgElem = select(elem);
     $: svgElem.call(zoom().on("zoom", zoomed));
 
-    $: console.log({appAlignments: $appAlignments});
+    $: console.log({appAlignments: $appAlignments, selectedObj: $selectedObject});
 </script>
 
 
@@ -51,6 +52,7 @@
     </div>
     <div class="col-md-3">
         <h1>Context Panel</h1>
+        <ProcessDiagramContextPanel/>
     </div>
 </div>
 

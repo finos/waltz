@@ -2,20 +2,16 @@
     export let obj;
     export let layout;
     export let appCount;
+    export let isSelected;
 
-    function onMouseEnter() {
-        console.log("activity:me:", obj);
-    }
-
-    $: console.log({appCount, obj});
 </script>
 
 
-<rect rx="10"
+<rect class={isSelected ? "selected" : ""}
+      rx="10"
       ry="10"
       width={layout.width}
-      height={layout.height}
-      on:mouseenter={onMouseEnter}>
+      height={layout.height}>
 </rect>
 
 <foreignObject width={layout.width}
@@ -42,6 +38,14 @@
     rect {
         opacity: 0.8;
         stroke: #ccc;
+        fill: url(#Activity-gradient);
+        transition: stroke ease-in-out 0.4s;
+    }
+
+    rect.selected {
+        opacity: 1;
+        stroke: #2b98ff;
+        stroke-width: 3;
         fill: url(#Activity-gradient);
     }
 

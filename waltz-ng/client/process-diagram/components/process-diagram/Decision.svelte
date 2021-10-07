@@ -1,6 +1,7 @@
 <script>
     export let obj;
     export let layout;
+    export let isSelected;
 
     function onMouseEnter() {
         console.log("decision:me:", obj);
@@ -24,7 +25,9 @@
 
 <g on:mouseenter={onMouseEnter}>
 
-    <polyline {points}></polyline>
+    <polyline class={isSelected ? "selected" : ""}
+              {points}>
+    </polyline>
 
     <foreignObject width={layout.width * 2}
                    height="200"
@@ -39,6 +42,13 @@
 <style>
     polyline {
         stroke: #999;
+        fill: #eee;
+        transition: stroke ease-in-out 0.4s;
+    }
+
+    polyline.selected {
+        stroke: #2b98ff;
+        stroke-width: 3;
         fill: #eee;
     }
 </style>

@@ -8,6 +8,7 @@ export const positions = writable([])
 export const layoutDataById = writable({});
 export const appAlignments = writable([]);
 export const diagramInfo = writable(null);
+export const selectedObject = writable(null);
 
 export function initData(diagram, layout, alignments) {
     const positionsById = _.keyBy(
@@ -39,11 +40,11 @@ export function initData(diagram, layout, alignments) {
     appAlignments.set(alignments)
 }
 
-export const appCountsByDiagramMeasurableId = derived([appAlignments], ([$appAlignments]) =>  {
+export const appsByDiagramMeasurableId = derived([appAlignments], ([$appAlignments]) =>  {
     return _
         .chain($appAlignments)
-        .map(a => Object.assign({}, { diagramEntityId: a.diagramMeasurableRef.id, app: a.applicationRef }))
+        .map(a => Object.assign({}, { diagramEntityId: a.diagramMeasurableRef.id, applicationRef: a.applicationRef }))
         .uniq()
-        .countBy(t => t.diagramEntityId)
+        .groupBy(t => t.diagramEntityId)
         .value()
 })

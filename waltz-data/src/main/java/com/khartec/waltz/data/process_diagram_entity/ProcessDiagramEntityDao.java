@@ -57,12 +57,15 @@ public class ProcessDiagramEntityDao {
                 .select(parent_measurable.ID,
                         parent_measurable.NAME,
                         parent_measurable.DESCRIPTION,
+                        parent_measurable.EXTERNAL_ID,
                         child_measurable.ID,
                         child_measurable.NAME,
                         child_measurable.DESCRIPTION,
+                        child_measurable.EXTERNAL_ID,
                         APPLICATION.ID,
                         APPLICATION.NAME,
-                        APPLICATION.DESCRIPTION)
+                        APPLICATION.DESCRIPTION,
+                        APPLICATION.ASSET_CODE)
                 .from(PROCESS_DIAGRAM_ENTITY)
                 .innerJoin(ENTITY_HIERARCHY).on(PROCESS_DIAGRAM_ENTITY.ENTITY_ID.eq(ENTITY_HIERARCHY.ANCESTOR_ID)
                 .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name()))
@@ -76,9 +79,9 @@ public class ProcessDiagramEntityDao {
                 .and(APPLICATION.ENTITY_LIFECYCLE_STATUS.ne(EntityLifecycleStatus.REMOVED.name()))
                 .and(APPLICATION.IS_REMOVED.isFalse())
                 .fetchSet(r -> ImmutableProcessDiagramEntityApplicationAlignment.builder()
-                        .diagramMeasurableRef(mkRef(EntityKind.MEASURABLE, r.get(parent_measurable.ID), r.get(parent_measurable.NAME), r.get(parent_measurable.DESCRIPTION)))
-                        .referencedMeasurableRef(mkRef(EntityKind.MEASURABLE, r.get(child_measurable.ID), r.get(child_measurable.NAME), r.get(child_measurable.DESCRIPTION)))
-                        .applicationRef(mkRef(EntityKind.APPLICATION, r.get(APPLICATION.ID), r.get(APPLICATION.NAME), r.get(APPLICATION.DESCRIPTION)))
+                        .diagramMeasurableRef(mkRef(EntityKind.MEASURABLE, r.get(parent_measurable.ID), r.get(parent_measurable.NAME), r.get(parent_measurable.DESCRIPTION), r.get(parent_measurable.EXTERNAL_ID)))
+                        .referencedMeasurableRef(mkRef(EntityKind.MEASURABLE, r.get(child_measurable.ID), r.get(child_measurable.NAME), r.get(child_measurable.DESCRIPTION), r.get(child_measurable.EXTERNAL_ID)))
+                        .applicationRef(mkRef(EntityKind.APPLICATION, r.get(APPLICATION.ID), r.get(APPLICATION.NAME), r.get(APPLICATION.DESCRIPTION), r.get(APPLICATION.ASSET_CODE)))
                         .build());
     }
 

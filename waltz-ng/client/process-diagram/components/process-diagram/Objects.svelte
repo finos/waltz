@@ -1,6 +1,6 @@
 <script>
-    import {appCountsByDiagramMeasurableId, layoutDataById, objects} from "./diagram-store";
-    import {toComp} from "./process-diagram-utils";
+    import {appsByDiagramMeasurableId, layoutDataById, objects, selectedObject} from "./diagram-store";
+    import {findAssociatedApps, toComp} from "./process-diagram-utils";
     import _ from "lodash";
 
     $: objs = _.map(
@@ -15,22 +15,21 @@
             };
         });
 
-    $: aligns = $appCountsByDiagramMeasurableId;
-
-    $: console.log({aligns, objs});
-
     function getAppCount(obj){
-        return _.get($appCountsByDiagramMeasurableId, [obj.waltzReference?.id], 0);
+        const associatedApps = findAssociatedApps($appsByDiagramMeasurableId, obj);
+        return associatedApps.length;
     }
 
 </script>
 
 {#each objs as d}
     <g transform={d.transform}
-       class={`object ${d.obj.stereotype}`}>
+       class={`object ${d.obj.stereotype}`}
+       on:click={() => $selectedObject = d.obj}>
         <svelte:component obj={d.obj}
                           layout={d.layout}
                           this={d.comp}
-                          appCount={getAppCount(d.obj)}/>
+                          appCount={getAppCount(d.obj)}
+                          isSelected={d.obj === $selectedObject}/>
     </g>
 {/each}
