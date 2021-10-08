@@ -328,23 +328,23 @@ public class BaseInMemoryIntegrationTest {
     }
 
 
-    public void createDatatype(){
-
+    public Long createDatatype(String name){
         DSLContext dsl = getDsl();
+        String uniqName = mkName(name);
 
-        dsl.deleteFrom(DATA_TYPE).execute();
+        long id = counter.incrementAndGet();
 
-        mkName();
-        dsl.insertInto(DATA_TYPE)
+        dsl
+                .insertInto(DATA_TYPE)
                 .columns(
                         DATA_TYPE.ID,
                         DATA_TYPE.NAME,
                         DATA_TYPE.DESCRIPTION,
-                        DATA_TYPE.CODE,
-                        DATA_TYPE.CONCRETE,
-                        DATA_TYPE.UNKNOWN.as(DSL.quotedName("unknown"))) //TODO: as part of #5639 can drop quotedName
-                .values(1L, "Unknown", "Unknown data type", "UNKNOWN", false, true)
+                        DATA_TYPE.CODE)
+                .values(id, uniqName, uniqName, uniqName.toUpperCase())
                 .execute();
+
+        return id;
     }
 
 

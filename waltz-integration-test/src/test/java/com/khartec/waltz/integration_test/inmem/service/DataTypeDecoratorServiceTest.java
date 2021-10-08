@@ -30,8 +30,13 @@ import org.junit.Test;
 
 import java.util.Collection;
 
+import static com.khartec.waltz.common.CollectionUtilities.first;
 import static com.khartec.waltz.common.ListUtilities.asList;
+import static com.khartec.waltz.common.SetUtilities.asSet;
+import static com.khartec.waltz.common.SetUtilities.map;
+import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
@@ -71,6 +76,22 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
         Collection<DataTypeDecorator> withNoDecorators = dtSvc.findByFlowIds(asList(flow.entityReference().id()), EntityKind.LOGICAL_DATA_FLOW);
         assertEquals("flow has no decorators", emptyList(), withNoDecorators);
 
+        Long dtId = createDatatype("findByFlowIds");
+        String username = mkName("findByFlowIds");
+
+        dtSvc.updateDecorators(username, flow.entityReference(), asSet(dtId), emptySet());
+
+        Collection<DataTypeDecorator> flowDecorators = dtSvc.findByFlowIds(asList(flow.entityReference().id()), EntityKind.LOGICAL_DATA_FLOW);
+        assertEquals("Flow with one datatype associated returns a set with one decorator", 1, flowDecorators.size());
+        assertEquals("Returns the correct datatype id on the decorator", dtId, Long.valueOf(first(flowDecorators).dataTypeId()));
+
+        Long dtId2 = createDatatype("findByFlowIds2");
+        Long dtId3 = createDatatype("findByFlowIds3");
+        dtSvc.updateDecorators(username, flow.entityReference(), asSet(dtId2, dtId3), emptySet());
+
+        Collection<DataTypeDecorator> multipleDecorators = dtSvc.findByFlowIds(asList(flow.entityReference().id()), EntityKind.LOGICAL_DATA_FLOW);
+        assertEquals("Returns all decorators for the flow", 3, multipleDecorators.size());
+        assertEquals("Returns all decorators for the flow", asSet(dtId, dtId2, dtId3), map(multipleDecorators, DataTypeDecorator::dataTypeId));
     }
 
 
