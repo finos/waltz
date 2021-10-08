@@ -12,13 +12,13 @@
    class={obj.stereotype}>
 
     <circle cx={layout.width / 2}
-            r={layout.width / 1.5}
+            r={layout.width / 1.8}
             class="outer">
     </circle>
 
     {#if obj.stereotype !== 'StartEvent'}
         <circle cx={layout.width / 2}
-                r={layout.width / 1.8}
+                r={layout.width / 2.2}
                 class="inner">
         </circle>
     {/if}
@@ -26,8 +26,8 @@
     <foreignObject width={layout.width * 4}
                    height={layout.height}
                    border="1px solid red"
-                   transform={`translate(${layout.width * -1}, ${layout.height * 0.5})`}>
-        <div style="text-align: left; font-size: smaller">
+                   transform={`translate(${layout.width * -1.4}, ${layout.height * 0.5})`}>
+        <div>
             {obj.name}
         </div>
     </foreignObject>
@@ -41,7 +41,7 @@
 
     foreignObject div {
         text-align: center;
-        font-size: smaller
+        font-size: 10px;
     }
 
     .EndEvent .inner {

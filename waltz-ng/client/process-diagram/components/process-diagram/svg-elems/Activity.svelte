@@ -17,7 +17,7 @@
 <foreignObject width={layout.width}
                height={layout.height}
                style="pointer-events: none"
-               y={layout.height / 6}>
+               y="4">
     <div>
         {obj.name}
     </div>
@@ -51,7 +51,7 @@
 
     foreignObject div {
         text-align: center;
-        font-size: smaller
+        font-size: 11px;
     }
 
     .app-count circle{

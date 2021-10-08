@@ -102,7 +102,7 @@ export function mkConnectorPath(layoutById, conn) {
 
 const objectLayoutAdjustments = {
     Event: {
-        y: -10
+        y: -13
     },
     Decision: {
         y: 0 //-18
