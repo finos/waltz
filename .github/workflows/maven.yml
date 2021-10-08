@@ -49,7 +49,7 @@ jobs:
     - name: Publish build
       uses: actions/upload-artifact@v2
       with:
-        name: waltz-web.war
+        name: waltz-web-postgres.war
         path: waltz-web/target/waltz-web.war
 
     - name: Publish liquibase changelogs
