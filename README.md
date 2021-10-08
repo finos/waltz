@@ -41,7 +41,6 @@ See [pom.xml](https://github.com/finos/waltz/blob/master/pom.xml) for a full lis
 
 ### Supported Databases
 
-- MariaDB
 - Postgres 
 - Microsoft SQL Server (2012+)  
   - requires [JOOQ Pro license](https://www.jooq.org/download/) to build from source
