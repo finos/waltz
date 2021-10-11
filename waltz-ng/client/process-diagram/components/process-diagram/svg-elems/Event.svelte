@@ -2,29 +2,13 @@
     import Message from "./sub-types/Message.svelte";
     import Timer from "./sub-types/Timer.svelte";
     import _ from "lodash";
+    import {lookupSubTypeComponent} from "../process-diagram-utils";
 
     export let obj;
     export let layout;
 
     function onMouseEnter() {
         // console.log("event:me:", obj);
-    }
-
-    function lookupSubTypeComponent(subType) {
-        if (_.isEmpty(subType)) {
-            return null;
-        }
-        switch (subType) {
-            case "Message":
-                return Message;
-            case "Timer":
-                return Timer;
-            case "None":
-                return null;
-            default:
-                console.log("Cannot find subtype for: " + subType)
-                return null;
-        }
     }
 
     $: subTypeComponent = lookupSubTypeComponent(obj.objectSubType);

@@ -5,6 +5,11 @@ import NavigationCell from "./svg-elems/NavigationCell.svelte";
 import Boundary from "./svg-elems/Boundary.svelte";
 import {max, min} from "d3-array";
 import _ from "lodash";
+import Message from "./svg-elems/sub-types/Message.svelte";
+import Timer from "./svg-elems/sub-types/Timer.svelte";
+import Inclusive from "./svg-elems/sub-types/Inclusive.svelte";
+import Exclusive from "./svg-elems/sub-types/Exclusive.svelte";
+import Parallel from "./svg-elems/sub-types/Parallel.svelte";
 
 
 export function calcBounds(positions = []) {
@@ -176,4 +181,28 @@ export function toLinkExtId(obj) {
         : extId
             .replace("{", "")
             .replace("}", "");
+}
+
+
+export function lookupSubTypeComponent(subType) {
+    if (_.isEmpty(subType)) {
+        return null;
+    }
+    switch (subType) {
+        case "Message":
+            return Message;
+        case "Timer":
+            return Timer;
+        case "Inclusive":
+            return Inclusive;
+        case "Exclusive":
+            return Exclusive;
+        case "Parallel":
+            return Parallel;
+        case "None":
+            return null;
+        default:
+            console.log("Cannot find subtype for: " + subType)
+            return null;
+    }
 }

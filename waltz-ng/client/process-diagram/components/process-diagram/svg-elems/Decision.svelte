@@ -1,4 +1,6 @@
 <script>
+    import {lookupSubTypeComponent} from "../process-diagram-utils";
+
     export let obj;
     export let layout;
     export let isSelected;
@@ -20,12 +22,15 @@
         `;
     }
 
+    $: subTypeComponent = lookupSubTypeComponent(obj.objectSubType);
+
 </script>
 
 
 <g on:mouseenter={onMouseEnter}>
 
     <polyline class={isSelected ? "selected" : ""}
+              stroke-linecap="square"
               {points}>
     </polyline>
 
@@ -36,6 +41,18 @@
             {obj.name}
         </div>
     </foreignObject>
+
+
+    <!-- subtype -->
+    {#if subTypeComponent}
+        <g transform="translate(0 {layout.height / 2 * -1})"
+           class="subtype">
+            <svelte:component this={subTypeComponent}
+                              width={layout.width}
+                              height={layout.height}/>
+        </g>
+    {/if}
+
 </g>
 
 
