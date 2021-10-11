@@ -82,4 +82,8 @@ public class OptionalUtilities {
                 : nullable;
     }
 
+
+    public static boolean isEmpty(Optional<?> d) {
+        return ! d.isPresent();
+    }
 }

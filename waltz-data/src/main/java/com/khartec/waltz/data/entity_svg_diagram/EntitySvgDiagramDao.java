@@ -46,17 +46,19 @@ public class EntitySvgDiagramDao {
 
 
     public List<EntitySvgDiagram> findForEntityReference(EntityReference ref) {
-        return dsl.selectFrom(ENTITY_SVG_DIAGRAM)
+        return dsl
+                .select(ENTITY_SVG_DIAGRAM.fields())
+                .from(ENTITY_SVG_DIAGRAM)
                 .where(ENTITY_SVG_DIAGRAM.ENTITY_KIND.eq(ref.kind().name()))
                 .and(ENTITY_SVG_DIAGRAM.ENTITY_ID.eq(ref.id()))
                 .fetch(r -> ImmutableEntitySvgDiagram.builder()
                             .entityReference(ref)
-                            .name(r.getName())
-                            .description(r.getDescription())
-                            .id(r.getId())
-                            .externalId(Optional.ofNullable(r.getExternalId()))
-                            .svg(r.getSvg())
-                            .provenance(r.getProvenance())
+                            .name(r.get(ENTITY_SVG_DIAGRAM.NAME))
+                            .description(r.get(ENTITY_SVG_DIAGRAM.DESCRIPTION))
+                            .id(r.get(ENTITY_SVG_DIAGRAM.ID))
+                            .externalId(Optional.ofNullable(r.get(ENTITY_SVG_DIAGRAM.EXTERNAL_ID)))
+                            .svg(r.get(ENTITY_SVG_DIAGRAM.SVG))
+                            .provenance(r.get(ENTITY_SVG_DIAGRAM.PROVENANCE))
                             .build());
     }
 

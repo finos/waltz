@@ -14,11 +14,10 @@ import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.measurable_category.MeasurableCategoryDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
+import com.khartec.waltz.integration_test.inmem.helpers.InvolvementHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
-import com.khartec.waltz.model.Criticality;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.integration_test.inmem.helpers.PersonHelper;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.actor.ImmutableActorCreateCommand;
 import com.khartec.waltz.model.app_group.AppGroup;
 import com.khartec.waltz.model.app_group.AppGroupKind;
@@ -31,8 +30,12 @@ import com.khartec.waltz.schema.tables.records.MeasurableRecord;
 import com.khartec.waltz.schema.tables.records.OrganisationalUnitRecord;
 import com.khartec.waltz.schema.tables.records.RatingSchemeRecord;
 import com.khartec.waltz.service.app_group.AppGroupService;
+import com.khartec.waltz.service.attestation.AttestationInstanceService;
+import com.khartec.waltz.service.attestation.AttestationRunService;
 import com.khartec.waltz.service.bookmark.BookmarkService;
 import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
+import com.khartec.waltz.service.involvement.InvolvementService;
+import com.khartec.waltz.service.involvement_kind.InvolvementKindService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import org.h2.tools.Server;
 import org.jooq.DSLContext;
@@ -46,6 +49,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
 
@@ -74,11 +78,17 @@ public class BaseInMemoryIntegrationTest {
         public LogicalFlowService logicalFlowService;
         public AppGroupService appGroupService;
         public BookmarkService bookmarkService;
+        public AttestationInstanceService attestationInstanceService;
+        public AttestationRunService attestationRunService;
+        public InvolvementService involvementService;
+        public InvolvementKindService involvementKindService;
     }
 
 
     public static class Helpers {
         public LogicalFlowHelper logicalFlowHelper;
+        public InvolvementHelper involvementHelper;
+        public PersonHelper personHelper;
     }
 
 
@@ -90,12 +100,9 @@ public class BaseInMemoryIntegrationTest {
     protected static final ApplicationIdSelectorFactory appSelectorFactory = new ApplicationIdSelectorFactory();
     protected static final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
     protected static final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
-;
 
     protected static final String LAST_UPDATE_USER = "last";
     protected static final String PROVENANCE = "test";
-
-
 
     protected OuIds ouIds;
     protected Daos daos;
@@ -124,8 +131,8 @@ public class BaseInMemoryIntegrationTest {
     public void baseSetup() {
         ouIds = setupOuTree();
         daos = setupDaos();
-        helpers = setupHelpers();
         services = setupServices();
+        helpers = setupHelpers();
     }
 
 
@@ -134,6 +141,10 @@ public class BaseInMemoryIntegrationTest {
         s.logicalFlowService = ctx.getBean(LogicalFlowService.class);
         s.appGroupService = ctx.getBean(AppGroupService.class);
         s.bookmarkService = ctx.getBean(BookmarkService.class);
+        s.attestationInstanceService = ctx.getBean(AttestationInstanceService.class);
+        s.attestationRunService = ctx.getBean(AttestationRunService.class);
+        s.involvementKindService = ctx.getBean(InvolvementKindService.class);
+        s.involvementService = ctx.getBean(InvolvementService.class);
         return s;
     }
 
@@ -141,6 +152,8 @@ public class BaseInMemoryIntegrationTest {
     private Helpers setupHelpers() {
         Helpers h = new Helpers();
         h.logicalFlowHelper = new LogicalFlowHelper(daos.logicalFlowDao);
+        h.involvementHelper = new InvolvementHelper(services.involvementService, services.involvementKindService);
+        h.personHelper = new PersonHelper(ctx.getBean(DSLContext.class));
         return h;
     }
 
@@ -176,8 +189,8 @@ public class BaseInMemoryIntegrationTest {
         return dao.create(
                 ImmutableActorCreateCommand
                         .builder()
-                        .name(nameStem + "Name")
-                        .description(nameStem + "Desc")
+                        .name(nameStem)
+                        .description(nameStem + " Desc")
                         .isExternal(true)
                         .build(),
                 "admin");
@@ -357,20 +370,6 @@ public class BaseInMemoryIntegrationTest {
         }
     }
 
-
-    public String mkUserId(String stem) {
-        return mkName(stem);
-    }
-
-
-    public String mkUserId() {
-        return mkName("testuser");
-    }
-
-
-    public String mkName(String stem) {
-        return stem + "_" + counter.incrementAndGet();
-    }
 
 
 }

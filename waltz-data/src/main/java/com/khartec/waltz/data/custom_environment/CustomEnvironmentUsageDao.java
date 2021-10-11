@@ -28,9 +28,7 @@ import com.khartec.waltz.model.custom_environment.CustomEnvironmentUsage;
 import com.khartec.waltz.model.custom_environment.CustomEnvironmentUsageInfo;
 import com.khartec.waltz.model.custom_environment.ImmutableCustomEnvironmentUsage;
 import com.khartec.waltz.model.custom_environment.ImmutableCustomEnvironmentUsageInfo;
-import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.Application;
-import com.khartec.waltz.schema.tables.DatabaseInformation;
 import com.khartec.waltz.schema.tables.records.CustomEnvironmentUsageRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -46,7 +44,6 @@ import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.model.EntityKind.valueOf;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.Tables.DATABASE_INFORMATION;
 
 
 @Repository
@@ -155,7 +152,8 @@ public class CustomEnvironmentUsageDao {
 
     public Set<CustomEnvironmentUsage> findByEntityRef(EntityReference ref){
         return dsl
-                .selectFrom(CUSTOM_ENVIRONMENT_USAGE)
+                .select(CUSTOM_ENVIRONMENT_USAGE.fields())
+                .from(CUSTOM_ENVIRONMENT_USAGE)
                 .where(CUSTOM_ENVIRONMENT_USAGE.ENTITY_ID.eq(ref.id())
                         .and(CUSTOM_ENVIRONMENT_USAGE.ENTITY_KIND.eq(ref.kind().name())))
                 .fetchSet(TO_CUSTOM_ENV_USAGE_MAPPER);

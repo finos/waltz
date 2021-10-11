@@ -86,21 +86,27 @@ public class PhysicalSpecDefinitionDao {
 
 
     public PhysicalSpecDefinition getById(long specDefinitionId) {
-        return dsl.selectFrom(PHYSICAL_SPEC_DEFN)
+        return dsl
+                .select(PHYSICAL_SPEC_DEFN.fields())
+                .from(PHYSICAL_SPEC_DEFN)
                 .where(PHYSICAL_SPEC_DEFN.ID.eq(specDefinitionId))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 
     public List<PhysicalSpecDefinition> findForSpecification(long specificationId) {
-        return dsl.selectFrom(PHYSICAL_SPEC_DEFN)
+        return dsl
+                .select(PHYSICAL_SPEC_DEFN.fields())
+                .from(PHYSICAL_SPEC_DEFN)
                 .where(PHYSICAL_SPEC_DEFN.SPECIFICATION_ID.eq(specificationId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
     public List<PhysicalSpecDefinition> findBySelector(Select<Record1<Long>> selector) {
-        return dsl.selectFrom(PHYSICAL_SPEC_DEFN)
+        return dsl
+                .select(PHYSICAL_SPEC_DEFN.fields())
+                .from(PHYSICAL_SPEC_DEFN)
                 .where(PHYSICAL_SPEC_DEFN.ID.in(selector))
                 .fetch(TO_DOMAIN_MAPPER);
     }

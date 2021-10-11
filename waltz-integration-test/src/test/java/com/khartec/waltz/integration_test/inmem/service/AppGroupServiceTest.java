@@ -32,6 +32,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.khartec.waltz.common.SetUtilities.asSet;
+import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
 import static org.junit.Assert.*;
 
 public class AppGroupServiceTest extends BaseInMemoryIntegrationTest {

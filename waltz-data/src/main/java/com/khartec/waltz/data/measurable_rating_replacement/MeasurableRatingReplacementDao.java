@@ -136,7 +136,8 @@ public class MeasurableRatingReplacementDao {
                         .and(MEASURABLE_RATING_REPLACEMENT.ENTITY_KIND.eq(entityReference.kind().name())));
 
         boolean isUpdate = dsl.fetchExists(DSL
-                .selectFrom(MEASURABLE_RATING_REPLACEMENT)
+                .select(MEASURABLE_RATING_REPLACEMENT.ID)
+                .from(MEASURABLE_RATING_REPLACEMENT)
                 .where(condition));
 
         if (isUpdate) {

@@ -86,7 +86,8 @@ public class AttributeChangeDao {
 
     public AttributeChange getById(long id) {
         return dsl
-                .selectFrom(ATTRIBUTE_CHANGE)
+                .select(ATTRIBUTE_CHANGE.fields())
+                .from(ATTRIBUTE_CHANGE)
                 .where(ATTRIBUTE_CHANGE.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
@@ -94,7 +95,8 @@ public class AttributeChangeDao {
 
     public List<AttributeChange> findByChangeUnitId(long id) {
         return dsl
-                .selectFrom(ATTRIBUTE_CHANGE)
+                .select(ATTRIBUTE_CHANGE.fields())
+                .from(ATTRIBUTE_CHANGE)
                 .where(ATTRIBUTE_CHANGE.CHANGE_UNIT_ID.eq(id))
                 .fetch(TO_DOMAIN_MAPPER);
     }

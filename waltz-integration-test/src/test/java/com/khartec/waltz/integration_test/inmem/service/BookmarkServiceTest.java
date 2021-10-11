@@ -37,6 +37,7 @@ import java.util.Set;
 
 import static com.khartec.waltz.common.CollectionUtilities.first;
 import static com.khartec.waltz.common.SetUtilities.asSet;
+import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static java.util.Collections.emptySet;

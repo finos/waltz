@@ -72,14 +72,18 @@ public class SharedPreferenceDao {
 
 
     public SharedPreference getPreference(String key, String category) {
-        return dsl.selectFrom(SHARED_PREFERENCE)
+        return dsl
+                .select(SHARED_PREFERENCE.fields())
+                .from(SHARED_PREFERENCE)
                 .where(SHARED_PREFERENCE.CATEGORY.eq(category).and(SHARED_PREFERENCE.KEY.eq(key)))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 
     public List<SharedPreference> findPreferencesByCategory(String category) {
-        return dsl.selectFrom(SHARED_PREFERENCE)
+        return dsl
+                .select(SHARED_PREFERENCE.fields())
+                .from(SHARED_PREFERENCE)
                 .where(SHARED_PREFERENCE.CATEGORY.eq(category))
                 .fetch(TO_DOMAIN_MAPPER);
     }

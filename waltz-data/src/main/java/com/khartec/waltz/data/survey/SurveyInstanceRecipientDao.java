@@ -62,7 +62,9 @@ public class SurveyInstanceRecipientDao {
 
 
     public boolean isPersonInstanceRecipient(long personId, long surveyInstanceId) {
-        Condition recipientExists = DSL.exists(DSL.selectFrom(SURVEY_INSTANCE_RECIPIENT)
+        Condition recipientExists = DSL.exists(DSL
+                .select(SURVEY_INSTANCE_RECIPIENT.ID)
+                .from(SURVEY_INSTANCE_RECIPIENT)
                 .where(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.eq(surveyInstanceId)
                         .and(SURVEY_INSTANCE_RECIPIENT.PERSON_ID.eq(personId))));
 

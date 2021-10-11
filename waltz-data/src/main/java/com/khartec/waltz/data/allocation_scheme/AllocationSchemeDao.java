@@ -58,7 +58,8 @@ public class AllocationSchemeDao {
 
     public AllocationScheme getById(long id){
         return dsl
-                .selectFrom(ALLOCATION_SCHEME)
+                .select(ALLOCATION_SCHEME.fields())
+                .from(ALLOCATION_SCHEME)
                 .where(ALLOCATION_SCHEME.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
@@ -66,14 +67,16 @@ public class AllocationSchemeDao {
 
     public List<AllocationScheme> findAll(){
         return dsl
-                .selectFrom(ALLOCATION_SCHEME)
+                .select(ALLOCATION_SCHEME.fields())
+                .from(ALLOCATION_SCHEME)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
     public List<AllocationScheme> findByCategoryId(long categoryId){
         return dsl
-                .selectFrom(ALLOCATION_SCHEME)
+                .select(ALLOCATION_SCHEME.fields())
+                .from(ALLOCATION_SCHEME)
                 .where(ALLOCATION_SCHEME.MEASURABLE_CATEGORY_ID.eq(categoryId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
