@@ -49,7 +49,6 @@ import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static com.khartec.waltz.model.attestation.AttestationStatus.ISSUED;
 import static com.khartec.waltz.model.attestation.AttestationStatus.ISSUING;
 import static com.khartec.waltz.model.utils.IdUtilities.toIds;
-import static java.util.Optional.empty;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 
@@ -271,7 +270,7 @@ public class AttestationRunService {
                 .selectionOptions(mkOpts(createCommand.entityReference()))
                 .involvementKindIds(asSet())
                 .attestedEntityKind(createCommand.attestedEntityKind())
-                .attestedEntityId(empty())
+                .attestedEntityId(createCommand.attestedEntityId())
                 .issuedOn(LocalDate.now())
                 .dueDate(LocalDate.now().plusMonths(6))
                 .build();
