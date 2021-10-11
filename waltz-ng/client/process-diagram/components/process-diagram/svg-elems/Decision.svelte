@@ -37,7 +37,7 @@
     <foreignObject width={layout.width * 2}
                    height="200"
                    transform={`translate(${layout.width * -0.7}, ${layout.height * 1})`}>
-        <div style="text-align: left; font-size: smaller">
+        <div style="text-align: left; font-size: 10px;">
             {obj.name}
         </div>
     </foreignObject>

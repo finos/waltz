@@ -30,7 +30,7 @@
 </script>
 
 
-<div class="row">
+<div class="row row-no-gutters">
     <div class="col-md-9">
         <svg bind:this={elem}
              width="100%"
@@ -47,7 +47,7 @@
         </svg>
 
     </div>
-    <div class="col-md-3">
+    <div class="col-md-3" style="padding-left: 1em">
         <ProcessDiagramContextPanel/>
     </div>
 </div>

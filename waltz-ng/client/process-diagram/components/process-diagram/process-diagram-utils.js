@@ -10,16 +10,25 @@ import Timer from "./svg-elems/sub-types/Timer.svelte";
 import Inclusive from "./svg-elems/sub-types/Inclusive.svelte";
 import Exclusive from "./svg-elems/sub-types/Exclusive.svelte";
 import Parallel from "./svg-elems/sub-types/Parallel.svelte";
+import {scaleLinear} from "d3-scale";
 
 
 export function calcBounds(positions = []) {
     if (positions.length === 0) {
         return { x1: 0, x2: 100, y1: 0, y2: 100, width: 100, height: 100};
     }
+
     const x1 = min(positions, d => d.topLeft.x);
-    const y1 = min(positions, d => d.topLeft.y);
     const x2 = max(positions, d => d.bottomRight.x);
-    const y2 = max(positions, d => d.bottomRight.y);
+
+    const maxY1 = min(positions, d => d.topLeft.y);
+    const minY1 = min(positions, d => d.topLeft.y);
+    const minY2 = max(positions, d => d.bottomRight.y);
+    const maxY2 = max(positions, d => d.bottomRight.y);
+
+    const y2 = Math.max(maxY2, maxY1);
+    const y1 = Math.min(minY1, minY2);
+
     return {
         x1,
         y1,

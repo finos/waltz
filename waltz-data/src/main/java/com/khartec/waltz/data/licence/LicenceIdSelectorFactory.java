@@ -61,6 +61,7 @@ public class LicenceIdSelectorFactory extends AbstractIdSelectorFactory {
             case MEASURABLE:
             case ORG_UNIT:
             case PERSON:
+            case PROCESS_DIAGRAM:
             case SCENARIO:
                 Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(options);
                 return mkFromAppSelector(appSelector);
