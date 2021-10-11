@@ -5,6 +5,7 @@
     import EntityLink from "../../../../common/svelte/EntityLink.svelte";
     import Markdown from "../../../../common/svelte/Markdown.svelte";
     import {toLinkExtId} from "../process-diagram-utils";
+    import _ from "lodash";
 
 
     let processDiagramCall = null;
