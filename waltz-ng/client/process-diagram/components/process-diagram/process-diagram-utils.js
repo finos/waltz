@@ -10,24 +10,24 @@ import Timer from "./svg-elems/sub-types/Timer.svelte";
 import Inclusive from "./svg-elems/sub-types/Inclusive.svelte";
 import Exclusive from "./svg-elems/sub-types/Exclusive.svelte";
 import Parallel from "./svg-elems/sub-types/Parallel.svelte";
-import {scaleLinear} from "d3-scale";
 
+
+const padding = {
+    top: 50,
+    left: 100,
+    right: 200
+}
 
 export function calcBounds(positions = []) {
     if (positions.length === 0) {
         return { x1: 0, x2: 100, y1: 0, y2: 100, width: 100, height: 100};
     }
 
-    const x1 = min(positions, d => d.topLeft.x);
-    const x2 = max(positions, d => d.bottomRight.x);
+    const x1 = min(positions, d => d.position.x);
+    const x2 = max(positions, d => d.position.x + d.width);
 
-    const maxY1 = min(positions, d => d.topLeft.y);
-    const minY1 = min(positions, d => d.topLeft.y);
-    const minY2 = max(positions, d => d.bottomRight.y);
-    const maxY2 = max(positions, d => d.bottomRight.y);
-
-    const y2 = Math.max(maxY2, maxY1);
-    const y1 = Math.min(minY1, minY2);
+    const y1 = min(positions, d => d.position.y);
+    const y2 = max(positions, d => d.position.y + d.height);
 
     return {
         x1,
@@ -42,7 +42,7 @@ export function calcBounds(positions = []) {
 
 export function calcViewBox(positions = []) {
     const bounds = calcBounds(positions);
-    return `${bounds.x1 - 100} ${bounds.y2 - bounds.y1 - 50} ${bounds.width + 200} ${bounds.height}`;
+    return `${bounds.x1 - padding.left} ${bounds.y2 - bounds.y1 - padding.top} ${bounds.width + padding.right} ${bounds.height}`;
 }
 
 
@@ -116,7 +116,7 @@ export function mkConnectorPath(layoutById, conn) {
 
 const objectLayoutAdjustments = {
     Event: {
-        y: -13
+        y: 26
     },
     Decision: {
         y: 0 //-18
@@ -136,11 +136,12 @@ export function mkLayoutData(objects = [], positions = []) {
             const basePosition = positionsByObjectId[d.objectId];
             return {
                 id: d.objectId,
-                x: basePosition.topLeft.x + _.get(adjustment, ["x"], 0),
-                y: bounds.height - (basePosition.topLeft.y + _.get(adjustment, ["y"], 0)),
-                width: Math.abs(basePosition.bottomRight.x - basePosition.topLeft.x) + _.get(adjustment, ["width"], 0),
-                height: Math.abs(basePosition.bottomRight.y - basePosition.topLeft.y) + _.get(adjustment, ["height"], 0),
-                data: d
+                x: basePosition.position.x, //+ _.get(adjustment, ["x"], 0),
+                y: bounds.height - (basePosition.position.y),// + _.get(adjustment, ["y"], 0),
+                width: basePosition.width,
+                height: basePosition.height,
+                data: d,
+                basePosition
             };
         })
         .keyBy(d => d.id)
@@ -161,14 +162,6 @@ export function toComp(obj) {
         case "Boundary":
             return Boundary;
     }
-}
-
-
-export function calcRectAttrs(obj) {
-    return {
-        height: Math.abs(obj.bottomRight.y - obj.topLeft.y),
-        width: Math.abs(obj.bottomRight.x - obj.topLeft.x)
-    };
 }
 
 

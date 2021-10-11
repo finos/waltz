@@ -1,7 +1,4 @@
 <script>
-    import Message from "./sub-types/Message.svelte";
-    import Timer from "./sub-types/Timer.svelte";
-    import _ from "lodash";
     import {lookupSubTypeComponent} from "../process-diagram-utils";
 
     export let obj;
