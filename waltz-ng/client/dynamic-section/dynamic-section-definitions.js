@@ -239,7 +239,7 @@ const relatedPhysicalFieldSection = {
     name: "Physical Fields",
     icon: "file-code-o",
     description: "Physical specification definition fields",
-    id: 40 
+    id: 40
 };
 
 const relatedOrgUnitSection = {
@@ -525,7 +525,7 @@ const changeInitiativeSections = [
     entityNamedNotesSection,
     involvedPeopleSection,
     relatedMeasurablesSection,
-    pack(relatedAppsSection, 
+    pack(relatedAppsSection,
          [
              appCostsSummarySection,
              appComplexitySummarySection,
@@ -540,9 +540,9 @@ const changeInitiativeSections = [
 ];
 
 const orgUnitSections = [
-    pack(appsSection, 
+    pack(appsSection,
          [
-             appCostsSummarySection, 
+             appCostsSummarySection,
              appComplexitySummarySection,
              attestationSummarySection,
              entityStatisticSummarySection,
@@ -560,10 +560,10 @@ const orgUnitSections = [
 ];
 
 const measurableSections = [
-    pack(appsSection, 
+    pack(appsSection,
          [
              appCostsSummarySection,
-             appComplexitySummarySection, 
+             appComplexitySummarySection,
              entityStatisticSummarySection,
              reportGridViewSection,
              technologySummarySection
@@ -613,7 +613,7 @@ const dataTypeSections = [
 ];
 
 const appGroupSections = [
-    pack(appsSection, 
+    pack(appsSection,
          [
              appCostsSummarySection,
              appComplexitySummarySection,
@@ -651,6 +651,21 @@ const scenarioSections = [
 ];
 
 const flowDiagramSections = [
+    pack(appsSection,
+         [
+             appCostsSummarySection,
+             appComplexitySummarySection,
+             entityStatisticSummarySection,
+             measurableRatingsBrowserSection,
+             reportGridViewSection,
+             technologySummarySection
+         ]),
+    bookmarksSection,
+    entityNamedNotesSection,
+    changeLogSection
+];
+
+const processDiagramSections = [
     pack(appsSection,
          [
              appCostsSummarySection,
@@ -773,6 +788,7 @@ export const dynamicSectionsByKind = {
     "main.person.view": personSections,
     "main.physical-flow.view": physicalFlowSections,
     "main.physical-specification.view": physicalSpecificationSections,
+    "main.process-diagram.view": processDiagramSections,
     "main.scenario.view": scenarioSections,
     "main.software-package.view": softwarePackageSections
 };

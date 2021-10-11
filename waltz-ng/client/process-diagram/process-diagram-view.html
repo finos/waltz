@@ -1,0 +1,50 @@
+
+<!-- HEADER -->
+<waltz-page-header name="{{ $ctrl.diagram.name }}"
+                   icon="picture-o"
+                   small="{{ $ctrl.diagram.externalId }}">
+    <breadcrumbs>
+        <ol class="waltz-breadcrumbs">
+            <li><a ui-sref="main">Home</a></li>
+            <li><span>Process Diagrams</span></li>
+            <li><span ng-bind="$ctrl.diagram.name"></span></li>
+        </ol>
+    </breadcrumbs>
+</waltz-page-header>
+
+
+<div class="waltz-page-summary-attach waltz-page-summary">
+
+    <div class="row">
+        <div class="col-md-12">
+            <waltz-markdown text="$ctrl.diagram.description"></waltz-markdown>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <waltz-svelte-component component="$ctrl.ProcessDiagram"
+                                    diagram="$ctrl.diagram"
+                                    entities="$ctrl.entities">
+            </waltz-svelte-component>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <!-- HELP -->
+            <div class="help-block small small">
+                This diagram may be moved and resized by holding down
+                <kbd>ctrl</kbd>
+                and dragging and/or zooming.
+            </div>
+            <br>
+        </div>
+    </div>
+
+</div>
+
+<br>
+
+<waltz-dynamic-sections-view parent-entity-ref="$ctrl.parentEntityRef">
+</waltz-dynamic-sections-view>
