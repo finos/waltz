@@ -93,7 +93,7 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
     public DataType getByCode(String code) {
         checkNotEmpty(code, "Code cannot be null/empty");
         return dsl
-                .select(DATA_TYPE.fields())
+                .select(DATA_TYPE.asterisk())
                 .from(DATA_TYPE)
                 .where(DATA_TYPE.CODE.eq(code))
                 .fetchOne(TO_DOMAIN);
@@ -102,7 +102,7 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
 
     public DataType getById(long dataTypeId) {
         return dsl
-                .select(DATA_TYPE.fields())
+                .select(DATA_TYPE.asterisk())
                 .from(DATA_TYPE)
                 .where(DATA_TYPE.ID.eq(dataTypeId))
                 .fetchOne(TO_DOMAIN);
@@ -131,7 +131,7 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
                 .where(isSourceOrTarget);
 
         return dsl
-                .selectDistinct(DATA_TYPE.fields())
+                .selectDistinct(DATA_TYPE.asterisk())
                 .from(DATA_TYPE)
                 .innerJoin(LOGICAL_FLOW_DECORATOR).on(DATA_TYPE.ID.eq(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID)
                         .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name())))
