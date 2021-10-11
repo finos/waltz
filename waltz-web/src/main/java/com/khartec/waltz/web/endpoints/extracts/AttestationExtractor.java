@@ -18,28 +18,48 @@
 
 package com.khartec.waltz.web.endpoints.extracts;
 
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
+import com.khartec.waltz.common.ListUtilities;
+import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.application.LifecyclePhase;
-import com.khartec.waltz.schema.tables.AttestationInstance;
-import com.khartec.waltz.web.json.AttestationStatus;
-import org.jooq.*;
-import org.jooq.impl.DSL;
+import com.khartec.waltz.model.attestation.ApplicationAttestationInstanceInfo;
+import com.khartec.waltz.model.attestation.ApplicationAttestationInstanceSummary;
+import com.khartec.waltz.model.external_identifier.ExternalIdValue;
+import com.khartec.waltz.service.attestation.AttestationInstanceService;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.SelectConditionStep;
+import org.jooq.lambda.tuple.Tuple3;
 import org.springframework.stereotype.Service;
-import spark.Request;
+import org.supercsv.io.CsvListWriter;
+import org.supercsv.prefs.CsvPreference;
 
-import java.sql.Timestamp;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.ListUtilities.asList;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
 import static com.khartec.waltz.schema.tables.AttestationInstanceRecipient.ATTESTATION_INSTANCE_RECIPIENT;
 import static com.khartec.waltz.schema.tables.AttestationRun.ATTESTATION_RUN;
 import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.extracts.ExtractorUtilities.convertExcelToByteArray;
+import static com.khartec.waltz.web.endpoints.extracts.ExtractorUtilities.sanitizeSheetName;
 import static java.lang.String.format;
+import static org.jooq.lambda.fi.util.function.CheckedConsumer.unchecked;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 import static spark.Spark.get;
 import static spark.Spark.post;
 
@@ -47,11 +67,12 @@ import static spark.Spark.post;
 @Service
 public class AttestationExtractor extends DirectQueryBasedDataExtractor {
 
-    private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
+    private final AttestationInstanceService attestationInstanceService;
 
-
-    public AttestationExtractor(DSLContext dsl) {
+    public AttestationExtractor(DSLContext dsl,
+                                AttestationInstanceService attestationInstanceService) {
         super(dsl);
+        this.attestationInstanceService = attestationInstanceService;
     }
 
 
@@ -61,108 +82,60 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
                 "data-extract",
                 "attestation",
                 ":id"));
-        registerExtractForAttestedEntityKindAndSelector(mkPath(
-                "data-extract",
-                "attestations",
-                ":kind"));
+        registerExtractForAttestedEntityKindAndSelector();
     }
 
 
-    private void registerExtractForAttestedEntityKindAndSelector(String path) {
-        post(path, (request, response) -> {
-            IdSelectionOptions idSelectionOptions = readIdSelectionOptionsFromBody(request);
-            EntityReference entityReference = idSelectionOptions.entityReference();
-            EntityKind kind = getKind(request);
-            Optional<Integer> year = getYearParam(request);
-            Optional<LifecyclePhase> lifecycle = getLifecycleParam(request);
-            Optional<AttestationStatus> status = getStatusParam(request);
+    private void registerExtractForAttestedEntityKindAndSelector() {
+        post(mkPath("data-extract", "attestations", ":kind", ":id"),
+                (request, response) -> {
+                    Long attestedId = StringUtilities.parseLong(request.params("id"), null);
 
-            String fileName = format(
-                    "%s-for-%s-%s-%s",
-                    status.map(Enum::name).orElse("ALL_ATTESTATIONS"),
-                    entityReference.kind().name().toLowerCase(),
-                    entityReference.id(),
-                    kind.name().toLowerCase());
-
-            Select<Record1<Long>> appSelector = applicationIdSelectorFactory.apply(idSelectionOptions);
-            SelectConditionStep<Record> qry = mkQueryForReportingAttestationsByKindAndSelector(
-                    appSelector,
-                    kind,
-                    year,
-                    lifecycle,
-                    status);
-
-            return writeExtract(
-                    fileName,
-                    qry,
-                    request,
-                    response);
-        });
+                    return writeReportResults(
+                            response,
+                            prepareReport(
+                                    parseExtractFormat(request),
+                                    getKind(request),
+                                    attestedId,
+                                    readBody(request, ApplicationAttestationInstanceInfo.class)));
+                });
     }
 
 
-    private SelectConditionStep<Record> mkQueryForReportingAttestationsByKindAndSelector(Select<Record1<Long>> appIds,
-                                                                                         EntityKind kind,
-                                                                                         Optional<Integer> year,
-                                                                                         Optional<LifecyclePhase> lifecycle,
-                                                                                         Optional<AttestationStatus> status) {
+    private Tuple3<ExtractFormat, String, byte[]> prepareReport(ExtractFormat format,
+                                                                EntityKind attestedKind,
+                                                                Long attestedId,
+                                                                ApplicationAttestationInstanceInfo applicationAttestationInstanceInfo) throws IOException {
 
-        AttestationInstance latestAttestationInstance = ATTESTATION_INSTANCE.as("latestAttestationInstance");
-        AttestationInstance attestationInstanceForPerson= ATTESTATION_INSTANCE.as("attestationInstanceForPerson");
+        Set<ApplicationAttestationInstanceSummary> attestationInstances = attestationInstanceService
+                .findApplicationAttestationInstancesForKindAndSelector(
+                        attestedKind,
+                        attestedId,
+                        applicationAttestationInstanceInfo);
 
-        Field<Long> latestAttestationParentId = latestAttestationInstance.PARENT_ENTITY_ID.as("parent_id");
-        Field<Timestamp> latestAttestationAt = DSL.max(latestAttestationInstance.ATTESTED_AT).as("latest_attested_at");
+        EntityReference entityReference = applicationAttestationInstanceInfo.selectionOptions().entityReference();
 
-        SelectHavingStep<Record2<Long, Timestamp>> latestAttestation = dsl
-                .selectDistinct(
-                        latestAttestationParentId,
-                        latestAttestationAt)
-                .from(latestAttestationInstance)
-                .innerJoin(ATTESTATION_RUN).on(latestAttestationInstance.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID))
-                .where(latestAttestationInstance.PARENT_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
-                .and(ATTESTATION_RUN.ATTESTED_ENTITY_KIND.eq(kind.name())))
-                .groupBy(latestAttestationInstance.PARENT_ENTITY_ID);
+        String fileName = format(
+                "%s-attestations-for-%s-%s",
+                attestedKind,
+                entityReference.kind().name().toLowerCase(),
+                entityReference.id());
 
-        Field<Long> entityPersonIsAttesting = attestationInstanceForPerson.PARENT_ENTITY_ID.as("entityPersonIsAttesting");
+        List<String> columnDefinitions = ListUtilities.asList(
+                "Application Id",
+                "Application Name",
+                "Asset Code",
+                "Criticality",
+                "Lifecycle Phase",
+                "Kind",
+                "Attested At",
+                "Attested By");
 
-        SelectOnConditionStep<Record3<String, Timestamp, Long>> peopleToAttest = dsl
-                .select(attestationInstanceForPerson.ATTESTED_BY,
-                        attestationInstanceForPerson.ATTESTED_AT,
-                        entityPersonIsAttesting)
-                .from(attestationInstanceForPerson)
-                .innerJoin(latestAttestation)
-                .on(attestationInstanceForPerson.PARENT_ENTITY_ID.eq(latestAttestationParentId))
-                .and(attestationInstanceForPerson.ATTESTED_AT.eq(latestAttestationAt));
-
-        Condition yearCondition = year
-                .map(y -> DSL.year((peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT))).eq(year.get()))
-                .orElse(DSL.trueCondition());
-
-        Condition lifecycleCondition = lifecycle
-                .map(l -> APPLICATION.LIFECYCLE_PHASE.eq(l.name()))
-                .orElse(DSL.trueCondition());
-
-        Condition statusCondition = status
-                .map(s -> s.equals(AttestationStatus.NEVER_ATTESTED)
-                        ? peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT).isNull()
-                        : peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT).isNotNull())
-                .orElse(DSL.trueCondition());
-
-        return dsl
-                .select(APPLICATION.NAME.as("Name"),
-                        APPLICATION.ASSET_CODE.as("Asset Code"),
-                        APPLICATION.KIND.as("Kind"),
-                        APPLICATION.BUSINESS_CRITICALITY.as("Business Criticality"),
-                        APPLICATION.LIFECYCLE_PHASE.as("Lifecycle Phase"))
-                .select(peopleToAttest.field(attestationInstanceForPerson.ATTESTED_BY).as("Last Attested By"),
-                        peopleToAttest.field(attestationInstanceForPerson.ATTESTED_AT).as("Last Attested At"))
-                .from(APPLICATION)
-                .leftJoin(peopleToAttest)
-                .on(APPLICATION.ID.eq(entityPersonIsAttesting))
-                .where(APPLICATION.ID.in(appIds))
-                .and(lifecycleCondition)
-                .and(yearCondition)
-                .and(statusCondition);
+        return formatReport(
+                format,
+                fileName,
+                columnDefinitions,
+                attestationInstances);
     }
 
 
@@ -213,27 +186,119 @@ public class AttestationExtractor extends DirectQueryBasedDataExtractor {
     }
 
 
-    private Optional<Integer> getYearParam(Request request) {
-        String yearVal = request.queryParams("year");
-        return Optional
-                .ofNullable(yearVal)
-                .map(Integer::valueOf);
+    private Tuple3<ExtractFormat, String, byte[]> formatReport(ExtractFormat format,
+                                                               String reportName,
+                                                               List<String> columns,
+                                                               Set<ApplicationAttestationInstanceSummary> reportRows) throws IOException {
+        switch (format) {
+            case XLSX:
+                return tuple(format, reportName, mkExcelReport(reportName, columns, reportRows));
+            case CSV:
+                return tuple(format, reportName, mkCSVReport(columns, reportRows));
+            default:
+                throw new UnsupportedOperationException("This report does not support export format: " + format);
+        }
     }
 
 
-    private Optional<LifecyclePhase> getLifecycleParam(Request request) {
-        String lifecycleVal = request.queryParams("lifecycle");
-        return Optional
-                .ofNullable(lifecycleVal)
-                .map(LifecyclePhase::valueOf);
+    private byte[] mkCSVReport(List<String> columnDefinitions,
+                               Set<ApplicationAttestationInstanceSummary> reportRows) throws IOException {
+
+        StringWriter writer = new StringWriter();
+        CsvListWriter csvWriter = new CsvListWriter(writer, CsvPreference.EXCEL_PREFERENCE);
+
+        csvWriter.write(columnDefinitions);
+
+        reportRows.forEach(unchecked(r -> {
+            List<Object> values = asList(
+                    r.appRef().id(),
+                    r.appRef().name().get(),
+                    r.appAssetCode(),
+                    r.appCriticality(),
+                    r.appLifecyclePhase(),
+                    r.appKind(),
+                    r.attestedAt(),
+                    r.attestedBy());
+
+            csvWriter.write(values);
+        }));
+        csvWriter.flush();
+
+        return writer.toString().getBytes();
     }
 
 
-    private Optional<AttestationStatus> getStatusParam(Request request) {
-        String status = request.queryParams("status");
-        return Optional
-                .ofNullable(status)
-                .map(AttestationStatus::valueOf);
+    private byte[] mkExcelReport(String reportName,
+                                 List<String> columnDefinitions,
+                                 Set<ApplicationAttestationInstanceSummary> reportRows) throws IOException {
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        XSSFSheet sheet = workbook.createSheet(sanitizeSheetName(reportName));
+
+        int colCount = writeExcelHeader(columnDefinitions, sheet);
+        writeExcelBody(reportRows, sheet);
+
+        sheet.setAutoFilter(new CellRangeAddress(0, 0, 0, colCount - 1));
+        sheet.createFreezePane(0, 1);
+
+        return convertExcelToByteArray(workbook);
+    }
+
+
+    private int writeExcelBody(Set<ApplicationAttestationInstanceSummary> reportRows, XSSFSheet sheet) {
+        AtomicInteger rowNum = new AtomicInteger(1);
+        reportRows.forEach(r -> {
+
+            List<Object> values = asList(
+                    r.appRef().id(),
+                    r.appRef().name().get(),
+                    r.appAssetCode(),
+                    r.appCriticality(),
+                    r.appLifecyclePhase(),
+                    r.appKind(),
+                    r.attestedAt(),
+                    r.attestedBy());
+
+            org.apache.poi.ss.usermodel.Row row = sheet.createRow(rowNum.getAndIncrement());
+            AtomicInteger colNum = new AtomicInteger(0);
+            for (Object value : values) {
+                Object v = value instanceof Optional
+                        ? ((Optional<?>) value).orElse(null)
+                        : value;
+
+                int nextColNum = colNum.getAndIncrement();
+
+                if (v == null) {
+                    row.createCell(nextColNum);
+                } else if (v instanceof Number) {
+                    Cell cell = row.createCell(nextColNum, CellType.NUMERIC);
+                    cell.setCellValue(((Number) v).doubleValue());
+                } else if (v instanceof ExternalIdValue) {
+                    Cell cell = row.createCell(nextColNum, CellType.STRING);
+                    cell.setCellValue(((ExternalIdValue) v).value());
+                } else {
+                    Cell cell = row.createCell(nextColNum);
+                    cell.setCellValue(Objects.toString(v));
+                }
+
+            }
+        });
+        return rowNum.get();
+    }
+
+
+    private int writeExcelHeader(List<String> columnDefinitions, XSSFSheet sheet) {
+        org.apache.poi.ss.usermodel.Row headerRow = sheet.createRow(0);
+        AtomicInteger colNum = new AtomicInteger();
+
+        columnDefinitions.forEach(hdr -> writeExcelHeaderCell(headerRow, colNum, hdr));
+
+        return colNum.get();
+    }
+
+
+    private void writeExcelHeaderCell(Row headerRow, AtomicInteger colNum, String text) {
+        Cell cell = headerRow.createCell(colNum.getAndIncrement());
+        cell.setCellValue(text);
     }
 
 }

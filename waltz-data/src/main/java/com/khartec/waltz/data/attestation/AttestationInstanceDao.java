@@ -19,28 +19,36 @@
 package com.khartec.waltz.data.attestation;
 
 import com.khartec.waltz.data.InlineSelectFieldFactory;
+import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.application.ApplicationKind;
+import com.khartec.waltz.model.application.LifecyclePhase;
 import com.khartec.waltz.model.attestation.*;
 import com.khartec.waltz.schema.tables.records.AttestationInstanceRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
+import org.jooq.lambda.tuple.Tuple2;
+import org.jooq.lambda.tuple.Tuple3;
+import org.jooq.lambda.tuple.Tuple4;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static java.util.stream.Collectors.*;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
 @Repository
@@ -49,7 +57,7 @@ public class AttestationInstanceDao {
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             ATTESTATION_INSTANCE.PARENT_ENTITY_ID,
             ATTESTATION_INSTANCE.PARENT_ENTITY_KIND,
-            newArrayList(EntityKind.values()))
+            newArrayList(EntityKind.APPLICATION))
             .as("entity_name");
 
     private final DSLContext dsl;
@@ -250,6 +258,7 @@ public class AttestationInstanceDao {
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
+
     public List<AttestationInstance> findByIdSelector(Select<Record1<Long>> selector) {
         return dsl
                 .select(ATTESTATION_INSTANCE.fields())
@@ -332,6 +341,175 @@ public class AttestationInstanceDao {
 
                     return latestMeasurableAttestationInfo;
                 })
-                .collect(Collectors.toSet());
+                .collect(toSet());
+    }
+
+
+    public Set<ApplicationAttestationInstanceSummary> findApplicationAttestationInstancesForKindAndSelector(EntityKind attestedKind,
+                                                                                                            Long attestedId,
+                                                                                                            Select<Record1<Long>> appSelector,
+                                                                                                            Condition filterCondition){
+
+        Condition attestedEntityIdCondition = attestedId == null
+                ? DSL.trueCondition()
+                : ATTESTATION_RUN.ATTESTED_ENTITY_ID.eq(attestedId);
+
+        Field<Long> latest_attestation = DSL
+                .firstValue(ATTESTATION_INSTANCE.ID)
+                .over()
+                .partitionBy(ATTESTATION_INSTANCE.PARENT_ENTITY_ID)
+                .orderBy(ATTESTATION_INSTANCE.ATTESTED_AT.desc().nullsLast())
+                .as("latest_attestation");
+
+        SelectConditionStep<Record> attestations = dsl
+                .select(latest_attestation)
+                .select(ATTESTATION_INSTANCE.ID.as("instance_id"),
+                        ATTESTATION_INSTANCE.ATTESTED_AT,
+                        ATTESTATION_INSTANCE.ATTESTED_BY,
+                        ATTESTATION_INSTANCE.PARENT_ENTITY_ID)
+                .from(ATTESTATION_INSTANCE)
+                .innerJoin(APPLICATION)
+                .on(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                        .and(ATTESTATION_INSTANCE.PARENT_ENTITY_ID.eq(APPLICATION.ID)))
+                .innerJoin(ATTESTATION_RUN)
+                .on(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID))
+                .where(ATTESTATION_RUN.ATTESTED_ENTITY_KIND.eq(attestedKind.name())
+                        .and(attestedEntityIdCondition));
+
+        Table<Record3<Timestamp, String, Long>> appAttestations = dsl
+                .select(attestations.field(ATTESTATION_INSTANCE.ATTESTED_AT).as("attested_at"),
+                        attestations.field(ATTESTATION_INSTANCE.ATTESTED_BY).as("attested_by"),
+                        attestations.field(ATTESTATION_INSTANCE.PARENT_ENTITY_ID).as("appId"))
+                .from(attestations)
+                .where(attestations.field(latest_attestation).eq(attestations.field("instance_id", Long.class)))
+                .asTable();
+
+        Result<Record> applicationsWithLatestInstance = dsl
+                .select(APPLICATION.ID,
+                        APPLICATION.NAME,
+                        APPLICATION.BUSINESS_CRITICALITY,
+                        APPLICATION.LIFECYCLE_PHASE,
+                        APPLICATION.KIND,
+                        APPLICATION.ASSET_CODE)
+                .select(appAttestations.field("attested_at", Timestamp.class),
+                        appAttestations.field("attested_by", String.class))
+                .from(APPLICATION)
+                .leftJoin(appAttestations)
+                .on(APPLICATION.ID.eq(appAttestations.field("appId", Long.class)))
+                .where(APPLICATION.ID.in(appSelector))
+                .and(filterCondition)
+                .fetch();
+
+        return applicationsWithLatestInstance
+                .stream()
+                .map(r -> ImmutableApplicationAttestationInstanceSummary
+                        .builder()
+                        .appRef(mkRef(EntityKind.APPLICATION, r.get(APPLICATION.ID), r.get(APPLICATION.NAME)))
+                        .appAssetCode(r.get(APPLICATION.ASSET_CODE))
+                        .appKind(ApplicationKind.valueOf(r.get(APPLICATION.KIND)))
+                        .appLifecyclePhase(LifecyclePhase.valueOf(r.get(APPLICATION.LIFECYCLE_PHASE)))
+                        .appCriticality(Criticality.valueOf(r.get(APPLICATION.BUSINESS_CRITICALITY)))
+                        .attestedAt(r.get("attested_at", Timestamp.class))
+                        .attestedBy(r.get("attested_by", String.class))
+                        .build())
+                .collect(toSet());
+    }
+
+
+
+    public Set<ApplicationAttestationSummaryCounts> findAttestationInstanceSummaryForSelector(Select<Record1<Long>> appSelector,
+                                                                                              Condition filterCondition) {
+
+        Table<Record5<String, Long, Timestamp, String, Long>> appAttestations = getLatestAttestationsForApps();
+
+        Field<String> isAttestedField = DSL
+                .when(appAttestations.field("attested_at", Timestamp.class).isNull(), DSL.val("NEVER_ATTESTED"))
+                .otherwise(DSL.val("ATTESTED")).as("is_attested");
+
+        SelectJoinStep<Record2<String, Long>> possibleAttestationKinds = DSL
+                .selectDistinct(ATTESTATION_RUN.ATTESTED_ENTITY_KIND, ATTESTATION_RUN.ATTESTED_ENTITY_ID)
+                .from(ATTESTATION_RUN);
+
+        Condition attestationExistsForThisTargetEntityAndAppCondition = APPLICATION.ID.eq(appAttestations.field("appId", Long.class))
+                .and(possibleAttestationKinds.field(ATTESTATION_RUN.ATTESTED_ENTITY_KIND).eq(appAttestations.field("attested_entity_kind", String.class))
+                        .and((possibleAttestationKinds.field(ATTESTATION_RUN.ATTESTED_ENTITY_ID).eq(appAttestations.field("attested_entity_id", Long.class)))
+                                .or(possibleAttestationKinds.field(ATTESTATION_RUN.ATTESTED_ENTITY_ID).isNull())));
+
+        //For each combination of app and possible attestation target entity, join the existing attestation instance
+        Map<Tuple3<EntityKind, Long, String>, Long> appCountsForAttestationTargetEntityAndAttestationStatus = dsl
+                .select(possibleAttestationKinds.field(ATTESTATION_RUN.ATTESTED_ENTITY_KIND),
+                        possibleAttestationKinds.field(ATTESTATION_RUN.ATTESTED_ENTITY_ID),
+                        isAttestedField,
+                        APPLICATION.ID)
+                .from(APPLICATION)
+                .crossJoin(possibleAttestationKinds)
+                .leftJoin(appAttestations)
+                .on(attestationExistsForThisTargetEntityAndAppCondition)
+                .where(APPLICATION.ID.in(appSelector))
+                .and(dsl.renderInlined(filterCondition))
+                .fetch(r -> tuple(
+                        EntityKind.valueOf(r.get(possibleAttestationKinds.field(ATTESTATION_RUN.ATTESTED_ENTITY_KIND))),
+                        r.get(possibleAttestationKinds.field(ATTESTATION_RUN.ATTESTED_ENTITY_ID)),
+                        r.get(isAttestedField),
+                        r.get(APPLICATION.ID)))
+                .stream()
+                .collect(groupingBy(Tuple4::limit3, counting()));
+
+        Map<Tuple2<EntityKind, Long>, Set<AttestationCount>> attestationCountsByTargetEntity = appCountsForAttestationTargetEntityAndAttestationStatus
+                .entrySet()
+                .stream()
+                .collect(groupingBy(
+                        t -> t.getKey().limit2(),
+                        mapping(t -> ImmutableAttestationCount.builder()
+                                .key(t.getKey().v3)
+                                .count(t.getValue().intValue())
+                                .build(),
+                                toSet())));
+
+        return attestationCountsByTargetEntity
+                .entrySet()
+                .stream()
+                .map(e -> ImmutableApplicationAttestationSummaryCounts.builder()
+                        .attestedKind(e.getKey().v1)
+                        .attestedId(e.getKey().v2)
+                        .attestationCounts(e.getValue())
+                        .build())
+                .collect(toSet());
+    }
+
+
+    private Table<Record5<String, Long, Timestamp, String, Long>> getLatestAttestationsForApps() {
+
+        Field<Long> latest_attestation = DSL
+                .firstValue(ATTESTATION_INSTANCE.ID)
+                .over()
+                .partitionBy(ATTESTATION_INSTANCE.PARENT_ENTITY_ID, ATTESTATION_RUN.ATTESTED_ENTITY_KIND, ATTESTATION_RUN.ATTESTED_ENTITY_ID)
+                .orderBy(ATTESTATION_INSTANCE.ATTESTED_AT.desc().nullsLast())
+                .as("latest_attestation");
+
+        SelectOnConditionStep<Record> attestations = dsl
+                .select(latest_attestation)
+                .select(ATTESTATION_INSTANCE.ID.as("instance_id"),
+                        ATTESTATION_INSTANCE.ATTESTED_AT,
+                        ATTESTATION_INSTANCE.ATTESTED_BY,
+                        ATTESTATION_INSTANCE.PARENT_ENTITY_ID)
+                .select(ATTESTATION_RUN.ATTESTED_ENTITY_KIND,
+                        ATTESTATION_RUN.ATTESTED_ENTITY_ID)
+                .from(ATTESTATION_INSTANCE)
+                .innerJoin(APPLICATION)
+                .on(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                        .and(ATTESTATION_INSTANCE.PARENT_ENTITY_ID.eq(APPLICATION.ID)))
+                .innerJoin(ATTESTATION_RUN)
+                .on(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID.eq(ATTESTATION_RUN.ID));
+
+        return dsl
+                .select(attestations.field(ATTESTATION_RUN.ATTESTED_ENTITY_KIND).as("attested_entity_kind"),
+                        attestations.field(ATTESTATION_RUN.ATTESTED_ENTITY_ID).as("attested_entity_id"),
+                        attestations.field(ATTESTATION_INSTANCE.ATTESTED_AT).as("attested_at"),
+                        attestations.field(ATTESTATION_INSTANCE.ATTESTED_BY).as("attested_by"),
+                        attestations.field(ATTESTATION_INSTANCE.PARENT_ENTITY_ID).as("appId"))
+                .from(attestations)
+                .where(attestations.field(latest_attestation).eq(attestations.field("instance_id", Long.class)))
+                .asTable();
     }
 }

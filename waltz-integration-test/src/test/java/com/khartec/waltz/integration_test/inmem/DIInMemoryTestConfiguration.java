@@ -13,6 +13,7 @@ import org.jooq.conf.Settings;
 import org.jooq.impl.DSL;
 import org.jooq.impl.DefaultConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.jmx.support.RegistrationPolicy;
 
@@ -26,12 +27,14 @@ import java.sql.SQLException;
 
 }, excludeFilters = @ComponentScan.Filter(type = FilterType.ANNOTATION, classes = ExcludeFromIntegrationTesting.class))
 @EnableMBeanExport(registration = RegistrationPolicy.REPLACE_EXISTING)
+@PropertySource("classpath:integration-test.properties")
 public class DIInMemoryTestConfiguration {
 
     @Bean
     public DBExecutorPoolInterface dbExecutorPool() {
         return new DBExecutorPool(2, 4);
     }
+
 
 
     @Bean
@@ -51,7 +54,6 @@ public class DIInMemoryTestConfiguration {
     @Bean
     @Autowired
     public DSLContext dsl(DataSource dataSource) {
-        System.out.println("Setting up dsl");
         Settings dslSettings = new Settings()
                 .withRenderFormatted(true)
                 .withDebugInfoOnStackTrace(true)

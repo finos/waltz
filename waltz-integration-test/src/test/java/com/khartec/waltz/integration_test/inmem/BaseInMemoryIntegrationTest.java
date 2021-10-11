@@ -18,10 +18,7 @@ import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.integration_test.inmem.helpers.InvolvementHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.PersonHelper;
-import com.khartec.waltz.model.Criticality;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.actor.ImmutableActorCreateCommand;
 import com.khartec.waltz.model.app_group.AppGroup;
 import com.khartec.waltz.model.app_group.AppGroupKind;
@@ -60,6 +57,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.ListUtilities.map;
+import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
 
@@ -201,8 +199,8 @@ public class BaseInMemoryIntegrationTest {
         return dao.create(
                 ImmutableActorCreateCommand
                         .builder()
-                        .name(nameStem + "Name")
-                        .description(nameStem + "Desc")
+                        .name(nameStem)
+                        .description(nameStem + " Desc")
                         .isExternal(true)
                         .build(),
                 "admin");

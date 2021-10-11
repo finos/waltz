@@ -15,7 +15,7 @@ Getting started
  - [Running](waltz-web/README.md)
 
 ---
-![postgres build](https://github.com/finos/waltz/actions/workflows/maven.yml/badge.svg)
+[![postgres build](https://github.com/finos/waltz/actions/workflows/maven.yml/badge.svg)](https://github.com/finos/waltz/actions)
 [![Language Grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/khartec/waltz.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/khartec/waltz/context:javascript) 
 [![Language Grade: Java](https://img.shields.io/lgtm/grade/java/g/khartec/waltz.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/khartec/waltz/context:java)
 [![FINOS - Active](https://cdn.jsdelivr.net/gh/finos/contrib-toolbox@master/images/badge-active.svg)](https://finosfoundation.atlassian.net/wiki/display/FINOS/Active)
@@ -41,7 +41,6 @@ See [pom.xml](https://github.com/finos/waltz/blob/master/pom.xml) for a full lis
 
 ### Supported Databases
 
-- MariaDB
 - Postgres 
 - Microsoft SQL Server (2012+)  
   - requires [JOOQ Pro license](https://www.jooq.org/download/) to build from source

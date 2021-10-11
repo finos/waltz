@@ -20,7 +20,6 @@ package com.khartec.waltz.data.actor;
 
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.actor.Actor;
 import com.khartec.waltz.model.actor.ActorChangeCommand;
 import com.khartec.waltz.model.actor.ActorCreateCommand;
@@ -150,9 +149,10 @@ public class ActorDao {
         command.isExternal().ifPresent(change -> record.setIsExternal(change.newVal()));
         command.externalId().ifPresent(change -> record.setExternalId(change.newVal()));
 
-        UserTimestamp lastUpdate = command.lastUpdate().get();
-        record.setLastUpdatedAt(Timestamp.valueOf(lastUpdate.at()));
-        record.setLastUpdatedBy(lastUpdate.by());
+        command.lastUpdate().ifPresent(ts -> {
+            record.setLastUpdatedAt(Timestamp.valueOf(ts.at()));
+            record.setLastUpdatedBy(ts.by());
+        });
 
         return dsl.executeUpdate(record) == 1;
     }
@@ -166,13 +166,14 @@ public class ActorDao {
                         .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(id)
                             .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.ACTOR.name()))
                             .or(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(id)
-                                    .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.ACTOR.name())))));
+                                    .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.ACTOR.name())))));
 
         Condition notMentionedInInvolvements = DSL
                 .notExists(DSL
                         .select(INVOLVEMENT.fields())
                         .from(INVOLVEMENT)
-                        .where(INVOLVEMENT.KIND_ID.eq(id)));
+                        .where(INVOLVEMENT.ENTITY_ID.eq(id))
+                        .and(INVOLVEMENT.ENTITY_KIND.eq(EntityKind.ACTOR.name())));
 
         return dsl
                 .deleteFrom(ACTOR)

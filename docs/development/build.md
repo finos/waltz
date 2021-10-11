@@ -11,7 +11,6 @@ Waltz is built using [Maven](https://maven.apache.org/).
   - [NPM](https://www.npmjs.com/) v6+
 - [Sass](http://sass-lang.com/)
 - Database - either
-  - [MariaDB](https://mariadb.org/)
   - [Microsoft SQL Server](https://www.microsoft.com/en-gb/sql-server/)
   - [Postgres](https://www.postgresql.org/)
 - [Liquibase](http://www.liquibase.org/) (recommended but not essential)
@@ -23,11 +22,10 @@ It is recommended that you clone the repository on GitHub to maintain your own f
 
 ## Preparing the database
 
-For **Mariadb** create a new database:
+For **Postgres** create a new daabase
 ```
-mysql -u root -e "create database IF NOT EXISTS waltz CHARACTER SET='utf8';"
+create database waltz;
 ```
-
 
 For **SQL Server** create a new database
 ```
@@ -60,12 +58,12 @@ SQL Server) would look like:
         -->
 
         <profile>
-            <id>dev-maria</id>
+            <id>dev-postgres</id>
             <properties>
-                <database.url>jdbc:mysql://dbhost:3306/waltzdb</database.url>
+                <database.url>jdbc:postgresql://localhost:5432/waltz</database.url>
                 <database.user>dbuser</database.user>
                 <database.password>dbpassword</database.password>
-                <database.schema>waltz</database.schema>
+                <database.schema>public</database.schema>
             </properties>
         </profile>
         <profile>
@@ -94,9 +92,9 @@ When running either variant you must provide the names of two profiles, firstly 
 Below are some example maven command lines.  We typically register the command as an alias to save time.
 
 ```
-alias compile-maria='mvn clean compile -P waltz-mariadb,dev-maria'
+alias compile-postgres='mvn clean compile -P waltz-postgres,dev-postgres'
 alias compile-mssql='mvn clean compile -P waltz-mssql,dev-mssql'
-alias pkg-maria='mvn clean package -P waltz-mariadb,dev-maria'
+alias pkg-postgres='mvn clean package -P waltz-postrgres,dev-postgres'
 alias pkg-mssql='mvn clean package -P waltz-mssql,dev-mssql'
 ```
 
