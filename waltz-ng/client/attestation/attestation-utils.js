@@ -79,11 +79,11 @@ export function mkAttestationSummaryDataForApps(applications = [],
 
 
 export const attestationSummaryColumnDefs = [
-    mkEntityLinkGridCell("Name", "application", "left", "right"),
-    {field: "application.assetCode", name: "Asset Code"},
-    {field: "application.kindDisplay", name: "Kind"},
-    {field: "application.businessCriticalityDisplay", name: "Business Criticality"},
-    {field: "application.lifecyclePhaseDisplay", name: "Lifecycle Phase"},
-    {field: "attestation.attestedBy", name: "Last Attested By"},
-    mkDateGridCell("Last Attested At", "attestation.attestedAt", false, true)
+    mkEntityLinkGridCell("Name", "appRef", "left", "right"),
+    {field: "appAssetCode", name: "Asset Code"},
+    {field: "appKind", name: "Kind", cellFilter: "toDisplayName:'applicationKind'"},
+    {field: "appCriticality", name: "Business Criticality", cellFilter: "toDisplayName:'criticality'"},
+    {field: "appLifecyclePhase", name: "Lifecycle Phase", cellFilter: "toDisplayName:'lifecyclePhase'"},
+    {field: "attestedBy", name: "Last Attested By"},
+    mkDateGridCell("Last Attested At", "attestedAt", false, true)
 ];
