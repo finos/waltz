@@ -17,146 +17,278 @@
   ~
   -->
 
-<div class="row"
-     ng-if="$ctrl.applications.length > 0">
-    <div class="col-md-4">
-        <waltz-static-panels group-key="SECTION.ATTESTATION_SUMMARY.ABOUT"
-                             class="small"
-                             render-mode="minimal-border">
-        </waltz-static-panels>
-    </div>
-    <div class="col-md-4">
-        <waltz-pie-table data="$ctrl.summaryData.logical"
-                         config="$ctrl.config.logical"
-                         name="Logical Flow Attestation summary for Applications">
-        </waltz-pie-table>
-    </div>
-    <div class="col-md-4">
-        <waltz-pie-table data="$ctrl.summaryData.physical"
-                         config="$ctrl.config.physical"
-                         name="Physical Flow Attestation summary for Applications">
-        </waltz-pie-table>
-    </div>
-</div>
+<div class="row">
 
-<!-- THE GRID -->
-<div class="row"
-     ng-if="$ctrl.visibility.tableView">
-    <div class="col-md-12">
-        <waltz-grid-with-search entries="$ctrl.gridDataToDisplay"
-                                column-defs="$ctrl.columnDefs">
-        </waltz-grid-with-search>
-    </div>
-</div>
+    <div ng-if="$ctrl.attestationSummaries.length > 0"
+         class="waltz-tabs col-md-9">
+        <!-- TAB HEADERS -->
+        <input type="radio"
+               value="summary"
+               ng-model="$ctrl.activeTab"
+               ng-change="$ctrl.changeTab(null)"
+               id="summary">
+        <label class="wt-label"
+               ng-model="$ctrl.activeTab"
+               for="summary">
+            <span>Summary</span>
+        </label>
 
-<!-- YEAR, LIFECYCLE && DOWNLOAD -->
-<div class="row"
-     ng-if="$ctrl.visibility.tableView">
-    <div class="col-md-3">
-        <!-- LIFECYCLE SELECTION -->
-        <div style="padding-top: 0.5em;">
-            <span>
-                Lifecycle Phase:&nbsp;
-            </span>
-            <div class="btn-group"
-                 style="display: inline-block"
-                 uib-dropdown
-                 keyboard-nav
-                 dropdown-append-to-body>
-                <button type="button"
-                        class="btn btn-default"
-                        uib-dropdown-toggle>
-                    <span ng-if="$ctrl.selectedLifecycle === 0">
-                        All Lifecycles
-                    </span>
-                    <span ng-if="$ctrl.selectedLifecycle !== 0"
-                          ng-bind="$ctrl.selectedLifecycle | toDisplayName:'lifecyclePhase'">
-                    </span>
-                    <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu"
-                    uib-dropdown-menu
-                    role="menu">
-                    <li ng-repeat="lifecycle in $ctrl.lifecycleOptions"
-                        role="menuitem">
-                        <a class="clickable"
-                           ng-click="$ctrl.onChangeLifecycle(lifecycle)"
-                           ng-if="lifecycle === 0">
-                           All Lifecycles
-                        </a>
-                        <a class="clickable"
-                           ng-click="$ctrl.onChangeLifecycle(lifecycle)"
-                           ng-if="lifecycle !== 0"
-                           ng-bind="lifecycle | toDisplayName:'lifecyclePhase'">
-                        </a>
-                    </li>
-                </ul>
+        <input type="radio"
+               ng-repeat-start="summary in $ctrl.attestationSummaries track by summary.key"
+               value="{{summary.key}}"
+               ng-change="$ctrl.changeTab(summary)"
+               ng-model="$ctrl.activeTab"
+               id="{{summary.key}}">
+        <label class="wt-label"
+               ng-repeat-end=""
+               for="{{summary.key}}">
+            <span>{{summary.name}}</span>
+        </label>
+
+        <div class="wt-tab wt-active">
+            <div ng-if="$ctrl.activeTab === 'summary'"
+                 class="row"
+                 style="padding-top: 1em; padding-bottom: 0.7em; padding-left:1em">
+
+                <div class="col-md-4">
+                    <waltz-static-panels group-key="SECTION.ATTESTATION_SUMMARY.ABOUT"
+                                         class="small"
+                                         render-mode="minimal-border">
+                    </waltz-static-panels>
+                </div>
+                <div class="col-md-4"
+                     style="height: 200px;"
+                     ng-repeat="summary in $ctrl.attestationSummaries">
+                    <waltz-pie-table data="summary.attestationCounts"
+                                     config="$ctrl.config"
+                                     name="Attestation summary for {{summary.name}}">
+                    </waltz-pie-table>
+                </div>
+            </div>
+
+            <div ng-if="$ctrl.activeTab != 'summary'"
+                 class="row"
+                 style="padding-top: 1em; padding-bottom: 0.7em; padding-left:1em">
+
+                <div class="col-md-12">
+                    <waltz-grid-with-search entries="$ctrl.gridData"
+                                            column-defs="$ctrl.columnDefs">
+                    </waltz-grid-with-search>
+                </div>
             </div>
         </div>
     </div>
-    <div class="col-md-3">
-        <!-- YEAR SELECTION -->
-        <div ng-if="$ctrl.selectedSegment.key === 'ATTESTED'"
-             style="padding-top: 0.5em;">
-            <span>
-                Attestation year:&nbsp;
-            </span>
-            <div class="btn-group"
-                 style="display: inline-block"
-                 uib-dropdown
-                 keyboard-nav
-                 dropdown-append-to-body>
-                <button type="button"
-                        class="btn btn-default"
-                        uib-dropdown-toggle>
-                    <span ng-if="$ctrl.selectedYear === 0">
-                        All Years
-                    </span>
-                    <span ng-if="$ctrl.selectedYear !== 0"
-                          ng-bind="$ctrl.selectedYear">
-                    </span>
-                    <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu"
-                    uib-dropdown-menu
-                    role="menu">
-                    <li ng-repeat="year in $ctrl.yearOptions"
-                        role="menuitem">
-                        <a class="clickable"
-                           ng-click="$ctrl.onChangeYear(year)"
-                           ng-if="year === 0">
-                            All Years
-                        </a>
-                        <a class="clickable"
-                           ng-click="$ctrl.onChangeYear(year)"
-                           ng-if="year !== 0"
-                           ng-bind="year">
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6"
-         style="padding-top: 0.5em;">
-        <waltz-data-extract-link name="Download {{$ctrl.exportFlowType | toDisplayName:'entity'}} Attestations"
-                                 styling="link"
-                                 filename="Attestations.csv"
-                                 extract="{{$ctrl.extractUrl}}"
-                                 method="POST"
-                                 request-body="$ctrl.selectionOptions"
-                                 class="pull-right">
-        </waltz-data-extract-link>
-    </div>
-</div>
 
-<div class="row"
-     ng-if="$ctrl.applications.length === 0">
-    <div class="col-md-12">
-        <waltz-no-data >
+    <div class="col-md-9"
+         style="padding-top: 2em"
+         ng-if="$ctrl.attestationSummaries.length === 0">
+        <waltz-no-data>
             <message>
-                <strong>No attestations to show</strong> as there are no applications associated to this entity
+                <strong>No attestations to show</strong> as there are no applications associated to this entity or filters have been applied
             </message>
         </waltz-no-data>
     </div>
+
+    <div class="col-md-3" style="padding-top: 2em">
+        <waltz-sub-section name="Filters">
+            <content>
+                <div class="waltz-sub-section-content">
+                    <div class="help-block">
+                        <waltz-icon name="info-circle"></waltz-icon>
+                        Use the below controls to filter the attestations. Filters are also applied to the exports.
+                    </div>
+                    <div style="padding-top: 1.5em;">
+                        <div ng-include="'wass-lifecycle-phase'"></div>
+                    </div>
+                    <div style="padding-top: 1.5em;">
+                        <div ng-include="'wass-criticality'"></div>
+                    </div>
+                    <div style="padding-top: 1.5em;">
+                        <div ng-include="'wass-attestation-status'"></div>
+                    </div>
+                    <div style="padding-top: 1.5em;">
+                        <div ng-include="'wass-date-picker'"></div>
+                    </div>
+                    <div style="padding-top: 1.5em;">
+                        <button class="btn btn-skinny"
+                                ng-click="$ctrl.clearAllFilters()">
+                            <waltz-icon name="ban"></waltz-icon>
+                            Clear All Filters
+                        </button>
+                    </div>
+                </div>
+                <div class="waltz-sub-section-controls">
+                    <waltz-data-extract-link ng-if="$ctrl.activeTab != 'summary'"
+                                             name="Download {{$ctrl.activeTab.name}} Attestations"
+                                             styling="link"
+                                             filename="Attestations.csv"
+                                             extract="attestations/{{$ctrl.selectedTab.attestedKind}}/{{$ctrl.selectedTab.attestedId}}}"
+                                             method="POST"
+                                             request-body="$ctrl.appAttestationInfo"
+                                             class="pull-right">
+                    </waltz-data-extract-link>
+                </div>
+            </content>
+        </waltz-sub-section>
+        <br>
+        <waltz-warning ng-if="$ctrl.filtersApplied()">
+            <message>Filters have been applied!</message>
+            <content></content>
+        </waltz-warning>
+    </div>
 </div>
+
+
+<script type="text/ng-template"
+        id="wass-criticality">
+    <span>
+        Criticality:
+    </span>
+    <div class="btn-group pull-right"
+         style="display: inline-block"
+         uib-dropdown
+         keyboard-nav
+         dropdown-append-to-body>
+        <button type="button"
+                class="btn btn-default"
+                uib-dropdown-toggle>
+                    <span ng-if="$ctrl.selectedCriticality === 0">
+                        All Criticalities
+                    </span>
+            <span ng-if="$ctrl.selectedCriticality !== 0"
+                  ng-bind="$ctrl.selectedCriticality | toDisplayName:'criticality'">
+            </span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu"
+            uib-dropdown-menu
+            role="menu">
+            <li ng-repeat="criticality in $ctrl.criticalityOptions"
+                role="menuitem">
+                <a class="clickable"
+                   ng-click="$ctrl.onChangeCriticality(criticality)"
+                   ng-if="criticality === 0">
+                    All Criticalities
+                </a>
+                <a class="clickable"
+                   ng-click="$ctrl.onChangeCriticality(criticality)"
+                   ng-if="criticality !== 0"
+                   ng-bind="criticality | toDisplayName:'criticality'">
+                </a>
+            </li>
+        </ul>
+    </div>
+</script>
+
+
+<script type="text/ng-template"
+        id="wass-attestation-status">
+    <span>
+        Status:
+    </span>
+    <div class="btn-group pull-right"
+         style="display: inline-block"
+         uib-dropdown
+         keyboard-nav
+         dropdown-append-to-body>
+        <button type="button"
+                class="btn btn-default"
+                uib-dropdown-toggle>
+                    <span ng-if="$ctrl.selectedStatus === 0">
+                        All Statuses
+                    </span>
+            <span ng-if="$ctrl.selectedStatus !== 0"
+                  ng-bind="$ctrl.selectedStatus | toDisplayName:'attestationStatus'">
+            </span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu"
+            uib-dropdown-menu
+            role="menu">
+            <li ng-repeat="status in $ctrl.statusOptions"
+                role="menuitem">
+                <a class="clickable"
+                   ng-click="$ctrl.onChangeStatus(status)"
+                   ng-if="status === 0">
+                    All Statuses
+                </a>
+                <a class="clickable"
+                   ng-click="$ctrl.onChangeStatus(status)"
+                   ng-if="status !== 0"
+                   ng-bind="status | toDisplayName:'attestationStatus'">
+                </a>
+            </li>
+        </ul>
+    </div>
+</script>
+
+<script type="text/ng-template"
+        id="wass-date-picker">
+    <span>
+        Attestations From Date:
+    </span>
+    <div style="display:inline-block;" class="pull-right">
+        <span ng-if="!$ctrl.editingDate">
+            <strong>{{!$ctrl.selectedDate ? 'All Attestations' : $ctrl.selectedDate | date:'yyyy-MM-dd'}}</strong>
+            <button class="btn btn-skinny"
+                    ng-click="$ctrl.toggleEditDate()">
+                <waltz-icon name="pencil"></waltz-icon>
+            </button>
+        </span>
+            <span ng-if="$ctrl.editingDate">
+            <waltz-date-picker-form-input id="year"
+                                          place-holder="yyyy-MM-dd"
+                                          allow-past-dates="true"
+                                          format="yyyy-MM-dd"
+                                          model="$ctrl.selectedDate">
+            </waltz-date-picker-form-input>
+            <button class="btn btn-skinny pull-right"
+                    ng-click="$ctrl.saveDate()">
+                Apply date filter
+            </button>
+        </span>
+    </div>
+</script>
+
+
+
+<script type="text/ng-template"
+        id="wass-lifecycle-phase">
+    <span>
+        Lifecycle Phase:&nbsp;
+    </span>
+    <div class="btn-group pull-right"
+         style="display: inline-block"
+         uib-dropdown
+         keyboard-nav
+         dropdown-append-to-body>
+        <button type="button"
+                class="btn btn-default"
+                uib-dropdown-toggle>
+                    <span ng-if="$ctrl.selectedLifecycle === 0">
+                        All Lifecycles
+                    </span>
+            <span ng-if="$ctrl.selectedLifecycle !== 0"
+                  ng-bind="$ctrl.selectedLifecycle | toDisplayName:'lifecyclePhase'">
+                    </span>
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu"
+            uib-dropdown-menu
+            role="menu">
+            <li ng-repeat="lifecycle in $ctrl.lifecycleOptions"
+                role="menuitem">
+                <a class="clickable"
+                   ng-click="$ctrl.onChangeLifecycle(lifecycle)"
+                   ng-if="lifecycle === 0">
+                    All Lifecycles
+                </a>
+                <a class="clickable"
+                   ng-click="$ctrl.onChangeLifecycle(lifecycle)"
+                   ng-if="lifecycle !== 0"
+                   ng-bind="lifecycle | toDisplayName:'lifecyclePhase'">
+                </a>
+            </li>
+        </ul>
+    </div>
+</script>

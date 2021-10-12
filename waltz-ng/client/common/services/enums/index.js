@@ -22,6 +22,7 @@ import { action } from "./action";
 import { applicationKind } from "./application-kind";
 import { appGroupKind } from "./app-group-kind";
 import { attestationType } from "./attestation-type";
+import { attestationStatus } from "./attestation-status";
 import { BOOLEAN } from "./boolean";
 import { criticality } from "./criticality";
 import { changeInitiative } from "./change-initiative";
@@ -62,6 +63,7 @@ export const enums = {
     applicationRating,
     appGroupKind,
     attestationType,
+    attestationStatus,
     BOOLEAN,
     capabilityRating,
     changeAction,
