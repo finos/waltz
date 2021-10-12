@@ -22,14 +22,14 @@
     <waltz-section-actions>
         <!-- Edit Logical Split button -->
         <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR"
-             ng-if="$ctrl.visibility.dataTab == 0 && !$ctrl.isAnyEditorVisible()">
+             ng-if="$ctrl.activeTab.id === 'SUMMARY' && !$ctrl.isAnyEditorVisible()">
             <div class="btn-group"
                  uib-dropdown>
 
                 <button type="button"
                         class="btn btn-xs btn-primary"
                         data-ux="logical-flow-switch-to-edit-mode"
-                        ng-click="$ctrl.visibility.editor.logicalFlow = true">
+                        ng-click="$ctrl.edit()">
                     Edit
                 </button>
                 <button type="button"
@@ -42,7 +42,7 @@
                     role="menu">
                     <li role="menuitem">
                         <a href=""
-                           ng-click="$ctrl.visibility.editor.bulkLogicalFlows = true"
+                           ng-click="$ctrl.bulkLoad()"
                            class="small">
                             <waltz-icon name="upload"></waltz-icon>
                             Bulk Insert
@@ -63,7 +63,7 @@
 
         <!-- Edit Physical Split button -->
         <div waltz-has-role="LOGICAL_DATA_FLOW_EDITOR"
-             ng-if="$ctrl.visibility.dataTab == 1 && !$ctrl.isAnyEditorVisible()">
+             ng-if="$ctrl.activeTab.id === 'PHYSICAL' && !$ctrl.isAnyEditorVisible()">
             <div class="btn-group"
                  uib-dropdown>
 
@@ -81,7 +81,7 @@
                     role="menu">
                     <li role="menuitem">
                         <a href=""
-                           ng-click="$ctrl.visibility.editor.bulkPhysicalFlows = true"
+                           ng-click="$ctrl.bulkLoad()"
                            class="small">
                             <waltz-icon name="upload"></waltz-icon>
                             Bulk Insert
@@ -92,20 +92,19 @@
         </div>
 
         <button class="btn btn-xs waltz-btn-transparent"
-                ng-click="$ctrl.visibility.logicalFlows = ! $ctrl.visibility.logicalFlows">
+                ng-click="$ctrl.visibility.sourceDataRatings = ! $ctrl.visibility.sourceDataRatings">
             <waltz-icon name="map-signs"></waltz-icon>
         </button>
-
     </waltz-section-actions>
 
-    <waltz-source-data-overlay visible="$ctrl.visibility.logicalFlows"
+    <waltz-source-data-overlay visible="$ctrl.visibility.sourceDataRatings"
                                entities="['LOGICAL_DATA_FLOW', 'PHYSICAL_SPECIFICATION', 'PHYSICAL_FLOW']">
     </waltz-source-data-overlay>
 
     <div class="waltz-tabs">
-        <input ng-repeat-start="tab in $ctrl.displayedTabs track by tab.id"
+        <input ng-repeat-start="tab in $ctrl.tabs"
                type="radio"
-               ng-change="$ctrl.onTabChange()"
+               ng-change="$ctrl.resetToViewMode()"
                ng-model="$ctrl.activeTab"
                ng-value="tab"
                id="{{ tab.id + '_' + $id }}">
@@ -117,7 +116,21 @@
 
         <div class="wt-tab wt-active"
              ng-if="$ctrl.activeTab.id === 'SUMMARY'">
-            <div class="waltz-panel-content">
+
+            <div ng-if="$ctrl.activeMode === 'EDIT'">
+                <h4>Edit Logical Data Flows</h4>
+                <waltz-logical-flow-edit-panel parent-entity-ref="$ctrl.parentEntityRef">
+                </waltz-logical-flow-edit-panel>
+            </div>
+
+            <div ng-if="$ctrl.activeMode === 'BULK'">
+                <h4>Bulk Insert Logical Data Flows</h4>
+                <waltz-bulk-logical-flow-loader-wizard>
+                </waltz-bulk-logical-flow-loader-wizard>
+            </div>
+
+            <div class="waltz-panel-content"
+                 ng-if="$ctrl.activeMode === 'VIEW'">
                 <!-- NO DATA, BOTH FLOWS AND TYPES -->
                 <div ng-if="$ctrl.dataTypeUsages.length == 0 && $ctrl.logicalFlows.length == 0">
                     <waltz-no-data ng-if="$ctrl.dataTypeUsages.length == 0">
@@ -220,12 +233,21 @@
 
         <div class="wt-tab wt-active"
              ng-if="$ctrl.activeTab.id === 'PHYSICAL'">
-            <br>
-            <waltz-physical-data-section specifications="$ctrl.physicalSpecifications"
-                                         logical-flows="$ctrl.logicalFlows"
-                                         primary-ref="$ctrl.parentEntityRef"
-                                         physical-flows="$ctrl.physicalFlows">
-            </waltz-physical-data-section>
+
+            <div class="waltz-panel-content"
+                 ng-if="$ctrl.activeMode === 'VIEW'">
+                <br>
+                <waltz-physical-data-section specifications="$ctrl.physicalSpecifications"
+                                             logical-flows="$ctrl.logicalFlows"
+                                             primary-ref="$ctrl.parentEntityRef"
+                                             physical-flows="$ctrl.physicalFlows">
+                </waltz-physical-data-section>
+            </div>
+
+            <div ng-if="$ctrl.activeMode === 'BULK'">
+                <waltz-bulk-physical-flow-loader-wizard>
+                </waltz-bulk-physical-flow-loader-wizard>
+            </div>
         </div>
 
         <div class="wt-tab wt-active"
@@ -248,28 +270,5 @@
                 <waltz-svelte-component component="$ctrl.FlowClassificationLegend"></waltz-svelte-component>
             </p>
         </div>
-
-
     </div>
-
-
-    <!-- Editing -->
-    <div ng-if="$ctrl.visibility.editor.logicalFlow">
-        <h4>Edit Logical Data Flows</h4>
-        <waltz-logical-flow-edit-panel parent-entity-ref="$ctrl.parentEntityRef">
-        </waltz-logical-flow-edit-panel>
-    </div>
-
-    <div ng-if="$ctrl.visibility.editor.bulkLogicalFlows">
-        <h4>Bulk Insert Logical Data Flows</h4>
-        <waltz-bulk-logical-flow-loader-wizard>
-        </waltz-bulk-logical-flow-loader-wizard>
-    </div>
-
-    <div ng-if="$ctrl.visibility.editor.bulkPhysicalFlows">
-        <waltz-bulk-physical-flow-loader-wizard>
-        </waltz-bulk-physical-flow-loader-wizard>
-    </div>
-
-
 </div>
