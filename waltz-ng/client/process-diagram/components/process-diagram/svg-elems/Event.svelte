@@ -4,9 +4,6 @@
     export let obj;
     export let layout;
 
-    function onMouseEnter() {
-        // console.log("event:me:", obj);
-    }
 
     $: subTypeComponent = lookupSubTypeComponent(obj.objectSubType);
 
@@ -14,9 +11,7 @@
 </script>
 
 
-<g on:mouseenter={onMouseEnter}
-   class={obj.stereotype}>
-
+<g class={obj.stereotype}>
 
     <g transform="translate({layout.width / 2} 0)">
 
@@ -33,18 +28,9 @@
 
     <!-- subtype -->
     {#if subTypeComponent}
-        <clipPath id="myClip_{obj.objectId}">
-            <!--
-              Everything outside the circle will be
-              clipped and therefore invisible.
-            -->
-            <circle transform="translate({layout.width / 2} {layout.height / 2})"
-                    r={layout.width / 1.8}></circle>
-        </clipPath>
 
         <g transform="translate(0 {layout.height / 2 * -1})"
-           class="subtype"
-           clip-path="url(#myClip_{obj.objectId})">
+           class="subtype">
             <svelte:component this={subTypeComponent}
                               width={layout.width}
                               height={layout.height}/>

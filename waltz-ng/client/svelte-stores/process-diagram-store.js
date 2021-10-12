@@ -37,7 +37,12 @@ export function mkProcessDiagramStore() {
 
     const findByGenericSelector = (kind, idSelectionOptions, force = false) => {
         return remote
-            .fetchViewData("POST", `api/process-diagram/selector/${kind}`, idSelectionOptions, [], {force})
+            .fetchViewData(
+                "POST",
+                `api/process-diagram/selector/${kind}`,
+                idSelectionOptions,
+                [],
+                {force})
     }
 
     return {

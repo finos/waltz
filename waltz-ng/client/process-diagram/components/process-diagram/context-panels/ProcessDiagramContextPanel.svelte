@@ -21,14 +21,10 @@
         switch (selectedObject?.objectType) {
             case "Activity":
                 return ActivityContextPanel;
-            // case "Event":
-            //     return Event;
             case "Text":
                 return NavigationCellContextPanel;
             case "Decision":
                 return DecisionContextPanel;
-            // case "Boundary":
-            //     return Boundary;
             default:
                 return DefaultContextPanel;
         }

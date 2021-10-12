@@ -47,7 +47,6 @@ function combineDiagrams(flowDiagrams = [],
                          processDiagrams = [],
                          flowActions = []) {
 
-    console.log("Process", {processDiagrams})
     const convertFlowDiagramFn = d => {
         return {
             id: refToString(d),
@@ -153,8 +152,6 @@ function controller($q,
 
 
     function reload() {
-        console.log(vm.parentEntityRef)
-
 
         const promises = [
             loadFlowDiagrams(true),
@@ -175,9 +172,6 @@ function controller($q,
     vm.$onInit = () => {
         reload();
         vm.visibility.makeNew = determineIfCreateAllowed(vm.parentEntityRef.kind);
-    };
-
-    vm.$onChanges = (changes) => {
     };
 
     vm.onDiagramSelect = (diagram) => {
@@ -216,7 +210,6 @@ function controller($q,
             return;
         }
 
-        let newDiagramId = null;
         serviceBroker
             .execute(CORE_API.FlowDiagramStore.makeNewForEntityReference, [vm.parentEntityRef, name])
             .then(r => {

@@ -52,23 +52,6 @@ const connectorLayoutAdjustments = {
     }
 }
 
-
-export function mkConnectorPoints(layoutById, conn) {
-    const start = layoutById[conn.startObjectId];
-    const end = layoutById[conn.endObjectId];
-
-    const startAdjustment = _.get(connectorLayoutAdjustments, [start.data.objectType]);
-    const endAdjustment = _.get(connectorLayoutAdjustments, [end.data.objectType]);
-
-    const x1 = start.x + start.width + _.get(startAdjustment, ["x"] , 0);
-    const y1 = start.y + start.height / 2 + _.get(startAdjustment, ["y"] , 0);
-
-    const x2 = end.x + _.get(endAdjustment, ["x"] , 0);
-    const y2 = end.y + end.height / 2 + _.get(endAdjustment, ["y"] , 0);
-
-    return `${x1},${y1} ${x2},${y2}`;
-}
-
 function lineToSPath(x1, y1, x2, y2, c = 0.2) {
     const dx = x2 - x1;
     const dy = y2 - y1;
@@ -113,18 +96,6 @@ export function mkConnectorPath(layoutById, conn) {
     return lineToSPath(x1, y1, x2, y2);
 }
 
-
-const objectLayoutAdjustments = {
-    Event: {
-        y: 26
-    },
-    Decision: {
-        y: 0 //-18
-    }
-}
-
-
-
 export function mkLayoutData(objects = [], positions = []) {
     const bounds = calcBounds(positions);
     const positionsByObjectId = _.keyBy(positions, d => d.objectId);
@@ -132,12 +103,11 @@ export function mkLayoutData(objects = [], positions = []) {
     return _
         .chain(objects)
         .map(d => {
-            const adjustment =  objectLayoutAdjustments[d.objectType];
             const basePosition = positionsByObjectId[d.objectId];
             return {
                 id: d.objectId,
-                x: basePosition.position.x, //+ _.get(adjustment, ["x"], 0),
-                y: bounds.height - (basePosition.position.y),// + _.get(adjustment, ["y"], 0),
+                x: basePosition.position.x,
+                y: bounds.height - (basePosition.position.y),
                 width: basePosition.width,
                 height: basePosition.height,
                 data: d,
@@ -166,7 +136,7 @@ export function toComp(obj) {
 
 
 export function findAssociatedApps(appsByDiagramMeasurableId, obj){
-    const waltzId = _.get(obj, ['waltzReference', 'id']);
+    const waltzId = _.get(obj, ["waltzReference", "id"]);
     return _.get(appsByDiagramMeasurableId, [waltzId], []);
 }
 

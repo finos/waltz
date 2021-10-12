@@ -5,11 +5,8 @@
     export let layout;
     export let isSelected;
 
-    function onMouseEnter() {
-        console.log("decision:me:", obj);
-    }
-
     let points = "";
+
     $: {
         const w = layout.width;
         const h = layout.height;
@@ -27,7 +24,7 @@
 </script>
 
 
-<g on:mouseenter={onMouseEnter}>
+<g>
 
     <polyline class={isSelected ? "selected" : ""}
               stroke-linecap="square"

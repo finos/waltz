@@ -2,7 +2,6 @@
     export let width = 10;
     export let height= 10;
 
-
     $: hands = `
         M ${width/5 * 2}, ${height/5 * 2}
         L ${width/2}, ${height/2}

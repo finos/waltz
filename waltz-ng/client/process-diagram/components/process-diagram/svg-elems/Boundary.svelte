@@ -2,18 +2,13 @@
     export let obj;
     export let layout;
 
-    function onMouseEnter() {
-        console.log("activity:me:", obj);
-    }
-
 </script>
 
 
 <rect rx="10"
       ry="10"
       width={layout.width}
-      height={layout.height}
-      on:mouseenter={onMouseEnter}>
+      height={layout.height}>
 </rect>
 
 <foreignObject width={layout.width}
