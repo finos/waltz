@@ -30,7 +30,6 @@ import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.datatype.DataTypeUsageCharacteristics;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
-import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import com.khartec.waltz.service.changelog.ChangeLogService;
@@ -57,7 +56,6 @@ import static com.khartec.waltz.model.EntityKind.*;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
 
 @Service
 public class DataTypeDecoratorService {
@@ -230,6 +228,7 @@ public class DataTypeDecoratorService {
                 dtId -> mkDecorator(userName, entityReference, dtId, Optional.empty()));
     }
 
+
     private ImmutableDataTypeDecorator mkDecorator(String userName,
                                                    EntityReference entityReference,
                                                    Long dtId,
@@ -277,6 +276,7 @@ public class DataTypeDecoratorService {
                 .getDao(entityKind)
                 .findByFlowIds(ids);
     }
+
 
     private void audit(String message,
                        EntityReference entityReference,
