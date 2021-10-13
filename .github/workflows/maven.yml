@@ -49,7 +49,7 @@ jobs:
     - name: Publish build
       uses: actions/upload-artifact@v2
       with:
-        name: waltz-web.war
+        name: waltz-web-postgres.war
         path: waltz-web/target/waltz-web.war
 
     - name: Publish liquibase changelogs
@@ -57,5 +57,9 @@ jobs:
       with:
         name: liquibase-changelogs
         path: waltz-data/src/main/ddl/liquibase/
+    
+    - name: Publish Test Report
+      if: ${{ always() }}
+      uses: scacap/action-surefire-report@v1
 
 

@@ -18,12 +18,22 @@
 
 package com.khartec.waltz.jobs.harness;
 
+import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.attestation.AttestationInstanceDao;
-import com.khartec.waltz.model.attestation.AttestationInstance;
+import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.attestation.*;
 import com.khartec.waltz.service.DIConfiguration;
+import com.khartec.waltz.service.attestation.AttestationInstanceService;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.util.List;
+import java.util.Set;
+
+import static com.khartec.waltz.common.FunctionUtilities.time;
+import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 
 
 public class AttestationInstanceHarness {
@@ -33,15 +43,36 @@ public class AttestationInstanceHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
         AttestationInstanceDao attestationInstanceDao = ctx.getBean(AttestationInstanceDao.class);
+        AttestationInstanceService svc = ctx.getBean(AttestationInstanceService.class);
+
+        IdSelectionOptions opts = mkOpts(mkRef(EntityKind.APPLICATION, 20506L));
+        IdSelectionOptions group = mkOpts(mkRef(EntityKind.APP_GROUP, 433L));
+        IdSelectionOptions org = mkOpts(mkRef(EntityKind.ORG_UNIT, 6811));
+        ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
+        Select<Record1<Long>> appIds = applicationIdSelectorFactory.apply(opts);
 
         long st = System.currentTimeMillis();
         System.out.println("-- start");
 
-        List<AttestationInstance> instances = attestationInstanceDao.findByRecipient("kamran.saleem@db.com", true);
-        List<AttestationInstance> instancesAll = attestationInstanceDao.findByRecipient("kamran.saleem@db.com", false);
+        ApplicationAttestationSummaryFilters filters = ImmutableApplicationAttestationSummaryFilters.builder()
+                .build();
 
-        System.out.println("-- end, dur: " + (System.currentTimeMillis() - st));
+        ImmutableApplicationAttestationInstanceInfo info = ImmutableApplicationAttestationInstanceInfo.builder()
+                .filters(filters)
+                .selectionOptions(org)
+                .build();
 
+        Set<ApplicationAttestationInstanceSummary> sumaries = time("instacnes", () -> svc.findApplicationAttestationInstancesForKindAndSelector(
+                EntityKind.LOGICAL_DATA_FLOW,
+                null,
+                info));
+
+        System.out.println(sumaries);
+
+        Set<ApplicationAttestationSummaryCounts> summary = time("summary", () -> svc
+                .findAttestationInstanceSummaryForSelector(info));
+
+        System.out.println(summary);
 
     }
 

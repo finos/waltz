@@ -32,6 +32,7 @@ export function determineDownwardsScopeForKind(kind) {
         case "MEASURABLE_CATEGORY":
         case "PHYSICAL_FLOW":
         case "PHYSICAL_SPECIFICATION":
+        case "PROCESS_DIAGRAM":
         case "SCENARIO":
         case "SERVER":
         case "SOFTWARE":

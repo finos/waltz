@@ -39,8 +39,8 @@ function utils(serviceBroker) {
         switch (kind) {
             case 'APP_GROUP':
                 return serviceBroker
-                    .loadViewData(CORE_API.AppGroupStore.findMyGroupSubscriptions, [])
-                    .then(r => _.map(r.data, 'appGroup'));
+                    .loadViewData(CORE_API.AppGroupStore.getById, [id])
+                    .then(r => r.data);
             case 'MEASURABLE':
                 return serviceBroker
                     .loadAppData(CORE_API.MeasurableStore.findAll, [])
@@ -61,7 +61,7 @@ function utils(serviceBroker) {
                 return serviceBroker
                     .loadViewData(CORE_API.ScenarioStore.getById, [id])
                     .then(r => serviceBroker
-                            .loadViewData(CORE_API.ScenarioStore.findForRoadmap, [r.data.scenario.roadmapId]))
+                        .loadViewData(CORE_API.ScenarioStore.findForRoadmap, [r.data.scenario.roadmapId]))
                     .then(r => r.data);
             default :
                 throw `esu: Cannot create hierarchy for kind - ${kind}`;

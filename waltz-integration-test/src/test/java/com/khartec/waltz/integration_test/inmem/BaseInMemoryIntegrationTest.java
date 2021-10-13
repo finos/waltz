@@ -8,6 +8,7 @@ import com.khartec.waltz.data.app_group.AppGroupDao;
 import com.khartec.waltz.data.app_group.AppGroupEntryDao;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
+import com.khartec.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
@@ -24,7 +25,10 @@ import com.khartec.waltz.model.app_group.AppGroup;
 import com.khartec.waltz.model.app_group.AppGroupKind;
 import com.khartec.waltz.model.app_group.ImmutableAppGroup;
 import com.khartec.waltz.model.application.*;
+import com.khartec.waltz.model.datatype.DataTypeDecorator;
+import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
 import com.khartec.waltz.model.measurable_category.MeasurableCategory;
+import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
 import com.khartec.waltz.schema.tables.records.MeasurableRecord;
@@ -50,10 +54,13 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
+import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
+import static com.khartec.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
@@ -149,15 +156,15 @@ public class BaseInMemoryIntegrationTest {
 
     private Services setupServices() {
         Services s = new Services();
-        s.logicalFlowService = ctx.getBean(LogicalFlowService.class);
-        s.dataTypeDecoratorService = ctx.getBean(DataTypeDecoratorService.class);
-        s.dataTypeService = ctx.getBean(DataTypeService.class);
         s.appGroupService = ctx.getBean(AppGroupService.class);
-        s.bookmarkService = ctx.getBean(BookmarkService.class);
         s.attestationInstanceService = ctx.getBean(AttestationInstanceService.class);
         s.attestationRunService = ctx.getBean(AttestationRunService.class);
+        s.bookmarkService = ctx.getBean(BookmarkService.class);
+        s.dataTypeDecoratorService = ctx.getBean(DataTypeDecoratorService.class);
+        s.dataTypeService= ctx.getBean(DataTypeService.class);
         s.involvementKindService = ctx.getBean(InvolvementKindService.class);
         s.involvementService = ctx.getBean(InvolvementService.class);
+        s.logicalFlowService = ctx.getBean(LogicalFlowService.class);
         s.physicalSpecificationService = ctx.getBean(PhysicalSpecificationService.class);
         s.physicalFlowService = ctx.getBean(PhysicalFlowService.class);
         return s;
@@ -166,11 +173,11 @@ public class BaseInMemoryIntegrationTest {
 
     private Helpers setupHelpers() {
         Helpers h = new Helpers();
-        h.logicalFlowHelper = new LogicalFlowHelper(daos.logicalFlowDao);
-        h.physicalSpecHelper = new PhysicalSpecHelper(services.physicalSpecificationService);
         h.involvementHelper = new InvolvementHelper(services.involvementService, services.involvementKindService);
+        h.logicalFlowHelper = new LogicalFlowHelper(daos.logicalFlowDao);
         h.personHelper = new PersonHelper(ctx.getBean(DSLContext.class));
         h.physicalFlowHelper = new PhysicalFlowHelper(services.physicalFlowService, services.physicalSpecificationService);
+        h.physicalSpecHelper = new PhysicalSpecHelper(services.physicalSpecificationService);
         return h;
     }
 
@@ -317,11 +324,10 @@ public class BaseInMemoryIntegrationTest {
     }
 
 
-    public void createUnknownDatatype(){
-
+    public void createUnknownDatatype() {
         DSLContext dsl = getDsl();
 
-        dsl.deleteFrom(DATA_TYPE).execute();
+        clearAllDataTypes();
 
         dsl.insertInto(DATA_TYPE)
                 .columns(
@@ -355,6 +361,42 @@ public class BaseInMemoryIntegrationTest {
         return id;
     }
 
+
+    public void createDataType(Long id, String name, String code) {
+        DSLContext dsl = getDsl();
+
+        dsl.insertInto(DATA_TYPE)
+                .columns(
+                        DATA_TYPE.ID,
+                        DATA_TYPE.NAME,
+                        DATA_TYPE.DESCRIPTION,
+                        DATA_TYPE.CODE)
+                .values(id, name, name, code)
+                .execute();
+    }
+
+
+    public void clearAllDataTypes(){
+        DSLContext dsl = getDsl();
+        dsl.deleteFrom(DATA_TYPE).execute();
+    }
+
+
+    public void createLogicalFlowDecorators(EntityReference flowRef, Set<Long> dtIds) {
+        DSLContext dsl = getDsl();
+
+        List<DataTypeDecorator> decorators = map(dtIds, dtId -> ImmutableDataTypeDecorator.builder()
+                .rating(AuthoritativenessRatingValue.NO_OPINION)
+                .entityReference(flowRef)
+                .decoratorEntity(mkRef(EntityKind.DATA_TYPE, dtId))
+                .provenance("waltz")
+                .lastUpdatedAt(nowUtc())
+                .lastUpdatedBy("test")
+                .build());
+
+        LogicalFlowDecoratorDao dao = ctx.getBean(LogicalFlowDecoratorDao.class);
+        dao.addDecorators(decorators);
+    }
 
 
     public Long createAppGroupWithAppRefs(String groupName, Collection<EntityReference> appRefs) {

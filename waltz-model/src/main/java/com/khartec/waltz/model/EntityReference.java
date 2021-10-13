@@ -71,11 +71,17 @@ public abstract class EntityReference implements EntityLifecycleStatusProvider, 
 
 
     public static EntityReference mkRef(EntityKind kind, long id, String name, String description) {
+        return mkRef(kind, id, name, description, null);
+    }
+
+
+    public static EntityReference mkRef(EntityKind kind, long id, String name, String description, String externalId) {
         return ImmutableEntityReference.builder()
                 .kind(kind)
                 .id(id)
                 .name(Optional.ofNullable(name))
                 .description(description)
+                .externalId(Optional.ofNullable(externalId))
                 .build();
     }
 

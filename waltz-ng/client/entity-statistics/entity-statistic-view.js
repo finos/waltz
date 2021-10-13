@@ -25,6 +25,7 @@ import {CORE_API} from "../common/services/core-api-utils";
 
 
 import template from "./entity-statistic-view.html";
+import {mkRef} from "../common/entity-utils";
 
 
 const initData = {
@@ -81,6 +82,8 @@ function controller($q,
     const entityKind = $stateParams.kind;
     const entityId = $stateParams.id;
 
+    vm.parentRef = mkRef(entityKind, entityId);
+
     vm.statRef = {
         id: statId,
         kind: "ENTITY_STATISTIC"
@@ -95,20 +98,23 @@ function controller($q,
         .then(() => vm.visibility.related = hasRelatedDefinitions(vm.relatedDefinitions));
 
     const navItemPromise = entityStatisticUtilities
-        .findAllForKind(entityKind, entityId)
-        .then(xs => vm.navItems = xs);
+        .findAllForKind(entityKind, entityId);
 
     const allDefinitionsPromise = serviceBroker
         .loadViewData(CORE_API.EntityStatisticStore.findAllActiveDefinitions, [])
-        .then(r => vm.allDefinitions = r.data);
+        .then(r => r.data);
 
     const orgUnitsPromise = serviceBroker
         .loadAppData(CORE_API.OrgUnitStore.findAll, [])
         .then(r => vm.orgUnits = r.data);
 
-    $q.all([navItemPromise, definitionPromise])
-        .then(() => /* boot */ vm.onSelectNavItem(_.find(vm.navItems, { id: entityId })))
-        .then(allDefinitionsPromise)
+    $q.all([navItemPromise, definitionPromise, allDefinitionsPromise])
+        .then(([navItems, definition, definitions]) => /* boot */ {
+            vm.allDefinitions = definitions;
+            vm.navItems = navItems
+            const navItem = _.find(navItems, n => n.id === entityId && n.kind === entityKind);
+            vm.onSelectNavItem(navItem)
+        })
         .then(orgUnitsPromise);
 
     function resetValueData() {

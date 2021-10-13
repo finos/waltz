@@ -244,7 +244,7 @@ public class EntityStatisticSummaryDao {
         Result<Record3<String, T, Timestamp>> values = dsl
                 .select(esv.OUTCOME, aggregateField, max(esv.CREATED_AT).as(maxCreatedAtField))
                 .from(esv)
-                .where(condition)
+                .where(dsl.renderInlined(condition))
                 .groupBy(esv.OUTCOME)
                 .fetch();
 

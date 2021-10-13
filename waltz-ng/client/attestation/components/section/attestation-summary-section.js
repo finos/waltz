@@ -20,115 +20,106 @@ import template from "./attestation-summary-section.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {determineDownwardsScopeForKind, mkSelectionOptions} from "../../../common/selector-utils";
-import {attestationPieConfig, prepareSummaryData} from "../../attestation-pie-utils";
-import {entity} from "../../../common/services/enums/entity";
-import {attestationSummaryColumnDefs, mkAttestationSummaryDataForApps} from "../../attestation-utils";
+import {attestationPieConfig} from "../../attestation-pie-utils";
+import {attestationSummaryColumnDefs} from "../../attestation-utils";
 import {entityLifecycleStatus} from "../../../common/services/enums/entity-lifecycle-status";
 import {lifecyclePhase} from "../../../common/services/enums/lifecycle-phase";
 import * as _ from "lodash";
-import moment from "moment";
+import {criticality} from "../../../common/services/enums/criticality";
+import {attestationStatus} from "../../../common/services/enums/attestation-status";
 
 
 const initialState = {
     columnDefs: attestationSummaryColumnDefs,
-    rawGridData: [],
-    gridDataToDisplay: [],
-
-    selectedFlowType: null,
-    selectedYear: null,
     selectedLifecycle: null,
-    selectedSegment: null,
-    selectedAttestationType: null,
-
-    extractUrl: null,
-
-    visibility : {
-        tableView: false
-    }
+    selectedCriticality: null,
+    activeTab: "summary",
+    gridData: [],
+    gridFilters: {},
+    selectedTab: null,
+    selectedDate: null,
+    selectedStatus: null,
+    editingDate: false
 };
 
 
 const bindings = {
     parentEntityRef: "<",
     filters: "<",
-    selectedYear: "<",
-    selectedLifecycle: "<",
-    selectedAppsByYear: "<"
 };
 
-const ALL_YEARS = 0;
 const ALL_LIFECYCLES = 0;
+const ALL_CRITICALITIES = 0;
+const ALL_STATUSES = 0;
 
 
-/**
- * Constructs an export url
- * @param attestationType
- * @param segment (optional)
- * @param year (optional, but needed if segment is provided)
- * @param lifecycle (application lifecycle phase; different from entityLifeCycle)
- * @returns {string}
- */
-function mkExtractUrl(attestationType, segment, year, lifecycle) {
-    const status = _.get(segment, "key", null);
 
-    const statusParam = _.isNil(status)
-        ? ""
-        : `status=${status}`
-
-    const yearParam = status === "NEVER_ATTESTED" || year === ALL_YEARS
-        ? ""
-        : `&year=${year}`;
-
-    const lifecycleParam = lifecycle === ALL_LIFECYCLES
-        ? ""
-        : `&lifecycle=${lifecycle}`;
-
-    return `attestations/${attestationType}?${statusParam}${yearParam}${lifecycleParam}`;
-}
-
-
-function calcGridData(segment, gridData, year, lifecycle) {
-    if (_.isNil(segment)) {
-        // return everything as no segments have been selected (i.e. total was clicked)
-        return gridData;
-    } else if (segment.key === "NEVER_ATTESTED" && lifecycle === 0) {
-        // the unattested segment was clicked, so show only rows without an attestation and with all lifecycle phasea
-        return _.filter(gridData, d => _.isNil(d.attestation));
-    } else if (segment.key === "NEVER_ATTESTED" && lifecycle !== 0) {
-        // the unattested segment was clicked, so show only rows without an attestation and with selected lifecycle phase
-        return _.filter(gridData, d => _.isNil(d.attestation) && d.application.lifecyclePhase === lifecycle);
-    } else if (year === ALL_YEARS && lifecycle === 0){
-        // the attested segment was clicked, so show only rows with an attestation and with all lifecycle phasea
-        return _.filter(gridData, d => !_.isNil(d.attestation));
-    } else if (year === ALL_YEARS && lifecycle !== 0){
-        // the attested segment was clicked, so show only rows with an attestation and with selected lifecycle phase
-        return _.filter(gridData, d => !_.isNil(d.attestation) && d.application.lifecyclePhase === lifecycle);
-    } else if (lifecycle === 0){
-        // the attested segment was clicked, so show only rows with an attestation and attestation date in year and with all lifecycle phases
-        return _
-            .chain(gridData)
-            .filter(d => !_.isNil(d.attestation))  // attestation exists
-            .filter(d => (moment(d.attestation.attestedAt, "YYYY-MM-DD").year()) === year)
-            .value();
-    } else{
-        // the attested segment was clicked, so show only rows with an attestation and attestation date in year and with selected lifecycle phase
-        return _
-            .chain(gridData)
-            .filter(d => !_.isNil(d.attestation))  // attestation exists
-            .filter(d => (moment(d.attestation.attestedAt, "YYYY-MM-DD").year()) === year)
-            .filter(d => d.application.lifecyclePhase === lifecycle)
-            .value();
+function determineName(summary, categoriesById) {
+    switch (summary.attestedKind) {
+        case "LOGICAL_DATA_FLOW":
+            return "Logical Flows";
+        case "PHYSICAL_FLOW":
+            return "Physical Flows"
+        case "MEASURABLE_CATEGORY":
+            return _.get(categoriesById, [summary.attestedId, "name"], "unknown category");
+        default:
+            throw "Cannot determine name for unknown attested entity kind: " + summary.attestedKind
     }
 }
 
-
-function controller($q,
-                    serviceBroker,
-                    displayNameService) {
+function controller($q, serviceBroker) {
     const vm = initialiseData(this, initialState);
 
+    const loadGridData = (attestedKind, attestedId) => {
+        serviceBroker
+            .loadViewData(
+                CORE_API.AttestationInstanceStore.findApplicationInstancesForKindAndSelector,
+                [attestedKind, attestedId, vm.appAttestationInfo])
+            .then(r => vm.gridData = r.data);
+    }
 
-    const loadData = () => {
+    const loadSummaryData = () => {
+
+        const attestationSummaryPromise = serviceBroker
+            .loadViewData(
+                CORE_API.AttestationInstanceStore.findApplicationAttestationSummary,
+                [vm.appAttestationInfo])
+            .then(r => r.data);
+
+        const measurableCategoriesPromise = serviceBroker
+            .loadAppData(CORE_API.MeasurableCategoryStore.findAll)
+            .then(r => r.data);
+
+        $q.all([attestationSummaryPromise, measurableCategoriesPromise])
+            .then(([summaryInfo, measurableCategories]) => {
+
+                const categoriesById = _.keyBy(measurableCategories, c => c.id);
+
+                vm.attestationSummaries = _
+                    .chain(summaryInfo)
+                    .map(i => Object.assign({}, i, {name: determineName(i, categoriesById), key: `${i.attestedKind}_${i.attestedId}`}))
+                    .sortBy("name")
+                    .value();
+            });
+    };
+
+    vm.$onInit = () => {
+
+        vm.lifecycleOptions = _.concat(ALL_LIFECYCLES, _.values(_.mapValues(lifecyclePhase, function(l) { return l.key })));
+        vm.selectedLifecycle = ALL_LIFECYCLES;
+
+        vm.criticalityOptions = _.concat(ALL_CRITICALITIES, _.values(_.mapValues(criticality, function(l) { return l.key })));
+        vm.selectedCriticality = ALL_CRITICALITIES;
+
+        vm.statusOptions = _.concat(ALL_CRITICALITIES, _.values(_.mapValues(attestationStatus, function(l) { return l.key })));
+        vm.selectedStatus = ALL_STATUSES;
+
+        vm.config = attestationPieConfig;
+
+        loadSummaryData();
+    };
+
+    vm.$onChanges = (changes) => {
 
         vm.selectionOptions = mkSelectionOptions(
             vm.parentEntityRef,
@@ -136,102 +127,68 @@ function controller($q,
             [entityLifecycleStatus.ACTIVE.key],
             vm.filters);
 
-        const attestationInstancePromise = serviceBroker
-            .loadViewData(
-                CORE_API.AttestationInstanceStore.findBySelector,
-                [vm.selectionOptions])
-            .then(r => r.data);
-
-        const appPromise = serviceBroker
-            .loadViewData(
-                CORE_API.ApplicationStore.findBySelector,
-                [vm.selectionOptions])
-            .then(r => r.data);
-
-        $q.all([attestationInstancePromise, appPromise])
-            .then(([attestationInstances, applications]) => {
-                vm.applications = applications;
-                const instancesByKind = _.groupBy(attestationInstances, d => d.attestedEntityKind);
-                vm.gridDataByLogicalFlow = mkAttestationSummaryDataForApps(applications, instancesByKind[entity.LOGICAL_DATA_FLOW.key], displayNameService);
-                vm.gridDataByPhysicalFlow = mkAttestationSummaryDataForApps(applications, instancesByKind[entity.PHYSICAL_FLOW.key], displayNameService);
-
-                vm.summaryData = {
-                    logical: prepareSummaryData(vm.gridDataByLogicalFlow, vm.selectedYear),
-                    physical: prepareSummaryData(vm.gridDataByPhysicalFlow, vm.selectedYear)
-                };
-            });
-    };
-
-
-    vm.$onInit = () => {
-        const currentYear = moment().year();
-        vm.yearOptions = [
-            ALL_YEARS,
-            currentYear,
-            currentYear - 1,
-            currentYear - 2,
-            currentYear - 3
-        ];
-        vm.selectedYear = ALL_YEARS;
-        vm.lifecycleOptions = _.concat(ALL_LIFECYCLES, _.values(_.mapValues(lifecyclePhase, function(l) { return l.key })));
-        vm.selectedLifecycle = ALL_LIFECYCLES;
-
-        vm.config =  {
-            logical: Object.assign({}, attestationPieConfig, { onSelect: onSelectLogicalFlowSegment }),
-            physical: Object.assign({}, attestationPieConfig, { onSelect: onSelectPhysicalFlowSegment }),
-        };
-
-        loadData();
-    };
-
-
-    vm.$onChanges = (changes) => {
         if(changes.filters) {
-            loadData();
+            vm.loadData();
         }
     };
 
-
-    // -- INTERACT ----
-    function updateGridData() {
-        const segment = vm.selectedSegment;
-        const year = vm.selectedYear;
-        const lifecycle = vm.selectedLifecycle;
-        const gridData = vm.rawGridData;
-        const attestationType = vm.selectedAttestationType;
-
-        vm.extractUrl = mkExtractUrl(attestationType, segment, year, lifecycle);
-        vm.gridDataToDisplay = calcGridData(segment, gridData, year, lifecycle);
-        vm.visibility.tableView = true;
+    vm.changeTab = (summary) => {
+        vm.selectedTab = summary;
+        vm.loadData();
     }
 
-
-    vm.onChangeYear = (year) => {
-        vm.selectedYear = Number(year);
-        loadData();
-        updateGridData();
+    vm.clearAllFilters = () => {
+        vm.selectedDate = null;
+        vm.selectedStatus = ALL_STATUSES;
+        vm.selectedLifecycle = ALL_LIFECYCLES;
+        vm.selectedCriticality = ALL_CRITICALITIES
+        vm.gridFilters = {};
+        vm.loadData();
     };
 
     vm.onChangeLifecycle = (lifecycle) => {
-        vm.selectedLifecycle = Number(lifecycle) ? 0 : lifecycle;
-        loadData();
-        updateGridData();
+        vm.gridFilters.appLifecyclePhase = lifecycle === ALL_LIFECYCLES ? null : lifecycle;
+        vm.selectedLifecycle = lifecycle;
+        vm.loadData();
     };
 
+    vm.onChangeCriticality = (criticality) => {
+        vm.gridFilters.appCriticality = criticality === ALL_CRITICALITIES ? null : criticality;
+        vm.selectedCriticality = criticality;
+        vm.loadData();
+    };
 
-    function onSelectLogicalFlowSegment(segment) {
-        vm.rawGridData = vm.gridDataByLogicalFlow;
-        vm.selectedSegment = segment;
-        vm.selectedAttestationType = "LOGICAL_DATA_FLOW";
-        updateGridData();
+    vm.onChangeStatus = (status) => {
+        vm.gridFilters.attestationState = status === ALL_STATUSES ? null : status;
+        vm.selectedStatus = status;
+        vm.loadData();
+    };
+
+    vm.toggleEditDate = () => {
+        vm.editingDate = true;
     }
 
+    vm.saveDate = () => {
+        vm.gridFilters.attestationsFromDate = vm.selectedDate;
+        vm.editingDate = false;
+        vm.loadData();
+    }
 
-    function onSelectPhysicalFlowSegment(segment) {
-        vm.rawGridData = vm.gridDataByPhysicalFlow;
-        vm.selectedSegment = segment;
-        vm.selectedAttestationType = "PHYSICAL_FLOW";
-        updateGridData();
+    vm.loadData = () => {
+        vm.appAttestationInfo = {
+            selectionOptions: vm.selectionOptions,
+            filters: vm.gridFilters
+        }
+
+        if(!_.isEmpty(vm.selectedTab)){
+            loadGridData(vm.selectedTab.attestedKind, vm.selectedTab.attestedId);
+        } else {
+            loadSummaryData();
+        }
+    }
+
+    vm.filtersApplied = () => {
+        return vm.selectedStatus || vm.selectedCriticality || vm.selectedLifecycle || vm.selectedDate
     }
 }
 
@@ -239,7 +196,6 @@ function controller($q,
 controller.$inject = [
     "$q",
     "ServiceBroker",
-    "DisplayNameService"
 ];
 
 
@@ -253,5 +209,4 @@ const component = {
 export default {
     component,
     id: "waltzAttestationSummarySection",
-    controllerAs: "$ctrl"
 };
