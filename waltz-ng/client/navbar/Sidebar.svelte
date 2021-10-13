@@ -7,9 +7,29 @@
     import {scaleLinear} from "d3-scale";
     import {yellow} from "../common/colors";
 
-    function activateSection(section) {
-        activeSections.add(section)
+    let jumpOffset = 250;
+
+    function activateSection(section, offset) {
+        activeSections.add(section);
+        window.scrollTo(0, offset);
     }
+
+    function calcJumpOffset(pageKind) {
+        switch(pageKind){
+            case "main.app.view":
+                return 300;
+            case "main.measurable.view":
+            case "main.org-unit.view":
+                return 500;
+            case "main.process-diagram.view":
+            case "main.flow-diagram.view":
+                return 600;
+            default:
+                return 250;
+        }
+    }
+
+    $: jumpOffset = calcJumpOffset($activeSections.pageKind);
 
     $: activeSectionIds = _.map($activeSections.sections, d => d.id);
 
@@ -27,7 +47,7 @@
                 <button class="btn-skinny no-overflow"
                         title={section.description}
                         class:selected={_.includes(activeSections.sections, section)}
-                        on:click={() => activateSection(section)}>
+                        on:click={() => activateSection(section, jumpOffset)}>
                     <span style={`color: ${colorScale(_.indexOf(activeSectionIds, section.id))}`}>
                         <Icon size="lg"
                               name={section.icon}/>
@@ -43,7 +63,7 @@
                             <li class={_.includes(activeSectionIds, child.id) ? "selected-sidenav" : "sidenav"}>
                                 <button class="btn-skinny no-overflow"
                                         title={child.description}
-                                        on:click={() => activateSection(child)}>
+                                        on:click={() => activateSection(child, jumpOffset)}>
                                     <span style={`color: ${colorScale(_.indexOf(activeSectionIds, child.id))}`}>
                                         <Icon size="lg"
                                               name={child.icon}/>

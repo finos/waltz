@@ -106,10 +106,32 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                 return mkForTag(options);
             case DATABASE:
                 return mkForDatabase(options);
+            case PROCESS_DIAGRAM:
+                return mkForProcessDiagram(options);
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: " + ref.kind());
         }
     }
+
+
+    private Select<Record1<Long>> mkForProcessDiagram(IdSelectionOptions options) {
+        ensureScopeIsExact(options);
+        return DSL
+                .select(APPLICATION.ID)
+                .from(PROCESS_DIAGRAM_ENTITY)
+                .innerJoin(ENTITY_HIERARCHY)
+                .on(PROCESS_DIAGRAM_ENTITY.ENTITY_ID.eq(ENTITY_HIERARCHY.ANCESTOR_ID)
+                        .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name())
+                                .and(PROCESS_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.MEASURABLE.name()))))
+                .innerJoin(MEASURABLE_RATING)
+                .on(ENTITY_HIERARCHY.ID.eq(MEASURABLE_RATING.MEASURABLE_ID))
+                .innerJoin(APPLICATION)
+                .on(MEASURABLE_RATING.ENTITY_ID.eq(APPLICATION.ID)
+                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
+                .where(PROCESS_DIAGRAM_ENTITY.DIAGRAM_ID.eq(options.entityReference().id()))
+                .and(mkApplicationConditions(options));
+    }
+
 
     private Select<Record1<Long>> mkForDatabase(IdSelectionOptions options) {
         return DSL.select(DATABASE_USAGE.ENTITY_ID)

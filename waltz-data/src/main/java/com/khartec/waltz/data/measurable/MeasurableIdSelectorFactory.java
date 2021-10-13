@@ -55,7 +55,8 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
             case MEASURABLE:
                 return mkForMeasurable(options);
             case APP_GROUP:
-                return mkForAppGroup(options);
+            case PROCESS_DIAGRAM:
+                return mkViaAppSelector(options);
             case FLOW_DIAGRAM:
                 return mkForFlowDiagram(options);
             case SCENARIO:
@@ -160,20 +161,25 @@ public class MeasurableIdSelectorFactory implements IdSelectorFactory {
 
 
     private Select<Record1<Long>> mkForAppGroup(IdSelectionOptions options) {
-        checkTrue(options.scope() == HierarchyQueryScope.EXACT, "Can only calculate app-group based selectors with exact scopes");
+        return mkViaAppSelector(options);
+    }
 
-        Select<Record1<Long>> validAppIdsInGroup = ApplicationIdSelectorFactory.mkForAppGroup(options);
 
-        SelectConditionStep<Record1<Long>> measurableIdsUsedByGroup = DSL
+    private Select<Record1<Long>> mkViaAppSelector(IdSelectionOptions options) {
+
+        ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
+        Select<Record1<Long>> validAppIds = applicationIdSelectorFactory.apply(options);
+
+        SelectConditionStep<Record1<Long>> measurableIds = DSL
                 .selectDistinct(MEASURABLE_RATING.MEASURABLE_ID)
                 .from(MEASURABLE_RATING)
-                .where(MEASURABLE_RATING.ENTITY_ID.in(validAppIdsInGroup));
+                .where(MEASURABLE_RATING.ENTITY_ID.in(validAppIds));
 
         return DSL
                 .selectDistinct(ENTITY_HIERARCHY.ANCESTOR_ID)
                 .from(ENTITY_HIERARCHY)
                 .where(ENTITY_HIERARCHY.KIND.eq(EntityKind.MEASURABLE.name()))
-                .and(ENTITY_HIERARCHY.ID.in(measurableIdsUsedByGroup));
+                .and(ENTITY_HIERARCHY.ID.in(measurableIds));
     }
 
 
