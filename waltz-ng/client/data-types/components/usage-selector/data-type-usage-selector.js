@@ -86,8 +86,6 @@ function controller($q, serviceBroker) {
 
 
     const loadSuggestedDataTypes = () => {
-
-        console.log({parentRef: vm.parentEntityRef});
         return serviceBroker
             .loadViewData(
                 CORE_API.DataTypeDecoratorStore.findSuggestedByEntityRef,
