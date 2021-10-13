@@ -69,6 +69,7 @@ public enum EntityKind {
     PHYSICAL_SPEC_DEFN("Physical spec definition"),
     PHYSICAL_SPEC_DEFN_FIELD("Physical spec definition field"),
     PHYSICAL_FLOW("Physical flow"),
+    PROCESS_DIAGRAM("Process Diagram"),
     RELATIONSHIP_KIND("Relationship Kind"),
     ROADMAP("Roadmap"),
     SCENARIO("Scenario"),

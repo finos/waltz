@@ -255,6 +255,13 @@ export const entity = {
         description: null,
         position: 230
     },
+    PROCESS_DIAGRAM: {
+        key: "PROCESS_DIAGRAM",
+        name: "Process Diagram",
+        icon: "cogs",
+        description: null,
+        position: 233
+    },
     ROADMAP: {
         key: "ROADMAP",
         name: "Roadmap",

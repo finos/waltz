@@ -24,6 +24,9 @@ import {determineIfCreateAllowed} from "../../../flow-diagram/flow-diagram-utils
 import {displayError} from "../../../common/error-utils";
 import {kindToViewState} from "../../../common/link-utils";
 import toasts from "../../../svelte-stores/toast-store";
+import {processDiagramStore} from "../../../svelte-stores/process-diagram-store";
+import {mkSelectionOptions} from "../../../common/selector-utils";
+import {svelteCallToPromise} from "../../../common/promise-utils";
 
 const bindings = {
     parentEntityRef: "<"
@@ -39,7 +42,10 @@ const initialState = {
 };
 
 
-function combineDiagrams(flowDiagrams = [], svgDiagrams = [], flowActions = []) {
+function combineDiagrams(flowDiagrams = [],
+                         svgDiagrams = [],
+                         processDiagrams = [],
+                         flowActions = []) {
 
     const convertFlowDiagramFn = d => {
         return {
@@ -50,6 +56,19 @@ function combineDiagrams(flowDiagrams = [], svgDiagrams = [], flowActions = []) 
             icon: "random",
             description: d.description,
             actions: flowActions,
+            lastUpdatedAt: d.lastUpdatedAt,
+            lastUpdatedBy: d.lastUpdatedBy
+        };
+    };
+
+    const convertProcessDiagramFn = d => {
+        return {
+            id: refToString(d),
+            ref: toEntityRef(d),
+            type: "Process",
+            name: d.name,
+            icon: "cogs",
+            description: d.description,
             lastUpdatedAt: d.lastUpdatedAt,
             lastUpdatedBy: d.lastUpdatedBy
         };
@@ -72,6 +91,7 @@ function combineDiagrams(flowDiagrams = [], svgDiagrams = [], flowActions = []) 
     return _.chain([])
         .concat(normalize(convertFlowDiagramFn, flowDiagrams))
         .concat(normalize(convertSvgDiagramFn, svgDiagrams))
+        .concat(normalize(convertProcessDiagramFn, processDiagrams))
         .orderBy(d => d.name.toLowerCase())
         .value();
 }
@@ -102,6 +122,9 @@ function controller($q,
             { force  })
         .then(r => r.data);
 
+
+
+
     const flowActions = [
         {
             name: "Clone",
@@ -127,15 +150,20 @@ function controller($q,
             }}
     ];
 
+
     function reload() {
+
         const promises = [
             loadFlowDiagrams(true),
-            loadEntitySvgDiagrams(false)
+            loadEntitySvgDiagrams(false),
+            svelteCallToPromise(processDiagramStore.findByGenericSelector(
+                "MEASURABLE",
+                mkSelectionOptions(vm.parentEntityRef)))
         ];
         return $q
             .all(promises)
-            .then(([flowDiagrams = [], svgDiagrams = []]) => {
-                vm.diagrams = combineDiagrams(flowDiagrams, svgDiagrams, flowActions);
+            .then(([flowDiagrams = [], svgDiagrams = [], processDiagrams = []]) => {
+                vm.diagrams = combineDiagrams(flowDiagrams, svgDiagrams, processDiagrams, flowActions);
                 vm.selectedDiagram = selectInitialDiagram(vm.diagrams, vm.selectedDiagram);
                 return vm.diagrams;
             });
@@ -146,15 +174,15 @@ function controller($q,
         vm.visibility.makeNew = determineIfCreateAllowed(vm.parentEntityRef.kind);
     };
 
-    vm.$onChanges = (changes) => {
-    };
-
     vm.onDiagramSelect = (diagram) => {
         vm.selectedDiagram = diagram;
         vm.visibility.flowDiagramMode = "VIEW";
 
         if(diagram.type === "Flow"){
             $state.go(kindToViewState("FLOW_DIAGRAM"), {id: diagram.ref.id});
+        }
+        if(diagram.type === "Process"){
+            $state.go(kindToViewState("PROCESS_DIAGRAM"), {id: diagram.ref.id});
         }
     };
 
@@ -182,7 +210,6 @@ function controller($q,
             return;
         }
 
-        let newDiagramId = null;
         serviceBroker
             .execute(CORE_API.FlowDiagramStore.makeNewForEntityReference, [vm.parentEntityRef, name])
             .then(r => {

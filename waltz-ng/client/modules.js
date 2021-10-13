@@ -98,6 +98,7 @@ import PhysicalSpecifications from "./physical-specifications";
 import PhysicalField from "./physical-field";
 import Playpen from "./playpen";
 import Playpen5 from "./playpen/5";
+import ProcessDiagram from "./process-diagram";
 import Profile from "./profile";
 import Ratings from "./ratings";
 import ReportGrid from "./report-grid";
@@ -207,6 +208,7 @@ const dependencies = [
     PhysicalField(),
     Playpen(),
     Playpen5(),
+    ProcessDiagram(),
     Profile(),
     Ratings(),
     ReportGrid(),

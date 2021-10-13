@@ -43,6 +43,7 @@ const stateKindTuples = [
     {kind: "ORG_UNIT", state: "main.org-unit.view"},
     {kind: "PERSON", state: "main.person.id"},
     {kind: "PROCESS", state: "main.process.view"},
+    {kind: "PROCESS_DIAGRAM", state: "main.process-diagram.view"},
     {kind: "PHYSICAL_SPECIFICATION", state: "main.physical-specification.view"},
     {kind: "PHYSICAL_FLOW", state: "main.physical-flow.view"},
     {kind: "ROADMAP", state: "main.roadmap.view"},
