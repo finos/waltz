@@ -14,10 +14,7 @@ import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.measurable_category.MeasurableCategoryDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
-import com.khartec.waltz.integration_test.inmem.helpers.InvolvementHelper;
-import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
-import com.khartec.waltz.integration_test.inmem.helpers.PersonHelper;
-import com.khartec.waltz.integration_test.inmem.helpers.PhysicalSpecHelper;
+import com.khartec.waltz.integration_test.inmem.helpers.*;
 import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
@@ -43,6 +40,7 @@ import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import com.khartec.waltz.service.involvement.InvolvementService;
 import com.khartec.waltz.service.involvement_kind.InvolvementKindService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
+import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
 import com.khartec.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.h2.tools.Server;
 import org.jooq.DSLContext;
@@ -92,12 +90,14 @@ public class BaseInMemoryIntegrationTest {
         public InvolvementService involvementService;
         public InvolvementKindService involvementKindService;
         public PhysicalSpecificationService physicalSpecificationService;
+        public PhysicalFlowService physicalFlowService;
     }
 
 
     public static class Helpers {
         public LogicalFlowHelper logicalFlowHelper;
         public PhysicalSpecHelper physicalSpecHelper;
+        public PhysicalFlowHelper physicalFlowHelper;
         public InvolvementHelper involvementHelper;
         public PersonHelper personHelper;
     }
@@ -159,6 +159,7 @@ public class BaseInMemoryIntegrationTest {
         s.involvementKindService = ctx.getBean(InvolvementKindService.class);
         s.involvementService = ctx.getBean(InvolvementService.class);
         s.physicalSpecificationService = ctx.getBean(PhysicalSpecificationService.class);
+        s.physicalFlowService = ctx.getBean(PhysicalFlowService.class);
         return s;
     }
 
@@ -169,6 +170,7 @@ public class BaseInMemoryIntegrationTest {
         h.physicalSpecHelper = new PhysicalSpecHelper(services.physicalSpecificationService);
         h.involvementHelper = new InvolvementHelper(services.involvementService, services.involvementKindService);
         h.personHelper = new PersonHelper(ctx.getBean(DSLContext.class));
+        h.physicalFlowHelper = new PhysicalFlowHelper(services.physicalFlowService, services.physicalSpecificationService);
         return h;
     }
 

@@ -20,9 +20,11 @@ package com.khartec.waltz.integration_test.inmem.service;
 
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
+import com.khartec.waltz.integration_test.inmem.helpers.PhysicalFlowHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.PhysicalSpecHelper;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
+import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.service.data_type.DataTypeDecoratorService;
@@ -38,6 +40,7 @@ import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static com.khartec.waltz.model.EntityReference.mkRef;
+import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static org.junit.Assert.*;
@@ -47,12 +50,14 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
     private DataTypeDecoratorService dtdSvc;
     private LogicalFlowHelper lfHelper;
     private PhysicalSpecHelper psHelper;
+    private PhysicalFlowHelper pfHelper;
 
     @Before
     public void setupLogicalFlowDecoratorServiceTest() {
         dtdSvc = services.dataTypeDecoratorService;
         lfHelper = helpers.logicalFlowHelper;
         psHelper = helpers.physicalSpecHelper;
+        pfHelper = helpers.physicalFlowHelper;
     }
 
 
@@ -171,5 +176,43 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
         assertEquals("Returns all data types on spec", asSet(dtId, dtId2, dtId3), map(specDecorators, DataTypeDecorator::dataTypeId));
     }
 
+
+    @Test
+    public void findByEntityIdSelector(){
+
+        String username = mkName("findByEntityIdSelector");
+
+        EntityReference a = createNewApp("a", ouIds.a);
+        EntityReference b = createNewApp("b", ouIds.a1);
+
+        IdSelectionOptions appOpts = mkOpts(a);
+
+        assertThrows("If not logical flow kind or physical spec kind should throw exception",
+                IllegalArgumentException.class,
+                () -> dtdSvc.findByEntityIdSelector(EntityKind.APPLICATION, appOpts));
+
+        List<DataTypeDecorator> selectorForLfWhereNoDecorators = dtdSvc.findByEntityIdSelector(EntityKind.LOGICAL_DATA_FLOW, appOpts);
+        assertEquals("If no flows and decorators for selector returns empty list", emptyList(), selectorForLfWhereNoDecorators);
+
+        LogicalFlow flow = lfHelper.createLogicalFlow(a, b);
+        Long dtId = createDatatype("findByEntityIdSelector");
+        Long dtId2 = createDatatype("findByEntityIdSelector2");
+        dtdSvc.updateDecorators(username, flow.entityReference(), asSet(dtId, dtId2), emptySet());
+
+        List<DataTypeDecorator> selectorWithDecorators = dtdSvc.findByEntityIdSelector(EntityKind.LOGICAL_DATA_FLOW, appOpts);
+        assertEquals("Returns all data types for flow selector", asSet(dtId, dtId2), map(selectorWithDecorators, DataTypeDecorator::dataTypeId));
+
+        IdSelectionOptions flowOpts = mkOpts(flow.entityReference());
+        List<DataTypeDecorator> selectorForPsWhereNoDecorators = dtdSvc.findByEntityIdSelector(EntityKind.PHYSICAL_SPECIFICATION, flowOpts);
+        assertEquals("If no flows and decorators for selector returns empty list", emptyList(), selectorForPsWhereNoDecorators);
+
+        Long psId = psHelper.createPhysicalSpec(a, "findByEntityIdSelector");
+        EntityReference specRef = mkRef(EntityKind.PHYSICAL_SPECIFICATION, psId);
+
+        pfHelper.createPhysicalFlow(flow.entityReference().id(), psId, "findByEntityIdSelector");
+        dtdSvc.updateDecorators(username, specRef, asSet(dtId, dtId2), emptySet());
+        List<DataTypeDecorator> selectorForPs = dtdSvc.findByEntityIdSelector(EntityKind.PHYSICAL_SPECIFICATION, flowOpts);
+        assertEquals("Returns all data types for spec selector", asSet(dtId, dtId2), map(selectorForPs, DataTypeDecorator::dataTypeId));
+    }
 
 }
