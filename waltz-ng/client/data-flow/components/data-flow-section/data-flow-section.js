@@ -32,9 +32,23 @@ const bindings = {
 };
 
 
+const tabs = [
+    {id: "SUMMARY", name: "Logical Flows"},
+    {id: "LOGICAL_FLOW_SCROLL", name: "Logical Flows (Beta View)"},
+    {id: "PHYSICAL", name: "Physical Flow Detail"},
+    {id: "FLOW_CLASSIFICATION_RULES", name: "Flow Classification Rules"}
+];
+
+const modes = {
+    EDIT: "EDIT",
+    VIEW: "VIEW",
+    BULK: "BULK"
+}
+
 const initialState = {
     FlowClassificationLegend,
     LogicalFlowScrollPanel,
+    activeTab: null,
     changeUnits: [],
     dataTypeUsages: [],
     logicalFlows: [],
@@ -44,45 +58,20 @@ const initialState = {
     tags: [],
     visibility: {
         dataTab: 0,
-        logicalFlows: false, // this is the source data ratings panel, rename
+        sourceDataRatings: false,
         editor: {
             logicalFlows: false,
             bulkLogicalFlows: false,
             bulkPhysicalFlows: false
         },
     },
-    tabs: [
-        {id: "SUMMARY", name: "Logical Flows"},
-        {id: "LOGICAL_FLOW_SCROLL", name: "Logical Flows (Beta View)"},
-        {id: "PHYSICAL", name: "Physical Flow Detail"},
-        {id: "FLOW_CLASSIFICATION_RULES", name: "Flow Classification Rules"}
-    ]
+    tabs,
+    activeMode: modes.VIEW
 };
 
 
-function controller(serviceBroker, userService) {
+function controller(serviceBroker) {
     const vm = initialiseData(this, initialState);
-
-    function loadAdditionalAuthSourceData() {
-
-        const orgUnitIds = _
-            .chain(vm.flowClassificationRules)
-            .map("parentReference")
-            .filter({ kind: "ORG_UNIT"})
-            .map("id")
-            .uniq()
-            .value();
-
-        serviceBroker
-            .loadAppData(
-                CORE_API.OrgUnitStore.findByIds,
-                [orgUnitIds])
-            .then(r => {
-                vm.orgUnits= r.data;
-                vm.orgUnitsById = _.keyBy(r.data, "id");
-            });
-    }
-
 
     function loadData() {
         const selector = {
@@ -141,34 +130,33 @@ function controller(serviceBroker, userService) {
             .then(r => vm.tags = r.data);
     }
 
-
     vm.$onInit = () => {
-        userService
-            .whoami()
-            .then(user => {
-                vm.displayedTabs = _.filter(vm.tabs, t => _.isEmpty(t.requiredRole) || _.includes(user.roles, t.requiredRole));
-                vm.activeTab = vm.displayedTabs[0];
-            });
-
+        vm.activeTab = vm.tabs[0];
         loadData();
     };
 
-
     vm.isAnyEditorVisible = () => {
-        return _.some(vm.visibility.editor, r => r);
+        return vm.activeMode !== modes.VIEW;
     };
 
     vm.resetToViewMode = () => {
-        vm.visibility.editor = Object.assign({}, initialState.visibility.editor);
+        vm.activeMode = modes.VIEW;
         loadData();
     };
+
+    vm.edit = () => {
+        vm.activeMode = modes.EDIT;
+    }
+
+    vm.bulkLoad = () => {
+        vm.activeMode = modes.BULK;
+    }
 
 }
 
 
 controller.$inject = [
-    "ServiceBroker",
-    "UserService"
+    "ServiceBroker"
 ];
 
 
