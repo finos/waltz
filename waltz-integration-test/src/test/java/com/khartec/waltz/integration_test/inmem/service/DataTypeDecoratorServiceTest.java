@@ -25,7 +25,9 @@ import com.khartec.waltz.integration_test.inmem.helpers.PhysicalSpecHelper;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
+import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
+import com.khartec.waltz.model.datatype.DataTypeUsageCharacteristics;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.service.data_type.DataTypeDecoratorService;
 import org.junit.Before;
@@ -215,4 +217,111 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
         assertEquals("Returns all data types for spec selector", asSet(dtId, dtId2), map(selectorForPs, DataTypeDecorator::dataTypeId));
     }
 
+
+    @Test
+    public void updateDecorators(){
+
+        String username = mkName("updateDecorators");
+
+        EntityReference a = createNewApp("a", ouIds.a);
+        EntityReference b = createNewApp("b", ouIds.a1);
+        LogicalFlow flow = lfHelper.createLogicalFlow(a, b);
+
+        assertThrows("Throws exception if no username provided",
+                IllegalArgumentException.class,
+                () -> dtdSvc.updateDecorators(null, flow.entityReference(), emptySet(), emptySet()));
+
+        assertThrows("Throws exception if no ref provided",
+                IllegalArgumentException.class,
+                () -> dtdSvc.updateDecorators(username, null, emptySet(), emptySet()));
+
+        assertThrows("Throws exception if no unsupported ref provided",
+                UnsupportedOperationException.class,
+                () -> dtdSvc.updateDecorators(username, mkRef(EntityKind.APPLICATION, -1L), emptySet(), emptySet()));
+
+        Long dtId = createDatatype("updateDecorators");
+        Long dtId2 = createDatatype("updateDecorators2");
+        Long dtId3 = createDatatype("updateDecorators3");
+        dtdSvc.updateDecorators(username, flow.entityReference(), asSet(dtId, dtId2), emptySet());
+
+        Collection<DataTypeDecorator> flowDecorators = dtdSvc.findByFlowIds(asSet(flow.entityReference().id()), EntityKind.LOGICAL_DATA_FLOW);
+        assertEquals("Adds data types that do not exist on flow", asSet(dtId, dtId2), map(flowDecorators, DataTypeDecorator::dataTypeId));
+
+        dtdSvc.updateDecorators(username, flow.entityReference(), emptySet(), asSet(dtId3));
+        Collection<DataTypeDecorator> removeDtNotAssociated = dtdSvc.findByFlowIds(asSet(flow.entityReference().id()), EntityKind.LOGICAL_DATA_FLOW);
+        assertEquals("Removing dt not associated does not change set of decorators", asSet(dtId, dtId2), map(removeDtNotAssociated, DataTypeDecorator::dataTypeId));
+
+        dtdSvc.updateDecorators(username, flow.entityReference(), asSet(dtId, dtId2), emptySet());
+        Collection<DataTypeDecorator> flowDecoratorWhichAlreadyExist = dtdSvc.findByFlowIds(asSet(flow.entityReference().id()), EntityKind.LOGICAL_DATA_FLOW);
+        assertEquals("Adds data types that do not exist on flow", asSet(dtId, dtId2), map(flowDecoratorWhichAlreadyExist, DataTypeDecorator::dataTypeId));
+
+        dtdSvc.updateDecorators(username, flow.entityReference(), emptySet(), asSet(dtId2));
+        Collection<DataTypeDecorator> removedDatatype = dtdSvc.findByFlowIds(asSet(flow.entityReference().id()), EntityKind.LOGICAL_DATA_FLOW);
+        assertEquals("Removed associated datatype", asSet(dtId), map(removedDatatype, DataTypeDecorator::dataTypeId));
+    }
+
+
+    @Test
+    public void findSuggestedByEntityRef() {
+        String username = mkName("updateDecorators");
+        EntityReference a = createNewApp("a", ouIds.a);
+
+        assertThrows(
+                "Throw exception if not a logical data flow or physical spec",
+                UnsupportedOperationException.class,
+                () -> dtdSvc.findSuggestedByEntityRef(a));
+
+        EntityReference b = createNewApp("b", ouIds.a1);
+        LogicalFlow flow = lfHelper.createLogicalFlow(a, b);
+
+        Collection<DataType> suggestedWhenNoFlows = dtdSvc.findSuggestedByEntityRef(flow.entityReference());
+        assertEquals("If no flows associated to entity should return empty list", emptyList(), suggestedWhenNoFlows);
+
+        EntityReference c = createNewApp("b", ouIds.a1);
+        LogicalFlow flow2 = lfHelper.createLogicalFlow(b, c);
+
+        Long dtId = createDatatype("updateDecorators");
+        Long dtId2 = createDatatype("updateDecorators2");
+        dtdSvc.updateDecorators(username, flow.entityReference(), asSet(dtId), emptySet());
+        dtdSvc.updateDecorators(username, flow2.entityReference(), asSet(dtId, dtId2), emptySet());
+
+        Collection<DataType> suggestedWhenUpstream = dtdSvc.findSuggestedByEntityRef(flow.entityReference());
+        assertEquals("Should return suggested data types based on the upstream app", asSet(dtId), map(suggestedWhenUpstream, d -> d.id().get()));
+
+        Collection<DataType> suggestedWhenSrcHasUpstreamAndDownStream = dtdSvc.findSuggestedByEntityRef(flow2.entityReference());
+        assertEquals("Should return suggested data types based on up and down stream flows on the upstream app",
+                asSet(dtId, dtId2),
+                map(suggestedWhenSrcHasUpstreamAndDownStream, d -> d.id().get()));
+
+        Long specId = psHelper.createPhysicalSpec(a, "updateDecorators");
+        pfHelper.createPhysicalFlow(flow.entityReference().id(), specId, "updateDecorators");
+
+        Collection<DataType> suggestedForPsWhenUpstream = dtdSvc.findSuggestedByEntityRef(mkRef(EntityKind.PHYSICAL_SPECIFICATION, specId));
+        assertEquals("Should return suggested data types based on the upstream app", asSet(dtId), map(suggestedForPsWhenUpstream, d -> d.id().get()));
+    }
+
+
+    @Test
+    public void findDatatypeUsageCharacteristics() {
+        String username = mkName("updateDecorators");
+        EntityReference a = createNewApp("a", ouIds.a);
+
+        assertThrows(
+                "Throw exception for entities other than physical specs and logical flows",
+                IllegalArgumentException.class,
+                () -> dtdSvc.findDatatypeUsageCharacteristics(a));
+
+        EntityReference b = createNewApp("b", ouIds.a1);
+        LogicalFlow flow = lfHelper.createLogicalFlow(a, b);
+
+        Collection<DataTypeUsageCharacteristics> noDecorators = dtdSvc.findDatatypeUsageCharacteristics(flow.entityReference());
+        assertEquals("If there are no decorators on a flow the list of usage characteristics should be empty", emptyList(), noDecorators);
+
+        Long dtId = createDatatype("updateDecorators");
+        Long dtId2 = createDatatype("updateDecorators2");
+        dtdSvc.updateDecorators(username, flow.entityReference(), asSet(dtId, dtId2), emptySet());
+
+        Collection<DataTypeUsageCharacteristics> decoratorsOnFlow = dtdSvc.findDatatypeUsageCharacteristics(flow.entityReference());
+        assertEquals("", asSet(dtId, dtId2), map(decoratorsOnFlow, d -> d.dataTypeId()));
+    }
 }
