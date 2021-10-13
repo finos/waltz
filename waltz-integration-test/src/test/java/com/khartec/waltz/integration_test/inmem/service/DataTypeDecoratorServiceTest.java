@@ -298,12 +298,17 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
 
         Collection<DataType> suggestedForPsWhenUpstream = dtdSvc.findSuggestedByEntityRef(mkRef(EntityKind.PHYSICAL_SPECIFICATION, specId));
         assertEquals("Should return suggested data types based on the upstream app", asSet(dtId), map(suggestedForPsWhenUpstream, d -> d.id().get()));
+
+        Long specId2 = psHelper.createPhysicalSpec(a, "updateDecorators");
+        Collection<DataType> specNotInvolvedInFlows = dtdSvc.findSuggestedByEntityRef(mkRef(EntityKind.PHYSICAL_SPECIFICATION, specId2));
+
+        assertEquals("Spec not involved in flows should return empty list", emptyList(), specNotInvolvedInFlows);
     }
 
 
     @Test
     public void findDatatypeUsageCharacteristics() {
-        String username = mkName("updateDecorators");
+        String username = mkName("findDatatypeUsageCharacteristics");
         EntityReference a = createNewApp("a", ouIds.a);
 
         assertThrows(
@@ -317,11 +322,28 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
         Collection<DataTypeUsageCharacteristics> noDecorators = dtdSvc.findDatatypeUsageCharacteristics(flow.entityReference());
         assertEquals("If there are no decorators on a flow the list of usage characteristics should be empty", emptyList(), noDecorators);
 
-        Long dtId = createDatatype("updateDecorators");
-        Long dtId2 = createDatatype("updateDecorators2");
+        Long dtId = createDatatype("findDatatypeUsageCharacteristics");
+        Long dtId2 = createDatatype("findDatatypeUsageCharacteristics");
         dtdSvc.updateDecorators(username, flow.entityReference(), asSet(dtId, dtId2), emptySet());
 
         Collection<DataTypeUsageCharacteristics> decoratorsOnFlow = dtdSvc.findDatatypeUsageCharacteristics(flow.entityReference());
-        assertEquals("", asSet(dtId, dtId2), map(decoratorsOnFlow, d -> d.dataTypeId()));
+
+        assertEquals("Returns usage characteristics for each data type associated to a flow", asSet(dtId, dtId2), map(decoratorsOnFlow, DataTypeUsageCharacteristics::dataTypeId));
+        assertEquals("Characteristics suggest all flows are removable when there are no underlying physical flows", asSet(true), map(decoratorsOnFlow, DataTypeUsageCharacteristics::isRemovable));
+
+        Long specId = psHelper.createPhysicalSpec(a, "findDatatypeUsageCharacteristics");
+        pfHelper.createPhysicalFlow(flow.entityReference().id(), specId, "findDatatypeUsageCharacteristics");
+        dtdSvc.updateDecorators(username, mkRef(EntityKind.PHYSICAL_SPECIFICATION, specId), asSet(dtId), emptySet());
+
+        Collection<DataTypeUsageCharacteristics> decoratorsOnFlowWithUnderlyingSpec = dtdSvc.findDatatypeUsageCharacteristics(flow.entityReference());
+        DataTypeUsageCharacteristics dtDecorator = decoratorsOnFlowWithUnderlyingSpec.stream().filter(d -> d.dataTypeId() == dtId).findFirst().get();
+        DataTypeUsageCharacteristics dt2Decorator = decoratorsOnFlowWithUnderlyingSpec.stream().filter(d -> d.dataTypeId() == dtId2).findFirst().get();
+
+        assertFalse("When underlying physical with datatype should not be removable", dtDecorator.isRemovable());
+        assertTrue("When no underlying physical datatype should remain removable", dt2Decorator.isRemovable());
+
+        Collection<DataTypeUsageCharacteristics> usageCharacteristicsForSpec = dtdSvc.findDatatypeUsageCharacteristics(mkRef(EntityKind.PHYSICAL_SPECIFICATION, specId));
+        assertEquals("Returns usage characteristics for each data type associated to a spec", asSet(dtId), map(usageCharacteristicsForSpec, DataTypeUsageCharacteristics::dataTypeId));
+        assertTrue("Specs should always be flagged as removable", first(usageCharacteristicsForSpec).isRemovable());
     }
 }
