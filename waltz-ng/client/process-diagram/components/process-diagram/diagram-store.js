@@ -10,7 +10,6 @@ export const appAlignments = writable([]);
 export const diagramInfo = writable(null);
 export const selectedObject = writable(null);
 
-
 function resetStore() {
     selectedObject.set(null);
 }
@@ -60,6 +59,10 @@ export const appsByDiagramMeasurableId = derived([appAlignments], ([$appAlignmen
 
 
 export const highlightedConnections = derived([connections, selectedObject], ([$connections, $selectedObject]) => {
+    if (!$selectedObject) {
+        return [];
+    }
+
     return _
         .chain($connections)
         .filter(c => c.startObjectId === $selectedObject.objectId || c.endObjectId === $selectedObject.objectId)

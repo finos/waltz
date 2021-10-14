@@ -20,10 +20,6 @@
     $: viewBox = calcViewBox($positions);
     $: bounds = calcBounds($positions);
 
-    $: y = scaleLinear()
-        .domain([bounds.y1, bounds.y2])
-        .range([bounds.y2, bounds.y1]);
-
     $: svgElem = select(elem);
     $: svgElem.call(zoom().on("zoom", zoomed));
 

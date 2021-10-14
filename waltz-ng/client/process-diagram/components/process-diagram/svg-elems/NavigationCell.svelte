@@ -2,18 +2,13 @@
     export let obj;
     export let layout;
 
-    function onMouseEnter() {
-        console.log("textCell:me:", obj);
-    }
-
 </script>
 
 
 <rect width={layout.width}
       height={layout.height}
       rx="10"
-      ry="10"
-      on:mouseenter={onMouseEnter}>
+      ry="10">
 </rect>
 
 <foreignObject width={layout.width}

@@ -60,7 +60,10 @@ function lineToSPath(x1, y1, x2, y2, c = 0.2) {
         Math.abs(dy * c),
         Math.abs(dx * c));
     // middle
-    const xm = x1 + dx / 2;
+
+    const xm = dx > 172 // science
+        ? x1 + dx / 16
+        : x1 + dx / 2;
     // start and ending points of the curves,
     // ..the ternary expr (?:) on the end ensures we are adding/removing as appropriate
     const x1a = xm + cl * (x1 > x2 ? 1 : -1);
@@ -177,4 +180,15 @@ export function lookupSubTypeComponent(subType) {
             console.log("Cannot find subtype for: " + subType)
             return null;
     }
+}
+
+
+/**
+ * Moves the given element to be the last of it's siblings.
+ * This causes it to be drawn last and therefore looks like
+ * it has been moved to the front.
+  * @param elem - the element to move
+ */
+export function moveToFront(elem) {
+    elem.parentNode.appendChild(elem);
 }
