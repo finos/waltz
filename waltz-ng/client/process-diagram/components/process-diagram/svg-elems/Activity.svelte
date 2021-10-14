@@ -1,14 +1,27 @@
 <script>
     import {truncateMiddle} from "../../../../common/string-utils";
+    import {selectAll} from "d3-selection";
+    import {highlightedActivities} from "../diagram-store";
+
     export let obj;
     export let layout;
     export let appCount;
     export let isSelected;
 
+    $: {
+        selectAll(".activity")
+            .classed("highlight", false);
+
+        _.forEach(
+            $highlightedActivities,
+            d => selectAll(`.activity-${d.id}`)
+                .classed("highlight", true));
+    }
+
 </script>
 
 
-<rect class={isSelected ? "selected" : ""}
+<rect class="{isSelected ? 'selected' : ''} activity activity-{obj.id}"
       rx="10"
       ry="10"
       width={layout.width}
@@ -58,5 +71,10 @@
     .app-count circle{
         fill: #d5fffc;
         stroke: #84a5a4;
+    }
+
+    .highlight {
+        stroke: #2b98ff;
+        stroke-width: 3;
     }
 </style>

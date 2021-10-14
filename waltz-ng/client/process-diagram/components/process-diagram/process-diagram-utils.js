@@ -10,6 +10,7 @@ import Timer from "./svg-elems/sub-types/Timer.svelte";
 import Inclusive from "./svg-elems/sub-types/Inclusive.svelte";
 import Exclusive from "./svg-elems/sub-types/Exclusive.svelte";
 import Parallel from "./svg-elems/sub-types/Parallel.svelte";
+import {selectedApp, selectedObject} from "./diagram-store";
 
 
 const padding = {
@@ -191,4 +192,15 @@ export function lookupSubTypeComponent(subType) {
  */
 export function moveToFront(elem) {
     elem.parentNode.appendChild(elem);
+}
+
+export function selectDiagramObject(obj){
+    selectedObject.set(obj);
+    selectedApp.set(null);
+}
+
+
+export function selectApplication(app){
+    selectedApp.set(app);
+    selectedObject.set(null);
 }

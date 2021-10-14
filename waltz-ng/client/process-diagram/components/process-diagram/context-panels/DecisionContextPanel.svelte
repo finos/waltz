@@ -1,5 +1,5 @@
 <script>
-
+    import {selectDiagramObject} from "../process-diagram-utils";
     import {highlightedConnections, selectedObject} from "../diagram-store";
 
     let inbound = [];
@@ -20,7 +20,7 @@
     <tbody>
     {#each inbound as conn}
         <tr class="clickable"
-            on:click={() => $selectedObject = conn.startObject}>
+            on:click={() => selectDiagramObject(conn.startObject)}>
             <td>{conn.name || '-'}</td>
             <td>{conn.startObject.name}</td>
         </tr>
@@ -37,7 +37,7 @@
     <tbody>
     {#each outbound as conn}
         <tr class="clickable"
-            on:click={() => $selectedObject = conn.endObject}>
+            on:click={() => selectDiagramObject(conn.endObject)}>
             <td>{conn.name || '-'}</td>
             <td>{conn.endObject.name}</td>
         </tr>
