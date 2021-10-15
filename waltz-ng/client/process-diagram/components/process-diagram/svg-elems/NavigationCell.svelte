@@ -1,6 +1,15 @@
 <script>
+
+    import {select} from "d3-selection";
+    import {wrapText} from "../../../../common/d3-utils";
     export let obj;
     export let layout;
+
+    let elem;
+
+    $: select(elem)
+        .text(obj.name)
+        .call(wrapText, layout.width - 10);
 
 </script>
 
@@ -11,15 +20,14 @@
       ry="10">
 </rect>
 
-<foreignObject width={layout.width}
-               height={layout.height}
-               style="pointer-events: none"
-               y={layout.height / 6}>
-    <div>
-        {obj.name}
-    </div>
-</foreignObject>
-
+<text transform="translate({layout.width / 2}, 15)"
+      style="pointer-events: none"
+      dominant-baseline="middle"
+      text-anchor="middle"
+      font-size="11"
+      fill="#332B23"
+      bind:this={elem}>
+</text>
 
 <style>
     rect {

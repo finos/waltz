@@ -2,8 +2,6 @@
     import {highlightedConnections, selectedObject} from "../diagram-store";
     import _ from "lodash";
 
-    $:console.log($selectedObject, $highlightedConnections)
-
     $: [outbound, inbound] = _.chain($highlightedConnections)
         .reject(c => c.hidden)
         .partition(c => c.startObjectId === $selectedObject?.objectId)

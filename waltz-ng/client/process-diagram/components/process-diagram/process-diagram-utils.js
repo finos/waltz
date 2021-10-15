@@ -134,6 +134,9 @@ export function toComp(obj) {
             return Decision;
         case "Boundary":
             return Boundary;
+        default:
+            console.log(`Could not determine the diagram object for object type: ${obj.objectType}`);
+            return null;
     }
 }
 

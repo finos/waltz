@@ -3,9 +3,9 @@
     import {findAssociatedApps, toComp} from "../process-diagram-utils";
     import _ from "lodash";
 
-    $: objs = _.map(
-        $objects,
-        obj => {
+    $: objs = _
+        .chain($objects)
+        .map(obj => {
             const layout = $layoutDataById[obj.objectId];
             return {
                 obj,
@@ -13,7 +13,9 @@
                 transform: `translate(${layout.x} ${layout.y})`,
                 layout
             };
-        });
+        })
+        .reject(d => d.comp === null)
+        .value();
 
     function getAppCount(obj){
         const associatedApps = findAssociatedApps($appsByDiagramMeasurableId, obj);
