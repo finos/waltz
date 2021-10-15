@@ -1,10 +1,13 @@
 <script>
     import {lookupSubTypeComponent} from "../process-diagram-utils";
+    import {select} from "d3-selection";
+    import {wrapText} from "../../../../common/d3-utils";
 
     export let obj;
     export let layout;
     export let isSelected;
 
+    let elem;
     let points = "";
 
     $: {
@@ -19,6 +22,10 @@
         `;
     }
 
+    $: select(elem)
+        .text(obj.name)
+        .call(wrapText, layout.width)
+
     $: subTypeComponent = lookupSubTypeComponent(obj.objectSubType);
 
 </script>
@@ -31,13 +38,13 @@
               {points}>
     </polyline>
 
-    <foreignObject width={layout.width * 2}
-                   height="200"
-                   transform={`translate(${layout.width * -0.7}, ${layout.height * 1})`}>
-        <div style="text-align: left; font-size: 10px;">
-            {obj.name}
-        </div>
-    </foreignObject>
+    <text transform={`translate(${layout.width / 2.2}, ${layout.height})`}
+          style="pointer-events: none"
+          text-anchor="end"
+          font-size="10"
+          fill="#332B23"
+          bind:this={elem}>
+    </text>
 
 
     <!-- subtype -->

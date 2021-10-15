@@ -3,8 +3,6 @@
     import _ from "lodash";
     import {selectDiagramObject} from "../process-diagram-utils";
 
-    $:console.log($selectedObject, $highlightedConnections)
-
     $: [outbound, inbound] = _.chain($highlightedConnections)
         .reject(c => c.hidden)
         .partition(c => c.startObjectId === $selectedObject?.objectId)

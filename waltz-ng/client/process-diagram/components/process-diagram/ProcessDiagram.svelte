@@ -43,7 +43,8 @@
         </svg>
 
     </div>
-    <div class="col-md-3" style="padding-left: 1em">
+    <div class="col-md-3"
+         style="padding-left: 1em">
         <ProcessDiagramContextPanel/>
     </div>
 </div>

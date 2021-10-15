@@ -1,6 +1,7 @@
 <script>
     import {truncateMiddle} from "../../../../common/string-utils";
-    import {selectAll} from "d3-selection";
+    import {wrapText} from "../../../../common/d3-utils";
+    import {selectAll, select} from "d3-selection";
     import {highlightedActivities} from "../diagram-store";
 
     export let obj;
@@ -18,6 +19,12 @@
                 .classed("highlight", true));
     }
 
+    let elem;
+
+    $: select(elem)
+        .text(truncateMiddle(obj.name, 64))
+        .call(wrapText, layout.width - 10);
+
 </script>
 
 
@@ -28,14 +35,14 @@
       height={layout.height}>
 </rect>
 
-<foreignObject width={layout.width}
-               height={layout.height}
-               style="pointer-events: none; padding: 2px;"
-               y="4">
-    <div title={obj.name}>
-            {truncateMiddle(obj.name, 64)}
-    </div>
-</foreignObject>
+<text transform="translate({layout.width / 2}, 15)"
+      style="pointer-events: none"
+      dominant-baseline="middle"
+      text-anchor="middle"
+      font-size="11"
+      fill="#332B23"
+      bind:this={elem}>
+</text>
 
 {#if appCount > 0}
     <g  class="app-count"
@@ -61,11 +68,6 @@
         stroke: #2b98ff;
         stroke-width: 3;
         fill: url(#Activity-gradient);
-    }
-
-    foreignObject div {
-        text-align: center;
-        font-size: 11px;
     }
 
     .app-count circle{
