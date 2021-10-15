@@ -351,7 +351,7 @@ public class AttestationInstanceDao {
                                                                                                             Condition filterCondition){
 
         Condition attestedEntityIdCondition = attestedId == null
-                ? DSL.trueCondition()
+                ? ATTESTATION_RUN.ATTESTED_ENTITY_ID.isNull()
                 : ATTESTATION_RUN.ATTESTED_ENTITY_ID.eq(attestedId);
 
         Field<Long> latest_attestation = DSL
@@ -433,7 +433,7 @@ public class AttestationInstanceDao {
         Condition attestationExistsForThisTargetEntityAndAppCondition = APPLICATION.ID.eq(appAttestations.field("appId", Long.class))
                 .and(possibleAttestationKinds.field(ATTESTATION_RUN.ATTESTED_ENTITY_KIND).eq(appAttestations.field("attested_entity_kind", String.class))
                         .and((possibleAttestationKinds.field(ATTESTATION_RUN.ATTESTED_ENTITY_ID).eq(appAttestations.field("attested_entity_id", Long.class)))
-                                .or(possibleAttestationKinds.field(ATTESTATION_RUN.ATTESTED_ENTITY_ID).isNull())));
+                                .or(possibleAttestationKinds.field(ATTESTATION_RUN.ATTESTED_ENTITY_ID).isNull().and(appAttestations.field("attested_entity_id", Long.class).isNull()))));
 
         //For each combination of app and possible attestation target entity, join the existing attestation instance
         Map<Tuple3<EntityKind, Long, String>, Long> appCountsForAttestationTargetEntityAndAttestationStatus = dsl
