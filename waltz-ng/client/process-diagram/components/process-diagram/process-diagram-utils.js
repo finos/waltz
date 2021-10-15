@@ -197,6 +197,11 @@ export function moveToFront(elem) {
     elem.parentNode.appendChild(elem);
 }
 
+export function clearSelections(){
+    selectedObject.set(null);
+    selectedApp.set(null);
+}
+
 export function selectDiagramObject(obj){
     selectedObject.set(obj);
     selectedApp.set(null);

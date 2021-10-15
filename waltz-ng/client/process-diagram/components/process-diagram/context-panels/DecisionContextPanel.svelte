@@ -9,7 +9,7 @@
 
 </script>
 
-<h4>&#8415; Decision selected</h4>
+<h4>&#8415; {$selectedObject.name || 'Decision'}</h4>
 
 <table class="small table table-condensed table-hover">
     <colgroup>

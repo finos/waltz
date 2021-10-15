@@ -64,8 +64,8 @@
     polyline {
         stroke: #999;
         fill: #eee;
-        transition: stroke ease-in-out 0.4s;
         opacity: 0.8;
+        transition: stroke ease-in-out 0.4s;
     }
 
     polyline.selected {
