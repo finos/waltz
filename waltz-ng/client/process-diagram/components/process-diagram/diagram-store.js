@@ -53,7 +53,8 @@ export const appsByDiagramMeasurableId = derived([appAlignments], ([$appAlignmen
     return _
         .chain($appAlignments)
         .map(a => Object.assign({}, { diagramEntityId: a.diagramMeasurableRef.id, applicationRef: a.applicationRef }))
-        .uniq() //TODO: ths diesn't work, need another way to unique
+        .uniqBy(d => `${d.diagramEntityId}_${d.applicationRef.id}`)
+        .orderBy(d => _.toLower(d.applicationRef.name))
         .groupBy(t => t.diagramEntityId)
         .value();
 });

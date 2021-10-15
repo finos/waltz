@@ -9,12 +9,15 @@
 
 </script>
 
-<h1>Decision selected</h1>
+<h4>&#8415; Decision selected</h4>
 
-<h4>Inputs</h4>
-<table class="table table-condensed table-hover table-striped">
+<table class="small table table-condensed table-hover">
+    <colgroup>
+        <col width="50%">
+        <col width="50%">
+    </colgroup>
     <thead>
-    <th>Decision Criteria</th>
+    <th>Input</th>
     <th>Source</th>
     </thead>
     <tbody>
@@ -28,10 +31,13 @@
     </tbody>
 </table>
 
-<h4>Outputs</h4>
-<table class="table table-condensed table-hover table-striped">
+<table class="small table table-condensed table-hover">
+    <colgroup>
+        <col width="50%">
+        <col width="50%">
+    </colgroup>
     <thead>
-    <th>Decision Criteria</th>
+    <th>Output</th>
     <th>Target</th>
     </thead>
     <tbody>

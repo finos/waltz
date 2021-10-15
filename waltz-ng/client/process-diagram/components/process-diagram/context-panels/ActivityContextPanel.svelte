@@ -8,14 +8,13 @@
     $: appsToDisplay = _
         .chain(findAssociatedApps($appsByDiagramMeasurableId, $selectedObject))
         .map(d => d.applicationRef)
-        .sortBy(d => d.name)
         .value();
 
 </script>
 
 <h4><EntityLink ref={$selectedObject.waltzReference}/></h4>
 
-<table class="table table-condensed small">
+<table class="table table-condensed table-hover small">
     <thead>
         <th>
             Associated Application

@@ -30,6 +30,7 @@
         stroke: #aaa;
         stroke-width: 2;
         fill: none;
+        transition: stroke ease 0.4s;  /* does not fade in due to re-ordering (moveToFront) call */
     }
 
     .highlight {

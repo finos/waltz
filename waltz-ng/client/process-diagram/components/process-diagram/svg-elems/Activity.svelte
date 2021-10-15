@@ -15,8 +15,12 @@
 
         _.forEach(
             $highlightedActivities,
-            d => selectAll(`.activity-${d.id}`)
+            d => selectAll(`.activity-${d.objectId}`)
                 .classed("highlight", true));
+    }
+
+    $: {
+        selectAll(`.activity-${obj.objectId}`).classed("selected", isSelected);
     }
 
     let elem;
@@ -28,7 +32,7 @@
 </script>
 
 
-<rect class="{isSelected ? 'selected' : ''} activity activity-{obj.id}"
+<rect class="activity activity-{obj.objectId}"
       rx="10"
       ry="10"
       width={layout.width}
@@ -60,14 +64,21 @@
         opacity: 0.8;
         stroke: #ccc;
         fill: url(#Activity-gradient);
-        transition: stroke ease-in-out 0.4s;
+        transition: stroke ease-in-out 0.4s, stroke-width ease-in-out 0.4s;
+    }
+
+
+
+    rect.highlight {
+        opacity: 1;
+        stroke: #2b98ff;
+        stroke-width: 3;
     }
 
     rect.selected {
         opacity: 1;
         stroke: #2b98ff;
         stroke-width: 3;
-        fill: url(#Activity-gradient);
     }
 
     .app-count circle{
@@ -75,8 +86,4 @@
         stroke: #84a5a4;
     }
 
-    .highlight {
-        stroke: #2b98ff;
-        stroke-width: 3;
-    }
 </style>

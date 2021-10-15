@@ -9,7 +9,7 @@
         .value();
 </script>
 
-<h4>{$selectedObject.name}</h4>
+<h4>&#8413; {$selectedObject.name}</h4>
 
 <dl>
     <dt>Stereotype</dt>
@@ -17,10 +17,14 @@
 </dl>
 
 {#if !_.isEmpty(inbound)}
-    <label>Inputs</label>
-    <table class="small table table-condensed table-hover table-striped">
+    <table class="small table table-condensed table-hover">
+        <colgroup>
+            <col width="50%">
+            <col width="50%">
+        </colgroup>
+
         <thead>
-        <th>Decision Criteria</th>
+        <th>Input</th>
         <th>Source</th>
         </thead>
         <tbody>
@@ -36,10 +40,13 @@
 {/if}
 
 {#if !_.isEmpty(outbound)}
-    <label>Outputs</label>
-    <table class="small table table-condensed table-hover table-striped">
+    <table class="small table table-condensed table-hover">
+        <colgroup>
+            <col width="50%">
+            <col width="50%">
+        </colgroup>
         <thead>
-        <th>Decision Criteria</th>
+        <th>Output</th>
         <th>Target</th>
         </thead>
         <tbody>

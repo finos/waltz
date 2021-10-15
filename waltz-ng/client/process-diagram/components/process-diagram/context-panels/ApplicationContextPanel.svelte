@@ -7,7 +7,7 @@
 
 <h4><EntityLink ref={$selectedApp}/></h4>
 
-<table class="table table-condensed small">
+<table class="table table-condensed table-hover small">
     <thead>
         <th>
             Associated Activity
