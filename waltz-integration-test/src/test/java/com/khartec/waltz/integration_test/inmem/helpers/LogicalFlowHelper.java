@@ -23,5 +23,4 @@ public class LogicalFlowHelper {
                 .build());
     }
 
-
 }
