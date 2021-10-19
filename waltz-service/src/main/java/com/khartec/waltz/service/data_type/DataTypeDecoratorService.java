@@ -30,7 +30,6 @@ import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.datatype.DataTypeUsageCharacteristics;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
-import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import com.khartec.waltz.service.changelog.ChangeLogService;
@@ -53,11 +52,12 @@ import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.CollectionUtilities.*;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
 import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.model.EntityKind.*;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
 
 @Service
 public class DataTypeDecoratorService {
@@ -152,8 +152,8 @@ public class DataTypeDecoratorService {
         return LOGICAL_DATA_FLOW.equals(entityKind)
                 ? getSelectorForLogicalFlow(dao, selectionOptions)
                 : dao.findByEntityIdSelector(
-                genericSelectorFactory.applyForKind(entityKind, selectionOptions).selector(),
-                Optional.ofNullable(entityKind));
+                        genericSelectorFactory.applyForKind(entityKind, selectionOptions).selector(),
+                        Optional.ofNullable(entityKind));
     }
 
 
@@ -170,7 +170,7 @@ public class DataTypeDecoratorService {
                 .getDao(entityReference.kind())
                 .addDecorators(dataTypeDecorators);
 
-        audit(String.format("Added data types: %s", dataTypeIds.toString()),
+        audit(format("Added data types: %s", dataTypeIds.toString()),
                 entityReference, userName);
 
         recalculateDataTypeUsageForApplications(entityReference);
@@ -191,7 +191,7 @@ public class DataTypeDecoratorService {
                 .getDao(entityReference.kind())
                 .removeDataTypes(entityReference, dataTypeIds);
 
-        audit(String.format("Removed data types: %s", dataTypeIds.toString()),
+        audit(format("Removed data types: %s", dataTypeIds.toString()),
                 entityReference, userName);
         recalculateDataTypeUsageForApplications(entityReference);
 
@@ -229,6 +229,7 @@ public class DataTypeDecoratorService {
         return map(dataTypeIds,
                 dtId -> mkDecorator(userName, entityReference, dtId, Optional.empty()));
     }
+
 
     private ImmutableDataTypeDecorator mkDecorator(String userName,
                                                    EntityReference entityReference,
@@ -278,6 +279,7 @@ public class DataTypeDecoratorService {
                 .findByFlowIds(ids);
     }
 
+
     private void audit(String message,
                        EntityReference entityReference,
                        String username) {
@@ -300,7 +302,7 @@ public class DataTypeDecoratorService {
         switch(entityReference.kind()) {
             case LOGICAL_DATA_FLOW:
                 LogicalFlow logicalFlow = logicalFlowDao.getByFlowId(entityReference.id());
-                String auditMessage = String.format("Logical Flow from %s to %s: Data types changed from [%s] to [%s]",
+                String auditMessage = format("Logical Flow from %s to %s: Data types changed from [%s] to [%s]",
                         logicalFlow.source().name().orElse(""),
                         logicalFlow.target().name().orElse(""),
                         currentDataTypeNames,
@@ -313,7 +315,7 @@ public class DataTypeDecoratorService {
                 logicalFlowService
                         .findBySelector(mkOpts(entityReference))
                         .forEach(lf -> {
-                            String message = String.format("Physical Specification [%s]: Data types changed from [%s] to [%s]",
+                            String message = format("Physical Specification [%s]: Data types changed from [%s] to [%s]",
                                     physicalSpecification.name(),
                                     currentDataTypeNames,
                                     updatedDataTypeNames);
@@ -343,11 +345,17 @@ public class DataTypeDecoratorService {
 
     public Collection<DataType> findSuggestedByEntityRef(EntityReference entityReference) {
 
+        if (!asSet(LOGICAL_DATA_FLOW, PHYSICAL_SPECIFICATION).contains(entityReference.kind())){
+            throw new UnsupportedOperationException(format("Cannot find suggested data types for entity kind: %s", entityReference.kind()));
+        }
+
+        // finds all flows for this entity
         List<LogicalFlow> logicalFlows = logicalFlowService.findBySelector(mkOpts(entityReference));
 
         if(isEmpty(logicalFlows)){
             return emptyList();
         } else {
+            //finds the first flow -- used by logical flows and specs only!
             LogicalFlow flow = first(logicalFlows);
             return dataTypeService.findSuggestedBySourceEntityRef(flow.source());
         }

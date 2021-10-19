@@ -123,7 +123,7 @@ public class DataTypeDao implements FindEntityReferencesByIdSelector {
         Condition isSourceOrTarget = LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(source.id())
                 .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(source.kind().name()))
                 .or(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(source.id())
-                        .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(source.kind().name())));
+                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(source.kind().name())));
 
         SelectConditionStep<Record1<Long>> logicalFlowsForSource = DSL
                 .select(LOGICAL_FLOW.ID)
