@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.service.attestation;
 
+import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.common.exception.UpdateFailedException;
 import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.GenericSelectorFactory;
@@ -50,6 +51,7 @@ import static com.khartec.waltz.common.CollectionUtilities.first;
 import static com.khartec.waltz.common.CollectionUtilities.notEmpty;
 import static com.khartec.waltz.common.DateTimeUtilities.*;
 import static com.khartec.waltz.schema.Tables.APPLICATION;
+import static java.lang.String.format;
 
 
 @Service
@@ -59,6 +61,7 @@ public class AttestationInstanceService {
 
     private final AttestationInstanceDao attestationInstanceDao;
     private final AttestationRunService attestationRunService;
+    private final AttestationPreCheckService attestationPreCheckService;
     private final ApplicationService applicationService;
     private final PersonDao personDao;
     private final ChangeLogService changeLogService;
@@ -69,9 +72,11 @@ public class AttestationInstanceService {
 
     public AttestationInstanceService(AttestationInstanceDao attestationInstanceDao,
                                       AttestationRunService attestationRunService,
+                                      AttestationPreCheckService attestationPreCheckService,
                                       ApplicationService applicationService,
                                       PersonDao personDao, ChangeLogService changeLogService,
                                       PermissionGroupService permissionGroupService) {
+
         checkNotNull(attestationInstanceDao, "attestationInstanceDao cannot be null");
         checkNotNull(attestationRunService, "attestationRunService cannot be null");
         checkNotNull(personDao, "personDao cannot be null");
@@ -79,6 +84,7 @@ public class AttestationInstanceService {
 
         this.attestationInstanceDao = attestationInstanceDao;
         this.attestationRunService = attestationRunService;
+        this.attestationPreCheckService = attestationPreCheckService;
         this.applicationService = applicationService;
         this.personDao = personDao;
         this.changeLogService = changeLogService;
@@ -149,14 +155,14 @@ public class AttestationInstanceService {
     private void logChange(String username, AttestationInstance instance, EntityKind attestedKind) {
 
         String logMessage = EntityKind.APPLICATION.equals(instance.parentEntity().kind())
-                ? String.format("Attestation of %s for application %s",
+                ? format("Attestation of %s for application %s",
                 attestedKind,
                 ExternalIdValue.orElse(
                         applicationService
                                 .getById(instance.parentEntity().id())
                                 .assetCode(),
                         "UNKNOWN"))
-                : String.format("Attestation of %s ", attestedKind);
+                : format("Attestation of %s ", attestedKind);
 
         changeLogService.write(ImmutableChangeLog.builder()
                 .message(logMessage)
@@ -171,6 +177,10 @@ public class AttestationInstanceService {
 
     public boolean attestForEntity(String username, AttestEntityCommand createCommand) {
         checkAttestationPermission(username, createCommand);
+
+        if(createCommand.attestedEntityKind().equals(EntityKind.LOGICAL_DATA_FLOW)){
+            checkLogicalFlowsCanBeAttested(createCommand);
+        }
 
         List<AttestationInstance> instancesForEntityForUser = attestationInstanceDao
                 .findForEntityByRecipient(
@@ -197,6 +207,13 @@ public class AttestationInstanceService {
             Long instanceId = getInstanceId(first(findByRunId(runId)));
             return attestInstance(instanceId, username);
         }
+    }
+
+
+    private void checkLogicalFlowsCanBeAttested(AttestEntityCommand createCommand) {
+        List<String> failures = attestationPreCheckService.calcLogicalFlowPreCheckFailures(createCommand.entityReference());
+        String warningString = StringUtilities.join(failures, ";");
+        checkNotEmpty(failures, format("Logical flow check failed with the following warnings: %s", warningString));
     }
 
 
