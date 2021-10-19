@@ -247,10 +247,10 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
         Collection<DataTypeDecorator> flowDecorators = dtdSvc.findByFlowIds(asSet(flow.entityReference().id()), EntityKind.LOGICAL_DATA_FLOW);
         assertEquals("Adds data types that do not exist on flow", asSet(dtId, dtId2), map(flowDecorators, DataTypeDecorator::dataTypeId));
 
-        dtdSvc.updateDecorators(username, flow.entityReference(), asSet(dtId, dtId2), emptySet());
-        Collection<DataTypeDecorator> flowDecoratorWhichAlreadyExist = dtdSvc.findByFlowIds(asSet(flow.entityReference().id()), EntityKind.LOGICAL_DATA_FLOW);
-        assertEquals("Adds data types that do not exist on flow", asSet(dtId, dtId2), map(flowDecoratorWhichAlreadyExist, DataTypeDecorator::dataTypeId));
-
+        dtdSvc.updateDecorators(username, flow.entityReference(), emptySet(), asSet(dtId3));
+        Collection<DataTypeDecorator> removeDtNotAssociated = dtdSvc.findByFlowIds(asSet(flow.entityReference().id()), EntityKind.LOGICAL_DATA_FLOW);
+        assertEquals("Removing dt not associated does not change set of decorators", asSet(dtId, dtId2), map(removeDtNotAssociated, DataTypeDecorator::dataTypeId));
+        
         dtdSvc.updateDecorators(username, flow.entityReference(), emptySet(), asSet(dtId2));
         Collection<DataTypeDecorator> removedDatatype = dtdSvc.findByFlowIds(asSet(flow.entityReference().id()), EntityKind.LOGICAL_DATA_FLOW);
         assertEquals("Removed associated datatype", asSet(dtId), map(removedDatatype, DataTypeDecorator::dataTypeId));
