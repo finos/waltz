@@ -62,4 +62,11 @@ jobs:
       if: ${{ always() }}
       uses: scacap/action-surefire-report@v1
 
+    - name: Release
+      uses: softprops/action-gh-release@v1
+      if: startsWith(github.ref, 'refs/tags/')
+      with:
+        files: |
+          liquibase-changelogs
+          waltz-web-postgres.war
 
