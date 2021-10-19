@@ -3,10 +3,8 @@
 
 name: Waltz Build (pg)
 
-on:
-  push:
-    branches: [ master ]
-  
+on: push
+      
 jobs:
   build:
 
