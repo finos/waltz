@@ -11,6 +11,7 @@
         <fileSet>
             <directory>./src/main/ddl/liquibase/</directory>
             <useDefaultExcludes>true</useDefaultExcludes>
+            <outputDirectory>.</outputDirectory>
         </fileSet>
     </fileSets>
 </assembly>
