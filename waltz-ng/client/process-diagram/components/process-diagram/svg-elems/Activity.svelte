@@ -1,34 +1,59 @@
 <script>
+    import {truncateMiddle} from "../../../../common/string-utils";
+    import {wrapText} from "../../../../common/d3-utils";
+    import {selectAll, select} from "d3-selection";
+    import {highlightedActivities} from "../diagram-store";
+
     export let obj;
     export let layout;
     export let appCount;
     export let isSelected;
 
+    $: {
+        selectAll(".activity")
+            .classed("highlight", false);
+
+        _.forEach(
+            $highlightedActivities,
+            d => selectAll(`.activity-${d.objectId}`)
+                .classed("highlight", true));
+    }
+
+    $: {
+        selectAll(`.activity-${obj.objectId}`).classed("selected", isSelected);
+    }
+
+    let elem;
+
+    $: select(elem)
+        .text(truncateMiddle(obj.name, 64))
+        .call(wrapText, layout.width - 10);
+
 </script>
 
 
-<rect class={isSelected ? "selected" : ""}
+<rect class="activity activity-{obj.objectId}"
       rx="10"
       ry="10"
       width={layout.width}
       height={layout.height}>
 </rect>
 
-<foreignObject width={layout.width}
-               height={layout.height}
-               style="pointer-events: none"
-               y="4">
-    <div>
-        {obj.name}
-    </div>
-</foreignObject>
+<text transform="translate({layout.width / 2}, 15)"
+      style="pointer-events: none"
+      dominant-baseline="middle"
+      text-anchor="middle"
+      font-size="11"
+      fill="#332B23"
+      bind:this={elem}>
+</text>
 
 {#if appCount > 0}
     <g  class="app-count"
         transform="translate({layout.width})">
-        <circle cx="-2" cy="5" r="12">
+        <circle cx="0" cy="5" r="12">
         </circle>
-        <text dx="-2" dy="10" text-anchor="middle">
+        <text dx="0" dy="10" text-anchor="middle">
             {appCount}
         </text>
     </g>
@@ -39,23 +64,26 @@
         opacity: 0.8;
         stroke: #ccc;
         fill: url(#Activity-gradient);
-        transition: stroke ease-in-out 0.4s;
+        transition: stroke ease-in-out 0.4s, stroke-width ease-in-out 0.4s;
+    }
+
+
+
+    rect.highlight {
+        opacity: 1;
+        stroke: #2b98ff;
+        stroke-width: 3;
     }
 
     rect.selected {
         opacity: 1;
         stroke: #2b98ff;
         stroke-width: 3;
-        fill: url(#Activity-gradient);
-    }
-
-    foreignObject div {
-        text-align: center;
-        font-size: 11px;
     }
 
     .app-count circle{
         fill: #d5fffc;
         stroke: #84a5a4;
     }
+
 </style>

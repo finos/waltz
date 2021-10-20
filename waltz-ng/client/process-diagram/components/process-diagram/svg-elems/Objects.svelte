@@ -1,11 +1,11 @@
 <script>
     import {appsByDiagramMeasurableId, layoutDataById, objects, selectedObject} from "../diagram-store";
-    import {findAssociatedApps, toComp} from "../process-diagram-utils";
+    import {findAssociatedApps, toComp, selectDiagramObject} from "../process-diagram-utils";
     import _ from "lodash";
 
-    $: objs = _.map(
-        $objects,
-        obj => {
+    $: objs = _
+        .chain($objects)
+        .map(obj => {
             const layout = $layoutDataById[obj.objectId];
             return {
                 obj,
@@ -13,7 +13,9 @@
                 transform: `translate(${layout.x} ${layout.y})`,
                 layout
             };
-        });
+        })
+        .reject(d => d.comp === null)
+        .value();
 
     function getAppCount(obj){
         const associatedApps = findAssociatedApps($appsByDiagramMeasurableId, obj);
@@ -25,7 +27,7 @@
 {#each objs as d}
     <g transform={d.transform}
        class={`object ${d.obj.stereotype}`}
-       on:click={() => $selectedObject = d.obj}>
+       on:click|stopPropagation={() => selectDiagramObject(d.obj)}>
         <svelte:component obj={d.obj}
                           layout={d.layout}
                           this={d.comp}

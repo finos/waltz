@@ -1,9 +1,8 @@
 <script>
-    import {calcBounds, calcViewBox} from "./process-diagram-utils";
+    import {calcBounds, calcViewBox, clearSelections} from "./process-diagram-utils";
     import Defs from "./svg-elems/Defs.svelte";
     import Objects from "./svg-elems/Objects.svelte";
     import Connections from "./svg-elems/Connections.svelte";
-    import {scaleLinear} from "d3-scale";
     import {zoom} from "d3-zoom";
     import {event, select} from "d3-selection";
     import {positions} from "./diagram-store";
@@ -20,12 +19,9 @@
     $: viewBox = calcViewBox($positions);
     $: bounds = calcBounds($positions);
 
-    $: y = scaleLinear()
-        .domain([bounds.y1, bounds.y2])
-        .range([bounds.y2, bounds.y1]);
-
     $: svgElem = select(elem);
     $: svgElem.call(zoom().on("zoom", zoomed));
+
 
 </script>
 
@@ -36,6 +32,7 @@
              width="100%"
              height="700"
              preserveAspectRatio="xMinYMin"
+             on:click={clearSelections}
              {viewBox}>
 
             <Defs/>
@@ -47,7 +44,8 @@
         </svg>
 
     </div>
-    <div class="col-md-3" style="padding-left: 1em">
+    <div class="col-md-3"
+         style="padding-left: 1em">
         <ProcessDiagramContextPanel/>
     </div>
 </div>

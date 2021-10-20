@@ -96,6 +96,7 @@ public abstract class IdSelectionOptions {
             case LOGICAL_DATA_FLOW:
             case PHYSICAL_FLOW:
             case PHYSICAL_SPECIFICATION:
+            case PROCESS_DIAGRAM:
             case SCENARIO:
             case SERVER:
                 return EXACT;

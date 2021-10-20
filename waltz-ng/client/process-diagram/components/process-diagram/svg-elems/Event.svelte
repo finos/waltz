@@ -3,7 +3,7 @@
 
     export let obj;
     export let layout;
-
+    export let isSelected;
 
     $: subTypeComponent = lookupSubTypeComponent(obj.objectSubType);
 
@@ -11,12 +11,12 @@
 </script>
 
 
-<g class={obj.stereotype}>
+<g class={obj.stereotype} >
 
     <g transform="translate({layout.width / 2} 0)">
 
         <circle r={layout.width / 1.8}
-                class="outer">
+                class="outer {isSelected ? 'selected':''}">
         </circle>
 
         {#if obj.stereotype !== 'StartEvent'}
@@ -76,6 +76,12 @@
 
     .StartEvent {
         fill: #e1ffe0;
+    }
+
+    .outer.selected {
+        opacity: 1;
+        stroke: #2b98ff;
+        stroke-width: 3;
     }
 
 </style>

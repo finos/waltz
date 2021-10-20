@@ -670,6 +670,7 @@ const processDiagramSections = [
          [
              appCostsSummarySection,
              appComplexitySummarySection,
+             attestationSummarySection,
              entityStatisticSummarySection,
              measurableRatingsBrowserSection,
              reportGridViewSection,

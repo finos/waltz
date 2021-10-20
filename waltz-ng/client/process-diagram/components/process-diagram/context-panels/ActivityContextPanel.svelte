@@ -1,21 +1,20 @@
 <script>
 
-    import {findAssociatedApps} from "../process-diagram-utils";
-    import {appsByDiagramMeasurableId, selectedObject} from "../diagram-store";
+    import {findAssociatedApps, selectApplication} from "../process-diagram-utils";
+    import {appsByDiagramMeasurableId, selectedObject, selectedApp, highlightedActivities} from "../diagram-store";
     import _ from "lodash";
     import EntityLink from "../../../../common/svelte/EntityLink.svelte";
 
     $: appsToDisplay = _
         .chain(findAssociatedApps($appsByDiagramMeasurableId, $selectedObject))
         .map(d => d.applicationRef)
-        .sortBy(d => d.name)
         .value();
 
 </script>
 
 <h4><EntityLink ref={$selectedObject.waltzReference}/></h4>
 
-<table class="table table-condensed">
+<table class="table table-condensed table-hover small">
     <thead>
         <th>
             Associated Application
@@ -26,8 +25,9 @@
     </thead>
     <tbody>
         {#each appsToDisplay as app}
-            <tr>
-                <td><EntityLink ref={app}/></td>
+            <tr class="clickable"
+                on:click={() => selectApplication(app)}>
+                <td>{app.name}</td>
                 <td>{app.externalId}</td>
             </tr>
             {:else}
