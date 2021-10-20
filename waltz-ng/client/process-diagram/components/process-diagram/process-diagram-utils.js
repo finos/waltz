@@ -10,6 +10,7 @@ import Timer from "./svg-elems/sub-types/Timer.svelte";
 import Inclusive from "./svg-elems/sub-types/Inclusive.svelte";
 import Exclusive from "./svg-elems/sub-types/Exclusive.svelte";
 import Parallel from "./svg-elems/sub-types/Parallel.svelte";
+import {selectedApp, selectedObject} from "./diagram-store";
 
 
 const padding = {
@@ -60,7 +61,10 @@ function lineToSPath(x1, y1, x2, y2, c = 0.2) {
         Math.abs(dy * c),
         Math.abs(dx * c));
     // middle
-    const xm = x1 + dx / 2;
+
+    const xm = dx > 172 // science
+        ? x1 + dx / 16
+        : x1 + dx / 2;
     // start and ending points of the curves,
     // ..the ternary expr (?:) on the end ensures we are adding/removing as appropriate
     const x1a = xm + cl * (x1 > x2 ? 1 : -1);
@@ -131,6 +135,9 @@ export function toComp(obj) {
             return Decision;
         case "Boundary":
             return Boundary;
+        default:
+            console.log(`Could not determine the diagram object for object type: ${obj.objectType}`);
+            return null;
     }
 }
 
@@ -177,4 +184,31 @@ export function lookupSubTypeComponent(subType) {
             console.log("Cannot find subtype for: " + subType)
             return null;
     }
+}
+
+
+/**
+ * Moves the given element to be the last of it's siblings.
+ * This causes it to be drawn last and therefore looks like
+ * it has been moved to the front.
+  * @param elem - the element to move
+ */
+export function moveToFront(elem) {
+    elem.parentNode.appendChild(elem);
+}
+
+export function clearSelections(){
+    selectedObject.set(null);
+    selectedApp.set(null);
+}
+
+export function selectDiagramObject(obj){
+    selectedObject.set(obj);
+    selectedApp.set(null);
+}
+
+
+export function selectApplication(app){
+    selectedApp.set(app);
+    selectedObject.set(null);
 }

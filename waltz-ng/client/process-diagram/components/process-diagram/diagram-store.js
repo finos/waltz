@@ -9,7 +9,7 @@ export const layoutDataById = writable({});
 export const appAlignments = writable([]);
 export const diagramInfo = writable(null);
 export const selectedObject = writable(null);
-
+export const selectedApp = writable(null);
 
 function resetStore() {
     selectedObject.set(null);
@@ -53,15 +53,42 @@ export const appsByDiagramMeasurableId = derived([appAlignments], ([$appAlignmen
     return _
         .chain($appAlignments)
         .map(a => Object.assign({}, { diagramEntityId: a.diagramMeasurableRef.id, applicationRef: a.applicationRef }))
-        .uniq()
+        .uniqBy(d => `${d.diagramEntityId}_${d.applicationRef.id}`)
+        .orderBy(d => _.toLower(d.applicationRef.name))
         .groupBy(t => t.diagramEntityId)
         .value();
 });
 
 
 export const highlightedConnections = derived([connections, selectedObject], ([$connections, $selectedObject]) => {
+    if (_.isNull($selectedObject)) {
+        return [];
+    }
+
     return _
         .chain($connections)
         .filter(c => c.startObjectId === $selectedObject.objectId || c.endObjectId === $selectedObject.objectId)
         .value();
 });
+
+
+export const highlightedActivities = derived(
+    [appAlignments, selectedApp, objects], ([$appAlignments, $selectedApp, $objects]) =>
+    {
+        const objectsByWaltzRefId = _
+            .chain($objects)
+            .filter(d => d.waltzReference)
+            .keyBy(d => d.waltzReference.id)
+            .value();
+
+        if (_.isNull($selectedApp)) {
+            return [];
+        }
+        return _
+            .chain($appAlignments)
+            .filter(a => a.applicationRef.id === $selectedApp.id)
+            .map(a => _.get(objectsByWaltzRefId, [a.diagramMeasurableRef.id], null))
+            .compact()
+            .sortBy(d => _.toLower(d.name))
+            .value();
+    });
