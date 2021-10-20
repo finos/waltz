@@ -65,6 +65,6 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       with:
         files: |
-          waltz-data/src/main/ddl/liquibase/*
+          waltz-data/target/liquibase-scripts.zip
           waltz-web/target/waltz-web.war
 
