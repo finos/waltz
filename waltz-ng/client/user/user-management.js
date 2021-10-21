@@ -113,8 +113,6 @@ function controller(serviceBroker) {
 
     vm.updateUser = (user, roleSelections, password1, password2, comment) => {
 
-        console.log({user, roleSelections, password1, password2, comment});
-
         if (password1 !== password2) {
             vm.lastError = { id: "MISMATCH", message: "Passwords do not match"};
             return;
