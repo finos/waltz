@@ -34,9 +34,4 @@
         stroke: #ccc;
         fill: url(#NavigationCell-gradient);
     }
-
-    foreignObject div {
-        text-align: center;
-        font-size: smaller
-    }
 </style>

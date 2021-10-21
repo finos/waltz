@@ -20,6 +20,7 @@ package com.khartec.waltz.web.endpoints.api;
 
 
 import com.khartec.waltz.model.assessment_rating.AssessmentGroupedEntities;
+import com.khartec.waltz.model.assessment_rating.AssessmentRatingDetail;
 import com.khartec.waltz.service.assessment_rating.AssessmentRatingViewService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -30,6 +31,7 @@ import java.util.List;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
 
 
@@ -53,13 +55,17 @@ public class AssessmentRatingViewEndpoint implements Endpoint {
     @Override
     public void register() {
         String findGroupedByDefinitionAndOutcomePath = mkPath(BASE_URL, "kind", ":kind", "grouped");
+        String findFavouriteAssessmentsForEntityPath = mkPath(BASE_URL, "kind", ":kind", "id", ":id");
 
         ListRoute<AssessmentGroupedEntities> findGroupedByDefinitionAndOutcomeRoute = (req, res) -> {
             List<Long> entityIds = readIdsFromBody(req);
             return assessmentRatingViewService.findGroupedByDefinitionAndOutcomes(getKind(req), entityIds);
         };
 
+        ListRoute<AssessmentRatingDetail> findFavouriteAssessmentsForEntityRoute = (req, res) -> assessmentRatingViewService.findFavouriteAssessmentsForEntityAndUser(getEntityReference(req), getUsername(req));
+
         postForList(findGroupedByDefinitionAndOutcomePath, findGroupedByDefinitionAndOutcomeRoute);
+        getForList(findFavouriteAssessmentsForEntityPath, findFavouriteAssessmentsForEntityRoute);
     }
 
 }

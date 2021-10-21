@@ -57,6 +57,10 @@
             path: ctx => `org-units/${ctx.id}`,
             title: "Org Unit View"
         },
+        "main.person.id": {
+            path: ctx => `person/id/${ctx.id}`,
+            title: "Person View"
+        },
         "main.physical-flow.view": {
             path: ctx => `physical-flow/${ctx.id}`,
             title: "Physical Flow View"

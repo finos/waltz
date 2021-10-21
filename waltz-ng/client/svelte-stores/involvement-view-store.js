@@ -18,32 +18,19 @@
 
 import {remote} from "./remote";
 
+export function mkInvolvementViewStore() {
 
-export function mkOrgUnitStore() {
-
-    const loadAll = (force) => {
-        return remote
-            .fetchViewList(
-                "GET",
-                "api/org-unit",
-                null,
-                force);
-    }
-
-    const getById = (id, force = false) => {
-        return remote.fetchViewData(
+    const findKeyInvolvementsForEntity = (ref, force = false) => remote
+        .fetchViewData(
             "GET",
-            `api/org-unit/${id}`,
+            `api/involvement-view/entity/kind/${ref.kind}/id/${ref.id}`,
             null,
-            {},
-            {force: force});
-    }
-
+            [],
+            {force});
 
     return {
-        loadAll,
-        getById
+        findKeyInvolvementsForEntity
     };
 }
 
-export const orgUnitStore = mkOrgUnitStore();
+export const involvementViewStore = mkInvolvementViewStore();
