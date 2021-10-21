@@ -37,15 +37,18 @@ function filterUsers(users = [], qry = null) {
     return users.filter(user => user.searchStr.indexOf(qryStr) > -1);
 }
 
+
 function enrichUsersWithSearchStr(user) {
     const searchStr = _.toLower(user.userName);
     return Object.assign({}, user, { searchStr });
 }
 
+
 function controller(serviceBroker) {
     const vm =  initialiseData(this, initialState);
 
-    serviceBroker.loadViewData(CORE_API.UserStore.findAll, [])
+    serviceBroker
+        .loadViewData(CORE_API.UserStore.findAll, [])
         .then(result => {
             vm.users = _.map(result.data, d => enrichUsersWithSearchStr(d));
 
@@ -54,7 +57,8 @@ function controller(serviceBroker) {
             }
         });
 
-    serviceBroker.loadViewData(CORE_API.RoleStore.findAllRoles, [])
+    serviceBroker
+        .loadViewData(CORE_API.RoleStore.findAllRoles, [])
         .then(result => vm.roles = _.orderBy(result.data, d => d.name));
 
     const refresh = () => {
@@ -66,12 +70,12 @@ function controller(serviceBroker) {
         refresh();
     };
 
-
     vm.dismiss = () => {
         vm.newUser = null;
         vm.selectedUser = null;
         vm.newPassword1 = null;
         vm.newPassword2 = null;
+        vm.comment = null;
     };
 
     vm.userSelected = (user) => {
@@ -107,13 +111,14 @@ function controller(serviceBroker) {
             );
     };
 
-    vm.updateUser = (user, roleSelections, password1, password2) => {
+    vm.updateUser = (user, roleSelections, password1, password2, comment) => {
+
+        console.log({user, roleSelections, password1, password2, comment});
 
         if (password1 !== password2) {
             vm.lastError = { id: "MISMATCH", message: "Passwords do not match"};
             return;
         }
-
 
         const roles = _.chain(roleSelections)
             .map((v, k) => v ? k : null)  // get selected key name or null if not selected
@@ -121,7 +126,7 @@ function controller(serviceBroker) {
             .value();
 
         serviceBroker
-            .execute(CORE_API.UserStore.updateRoles, [user.userName, roles])
+            .execute(CORE_API.UserStore.updateRoles, [user.userName, roles, comment])
             .then(
                 () => {
                     user.roles = roles;
