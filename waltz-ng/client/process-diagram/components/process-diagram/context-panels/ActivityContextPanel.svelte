@@ -16,7 +16,7 @@
 
     <div slot="post-header">
 
-        <div class={_.size(appsToDisplay) > 10 ? "waltz-scroll-region-250 scroll-activities" : ""}>
+        <div class={_.size(appsToDisplay) > 10 ? "waltz-scroll-region-250 scroll-apps" : ""}>
             <table class="table table-condensed table-hover small">
                 <thead>
                 <th width="50%">
@@ -44,3 +44,11 @@
 
     </div>
 </EntityInfoPanel>
+
+
+<style>
+    .scroll-apps {
+        margin-top: 1em;
+        margin-bottom: 1em;
+    }
+</style>
