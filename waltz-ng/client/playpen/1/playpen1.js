@@ -19,14 +19,13 @@
 
 import template from "./playpen1.html";
 import {initialiseData} from "../../common";
-import {mkRef} from "../../common/entity-utils";
-import ProcessDiagram from "../../process-diagram/components/process-diagram/ProcessDiagram.svelte"
 import EntityInfoPanel from "./EntityInfoPanel.svelte";
 
 const initData = {
     EntityInfoPanel,
-    parentEntityRef: {id: 20768, kind: "APPLICATION"}
-    // parentEntityRef: {id: 6538029, kind: "CHANGE_INITIATIVE"}
+    // parentEntityRef: {id: 20768, kind: "APPLICATION"}
+    parentEntityRef: {id: 6538029, kind: "CHANGE_INITIATIVE"},
+    measurableEntityRef: {id: 54566, kind: "MEASURABLE"}
 };
 
 

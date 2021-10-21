@@ -1,14 +1,16 @@
 <script>
 
     import {involvementViewStore} from "../../svelte-stores/involvement-view-store";
+    import EntityLink from "../../common/svelte/EntityLink.svelte";
+    import _ from "lodash"
 
     export let primaryEntityRef;
 
-    $: involvementsCall2 = involvementViewStore.findKeyInvolvementsForEntity(primaryEntityRef);
-    $: involvements2 = $involvementsCall2.data;
+    $: involvementsCall = involvementViewStore.findKeyInvolvementsForEntity(primaryEntityRef);
+    $: involvements = $involvementsCall.data;
 
-    $: tableData =  _
-        .chain(involvements2)
+    $: tableData = _
+        .chain(involvements)
         .groupBy(d => d.involvementKind.id)
         .map((v, k) => Object.assign(
             {},
@@ -18,24 +20,28 @@
             }))
         .value()
 
-    function mkNamesString(people){
-        const names = _.map(people, p => p.name);
-        return _.join(names, ", ");
-    }
-
 </script>
 
-<table class="table table-condensed small">
-    <thead>
-        <th width="50%">Key People:</th>
-        <th width="50%"></th>
-    </thead>
-    <tbody>
-    {#each tableData as keyPerson}
-        <tr>
-            <td>{keyPerson.involvementKind.name}</td>
-            <td>{mkNamesString(keyPerson.people)}</td>
-        </tr>
-    {/each}
-    </tbody>
-</table>
+{#if !_.isEmpty(tableData)}
+    <table class="table table-condensed small">
+        <thead>
+            <th width="50%">Key People:</th>
+            <th width="50%"></th>
+        </thead>
+        <tbody>
+        {#each tableData as keyPerson}
+            <tr>
+                <td>{keyPerson.involvementKind.name}</td>
+                <td>
+                    {#each keyPerson.people as person}
+                        <span>
+                            {#if _.first(keyPerson.people).id !== person.id};&nbsp;{/if}
+                            <EntityLink ref={person}/>
+                        </span>
+                    {/each}
+                </td>
+            </tr>
+        {/each}
+        </tbody>
+    </table>
+{/if}

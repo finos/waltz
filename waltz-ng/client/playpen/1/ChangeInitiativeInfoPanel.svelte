@@ -3,18 +3,14 @@
 
     import {changeInitiativeStore} from "../../svelte-stores/change-initiative-store";
     import EntityLink from "../../common/svelte/EntityLink.svelte";
-    import _ from "lodash";
-    import Markdown from "../../common/svelte/Markdown.svelte";
     import KeyInvolvementInfoPanel from "./KeyInvolvementInfoPanel.svelte";
     import KeyAssessmentInfoPanel from "./KeyAssessmentInfoPanel.svelte";
+    import DescriptionFade from "./DescriptionFade.svelte";
 
     export let primaryEntityRef;
 
     $: changeInitiativeCall = changeInitiativeStore.getById(primaryEntityRef.id);
     $: changeInitiative = $changeInitiativeCall.data;
-
-
-    $: console.log({primaryEntityRef, changeInitiative});
 
 </script>
 
@@ -45,37 +41,14 @@
         </tbody>
     </table>
 
-    <div class="waip-description">
-        <div class={_.size(changeInitiative.description) > 50 ? "waip-description-fade" : ""}></div>
-        <Markdown text={changeInitiative.description}/>
-    </div>
-
+    <DescriptionFade text={changeInitiative.description}/>
     <br>
+
+    <slot name="post-header"/>
 
     <KeyInvolvementInfoPanel {primaryEntityRef}/>
 
     <KeyAssessmentInfoPanel {primaryEntityRef}/>
+
+    <slot name="footer"/>
 {/if}
-
-
-<style>
-
-    .waip-description {
-        position:relative;
-        max-height:6em;
-        overflow:hidden;
-    }
-
-    .waip-description-fade {
-        position:absolute;
-        top:2em;
-        width:100%;
-        height:4em;
-        background: -webkit-linear-gradient(transparent, white);
-        background: -o-linear-gradient(transparent, white);
-        background: -moz-linear-gradient(transparent, white);
-        background: linear-gradient(transparent, white);
-    }
-
-
-</style>

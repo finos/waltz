@@ -30,8 +30,19 @@ export function mkOrgUnitStore() {
                 force);
     }
 
+    const getById = (id, force = false) => {
+        return remote.fetchViewData(
+            "GET",
+            `api/org-unit/${id}`,
+            null,
+            {},
+            {force: force});
+    }
+
+
     return {
-        loadAll
+        loadAll,
+        getById
     };
 }
 
