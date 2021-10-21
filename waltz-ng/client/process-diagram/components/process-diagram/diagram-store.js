@@ -89,6 +89,7 @@ export const highlightedActivities = derived(
             .filter(a => a.applicationRef.id === $selectedApp.id)
             .map(a => _.get(objectsByWaltzRefId, [a.diagramMeasurableRef.id], null))
             .compact()
+            .uniqBy(d => d.objectId)
             .sortBy(d => _.toLower(d.name))
             .value();
     });

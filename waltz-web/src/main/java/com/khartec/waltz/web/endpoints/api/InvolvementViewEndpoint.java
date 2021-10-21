@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
+import com.khartec.waltz.model.involvement.InvolvementDetail;
 import com.khartec.waltz.model.involvement.InvolvementViewItem;
 import com.khartec.waltz.service.involvement.InvolvementViewService;
 import com.khartec.waltz.web.ListRoute;
@@ -25,6 +26,7 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.khartec.waltz.web.WebUtilities.getEntityReference;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 
@@ -46,13 +48,18 @@ public class InvolvementViewEndpoint implements Endpoint {
     public void register() {
 
         String findAllByEmployeeIdPath = mkPath(BASE_URL, "employee", ":employeeId");
+        String findKeyInvolvementsForEntityPath = mkPath(BASE_URL, "entity", "kind", ":kind", "id", ":id");
 
         ListRoute<InvolvementViewItem> findAllByEmployeeIdRoute = (request, response) -> {
             String employeeId = request.params("employeeId");
             return involvementViewService.findAllByEmployeeId(employeeId);
         };
 
+        ListRoute<InvolvementDetail> findKeyInvolvementsForEntityRoute = (request, response) ->
+                involvementViewService.findKeyInvolvementsForEntity(getEntityReference(request));
+
         getForList(findAllByEmployeeIdPath, findAllByEmployeeIdRoute);
+        getForList(findKeyInvolvementsForEntityPath, findKeyInvolvementsForEntityRoute);
     }
 
 }
