@@ -2,7 +2,7 @@
 
     import {selectDiagramObject} from "../process-diagram-utils";
     import {highlightedActivities, selectedApp} from "../diagram-store";
-    import EntityInfoPanel from "../../../../playpen/1/EntityInfoPanel.svelte";
+    import EntityInfoPanel from "../../../../common/svelte/info-panels/EntityInfoPanel.svelte";
 </script>
 
 <EntityInfoPanel primaryEntityRef={$selectedApp}>

@@ -1,7 +1,7 @@
 <script>
 
-    import {involvementViewStore} from "../../svelte-stores/involvement-view-store";
-    import EntityLink from "../../common/svelte/EntityLink.svelte";
+    import {involvementViewStore} from "../../../svelte-stores/involvement-view-store";
+    import EntityLink from "../EntityLink.svelte";
     import _ from "lodash"
 
     export let primaryEntityRef;

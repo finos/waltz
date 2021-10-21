@@ -1,11 +1,11 @@
 
 <script>
 
-    import {changeInitiativeStore} from "../../svelte-stores/change-initiative-store";
-    import EntityLink from "../../common/svelte/EntityLink.svelte";
+    import {changeInitiativeStore} from "../../../svelte-stores/change-initiative-store";
+    import EntityLink from "../EntityLink.svelte";
     import KeyInvolvementInfoPanel from "./KeyInvolvementInfoPanel.svelte";
     import KeyAssessmentInfoPanel from "./KeyAssessmentInfoPanel.svelte";
-    import DescriptionFade from "./DescriptionFade.svelte";
+    import DescriptionFade from "../DescriptionFade.svelte";
 
     export let primaryEntityRef;
 

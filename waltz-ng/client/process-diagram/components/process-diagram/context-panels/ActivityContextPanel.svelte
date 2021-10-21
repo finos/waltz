@@ -3,7 +3,7 @@
     import {findAssociatedApps, selectApplication} from "../process-diagram-utils";
     import {appsByDiagramMeasurableId, selectedObject} from "../diagram-store";
     import _ from "lodash";
-    import EntityInfoPanel from "../../../../playpen/1/EntityInfoPanel.svelte";
+    import EntityInfoPanel from "../../../../common/svelte/info-panels/EntityInfoPanel.svelte";
 
     $: appsToDisplay = _
         .chain(findAssociatedApps($appsByDiagramMeasurableId, $selectedObject))

@@ -58,7 +58,7 @@
             title: "Org Unit View"
         },
         "main.person.id": {
-            path: ctx => `person/${ctx.id}`,
+            path: ctx => `person/id/${ctx.id}`,
             title: "Person View"
         },
         "main.physical-flow.view": {

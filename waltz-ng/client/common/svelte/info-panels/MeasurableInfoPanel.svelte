@@ -1,13 +1,13 @@
 
 <script>
 
-    import EntityLink from "../../common/svelte/EntityLink.svelte";
+    import EntityLink from "../EntityLink.svelte";
     import _ from "lodash";
     import KeyInvolvementInfoPanel from "./KeyInvolvementInfoPanel.svelte";
     import KeyAssessmentInfoPanel from "./KeyAssessmentInfoPanel.svelte";
-    import DescriptionFade from "./DescriptionFade.svelte";
-    import {measurableStore} from "../../svelte-stores/measurables";
-    import {orgUnitStore} from "../../svelte-stores/org-unit-store";
+    import DescriptionFade from "../DescriptionFade.svelte";
+    import {measurableStore} from "../../../svelte-stores/measurables";
+    import {orgUnitStore} from "../../../svelte-stores/org-unit-store";
 
     export let primaryEntityRef;
 

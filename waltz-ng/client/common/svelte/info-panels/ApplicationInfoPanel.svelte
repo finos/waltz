@@ -1,14 +1,14 @@
 
 <script>
 
-    import {applicationStore} from "../../svelte-stores/application-store";
-    import EntityLink from "../../common/svelte/EntityLink.svelte";
-    import {lifecyclePhase} from "../../common/services/enums/lifecycle-phase";
-    import {criticality} from "../../common/services/enums/criticality";
+    import {applicationStore} from "../../../svelte-stores/application-store";
+    import EntityLink from "../EntityLink.svelte";
+    import {lifecyclePhase} from "../../services/enums/lifecycle-phase";
+    import {criticality} from "../../services/enums/criticality";
     import _ from "lodash";
     import KeyInvolvementInfoPanel from "./KeyInvolvementInfoPanel.svelte";
     import KeyAssessmentInfoPanel from "./KeyAssessmentInfoPanel.svelte";
-    import DescriptionFade from "./DescriptionFade.svelte";
+    import DescriptionFade from "../DescriptionFade.svelte";
 
     export let primaryEntityRef;
 

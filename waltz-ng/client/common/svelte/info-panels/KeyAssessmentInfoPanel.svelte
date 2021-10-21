@@ -1,6 +1,6 @@
 <script>
 
-    import {assessmentRatingViewStore} from "../../svelte-stores/assessment-rating-view-service";
+    import {assessmentRatingViewStore} from "../../../svelte-stores/assessment-rating-view-service";
 
     export let primaryEntityRef;
 

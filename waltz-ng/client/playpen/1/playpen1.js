@@ -19,7 +19,7 @@
 
 import template from "./playpen1.html";
 import {initialiseData} from "../../common";
-import EntityInfoPanel from "./EntityInfoPanel.svelte";
+import EntityInfoPanel from "../../common/svelte/info-panels/EntityInfoPanel.svelte";
 
 const initData = {
     EntityInfoPanel,
