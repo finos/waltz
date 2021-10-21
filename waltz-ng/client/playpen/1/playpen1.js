@@ -21,14 +21,12 @@ import template from "./playpen1.html";
 import {initialiseData} from "../../common";
 import {mkRef} from "../../common/entity-utils";
 import ProcessDiagram from "../../process-diagram/components/process-diagram/ProcessDiagram.svelte"
+import EntityInfoPanel from "./EntityInfoPanel.svelte";
 
 const initData = {
-    ref: mkRef("APPLICATION", 840),
-    ref1: mkRef("APPLICATION", 12),
-    ref2: mkRef("APPLICATION", 842),
-    ref3: mkRef("APPLICATION", 212),
-    ref4: mkRef("APPLICATION", 913),
-    ProcessDiagram
+    EntityInfoPanel,
+    parentEntityRef: {id: 20768, kind: "APPLICATION"}
+    // parentEntityRef: {id: 6538029, kind: "CHANGE_INITIATIVE"}
 };
 
 

@@ -11,8 +11,18 @@ export function mkAssessmentRatingViewStore() {
             [],
             {force});
 
+    const findFavouritesForEntity = (ref, force = false) => {
+        return remote
+            .fetchViewList(
+                "GET",
+                `api/assessment-rating-view/kind/${ref.kind}/id/${ref.id}`,
+                [],
+                {force});
+    }
+
     return {
         findEntitiesGroupedByDefinitionAndOutcome,
+        findFavouritesForEntity
     };
 }
 

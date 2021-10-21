@@ -2,10 +2,10 @@
 
     import {selectDiagramObject} from "../process-diagram-utils";
     import {highlightedActivities, selectedApp} from "../diagram-store";
-    import EntityLink from "../../../../common/svelte/EntityLink.svelte"
+    import EntityInfoPanel from "../../../../playpen/1/EntityInfoPanel.svelte";
 </script>
 
-<h4><EntityLink ref={$selectedApp}/></h4>
+<EntityInfoPanel primaryEntityRef={$selectedApp}/>
 
 <table class="table table-condensed table-hover small">
     <thead>
