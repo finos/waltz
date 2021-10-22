@@ -11,8 +11,15 @@ export const diagramInfo = writable(null);
 export const selectedObject = writable(null);
 export const selectedApp = writable(null);
 
-function resetStore() {
+export function resetStore() {
+    diagramInfo.set(null);
+    objects.set([]);
+    connections.set([]);
+    positions.set([]);
+    layoutDataById.set({});
+    appAlignments.set([]);
     selectedObject.set(null);
+    selectedApp.set(null);
 }
 
 export function initData(diagram, layout, alignments) {
