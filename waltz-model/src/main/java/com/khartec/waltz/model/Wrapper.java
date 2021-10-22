@@ -21,7 +21,10 @@ public abstract class Wrapper<T> {
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "(" + value() + ")";
+        if(value() == null){
+            return null;
+        } else {
+            return value().toString();
+        }
     }
-
 }
