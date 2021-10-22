@@ -28,9 +28,6 @@ import com.khartec.waltz.web.endpoints.auth.AuthenticationUtilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Set;
-
-import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
@@ -82,8 +79,8 @@ public class UserEndpoint implements Endpoint {
 
             String userName = getUsername(request);
             String targetUserName = request.params("userName");
-            Set<String> roles = (Set<String>) readBody(request, Set.class);
-            return userRoleService.updateRoles(userName, targetUserName, roles);
+            UpdateRolesCommand cmd = readBody(request, UpdateRolesCommand.class);
+            return userRoleService.updateRoles(userName, targetUserName, cmd);
         };
 
         DatumRoute<Boolean> resetPasswordRoute = (request, response) -> {
