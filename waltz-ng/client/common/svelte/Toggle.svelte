@@ -1,5 +1,3 @@
-
-
 <script>
     import Icon from "./Icon.svelte";
 

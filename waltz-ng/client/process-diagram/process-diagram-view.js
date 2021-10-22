@@ -57,7 +57,6 @@ function controller($q, $stateParams, historyStore)
                 vm.diagram = d.diagram;
                 vm.entities = d.entities;
                 addToHistory(historyStore, d.diagram);
-                console.log({vm})
                 const layout = JSON.parse(vm.diagram.layoutData);
                 if (layout) {
                     initData(d.diagram, layout, alignments);
