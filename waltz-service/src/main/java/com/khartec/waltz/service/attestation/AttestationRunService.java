@@ -35,10 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.ListUtilities.asList;
@@ -270,7 +267,7 @@ public class AttestationRunService {
                 .selectionOptions(mkOpts(createCommand.entityReference()))
                 .involvementKindIds(asSet())
                 .attestedEntityKind(createCommand.attestedEntityKind())
-                .attestedEntityId(createCommand.attestedEntityId())
+                .attestedEntityId(Optional.ofNullable(createCommand.attestedEntityId()))
                 .issuedOn(LocalDate.now())
                 .dueDate(LocalDate.now().plusMonths(6))
                 .build();
