@@ -21,7 +21,7 @@ function store($http) {
     const register = (regRequest) => $http.post(`${BASE}/new-user`, regRequest);
     const findAll = () => $http.get(BASE).then(r => r.data);
     const findForUserId = (userId) => $http.get(`${BASE}/user-id/${userId}`).then(r => r.data);
-    const updateRoles = (userName, roles) => $http.post(`${BASE}/${userName}/roles`, roles).then(r => r.data);
+    const updateRoles = (userName, roles, comment) => $http.post(`${BASE}/${userName}/roles`, {roles, comment}).then(r => r.data);
     const deleteUser = (userName) => $http.delete(`${BASE}/${userName}`).then(r => r.data);
     const whoami = () => $http.get(`${BASE}/whoami`).then(r => r.data);
 

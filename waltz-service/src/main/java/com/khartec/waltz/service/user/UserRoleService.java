@@ -19,6 +19,7 @@
 package com.khartec.waltz.service.user;
 
 import com.khartec.waltz.common.SetUtilities;
+import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.data.user.UserRoleDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.Operation;
@@ -27,6 +28,7 @@ import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.model.user.ImmutableUser;
 import com.khartec.waltz.model.user.SystemRole;
+import com.khartec.waltz.model.user.UpdateRolesCommand;
 import com.khartec.waltz.model.user.User;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.person.PersonService;
@@ -117,8 +119,8 @@ public class UserRoleService {
     }
 
 
-    public boolean updateRoles(String userName, String targetUserName, Set<String> newRoles) {
-        LOG.info("Updating roles for userName: {}, new roles: {}", targetUserName, newRoles);
+    public boolean updateRoles(String userName, String targetUserName, UpdateRolesCommand command) {
+        LOG.info("Updating roles for userName: {}, new roles: {}", targetUserName, command.roles());
 
         Person person = personService.getPersonByUserId(targetUserName);
         if(person == null) {
@@ -129,17 +131,17 @@ public class UserRoleService {
                     .severity(Severity.INFORMATION)
                     .userId(userName)
                     .message(format(
-                            "Roles for %s updated to %s",
+                            "Roles for %s updated to %s.  Comment: %s",
                             targetUserName,
-                            sort(newRoles)
-                    ))
+                            sort(command.roles()),
+                            StringUtilities.ifEmpty(command.comment(), "none")))
                     .childKind(Optional.empty())
                     .operation(Operation.UPDATE)
                     .build();
             changeLogService.write(logEntry);
         }
 
-        return userRoleDao.updateRoles(targetUserName, newRoles);
+        return userRoleDao.updateRoles(targetUserName, command.roles());
     }
 
 
