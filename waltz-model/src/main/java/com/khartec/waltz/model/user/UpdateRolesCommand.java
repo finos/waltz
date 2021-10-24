@@ -21,6 +21,7 @@ package com.khartec.waltz.model.user;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.khartec.waltz.model.Nullable;
+import com.khartec.waltz.model.command.Command;
 import org.immutables.value.Value;
 
 import java.util.Set;
@@ -29,7 +30,7 @@ import java.util.Set;
 @Value.Immutable
 @JsonSerialize(as = ImmutableUpdateRolesCommand.class)
 @JsonDeserialize(as = ImmutableUpdateRolesCommand.class)
-public abstract class UpdateRolesCommand {
+public abstract class UpdateRolesCommand implements Command {
 
     public abstract Set<String> roles();
     @Nullable
