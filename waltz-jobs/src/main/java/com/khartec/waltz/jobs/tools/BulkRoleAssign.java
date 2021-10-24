@@ -20,6 +20,7 @@ package com.khartec.waltz.jobs.tools;
 
 import com.khartec.waltz.common.IOUtilities;
 import com.khartec.waltz.common.SetUtilities;
+import com.khartec.waltz.model.user.ImmutableUpdateRolesCommand;
 import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -60,7 +61,15 @@ public class BulkRoleAssign {
                 .collect(Collectors.toSet());
 
         System.out.printf("About to update: %d user-role mappings\n", updates.size());
-        updates.forEach(t -> userRoleService.updateRoles("admin", t.v1, t.v2));
+
+        updates.forEach(t -> userRoleService.updateRoles(
+                "admin",
+                t.v1,
+                ImmutableUpdateRolesCommand.builder()
+                        .roles(t.v2)
+                        .comment("Updated via the Bulk Role Assign tool")
+                        .build()));
+
         System.out.println("Finished updating mappings");
     }
 }
