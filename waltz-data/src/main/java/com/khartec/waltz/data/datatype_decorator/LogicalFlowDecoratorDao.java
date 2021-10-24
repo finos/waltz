@@ -235,7 +235,7 @@ public class LogicalFlowDecoratorDao extends DataTypeDecoratorDao {
                 .collect(toList());
 
         Query[] queries = records.stream().map(
-                record -> DSL.using(dsl.configuration())
+                record -> dsl
                         .insertInto(LOGICAL_FLOW_DECORATOR)
                         .set(record)
                         .onDuplicateKeyUpdate()
