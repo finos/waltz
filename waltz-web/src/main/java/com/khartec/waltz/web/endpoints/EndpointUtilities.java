@@ -21,9 +21,7 @@ package com.khartec.waltz.web.endpoints;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.WebUtilities;
-import spark.ResponseTransformer;
-import spark.Route;
-import spark.Spark;
+import spark.*;
 
 import static com.khartec.waltz.web.WebUtilities.TYPE_JSON;
 
@@ -81,6 +79,18 @@ public class EndpointUtilities {
         Spark.put(path, wrapListHandler(handler), transformer);
     }
 
+    public static <T extends Exception> void addExceptionHandler(Class<T> exceptionClass, ExceptionHandler<T> handler) {
+        Spark.exception(exceptionClass, handler);
+
+        ExceptionHandlerImpl<T> servletExceptionHandler = new ExceptionHandlerImpl<T>(exceptionClass) {
+            @Override
+            public void handle(T exception, Request request, Response response) {
+                handler.handle(exception, request, response);
+            }
+        };
+
+        ExceptionMapper.getInstance().map(exceptionClass, servletExceptionHandler);
+    }
 
     // -- helpers ---
 

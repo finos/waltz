@@ -21,6 +21,7 @@ package com.khartec.waltz.common;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 public class Checks {
 
@@ -121,9 +122,18 @@ public class Checks {
         throw mkFail(msg, args);
     }
 
+
     public static IllegalArgumentException mkFail(String msg, Object... args) {
         throw new IllegalArgumentException(String.format(msg, args));
     }
 
 
+    public static <T> void checkEmpty(Collection<T> ts, Supplier<String> messageSupplier) {
+        checkTrue(CollectionUtilities.isEmpty(ts), messageSupplier.get());
+    }
+
+
+    public static <T> void checkEmpty(Collection<T> ts, String message) {
+        checkTrue(CollectionUtilities.isEmpty(ts), message);
+    }
 }
