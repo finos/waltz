@@ -20,9 +20,11 @@ package com.khartec.waltz.integration_test.inmem.dao;
 
 import com.khartec.waltz.data.actor.ActorDao;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
+import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.actor.Actor;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static com.khartec.waltz.model.EntityReference.mkRef;
@@ -31,12 +33,17 @@ import static org.junit.Assert.*;
 
 public class ActorDaoTest extends BaseInMemoryIntegrationTest {
 
+    @Autowired
+    private ActorDao dao;
+
+    @Autowired
+    private LogicalFlowHelper logicalFlowHelper;
+
     @Test
     public void actorsCanBeCreated() {
         String name = mkName("actorsCanBeCreated");
         Long id = createActor(name);
 
-        ActorDao dao = ctx.getBean(ActorDao.class);
         Actor retrieved = dao.getById(id);
         assertEquals(name, retrieved.name());
         assertEquals(name + " Desc", retrieved.description());
@@ -46,7 +53,6 @@ public class ActorDaoTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void actorsCanBeDeletedIfNotUsed() {
-        ActorDao dao = ctx.getBean(ActorDao.class);
         int preCount = dao.findAll().size();
         Long id = createActor(mkName("canBeDeletedTest"));
 
@@ -60,11 +66,10 @@ public class ActorDaoTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void actorsCannotBeDeletedIfUsed() {
-        ActorDao dao = ctx.getBean(ActorDao.class);
         Long idA = createActor(mkName("cannotBeDeletedActorA"));
         Long idB = createActor(mkName("cannotBeDeletedActorB"));
 
-        helpers.logicalFlowHelper.createLogicalFlow(
+        logicalFlowHelper.createLogicalFlow(
                 mkRef(EntityKind.ACTOR, idA),
                 mkRef(EntityKind.ACTOR, idB));
 

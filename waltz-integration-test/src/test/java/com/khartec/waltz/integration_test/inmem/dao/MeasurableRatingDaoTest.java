@@ -25,8 +25,10 @@ import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.measurable_rating.ImmutableSaveMeasurableRatingCommand;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
 import com.khartec.waltz.schema.Tables;
+import org.jooq.DSLContext;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
@@ -40,20 +42,23 @@ import static org.junit.Assert.assertThrows;
 
 public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
 
-    private final MeasurableRatingDao dao = ctx.getBean(MeasurableRatingDao.class);
+    @Autowired
+    private MeasurableRatingDao dao;
+
+    @Autowired
+    private DSLContext dsl;
 
     @Before
     public void beforeMeasurableRatingTests() {
-        getDsl().deleteFrom(Tables.MEASURABLE_RATING).execute();
-        getDsl().deleteFrom(Tables.APPLICATION).execute();
-        getDsl().deleteFrom(Tables.MEASURABLE).execute();
-        getDsl().deleteFrom(Tables.MEASURABLE_CATEGORY).execute();
+        dsl.deleteFrom(Tables.MEASURABLE_RATING).execute();
+        dsl.deleteFrom(Tables.APPLICATION).execute();
+        dsl.deleteFrom(Tables.MEASURABLE).execute();
+        dsl.deleteFrom(Tables.MEASURABLE_CATEGORY).execute();
     }
 
 
     @Test
     public void ratingsAreEmptyIfNoneAreAssociatedToAnApp() {
-        MeasurableRatingDao dao = ctx.getBean(MeasurableRatingDao.class);
         List<MeasurableRating> ratingsForBrandNewEntity = dao.findForEntity(mkNewAppRef());
         assertTrue(ratingsForBrandNewEntity.isEmpty());
     }
@@ -82,7 +87,7 @@ public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
         mkRatings(appRef, m1Id);
 
         // make the rating read-only
-        getDsl().update(MEASURABLE_RATING)
+        dsl.update(MEASURABLE_RATING)
                 .set(MEASURABLE_RATING.IS_READONLY, true)
                 .where(MEASURABLE_RATING.ENTITY_ID.eq(appRef.id()))
                 .and(MEASURABLE_RATING.MEASURABLE_ID.eq(m1Id))

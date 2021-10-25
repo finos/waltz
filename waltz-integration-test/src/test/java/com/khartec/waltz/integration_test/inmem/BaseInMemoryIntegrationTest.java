@@ -9,13 +9,10 @@ import com.khartec.waltz.data.app_group.AppGroupEntryDao;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
-import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.measurable_category.MeasurableCategoryDao;
-import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
-import com.khartec.waltz.integration_test.inmem.helpers.*;
 import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
@@ -34,23 +31,16 @@ import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
 import com.khartec.waltz.schema.tables.records.MeasurableRecord;
 import com.khartec.waltz.schema.tables.records.OrganisationalUnitRecord;
 import com.khartec.waltz.schema.tables.records.RatingSchemeRecord;
-import com.khartec.waltz.service.app_group.AppGroupService;
-import com.khartec.waltz.service.attestation.AttestationInstanceService;
-import com.khartec.waltz.service.attestation.AttestationRunService;
-import com.khartec.waltz.service.bookmark.BookmarkService;
-import com.khartec.waltz.service.data_type.DataTypeDecoratorService;
-import com.khartec.waltz.service.data_type.DataTypeService;
 import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
-import com.khartec.waltz.service.involvement.InvolvementService;
-import com.khartec.waltz.service.involvement_kind.InvolvementKindService;
-import com.khartec.waltz.service.logical_flow.LogicalFlowService;
-import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
-import com.khartec.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.h2.tools.Server;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.junit.Before;
+import org.junit.runner.RunWith;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import java.sql.SQLException;
 import java.util.Collection;
@@ -65,7 +55,9 @@ import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
 
-public class BaseInMemoryIntegrationTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(classes = DIInMemoryTestConfiguration.class, loader = AnnotationConfigContextLoader.class)
+public abstract class BaseInMemoryIntegrationTest {
 
     static {
         LoggingUtilities.configureLogging();
@@ -78,37 +70,6 @@ public class BaseInMemoryIntegrationTest {
         public Long a1;
         public Long b;
     }
-
-
-    public static class Daos {
-        public LogicalFlowDao logicalFlowDao;
-        public OrganisationalUnitDao organisationalUnitDao;
-    }
-
-
-    public static class Services {
-        public LogicalFlowService logicalFlowService;
-        public DataTypeDecoratorService dataTypeDecoratorService;
-        public DataTypeService dataTypeService;
-        public AppGroupService appGroupService;
-        public BookmarkService bookmarkService;
-        public AttestationInstanceService attestationInstanceService;
-        public AttestationRunService attestationRunService;
-        public InvolvementService involvementService;
-        public InvolvementKindService involvementKindService;
-        public PhysicalSpecificationService physicalSpecificationService;
-        public PhysicalFlowService physicalFlowService;
-    }
-
-
-    public static class Helpers {
-        public LogicalFlowHelper logicalFlowHelper;
-        public PhysicalSpecHelper physicalSpecHelper;
-        public PhysicalFlowHelper physicalFlowHelper;
-        public InvolvementHelper involvementHelper;
-        public PersonHelper personHelper;
-    }
-
 
     protected static final AtomicLong counter = new AtomicLong(1_000_000);
 
@@ -123,9 +84,6 @@ public class BaseInMemoryIntegrationTest {
     protected static final String PROVENANCE = "test";
 
     protected OuIds ouIds;
-    protected Daos daos;
-    protected Helpers helpers;
-    protected Services services;
 
     /**
      *   - root
@@ -148,49 +106,10 @@ public class BaseInMemoryIntegrationTest {
     @Before
     public void baseSetup() {
         ouIds = setupOuTree();
-        daos = setupDaos();
-        services = setupServices();
-        helpers = setupHelpers();
     }
 
 
-    private Services setupServices() {
-        Services s = new Services();
-        s.appGroupService = ctx.getBean(AppGroupService.class);
-        s.attestationInstanceService = ctx.getBean(AttestationInstanceService.class);
-        s.attestationRunService = ctx.getBean(AttestationRunService.class);
-        s.bookmarkService = ctx.getBean(BookmarkService.class);
-        s.dataTypeDecoratorService = ctx.getBean(DataTypeDecoratorService.class);
-        s.dataTypeService= ctx.getBean(DataTypeService.class);
-        s.involvementKindService = ctx.getBean(InvolvementKindService.class);
-        s.involvementService = ctx.getBean(InvolvementService.class);
-        s.logicalFlowService = ctx.getBean(LogicalFlowService.class);
-        s.physicalSpecificationService = ctx.getBean(PhysicalSpecificationService.class);
-        s.physicalFlowService = ctx.getBean(PhysicalFlowService.class);
-        return s;
-    }
-
-
-    private Helpers setupHelpers() {
-        Helpers h = new Helpers();
-        h.involvementHelper = new InvolvementHelper(services.involvementService, services.involvementKindService);
-        h.logicalFlowHelper = new LogicalFlowHelper(daos.logicalFlowDao);
-        h.personHelper = new PersonHelper(ctx.getBean(DSLContext.class));
-        h.physicalFlowHelper = new PhysicalFlowHelper(services.physicalFlowService, services.physicalSpecificationService);
-        h.physicalSpecHelper = new PhysicalSpecHelper(services.physicalSpecificationService);
-        return h;
-    }
-
-
-    private Daos setupDaos() {
-        Daos d = new Daos();
-        d.logicalFlowDao = ctx.getBean(LogicalFlowDao.class);
-        d.organisationalUnitDao = ctx.getBean(OrganisationalUnitDao.class);
-        return d;
-    }
-
-
-    public DSLContext getDsl() {
+    private DSLContext getDsl() {
         return ctx.getBean(DSLContext.class);
     }
 

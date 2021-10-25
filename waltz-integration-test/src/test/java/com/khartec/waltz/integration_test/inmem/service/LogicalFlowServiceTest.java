@@ -28,8 +28,8 @@ import com.khartec.waltz.model.logical_flow.ImmutableAddLogicalFlowCommand;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import org.jooq.lambda.tuple.Tuple2;
-import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
 import java.util.List;
@@ -48,15 +48,11 @@ import static org.junit.Assert.*;
 
 public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
+    @Autowired
     private LogicalFlowService lfSvc;
+
+    @Autowired
     private LogicalFlowHelper helper;
-
-
-    @Before
-    public void setupOuTest() {
-        lfSvc = services.logicalFlowService;
-        helper = helpers.logicalFlowHelper;
-    }
 
 
     @Test

@@ -29,6 +29,7 @@ import com.khartec.waltz.model.app_group.AppGroupEntry;
 import com.khartec.waltz.model.application.Application;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
 import java.util.List;
@@ -45,12 +46,17 @@ import static org.junit.Assert.assertTrue;
 public class AppGroupDaoTest extends BaseInMemoryIntegrationTest {
 
     private final ApplicationIdSelectorFactory idSelectorFactory = new ApplicationIdSelectorFactory();
-    private final ApplicationDao appDao = ctx.getBean(ApplicationDao.class);
+
+    @Autowired
+    private ApplicationDao appDao;
+
+    @Autowired
+    private AppGroupOrganisationalUnitDao appGroupOuDao;
+
     private Long raOu;
     private EntityReference r1;
     private EntityReference ra2;
     private EntityReference raa3;
-    private AppGroupOrganisationalUnitDao appGroupOuDao;
 
 
     @Before
@@ -66,7 +72,6 @@ public class AppGroupDaoTest extends BaseInMemoryIntegrationTest {
         ra2 = createNewApp("ra2", raOu);
         raa3 = createNewApp("raa3", raaOu);
         EntityReference rb4 = createNewApp("rb4", rbOu);
-        appGroupOuDao = ctx.getBean(AppGroupOrganisationalUnitDao.class);
     }
 
 

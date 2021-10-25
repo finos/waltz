@@ -9,15 +9,19 @@ import com.khartec.waltz.model.involvement_kind.ImmutableInvolvementKindCreateCo
 import com.khartec.waltz.model.involvement_kind.InvolvementKindCreateCommand;
 import com.khartec.waltz.service.involvement.InvolvementService;
 import com.khartec.waltz.service.involvement_kind.InvolvementKindService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 
+@Service
 public class InvolvementHelper {
 
     private final InvolvementService involvementService;
     private final InvolvementKindService involvementKindService;
 
+    @Autowired
     public InvolvementHelper(InvolvementService involvementService,
                              InvolvementKindService involvementKindService) {
         this.involvementService = involvementService;
