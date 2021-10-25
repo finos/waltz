@@ -4,6 +4,7 @@
     import {appsByDiagramMeasurableId, selectedObject} from "../diagram-store";
     import _ from "lodash";
     import EntityInfoPanel from "../../../../common/svelte/info-panels/EntityInfoPanel.svelte";
+    import ConnectionsSubContextPanel from "./ConnectionsSubContextPanel.svelte";
 
     $: appsToDisplay = _
         .chain(findAssociatedApps($appsByDiagramMeasurableId, $selectedObject))
@@ -12,39 +13,44 @@
 
 </script>
 
-<EntityInfoPanel primaryEntityRef={$selectedObject.waltzReference}>
+{#if _.isNull($selectedObject.waltzReference)}
+    <h4>{$selectedObject.name}</h4>
+    <ConnectionsSubContextPanel />
+{:else}
+    <EntityInfoPanel primaryEntityRef={$selectedObject.waltzReference}>
+        <div slot="post-header">
 
-    <div slot="post-header">
+            <div class={_.size(appsToDisplay) > 10 ? "waltz-scroll-region-250 scroll-apps" : ""}>
+                <table class="table table-condensed table-hover small">
+                    <thead>
+                    <th width="50%">
+                        Associated Application
+                    </th>
+                    <th width="50%">
+                        Ext Id
+                    </th>
+                    </thead>
+                    <tbody>
+                    {#each appsToDisplay as app}
+                        <tr class="clickable"
+                            on:click={() => selectApplication(app)}>
+                            <td>{app.name}</td>
+                            <td>{app.externalId}</td>
+                        </tr>
+                    {:else}
+                        <tr>
+                            <td colspan="2">No applications are associated to this Activity</td>
+                        </tr>
+                    {/each}
+                    </tbody>
+                </table>
+            </div>
 
-        <div class={_.size(appsToDisplay) > 10 ? "waltz-scroll-region-250 scroll-apps" : ""}>
-            <table class="table table-condensed table-hover small">
-                <thead>
-                <th width="50%">
-                    Associated Application
-                </th>
-                <th width="50%">
-                    Ext Id
-                </th>
-                </thead>
-                <tbody>
-                {#each appsToDisplay as app}
-                    <tr class="clickable"
-                        on:click={() => selectApplication(app)}>
-                        <td>{app.name}</td>
-                        <td>{app.externalId}</td>
-                    </tr>
-                {:else}
-                    <tr>
-                        <td colspan="2">No applications are associated to this Activity</td>
-                    </tr>
-                {/each}
-                </tbody>
-            </table>
+            <ConnectionsSubContextPanel />
+
         </div>
-
-    </div>
-</EntityInfoPanel>
-
+    </EntityInfoPanel>
+{/if}
 
 <style>
     .scroll-apps {
