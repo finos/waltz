@@ -79,7 +79,8 @@ function controller($q, serviceBroker) {
             return;
         }
         vm.attesting = true;
-        invokeFunction(vm.onConfirm, attestation);
+        vm.onConfirm(attestation)
+            .finally(() => vm.attesting = false);
     };
 
     vm.cancel = () => {

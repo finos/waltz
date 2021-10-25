@@ -32,15 +32,14 @@ import org.jooq.exception.DataAccessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import spark.Request;
-import spark.Response;
-import spark.Spark;
+import spark.*;
 
 import java.util.Map;
 import java.util.TimeZone;
 
 import static com.khartec.waltz.common.DateTimeUtilities.UTC;
 import static com.khartec.waltz.web.WebUtilities.reportException;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.addExceptionHandler;
 import static spark.Spark.*;
 
 public class Main {
@@ -118,7 +117,6 @@ public class Main {
             extractor.register();
         });
 
-
         new StaticResourcesEndpoint().register();
 
         LOG.info("Completed endpoint registration");
@@ -126,45 +124,39 @@ public class Main {
         registerExceptionHandlers();
         enableGZIP();
         enableCORS();
-
     }
 
 
     private void registerExceptionHandlers() {
 
-        exception(NotFoundException.class, (e, req, res) -> {
-            LOG.error(e.getMessage());
+        addExceptionHandler(InsufficientPrivelegeException.class, (e, req, resp) ->
+                reportException(403, "NOT_AUTHORIZED", e.getMessage(), resp, LOG));
+
+        addExceptionHandler(NotFoundException.class, (e, req, res) -> {
+            String message = "Not found exception" + e.getMessage();
+            LOG.error(message);
             reportException(
                     404,
                     e.getCode(),
-                    e.getMessage(),
+                    message,
                     res,
                     LOG);
         });
 
-        exception(UpdateFailedException.class, (e, req, res) -> {
-            LOG.error(e.getMessage());
+        addExceptionHandler(UpdateFailedException.class, (e, req, res) -> {
+            String message = "Update failed exception:" + e.getMessage();
+            LOG.error(message);
             reportException(
-                    500,
+                    400,
                     e.getCode(),
-                    e.getMessage(),
+                    message,
                     res,
                     LOG);
         });
 
-        exception(WebException.class, (e, req, res) -> {
-            LOG.error(e.getMessage());
-            reportException(
-                    500,
-                    e.getCode(),
-                    e.getMessage(),
-                    res,
-                    LOG);
-        });
-
-        exception(DuplicateKeyException.class, (e, req, res) -> {
+        addExceptionHandler(DuplicateKeyException.class, (e, req, res) -> {
             String message = "Duplicate detected: " + e.getMessage();
-            LOG.error(message, e);
+            LOG.error(message);
             reportException(
                     500,
                     "DUPLICATE",
@@ -173,25 +165,41 @@ public class Main {
                     LOG);
         });
 
-
-        exception(InsufficientPrivelegeException.class, (e, req, resp) ->
-           reportException(403, "NOT_AUTHORIZED", e.getMessage(), resp, LOG));
-
-
-        exception(DataAccessException.class, (e, req, resp) -> {
-                    String message = "Exception: " + e.getCause().getMessage();
-                    LOG.error(message, e);
-                    reportException(
-                            500,
-                            e.sqlState(),
-                            message,
-                            resp,
-                            LOG);
+        addExceptionHandler(DataAccessException.class, (e, req, resp) -> {
+            String message = "Exception: " + e.getCause().getMessage();
+            LOG.error(message);
+            reportException(
+                    400,
+                    e.sqlState(),
+                    message,
+                    resp,
+                    LOG);
         });
 
+        addExceptionHandler(IllegalArgumentException.class, (e, req, resp) -> {
+            String message = "Illegal Argument Exception: " + e.getMessage();
+            LOG.error(message);
+            reportException(
+                    400,
+                    "ILLEGAL ARGUMENT",
+                    message,
+                    resp,
+                    LOG);
+        });
 
-        exception(Exception.class, (e, req, res) -> {
-            String message = "Exception: " + e.getMessage() + " / " + e.getClass().getCanonicalName();
+        addExceptionHandler(WebException.class, (e, req, res) -> {
+            String message = "Web exception: " + e.getMessage();
+            LOG.error(message);
+            reportException(
+                    500,
+                    e.getCode(),
+                    message,
+                    res,
+                    LOG);
+        });
+
+        addExceptionHandler(Exception.class, (e, req, res) -> {
+            String message = "Generic Exception: " + e.getMessage() + " / " + e.getClass().getCanonicalName();
             LOG.error(message, e);
             reportException(
                     500,

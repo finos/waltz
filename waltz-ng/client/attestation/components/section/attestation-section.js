@@ -156,13 +156,15 @@ function controller($q,
     vm.attestEntity = () => {
         const msg = "By clicking 'OK', you are attesting that all data flows are present, correct and accurately reflected for this entity, and thereby accountable for this validation.";
         if (confirm(msg)){
-            attest(serviceBroker, vm.parentEntityRef, vm.activeAttestationSection.type)
+            return attest(serviceBroker, vm.parentEntityRef, vm.activeAttestationSection.type)
                 .then(() => {
                     toasts.success("Attested successfully");
                     loadAttestationData(vm.parentEntityRef);
                     vm.onCancelAttestation();
                 })
                 .catch(e => displayError("Could not attest", e));
+        } else {
+            return Promise.resolve();
         }
     };
 
