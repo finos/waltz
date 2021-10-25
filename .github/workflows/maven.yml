@@ -67,4 +67,4 @@ jobs:
         files: |
           waltz-data/target/liquibase-scripts.zip
           waltz-web/target/waltz-web.war
-
+          waltz-web/target/waltz-web-jar-with-dependencies.jar
