@@ -1,5 +1,3 @@
-
-
 <script>
     import Icon from "./Icon.svelte";
 
@@ -15,7 +13,7 @@
 
 
 {#if !readOnly}
-    <a class="clickable no-text-select"
+    <button class="btn btn-skinny no-text-select"
        style="text-decoration: none"
        on:click={() => onToggle()}>
         {#if state}
@@ -29,7 +27,7 @@
                 <span>{labelOff}</span>
             </span>
         {/if}
-    </a>
+    </button>
 {:else}
     {#if state}
         <span>

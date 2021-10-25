@@ -3,6 +3,8 @@
     import {selectDiagramObject} from "../process-diagram-utils";
     import {highlightedActivities, selectedApp} from "../diagram-store";
     import EntityInfoPanel from "../../../../common/svelte/info-panels/EntityInfoPanel.svelte";
+    import _ from "lodash";
+
 </script>
 
 <EntityInfoPanel primaryEntityRef={$selectedApp}>
