@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.service.attestation;
 
+import com.khartec.waltz.common.Checks;
 import com.khartec.waltz.common.StringUtilities;
 import com.khartec.waltz.common.exception.UpdateFailedException;
 import com.khartec.waltz.data.GenericSelector;
@@ -45,11 +46,11 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.checkNotEmpty;
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static com.khartec.waltz.common.Checks.*;
 import static com.khartec.waltz.common.CollectionUtilities.first;
 import static com.khartec.waltz.common.CollectionUtilities.notEmpty;
 import static com.khartec.waltz.common.DateTimeUtilities.*;
+import static com.khartec.waltz.common.StringUtilities.join;
 import static com.khartec.waltz.schema.Tables.APPLICATION;
 import static java.lang.String.format;
 
@@ -212,8 +213,11 @@ public class AttestationInstanceService {
 
     private void checkLogicalFlowsCanBeAttested(AttestEntityCommand createCommand) {
         List<String> failures = attestationPreCheckService.calcLogicalFlowPreCheckFailures(createCommand.entityReference());
-        String warningString = StringUtilities.join(failures, ";");
-        checkNotEmpty(failures, format("Logical flow check failed with the following warnings: %s", warningString));
+        checkEmpty(
+                failures,
+                () -> format(
+                        "Logical flow check failed with the following warnings: %s",
+                        join(failures, ";")));
     }
 
 
