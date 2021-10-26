@@ -28,8 +28,8 @@ import com.khartec.waltz.model.entity_search.ImmutableEntitySearchOptions;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.service.data_type.DataTypeService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
-import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
 import java.util.List;
@@ -42,17 +42,14 @@ import static org.junit.Assert.*;
 
 public class DataTypeServiceTest extends BaseInMemoryIntegrationTest {
 
+    @Autowired
     private DataTypeService dtSvc;
+
+    @Autowired
     private LogicalFlowService lfSvc;
+
+    @Autowired
     private LogicalFlowHelper lfHelper;
-
-
-    @Before
-    public void setupOuTest() {
-        dtSvc = services.dataTypeService;
-        lfSvc = services.logicalFlowService;
-        lfHelper = helpers.logicalFlowHelper;
-    }
 
 
     @Test

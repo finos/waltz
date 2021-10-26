@@ -26,6 +26,7 @@ import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
 import java.util.List;
@@ -41,7 +42,10 @@ import static org.junit.Assert.assertTrue;
 public class ApplicationDaoTest extends BaseInMemoryIntegrationTest {
 
     private final ApplicationIdSelectorFactory idSelectorFactory = new ApplicationIdSelectorFactory();
-    private final ApplicationDao appDao = ctx.getBean(ApplicationDao.class);
+
+    @Autowired
+    private ApplicationDao appDao;
+
     private Long rbOu;
     private Long raaOu;
     private Long raOu;

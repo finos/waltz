@@ -29,8 +29,8 @@ import com.khartec.waltz.model.bookmark.Bookmark;
 import com.khartec.waltz.model.bookmark.BookmarkKindValue;
 import com.khartec.waltz.model.bookmark.ImmutableBookmark;
 import com.khartec.waltz.service.bookmark.BookmarkService;
-import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Set;
@@ -46,14 +46,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
 public class BookmarkServiceTest extends BaseInMemoryIntegrationTest {
+
+    @Autowired
     private BookmarkService svc;
-
-
-    @Before
-    public void setupBookmarkTest() {
-        svc = services.bookmarkService;
-        System.out.println("bmTest::setup");
-    }
 
 
     @Test

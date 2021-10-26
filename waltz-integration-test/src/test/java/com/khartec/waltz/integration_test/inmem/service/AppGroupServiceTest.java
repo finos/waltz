@@ -25,8 +25,8 @@ import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.model.app_group.*;
 import com.khartec.waltz.service.app_group.AppGroupService;
 import com.khartec.waltz.service.app_group.AppGroupSubscription;
-import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 import java.util.Set;
@@ -37,14 +37,8 @@ import static org.junit.Assert.*;
 
 public class AppGroupServiceTest extends BaseInMemoryIntegrationTest {
 
+    @Autowired
     private AppGroupService appGroupSvc;
-
-
-    @Before
-    public void setupAppGroupTest() {
-        appGroupSvc = services.appGroupService;
-        System.out.println("agTest::setup");
-    }
 
 
     @Test

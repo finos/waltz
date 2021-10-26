@@ -25,8 +25,8 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
-import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.model.EntityReference.mkRef;
@@ -35,12 +35,9 @@ import static com.khartec.waltz.model.utils.IdUtilities.toIds;
 import static org.junit.Assert.*;
 
 public class OrgUnitTest extends BaseInMemoryIntegrationTest {
-  private OrganisationalUnitDao dao;
 
-    @Before
-    public void setupOuTest() {
-        dao = ctx.getBean(OrganisationalUnitDao.class);
-    }
+    @Autowired
+    private OrganisationalUnitDao dao;
 
 
     @Test

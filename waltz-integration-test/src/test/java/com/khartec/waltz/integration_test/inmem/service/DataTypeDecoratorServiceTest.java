@@ -30,8 +30,8 @@ import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.datatype.DataTypeUsageCharacteristics;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.service.data_type.DataTypeDecoratorService;
-import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
 import java.util.List;
@@ -49,19 +49,17 @@ import static org.junit.Assert.*;
 
 public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
 
+    @Autowired
     private DataTypeDecoratorService dtdSvc;
+
+    @Autowired
     private LogicalFlowHelper lfHelper;
+
+    @Autowired
     private PhysicalSpecHelper psHelper;
+
+    @Autowired
     private PhysicalFlowHelper pfHelper;
-
-    @Before
-    public void setupLogicalFlowDecoratorServiceTest() {
-        dtdSvc = services.dataTypeDecoratorService;
-        lfHelper = helpers.logicalFlowHelper;
-        psHelper = helpers.physicalSpecHelper;
-        pfHelper = helpers.physicalFlowHelper;
-    }
-
 
     @Test
     public void findByFlowIds() {
