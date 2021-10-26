@@ -49,7 +49,7 @@ import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.common.StringUtilities.splitThenMap;
 import static com.khartec.waltz.schema.Tables.ASSESSMENT_RATING;
 import static java.lang.String.format;
-import static org.jooq.tools.StringUtils.toCamelCase;
+import static org.jooq.tools.StringUtils.toCamelCaseLC;
 
 @Service
 public class AssessmentRatingViewService {
@@ -105,7 +105,7 @@ public class AssessmentRatingViewService {
         List<AssessmentDefinition> allDefns = assessmentDefinitionDao.findAll();
         Map<Long, AssessmentDefinition> definitionsById = indexBy(allDefns, d -> d.id().get());
 
-        List<Long> assessmentDefinitionIds = determineFavoriteAssessments(username, allDefns);
+        List<Long> assessmentDefinitionIds = determineFavoriteAssessments(username, allDefns, ref.kind());
 
         List<AssessmentRating> assessmentRatings = assessmentRatingDao.findForEntity(ref);
 
@@ -127,7 +127,7 @@ public class AssessmentRatingViewService {
     }
 
 
-    private List<Long> determineFavoriteAssessments(String username, List<AssessmentDefinition> allDefns) {
+    private List<Long> determineFavoriteAssessments(String username, List<AssessmentDefinition> allDefns, EntityKind kind) {
 
         List<Long> defaultAssessmentIds = allDefns
                 .stream()
@@ -137,7 +137,12 @@ public class AssessmentRatingViewService {
 
         List<UserPreference> preferences = userPreferenceService.getPreferences(username);
 
-        List<Long> assessmentDefinitionIds = maybeFirst(preferences, d -> d.key().equalsIgnoreCase(format("%s%s", ASSESSMENT_PREFERENCE_KEY, toCamelCase(username))))
+        List<Long> assessmentDefinitionIds = maybeFirst(
+                preferences,
+                d -> {
+                    String favouriteAssessmentsKey = format(ASSESSMENT_PREFERENCE_KEY, toCamelCaseLC(kind.name()));
+                    return d.key().equalsIgnoreCase(favouriteAssessmentsKey);
+                })
                 .map(d -> splitThenMap(d.value(), ",", Long::valueOf))
                 .orElse(defaultAssessmentIds);
 
