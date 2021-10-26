@@ -25,8 +25,8 @@ import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdProvider;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
-import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
 import static com.khartec.waltz.common.SetUtilities.asSet;
@@ -39,17 +39,11 @@ import static org.junit.Assert.assertTrue;
 
 public class LogicalFlowTest extends BaseInMemoryIntegrationTest {
 
+    @Autowired
     private LogicalFlowDao lfDao;
+
+    @Autowired
     private LogicalFlowHelper helper;
-
-
-    @Before
-    public void setupOuTest() {
-        lfDao = daos.logicalFlowDao;
-        helper = helpers.logicalFlowHelper;
-        System.out.println("ouTest::setup");
-    }
-
 
     @Test
     public void basicDirectAssociations() {

@@ -20,7 +20,6 @@ package com.khartec.waltz.integration_test.inmem.service;
 
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.OptionalUtilities;
-import com.khartec.waltz.common.OptionalUtilities;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.integration_test.inmem.helpers.InvolvementHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.PersonHelper;
@@ -30,8 +29,8 @@ import com.khartec.waltz.model.IdCommandResponse;
 import com.khartec.waltz.model.attestation.*;
 import com.khartec.waltz.service.attestation.AttestationInstanceService;
 import com.khartec.waltz.service.attestation.AttestationRunService;
-import org.junit.Before;
 import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,18 +46,17 @@ import static org.junit.Assert.assertTrue;
 
 public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
 
+    @Autowired
     private AttestationInstanceService aiSvc;
-    private AttestationRunService arSvc;
-    private InvolvementHelper involvementHelper;
-    private PersonHelper personHelper;
 
-    @Before
-    public void setupAttestationServiceTest() {
-        aiSvc = services.attestationInstanceService;
-        arSvc = services.attestationRunService;
-        involvementHelper = helpers.involvementHelper;
-        personHelper = helpers.personHelper;
-    }
+    @Autowired
+    private AttestationRunService arSvc;
+
+    @Autowired
+    private InvolvementHelper involvementHelper;
+
+    @Autowired
+    private PersonHelper personHelper;
 
 
     @Test

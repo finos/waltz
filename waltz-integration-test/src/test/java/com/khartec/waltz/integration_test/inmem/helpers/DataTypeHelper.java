@@ -1,25 +1,25 @@
 package com.khartec.waltz.integration_test.inmem.helpers;
 
-import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.schema.tables.records.DataTypeRecord;
 import org.jooq.DSLContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.concurrent.atomic.AtomicLong;
 
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static com.khartec.waltz.schema.Tables.DATA_TYPE;
 
+@Service
 public class DataTypeHelper {
 
     private static final AtomicLong ctr = new AtomicLong();
 
     private final DSLContext dsl;
 
-    private final LogicalFlowDao logicalFlowDao;
 
-    public DataTypeHelper(LogicalFlowDao logicalFlowDao, DSLContext dsl) {
-
-        this.logicalFlowDao = logicalFlowDao;
+    @Autowired
+    public DataTypeHelper(DSLContext dsl) {
         this.dsl = dsl;
     }
 
