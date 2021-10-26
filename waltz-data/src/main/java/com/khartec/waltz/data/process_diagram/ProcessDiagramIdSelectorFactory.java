@@ -22,22 +22,20 @@ import com.khartec.waltz.data.IdSelectorFactory;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
 
 import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
-import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
-import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static com.khartec.waltz.schema.Tables.MEASURABLE_RATING;
+import static com.khartec.waltz.schema.Tables.PROCESS_DIAGRAM_ENTITY;
 
 
 public class ProcessDiagramIdSelectorFactory implements IdSelectorFactory {
 
-    private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
+    private final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
 
     @Override
     public Select<Record1<Long>> apply(IdSelectionOptions options) {
@@ -45,50 +43,40 @@ public class ProcessDiagramIdSelectorFactory implements IdSelectorFactory {
         switch(options.entityReference().kind()) {
             case ACTOR:
             case APPLICATION:
-                return mkForApplication(options);
+            case CHANGE_INITIATIVE:
             case LOGICAL_DATA_FLOW:
-                return mkForLogicalFlow(options);
             case PHYSICAL_FLOW:
-            case MEASURABLE:
-                return mkForDirectEntity(options);
             case PHYSICAL_SPECIFICATION:
-                return mkForPhysicalSpecification(options);
+                return mkViaApplication(options);
+            case MEASURABLE:
+                return mkForMeasurable(options);
             default:
-                throw new UnsupportedOperationException("Cannot create physical flow selector from options: "+options);
+                throw new UnsupportedOperationException("Cannot create process diagram selector from options: "+options);
         }
     }
 
-    private Select<Record1<Long>> mkForLogicalFlow(IdSelectionOptions options) {
 
-        return null;
-    }
+    private Select<Record1<Long>> mkViaApplication(IdSelectionOptions options) {
 
-    private Select<Record1<Long>> mkForApplication(IdSelectionOptions options) {
-        return null;
-    }
+        Select<Record1<Long>> relatedApplications = applicationIdSelectorFactory.apply(options);
 
-
-    private Select<Record1<Long>> mkForDirectEntity(IdSelectionOptions options) {
-        ensureScopeIsExact(options);
-        EntityReference ref = options.entityReference();
         return DSL
-                .select(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID)
-                .from(FLOW_DIAGRAM_ENTITY)
-                .where(FLOW_DIAGRAM_ENTITY.ENTITY_ID.eq(ref.id()))
-                .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(ref.kind().name()));
+                .select(PROCESS_DIAGRAM_ENTITY.DIAGRAM_ID)
+                .from(PROCESS_DIAGRAM_ENTITY)
+                .innerJoin(MEASURABLE_RATING).on(PROCESS_DIAGRAM_ENTITY.ENTITY_ID.eq(MEASURABLE_RATING.MEASURABLE_ID)
+                        .and(PROCESS_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.MEASURABLE.name())))
+                .where(MEASURABLE_RATING.ENTITY_ID.in(relatedApplications)
+                        .and(MEASURABLE_RATING.ENTITY_KIND.eq(EntityKind.APPLICATION.name())));
     }
 
 
-    private Select<Record1<Long>> mkForPhysicalSpecification(IdSelectionOptions options) {
-        ensureScopeIsExact(options);
-        long specificationId = options.entityReference().id();
+    private Select<Record1<Long>> mkForMeasurable(IdSelectionOptions options) {
+        Select<Record1<Long>> measurableIds = measurableIdSelectorFactory.apply(options);
         return DSL
-                .select(FLOW_DIAGRAM_ENTITY.DIAGRAM_ID)
-                .from(FLOW_DIAGRAM_ENTITY)
-                .innerJoin(PHYSICAL_FLOW)
-                .on(FLOW_DIAGRAM_ENTITY.ENTITY_ID.eq(PHYSICAL_FLOW.ID)
-                        .and(FLOW_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.PHYSICAL_FLOW.name())))
-                .where(PHYSICAL_FLOW.SPECIFICATION_ID.eq(specificationId));
+                .select(PROCESS_DIAGRAM_ENTITY.DIAGRAM_ID)
+                .from(PROCESS_DIAGRAM_ENTITY)
+                .where(PROCESS_DIAGRAM_ENTITY.ENTITY_ID.in(measurableIds)
+                .and(PROCESS_DIAGRAM_ENTITY.ENTITY_KIND.eq(EntityKind.MEASURABLE.name())));
     }
 
 }

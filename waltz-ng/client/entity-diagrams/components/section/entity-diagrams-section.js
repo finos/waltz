@@ -156,10 +156,7 @@ function controller($q,
         const promises = [
             loadFlowDiagrams(true),
             loadEntitySvgDiagrams(false),
-            svelteCallToPromise(processDiagramStore.findByGenericSelector(
-                "MEASURABLE",
-                mkSelectionOptions(vm.parentEntityRef)))
-        ];
+            svelteCallToPromise(processDiagramStore.findBySelector(mkSelectionOptions(vm.parentEntityRef)))];
         return $q
             .all(promises)
             .then(([flowDiagrams = [], svgDiagrams = [], processDiagrams = []]) => {
