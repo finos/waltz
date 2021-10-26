@@ -521,7 +521,7 @@ const changeInitiativeSections = [
     assessmentRatingSection,
     bookmarksSection,
     changeSetSection,
-    entityDiagramsSection,
+    //entityDiagramsSection,
     entityNamedNotesSection,
     involvedPeopleSection,
     relatedMeasurablesSection,
@@ -604,7 +604,7 @@ const dataTypeSections = [
     appsSection,
     bookmarksSection,
     dataTypeOriginatorsSection,
-    entityDiagramsSection,
+    // entityDiagramsSection,
     entityNamedNotesSection,
     involvedPeopleSection,
     logicalDataElementsSection,
@@ -684,7 +684,7 @@ const processDiagramSections = [
 const physicalFlowSections = [
     assessmentRatingSection,
     bookmarksSection,
-    entityDiagramsSection,
+    // entityDiagramsSection,
     entityNamedNotesSection,
     flowSpecDefinitionSection,
     involvedPeopleSection,
@@ -695,7 +695,7 @@ const physicalFlowSections = [
 const logicalDataFlowSections = [
     assessmentRatingSection,
     bookmarksSection,
-    entityDiagramsSection,
+    // entityDiagramsSection,
     entityNamedNotesSection,
     physicalFlowSection,
     changeLogSection
@@ -732,7 +732,7 @@ const softwarePackageSections = [
 const physicalSpecificationSections = [
     assessmentRatingSection,
     bookmarksSection,
-    entityDiagramsSection,
+    // entityDiagramsSection,
     physicalFlowSection,
     specificationDefinitionSection,
     changeLogSection
