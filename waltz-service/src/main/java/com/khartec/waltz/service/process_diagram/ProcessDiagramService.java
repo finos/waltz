@@ -38,6 +38,13 @@ public class ProcessDiagramService {
     }
 
 
+    public Set<ProcessDiagram> findBySelector(EntityKind targetKind,
+                                              IdSelectionOptions selectionOptions) {
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(targetKind, selectionOptions);
+        return dao.findByGenericSelector(genericSelector);
+    }
+
+
     public ProcessDiagramAndEntities getDiagramAndEntitiesById(long diagramId) {
         return ImmutableProcessDiagramAndEntities
                 .builder()
