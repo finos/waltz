@@ -5,7 +5,7 @@
 
     export let primaryEntityRef;
 
-    $: assessmentsCall = assessmentRatingViewStore.findFavouritesForEntity(primaryEntityRef);
+    $: assessmentsCall = assessmentRatingViewStore.findFavouritesForEntity(primaryEntityRef, true);
     $: assessments = $assessmentsCall.data;
 
 </script>
