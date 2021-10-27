@@ -121,7 +121,6 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
 
 
     private Select<Record1<Long>> mkForPhysicalSpec(IdSelectionOptions options) {
-        ensureScopeIsExact(options);
         return DSL
                 .select(APPLICATION.ID)
                 .from(PHYSICAL_FLOW)
@@ -142,7 +141,6 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
 
 
     private Select<Record1<Long>> mkForPhysicalFlow(IdSelectionOptions options) {
-        ensureScopeIsExact(options);
         return DSL
                 .select(APPLICATION.ID)
                 .from(PHYSICAL_FLOW)
@@ -163,7 +161,6 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
 
 
     private Select<Record1<Long>> mkForLogicalDataFlow(IdSelectionOptions options) {
-        ensureScopeIsExact(options);
         return DSL
                 .select(APPLICATION.ID)
                 .from(LOGICAL_FLOW)

@@ -44,6 +44,7 @@ public class ProcessDiagramIdSelectorFactory implements IdSelectorFactory {
             case ACTOR:
             case APPLICATION:
             case CHANGE_INITIATIVE:
+            case DATA_TYPE:
             case LOGICAL_DATA_FLOW:
             case PHYSICAL_FLOW:
             case PHYSICAL_SPECIFICATION:
