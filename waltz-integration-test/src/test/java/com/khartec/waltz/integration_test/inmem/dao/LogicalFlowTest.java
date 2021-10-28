@@ -20,6 +20,7 @@ package com.khartec.waltz.integration_test.inmem.dao;
 
 import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
+import com.khartec.waltz.integration_test.inmem.helpers.AppHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -45,12 +46,16 @@ public class LogicalFlowTest extends BaseInMemoryIntegrationTest {
     @Autowired
     private LogicalFlowHelper helper;
 
+    @Autowired
+    private AppHelper appHelper;
+
+
     @Test
     public void basicDirectAssociations() {
-        EntityReference a = createNewApp("a", ouIds.a);
-        EntityReference b = createNewApp("b", ouIds.a1);
-        EntityReference c = createNewApp("c", ouIds.b);
-        EntityReference d = createNewApp("c", ouIds.b);
+        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
+        EntityReference c = appHelper.createNewApp("c", ouIds.b);
+        EntityReference d = appHelper.createNewApp("c", ouIds.b);
         // a -> b
         // a -> d
         // c
@@ -81,9 +86,9 @@ public class LogicalFlowTest extends BaseInMemoryIntegrationTest {
     @Test
     public void bySelector() {
 
-        EntityReference a = createNewApp("a", ouIds.a);
-        EntityReference b = createNewApp("b", ouIds.a1);
-        EntityReference c = createNewApp("c", ouIds.b);
+        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
+        EntityReference c = appHelper.createNewApp("c", ouIds.b);
         // a -> b
         // a -> c
         // c

@@ -21,6 +21,7 @@ package com.khartec.waltz.integration_test.inmem.dao;
 import com.khartec.waltz.common.exception.NotFoundException;
 import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
+import com.khartec.waltz.integration_test.inmem.helpers.AppHelper;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.measurable_rating.ImmutableSaveMeasurableRatingCommand;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
@@ -44,6 +45,9 @@ public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
 
     @Autowired
     private MeasurableRatingDao dao;
+
+    @Autowired
+    private AppHelper appHelper;
 
     @Autowired
     private DSLContext dsl;
@@ -134,10 +138,10 @@ public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
         long m1Id = createMeasurable("m1", categoryId);
         long m2Id = createMeasurable("m2", categoryId);
 
-        EntityReference app1Ref = createNewApp("a1", null);
+        EntityReference app1Ref = appHelper.createNewApp("a1", null);
         mkRatings(app1Ref, m1Id, m2Id);
 
-        EntityReference app2Ref = createNewApp("a2", null);
+        EntityReference app2Ref = appHelper.createNewApp("a2", null);
         mkRatings(app2Ref, m1Id);
 
         rebuildHierarchy(EntityKind.MEASURABLE);
@@ -174,7 +178,7 @@ public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
         long m1Id = createMeasurable("m1", categoryId);
         long m2Id = createMeasurable("m2", categoryId);
 
-        EntityReference app1Ref = createNewApp("a1", null);
+        EntityReference app1Ref = appHelper.createNewApp("a1", null);
         mkRatings(app1Ref, m1Id, m2Id);
 
         assertEquals(

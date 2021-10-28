@@ -154,32 +154,6 @@ public abstract class BaseInMemoryIntegrationTest {
         return record.getId();
     }
 
-    public EntityReference createNewApp(String name, Long ouId) {
-        AppRegistrationResponse resp = ctx.getBean(ApplicationDao.class)
-                .registerApp(ImmutableAppRegistrationRequest.builder()
-                        .name(name)
-                        .organisationalUnitId(ouId != null ? ouId : 1L)
-                        .applicationKind(ApplicationKind.IN_HOUSE)
-                        .businessCriticality(Criticality.MEDIUM)
-                        .lifecyclePhase(LifecyclePhase.PRODUCTION)
-                        .overallRating(RagRating.G)
-                        .businessCriticality(Criticality.MEDIUM)
-                        .build());
-
-        return resp.id().map(id -> mkRef(EntityKind.APPLICATION, id)).get();
-    }
-
-
-    protected void removeApp(Long appId){
-        ApplicationDao appDao = ctx.getBean(ApplicationDao.class);
-        Application app = appDao.getById(appId);
-        appDao
-                .update(ImmutableApplication
-                        .copyOf(app)
-                        .withIsRemoved(true)
-                        .withEntityLifecycleStatus(EntityLifecycleStatus.REMOVED));
-    }
-
 
     protected long createMeasurableCategory(String name) {
         MeasurableCategoryDao dao = ctx.getBean(MeasurableCategoryDao.class);

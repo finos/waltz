@@ -19,6 +19,7 @@
 package com.khartec.waltz.integration_test.inmem.service;
 
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
+import com.khartec.waltz.integration_test.inmem.helpers.AppHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
@@ -54,13 +55,16 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
     @Autowired
     private LogicalFlowHelper helper;
 
+    @Autowired
+    private AppHelper appHelper;
+
 
     @Test
     public void basicDirectAssociations() {
-        EntityReference a = createNewApp("a", ouIds.a);
-        EntityReference b = createNewApp("b", ouIds.a1);
-        EntityReference c = createNewApp("c", ouIds.b);
-        EntityReference d = createNewApp("c", ouIds.b);
+        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
+        EntityReference c = appHelper.createNewApp("c", ouIds.b);
+        EntityReference d = appHelper.createNewApp("c", ouIds.b);
         // a -> b
         // a -> d
         // c
@@ -91,9 +95,9 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
     @Test
     public void bySelector() {
 
-        EntityReference a = createNewApp("a", ouIds.a);
-        EntityReference b = createNewApp("b", ouIds.a1);
-        EntityReference c = createNewApp("c", ouIds.b);
+        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
+        EntityReference c = appHelper.createNewApp("c", ouIds.b);
         // a -> b
         // a -> c
         // c
@@ -119,8 +123,8 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
     @Test
     public void getByIdTest(){
 
-        EntityReference a = createNewApp("a", ouIds.a);
-        EntityReference b = createNewApp("b", ouIds.a1);
+        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
         // a -> b
         // a -> c
         LogicalFlow ab = helper.createLogicalFlow(a, b);
@@ -138,9 +142,9 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void removeFlowTest(){
-        EntityReference a = createNewApp("a", ouIds.a);
-        EntityReference b = createNewApp("b", ouIds.a1);
-        EntityReference c = createNewApp("c", ouIds.b);
+        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
+        EntityReference c = appHelper.createNewApp("c", ouIds.b);
         // a -> b
         // a -> c
         LogicalFlow ab = helper.createLogicalFlow(a, b);
@@ -159,10 +163,10 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
     @Test
     public void findActiveByFlowIdsTest(){
 
-        EntityReference a = createNewApp("a", ouIds.a);
-        EntityReference b = createNewApp("b", ouIds.a1);
-        EntityReference c = createNewApp("c", ouIds.b);
-        EntityReference d = createNewApp("d", ouIds.b);
+        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
+        EntityReference c = appHelper.createNewApp("c", ouIds.b);
+        EntityReference d = appHelper.createNewApp("d", ouIds.b);
 
         // a -> b
         // a -> c
@@ -186,9 +190,9 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
     @Test
     public void findBySourceAndTargetEntityReferences(){
 
-        EntityReference a = createNewApp("a", ouIds.a);
-        EntityReference b = createNewApp("b", ouIds.a1);
-        EntityReference c = createNewApp("c", ouIds.b);
+        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
+        EntityReference c = appHelper.createNewApp("c", ouIds.b);
 
         // a -> b
         // a -> c
@@ -217,8 +221,8 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
     @Test
     public void addFlow(){
 
-        EntityReference a = createNewApp("a", ouIds.a);
-        EntityReference b = createNewApp("b", ouIds.a1);
+        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
 
         createUnknownDatatype();
 
@@ -249,9 +253,9 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
     @Test
     public void addFlows(){
 
-        EntityReference a = createNewApp("a", ouIds.a);
-        EntityReference b = createNewApp("b", ouIds.a1);
-        EntityReference c = createNewApp("c", ouIds.b);
+        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
+        EntityReference c = appHelper.createNewApp("c", ouIds.b);
 
         createUnknownDatatype();
 
@@ -307,9 +311,9 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
     @Test
     public void restoreFlow(){
 
-        EntityReference a = createNewApp("a", ouIds.a);
-        EntityReference b = createNewApp("b", ouIds.a1);
-        EntityReference c = createNewApp("c", ouIds.b);
+        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
+        EntityReference c = appHelper.createNewApp("c", ouIds.b);
 
         LogicalFlow ab = helper.createLogicalFlow(a, b);
 
@@ -340,9 +344,9 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
         clearAllFlows();
 
-        EntityReference a = createNewApp("a", ouIds.a);
-        EntityReference b = createNewApp("b", ouIds.a1);
-        EntityReference c = createNewApp("c", ouIds.b);
+        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
+        EntityReference c = appHelper.createNewApp("c", ouIds.b);
 
         LogicalFlow ab = helper.createLogicalFlow(a, b);
         LogicalFlow ac = helper.createLogicalFlow(a, c);
@@ -352,7 +356,7 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
         assertEquals("No flows removed if all apps are active", 0, flowsRemoved);
 
-        removeApp(c.id());
+        appHelper.removeApp(c.id());
 
         int flowsRemovedAfterAppRemoved = lfSvc.cleanupOrphans();
 
@@ -373,8 +377,8 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
         clearAllFlows();
 
-        EntityReference a = createNewApp("a", ouIds.a);
-        EntityReference b = createNewApp("b", ouIds.a1);
+        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
 
         int removedFlows = lfSvc.cleanupSelfReferencingFlows();
         assertEquals("Nothing removed if no logical flows", 0, removedFlows);
@@ -400,10 +404,10 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
         clearAllFlows();
 
-        EntityReference a = createNewApp("a", ouIds.a);
-        EntityReference b = createNewApp("b", ouIds.a1);
-        EntityReference c = createNewApp("c", ouIds.b);
-        EntityReference d = createNewApp("d", ouIds.b);
+        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
+        EntityReference c = appHelper.createNewApp("c", ouIds.b);
+        EntityReference d = appHelper.createNewApp("d", ouIds.b);
 
         LogicalFlow ab = helper.createLogicalFlow(a, b);
         LogicalFlow cb = helper.createLogicalFlow(c, b);

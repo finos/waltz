@@ -19,6 +19,7 @@
 package com.khartec.waltz.integration_test.inmem.service;
 
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
+import com.khartec.waltz.integration_test.inmem.helpers.AppHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.PhysicalFlowHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.PhysicalSpecHelper;
@@ -61,6 +62,10 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
     @Autowired
     private PhysicalFlowHelper pfHelper;
 
+    @Autowired
+    private AppHelper appHelper;
+
+
     @Test
     public void findByFlowIds() {
 
@@ -77,8 +82,8 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
                 IllegalArgumentException.class,
                 () ->  dtdSvc.findByFlowIds(asList(-1L), EntityKind.APPLICATION));
 
-        EntityReference a = createNewApp("a", ouIds.a);
-        EntityReference b = createNewApp("b", ouIds.a1);
+        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
 
         LogicalFlow flow = lfHelper.createLogicalFlow(a, b);
 
@@ -113,8 +118,8 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
 
         String username = mkName("getByEntityRefAndDataTypeId");
 
-        EntityReference a = createNewApp("a", ouIds.a);
-        EntityReference b = createNewApp("b", ouIds.a1);
+        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
 
         assertThrows("If unsupported kind id throws exception",
                 IllegalArgumentException.class,
@@ -145,8 +150,8 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
 
         String username = mkName("getByEntityRefAndDataTypeId");
 
-        EntityReference a = createNewApp("a", ouIds.a);
-        EntityReference b = createNewApp("b", ouIds.a1);
+        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
 
         assertThrows("If unsupported kind id throws exception",
                 IllegalArgumentException.class,
@@ -182,8 +187,8 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
 
         String username = mkName("findByEntityIdSelector");
 
-        EntityReference a = createNewApp("a", ouIds.a);
-        EntityReference b = createNewApp("b", ouIds.a1);
+        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
 
         IdSelectionOptions appOpts = mkOpts(a);
 
@@ -221,8 +226,8 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
 
         String username = mkName("updateDecorators");
 
-        EntityReference a = createNewApp("a", ouIds.a);
-        EntityReference b = createNewApp("b", ouIds.a1);
+        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
         LogicalFlow flow = lfHelper.createLogicalFlow(a, b);
 
         assertThrows("Throws exception if no username provided",
@@ -258,20 +263,20 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
     @Test
     public void findSuggestedByEntityRef() {
         String username = mkName("updateDecorators");
-        EntityReference a = createNewApp("a", ouIds.a);
+        EntityReference a = appHelper.createNewApp("a", ouIds.a);
 
         assertThrows(
                 "Throw exception if not a logical data flow or physical spec",
                 UnsupportedOperationException.class,
                 () -> dtdSvc.findSuggestedByEntityRef(a));
 
-        EntityReference b = createNewApp("b", ouIds.a1);
+        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
         LogicalFlow flow = lfHelper.createLogicalFlow(a, b);
 
         Collection<DataType> suggestedWhenNoFlows = dtdSvc.findSuggestedByEntityRef(flow.entityReference());
         assertEquals("If no flows associated to entity should return empty list", emptyList(), suggestedWhenNoFlows);
 
-        EntityReference c = createNewApp("b", ouIds.a1);
+        EntityReference c = appHelper.createNewApp("b", ouIds.a1);
         LogicalFlow flow2 = lfHelper.createLogicalFlow(b, c);
 
         Long dtId = createDatatype("updateDecorators");
@@ -303,14 +308,14 @@ public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
     @Test
     public void findDatatypeUsageCharacteristics() {
         String username = mkName("findDatatypeUsageCharacteristics");
-        EntityReference a = createNewApp("a", ouIds.a);
+        EntityReference a = appHelper.createNewApp("a", ouIds.a);
 
         assertThrows(
                 "Throw exception for entities other than physical specs and logical flows",
                 IllegalArgumentException.class,
                 () -> dtdSvc.findDatatypeUsageCharacteristics(a));
 
-        EntityReference b = createNewApp("b", ouIds.a1);
+        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
         LogicalFlow flow = lfHelper.createLogicalFlow(a, b);
 
         Collection<DataTypeUsageCharacteristics> noDecorators = dtdSvc.findDatatypeUsageCharacteristics(flow.entityReference());

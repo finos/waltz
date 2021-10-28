@@ -16,25 +16,29 @@
  *
  */
 
-package com.khartec.waltz.integration_test.inmem.dao;
+package com.khartec.waltz.integration_test.inmem.service;
 
-import com.khartec.waltz.data.actor.ActorDao;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
 import com.khartec.waltz.model.EntityKind;
+import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.actor.Actor;
+import com.khartec.waltz.service.actor.ActorService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
+import static com.khartec.waltz.common.CollectionUtilities.first;
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static org.junit.Assert.*;
 
 
-public class ActorDaoTest extends BaseInMemoryIntegrationTest {
+public class ActorServiceTest extends BaseInMemoryIntegrationTest {
 
     @Autowired
-    private ActorDao dao;
+    private ActorService svc;
 
     @Autowired
     private LogicalFlowHelper logicalFlowHelper;
@@ -44,7 +48,7 @@ public class ActorDaoTest extends BaseInMemoryIntegrationTest {
         String name = mkName("actorsCanBeCreated");
         Long id = createActor(name);
 
-        Actor retrieved = dao.getById(id);
+        Actor retrieved = svc.getById(id);
         assertEquals(name, retrieved.name());
         assertEquals(name + " Desc", retrieved.description());
         assertTrue(retrieved.isExternal());
@@ -53,14 +57,14 @@ public class ActorDaoTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void actorsCanBeDeletedIfNotUsed() {
-        int preCount = dao.findAll().size();
+        int preCount = svc.findAll().size();
         Long id = createActor(mkName("canBeDeletedTest"));
 
-        System.out.println("After creation: "+ dao.findAll());
-        boolean deleted = dao.deleteIfNotUsed(id);
+        System.out.println("After creation: "+ svc.findAll());
+        boolean deleted = svc.delete(id);
 
         assertTrue("Actor should be deleted as not used in flows", deleted);
-        assertEquals("After deletion the count of actors should be the same as before the actor was added", preCount, dao.findAll().size());
+        assertEquals("After deletion the count of actors should be the same as before the actor was added", preCount, svc.findAll().size());
     }
 
 
@@ -73,11 +77,28 @@ public class ActorDaoTest extends BaseInMemoryIntegrationTest {
                 mkRef(EntityKind.ACTOR, idA),
                 mkRef(EntityKind.ACTOR, idB));
 
-        int preCount = dao.findAll().size();
-        boolean wasDeleted = dao.deleteIfNotUsed(idA);
+        int preCount = svc.findAll().size();
+        boolean wasDeleted = svc.delete(idA);
 
         assertFalse("Actor should not be deleted as used in a flow", wasDeleted);
-        assertEquals("After attempted deletion the count of actors should be the same", preCount, dao.findAll().size());
+        assertEquals("After attempted deletion the count of actors should be the same", preCount, svc.findAll().size());
+    }
+
+
+    @Test
+    public void actorsCanBeSearched() {
+        List<EntityReference> noHits = svc.search("wibble");
+        assertTrue(noHits.isEmpty());
+
+        String a = mkName("searchActorA");
+        String b = mkName("searchActorB");
+
+        Long aId = createActor(a);
+        createActor(b);
+
+        List<EntityReference> hits = svc.search(a + " " + "desc");
+        assertEquals(1, hits.size());
+        assertEquals(first(hits), mkRef(EntityKind.ACTOR, aId));
     }
 
 }
