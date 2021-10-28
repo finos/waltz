@@ -105,7 +105,7 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
                 .build();
 
         assertThrows(
-                "Should not be able to attest",
+                "Should not be able to attest as user not associated to app",
                 UpdateFailedException.class,
                 () -> aiSvc.attestForEntity(user, cmd));
     }
@@ -128,7 +128,10 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
                 .entityReference(appRef)
                 .build();
 
-        aiSvc.attestForEntity(user, cmd);
+        assertThrows(
+                "Should not be able to attest as no flows",
+                Exception.class,
+                () -> aiSvc.attestForEntity(user, cmd));
     }
 
 
