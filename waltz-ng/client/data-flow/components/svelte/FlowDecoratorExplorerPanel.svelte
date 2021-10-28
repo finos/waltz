@@ -234,7 +234,7 @@
 </div>
 
 
-<div class="row">
+<div class="row row-no-gutters">
     <div class="col-md-12">
         <div class="col-md-7">
             <svg bind:this={svgElem}
@@ -271,7 +271,7 @@
                 </NoData>
             {/if}
         </div>
-        <div class="col-md-5">
+        <div class="col-md-5" style="padding-left: 1em">
             <FlowContextPanel parentEntity={entity}
                               {flowInfo}
                               on:select={selectClient}/>

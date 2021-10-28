@@ -18,10 +18,13 @@
 
 package com.khartec.waltz.data.physical_flow;
 
+import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.data.enum_value.EnumValueDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.enum_value.EnumValueKind;
 import com.khartec.waltz.model.physical_flow.*;
+import com.khartec.waltz.schema.Tables;
+import com.khartec.waltz.schema.tables.PhysicalSpecDataType;
 import com.khartec.waltz.schema.tables.records.PhysicalFlowRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -33,17 +36,20 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static com.khartec.waltz.common.Checks.checkFalse;
 import static com.khartec.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static com.khartec.waltz.common.EnumUtilities.readEnum;
+import static com.khartec.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
+import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.EXTERNAL_IDENTIFIER;
+import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
-import static com.khartec.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 
 
@@ -87,6 +93,17 @@ public class PhysicalFlowDao {
 
     private final DSLContext dsl;
 
+
+    private static final Field<String> SOURCE_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+            LOGICAL_FLOW.SOURCE_ENTITY_ID,
+            LOGICAL_FLOW.SOURCE_ENTITY_KIND,
+            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
+
+
+    private static final Field<String> TARGET_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+            LOGICAL_FLOW.TARGET_ENTITY_ID,
+            LOGICAL_FLOW.TARGET_ENTITY_KIND,
+            newArrayList(EntityKind.APPLICATION, EntityKind.ACTOR));
 
     @Autowired
     public PhysicalFlowDao(DSLContext dsl) {
@@ -194,7 +211,7 @@ public class PhysicalFlowDao {
                 .and(PHYSICAL_SPECIFICATION.NAME.eq(flow.name()))
                 .and(PHYSICAL_SPECIFICATION.IS_REMOVED.isFalse());
 
-        Condition specDataTypeMatch = PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID.eq(flow.dataType().id());
+        Condition specDataTypeMatch = PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID.eq(flow.dataType().id());
 
 
         return dsl
@@ -202,7 +219,7 @@ public class PhysicalFlowDao {
                 .from(PHYSICAL_FLOW)
                 .join(LOGICAL_FLOW).on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
                 .join(PHYSICAL_SPECIFICATION).on(PHYSICAL_SPECIFICATION.ID.eq(PHYSICAL_FLOW.SPECIFICATION_ID))
-                .join(PHYSICAL_SPEC_DATA_TYPE).on(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
+                .join(PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE).on(PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
                 .where(logicalFlowMatch)
                 .and(specMatch)
                 .and(attributesMatch)
@@ -450,6 +467,60 @@ public class PhysicalFlowDao {
     }
 
 
+    public Set<PhysicalFlowInfo> findUnderlyingPhysicalFlows(Long logicalFlowId, Long dataTypeId) {
+
+        SelectConditionStep<Record1<Long>> specsSharingDataType = DSL
+                .select(PHYSICAL_SPECIFICATION.ID)
+                .from(LOGICAL_FLOW_DECORATOR)
+                .innerJoin(PHYSICAL_FLOW).on(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
+                .innerJoin(PHYSICAL_SPECIFICATION).on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
+                .innerJoin(Tables.PHYSICAL_SPEC_DATA_TYPE).on(PHYSICAL_SPECIFICATION.ID.eq(Tables.PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID)
+                        .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(Tables.PHYSICAL_SPEC_DATA_TYPE.DATA_TYPE_ID)
+                                .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))))
+                .where(LOGICAL_FLOW_DECORATOR.LOGICAL_FLOW_ID.eq(logicalFlowId)
+                        .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(dataTypeId)));
+
+        SelectConditionStep<Record14<Long, String, String, Long, String, String, Long, Long, String, String, String, String, String, String>> qry = dsl
+                .select(LOGICAL_FLOW.SOURCE_ENTITY_ID,
+                        LOGICAL_FLOW.SOURCE_ENTITY_KIND,
+                        SOURCE_NAME_FIELD,
+                        LOGICAL_FLOW.TARGET_ENTITY_ID,
+                        LOGICAL_FLOW.TARGET_ENTITY_KIND,
+                        TARGET_NAME_FIELD,
+                        LOGICAL_FLOW.ID,
+                        PHYSICAL_SPECIFICATION.ID,
+                        PHYSICAL_SPECIFICATION.NAME,
+                        PHYSICAL_FLOW.EXTERNAL_ID,
+                        PHYSICAL_FLOW.DESCRIPTION,
+                        PHYSICAL_FLOW.TRANSPORT,
+                        PHYSICAL_FLOW.FREQUENCY,
+                        PHYSICAL_FLOW.CRITICALITY)
+                .from(PHYSICAL_FLOW)
+                .innerJoin(PHYSICAL_SPECIFICATION).on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
+                .innerJoin(LOGICAL_FLOW).on(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID))
+                .where(PHYSICAL_SPECIFICATION.ID.in(specsSharingDataType)
+                        .and(PHYSICAL_FLOW.IS_REMOVED.isFalse().and(PHYSICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name())
+                                .and(LOGICAL_FLOW.IS_REMOVED.isFalse().and(LOGICAL_FLOW.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name()))
+                                        .and(PHYSICAL_SPECIFICATION.IS_REMOVED.isFalse())))));
+
+        System.out.println(qry);
+
+        Set<PhysicalFlowInfo> physicalFlowDetails = qry
+                .fetchSet(r -> ImmutablePhysicalFlowInfo
+                        .builder()
+                    .source(mkRef(EntityKind.valueOf(r.get(LOGICAL_FLOW.SOURCE_ENTITY_KIND)), r.get(LOGICAL_FLOW.SOURCE_ENTITY_ID), r.get(SOURCE_NAME_FIELD)))
+                    .target(mkRef(EntityKind.valueOf(r.get(LOGICAL_FLOW.TARGET_ENTITY_KIND)), r.get(LOGICAL_FLOW.TARGET_ENTITY_ID), r.get(TARGET_NAME_FIELD)))
+                    .logicalFlow(mkRef(EntityKind.LOGICAL_DATA_FLOW, r.get(LOGICAL_FLOW.ID)))
+                    .specification(mkRef(EntityKind.PHYSICAL_SPECIFICATION, r.get(PHYSICAL_SPECIFICATION.ID), r.get(PHYSICAL_SPECIFICATION.NAME)))
+                    .physicalFlowDescription(r.get(PHYSICAL_FLOW.DESCRIPTION))
+                    .physicalFlowExternalId(r.get(PHYSICAL_FLOW.EXTERNAL_ID))
+                    .frequencyKind(FrequencyKind.valueOf(r.get(PHYSICAL_FLOW.FREQUENCY)))
+                    .transportKindValue(TransportKindValue.of(r.get(PHYSICAL_FLOW.TRANSPORT)))
+                    .criticality(Criticality.valueOf(r.get(PHYSICAL_FLOW.CRITICALITY)))
+                    .build());
+
+        return physicalFlowDetails;
+    }
     // --- helpers
 
     private int updateEnum(long flowId, TableField<PhysicalFlowRecord, String> field, String value) {

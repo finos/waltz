@@ -18,6 +18,14 @@ export const flowDirections = {
     INBOUND: "INBOUND"
 }
 
+
+export const Modes = {
+    DEFAULT: "DEFAULT",
+    ENTITY: "ENTITY",
+    DECORATOR: "DECORATOR",
+    FLOW: "FLOW"
+}
+
 export const categories = writable([]);
 export const clients = writable([]);
 export const arcs = writable([]);
@@ -28,7 +36,10 @@ export const assessmentRatingFilter = writable(() => true);
 export const layoutDirection = writable(layoutDirections.clientToCategory)
 export const highlightClass = writable(null);
 export const rainbowTipProportion = tweened(0.2, { duration: 600, delay: 600 });
+export const contextPanelMode = writable(Modes.DEFAULT);
 
+export const selectedCategory = writable(null);
+export const selectedDecorator = writable(null);
 export const selectedClient = writable(null);
 export const focusClient = writable(null);
 
@@ -54,6 +65,7 @@ export const filteredClients = derived([clientQuery, entityKindFilter, assessmen
         : _.chain(filtered)
             .filter(entityKindFilter)
             .filter(assessmentRatingFilter)
+            .sortBy(c => c.name)
             .value();
 });
 

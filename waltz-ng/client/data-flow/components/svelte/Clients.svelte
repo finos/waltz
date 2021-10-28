@@ -5,7 +5,9 @@
         highlightClass,
         selectedClient,
         layoutDirection,
-        layoutDirections
+        layoutDirections,
+        contextPanelMode,
+        Modes
     } from "./flow-decorator-store";
     import {dimensions} from "./flow-decorator-utils"
     import {truncateMiddle} from "../../../common/string-utils";
@@ -27,6 +29,7 @@
 
     function selectClient(client) {
         $selectedClient = client;
+        $contextPanelMode = Modes.ENTITY;
     }
 
 </script>

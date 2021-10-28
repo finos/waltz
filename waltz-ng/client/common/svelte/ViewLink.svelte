@@ -65,6 +65,10 @@
             path: ctx => `physical-flow/${ctx.id}`,
             title: "Physical Flow View"
         },
+        "main.physical-specification.view": {
+            path: ctx => `physical-specification/${ctx.id}`,
+            title: "Physical Specification View"
+        },
         "main.process-diagram.view": {
             path: ctx => `process-diagram/${ctx.id}`,
             title: "Process Diagram View"

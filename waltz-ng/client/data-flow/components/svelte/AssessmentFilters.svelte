@@ -63,93 +63,91 @@
 
 </script>
 
-<div class="row">
+<div class="col-sm-12">
+    <div class="help-block">
+        <Icon name="info-circle"/> Use the selection below to filter counterpart entities by assessment rating
+    </div>
+</div>
+{#if activeMode === Modes.DEFINITION}
+    <div  class="col-sm-12">
+        <div>
+            Select an assessment definition for applications:
+        </div>
+        {#if !_.isEmpty(groupedAssessments)}
+            <div>
+                <div class="waltz-scroll-region-250">
+                    <table class="table table-condensed table-hover small">
+                        <thead>
+                        <th></th>
+                        <th>Assessment Definition</th>
+                        <th>Entity Count</th>
+                        </thead>
+                        <tbody>
+                        {#each groupedAssessments as assessmentInfo}
+                            <tr on:click={() => selectDefinition(assessmentInfo)}
+                                class="clickable">
+                                <td>
+                                    <Icon name={entity[assessmentInfo.assessmentDefinition.entityKind].icon}/>
+                                </td>
+                                <td>{assessmentInfo.assessmentDefinition.name}</td>
+                                <td>{_.sumBy(assessmentInfo.ratingEntityLists, d => _.size(d.entityReferences))}</td>
+                            </tr>
+                        {/each}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {:else}
+            <NoData>There are no assessments for the current entity list and selected kind</NoData>
+        {/if}
+    </div>
+    <br>
     <div class="col-sm-12">
-        <div class="help-block">
-            <Icon name="info-circle"/> Use the selection below to filter counterpart entities by assessment rating
+        <div style="border-top: 1px dotted #eee; padding-top: 0.2em; margin-top: 0.2em">
+            <button class="btn btn-skinny"
+                    on:click={changeView}>
+                View default filters
+            </button>
         </div>
     </div>
-    {#if activeMode === Modes.DEFINITION}
-        <div  class="col-sm-12">
-            <div>
-                Select an assessment definition for applications:
-            </div>
-            {#if !_.isEmpty(groupedAssessments)}
-                <div>
-                    <div class="waltz-scroll-region-250">
-                        <table class="table table-condensed table-hover small">
-                            <thead>
-                            <th></th>
-                            <th>Assessment Definition</th>
-                            <th>Entity Count</th>
-                            </thead>
-                            <tbody>
-                            {#each groupedAssessments as assessmentInfo}
-                                <tr on:click={() => selectDefinition(assessmentInfo)}
-                                    class="clickable">
-                                    <td>
-                                        <Icon name={entity[assessmentInfo.assessmentDefinition.entityKind].icon}/>
-                                    </td>
-                                    <td>{assessmentInfo.assessmentDefinition.name}</td>
-                                    <td>{_.sumBy(assessmentInfo.ratingEntityLists, d => _.size(d.entityReferences))}</td>
-                                </tr>
-                            {/each}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            {:else}
-                <NoData>There are no assessments for the current entity list and selected kind</NoData>
-            {/if}
+{:else if activeMode === Modes.RATING}
+    <div class="col-sm-12">
+        <div>
+            Filter by assessment rating for {selectedDefinition.assessmentDefinition.name}:
         </div>
-        <br>
-        <div class="col-sm-12">
-            <div style="border-top: 1px dotted #eee; padding-top: 0.2em; margin-top: 0.2em">
-                <button class="btn btn-skinny"
-                        on:click={changeView}>
-                    View default filters
-                </button>
-            </div>
+        <div>
+            <table class="table table-condensed table-hover small">
+                <thead>
+                <th>Rating</th>
+                <th>Entity Count</th>
+                </thead>
+                <tbody>
+                {#each selectedDefinition.ratingEntityLists as rating}
+                    <tr on:click={() => selectRating(rating)}
+                        class="clickable" class:selected={selectedRating === rating}>
+                        <td>{rating.rating}</td>
+                        <td>{_.size(rating.entityReferences)}</td>
+                    </tr>
+                {/each}
+                </tbody>
+            </table>
         </div>
-    {:else if activeMode === Modes.RATING}
-        <div class="col-sm-12">
-            <div>
-                Filter by assessment rating for {selectedDefinition.assessmentDefinition.name}:
-            </div>
-            <div>
-                <table class="table table-condensed table-hover small">
-                    <thead>
-                    <th>Rating</th>
-                    <th>Entity Count</th>
-                    </thead>
-                    <tbody>
-                    {#each selectedDefinition.ratingEntityLists as rating}
-                        <tr on:click={() => selectRating(rating)}
-                            class="clickable" class:selected={selectedRating === rating}>
-                            <td>{rating.rating}</td>
-                            <td>{_.size(rating.entityReferences)}</td>
-                        </tr>
-                    {/each}
-                    </tbody>
-                </table>
-            </div>
+    </div>
+    <br>
+    <div class="col-sm-12">
+        <div  style="border-top: 1px dotted #eee; padding-top: 0.2em; margin-top: 0.2em">
+            <button class="btn btn-skinny"
+                    on:click={back}>
+                Back
+            </button>
+            |
+            <button class="btn btn-skinny"
+                    on:click={changeView}>
+                View default filters
+            </button>
         </div>
-        <br>
-        <div class="col-sm-12">
-            <div  style="border-top: 1px dotted #eee; padding-top: 0.2em; margin-top: 0.2em">
-                <button class="btn btn-skinny"
-                        on:click={back}>
-                    Back
-                </button>
-                |
-                <button class="btn btn-skinny"
-                        on:click={changeView}>
-                    View default filters
-                </button>
-            </div>
-        </div>
-    {/if}
-</div>
+    </div>
+{/if}
 
 
 

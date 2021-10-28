@@ -15,22 +15,24 @@
 </script>
 
 {#if activeMode === Modes.DEFAULT}
-    <DefaultFilters on:submit={() => activeMode = Modes.ASSESSMENT}/>
+    <div class="row row-no-gutters">
+        <DefaultFilters style="display: inline-block" on:submit={() => activeMode = Modes.ASSESSMENT}/>
+    </div>
 {:else if activeMode === Modes.ASSESSMENT}
-    <AssessmentFilters on:submit={() => activeMode = Modes.DEFAULT}/>
+    <div class="row row-no-gutters">
+        <AssessmentFilters on:submit={() => activeMode = Modes.DEFAULT}/>
+    </div>
 {/if}
 
 {#if $filterApplied}
     <br>
-    <div class="row">
-        <div class="col-sm-12">
-            <div class="warning-block text-muted">
-                <span>
-                    <Icon class="warning-icon"
-                          name="exclamation-triangle"/>
-                    There are filters applied to the flow diagram
-                </span>
-            </div>
+    <div class="col-sm-12">
+        <div class="warning-block text-muted">
+        <span>
+            <Icon class="warning-icon"
+                  name="exclamation-triangle"/>
+            There are filters applied to the flow diagram
+        </span>
         </div>
     </div>
 {/if}

@@ -1,14 +1,32 @@
 <script>
-    import {filteredArcs, layoutDirection, layoutDirections, selectedClient} from "./flow-decorator-store";
+    import {
+        contextPanelMode,
+        filteredArcs,
+        layoutDirection,
+        layoutDirections,
+        Modes,
+        selectedClient,
+        selectedDecorator
+    } from "./flow-decorator-store";
     import _ from "lodash";
     import {dataTypeDecoratorStore} from "../../../svelte-stores/data-type-decorator-store";
     import {flowClassificationStore} from "../../../svelte-stores/flow-classification-store";
     import EntityLink from "../../../common/svelte/EntityLink.svelte";
+    import {mkRef} from "../../../common/entity-utils";
+    import Icon from "../../../common/svelte/Icon.svelte";
+    import {createEventDispatcher} from "svelte";
 
     export let parentEntity
 
-    $: decoratorCall = dataTypeDecoratorStore.findByFlowIds(logicalFlowIds);
-    $: decorators = _.orderBy($decoratorCall.data, d => d.decoratorEntity.name);
+    let logicalFlowId = null;
+
+    let dispatch = createEventDispatcher();
+
+    $: decoratorCall = dataTypeDecoratorStore.findByFlowIds([logicalFlowId]);
+    $: decorators = _.chain($decoratorCall.data)
+        .map(d => Object.assign({}, d, {info: _.get(decoratorInfoByDtId, d.dataTypeId)}))
+        .orderBy(d => d.decoratorEntity.name)
+        .value();
 
     $: source = $layoutDirection === layoutDirections.clientToCategory ? $selectedClient.name : parentEntity.name
     $: target = $layoutDirection === layoutDirections.clientToCategory ? parentEntity.name : $selectedClient.name
@@ -17,11 +35,29 @@
     $: ratingsByCode = _.keyBy($flowClassificationCall.data, d => d.code);
     $: noOpinionRating = ratingsByCode['NO_OPINION'];
 
-    $: logicalFlowIds = _
+    $: logicalFlowId = _
         .chain($filteredArcs)
         .filter(a => a.clientId === $selectedClient.id)
         .map(a => a.flowId)
+        .first()
         .value();
+
+    $: decoratorInfoCall = dataTypeDecoratorStore.findDatatypeUsageCharacteristics(mkRef("LOGICAL_DATA_FLOW", logicalFlowId));
+    $: decoratorInfo = $decoratorInfoCall?.data
+    $: decoratorInfoByDtId = _.keyBy(decoratorInfo, d => d.dataTypeId);
+
+    function selectDecorator(decorator) {
+        $selectedDecorator = decorator;
+        $contextPanelMode = Modes.DECORATOR;
+    }
+
+    function mkHoverText(decorator) {
+        return _
+            .chain([decorator.info?.warningMessageForViewers, decorator.info?.warningMessageForEditors])
+            .compact()
+            .join(' ')
+            .value()
+    }
 
 </script>
 
@@ -29,7 +65,7 @@
     Data types on logical flows from {source} to {target}:
 </div>
 <div class:waltz-scroll-region-250={_.size(decorators) > 6}>
-    <table class="table table-condensed small">
+    <table class="table table-condensed table-hover small">
         <colgroup>
             <col style="width: 50%;">
             <col style="width: 50%;">
@@ -42,7 +78,9 @@
         </thead>
         <tbody>
         {#each decorators as decorator}
-            <tr>
+            <tr class="clickable"
+                title={mkHoverText(decorator)}
+                on:click={() => selectDecorator(decorator)}>
                 <td>
                     <EntityLink ref={decorator.decoratorEntity}/>
                 </td>
@@ -50,6 +88,12 @@
                     <div class="rating-indicator-block"
                          style="background-color: {_.get(ratingsByCode, [decorator.rating, 'color'], noOpinionRating.color)}">&nbsp;</div>
                     {_.get(ratingsByCode, [decorator.rating, "name"], noOpinionRating.name)}
+                    {#if !decorator.info?.isRemovable}
+                        <Icon name="lock"/>
+                    {/if}
+                    {#if decorator.info?.warningMessageForViewers}
+                        <Icon name="exclamation-triangle"/>
+                    {/if}
                 </td>
             </tr>
         {/each}
