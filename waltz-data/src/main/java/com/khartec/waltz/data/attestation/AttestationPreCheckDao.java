@@ -20,17 +20,18 @@ import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 @Repository
 public class AttestationPreCheckDao {
 
+    public static final String EXEMPT_FROM_DEPRECATED_DATA_TYPE_CHECK = "EXEMPT_FROM_DEPRECATED_DATA_TYPE_CHECK";
+    public static final String EXEMPT_FROM_UNKNOWN_DATA_TYPE_CHECK = "EXEMPT_FROM_UNKNOWN_DATA_TYPE_CHECK";
+    public static final String EXEMPT_FROM_FLOW_COUNT_CHECK = "EXEMPT_FROM_FLOW_COUNT_CHECK";
+    public static final String GROUP_LOGICAL_FLOW_ATTESTATION_EXEMPT_FROM_FLOW_COUNT_CHECK = "LOGICAL_FLOW_ATTESTATION_EXEMPT_FROM_FLOW_COUNT_CHECK";
+    public static final String GROUP_LOGICAL_FLOW_ATTESTATION_EXEMPT_FROM_UNKNOWN_DATA_TYPE_CHECK = "LOGICAL_FLOW_ATTESTATION_EXEMPT_FROM_UNKNOWN_DATA_TYPE_CHECK";
+    public static final String GROUP_LOGICAL_FLOW_ATTESTATION_EXEMPT_FROM_DEPRECATED_DATA_TYPE_CHECK = "LOGICAL_FLOW_ATTESTATION_EXEMPT_FROM_DEPRECATED_DATA_TYPE_CHECK";
+
     private static final LogicalFlow lf = LOGICAL_FLOW;
     private static final LogicalFlowDecorator lfd = LOGICAL_FLOW_DECORATOR;
     private static final ApplicationGroupEntry age = APPLICATION_GROUP_ENTRY;
     private static final ApplicationGroup ag = APPLICATION_GROUP;
     private static final DataType dt = DATA_TYPE;
-    private static final String EXEMPT_FROM_DEPRECATED_DATA_TYPE_CHECK = "EXEMPT_FROM_DEPRECATED_DATA_TYPE_CHECK";
-    private static final String EXEMPT_FROM_UNKNOWN_DATA_TYPE_CHECK = "EXEMPT_FROM_UNKNOWN_DATA_TYPE_CHECK";
-    private static final String EXEMPT_FROM_FLOW_COUNT_CHECK = "EXEMPT_FROM_FLOW_COUNT_CHECK";
-    private static final String GROUP_LOGICAL_FLOW_ATTESTATION_EXEMPT_FROM_FLOW_COUNT_CHECK = "LOGICAL_FLOW_ATTESTATION_EXEMPT_FROM_FLOW_COUNT_CHECK";
-    private static final String GROUP_LOGICAL_FLOW_ATTESTATION_EXEMPT_FROM_UNKNOWN_DATA_TYPE_CHECK = "LOGICAL_FLOW_ATTESTATION_EXEMPT_FROM_UNKNOWN_DATA_TYPE_CHECK";
-    private static final String GROUP_LOGICAL_FLOW_ATTESTATION_EXEMPT_FROM_DEPRECATED_DATA_TYPE_CHECK = "LOGICAL_FLOW_ATTESTATION_EXEMPT_FROM_DEPRECATED_DATA_TYPE_CHECK";
 
     private final DSLContext dsl;
 
@@ -51,14 +52,14 @@ public class AttestationPreCheckDao {
         CommonTableExpression<Record2<String, Integer>> flowCount = DSL
                 .name("flow_count")
                 .as(DSL
-                        .select(DSL.val("FLOWS").as("check"),
+                        .select(DSL.val("FLOWS").as("chk"),
                                 DSL.count().as("count"))
                         .from(anyFlows));
 
         CommonTableExpression<Record2<String, Integer>> unknownFlowCount = DSL
                 .name("unknown_flow_count")
                 .as(DSL
-                        .select(DSL.val("UNKNOWN").as("check"),
+                        .select(DSL.val("UNKNOWN").as("chk"),
                                 DSL.count().as("count"))
                         .from(lfd)
                         .where(lfd.LOGICAL_FLOW_ID.in(DSL
@@ -70,7 +71,7 @@ public class AttestationPreCheckDao {
         CommonTableExpression<Record2<String, Integer>> deprecatedFlowCount = DSL
                 .name("deprecated_flow_count")
                 .as(DSL
-                        .select(DSL.val("DEPRECATED").as("check"),
+                        .select(DSL.val("DEPRECATED").as("chk"),
                                 DSL.count().as("count"))
                         .from(lfd)
                         .where(lfd.LOGICAL_FLOW_ID.in(DSL
@@ -114,7 +115,7 @@ public class AttestationPreCheckDao {
         ImmutableLogicalFlowAttestationPreChecks.Builder builder = ImmutableLogicalFlowAttestationPreChecks.builder();
 
         qry.forEach(r -> {
-            String check = r.get("check", String.class);
+            String check = r.get("chk", String.class);
             int count = r.get("count", Integer.class);
             switch (check) {
                 case "FLOWS":
@@ -161,7 +162,7 @@ public class AttestationPreCheckDao {
         return DSL
                 .name(checkName)
                 .as(DSL
-                    .select(DSL.val(checkName).as("check"),
+                    .select(DSL.val(checkName).as("chk"),
                             DSL.count().as("count"))
                     .from(age)
                     .where(age.APPLICATION_ID.eq(ref.id()))

@@ -243,10 +243,12 @@ public abstract class BaseInMemoryIntegrationTest {
     }
 
 
-    public void createUnknownDatatype() {
+    public long createUnknownDatatype() {
         DSLContext dsl = getDsl();
 
         clearAllDataTypes();
+
+        long id = 1L;
 
         dsl.insertInto(DATA_TYPE)
                 .columns(
@@ -256,8 +258,10 @@ public abstract class BaseInMemoryIntegrationTest {
                         DATA_TYPE.CODE,
                         DATA_TYPE.CONCRETE,
                         DATA_TYPE.UNKNOWN.as(DSL.quotedName("unknown"))) //TODO: as part of #5639 can drop quotedName
-                .values(1L, "Unknown", "Unknown data type", "UNKNOWN", false, true)
+                .values(id, "Unknown", "Unknown data type", "UNKNOWN", false, true)
                 .execute();
+
+        return id;
     }
 
 
