@@ -5,9 +5,6 @@
     import {physicalFlowStore} from "../../../svelte-stores/physical-flow-store";
     import FlowDatatypeDetailTable from "./FlowDatatypeDetailTable.svelte";
 
-    export let parentEntity;
-    export let flowInfo;
-
     function cancel() {
         $contextPanelMode = Modes.DEFAULT
         $selectedDecorator = null;
@@ -42,3 +39,16 @@
         </li>
     </ul>
 </div>
+
+
+<style>
+    ul {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+    }
+
+    li {
+        padding-top: 0;
+    }
+</style>

@@ -4,6 +4,7 @@
     import {truncate} from "../../../common/string-utils";
     import EntityLink from "../../../common/svelte/EntityLink.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
+    import _ from "lodash";
 
     $: physicalFlowCall = physicalFlowStore.findUnderlyingPhysicalFlows($selectedDecorator?.dataFlowId, $selectedDecorator?.dataTypeId);
     $: physicalFlows = $physicalFlowCall.data;
@@ -40,16 +41,3 @@
 {:else}
     <NoData>There are no physical flows sharing this data type</NoData>
 {/if}
-
-
-<style>
-    ul {
-        padding: 0;
-        margin: 0;
-        list-style: none;
-    }
-
-    li {
-        padding-top: 0;
-    }
-</style>
