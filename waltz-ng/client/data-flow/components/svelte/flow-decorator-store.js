@@ -49,9 +49,11 @@ export const flowDirection = derived(layoutDirection, (direction) => {
 
 export const filteredCategories = derived([categoryQuery, categories], ([catQry, cats]) => {
 
-    return _.isEmpty(catQry)
+    const filteredCats = _.isEmpty(catQry)
         ? cats
         : termSearch(cats, catQry, ["name"]);
+
+    return _.sortBy(filteredCats, d => d.name)
 })
 
 export const filteredClients = derived([clientQuery, entityKindFilter, assessmentRatingFilter, clients], ([clientQry, entityKindFilter, assessmentRatingFilter, cs]) => {

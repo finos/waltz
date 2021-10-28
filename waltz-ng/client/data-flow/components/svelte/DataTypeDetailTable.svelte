@@ -1,7 +1,7 @@
 <script>
     import {
+        arcs,
         contextPanelMode,
-        filteredArcs,
         layoutDirection,
         layoutDirections,
         Modes,
@@ -15,18 +15,21 @@
     import {mkRef} from "../../../common/entity-utils";
     import Icon from "../../../common/svelte/Icon.svelte";
     import {createEventDispatcher} from "svelte";
+    import NoData from "../../../common/svelte/NoData.svelte";
 
     export let parentEntity
 
     let logicalFlowId = null;
+    $:  flowIds = logicalFlowId ? [logicalFlowId] : [];
 
     let dispatch = createEventDispatcher();
 
-    $: decoratorCall = dataTypeDecoratorStore.findByFlowIds([logicalFlowId]);
-    $: decorators = _.chain($decoratorCall.data)
-        .map(d => Object.assign({}, d, {info: _.get(decoratorInfoByDtId, d.dataTypeId)}))
-        .orderBy(d => d.decoratorEntity.name)
-        .value();
+    $: decoratorCall = dataTypeDecoratorStore.findByFlowIds(flowIds);
+    $: decorators = _
+            .chain($decoratorCall.data)
+            .map(d => Object.assign({}, d, {info: _.get(decoratorInfoByDtId, d.dataTypeId)}))
+            .orderBy(d => d.decoratorEntity.name)
+            .value();
 
     $: source = $layoutDirection === layoutDirections.clientToCategory ? $selectedClient.name : parentEntity.name
     $: target = $layoutDirection === layoutDirections.clientToCategory ? parentEntity.name : $selectedClient.name
@@ -36,7 +39,7 @@
     $: noOpinionRating = ratingsByCode['NO_OPINION'];
 
     $: logicalFlowId = _
-        .chain($filteredArcs)
+        .chain($arcs)
         .filter(a => a.clientId === $selectedClient.id)
         .map(a => a.flowId)
         .first()
@@ -64,6 +67,7 @@
 <div class="small help-block">
     Data types on logical flows from {source} to {target}:
 </div>
+{#if !_.isEmpty(decorators)}
 <div class:waltz-scroll-region-250={_.size(decorators) > 6}>
     <table class="table table-condensed table-hover small">
         <colgroup>
@@ -100,7 +104,9 @@
         </tbody>
     </table>
 </div>
-
+{:else}
+    <NoData>There are no decorators for this flow</NoData>
+{/if}
 
 <style>
     .rating-indicator-block {

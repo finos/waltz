@@ -2,16 +2,12 @@
     import Icon from "../../../common/svelte/Icon.svelte";
     import {contextPanelMode, Modes, selectedDecorator} from "./flow-decorator-store";
     import EntityInfoPanel from "../../../common/svelte/info-panels/EntityInfoPanel.svelte";
-    import {physicalFlowStore} from "../../../svelte-stores/physical-flow-store";
     import FlowDatatypeDetailTable from "./FlowDatatypeDetailTable.svelte";
 
     function cancel() {
         $contextPanelMode = Modes.DEFAULT
         $selectedDecorator = null;
     }
-
-    $: physicalFlowCall = physicalFlowStore.findUnderlyingPhysicalFlows($selectedDecorator?.dataFlowId, $selectedDecorator?.dataTypeId);
-    $: physicalFlows = $physicalFlowCall.data;
 
 </script>
 
