@@ -21,6 +21,7 @@ package com.khartec.waltz.integration_test.inmem.dao;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
+import com.khartec.waltz.integration_test.inmem.helpers.AppHelper;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
@@ -46,6 +47,9 @@ public class ApplicationDaoTest extends BaseInMemoryIntegrationTest {
     @Autowired
     private ApplicationDao appDao;
 
+    @Autowired
+    private AppHelper appHelper;
+
     private Long rbOu;
     private Long raaOu;
     private Long raOu;
@@ -65,10 +69,10 @@ public class ApplicationDaoTest extends BaseInMemoryIntegrationTest {
 
         rebuildHierarchy(EntityKind.ORG_UNIT);
 
-        r1 = createNewApp("r1", rootOu);
-        ra2 = createNewApp("ra2", raOu);
-        raa3 = createNewApp("raa3", raaOu);
-        rb4 = createNewApp("rb4", rbOu);
+        r1 = appHelper.createNewApp("r1", rootOu);
+        ra2 = appHelper.createNewApp("ra2", raOu);
+        raa3 = appHelper.createNewApp("raa3", raaOu);
+        rb4 = appHelper.createNewApp("rb4", rbOu);
     }
 
 

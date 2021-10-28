@@ -19,6 +19,7 @@
 package com.khartec.waltz.integration_test.inmem.service;
 
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
+import com.khartec.waltz.integration_test.inmem.helpers.AppHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -27,7 +28,6 @@ import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.entity_search.ImmutableEntitySearchOptions;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.service.data_type.DataTypeService;
-import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -46,10 +46,10 @@ public class DataTypeServiceTest extends BaseInMemoryIntegrationTest {
     private DataTypeService dtSvc;
 
     @Autowired
-    private LogicalFlowService lfSvc;
+    private LogicalFlowHelper lfHelper;
 
     @Autowired
-    private LogicalFlowHelper lfHelper;
+    private AppHelper appHelper;
 
 
     @Test
@@ -108,9 +108,9 @@ public class DataTypeServiceTest extends BaseInMemoryIntegrationTest {
     public void findSuggestedBySourceEntityRef() {
         clearAllDataTypes();
 
-        EntityReference a = createNewApp("a", ouIds.a);
-        EntityReference b = createNewApp("b", ouIds.a1);
-        EntityReference c = createNewApp("b", ouIds.b);
+        EntityReference a = appHelper.createNewApp("a", ouIds.a);
+        EntityReference b = appHelper.createNewApp("b", ouIds.a1);
+        EntityReference c = appHelper.createNewApp("b", ouIds.b);
 
         Collection<DataType> noDecoratorsOnFlow = dtSvc.findSuggestedBySourceEntityRef(a);
         assertEquals("if source app has no logical flows returns empty list", emptyList(), noDecoratorsOnFlow);
