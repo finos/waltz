@@ -20,6 +20,7 @@ package com.khartec.waltz.integration_test.inmem.service;
 
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.integration_test.inmem.helpers.AppHelper;
+import com.khartec.waltz.integration_test.inmem.helpers.DataTypeHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -51,16 +52,19 @@ public class DataTypeServiceTest extends BaseInMemoryIntegrationTest {
     @Autowired
     private AppHelper appHelper;
 
+    @Autowired
+    private DataTypeHelper dataTypeHelper;
+
 
     @Test
     public void findsAllDatatypes() {
-        clearAllDataTypes();
+        dataTypeHelper.clearAllDataTypes();
 
         List<DataType> dts = dtSvc.findAll();
         assertEquals("Should return empty list when no datatypes created", emptyList(), dts);
 
-        createDataType(1L, "dt1", "DT1");
-        createDataType(2L, "dt2", "DT2");
+        dataTypeHelper.createDataType(1L, "dt1", "DT1");
+        dataTypeHelper.createDataType(2L, "dt2", "DT2");
 
         List<DataType> dataTypes = dtSvc.findAll();
         assertEquals("Returns all added datatypes", 2, dataTypes.size());
@@ -70,13 +74,13 @@ public class DataTypeServiceTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void getDataTypeById() {
-        clearAllDataTypes();
+        dataTypeHelper.clearAllDataTypes();
 
         DataType noDataTypesAdded = dtSvc.getDataTypeById(1L);
         assertNull("When no datatypes created returns null", noDataTypesAdded);
 
-        createDataType(1L, "dt1", "DT1");
-        createDataType(2L, "dt2", "DT2");
+        dataTypeHelper.createDataType(1L, "dt1", "DT1");
+        dataTypeHelper.createDataType(2L, "dt2", "DT2");
 
         DataType dt1 = dtSvc.getDataTypeById(1L);
         assertEquals("returns the datatype with that id", 1L, dt1.id().get().longValue());
@@ -90,12 +94,12 @@ public class DataTypeServiceTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void getDataTypeByCode() {
-        clearAllDataTypes();
+        dataTypeHelper.clearAllDataTypes();
 
         DataType noDataTypesAdded = dtSvc.getDataTypeByCode("DT1");
         assertNull("When no datatypes created returns null", noDataTypesAdded);
 
-        createDataType(1L, "dt1", "DT1");
+        dataTypeHelper.createDataType(1L, "dt1", "DT1");
 
         DataType dt1 = dtSvc.getDataTypeByCode("DT1");
         assertEquals("retrieved data type has the correct name", 1L, dt1.id().get().longValue());
@@ -106,7 +110,7 @@ public class DataTypeServiceTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void findSuggestedBySourceEntityRef() {
-        clearAllDataTypes();
+        dataTypeHelper.clearAllDataTypes();
 
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
@@ -118,13 +122,13 @@ public class DataTypeServiceTest extends BaseInMemoryIntegrationTest {
         LogicalFlow ab = lfHelper.createLogicalFlow(a, b);
         assertEquals("if source app has no flow decorators returns empty list", emptyList(), noDecoratorsOnFlow);
 
-        createDataType(1L, "dt1", "DT1");
+        dataTypeHelper.createDataType(1L, "dt1", "DT1");
         createLogicalFlowDecorators(ab.entityReference(), asSet(1L));
         Set<Long> suggestedDtIds = map(dtSvc.findSuggestedBySourceEntityRef(a), dtd -> dtd.entityReference().id());
         assertEquals("returns data type associated to the source application", asSet(1L), suggestedDtIds);
 
         LogicalFlow bc = lfHelper.createLogicalFlow(b, c);
-        createDataType(2L, "dt2", "DT2");
+        dataTypeHelper.createDataType(2L, "dt2", "DT2");
         createLogicalFlowDecorators(bc.entityReference(), asSet(2L));
         Set<Long> onlySourceDts = map(dtSvc.findSuggestedBySourceEntityRef(a), dtd -> dtd.entityReference().id());
         assertEquals("does not return dts associated to only the target app", asSet(1L), onlySourceDts);
@@ -142,7 +146,7 @@ public class DataTypeServiceTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void search() {
-        clearAllDataTypes();
+        dataTypeHelper.clearAllDataTypes();
 
         assertThrows(
                 "null search options throws exception",
@@ -155,9 +159,9 @@ public class DataTypeServiceTest extends BaseInMemoryIntegrationTest {
 
         assertEquals("Search will return an empty list when no datatypes", emptyList(), dtSvc.search(dt1Search));
 
-        createDataType(1L, "dt1", "DT1");
-        createDataType(2L, "dt2", "DT2");
-        createDataType(3L, "dt10", "DT10");
+        dataTypeHelper.createDataType(1L, "dt1", "DT1");
+        dataTypeHelper.createDataType(2L, "dt2", "DT2");
+        dataTypeHelper.createDataType(3L, "dt10", "DT10");
 
         assertEquals("Empty search string will return all dts",
                 asSet(1L, 2L, 3L),
@@ -171,7 +175,7 @@ public class DataTypeServiceTest extends BaseInMemoryIntegrationTest {
                 asSet(1L, 3L),
                 map(dtSvc.search(dt1Search), dt -> dt.id().get()));
 
-        createDataType(4L, "test", "TESTING");
+        dataTypeHelper.createDataType(4L, "test", "TESTING");
 
         assertEquals("search is case insensitive",
                 asSet(4L),

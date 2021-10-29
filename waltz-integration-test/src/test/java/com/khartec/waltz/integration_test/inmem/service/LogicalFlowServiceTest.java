@@ -20,6 +20,7 @@ package com.khartec.waltz.integration_test.inmem.service;
 
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.integration_test.inmem.helpers.AppHelper;
+import com.khartec.waltz.integration_test.inmem.helpers.DataTypeHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
@@ -57,6 +58,9 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
     @Autowired
     private AppHelper appHelper;
+
+    @Autowired
+    private DataTypeHelper dataTypeHelper;
 
 
     @Test
@@ -224,7 +228,7 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
 
-        createUnknownDatatype();
+        dataTypeHelper.createUnknownDatatype();
 
         ImmutableAddLogicalFlowCommand createLoopCommand = ImmutableAddLogicalFlowCommand.builder()
                 .source(a)
@@ -257,7 +261,7 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
         EntityReference c = appHelper.createNewApp("c", ouIds.b);
 
-        createUnknownDatatype();
+        dataTypeHelper.createUnknownDatatype();
 
         ImmutableAddLogicalFlowCommand createLoopCommand = ImmutableAddLogicalFlowCommand.builder()
                 .source(a)

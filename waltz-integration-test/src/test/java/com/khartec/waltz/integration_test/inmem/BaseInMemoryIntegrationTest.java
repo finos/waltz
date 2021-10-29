@@ -3,30 +3,23 @@ package com.khartec.waltz.integration_test.inmem;
 import com.khartec.waltz.common.CollectionUtilities;
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.LoggingUtilities;
-import com.khartec.waltz.data.actor.ActorDao;
 import com.khartec.waltz.data.app_group.AppGroupDao;
 import com.khartec.waltz.data.app_group.AppGroupEntryDao;
-import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.measurable_category.MeasurableCategoryDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
-import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.actor.ImmutableActorCreateCommand;
 import com.khartec.waltz.model.app_group.AppGroup;
 import com.khartec.waltz.model.app_group.AppGroupKind;
 import com.khartec.waltz.model.app_group.ImmutableAppGroup;
-import com.khartec.waltz.model.application.*;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;
 import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
 import com.khartec.waltz.model.measurable_category.MeasurableCategory;
 import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
-import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
 import com.khartec.waltz.schema.tables.records.MeasurableRecord;
 import com.khartec.waltz.schema.tables.records.OrganisationalUnitRecord;
@@ -76,7 +69,6 @@ public abstract class BaseInMemoryIntegrationTest {
     protected static AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIInMemoryTestConfiguration.class);
 
     protected static final OrganisationalUnitIdSelectorFactory ouSelectorFactory = new OrganisationalUnitIdSelectorFactory();
-    protected static final ApplicationIdSelectorFactory appSelectorFactory = new ApplicationIdSelectorFactory();
     protected static final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
     protected static final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
 
@@ -124,19 +116,6 @@ public abstract class BaseInMemoryIntegrationTest {
     protected void rebuildHierarchy(EntityKind kind) {
         EntityHierarchyService ehSvc = ctx.getBean(EntityHierarchyService.class);
         ehSvc.buildFor(kind);
-    }
-
-
-    public Long createActor(String nameStem) {
-        ActorDao dao = ctx.getBean(ActorDao.class);
-        return dao.create(
-                ImmutableActorCreateCommand
-                        .builder()
-                        .name(nameStem)
-                        .description(nameStem + " Desc")
-                        .isExternal(true)
-                        .build(),
-                "admin");
     }
 
 
@@ -214,68 +193,6 @@ public abstract class BaseInMemoryIntegrationTest {
                     record.store();
                     return record.getId();
                 });
-    }
-
-
-    public long createUnknownDatatype() {
-        DSLContext dsl = getDsl();
-
-        clearAllDataTypes();
-
-        long id = 1L;
-
-        dsl.insertInto(DATA_TYPE)
-                .columns(
-                        DATA_TYPE.ID,
-                        DATA_TYPE.NAME,
-                        DATA_TYPE.DESCRIPTION,
-                        DATA_TYPE.CODE,
-                        DATA_TYPE.CONCRETE,
-                        DATA_TYPE.UNKNOWN.as(DSL.quotedName("unknown"))) //TODO: as part of #5639 can drop quotedName
-                .values(id, "Unknown", "Unknown data type", "UNKNOWN", false, true)
-                .execute();
-
-        return id;
-    }
-
-
-    public Long createDatatype(String name){
-        DSLContext dsl = getDsl();
-        String uniqName = mkName(name);
-
-        long id = counter.incrementAndGet();
-
-        dsl
-                .insertInto(DATA_TYPE)
-                .columns(
-                        DATA_TYPE.ID,
-                        DATA_TYPE.NAME,
-                        DATA_TYPE.DESCRIPTION,
-                        DATA_TYPE.CODE)
-                .values(id, uniqName, uniqName, uniqName.toUpperCase())
-                .execute();
-
-        return id;
-    }
-
-
-    public void createDataType(Long id, String name, String code) {
-        DSLContext dsl = getDsl();
-
-        dsl.insertInto(DATA_TYPE)
-                .columns(
-                        DATA_TYPE.ID,
-                        DATA_TYPE.NAME,
-                        DATA_TYPE.DESCRIPTION,
-                        DATA_TYPE.CODE)
-                .values(id, name, name, code)
-                .execute();
-    }
-
-
-    public void clearAllDataTypes(){
-        DSLContext dsl = getDsl();
-        dsl.deleteFrom(DATA_TYPE).execute();
     }
 
 
