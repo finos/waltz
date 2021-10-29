@@ -42,7 +42,7 @@
         {#if category.hasChildren}
             <g transform={`translate(${$layoutDirection === layoutDirections.categoryToClient ? dimensions.category.width - 20 : 20 }, ${$categoryScale.bandwidth() / 2})`}>
                 <path d={symbol().type(symbolCircle).size(500)()}
-                      on:click={() => drillDownCategory(category)}
+                      on:click|stopPropagation={() => drillDownCategory(category)}
                       class="clickable drilldown"
                       fill="#f4fff0"
                       style="stroke: #bbb; stroke-dasharray: 2,2"

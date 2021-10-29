@@ -9,7 +9,8 @@
         flowDirection,
         flowDirections, focusClient,
         layout,
-        selectedClient
+        selectedClient,
+        clearSelections
     } from "./flow-decorator-store";
     import Categories from "./Categories.svelte";
     import Clients from "./Clients.svelte";
@@ -240,7 +241,8 @@
             <svg bind:this={svgElem}
                  viewBox={`0 0 ${dimensions.diagram.width} ${dimensions.diagram.height}`}
                  width="100%"
-                 height="550">
+                 height="550"
+                 on:click={clearSelections}>
 
                 <clipPath id="row-clip">
                     <rect x="0"

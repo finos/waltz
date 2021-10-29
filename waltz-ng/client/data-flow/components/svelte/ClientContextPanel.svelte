@@ -1,6 +1,6 @@
 <script>
     import Icon from "../../../common/svelte/Icon.svelte";
-    import {contextPanelMode, selectedClient} from "./flow-decorator-store";
+    import {contextPanelMode, selectedClient, Modes} from "./flow-decorator-store";
     import PhysicalFlowDetailTable from "./PhysicalFlowDetailTable.svelte";
     import {createEventDispatcher} from "svelte";
     import DataTypeDetailTable from "./DataTypeDetailTable.svelte";
@@ -21,8 +21,8 @@
     }
 
     function cancel() {
-        $selectedClient = null;
         $contextPanelMode = Modes.DEFAULT
+        $selectedClient = null;
     }
 
 </script>
@@ -46,7 +46,7 @@
     <ul>
         <li>
             <button class="btn btn-skinny" on:click={() => focusOnEntity($selectedClient)}>
-                <Icon name="dot-circle-o"/>Focus diagram on {$selectedClient.name}
+                <Icon name="dot-circle-o"/>Focus diagram on {$selectedClient?.name}
             </button>
         </li>
         <li>

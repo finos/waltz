@@ -31,8 +31,8 @@
             .orderBy(d => d.decoratorEntity.name)
             .value();
 
-    $: source = $layoutDirection === layoutDirections.clientToCategory ? $selectedClient.name : parentEntity.name
-    $: target = $layoutDirection === layoutDirections.clientToCategory ? parentEntity.name : $selectedClient.name
+    $: source = $layoutDirection === layoutDirections.clientToCategory ? $selectedClient?.name : parentEntity.name
+    $: target = $layoutDirection === layoutDirections.clientToCategory ? parentEntity.name : $selectedClient?.name
 
     $: flowClassificationCall = flowClassificationStore.findAll()
     $: ratingsByCode = _.keyBy($flowClassificationCall.data, d => d.code);
@@ -40,12 +40,12 @@
 
     $: logicalFlowId = _
         .chain($arcs)
-        .filter(a => a.clientId === $selectedClient.id)
+        .filter(a => a.clientId === $selectedClient?.id)
         .map(a => a.flowId)
         .first()
         .value();
 
-    $: decoratorInfoCall = dataTypeDecoratorStore.findDatatypeUsageCharacteristics(mkRef("LOGICAL_DATA_FLOW", logicalFlowId));
+    $: decoratorInfoCall = logicalFlowId && dataTypeDecoratorStore.findDatatypeUsageCharacteristics(mkRef("LOGICAL_DATA_FLOW", logicalFlowId));
     $: decoratorInfo = $decoratorInfoCall?.data
     $: decoratorInfoByDtId = _.keyBy(decoratorInfo, d => d.dataTypeId);
 

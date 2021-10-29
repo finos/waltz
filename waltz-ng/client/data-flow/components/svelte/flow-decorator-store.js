@@ -135,3 +135,11 @@ export const layout = derived(
             throw "layout direction: '" + layoutDir + "' not recognised!!"
         }
     });
+
+
+export function clearSelections() {
+    contextPanelMode.set(Modes.DEFAULT);
+    selectedClient.set(null);
+    selectedDecorator.set(null);
+    selectedCategory.set(null);
+}
