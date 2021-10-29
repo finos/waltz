@@ -48,7 +48,8 @@ public class ProcessDiagramEndpoint implements Endpoint {
     public void register() {
         String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String getByExternalIdPath = mkPath(BASE_URL, "external-id", ":externalId");
-        String findForSelectorPath = mkPath(BASE_URL, "selector", ":kind");
+        String findForGenericSelectorPath = mkPath(BASE_URL, "selector", ":kind");
+        String findForSelectorPath = mkPath(BASE_URL, "selector");
 
         DatumRoute<ProcessDiagramAndEntities> getByIdRoute = (req, res)
                 -> diagramService.getDiagramAndEntitiesById(getId(req));
@@ -56,10 +57,13 @@ public class ProcessDiagramEndpoint implements Endpoint {
         DatumRoute<ProcessDiagram> getByExternalIdRoute = (req, res)
                 -> diagramService.getByExternalId(req.params("externalId"));
 
-        ListRoute<ProcessDiagram> findForSelectorRoute = (req, res)
+        ListRoute<ProcessDiagram> findForGenericSelectorRoute = (req, res)
                 -> diagramService.findByGenericSelector(
                         getKind(req),
                         readIdSelectionOptionsFromBody(req));
+
+        ListRoute<ProcessDiagram> findForSelectorRoute = (req, res)
+                -> diagramService.findBySelector(readIdSelectionOptionsFromBody(req));
 
         getForDatum(getByIdPath, getByIdRoute);
         getForDatum(getByExternalIdPath, getByExternalIdRoute);
