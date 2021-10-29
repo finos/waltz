@@ -26,8 +26,19 @@ export function mkPhysicalFlowStore() {
     };
 
 
+    const findUnderlyingPhysicalFlows = (logicalFlowId, dataTypeId, force = false) => {
+        return remote
+            .fetchViewList(
+                "GET",
+                `api/physical-flow/underlying/logical-flow/${logicalFlowId}/data-type/${dataTypeId}`,
+                [],
+                {force});
+    };
+
+
     return {
         findBySelector,
+        findUnderlyingPhysicalFlows
     };
 }
 

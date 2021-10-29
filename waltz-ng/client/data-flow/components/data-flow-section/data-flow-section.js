@@ -24,8 +24,10 @@ import {mkSelectionOptions} from "../../../common/selector-utils";
 
 import template from "./data-flow-section.html";
 import {entity} from "../../../common/services/enums/entity";
-import FlowClassificationLegend from "../../../flow-classification-rule/components/svelte/FlowClassificationLegend.svelte";
+import FlowClassificationLegend
+    from "../../../flow-classification-rule/components/svelte/FlowClassificationLegend.svelte";
 import LogicalFlowScrollPanel from "../svelte/FlowDecoratorExplorerPanel.svelte"
+import {lastViewedFlowTabKey} from "../../../user";
 
 const bindings = {
     parentEntityRef: "<",
@@ -66,12 +68,32 @@ const initialState = {
         },
     },
     tabs,
-    activeMode: modes.VIEW
+    activeMode: modes.VIEW,
+    lastTabId: tabs[0].id
 };
 
 
+
 function controller(serviceBroker) {
+
     const vm = initialiseData(this, initialState);
+
+    function determineActiveTab() {
+        serviceBroker
+            .loadViewData(CORE_API.UserPreferenceStore.findAllForUser, [], {force: true})
+            .then(prefs => {
+                const lastTab = _.find(prefs.data, p => p.key === lastViewedFlowTabKey);
+                const lastTabId = _.get(lastTab, ["value"], vm.tabs[0].id);
+                vm.activeTab = _.find(vm.tabs, t => t.id === lastTabId);
+            });
+    }
+
+    function setLastViewedTab() {
+        serviceBroker
+            .execute(
+                CORE_API.UserPreferenceStore.saveForUser,
+                [{key: lastViewedFlowTabKey, value: vm.activeTab.id}])
+    }
 
     function loadData() {
         const selector = {
@@ -131,7 +153,7 @@ function controller(serviceBroker) {
     }
 
     vm.$onInit = () => {
-        vm.activeTab = vm.tabs[0];
+        determineActiveTab();
         loadData();
     };
 
@@ -140,6 +162,7 @@ function controller(serviceBroker) {
     };
 
     vm.resetToViewMode = () => {
+        setLastViewedTab();
         vm.activeMode = modes.VIEW;
         loadData();
     };

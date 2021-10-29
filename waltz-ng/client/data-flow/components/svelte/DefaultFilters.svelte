@@ -31,7 +31,7 @@
 
 </script>
 
-<div class="row">
+<div class="row row-no-gutters">
     <div class="col-sm-12">
         <div class="help-block">
             <Icon name="info-circle"/> Use the selection below to filter counterpart entities by name or entity kind
@@ -39,7 +39,7 @@
     </div>
 </div>
 
-<div class="row">
+<div class="row row-no-gutters">
     <div class="col-sm-5">
         Filter data types:
     </div>
@@ -54,7 +54,7 @@
 
 <br>
 
-<div class="row">
+<div class="row row-no-gutters">
     <div class="col-sm-5">
             Filter applications and actors:
     </div>
@@ -69,7 +69,7 @@
 
 <br>
 
-<div class="row">
+<div class="row row-no-gutters">
     <div class="col-sm-5">
             Display applications:
     </div>
@@ -83,7 +83,7 @@
 
 <br>
 
-<div class="row">
+<div class="row row-no-gutters">
     <div class="col-sm-5">
             Display actors:
     </div>
@@ -97,7 +97,7 @@
 
 <br>
 
-<div class="row">
+<div class="row row-no-gutters">
     <div class="col-sm-12">
         <div style="border-top: 1px dotted #eee; padding-top: 0.2em; margin-top: 0.2em">
             <button class="btn btn-skinny"

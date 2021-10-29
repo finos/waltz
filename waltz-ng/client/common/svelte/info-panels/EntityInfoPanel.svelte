@@ -3,15 +3,24 @@
     import ApplicationInfoPanel from "./ApplicationInfoPanel.svelte";
     import ChangeInitiativeInfoPanel from "./ChangeInitiativeInfoPanel.svelte";
     import MeasurableInfoPanel from "./MeasurableInfoPanel.svelte";
+    import ActorInfoPanel from "./ActorInfoPanel.svelte";
+    import DataTypeInfoPanel from "./DataTypeInfoPanel.svelte";
+    import LogicalDataFlowPanel from "./LogicalDataFlowInfoPanel.svelte"
 
     export let primaryEntityRef;
 
     function determinePanel(entityKind) {
         switch (entityKind) {
+            case "ACTOR":
+                return ActorInfoPanel;
             case "APPLICATION":
                 return ApplicationInfoPanel;
             case "CHANGE_INITIATIVE":
                 return ChangeInitiativeInfoPanel;
+            case "DATA_TYPE":
+                return DataTypeInfoPanel;
+            case "LOGICAL_DATA_FLOW":
+                return LogicalDataFlowPanel;
             case "MEASURABLE":
                 return MeasurableInfoPanel;
             default:

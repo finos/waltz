@@ -126,6 +126,15 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 BASE_URL,
                 ":id");
 
+
+        String findUnderlyingPhysicalFlowsPath = mkPath(
+                BASE_URL,
+                "underlying",
+                "logical-flow",
+                ":flowId",
+                "data-type",
+                ":dataTypeId");
+
         String searchReportsPath = mkPath(
                 BASE_URL,
                 "search-reports",
@@ -179,6 +188,10 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 (request, response) -> physicalFlowService
                         .findBySelector(readIdSelectionOptionsFromBody(request));
 
+        ListRoute<PhysicalFlowInfo> findUnderlyingPhysicalFlowsRoute =
+                (request, response) -> physicalFlowService
+                        .findUnderlyingPhysicalFlows(getLong(request, "flowId"), getLong(request, "dataTypeId"));
+
         ListRoute<EntityReference> searchReportsRoute =
                 (request, response) -> physicalFlowService
                         .searchReports(
@@ -201,6 +214,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
         getForList(findBySpecificationIdPath, findBySpecificationIdRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
         getForList(findByExternalIdPath, findByExternalIdRoute);
+        getForList(findUnderlyingPhysicalFlowsPath, findUnderlyingPhysicalFlowsRoute);
         getForList(searchReportsPath, searchReportsRoute);
 
 

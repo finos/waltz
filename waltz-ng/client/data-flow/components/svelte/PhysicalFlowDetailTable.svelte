@@ -7,10 +7,10 @@
 
     export let parentEntity;
 
-    $: physicalFlows = $selectedClient.physicalFlows
+    $: physicalFlows = $selectedClient?.physicalFlows
 
-    $: source = $layoutDirection === layoutDirections.clientToCategory ? $selectedClient.name : parentEntity.name
-    $: target = $layoutDirection === layoutDirections.clientToCategory ? parentEntity.name : $selectedClient.name
+    $: source = $layoutDirection === layoutDirections.clientToCategory ? $selectedClient?.name : parentEntity.name
+    $: target = $layoutDirection === layoutDirections.clientToCategory ? parentEntity.name : $selectedClient?.name
 
 </script>
 
