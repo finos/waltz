@@ -20,6 +20,7 @@ package com.khartec.waltz.integration_test.inmem.service;
 
 import com.khartec.waltz.data.attestation.AttestationPreCheckDao;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
+import com.khartec.waltz.integration_test.inmem.helpers.DataTypeHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.logical_flow.LogicalFlow;
@@ -54,6 +55,9 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
     @Autowired
     private DSLContext dsl;
 
+    @Autowired
+    private DataTypeHelper dataTypeHelper;
+
 
     @Test
     public void notAllowedToAttestAttestIfNoFlows() {
@@ -69,7 +73,7 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
         EntityReference bRef = mkNewAppRef();
 
         // create flow with unknown datatype
-        long unkId = createUnknownDatatype();
+        long unkId = dataTypeHelper.createUnknownDatatype();
         LogicalFlow flow = lfHelper.createLogicalFlow(aRef, bRef);
         createLogicalFlowDecorators(flow.entityReference(), asSet(unkId));
 
@@ -124,7 +128,7 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
         EntityReference bRef = mkNewAppRef();
 
         // create flow with unknown datatype
-        long unkId = createUnknownDatatype();
+        long unkId = dataTypeHelper.createUnknownDatatype();
         LogicalFlow flow = lfHelper.createLogicalFlow(aRef, bRef);
         createLogicalFlowDecorators(flow.entityReference(), asSet(unkId));
 
@@ -163,7 +167,7 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
 
     private long createDeprecatedDataType() {
         long deprecatedTypeId = counter.incrementAndGet();
-        createDataType(deprecatedTypeId, mkName("deprecated"), mkName("deprecated"));
+        dataTypeHelper.createDataType(deprecatedTypeId, mkName("deprecated"), mkName("deprecated"));
         dsl.update(DATA_TYPE).set(DATA_TYPE.DEPRECATED, true).where(DATA_TYPE.ID.eq(deprecatedTypeId)).execute();
         return deprecatedTypeId;
     }
