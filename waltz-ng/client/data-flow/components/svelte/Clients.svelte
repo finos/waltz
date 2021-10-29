@@ -5,7 +5,9 @@
         highlightClass,
         selectedClient,
         layoutDirection,
-        layoutDirections
+        layoutDirections,
+        contextPanelMode,
+        Modes
     } from "./flow-decorator-store";
     import {dimensions} from "./flow-decorator-utils"
     import {truncateMiddle} from "../../../common/string-utils";
@@ -21,12 +23,13 @@
     }
 
     function mkClasses(client) {
-        return client.kind + " clickable";
+        return client.kind + " clickable no-text-select";
     }
 
 
     function selectClient(client) {
         $selectedClient = client;
+        $contextPanelMode = Modes.ENTITY;
     }
 
 </script>
@@ -34,7 +37,7 @@
 <g transform={`translate(0, ${$clientScrollOffset})`}>
     {#each $filteredClients as client}
         <g transform={`translate(0, ${$clientScale(client.id)})`} class={mkClasses(client)}
-           on:click={() => selectClient(client)}>
+           on:click|stopPropagation={() => selectClient(client)}>
             <rect stroke="#999"
                   on:mouseenter={() => onMouseEnter(client)}
                   on:mouseleave={() => onMouseLeave()}

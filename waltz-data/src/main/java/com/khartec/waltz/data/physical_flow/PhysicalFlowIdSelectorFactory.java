@@ -58,10 +58,11 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
                 return mkForChangeSet(options);
             case TAG:
                 return mkForTag(options);
+            case DATA_TYPE:
+                return mkForDataType(options);
             case APPLICATION:
             case APP_GROUP:
             case CHANGE_INITIATIVE:
-            case DATA_TYPE:
             case MEASURABLE:
             case ORG_UNIT:
             case PERSON:
@@ -70,6 +71,15 @@ public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {
             default:
                 throw new UnsupportedOperationException("Cannot create physical flow selector from options: "+options);
         }
+    }
+
+
+    private Select<Record1<Long>> mkForDataType(IdSelectionOptions options) {
+        return DSL
+                .select(PHYSICAL_FLOW.ID)
+                .from(PHYSICAL_FLOW)
+                .innerJoin(PHYSICAL_SPEC_DATA_TYPE).on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPEC_DATA_TYPE.SPECIFICATION_ID))
+                .where(getLifecycleCondition(options));
     }
 
 
