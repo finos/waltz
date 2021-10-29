@@ -24,7 +24,8 @@
 </script>
 
 {#each $filteredCategories as category}
-    <g transform={`translate(0, ${$categoryScale(category.id)})`}>
+    <g transform={`translate(0, ${$categoryScale(category.id)})`}
+       class="no-text-select">
         <rect fill="#f4fff0"
               stroke="#ccc"
               on:mouseenter={() => onMouseEnter(category)}

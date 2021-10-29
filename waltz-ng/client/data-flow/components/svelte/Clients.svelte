@@ -23,7 +23,7 @@
     }
 
     function mkClasses(client) {
-        return client.kind + " clickable";
+        return client.kind + " clickable no-text-select";
     }
 
 
