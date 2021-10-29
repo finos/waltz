@@ -24,6 +24,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Set;
 
 @Service
 public class MeasurableCategoryService {
@@ -36,16 +37,26 @@ public class MeasurableCategoryService {
         this.measurableCategoryDao = measurableCategoryDao;
     }
 
+
     public Collection<MeasurableCategory> findAll() {
         return measurableCategoryDao.findAll();
     }
+
 
     public MeasurableCategory getById(long id) {
         return measurableCategoryDao.getById(id);
     }
 
+
     public Collection<MeasurableCategory> findCategoriesByDirectOrgUnit(long id) {
         return measurableCategoryDao.findCategoriesByDirectOrgUnit(id);
     }
+
+
+    public Set<MeasurableCategory> findByExternalId(String externalId) {
+        return measurableCategoryDao.findByExternalId(externalId);
+    }
+
+
 
 }

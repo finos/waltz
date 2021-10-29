@@ -202,8 +202,8 @@ public class AppGroupService {
 
     public List<AppGroupEntry> addApplications(String userId,
                                                  long groupId,
-                                                 List<Long> applicationIds,
-                                                 List<String> unknownIdentifiers) throws InsufficientPrivelegeException {
+                                                 Collection<Long> applicationIds,
+                                                 Collection<String> unknownIdentifiers) throws InsufficientPrivelegeException {
         verifyUserCanUpdateGroup(userId, groupId);
 
         appGroupEntryDao.addApplications(groupId, applicationIds);

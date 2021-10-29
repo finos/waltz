@@ -22,6 +22,7 @@ import com.khartec.waltz.common.exception.NotFoundException;
 import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.integration_test.inmem.helpers.AppHelper;
+import com.khartec.waltz.integration_test.inmem.helpers.MeasurableHelper;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.measurable_rating.ImmutableSaveMeasurableRatingCommand;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;
@@ -47,6 +48,9 @@ public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
     private MeasurableRatingDao dao;
 
     @Autowired
+    private MeasurableHelper measurableHelper;
+
+    @Autowired
     private AppHelper appHelper;
 
     @Autowired
@@ -70,8 +74,8 @@ public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void ratingsCanBeSaved() {
-        long categoryId = createMeasurableCategory("mc");
-        long m1Id = createMeasurable("m1", categoryId);
+        long categoryId = measurableHelper.createMeasurableCategory("mc");
+        long m1Id = measurableHelper.createMeasurable("m1", categoryId);
 
         EntityReference appRef = mkNewAppRef();
         mkRatings(appRef, m1Id);
@@ -84,8 +88,8 @@ public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void readOnlyRatingsCannotBeSaved() {
-        long categoryId = createMeasurableCategory("mc");
-        long m1Id = createMeasurable("m1", categoryId);
+        long categoryId = measurableHelper.createMeasurableCategory("mc");
+        long m1Id = measurableHelper.createMeasurable("m1", categoryId);
 
         EntityReference appRef = mkNewAppRef();
         mkRatings(appRef, m1Id);
@@ -116,9 +120,9 @@ public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void multipleRatingsCanBeSaved() {
-        long categoryId = createMeasurableCategory("mc");
-        long m1Id = createMeasurable("m1", categoryId);
-        long m2Id = createMeasurable("m2", categoryId);
+        long categoryId = measurableHelper.createMeasurableCategory("mc");
+        long m1Id = measurableHelper.createMeasurable("m1", categoryId);
+        long m2Id = measurableHelper.createMeasurable("m2", categoryId);
 
         EntityReference app1Ref = mkNewAppRef();
         mkRatings(app1Ref, m1Id, m2Id);
@@ -134,9 +138,9 @@ public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
     @Test
     public void multipleRatingsCanRetrievedBySelectors() {
 
-        long categoryId = createMeasurableCategory("mc");
-        long m1Id = createMeasurable("m1", categoryId);
-        long m2Id = createMeasurable("m2", categoryId);
+        long categoryId = measurableHelper.createMeasurableCategory("mc");
+        long m1Id = measurableHelper.createMeasurable("m1", categoryId);
+        long m2Id = measurableHelper.createMeasurable("m2", categoryId);
 
         EntityReference app1Ref = appHelper.createNewApp("a1", null);
         mkRatings(app1Ref, m1Id, m2Id);
@@ -174,9 +178,9 @@ public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void ratingsCanBeBulkRemovedByCategoryForAGivenApp() {
-        long categoryId = createMeasurableCategory("mc");
-        long m1Id = createMeasurable("m1", categoryId);
-        long m2Id = createMeasurable("m2", categoryId);
+        long categoryId = measurableHelper.createMeasurableCategory("mc");
+        long m1Id = measurableHelper.createMeasurable("m1", categoryId);
+        long m2Id = measurableHelper.createMeasurable("m2", categoryId);
 
         EntityReference app1Ref = appHelper.createNewApp("a1", null);
         mkRatings(app1Ref, m1Id, m2Id);
