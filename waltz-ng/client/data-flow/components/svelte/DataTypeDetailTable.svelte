@@ -45,7 +45,7 @@
         .first()
         .value();
 
-    $: decoratorInfoCall = logicalFlowId && dataTypeDecoratorStore.findDatatypeUsageCharacteristics(mkRef("LOGICAL_DATA_FLOW", logicalFlowId));
+    $: decoratorInfoCall = dataTypeDecoratorStore.findDatatypeUsageCharacteristics(mkRef("LOGICAL_DATA_FLOW", logicalFlowId));
     $: decoratorInfo = $decoratorInfoCall?.data
     $: decoratorInfoByDtId = _.keyBy(decoratorInfo, d => d.dataTypeId);
 
