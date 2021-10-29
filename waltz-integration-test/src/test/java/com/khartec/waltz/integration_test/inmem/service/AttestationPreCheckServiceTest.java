@@ -18,8 +18,10 @@
 
 package com.khartec.waltz.integration_test.inmem.service;
 
+import com.khartec.waltz.common.exception.InsufficientPrivelegeException;
 import com.khartec.waltz.data.attestation.AttestationPreCheckDao;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
+import com.khartec.waltz.integration_test.inmem.helpers.AppGroupHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.DataTypeHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
 import com.khartec.waltz.model.EntityReference;
@@ -58,6 +60,9 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
     @Autowired
     private DataTypeHelper dataTypeHelper;
 
+    @Autowired
+    private AppGroupHelper appGroupHelper;
+
 
     @Test
     public void notAllowedToAttestAttestIfNoFlows() {
@@ -75,7 +80,7 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
         // create flow with unknown datatype
         long unkId = dataTypeHelper.createUnknownDatatype();
         LogicalFlow flow = lfHelper.createLogicalFlow(aRef, bRef);
-        createLogicalFlowDecorators(flow.entityReference(), asSet(unkId));
+        lfHelper.createLogicalFlowDecorators(flow.entityReference(), asSet(unkId));
 
         List<String> aResult = aipcSvc.calcLogicalFlowPreCheckFailures(aRef);
         assertTrue("ok as unknown is outgoing", aResult.isEmpty());
@@ -93,7 +98,7 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
         // create flow with deprecated datatype
         long deprecatedTypeId = createDeprecatedDataType();
         LogicalFlow flow = lfHelper.createLogicalFlow(aRef, bRef);
-        createLogicalFlowDecorators(flow.entityReference(), asSet(deprecatedTypeId));
+        lfHelper.createLogicalFlowDecorators(flow.entityReference(), asSet(deprecatedTypeId));
 
         List<String> aResult = aipcSvc.calcLogicalFlowPreCheckFailures(aRef);
         assertTrue("ok as deprecated is outgoing", aResult.isEmpty());
@@ -104,14 +109,14 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
 
 
     @Test
-    public void allowedToAttestAttestIfInExemptionGroupAndDeprecatedIncomingDataTypeFlows() {
+    public void allowedToAttestAttestIfInExemptionGroupAndDeprecatedIncomingDataTypeFlows() throws InsufficientPrivelegeException {
         EntityReference aRef = mkNewAppRef();
         EntityReference bRef = mkNewAppRef();
 
         // create flow with unknown datatype
         long deprecatedId = createDeprecatedDataType();
         LogicalFlow flow = lfHelper.createLogicalFlow(aRef, bRef);
-        createLogicalFlowDecorators(flow.entityReference(), asSet(deprecatedId));
+        lfHelper.createLogicalFlowDecorators(flow.entityReference(), asSet(deprecatedId));
 
         createGroupWithApps(
                 AttestationPreCheckDao.GROUP_LOGICAL_FLOW_ATTESTATION_EXEMPT_FROM_DEPRECATED_DATA_TYPE_CHECK,
@@ -123,14 +128,14 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
 
 
     @Test
-    public void allowedToAttestAttestIfInExemptionGroupAndUnknownIncomingDataTypeFlows() {
+    public void allowedToAttestAttestIfInExemptionGroupAndUnknownIncomingDataTypeFlows() throws InsufficientPrivelegeException {
         EntityReference aRef = mkNewAppRef();
         EntityReference bRef = mkNewAppRef();
 
         // create flow with unknown datatype
         long unkId = dataTypeHelper.createUnknownDatatype();
         LogicalFlow flow = lfHelper.createLogicalFlow(aRef, bRef);
-        createLogicalFlowDecorators(flow.entityReference(), asSet(unkId));
+        lfHelper.createLogicalFlowDecorators(flow.entityReference(), asSet(unkId));
 
         createGroupWithApps(
                 AttestationPreCheckDao.GROUP_LOGICAL_FLOW_ATTESTATION_EXEMPT_FROM_UNKNOWN_DATA_TYPE_CHECK,
@@ -142,7 +147,7 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
 
 
     @Test
-    public void allowedToAttestIfInExemptionGroupAndNoFlows() {
+    public void allowedToAttestIfInExemptionGroupAndNoFlows() throws InsufficientPrivelegeException {
         EntityReference appRef = mkNewAppRef();
 
         createGroupWithApps(
@@ -155,8 +160,8 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
     }
 
 
-    private void createGroupWithApps(String extId, EntityReference appRef) {
-        Long groupId = createAppGroupWithAppRefs(mkName(extId), asSet(appRef));
+    private void createGroupWithApps(String extId, EntityReference appRef) throws InsufficientPrivelegeException {
+        Long groupId = appGroupHelper.createAppGroupWithAppRefs(mkName(extId), asSet(appRef));
 
         dsl.update(APPLICATION_GROUP)
                 .set(APPLICATION_GROUP.EXTERNAL_ID, extId)

@@ -346,7 +346,7 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
     @Test
     public void cleanupOrphans(){
 
-        clearAllFlows();
+        helper.clearAllFlows();
 
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
@@ -379,7 +379,7 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
     @Test
     public void cleanupSelfReferencingFlows() {
 
-        clearAllFlows();
+        helper.clearAllFlows();
 
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
@@ -406,17 +406,17 @@ public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
     @Test
     public void findUpstreamFlowsForEntityReferences() {
 
-        clearAllFlows();
+        helper.clearAllFlows();
 
         EntityReference a = appHelper.createNewApp("a", ouIds.a);
         EntityReference b = appHelper.createNewApp("b", ouIds.a1);
         EntityReference c = appHelper.createNewApp("c", ouIds.b);
         EntityReference d = appHelper.createNewApp("d", ouIds.b);
 
-        LogicalFlow ab = helper.createLogicalFlow(a, b);
-        LogicalFlow cb = helper.createLogicalFlow(c, b);
-        LogicalFlow bc = helper.createLogicalFlow(b, c);
-        LogicalFlow bd = helper.createLogicalFlow(b, d);
+        helper.createLogicalFlow(a, b);
+        helper.createLogicalFlow(c, b);
+        helper.createLogicalFlow(b, c);
+        helper.createLogicalFlow(b, d);
 
         Collection<LogicalFlow> upstreamFlowsForEmptyList = lfSvc.findUpstreamFlowsForEntityReferences(emptyList());
 

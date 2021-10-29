@@ -123,22 +123,22 @@ public class DataTypeServiceTest extends BaseInMemoryIntegrationTest {
         assertEquals("if source app has no flow decorators returns empty list", emptyList(), noDecoratorsOnFlow);
 
         dataTypeHelper.createDataType(1L, "dt1", "DT1");
-        createLogicalFlowDecorators(ab.entityReference(), asSet(1L));
+        lfHelper.createLogicalFlowDecorators(ab.entityReference(), asSet(1L));
         Set<Long> suggestedDtIds = map(dtSvc.findSuggestedBySourceEntityRef(a), dtd -> dtd.entityReference().id());
         assertEquals("returns data type associated to the source application", asSet(1L), suggestedDtIds);
 
         LogicalFlow bc = lfHelper.createLogicalFlow(b, c);
         dataTypeHelper.createDataType(2L, "dt2", "DT2");
-        createLogicalFlowDecorators(bc.entityReference(), asSet(2L));
+        lfHelper.createLogicalFlowDecorators(bc.entityReference(), asSet(2L));
         Set<Long> onlySourceDts = map(dtSvc.findSuggestedBySourceEntityRef(a), dtd -> dtd.entityReference().id());
         assertEquals("does not return dts associated to only the target app", asSet(1L), onlySourceDts);
 
-        createLogicalFlowDecorators(ab.entityReference(), asSet(2L));
+        lfHelper.createLogicalFlowDecorators(ab.entityReference(), asSet(2L));
         Set<Long> allSourceDts = map(dtSvc.findSuggestedBySourceEntityRef(a), dtd -> dtd.entityReference().id());
         assertEquals("returns all dts associated to source app", asSet(1L, 2L), allSourceDts);
 
         LogicalFlow ac = lfHelper.createLogicalFlow(a, c);
-        createLogicalFlowDecorators(ac.entityReference(), asSet(2L));
+        lfHelper.createLogicalFlowDecorators(ac.entityReference(), asSet(2L));
         Set<Long> setOfDts = map(dtSvc.findSuggestedBySourceEntityRef(a), dtd -> dtd.entityReference().id());
         assertEquals("returns all dts associated to source app", asSet(1L, 2L), setOfDts);
     }
