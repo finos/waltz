@@ -99,7 +99,13 @@ public class AssessmentDefinitionDao {
     }
 
 
-    public int save(AssessmentDefinition def) {
+    /**
+     * Saves the given assessment definition.  Either updating or inserting.
+     * Returns the identifier for the record.
+     * @param def the definition to save
+     * @return the identifier for the record
+     */
+    public Long save(AssessmentDefinition def) {
         AssessmentDefinitionRecord r = dsl.newRecord(ASSESSMENT_DEFINITION);
 
         r.setName(def.name());
@@ -120,10 +126,12 @@ public class AssessmentDefinitionDao {
         def.id().ifPresent(r::setId);
 
         if (r.getId() == null) {
-            return r.insert();
+            r.insert();
+            return r.getId();
         } else {
             r.changed(ASSESSMENT_DEFINITION.ID, false);
-            return r.update();
+            r.update();
+            return r.getId();
         }
 
     }
