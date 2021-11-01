@@ -15,7 +15,7 @@
     import Categories from "./Categories.svelte";
     import Clients from "./Clients.svelte";
     import {dimensions} from "./flow-decorator-utils";
-    import {mkArcs, mkCategories, mkClients} from "./demo-data";
+    import {mkArcs, mkCategories, mkClients} from "./flow-decorator-utils";
     import _ from "lodash";
     import Arcs from "./Arcs.svelte";
     import {event, select} from "d3-selection";
