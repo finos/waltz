@@ -15,17 +15,17 @@ public class RatingSchemeHelper {
 
     public long createEmptyRatingScheme(String name) {
         return dsl
-                .select(RATING_SCHEME.ID)
-                .from(RATING_SCHEME)
-                .where(RATING_SCHEME.NAME.eq(name))
-                .fetchOptional(RATING_SCHEME.ID)
-                .orElseGet(() -> {
-                    RatingSchemeRecord record = dsl.newRecord(RATING_SCHEME);
-                    record.setName(name);
-                    record.setDescription(name);
-                    record.store();
-                    return record.getId();
-                });
+            .select(RATING_SCHEME.ID)
+            .from(RATING_SCHEME)
+            .where(RATING_SCHEME.NAME.eq(name))
+            .fetchOptional(RATING_SCHEME.ID)
+            .orElseGet(() -> {
+                RatingSchemeRecord record = dsl.newRecord(RATING_SCHEME);
+                record.setName(name);
+                record.setDescription(name);
+                record.store();
+                return record.getId();
+            });
     }
 
 

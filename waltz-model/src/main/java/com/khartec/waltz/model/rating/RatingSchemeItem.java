@@ -30,7 +30,7 @@ import org.immutables.value.Value;
 public abstract class RatingSchemeItem implements
         IdProvider,
         NameProvider,
-        DescriptionProvider,
+        MandatoryDescriptionProvider,
         PositionProvider,
         ExternalIdProvider {
 

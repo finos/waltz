@@ -69,7 +69,7 @@ public class RatingSchemeService {
     }
 
 
-    public Boolean saveRatingItem(long schemeId, RatingSchemeItem item) {
+    public Long saveRatingItem(long schemeId, RatingSchemeItem item) {
         return ratingSchemeDAO.saveRatingItem(schemeId, item);
     }
 

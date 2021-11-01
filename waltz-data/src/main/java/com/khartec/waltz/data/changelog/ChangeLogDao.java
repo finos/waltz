@@ -63,7 +63,7 @@ public class ChangeLogDao {
                 .message(record.getMessage())
                 .severity(Severity.valueOf(record.getSeverity()))
                 .parentReference(parentRef)
-                .childKind(Optional.ofNullable(record.getChildKind()).map(ck -> EntityKind.valueOf(ck)))
+                .childKind(Optional.ofNullable(record.getChildKind()).map(EntityKind::valueOf))
                 .operation(Operation.valueOf(record.getOperation()))
                 .createdAt(record.getCreatedAt().toLocalDateTime())
                 .build();

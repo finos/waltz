@@ -101,7 +101,7 @@ public class RatingSchemeEndpoint implements Endpoint {
     }
 
 
-    private Boolean saveRatingItem(Request request, Response response) throws IOException {
+    private Long saveRatingItem(Request request, Response response) throws IOException {
         ensureUserHasEditRights(request);
         long schemeId = getId(request);
         return ratingSchemeService.saveRatingItem(
