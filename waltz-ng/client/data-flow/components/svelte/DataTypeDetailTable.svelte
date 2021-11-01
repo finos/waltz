@@ -1,13 +1,5 @@
 <script>
-    import {
-        arcs,
-        contextPanelMode,
-        layoutDirection,
-        layoutDirections,
-        Modes,
-        selectedClient,
-        selectedDecorator
-    } from "./flow-decorator-store";
+    import {selectedCategory} from "./flow-decorator-store";
     import _ from "lodash";
     import {dataTypeDecoratorStore} from "../../../svelte-stores/data-type-decorator-store";
     import {flowClassificationStore} from "../../../svelte-stores/flow-classification-store";
@@ -17,9 +9,8 @@
     import {createEventDispatcher} from "svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
 
-    export let parentEntity
+    export let logicalFlowId;
 
-    let logicalFlowId = null;
     $:  flowIds = logicalFlowId ? [logicalFlowId] : [];
 
     let dispatch = createEventDispatcher();
@@ -31,27 +22,16 @@
             .orderBy(d => d.decoratorEntity.name)
             .value();
 
-    $: source = $layoutDirection === layoutDirections.clientToCategory ? $selectedClient?.name : parentEntity.name
-    $: target = $layoutDirection === layoutDirections.clientToCategory ? parentEntity.name : $selectedClient?.name
-
     $: flowClassificationCall = flowClassificationStore.findAll()
     $: ratingsByCode = _.keyBy($flowClassificationCall.data, d => d.code);
     $: noOpinionRating = ratingsByCode['NO_OPINION'];
-
-    $: logicalFlowId = _
-        .chain($arcs)
-        .filter(a => a.clientId === $selectedClient?.id)
-        .map(a => a.flowId)
-        .first()
-        .value();
 
     $: decoratorInfoCall = dataTypeDecoratorStore.findDatatypeUsageCharacteristics(mkRef("LOGICAL_DATA_FLOW", logicalFlowId));
     $: decoratorInfo = $decoratorInfoCall?.data
     $: decoratorInfoByDtId = _.keyBy(decoratorInfo, d => d.dataTypeId);
 
     function selectDecorator(decorator) {
-        $selectedDecorator = decorator;
-        $contextPanelMode = Modes.DECORATOR;
+        $selectedCategory = decorator.decoratorEntity;
     }
 
     function mkHoverText(decorator) {
@@ -64,9 +44,6 @@
 
 </script>
 
-<div class="small help-block">
-    Data types on logical flows from {source} to {target}:
-</div>
 {#if !_.isEmpty(decorators)}
 <div class:waltz-scroll-region-250={_.size(decorators) > 6}>
     <table class="table table-condensed table-hover small">

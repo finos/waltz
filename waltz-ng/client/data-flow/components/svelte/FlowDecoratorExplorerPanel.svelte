@@ -100,6 +100,18 @@
 
             const lineLifecycleStatus = _.get(exactFlow, "flowEntityLifecycleStatus", "ACTIVE");
 
+            const actualDataTypeIds = _
+                .chain(v)
+                .map(f => f.actualDataType?.id)
+                .uniq()
+                .value();
+
+            const rollupDataTypeIds = _
+                .chain(v)
+                .map(f => f.rollupDataType?.id)
+                .uniq()
+                .value();
+
             return {
                 key: k,
                 ratings: v,
@@ -107,6 +119,8 @@
                 ratingCounts,
                 lineRating,
                 lineLifecycleStatus,
+                actualDataTypeIds,
+                rollupDataTypeIds,
                 flowId: flow.flowId,
                 category: flow.rollupDataType,
                 client: flow.counterpart

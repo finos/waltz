@@ -15,6 +15,7 @@ export function mkClients(summarisedFlows, physicalFlows = []){
             const physFlows = _
                 .chain(physicalFlows)
                 .filter(f => _.includes(flowIds, f.logicalFlowId))
+                .filter(f => !f.isRemoved)
                 .value();
 
             return {
@@ -50,7 +51,10 @@ export function mkArcs(summarisedFlows){
             flowId: d.flowId,
             ratingId: d.lineRating, // overall flow rating
             lifecycleStatus: d.lineLifecycleStatus,
-            tipRatings: mkTipRatings(d.ratingCounts)
+            tipRatings: mkTipRatings(d.ratingCounts),
+            actualDataTypeIds: d.actualDataTypeIds,
+            rollupDataTypeIds: d.rollupDataTypeIds
+
         }))
         .value();
 }

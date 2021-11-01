@@ -1,11 +1,11 @@
 <script>
-    import {contextPanelMode, Modes} from "./flow-decorator-store";
+    import {contextPanelMode, Modes, clearSelections} from "./flow-decorator-store";
     import {createEventDispatcher, onMount} from "svelte";
     import FlowDecoratorGraphFilters from "./FlowDecoratorGraphFilters.svelte";
     import ToastStore from "../../../svelte-stores/toast-store";
     import DefaultContextPanel from "./DefaultContextPanel.svelte";
     import ClientContextPanel from "./ClientContextPanel.svelte";
-    import FlowDecoratorContextPanel from "./FlowDecoratorContextPanel.svelte";
+    import FlowDetailContextPanel from "./FlowDetailContextPanel.svelte";
 
     export let parentEntity;
     export let flowInfo;
@@ -14,7 +14,8 @@
     let dispatch = createEventDispatcher();
 
     function focusOnEntity(selectedEntity) {
-        dispatch('select', selectedEntity);
+        clearSelections();
+        dispatch('select', selectedEntity.detail);
     }
 
     onMount(() => ToastStore.info("This is a beta view, we'd love to hear feedback!"));
@@ -49,15 +50,15 @@
                 <DefaultContextPanel {parentEntity}/>
             {/if}
 
-            {#if $contextPanelMode === Modes.ENTITY}
-                <ClientContextPanel {parentEntity}
-                                    {flowInfo}
-                                    on:selectEntity={focusOnEntity}/>
+            {#if $contextPanelMode === Modes.FLOW_SUMMARY}
+                <ClientContextPanel on:selectEntity={focusOnEntity}
+                                    {flowInfo}/>
             {/if}
 
-            {#if $contextPanelMode === Modes.DECORATOR}
-                <FlowDecoratorContextPanel {parentEntity}
-                                      {flowInfo}/>
+            {#if $contextPanelMode === Modes.FLOW_DETAIL}
+                <FlowDetailContextPanel {parentEntity}
+                                        {flowInfo}
+                                        on:selectEntity={focusOnEntity}/>
             {/if}
 
         {:else if selectedTab === 'filters'}
