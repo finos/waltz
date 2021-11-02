@@ -1,12 +1,18 @@
 <script>
     import Icon from "../../../common/svelte/Icon.svelte";
-    import {contextPanelMode, selectedClient, Modes} from "./flow-decorator-store";
-    import PhysicalFlowDetailTable from "./PhysicalFlowDetailTable.svelte";
+    import {
+        clearSelections,
+        contextPanelMode,
+        filteredArcs,
+        Modes,
+        selectedClient,
+        selectedClientArcs
+    } from "./flow-decorator-store";
     import {createEventDispatcher} from "svelte";
-    import DataTypeDetailTable from "./DataTypeDetailTable.svelte";
     import EntityInfoPanel from "../../../common/svelte/info-panels/EntityInfoPanel.svelte";
+    import {entity} from "../../../common/services/enums/entity";
+    import NoData from "../../../common/svelte/NoData.svelte";
 
-    export let parentEntity;
     export let flowInfo;
 
     let selectedTab = "context";
@@ -16,27 +22,42 @@
         dispatch('selectEntity', selectedEntity);
     }
 
-    function focusOnDataType(decorator) {
-        dispatch('selectDecorator', decorator);
+    function cancel() {
+        clearSelections();
     }
 
-    function cancel() {
-        $contextPanelMode = Modes.DEFAULT
-        $selectedClient = null;
-    }
+    $: actualDataTypeCount = _
+        .chain($selectedClientArcs)
+        .flatMap(f => f.actualDataTypeIds)
+        .uniq()
+        .size()
+        .value();
+
+    $: rollupDataTypeCount = _
+        .chain($selectedClientArcs)
+        .flatMap(f => f.rollupDataTypeIds)
+        .uniq()
+        .size()
+        .value();
 
 </script>
 
 <EntityInfoPanel primaryEntityRef={$selectedClient}>
 
-    <div slot="post-header">
-        <div style="margin-bottom: 1em;">
-            <DataTypeDetailTable on:selectDecorator={focusOnDataType}
-                                 {flowInfo}
-                                 {parentEntity}/>
-            <PhysicalFlowDetailTable {flowInfo} {parentEntity}/>
-        </div>
+    <div slot="post-title">
+        <NoData type="info"
+                style="padding-top: 1em; padding-bottom: 1em">
+            This {entity[$selectedClient.kind].name} has
+            <span title={"These roll up to " + rollupDataTypeCount + " parent data types"}>
+                {actualDataTypeCount} data types
+            </span> and {_.size($selectedClient.physicalFlows)} physical flows.
+            <button class="btn btn-skinny"
+                    on:click={() => $contextPanelMode = Modes.FLOW_DETAIL}>
+                View flow detail.
+            </button>
+        </NoData>
     </div>
+
 
 </EntityInfoPanel>
 

@@ -16,7 +16,8 @@
 
 {#if activeMode === Modes.DEFAULT}
     <div class="row row-no-gutters">
-        <DefaultFilters style="display: inline-block" on:submit={() => activeMode = Modes.ASSESSMENT}/>
+        <DefaultFilters style="display: inline-block"
+                        on:submit={() => activeMode = Modes.ASSESSMENT}/>
     </div>
 {:else if activeMode === Modes.ASSESSMENT}
     <div class="row row-no-gutters">
@@ -26,7 +27,7 @@
 
 {#if $filterApplied}
     <br>
-    <div class="col-sm-12">
+    <div class="row row-no-gutters">
         <div class="warning-block text-muted">
         <span>
             <Icon class="warning-icon"

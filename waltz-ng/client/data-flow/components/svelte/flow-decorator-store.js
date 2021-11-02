@@ -21,9 +21,9 @@ export const flowDirections = {
 
 export const Modes = {
     DEFAULT: "DEFAULT",
-    ENTITY: "ENTITY",
     DECORATOR: "DECORATOR",
-    FLOW: "FLOW"
+    FLOW_SUMMARY: "FLOW_SUMMARY",
+    FLOW_DETAIL: "FLOW_DETAIL"
 }
 
 export const categories = writable([]);
@@ -41,6 +41,7 @@ export const contextPanelMode = writable(Modes.DEFAULT);
 export const selectedCategory = writable(null);
 export const selectedDecorator = writable(null);
 export const selectedClient = writable(null);
+export const selectedFlow = writable(null);
 export const focusClient = writable(null);
 
 export const flowDirection = derived(layoutDirection, (direction) => {
@@ -137,9 +138,22 @@ export const layout = derived(
     });
 
 
+export const selectedClientArcs = derived([filteredArcs, selectedClient], ([$filteredArcs, $selectedClient]) => {
+
+    if($selectedClient == null){
+        return [];
+    } else{
+        return _
+            .chain($filteredArcs)
+            .filter(a => a.clientId === $selectedClient.id)
+            .value();
+    }
+});
+
 export function clearSelections() {
     contextPanelMode.set(Modes.DEFAULT);
     selectedClient.set(null);
     selectedDecorator.set(null);
+    selectedFlow.set(null);
     selectedCategory.set(null);
 }

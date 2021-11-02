@@ -15,7 +15,7 @@
     import Categories from "./Categories.svelte";
     import Clients from "./Clients.svelte";
     import {dimensions} from "./flow-decorator-utils";
-    import {mkArcs, mkCategories, mkClients} from "./demo-data";
+    import {mkArcs, mkCategories, mkClients} from "./flow-decorator-utils";
     import _ from "lodash";
     import Arcs from "./Arcs.svelte";
     import {event, select} from "d3-selection";
@@ -100,6 +100,18 @@
 
             const lineLifecycleStatus = _.get(exactFlow, "flowEntityLifecycleStatus", "ACTIVE");
 
+            const actualDataTypeIds = _
+                .chain(v)
+                .map(f => f.actualDataType?.id)
+                .uniq()
+                .value();
+
+            const rollupDataTypeIds = _
+                .chain(v)
+                .map(f => f.rollupDataType?.id)
+                .uniq()
+                .value();
+
             return {
                 key: k,
                 ratings: v,
@@ -107,6 +119,8 @@
                 ratingCounts,
                 lineRating,
                 lineLifecycleStatus,
+                actualDataTypeIds,
+                rollupDataTypeIds,
                 flowId: flow.flowId,
                 category: flow.rollupDataType,
                 client: flow.counterpart

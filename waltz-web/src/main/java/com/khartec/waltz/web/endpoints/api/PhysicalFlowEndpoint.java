@@ -131,9 +131,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 BASE_URL,
                 "underlying",
                 "logical-flow",
-                ":flowId",
-                "data-type",
-                ":dataTypeId");
+                ":flowId");
 
         String searchReportsPath = mkPath(
                 BASE_URL,
@@ -190,7 +188,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
         ListRoute<PhysicalFlowInfo> findUnderlyingPhysicalFlowsRoute =
                 (request, response) -> physicalFlowService
-                        .findUnderlyingPhysicalFlows(getLong(request, "flowId"), getLong(request, "dataTypeId"));
+                        .findUnderlyingPhysicalFlows(getLong(request, "flowId"));
 
         ListRoute<EntityReference> searchReportsRoute =
                 (request, response) -> physicalFlowService

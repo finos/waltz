@@ -16,6 +16,7 @@
 
 {#if actor}
     <h4><EntityLink ref={actor}/></h4>
+    <slot name="post-title"/>
     <table class="table table-condensed small">
         <tbody>
             <tr>

@@ -393,7 +393,7 @@ public class PhysicalFlowService {
     }
 
 
-    public Collection<PhysicalFlowInfo> findUnderlyingPhysicalFlows(Long logicalFlowId, Long dataTypeId) {
-        return physicalFlowDao.findUnderlyingPhysicalFlows(logicalFlowId, dataTypeId);
+    public Collection<PhysicalFlowInfo> findUnderlyingPhysicalFlows(Long logicalFlowId) {
+        return physicalFlowDao.findUnderlyingPhysicalFlows(logicalFlowId);
     }
 }

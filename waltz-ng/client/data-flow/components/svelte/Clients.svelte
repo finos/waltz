@@ -1,5 +1,6 @@
 <script>
-    import {clientScale,
+    import {
+        clientScale,
         clientScrollOffset,
         filteredClients,
         highlightClass,
@@ -7,7 +8,7 @@
         layoutDirection,
         layoutDirections,
         contextPanelMode,
-        Modes
+        Modes, clearSelections
     } from "./flow-decorator-store";
     import {dimensions} from "./flow-decorator-utils"
     import {truncateMiddle} from "../../../common/string-utils";
@@ -28,8 +29,9 @@
 
 
     function selectClient(client) {
+        clearSelections();
         $selectedClient = client;
-        $contextPanelMode = Modes.ENTITY;
+        $contextPanelMode = Modes.FLOW_SUMMARY;
     }
 
 </script>
