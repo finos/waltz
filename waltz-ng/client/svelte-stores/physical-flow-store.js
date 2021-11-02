@@ -26,11 +26,11 @@ export function mkPhysicalFlowStore() {
     };
 
 
-    const findUnderlyingPhysicalFlows = (logicalFlowId, dataTypeId, force = false) => {
+    const findUnderlyingPhysicalFlows = (logicalFlowId, force = false) => {
         return remote
             .fetchViewList(
                 "GET",
-                `api/physical-flow/underlying/logical-flow/${logicalFlowId}/data-type/${dataTypeId}`,
+                `api/physical-flow/underlying/logical-flow/${logicalFlowId}`,
                 [],
                 {force});
     };

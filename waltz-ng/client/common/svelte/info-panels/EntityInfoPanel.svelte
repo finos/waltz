@@ -33,6 +33,9 @@
 </script>
 
 <svelte:component this={panel} {primaryEntityRef}>
+    <div slot="post-title">
+        <slot name="post-title"></slot>
+    </div>
     <div slot="post-header">
         <slot name="post-header"></slot>
     </div>
