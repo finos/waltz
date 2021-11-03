@@ -19,7 +19,6 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.SetAttributeCommand;
 import com.khartec.waltz.model.physical_flow.*;
 import com.khartec.waltz.model.user.SystemRole;
@@ -135,11 +134,6 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 "data-type",
                 ":dataTypeId");
 
-        String searchReportsPath = mkPath(
-                BASE_URL,
-                "search-reports",
-                ":query");
-
         String createPath = BASE_URL;
 
         String updateSpecDefinitionIdPath = mkPath(
@@ -192,11 +186,6 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 (request, response) -> physicalFlowService
                         .findUnderlyingPhysicalFlows(getLong(request, "flowId"), getLong(request, "dataTypeId"));
 
-        ListRoute<EntityReference> searchReportsRoute =
-                (request, response) -> physicalFlowService
-                        .searchReports(
-                                request.params("query"));
-
         DatumRoute<PhysicalFlow> getByIdRoute =
                 (request, response) -> physicalFlowService
                         .getById(getId(request));
@@ -215,8 +204,6 @@ public class PhysicalFlowEndpoint implements Endpoint {
         postForList(findBySelectorPath, findBySelectorRoute);
         getForList(findByExternalIdPath, findByExternalIdRoute);
         getForList(findUnderlyingPhysicalFlowsPath, findUnderlyingPhysicalFlowsRoute);
-        getForList(searchReportsPath, searchReportsRoute);
-
 
         postForDatum(mergePath, mergeRoute);
         postForDatum(createPath, this::createFlow);
