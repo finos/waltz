@@ -130,9 +130,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
                 BASE_URL,
                 "underlying",
                 "logical-flow",
-                ":flowId",
-                "data-type",
-                ":dataTypeId");
+                ":flowId");
 
         String createPath = BASE_URL;
 
@@ -184,7 +182,7 @@ public class PhysicalFlowEndpoint implements Endpoint {
 
         ListRoute<PhysicalFlowInfo> findUnderlyingPhysicalFlowsRoute =
                 (request, response) -> physicalFlowService
-                        .findUnderlyingPhysicalFlows(getLong(request, "flowId"), getLong(request, "dataTypeId"));
+                        .findUnderlyingPhysicalFlows(getLong(request, "flowId"));
 
         DatumRoute<PhysicalFlow> getByIdRoute =
                 (request, response) -> physicalFlowService

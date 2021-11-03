@@ -16,30 +16,14 @@
  *
  */
 
-import {remote} from "./remote";
+package com.khartec.waltz.model;
 
-export function mkPhysicalFlowStore() {
-
-    const findBySelector = (selector) => {
-        return remote
-            .fetchViewList("POST", "api/physical-flow/selector", selector);
-    };
+import org.immutables.value.Value;
 
 
-    const findUnderlyingPhysicalFlows = (logicalFlowId, force = false) => {
-        return remote
-            .fetchViewList(
-                "GET",
-                `api/physical-flow/underlying/logical-flow/${logicalFlowId}`,
-                [],
-                {force});
-    };
+public interface MandatoryDescriptionProvider {
 
-
-    return {
-        findBySelector,
-        findUnderlyingPhysicalFlows
-    };
+    @Value
+    @Value.Auxiliary
+    String description();
 }
-
-export const physicalFlowStore = mkPhysicalFlowStore();
