@@ -105,4 +105,15 @@ public class ProcessDiagramDao {
     }
 
 
+    public Set<ProcessDiagram> findBySelector(Select<Record1<Long>> diagramSelector) {
+        SelectConditionStep<Record> qry = dsl
+                .selectDistinct(FIELDS_WITHOUT_LAYOUT)
+                .from(PROCESS_DIAGRAM)
+                .where(PROCESS_DIAGRAM.ID.in(diagramSelector));
+
+        return qry
+                .fetchSet(RECORD_TO_DIAGRAM_MAPPER);
+    }
+
+
 }

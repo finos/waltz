@@ -42,7 +42,7 @@ public class DIInMemoryTestConfiguration {
         System.out.println("Setting up ds");
 
         HikariConfig dsConfig = new HikariConfig();
-        dsConfig.setJdbcUrl("jdbc:h2:mem:waltz;CASE_INSENSITIVE_IDENTIFIERS=TRUE");
+        dsConfig.setJdbcUrl("jdbc:h2:mem:waltz;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DATABASE_TO_UPPER=FALSE");
         dsConfig.setUsername("sa");
         dsConfig.setPassword("sa");
         dsConfig.setMaximumPoolSize(5);
@@ -57,7 +57,7 @@ public class DIInMemoryTestConfiguration {
         Settings dslSettings = new Settings()
                 .withRenderFormatted(true)
                 .withDebugInfoOnStackTrace(true)
-                .withRenderQuotedNames(RenderQuotedNames.EXPLICIT_DEFAULT_UNQUOTED)
+                .withRenderQuotedNames(RenderQuotedNames.ALWAYS)
                 .withExecuteLogging(true);
 
         org.jooq.Configuration configuration = new DefaultConfiguration()

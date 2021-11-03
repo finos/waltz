@@ -1,40 +1,16 @@
 package com.khartec.waltz.integration_test.inmem;
 
-import com.khartec.waltz.common.CollectionUtilities;
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.LoggingUtilities;
-import com.khartec.waltz.data.actor.ActorDao;
-import com.khartec.waltz.data.app_group.AppGroupDao;
-import com.khartec.waltz.data.app_group.AppGroupEntryDao;
-import com.khartec.waltz.data.application.ApplicationDao;
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
-import com.khartec.waltz.data.measurable_category.MeasurableCategoryDao;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
-import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.actor.ImmutableActorCreateCommand;
-import com.khartec.waltz.model.app_group.AppGroup;
-import com.khartec.waltz.model.app_group.AppGroupKind;
-import com.khartec.waltz.model.app_group.ImmutableAppGroup;
-import com.khartec.waltz.model.application.*;
-import com.khartec.waltz.model.datatype.DataTypeDecorator;
-import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
-import com.khartec.waltz.model.measurable_category.MeasurableCategory;
-import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
-import com.khartec.waltz.model.rating.RagRating;
-import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
-import com.khartec.waltz.schema.tables.records.MeasurableRecord;
 import com.khartec.waltz.schema.tables.records.OrganisationalUnitRecord;
-import com.khartec.waltz.schema.tables.records.RatingSchemeRecord;
 import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.h2.tools.Server;
 import org.jooq.DSLContext;
-import org.jooq.impl.DSL;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -43,17 +19,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.support.AnnotationConfigContextLoader;
 
 import java.sql.SQLException;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
-import static com.khartec.waltz.common.ListUtilities.map;
-import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.schema.Tables.*;
+import static com.khartec.waltz.schema.Tables.ORGANISATIONAL_UNIT;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DIInMemoryTestConfiguration.class, loader = AnnotationConfigContextLoader.class)
@@ -76,7 +46,6 @@ public abstract class BaseInMemoryIntegrationTest {
     protected static AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIInMemoryTestConfiguration.class);
 
     protected static final OrganisationalUnitIdSelectorFactory ouSelectorFactory = new OrganisationalUnitIdSelectorFactory();
-    protected static final ApplicationIdSelectorFactory appSelectorFactory = new ApplicationIdSelectorFactory();
     protected static final MeasurableIdSelectorFactory measurableIdSelectorFactory = new MeasurableIdSelectorFactory();
     protected static final LogicalFlowIdSelectorFactory logicalFlowIdSelectorFactory = new LogicalFlowIdSelectorFactory();
 
@@ -127,19 +96,6 @@ public abstract class BaseInMemoryIntegrationTest {
     }
 
 
-    public Long createActor(String nameStem) {
-        ActorDao dao = ctx.getBean(ActorDao.class);
-        return dao.create(
-                ImmutableActorCreateCommand
-                        .builder()
-                        .name(nameStem)
-                        .description(nameStem + " Desc")
-                        .isExternal(true)
-                        .build(),
-                "admin");
-    }
-
-
     public Long createOrgUnit(String nameStem, Long parentId) {
         OrganisationalUnitRecord record = getDsl().newRecord(ORGANISATIONAL_UNIT);
         record.setId(counter.incrementAndGet());
@@ -154,196 +110,6 @@ public abstract class BaseInMemoryIntegrationTest {
         return record.getId();
     }
 
-    public EntityReference createNewApp(String name, Long ouId) {
-        AppRegistrationResponse resp = ctx.getBean(ApplicationDao.class)
-                .registerApp(ImmutableAppRegistrationRequest.builder()
-                        .name(name)
-                        .organisationalUnitId(ouId != null ? ouId : 1L)
-                        .applicationKind(ApplicationKind.IN_HOUSE)
-                        .businessCriticality(Criticality.MEDIUM)
-                        .lifecyclePhase(LifecyclePhase.PRODUCTION)
-                        .overallRating(RagRating.G)
-                        .businessCriticality(Criticality.MEDIUM)
-                        .build());
-
-        return resp.id().map(id -> mkRef(EntityKind.APPLICATION, id)).get();
-    }
-
-
-    protected void removeApp(Long appId){
-        ApplicationDao appDao = ctx.getBean(ApplicationDao.class);
-        Application app = appDao.getById(appId);
-        appDao
-                .update(ImmutableApplication
-                        .copyOf(app)
-                        .withIsRemoved(true)
-                        .withEntityLifecycleStatus(EntityLifecycleStatus.REMOVED));
-    }
-
-
-    protected long createMeasurableCategory(String name) {
-        MeasurableCategoryDao dao = ctx.getBean(MeasurableCategoryDao.class);
-        Set<MeasurableCategory> categories = dao.findByExternalId(name);
-        return CollectionUtilities
-                .maybeFirst(categories)
-                .map(c -> c.id().get())
-                .orElseGet(() -> {
-                    long schemeId = createEmptyRatingScheme("test");
-                    MeasurableCategoryRecord record = getDsl().newRecord(MEASURABLE_CATEGORY);
-                    record.setDescription(name);
-                    record.setName(name);
-                    record.setExternalId(name);
-                    record.setRatingSchemeId(schemeId);
-                    record.setLastUpdatedBy("admin");
-                    record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
-                    record.setEditable(false);
-                    record.store();
-                    return record.getId();
-                });
-    }
-
-
-    private long createEmptyRatingScheme(String name) {
-        DSLContext dsl = getDsl();
-        return dsl
-                .select(RATING_SCHEME.ID)
-                .from(RATING_SCHEME)
-                .where(RATING_SCHEME.NAME.eq(name))
-                .fetchOptional(RATING_SCHEME.ID)
-                .orElseGet(() -> {
-                    RatingSchemeRecord record = dsl.newRecord(RATING_SCHEME);
-                    record.setName(name);
-                    record.setDescription(name);
-                    record.store();
-                    return record.getId();
-                });
-    }
-
-
-    protected long createMeasurable(String name, long categoryId) {
-        return getDsl()
-                .select(MEASURABLE.ID)
-                .from(MEASURABLE)
-                .where(MEASURABLE.EXTERNAL_ID.eq(name))
-                .and(MEASURABLE.MEASURABLE_CATEGORY_ID.eq(categoryId))
-                .fetchOptional(MEASURABLE.ID)
-                .orElseGet(() -> {
-                    MeasurableRecord record = getDsl().newRecord(MEASURABLE);
-                    record.setMeasurableCategoryId(categoryId);
-                    record.setName(name);
-                    record.setDescription(name);
-                    record.setConcrete(true);
-                    record.setExternalId(name);
-                    record.setProvenance(PROVENANCE);
-                    record.setLastUpdatedBy(LAST_UPDATE_USER);
-                    record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
-                    record.store();
-                    return record.getId();
-                });
-    }
-
-
-    public void createUnknownDatatype() {
-        DSLContext dsl = getDsl();
-
-        clearAllDataTypes();
-
-        dsl.insertInto(DATA_TYPE)
-                .columns(
-                        DATA_TYPE.ID,
-                        DATA_TYPE.NAME,
-                        DATA_TYPE.DESCRIPTION,
-                        DATA_TYPE.CODE,
-                        DATA_TYPE.CONCRETE,
-                        DATA_TYPE.UNKNOWN.as(DSL.quotedName("unknown"))) //TODO: as part of #5639 can drop quotedName
-                .values(1L, "Unknown", "Unknown data type", "UNKNOWN", false, true)
-                .execute();
-    }
-
-
-    public Long createDatatype(String name){
-        DSLContext dsl = getDsl();
-        String uniqName = mkName(name);
-
-        long id = counter.incrementAndGet();
-
-        dsl
-                .insertInto(DATA_TYPE)
-                .columns(
-                        DATA_TYPE.ID,
-                        DATA_TYPE.NAME,
-                        DATA_TYPE.DESCRIPTION,
-                        DATA_TYPE.CODE)
-                .values(id, uniqName, uniqName, uniqName.toUpperCase())
-                .execute();
-
-        return id;
-    }
-
-
-    public void createDataType(Long id, String name, String code) {
-        DSLContext dsl = getDsl();
-
-        dsl.insertInto(DATA_TYPE)
-                .columns(
-                        DATA_TYPE.ID,
-                        DATA_TYPE.NAME,
-                        DATA_TYPE.DESCRIPTION,
-                        DATA_TYPE.CODE)
-                .values(id, name, name, code)
-                .execute();
-    }
-
-
-    public void clearAllDataTypes(){
-        DSLContext dsl = getDsl();
-        dsl.deleteFrom(DATA_TYPE).execute();
-    }
-
-
-    public void createLogicalFlowDecorators(EntityReference flowRef, Set<Long> dtIds) {
-        DSLContext dsl = getDsl();
-
-        List<DataTypeDecorator> decorators = map(dtIds, dtId -> ImmutableDataTypeDecorator.builder()
-                .rating(AuthoritativenessRatingValue.NO_OPINION)
-                .entityReference(flowRef)
-                .decoratorEntity(mkRef(EntityKind.DATA_TYPE, dtId))
-                .provenance("waltz")
-                .lastUpdatedAt(nowUtc())
-                .lastUpdatedBy("test")
-                .build());
-
-        LogicalFlowDecoratorDao dao = ctx.getBean(LogicalFlowDecoratorDao.class);
-        dao.addDecorators(decorators);
-    }
-
-
-    public Long createAppGroupWithAppRefs(String groupName, Collection<EntityReference> appRefs) {
-        Collection<Long> appIds = CollectionUtilities.map(appRefs, EntityReference::id);
-        return createAppGroupWithAppIds(groupName, appIds);
-    }
-
-
-    public Long createAppGroupWithAppIds(String groupName, Collection<Long> appIds) {
-        AppGroup g = ImmutableAppGroup
-                .builder()
-                .name(groupName)
-                .appGroupKind(AppGroupKind.PUBLIC)
-                .build();
-
-        Long gId = ctx.getBean(AppGroupDao.class)
-                .insert(g);
-
-        ctx.getBean(AppGroupEntryDao.class)
-                .addApplications(gId, appIds);
-
-        return gId;
-    }
-
-
-    public void clearAllFlows(){
-        getDsl().deleteFrom(LOGICAL_FLOW).execute();
-    }
 
     /**
      * DEBUG ONLY
@@ -367,7 +133,5 @@ public abstract class BaseInMemoryIntegrationTest {
             e.printStackTrace();
         }
     }
-
-
 
 }

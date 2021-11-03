@@ -77,7 +77,7 @@ public class AssessmentDefinitionEndpoint implements Endpoint {
     }
 
 
-    private boolean saveRoute(Request request, Response response) throws IOException {
+    private long saveRoute(Request request, Response response) throws IOException {
         ensureUserHasEditRights(request);
         AssessmentDefinition def = ImmutableAssessmentDefinition
                 .copyOf(readBody(request, AssessmentDefinition.class))

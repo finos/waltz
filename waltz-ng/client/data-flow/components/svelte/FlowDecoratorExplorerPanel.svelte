@@ -9,12 +9,13 @@
         flowDirection,
         flowDirections, focusClient,
         layout,
-        selectedClient
+        selectedClient,
+        clearSelections
     } from "./flow-decorator-store";
     import Categories from "./Categories.svelte";
     import Clients from "./Clients.svelte";
     import {dimensions} from "./flow-decorator-utils";
-    import {mkArcs, mkCategories, mkClients} from "./demo-data";
+    import {mkArcs, mkCategories, mkClients} from "./flow-decorator-utils";
     import _ from "lodash";
     import Arcs from "./Arcs.svelte";
     import {event, select} from "d3-selection";
@@ -99,6 +100,18 @@
 
             const lineLifecycleStatus = _.get(exactFlow, "flowEntityLifecycleStatus", "ACTIVE");
 
+            const actualDataTypeIds = _
+                .chain(v)
+                .map(f => f.actualDataType?.id)
+                .uniq()
+                .value();
+
+            const rollupDataTypeIds = _
+                .chain(v)
+                .map(f => f.rollupDataType?.id)
+                .uniq()
+                .value();
+
             return {
                 key: k,
                 ratings: v,
@@ -106,6 +119,8 @@
                 ratingCounts,
                 lineRating,
                 lineLifecycleStatus,
+                actualDataTypeIds,
+                rollupDataTypeIds,
                 flowId: flow.flowId,
                 category: flow.rollupDataType,
                 client: flow.counterpart
@@ -234,13 +249,14 @@
 </div>
 
 
-<div class="row">
+<div class="row row-no-gutters">
     <div class="col-md-12">
         <div class="col-md-7">
             <svg bind:this={svgElem}
                  viewBox={`0 0 ${dimensions.diagram.width} ${dimensions.diagram.height}`}
                  width="100%"
-                 height="550">
+                 height="550"
+                 on:click={clearSelections}>
 
                 <clipPath id="row-clip">
                     <rect x="0"
@@ -271,7 +287,7 @@
                 </NoData>
             {/if}
         </div>
-        <div class="col-md-5">
+        <div class="col-md-5" style="padding-left: 1em">
             <FlowContextPanel parentEntity={entity}
                               {flowInfo}
                               on:select={selectClient}/>

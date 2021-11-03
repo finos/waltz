@@ -197,8 +197,8 @@ public class RatingSchemeDAO {
     }
 
 
-    public Boolean saveRatingItem(long schemeId,
-                                  RatingSchemeItem item) {
+    public Long saveRatingItem(long schemeId,
+                               RatingSchemeItem item) {
         RatingSchemeItemRecord r = dsl.newRecord(RATING_SCHEME_ITEM);
 
         r.setSchemeId(schemeId);
@@ -213,9 +213,12 @@ public class RatingSchemeDAO {
                 .map(id -> {
                     r.setId(id);
                     r.changed(RATING_SCHEME_ITEM.ID, false);
-                    return r.update() == 1;
+                    return id;
                 })
-                .orElseGet(() -> r.insert() == 1);
+                .orElseGet(() -> {
+                    r.insert();
+                    return r.getId();
+                });
     }
 
 

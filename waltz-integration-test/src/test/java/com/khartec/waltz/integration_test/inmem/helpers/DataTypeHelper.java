@@ -1,7 +1,9 @@
 package com.khartec.waltz.integration_test.inmem.helpers;
 
 import com.khartec.waltz.schema.tables.records.DataTypeRecord;
+import com.khartec.waltz.service.data_type.DataTypeService;
 import org.jooq.DSLContext;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -13,21 +15,19 @@ import static com.khartec.waltz.schema.Tables.DATA_TYPE;
 @Service
 public class DataTypeHelper {
 
-    private static final AtomicLong ctr = new AtomicLong();
-
-    private final DSLContext dsl;
-
+    private static final AtomicLong counter = new AtomicLong(100);
 
     @Autowired
-    public DataTypeHelper(DSLContext dsl) {
-        this.dsl = dsl;
-    }
+    private DSLContext dsl;
+
+    @Autowired
+    private DataTypeService svc;
 
 
     public Long createDataType(String name) {
         DataTypeRecord record = dsl.newRecord(DATA_TYPE);
 
-        record.setId(ctr.incrementAndGet());
+        record.setId(counter.incrementAndGet());
         String uniqName = mkName(name);
 
         record.setName(uniqName);
@@ -38,5 +38,45 @@ public class DataTypeHelper {
 
         return record.getId();
     }
+
+
+    public long createUnknownDatatype() {
+        clearAllDataTypes();
+
+        long id = 1L;
+
+        dsl.insertInto(DATA_TYPE)
+                .columns(
+                        DATA_TYPE.ID,
+                        DATA_TYPE.NAME,
+                        DATA_TYPE.DESCRIPTION,
+                        DATA_TYPE.CODE,
+                        DATA_TYPE.CONCRETE,
+                        DATA_TYPE.UNKNOWN.as(DSL.quotedName("unknown"))) //TODO: as part of #5639 can drop quotedName
+                .values(id, "Unknown", "Unknown data type", "UNKNOWN", false, true)
+                .execute();
+
+        return id;
+    }
+
+
+
+    public void createDataType(Long id, String name, String code) {
+
+        dsl.insertInto(DATA_TYPE)
+                .columns(
+                        DATA_TYPE.ID,
+                        DATA_TYPE.NAME,
+                        DATA_TYPE.DESCRIPTION,
+                        DATA_TYPE.CODE)
+                .values(id, name, name, code)
+                .execute();
+    }
+
+
+    public void clearAllDataTypes(){
+        dsl.deleteFrom(DATA_TYPE).execute();
+    }
+
 
 }

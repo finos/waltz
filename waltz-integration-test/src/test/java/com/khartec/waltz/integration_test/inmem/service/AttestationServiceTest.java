@@ -20,7 +20,9 @@ package com.khartec.waltz.integration_test.inmem.service;
 
 import com.khartec.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.common.OptionalUtilities;
+import com.khartec.waltz.common.exception.UpdateFailedException;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
+import com.khartec.waltz.integration_test.inmem.helpers.AppHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.InvolvementHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.PersonHelper;
 import com.khartec.waltz.model.EntityKind;
@@ -29,6 +31,8 @@ import com.khartec.waltz.model.IdCommandResponse;
 import com.khartec.waltz.model.attestation.*;
 import com.khartec.waltz.service.attestation.AttestationInstanceService;
 import com.khartec.waltz.service.attestation.AttestationRunService;
+import org.jooq.DSLContext;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -41,8 +45,8 @@ import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static com.khartec.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
+import static org.junit.Assert.*;
 
 public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
 
@@ -57,6 +61,12 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
 
     @Autowired
     private PersonHelper personHelper;
+
+    @Autowired
+    private AppHelper appHelper;
+
+    @Autowired
+    private DSLContext dsl;
 
 
     @Test
@@ -92,11 +102,85 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
         assertEquals(EntityKind.APPLICATION, run.targetEntityKind());
     }
 
+    @Test
+    @Ignore
+    public void basicRetrieval() {
+
+        long invId = involvementHelper.mkInvolvementKind(mkName("basicRetrieval"));
+
+        EntityReference appRef = appHelper.createNewApp(mkName("basicRetrieval"), ouIds.a);
+
+        AttestationRunCreateCommand cmd = ImmutableAttestationRunCreateCommand.builder()
+                .dueDate(DateTimeUtilities.today().plusMonths(1))
+                .targetEntityKind(EntityKind.APPLICATION)
+                .attestedEntityKind(EntityKind.LOGICAL_DATA_FLOW)
+                .selectionOptions(mkOpts(mkRef(EntityKind.ORG_UNIT, ouIds.a)))
+                .addInvolvementKindIds(invId)
+                .name(mkName("basicRetrieval"))
+                .description("basicRetrieval Desc")
+                .sendEmailNotifications(false)
+                .build();
+
+        String user = mkUserId("ast");
+        long pId = personHelper.createPerson(mkName("basicRetrieval"));
+        involvementHelper.createInvolvement(pId, invId, appRef);
+        IdCommandResponse response = arSvc.create(user, cmd);
+        arSvc.issueInstancesForPendingRuns();
+
+        System.out.println("-------------");
+        dsl.selectFrom(ATTESTATION_INSTANCE).fetch().forEach(System.out::println);
+        System.out.println("-------------");
+
+        List<AttestationInstance> instances = aiSvc.findByIdSelector(mkOpts(mkRef(EntityKind.ORG_UNIT, ouIds.a)));
+        assertFalse(instances.isEmpty());
+    }
+
+
+    @Test
+    public void cannotAttestIfNotAssociated() {
+        String user = mkUserId("cannotAttestIfNotAssociated");
+        EntityReference appRef = mkNewAppRef();
+
+        AttestEntityCommand cmd = ImmutableAttestEntityCommand.builder()
+                .attestedEntityKind(EntityKind.LOGICAL_DATA_FLOW)
+                .entityReference(appRef)
+                .build();
+
+        assertThrows(
+                "Should not be able to attest as user not associated to app",
+                UpdateFailedException.class,
+                () -> aiSvc.attestForEntity(user, cmd));
+    }
+
+
+    @Test
+    public void cannotAttestIfNoFlows() {
+        long invId = involvementHelper.mkInvolvementKind(mkName("cannotAttestIfNoFlows"));
+        String user = mkUserId("cannotAttestIfNotAssociated");
+        EntityReference appRef = mkNewAppRef();
+
+        involvementHelper.createInvolvement(
+                personHelper.createPerson(user),
+                invId,
+                appRef);
+
+        AttestEntityCommand cmd = ImmutableAttestEntityCommand
+                .builder()
+                .attestedEntityKind(EntityKind.LOGICAL_DATA_FLOW)
+                .entityReference(appRef)
+                .build();
+
+        assertThrows(
+                "Should not be able to attest as no flows",
+                Exception.class,
+                () -> aiSvc.attestForEntity(user, cmd));
+    }
+
 
     @Test
     public void runCreationPreview() {
 
-        EntityReference app = createNewApp("a", ouIds.a);
+        EntityReference app = appHelper.createNewApp("a", ouIds.a);
         String involvementKindName = mkName("runCreationPreview");
         String involvedUser = mkName("runCreationPreviewUser");
 

@@ -88,6 +88,8 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                 return mkForFlowDiagram(options);
             case LICENCE:
                 return mkForLicence(options);
+            case LOGICAL_DATA_FLOW:
+                return mkForLogicalDataFlow(options);
             case MEASURABLE:
                 return mkForMeasurable(options);
             case SCENARIO:
@@ -98,6 +100,10 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
                 return mkForOrgUnit(options);
             case PERSON:
                 return mkForPerson(options);
+            case PHYSICAL_FLOW:
+                return mkForPhysicalFlow(options);
+            case PHYSICAL_SPECIFICATION:
+                return mkForPhysicalSpec(options);
             case SOFTWARE:
                 return mkForSoftwarePackage(options);
             case SOFTWARE_VERSION:
@@ -111,6 +117,64 @@ public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions
             default:
                 throw new IllegalArgumentException("Cannot create selector for entity kind: " + ref.kind());
         }
+    }
+
+
+    private Select<Record1<Long>> mkForPhysicalSpec(IdSelectionOptions options) {
+        return DSL
+                .select(APPLICATION.ID)
+                .from(PHYSICAL_FLOW)
+                .innerJoin(LOGICAL_FLOW).on(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID))
+                .innerJoin(APPLICATION).on(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(APPLICATION.ID))
+                .where(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                        .and(PHYSICAL_FLOW.SPECIFICATION_ID.eq(options.entityReference().id()))
+                        .and(mkApplicationConditions(options)))
+                .union(DSL
+                        .select(APPLICATION.ID)
+                        .from(PHYSICAL_FLOW)
+                        .innerJoin(LOGICAL_FLOW).on(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID))
+                        .innerJoin(APPLICATION).on(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(APPLICATION.ID))
+                        .where(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                                .and(PHYSICAL_FLOW.SPECIFICATION_ID.eq(options.entityReference().id()))
+                                .and(mkApplicationConditions(options))));
+    }
+
+
+    private Select<Record1<Long>> mkForPhysicalFlow(IdSelectionOptions options) {
+        return DSL
+                .select(APPLICATION.ID)
+                .from(PHYSICAL_FLOW)
+                .innerJoin(LOGICAL_FLOW).on(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID))
+                .innerJoin(APPLICATION).on(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(APPLICATION.ID))
+                .where(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                        .and(PHYSICAL_FLOW.ID.eq(options.entityReference().id()))
+                        .and(mkApplicationConditions(options)))
+                .union(DSL
+                        .select(APPLICATION.ID)
+                        .from(PHYSICAL_FLOW)
+                        .innerJoin(LOGICAL_FLOW).on(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(LOGICAL_FLOW.ID))
+                        .innerJoin(APPLICATION).on(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(APPLICATION.ID))
+                        .where(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                                .and(PHYSICAL_FLOW.ID.eq(options.entityReference().id()))
+                                .and(mkApplicationConditions(options))));
+    }
+
+
+    private Select<Record1<Long>> mkForLogicalDataFlow(IdSelectionOptions options) {
+        return DSL
+                .select(APPLICATION.ID)
+                .from(LOGICAL_FLOW)
+                .innerJoin(APPLICATION).on(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(APPLICATION.ID))
+                .where(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                        .and(LOGICAL_FLOW.ID.eq(options.entityReference().id()))
+                        .and(mkApplicationConditions(options)))
+                .union(DSL
+                        .select(APPLICATION.ID)
+                        .from(LOGICAL_FLOW)
+                        .innerJoin(APPLICATION).on(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(APPLICATION.ID))
+                        .where(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
+                                .and(LOGICAL_FLOW.ID.eq(options.entityReference().id()))
+                                .and(mkApplicationConditions(options))));
     }
 
 

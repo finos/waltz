@@ -31,8 +31,27 @@ export function mkDataTypeDecoratorStore() {
             {force})
     };
 
+    const findDatatypeUsageCharacteristics = (ref, force = false) => remote
+        .fetchViewData(
+            "GET",
+            `api/data-type-decorator/entity/${ref.kind}/${ref.id}/usage-characteristics`,
+            [],
+            null,
+            {force});
+
+
+    const findBySelector = (targetKind, selector, force = false) => remote
+        .fetchViewData(
+            "POST",
+            `api/data-type-decorator/selector/targetKind/${targetKind}`,
+            selector,
+            null,
+            {force});
+
     return {
-        findByFlowIds
+        findByFlowIds,
+        findDatatypeUsageCharacteristics,
+        findBySelector
     };
 }
 

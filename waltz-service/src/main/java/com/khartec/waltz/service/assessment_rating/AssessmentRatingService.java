@@ -93,6 +93,7 @@ public class AssessmentRatingService {
         return assessmentRatingDao.findByDefinitionId(definitionId);
     }
 
+
     public boolean store(SaveAssessmentRatingCommand command, String username) {
         AssessmentDefinition assessmentDefinition = assessmentDefinitionDao.getById(command.assessmentDefinitionId());
         createChangeLogEntry(command, username, assessmentDefinition);

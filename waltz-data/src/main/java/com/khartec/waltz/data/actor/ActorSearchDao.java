@@ -46,6 +46,11 @@ public class ActorSearchDao implements SearchDao<Actor> {
     }
 
 
+    /**
+     * Searches across name and description
+     * @param options - contains search term and limits
+     * @return matches (if any)
+     */
     @Override
     public List<Actor> search(EntitySearchOptions options) {
         List<String> terms = SearchUtilities.mkTerms(options.searchQuery().toLowerCase());
