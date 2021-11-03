@@ -45,10 +45,22 @@ export function mkProcessDiagramStore() {
                 {force})
     }
 
+    
+    const findBySelector = (idSelectionOptions, force = false) => {
+        return remote
+            .fetchViewData(
+                "POST",
+                "api/process-diagram/selector",
+                idSelectionOptions,
+                [],
+                {force})
+    }
+
     return {
         getById,
         getByExternalId,
-        findByGenericSelector
+        findByGenericSelector,
+        findBySelector
     };
 }
 

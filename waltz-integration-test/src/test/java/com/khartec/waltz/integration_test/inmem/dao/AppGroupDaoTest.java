@@ -19,10 +19,13 @@
 package com.khartec.waltz.integration_test.inmem.dao;
 
 import com.khartec.waltz.common.CollectionUtilities;
+import com.khartec.waltz.common.exception.InsufficientPrivelegeException;
 import com.khartec.waltz.data.app_group.AppGroupOrganisationalUnitDao;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
+import com.khartec.waltz.integration_test.inmem.helpers.AppGroupHelper;
+import com.khartec.waltz.integration_test.inmem.helpers.AppHelper;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.app_group.AppGroupEntry;
@@ -53,6 +56,12 @@ public class AppGroupDaoTest extends BaseInMemoryIntegrationTest {
     @Autowired
     private AppGroupOrganisationalUnitDao appGroupOuDao;
 
+    @Autowired
+    private AppHelper appHelper;
+
+    @Autowired
+    private AppGroupHelper appGroupHelper;
+
     private Long raOu;
     private EntityReference r1;
     private EntityReference ra2;
@@ -68,23 +77,23 @@ public class AppGroupDaoTest extends BaseInMemoryIntegrationTest {
 
         rebuildHierarchy(EntityKind.ORG_UNIT);
 
-        r1 = createNewApp("r1", rootOu);
-        ra2 = createNewApp("ra2", raOu);
-        raa3 = createNewApp("raa3", raaOu);
-        EntityReference rb4 = createNewApp("rb4", rbOu);
+        r1 = appHelper.createNewApp("r1", rootOu);
+        ra2 = appHelper.createNewApp("ra2", raOu);
+        raa3 = appHelper.createNewApp("raa3", raaOu);
+        appHelper.createNewApp("rb4", rbOu);
     }
 
 
     @Test
-    public void usingAppSelectorWithAPlainAppGroupWorks() {
-        Long gId = createAppGroupWithAppRefs("t1", asSet(r1, ra2));
+    public void usingAppSelectorWithAPlainAppGroupWorks() throws InsufficientPrivelegeException {
+        Long gId = appGroupHelper.createAppGroupWithAppRefs("t1", asSet(r1, ra2));
         checkAppIdSelectorForRef(mkRef(EntityKind.APP_GROUP, gId), r1, ra2);
     }
 
 
     @Test
-    public void usingAppSelectorWithAComplexAppGroupWorks() {
-        Long gId = createAppGroupWithAppRefs("t2", asSet(r1));
+    public void usingAppSelectorWithAComplexAppGroupWorks() throws InsufficientPrivelegeException {
+        Long gId = appGroupHelper.createAppGroupWithAppRefs("t2", asSet(r1));
         appGroupOuDao.addOrgUnit(gId, raOu);
         checkAppIdSelectorForRef(
                 mkRef(EntityKind.APP_GROUP, gId),
@@ -95,8 +104,8 @@ public class AppGroupDaoTest extends BaseInMemoryIntegrationTest {
 
 
     @Test
-    public void canAddOrgUnitsToGroups() {
-        Long gId = createAppGroupWithAppRefs("t3", asSet(r1));
+    public void canAddOrgUnitsToGroups() throws InsufficientPrivelegeException {
+        Long gId = appGroupHelper.createAppGroupWithAppRefs("t3", asSet(r1));
         appGroupOuDao.addOrgUnit(gId, raOu);
         List<AppGroupEntry> ouEntries = appGroupOuDao.getEntriesForGroup(gId);
         assertEquals(1, ouEntries.size());
@@ -107,8 +116,8 @@ public class AppGroupDaoTest extends BaseInMemoryIntegrationTest {
 
 
     @Test
-    public void canRemoveOrgUnitsFromGroups() {
-        Long gId = createAppGroupWithAppRefs("t3", asSet(r1));
+    public void canRemoveOrgUnitsFromGroups() throws InsufficientPrivelegeException {
+        Long gId = appGroupHelper.createAppGroupWithAppRefs("t3", asSet(r1));
         appGroupOuDao.addOrgUnit(gId, raOu);
         assertEquals(1, appGroupOuDao.getEntriesForGroup(gId).size());
         appGroupOuDao.removeOrgUnit(gId, raOu);

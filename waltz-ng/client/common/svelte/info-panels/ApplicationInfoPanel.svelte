@@ -19,6 +19,7 @@
 
 {#if app}
     <h4><EntityLink ref={app}/></h4>
+    <slot name="post-title"/>
     <table class="table table-condensed small">
         <tbody>
             <tr>

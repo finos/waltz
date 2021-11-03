@@ -47,7 +47,7 @@ public class FlowDiagramIdSelectorFactory implements IdSelectorFactory {
             case PHYSICAL_SPECIFICATION:
                 return mkForPhysicalSpecification(options);
             default:
-                throw new UnsupportedOperationException("Cannot create physical flow selector from options: "+options);
+                throw new UnsupportedOperationException("Cannot create flow diagram selector from options: "+options);
         }
     }
 

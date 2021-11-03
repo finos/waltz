@@ -59,8 +59,8 @@ public class AssessmentDefinitionService {
     }
 
 
-    public boolean save(AssessmentDefinition def) {
-        return assessmentDefinitionDao.save(def) == 1;
+    public Long save(AssessmentDefinition def) {
+        return assessmentDefinitionDao.save(def);
     }
 
 

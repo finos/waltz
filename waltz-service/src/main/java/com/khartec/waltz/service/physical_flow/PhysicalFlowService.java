@@ -391,4 +391,9 @@ public class PhysicalFlowService {
                     }
                 });
     }
+
+
+    public Collection<PhysicalFlowInfo> findUnderlyingPhysicalFlows(Long logicalFlowId) {
+        return physicalFlowDao.findUnderlyingPhysicalFlows(logicalFlowId);
+    }
 }
