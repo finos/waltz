@@ -42,6 +42,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
 import static com.khartec.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName;
@@ -940,5 +941,51 @@ public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {
         assertEquals("Basis offset should be updated after updateAttribute", 0, physFlowAfterUpdates.basisOffset());
         assertEquals("EntityLifecycleStatus should be updated after updateAttribute", EntityLifecycleStatus.REMOVED, physFlowAfterUpdates.entityLifecycleStatus());
         assertEquals("Criticality should be updated after updateAttribute", Criticality.LOW, physFlowAfterUpdates.criticality());
+    }
+
+
+    @Test
+    public void findUnderlyingPhysicalFlows() {
+
+        Collection<PhysicalFlowInfo> underlyingPhysicalFlowsWhenLogicalNull = pfSvc.findUnderlyingPhysicalFlows(null);
+        assertTrue("If null logical flow id then returns empty list", isEmpty(underlyingPhysicalFlowsWhenLogicalNull));
+
+        Collection<PhysicalFlowInfo> underlyingPhysicalFlowsWhenLogicalDoesntExist = pfSvc.findUnderlyingPhysicalFlows(-1L);
+        assertTrue("If invalid logical flow id then returns empty list", isEmpty(underlyingPhysicalFlowsWhenLogicalDoesntExist));
+
+        EntityReference a = appHelper.createNewApp(mkName("a"), ouIds.a);
+        EntityReference b = appHelper.createNewApp(mkName("b"), ouIds.a1);
+
+        LogicalFlow ab = lfHelper.createLogicalFlow(a, b);
+
+        Collection<PhysicalFlowInfo> noPhysicalsAssociated = pfSvc.findUnderlyingPhysicalFlows(ab.entityReference().id());
+        assertTrue("If no physicals associated to the logical then returns empty list", isEmpty(noPhysicalsAssociated));
+
+        Long specId = psHelper.createPhysicalSpec(a, mkName("updateAttribute"));
+        PhysicalFlowCreateCommandResponse flowCreateResp = pfHelper.createPhysicalFlow(
+                ab.entityReference().id(),
+                specId,
+                mkName("findUnderlyingPhysicalFlows"));
+
+        Collection<PhysicalFlowInfo> physicalAssociated = pfSvc.findUnderlyingPhysicalFlows(ab.entityReference().id());
+        assertEquals("Returns correct number of underlying physical flows for that logical", 1, physicalAssociated.size());
+
+        pfHelper.deletePhysicalFlow(flowCreateResp.entityReference().id());
+
+        Collection<PhysicalFlowInfo> noActivePhysicals = pfSvc.findUnderlyingPhysicalFlows(ab.entityReference().id());
+        assertTrue("If no active physicals associated to the logical then returns empty list", isEmpty(noActivePhysicals));
+
+        PhysicalFlowCreateCommandResponse flowCreateResp2 = pfHelper.createPhysicalFlow(
+                ab.entityReference().id(),
+                specId,
+                mkName("findUnderlyingPhysicalFlows"));
+
+        Collection<PhysicalFlowInfo> physicalAssociated2 = pfSvc.findUnderlyingPhysicalFlows(ab.entityReference().id());
+        assertEquals("Returns correct number of underlying physical flows for that logical", 1, physicalAssociated2.size());
+
+        lfSvc.removeFlow(ab.entityReference().id(), mkName("findUnderlyingPhysicalFlows"));
+
+        Collection<PhysicalFlowInfo> underlyingPhysicalsForRemovedLogical = pfSvc.findUnderlyingPhysicalFlows(ab.entityReference().id());
+        assertTrue("Returns empty list of the logical flow is removed", isEmpty(underlyingPhysicalsForRemovedLogical));
     }
 }
