@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Deployment: Getting Started"
-date:   2021-08-19
+date:   2021-11-05
 categories: waltz deployment screencast
 ---
 
