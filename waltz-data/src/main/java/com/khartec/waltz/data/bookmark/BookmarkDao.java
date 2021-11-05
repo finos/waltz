@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.*;
+import static org.finos.waltz.common.Checks.*;
 import static com.khartec.waltz.schema.tables.Bookmark.BOOKMARK;
 
 

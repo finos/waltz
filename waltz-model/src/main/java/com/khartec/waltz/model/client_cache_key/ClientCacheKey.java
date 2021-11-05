@@ -20,7 +20,7 @@ package com.khartec.waltz.model.client_cache_key;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
 import org.immutables.value.Value;
 
 import java.time.LocalDateTime;

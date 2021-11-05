@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.web;
 
-import com.khartec.waltz.common.LoggingUtilities;
-import com.khartec.waltz.common.exception.DuplicateKeyException;
-import com.khartec.waltz.common.exception.InsufficientPrivelegeException;
-import com.khartec.waltz.common.exception.NotFoundException;
-import com.khartec.waltz.common.exception.UpdateFailedException;
+import org.finos.waltz.common.LoggingUtilities;
+import org.finos.waltz.common.exception.DuplicateKeyException;
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.common.exception.NotFoundException;
+import org.finos.waltz.common.exception.UpdateFailedException;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.settings.SettingsService;
 import com.khartec.waltz.web.endpoints.Endpoint;
@@ -37,7 +37,7 @@ import spark.*;
 import java.util.Map;
 import java.util.TimeZone;
 
-import static com.khartec.waltz.common.DateTimeUtilities.UTC;
+import static org.finos.waltz.common.DateTimeUtilities.UTC;
 import static com.khartec.waltz.web.WebUtilities.reportException;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.addExceptionHandler;
 import static spark.Spark.*;

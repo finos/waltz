@@ -31,10 +31,10 @@ import java.net.URL;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.khartec.waltz.common.IOUtilities.copyStream;
-import static com.khartec.waltz.common.IOUtilities.readLines;
-import static com.khartec.waltz.common.StringUtilities.lower;
-import static com.khartec.waltz.common.StringUtilities.notEmpty;
+import static org.finos.waltz.common.IOUtilities.copyStream;
+import static org.finos.waltz.common.IOUtilities.readLines;
+import static org.finos.waltz.common.StringUtilities.lower;
+import static org.finos.waltz.common.StringUtilities.notEmpty;
 import static com.khartec.waltz.web.WebUtilities.getMimeType;
 import static java.lang.String.format;
 

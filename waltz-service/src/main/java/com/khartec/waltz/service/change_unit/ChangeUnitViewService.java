@@ -44,10 +44,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.MapUtilities.groupBy;
-import static com.khartec.waltz.common.MapUtilities.indexBy;
-import static com.khartec.waltz.common.SetUtilities.map;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.MapUtilities.groupBy;
+import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOptsForAllLifecycleStates;
 import static java.util.Collections.emptySet;

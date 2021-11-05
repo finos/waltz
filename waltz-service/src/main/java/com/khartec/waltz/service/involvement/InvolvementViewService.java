@@ -16,8 +16,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.MapUtilities.indexBy;
-import static com.khartec.waltz.common.SetUtilities.map;
+import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.SetUtilities.map;
 import static java.util.stream.Collectors.toSet;
 
 @Service

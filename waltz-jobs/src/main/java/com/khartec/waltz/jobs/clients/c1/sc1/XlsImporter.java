@@ -18,15 +18,15 @@
 
 package com.khartec.waltz.jobs.clients.c1.sc1;
 
-import com.khartec.waltz.common.CollectionUtilities;
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.ListUtilities;
-import com.khartec.waltz.common.MapUtilities;
-import com.khartec.waltz.common.StreamUtilities.Siphon;
-import com.khartec.waltz.common.hierarchy.FlatNode;
-import com.khartec.waltz.common.hierarchy.Forest;
-import com.khartec.waltz.common.hierarchy.HierarchyUtilities;
-import com.khartec.waltz.common.hierarchy.Node;
+import org.finos.waltz.common.CollectionUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.common.MapUtilities;
+import org.finos.waltz.common.StreamUtilities.Siphon;
+import org.finos.waltz.common.hierarchy.FlatNode;
+import org.finos.waltz.common.hierarchy.Forest;
+import org.finos.waltz.common.hierarchy.HierarchyUtilities;
+import org.finos.waltz.common.hierarchy.Node;
 import com.khartec.waltz.jobs.Columns;
 import com.khartec.waltz.jobs.WaltzUtilities;
 import com.khartec.waltz.jobs.clients.c1.sc1.model.*;
@@ -63,12 +63,12 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
-import static com.khartec.waltz.common.MapUtilities.indexBy;
-import static com.khartec.waltz.common.StreamUtilities.mkSiphon;
-import static com.khartec.waltz.common.StringUtilities.isEmpty;
-import static com.khartec.waltz.common.StringUtilities.mkSafe;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
+import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.StreamUtilities.mkSiphon;
+import static org.finos.waltz.common.StringUtilities.isEmpty;
+import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.jobs.WaltzUtilities.getOrCreateMeasurableCategory;
 import static com.khartec.waltz.jobs.WaltzUtilities.toId;
 import static com.khartec.waltz.jobs.XlsUtilities.strVal;

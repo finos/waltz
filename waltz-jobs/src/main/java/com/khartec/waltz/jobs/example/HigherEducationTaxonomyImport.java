@@ -18,10 +18,10 @@
 
 package com.khartec.waltz.jobs.example;
 
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.IOUtilities;
-import com.khartec.waltz.common.SetUtilities;
-import com.khartec.waltz.common.XmlUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.IOUtilities;
+import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.common.XmlUtilities;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.schema.tables.Measurable;
 import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
@@ -52,8 +52,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import static com.khartec.waltz.common.CollectionUtilities.filter;
-import static com.khartec.waltz.common.SetUtilities.map;
+import static org.finos.waltz.common.CollectionUtilities.filter;
+import static org.finos.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.schema.Tables.MEASURABLE;
 import static com.khartec.waltz.schema.Tables.MEASURABLE_CATEGORY;
 import static java.util.stream.Collectors.collectingAndThen;

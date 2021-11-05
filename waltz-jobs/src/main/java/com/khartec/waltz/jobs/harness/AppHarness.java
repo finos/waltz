@@ -30,7 +30,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import java.util.List;
 import java.util.Map;
 
-import static com.khartec.waltz.common.ListUtilities.map;
+import static org.finos.waltz.common.ListUtilities.map;
 
 
 public class AppHarness {

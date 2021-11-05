@@ -39,8 +39,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.function.Function;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.ListUtilities.map;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.data.JooqUtilities.TO_STRING_TALLY;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 

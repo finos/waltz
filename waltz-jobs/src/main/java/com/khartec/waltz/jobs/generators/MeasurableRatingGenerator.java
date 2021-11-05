@@ -29,9 +29,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.RandomUtilities.randomlySizedIntStream;
-import static com.khartec.waltz.common.RandomUtilities.randomPick;
-import static com.khartec.waltz.common.SetUtilities.uniqBy;
+import static org.finos.waltz.common.RandomUtilities.randomlySizedIntStream;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
+import static org.finos.waltz.common.SetUtilities.uniqBy;
 import static com.khartec.waltz.schema.Tables.MEASURABLE;
 import static com.khartec.waltz.schema.Tables.MEASURABLE_RATING;
 

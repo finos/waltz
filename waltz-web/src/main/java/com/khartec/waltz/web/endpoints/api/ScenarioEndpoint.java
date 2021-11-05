@@ -40,7 +40,7 @@ import spark.Request;
 
 import java.time.LocalDate;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 

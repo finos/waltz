@@ -30,7 +30,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static com.khartec.waltz.common.CollectionUtilities.first;
+import static org.finos.waltz.common.CollectionUtilities.first;
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static org.junit.Assert.*;

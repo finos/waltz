@@ -42,11 +42,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.Checks.checkNotEmpty;
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.FunctionUtilities.time;
-import static com.khartec.waltz.common.ListUtilities.applyToFirst;
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.Checks.checkNotEmpty;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.FunctionUtilities.time;
+import static org.finos.waltz.common.ListUtilities.applyToFirst;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
 
 
 @Service

@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.end_user_app;
 
-import com.khartec.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.changelog.ChangeLogDao;
 import com.khartec.waltz.data.end_user_app.EndUserAppDao;
@@ -48,9 +48,9 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.FunctionUtilities.time;
-import static com.khartec.waltz.common.ListUtilities.map;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.FunctionUtilities.time;
+import static org.finos.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.model.EntityKind.APPLICATION;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 

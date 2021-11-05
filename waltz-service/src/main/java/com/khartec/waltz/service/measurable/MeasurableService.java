@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.measurable;
 
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.StringUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.StringUtilities;
 import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.measurable.MeasurableDao;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
@@ -37,7 +37,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.function.Function;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;

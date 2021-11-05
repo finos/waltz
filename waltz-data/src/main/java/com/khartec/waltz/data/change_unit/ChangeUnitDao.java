@@ -35,8 +35,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.khartec.waltz.common.Checks.*;
-import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static org.finos.waltz.common.Checks.*;
+import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.ChangeUnit.CHANGE_UNIT;
 

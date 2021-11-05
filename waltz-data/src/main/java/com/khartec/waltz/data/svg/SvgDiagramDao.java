@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.data.svg;
 
-import com.khartec.waltz.common.FunctionUtilities;
+import org.finos.waltz.common.FunctionUtilities;
 import com.khartec.waltz.model.svg.ImmutableSvgDiagram;
 import com.khartec.waltz.model.svg.SvgDiagram;
 import com.khartec.waltz.schema.tables.records.SvgDiagramRecord;
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.khartec.waltz.common.StringUtilities.mkSafe;
+import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.tables.SvgDiagram.SVG_DIAGRAM;
 
 @Repository

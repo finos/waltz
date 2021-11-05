@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.clients.c1.sc1.parse;
 
-import com.khartec.waltz.common.Aliases;
+import org.finos.waltz.common.Aliases;
 import com.khartec.waltz.jobs.clients.c1.sc1.model.MaintenanceStatus;
 
 public class WartungstatusToMaintenanceStatus {

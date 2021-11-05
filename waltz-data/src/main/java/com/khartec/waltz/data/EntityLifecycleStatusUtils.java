@@ -19,7 +19,7 @@
 package com.khartec.waltz.data;
 
 
-import com.khartec.waltz.common.ListUtilities;
+import org.finos.waltz.common.ListUtilities;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 
 import java.util.List;

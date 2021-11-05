@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.data.entity_alias;
 
-import com.khartec.waltz.common.SetUtilities;
+import org.finos.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.schema.tables.records.EntityAliasRecord;
 import org.jooq.Condition;

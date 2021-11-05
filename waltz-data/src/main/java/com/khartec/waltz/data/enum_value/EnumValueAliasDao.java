@@ -19,7 +19,7 @@
 package com.khartec.waltz.data.enum_value;
 
 
-import com.khartec.waltz.common.Aliases;
+import org.finos.waltz.common.Aliases;
 import com.khartec.waltz.model.enum_value.EnumValueKind;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -28,7 +28,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.function.Function;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.Tables.ENUM_VALUE;
 import static com.khartec.waltz.schema.Tables.ENUM_VALUE_ALIAS;
 

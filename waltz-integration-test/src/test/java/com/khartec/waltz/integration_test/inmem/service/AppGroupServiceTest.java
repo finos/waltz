@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.integration_test.inmem.service;
 
-import com.khartec.waltz.common.ListUtilities;
-import com.khartec.waltz.common.SetUtilities;
-import com.khartec.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.model.app_group.*;
 import com.khartec.waltz.service.app_group.AppGroupService;
@@ -31,7 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.khartec.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
 import static org.junit.Assert.*;
 

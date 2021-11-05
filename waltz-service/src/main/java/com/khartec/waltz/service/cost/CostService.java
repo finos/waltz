@@ -36,9 +36,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.CollectionUtilities.maybeFirst;
-import static com.khartec.waltz.common.FunctionUtilities.time;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.CollectionUtilities.maybeFirst;
+import static org.finos.waltz.common.FunctionUtilities.time;
 import static java.util.Optional.ofNullable;
 
 @Service

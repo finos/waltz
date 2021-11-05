@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.flow_classification_rule;
 
-import com.khartec.waltz.common.SetUtilities;
+import org.finos.waltz.common.SetUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
@@ -41,8 +41,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.SetUtilities.fromCollection;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.SetUtilities.fromCollection;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static java.util.stream.Collectors.toList;
 

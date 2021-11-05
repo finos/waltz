@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.common.RandomUtilities;
+import org.finos.waltz.common.RandomUtilities;
 import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.application.AppRegistrationRequest;
 import com.khartec.waltz.model.application.ApplicationKind;
@@ -37,8 +37,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import static com.khartec.waltz.common.RandomUtilities.randomPick;
-import static com.khartec.waltz.common.IOUtilities.readLines;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
+import static org.finos.waltz.common.IOUtilities.readLines;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.AuthoritativeSource.AUTHORITATIVE_SOURCE;
 

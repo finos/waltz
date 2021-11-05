@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.data.entity_hierarchy;
 
-import com.khartec.waltz.common.Checks;
+import org.finos.waltz.common.Checks;
 import com.khartec.waltz.data.IdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;

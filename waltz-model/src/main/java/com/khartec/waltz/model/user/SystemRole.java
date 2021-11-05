@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.model.user;
 
-import com.khartec.waltz.common.EnumUtilities;
+import org.finos.waltz.common.EnumUtilities;
 
 import java.util.Set;
 

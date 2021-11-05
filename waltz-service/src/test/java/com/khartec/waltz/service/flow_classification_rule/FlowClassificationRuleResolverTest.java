@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.service.flow_classification_rule.FlowClassificationRuleResolver.getMostSpecificRanked;
 
 public class FlowClassificationRuleResolverTest {

@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.clients.c1.sc1.parse;
 
-import com.khartec.waltz.common.Aliases;
+import org.finos.waltz.common.Aliases;
 
 public class FlagToBoolean {
 

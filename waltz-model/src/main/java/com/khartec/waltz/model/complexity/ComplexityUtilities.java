@@ -22,8 +22,8 @@ import com.khartec.waltz.model.tally.Tally;
 
 import java.util.function.Function;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkTrue;
 
 /**
  * To be removed in 1.32

@@ -19,7 +19,7 @@
 package com.khartec.waltz.data.logical_data_element.search;
 
 
-import com.khartec.waltz.common.EnumUtilities;
+import org.finos.waltz.common.EnumUtilities;
 import com.khartec.waltz.data.SearchDao;
 import com.khartec.waltz.data.logical_data_element.LogicalDataElementDao;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
@@ -33,8 +33,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.CollectionUtilities.sort;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.CollectionUtilities.sort;
 import static com.khartec.waltz.data.JooqUtilities.mkBasicTermSearch;
 import static com.khartec.waltz.data.SearchUtilities.mkRelevancyComparator;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;

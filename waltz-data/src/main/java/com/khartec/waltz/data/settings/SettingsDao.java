@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.data.settings;
 
-import com.khartec.waltz.common.StringUtilities;
+import org.finos.waltz.common.StringUtilities;
 import com.khartec.waltz.model.settings.ImmutableSetting;
 import com.khartec.waltz.model.settings.Setting;
 import com.khartec.waltz.schema.tables.records.SettingsRecord;

@@ -19,8 +19,8 @@
 package com.khartec.waltz.data.measurable_rating_planned_decommission;
 
 
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.exception.ModifyingReadOnlyRecordException;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.exception.ModifyingReadOnlyRecordException;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -38,10 +38,10 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
-import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
-import static com.khartec.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
+import static org.finos.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static com.khartec.waltz.schema.tables.MeasurableRatingPlannedDecommission.MEASURABLE_RATING_PLANNED_DECOMMISSION;

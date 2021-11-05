@@ -33,7 +33,7 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.khartec.waltz.common.SetUtilities.orderedUnion;
+import static org.finos.waltz.common.SetUtilities.orderedUnion;
 import static com.khartec.waltz.data.JooqUtilities.*;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;

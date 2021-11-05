@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.assessment_rating;
 
-import com.khartec.waltz.common.MapUtilities;
-import com.khartec.waltz.common.StringUtilities;
+import org.finos.waltz.common.MapUtilities;
+import org.finos.waltz.common.StringUtilities;
 import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.assessment_definition.AssessmentDefinitionDao;
@@ -38,7 +38,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static java.lang.String.format;
 

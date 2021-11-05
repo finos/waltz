@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.data;
 
-import com.khartec.waltz.common.StringUtilities;
+import org.finos.waltz.common.StringUtilities;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static java.util.stream.Collectors.toList;
 
 public class SearchUtilities

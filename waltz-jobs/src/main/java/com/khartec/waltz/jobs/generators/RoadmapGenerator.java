@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.measurable.MeasurableDao;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
@@ -46,12 +46,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.khartec.waltz.common.ListUtilities.filter;
-import static com.khartec.waltz.common.MapUtilities.groupBy;
-import static com.khartec.waltz.common.ObjectUtilities.any;
-import static com.khartec.waltz.common.RandomUtilities.randomIntBetween;
-import static com.khartec.waltz.common.RandomUtilities.randomPick;
-import static com.khartec.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.ListUtilities.filter;
+import static org.finos.waltz.common.MapUtilities.groupBy;
+import static org.finos.waltz.common.ObjectUtilities.any;
+import static org.finos.waltz.common.RandomUtilities.randomIntBetween;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
+import static org.finos.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static com.khartec.waltz.schema.Tables.*;

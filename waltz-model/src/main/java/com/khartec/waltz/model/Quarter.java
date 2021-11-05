@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.model;
 
-import com.khartec.waltz.common.Checks;
+import org.finos.waltz.common.Checks;
 
 public enum Quarter {
 

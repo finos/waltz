@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.common.EnumUtilities;
+import org.finos.waltz.common.EnumUtilities;
 import com.khartec.waltz.model.Duration;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.application.Application;
@@ -43,7 +43,7 @@ import spark.Response;
 import java.io.IOException;
 import java.util.List;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 

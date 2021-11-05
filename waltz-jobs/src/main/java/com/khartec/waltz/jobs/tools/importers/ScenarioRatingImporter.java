@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.tools.importers;
 
-import com.khartec.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.measurable.MeasurableDao;
 import com.khartec.waltz.data.rating_scheme.RatingSchemeDAO;
@@ -51,10 +51,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.Checks.checkTrue;
-import static com.khartec.waltz.common.MapUtilities.indexBy;
-import static com.khartec.waltz.common.StringUtilities.lower;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.StringUtilities.lower;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ScenarioRatingItem.SCENARIO_RATING_ITEM;
 import static java.util.stream.Collectors.*;

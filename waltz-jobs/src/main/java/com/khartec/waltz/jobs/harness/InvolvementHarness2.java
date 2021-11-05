@@ -30,7 +30,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import javax.sql.DataSource;
 import java.util.Collection;
 
-import static com.khartec.waltz.common.FunctionUtilities.time;
+import static org.finos.waltz.common.FunctionUtilities.time;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;

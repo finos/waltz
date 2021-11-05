@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.change_initiative;
 
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.StringUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.StringUtilities;
 import com.khartec.waltz.data.change_initiative.ChangeInitiativeDao;
 import com.khartec.waltz.data.change_initiative.ChangeInitiativeIdSelectorFactory;
 import com.khartec.waltz.data.change_initiative.search.ChangeInitiativeSearchDao;
@@ -41,7 +41,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.Collections;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityKind.CHANGE_INITIATIVE;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 

@@ -31,7 +31,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.function.Function;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.UserAgentInfo.USER_AGENT_INFO;
 
 @Repository

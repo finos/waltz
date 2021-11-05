@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.app_group;
 
-import com.khartec.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import com.khartec.waltz.data.app_group.AppGroupDao;
 import com.khartec.waltz.data.app_group.AppGroupEntryDao;
 import com.khartec.waltz.data.app_group.AppGroupMemberDao;
@@ -35,7 +35,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static java.lang.String.format;
 
 @Service

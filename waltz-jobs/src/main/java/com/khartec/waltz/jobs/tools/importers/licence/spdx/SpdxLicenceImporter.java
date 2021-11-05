@@ -20,7 +20,7 @@ package com.khartec.waltz.jobs.tools.importers.licence.spdx;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.khartec.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.licence.LicenceDao;
 import com.khartec.waltz.model.ApprovalStatus;
 import com.khartec.waltz.model.EntityKind;

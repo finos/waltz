@@ -19,7 +19,7 @@
 package com.khartec.waltz.service.measurable_rating_replacement;
 
 
-import com.khartec.waltz.common.exception.UpdateFailedException;
+import org.finos.waltz.common.exception.UpdateFailedException;
 import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionDao;
 import com.khartec.waltz.data.measurable_rating_replacement.MeasurableRatingReplacementDao;
@@ -38,7 +38,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static java.lang.String.format;
 

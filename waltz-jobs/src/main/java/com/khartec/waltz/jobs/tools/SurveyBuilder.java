@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.tools;
 
-import com.khartec.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.ReleaseLifecycleStatus;
 import com.khartec.waltz.model.survey.*;
@@ -35,7 +35,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static java.util.Collections.emptyList;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 

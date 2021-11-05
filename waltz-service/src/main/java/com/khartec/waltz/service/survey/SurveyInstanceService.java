@@ -19,7 +19,7 @@
 package com.khartec.waltz.service.survey;
 
 
-import com.khartec.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.data.survey.SurveyInstanceDao;
 import com.khartec.waltz.data.survey.SurveyInstanceRecipientDao;
@@ -44,10 +44,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.Checks.checkTrue;
-import static com.khartec.waltz.common.CollectionUtilities.find;
-import static com.khartec.waltz.common.OptionalUtilities.contentsEqual;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.CollectionUtilities.find;
+import static org.finos.waltz.common.OptionalUtilities.contentsEqual;
 import static com.khartec.waltz.model.survey.SurveyInstanceStateMachineFactory.simple;
 
 @Service

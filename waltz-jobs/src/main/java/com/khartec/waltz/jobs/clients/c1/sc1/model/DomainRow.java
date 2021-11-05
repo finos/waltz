@@ -18,19 +18,13 @@
 
 package com.khartec.waltz.jobs.clients.c1.sc1.model;
 
-import com.khartec.waltz.common.StringUtilities;
-import com.khartec.waltz.common.hierarchy.FlatNode;
+import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.common.hierarchy.FlatNode;
 import com.khartec.waltz.jobs.Columns;
-import com.khartec.waltz.jobs.clients.c1.sc1.parse.FlagToBoolean;
-import com.khartec.waltz.jobs.clients.c1.sc1.parse.StatusToLifecyclePhase;
 import com.khartec.waltz.model.Nullable;
-import com.khartec.waltz.model.application.LifecyclePhase;
 import org.apache.poi.ss.usermodel.Row;
 import org.immutables.value.Value;
 
-import java.util.Optional;
-
-import static com.khartec.waltz.jobs.XlsUtilities.mapStrCell;
 import static com.khartec.waltz.jobs.XlsUtilities.strVal;
 
 @Value.Immutable

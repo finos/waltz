@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.tools;
 
-import com.khartec.waltz.common.StringUtilities;
+import org.finos.waltz.common.StringUtilities;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_type.DataTypeDao;
@@ -55,9 +55,9 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.common.MapUtilities.groupBy;
-import static com.khartec.waltz.common.SetUtilities.fromCollection;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.MapUtilities.groupBy;
+import static org.finos.waltz.common.SetUtilities.fromCollection;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.utils.IdUtilities.indexByOptId;

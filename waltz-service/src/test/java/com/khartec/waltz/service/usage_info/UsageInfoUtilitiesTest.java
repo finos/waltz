@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.usage_info;
 
-import com.khartec.waltz.common.SetUtilities;
+import org.finos.waltz.common.SetUtilities;
 import com.khartec.waltz.model.system.SystemChangeSet;
 import com.khartec.waltz.model.usage_info.ImmutableUsageInfo;
 import com.khartec.waltz.model.usage_info.UsageInfo;

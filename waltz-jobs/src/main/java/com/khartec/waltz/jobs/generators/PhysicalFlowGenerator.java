@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.common.RandomUtilities;
+import org.finos.waltz.common.RandomUtilities;
 import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
 import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.EntityLifecycleStatus;
@@ -35,11 +35,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
-import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.common.MapUtilities.groupBy;
-import static com.khartec.waltz.common.RandomUtilities.randomPick;
+import static org.finos.waltz.common.CollectionUtilities.isEmpty;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.MapUtilities.groupBy;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao.owningEntityNameField;
 import static com.khartec.waltz.schema.tables.EnumValue.ENUM_VALUE;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;

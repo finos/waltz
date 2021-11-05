@@ -40,9 +40,9 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 
-import static com.khartec.waltz.common.Checks.checkNotEmpty;
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.EnumUtilities.readEnum;
+import static org.finos.waltz.common.Checks.checkNotEmpty;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.schema.Tables.EXTERNAL_IDENTIFIER;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static java.util.Optional.ofNullable;

@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.common.ListUtilities;
-import com.khartec.waltz.common.hierarchy.FlatNode;
-import com.khartec.waltz.common.hierarchy.Forest;
-import com.khartec.waltz.common.hierarchy.HierarchyUtilities;
-import com.khartec.waltz.common.hierarchy.Node;
+import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.common.hierarchy.FlatNode;
+import org.finos.waltz.common.hierarchy.Forest;
+import org.finos.waltz.common.hierarchy.HierarchyUtilities;
+import org.finos.waltz.common.hierarchy.Node;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRule;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;

@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.integration_test.inmem.dao;
 
-import com.khartec.waltz.common.CollectionUtilities;
-import com.khartec.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.common.CollectionUtilities;
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import com.khartec.waltz.data.app_group.AppGroupOrganisationalUnitDao;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
@@ -37,9 +37,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Collection;
 import java.util.List;
 
-import static com.khartec.waltz.common.CollectionUtilities.any;
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.CollectionUtilities.any;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static java.lang.String.format;

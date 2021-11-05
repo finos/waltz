@@ -30,7 +30,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.PhysicalSpecDefnSampleFile.PHYSICAL_SPEC_DEFN_SAMPLE_FILE;
 
 @Repository

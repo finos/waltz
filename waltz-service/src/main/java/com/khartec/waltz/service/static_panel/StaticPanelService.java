@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.static_panel;
 
-import com.khartec.waltz.common.ArrayUtilities;
+import org.finos.waltz.common.ArrayUtilities;
 import com.khartec.waltz.data.static_panel.StaticPanelDao;
 import com.khartec.waltz.model.staticpanel.StaticPanel;
 import org.springframework.beans.factory.annotation.Autowired;

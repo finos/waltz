@@ -27,7 +27,7 @@ import org.jooq.Select;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.Tables.CHANGE_SET;
 import static com.khartec.waltz.schema.tables.ChangeUnit.CHANGE_UNIT;
 

@@ -26,7 +26,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.util.Arrays;
 
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
 
 
 public class ScenarioHarness {

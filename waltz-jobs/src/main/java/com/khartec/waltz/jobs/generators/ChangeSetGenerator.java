@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.common.RandomUtilities;
+import org.finos.waltz.common.RandomUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.schema.tables.records.ChangeSetRecord;
@@ -34,7 +34,7 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.RandomUtilities.randomPick;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
 import static com.khartec.waltz.schema.tables.ChangeSet.CHANGE_SET;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;

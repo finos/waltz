@@ -1,6 +1,6 @@
 package com.khartec.waltz.jobs.tools.importers;
 
-import com.khartec.waltz.common.MapUtilities;
+import org.finos.waltz.common.MapUtilities;
 import org.immutables.value.Value;
 
 import java.util.Collection;

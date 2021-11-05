@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.taxonomy_management;
 
-import com.khartec.waltz.common.Checks;
+import org.finos.waltz.common.Checks;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.taxonomy_management.TaxonomyChangeCommand;
 import com.khartec.waltz.model.taxonomy_management.TaxonomyChangePreview;

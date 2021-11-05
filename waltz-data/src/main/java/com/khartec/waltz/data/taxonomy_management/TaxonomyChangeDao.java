@@ -40,9 +40,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
-import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
-import static com.khartec.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
+import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static org.finos.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.data.InlineSelectFieldFactory.mkNameField;
 import static com.khartec.waltz.data.JooqUtilities.readRef;
 import static com.khartec.waltz.schema.tables.TaxonomyChange.TAXONOMY_CHANGE;

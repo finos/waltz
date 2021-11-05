@@ -32,7 +32,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import java.util.List;
 import java.util.Optional;
 
-import static com.khartec.waltz.common.FunctionUtilities.time;
+import static org.finos.waltz.common.FunctionUtilities.time;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static com.khartec.waltz.schema.Tables.CHANGE_LOG;

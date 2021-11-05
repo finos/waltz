@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.extracts;
 
-import com.khartec.waltz.common.SetUtilities;
+import org.finos.waltz.common.SetUtilities;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.data.survey.SurveyQuestionDao;
 import com.khartec.waltz.model.EntityKind;
@@ -47,13 +47,13 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.common.CollectionUtilities.first;
-import static com.khartec.waltz.common.EnumUtilities.names;
-import static com.khartec.waltz.common.ListUtilities.*;
-import static com.khartec.waltz.common.MapUtilities.indexBy;
-import static com.khartec.waltz.common.SetUtilities.asSet;
-import static com.khartec.waltz.common.SetUtilities.fromArray;
-import static com.khartec.waltz.common.StringUtilities.mkSafe;
+import static org.finos.waltz.common.CollectionUtilities.first;
+import static org.finos.waltz.common.EnumUtilities.names;
+import static org.finos.waltz.common.ListUtilities.*;
+import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.fromArray;
+import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.tables.SurveyInstance.SURVEY_INSTANCE;
 import static com.khartec.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
 import static com.khartec.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;

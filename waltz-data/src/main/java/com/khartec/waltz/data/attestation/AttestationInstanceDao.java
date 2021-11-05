@@ -42,8 +42,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
@@ -459,10 +459,10 @@ public class AttestationInstanceDao {
                 .entrySet()
                 .stream()
                 .collect(groupingBy(
-                        t -> t.getKey().limit2(),
-                        mapping(t -> ImmutableAttestationCount.builder()
-                                .key(t.getKey().v3)
-                                .count(t.getValue().intValue())
+                        entry -> entry.getKey().limit2(),
+                        mapping(entry -> (AttestationCount) ImmutableAttestationCount.builder()
+                                .key(entry.getKey().v3)
+                                .count(entry.getValue().intValue())
                                 .build(),
                                 toSet())));
 

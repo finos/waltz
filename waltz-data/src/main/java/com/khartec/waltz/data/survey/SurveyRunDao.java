@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.data.survey;
 
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.StringUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.StringUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
@@ -35,10 +35,10 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
-import static com.khartec.waltz.common.StringUtilities.join;
-import static com.khartec.waltz.common.StringUtilities.splitThenMap;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
+import static org.finos.waltz.common.StringUtilities.join;
+import static org.finos.waltz.common.StringUtilities.splitThenMap;
 import static com.khartec.waltz.schema.Tables.*;
 
 @Repository

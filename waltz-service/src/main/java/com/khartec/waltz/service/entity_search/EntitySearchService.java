@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.entity_search;
 
-import com.khartec.waltz.common.StringUtilities;
+import org.finos.waltz.common.StringUtilities;
 import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.data.SearchUtilities;
 import com.khartec.waltz.model.*;
@@ -46,7 +46,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static java.util.stream.Collectors.toList;
 import static org.jooq.lambda.Unchecked.supplier;
 

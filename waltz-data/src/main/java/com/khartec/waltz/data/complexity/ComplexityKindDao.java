@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.data.complexity;
 
-import com.khartec.waltz.common.Checks;
+import org.finos.waltz.common.Checks;
 import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.model.complexity.ComplexityKind;
 import com.khartec.waltz.model.complexity.ImmutableComplexityKind;

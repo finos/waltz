@@ -31,9 +31,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
-import static com.khartec.waltz.common.EnumUtilities.readEnum;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
+import static org.finos.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.schema.tables.ServerUsage.SERVER_USAGE;
 
 

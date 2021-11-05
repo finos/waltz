@@ -34,7 +34,7 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.function.Function;
 
-import static com.khartec.waltz.common.CollectionUtilities.map;
+import static org.finos.waltz.common.CollectionUtilities.map;
 import static com.khartec.waltz.schema.tables.ExternalIdentifier.EXTERNAL_IDENTIFIER;
 
 @Repository

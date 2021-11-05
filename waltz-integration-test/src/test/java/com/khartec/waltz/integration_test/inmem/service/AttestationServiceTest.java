@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.integration_test.inmem.service;
 
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.OptionalUtilities;
-import com.khartec.waltz.common.exception.UpdateFailedException;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.OptionalUtilities;
+import org.finos.waltz.common.exception.UpdateFailedException;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.integration_test.inmem.helpers.AppHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.InvolvementHelper;
@@ -39,8 +39,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Optional;
 
-import static com.khartec.waltz.common.CollectionUtilities.first;
-import static com.khartec.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.CollectionUtilities.first;
+import static org.finos.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
 import static com.khartec.waltz.model.EntityReference.mkRef;

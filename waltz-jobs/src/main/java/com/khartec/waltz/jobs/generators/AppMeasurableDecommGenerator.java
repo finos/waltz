@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.LoggingUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.LoggingUtilities;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.measurable_category.MeasurableCategoryDao;
 import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
@@ -38,13 +38,13 @@ import java.sql.Date;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.CollectionUtilities.first;
-import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
-import static com.khartec.waltz.common.DateTimeUtilities.today;
-import static com.khartec.waltz.common.MapUtilities.groupBy;
-import static com.khartec.waltz.common.RandomUtilities.*;
-import static com.khartec.waltz.common.SetUtilities.map;
-import static com.khartec.waltz.common.SetUtilities.minus;
+import static org.finos.waltz.common.CollectionUtilities.first;
+import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
+import static org.finos.waltz.common.DateTimeUtilities.today;
+import static org.finos.waltz.common.MapUtilities.groupBy;
+import static org.finos.waltz.common.RandomUtilities.*;
+import static org.finos.waltz.common.SetUtilities.map;
+import static org.finos.waltz.common.SetUtilities.minus;
 import static com.khartec.waltz.schema.Tables.MEASURABLE_RATING_PLANNED_DECOMMISSION;
 import static com.khartec.waltz.schema.Tables.MEASURABLE_RATING_REPLACEMENT;
 import static java.util.stream.Collectors.collectingAndThen;

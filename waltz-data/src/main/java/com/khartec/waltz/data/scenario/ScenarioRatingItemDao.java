@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.data.scenario;
 
-import com.khartec.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.scenario.ChangeScenarioCommand;
 import com.khartec.waltz.model.scenario.CloneScenarioCommand;
@@ -33,7 +33,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.Collection;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.JooqUtilities.readRef;
 import static com.khartec.waltz.schema.tables.Scenario.SCENARIO;
 import static com.khartec.waltz.schema.tables.ScenarioRatingItem.SCENARIO_RATING_ITEM;

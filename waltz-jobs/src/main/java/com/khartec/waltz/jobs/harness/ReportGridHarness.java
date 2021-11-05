@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.common.FunctionUtilities;
+import org.finos.waltz.common.FunctionUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.report_grid.ReportGridDao;
 import com.khartec.waltz.model.EntityKind;
@@ -31,7 +31,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.util.Set;
 
-import static com.khartec.waltz.common.CollectionUtilities.first;
+import static org.finos.waltz.common.CollectionUtilities.first;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 

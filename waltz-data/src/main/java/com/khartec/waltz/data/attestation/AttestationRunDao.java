@@ -35,11 +35,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.DateTimeUtilities.*;
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.common.StringUtilities.join;
-import static com.khartec.waltz.common.StringUtilities.splitThenMap;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.*;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.StringUtilities.join;
+import static org.finos.waltz.common.StringUtilities.splitThenMap;
 import static com.khartec.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
 import static com.khartec.waltz.schema.tables.AttestationInstanceRecipient.ATTESTATION_INSTANCE_RECIPIENT;
 import static com.khartec.waltz.schema.tables.AttestationRun.ATTESTATION_RUN;

@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.data.source_data_rating;
 
-import com.khartec.waltz.common.Checks;
+import org.finos.waltz.common.Checks;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.model.source_data_rating.ImmutableSourceDataRating;

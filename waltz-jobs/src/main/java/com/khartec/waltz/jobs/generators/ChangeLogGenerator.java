@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.common.SetUtilities;
+import org.finos.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.schema.tables.records.ChangeLogRecord;
@@ -34,8 +34,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.common.RandomUtilities.randomIntBetween;
-import static com.khartec.waltz.common.RandomUtilities.randomPick;
+import static org.finos.waltz.common.RandomUtilities.randomIntBetween;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG;
 import static com.khartec.waltz.schema.tables.Person.PERSON;

@@ -34,8 +34,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.SetUtilities.orderedUnion;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.SetUtilities.orderedUnion;
 import static com.khartec.waltz.data.JooqUtilities.mkBasicTermSearch;
 import static com.khartec.waltz.data.JooqUtilities.mkStartsWithTermSearch;
 import static com.khartec.waltz.data.SearchUtilities.mkRelevancyComparator;

@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.model;
 
-import com.khartec.waltz.common.ListUtilities;
-import com.khartec.waltz.common.SetUtilities;
+import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.common.SetUtilities;
 import com.khartec.waltz.model.application.ApplicationIdSelectionOptions;
 import com.khartec.waltz.model.application.ApplicationKind;
 import com.khartec.waltz.model.application.ImmutableApplicationIdSelectionOptions;

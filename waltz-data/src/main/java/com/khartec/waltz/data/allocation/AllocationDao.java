@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.data.allocation;
 
-import com.khartec.waltz.common.CollectionUtilities;
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.ListUtilities;
+import org.finos.waltz.common.CollectionUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.ListUtilities;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.allocation.Allocation;
@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.khartec.waltz.common.MapUtilities.groupBy;
+import static org.finos.waltz.common.MapUtilities.groupBy;
 import static com.khartec.waltz.data.JooqUtilities.readRef;
 import static com.khartec.waltz.schema.Tables.ALLOCATION;
 

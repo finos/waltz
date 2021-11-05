@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.entity_alias;
 
-import com.khartec.waltz.common.Checks;
+import org.finos.waltz.common.Checks;
 import com.khartec.waltz.data.entity_alias.EntityAliasDao;
 import com.khartec.waltz.model.EntityReference;
 import org.springframework.beans.factory.annotation.Autowired;

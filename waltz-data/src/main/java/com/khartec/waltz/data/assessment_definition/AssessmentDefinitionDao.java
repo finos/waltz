@@ -19,7 +19,7 @@
 package com.khartec.waltz.data.assessment_definition;
 
 
-import com.khartec.waltz.common.StringUtilities;
+import org.finos.waltz.common.StringUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
 import com.khartec.waltz.model.assessment_definition.AssessmentVisibility;
@@ -35,9 +35,9 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
-import static com.khartec.waltz.common.StringUtilities.mkSafe;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.tables.AssessmentDefinition.ASSESSMENT_DEFINITION;
 
 

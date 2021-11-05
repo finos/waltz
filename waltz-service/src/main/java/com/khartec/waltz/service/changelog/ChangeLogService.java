@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.changelog;
 
-import com.khartec.waltz.common.CollectionUtilities;
+import org.finos.waltz.common.CollectionUtilities;
 import com.khartec.waltz.data.DBExecutorPoolInterface;
 import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.GenericSelector;
@@ -49,8 +49,8 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.concurrent.Future;
 
-import static com.khartec.waltz.common.Checks.*;
-import static com.khartec.waltz.common.SetUtilities.*;
+import static org.finos.waltz.common.Checks.*;
+import static org.finos.waltz.common.SetUtilities.*;
 import static com.khartec.waltz.model.EntityKind.*;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.EntityReferenceUtilities.safeName;

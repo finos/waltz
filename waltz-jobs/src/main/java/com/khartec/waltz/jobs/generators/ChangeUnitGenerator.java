@@ -18,10 +18,10 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.ListUtilities;
-import com.khartec.waltz.common.MapUtilities;
-import com.khartec.waltz.common.StringUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.common.MapUtilities;
+import org.finos.waltz.common.StringUtilities;
 import com.khartec.waltz.data.change_unit.ChangeUnitDao;
 import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowDao;
@@ -45,8 +45,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.khartec.waltz.common.RandomUtilities.*;
-import static com.khartec.waltz.common.StringUtilities.joinUsing;
+import static org.finos.waltz.common.RandomUtilities.*;
+import static org.finos.waltz.common.StringUtilities.joinUsing;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.ChangeSet.CHANGE_SET;
 import static com.khartec.waltz.schema.tables.ChangeUnit.CHANGE_UNIT;

@@ -36,8 +36,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.MapUtilities.groupAndThen;
-import static com.khartec.waltz.common.SetUtilities.map;
+import static org.finos.waltz.common.MapUtilities.groupAndThen;
+import static org.finos.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static org.jooq.impl.DSL.name;
 

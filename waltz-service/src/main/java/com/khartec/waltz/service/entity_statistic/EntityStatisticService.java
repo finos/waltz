@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.entity_statistic;
 
-import com.khartec.waltz.common.Checks;
+import org.finos.waltz.common.Checks;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticDao;
 import com.khartec.waltz.data.entity_statistic.EntityStatisticDefinitionDao;
@@ -44,9 +44,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.ListUtilities.concat;
-import static com.khartec.waltz.common.MapUtilities.groupBy;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.ListUtilities.concat;
+import static org.finos.waltz.common.MapUtilities.groupBy;
 import static java.util.Collections.emptyList;
 
 @Service

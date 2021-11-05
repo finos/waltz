@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web;
 
-import com.khartec.waltz.common.SetUtilities;
+import org.finos.waltz.common.SetUtilities;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaModifier;
@@ -33,9 +33,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.khartec.waltz.common.CollectionUtilities.any;
-import static com.khartec.waltz.common.LoggingUtilities.configureLogging;
-import static com.khartec.waltz.common.SetUtilities.map;
+import static org.finos.waltz.common.CollectionUtilities.any;
+import static org.finos.waltz.common.LoggingUtilities.configureLogging;
+import static org.finos.waltz.common.SetUtilities.map;
 
 /**
  * It is advisable to add a rule into your logback config to switch

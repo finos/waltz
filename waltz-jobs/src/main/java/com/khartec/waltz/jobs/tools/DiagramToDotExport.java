@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.khartec.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.MapUtilities.indexBy;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 
 /**

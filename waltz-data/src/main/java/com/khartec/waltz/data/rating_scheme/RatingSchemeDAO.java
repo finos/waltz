@@ -31,9 +31,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.MapUtilities.groupBy;
-import static com.khartec.waltz.common.StringUtilities.firstChar;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.MapUtilities.groupBy;
+import static org.finos.waltz.common.StringUtilities.firstChar;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
 import static com.khartec.waltz.schema.tables.RatingScheme.RATING_SCHEME;

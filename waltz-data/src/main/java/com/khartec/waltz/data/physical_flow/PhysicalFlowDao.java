@@ -38,11 +38,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.checkFalse;
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
-import static com.khartec.waltz.common.EnumUtilities.readEnum;
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.Checks.checkFalse;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
+import static org.finos.waltz.common.EnumUtilities.readEnum;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
 import static com.khartec.waltz.model.EntityReference.mkRef;

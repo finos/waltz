@@ -38,10 +38,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.SetUtilities.fromCollection;
-import static com.khartec.waltz.common.StreamUtilities.batchProcessingCollector;
-import static com.khartec.waltz.common.StringUtilities.mkSafe;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.SetUtilities.fromCollection;
+import static org.finos.waltz.common.StreamUtilities.batchProcessingCollector;
+import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
 

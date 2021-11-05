@@ -19,8 +19,8 @@
 package com.khartec.waltz.jobs.generators;
 
 
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.RandomUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.RandomUtilities;
 import com.khartec.waltz.data.app_group.AppGroupDao;
 import com.khartec.waltz.data.involvement_kind.InvolvementKindDao;
 import com.khartec.waltz.data.person.PersonDao;
@@ -52,10 +52,10 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
-import static com.khartec.waltz.common.Checks.checkFalse;
-import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
-import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
-import static com.khartec.waltz.common.RandomUtilities.randomPick;
+import static org.finos.waltz.common.Checks.checkFalse;
+import static org.finos.waltz.common.CollectionUtilities.isEmpty;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
 import static com.khartec.waltz.schema.Tables.SURVEY_RUN;
 import static com.khartec.waltz.schema.tables.Person.PERSON;

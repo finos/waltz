@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.common.SetUtilities;
+import org.finos.waltz.common.SetUtilities;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.survey.*;
 import com.khartec.waltz.service.DIConfiguration;

@@ -1,7 +1,7 @@
 package com.khartec.waltz.integration_test.inmem;
 
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.LoggingUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.LoggingUtilities;
 import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;

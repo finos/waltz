@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.survey;
 
-import com.khartec.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.data.survey.SurveyQuestionDao;
 import com.khartec.waltz.data.survey.SurveyQuestionDropdownEntryDao;
@@ -34,10 +34,10 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.Checks.checkTrue;
-import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
-import static com.khartec.waltz.common.ListUtilities.map;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.CollectionUtilities.isEmpty;
+import static org.finos.waltz.common.ListUtilities.map;
 
 @Service
 public class SurveyTemplateService {

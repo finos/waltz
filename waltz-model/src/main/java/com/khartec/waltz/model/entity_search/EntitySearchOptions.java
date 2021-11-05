@@ -26,7 +26,7 @@ import org.immutables.value.Value;
 
 import java.util.List;
 
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityLifecycleStatus.ACTIVE;
 import static com.khartec.waltz.model.EntityLifecycleStatus.PENDING;
 

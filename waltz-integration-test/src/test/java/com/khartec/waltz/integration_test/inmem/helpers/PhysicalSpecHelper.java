@@ -1,6 +1,6 @@
 package com.khartec.waltz.integration_test.inmem.helpers;
 
-import com.khartec.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.physical_specification.DataFormatKind;

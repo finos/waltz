@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.service.physical_flow;
 
-import com.khartec.waltz.common.Aliases;
-import com.khartec.waltz.common.MapUtilities;
-import com.khartec.waltz.common.StringUtilities;
+import org.finos.waltz.common.Aliases;
+import org.finos.waltz.common.MapUtilities;
+import org.finos.waltz.common.StringUtilities;
 import com.khartec.waltz.data.actor.ActorDao;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.data_type.DataTypeDao;
@@ -56,11 +56,11 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
-import static com.khartec.waltz.common.SetUtilities.fromArray;
-import static com.khartec.waltz.common.StringUtilities.isEmpty;
-import static com.khartec.waltz.common.StringUtilities.lower;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
+import static org.finos.waltz.common.SetUtilities.fromArray;
+import static org.finos.waltz.common.StringUtilities.isEmpty;
+import static org.finos.waltz.common.StringUtilities.lower;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 

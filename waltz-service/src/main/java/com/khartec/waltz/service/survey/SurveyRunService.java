@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.survey;
 
-import com.khartec.waltz.common.ListUtilities;
-import com.khartec.waltz.common.SetUtilities;
+import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.common.SetUtilities;
 import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.involvement.InvolvementDao;
@@ -41,11 +41,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.Checks.checkTrue;
-import static com.khartec.waltz.common.ListUtilities.map;
-import static com.khartec.waltz.common.MapUtilities.indexBy;
-import static com.khartec.waltz.common.SetUtilities.fromCollection;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.ListUtilities.map;
+import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.SetUtilities.fromCollection;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 

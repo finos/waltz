@@ -34,9 +34,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Date;
 import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.DateTimeUtilities.*;
-import static com.khartec.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.*;
+import static org.finos.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.data.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionDao.checkIfReadOnly;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.MeasurableRatingPlannedDecommission.MEASURABLE_RATING_PLANNED_DECOMMISSION;

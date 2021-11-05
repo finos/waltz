@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.model.usage_info;
 
-import com.khartec.waltz.common.SetUtilities;
-import com.khartec.waltz.common.StringUtilities;
+import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.common.StringUtilities;
 import com.khartec.waltz.model.system.ImmutableSystemChangeSet;
 import com.khartec.waltz.model.system.SystemChangeSet;
 import org.jooq.lambda.tuple.Tuple;
@@ -28,8 +28,8 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.CollectionUtilities.find;
-import static com.khartec.waltz.common.SetUtilities.intersection;
+import static org.finos.waltz.common.CollectionUtilities.find;
+import static org.finos.waltz.common.SetUtilities.intersection;
 
 public class UsageInfoUtilities {
 

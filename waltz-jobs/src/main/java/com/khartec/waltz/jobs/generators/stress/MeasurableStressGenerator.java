@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.generators.stress;
 
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.RandomUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.RandomUtilities;
 import com.khartec.waltz.schema.tables.records.MeasurableRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;

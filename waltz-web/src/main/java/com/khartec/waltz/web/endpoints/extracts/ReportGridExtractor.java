@@ -47,8 +47,8 @@ import java.io.StringWriter;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.khartec.waltz.common.ListUtilities.*;
-import static com.khartec.waltz.common.MapUtilities.*;
+import static org.finos.waltz.common.ListUtilities.*;
+import static org.finos.waltz.common.MapUtilities.*;
 import static com.khartec.waltz.model.utils.IdUtilities.indexById;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.extracts.ExtractorUtilities.sanitizeSheetName;

@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 import spark.Request;
 import spark.Response;
 
-import static com.khartec.waltz.common.StringUtilities.notEmpty;
+import static org.finos.waltz.common.StringUtilities.notEmpty;
 
 
 /**

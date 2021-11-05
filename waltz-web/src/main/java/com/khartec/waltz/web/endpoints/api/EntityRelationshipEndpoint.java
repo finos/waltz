@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.StreamUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.StreamUtilities;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.entity_relationship.*;
 import com.khartec.waltz.service.entity_relationship.EntityRelationshipService;
@@ -33,8 +33,8 @@ import spark.Request;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.EnumUtilities.readEnum;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 

@@ -37,10 +37,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
-import static com.khartec.waltz.common.ListUtilities.asList;
-import static com.khartec.waltz.common.SetUtilities.asSet;
-import static com.khartec.waltz.common.SetUtilities.map;
+import static org.finos.waltz.common.CollectionUtilities.isEmpty;
+import static org.finos.waltz.common.ListUtilities.asList;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.HierarchyQueryScope.CHILDREN;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;

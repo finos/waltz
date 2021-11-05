@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.database_information;
 
-import com.khartec.waltz.common.Checks;
+import org.finos.waltz.common.Checks;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.database_information.DatabaseInformationDao;
 import com.khartec.waltz.model.IdSelectionOptions;
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class DatabaseInformationService {

@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.RandomUtilities.randomPick;
-import static com.khartec.waltz.common.RandomUtilities.randomlySizedIntStream;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
+import static org.finos.waltz.common.RandomUtilities.randomlySizedIntStream;
 import static com.khartec.waltz.schema.Tables.APPLICATION_GROUP_ENTRY;
 import static com.khartec.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
 

@@ -19,7 +19,6 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.UpdateNameCommand;
 import com.khartec.waltz.model.thumbnail.ThumbnailSaveCommand;
 import com.khartec.waltz.service.thumbnail.ThumbnailService;
 import com.khartec.waltz.web.WebUtilities;
@@ -27,7 +26,7 @@ import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 

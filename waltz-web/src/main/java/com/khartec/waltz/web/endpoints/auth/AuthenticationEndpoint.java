@@ -22,7 +22,7 @@ package com.khartec.waltz.web.endpoints.auth;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.khartec.waltz.common.IOUtilities;
+import org.finos.waltz.common.IOUtilities;
 import com.khartec.waltz.model.settings.NamedSettings;
 import com.khartec.waltz.model.user.AuthenticationResponse;
 import com.khartec.waltz.model.user.ImmutableAuthenticationResponse;
@@ -42,7 +42,7 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import static com.khartec.waltz.common.MapUtilities.newHashMap;
+import static org.finos.waltz.common.MapUtilities.newHashMap;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static spark.Spark.before;
 import static spark.Spark.post;

@@ -23,7 +23,7 @@ import spark.Filter;
 
 import java.util.Optional;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 public abstract class WaltzFilter implements Filter {

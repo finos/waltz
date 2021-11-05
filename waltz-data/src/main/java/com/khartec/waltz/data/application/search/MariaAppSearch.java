@@ -30,7 +30,7 @@ import org.jooq.impl.DSL;
 
 import java.util.List;
 
-import static com.khartec.waltz.common.ListUtilities.map;
+import static org.finos.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;

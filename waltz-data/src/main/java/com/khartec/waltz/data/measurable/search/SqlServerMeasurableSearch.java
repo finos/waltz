@@ -29,7 +29,7 @@ import org.jooq.DSLContext;
 
 import java.util.List;
 
-import static com.khartec.waltz.common.StringUtilities.lower;
+import static org.finos.waltz.common.StringUtilities.lower;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 

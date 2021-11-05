@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.common.FunctionUtilities;
-import com.khartec.waltz.common.ListUtilities;
+import org.finos.waltz.common.FunctionUtilities;
+import org.finos.waltz.common.ListUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.server_information.ServerInformationDao;
 import com.khartec.waltz.model.EntityKind;

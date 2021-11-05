@@ -23,7 +23,7 @@ import com.khartec.waltz.model.change_unit.ChangeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.khartec.waltz.common.Checks.*;
+import static org.finos.waltz.common.Checks.*;
 
 public interface AttributeChangeCommandProcessor {
     Logger LOG = LoggerFactory.getLogger(AttributeChangeCommandProcessor.class);

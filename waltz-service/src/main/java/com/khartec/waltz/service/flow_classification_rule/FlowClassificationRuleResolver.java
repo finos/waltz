@@ -24,11 +24,11 @@ import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 
 import java.util.*;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.CollectionUtilities.head;
-import static com.khartec.waltz.common.CollectionUtilities.sort;
-import static com.khartec.waltz.common.MapUtilities.groupAndThen;
-import static com.khartec.waltz.common.MapUtilities.isEmpty;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.CollectionUtilities.head;
+import static org.finos.waltz.common.CollectionUtilities.sort;
+import static org.finos.waltz.common.MapUtilities.groupAndThen;
+import static org.finos.waltz.common.MapUtilities.isEmpty;
 
 
 public class FlowClassificationRuleResolver {

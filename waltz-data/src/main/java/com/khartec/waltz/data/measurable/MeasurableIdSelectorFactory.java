@@ -30,7 +30,7 @@ import com.khartec.waltz.schema.tables.MeasurableRating;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
-import static com.khartec.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.Checks.checkTrue;
 import static com.khartec.waltz.data.SelectorUtilities.ensureScopeIsExact;
 import static com.khartec.waltz.data.SelectorUtilities.mkApplicationConditions;
 import static com.khartec.waltz.schema.Tables.*;

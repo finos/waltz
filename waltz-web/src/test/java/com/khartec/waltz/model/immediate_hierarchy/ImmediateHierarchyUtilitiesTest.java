@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.model.immediate_hierarchy;
 
-import com.khartec.waltz.common.ListUtilities;
+import org.finos.waltz.common.ListUtilities;
 import com.khartec.waltz.model.IdProvider;
 import com.khartec.waltz.model.ParentIdProvider;
 import org.junit.Test;

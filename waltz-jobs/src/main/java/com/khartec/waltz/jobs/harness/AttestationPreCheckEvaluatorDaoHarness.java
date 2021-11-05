@@ -24,7 +24,7 @@ import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.attestation.AttestationPreCheckService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static com.khartec.waltz.common.FunctionUtilities.time;
+import static org.finos.waltz.common.FunctionUtilities.time;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 
 

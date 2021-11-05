@@ -32,8 +32,8 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.DigestUtilities.digest;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DigestUtilities.digest;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 

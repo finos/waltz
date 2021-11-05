@@ -19,7 +19,7 @@
 package com.khartec.waltz.data.report_grid;
 
 
-import com.khartec.waltz.common.SetUtilities;
+import org.finos.waltz.common.SetUtilities;
 import com.khartec.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -39,12 +39,12 @@ import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.common.MapUtilities.groupBy;
-import static com.khartec.waltz.common.SetUtilities.map;
-import static com.khartec.waltz.common.SetUtilities.union;
-import static com.khartec.waltz.common.StringUtilities.join;
+import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.MapUtilities.groupBy;
+import static org.finos.waltz.common.SetUtilities.map;
+import static org.finos.waltz.common.SetUtilities.union;
+import static org.finos.waltz.common.StringUtilities.join;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.survey.SurveyInstanceStatus.APPROVED;
 import static com.khartec.waltz.model.survey.SurveyInstanceStatus.COMPLETED;

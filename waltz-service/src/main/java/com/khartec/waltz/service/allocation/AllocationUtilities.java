@@ -30,7 +30,7 @@ import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import java.util.Collection;
 import java.util.Set;
 
-import static com.khartec.waltz.common.SetUtilities.map;
+import static org.finos.waltz.common.SetUtilities.map;
 
 public class AllocationUtilities {
 

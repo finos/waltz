@@ -39,8 +39,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.StringUtilities.firstChar;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.StringUtilities.firstChar;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;

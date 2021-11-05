@@ -18,10 +18,10 @@
 
 package com.khartec.waltz.service.flow_diagram;
 
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.ListUtilities;
-import com.khartec.waltz.common.RandomUtilities;
-import com.khartec.waltz.common.SetUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.common.RandomUtilities;
+import org.finos.waltz.common.SetUtilities;
 import com.khartec.waltz.data.actor.ActorDao;
 import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.data.change_initiative.ChangeInitiativeDao;
@@ -58,11 +58,11 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
-import static com.khartec.waltz.common.ListUtilities.map;
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.common.StringUtilities.isEmpty;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
+import static org.finos.waltz.common.ListUtilities.map;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.StringUtilities.isEmpty;
 import static com.khartec.waltz.model.EntityKind.FLOW_DIAGRAM;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;

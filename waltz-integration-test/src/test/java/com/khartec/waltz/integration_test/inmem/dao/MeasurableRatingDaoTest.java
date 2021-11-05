@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.integration_test.inmem.dao;
 
-import com.khartec.waltz.common.exception.NotFoundException;
+import org.finos.waltz.common.exception.NotFoundException;
 import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.integration_test.inmem.helpers.AppHelper;
@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-import static com.khartec.waltz.common.CollectionUtilities.first;
+import static org.finos.waltz.common.CollectionUtilities.first;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;

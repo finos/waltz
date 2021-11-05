@@ -1,9 +1,7 @@
 package com.khartec.waltz.integration_test.inmem.helpers;
 
-import com.khartec.waltz.common.CollectionUtilities;
-import com.khartec.waltz.common.exception.InsufficientPrivelegeException;
-import com.khartec.waltz.data.app_group.AppGroupDao;
-import com.khartec.waltz.data.app_group.AppGroupEntryDao;
+import org.finos.waltz.common.CollectionUtilities;
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.app_group.AppGroup;
 import com.khartec.waltz.model.app_group.AppGroupKind;

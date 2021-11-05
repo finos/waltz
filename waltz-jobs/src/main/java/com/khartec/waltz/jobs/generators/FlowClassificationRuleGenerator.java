@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.common.ColorUtilities.HexStrings;
-import com.khartec.waltz.common.RandomUtilities;
+import org.finos.waltz.common.ColorUtilities.HexStrings;
+import org.finos.waltz.common.RandomUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import com.khartec.waltz.schema.tables.records.FlowClassificationRecord;
@@ -34,10 +34,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.khartec.waltz.common.DateTimeUtilities.nowUtcTimestamp;
-import static com.khartec.waltz.common.ListUtilities.asList;
-import static com.khartec.waltz.common.RandomUtilities.randomPick;
-import static com.khartec.waltz.common.StringUtilities.capitalise;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
+import static org.finos.waltz.common.ListUtilities.asList;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
+import static org.finos.waltz.common.StringUtilities.capitalise;
 import static com.khartec.waltz.schema.Tables.FLOW_CLASSIFICATION;
 import static com.khartec.waltz.schema.Tables.FLOW_CLASSIFICATION_RULE;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;

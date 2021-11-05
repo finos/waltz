@@ -29,8 +29,8 @@ import org.springframework.context.ApplicationContext;
 import java.util.Map;
 import java.util.Set;
 
-import static com.khartec.waltz.common.RandomUtilities.getRandom;
-import static com.khartec.waltz.common.RandomUtilities.randomPick;
+import static org.finos.waltz.common.RandomUtilities.getRandom;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
 
 /**

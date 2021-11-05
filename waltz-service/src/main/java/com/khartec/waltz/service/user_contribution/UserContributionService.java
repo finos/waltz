@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.user_contribution;
 
-import com.khartec.waltz.common.ListUtilities;
+import org.finos.waltz.common.ListUtilities;
 import com.khartec.waltz.data.changelog.ChangeLogDao;
 import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.model.person.Person;
@@ -30,10 +30,10 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.List;
 
-import static com.khartec.waltz.common.Checks.checkNotEmpty;
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.ListUtilities.map;
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.Checks.checkNotEmpty;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.ListUtilities.map;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.service.user_contribution.UserContributionUtilities.getOrderedListOf10;
 
 @Service

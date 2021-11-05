@@ -18,26 +18,21 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.common.ArrayUtilities;
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.ListUtilities;
-import com.khartec.waltz.common.RandomUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.common.RandomUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.schema.tables.records.BookmarkRecord;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
 
-import javax.xml.stream.events.DTD;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import static com.khartec.waltz.common.RandomUtilities.randomPick;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
 import static com.khartec.waltz.schema.tables.Bookmark.BOOKMARK;

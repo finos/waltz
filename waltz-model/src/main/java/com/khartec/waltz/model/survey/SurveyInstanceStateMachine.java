@@ -1,18 +1,10 @@
 package com.khartec.waltz.model.survey;
 
-import com.khartec.waltz.model.exceptions.NotAuthorizedException;
-import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.BiFunction;
 
-import static com.khartec.waltz.common.Checks.checkTrue;
-import static com.khartec.waltz.model.survey.SurveyInstanceAction.*;
 import static com.khartec.waltz.model.survey.SurveyInstanceStateTransition.transition;
-import static com.khartec.waltz.model.survey.SurveyInstanceStatus.*;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 

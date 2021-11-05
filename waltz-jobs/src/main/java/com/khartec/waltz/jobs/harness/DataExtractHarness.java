@@ -31,7 +31,7 @@ import org.jooq.*;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
 import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;

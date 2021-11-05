@@ -18,10 +18,10 @@
 
 package com.khartec.waltz.jobs.tools;
 
-import com.khartec.waltz.common.ArrayUtilities;
-import com.khartec.waltz.common.DebugUtilities;
-import com.khartec.waltz.common.IOUtilities;
-import com.khartec.waltz.common.StreamUtilities.Siphon;
+import org.finos.waltz.common.ArrayUtilities;
+import org.finos.waltz.common.DebugUtilities;
+import org.finos.waltz.common.IOUtilities;
+import org.finos.waltz.common.StreamUtilities.Siphon;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.application.LifecyclePhase;
 import com.khartec.waltz.model.external_identifier.ExternalIdValue;
@@ -39,9 +39,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.MapUtilities.countBy;
-import static com.khartec.waltz.common.MapUtilities.indexBy;
-import static com.khartec.waltz.common.StreamUtilities.mkSiphon;
+import static org.finos.waltz.common.MapUtilities.countBy;
+import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.StreamUtilities.mkSiphon;
 
 public class InvolvementImporter {
     private static final ClassLoader classLoader = InvolvementImporter.class.getClassLoader();

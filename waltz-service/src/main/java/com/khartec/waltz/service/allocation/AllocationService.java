@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.allocation;
 
-import com.khartec.waltz.common.ListUtilities;
+import org.finos.waltz.common.ListUtilities;
 import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.allocation.AllocationDao;
 import com.khartec.waltz.model.EntityReference;
@@ -37,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityKind.ALLOCATION_SCHEME;
 import static com.khartec.waltz.model.EntityKind.MEASURABLE;
 import static com.khartec.waltz.model.EntityReference.mkRef;

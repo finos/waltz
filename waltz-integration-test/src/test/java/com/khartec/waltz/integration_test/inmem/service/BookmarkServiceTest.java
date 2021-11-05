@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.integration_test.inmem.service;
 
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.SetUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.SetUtilities;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -35,8 +35,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Set;
 
-import static com.khartec.waltz.common.CollectionUtilities.first;
-import static com.khartec.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.CollectionUtilities.first;
+import static org.finos.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;

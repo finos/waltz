@@ -19,9 +19,9 @@
 package com.khartec.waltz.service.data_flow_decorator;
 
 
-import com.khartec.waltz.common.Checks;
-import com.khartec.waltz.common.ListUtilities;
-import com.khartec.waltz.common.SetUtilities;
+import org.finos.waltz.common.Checks;
+import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.common.SetUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.data_flow_decorator.LogicalFlowDecoratorSummaryDao;
 import com.khartec.waltz.data.data_type.DataTypeDao;
@@ -50,14 +50,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.common.Checks.checkNotEmpty;
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.CollectionUtilities.map;
-import static com.khartec.waltz.common.DateTimeUtilities.nowUtc;
-import static com.khartec.waltz.common.ListUtilities.asList;
-import static com.khartec.waltz.common.MapUtilities.indexBy;
-import static com.khartec.waltz.common.SetUtilities.asSet;
-import static com.khartec.waltz.common.SetUtilities.union;
+import static org.finos.waltz.common.Checks.checkNotEmpty;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.CollectionUtilities.map;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
+import static org.finos.waltz.common.ListUtilities.asList;
+import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.SetUtilities.union;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.FlowDirection.*;
 import static com.khartec.waltz.model.utils.IdUtilities.indexById;

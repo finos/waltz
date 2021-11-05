@@ -28,7 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.checkNotEmpty;
+import static org.finos.waltz.common.Checks.checkNotEmpty;
 
 @Service
 public class RoleService {

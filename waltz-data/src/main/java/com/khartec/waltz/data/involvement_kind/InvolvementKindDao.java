@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.data.involvement_kind;
 
-import com.khartec.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.involvement_kind.ImmutableInvolvementKind;
@@ -38,8 +38,8 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.function.Function;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.Checks.checkOptionalIsPresent;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkOptionalIsPresent;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
 import static com.khartec.waltz.schema.tables.KeyInvolvementKind.KEY_INVOLVEMENT_KIND;

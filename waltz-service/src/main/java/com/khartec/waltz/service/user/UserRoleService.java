@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.user;
 
-import com.khartec.waltz.common.SetUtilities;
-import com.khartec.waltz.common.StringUtilities;
+import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.common.StringUtilities;
 import com.khartec.waltz.data.user.UserRoleDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.Operation;
@@ -41,9 +41,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.CollectionUtilities.sort;
-import static com.khartec.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.CollectionUtilities.sort;
+import static org.finos.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static java.lang.String.format;
 

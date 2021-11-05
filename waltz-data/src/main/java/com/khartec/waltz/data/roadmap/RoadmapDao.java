@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.data.roadmap;
 
-import com.khartec.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.scenario.ScenarioDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
@@ -41,10 +41,10 @@ import java.util.Comparator;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.EnumUtilities.readEnum;
-import static com.khartec.waltz.common.SetUtilities.asSet;
-import static com.khartec.waltz.common.StreamUtilities.concat;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.EnumUtilities.readEnum;
+import static org.finos.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.StreamUtilities.concat;
 import static com.khartec.waltz.data.InlineSelectFieldFactory.mkNameField;
 import static com.khartec.waltz.data.JooqUtilities.readRef;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;

@@ -20,8 +20,6 @@ package com.khartec.waltz.data.licence;
 
 
 import com.khartec.waltz.data.JooqUtilities;
-import com.khartec.waltz.model.ApprovalStatus;
-import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.licence.ImmutableLicence;
 import com.khartec.waltz.model.licence.Licence;
@@ -35,12 +33,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Licence.LICENCE;
 import static com.khartec.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
-import static com.khartec.waltz.schema.tables.SoftwareVersion.SOFTWARE_VERSION;
 import static com.khartec.waltz.schema.tables.SoftwareVersionLicence.SOFTWARE_VERSION_LICENCE;
 
 

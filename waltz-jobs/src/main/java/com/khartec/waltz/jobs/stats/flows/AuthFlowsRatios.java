@@ -17,8 +17,8 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.util.Map;
 
-import static com.khartec.waltz.common.CollectionUtilities.sumInts;
-import static com.khartec.waltz.common.StringUtilities.join;
+import static org.finos.waltz.common.CollectionUtilities.sumInts;
+import static org.finos.waltz.common.StringUtilities.join;
 import static java.util.stream.Collectors.joining;
 import static org.jooq.lambda.Seq.seq;
 import static org.jooq.lambda.tuple.Tuple.tuple;

@@ -43,10 +43,10 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.ListUtilities.filter;
-import static com.khartec.waltz.common.ListUtilities.isEmpty;
-import static com.khartec.waltz.common.SetUtilities.map;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.ListUtilities.filter;
+import static org.finos.waltz.common.ListUtilities.isEmpty;
+import static org.finos.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.model.utils.IdUtilities.indexById;
 
 @Service

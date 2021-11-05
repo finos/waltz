@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.data.scenario;
 
-import com.khartec.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.ReleaseLifecycleStatus;
 import com.khartec.waltz.model.scenario.CloneScenarioCommand;
@@ -36,8 +36,8 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.function.BiFunction;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.DateTimeUtilities.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.*;
 import static com.khartec.waltz.schema.tables.Scenario.SCENARIO;
 
 @Repository

@@ -34,7 +34,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 import static java.util.stream.Collectors.toList;

@@ -33,8 +33,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 import java.util.List;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.EnumUtilities.readEnum;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.schema.tables.DatabaseUsage.DATABASE_USAGE;
 
 

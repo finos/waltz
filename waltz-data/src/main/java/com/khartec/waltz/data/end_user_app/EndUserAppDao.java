@@ -31,7 +31,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.khartec.waltz.common.StringUtilities.mkSafe;
+import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
 import static java.util.Optional.ofNullable;
 

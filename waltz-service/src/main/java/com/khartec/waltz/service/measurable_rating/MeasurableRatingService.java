@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.measurable_rating;
 
-import com.khartec.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.data.measurable.MeasurableDao;
@@ -46,7 +46,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 
-import static com.khartec.waltz.common.Checks.*;
+import static org.finos.waltz.common.Checks.*;
 import static java.lang.String.format;
 
 @Service

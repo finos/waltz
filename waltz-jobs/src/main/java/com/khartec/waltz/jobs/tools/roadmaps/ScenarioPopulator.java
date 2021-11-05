@@ -1,7 +1,7 @@
 package com.khartec.waltz.jobs.tools.roadmaps;
 
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.LoggingUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.LoggingUtilities;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.AxisOrientation;
 import com.khartec.waltz.model.EntityKind;

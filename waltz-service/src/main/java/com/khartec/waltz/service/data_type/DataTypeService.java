@@ -32,7 +32,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class DataTypeService {

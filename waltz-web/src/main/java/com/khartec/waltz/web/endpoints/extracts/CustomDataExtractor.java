@@ -36,7 +36,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.khartec.waltz.common.ListUtilities.map;
+import static org.finos.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.web.endpoints.extracts.ExtractorUtilities.convertExcelToByteArray;
 import static com.khartec.waltz.web.endpoints.extracts.ExtractorUtilities.sanitizeSheetName;
 import static org.jooq.lambda.fi.util.function.CheckedConsumer.unchecked;

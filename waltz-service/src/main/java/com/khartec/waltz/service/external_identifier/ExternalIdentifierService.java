@@ -34,8 +34,8 @@ import org.springframework.stereotype.Service;
 import java.util.Set;
 import java.util.stream.IntStream;
 
-import static com.khartec.waltz.common.SetUtilities.map;
-import static com.khartec.waltz.common.SetUtilities.minus;
+import static org.finos.waltz.common.SetUtilities.map;
+import static org.finos.waltz.common.SetUtilities.minus;
 
 @Service
 public class ExternalIdentifierService {

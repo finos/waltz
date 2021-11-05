@@ -29,7 +29,7 @@ import org.jooq.lambda.tuple.Tuple2;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 public class EntityRelationshipUtilities {

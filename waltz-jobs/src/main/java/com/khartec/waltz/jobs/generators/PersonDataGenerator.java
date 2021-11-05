@@ -18,9 +18,8 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.common.ListUtilities;
-import com.khartec.waltz.common.MapUtilities;
-import com.khartec.waltz.common.RandomUtilities;
+import org.finos.waltz.common.MapUtilities;
+import org.finos.waltz.common.RandomUtilities;
 import com.khartec.waltz.model.person.ImmutablePerson;
 import com.khartec.waltz.model.person.PersonKind;
 import com.khartec.waltz.service.person.PersonService;
@@ -34,7 +33,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import static com.khartec.waltz.common.RandomUtilities.randomPick;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.Tables.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;

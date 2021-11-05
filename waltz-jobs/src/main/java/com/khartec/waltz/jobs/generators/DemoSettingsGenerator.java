@@ -27,7 +27,7 @@ import org.springframework.context.ApplicationContext;
 import java.util.List;
 import java.util.Map;
 
-import static com.khartec.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.schema.Tables.SETTINGS;
 
 public class DemoSettingsGenerator implements SampleDataGenerator {

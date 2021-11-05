@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.data.system.job_log;
 
-import com.khartec.waltz.common.Checks;
+import org.finos.waltz.common.Checks;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.system.job_log.ImmutableJobLog;
 import com.khartec.waltz.model.system.job_log.JobLog;

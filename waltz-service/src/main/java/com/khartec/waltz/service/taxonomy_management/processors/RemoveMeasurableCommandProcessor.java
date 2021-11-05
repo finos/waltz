@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.taxonomy_management.processors;
 
-import com.khartec.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.bookmark.Bookmark;
 import com.khartec.waltz.model.flow_diagram.FlowDiagramEntity;
@@ -42,8 +42,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.SetUtilities.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.SetUtilities.*;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUtilities.addToPreview;
 import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUtilities.validatePrimaryMeasurable;

@@ -1,13 +1,12 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
-import com.khartec.waltz.common.SvgUtilities;
+import org.finos.waltz.common.SvgUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.svg.SvgDiagram;
 import com.khartec.waltz.service.measurable.MeasurableService;
 import com.khartec.waltz.service.svg.SvgDiagramService;
 import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -15,8 +14,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.khartec.waltz.common.StringUtilities.isNumericLong;
-import static com.khartec.waltz.common.StringUtilities.toOptional;
+import static org.finos.waltz.common.StringUtilities.isNumericLong;
+import static org.finos.waltz.common.StringUtilities.toOptional;
 import static com.khartec.waltz.model.EntityLinkUtilities.mkExternalIdLink;
 import static com.khartec.waltz.model.EntityLinkUtilities.mkIdLink;
 import static com.khartec.waltz.web.WebUtilities.getLong;

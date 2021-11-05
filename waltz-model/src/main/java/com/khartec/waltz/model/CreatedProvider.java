@@ -19,7 +19,7 @@
 package com.khartec.waltz.model;
 
 
-import com.khartec.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
 import org.immutables.value.Value;
 
 import java.time.LocalDateTime;

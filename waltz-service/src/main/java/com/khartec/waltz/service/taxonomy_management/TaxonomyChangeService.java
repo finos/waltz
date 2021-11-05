@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.taxonomy_management;
 
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.StringUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.StringUtilities;
 import com.khartec.waltz.data.taxonomy_management.TaxonomyChangeDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -40,7 +40,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static com.khartec.waltz.common.Checks.*;
+import static org.finos.waltz.common.Checks.*;
 import static java.util.stream.Collectors.toMap;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 

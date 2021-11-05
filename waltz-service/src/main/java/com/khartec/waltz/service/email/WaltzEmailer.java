@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.service.email;
 
-import com.khartec.waltz.common.Checks;
-import com.khartec.waltz.common.IOUtilities;
-import com.khartec.waltz.common.StringUtilities;
+import org.finos.waltz.common.Checks;
+import org.finos.waltz.common.IOUtilities;
+import org.finos.waltz.common.StringUtilities;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import org.slf4j.Logger;

@@ -25,7 +25,7 @@ import com.khartec.waltz.model.command.CommandResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.khartec.waltz.common.Checks.*;
+import static org.finos.waltz.common.Checks.*;
 
 
 public interface ChangeUnitCommandProcessor {

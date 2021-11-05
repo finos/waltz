@@ -19,7 +19,7 @@
 package com.khartec.waltz.service.scheduled_job;
 
 
-import com.khartec.waltz.common.ExcludeFromIntegrationTesting;
+import org.finos.waltz.common.ExcludeFromIntegrationTesting;
 import com.khartec.waltz.data.scheduled_job.ScheduledJobDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.scheduled_job.JobKey;
@@ -38,7 +38,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.function.Consumer;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @ExcludeFromIntegrationTesting
 @Service

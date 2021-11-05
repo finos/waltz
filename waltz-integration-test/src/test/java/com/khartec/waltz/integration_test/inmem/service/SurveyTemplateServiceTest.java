@@ -19,8 +19,8 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
-import static com.khartec.waltz.common.CollectionUtilities.find;
-import static com.khartec.waltz.common.StringUtilities.lower;
+import static org.finos.waltz.common.CollectionUtilities.find;
+import static org.finos.waltz.common.StringUtilities.lower;
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
 import static com.khartec.waltz.model.EntityReference.mkRef;

@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.data;
 
-import com.khartec.waltz.common.ListUtilities;
+import org.finos.waltz.common.ListUtilities;
 import org.junit.Test;
 
 import java.util.ArrayList;

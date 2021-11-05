@@ -12,8 +12,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static com.khartec.waltz.common.ListUtilities.asList;
-import static com.khartec.waltz.common.ListUtilities.map;
+import static org.finos.waltz.common.ListUtilities.asList;
+import static org.finos.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;

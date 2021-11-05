@@ -26,8 +26,8 @@ import org.immutables.value.Value;
 
 import java.util.Map;
 
-import static com.khartec.waltz.common.Checks.checkTrue;
-import static com.khartec.waltz.common.StringUtilities.isEmpty;
+import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.StringUtilities.isEmpty;
 
 @Value.Immutable
 @JsonSerialize(as =  ImmutableTaxonomyChangeCommand.class)

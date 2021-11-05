@@ -40,9 +40,9 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.CollectionUtilities.sort;
-import static com.khartec.waltz.common.SetUtilities.orderedUnion;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.CollectionUtilities.sort;
+import static org.finos.waltz.common.SetUtilities.orderedUnion;
 import static com.khartec.waltz.data.JooqUtilities.*;
 import static com.khartec.waltz.data.SearchUtilities.mkRelevancyComparator;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;

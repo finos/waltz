@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.jobs.example;
 
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.IOUtilities;
-import com.khartec.waltz.common.StringUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.IOUtilities;
+import org.finos.waltz.common.StringUtilities;
 import com.khartec.waltz.jobs.Columns;
 import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
 import com.khartec.waltz.schema.tables.records.MeasurableRecord;
@@ -39,7 +39,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.common.IOUtilities.getFileResource;
+import static org.finos.waltz.common.IOUtilities.getFileResource;
 import static com.khartec.waltz.schema.Tables.*;
 
 @Service

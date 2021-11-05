@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.model.physical_specification;
 
-import com.khartec.waltz.common.Aliases;
-import com.khartec.waltz.common.EnumUtilities;
+import org.finos.waltz.common.Aliases;
+import org.finos.waltz.common.EnumUtilities;
 
 import java.util.function.Function;
 

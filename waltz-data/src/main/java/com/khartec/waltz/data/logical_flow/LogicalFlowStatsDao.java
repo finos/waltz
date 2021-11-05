@@ -45,7 +45,7 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.JooqUtilities.safeGet;
 import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
@@ -276,7 +276,11 @@ public class LogicalFlowStatsDao {
         Map<FlowDirection, Set<FlowInfo>> data = unionedData
                 .fetch()
                 .stream()
-                .collect(groupingBy(r -> FlowDirection.valueOf(r.get("direction", String.class)),
+                .collect(groupingBy(
+                        record -> {
+                            String directionStr = record.get("direction", String.class);
+                            return FlowDirection.valueOf(directionStr);
+                        },
                         mapping(r -> {
 
                             EntityReference rollupDtRef = mkRef(DATA_TYPE, r.get(rollup_dt.ID), r.get(rollup_dt.NAME));
@@ -287,7 +291,7 @@ public class LogicalFlowStatsDao {
                                     r.get("counterpart_id", Long.class),
                                     r.get("counterpart_name", String.class));
 
-                            return ImmutableFlowInfo.builder()
+                            return (FlowInfo) ImmutableFlowInfo.builder()
                                     .classificationId(r.get(FLOW_CLASSIFICATION.ID))
                                     .rollupDataType(rollupDtRef)
                                     .actualDataType(actualDtRef)

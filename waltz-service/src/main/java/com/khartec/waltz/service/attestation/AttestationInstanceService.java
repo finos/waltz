@@ -18,9 +18,7 @@
 
 package com.khartec.waltz.service.attestation;
 
-import com.khartec.waltz.common.Checks;
-import com.khartec.waltz.common.StringUtilities;
-import com.khartec.waltz.common.exception.UpdateFailedException;
+import org.finos.waltz.common.exception.UpdateFailedException;
 import com.khartec.waltz.data.GenericSelector;
 import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
@@ -46,11 +44,11 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.*;
-import static com.khartec.waltz.common.CollectionUtilities.first;
-import static com.khartec.waltz.common.CollectionUtilities.notEmpty;
-import static com.khartec.waltz.common.DateTimeUtilities.*;
-import static com.khartec.waltz.common.StringUtilities.join;
+import static org.finos.waltz.common.Checks.*;
+import static org.finos.waltz.common.CollectionUtilities.first;
+import static org.finos.waltz.common.CollectionUtilities.notEmpty;
+import static org.finos.waltz.common.DateTimeUtilities.*;
+import static org.finos.waltz.common.StringUtilities.join;
 import static com.khartec.waltz.schema.Tables.APPLICATION;
 import static java.lang.String.format;
 

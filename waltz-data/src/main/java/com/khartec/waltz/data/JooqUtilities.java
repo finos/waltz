@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.data;
 
-import com.khartec.waltz.common.SetUtilities;
-import com.khartec.waltz.common.StringUtilities;
+import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.common.StringUtilities;
 import com.khartec.waltz.model.EndOfLifeStatus;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
@@ -40,9 +40,9 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.DateTimeUtilities.toLocalDate;
-import static com.khartec.waltz.common.DateTimeUtilities.toSqlDate;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
+import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static java.util.stream.Collectors.*;
 import static org.jooq.impl.DSL.currentDate;

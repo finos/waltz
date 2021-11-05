@@ -37,9 +37,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.MapUtilities.indexBy;
-import static com.khartec.waltz.common.MapUtilities.newHashMap;
-import static com.khartec.waltz.common.StringUtilities.isEmpty;
+import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.MapUtilities.newHashMap;
+import static org.finos.waltz.common.StringUtilities.isEmpty;
 
 @Service
 public class QuestionPredicateEvaluator {

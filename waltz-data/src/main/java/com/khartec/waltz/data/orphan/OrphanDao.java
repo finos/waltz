@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.data.orphan;
 
-import com.khartec.waltz.common.ListUtilities;
+import org.finos.waltz.common.ListUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.orphan.ImmutableOrphanRelationship;
@@ -32,7 +32,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.function.BiFunction;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
 import static com.khartec.waltz.model.EntityReference.mkRef;

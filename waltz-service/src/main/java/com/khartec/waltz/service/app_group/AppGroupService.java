@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.app_group;
 
-import com.khartec.waltz.common.Checks;
-import com.khartec.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.common.Checks;
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import com.khartec.waltz.data.app_group.AppGroupDao;
 import com.khartec.waltz.data.app_group.AppGroupEntryDao;
 import com.khartec.waltz.data.app_group.AppGroupMemberDao;
@@ -46,9 +46,9 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.ListUtilities.append;
-import static com.khartec.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.ListUtilities.append;
+import static org.finos.waltz.common.MapUtilities.indexBy;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static java.lang.String.format;

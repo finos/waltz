@@ -22,7 +22,7 @@ package com.khartec.waltz.model;
 import java.time.LocalDate;
 import java.util.Date;
 
-import static com.khartec.waltz.common.DateTimeUtilities.toLocalDate;
+import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 
 public enum EndOfLifeStatus {
 

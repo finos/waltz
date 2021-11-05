@@ -24,7 +24,7 @@ import org.jooq.lambda.tuple.Tuple2;
 import java.util.Collections;
 import java.util.Set;
 
-import static com.khartec.waltz.common.SetUtilities.fromArray;
+import static org.finos.waltz.common.SetUtilities.fromArray;
 import static com.khartec.waltz.model.EntityKind.*;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 

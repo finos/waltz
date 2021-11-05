@@ -32,7 +32,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.SetUtilities.orderedUnion;
+import static org.finos.waltz.common.SetUtilities.orderedUnion;
 import static com.khartec.waltz.data.SearchUtilities.mkRelevancyComparator;
 import static com.khartec.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.Tables.SERVER_INFORMATION;

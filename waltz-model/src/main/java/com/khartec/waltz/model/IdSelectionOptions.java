@@ -20,13 +20,13 @@ package com.khartec.waltz.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.common.SetUtilities;
+import org.finos.waltz.common.SetUtilities;
 import org.immutables.value.Value;
 
 import java.util.Optional;
 import java.util.Set;
 
-import static com.khartec.waltz.common.ListUtilities.asList;
+import static org.finos.waltz.common.ListUtilities.asList;
 import static com.khartec.waltz.model.HierarchyQueryScope.CHILDREN;
 import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 

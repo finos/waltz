@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.measurable_rating_planned_decommission;
 
-import com.khartec.waltz.common.exception.UpdateFailedException;
+import org.finos.waltz.common.exception.UpdateFailedException;
 import com.khartec.waltz.data.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionDao;
 import com.khartec.waltz.data.measurable_rating_replacement.MeasurableRatingReplacementDao;
 import com.khartec.waltz.model.EntityKind;
@@ -35,8 +35,8 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.SetUtilities.map;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static java.lang.String.format;
 

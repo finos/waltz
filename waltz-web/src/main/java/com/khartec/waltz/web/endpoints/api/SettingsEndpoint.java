@@ -32,7 +32,7 @@ import spark.Request;
 
 import java.util.Collection;
 
-import static com.khartec.waltz.common.CollectionUtilities.map;
+import static org.finos.waltz.common.CollectionUtilities.map;
 import static com.khartec.waltz.web.WebUtilities.getUsername;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;

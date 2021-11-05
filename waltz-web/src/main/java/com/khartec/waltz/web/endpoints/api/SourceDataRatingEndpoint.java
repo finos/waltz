@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.common.Checks;
+import org.finos.waltz.common.Checks;
 import com.khartec.waltz.model.source_data_rating.SourceDataRating;
 import com.khartec.waltz.service.source_data_rating.SourceDataRatingService;
 import com.khartec.waltz.web.ListRoute;

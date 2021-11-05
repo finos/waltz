@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.tag;
 
-import com.khartec.waltz.common.SetUtilities;
+import org.finos.waltz.common.SetUtilities;
 import com.khartec.waltz.data.GenericSelectorFactory;
 import com.khartec.waltz.data.tag.TagDao;
 import com.khartec.waltz.model.EntityKind;
@@ -39,8 +39,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.SetUtilities.fromCollection;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.SetUtilities.fromCollection;
 
 @Service
 public class TagService {

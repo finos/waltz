@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.taxonomy_management.processors;
 
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.SetUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.model.measurable.Measurable;
@@ -34,7 +34,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUtilities.*;
 
 @Service

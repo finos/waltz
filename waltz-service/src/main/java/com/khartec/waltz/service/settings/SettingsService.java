@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.settings;
 
-import com.khartec.waltz.common.CollectionUtilities;
-import com.khartec.waltz.common.MapUtilities;
+import org.finos.waltz.common.CollectionUtilities;
+import org.finos.waltz.common.MapUtilities;
 import com.khartec.waltz.data.settings.SettingsDao;
 import com.khartec.waltz.model.settings.Setting;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.khartec.waltz.common.ListUtilities.ensureNotNull;
+import static org.finos.waltz.common.ListUtilities.ensureNotNull;
 
 
 @Service

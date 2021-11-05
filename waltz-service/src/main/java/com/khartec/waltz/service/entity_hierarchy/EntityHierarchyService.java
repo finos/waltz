@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.service.entity_hierarchy;
 
-import com.khartec.waltz.common.ListUtilities;
-import com.khartec.waltz.common.hierarchy.FlatNode;
-import com.khartec.waltz.common.hierarchy.Forest;
-import com.khartec.waltz.common.hierarchy.HierarchyUtilities;
-import com.khartec.waltz.common.hierarchy.Node;
+import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.common.hierarchy.FlatNode;
+import org.finos.waltz.common.hierarchy.Forest;
+import org.finos.waltz.common.hierarchy.HierarchyUtilities;
+import org.finos.waltz.common.hierarchy.Node;
 import com.khartec.waltz.data.change_initiative.ChangeInitiativeDao;
 import com.khartec.waltz.data.data_type.DataTypeDao;
 import com.khartec.waltz.data.entity_hierarchy.EntityHierarchyDao;
@@ -48,7 +48,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.model.EntityKind.PERSON;
 import static com.khartec.waltz.schema.Tables.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.Tables.MEASURABLE;

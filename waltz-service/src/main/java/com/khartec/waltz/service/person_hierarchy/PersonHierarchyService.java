@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.service.person_hierarchy;
 
-import com.khartec.waltz.common.ListUtilities;
-import com.khartec.waltz.common.hierarchy.FlatNode;
-import com.khartec.waltz.common.hierarchy.Forest;
-import com.khartec.waltz.common.hierarchy.HierarchyUtilities;
-import com.khartec.waltz.common.hierarchy.Node;
+import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.common.hierarchy.FlatNode;
+import org.finos.waltz.common.hierarchy.Forest;
+import org.finos.waltz.common.hierarchy.HierarchyUtilities;
+import org.finos.waltz.common.hierarchy.Node;
 import com.khartec.waltz.data.person.PersonDao;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.schema.tables.records.PersonHierarchyRecord;

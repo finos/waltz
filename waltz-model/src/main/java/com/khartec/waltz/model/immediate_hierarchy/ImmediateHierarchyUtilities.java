@@ -19,7 +19,7 @@
 package com.khartec.waltz.model.immediate_hierarchy;
 
 
-import com.khartec.waltz.common.Checks;
+import org.finos.waltz.common.Checks;
 import com.khartec.waltz.model.IdProvider;
 import com.khartec.waltz.model.ParentIdProvider;
 
@@ -28,12 +28,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import static com.khartec.waltz.common.Checks.checkNotEmpty;
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.CollectionUtilities.filter;
-import static com.khartec.waltz.common.ListUtilities.ensureNotNull;
-import static com.khartec.waltz.common.MapUtilities.groupBy;
-import static com.khartec.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.Checks.checkNotEmpty;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.CollectionUtilities.filter;
+import static org.finos.waltz.common.ListUtilities.ensureNotNull;
+import static org.finos.waltz.common.MapUtilities.groupBy;
+import static org.finos.waltz.common.MapUtilities.indexBy;
 
 public class ImmediateHierarchyUtilities {
 

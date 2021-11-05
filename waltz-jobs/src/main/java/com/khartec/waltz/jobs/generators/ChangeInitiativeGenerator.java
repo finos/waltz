@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.common.RandomUtilities;
-import com.khartec.waltz.common.StreamUtilities;
+import org.finos.waltz.common.RandomUtilities;
+import org.finos.waltz.common.StreamUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.application.LifecyclePhase;
 import com.khartec.waltz.model.change_initiative.ChangeInitiativeKind;
@@ -44,7 +44,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.common.RandomUtilities.randomPick;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.model.change_initiative.ChangeInitiativeKind.*;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;

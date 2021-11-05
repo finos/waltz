@@ -27,8 +27,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkTrue;
 
 @Service
 public class SurveyQuestionService {

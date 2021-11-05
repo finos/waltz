@@ -33,7 +33,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.EntityWorkflowTransition.ENTITY_WORKFLOW_TRANSITION;
 
 @Repository

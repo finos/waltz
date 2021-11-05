@@ -8,7 +8,7 @@ import spark.Response;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-import static com.khartec.waltz.common.EnumUtilities.readEnum;
+import static org.finos.waltz.common.EnumUtilities.readEnum;
 
 /**
  * Represents classes which are used for Data Extraction.

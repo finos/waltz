@@ -37,10 +37,10 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.*;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.ListUtilities.asList;
-import static com.khartec.waltz.common.ListUtilities.isEmpty;
-import static com.khartec.waltz.common.SetUtilities.asSet;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.ListUtilities.asList;
+import static org.finos.waltz.common.ListUtilities.isEmpty;
+import static org.finos.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static com.khartec.waltz.model.attestation.AttestationStatus.ISSUED;

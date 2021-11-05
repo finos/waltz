@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.BiFunction;
 
-import static com.khartec.waltz.common.FunctionUtilities.alwaysBi;
+import static org.finos.waltz.common.FunctionUtilities.alwaysBi;
 import static com.khartec.waltz.model.user.SystemRole.*;
 
 public class RoleUtilities {

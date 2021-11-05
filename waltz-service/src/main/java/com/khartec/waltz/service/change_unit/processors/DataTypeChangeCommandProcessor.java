@@ -19,7 +19,7 @@
 package com.khartec.waltz.service.change_unit.processors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.khartec.waltz.common.SetUtilities;
+import org.finos.waltz.common.SetUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.attribute_change.AttributeChange;
@@ -36,9 +36,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.Checks.checkTrue;
-import static com.khartec.waltz.common.SetUtilities.minus;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.SetUtilities.minus;
 import static java.util.stream.Collectors.toSet;
 
 

@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.common.FunctionUtilities;
+import org.finos.waltz.common.FunctionUtilities;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecoratorStat;
 import com.khartec.waltz.service.DIConfiguration;

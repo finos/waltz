@@ -41,12 +41,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.CollectionUtilities.isEmpty;
-import static com.khartec.waltz.common.CollectionUtilities.maybeFirst;
-import static com.khartec.waltz.common.MapUtilities.indexBy;
-import static com.khartec.waltz.common.SetUtilities.map;
-import static com.khartec.waltz.common.StringUtilities.splitThenMap;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.CollectionUtilities.isEmpty;
+import static org.finos.waltz.common.CollectionUtilities.maybeFirst;
+import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.SetUtilities.map;
+import static org.finos.waltz.common.StringUtilities.splitThenMap;
 import static com.khartec.waltz.schema.Tables.ASSESSMENT_RATING;
 import static java.lang.String.format;
 import static org.jooq.tools.StringUtils.toCamelCaseLC;

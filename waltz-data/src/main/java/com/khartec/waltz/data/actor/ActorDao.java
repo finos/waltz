@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.data.actor;
 
-import com.khartec.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.actor.Actor;
 import com.khartec.waltz.model.actor.ActorChangeCommand;
@@ -38,9 +38,9 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.function.Function;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.common.Checks.checkOptionalIsPresent;
-import static com.khartec.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkOptionalIsPresent;
+import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.Actor.ACTOR;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;

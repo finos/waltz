@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.common.RandomUtilities;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.RandomUtilities;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.schema.tables.records.CostRecord;
@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.RandomUtilities.randomPickSome;
+import static org.finos.waltz.common.RandomUtilities.randomPickSome;
 import static com.khartec.waltz.jobs.WaltzUtilities.getOrCreateCostKind;
 import static com.khartec.waltz.schema.Tables.COST;
 

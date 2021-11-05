@@ -7,8 +7,8 @@ import spark.Request;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import static com.khartec.waltz.common.EnumUtilities.readEnum;
-import static com.khartec.waltz.common.StringUtilities.mkSafe;
+import static org.finos.waltz.common.EnumUtilities.readEnum;
+import static org.finos.waltz.common.StringUtilities.mkSafe;
 
 
 public class ExtractorUtilities {

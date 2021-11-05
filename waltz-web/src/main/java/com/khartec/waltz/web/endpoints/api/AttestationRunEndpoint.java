@@ -21,7 +21,6 @@ package com.khartec.waltz.web.endpoints.api;
 
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdCommandResponse;
-import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.attestation.AttestationCreateSummary;
 import com.khartec.waltz.model.attestation.AttestationRun;
 import com.khartec.waltz.model.attestation.AttestationRunCreateCommand;
@@ -36,7 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
-import static com.khartec.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 

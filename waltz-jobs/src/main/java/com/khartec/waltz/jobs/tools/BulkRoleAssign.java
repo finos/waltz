@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.tools;
 
-import com.khartec.waltz.common.IOUtilities;
-import com.khartec.waltz.common.SetUtilities;
+import org.finos.waltz.common.IOUtilities;
+import org.finos.waltz.common.SetUtilities;
 import com.khartec.waltz.model.user.ImmutableUpdateRolesCommand;
 import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.DIConfiguration;
@@ -33,7 +33,7 @@ import java.io.InputStream;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.common.SetUtilities.union;
+import static org.finos.waltz.common.SetUtilities.union;
 
 public class BulkRoleAssign {
 

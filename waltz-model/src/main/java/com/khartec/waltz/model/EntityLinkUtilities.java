@@ -18,10 +18,8 @@
 
 package com.khartec.waltz.model;
 
-import com.khartec.waltz.common.StringUtilities;
-
-import static com.khartec.waltz.common.Checks.*;
-import static com.khartec.waltz.common.StringUtilities.mkPath;
+import static org.finos.waltz.common.Checks.*;
+import static org.finos.waltz.common.StringUtilities.mkPath;
 
 public class EntityLinkUtilities {
 

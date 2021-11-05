@@ -18,11 +18,8 @@
 
 package com.khartec.waltz.jobs.clients.c1.sc1.parse;
 
-import com.khartec.waltz.common.Aliases;
+import org.finos.waltz.common.Aliases;
 import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.application.LifecyclePhase;
-
-import java.util.function.Function;
 
 public class StatusToEntityLifecycleStatus {
 

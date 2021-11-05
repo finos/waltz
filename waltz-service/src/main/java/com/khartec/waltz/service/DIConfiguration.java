@@ -43,7 +43,7 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.common.StringUtilities.mkSafe;
+import static org.finos.waltz.common.StringUtilities.mkSafe;
 
 
 @Configuration
