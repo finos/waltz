@@ -51,7 +51,7 @@ function lookupBySeverity(severity) {
 }
 
 /**
- * Given a severity from the `com.khartec.waltz.model.Severity`
+ * Given a severity from the `org.finos.waltz.model.Severity`
  * enum will return it's corresponding bootstrap classname
  * @param severity
  * @returns {string}
