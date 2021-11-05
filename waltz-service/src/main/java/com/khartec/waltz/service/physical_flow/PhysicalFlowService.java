@@ -20,7 +20,6 @@ package com.khartec.waltz.service.physical_flow;
 
 import com.khartec.waltz.data.physical_flow.PhysicalFlowDao;
 import com.khartec.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
-import com.khartec.waltz.data.physical_flow.PhysicalFlowSearchDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.command.CommandOutcome;
 import com.khartec.waltz.model.external_identifier.ExternalIdentifier;
@@ -60,7 +59,6 @@ public class PhysicalFlowService {
     private final PhysicalSpecificationService physicalSpecificationService;
     private final ChangeLogService changeLogService;
     private final LogicalFlowService logicalFlowService;
-    private final PhysicalFlowSearchDao searchDao;
     private final ExternalIdentifierService externalIdentifierService;
     private final PhysicalFlowIdSelectorFactory physicalFlowIdSelectorFactory = new PhysicalFlowIdSelectorFactory();
 
@@ -70,19 +68,16 @@ public class PhysicalFlowService {
                                LogicalFlowService logicalFlowService,
                                PhysicalFlowDao physicalDataFlowDao,
                                PhysicalSpecificationService physicalSpecificationService,
-                               PhysicalFlowSearchDao searchDao,
                                ExternalIdentifierService externalIdentifierService) {
         checkNotNull(changeLogService, "changeLogService cannot be null");
         checkNotNull(logicalFlowService, "logicalFlowService cannot be null");
         checkNotNull(physicalDataFlowDao, "physicalFlowDao cannot be null");
         checkNotNull(physicalSpecificationService, "physicalSpecificationService cannot be null");
-        checkNotNull(searchDao, "searchDao cannot be null");
 
         this.changeLogService = changeLogService;
         this.logicalFlowService = logicalFlowService;
         this.physicalFlowDao = physicalDataFlowDao;
         this.physicalSpecificationService = physicalSpecificationService;
-        this.searchDao = searchDao;
         this.externalIdentifierService = externalIdentifierService;
     }
 
@@ -182,7 +177,7 @@ public class PhysicalFlowService {
             if (deleteCount == 0) {
                 return responseBuilder
                         .outcome(CommandOutcome.FAILURE)
-                        .message("This flow cannot be deleted as it is being used in a lineage")
+                        .message("This flow cannot be deleted as it has been marked as read only")
                         .build();
             } else {
                 externalIdentifierService.delete(physicalFlow.entityReference());
@@ -210,6 +205,7 @@ public class PhysicalFlowService {
         ensureLogicalDataFlowExistsAndIsNotRemoved(command.logicalFlowId(), username);
 
         LocalDateTime now = nowUtc();
+
         long specId = command
                 .specification()
                 .id()
@@ -282,11 +278,6 @@ public class PhysicalFlowService {
         }
 
         return updateCount;
-    }
-
-
-    public Collection<EntityReference> searchReports(String query) {
-        return searchDao.searchReports(query);
     }
 
 

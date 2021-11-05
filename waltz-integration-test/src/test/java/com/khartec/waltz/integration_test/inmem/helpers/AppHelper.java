@@ -1,6 +1,5 @@
 package com.khartec.waltz.integration_test.inmem.helpers;
 
-import com.khartec.waltz.data.application.ApplicationDao;
 import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;

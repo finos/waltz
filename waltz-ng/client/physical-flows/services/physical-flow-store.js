@@ -90,16 +90,9 @@ export function store($http, baseApiUrl) {
     };
 
 
-    const searchReports = (query) => {
-        return $http
-            .get(`${base}/search-reports/${query}`)
-            .then(r => r.data);
-    };
-
-
     const deleteById = (id) => $http
-            .delete(`${base}/${id}`)
-            .then(r => r.data);
+        .delete(`${base}/${id}`)
+        .then(r => r.data);
 
 
     const updateSpecDefinitionId = (flowId, command) => {
@@ -144,7 +137,6 @@ export function store($http, baseApiUrl) {
         findBySelector,
         merge,
         getById,
-        searchReports,
         create,
         deleteById,
         updateSpecDefinitionId,
@@ -206,11 +198,6 @@ export const PhysicalFlowStore_API = {
         serviceName,
         serviceFnName: "getById",
         description: "executes getById"
-    },
-    searchReports: {
-        serviceName,
-        serviceFnName: "searchReports",
-        description: "executes searchReports"
     },
     create: {
         serviceName,
