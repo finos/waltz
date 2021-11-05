@@ -42,7 +42,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.khartec" level="DEBUG" />
+    <logger name="org.finos" level="DEBUG" />
     <!--<logger name="org.jooq" level="DEBUG" />-->
 
     <root level="WARN">
