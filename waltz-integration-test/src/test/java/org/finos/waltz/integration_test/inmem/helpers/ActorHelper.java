@@ -5,8 +5,6 @@ import org.finos.waltz.service.actor.ActorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.finos.waltz.model.EntityReference.mkRef;
-
 @Service
 public class ActorHelper {
 

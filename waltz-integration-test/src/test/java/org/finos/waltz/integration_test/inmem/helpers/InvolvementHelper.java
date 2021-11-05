@@ -12,7 +12,6 @@ import org.finos.waltz.service.involvement_kind.InvolvementKindService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
 import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Service

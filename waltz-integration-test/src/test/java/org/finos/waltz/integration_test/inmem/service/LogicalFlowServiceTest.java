@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.common.SetUtilities.asSet;
@@ -44,7 +45,6 @@ import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.HierarchyQueryScope.CHILDREN;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
-import static java.util.Collections.emptyList;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 import static org.junit.Assert.*;
 

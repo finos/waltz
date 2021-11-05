@@ -36,9 +36,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.map;
-import static java.util.Collections.emptyList;
 import static org.junit.Assert.*;
 
 public class DataTypeServiceTest extends BaseInMemoryIntegrationTest {

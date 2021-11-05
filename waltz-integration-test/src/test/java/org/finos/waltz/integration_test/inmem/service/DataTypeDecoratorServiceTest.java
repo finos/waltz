@@ -19,7 +19,6 @@
 package org.finos.waltz.integration_test.inmem.service;
 
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import com.khartec.waltz.integration_test.inmem.helpers.*;
 import org.finos.waltz.integration_test.inmem.helpers.*;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -35,6 +34,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Collection;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.common.SetUtilities.asSet;
@@ -42,8 +43,6 @@ import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
 import static org.junit.Assert.*;
 
 public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {

@@ -1,11 +1,11 @@
 package org.finos.waltz.integration_test.inmem;
 
-import org.finos.waltz.common.ExcludeFromIntegrationTesting;
-import org.finos.waltz.data.DBExecutorPool;
-import org.finos.waltz.data.DBExecutorPoolInterface;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import liquibase.integration.spring.SpringLiquibase;
+import org.finos.waltz.common.ExcludeFromIntegrationTesting;
+import org.finos.waltz.data.DBExecutorPool;
+import org.finos.waltz.data.DBExecutorPoolInterface;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.conf.RenderQuotedNames;

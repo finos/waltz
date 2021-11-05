@@ -9,8 +9,6 @@ import org.finos.waltz.service.physical_specification.PhysicalSpecificationServi
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
-
 @Service
 public class PhysicalSpecHelper {
 

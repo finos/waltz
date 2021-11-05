@@ -35,13 +35,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.List;
 import java.util.Set;
 
+import static java.util.Collections.emptySet;
+import static junit.framework.TestCase.assertTrue;
 import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
-import static java.util.Collections.emptySet;
-import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 

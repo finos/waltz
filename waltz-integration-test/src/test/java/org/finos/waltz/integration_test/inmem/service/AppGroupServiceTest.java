@@ -22,9 +22,9 @@ import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
+import org.finos.waltz.model.app_group.*;
 import org.finos.waltz.service.app_group.AppGroupService;
 import org.finos.waltz.service.app_group.AppGroupSubscription;
-import org.finos.waltz.model.app_group.*;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

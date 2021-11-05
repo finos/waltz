@@ -20,8 +20,6 @@ package org.finos.waltz.integration_test.inmem.service;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
-import com.khartec.waltz.integration_test.inmem.helpers.*;
-import com.khartec.waltz.model.*;
 import org.finos.waltz.integration_test.inmem.helpers.*;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.command.CommandOutcome;
@@ -44,14 +42,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
 import static org.junit.Assert.*;
 
 public class PhysicalFlowServiceTest extends BaseInMemoryIntegrationTest {

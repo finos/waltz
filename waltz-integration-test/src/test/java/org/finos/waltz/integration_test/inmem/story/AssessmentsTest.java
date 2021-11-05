@@ -3,8 +3,8 @@ package org.finos.waltz.integration_test.inmem.story;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.integration_test.inmem.helpers.AppHelper;
 import org.finos.waltz.integration_test.inmem.helpers.ChangeLogHelper;
-import org.finos.waltz.integration_test.inmem.helpers.RatingSchemeHelper;
 import org.finos.waltz.integration_test.inmem.helpers.NameHelper;
+import org.finos.waltz.integration_test.inmem.helpers.RatingSchemeHelper;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.Operation;
@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.finos.waltz.common.CollectionUtilities.find;
-import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
 import static org.junit.Assert.*;
 
 public class AssessmentsTest extends BaseInMemoryIntegrationTest {

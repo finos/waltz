@@ -23,7 +23,6 @@ import org.finos.waltz.data.measurable_rating.MeasurableRatingDao;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.integration_test.inmem.helpers.AppHelper;
 import org.finos.waltz.integration_test.inmem.helpers.MeasurableHelper;
-import com.khartec.waltz.model.*;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.measurable_rating.ImmutableSaveMeasurableRatingCommand;
 import org.finos.waltz.model.measurable_rating.MeasurableRating;
@@ -35,12 +34,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
 import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertThrows;
 
 public class MeasurableRatingDaoTest extends BaseInMemoryIntegrationTest {
