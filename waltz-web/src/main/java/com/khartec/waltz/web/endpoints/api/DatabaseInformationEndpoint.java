@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.database_information.DatabaseInformationService;
+import org.finos.waltz.service.database_information.DatabaseInformationService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;

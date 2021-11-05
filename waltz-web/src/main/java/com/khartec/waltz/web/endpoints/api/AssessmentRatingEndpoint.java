@@ -19,9 +19,9 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
-import com.khartec.waltz.service.assessment_definition.AssessmentDefinitionService;
-import com.khartec.waltz.service.assessment_rating.AssessmentRatingService;
-import com.khartec.waltz.service.user.UserRoleService;
+import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
+import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
+import org.finos.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.NotAuthorizedException;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.common.StringUtilities;

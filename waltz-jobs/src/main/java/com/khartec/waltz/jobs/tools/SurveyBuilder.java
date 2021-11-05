@@ -18,10 +18,10 @@
 
 package com.khartec.waltz.jobs.tools;
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.survey.SurveyQuestionDropdownEntryService;
-import com.khartec.waltz.service.survey.SurveyQuestionService;
-import com.khartec.waltz.service.survey.SurveyTemplateService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.survey.SurveyQuestionDropdownEntryService;
+import org.finos.waltz.service.survey.SurveyQuestionService;
+import org.finos.waltz.service.survey.SurveyTemplateService;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.ReleaseLifecycleStatus;

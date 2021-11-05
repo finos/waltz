@@ -20,7 +20,7 @@ package com.khartec.waltz.jobs.tools.importers;
 
 import org.finos.waltz.schema.Tables;
 import org.finos.waltz.schema.tables.records.ApplicationGroupEntryRecord;
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.jooq.DSLContext;

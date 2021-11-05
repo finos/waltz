@@ -22,7 +22,7 @@ import com.khartec.waltz.jobs.tools.resolvers.InvolvementNameToIdResolver;
 import com.khartec.waltz.jobs.tools.resolvers.OrgNameToIdResolver;
 import com.khartec.waltz.jobs.tools.resolvers.PersonNameToEmpIdResolver;
 import org.finos.waltz.schema.tables.records.InvolvementRecord;
-import com.khartec.waltz.service.DIBaseConfiguration;
+import org.finos.waltz.service.DIBaseConfiguration;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.StreamUtilities.Siphon;
 import org.finos.waltz.model.EntityKind;

@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.taxonomy_management.TaxonomyChangeService;
+import org.finos.waltz.service.taxonomy_management.TaxonomyChangeService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.taxonomy_management.TaxonomyChangeCommand;
 import org.springframework.beans.factory.annotation.Autowired;

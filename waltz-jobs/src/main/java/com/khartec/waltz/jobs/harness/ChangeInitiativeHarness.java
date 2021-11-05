@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.data.change_initiative.ChangeInitiativeDao;
 import org.finos.waltz.data.change_initiative.ChangeInitiativeIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;

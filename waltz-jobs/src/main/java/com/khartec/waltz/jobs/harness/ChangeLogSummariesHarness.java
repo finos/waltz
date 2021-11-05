@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.HierarchyQueryScope;
 import org.finos.waltz.model.IdSelectionOptions;

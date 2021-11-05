@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.HierarchyQueryScope;

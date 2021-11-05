@@ -19,7 +19,7 @@
 package com.khartec.waltz.jobs.generators;
 
 import org.finos.waltz.schema.tables.records.CostRecord;
-import com.khartec.waltz.service.application.ApplicationService;
+import org.finos.waltz.service.application.ApplicationService;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.RandomUtilities;
 import org.finos.waltz.model.EntityKind;

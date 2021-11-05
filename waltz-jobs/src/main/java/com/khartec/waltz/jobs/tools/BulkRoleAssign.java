@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.tools;
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.user.UserRoleService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.common.IOUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.model.user.ImmutableUpdateRolesCommand;

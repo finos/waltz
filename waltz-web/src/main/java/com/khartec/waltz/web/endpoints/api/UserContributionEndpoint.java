@@ -19,7 +19,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
-import com.khartec.waltz.service.user_contribution.UserContributionService;
+import org.finos.waltz.service.user_contribution.UserContributionService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;

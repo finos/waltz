@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.shared_preference.SharedPreferenceService;
+import org.finos.waltz.service.shared_preference.SharedPreferenceService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.json.SharedPreferenceKeyAndCategory;
 import org.finos.waltz.model.shared_preference.SharedPreference;

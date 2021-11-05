@@ -28,7 +28,7 @@ import org.finos.waltz.model.datatype.DataType;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.finos.waltz.model.entity_search.ImmutableEntitySearchOptions;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
-import com.khartec.waltz.service.data_type.DataTypeService;
+import org.finos.waltz.service.data_type.DataTypeService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.data.user_agent_info.UserAgentInfoDao;
 import org.finos.waltz.model.user_agent_info.UserAgentInfo;
 import org.jooq.DSLContext;

@@ -21,7 +21,7 @@ package com.khartec.waltz.jobs.example;
 import org.finos.waltz.schema.tables.Measurable;
 import org.finos.waltz.schema.tables.records.MeasurableCategoryRecord;
 import org.finos.waltz.schema.tables.records.MeasurableRecord;
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.IOUtilities;
 import org.finos.waltz.common.SetUtilities;

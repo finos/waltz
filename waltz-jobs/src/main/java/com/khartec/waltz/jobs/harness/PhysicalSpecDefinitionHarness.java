@@ -19,10 +19,10 @@
 package com.khartec.waltz.jobs.harness;
 
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.physical_specification_definition.PhysicalSpecDefinitionFieldService;
-import com.khartec.waltz.service.physical_specification_definition.PhysicalSpecDefinitionSampleFileService;
-import com.khartec.waltz.service.physical_specification_definition.PhysicalSpecDefinitionService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.physical_specification_definition.PhysicalSpecDefinitionFieldService;
+import org.finos.waltz.service.physical_specification_definition.PhysicalSpecDefinitionSampleFileService;
+import org.finos.waltz.service.physical_specification_definition.PhysicalSpecDefinitionService;
 import org.finos.waltz.model.FieldDataType;
 import org.finos.waltz.model.ImmutableReleaseLifecycleStatusChangeCommand;
 import org.finos.waltz.model.ReleaseLifecycleStatus;

@@ -19,7 +19,7 @@
 package com.khartec.waltz.jobs;
 
 import org.finos.waltz.schema.tables.records.PersonRecord;
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.jooq.ExecuteContext;
 import org.jooq.ExecuteListener;

@@ -21,7 +21,7 @@ package com.khartec.waltz.jobs.generators;
 import org.finos.waltz.schema.tables.records.ChangeInitiativeRecord;
 import org.finos.waltz.schema.tables.records.EntityRelationshipRecord;
 import org.finos.waltz.schema.tables.records.InvolvementRecord;
-import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
+import org.finos.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.finos.waltz.common.RandomUtilities;
 import org.finos.waltz.common.StreamUtilities;
 import org.finos.waltz.model.EntityKind;

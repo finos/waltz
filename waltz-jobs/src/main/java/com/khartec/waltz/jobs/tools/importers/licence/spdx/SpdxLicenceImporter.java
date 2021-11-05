@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.finos.waltz.schema.tables.records.BookmarkRecord;
 import org.finos.waltz.schema.tables.records.LicenceRecord;
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.licence.LicenceDao;
 import org.finos.waltz.model.ApprovalStatus;

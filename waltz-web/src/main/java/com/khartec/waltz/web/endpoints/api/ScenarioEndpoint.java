@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.roadmap.RoadmapService;
-import com.khartec.waltz.service.scenario.ScenarioAxisItemService;
-import com.khartec.waltz.service.scenario.ScenarioRatingItemService;
-import com.khartec.waltz.service.scenario.ScenarioService;
-import com.khartec.waltz.service.user.UserRoleService;
+import org.finos.waltz.service.roadmap.RoadmapService;
+import org.finos.waltz.service.scenario.ScenarioAxisItemService;
+import org.finos.waltz.service.scenario.ScenarioRatingItemService;
+import org.finos.waltz.service.scenario.ScenarioService;
+import org.finos.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.json.ImmutableFullScenario;
 import org.finos.waltz.model.AxisOrientation;

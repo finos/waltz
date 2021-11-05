@@ -19,9 +19,9 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
-import com.khartec.waltz.service.physical_flow.PhysicalFlowUploadService;
-import com.khartec.waltz.service.user.UserRoleService;
+import org.finos.waltz.service.physical_flow.PhysicalFlowService;
+import org.finos.waltz.service.physical_flow.PhysicalFlowUploadService;
+import org.finos.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;

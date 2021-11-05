@@ -19,7 +19,7 @@
 package com.khartec.waltz.jobs.generators;
 
 import org.finos.waltz.schema.tables.records.SettingsRecord;
-import com.khartec.waltz.service.settings.SettingsService;
+import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.model.user.SystemRole;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;

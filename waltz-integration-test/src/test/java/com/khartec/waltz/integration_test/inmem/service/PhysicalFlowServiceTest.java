@@ -32,10 +32,10 @@ import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecificati
 import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.finos.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinitionChangeCommand;
 import org.finos.waltz.model.physical_specification_definition.PhysicalSpecDefinitionType;
-import com.khartec.waltz.service.logical_flow.LogicalFlowService;
-import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
-import com.khartec.waltz.service.physical_specification.PhysicalSpecificationService;
-import com.khartec.waltz.service.physical_specification_definition.PhysicalSpecDefinitionService;
+import org.finos.waltz.service.logical_flow.LogicalFlowService;
+import org.finos.waltz.service.physical_flow.PhysicalFlowService;
+import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
+import org.finos.waltz.service.physical_specification_definition.PhysicalSpecDefinitionService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

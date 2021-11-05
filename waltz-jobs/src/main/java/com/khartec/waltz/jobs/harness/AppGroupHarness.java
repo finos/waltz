@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.app_group.FavouritesService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.app_group.FavouritesService;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.model.app_group.AppGroupEntry;

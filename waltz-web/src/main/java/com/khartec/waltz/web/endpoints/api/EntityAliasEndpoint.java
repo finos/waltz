@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.entity_alias.EntityAliasService;
+import org.finos.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.service.entity_alias.EntityAliasService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.EntityReference;

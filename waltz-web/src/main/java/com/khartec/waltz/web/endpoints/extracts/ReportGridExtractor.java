@@ -17,7 +17,7 @@
  */
 package com.khartec.waltz.web.endpoints.extracts;
 
-import com.khartec.waltz.service.report_grid.ReportGridService;
+import org.finos.waltz.service.report_grid.ReportGridService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;

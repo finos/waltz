@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.measurable.MeasurableService;
+import org.finos.waltz.service.measurable.MeasurableService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;

@@ -19,11 +19,11 @@
 package com.khartec.waltz.jobs.harness;
 
 import org.finos.waltz.schema.tables.records.AllocationRecord;
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.allocation_schemes.AllocationSchemeService;
-import com.khartec.waltz.service.application.ApplicationService;
-import com.khartec.waltz.service.measurable.MeasurableService;
-import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.allocation_schemes.AllocationSchemeService;
+import org.finos.waltz.service.application.ApplicationService;
+import org.finos.waltz.service.measurable.MeasurableService;
+import org.finos.waltz.service.measurable_rating.MeasurableRatingService;
 import org.finos.waltz.data.measurable_category.MeasurableCategoryDao;
 import org.finos.waltz.model.Criticality;
 import org.finos.waltz.model.UserTimestamp;

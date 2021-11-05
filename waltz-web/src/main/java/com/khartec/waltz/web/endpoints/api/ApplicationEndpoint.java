@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.application.ApplicationService;
-import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.tag.TagService;
+import org.finos.waltz.service.application.ApplicationService;
+import org.finos.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.service.tag.TagService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.WebUtilities;

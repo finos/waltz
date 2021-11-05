@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.changelog.ChangeLogSummariesService;
+import org.finos.waltz.service.changelog.ChangeLogSummariesService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.IdSelectionOptions;

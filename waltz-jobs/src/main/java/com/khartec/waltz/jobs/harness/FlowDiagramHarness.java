@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.flow_diagram.FlowDiagramService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.flow_diagram.FlowDiagramService;
 import org.jooq.DSLContext;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

@@ -1,7 +1,7 @@
 package com.khartec.waltz.integration_test.inmem.helpers;
 
 import org.finos.waltz.schema.tables.records.DataTypeRecord;
-import com.khartec.waltz.service.data_type.DataTypeService;
+import org.finos.waltz.service.data_type.DataTypeService;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;

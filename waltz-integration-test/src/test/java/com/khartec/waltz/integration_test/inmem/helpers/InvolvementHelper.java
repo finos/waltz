@@ -7,8 +7,8 @@ import org.finos.waltz.model.involvement.EntityInvolvementChangeCommand;
 import org.finos.waltz.model.involvement.ImmutableEntityInvolvementChangeCommand;
 import org.finos.waltz.model.involvement_kind.ImmutableInvolvementKindCreateCommand;
 import org.finos.waltz.model.involvement_kind.InvolvementKindCreateCommand;
-import com.khartec.waltz.service.involvement.InvolvementService;
-import com.khartec.waltz.service.involvement_kind.InvolvementKindService;
+import org.finos.waltz.service.involvement.InvolvementService;
+import org.finos.waltz.service.involvement_kind.InvolvementKindService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

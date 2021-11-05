@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.logical_flow.LogicalFlowService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;

@@ -19,7 +19,7 @@
 package com.khartec.waltz.jobs.tools;
 
 import org.finos.waltz.schema.tables.*;
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.model.EntityKind;
 import org.jooq.DSLContext;
 import org.jooq.lambda.Unchecked;

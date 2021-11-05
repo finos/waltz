@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
+import org.finos.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.finos.waltz.model.EntityKind;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;

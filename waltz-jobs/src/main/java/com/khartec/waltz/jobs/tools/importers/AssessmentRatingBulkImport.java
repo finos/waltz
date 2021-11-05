@@ -1,7 +1,7 @@
 package com.khartec.waltz.jobs.tools.importers;
 
 import org.finos.waltz.schema.tables.records.AssessmentRatingRecord;
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.service.DIConfiguration;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;

@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.jobs.tools;
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.application.ApplicationService;
-import com.khartec.waltz.service.flow_diagram.FlowDiagramEntityService;
-import com.khartec.waltz.service.flow_diagram.FlowDiagramService;
-import com.khartec.waltz.service.logical_flow.LogicalFlowService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.application.ApplicationService;
+import org.finos.waltz.service.flow_diagram.FlowDiagramEntityService;
+import org.finos.waltz.service.flow_diagram.FlowDiagramService;
+import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.HierarchyQueryScope;

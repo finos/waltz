@@ -24,7 +24,7 @@ import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.actor.Actor;
-import com.khartec.waltz.service.actor.ActorService;
+import org.finos.waltz.service.actor.ActorService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

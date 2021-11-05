@@ -28,7 +28,7 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdProvider;
 import org.finos.waltz.model.logical_flow.ImmutableAddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
-import com.khartec.waltz.service.logical_flow.LogicalFlowService;
+import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.jooq.lambda.tuple.Tuple2;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -15,9 +15,9 @@ import org.finos.waltz.model.assessment_rating.ImmutableRemoveAssessmentRatingCo
 import org.finos.waltz.model.assessment_rating.ImmutableSaveAssessmentRatingCommand;
 import org.finos.waltz.model.assessment_rating.SaveAssessmentRatingCommand;
 import org.finos.waltz.model.rating.ImmutableRatingSchemeItem;
-import com.khartec.waltz.service.assessment_definition.AssessmentDefinitionService;
-import com.khartec.waltz.service.assessment_rating.AssessmentRatingService;
-import com.khartec.waltz.service.rating_scheme.RatingSchemeService;
+import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
+import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
+import org.finos.waltz.service.rating_scheme.RatingSchemeService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

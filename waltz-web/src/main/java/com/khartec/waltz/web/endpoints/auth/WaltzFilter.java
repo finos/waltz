@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.auth;
 
-import com.khartec.waltz.service.settings.SettingsService;
+import org.finos.waltz.service.settings.SettingsService;
 import spark.Filter;
 
 import java.util.Optional;

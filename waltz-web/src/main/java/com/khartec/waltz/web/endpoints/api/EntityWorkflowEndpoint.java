@@ -19,7 +19,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
-import com.khartec.waltz.service.entity_workflow.EntityWorkflowService;
+import org.finos.waltz.service.entity_workflow.EntityWorkflowService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;

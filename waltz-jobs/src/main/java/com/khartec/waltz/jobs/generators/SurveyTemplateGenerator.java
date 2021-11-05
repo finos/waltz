@@ -19,8 +19,8 @@
 package com.khartec.waltz.jobs.generators;
 
 
-import com.khartec.waltz.service.survey.SurveyQuestionService;
-import com.khartec.waltz.service.survey.SurveyTemplateService;
+import org.finos.waltz.service.survey.SurveyQuestionService;
+import org.finos.waltz.service.survey.SurveyTemplateService;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.ImmutableReleaseLifecycleStatusChangeCommand;
 import org.finos.waltz.model.ReleaseLifecycleStatus;

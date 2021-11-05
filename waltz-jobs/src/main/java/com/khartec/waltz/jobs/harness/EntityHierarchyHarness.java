@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.finos.waltz.model.EntityKind;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

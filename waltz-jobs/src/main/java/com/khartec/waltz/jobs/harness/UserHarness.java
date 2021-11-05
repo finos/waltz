@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.user.UserRoleService;
-import com.khartec.waltz.service.user.UserService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.user.UserRoleService;
+import org.finos.waltz.service.user.UserService;
 import org.finos.waltz.model.user.ImmutableUserRegistrationRequest;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

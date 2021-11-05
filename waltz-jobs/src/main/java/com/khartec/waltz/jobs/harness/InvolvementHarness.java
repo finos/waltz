@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.involvement.InvolvementService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.involvement.InvolvementService;
 import org.finos.waltz.data.involvement.InvolvementDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.application.Application;

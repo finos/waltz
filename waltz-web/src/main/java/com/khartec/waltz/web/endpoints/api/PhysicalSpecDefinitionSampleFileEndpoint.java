@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.physical_specification_definition.PhysicalSpecDefinitionSampleFileService;
-import com.khartec.waltz.service.user.UserRoleService;
+import org.finos.waltz.service.physical_specification_definition.PhysicalSpecDefinitionSampleFileService;
+import org.finos.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.physical_specification_definition.PhysicalSpecDefinitionSampleFile;

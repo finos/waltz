@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.web;
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.settings.SettingsService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.settings.SettingsService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.endpoints.api.StaticResourcesEndpoint;
 import com.khartec.waltz.web.endpoints.extracts.DataExtractor;

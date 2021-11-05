@@ -1,7 +1,7 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
-import com.khartec.waltz.service.measurable.MeasurableService;
-import com.khartec.waltz.service.svg.SvgDiagramService;
+import org.finos.waltz.service.measurable.MeasurableService;
+import org.finos.waltz.service.svg.SvgDiagramService;
 import org.finos.waltz.common.SvgUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.svg.SvgDiagram;

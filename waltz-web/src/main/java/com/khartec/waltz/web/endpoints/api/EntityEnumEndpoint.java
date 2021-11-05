@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.entity_enum.EntityEnumService;
+import org.finos.waltz.service.entity_enum.EntityEnumService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.entity_enum.EntityEnumDefinition;

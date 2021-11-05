@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.measurable_rating_replacement.MeasurableRatingReplacementService;
-import com.khartec.waltz.service.user.UserRoleService;
+import org.finos.waltz.service.measurable_rating_replacement.MeasurableRatingReplacementService;
+import org.finos.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.EntityKind;

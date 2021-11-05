@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.service.application.ApplicationService;
-import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
+import org.finos.waltz.service.application.ApplicationService;
+import org.finos.waltz.service.orgunit.OrganisationalUnitService;
 import org.finos.waltz.common.RandomUtilities;
 import org.finos.waltz.model.Criticality;
 import org.finos.waltz.model.application.AppRegistrationRequest;

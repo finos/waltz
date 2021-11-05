@@ -19,7 +19,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
-import com.khartec.waltz.service.change_unit.ChangeUnitViewService;
+import org.finos.waltz.service.change_unit.ChangeUnitViewService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;

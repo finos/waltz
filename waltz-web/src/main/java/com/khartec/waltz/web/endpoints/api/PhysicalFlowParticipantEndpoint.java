@@ -19,8 +19,8 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
-import com.khartec.waltz.service.physical_flow_participant.PhysicalFlowParticipantService;
-import com.khartec.waltz.service.user.UserRoleService;
+import org.finos.waltz.service.physical_flow_participant.PhysicalFlowParticipantService;
+import org.finos.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;

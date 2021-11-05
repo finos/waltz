@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.usage_info.DataTypeUsageService;
-import com.khartec.waltz.service.user.UserRoleService;
+import org.finos.waltz.service.usage_info.DataTypeUsageService;
+import org.finos.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.EntityKind;

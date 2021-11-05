@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.usage_info.DataTypeUsageService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.usage_info.DataTypeUsageService;
 import org.finos.waltz.data.data_type_usage.DataTypeUsageDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.HierarchyQueryScope;

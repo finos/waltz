@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
-import com.khartec.waltz.service.user.UserRoleService;
+import org.finos.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.service.orgunit.OrganisationalUnitService;
+import org.finos.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;

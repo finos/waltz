@@ -22,7 +22,7 @@ import com.khartec.waltz.jobs.Columns;
 import com.khartec.waltz.jobs.WaltzUtilities;
 import com.khartec.waltz.jobs.clients.c1.sc1.model.*;
 import org.finos.waltz.schema.tables.records.*;
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.service.DIConfiguration;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.finos.waltz.common.CollectionUtilities;

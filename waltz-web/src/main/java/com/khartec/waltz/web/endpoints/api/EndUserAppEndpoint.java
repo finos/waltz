@@ -19,7 +19,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
-import com.khartec.waltz.service.end_user_app.EndUserAppService;
+import org.finos.waltz.service.end_user_app.EndUserAppService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.WebUtilities;

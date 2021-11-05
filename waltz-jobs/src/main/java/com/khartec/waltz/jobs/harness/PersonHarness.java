@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.data.person.PersonDao;
 import org.finos.waltz.model.person.PersonKind;
 import org.jooq.DSLContext;

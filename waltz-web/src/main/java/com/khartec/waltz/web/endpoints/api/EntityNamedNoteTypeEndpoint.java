@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.entity_named_note.EntityNamedNoteTypeService;
-import com.khartec.waltz.service.user.UserRoleService;
+import org.finos.waltz.service.entity_named_note.EntityNamedNoteTypeService;
+import org.finos.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;

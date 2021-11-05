@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.flow_diagram.FlowDiagramAnnotationService;
+import org.finos.waltz.service.flow_diagram.FlowDiagramAnnotationService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.flow_diagram.FlowDiagramAnnotation;

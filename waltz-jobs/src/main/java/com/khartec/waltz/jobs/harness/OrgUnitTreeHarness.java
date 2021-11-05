@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.common.Checks;
 import org.jooq.*;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

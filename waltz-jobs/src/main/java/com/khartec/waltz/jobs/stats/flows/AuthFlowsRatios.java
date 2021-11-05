@@ -5,7 +5,7 @@ import org.finos.waltz.schema.tables.DataType;
 import org.finos.waltz.schema.tables.EnumValue;
 import org.finos.waltz.schema.tables.LogicalFlow;
 import org.finos.waltz.schema.tables.LogicalFlowDecorator;
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.jooq.*;

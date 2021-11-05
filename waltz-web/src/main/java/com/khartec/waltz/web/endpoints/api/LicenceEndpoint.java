@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.licence.LicenceService;
+import org.finos.waltz.service.licence.LicenceService;
 import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.IdSelectionOptions;

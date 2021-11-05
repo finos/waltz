@@ -19,7 +19,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
-import com.khartec.waltz.service.attestation.AttestationPreCheckService;
+import org.finos.waltz.service.attestation.AttestationPreCheckService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;

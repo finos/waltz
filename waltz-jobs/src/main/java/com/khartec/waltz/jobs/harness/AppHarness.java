@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.data.application.search.SqlServerAppSearch;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.application.Application;

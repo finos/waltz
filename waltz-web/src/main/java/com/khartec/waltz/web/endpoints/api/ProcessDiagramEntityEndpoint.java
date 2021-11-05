@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.process_diagram.ProcessDiagramEntityService;
+import org.finos.waltz.service.process_diagram.ProcessDiagramEntityService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.process_diagram.ProcessDiagramEntityApplicationAlignment;

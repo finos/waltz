@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.roadmap.RoadmapService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.roadmap.RoadmapService;
 import org.finos.waltz.data.roadmap.RoadmapDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.roadmap.RoadmapAndScenarioOverview;

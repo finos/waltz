@@ -6,7 +6,7 @@ import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.application.*;
 import org.finos.waltz.model.rating.RagRating;
-import com.khartec.waltz.service.application.ApplicationService;
+import org.finos.waltz.service.application.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

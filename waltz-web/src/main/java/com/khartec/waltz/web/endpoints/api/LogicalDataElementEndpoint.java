@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.logical_data_element.LogicalDataElementService;
+import org.finos.waltz.service.logical_data_element.LogicalDataElementService;
 import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.IdSelectionOptions;

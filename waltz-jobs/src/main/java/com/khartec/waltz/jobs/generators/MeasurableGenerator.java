@@ -20,7 +20,7 @@ package com.khartec.waltz.jobs.generators;
 
 import org.finos.waltz.schema.tables.records.MeasurableCategoryRecord;
 import org.finos.waltz.schema.tables.records.MeasurableRecord;
-import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
+import org.finos.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.jooq.DSLContext;

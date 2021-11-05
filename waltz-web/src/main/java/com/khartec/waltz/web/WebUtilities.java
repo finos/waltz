@@ -22,7 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
-import com.khartec.waltz.service.user.UserRoleService;
+import org.finos.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.endpoints.auth.AuthenticationUtilities;
 import org.eclipse.jetty.http.MimeTypes;
 import org.finos.waltz.common.EnumUtilities;
@@ -43,7 +43,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.service.user.RoleUtilities.getRequiredRoleForEntityKind;
+import static org.finos.waltz.service.user.RoleUtilities.getRequiredRoleForEntityKind;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ObjectUtilities.firstNotNull;

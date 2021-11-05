@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-    import com.khartec.waltz.service.bookmark.BookmarkService;
-    import com.khartec.waltz.service.changelog.ChangeLogService;
-    import com.khartec.waltz.service.user.UserRoleService;
+    import org.finos.waltz.service.bookmark.BookmarkService;
+    import org.finos.waltz.service.changelog.ChangeLogService;
+    import org.finos.waltz.service.user.UserRoleService;
     import com.khartec.waltz.web.endpoints.Endpoint;
     import org.finos.waltz.model.EntityReference;
     import org.finos.waltz.model.bookmark.Bookmark;

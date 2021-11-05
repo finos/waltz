@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.data.app_group.AppGroupMemberDao;
 import org.finos.waltz.model.app_group.AppGroupMemberRole;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

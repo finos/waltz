@@ -8,7 +8,7 @@ import org.finos.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.schema.tables.records.OrganisationalUnitRecord;
-import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
+import org.finos.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.h2.tools.Server;
 import org.jooq.DSLContext;
 import org.junit.Before;

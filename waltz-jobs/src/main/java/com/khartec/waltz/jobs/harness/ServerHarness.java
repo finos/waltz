@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIBaseConfiguration;
+import org.finos.waltz.service.DIBaseConfiguration;
 import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;

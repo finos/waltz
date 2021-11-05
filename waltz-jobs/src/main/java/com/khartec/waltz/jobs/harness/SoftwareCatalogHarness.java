@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.software_catalog.SoftwareCatalogService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.software_catalog.SoftwareCatalogService;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.software_catalog.SoftwareSummaryStatistics;
 import org.jooq.DSLContext;

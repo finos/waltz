@@ -19,7 +19,7 @@
 package com.khartec.waltz.jobs.generators;
 
 import org.finos.waltz.schema.tables.records.OrganisationalUnitRecord;
-import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
+import org.finos.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.EntityKind;

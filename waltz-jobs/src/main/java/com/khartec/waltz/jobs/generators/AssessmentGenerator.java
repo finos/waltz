@@ -22,7 +22,7 @@ import org.finos.waltz.schema.tables.records.AssessmentDefinitionRecord;
 import org.finos.waltz.schema.tables.records.AssessmentRatingRecord;
 import org.finos.waltz.schema.tables.records.RatingSchemeItemRecord;
 import org.finos.waltz.schema.tables.records.RatingSchemeRecord;
-import com.khartec.waltz.service.rating_scheme.RatingSchemeService;
+import org.finos.waltz.service.rating_scheme.RatingSchemeService;
 import org.finos.waltz.common.ColorUtilities;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.RandomUtilities;

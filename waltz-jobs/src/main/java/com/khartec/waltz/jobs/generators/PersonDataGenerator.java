@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.service.person.PersonService;
-import com.khartec.waltz.service.person_hierarchy.PersonHierarchyService;
+import org.finos.waltz.service.person.PersonService;
+import org.finos.waltz.service.person_hierarchy.PersonHierarchyService;
 import io.codearte.jfairy.Fairy;
 import io.codearte.jfairy.producer.person.Person;
 import org.finos.waltz.common.MapUtilities;

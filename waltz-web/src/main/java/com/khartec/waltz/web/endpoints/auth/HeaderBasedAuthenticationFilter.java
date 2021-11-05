@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.auth;
 
-import com.khartec.waltz.service.settings.SettingsService;
+import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.model.settings.NamedSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

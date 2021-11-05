@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.thumbnail.ThumbnailService;
+import org.finos.waltz.service.thumbnail.ThumbnailService;
 import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.EntityReference;

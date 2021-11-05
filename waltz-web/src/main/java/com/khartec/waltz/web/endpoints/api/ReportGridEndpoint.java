@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.report_grid.ReportGridService;
+import org.finos.waltz.service.report_grid.ReportGridService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.report_grid.ReportGrid;
 import org.springframework.beans.factory.annotation.Autowired;

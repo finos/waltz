@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.notification.NotificationService;
+import org.finos.waltz.service.notification.NotificationService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;

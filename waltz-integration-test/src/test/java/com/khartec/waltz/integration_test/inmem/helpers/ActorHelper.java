@@ -1,7 +1,7 @@
 package com.khartec.waltz.integration_test.inmem.helpers;
 
 import org.finos.waltz.model.actor.ImmutableActorCreateCommand;
-import com.khartec.waltz.service.actor.ActorService;
+import org.finos.waltz.service.actor.ActorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

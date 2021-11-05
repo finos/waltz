@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.entity_search.EntitySearchService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.entity_search.EntitySearchService;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;

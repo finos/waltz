@@ -27,7 +27,7 @@ import org.finos.waltz.model.datatype.DataType;
 import org.finos.waltz.model.datatype.DataTypeDecorator;
 import org.finos.waltz.model.datatype.DataTypeUsageCharacteristics;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
-import com.khartec.waltz.service.data_type.DataTypeDecoratorService;
+import org.finos.waltz.service.data_type.DataTypeDecoratorService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 

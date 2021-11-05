@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.relationship_kind.RelationshipKindService;
-import com.khartec.waltz.service.user.UserRoleService;
+import org.finos.waltz.service.relationship_kind.RelationshipKindService;
+import org.finos.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;

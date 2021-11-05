@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.tools;
 
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;

@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class PhysicalFlowHarness {

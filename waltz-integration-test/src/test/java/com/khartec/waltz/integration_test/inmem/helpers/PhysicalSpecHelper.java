@@ -5,7 +5,7 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.physical_specification.DataFormatKind;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
-import com.khartec.waltz.service.physical_specification.PhysicalSpecificationService;
+import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

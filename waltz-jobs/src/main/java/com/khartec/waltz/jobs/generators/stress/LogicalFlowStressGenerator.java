@@ -20,7 +20,7 @@ package com.khartec.waltz.jobs.generators.stress;
 
 import org.finos.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
 import org.finos.waltz.schema.tables.records.LogicalFlowRecord;
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.common.RandomUtilities;
 import org.finos.waltz.data.data_type.DataTypeDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;

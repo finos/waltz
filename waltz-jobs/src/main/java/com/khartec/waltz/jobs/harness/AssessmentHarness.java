@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.assessment_rating.AssessmentRatingViewService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.assessment_rating.AssessmentRatingViewService;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.assessment_rating.AssessmentRatingDetail;
 import org.jooq.tools.json.ParseException;

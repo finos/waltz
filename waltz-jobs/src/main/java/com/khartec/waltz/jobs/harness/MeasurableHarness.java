@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.measurable.MeasurableService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.measurable.MeasurableService;
 import org.finos.waltz.common.OptionalUtilities;
 import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;

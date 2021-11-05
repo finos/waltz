@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.database_information.DatabaseInformationService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.database_information.DatabaseInformationService;
 import org.finos.waltz.data.database_information.DatabaseInformationDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;

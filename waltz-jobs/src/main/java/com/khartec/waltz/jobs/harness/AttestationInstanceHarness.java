@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.attestation.AttestationInstanceService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.attestation.AttestationInstanceService;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.attestation.AttestationInstanceDao;
 import org.finos.waltz.model.EntityKind;

@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.tools;
 
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.HierarchyQueryScope;

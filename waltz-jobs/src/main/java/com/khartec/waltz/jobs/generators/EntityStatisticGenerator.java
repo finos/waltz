@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.finos.waltz.common.RandomUtilities;
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.entity_statistic.EntityStatisticDefinitionDao;

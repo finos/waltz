@@ -2,7 +2,7 @@ package com.khartec.waltz.jobs.tools.roadmaps;
 
 import org.finos.waltz.schema.tables.*;
 import org.finos.waltz.schema.tables.records.ScenarioRatingItemRecord;
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.service.DIConfiguration;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.LoggingUtilities;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;

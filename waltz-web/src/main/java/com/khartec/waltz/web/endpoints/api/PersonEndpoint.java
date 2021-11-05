@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.person.PersonService;
-import com.khartec.waltz.service.person_hierarchy.PersonHierarchyService;
-import com.khartec.waltz.service.user.UserRoleService;
+import org.finos.waltz.service.person.PersonService;
+import org.finos.waltz.service.person_hierarchy.PersonHierarchyService;
+import org.finos.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.user.SystemRole;
 import org.springframework.beans.factory.annotation.Autowired;

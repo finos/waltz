@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.notification.NotificationService;
+import org.finos.waltz.service.DIConfiguration;
+import org.finos.waltz.service.notification.NotificationService;
 import org.finos.waltz.model.notification.NotificationResponse;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

@@ -21,9 +21,9 @@ package com.khartec.waltz.jobs.generators;
 
 import org.finos.waltz.schema.tables.records.SurveyQuestionResponseRecord;
 import org.finos.waltz.schema.tables.records.SurveyRunRecord;
-import com.khartec.waltz.service.survey.SurveyInstanceService;
-import com.khartec.waltz.service.survey.SurveyQuestionService;
-import com.khartec.waltz.service.survey.SurveyRunService;
+import org.finos.waltz.service.survey.SurveyInstanceService;
+import org.finos.waltz.service.survey.SurveyQuestionService;
+import org.finos.waltz.service.survey.SurveyRunService;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.RandomUtilities;
 import org.finos.waltz.data.app_group.AppGroupDao;

@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.service.asset_cost.AssetCostService;
+import org.finos.waltz.service.asset_cost.AssetCostService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.cost.ApplicationCost;

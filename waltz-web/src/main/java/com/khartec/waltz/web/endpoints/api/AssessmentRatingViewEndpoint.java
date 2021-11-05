@@ -19,7 +19,7 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
-import com.khartec.waltz.service.assessment_rating.AssessmentRatingViewService;
+import org.finos.waltz.service.assessment_rating.AssessmentRatingViewService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.assessment_rating.AssessmentGroupedEntities;
