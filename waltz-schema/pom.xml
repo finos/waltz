@@ -21,7 +21,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>waltz</artifactId>
-        <groupId>com.khartec</groupId>
+        <groupId>org.finos</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -52,19 +52,19 @@
                             <rules>
                                 <requireProperty>
                                     <property>database.url</property>
-                                    <message>Property 'database.url' must be specified, usually via a profile in your settings.xml file. See https://github.com/khartec/waltz/blob/master/docs/development/build.md for more information</message>
+                                    <message>Property 'database.url' must be specified, usually via a profile in your settings.xml file. See https://github.com/finos/waltz/blob/master/docs/development/build.md for more information</message>
                                 </requireProperty>
                                 <requireProperty>
                                     <property>database.user</property>
-                                    <message>Property 'database.user' must be specified, usually via a profile in your settings.xml file. See https://github.com/khartec/waltz/blob/master/docs/development/build.md for more information</message>
+                                    <message>Property 'database.user' must be specified, usually via a profile in your settings.xml file. See https://github.com/finos/waltz/blob/master/docs/development/build.md for more information</message>
                                 </requireProperty>
                                 <requireProperty>
                                     <property>jooq.group</property>
-                                    <message>Property 'jooq.group' must be specified, usually by selecting one of the in-built profiles in the waltz-schema/pom.xml file. See https://github.com/khartec/waltz/blob/master/docs/development/build.md for more information</message>
+                                    <message>Property 'jooq.group' must be specified, usually by selecting one of the in-built profiles in the waltz-schema/pom.xml file. See https://github.com/finos/waltz/blob/master/docs/development/build.md for more information</message>
                                 </requireProperty>
                                 <requireProperty>
                                     <property>jdbc.driver</property>
-                                    <message>Property 'jdbc.driver' must be specified, usually by selecting one of the in-built profiles in the waltz-schema/pom.xml file. See https://github.com/khartec/waltz/blob/master/docs/development/build.md for more information</message>
+                                    <message>Property 'jdbc.driver' must be specified, usually by selecting one of the in-built profiles in the waltz-schema/pom.xml file. See https://github.com/finos/waltz/blob/master/docs/development/build.md for more information</message>
                                 </requireProperty>
                             </rules>
                         </configuration>
@@ -151,7 +151,7 @@
                         </database>
 
                         <target>
-                            <packageName>com.khartec.waltz.schema</packageName>
+                            <packageName>org.finos.waltz.schema</packageName>
                             <directory>target/generated-sources/jooq</directory>
                         </target>
                     </generator>

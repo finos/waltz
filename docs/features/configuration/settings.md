@@ -37,9 +37,9 @@ Group of settings which control how waltz handles authentication/authorization
   * ```sso``` - authentication is done elsewhere, do not show the login panel
 * ```server.authentication.filter```
   * ```<classname>``` - the name of the class which injects the user object into incoming requests.
-    By default this is ```com.khartec.waltz.web.endpoints.auth.JWTAuthenticationFilter```, options are:
-    * ```com.khartec.waltz.web.endpoints.auth.HeaderBasedAuthenticationFilter```
-    * ```com.khartec.waltz.web.endpoints.auth.JWTAuthenticationFilter```
+    By default this is ```JWTAuthenticationFilter```, options are:
+    * ```HeaderBasedAuthenticationFilter```
+    * ```JWTAuthenticationFilter```
 * ```server.authentication.roles.default``` - Default set of role names (comma sep)
 
 If using header based authentication provide an additional setting which gives the name of the parameter to obtain the username from:
