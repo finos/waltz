@@ -84,11 +84,11 @@ The Waltz meta model is described in the
 **Which life-cycles for (which) objects are available, e.g. applications?**
 
 There is a basic lifecycle 
-(see the enum [EntityLifecycleStatus](https://github.com/finos/waltz/blob/master/waltz-model/src/main/java/com/khartec/waltz/model/EntityLifecycleStatus.java))
+(see the enum [EntityLifecycleStatus](https://github.com/finos/waltz/blob/master/waltz-model/src/main/java/org/finos/waltz/model/EntityLifecycleStatus.java))
 supported by the main entities within Waltz. 
  
 In addition some other classes of entities (e.g. Scenarios and Physical Specifications)
-support and enhanced [ReleaseLifecycleStatus](https://github.com/finos/waltz/blob/master/waltz-model/src/main/java/com/khartec/waltz/model/ReleaseLifecycleStatus.java)
+support and enhanced [ReleaseLifecycleStatus](https://github.com/finos/waltz/blob/master/waltz-model/src/main/java/org/finos/waltz/model/ReleaseLifecycleStatus.java)
 which operates independently of the entity lifecycle.
 
 

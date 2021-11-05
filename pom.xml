@@ -38,7 +38,7 @@
     <packaging>pom</packaging>
 
     <name>waltz</name>
-    <url>http://khartec.com</url>
+    <url>https://waltz.finos.org/</url>
 
     <issueManagement>
         <url>https://github.com/finos/waltz/issues</url>

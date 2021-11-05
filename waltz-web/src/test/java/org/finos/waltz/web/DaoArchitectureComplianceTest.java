@@ -35,7 +35,7 @@ public class DaoArchitectureComplianceTest extends BaseArchitectureComplianceTes
                 .and()
                 .doNotHaveModifier(ABSTRACT)
                 .and()
-                .resideInAPackage("..khartec..")
+                .resideInAPackage("..finos..")
                 .and()
                 .haveNameMatching(".*Dao")
                 .should()
