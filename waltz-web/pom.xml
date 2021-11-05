@@ -189,7 +189,7 @@
                             <archive>
                                 <manifest>
                                     <mainClass>
-                                        com.khartec.waltz.web.Main
+                                        org.finos.waltz.web.Main
                                     </mainClass>
                                 </manifest>
                             </archive>

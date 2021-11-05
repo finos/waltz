@@ -46,12 +46,12 @@ enpoints and CORS services, similar to:
 
 ````
 ....
-7:59:43.633 [main] INFO  com.khartec.waltz.web.Main - Registering Endpoint: userEndpoint
-17:59:43.637 [main] INFO  com.khartec.waltz.web.Main - Registering Endpoint: authenticationEndpoint
-17:59:43.639 [main] INFO  com.khartec.waltz.web.Main - Registering Endpoint: dataExtractEndpoint
+7:59:43.633 [main] INFO  Main - Registering Endpoint: userEndpoint
+17:59:43.637 [main] INFO  Main - Registering Endpoint: authenticationEndpoint
+17:59:43.639 [main] INFO  Main - Registering Endpoint: dataExtractEndpoint
 17:59:43.643 [main] DEBUG c.k.w.w.e.a.StaticResourcesEndpoint - Registering static resources
-17:59:43.644 [main] INFO  com.khartec.waltz.web.Main - Completed endpoint registration
-17:59:43.649 [main] INFO  com.khartec.waltz.web.Main - Enabled CORS
+17:59:43.644 [main] INFO  Main - Completed endpoint registration
+17:59:43.649 [main] INFO  Main - Enabled CORS
 ````
 
 
