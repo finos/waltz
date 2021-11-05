@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.attestation;
 
-import com.khartec.waltz.schema.tables.records.AttestationInstanceRecord;
+import org.finos.waltz.schema.tables.records.AttestationInstanceRecord;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.Criticality;
 import org.finos.waltz.model.EntityKind;
@@ -42,8 +42,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;

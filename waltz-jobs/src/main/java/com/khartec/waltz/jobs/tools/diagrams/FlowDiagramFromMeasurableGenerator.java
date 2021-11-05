@@ -1,6 +1,6 @@
 package com.khartec.waltz.jobs.tools.diagrams;
 
-import com.khartec.waltz.schema.tables.*;
+import org.finos.waltz.schema.tables.*;
 import com.khartec.waltz.service.DIConfiguration;
 import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
@@ -10,8 +10,8 @@ import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.lang.String.format;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;

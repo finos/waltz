@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.database_information;
 
-import com.khartec.waltz.schema.tables.records.DatabaseInformationRecord;
+import org.finos.waltz.schema.tables.records.DatabaseInformationRecord;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.LifecycleStatus;
@@ -37,9 +37,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.Tables.DATABASE_USAGE;
-import static com.khartec.waltz.schema.tables.DatabaseInformation.DATABASE_INFORMATION;
-import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
+import static org.finos.waltz.schema.Tables.DATABASE_USAGE;
+import static org.finos.waltz.schema.tables.DatabaseInformation.DATABASE_INFORMATION;
+import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.mapping;
 import static org.jooq.lambda.tuple.Tuple.tuple;

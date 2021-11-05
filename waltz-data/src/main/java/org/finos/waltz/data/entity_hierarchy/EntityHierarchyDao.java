@@ -18,8 +18,8 @@
 
 package org.finos.waltz.data.entity_hierarchy;
 
-import com.khartec.waltz.schema.tables.EntityHierarchy;
-import com.khartec.waltz.schema.tables.records.EntityHierarchyRecord;
+import org.finos.waltz.schema.tables.EntityHierarchy;
+import org.finos.waltz.schema.tables.records.EntityHierarchyRecord;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -39,7 +39,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
+import static org.finos.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.map;
 

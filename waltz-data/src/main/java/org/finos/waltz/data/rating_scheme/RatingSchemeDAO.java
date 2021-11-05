@@ -18,9 +18,9 @@
 
 package org.finos.waltz.data.rating_scheme;
 
-import com.khartec.waltz.schema.Tables;
-import com.khartec.waltz.schema.tables.records.RatingSchemeItemRecord;
-import com.khartec.waltz.schema.tables.records.RatingSchemeRecord;
+import org.finos.waltz.schema.Tables;
+import org.finos.waltz.schema.tables.records.RatingSchemeItemRecord;
+import org.finos.waltz.schema.tables.records.RatingSchemeRecord;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.rating.*;
@@ -31,10 +31,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
-import static com.khartec.waltz.schema.tables.RatingScheme.RATING_SCHEME;
-import static com.khartec.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
+import static org.finos.waltz.schema.tables.RatingScheme.RATING_SCHEME;
+import static org.finos.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITEM;
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
@@ -45,7 +45,7 @@ import static org.finos.waltz.common.StringUtilities.firstChar;
 @Repository
 public class RatingSchemeDAO {
 
-    public static final com.khartec.waltz.schema.tables.RatingSchemeItem CONSTRAINING_RATING = Tables.RATING_SCHEME_ITEM.as("constrainingRating");
+    public static final org.finos.waltz.schema.tables.RatingSchemeItem CONSTRAINING_RATING = Tables.RATING_SCHEME_ITEM.as("constrainingRating");
 
     public static final Field<Boolean> IS_RESTRICTED_FIELD = DSL.coalesce(
             DSL.field(Tables.RATING_SCHEME_ITEM.POSITION.lt(CONSTRAINING_RATING.POSITION)), false)
@@ -246,15 +246,15 @@ public class RatingSchemeDAO {
 
     public List<RatingSchemeItemUsageCount> calcRatingUsageStats() {
 
-        com.khartec.waltz.schema.tables.RatingSchemeItem rsi = RATING_SCHEME_ITEM.as("rsi");
-        com.khartec.waltz.schema.tables.RatingScheme rs = RATING_SCHEME.as("rs");
-        com.khartec.waltz.schema.tables.AssessmentRating ar = ASSESSMENT_RATING.as("ar");
-        com.khartec.waltz.schema.tables.MeasurableRating mr = MEASURABLE_RATING.as("mr");
-        com.khartec.waltz.schema.tables.Measurable m = MEASURABLE.as("m");
-        com.khartec.waltz.schema.tables.MeasurableCategory mc = MEASURABLE_CATEGORY.as("mc");
-        com.khartec.waltz.schema.tables.ScenarioRatingItem sri = SCENARIO_RATING_ITEM.as("sri");
-        com.khartec.waltz.schema.tables.Scenario s = SCENARIO.as("s");
-        com.khartec.waltz.schema.tables.Roadmap r = ROADMAP.as("r");
+        org.finos.waltz.schema.tables.RatingSchemeItem rsi = RATING_SCHEME_ITEM.as("rsi");
+        org.finos.waltz.schema.tables.RatingScheme rs = RATING_SCHEME.as("rs");
+        org.finos.waltz.schema.tables.AssessmentRating ar = ASSESSMENT_RATING.as("ar");
+        org.finos.waltz.schema.tables.MeasurableRating mr = MEASURABLE_RATING.as("mr");
+        org.finos.waltz.schema.tables.Measurable m = MEASURABLE.as("m");
+        org.finos.waltz.schema.tables.MeasurableCategory mc = MEASURABLE_CATEGORY.as("mc");
+        org.finos.waltz.schema.tables.ScenarioRatingItem sri = SCENARIO_RATING_ITEM.as("sri");
+        org.finos.waltz.schema.tables.Scenario s = SCENARIO.as("s");
+        org.finos.waltz.schema.tables.Roadmap r = ROADMAP.as("r");
 
         SelectHavingStep<Record4<Long, Long, String, Integer>> assessmentCounts = dsl
                 .select(rsi.SCHEME_ID, rsi.ID, DSL.val("ASSESSMENT_RATING"), DSL.count())

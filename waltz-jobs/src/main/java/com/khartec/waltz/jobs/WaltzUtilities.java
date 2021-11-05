@@ -18,10 +18,10 @@
 
 package com.khartec.waltz.jobs;
 
-import com.khartec.waltz.schema.tables.records.CostKindRecord;
-import com.khartec.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
-import com.khartec.waltz.schema.tables.records.LogicalFlowRecord;
-import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
+import org.finos.waltz.schema.tables.records.CostKindRecord;
+import org.finos.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
+import org.finos.waltz.schema.tables.records.LogicalFlowRecord;
+import org.finos.waltz.schema.tables.records.MeasurableCategoryRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.EntityKind;
@@ -33,9 +33,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.schema.Tables.COST_KIND;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
+import static org.finos.waltz.schema.Tables.COST_KIND;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 
 public class WaltzUtilities {

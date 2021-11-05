@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.flow_diagram;
 
-import com.khartec.waltz.schema.tables.records.FlowDiagramRecord;
+import org.finos.waltz.schema.tables.records.FlowDiagramRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.data.SearchUtilities;
@@ -38,8 +38,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.tables.FlowDiagram.FLOW_DIAGRAM;
-import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
+import static org.finos.waltz.schema.tables.FlowDiagram.FLOW_DIAGRAM;
+import static org.finos.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 

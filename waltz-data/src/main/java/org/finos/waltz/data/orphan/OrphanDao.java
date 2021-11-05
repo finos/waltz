@@ -32,9 +32,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.function.BiFunction;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static org.finos.waltz.model.EntityLifecycleStatus.REMOVED;

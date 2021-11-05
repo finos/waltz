@@ -32,8 +32,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
 import static org.finos.waltz.data.application.ApplicationDao.IS_ACTIVE;
 
 

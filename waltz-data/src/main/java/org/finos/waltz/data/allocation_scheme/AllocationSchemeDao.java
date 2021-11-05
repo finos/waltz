@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.allocation_scheme;
 
-import com.khartec.waltz.schema.tables.records.AllocationSchemeRecord;
+import org.finos.waltz.schema.tables.records.AllocationSchemeRecord;
 import org.finos.waltz.model.allocation_scheme.AllocationScheme;
 import org.finos.waltz.model.allocation_scheme.ImmutableAllocationScheme;
 import org.jooq.DSLContext;
@@ -29,7 +29,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.AllocationScheme.ALLOCATION_SCHEME;
+import static org.finos.waltz.schema.tables.AllocationScheme.ALLOCATION_SCHEME;
 import static java.util.Optional.ofNullable;
 
 @Repository

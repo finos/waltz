@@ -25,7 +25,7 @@ import org.finos.waltz.model.user.ImmutableUserRegistrationRequest;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static com.khartec.waltz.schema.tables.User.USER;
+import static org.finos.waltz.schema.tables.User.USER;
 
 
 public class UserHarness {

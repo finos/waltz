@@ -19,7 +19,7 @@
 package org.finos.waltz.data.entity_workflow;
 
 
-import com.khartec.waltz.schema.tables.records.EntityWorkflowDefinitionRecord;
+import org.finos.waltz.schema.tables.records.EntityWorkflowDefinitionRecord;
 import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowDefinition;
 import org.jooq.DSLContext;
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.EntityWorkflowDefinition.ENTITY_WORKFLOW_DEFINITION;
+import static org.finos.waltz.schema.tables.EntityWorkflowDefinition.ENTITY_WORKFLOW_DEFINITION;
 
 @Repository
 public class EntityWorkflowDefinitionDao {

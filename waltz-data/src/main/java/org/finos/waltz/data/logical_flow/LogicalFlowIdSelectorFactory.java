@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.logical_flow;
 
-import com.khartec.waltz.schema.tables.Application;
+import org.finos.waltz.schema.tables.Application;
 import org.finos.waltz.data.IdSelectorFactory;
 import org.finos.waltz.data.SelectorUtilities;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
@@ -31,14 +31,14 @@ import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
 
-import static com.khartec.waltz.schema.Tables.FLOW_CLASSIFICATION_RULE;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
-import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
-import static com.khartec.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_FLOW_PARTICIPANT;
-import static com.khartec.waltz.schema.tables.TagUsage.TAG_USAGE;
+import static org.finos.waltz.schema.Tables.FLOW_CLASSIFICATION_RULE;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
+import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static org.finos.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_FLOW_PARTICIPANT;
+import static org.finos.waltz.schema.tables.TagUsage.TAG_USAGE;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.SetUtilities.map;

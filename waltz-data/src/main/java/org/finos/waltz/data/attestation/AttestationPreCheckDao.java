@@ -1,8 +1,8 @@
 package org.finos.waltz.data.attestation;
 
 
-import com.khartec.waltz.schema.tables.DataType;
-import com.khartec.waltz.schema.tables.*;
+import org.finos.waltz.schema.tables.DataType;
+import org.finos.waltz.schema.tables.*;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
@@ -13,8 +13,8 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.DataType.DATA_TYPE;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository

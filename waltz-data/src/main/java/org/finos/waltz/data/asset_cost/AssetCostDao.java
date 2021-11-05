@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.asset_cost;
 
-import com.khartec.waltz.schema.tables.records.AssetCostRecord;
+import org.finos.waltz.schema.tables.records.AssetCostRecord;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -36,9 +36,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.AssetCost.ASSET_COST;
-import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.AssetCost.ASSET_COST;
+import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 

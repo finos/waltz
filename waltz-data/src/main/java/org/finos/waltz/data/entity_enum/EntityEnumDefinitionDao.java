@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.entity_enum;
 
-import com.khartec.waltz.schema.tables.records.EntityEnumDefinitionRecord;
+import org.finos.waltz.schema.tables.records.EntityEnumDefinitionRecord;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.entity_enum.EntityEnumDefinition;
 import org.finos.waltz.model.entity_enum.ImmutableEntityEnumDefinition;
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.EntityEnumDefinition.ENTITY_ENUM_DEFINITION;
+import static org.finos.waltz.schema.tables.EntityEnumDefinition.ENTITY_ENUM_DEFINITION;
 
 @Repository
 public class EntityEnumDefinitionDao {

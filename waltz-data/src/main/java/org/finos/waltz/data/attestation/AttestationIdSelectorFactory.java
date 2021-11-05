@@ -28,7 +28,7 @@ import org.jooq.impl.DSL;
 
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
+import static org.finos.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 public class AttestationIdSelectorFactory implements Function<IdSelectionOptions, Select<Record1<Long>>> {

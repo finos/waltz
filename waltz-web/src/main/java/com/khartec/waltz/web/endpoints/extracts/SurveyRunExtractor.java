@@ -36,8 +36,8 @@ import org.springframework.stereotype.Service;
 import java.sql.Date;
 import java.util.List;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static java.lang.String.format;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;

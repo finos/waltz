@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.user;
 
-import com.khartec.waltz.schema.tables.records.UserRecord;
+import org.finos.waltz.schema.tables.records.UserRecord;
 import org.finos.waltz.model.user.ImmutableUser;
 import org.finos.waltz.model.user.User;
 import org.jooq.DSLContext;
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.User.USER;
+import static org.finos.waltz.schema.tables.User.USER;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 

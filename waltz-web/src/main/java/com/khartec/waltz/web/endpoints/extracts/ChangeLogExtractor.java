@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.extracts;
 
-import com.khartec.waltz.schema.tables.ChangeLog;
+import org.finos.waltz.schema.tables.ChangeLog;
 import org.finos.waltz.data.changelog.ChangeLogDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -29,8 +29,8 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 
-import static com.khartec.waltz.schema.Tables.CHANGE_LOG;
-import static com.khartec.waltz.schema.Tables.PERSON;
+import static org.finos.waltz.schema.Tables.CHANGE_LOG;
+import static org.finos.waltz.schema.Tables.PERSON;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static java.lang.String.format;
 import static spark.Spark.get;
@@ -117,7 +117,7 @@ public class ChangeLogExtractor extends DirectQueryBasedDataExtractor {
 
 
     private SelectJoinStep<Record4<String, String, String, Timestamp>> mkUnattestedChangesQuery(EntityReference entityRef, EntityKind childKind) {
-        com.khartec.waltz.schema.tables.ChangeLog cl = com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG.as("cl");
+        org.finos.waltz.schema.tables.ChangeLog cl = org.finos.waltz.schema.tables.ChangeLog.CHANGE_LOG.as("cl");
 
         SelectConditionStep<Record> qry = ChangeLogDao.mkUnattestedChangesQuery(entityRef);
 

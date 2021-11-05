@@ -18,15 +18,15 @@
 
 package org.finos.waltz.data.attestation;
 
-import com.khartec.waltz.schema.tables.records.AttestationInstanceRecipientRecord;
+import org.finos.waltz.schema.tables.records.AttestationInstanceRecipientRecord;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
-import static com.khartec.waltz.schema.tables.AttestationInstanceRecipient.ATTESTATION_INSTANCE_RECIPIENT;
+import static org.finos.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
+import static org.finos.waltz.schema.tables.AttestationInstanceRecipient.ATTESTATION_INSTANCE_RECIPIENT;
 
 @Repository
 public class AttestationInstanceRecipientDao {

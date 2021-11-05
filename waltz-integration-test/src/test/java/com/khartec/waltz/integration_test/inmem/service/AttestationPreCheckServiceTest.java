@@ -26,7 +26,7 @@ import com.khartec.waltz.integration_test.inmem.helpers.DataTypeHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
-import com.khartec.waltz.schema.Tables;
+import org.finos.waltz.schema.Tables;
 import com.khartec.waltz.service.attestation.AttestationPreCheckService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import org.jooq.DSLContext;
@@ -38,8 +38,8 @@ import java.util.List;
 
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName;
-import static com.khartec.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
-import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
+import static org.finos.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
+import static org.finos.waltz.schema.tables.DataType.DATA_TYPE;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 

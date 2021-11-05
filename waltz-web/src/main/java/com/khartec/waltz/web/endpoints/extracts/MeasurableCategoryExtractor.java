@@ -29,12 +29,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.schema.Tables.ENTITY_HIERARCHY;
-import static com.khartec.waltz.schema.Tables.INVOLVEMENT;
-import static com.khartec.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
-import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
-import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
-import static com.khartec.waltz.schema.tables.Person.PERSON;
+import static org.finos.waltz.schema.Tables.ENTITY_HIERARCHY;
+import static org.finos.waltz.schema.Tables.INVOLVEMENT;
+import static org.finos.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
+import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
+import static org.finos.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
+import static org.finos.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.web.WebUtilities.getId;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static org.finos.waltz.common.Checks.checkNotNull;

@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
-import com.khartec.waltz.schema.tables.records.MeasurableRecord;
+import org.finos.waltz.schema.tables.records.MeasurableCategoryRecord;
+import org.finos.waltz.schema.tables.records.MeasurableRecord;
 import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.EntityKind;
@@ -34,8 +34,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
-import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
+import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
+import static org.finos.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
 import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.IOUtilities.readLines;
 

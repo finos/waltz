@@ -30,7 +30,7 @@ import org.jooq.DSLContext;
 
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
+import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
 import static org.finos.waltz.common.StringUtilities.lower;
 
 public class SqlServerMeasurableSearch implements FullTextSearch<Measurable>, DatabaseVendorSpecific {

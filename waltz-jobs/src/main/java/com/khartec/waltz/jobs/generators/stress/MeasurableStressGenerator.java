@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.generators.stress;
 
-import com.khartec.waltz.schema.tables.records.MeasurableRecord;
+import org.finos.waltz.schema.tables.records.MeasurableRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.RandomUtilities;
@@ -34,7 +34,7 @@ import java.util.Random;
 import java.util.stream.Collectors;
 
 import static com.khartec.waltz.jobs.WaltzUtilities.getOrCreateMeasurableCategory;
-import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
+import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class MeasurableStressGenerator {

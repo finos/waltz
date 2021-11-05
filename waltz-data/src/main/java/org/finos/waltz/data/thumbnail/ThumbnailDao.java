@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.thumbnail;
 
-import com.khartec.waltz.schema.tables.records.ThumbnailRecord;
+import org.finos.waltz.schema.tables.records.ThumbnailRecord;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.thumbnail.ImmutableThumbnail;
@@ -33,7 +33,7 @@ import java.sql.Timestamp;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.tables.Thumbnail.THUMBNAIL;
+import static org.finos.waltz.schema.tables.Thumbnail.THUMBNAIL;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 

@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.source_data_rating;
 
-import com.khartec.waltz.schema.tables.records.SourceDataRatingRecord;
+import org.finos.waltz.schema.tables.records.SourceDataRatingRecord;
 import org.finos.waltz.common.Checks;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.rating.RagRating;
@@ -34,7 +34,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Optional;
 
-import static com.khartec.waltz.schema.tables.SourceDataRating.SOURCE_DATA_RATING;
+import static org.finos.waltz.schema.tables.SourceDataRating.SOURCE_DATA_RATING;
 
 
 @Repository

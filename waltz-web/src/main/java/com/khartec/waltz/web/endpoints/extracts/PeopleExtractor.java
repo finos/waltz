@@ -30,7 +30,7 @@ import org.jooq.SelectSeekStep1;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.*;
 import static com.khartec.waltz.web.WebUtilities.getEntityReference;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;

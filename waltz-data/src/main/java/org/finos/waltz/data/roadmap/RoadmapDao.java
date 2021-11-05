@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.roadmap;
 
-import com.khartec.waltz.schema.tables.records.RoadmapRecord;
+import org.finos.waltz.schema.tables.records.RoadmapRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.scenario.ScenarioDao;
 import org.finos.waltz.model.EntityKind;
@@ -41,10 +41,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
-import static com.khartec.waltz.schema.tables.Roadmap.ROADMAP;
-import static com.khartec.waltz.schema.tables.Scenario.SCENARIO;
-import static com.khartec.waltz.schema.tables.ScenarioRatingItem.SCENARIO_RATING_ITEM;
+import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
+import static org.finos.waltz.schema.tables.Roadmap.ROADMAP;
+import static org.finos.waltz.schema.tables.Scenario.SCENARIO;
+import static org.finos.waltz.schema.tables.ScenarioRatingItem.SCENARIO_RATING_ITEM;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;

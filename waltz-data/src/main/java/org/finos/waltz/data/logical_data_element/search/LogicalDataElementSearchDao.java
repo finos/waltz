@@ -35,7 +35,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static com.khartec.waltz.schema.tables.LogicalDataElement.LOGICAL_DATA_ELEMENT;
+import static org.finos.waltz.schema.tables.LogicalDataElement.LOGICAL_DATA_ELEMENT;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.sort;
 

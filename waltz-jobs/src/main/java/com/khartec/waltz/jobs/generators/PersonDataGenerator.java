@@ -33,9 +33,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import static com.khartec.waltz.schema.Tables.INVOLVEMENT;
-import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
-import static com.khartec.waltz.schema.tables.Person.PERSON;
+import static org.finos.waltz.schema.Tables.INVOLVEMENT;
+import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
+import static org.finos.waltz.schema.tables.Person.PERSON;
 import static org.finos.waltz.common.RandomUtilities.randomPick;
 
 

@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.measurable_rating;
 
-import com.khartec.waltz.schema.tables.records.MeasurableRatingRecord;
+import org.finos.waltz.schema.tables.records.MeasurableRatingRecord;
 import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.JooqUtilities;
@@ -42,9 +42,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
-import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
+import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
@@ -259,8 +259,8 @@ public class MeasurableRatingDao {
 
 
     public List<MeasurableRatingTally> statsForRelatedMeasurable(Select<Record1<Long>> selector) {
-        com.khartec.waltz.schema.tables.MeasurableRating related = MEASURABLE_RATING.as("related");
-        com.khartec.waltz.schema.tables.MeasurableRating orig = MEASURABLE_RATING.as("orig");
+        org.finos.waltz.schema.tables.MeasurableRating related = MEASURABLE_RATING.as("related");
+        org.finos.waltz.schema.tables.MeasurableRating orig = MEASURABLE_RATING.as("orig");
 
         SelectConditionStep<Record1<Long>> relatedAppIds = DSL
                 .selectDistinct(orig.ENTITY_ID)

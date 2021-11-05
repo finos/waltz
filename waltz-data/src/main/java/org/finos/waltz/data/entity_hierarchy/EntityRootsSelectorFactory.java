@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.entity_hierarchy;
 
-import com.khartec.waltz.schema.tables.EntityHierarchy;
+import org.finos.waltz.schema.tables.EntityHierarchy;
 import org.finos.waltz.model.EntityKind;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -26,7 +26,7 @@ import org.jooq.impl.DSL;
 
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
+import static org.finos.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 
 
 public class EntityRootsSelectorFactory implements Function<EntityKind, Select<Record1<Long>>> {

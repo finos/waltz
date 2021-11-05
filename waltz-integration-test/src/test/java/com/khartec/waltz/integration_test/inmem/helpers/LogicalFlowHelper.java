@@ -19,7 +19,7 @@ import java.util.Set;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.ListUtilities.map;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW;
+import static org.finos.waltz.schema.Tables.LOGICAL_FLOW;
 
 @Service
 public class LogicalFlowHelper {

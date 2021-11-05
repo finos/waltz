@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.system.job_log;
 
-import com.khartec.waltz.schema.tables.records.SystemJobLogRecord;
+import org.finos.waltz.schema.tables.records.SystemJobLogRecord;
 import org.finos.waltz.common.Checks;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.system.job_log.ImmutableJobLog;
@@ -34,7 +34,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.SystemJobLog.SYSTEM_JOB_LOG;
+import static org.finos.waltz.schema.tables.SystemJobLog.SYSTEM_JOB_LOG;
 
 /**
  * Created by dwatkins on 23/05/2016.

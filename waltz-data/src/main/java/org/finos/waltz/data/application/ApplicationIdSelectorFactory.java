@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.application;
 
-import com.khartec.waltz.schema.tables.*;
+import org.finos.waltz.schema.tables.*;
 import org.finos.waltz.data.SelectorUtilities;
 import org.finos.waltz.data.data_type.DataTypeIdSelectorFactory;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
@@ -36,17 +36,17 @@ import org.springframework.stereotype.Service;
 
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
-import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
-import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
-import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
-import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
-import static com.khartec.waltz.schema.tables.Person.PERSON;
-import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
+import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
+import static org.finos.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
+import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
+import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
+import static org.finos.waltz.schema.tables.Person.PERSON;
+import static org.finos.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.model.EntityLifecycleStatus.REMOVED;

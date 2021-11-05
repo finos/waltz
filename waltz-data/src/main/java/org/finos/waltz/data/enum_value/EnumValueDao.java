@@ -19,8 +19,8 @@
 package org.finos.waltz.data.enum_value;
 
 
-import com.khartec.waltz.schema.Tables;
-import com.khartec.waltz.schema.tables.records.EnumValueRecord;
+import org.finos.waltz.schema.Tables;
+import org.finos.waltz.schema.tables.records.EnumValueRecord;
 import org.finos.waltz.model.EnumValue;
 import org.finos.waltz.model.ImmutableEnumValue;
 import org.finos.waltz.model.enum_value.EnumValueKind;
@@ -34,7 +34,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.EnumValue.ENUM_VALUE;
+import static org.finos.waltz.schema.tables.EnumValue.ENUM_VALUE;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository

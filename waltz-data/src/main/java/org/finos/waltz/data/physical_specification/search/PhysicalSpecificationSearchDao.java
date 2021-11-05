@@ -38,9 +38,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-import static com.khartec.waltz.schema.Tables.EXTERNAL_IDENTIFIER;
-import static com.khartec.waltz.schema.Tables.PHYSICAL_FLOW;
-import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
+import static org.finos.waltz.schema.Tables.EXTERNAL_IDENTIFIER;
+import static org.finos.waltz.schema.Tables.PHYSICAL_FLOW;
+import static org.finos.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.data.physical_specification.PhysicalSpecificationDao.owningEntityNameField;

@@ -28,7 +28,7 @@ import org.jooq.impl.DSL;
 
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
+import static org.finos.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
 
 public class PostgresServerInformationSearch implements FullTextSearch<ServerInformation> {
 

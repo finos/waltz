@@ -29,7 +29,7 @@ import org.jooq.DSLContext;
 
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
 
 public class SqlServerAppSearch implements FullTextSearch<Application>, DatabaseVendorSpecific {
 

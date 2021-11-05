@@ -34,10 +34,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
 import static java.util.stream.Collectors.toList;

@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.schema.tables.records.PhysicalFlowParticipantRecord;
+import org.finos.waltz.schema.tables.records.PhysicalFlowParticipantRecord;
 import org.finos.waltz.common.RandomUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.model.Criticality;
@@ -34,10 +34,10 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
-import static com.khartec.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_FLOW_PARTICIPANT;
-import static com.khartec.waltz.schema.tables.ServerUsage.SERVER_USAGE;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static org.finos.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_FLOW_PARTICIPANT;
+import static org.finos.waltz.schema.tables.ServerUsage.SERVER_USAGE;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;

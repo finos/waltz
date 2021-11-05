@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.schema.tables.records.InvolvementRecord;
+import org.finos.waltz.schema.tables.records.InvolvementRecord;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.jooq.DSLContext;
@@ -27,11 +27,11 @@ import org.springframework.context.ApplicationContext;
 import java.util.List;
 import java.util.Map;
 
-import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
-import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
-import static com.khartec.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
-import static com.khartec.waltz.schema.tables.Person.PERSON;
-import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
+import static org.finos.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
+import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
+import static org.finos.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
+import static org.finos.waltz.schema.tables.Person.PERSON;
+import static org.finos.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 import static org.finos.waltz.common.RandomUtilities.randomPick;
 
 

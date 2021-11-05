@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.survey.inclusion_evaluator;
 
-import com.khartec.waltz.schema.tables.EntityHierarchy;
-import com.khartec.waltz.schema.tables.OrganisationalUnit;
+import org.finos.waltz.schema.tables.EntityHierarchy;
+import org.finos.waltz.schema.tables.OrganisationalUnit;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.survey.SurveyQuestion;
 import org.finos.waltz.model.survey.SurveyQuestionResponse;
@@ -29,7 +29,7 @@ import org.jooq.impl.DSL;
 import java.util.List;
 import java.util.Map;
 
-import static com.khartec.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.*;
 
 /**
  *

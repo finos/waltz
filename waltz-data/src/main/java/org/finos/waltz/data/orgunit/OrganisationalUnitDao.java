@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.orgunit;
 
-import com.khartec.waltz.schema.tables.records.OrganisationalUnitRecord;
+import org.finos.waltz.schema.tables.records.OrganisationalUnitRecord;
 import org.finos.waltz.data.FindEntityReferencesByIdSelector;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -31,8 +31,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
-import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
+import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
+import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
@@ -41,7 +41,7 @@ import static org.finos.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
 @Repository
 public class OrganisationalUnitDao implements FindEntityReferencesByIdSelector {
 
-    private static final com.khartec.waltz.schema.tables.OrganisationalUnit ou = ORGANISATIONAL_UNIT.as("ou");
+    private static final org.finos.waltz.schema.tables.OrganisationalUnit ou = ORGANISATIONAL_UNIT.as("ou");
 
 
     public static final RecordMapper<Record, OrganisationalUnit> TO_DOMAIN_MAPPER = record -> {

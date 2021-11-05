@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.schema.tables.records.LogicalFlowRecord;
+import org.finos.waltz.schema.tables.records.LogicalFlowRecord;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
 import org.finos.waltz.common.ListUtilities;
@@ -39,7 +39,7 @@ import org.springframework.context.ApplicationContext;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.RandomUtilities.randomPick;

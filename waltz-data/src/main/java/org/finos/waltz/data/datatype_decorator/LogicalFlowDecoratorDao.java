@@ -18,8 +18,8 @@
 
 package org.finos.waltz.data.datatype_decorator;
 
-import com.khartec.waltz.schema.tables.LogicalFlowDecorator;
-import com.khartec.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
+import org.finos.waltz.schema.tables.LogicalFlowDecorator;
+import org.finos.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
@@ -44,12 +44,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.Tables.PHYSICAL_FLOW;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
-import static com.khartec.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE;
+import static org.finos.waltz.schema.Tables.PHYSICAL_FLOW;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
+import static org.finos.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;

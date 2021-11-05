@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.data_type;
 
-import com.khartec.waltz.schema.tables.records.DataTypeRecord;
+import org.finos.waltz.schema.tables.records.DataTypeRecord;
 import org.finos.waltz.data.FindEntityReferencesByIdSelector;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -33,9 +33,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW;
-import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW_DECORATOR;
-import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
+import static org.finos.waltz.schema.Tables.LOGICAL_FLOW;
+import static org.finos.waltz.schema.Tables.LOGICAL_FLOW_DECORATOR;
+import static org.finos.waltz.schema.tables.DataType.DATA_TYPE;
 import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.StringUtilities.mkSafe;

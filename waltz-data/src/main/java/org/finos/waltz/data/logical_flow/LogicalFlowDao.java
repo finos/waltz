@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.logical_flow;
 
-import com.khartec.waltz.schema.tables.records.LogicalFlowRecord;
+import org.finos.waltz.schema.tables.records.LogicalFlowRecord;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
@@ -36,9 +36,9 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.Tables.PHYSICAL_SPECIFICATION;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.Tables.PHYSICAL_SPECIFICATION;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;

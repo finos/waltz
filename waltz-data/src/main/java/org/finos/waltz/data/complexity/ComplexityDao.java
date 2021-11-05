@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.complexity;
 
-import com.khartec.waltz.schema.tables.records.ComplexityRecord;
+import org.finos.waltz.schema.tables.records.ComplexityRecord;
 import org.finos.waltz.common.Checks;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
@@ -37,8 +37,8 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.Set;
 
-import static com.khartec.waltz.schema.Tables.COMPLEXITY;
-import static com.khartec.waltz.schema.Tables.COMPLEXITY_KIND;
+import static org.finos.waltz.schema.Tables.COMPLEXITY;
+import static org.finos.waltz.schema.Tables.COMPLEXITY_KIND;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.data.JooqUtilities.selectorToCTE;

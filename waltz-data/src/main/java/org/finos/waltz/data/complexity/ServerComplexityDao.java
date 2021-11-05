@@ -29,9 +29,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
-import static com.khartec.waltz.schema.tables.ServerUsage.SERVER_USAGE;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
+import static org.finos.waltz.schema.tables.ServerUsage.SERVER_USAGE;
 
 @Deprecated
 @Repository

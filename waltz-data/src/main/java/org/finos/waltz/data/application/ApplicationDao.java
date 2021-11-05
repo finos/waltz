@@ -19,7 +19,7 @@
 package org.finos.waltz.data.application;
 
 
-import com.khartec.waltz.schema.tables.records.ApplicationRecord;
+import org.finos.waltz.schema.tables.records.ApplicationRecord;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.model.Criticality;
 import org.finos.waltz.model.EntityKind;
@@ -40,8 +40,8 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 
-import static com.khartec.waltz.schema.Tables.EXTERNAL_IDENTIFIER;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.Tables.EXTERNAL_IDENTIFIER;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -145,8 +145,8 @@ public class ApplicationDao {
      */
     public List<Application> findRelatedByApplicationId(long appId) {
 
-        com.khartec.waltz.schema.tables.Application self = APPLICATION.as("self");
-        com.khartec.waltz.schema.tables.Application rel = APPLICATION.as("rel");
+        org.finos.waltz.schema.tables.Application self = APPLICATION.as("self");
+        org.finos.waltz.schema.tables.Application rel = APPLICATION.as("rel");
 
         return dsl.select(rel.fields())
                 .from(rel)

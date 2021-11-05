@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.survey;
 
-import com.khartec.waltz.schema.tables.records.SurveyRunRecord;
+import org.finos.waltz.schema.tables.records.SurveyRunRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.EntityKind;
@@ -35,7 +35,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static com.khartec.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
 import static org.finos.waltz.common.StringUtilities.join;

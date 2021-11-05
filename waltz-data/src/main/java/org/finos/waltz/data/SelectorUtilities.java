@@ -25,7 +25,7 @@ import org.jooq.Condition;
 
 import java.util.Set;
 
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.minus;

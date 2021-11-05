@@ -29,11 +29,11 @@ import org.jooq.Select;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 
-import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
-import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
-import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
-import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
-import static com.khartec.waltz.schema.tables.Person.PERSON;
+import static org.finos.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
+import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
+import static org.finos.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
+import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
+import static org.finos.waltz.schema.tables.Person.PERSON;
 
 public class ChangeInitiativeIdSelectorFactory extends AbstractIdSelectorFactory {
 

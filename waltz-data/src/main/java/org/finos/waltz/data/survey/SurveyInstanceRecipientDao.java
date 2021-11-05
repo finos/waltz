@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.survey;
 
-import com.khartec.waltz.schema.tables.records.SurveyInstanceRecipientRecord;
+import org.finos.waltz.schema.tables.records.SurveyInstanceRecipientRecord;
 import org.finos.waltz.data.person.PersonDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.khartec.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository

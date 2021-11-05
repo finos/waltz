@@ -1,7 +1,7 @@
 package org.finos.waltz.data.process_diagram;
 
-import com.khartec.waltz.schema.tables.records.ProcessDiagramEntityRecord;
-import com.khartec.waltz.schema.tables.records.ProcessDiagramRecord;
+import org.finos.waltz.schema.tables.records.ProcessDiagramEntityRecord;
+import org.finos.waltz.schema.tables.records.ProcessDiagramRecord;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.JooqUtilities;
@@ -12,8 +12,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
-import static com.khartec.waltz.schema.Tables.PROCESS_DIAGRAM;
-import static com.khartec.waltz.schema.Tables.PROCESS_DIAGRAM_ENTITY;
+import static org.finos.waltz.schema.Tables.PROCESS_DIAGRAM;
+import static org.finos.waltz.schema.Tables.PROCESS_DIAGRAM_ENTITY;
 import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.EnumUtilities.readEnum;

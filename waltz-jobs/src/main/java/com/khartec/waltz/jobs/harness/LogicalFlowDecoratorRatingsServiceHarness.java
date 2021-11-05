@@ -37,7 +37,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 
-import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
+import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 
 public class LogicalFlowDecoratorRatingsServiceHarness {
 

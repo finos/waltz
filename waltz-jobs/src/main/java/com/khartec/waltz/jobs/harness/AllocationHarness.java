@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.schema.tables.records.AllocationRecord;
+import org.finos.waltz.schema.tables.records.AllocationRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.allocation_schemes.AllocationSchemeService;
 import com.khartec.waltz.service.application.ApplicationService;
@@ -44,7 +44,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.util.List;
 
-import static com.khartec.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.*;
 
 
 public class AllocationHarness {

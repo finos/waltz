@@ -18,8 +18,8 @@
 
 package org.finos.waltz.data.custom_environment;
 
-import com.khartec.waltz.schema.tables.Application;
-import com.khartec.waltz.schema.tables.records.CustomEnvironmentUsageRecord;
+import org.finos.waltz.schema.tables.Application;
+import org.finos.waltz.schema.tables.records.CustomEnvironmentUsageRecord;
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.database_information.DatabaseInformationDao;
 import org.finos.waltz.data.server_information.ServerInformationDao;
@@ -39,7 +39,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
-import static com.khartec.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.model.EntityKind.valueOf;

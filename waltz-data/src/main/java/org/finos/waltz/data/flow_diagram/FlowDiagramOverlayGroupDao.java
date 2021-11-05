@@ -18,8 +18,8 @@
 
 package org.finos.waltz.data.flow_diagram;
 
-import com.khartec.waltz.schema.tables.records.FlowDiagramOverlayGroupEntryRecord;
-import com.khartec.waltz.schema.tables.records.FlowDiagramOverlayGroupRecord;
+import org.finos.waltz.schema.tables.records.FlowDiagramOverlayGroupEntryRecord;
+import org.finos.waltz.schema.tables.records.FlowDiagramOverlayGroupRecord;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.flow_diagram.FlowDiagramOverlayGroup;
@@ -38,8 +38,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.khartec.waltz.schema.Tables.FLOW_DIAGRAM_OVERLAY_GROUP;
-import static com.khartec.waltz.schema.Tables.FLOW_DIAGRAM_OVERLAY_GROUP_ENTRY;
+import static org.finos.waltz.schema.Tables.FLOW_DIAGRAM_OVERLAY_GROUP;
+import static org.finos.waltz.schema.Tables.FLOW_DIAGRAM_OVERLAY_GROUP_ENTRY;
 import static java.util.stream.Collectors.collectingAndThen;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;

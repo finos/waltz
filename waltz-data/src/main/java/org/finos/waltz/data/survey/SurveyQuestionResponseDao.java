@@ -19,9 +19,9 @@
 package org.finos.waltz.data.survey;
 
 
-import com.khartec.waltz.schema.Tables;
-import com.khartec.waltz.schema.tables.records.SurveyQuestionListResponseRecord;
-import com.khartec.waltz.schema.tables.records.SurveyQuestionResponseRecord;
+import org.finos.waltz.schema.Tables;
+import org.finos.waltz.schema.tables.records.SurveyQuestionListResponseRecord;
+import org.finos.waltz.schema.tables.records.SurveyQuestionResponseRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
@@ -45,9 +45,9 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
-import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
-import static com.khartec.waltz.schema.Tables.SURVEY_QUESTION_LIST_RESPONSE;
-import static com.khartec.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
+import static org.finos.waltz.schema.Tables.SURVEY_INSTANCE;
+import static org.finos.waltz.schema.Tables.SURVEY_QUESTION_LIST_RESPONSE;
+import static org.finos.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;

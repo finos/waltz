@@ -20,7 +20,7 @@ package org.finos.waltz.data.taxonomy_management;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.khartec.waltz.schema.tables.records.TaxonomyChangeRecord;
+import org.finos.waltz.schema.tables.records.TaxonomyChangeRecord;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.model.EntityKind;
@@ -42,7 +42,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-import static com.khartec.waltz.schema.tables.TaxonomyChange.TAXONOMY_CHANGE;
+import static org.finos.waltz.schema.tables.TaxonomyChange.TAXONOMY_CHANGE;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.SetUtilities.asSet;

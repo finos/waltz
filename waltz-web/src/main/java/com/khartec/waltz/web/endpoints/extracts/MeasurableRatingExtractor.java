@@ -19,8 +19,8 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
 
-import com.khartec.waltz.schema.Tables;
-import com.khartec.waltz.schema.tables.*;
+import org.finos.waltz.schema.Tables;
+import org.finos.waltz.schema.tables.*;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
@@ -30,10 +30,10 @@ import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
-import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
-import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
+import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
+import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.jooq.tools.StringUtils.toCamelCase;

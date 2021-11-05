@@ -41,7 +41,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.Tables.ASSESSMENT_RATING;
+import static org.finos.waltz.schema.Tables.ASSESSMENT_RATING;
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;

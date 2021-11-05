@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.measurable_category;
 
-import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
+import org.finos.waltz.schema.tables.records.MeasurableCategoryRecord;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.measurable_category.ImmutableMeasurableCategory;
@@ -32,8 +32,8 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
 
 
 @Repository

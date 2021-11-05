@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.person_hierarchy;
 
-import com.khartec.waltz.schema.tables.records.PersonHierarchyRecord;
+import org.finos.waltz.schema.tables.records.PersonHierarchyRecord;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.hierarchy.FlatNode;
 import org.finos.waltz.common.hierarchy.Forest;
@@ -39,7 +39,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
+import static org.finos.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 import static java.util.stream.Collectors.toList;
 
 @Service

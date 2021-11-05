@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.schema.tables.records.MeasurableRatingPlannedDecommissionRecord;
-import com.khartec.waltz.schema.tables.records.MeasurableRatingReplacementRecord;
+import org.finos.waltz.schema.tables.records.MeasurableRatingPlannedDecommissionRecord;
+import org.finos.waltz.schema.tables.records.MeasurableRatingReplacementRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.LoggingUtilities;
@@ -38,8 +38,8 @@ import java.sql.Date;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.Tables.MEASURABLE_RATING_PLANNED_DECOMMISSION;
-import static com.khartec.waltz.schema.Tables.MEASURABLE_RATING_REPLACEMENT;
+import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_PLANNED_DECOMMISSION;
+import static org.finos.waltz.schema.Tables.MEASURABLE_RATING_REPLACEMENT;
 import static java.util.stream.Collectors.collectingAndThen;
 import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;

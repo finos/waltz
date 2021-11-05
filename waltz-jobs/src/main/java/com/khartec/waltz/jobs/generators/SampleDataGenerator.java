@@ -28,9 +28,9 @@ import org.springframework.context.ApplicationContext;
 import java.util.List;
 import java.util.Map;
 
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
-import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
+import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 
 public interface SampleDataGenerator {
 

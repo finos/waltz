@@ -34,7 +34,7 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 
-import static com.khartec.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.*;
 import static com.khartec.waltz.web.WebUtilities.getId;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static org.finos.waltz.common.SetUtilities.asSet;

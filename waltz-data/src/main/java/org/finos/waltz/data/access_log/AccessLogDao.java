@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.access_log;
 
-import com.khartec.waltz.schema.tables.records.AccessLogRecord;
+import org.finos.waltz.schema.tables.records.AccessLogRecord;
 import org.finos.waltz.model.accesslog.AccessLog;
 import org.finos.waltz.model.accesslog.AccessTime;
 import org.finos.waltz.model.accesslog.ImmutableAccessLog;
@@ -38,7 +38,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
-import static com.khartec.waltz.schema.tables.AccessLog.ACCESS_LOG;
+import static org.finos.waltz.schema.tables.AccessLog.ACCESS_LOG;
 
 
 @Repository

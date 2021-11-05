@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.schema.tables.Application;
-import com.khartec.waltz.schema.tables.OrganisationalUnit;
+import org.finos.waltz.schema.tables.Application;
+import org.finos.waltz.schema.tables.OrganisationalUnit;
 import com.khartec.waltz.service.DIConfiguration;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
@@ -31,10 +31,10 @@ import org.jooq.*;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW_DECORATOR;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
+import static org.finos.waltz.schema.Tables.LOGICAL_FLOW_DECORATOR;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.model.EntityLifecycleStatus.REMOVED;
 

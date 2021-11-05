@@ -26,9 +26,9 @@ import org.finos.waltz.model.IdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
 
-import static com.khartec.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
-import static com.khartec.waltz.schema.tables.SoftwareVersion.SOFTWARE_VERSION;
-import static com.khartec.waltz.schema.tables.SoftwareVersionLicence.SOFTWARE_VERSION_LICENCE;
+import static org.finos.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
+import static org.finos.waltz.schema.tables.SoftwareVersion.SOFTWARE_VERSION;
+import static org.finos.waltz.schema.tables.SoftwareVersionLicence.SOFTWARE_VERSION_LICENCE;
 import static org.finos.waltz.data.SelectorUtilities.ensureScopeIsExact;
 import static org.jooq.impl.DSL.select;
 import static org.jooq.impl.DSL.val;

@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.generators.stress;
 
-import com.khartec.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
-import com.khartec.waltz.schema.tables.records.LogicalFlowRecord;
+import org.finos.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
+import org.finos.waltz.schema.tables.records.LogicalFlowRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import org.finos.waltz.common.RandomUtilities;
 import org.finos.waltz.data.data_type.DataTypeDao;
@@ -35,8 +35,8 @@ import java.util.List;
 import java.util.Set;
 
 import static com.khartec.waltz.jobs.WaltzUtilities.*;
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static org.jooq.lambda.tuple.Tuple.tuple;

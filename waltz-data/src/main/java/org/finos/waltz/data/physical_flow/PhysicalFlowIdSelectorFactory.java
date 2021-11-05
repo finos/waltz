@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.physical_flow;
 
-import com.khartec.waltz.schema.tables.PhysicalFlow;
+import org.finos.waltz.schema.tables.PhysicalFlow;
 import org.finos.waltz.data.IdSelectorFactory;
 import org.finos.waltz.data.SelectorUtilities;
 import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
@@ -30,10 +30,10 @@ import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
-import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
-import static com.khartec.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_FLOW_PARTICIPANT;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
+import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static org.finos.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_FLOW_PARTICIPANT;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 

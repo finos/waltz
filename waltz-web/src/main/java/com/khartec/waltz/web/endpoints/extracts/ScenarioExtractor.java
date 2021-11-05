@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.web.endpoints.extracts;
 
-import com.khartec.waltz.schema.tables.Measurable;
-import com.khartec.waltz.schema.tables.ScenarioAxisItem;
+import org.finos.waltz.schema.tables.Measurable;
+import org.finos.waltz.schema.tables.ScenarioAxisItem;
 import org.finos.waltz.model.AxisOrientation;
 import org.finos.waltz.model.EntityKind;
 import org.jooq.Condition;
@@ -33,8 +33,8 @@ import org.springframework.stereotype.Service;
 import spark.Request;
 import spark.Response;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.web.WebUtilities.getId;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static spark.Spark.get;

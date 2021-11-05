@@ -43,8 +43,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.tables.Actor.ACTOR;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.Actor.ACTOR;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.*;
 import static org.finos.waltz.common.SetUtilities.fromCollection;

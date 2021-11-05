@@ -18,8 +18,8 @@
 
 package org.finos.waltz.data.physical_flow;
 
-import com.khartec.waltz.schema.tables.PhysicalSpecDataType;
-import com.khartec.waltz.schema.tables.records.PhysicalFlowRecord;
+import org.finos.waltz.schema.tables.PhysicalSpecDataType;
+import org.finos.waltz.schema.tables.records.PhysicalFlowRecord;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.enum_value.EnumValueDao;
 import org.finos.waltz.model.*;
@@ -38,10 +38,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
-import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static org.finos.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.Checks.checkFalse;
 import static org.finos.waltz.common.Checks.checkNotNull;

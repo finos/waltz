@@ -26,7 +26,7 @@ import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
+import static org.finos.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 
 public class EntityNameUtilitiesHarness {

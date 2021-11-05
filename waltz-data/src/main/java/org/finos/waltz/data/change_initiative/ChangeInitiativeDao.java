@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.change_initiative;
 
-import com.khartec.waltz.schema.tables.records.ChangeInitiativeRecord;
+import org.finos.waltz.schema.tables.records.ChangeInitiativeRecord;
 import org.finos.waltz.data.FindEntityReferencesByIdSelector;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.model.EntityKind;
@@ -35,8 +35,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
-import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
+import static org.finos.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
+import static org.finos.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.checkNotNull;
 

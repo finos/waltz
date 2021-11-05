@@ -26,7 +26,7 @@ import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
 
-import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
+import static org.finos.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 
 public abstract class AbstractIdSelectorFactory implements IdSelectorFactory {
 

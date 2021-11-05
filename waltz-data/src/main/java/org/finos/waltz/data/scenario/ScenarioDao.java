@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.scenario;
 
-import com.khartec.waltz.schema.tables.records.ScenarioRecord;
+import org.finos.waltz.schema.tables.records.ScenarioRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.ReleaseLifecycleStatus;
@@ -36,7 +36,7 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.function.BiFunction;
 
-import static com.khartec.waltz.schema.tables.Scenario.SCENARIO;
+import static org.finos.waltz.schema.tables.Scenario.SCENARIO;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.*;
 

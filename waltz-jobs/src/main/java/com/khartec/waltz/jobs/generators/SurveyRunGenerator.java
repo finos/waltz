@@ -19,8 +19,8 @@
 package com.khartec.waltz.jobs.generators;
 
 
-import com.khartec.waltz.schema.tables.records.SurveyQuestionResponseRecord;
-import com.khartec.waltz.schema.tables.records.SurveyRunRecord;
+import org.finos.waltz.schema.tables.records.SurveyQuestionResponseRecord;
+import org.finos.waltz.schema.tables.records.SurveyRunRecord;
 import com.khartec.waltz.service.survey.SurveyInstanceService;
 import com.khartec.waltz.service.survey.SurveyQuestionService;
 import com.khartec.waltz.service.survey.SurveyRunService;
@@ -52,11 +52,11 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
-import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
-import static com.khartec.waltz.schema.Tables.SURVEY_RUN;
-import static com.khartec.waltz.schema.tables.Person.PERSON;
-import static com.khartec.waltz.schema.tables.SurveyInstanceRecipient.SURVEY_INSTANCE_RECIPIENT;
-import static com.khartec.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
+import static org.finos.waltz.schema.Tables.SURVEY_INSTANCE;
+import static org.finos.waltz.schema.Tables.SURVEY_RUN;
+import static org.finos.waltz.schema.tables.Person.PERSON;
+import static org.finos.waltz.schema.tables.SurveyInstanceRecipient.SURVEY_INSTANCE_RECIPIENT;
+import static org.finos.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
 import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkFalse;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;

@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.client_cache_key;
 
-import com.khartec.waltz.schema.tables.records.ClientCacheKeyRecord;
+import org.finos.waltz.schema.tables.records.ClientCacheKeyRecord;
 import org.finos.waltz.model.client_cache_key.ClientCacheKey;
 import org.finos.waltz.model.client_cache_key.ImmutableClientCacheKey;
 import org.jooq.DSLContext;
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.ClientCacheKey.CLIENT_CACHE_KEY;
+import static org.finos.waltz.schema.tables.ClientCacheKey.CLIENT_CACHE_KEY;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 

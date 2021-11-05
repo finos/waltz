@@ -12,10 +12,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
-import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
-import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
+import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
+import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.common.ListUtilities.map;

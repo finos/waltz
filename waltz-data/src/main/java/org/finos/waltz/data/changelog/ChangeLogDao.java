@@ -18,8 +18,8 @@
 
 package org.finos.waltz.data.changelog;
 
-import com.khartec.waltz.schema.tables.AttestationInstance;
-import com.khartec.waltz.schema.tables.records.ChangeLogRecord;
+import org.finos.waltz.schema.tables.AttestationInstance;
+import org.finos.waltz.schema.tables.records.ChangeLogRecord;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
@@ -37,8 +37,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import static com.khartec.waltz.schema.Tables.PERSON;
-import static com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG;
+import static org.finos.waltz.schema.Tables.PERSON;
+import static org.finos.waltz.schema.tables.ChangeLog.CHANGE_LOG;
 import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
@@ -71,7 +71,7 @@ public class ChangeLogDao {
 
 
     public static SelectConditionStep<Record> mkUnattestedChangesQuery(EntityReference ref) {
-        com.khartec.waltz.schema.tables.ChangeLog cl = com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG.as("cl");
+        org.finos.waltz.schema.tables.ChangeLog cl = org.finos.waltz.schema.tables.ChangeLog.CHANGE_LOG.as("cl");
         AttestationInstance ai = AttestationInstance.ATTESTATION_INSTANCE.as("ai");
 
         Condition changeLogEntryOfInterest = cl.OPERATION.in(

@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.scenario;
 
-import com.khartec.waltz.schema.tables.records.ScenarioRatingItemRecord;
+import org.finos.waltz.schema.tables.records.ScenarioRatingItemRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.scenario.ChangeScenarioCommand;
@@ -33,8 +33,8 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.Collection;
 
-import static com.khartec.waltz.schema.tables.Scenario.SCENARIO;
-import static com.khartec.waltz.schema.tables.ScenarioRatingItem.SCENARIO_RATING_ITEM;
+import static org.finos.waltz.schema.tables.Scenario.SCENARIO;
+import static org.finos.waltz.schema.tables.ScenarioRatingItem.SCENARIO_RATING_ITEM;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.data.JooqUtilities.readRef;
 

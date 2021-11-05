@@ -36,7 +36,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
 
-import static com.khartec.waltz.schema.tables.Person.PERSON;
+import static org.finos.waltz.schema.tables.Person.PERSON;
 import static org.finos.waltz.common.SetUtilities.orderedUnion;
 import static org.finos.waltz.data.JooqUtilities.mkBasicTermSearch;
 import static org.finos.waltz.data.SearchUtilities.mkTerms;

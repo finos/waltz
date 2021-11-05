@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.schema.tables.records.ChangeInitiativeRecord;
-import com.khartec.waltz.schema.tables.records.EntityRelationshipRecord;
-import com.khartec.waltz.schema.tables.records.InvolvementRecord;
+import org.finos.waltz.schema.tables.records.ChangeInitiativeRecord;
+import org.finos.waltz.schema.tables.records.EntityRelationshipRecord;
+import org.finos.waltz.schema.tables.records.InvolvementRecord;
 import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.finos.waltz.common.RandomUtilities;
 import org.finos.waltz.common.StreamUtilities;
@@ -44,11 +44,11 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
-import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
-import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
-import static com.khartec.waltz.schema.tables.Person.PERSON;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
+import static org.finos.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
+import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
+import static org.finos.waltz.schema.tables.Person.PERSON;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static org.finos.waltz.model.change_initiative.ChangeInitiativeKind.*;

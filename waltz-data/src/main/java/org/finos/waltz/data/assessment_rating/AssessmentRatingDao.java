@@ -19,7 +19,7 @@
 package org.finos.waltz.data.assessment_rating;
 
 
-import com.khartec.waltz.schema.tables.records.AssessmentRatingRecord;
+import org.finos.waltz.schema.tables.records.AssessmentRatingRecord;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
@@ -38,9 +38,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.Tables.RATING_SCHEME_ITEM;
-import static com.khartec.waltz.schema.tables.AssessmentDefinition.ASSESSMENT_DEFINITION;
-import static com.khartec.waltz.schema.tables.AssessmentRating.ASSESSMENT_RATING;
+import static org.finos.waltz.schema.Tables.RATING_SCHEME_ITEM;
+import static org.finos.waltz.schema.tables.AssessmentDefinition.ASSESSMENT_DEFINITION;
+import static org.finos.waltz.schema.tables.AssessmentRating.ASSESSMENT_RATING;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.Checks.checkNotNull;

@@ -29,9 +29,9 @@ import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
 
-import static com.khartec.waltz.schema.tables.ChangeUnit.CHANGE_UNIT;
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static org.finos.waltz.schema.tables.ChangeUnit.CHANGE_UNIT;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 public class ChangeUnitIdSelectorFactory implements IdSelectorFactory {

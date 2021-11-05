@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.extracts;
 
-import com.khartec.waltz.schema.tables.Application;
+import org.finos.waltz.schema.tables.Application;
 import org.finos.waltz.data.SelectorUtilities;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.model.IdSelectionOptions;
@@ -28,8 +28,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.schema.Tables.APPLICATION;
-import static com.khartec.waltz.schema.Tables.ORGANISATIONAL_UNIT;
+import static org.finos.waltz.schema.Tables.APPLICATION;
+import static org.finos.waltz.schema.Tables.ORGANISATIONAL_UNIT;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.WebUtilities.readIdSelectionOptionsFromBody;
 import static spark.Spark.post;

@@ -11,9 +11,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-import static com.khartec.waltz.schema.tables.PermissionGroup.PERMISSION_GROUP;
-import static com.khartec.waltz.schema.tables.PermissionGroupEntry.PERMISSION_GROUP_ENTRY;
-import static com.khartec.waltz.schema.tables.PermissionGroupInvolvement.PERMISSION_GROUP_INVOLVEMENT;
+import static org.finos.waltz.schema.tables.PermissionGroup.PERMISSION_GROUP;
+import static org.finos.waltz.schema.tables.PermissionGroupEntry.PERMISSION_GROUP_ENTRY;
+import static org.finos.waltz.schema.tables.PermissionGroupInvolvement.PERMISSION_GROUP_INVOLVEMENT;
 
 @Repository
 public class PermissionGroupDao {

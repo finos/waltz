@@ -29,9 +29,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
-import static com.khartec.waltz.schema.tables.SoftwareVersion.SOFTWARE_VERSION;
-import static com.khartec.waltz.schema.tables.SoftwareVersionLicence.SOFTWARE_VERSION_LICENCE;
+import static org.finos.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
+import static org.finos.waltz.schema.tables.SoftwareVersion.SOFTWARE_VERSION;
+import static org.finos.waltz.schema.tables.SoftwareVersionLicence.SOFTWARE_VERSION_LICENCE;
 
 @Repository
 public class SoftwareUsageDao {

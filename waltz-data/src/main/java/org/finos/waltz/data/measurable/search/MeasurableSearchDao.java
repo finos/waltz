@@ -33,7 +33,7 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
+import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
 import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.SetUtilities.orderedUnion;
 import static org.finos.waltz.common.StringUtilities.lower;

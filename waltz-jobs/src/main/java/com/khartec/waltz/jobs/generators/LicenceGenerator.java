@@ -26,7 +26,7 @@ import org.springframework.context.ApplicationContext;
 
 import java.util.Map;
 
-import static com.khartec.waltz.schema.Tables.LICENCE;
+import static org.finos.waltz.schema.Tables.LICENCE;
 
 public class LicenceGenerator implements SampleDataGenerator {
 

@@ -18,10 +18,10 @@
 
 package org.finos.waltz.data.measurable_category;
 
-import com.khartec.waltz.schema.Tables;
-import com.khartec.waltz.schema.tables.EntityHierarchy;
-import com.khartec.waltz.schema.tables.MeasurableCategory;
-import com.khartec.waltz.schema.tables.MeasurableRating;
+import org.finos.waltz.schema.Tables;
+import org.finos.waltz.schema.tables.EntityHierarchy;
+import org.finos.waltz.schema.tables.MeasurableCategory;
+import org.finos.waltz.schema.tables.MeasurableRating;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.EntityReference;
@@ -46,7 +46,7 @@ import static org.jooq.impl.DSL.name;
 public class MeasurableCategoryAlignmentViewDao {
 
     private static final MeasurableRating mr = Tables.MEASURABLE_RATING.as("mr");
-    private static final com.khartec.waltz.schema.tables.Measurable m = Tables.MEASURABLE.as("m");
+    private static final org.finos.waltz.schema.tables.Measurable m = Tables.MEASURABLE.as("m");
     private static final MeasurableCategory mc = Tables.MEASURABLE_CATEGORY.as("mc");
     private static final EntityHierarchy eh = Tables.ENTITY_HIERARCHY.as("eh");
 

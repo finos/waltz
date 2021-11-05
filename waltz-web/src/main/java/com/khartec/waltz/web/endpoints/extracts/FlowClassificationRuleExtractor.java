@@ -1,7 +1,7 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
 
-import com.khartec.waltz.schema.tables.Application;
+import org.finos.waltz.schema.tables.Application;
 import org.finos.waltz.model.EntityKind;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -11,8 +11,8 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static spark.Spark.get;
 

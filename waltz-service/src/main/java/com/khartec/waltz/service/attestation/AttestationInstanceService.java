@@ -44,7 +44,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 
-import static com.khartec.waltz.schema.Tables.APPLICATION;
+import static org.finos.waltz.schema.Tables.APPLICATION;
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.*;
 import static org.finos.waltz.common.CollectionUtilities.first;

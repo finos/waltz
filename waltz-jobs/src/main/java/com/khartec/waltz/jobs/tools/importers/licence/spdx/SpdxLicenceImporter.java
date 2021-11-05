@@ -20,8 +20,8 @@ package com.khartec.waltz.jobs.tools.importers.licence.spdx;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.khartec.waltz.schema.tables.records.BookmarkRecord;
-import com.khartec.waltz.schema.tables.records.LicenceRecord;
+import org.finos.waltz.schema.tables.records.BookmarkRecord;
+import org.finos.waltz.schema.tables.records.LicenceRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.licence.LicenceDao;
@@ -44,8 +44,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.schema.tables.Bookmark.BOOKMARK;
-import static com.khartec.waltz.schema.tables.Licence.LICENCE;
+import static org.finos.waltz.schema.tables.Bookmark.BOOKMARK;
+import static org.finos.waltz.schema.tables.Licence.LICENCE;
 import static java.util.stream.Collectors.toList;
 
 public class SpdxLicenceImporter {

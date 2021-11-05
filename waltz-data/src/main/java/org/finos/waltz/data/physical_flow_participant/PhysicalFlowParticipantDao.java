@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.physical_flow_participant;
 
-import com.khartec.waltz.schema.tables.records.PhysicalFlowParticipantRecord;
+import org.finos.waltz.schema.tables.records.PhysicalFlowParticipantRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
@@ -35,7 +35,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 
-import static com.khartec.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_FLOW_PARTICIPANT;
+import static org.finos.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_FLOW_PARTICIPANT;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository

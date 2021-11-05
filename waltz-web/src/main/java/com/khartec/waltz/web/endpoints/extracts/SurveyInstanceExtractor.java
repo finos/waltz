@@ -47,11 +47,11 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.schema.tables.SurveyInstance.SURVEY_INSTANCE;
-import static com.khartec.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
-import static com.khartec.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
-import static com.khartec.waltz.schema.tables.SurveyRun.SURVEY_RUN;
-import static com.khartec.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
+import static org.finos.waltz.schema.tables.SurveyInstance.SURVEY_INSTANCE;
+import static org.finos.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
+import static org.finos.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
+import static org.finos.waltz.schema.tables.SurveyRun.SURVEY_RUN;
+import static org.finos.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
 import static com.khartec.waltz.web.WebUtilities.getId;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.endpoints.extracts.ExtractorUtilities.sanitizeSheetName;
@@ -74,11 +74,11 @@ public class SurveyInstanceExtractor implements DataExtractor {
     public static final String BASE_URL = mkPath("data-extract", "survey-instance");
     private final DSLContext dsl;
     private final SurveyQuestionDao questionDao;
-    private final com.khartec.waltz.schema.tables.SurveyTemplate st = SURVEY_TEMPLATE.as("st");
-    private final com.khartec.waltz.schema.tables.SurveyRun sr = SURVEY_RUN.as("sr");
-    private final com.khartec.waltz.schema.tables.SurveyInstance si = SURVEY_INSTANCE.as("si");
-    private final com.khartec.waltz.schema.tables.SurveyQuestion sq = SURVEY_QUESTION.as("sq");
-    private final com.khartec.waltz.schema.tables.SurveyQuestionResponse sqr = SURVEY_QUESTION_RESPONSE.as("sqr");
+    private final org.finos.waltz.schema.tables.SurveyTemplate st = SURVEY_TEMPLATE.as("st");
+    private final org.finos.waltz.schema.tables.SurveyRun sr = SURVEY_RUN.as("sr");
+    private final org.finos.waltz.schema.tables.SurveyInstance si = SURVEY_INSTANCE.as("si");
+    private final org.finos.waltz.schema.tables.SurveyQuestion sq = SURVEY_QUESTION.as("sq");
+    private final org.finos.waltz.schema.tables.SurveyQuestionResponse sqr = SURVEY_QUESTION_RESPONSE.as("sqr");
 
     private final Field<String> subjectNameField = InlineSelectFieldFactory.mkNameField(
             si.ENTITY_ID,

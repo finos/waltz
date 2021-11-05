@@ -25,7 +25,7 @@ import org.finos.waltz.model.IdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
 
-import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
+import static org.finos.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static org.jooq.impl.DSL.selectDistinct;
 
 /**

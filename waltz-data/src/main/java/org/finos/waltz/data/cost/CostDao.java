@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.cost;
 
-import com.khartec.waltz.schema.tables.records.CostRecord;
+import org.finos.waltz.schema.tables.records.CostRecord;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.Tables.COST;
+import static org.finos.waltz.schema.Tables.COST;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.data.JooqUtilities.selectorToCTE;

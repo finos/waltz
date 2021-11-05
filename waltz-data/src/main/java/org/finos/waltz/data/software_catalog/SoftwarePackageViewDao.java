@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.software_catalog;
 
-import com.khartec.waltz.schema.tables.records.SoftwarePackageRecord;
+import org.finos.waltz.schema.tables.records.SoftwarePackageRecord;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.software_catalog.ImmutableSoftwarePackageView;
@@ -35,9 +35,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import static com.khartec.waltz.schema.tables.SoftwarePackage.SOFTWARE_PACKAGE;
-import static com.khartec.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
-import static com.khartec.waltz.schema.tables.SoftwareVersion.SOFTWARE_VERSION;
+import static org.finos.waltz.schema.tables.SoftwarePackage.SOFTWARE_PACKAGE;
+import static org.finos.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
+import static org.finos.waltz.schema.tables.SoftwareVersion.SOFTWARE_VERSION;
 
 @Repository
 public class SoftwarePackageViewDao {

@@ -19,7 +19,7 @@
 package org.finos.waltz.data.measurable;
 
 
-import com.khartec.waltz.schema.tables.MeasurableRating;
+import org.finos.waltz.schema.tables.MeasurableRating;
 import org.finos.waltz.data.IdSelectorFactory;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
@@ -30,11 +30,11 @@ import org.finos.waltz.model.IdSelectionOptions;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
-import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
-import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
+import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
+import static org.finos.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.data.SelectorUtilities.ensureScopeIsExact;

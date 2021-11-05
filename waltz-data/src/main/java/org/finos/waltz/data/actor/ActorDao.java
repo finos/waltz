@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.actor;
 
-import com.khartec.waltz.schema.tables.records.ActorRecord;
+import org.finos.waltz.schema.tables.records.ActorRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.actor.Actor;
@@ -38,9 +38,9 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW;
-import static com.khartec.waltz.schema.tables.Actor.ACTOR;
-import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
+import static org.finos.waltz.schema.Tables.LOGICAL_FLOW;
+import static org.finos.waltz.schema.tables.Actor.ACTOR;
+import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkOptionalIsPresent;
@@ -49,7 +49,7 @@ import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 @Repository
 public class ActorDao {
 
-    public static final com.khartec.waltz.schema.tables.Actor actor = ACTOR.as("actor");
+    public static final org.finos.waltz.schema.tables.Actor actor = ACTOR.as("actor");
 
     public static final RecordMapper<Record, Actor> TO_DOMAIN_MAPPER = r -> {
         ActorRecord record = r.into(ActorRecord.class);

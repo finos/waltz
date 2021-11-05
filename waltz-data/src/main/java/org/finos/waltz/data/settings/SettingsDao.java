@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.settings;
 
-import com.khartec.waltz.schema.tables.records.SettingsRecord;
+import org.finos.waltz.schema.tables.records.SettingsRecord;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.settings.ImmutableSetting;
 import org.finos.waltz.model.settings.Setting;
@@ -32,7 +32,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.khartec.waltz.schema.tables.Settings.SETTINGS;
+import static org.finos.waltz.schema.tables.Settings.SETTINGS;
 
 @Repository
 public class SettingsDao {

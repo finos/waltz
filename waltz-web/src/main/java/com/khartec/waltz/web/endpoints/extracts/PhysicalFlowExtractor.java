@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.extracts;
 
-import com.khartec.waltz.schema.tables.PhysicalFlow;
+import org.finos.waltz.schema.tables.PhysicalFlow;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
@@ -36,10 +36,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.ListUtilities.isEmpty;

@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.survey;
 
-import com.khartec.waltz.schema.tables.records.SurveyQuestionDropdownEntryRecord;
+import org.finos.waltz.schema.tables.records.SurveyQuestionDropdownEntryRecord;
 import org.finos.waltz.model.survey.ImmutableSurveyQuestionDropdownEntry;
 import org.finos.waltz.model.survey.SurveyQuestionDropdownEntry;
 import org.jooq.*;
@@ -29,8 +29,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.SurveyQuestionDropdownEntry.SURVEY_QUESTION_DROPDOWN_ENTRY;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.SurveyQuestionDropdownEntry.SURVEY_QUESTION_DROPDOWN_ENTRY;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 

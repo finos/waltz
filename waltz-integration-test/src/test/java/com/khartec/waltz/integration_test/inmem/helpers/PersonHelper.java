@@ -1,14 +1,14 @@
 package com.khartec.waltz.integration_test.inmem.helpers;
 
 import org.finos.waltz.model.person.PersonKind;
-import com.khartec.waltz.schema.tables.records.PersonRecord;
+import org.finos.waltz.schema.tables.records.PersonRecord;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.concurrent.atomic.AtomicLong;
 
-import static com.khartec.waltz.schema.tables.Person.PERSON;
+import static org.finos.waltz.schema.tables.Person.PERSON;
 
 @Service
 public class PersonHelper {

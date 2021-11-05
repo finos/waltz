@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.schema.tables.records.OrganisationalUnitRecord;
+import org.finos.waltz.schema.tables.records.OrganisationalUnitRecord;
 import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.common.StringUtilities;
@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
+import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static org.finos.waltz.common.IOUtilities.readLines;
 
 

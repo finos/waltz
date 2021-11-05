@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.flow_classification_rule;
 
-import com.khartec.waltz.schema.tables.records.FlowClassificationRecord;
+import org.finos.waltz.schema.tables.records.FlowClassificationRecord;
 import org.finos.waltz.model.flow_classification.FlowClassification;
 import org.finos.waltz.model.flow_classification.ImmutableFlowClassification;
 import org.jooq.DSLContext;
@@ -29,7 +29,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
-import static com.khartec.waltz.schema.Tables.FLOW_CLASSIFICATION;
+import static org.finos.waltz.schema.Tables.FLOW_CLASSIFICATION;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 

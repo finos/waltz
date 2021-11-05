@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.physical_specification_definition;
 
-import com.khartec.waltz.schema.tables.records.PhysicalSpecDefnFieldRecord;
+import org.finos.waltz.schema.tables.records.PhysicalSpecDefnFieldRecord;
 import org.finos.waltz.model.FieldDataType;
 import org.finos.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinitionField;
 import org.finos.waltz.model.physical_specification_definition.PhysicalSpecDefinitionField;
@@ -31,7 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.tables.PhysicalSpecDefnField.PHYSICAL_SPEC_DEFN_FIELD;
+import static org.finos.waltz.schema.tables.PhysicalSpecDefnField.PHYSICAL_SPEC_DEFN_FIELD;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository

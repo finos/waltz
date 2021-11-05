@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.schema.tables.records.ScenarioRatingItemRecord;
+import org.finos.waltz.schema.tables.records.ScenarioRatingItemRecord;
 import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.measurable.MeasurableDao;
@@ -46,8 +46,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.Roadmap.ROADMAP;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.Roadmap.ROADMAP;
 import static org.finos.waltz.common.ListUtilities.filter;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.ObjectUtilities.any;

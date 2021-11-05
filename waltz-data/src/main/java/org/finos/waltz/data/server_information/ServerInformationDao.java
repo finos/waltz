@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.server_information;
 
-import com.khartec.waltz.schema.tables.records.ServerInformationRecord;
+import org.finos.waltz.schema.tables.records.ServerInformationRecord;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.model.EntityKind;
@@ -38,9 +38,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
-import static com.khartec.waltz.schema.tables.ServerUsage.SERVER_USAGE;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
+import static org.finos.waltz.schema.tables.ServerUsage.SERVER_USAGE;
 import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;

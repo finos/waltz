@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.jobs.example;
 
-import com.khartec.waltz.schema.tables.Measurable;
-import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
-import com.khartec.waltz.schema.tables.records.MeasurableRecord;
+import org.finos.waltz.schema.tables.Measurable;
+import org.finos.waltz.schema.tables.records.MeasurableCategoryRecord;
+import org.finos.waltz.schema.tables.records.MeasurableRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.IOUtilities;
@@ -52,8 +52,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.Tables.MEASURABLE;
-import static com.khartec.waltz.schema.Tables.MEASURABLE_CATEGORY;
+import static org.finos.waltz.schema.Tables.MEASURABLE;
+import static org.finos.waltz.schema.Tables.MEASURABLE_CATEGORY;
 import static java.util.stream.Collectors.collectingAndThen;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.CollectionUtilities.filter;

@@ -27,8 +27,8 @@ import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
 
-import static com.khartec.waltz.schema.Tables.MEASURABLE_RATING;
-import static com.khartec.waltz.schema.Tables.PROCESS_DIAGRAM_ENTITY;
+import static org.finos.waltz.schema.Tables.MEASURABLE_RATING;
+import static org.finos.waltz.schema.Tables.PROCESS_DIAGRAM_ENTITY;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 

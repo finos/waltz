@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.schema.tables.records.ServerUsageRecord;
+import org.finos.waltz.schema.tables.records.ServerUsageRecord;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.RandomUtilities;
 import org.finos.waltz.data.server_information.ServerInformationDao;
@@ -37,8 +37,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
-import static com.khartec.waltz.schema.tables.ServerUsage.SERVER_USAGE;
+import static org.finos.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
+import static org.finos.waltz.schema.tables.ServerUsage.SERVER_USAGE;
 import static org.finos.waltz.common.RandomUtilities.randomPick;
 
 

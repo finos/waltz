@@ -30,8 +30,8 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.AssetCost.ASSET_COST;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.AssetCost.ASSET_COST;
 
 @Repository
 public class AssetCostStatsDao {

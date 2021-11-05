@@ -37,8 +37,8 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;
 import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.sort;

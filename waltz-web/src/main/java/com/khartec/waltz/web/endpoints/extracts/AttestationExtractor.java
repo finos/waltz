@@ -48,10 +48,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
-import static com.khartec.waltz.schema.tables.AttestationInstanceRecipient.ATTESTATION_INSTANCE_RECIPIENT;
-import static com.khartec.waltz.schema.tables.AttestationRun.ATTESTATION_RUN;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
+import static org.finos.waltz.schema.tables.AttestationInstanceRecipient.ATTESTATION_INSTANCE_RECIPIENT;
+import static org.finos.waltz.schema.tables.AttestationRun.ATTESTATION_RUN;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.extracts.ExtractorUtilities.convertExcelToByteArray;
 import static com.khartec.waltz.web.endpoints.extracts.ExtractorUtilities.sanitizeSheetName;

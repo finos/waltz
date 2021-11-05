@@ -28,7 +28,7 @@ import org.jooq.DSLContext;
 
 import java.util.List;
 
-import static com.khartec.waltz.schema.Tables.SERVER_INFORMATION;
+import static org.finos.waltz.schema.Tables.SERVER_INFORMATION;
 
 public class SqlServerServerInformationSearch implements FullTextSearch<ServerInformation> {
 

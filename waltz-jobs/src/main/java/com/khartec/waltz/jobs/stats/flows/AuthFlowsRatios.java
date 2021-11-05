@@ -1,10 +1,10 @@
 package com.khartec.waltz.jobs.stats.flows;
 
-import com.khartec.waltz.schema.Tables;
-import com.khartec.waltz.schema.tables.DataType;
-import com.khartec.waltz.schema.tables.EnumValue;
-import com.khartec.waltz.schema.tables.LogicalFlow;
-import com.khartec.waltz.schema.tables.LogicalFlowDecorator;
+import org.finos.waltz.schema.Tables;
+import org.finos.waltz.schema.tables.DataType;
+import org.finos.waltz.schema.tables.EnumValue;
+import org.finos.waltz.schema.tables.LogicalFlow;
+import org.finos.waltz.schema.tables.LogicalFlowDecorator;
 import com.khartec.waltz.service.DIConfiguration;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;

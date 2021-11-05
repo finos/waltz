@@ -25,7 +25,7 @@ import org.springframework.context.ApplicationContext;
 
 import java.util.Map;
 
-import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
+import static org.finos.waltz.schema.tables.DataType.DATA_TYPE;
 
 
 public class DataTypeGenerator implements SampleDataGenerator {

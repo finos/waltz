@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.entity_named_note;
 
-import com.khartec.waltz.schema.tables.records.EntityNamedNoteTypeRecord;
+import org.finos.waltz.schema.tables.records.EntityNamedNoteTypeRecord;
 import org.finos.waltz.common.Checks;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.entity_named_note.EntityNamedNodeType;
@@ -36,8 +36,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.khartec.waltz.schema.tables.EntityNamedNote.ENTITY_NAMED_NOTE;
-import static com.khartec.waltz.schema.tables.EntityNamedNoteType.ENTITY_NAMED_NOTE_TYPE;
+import static org.finos.waltz.schema.tables.EntityNamedNote.ENTITY_NAMED_NOTE;
+import static org.finos.waltz.schema.tables.EntityNamedNoteType.ENTITY_NAMED_NOTE_TYPE;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.StringUtilities.join;
 import static org.finos.waltz.common.StringUtilities.splitThenMap;

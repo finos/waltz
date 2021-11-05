@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.schema.tables.records.AttributeChangeRecord;
-import com.khartec.waltz.schema.tables.records.ChangeUnitRecord;
+import org.finos.waltz.schema.tables.records.AttributeChangeRecord;
+import org.finos.waltz.schema.tables.records.ChangeUnitRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.MapUtilities;
@@ -45,9 +45,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.ChangeSet.CHANGE_SET;
-import static com.khartec.waltz.schema.tables.ChangeUnit.CHANGE_UNIT;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.ChangeSet.CHANGE_SET;
+import static org.finos.waltz.schema.tables.ChangeUnit.CHANGE_UNIT;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.RandomUtilities.*;
 import static org.finos.waltz.common.StringUtilities.joinUsing;

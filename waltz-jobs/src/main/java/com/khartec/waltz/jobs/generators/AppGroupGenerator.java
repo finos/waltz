@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.schema.tables.records.ApplicationGroupRecord;
+import org.finos.waltz.schema.tables.records.ApplicationGroupRecord;
 import org.finos.waltz.model.app_group.AppGroupKind;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
-import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
+import static org.finos.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
+import static org.finos.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
 import static java.lang.String.format;
 
 public class AppGroupGenerator implements SampleDataGenerator {

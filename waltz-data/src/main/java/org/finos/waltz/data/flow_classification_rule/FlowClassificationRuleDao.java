@@ -18,9 +18,9 @@
 
 package org.finos.waltz.data.flow_classification_rule;
 
-import com.khartec.waltz.schema.tables.Application;
-import com.khartec.waltz.schema.tables.EntityHierarchy;
-import com.khartec.waltz.schema.tables.records.FlowClassificationRuleRecord;
+import org.finos.waltz.schema.tables.Application;
+import org.finos.waltz.schema.tables.EntityHierarchy;
+import org.finos.waltz.schema.tables.records.FlowClassificationRuleRecord;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -36,13 +36,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.khartec.waltz.schema.Tables.FLOW_CLASSIFICATION;
-import static com.khartec.waltz.schema.Tables.FLOW_CLASSIFICATION_RULE;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
-import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
+import static org.finos.waltz.schema.Tables.FLOW_CLASSIFICATION;
+import static org.finos.waltz.schema.Tables.FLOW_CLASSIFICATION_RULE;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
+import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static java.util.stream.Collectors.collectingAndThen;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
@@ -61,8 +61,8 @@ public class FlowClassificationRuleDao {
 
     public final static Application CONSUMER_APP = APPLICATION.as("consumer");
     public final static Application SUPPLIER_APP = APPLICATION.as("supplier");
-    public static final com.khartec.waltz.schema.tables.DataType parent_dt = com.khartec.waltz.schema.tables.DataType.DATA_TYPE.as("parent_dt");
-    public static final com.khartec.waltz.schema.tables.DataType child_dt = com.khartec.waltz.schema.tables.DataType.DATA_TYPE.as("child_dt");
+    public static final org.finos.waltz.schema.tables.DataType parent_dt = org.finos.waltz.schema.tables.DataType.DATA_TYPE.as("parent_dt");
+    public static final org.finos.waltz.schema.tables.DataType child_dt = org.finos.waltz.schema.tables.DataType.DATA_TYPE.as("child_dt");
     public static final EntityHierarchy eh = ENTITY_HIERARCHY.as("eh");
     public static final EntityHierarchy level = ENTITY_HIERARCHY.as("level");
 
@@ -70,8 +70,8 @@ public class FlowClassificationRuleDao {
 
     private final static EntityHierarchy ehOrgUnit = ENTITY_HIERARCHY.as("ehOrgUnit");
     private final static EntityHierarchy ehDataType = ENTITY_HIERARCHY.as("ehDataType");
-    private final static com.khartec.waltz.schema.tables.DataType declaredDataType = com.khartec.waltz.schema.tables.DataType.DATA_TYPE.as("declaredDataType");
-    private final static com.khartec.waltz.schema.tables.DataType impliedDataType = com.khartec.waltz.schema.tables.DataType.DATA_TYPE.as("impliedDataType");
+    private final static org.finos.waltz.schema.tables.DataType declaredDataType = org.finos.waltz.schema.tables.DataType.DATA_TYPE.as("declaredDataType");
+    private final static org.finos.waltz.schema.tables.DataType impliedDataType = org.finos.waltz.schema.tables.DataType.DATA_TYPE.as("impliedDataType");
 
     private final static Field<Long> targetOrgUnitId = ehOrgUnit.ID.as("targetOrgUnitId");
     private final static Field<Integer> declaredOrgUnitLevel = ehOrgUnit.LEVEL.as("declaredOrgUnitLevel");
@@ -285,9 +285,9 @@ public class FlowClassificationRuleDao {
                 .and(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_KIND.eq(EntityKind.DATA_TYPE.name()))
                 .innerJoin(ENTITY_HIERARCHY).on(LOGICAL_FLOW_DECORATOR.DECORATOR_ENTITY_ID.eq(ENTITY_HIERARCHY.ID))
                 .and(ENTITY_HIERARCHY.KIND.eq(EntityKind.DATA_TYPE.name()))
-                .innerJoin(com.khartec.waltz.schema.tables.DataType.DATA_TYPE).on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(com.khartec.waltz.schema.tables.DataType.DATA_TYPE.ID))
+                .innerJoin(org.finos.waltz.schema.tables.DataType.DATA_TYPE).on(ENTITY_HIERARCHY.ANCESTOR_ID.eq(org.finos.waltz.schema.tables.DataType.DATA_TYPE.ID))
                 .innerJoin(FLOW_CLASSIFICATION).on(LOGICAL_FLOW_DECORATOR.RATING.eq(FLOW_CLASSIFICATION.CODE))
-                .where(dsl.renderInlined(com.khartec.waltz.schema.tables.DataType.DATA_TYPE.ID.eq(rule.dataTypeId())
+                .where(dsl.renderInlined(org.finos.waltz.schema.tables.DataType.DATA_TYPE.ID.eq(rule.dataTypeId())
                         .and(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(rule.applicationReference().id())
                                 .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())
                                         .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(rule.parentReference().kind().name())
@@ -344,10 +344,10 @@ public class FlowClassificationRuleDao {
                 .on(ehOrgUnit.ANCESTOR_ID.eq(FLOW_CLASSIFICATION_RULE.PARENT_ID)
                         .and(ehOrgUnit.KIND.eq(EntityKind.ORG_UNIT.name()))
                         .and(ehOrgUnit.ID.eq(ehOrgUnit.ANCESTOR_ID)))
-                .innerJoin(com.khartec.waltz.schema.tables.DataType.DATA_TYPE)
-                .on(com.khartec.waltz.schema.tables.DataType.DATA_TYPE.ID.eq(FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID))
+                .innerJoin(org.finos.waltz.schema.tables.DataType.DATA_TYPE)
+                .on(org.finos.waltz.schema.tables.DataType.DATA_TYPE.ID.eq(FLOW_CLASSIFICATION_RULE.DATA_TYPE_ID))
                 .innerJoin(ehDataType)
-                .on(ehDataType.ANCESTOR_ID.eq(com.khartec.waltz.schema.tables.DataType.DATA_TYPE.ID)
+                .on(ehDataType.ANCESTOR_ID.eq(org.finos.waltz.schema.tables.DataType.DATA_TYPE.ID)
                         .and(ehDataType.KIND.eq(EntityKind.DATA_TYPE.name()))
                         .and(ehDataType.ID.eq(ehDataType.ANCESTOR_ID)))
                 .innerJoin(FLOW_CLASSIFICATION).on(FLOW_CLASSIFICATION_RULE.FLOW_CLASSIFICATION_ID.eq(FLOW_CLASSIFICATION.ID))

@@ -37,8 +37,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.AuthoritativeSource.AUTHORITATIVE_SOURCE;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.AuthoritativeSource.AUTHORITATIVE_SOURCE;
 import static org.finos.waltz.common.IOUtilities.readLines;
 import static org.finos.waltz.common.RandomUtilities.randomPick;
 

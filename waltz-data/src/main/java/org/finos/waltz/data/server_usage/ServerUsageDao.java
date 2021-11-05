@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.server_usage;
 
-import com.khartec.waltz.schema.tables.records.ServerUsageRecord;
+import org.finos.waltz.schema.tables.records.ServerUsageRecord;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.server_usage.ImmutableServerUsage;
@@ -31,7 +31,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.tables.ServerUsage.SERVER_USAGE;
+import static org.finos.waltz.schema.tables.ServerUsage.SERVER_USAGE;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static org.finos.waltz.common.EnumUtilities.readEnum;

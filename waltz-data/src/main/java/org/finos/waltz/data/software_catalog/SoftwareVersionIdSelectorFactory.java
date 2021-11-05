@@ -1,6 +1,6 @@
 package org.finos.waltz.data.software_catalog;
 
-import com.khartec.waltz.schema.tables.SoftwareVersion;
+import org.finos.waltz.schema.tables.SoftwareVersion;
 import org.finos.waltz.data.IdSelectorFactory;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.jooq.Record1;
@@ -8,7 +8,7 @@ import org.jooq.Select;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.schema.tables.SoftwareVersion.SOFTWARE_VERSION;
+import static org.finos.waltz.schema.tables.SoftwareVersion.SOFTWARE_VERSION;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.model.HierarchyQueryScope.EXACT;

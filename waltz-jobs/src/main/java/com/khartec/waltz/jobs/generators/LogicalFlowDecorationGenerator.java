@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
+import org.finos.waltz.schema.tables.records.LogicalFlowDecoratorRecord;
 import org.finos.waltz.model.EntityKind;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
@@ -29,9 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.khartec.waltz.schema.Tables.DATA_TYPE;
-import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW_DECORATOR;
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.Tables.DATA_TYPE;
+import static org.finos.waltz.schema.Tables.LOGICAL_FLOW_DECORATOR;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static org.finos.waltz.common.ListUtilities.map;
 import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static org.finos.waltz.common.SetUtilities.uniqBy;

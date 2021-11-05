@@ -7,7 +7,7 @@ import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
 import org.finos.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
-import com.khartec.waltz.schema.tables.records.OrganisationalUnitRecord;
+import org.finos.waltz.schema.tables.records.OrganisationalUnitRecord;
 import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.h2.tools.Server;
 import org.jooq.DSLContext;
@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.schema.Tables.ORGANISATIONAL_UNIT;
+import static org.finos.waltz.schema.Tables.ORGANISATIONAL_UNIT;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = DIInMemoryTestConfiguration.class, loader = AnnotationConfigContextLoader.class)

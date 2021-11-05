@@ -33,7 +33,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.Tables.SERVER_INFORMATION;
+import static org.finos.waltz.schema.Tables.SERVER_INFORMATION;
 import static org.finos.waltz.common.SetUtilities.orderedUnion;
 
 public class MariaServerInformationSearch implements FullTextSearch<ServerInformation>, DatabaseVendorSpecific {

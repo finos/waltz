@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.schema.tables.records.ApplicationGroupEntryRecord;
+import org.finos.waltz.schema.tables.records.ApplicationGroupEntryRecord;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
 
@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.Tables.APPLICATION_GROUP_ENTRY;
-import static com.khartec.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
+import static org.finos.waltz.schema.Tables.APPLICATION_GROUP_ENTRY;
+import static org.finos.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
 import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static org.finos.waltz.common.RandomUtilities.randomlySizedIntStream;
 

@@ -31,8 +31,8 @@ import org.jooq.impl.DSL;
 
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;
 import static org.finos.waltz.common.ListUtilities.map;
 
 public class MariaAppSearch implements FullTextSearch<Application>, DatabaseVendorSpecific {

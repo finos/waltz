@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.software_catalog;
 
-import com.khartec.waltz.schema.tables.records.SoftwareVersionRecord;
+import org.finos.waltz.schema.tables.records.SoftwareVersionRecord;
 import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.software_catalog.ImmutableSoftwareVersion;
 import org.finos.waltz.model.software_catalog.SoftwareVersion;
@@ -34,8 +34,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import static com.khartec.waltz.schema.tables.SoftwareVersion.SOFTWARE_VERSION;
-import static com.khartec.waltz.schema.tables.SoftwareVersionLicence.SOFTWARE_VERSION_LICENCE;
+import static org.finos.waltz.schema.tables.SoftwareVersion.SOFTWARE_VERSION;
+import static org.finos.waltz.schema.tables.SoftwareVersionLicence.SOFTWARE_VERSION_LICENCE;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 

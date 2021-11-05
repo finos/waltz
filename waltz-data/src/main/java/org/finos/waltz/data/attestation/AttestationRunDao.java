@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.attestation;
 
-import com.khartec.waltz.schema.tables.records.AttestationRunRecord;
+import org.finos.waltz.schema.tables.records.AttestationRunRecord;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -35,9 +35,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.khartec.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
-import static com.khartec.waltz.schema.tables.AttestationInstanceRecipient.ATTESTATION_INSTANCE_RECIPIENT;
-import static com.khartec.waltz.schema.tables.AttestationRun.ATTESTATION_RUN;
+import static org.finos.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
+import static org.finos.waltz.schema.tables.AttestationInstanceRecipient.ATTESTATION_INSTANCE_RECIPIENT;
+import static org.finos.waltz.schema.tables.AttestationRun.ATTESTATION_RUN;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.*;
 import static org.finos.waltz.common.ListUtilities.newArrayList;

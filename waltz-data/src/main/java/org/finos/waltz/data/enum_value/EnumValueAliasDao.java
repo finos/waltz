@@ -28,8 +28,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.Tables.ENUM_VALUE;
-import static com.khartec.waltz.schema.Tables.ENUM_VALUE_ALIAS;
+import static org.finos.waltz.schema.Tables.ENUM_VALUE;
+import static org.finos.waltz.schema.Tables.ENUM_VALUE_ALIAS;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository

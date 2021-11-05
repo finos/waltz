@@ -24,8 +24,8 @@ import static org.finos.waltz.common.StringUtilities.lower;
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
-import static com.khartec.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
+import static org.finos.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
+import static org.finos.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
 import static org.junit.Assert.*;
 
 @Service

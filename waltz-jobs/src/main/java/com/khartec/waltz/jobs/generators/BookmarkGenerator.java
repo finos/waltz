@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.schema.tables.records.BookmarkRecord;
+import org.finos.waltz.schema.tables.records.BookmarkRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.RandomUtilities;
@@ -32,11 +32,11 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
-import static com.khartec.waltz.schema.tables.Bookmark.BOOKMARK;
-import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
-import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
+import static org.finos.waltz.schema.tables.Bookmark.BOOKMARK;
+import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
+import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static org.finos.waltz.common.RandomUtilities.randomPick;
 
 

@@ -3,8 +3,8 @@ package com.khartec.waltz.integration_test.inmem.helpers;
 import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.measurable_category.MeasurableCategory;
-import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
-import com.khartec.waltz.schema.tables.records.MeasurableRecord;
+import org.finos.waltz.schema.tables.records.MeasurableCategoryRecord;
+import org.finos.waltz.schema.tables.records.MeasurableRecord;
 import com.khartec.waltz.service.measurable.MeasurableService;
 import com.khartec.waltz.service.measurable_category.MeasurableCategoryService;
 import org.jooq.DSLContext;
@@ -13,8 +13,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
-import static com.khartec.waltz.schema.Tables.MEASURABLE;
-import static com.khartec.waltz.schema.Tables.MEASURABLE_CATEGORY;
+import static org.finos.waltz.schema.Tables.MEASURABLE;
+import static org.finos.waltz.schema.Tables.MEASURABLE_CATEGORY;
 
 @Service
 public class MeasurableHelper {

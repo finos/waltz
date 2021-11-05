@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.schema.tables.records.MeasurableRatingRecord;
+import org.finos.waltz.schema.tables.records.MeasurableRatingRecord;
 import org.finos.waltz.model.EntityKind;
 import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple;
@@ -29,8 +29,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.Tables.MEASURABLE;
-import static com.khartec.waltz.schema.Tables.MEASURABLE_RATING;
+import static org.finos.waltz.schema.Tables.MEASURABLE;
+import static org.finos.waltz.schema.Tables.MEASURABLE_RATING;
 import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static org.finos.waltz.common.RandomUtilities.randomlySizedIntStream;
 import static org.finos.waltz.common.SetUtilities.uniqBy;

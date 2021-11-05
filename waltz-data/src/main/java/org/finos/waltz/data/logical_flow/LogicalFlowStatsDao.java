@@ -18,10 +18,10 @@
 
 package org.finos.waltz.data.logical_flow;
 
-import com.khartec.waltz.schema.Tables;
-import com.khartec.waltz.schema.tables.DataType;
-import com.khartec.waltz.schema.tables.LogicalFlow;
-import com.khartec.waltz.schema.tables.*;
+import org.finos.waltz.schema.Tables;
+import org.finos.waltz.schema.tables.DataType;
+import org.finos.waltz.schema.tables.LogicalFlow;
+import org.finos.waltz.schema.tables.*;
 import org.finos.waltz.data.DBExecutorPoolInterface;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.model.EntityKind;
@@ -46,9 +46,9 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.model.EntityKind.DATA_TYPE;
@@ -64,7 +64,7 @@ public class LogicalFlowStatsDao {
 
     private final DSLContext dsl;
     private static final LogicalFlow lf = LOGICAL_FLOW.as("lf");
-    private static final com.khartec.waltz.schema.tables.LogicalFlowDecorator lfd = LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR.as("lfd");
+    private static final org.finos.waltz.schema.tables.LogicalFlowDecorator lfd = LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR.as("lfd");
     private static final Application counterpart_app = APPLICATION.as("counterpart_app");
     private static final Actor counterpart_actor = ACTOR.as("counterpart_actor");
     private static final DataType rollup_dt = Tables.DATA_TYPE.as("rollup_dt");

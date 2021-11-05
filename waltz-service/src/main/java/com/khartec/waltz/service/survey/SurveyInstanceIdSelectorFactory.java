@@ -29,7 +29,7 @@ import org.jooq.Select;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 
-import static com.khartec.waltz.schema.tables.SurveyInstance.SURVEY_INSTANCE;
+import static org.finos.waltz.schema.tables.SurveyInstance.SURVEY_INSTANCE;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.model.HierarchyQueryScope.EXACT;

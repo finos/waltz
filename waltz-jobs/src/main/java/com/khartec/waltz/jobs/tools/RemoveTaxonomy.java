@@ -32,7 +32,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.util.function.Supplier;
 
-import static com.khartec.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 

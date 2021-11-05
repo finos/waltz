@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
+import static org.finos.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static org.finos.waltz.common.SetUtilities.orderedUnion;
 import static org.finos.waltz.data.JooqUtilities.*;
 import static org.finos.waltz.data.SearchUtilities.mkTerms;

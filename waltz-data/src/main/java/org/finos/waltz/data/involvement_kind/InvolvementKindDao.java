@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.involvement_kind;
 
-import com.khartec.waltz.schema.tables.records.InvolvementKindRecord;
+import org.finos.waltz.schema.tables.records.InvolvementKindRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.UserTimestamp;
@@ -38,16 +38,16 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
-import static com.khartec.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
-import static com.khartec.waltz.schema.tables.KeyInvolvementKind.KEY_INVOLVEMENT_KIND;
+import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
+import static org.finos.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
+import static org.finos.waltz.schema.tables.KeyInvolvementKind.KEY_INVOLVEMENT_KIND;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkOptionalIsPresent;
 
 @Repository
 public class InvolvementKindDao {
 
-    public static final com.khartec.waltz.schema.tables.InvolvementKind involvementKind = INVOLVEMENT_KIND.as("inv_kind");
+    public static final org.finos.waltz.schema.tables.InvolvementKind involvementKind = INVOLVEMENT_KIND.as("inv_kind");
 
     public static final RecordMapper<Record, InvolvementKind> TO_DOMAIN_MAPPER = r -> {
         InvolvementKindRecord record = r.into(InvolvementKindRecord.class);

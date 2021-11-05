@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.extracts;
 
-import com.khartec.waltz.schema.tables.Application;
+import org.finos.waltz.schema.tables.Application;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.jooq.*;
@@ -26,7 +26,7 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.*;
 import static com.khartec.waltz.web.WebUtilities.getEntityReference;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static java.lang.String.format;

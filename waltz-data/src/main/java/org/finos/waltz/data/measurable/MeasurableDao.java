@@ -19,7 +19,7 @@
 package org.finos.waltz.data.measurable;
 
 
-import com.khartec.waltz.schema.tables.records.MeasurableRecord;
+import org.finos.waltz.schema.tables.records.MeasurableRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.FindEntityReferencesByIdSelector;
 import org.finos.waltz.model.EntityKind;
@@ -39,9 +39,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
-import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
+import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
 import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.EnumUtilities.readEnum;

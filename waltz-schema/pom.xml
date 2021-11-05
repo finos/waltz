@@ -151,7 +151,7 @@
                         </database>
 
                         <target>
-                            <packageName>com.khartec.waltz.schema</packageName>
+                            <packageName>org.finos.waltz.schema</packageName>
                             <directory>target/generated-sources/jooq</directory>
                         </target>
                     </generator>

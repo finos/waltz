@@ -25,10 +25,10 @@ import org.jooq.Record;
 import org.jooq.SelectConditionStep;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static com.khartec.waltz.schema.Tables.INVOLVEMENT;
-import static com.khartec.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
-import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
-import static com.khartec.waltz.schema.tables.Person.PERSON;
+import static org.finos.waltz.schema.Tables.INVOLVEMENT;
+import static org.finos.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
+import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
+import static org.finos.waltz.schema.tables.Person.PERSON;
 
 public class MeasurableExporterHarness {
 

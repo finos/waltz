@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.schema.tables.records.SettingsRecord;
+import org.finos.waltz.schema.tables.records.SettingsRecord;
 import com.khartec.waltz.service.settings.SettingsService;
 import org.finos.waltz.model.user.SystemRole;
 import org.jooq.DSLContext;
@@ -27,7 +27,7 @@ import org.springframework.context.ApplicationContext;
 import java.util.List;
 import java.util.Map;
 
-import static com.khartec.waltz.schema.Tables.SETTINGS;
+import static org.finos.waltz.schema.Tables.SETTINGS;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 
 public class DemoSettingsGenerator implements SampleDataGenerator {

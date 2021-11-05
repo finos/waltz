@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.entity_named_note;
 
-import com.khartec.waltz.schema.tables.records.EntityNamedNoteRecord;
+import org.finos.waltz.schema.tables.records.EntityNamedNoteRecord;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.UserTimestamp;
@@ -33,7 +33,7 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.EntityNamedNote.ENTITY_NAMED_NOTE;
+import static org.finos.waltz.schema.tables.EntityNamedNote.ENTITY_NAMED_NOTE;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository

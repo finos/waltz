@@ -25,7 +25,7 @@ import org.jooq.impl.DSL;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.khartec.waltz.schema.Tables.PERSON;
+import static org.finos.waltz.schema.Tables.PERSON;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 public class PersonNameToEmpIdResolver implements Resolver<String> {

@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.flow_diagram;
 
-import com.khartec.waltz.schema.tables.records.FlowDiagramEntityRecord;
+import org.finos.waltz.schema.tables.records.FlowDiagramEntityRecord;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
+import static org.finos.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
@@ -48,7 +48,7 @@ import static org.finos.waltz.model.EntityReference.mkRef;
 @Repository
 public class FlowDiagramEntityDao {
 
-    private static final com.khartec.waltz.schema.tables.FlowDiagramEntity fde = FLOW_DIAGRAM_ENTITY.as("fde");
+    private static final org.finos.waltz.schema.tables.FlowDiagramEntity fde = FLOW_DIAGRAM_ENTITY.as("fde");
 
     private static final ArrayList<EntityKind> POSSIBLE_ENTITY_KINDS = newArrayList(
             EntityKind.APPLICATION,

@@ -45,7 +45,7 @@ import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
-import static com.khartec.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
+import static org.finos.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
 import static org.junit.Assert.*;
 
 public class AttestationServiceTest extends BaseInMemoryIntegrationTest {

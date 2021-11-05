@@ -27,7 +27,7 @@ import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.*;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static spark.Spark.post;
 

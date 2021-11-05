@@ -19,7 +19,7 @@
 package org.finos.waltz.data.flow_diagram;
 
 
-import com.khartec.waltz.schema.tables.records.FlowDiagramAnnotationRecord;
+import org.finos.waltz.schema.tables.records.FlowDiagramAnnotationRecord;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.flow_diagram.FlowDiagramAnnotation;
@@ -33,7 +33,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.Tables.FLOW_DIAGRAM_ANNOTATION;
+import static org.finos.waltz.schema.Tables.FLOW_DIAGRAM_ANNOTATION;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.map;

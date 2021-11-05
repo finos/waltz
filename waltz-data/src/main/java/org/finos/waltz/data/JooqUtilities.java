@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data;
 
-import com.khartec.waltz.schema.tables.records.ChangeLogRecord;
+import org.finos.waltz.schema.tables.records.ChangeLogRecord;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.EndOfLifeStatus;

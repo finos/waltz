@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.cost;
 
-import com.khartec.waltz.schema.tables.records.CostKindRecord;
+import org.finos.waltz.schema.tables.records.CostKindRecord;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.model.cost.EntityCostKind;
 import org.finos.waltz.model.cost.ImmutableEntityCostKind;
@@ -32,8 +32,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
-import static com.khartec.waltz.schema.Tables.COST;
-import static com.khartec.waltz.schema.Tables.COST_KIND;
+import static org.finos.waltz.schema.Tables.COST;
+import static org.finos.waltz.schema.Tables.COST_KIND;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 

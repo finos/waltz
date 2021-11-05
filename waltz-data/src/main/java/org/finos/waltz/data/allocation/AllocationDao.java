@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.allocation;
 
-import com.khartec.waltz.schema.tables.records.AllocationRecord;
+import org.finos.waltz.schema.tables.records.AllocationRecord;
 import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.ListUtilities;
@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.khartec.waltz.schema.Tables.ALLOCATION;
+import static org.finos.waltz.schema.Tables.ALLOCATION;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.data.JooqUtilities.readRef;
 

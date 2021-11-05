@@ -1,6 +1,6 @@
 package com.khartec.waltz.jobs.tools.importers;
 
-import com.khartec.waltz.schema.tables.records.AssessmentRatingRecord;
+import org.finos.waltz.schema.tables.records.AssessmentRatingRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -26,7 +26,7 @@ import java.util.stream.IntStream;
 import static com.khartec.waltz.jobs.XlsUtilities.strVal;
 import static com.khartec.waltz.jobs.XlsUtilities.streamRows;
 import static com.khartec.waltz.jobs.tools.importers.DiffResult.mkDiff;
-import static com.khartec.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.*;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.StreamUtilities.mkSiphon;

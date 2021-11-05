@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.survey;
 
-import com.khartec.waltz.schema.tables.records.SurveyQuestionRecord;
+import org.finos.waltz.schema.tables.records.SurveyQuestionRecord;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -34,8 +34,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.model.EntityReference.mkRef;

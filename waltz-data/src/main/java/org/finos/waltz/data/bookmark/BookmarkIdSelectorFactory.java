@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.bookmark;
 
-import com.khartec.waltz.schema.tables.Bookmark;
+import org.finos.waltz.schema.tables.Bookmark;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.IdSelectorFactory;

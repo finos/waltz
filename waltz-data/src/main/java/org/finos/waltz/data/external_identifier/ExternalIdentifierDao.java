@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.external_identifier;
 
-import com.khartec.waltz.schema.tables.records.ExternalIdentifierRecord;
+import org.finos.waltz.schema.tables.records.ExternalIdentifierRecord;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -34,7 +34,7 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.tables.ExternalIdentifier.EXTERNAL_IDENTIFIER;
+import static org.finos.waltz.schema.tables.ExternalIdentifier.EXTERNAL_IDENTIFIER;
 import static org.finos.waltz.common.CollectionUtilities.map;
 
 @Repository

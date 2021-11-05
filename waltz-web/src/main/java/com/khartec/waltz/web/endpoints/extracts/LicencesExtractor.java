@@ -28,10 +28,10 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 
-import static com.khartec.waltz.schema.Tables.LICENCE;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
-import static com.khartec.waltz.schema.tables.SoftwareVersionLicence.SOFTWARE_VERSION_LICENCE;
+import static org.finos.waltz.schema.Tables.LICENCE;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
+import static org.finos.waltz.schema.tables.SoftwareVersionLicence.SOFTWARE_VERSION_LICENCE;
 import static com.khartec.waltz.web.WebUtilities.getEntityReference;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static java.lang.String.format;

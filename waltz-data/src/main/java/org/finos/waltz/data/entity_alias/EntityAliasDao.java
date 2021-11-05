@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.entity_alias;
 
-import com.khartec.waltz.schema.tables.records.EntityAliasRecord;
+import org.finos.waltz.schema.tables.records.EntityAliasRecord;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.model.EntityReference;
 import org.jooq.Condition;
@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;
+import static org.finos.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;
 
 
 @Repository

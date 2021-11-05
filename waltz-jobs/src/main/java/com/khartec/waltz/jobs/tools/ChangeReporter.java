@@ -38,8 +38,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.ChangeLog.CHANGE_LOG;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 
 public class ChangeReporter {

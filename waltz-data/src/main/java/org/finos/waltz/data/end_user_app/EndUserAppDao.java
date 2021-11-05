@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.end_user_app;
 
-import com.khartec.waltz.schema.tables.records.EndUserApplicationRecord;
+import org.finos.waltz.schema.tables.records.EndUserApplicationRecord;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.model.Criticality;
 import org.finos.waltz.model.application.LifecyclePhase;
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
+import static org.finos.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
 import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
 

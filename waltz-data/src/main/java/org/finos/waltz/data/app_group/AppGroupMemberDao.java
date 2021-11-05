@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.app_group;
 
-import com.khartec.waltz.schema.tables.records.ApplicationGroupMemberRecord;
+import org.finos.waltz.schema.tables.records.ApplicationGroupMemberRecord;
 import org.finos.waltz.model.app_group.AppGroupMember;
 import org.finos.waltz.model.app_group.AppGroupMemberRole;
 import org.finos.waltz.model.app_group.ImmutableAppGroupMember;
@@ -30,7 +30,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
-import static com.khartec.waltz.schema.tables.ApplicationGroupMember.APPLICATION_GROUP_MEMBER;
+import static org.finos.waltz.schema.tables.ApplicationGroupMember.APPLICATION_GROUP_MEMBER;
 
 @Repository
 public class AppGroupMemberDao {

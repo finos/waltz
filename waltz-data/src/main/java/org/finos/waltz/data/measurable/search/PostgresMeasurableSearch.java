@@ -30,7 +30,7 @@ import org.jooq.impl.DSL;
 
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
+import static org.finos.waltz.schema.tables.Measurable.MEASURABLE;
 
 public class PostgresMeasurableSearch implements FullTextSearch<Measurable>, DatabaseVendorSpecific {
 

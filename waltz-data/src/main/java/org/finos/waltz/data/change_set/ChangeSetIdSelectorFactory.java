@@ -27,8 +27,8 @@ import org.jooq.Select;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 
-import static com.khartec.waltz.schema.Tables.CHANGE_SET;
-import static com.khartec.waltz.schema.tables.ChangeUnit.CHANGE_UNIT;
+import static org.finos.waltz.schema.Tables.CHANGE_SET;
+import static org.finos.waltz.schema.tables.ChangeUnit.CHANGE_UNIT;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 public class ChangeSetIdSelectorFactory implements IdSelectorFactory {

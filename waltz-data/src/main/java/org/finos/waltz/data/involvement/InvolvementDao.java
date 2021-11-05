@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.involvement;
 
-import com.khartec.waltz.schema.tables.records.InvolvementRecord;
+import org.finos.waltz.schema.tables.records.InvolvementRecord;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.application.ApplicationDao;
@@ -43,11 +43,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
-import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
-import static com.khartec.waltz.schema.tables.Person.PERSON;
-import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
+import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
+import static org.finos.waltz.schema.tables.Person.PERSON;
+import static org.finos.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;

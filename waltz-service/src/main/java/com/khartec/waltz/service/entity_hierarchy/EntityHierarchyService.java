@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.entity_hierarchy;
 
-import com.khartec.waltz.schema.Tables;
+import org.finos.waltz.schema.Tables;
 import com.khartec.waltz.service.person_hierarchy.PersonHierarchyService;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.hierarchy.FlatNode;
@@ -48,8 +48,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.schema.Tables.ENTITY_HIERARCHY;
-import static com.khartec.waltz.schema.Tables.MEASURABLE;
+import static org.finos.waltz.schema.Tables.ENTITY_HIERARCHY;
+import static org.finos.waltz.schema.Tables.MEASURABLE;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.model.EntityKind.PERSON;
 import static org.jooq.impl.DSL.select;

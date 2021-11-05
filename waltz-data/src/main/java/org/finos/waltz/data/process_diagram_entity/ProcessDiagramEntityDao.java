@@ -1,7 +1,7 @@
 package org.finos.waltz.data.process_diagram_entity;
 
-import com.khartec.waltz.schema.tables.Measurable;
-import com.khartec.waltz.schema.tables.records.ProcessDiagramEntityRecord;
+import org.finos.waltz.schema.tables.Measurable;
+import org.finos.waltz.schema.tables.records.ProcessDiagramEntityRecord;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
-import static com.khartec.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Repository

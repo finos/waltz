@@ -32,8 +32,8 @@ import org.jooq.SelectConditionStep;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.schema.Tables.COMPLEXITY;
-import static com.khartec.waltz.schema.Tables.COMPLEXITY_KIND;
+import static org.finos.waltz.schema.Tables.COMPLEXITY;
+import static org.finos.waltz.schema.Tables.COMPLEXITY_KIND;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;

@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.data_type_usage;
 
-import com.khartec.waltz.schema.tables.records.DataTypeUsageRecord;
+import org.finos.waltz.schema.tables.records.DataTypeUsageRecord;
 import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.model.EntityKind;
@@ -43,12 +43,12 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.tables.Actor.ACTOR;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
-import static com.khartec.waltz.schema.tables.DataTypeUsage.DATA_TYPE_USAGE;
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
+import static org.finos.waltz.schema.tables.Actor.ACTOR;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.DataType.DATA_TYPE;
+import static org.finos.waltz.schema.tables.DataTypeUsage.DATA_TYPE_USAGE;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.StringUtilities.limit;
 import static org.finos.waltz.data.application.ApplicationDao.IS_ACTIVE;
@@ -59,12 +59,12 @@ import static org.jooq.impl.DSL.*;
 @Repository
 public class DataTypeUsageDao {
 
-    private final com.khartec.waltz.schema.tables.DataType dt = DATA_TYPE.as("dt");
-    private final com.khartec.waltz.schema.tables.DataTypeUsage dtu = DATA_TYPE_USAGE.as("dtu");
-    private final com.khartec.waltz.schema.tables.LogicalFlow lf = LOGICAL_FLOW.as("lf");
-    private final com.khartec.waltz.schema.tables.LogicalFlowDecorator lfd = LOGICAL_FLOW_DECORATOR.as("lfd");
-    private final com.khartec.waltz.schema.tables.Application app = APPLICATION.as("app");
-    private final com.khartec.waltz.schema.tables.Actor actor = ACTOR.as("actor");
+    private final org.finos.waltz.schema.tables.DataType dt = DATA_TYPE.as("dt");
+    private final org.finos.waltz.schema.tables.DataTypeUsage dtu = DATA_TYPE_USAGE.as("dtu");
+    private final org.finos.waltz.schema.tables.LogicalFlow lf = LOGICAL_FLOW.as("lf");
+    private final org.finos.waltz.schema.tables.LogicalFlowDecorator lfd = LOGICAL_FLOW_DECORATOR.as("lfd");
+    private final org.finos.waltz.schema.tables.Application app = APPLICATION.as("app");
+    private final org.finos.waltz.schema.tables.Actor actor = ACTOR.as("actor");
     private final Condition NOT_REMOVED = lf.ENTITY_LIFECYCLE_STATUS.ne(REMOVED.name());
 
     private final Field<String> originatorUsageKindField = val(UsageKind.ORIGINATOR.name());
@@ -493,7 +493,7 @@ public class DataTypeUsageDao {
     private Table<Record3<Long, Long, String>> mkFlowWithTypesForOriginators(EntityKind nodeKind,
                                                                                Select<Record1<Long>> nodeIdSelector) {
 
-        com.khartec.waltz.schema.tables.DataTypeUsage dtuConsumer = DATA_TYPE_USAGE.as("dtu_consumer");
+        org.finos.waltz.schema.tables.DataTypeUsage dtuConsumer = DATA_TYPE_USAGE.as("dtu_consumer");
 
         return DSL.select(
                     dtu.ENTITY_ID.as(nodeIdInner),

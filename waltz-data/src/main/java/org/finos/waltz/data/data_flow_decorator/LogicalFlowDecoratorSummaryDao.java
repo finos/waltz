@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.data_flow_decorator;
 
-import com.khartec.waltz.schema.tables.LogicalFlow;
+import org.finos.waltz.schema.tables.LogicalFlow;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.FlowDirection;
@@ -35,8 +35,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
+import static org.finos.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static org.finos.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
@@ -52,7 +52,7 @@ public class LogicalFlowDecoratorSummaryDao {
     private final DSLContext dsl;
 
     private static final LogicalFlow lf = LOGICAL_FLOW.as("lf");
-    private static final com.khartec.waltz.schema.tables.LogicalFlowDecorator lfd = LOGICAL_FLOW_DECORATOR.as("lfd");
+    private static final org.finos.waltz.schema.tables.LogicalFlowDecorator lfd = LOGICAL_FLOW_DECORATOR.as("lfd");
 
     @Autowired
     public LogicalFlowDecoratorSummaryDao(DSLContext dsl) {

@@ -19,8 +19,8 @@
 package org.finos.waltz.data.report_grid;
 
 
-import com.khartec.waltz.schema.Tables;
-import com.khartec.waltz.schema.tables.records.ReportGridRecord;
+import org.finos.waltz.schema.Tables;
+import org.finos.waltz.schema.tables.records.ReportGridRecord;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
@@ -39,8 +39,8 @@ import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.function.Function.identity;
@@ -61,21 +61,21 @@ public class ReportGridDao {
 
     private final DSLContext dsl;
 
-    private final com.khartec.waltz.schema.tables.Measurable m = MEASURABLE.as("m");
-    private final com.khartec.waltz.schema.tables.MeasurableRating mr = MEASURABLE_RATING.as("mr");
-    private final com.khartec.waltz.schema.tables.MeasurableCategory mc = MEASURABLE_CATEGORY.as("mc");
-    private final com.khartec.waltz.schema.tables.ReportGridColumnDefinition rgcd = REPORT_GRID_COLUMN_DEFINITION.as("rgcd");
-    private final com.khartec.waltz.schema.tables.ReportGrid rg = Tables.REPORT_GRID.as("rg");
-    private final com.khartec.waltz.schema.tables.RatingSchemeItem rsi = RATING_SCHEME_ITEM.as("rsi");
-    private final com.khartec.waltz.schema.tables.EntityHierarchy eh = ENTITY_HIERARCHY.as("eh");
-    private final com.khartec.waltz.schema.tables.AssessmentDefinition ad = ASSESSMENT_DEFINITION.as("ad");
-    private final com.khartec.waltz.schema.tables.AssessmentRating ar = ASSESSMENT_RATING.as("ar");
-    private final com.khartec.waltz.schema.tables.CostKind ck = COST_KIND.as("ck");
-    private final com.khartec.waltz.schema.tables.Cost c = COST.as("c");
-    private final com.khartec.waltz.schema.tables.Involvement inv = INVOLVEMENT.as("inv");
-    private final com.khartec.waltz.schema.tables.InvolvementKind ik  = INVOLVEMENT_KIND.as("ik");
-    private final com.khartec.waltz.schema.tables.Person p = Tables.PERSON.as("p");
-    private final com.khartec.waltz.schema.tables.SurveyQuestion sq = SURVEY_QUESTION.as("sq");
+    private final org.finos.waltz.schema.tables.Measurable m = MEASURABLE.as("m");
+    private final org.finos.waltz.schema.tables.MeasurableRating mr = MEASURABLE_RATING.as("mr");
+    private final org.finos.waltz.schema.tables.MeasurableCategory mc = MEASURABLE_CATEGORY.as("mc");
+    private final org.finos.waltz.schema.tables.ReportGridColumnDefinition rgcd = REPORT_GRID_COLUMN_DEFINITION.as("rgcd");
+    private final org.finos.waltz.schema.tables.ReportGrid rg = Tables.REPORT_GRID.as("rg");
+    private final org.finos.waltz.schema.tables.RatingSchemeItem rsi = RATING_SCHEME_ITEM.as("rsi");
+    private final org.finos.waltz.schema.tables.EntityHierarchy eh = ENTITY_HIERARCHY.as("eh");
+    private final org.finos.waltz.schema.tables.AssessmentDefinition ad = ASSESSMENT_DEFINITION.as("ad");
+    private final org.finos.waltz.schema.tables.AssessmentRating ar = ASSESSMENT_RATING.as("ar");
+    private final org.finos.waltz.schema.tables.CostKind ck = COST_KIND.as("ck");
+    private final org.finos.waltz.schema.tables.Cost c = COST.as("c");
+    private final org.finos.waltz.schema.tables.Involvement inv = INVOLVEMENT.as("inv");
+    private final org.finos.waltz.schema.tables.InvolvementKind ik  = INVOLVEMENT_KIND.as("ik");
+    private final org.finos.waltz.schema.tables.Person p = Tables.PERSON.as("p");
+    private final org.finos.waltz.schema.tables.SurveyQuestion sq = SURVEY_QUESTION.as("sq");
 
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_ID,

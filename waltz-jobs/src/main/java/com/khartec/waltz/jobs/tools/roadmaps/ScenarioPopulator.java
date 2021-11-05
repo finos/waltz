@@ -1,7 +1,7 @@
 package com.khartec.waltz.jobs.tools.roadmaps;
 
-import com.khartec.waltz.schema.tables.*;
-import com.khartec.waltz.schema.tables.records.ScenarioRatingItemRecord;
+import org.finos.waltz.schema.tables.*;
+import org.finos.waltz.schema.tables.records.ScenarioRatingItemRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.LoggingUtilities;
@@ -18,7 +18,7 @@ import java.sql.Timestamp;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.Tables.*;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.collectingAndThen;
 import static org.finos.waltz.model.EntityReference.mkRef;

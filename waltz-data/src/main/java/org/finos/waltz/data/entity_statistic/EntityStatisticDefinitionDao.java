@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.entity_statistic;
 
-import com.khartec.waltz.schema.tables.records.EntityStatisticDefinitionRecord;
+import org.finos.waltz.schema.tables.records.EntityStatisticDefinitionRecord;
 import org.finos.waltz.model.entity_statistic.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
@@ -29,13 +29,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
+import static org.finos.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository
 public class EntityStatisticDefinitionDao {
 
-    private static final com.khartec.waltz.schema.tables.EntityStatisticDefinition esd = ENTITY_STATISTIC_DEFINITION.as("esd");
+    private static final org.finos.waltz.schema.tables.EntityStatisticDefinition esd = ENTITY_STATISTIC_DEFINITION.as("esd");
 
     public static final RecordMapper<? super Record, EntityStatisticDefinition> TO_DEFINITION_MAPPER = r -> {
         EntityStatisticDefinitionRecord record = r.into(ENTITY_STATISTIC_DEFINITION);

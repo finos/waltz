@@ -19,7 +19,7 @@
 package org.finos.waltz.data.scenario;
 
 
-import com.khartec.waltz.schema.tables.records.ScenarioAxisItemRecord;
+import org.finos.waltz.schema.tables.records.ScenarioAxisItemRecord;
 import org.finos.waltz.model.AxisOrientation;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -35,7 +35,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.ScenarioAxisItem.SCENARIO_AXIS_ITEM;
+import static org.finos.waltz.schema.tables.ScenarioAxisItem.SCENARIO_AXIS_ITEM;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.data.InlineSelectFieldFactory.mkNameField;

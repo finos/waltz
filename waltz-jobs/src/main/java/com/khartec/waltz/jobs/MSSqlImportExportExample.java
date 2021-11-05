@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs;
 
-import com.khartec.waltz.schema.tables.records.PersonRecord;
+import org.finos.waltz.schema.tables.records.PersonRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.jooq.ExecuteContext;
@@ -34,7 +34,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
-import static com.khartec.waltz.schema.Tables.PERSON;
+import static org.finos.waltz.schema.Tables.PERSON;
 
 
 public class MSSqlImportExportExample {

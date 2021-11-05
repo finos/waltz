@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.entity_statistic;
 
-import com.khartec.waltz.schema.tables.records.EntityStatisticValueRecord;
+import org.finos.waltz.schema.tables.records.EntityStatisticValueRecord;
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.ImmutableEntityReference;
@@ -34,15 +34,15 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository
 public class EntityStatisticValueDao {
 
-    private static final com.khartec.waltz.schema.tables.EntityStatisticValue esv = ENTITY_STATISTIC_VALUE.as("esv");
-    private static final com.khartec.waltz.schema.tables.Application app = APPLICATION.as("app");
+    private static final org.finos.waltz.schema.tables.EntityStatisticValue esv = ENTITY_STATISTIC_VALUE.as("esv");
+    private static final org.finos.waltz.schema.tables.Application app = APPLICATION.as("app");
 
 
     public static final RecordMapper<? super Record, EntityStatisticValue> TO_VALUE_MAPPER = r -> {

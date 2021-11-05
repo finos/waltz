@@ -44,7 +44,7 @@ import java.util.List;
 import java.util.concurrent.Future;
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
+import static org.finos.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
 import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
@@ -55,7 +55,7 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 @Repository
 public class EntityStatisticSummaryDao {
 
-    private static final com.khartec.waltz.schema.tables.EntityStatisticValue esv = ENTITY_STATISTIC_VALUE.as("esv");
+    private static final org.finos.waltz.schema.tables.EntityStatisticValue esv = ENTITY_STATISTIC_VALUE.as("esv");
 
     private static final DataType<BigDecimal> decimalValueDataType = SQLDataType.DECIMAL(38, 12);
     private static final DataType<BigDecimal> decimalTotalDataType = SQLDataType.DECIMAL(38, 2);

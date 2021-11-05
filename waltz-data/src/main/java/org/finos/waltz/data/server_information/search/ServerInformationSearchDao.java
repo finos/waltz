@@ -32,7 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.khartec.waltz.schema.Tables.SERVER_INFORMATION;
+import static org.finos.waltz.schema.Tables.SERVER_INFORMATION;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.SetUtilities.orderedUnion;
 

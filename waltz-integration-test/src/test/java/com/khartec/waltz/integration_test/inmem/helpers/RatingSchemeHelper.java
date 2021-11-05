@@ -1,11 +1,11 @@
 package com.khartec.waltz.integration_test.inmem.helpers;
 
-import com.khartec.waltz.schema.tables.records.RatingSchemeRecord;
+import org.finos.waltz.schema.tables.records.RatingSchemeRecord;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.schema.Tables.RATING_SCHEME;
+import static org.finos.waltz.schema.Tables.RATING_SCHEME;
 
 @Service
 public class RatingSchemeHelper {

@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.shared_preference;
 
-import com.khartec.waltz.schema.tables.records.SharedPreferenceRecord;
+import org.finos.waltz.schema.tables.records.SharedPreferenceRecord;
 import org.finos.waltz.model.shared_preference.ImmutableSharedPreference;
 import org.finos.waltz.model.shared_preference.SharedPreference;
 import org.jooq.DSLContext;
@@ -33,7 +33,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.tables.SharedPreference.SHARED_PREFERENCE;
+import static org.finos.waltz.schema.tables.SharedPreference.SHARED_PREFERENCE;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository

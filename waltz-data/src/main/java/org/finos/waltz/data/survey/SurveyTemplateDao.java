@@ -19,7 +19,7 @@
 package org.finos.waltz.data.survey;
 
 
-import com.khartec.waltz.schema.tables.records.SurveyTemplateRecord;
+import org.finos.waltz.schema.tables.records.SurveyTemplateRecord;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.ReleaseLifecycleStatus;
 import org.finos.waltz.model.survey.ImmutableSurveyTemplate;
@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.khartec.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
+import static org.finos.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
 import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository

@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data.bookmark;
 
-import com.khartec.waltz.schema.tables.records.BookmarkRecord;
+import org.finos.waltz.schema.tables.records.BookmarkRecord;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
@@ -36,7 +36,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static com.khartec.waltz.schema.tables.Bookmark.BOOKMARK;
+import static org.finos.waltz.schema.tables.Bookmark.BOOKMARK;
 import static org.finos.waltz.common.Checks.*;
 
 

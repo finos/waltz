@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName;
-import static com.khartec.waltz.schema.Tables.PHYSICAL_FLOW;
+import static org.finos.waltz.schema.Tables.PHYSICAL_FLOW;
 
 @Service
 public class PhysicalFlowHelper {

@@ -33,8 +33,8 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.schema.tables.User.USER;
-import static com.khartec.waltz.schema.tables.UserRole.USER_ROLE;
+import static org.finos.waltz.schema.tables.User.USER;
+import static org.finos.waltz.schema.tables.UserRole.USER_ROLE;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;

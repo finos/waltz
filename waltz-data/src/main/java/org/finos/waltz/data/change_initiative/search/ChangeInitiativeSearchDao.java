@@ -31,7 +31,7 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
+import static org.finos.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
 import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.SetUtilities.orderedUnion;
 
