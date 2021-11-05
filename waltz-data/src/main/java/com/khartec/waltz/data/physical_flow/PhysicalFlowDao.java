@@ -186,7 +186,8 @@ public class PhysicalFlowDao {
                 .and(PHYSICAL_FLOW.BASIS_OFFSET.eq(flow.basisOffset()))
                 .and(PHYSICAL_FLOW.FREQUENCY.eq(flow.frequency().name()))
                 .and(PHYSICAL_FLOW.TRANSPORT.eq(flow.transport().value()))
-                .and(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(flow.logicalFlowId()));
+                .and(PHYSICAL_FLOW.LOGICAL_FLOW_ID.eq(flow.logicalFlowId()))
+                .and(PHYSICAL_FLOW.IS_REMOVED.isFalse());
 
         return findByCondition(sameFlow);
     }
@@ -264,6 +265,7 @@ public class PhysicalFlowDao {
         return dsl.update(PHYSICAL_FLOW)
                 .set(PHYSICAL_FLOW.IS_REMOVED, true)
                 .where(PHYSICAL_FLOW.ID.eq(flowId))
+                .and(PHYSICAL_FLOW.IS_READONLY.isFalse())
                 .execute();
     }
 
@@ -311,7 +313,8 @@ public class PhysicalFlowDao {
     public int updateSpecDefinition(String userName, long flowId, long newSpecDefinitionId) {
         checkNotNull(userName, "userName cannot be null");
 
-        return dsl.update(PHYSICAL_FLOW)
+        return dsl
+                .update(PHYSICAL_FLOW)
                 .set(PHYSICAL_FLOW.SPECIFICATION_DEFINITION_ID, newSpecDefinitionId)
                 .set(PHYSICAL_FLOW.LAST_UPDATED_BY, userName)
                 .set(PHYSICAL_FLOW.LAST_UPDATED_AT, nowUtcTimestamp())
