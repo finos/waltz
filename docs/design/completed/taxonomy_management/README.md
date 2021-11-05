@@ -177,4 +177,4 @@ See [removal example walkthrough](taxonomy_management.pdf).
 ## Notes
 
 [1] - an example of deleting an entire category already exists in
-`com.khartec.waltz.jobs.tools.RemoveTaxonomy`
+`RemoveTaxonomy`

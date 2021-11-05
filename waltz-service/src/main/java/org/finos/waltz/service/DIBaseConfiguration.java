@@ -37,11 +37,12 @@ import org.springframework.context.annotation.PropertySource;
 
 import javax.sql.DataSource;
 
+
 @Configuration
 @PropertySource(value = "classpath:waltz.properties", ignoreResourceNotFound = true)
 @PropertySource(value = "file:${user.home}/.waltz/waltz.properties", ignoreResourceNotFound = true)
 @PropertySource(value = "classpath:version.properties", ignoreResourceNotFound = true)
-@ComponentScan(value={"com.khartec.waltz.data"})
+@ComponentScan(value={"org.finos.waltz.data"})
 public class DIBaseConfiguration {
 
     // -- DATABASE ---

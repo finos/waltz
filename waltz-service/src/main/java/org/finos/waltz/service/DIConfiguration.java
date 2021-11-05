@@ -50,7 +50,7 @@ import static org.finos.waltz.common.StringUtilities.mkSafe;
 @Import(DIBaseConfiguration.class)
 @EnableMBeanExport(defaultDomain = "waltz_${waltz.qualifier:}")
 @EnableScheduling
-@ComponentScan(value={"com.khartec.waltz"})
+@ComponentScan(value={"org.finos.waltz"})
 public class DIConfiguration implements SchedulingConfigurer {
 
 
