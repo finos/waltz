@@ -18,20 +18,20 @@
 
 package com.khartec.waltz.jobs.harness;
 
+import com.khartec.waltz.service.DIConfiguration;
 import org.finos.waltz.data.change_initiative.ChangeInitiativeDao;
 import org.finos.waltz.data.change_initiative.ChangeInitiativeIdSelectorFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.HierarchyQueryScope;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
 
 public class ChangeInitiativeHarness {

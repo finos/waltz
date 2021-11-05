@@ -18,16 +18,16 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import org.finos.waltz.common.StringUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.attestation.*;
-import com.khartec.waltz.model.person.Person;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.attestation.AttestationInstanceService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.attestation.*;
+import org.finos.waltz.model.person.Person;
+import org.finos.waltz.model.user.SystemRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +37,9 @@ import spark.Response;
 
 import java.io.IOException;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Service

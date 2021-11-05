@@ -18,17 +18,17 @@
 
 package com.khartec.waltz.service.measurable;
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.data.EntityReferenceNameResolver;
 import org.finos.waltz.data.measurable.MeasurableDao;
 import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
 import org.finos.waltz.data.measurable.search.MeasurableSearchDao;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.model.measurable.Measurable;
-import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.measurable.Measurable;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,10 +37,10 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.function.Function;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static java.lang.String.format;
 import static java.util.Optional.ofNullable;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 
 @Service

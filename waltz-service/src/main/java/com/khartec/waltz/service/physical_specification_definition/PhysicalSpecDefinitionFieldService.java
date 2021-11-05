@@ -18,15 +18,15 @@
 
 package com.khartec.waltz.service.physical_specification_definition;
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.data.physical_specification_definition.PhysicalSpecDefinitionFieldDao;
 import org.finos.waltz.data.physical_specification_definition.PhysicalSpecDefnFieldIdSelectorFactory;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.logical_data_element.LogicalDataElementChangeCommand;
-import com.khartec.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinitionField;
-import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionField;
-import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionFieldChangeCommand;
-import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.logical_data_element.LogicalDataElementChangeCommand;
+import org.finos.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinitionField;
+import org.finos.waltz.model.physical_specification_definition.PhysicalSpecDefinitionField;
+import org.finos.waltz.model.physical_specification_definition.PhysicalSpecDefinitionFieldChangeCommand;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;

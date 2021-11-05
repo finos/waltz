@@ -18,14 +18,14 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.database_information.DatabaseInformation;
-import com.khartec.waltz.model.database_information.DatabaseSummaryStatistics;
 import com.khartec.waltz.service.database_information.DatabaseInformationService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.json.ApplicationDatabases;
 import com.khartec.waltz.web.json.ImmutableApplicationDatabases;
+import org.finos.waltz.model.database_information.DatabaseInformation;
+import org.finos.waltz.model.database_information.DatabaseSummaryStatistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

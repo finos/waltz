@@ -18,15 +18,15 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import org.finos.waltz.data.logical_flow.LogicalFlowStatsDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.logical_flow.LogicalFlowGraphSummary;
 import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.data.logical_flow.LogicalFlowStatsDao;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.logical_flow.LogicalFlowGraphSummary;
 import org.jooq.DSLContext;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static com.khartec.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 public class LogicalFlowStatsHarness {
     public static void main(String[] args) throws ParseException {

@@ -2,10 +2,10 @@ package com.khartec.waltz.integration_test.inmem.helpers;
 
 import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.app_group.AppGroup;
-import com.khartec.waltz.model.app_group.AppGroupKind;
-import com.khartec.waltz.model.app_group.ImmutableAppGroup;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.app_group.AppGroup;
+import org.finos.waltz.model.app_group.AppGroupKind;
+import org.finos.waltz.model.app_group.ImmutableAppGroup;
 import com.khartec.waltz.service.app_group.AppGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

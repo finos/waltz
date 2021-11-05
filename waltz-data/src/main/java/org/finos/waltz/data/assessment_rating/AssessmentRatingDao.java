@@ -19,13 +19,13 @@
 package org.finos.waltz.data.assessment_rating;
 
 
+import com.khartec.waltz.schema.tables.records.AssessmentRatingRecord;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.assessment_rating.*;
-import com.khartec.waltz.schema.tables.records.AssessmentRatingRecord;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.assessment_rating.*;
 import org.jooq.*;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,18 +38,18 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import static com.khartec.waltz.schema.Tables.RATING_SCHEME_ITEM;
+import static com.khartec.waltz.schema.tables.AssessmentDefinition.ASSESSMENT_DEFINITION;
+import static com.khartec.waltz.schema.tables.AssessmentRating.ASSESSMENT_RATING;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.schema.Tables.RATING_SCHEME_ITEM;
-import static com.khartec.waltz.schema.tables.AssessmentDefinition.ASSESSMENT_DEFINITION;
-import static com.khartec.waltz.schema.tables.AssessmentRating.ASSESSMENT_RATING;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toSet;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository

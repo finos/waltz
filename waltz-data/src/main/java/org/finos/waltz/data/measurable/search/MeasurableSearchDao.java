@@ -22,8 +22,8 @@ import org.finos.waltz.data.FullTextSearch;
 import org.finos.waltz.data.SearchDao;
 import org.finos.waltz.data.UnsupportedSearcher;
 import org.finos.waltz.data.measurable.MeasurableDao;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.model.measurable.Measurable;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.measurable.Measurable;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
@@ -33,12 +33,12 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
+import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.SetUtilities.orderedUnion;
 import static org.finos.waltz.common.StringUtilities.lower;
 import static org.finos.waltz.data.JooqUtilities.*;
 import static org.finos.waltz.data.SearchUtilities.mkTerms;
-import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
-import static java.util.Collections.emptyList;
 
 @Repository
 public class MeasurableSearchDao implements SearchDao<Measurable> {

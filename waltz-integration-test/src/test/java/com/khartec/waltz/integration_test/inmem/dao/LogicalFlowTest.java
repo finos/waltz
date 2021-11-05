@@ -22,19 +22,19 @@ import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.integration_test.inmem.helpers.AppHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdProvider;
-import com.khartec.waltz.model.logical_flow.LogicalFlow;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdProvider;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.map;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.model.HierarchyQueryScope.CHILDREN;
-import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.HierarchyQueryScope.CHILDREN;
+import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

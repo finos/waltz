@@ -22,12 +22,12 @@ import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.cost.CostDao;
 import org.finos.waltz.data.cost.CostKindDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.cost.EntityCost;
-import com.khartec.waltz.model.cost.EntityCostsSummary;
-import com.khartec.waltz.model.cost.ImmutableEntityCostsSummary;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.cost.EntityCost;
+import org.finos.waltz.model.cost.EntityCostsSummary;
+import org.finos.waltz.model.cost.ImmutableEntityCostsSummary;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,10 +36,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Set;
 
+import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.maybeFirst;
 import static org.finos.waltz.common.FunctionUtilities.time;
-import static java.util.Optional.ofNullable;
 
 @Service
 public class CostService {

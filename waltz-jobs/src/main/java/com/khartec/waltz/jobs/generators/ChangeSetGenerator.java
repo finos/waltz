@@ -18,10 +18,10 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import org.finos.waltz.common.RandomUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.schema.tables.records.ChangeSetRecord;
+import org.finos.waltz.common.RandomUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
 
@@ -34,11 +34,11 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
 import static com.khartec.waltz.schema.tables.ChangeSet.CHANGE_SET;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static java.lang.String.format;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
 
 public class ChangeSetGenerator implements SampleDataGenerator {
 

@@ -18,12 +18,12 @@
 
 package org.finos.waltz.data.system.job_log;
 
-import org.finos.waltz.common.Checks;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.system.job_log.ImmutableJobLog;
-import com.khartec.waltz.model.system.job_log.JobLog;
-import com.khartec.waltz.model.system.job_log.JobStatus;
 import com.khartec.waltz.schema.tables.records.SystemJobLogRecord;
+import org.finos.waltz.common.Checks;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.system.job_log.ImmutableJobLog;
+import org.finos.waltz.model.system.job_log.JobLog;
+import org.finos.waltz.model.system.job_log.JobStatus;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;

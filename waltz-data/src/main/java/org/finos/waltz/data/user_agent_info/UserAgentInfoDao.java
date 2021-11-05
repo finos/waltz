@@ -18,9 +18,9 @@
 
 package org.finos.waltz.data.user_agent_info;
 
-import com.khartec.waltz.model.user_agent_info.ImmutableUserAgentInfo;
-import com.khartec.waltz.model.user_agent_info.UserAgentInfo;
 import com.khartec.waltz.schema.tables.records.UserAgentInfoRecord;
+import org.finos.waltz.model.user_agent_info.ImmutableUserAgentInfo;
+import org.finos.waltz.model.user_agent_info.UserAgentInfo;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -31,8 +31,8 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.function.Function;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.UserAgentInfo.USER_AGENT_INFO;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository
 public class UserAgentInfoDao {

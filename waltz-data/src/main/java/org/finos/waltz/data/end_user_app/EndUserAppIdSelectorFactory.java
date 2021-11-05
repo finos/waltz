@@ -18,15 +18,15 @@
 
 package org.finos.waltz.data.end_user_app;
 
-import org.finos.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.application.ApplicationKind;
 import com.khartec.waltz.schema.tables.EndUserApplication;
 import com.khartec.waltz.schema.tables.Involvement;
 import com.khartec.waltz.schema.tables.Person;
 import com.khartec.waltz.schema.tables.PersonHierarchy;
+import org.finos.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.application.ApplicationKind;
 import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -37,11 +37,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.function.Function;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 public class EndUserAppIdSelectorFactory implements Function<IdSelectionOptions, Select<Record1<Long>>>  {
 

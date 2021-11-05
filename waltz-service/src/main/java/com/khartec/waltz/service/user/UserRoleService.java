@@ -18,20 +18,20 @@
 
 package com.khartec.waltz.service.user;
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.person.PersonService;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.data.user.UserRoleDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.Severity;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.person.Person;
-import com.khartec.waltz.model.user.ImmutableUser;
-import com.khartec.waltz.model.user.SystemRole;
-import com.khartec.waltz.model.user.UpdateRolesCommand;
-import com.khartec.waltz.model.user.User;
-import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.person.PersonService;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.person.Person;
+import org.finos.waltz.model.user.ImmutableUser;
+import org.finos.waltz.model.user.SystemRole;
+import org.finos.waltz.model.user.UpdateRolesCommand;
+import org.finos.waltz.model.user.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,11 +41,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.sort;
 import static org.finos.waltz.common.SetUtilities.asSet;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static java.lang.String.format;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 /**
  * Created by dwatkins on 30/03/2016.

@@ -19,9 +19,9 @@
 package com.khartec.waltz.service.physical_specification_definition;
 
 import org.finos.waltz.data.physical_specification_definition.PhysicalSpecDefinitionSampleFileDao;
-import com.khartec.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinitionSampleFile;
-import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionSampleFile;
-import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionSampleFileCreateCommand;
+import org.finos.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinitionSampleFile;
+import org.finos.waltz.model.physical_specification_definition.PhysicalSpecDefinitionSampleFile;
+import org.finos.waltz.model.physical_specification_definition.PhysicalSpecDefinitionSampleFileCreateCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

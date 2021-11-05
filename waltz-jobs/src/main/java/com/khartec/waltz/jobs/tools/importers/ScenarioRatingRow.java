@@ -19,7 +19,7 @@
 package com.khartec.waltz.jobs.tools.importers;
 
 
-import com.khartec.waltz.model.Nullable;
+import org.finos.waltz.model.Nullable;
 import org.immutables.value.Value;
 
 @Value.Immutable

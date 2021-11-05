@@ -21,12 +21,12 @@ package com.khartec.waltz.service.server_information;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.server_information.ServerInformationDao;
 import org.finos.waltz.data.server_information.search.ServerInformationSearchDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.model.server_information.ServerInformation;
-import com.khartec.waltz.model.server_information.ServerSummaryBasicStatistics;
-import com.khartec.waltz.model.server_information.ServerSummaryStatistics;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.server_information.ServerInformation;
+import org.finos.waltz.model.server_information.ServerSummaryBasicStatistics;
+import org.finos.waltz.model.server_information.ServerSummaryStatistics;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,9 +34,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.StringUtilities.isEmpty;
-import static java.util.Collections.emptyList;
 
 
 @Service

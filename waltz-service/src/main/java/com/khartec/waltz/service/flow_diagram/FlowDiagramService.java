@@ -18,6 +18,8 @@
 
 package com.khartec.waltz.service.flow_diagram;
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.data_type.DataTypeService;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.RandomUtilities;
@@ -34,21 +36,19 @@ import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import org.finos.waltz.data.measurable.MeasurableDao;
 import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
 import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.actor.Actor;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.change_initiative.ChangeInitiative;
-import com.khartec.waltz.model.changelog.ChangeLog;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.datatype.DataType;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.model.flow_diagram.*;
-import com.khartec.waltz.model.logical_flow.LogicalFlow;
-import com.khartec.waltz.model.measurable.Measurable;
-import com.khartec.waltz.model.physical_flow.PhysicalFlow;
-import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
-import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.data_type.DataTypeService;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.actor.Actor;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.change_initiative.ChangeInitiative;
+import org.finos.waltz.model.changelog.ChangeLog;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.datatype.DataType;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.flow_diagram.*;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
+import org.finos.waltz.model.measurable.Measurable;
+import org.finos.waltz.model.physical_flow.PhysicalFlow;
+import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.exception.InvalidResultException;
@@ -58,18 +58,18 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Stream;
 
+import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.ListUtilities.map;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.StringUtilities.isEmpty;
-import static com.khartec.waltz.model.EntityKind.FLOW_DIAGRAM;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
-import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.model.EntityKind.FLOW_DIAGRAM;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
 
 @Service

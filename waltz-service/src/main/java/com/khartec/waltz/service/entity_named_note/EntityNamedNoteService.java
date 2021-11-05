@@ -18,17 +18,17 @@
 
 package com.khartec.waltz.service.entity_named_note;
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.data.entity_named_note.EntityNamedNoteDao;
 import org.finos.waltz.data.entity_named_note.EntityNamedNoteTypeDao;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.Severity;
-import com.khartec.waltz.model.UserTimestamp;
-import com.khartec.waltz.model.changelog.ChangeLog;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.entity_named_note.EntityNamedNodeType;
-import com.khartec.waltz.model.entity_named_note.EntityNamedNote;
-import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.changelog.ChangeLog;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.entity_named_note.EntityNamedNodeType;
+import org.finos.waltz.model.entity_named_note.EntityNamedNote;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

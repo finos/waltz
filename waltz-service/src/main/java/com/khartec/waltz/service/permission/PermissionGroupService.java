@@ -1,12 +1,12 @@
 package com.khartec.waltz.service.permission;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.involvement.Involvement;
-import com.khartec.waltz.model.permission_group.Permission;
-import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.service.involvement.InvolvementService;
 import com.khartec.waltz.service.person.PersonService;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.involvement.Involvement;
+import org.finos.waltz.model.permission_group.Permission;
+import org.finos.waltz.model.person.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

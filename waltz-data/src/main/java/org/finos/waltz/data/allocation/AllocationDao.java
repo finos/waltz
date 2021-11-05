@@ -18,15 +18,15 @@
 
 package org.finos.waltz.data.allocation;
 
+import com.khartec.waltz.schema.tables.records.AllocationRecord;
 import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.ListUtilities;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.allocation.Allocation;
-import com.khartec.waltz.model.allocation.ImmutableAllocation;
-import com.khartec.waltz.model.allocation.MeasurablePercentageChange;
-import com.khartec.waltz.schema.tables.records.AllocationRecord;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.allocation.Allocation;
+import org.finos.waltz.model.allocation.ImmutableAllocation;
+import org.finos.waltz.model.allocation.MeasurablePercentageChange;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -36,9 +36,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.khartec.waltz.schema.Tables.ALLOCATION;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.data.JooqUtilities.readRef;
-import static com.khartec.waltz.schema.Tables.ALLOCATION;
 
 @Repository
 public class AllocationDao {

@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data;
 
-import com.khartec.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityKind;
 import org.immutables.value.Value;
 import org.jooq.Record1;
 import org.jooq.Select;

@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.change_unit;
 
-import com.khartec.waltz.model.attribute_change.AttributeChange;
-import com.khartec.waltz.model.change_unit.ChangeUnit;
+import org.finos.waltz.model.attribute_change.AttributeChange;
+import org.finos.waltz.model.change_unit.ChangeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

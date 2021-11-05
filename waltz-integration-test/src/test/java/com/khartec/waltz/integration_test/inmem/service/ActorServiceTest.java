@@ -21,9 +21,9 @@ package com.khartec.waltz.integration_test.inmem.service;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.integration_test.inmem.helpers.ActorHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.actor.Actor;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.actor.Actor;
 import com.khartec.waltz.service.actor.ActorService;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +32,7 @@ import java.util.List;
 
 import static org.finos.waltz.common.CollectionUtilities.first;
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkName;
-import static com.khartec.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.junit.Assert.*;
 
 

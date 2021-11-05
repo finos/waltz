@@ -18,14 +18,14 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.common.StreamUtilities;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.entity_relationship.*;
 import com.khartec.waltz.service.entity_relationship.EntityRelationshipService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.StreamUtilities;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.entity_relationship.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
@@ -33,10 +33,10 @@ import spark.Request;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.EnumUtilities.readEnum;
 
 @Service
 public class EntityRelationshipEndpoint implements Endpoint {

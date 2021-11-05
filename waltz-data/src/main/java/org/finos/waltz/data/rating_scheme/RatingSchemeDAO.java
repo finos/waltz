@@ -18,12 +18,12 @@
 
 package org.finos.waltz.data.rating_scheme;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.rating.*;
 import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.records.RatingSchemeItemRecord;
 import com.khartec.waltz.schema.tables.records.RatingSchemeRecord;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.rating.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +31,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.MapUtilities.groupBy;
-import static org.finos.waltz.common.StringUtilities.firstChar;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
 import static com.khartec.waltz.schema.tables.RatingScheme.RATING_SCHEME;
@@ -41,6 +38,9 @@ import static com.khartec.waltz.schema.tables.RatingSchemeItem.RATING_SCHEME_ITE
 import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.MapUtilities.groupBy;
+import static org.finos.waltz.common.StringUtilities.firstChar;
 
 @Repository
 public class RatingSchemeDAO {

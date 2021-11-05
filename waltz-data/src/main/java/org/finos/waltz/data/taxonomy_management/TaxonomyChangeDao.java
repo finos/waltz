@@ -20,15 +20,15 @@ package org.finos.waltz.data.taxonomy_management;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.taxonomy_management.ImmutableTaxonomyChangeCommand;
-import com.khartec.waltz.model.taxonomy_management.TaxonomyChangeCommand;
-import com.khartec.waltz.model.taxonomy_management.TaxonomyChangeLifecycleStatus;
-import com.khartec.waltz.model.taxonomy_management.TaxonomyChangeType;
 import com.khartec.waltz.schema.tables.records.TaxonomyChangeRecord;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.JooqUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.taxonomy_management.ImmutableTaxonomyChangeCommand;
+import org.finos.waltz.model.taxonomy_management.TaxonomyChangeCommand;
+import org.finos.waltz.model.taxonomy_management.TaxonomyChangeLifecycleStatus;
+import org.finos.waltz.model.taxonomy_management.TaxonomyChangeType;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
@@ -42,12 +42,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 
+import static com.khartec.waltz.schema.tables.TaxonomyChange.TAXONOMY_CHANGE;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.SetUtilities.asSet;
-import static org.finos.waltz.data.InlineSelectFieldFactory.mkNameField;
-import static org.finos.waltz.data.JooqUtilities.readRef;
-import static com.khartec.waltz.schema.tables.TaxonomyChange.TAXONOMY_CHANGE;
 
 
 @Repository

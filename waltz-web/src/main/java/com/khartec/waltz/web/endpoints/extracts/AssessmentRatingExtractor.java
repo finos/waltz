@@ -20,10 +20,13 @@ package com.khartec.waltz.web.endpoints.extracts;
 
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.assessment_definition.AssessmentDefinitionDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
-import org.jooq.*;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
+import org.jooq.DSLContext;
+import org.jooq.Field;
+import org.jooq.Record10;
+import org.jooq.SelectConditionStep;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +34,10 @@ import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 
-import static org.finos.waltz.common.SetUtilities.asSet;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.web.WebUtilities.getId;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static org.finos.waltz.common.SetUtilities.asSet;
 import static spark.Spark.post;
 
 

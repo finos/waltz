@@ -18,12 +18,12 @@
 
 package org.finos.waltz.data.source_data_rating;
 
-import org.finos.waltz.common.Checks;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.rating.RagRating;
-import com.khartec.waltz.model.source_data_rating.ImmutableSourceDataRating;
-import com.khartec.waltz.model.source_data_rating.SourceDataRating;
 import com.khartec.waltz.schema.tables.records.SourceDataRatingRecord;
+import org.finos.waltz.common.Checks;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.rating.RagRating;
+import org.finos.waltz.model.source_data_rating.ImmutableSourceDataRating;
+import org.finos.waltz.model.source_data_rating.SourceDataRating;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;

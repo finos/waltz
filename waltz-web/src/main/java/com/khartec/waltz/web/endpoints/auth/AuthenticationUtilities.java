@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.auth;
 
-import com.khartec.waltz.model.user.UserUtilities;
+import org.finos.waltz.model.user.UserUtilities;
 import spark.Request;
 
 public class AuthenticationUtilities {

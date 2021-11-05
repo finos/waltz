@@ -18,8 +18,8 @@
 
 package org.finos.waltz.data.entity_statistic;
 
-import com.khartec.waltz.model.entity_statistic.*;
 import com.khartec.waltz.schema.tables.records.EntityStatisticDefinitionRecord;
+import org.finos.waltz.model.entity_statistic.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository
 public class EntityStatisticDefinitionDao {

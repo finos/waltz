@@ -18,14 +18,14 @@
 
 package com.khartec.waltz.jobs.tools;
 
-import org.finos.waltz.common.ListUtilities;
-import org.finos.waltz.common.StreamUtilities.Siphon;
 import com.khartec.waltz.jobs.tools.resolvers.InvolvementNameToIdResolver;
 import com.khartec.waltz.jobs.tools.resolvers.OrgNameToIdResolver;
 import com.khartec.waltz.jobs.tools.resolvers.PersonNameToEmpIdResolver;
-import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.schema.tables.records.InvolvementRecord;
 import com.khartec.waltz.service.DIBaseConfiguration;
+import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.common.StreamUtilities.Siphon;
+import org.finos.waltz.model.EntityKind;
 import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
@@ -38,10 +38,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.String.format;
 import static org.finos.waltz.common.DebugUtilities.dump;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.common.StreamUtilities.mkSiphon;
-import static java.lang.String.format;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class PersonResolver {

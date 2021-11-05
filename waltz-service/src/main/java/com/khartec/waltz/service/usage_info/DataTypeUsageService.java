@@ -18,19 +18,19 @@
 
 package com.khartec.waltz.service.usage_info;
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.data_type.DataTypeDao;
 import org.finos.waltz.data.data_type.DataTypeIdSelectorFactory;
 import org.finos.waltz.data.data_type_usage.DataTypeUsageDao;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.changelog.ChangeLog;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.data_type_usage.DataTypeUsage;
-import com.khartec.waltz.model.system.SystemChangeSet;
-import com.khartec.waltz.model.tally.Tally;
-import com.khartec.waltz.model.usage_info.UsageInfo;
-import com.khartec.waltz.model.usage_info.UsageKind;
-import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.changelog.ChangeLog;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.data_type_usage.DataTypeUsage;
+import org.finos.waltz.model.system.SystemChangeSet;
+import org.finos.waltz.model.tally.Tally;
+import org.finos.waltz.model.usage_info.UsageInfo;
+import org.finos.waltz.model.usage_info.UsageKind;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
@@ -43,12 +43,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.khartec.waltz.schema.tables.Actor.ACTOR;
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.*;
 import static org.finos.waltz.common.SetUtilities.fromCollection;
-import static com.khartec.waltz.model.usage_info.UsageInfoUtilities.mkChangeSet;
-import static com.khartec.waltz.schema.tables.Actor.ACTOR;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.model.usage_info.UsageInfoUtilities.mkChangeSet;
 
 @Service
 public class DataTypeUsageService {

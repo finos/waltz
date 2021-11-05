@@ -18,11 +18,11 @@
 
 package org.finos.waltz.data.survey;
 
-import org.finos.waltz.data.person.PersonDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.survey.*;
 import com.khartec.waltz.schema.tables.records.SurveyInstanceRecipientRecord;
+import org.finos.waltz.data.person.PersonDao;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.survey.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,8 +30,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.Tables.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository
 public class SurveyInstanceRecipientDao {

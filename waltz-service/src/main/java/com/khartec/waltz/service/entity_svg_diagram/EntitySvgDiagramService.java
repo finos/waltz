@@ -19,8 +19,8 @@
 package com.khartec.waltz.service.entity_svg_diagram;
 
 import org.finos.waltz.data.entity_svg_diagram.EntitySvgDiagramDao;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.entity_svg_diagram.EntitySvgDiagram;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.entity_svg_diagram.EntitySvgDiagram;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

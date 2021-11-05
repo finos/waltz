@@ -18,12 +18,12 @@
 
 package org.finos.waltz.data.external_identifier;
 
-import org.finos.waltz.data.JooqUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.external_identifier.ExternalIdentifier;
-import com.khartec.waltz.model.external_identifier.ImmutableExternalIdentifier;
 import com.khartec.waltz.schema.tables.records.ExternalIdentifierRecord;
+import org.finos.waltz.data.JooqUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.external_identifier.ExternalIdentifier;
+import org.finos.waltz.model.external_identifier.ImmutableExternalIdentifier;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -34,8 +34,8 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.function.Function;
 
-import static org.finos.waltz.common.CollectionUtilities.map;
 import static com.khartec.waltz.schema.tables.ExternalIdentifier.EXTERNAL_IDENTIFIER;
+import static org.finos.waltz.common.CollectionUtilities.map;
 
 @Repository
 public class ExternalIdentifierDao {

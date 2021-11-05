@@ -18,19 +18,19 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.server_information.ServerInformation;
-import com.khartec.waltz.model.server_information.ServerSummaryBasicStatistics;
-import com.khartec.waltz.model.server_information.ServerSummaryStatistics;
 import com.khartec.waltz.service.server_information.ServerInformationService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.server_information.ServerInformation;
+import org.finos.waltz.model.server_information.ServerSummaryBasicStatistics;
+import org.finos.waltz.model.server_information.ServerSummaryStatistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Service

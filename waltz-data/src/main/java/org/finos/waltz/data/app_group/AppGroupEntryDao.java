@@ -18,9 +18,9 @@
 
 package org.finos.waltz.data.app_group;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.app_group.AppGroupEntry;
-import com.khartec.waltz.model.app_group.ImmutableAppGroupEntry;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.app_group.AppGroupEntry;
+import org.finos.waltz.model.app_group.ImmutableAppGroupEntry;
 import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.Record;
@@ -32,9 +32,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Collection;
 import java.util.List;
 
-import static org.finos.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
+import static org.finos.waltz.data.application.ApplicationDao.IS_ACTIVE;
 
 
 @Repository

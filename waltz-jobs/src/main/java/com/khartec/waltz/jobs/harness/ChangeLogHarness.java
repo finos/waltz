@@ -18,21 +18,21 @@
 
 package com.khartec.waltz.jobs.harness;
 
+import com.khartec.waltz.service.DIBaseConfiguration;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.changelog.ChangeLogSummariesDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.service.DIBaseConfiguration;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.HierarchyQueryScope;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.Optional;
 
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
 
 public class ChangeLogHarness {

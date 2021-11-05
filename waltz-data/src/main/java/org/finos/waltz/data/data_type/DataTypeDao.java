@@ -18,12 +18,12 @@
 
 package org.finos.waltz.data.data_type;
 
-import org.finos.waltz.data.FindEntityReferencesByIdSelector;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.datatype.DataType;
-import com.khartec.waltz.model.datatype.ImmutableDataType;
 import com.khartec.waltz.schema.tables.records.DataTypeRecord;
+import org.finos.waltz.data.FindEntityReferencesByIdSelector;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.datatype.DataType;
+import org.finos.waltz.model.datatype.ImmutableDataType;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,13 +33,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW;
+import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW_DECORATOR;
+import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static org.finos.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
-import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW;
-import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW_DECORATOR;
-import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 
 
 @Repository

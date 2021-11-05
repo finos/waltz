@@ -18,16 +18,16 @@
 
 package org.finos.waltz.data.application;
 
-import org.finos.waltz.data.data_type.DataTypeIdSelectorFactory;
-import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
-import org.finos.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.ImmutableIdSelectionOptions;
 import com.khartec.waltz.schema.tables.*;
 import org.finos.waltz.data.SelectorUtilities;
+import org.finos.waltz.data.data_type.DataTypeIdSelectorFactory;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
+import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
+import org.finos.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.ImmutableIdSelectionOptions;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -36,10 +36,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.function.Function;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.Checks.checkTrue;
-import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
-import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroupEntry.APPLICATION_GROUP_ENTRY;
@@ -51,6 +47,10 @@ import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_
 import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.model.EntityLifecycleStatus.REMOVED;
+import static org.finos.waltz.model.HierarchyQueryScope.EXACT;
 
 @Service
 public class ApplicationIdSelectorFactory implements Function<IdSelectionOptions, Select<Record1<Long>>> {

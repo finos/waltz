@@ -1,16 +1,16 @@
 package com.khartec.waltz.integration_test.inmem.helpers;
 
-import com.khartec.waltz.model.Criticality;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.application.*;
-import com.khartec.waltz.model.rating.RagRating;
+import org.finos.waltz.model.Criticality;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.application.*;
+import org.finos.waltz.model.rating.RagRating;
 import com.khartec.waltz.service.application.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.khartec.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Service
 public class AppHelper {

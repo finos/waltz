@@ -18,17 +18,17 @@
 
 package com.khartec.waltz.jobs.generators;
 
+import com.khartec.waltz.schema.tables.records.MeasurableRatingPlannedDecommissionRecord;
+import com.khartec.waltz.schema.tables.records.MeasurableRatingReplacementRecord;
+import com.khartec.waltz.service.DIConfiguration;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.LoggingUtilities;
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.measurable_category.MeasurableCategoryDao;
 import org.finos.waltz.data.measurable_rating.MeasurableRatingDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.measurable_rating.MeasurableRating;
-import com.khartec.waltz.schema.tables.records.MeasurableRatingPlannedDecommissionRecord;
-import com.khartec.waltz.schema.tables.records.MeasurableRatingReplacementRecord;
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.measurable_rating.MeasurableRating;
 import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.context.ApplicationContext;
@@ -38,6 +38,9 @@ import java.sql.Date;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.khartec.waltz.schema.Tables.MEASURABLE_RATING_PLANNED_DECOMMISSION;
+import static com.khartec.waltz.schema.Tables.MEASURABLE_RATING_REPLACEMENT;
+import static java.util.stream.Collectors.collectingAndThen;
 import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
 import static org.finos.waltz.common.DateTimeUtilities.today;
@@ -45,9 +48,6 @@ import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.RandomUtilities.*;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.common.SetUtilities.minus;
-import static com.khartec.waltz.schema.Tables.MEASURABLE_RATING_PLANNED_DECOMMISSION;
-import static com.khartec.waltz.schema.Tables.MEASURABLE_RATING_REPLACEMENT;
-import static java.util.stream.Collectors.collectingAndThen;
 
 
 public class AppMeasurableDecommGenerator implements SampleDataGenerator {

@@ -19,9 +19,9 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.schema.tables.Measurable;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
 import org.jooq.DSLContext;
 import org.jooq.Record12;
 import org.jooq.SelectConditionStep;

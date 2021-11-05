@@ -18,13 +18,13 @@
 
 package com.khartec.waltz.jobs.harness;
 
+import com.khartec.waltz.service.DIConfiguration;
 import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
 import org.finos.waltz.data.measurable_rating.MeasurableRatingDao;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.tally.MeasurableRatingTally;
-import com.khartec.waltz.model.tally.Tally;
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.tally.MeasurableRatingTally;
+import org.finos.waltz.model.tally.Tally;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.tools.json.ParseException;
@@ -32,9 +32,9 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.util.List;
 
-import static com.khartec.waltz.model.EntityKind.MEASURABLE;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.model.HierarchyQueryScope.CHILDREN;
+import static org.finos.waltz.model.EntityKind.MEASURABLE;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.HierarchyQueryScope.CHILDREN;
 
 
 public class MeasurableRatingHarness {

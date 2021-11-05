@@ -19,12 +19,12 @@
 package org.finos.waltz.data.entity_workflow;
 
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.entity_workflow.EntityWorkflowTransition;
-import com.khartec.waltz.model.entity_workflow.ImmutableEntityWorkflowTransition;
 import com.khartec.waltz.schema.tables.records.EntityWorkflowTransitionRecord;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
+import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowTransition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -33,8 +33,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.EntityWorkflowTransition.ENTITY_WORKFLOW_TRANSITION;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository
 public class EntityWorkflowTransitionDao {

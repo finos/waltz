@@ -18,26 +18,26 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.UpdateDescriptionCommand;
-import com.khartec.waltz.model.logical_data_element.LogicalDataElementChangeCommand;
-import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionField;
-import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionFieldChangeCommand;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.physical_specification_definition.PhysicalSpecDefinitionFieldService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.UpdateDescriptionCommand;
+import org.finos.waltz.model.logical_data_element.LogicalDataElementChangeCommand;
+import org.finos.waltz.model.physical_specification_definition.PhysicalSpecDefinitionField;
+import org.finos.waltz.model.physical_specification_definition.PhysicalSpecDefinitionFieldChangeCommand;
+import org.finos.waltz.model.user.SystemRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class PhysicalSpecDefinitionFieldEndpoint implements Endpoint {

@@ -18,16 +18,16 @@
 
 package org.finos.waltz.data.software_catalog;
 
+import com.khartec.waltz.schema.tables.records.SoftwarePackageRecord;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.data.SearchDao;
-import com.khartec.waltz.model.NameProvider;
-import com.khartec.waltz.model.UserTimestamp;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.model.software_catalog.ImmutableSoftwarePackage;
-import com.khartec.waltz.model.software_catalog.SoftwarePackage;
-import com.khartec.waltz.model.tally.Tally;
-import com.khartec.waltz.schema.tables.records.SoftwarePackageRecord;
 import org.finos.waltz.data.SearchUtilities;
+import org.finos.waltz.model.NameProvider;
+import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.software_catalog.ImmutableSoftwarePackage;
+import org.finos.waltz.model.software_catalog.SoftwarePackage;
+import org.finos.waltz.model.tally.Tally;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,11 +35,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.SetUtilities.orderedUnion;
 import static com.khartec.waltz.schema.tables.SoftwarePackage.SOFTWARE_PACKAGE;
 import static com.khartec.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
 import static com.khartec.waltz.schema.tables.SoftwareVersion.SOFTWARE_VERSION;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.SetUtilities.orderedUnion;
 
 @Repository
 public class SoftwarePackageDao implements SearchDao<SoftwarePackage> {

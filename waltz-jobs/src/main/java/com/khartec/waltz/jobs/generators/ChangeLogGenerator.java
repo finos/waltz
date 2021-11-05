@@ -18,10 +18,10 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import org.finos.waltz.common.SetUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.Severity;
 import com.khartec.waltz.schema.tables.records.ChangeLogRecord;
+import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.Severity;
 import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.context.ApplicationContext;
@@ -34,13 +34,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static org.finos.waltz.common.RandomUtilities.randomIntBetween;
-import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static java.time.LocalDateTime.now;
 import static java.util.stream.Collectors.toSet;
+import static org.finos.waltz.common.RandomUtilities.randomIntBetween;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class ChangeLogGenerator implements SampleDataGenerator {

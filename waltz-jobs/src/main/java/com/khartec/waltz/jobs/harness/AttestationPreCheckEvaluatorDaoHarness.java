@@ -18,14 +18,14 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import org.finos.waltz.data.attestation.AttestationPreCheckDao;
-import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.attestation.AttestationPreCheckService;
+import org.finos.waltz.data.attestation.AttestationPreCheckDao;
+import org.finos.waltz.model.EntityKind;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import static org.finos.waltz.common.FunctionUtilities.time;
-import static com.khartec.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 
 public class AttestationPreCheckEvaluatorDaoHarness {

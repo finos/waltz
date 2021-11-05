@@ -19,14 +19,14 @@
 package org.finos.waltz.data.physical_specification_definition;
 
 import org.finos.waltz.data.IdSelectorFactory;
-import com.khartec.waltz.model.IdSelectionOptions;
 import org.finos.waltz.data.SelectorUtilities;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.PhysicalSpecDefnField.PHYSICAL_SPEC_DEFN_FIELD;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 public class PhysicalSpecDefnFieldIdSelectorFactory implements IdSelectorFactory {

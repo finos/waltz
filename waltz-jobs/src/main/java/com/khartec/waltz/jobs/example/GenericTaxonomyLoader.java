@@ -18,13 +18,13 @@
 
 package com.khartec.waltz.jobs.example;
 
-import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.common.IOUtilities;
-import org.finos.waltz.common.StringUtilities;
 import com.khartec.waltz.jobs.Columns;
 import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
 import com.khartec.waltz.schema.tables.records.MeasurableRecord;
 import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.IOUtilities;
+import org.finos.waltz.common.StringUtilities;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +39,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.finos.waltz.common.IOUtilities.getFileResource;
 import static com.khartec.waltz.schema.Tables.*;
+import static org.finos.waltz.common.IOUtilities.getFileResource;
 
 @Service
 public class GenericTaxonomyLoader {

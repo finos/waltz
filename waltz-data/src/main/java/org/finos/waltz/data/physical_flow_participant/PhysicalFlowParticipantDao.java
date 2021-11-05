@@ -18,15 +18,15 @@
 
 package org.finos.waltz.data.physical_flow_participant;
 
+import com.khartec.waltz.schema.tables.records.PhysicalFlowParticipantRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.physical_flow_participant.ImmutablePhysicalFlowParticipant;
-import com.khartec.waltz.model.physical_flow_participant.ParticipationKind;
-import com.khartec.waltz.model.physical_flow_participant.PhysicalFlowParticipant;
-import com.khartec.waltz.schema.tables.records.PhysicalFlowParticipantRecord;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.physical_flow_participant.ImmutablePhysicalFlowParticipant;
+import org.finos.waltz.model.physical_flow_participant.ParticipationKind;
+import org.finos.waltz.model.physical_flow_participant.PhysicalFlowParticipant;
 import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,8 +35,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_FLOW_PARTICIPANT;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository
 public class PhysicalFlowParticipantDao {

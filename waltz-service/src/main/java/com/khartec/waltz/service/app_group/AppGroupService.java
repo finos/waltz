@@ -18,6 +18,8 @@
 
 package com.khartec.waltz.service.app_group;
 
+import com.khartec.waltz.service.change_initiative.ChangeInitiativeService;
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.common.Checks;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.data.app_group.AppGroupDao;
@@ -27,31 +29,29 @@ import org.finos.waltz.data.app_group.AppGroupOrganisationalUnitDao;
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.entity_relationship.EntityRelationshipDao;
 import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.app_group.*;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.change_initiative.ChangeInitiative;
-import com.khartec.waltz.model.changelog.ChangeLog;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.entity_relationship.EntityRelationship;
-import com.khartec.waltz.model.entity_relationship.ImmutableEntityRelationship;
-import com.khartec.waltz.model.entity_relationship.RelationshipKind;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.model.orgunit.OrganisationalUnit;
-import com.khartec.waltz.service.change_initiative.ChangeInitiativeService;
-import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.app_group.*;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.change_initiative.ChangeInitiative;
+import org.finos.waltz.model.changelog.ChangeLog;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.entity_relationship.EntityRelationship;
+import org.finos.waltz.model.entity_relationship.ImmutableEntityRelationship;
+import org.finos.waltz.model.entity_relationship.RelationshipKind;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.orgunit.OrganisationalUnit;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.append;
 import static org.finos.waltz.common.MapUtilities.indexBy;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
-import static java.lang.String.format;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
 @Service
 public class AppGroupService {

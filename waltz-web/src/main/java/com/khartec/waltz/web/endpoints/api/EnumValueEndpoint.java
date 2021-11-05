@@ -18,16 +18,16 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.EnumValue;
 import com.khartec.waltz.service.enum_value.EnumValueService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.EnumValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class EnumValueEndpoint implements Endpoint {

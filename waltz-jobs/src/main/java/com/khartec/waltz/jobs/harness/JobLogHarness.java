@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import org.finos.waltz.data.system.job_log.JobLogDao;
 import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.data.system.job_log.JobLogDao;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

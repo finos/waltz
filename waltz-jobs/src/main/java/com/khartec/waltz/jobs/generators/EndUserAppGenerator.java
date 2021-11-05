@@ -18,20 +18,20 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
-import com.khartec.waltz.model.Criticality;
-import com.khartec.waltz.model.application.LifecyclePhase;
-import com.khartec.waltz.model.utils.IdUtilities;
 import com.khartec.waltz.schema.tables.records.EndUserApplicationRecord;
+import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
+import org.finos.waltz.model.Criticality;
+import org.finos.waltz.model.application.LifecyclePhase;
+import org.finos.waltz.model.utils.IdUtilities;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
 
 import java.util.Map;
 import java.util.Set;
 
+import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
 import static org.finos.waltz.common.RandomUtilities.getRandom;
 import static org.finos.waltz.common.RandomUtilities.randomPick;
-import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
 
 /**
  * Created by dwatkins on 14/12/2015.

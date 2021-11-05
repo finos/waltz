@@ -18,10 +18,10 @@
 
 package org.finos.waltz.data.svg;
 
-import org.finos.waltz.common.FunctionUtilities;
-import com.khartec.waltz.model.svg.ImmutableSvgDiagram;
-import com.khartec.waltz.model.svg.SvgDiagram;
 import com.khartec.waltz.schema.tables.records.SvgDiagramRecord;
+import org.finos.waltz.common.FunctionUtilities;
+import org.finos.waltz.model.svg.ImmutableSvgDiagram;
+import org.finos.waltz.model.svg.SvgDiagram;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -30,8 +30,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.tables.SvgDiagram.SVG_DIAGRAM;
+import static org.finos.waltz.common.StringUtilities.mkSafe;
 
 @Repository
 public class SvgDiagramDao {

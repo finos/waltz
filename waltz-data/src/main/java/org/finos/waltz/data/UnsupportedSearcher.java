@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data;
 
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.slf4j.Logger;

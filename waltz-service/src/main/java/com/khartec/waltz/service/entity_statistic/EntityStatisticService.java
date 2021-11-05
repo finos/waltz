@@ -24,17 +24,17 @@ import org.finos.waltz.data.entity_statistic.EntityStatisticDao;
 import org.finos.waltz.data.entity_statistic.EntityStatisticDefinitionDao;
 import org.finos.waltz.data.entity_statistic.EntityStatisticSummaryDao;
 import org.finos.waltz.data.entity_statistic.EntityStatisticValueDao;
-import com.khartec.waltz.model.Duration;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.entity_statistic.EntityStatistic;
-import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
-import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
-import com.khartec.waltz.model.entity_statistic.RollupKind;
-import com.khartec.waltz.model.immediate_hierarchy.ImmediateHierarchy;
-import com.khartec.waltz.model.immediate_hierarchy.ImmediateHierarchyUtilities;
-import com.khartec.waltz.model.tally.TallyPack;
+import org.finos.waltz.model.Duration;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.entity_statistic.EntityStatistic;
+import org.finos.waltz.model.entity_statistic.EntityStatisticDefinition;
+import org.finos.waltz.model.entity_statistic.EntityStatisticValue;
+import org.finos.waltz.model.entity_statistic.RollupKind;
+import org.finos.waltz.model.immediate_hierarchy.ImmediateHierarchy;
+import org.finos.waltz.model.immediate_hierarchy.ImmediateHierarchyUtilities;
+import org.finos.waltz.model.tally.TallyPack;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,10 +44,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.concat;
 import static org.finos.waltz.common.MapUtilities.groupBy;
-import static java.util.Collections.emptyList;
 
 @Service
 public class EntityStatisticService {

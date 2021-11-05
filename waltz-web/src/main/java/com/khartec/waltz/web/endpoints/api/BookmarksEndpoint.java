@@ -18,21 +18,21 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.bookmark.Bookmark;
-import com.khartec.waltz.model.user.SystemRole;
-import com.khartec.waltz.service.bookmark.BookmarkService;
-import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.user.UserRoleService;
-import com.khartec.waltz.web.endpoints.Endpoint;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+    import com.khartec.waltz.service.bookmark.BookmarkService;
+    import com.khartec.waltz.service.changelog.ChangeLogService;
+    import com.khartec.waltz.service.user.UserRoleService;
+    import com.khartec.waltz.web.endpoints.Endpoint;
+    import org.finos.waltz.model.EntityReference;
+    import org.finos.waltz.model.bookmark.Bookmark;
+    import org.finos.waltz.model.user.SystemRole;
+    import org.slf4j.Logger;
+    import org.slf4j.LoggerFactory;
+    import org.springframework.beans.factory.annotation.Autowired;
+    import org.springframework.stereotype.Service;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.web.WebUtilities.*;
-import static spark.Spark.*;
+    import static com.khartec.waltz.web.WebUtilities.*;
+    import static org.finos.waltz.common.Checks.checkNotNull;
+    import static spark.Spark.*;
 
 @Service
 public class BookmarksEndpoint implements Endpoint {

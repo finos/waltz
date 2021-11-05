@@ -18,14 +18,14 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import org.finos.waltz.common.MapUtilities;
-import org.finos.waltz.common.RandomUtilities;
-import com.khartec.waltz.model.person.ImmutablePerson;
-import com.khartec.waltz.model.person.PersonKind;
 import com.khartec.waltz.service.person.PersonService;
 import com.khartec.waltz.service.person_hierarchy.PersonHierarchyService;
 import io.codearte.jfairy.Fairy;
 import io.codearte.jfairy.producer.person.Person;
+import org.finos.waltz.common.MapUtilities;
+import org.finos.waltz.common.RandomUtilities;
+import org.finos.waltz.model.person.ImmutablePerson;
+import org.finos.waltz.model.person.PersonKind;
 import org.springframework.context.ApplicationContext;
 
 import java.util.ArrayList;
@@ -33,10 +33,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.Tables.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
 
 
 public class PersonDataGenerator implements SampleDataGenerator {

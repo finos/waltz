@@ -19,14 +19,14 @@
 package org.finos.waltz.data.measurable;
 
 
+import com.khartec.waltz.schema.tables.records.MeasurableRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.FindEntityReferencesByIdSelector;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.measurable.ImmutableMeasurable;
-import com.khartec.waltz.model.measurable.Measurable;
-import com.khartec.waltz.schema.tables.records.MeasurableRecord;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.measurable.ImmutableMeasurable;
+import org.finos.waltz.model.measurable.Measurable;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -39,14 +39,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.EnumUtilities.readEnum;
-import static org.finos.waltz.common.StringUtilities.mkSafe;
-import static org.finos.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static java.util.Optional.ofNullable;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.EnumUtilities.readEnum;
+import static org.finos.waltz.common.StringUtilities.mkSafe;
+import static org.finos.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
 
 
 @Repository

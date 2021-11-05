@@ -18,19 +18,19 @@
 
 package com.khartec.waltz.service.change_unit.processors;
 
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.ImmutableSetAttributeCommand;
-import com.khartec.waltz.model.SetAttributeCommand;
-import com.khartec.waltz.model.change_unit.ChangeAction;
-import com.khartec.waltz.model.change_unit.ChangeUnit;
-import com.khartec.waltz.model.change_unit.UpdateExecutionStatusCommand;
-import com.khartec.waltz.model.command.CommandOutcome;
-import com.khartec.waltz.model.command.CommandResponse;
-import com.khartec.waltz.model.command.ImmutableCommandResponse;
-import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.service.change_unit.ChangeUnitCommandProcessor;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.ImmutableSetAttributeCommand;
+import org.finos.waltz.model.SetAttributeCommand;
+import org.finos.waltz.model.change_unit.ChangeAction;
+import org.finos.waltz.model.change_unit.ChangeUnit;
+import org.finos.waltz.model.change_unit.UpdateExecutionStatusCommand;
+import org.finos.waltz.model.command.CommandOutcome;
+import org.finos.waltz.model.command.CommandResponse;
+import org.finos.waltz.model.command.ImmutableCommandResponse;
+import org.finos.waltz.model.physical_flow.PhysicalFlow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

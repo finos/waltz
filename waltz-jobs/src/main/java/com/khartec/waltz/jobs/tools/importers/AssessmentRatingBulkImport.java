@@ -1,12 +1,12 @@
 package com.khartec.waltz.jobs.tools.importers;
 
-import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.schema.tables.records.AssessmentRatingRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.finos.waltz.common.*;
+import org.finos.waltz.model.EntityKind;
 import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple5;
 import org.slf4j.Logger;
@@ -23,15 +23,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.finos.waltz.common.StreamUtilities.mkSiphon;
-import static org.finos.waltz.data.JooqUtilities.readRef;
 import static com.khartec.waltz.jobs.XlsUtilities.strVal;
 import static com.khartec.waltz.jobs.XlsUtilities.streamRows;
 import static com.khartec.waltz.jobs.tools.importers.DiffResult.mkDiff;
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toSet;
+import static org.finos.waltz.common.StreamUtilities.mkSiphon;
+import static org.finos.waltz.data.JooqUtilities.readRef;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Component

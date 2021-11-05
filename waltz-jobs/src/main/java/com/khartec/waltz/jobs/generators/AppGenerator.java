@@ -18,16 +18,16 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import org.finos.waltz.common.RandomUtilities;
-import com.khartec.waltz.model.Criticality;
-import com.khartec.waltz.model.application.AppRegistrationRequest;
-import com.khartec.waltz.model.application.ApplicationKind;
-import com.khartec.waltz.model.application.ImmutableAppRegistrationRequest;
-import com.khartec.waltz.model.application.LifecyclePhase;
-import com.khartec.waltz.model.orgunit.OrganisationalUnit;
-import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
+import org.finos.waltz.common.RandomUtilities;
+import org.finos.waltz.model.Criticality;
+import org.finos.waltz.model.application.AppRegistrationRequest;
+import org.finos.waltz.model.application.ApplicationKind;
+import org.finos.waltz.model.application.ImmutableAppRegistrationRequest;
+import org.finos.waltz.model.application.LifecyclePhase;
+import org.finos.waltz.model.orgunit.OrganisationalUnit;
+import org.finos.waltz.model.rating.RagRating;
 import org.jooq.DSLContext;
 import org.jooq.lambda.Unchecked;
 import org.springframework.context.ApplicationContext;
@@ -37,10 +37,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import static org.finos.waltz.common.RandomUtilities.randomPick;
-import static org.finos.waltz.common.IOUtilities.readLines;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.AuthoritativeSource.AUTHORITATIVE_SOURCE;
+import static org.finos.waltz.common.IOUtilities.readLines;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
 
 
 public class AppGenerator implements SampleDataGenerator {

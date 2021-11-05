@@ -1,6 +1,6 @@
 package com.khartec.waltz.jobs.tools.importers;
 
-import com.khartec.waltz.model.EntityReference;
+import org.finos.waltz.model.EntityReference;
 import org.immutables.value.Value;
 
 @Value.Immutable

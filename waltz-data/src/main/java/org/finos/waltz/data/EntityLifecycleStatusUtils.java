@@ -20,7 +20,7 @@ package org.finos.waltz.data;
 
 
 import org.finos.waltz.common.ListUtilities;
-import com.khartec.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.EntityLifecycleStatus;
 
 import java.util.List;
 import java.util.Set;

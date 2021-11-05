@@ -18,18 +18,18 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import org.finos.waltz.common.FunctionUtilities;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecoratorStat;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
+import org.finos.waltz.common.FunctionUtilities;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.data_flow_decorator.LogicalFlowDecoratorStat;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.Set;
 
-import static com.khartec.waltz.model.EntityKind.APP_GROUP;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
+import static org.finos.waltz.model.EntityKind.APP_GROUP;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
 
 public class DataTypeUsageStatsHarness {

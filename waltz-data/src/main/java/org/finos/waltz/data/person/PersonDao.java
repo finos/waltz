@@ -18,10 +18,10 @@
 
 package org.finos.waltz.data.person;
 
-import com.khartec.waltz.model.person.ImmutablePerson;
-import com.khartec.waltz.model.person.Person;
-import com.khartec.waltz.model.person.PersonKind;
 import com.khartec.waltz.schema.tables.records.PersonRecord;
+import org.finos.waltz.model.person.ImmutablePerson;
+import org.finos.waltz.model.person.Person;
+import org.finos.waltz.model.person.PersonKind;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
@@ -38,11 +38,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.common.Checks.checkNotEmpty;
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.AttestationInstanceRecipient.ATTESTATION_INSTANCE_RECIPIENT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
+import static org.finos.waltz.common.Checks.checkNotEmpty;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Repository

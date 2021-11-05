@@ -18,15 +18,6 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import org.finos.waltz.common.ListUtilities;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.application.AppRegistrationRequest;
-import com.khartec.waltz.model.application.AppRegistrationResponse;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.application.AssetCodeRelationshipKind;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.external_identifier.ExternalIdValue;
-import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.tag.TagService;
@@ -35,6 +26,15 @@ import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.action.AppChangeAction;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.application.AppRegistrationRequest;
+import org.finos.waltz.model.application.AppRegistrationResponse;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.application.AssetCodeRelationshipKind;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.external_identifier.ExternalIdValue;
+import org.finos.waltz.model.tally.Tally;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,10 +44,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 import static java.lang.Long.parseLong;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Service

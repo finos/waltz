@@ -18,18 +18,18 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import org.finos.waltz.common.StringUtilities;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.logical_flow.AddLogicalFlowCommand;
-import com.khartec.waltz.model.logical_flow.LogicalFlow;
-import com.khartec.waltz.model.logical_flow.LogicalFlowGraphSummary;
-import com.khartec.waltz.model.logical_flow.LogicalFlowStatistics;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.logical_flow.AddLogicalFlowCommand;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
+import org.finos.waltz.model.logical_flow.LogicalFlowGraphSummary;
+import org.finos.waltz.model.logical_flow.LogicalFlowStatistics;
+import org.finos.waltz.model.user.SystemRole;
 import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
@@ -44,11 +44,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.map;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service

@@ -18,11 +18,11 @@
 
 package org.finos.waltz.data.logical_data_element;
 
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.FieldDataType;
-import com.khartec.waltz.model.logical_data_element.ImmutableLogicalDataElement;
-import com.khartec.waltz.model.logical_data_element.LogicalDataElement;
 import com.khartec.waltz.schema.tables.records.LogicalDataElementRecord;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.FieldDataType;
+import org.finos.waltz.model.logical_data_element.ImmutableLogicalDataElement;
+import org.finos.waltz.model.logical_data_element.LogicalDataElement;
 import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,8 +31,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.Tables.LOGICAL_DATA_ELEMENT;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Repository

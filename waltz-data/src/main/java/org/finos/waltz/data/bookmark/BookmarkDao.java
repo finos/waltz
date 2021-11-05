@@ -18,14 +18,14 @@
 
 package org.finos.waltz.data.bookmark;
 
-import org.finos.waltz.data.GenericSelector;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.bookmark.Bookmark;
-import com.khartec.waltz.model.bookmark.BookmarkKindValue;
-import com.khartec.waltz.model.bookmark.ImmutableBookmark;
 import com.khartec.waltz.schema.tables.records.BookmarkRecord;
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.bookmark.Bookmark;
+import org.finos.waltz.model.bookmark.BookmarkKindValue;
+import org.finos.waltz.model.bookmark.ImmutableBookmark;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +36,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.finos.waltz.common.Checks.*;
 import static com.khartec.waltz.schema.tables.Bookmark.BOOKMARK;
+import static org.finos.waltz.common.Checks.*;
 
 
 @Repository

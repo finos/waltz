@@ -21,20 +21,20 @@ package com.khartec.waltz.service.user_contribution;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.data.changelog.ChangeLogDao;
 import org.finos.waltz.data.person.PersonDao;
-import com.khartec.waltz.model.person.Person;
-import com.khartec.waltz.model.tally.OrderedTally;
-import com.khartec.waltz.model.tally.Tally;
+import org.finos.waltz.model.person.Person;
+import org.finos.waltz.model.tally.OrderedTally;
+import org.finos.waltz.model.tally.Tally;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
 
+import static com.khartec.waltz.service.user_contribution.UserContributionUtilities.getOrderedListOf10;
 import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.map;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.service.user_contribution.UserContributionUtilities.getOrderedListOf10;
 
 @Service
 public class UserContributionService {

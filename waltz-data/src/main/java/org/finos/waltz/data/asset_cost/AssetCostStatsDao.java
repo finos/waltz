@@ -18,9 +18,12 @@
 
 package org.finos.waltz.data.asset_cost;
 
-import com.khartec.waltz.model.cost.Cost;
-import com.khartec.waltz.model.cost.ImmutableCost;
-import org.jooq.*;
+import org.finos.waltz.model.cost.Cost;
+import org.finos.waltz.model.cost.ImmutableCost;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Record1;
+import org.jooq.Select;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

@@ -19,22 +19,22 @@
 package com.khartec.waltz.jobs.generators;
 
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.ImmutableReleaseLifecycleStatusChangeCommand;
-import com.khartec.waltz.model.ReleaseLifecycleStatus;
-import com.khartec.waltz.model.survey.*;
 import com.khartec.waltz.service.survey.SurveyQuestionService;
 import com.khartec.waltz.service.survey.SurveyTemplateService;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.ImmutableReleaseLifecycleStatusChangeCommand;
+import org.finos.waltz.model.ReleaseLifecycleStatus;
+import org.finos.waltz.model.survey.*;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
 
 import java.util.List;
 import java.util.Map;
 
-import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.schema.Tables.SURVEY_QUESTION_RESPONSE;
 import static com.khartec.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
 import static com.khartec.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
 
 /**
  * Generates random survey templates and associated questions

@@ -20,7 +20,7 @@ package com.khartec.waltz.web.action;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.bookmark.Bookmark;
+import org.finos.waltz.model.bookmark.Bookmark;
 import org.immutables.value.Value;
 
 @Value.Immutable

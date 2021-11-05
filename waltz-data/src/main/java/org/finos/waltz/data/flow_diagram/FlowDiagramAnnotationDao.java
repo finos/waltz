@@ -19,11 +19,11 @@
 package org.finos.waltz.data.flow_diagram;
 
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.flow_diagram.FlowDiagramAnnotation;
-import com.khartec.waltz.model.flow_diagram.ImmutableFlowDiagramAnnotation;
 import com.khartec.waltz.schema.tables.records.FlowDiagramAnnotationRecord;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.flow_diagram.FlowDiagramAnnotation;
+import org.finos.waltz.model.flow_diagram.ImmutableFlowDiagramAnnotation;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -33,11 +33,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.function.Function;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.ListUtilities.map;
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.FLOW_DIAGRAM_ANNOTATION;
 import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.ListUtilities.map;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Repository
 public class FlowDiagramAnnotationDao {

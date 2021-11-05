@@ -18,12 +18,12 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import org.finos.waltz.common.ColorUtilities.HexStrings;
-import org.finos.waltz.common.RandomUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import com.khartec.waltz.schema.tables.records.FlowClassificationRecord;
 import com.khartec.waltz.schema.tables.records.FlowClassificationRuleRecord;
+import org.finos.waltz.common.ColorUtilities.HexStrings;
+import org.finos.waltz.common.RandomUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
 
@@ -34,15 +34,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
-import static org.finos.waltz.common.ListUtilities.asList;
-import static org.finos.waltz.common.RandomUtilities.randomPick;
-import static org.finos.waltz.common.StringUtilities.capitalise;
 import static com.khartec.waltz.schema.Tables.FLOW_CLASSIFICATION;
 import static com.khartec.waltz.schema.Tables.FLOW_CLASSIFICATION_RULE;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static java.util.stream.Collectors.toSet;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
+import static org.finos.waltz.common.ListUtilities.asList;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
+import static org.finos.waltz.common.StringUtilities.capitalise;
 
 /**
  * Created by dwatkins on 04/03/2017.

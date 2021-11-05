@@ -20,8 +20,8 @@ package org.finos.waltz.data.entity_hierarchy;
 
 import org.finos.waltz.common.Checks;
 import org.finos.waltz.data.IdSelectorFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;

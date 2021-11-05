@@ -18,20 +18,20 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import org.finos.waltz.common.EnumUtilities;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.roadmap.RoadmapCreateCommand;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.roadmap.RoadmapService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.common.EnumUtilities;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.roadmap.RoadmapCreateCommand;
+import org.finos.waltz.model.user.SystemRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class RoadmapEndpoint implements Endpoint {

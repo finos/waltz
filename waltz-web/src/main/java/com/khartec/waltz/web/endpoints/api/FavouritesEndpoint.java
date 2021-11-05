@@ -18,12 +18,12 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.app_group.AppGroup;
-import com.khartec.waltz.model.app_group.AppGroupEntry;
 import com.khartec.waltz.service.app_group.FavouritesService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.app_group.AppGroup;
+import org.finos.waltz.model.app_group.AppGroupEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

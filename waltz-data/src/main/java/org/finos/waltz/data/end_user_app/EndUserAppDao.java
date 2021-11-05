@@ -18,22 +18,22 @@
 
 package org.finos.waltz.data.end_user_app;
 
-import org.finos.waltz.data.JooqUtilities;
-import com.khartec.waltz.model.Criticality;
-import com.khartec.waltz.model.application.LifecyclePhase;
-import com.khartec.waltz.model.enduserapp.EndUserApplication;
-import com.khartec.waltz.model.enduserapp.ImmutableEndUserApplication;
-import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.EndUserApplicationRecord;
+import org.finos.waltz.data.JooqUtilities;
+import org.finos.waltz.model.Criticality;
+import org.finos.waltz.model.application.LifecyclePhase;
+import org.finos.waltz.model.enduserapp.EndUserApplication;
+import org.finos.waltz.model.enduserapp.ImmutableEndUserApplication;
+import org.finos.waltz.model.tally.Tally;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
 import static java.util.Optional.ofNullable;
+import static org.finos.waltz.common.StringUtilities.mkSafe;
 
 @Repository
 public class EndUserAppDao {

@@ -18,11 +18,11 @@
 
 package org.finos.waltz.data.measurable_category;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.measurable_category.ImmutableMeasurableCategory;
-import com.khartec.waltz.model.measurable_category.MeasurableCategory;
 import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.measurable_category.ImmutableMeasurableCategory;
+import org.finos.waltz.model.measurable_category.MeasurableCategory;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;

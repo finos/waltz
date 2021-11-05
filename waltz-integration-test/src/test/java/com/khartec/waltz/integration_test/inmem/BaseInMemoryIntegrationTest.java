@@ -5,8 +5,8 @@ import org.finos.waltz.common.LoggingUtilities;
 import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
 import org.finos.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
 import com.khartec.waltz.schema.tables.records.OrganisationalUnitRecord;
 import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.h2.tools.Server;
@@ -22,7 +22,7 @@ import java.sql.SQLException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static com.khartec.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.ORGANISATIONAL_UNIT;
 
 @RunWith(SpringJUnit4ClassRunner.class)

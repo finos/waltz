@@ -19,7 +19,7 @@
 package com.khartec.waltz.service.attribute_change;
 
 import org.finos.waltz.data.attribute_change.AttributeChangeDao;
-import com.khartec.waltz.model.attribute_change.AttributeChange;
+import org.finos.waltz.model.attribute_change.AttributeChange;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

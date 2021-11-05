@@ -18,13 +18,10 @@
 
 package org.finos.waltz.data.change_initiative.search;
 
-import org.finos.waltz.data.FullTextSearch;
-import org.finos.waltz.data.SearchDao;
-import org.finos.waltz.data.UnsupportedSearcher;
-import org.finos.waltz.data.change_initiative.ChangeInitiativeDao;
-import com.khartec.waltz.model.change_initiative.ChangeInitiative;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import org.finos.waltz.data.*;
+import org.finos.waltz.data.change_initiative.ChangeInitiativeDao;
+import org.finos.waltz.model.change_initiative.ChangeInitiative;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
@@ -34,9 +31,9 @@ import org.springframework.stereotype.Repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.finos.waltz.common.SetUtilities.orderedUnion;
 import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
 import static java.util.Collections.emptyList;
+import static org.finos.waltz.common.SetUtilities.orderedUnion;
 
 @Repository
 public class ChangeInitiativeSearchDao implements SearchDao<ChangeInitiative> {

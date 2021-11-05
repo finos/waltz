@@ -18,15 +18,15 @@
 
 package org.finos.waltz.data.attestation;
 
-import org.finos.waltz.data.InlineSelectFieldFactory;
-import com.khartec.waltz.model.Criticality;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.application.ApplicationKind;
-import com.khartec.waltz.model.application.LifecyclePhase;
-import com.khartec.waltz.model.attestation.*;
 import com.khartec.waltz.schema.tables.records.AttestationInstanceRecord;
+import org.finos.waltz.data.InlineSelectFieldFactory;
+import org.finos.waltz.model.Criticality;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.application.ApplicationKind;
+import org.finos.waltz.model.application.LifecyclePhase;
+import org.finos.waltz.model.attestation.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
@@ -42,12 +42,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static java.util.stream.Collectors.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 

@@ -20,9 +20,9 @@ package com.khartec.waltz.jobs.clients.c1.sc1.model;
 
 import com.khartec.waltz.jobs.Columns;
 import com.khartec.waltz.jobs.clients.c1.sc1.parse.StatusToEntityLifecycleStatus;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.Nullable;
 import org.apache.poi.ss.usermodel.Row;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.Nullable;
 import org.immutables.value.Value;
 
 import static com.khartec.waltz.jobs.XlsUtilities.mapStrCell;

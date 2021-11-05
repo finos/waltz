@@ -20,7 +20,7 @@ package com.khartec.waltz.web.json;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.database_information.DatabaseInformation;
+import org.finos.waltz.model.database_information.DatabaseInformation;
 import org.immutables.value.Value;
 
 import java.util.List;

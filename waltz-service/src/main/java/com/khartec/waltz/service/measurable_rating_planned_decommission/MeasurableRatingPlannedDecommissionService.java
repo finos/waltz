@@ -18,16 +18,16 @@
 
 package com.khartec.waltz.service.measurable_rating_planned_decommission;
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
 import org.finos.waltz.common.exception.UpdateFailedException;
 import org.finos.waltz.data.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionDao;
 import org.finos.waltz.data.measurable_rating_replacement.MeasurableRatingReplacementDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.command.DateFieldChange;
-import com.khartec.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
-import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.command.DateFieldChange;
+import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -35,10 +35,10 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.Set;
 
+import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.SetUtilities.map;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static java.lang.String.format;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Service
 public class MeasurableRatingPlannedDecommissionService {

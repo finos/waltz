@@ -20,8 +20,8 @@ package org.finos.waltz.data.server_information.search;
 
 import org.finos.waltz.data.FullTextSearch;
 import org.finos.waltz.data.server_information.ServerInformationDao;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.model.server_information.ServerInformation;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.server_information.ServerInformation;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.impl.DSL;

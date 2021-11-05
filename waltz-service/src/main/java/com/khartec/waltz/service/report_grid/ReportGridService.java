@@ -18,17 +18,17 @@
 
 package com.khartec.waltz.service.report_grid;
 
+import com.khartec.waltz.service.rating_scheme.RatingSchemeService;
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.report_grid.ReportGridDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.ImmutableIdSelectionOptions;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.rating.RatingSchemeItem;
-import com.khartec.waltz.model.report_grid.*;
-import com.khartec.waltz.service.rating_scheme.RatingSchemeService;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.HierarchyQueryScope;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.ImmutableIdSelectionOptions;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.rating.RatingSchemeItem;
+import org.finos.waltz.model.report_grid.*;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import org.finos.waltz.data.involvement.InvolvementDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.involvement.InvolvementService;
+import org.finos.waltz.data.involvement.InvolvementDao;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.application.Application;
 import org.jooq.*;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

@@ -18,11 +18,11 @@
 
 package org.finos.waltz.data.bookmark;
 
+import com.khartec.waltz.schema.tables.Bookmark;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.IdSelectorFactory;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.schema.tables.Bookmark;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;

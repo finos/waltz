@@ -18,12 +18,12 @@
 
 package org.finos.waltz.data.survey;
 
-import org.finos.waltz.common.CollectionUtilities;
-import org.finos.waltz.data.InlineSelectFieldFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.survey.*;
 import com.khartec.waltz.schema.tables.records.SurveyInstanceRecipientRecord;
 import com.khartec.waltz.schema.tables.records.SurveyInstanceRecord;
+import org.finos.waltz.common.CollectionUtilities;
+import org.finos.waltz.data.InlineSelectFieldFactory;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.survey.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,14 +35,14 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.khartec.waltz.schema.Tables.*;
+import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.data.JooqUtilities.maybeReadRef;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.schema.Tables.*;
-import static java.util.Optional.ofNullable;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Repository
 public class SurveyInstanceDao {

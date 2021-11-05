@@ -19,15 +19,15 @@
 package org.finos.waltz.data.physical_specification.search;
 
 
-import org.finos.waltz.data.SearchDao;
-import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.NameProvider;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
-import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import org.finos.waltz.data.JooqUtilities;
+import org.finos.waltz.data.SearchDao;
 import org.finos.waltz.data.SearchUtilities;
+import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.NameProvider;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
+import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -38,12 +38,12 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static org.finos.waltz.data.physical_specification.PhysicalSpecificationDao.owningEntityNameField;
 import static com.khartec.waltz.schema.Tables.EXTERNAL_IDENTIFIER;
 import static com.khartec.waltz.schema.Tables.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.data.physical_specification.PhysicalSpecificationDao.owningEntityNameField;
 
 @Repository
 public class PhysicalSpecificationSearchDao implements SearchDao<PhysicalSpecification> {

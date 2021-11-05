@@ -1,19 +1,19 @@
 package com.khartec.waltz.integration_test.inmem.helpers;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.involvement.EntityInvolvementChangeCommand;
-import com.khartec.waltz.model.involvement.ImmutableEntityInvolvementChangeCommand;
-import com.khartec.waltz.model.involvement_kind.ImmutableInvolvementKindCreateCommand;
-import com.khartec.waltz.model.involvement_kind.InvolvementKindCreateCommand;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.involvement.EntityInvolvementChangeCommand;
+import org.finos.waltz.model.involvement.ImmutableEntityInvolvementChangeCommand;
+import org.finos.waltz.model.involvement_kind.ImmutableInvolvementKindCreateCommand;
+import org.finos.waltz.model.involvement_kind.InvolvementKindCreateCommand;
 import com.khartec.waltz.service.involvement.InvolvementService;
 import com.khartec.waltz.service.involvement_kind.InvolvementKindService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static com.khartec.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
-import static com.khartec.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Service
 public class InvolvementHelper {

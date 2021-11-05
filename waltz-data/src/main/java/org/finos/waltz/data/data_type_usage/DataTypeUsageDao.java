@@ -18,19 +18,19 @@
 
 package org.finos.waltz.data.data_type_usage;
 
+import com.khartec.waltz.schema.tables.records.DataTypeUsageRecord;
 import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.data.JooqUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.data_type_usage.DataTypeUsage;
-import com.khartec.waltz.model.data_type_usage.ImmutableDataTypeUsage;
-import com.khartec.waltz.model.tally.Tally;
-import com.khartec.waltz.model.usage_info.ImmutableUsageInfo;
-import com.khartec.waltz.model.usage_info.UsageInfo;
-import com.khartec.waltz.model.usage_info.UsageKind;
-import com.khartec.waltz.schema.tables.records.DataTypeUsageRecord;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.data_type_usage.DataTypeUsage;
+import org.finos.waltz.model.data_type_usage.ImmutableDataTypeUsage;
+import org.finos.waltz.model.tally.Tally;
+import org.finos.waltz.model.usage_info.ImmutableUsageInfo;
+import org.finos.waltz.model.usage_info.UsageInfo;
+import org.finos.waltz.model.usage_info.UsageKind;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,17 +43,17 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.StringUtilities.limit;
-import static org.finos.waltz.data.application.ApplicationDao.IS_ACTIVE;
-import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.Actor.ACTOR;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.DataTypeUsage.DATA_TYPE_USAGE;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.StringUtilities.limit;
+import static org.finos.waltz.data.application.ApplicationDao.IS_ACTIVE;
+import static org.finos.waltz.model.EntityLifecycleStatus.REMOVED;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.jooq.impl.DSL.*;
 
 @Repository

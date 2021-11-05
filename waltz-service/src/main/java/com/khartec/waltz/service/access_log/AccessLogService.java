@@ -19,8 +19,8 @@
 package com.khartec.waltz.service.access_log;
 
 import org.finos.waltz.data.access_log.AccessLogDao;
-import com.khartec.waltz.model.accesslog.AccessLog;
-import com.khartec.waltz.model.accesslog.AccessTime;
+import org.finos.waltz.model.accesslog.AccessLog;
+import org.finos.waltz.model.accesslog.AccessTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

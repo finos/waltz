@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.schema.tables.records.MeasurableRatingRecord;
+import org.finos.waltz.model.EntityKind;
 import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple;
 import org.springframework.context.ApplicationContext;
@@ -29,11 +29,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.common.RandomUtilities.randomlySizedIntStream;
-import static org.finos.waltz.common.RandomUtilities.randomPick;
-import static org.finos.waltz.common.SetUtilities.uniqBy;
 import static com.khartec.waltz.schema.Tables.MEASURABLE;
 import static com.khartec.waltz.schema.Tables.MEASURABLE_RATING;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
+import static org.finos.waltz.common.RandomUtilities.randomlySizedIntStream;
+import static org.finos.waltz.common.SetUtilities.uniqBy;
 
 
 public class MeasurableRatingGenerator implements SampleDataGenerator {

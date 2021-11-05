@@ -18,22 +18,22 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.WaltzVersionInfo;
-import com.khartec.waltz.model.accesslog.AccessLog;
-import com.khartec.waltz.model.accesslog.AccessTime;
-import com.khartec.waltz.model.accesslog.ImmutableAccessLog;
 import com.khartec.waltz.service.access_log.AccessLogService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.WaltzVersionInfo;
+import org.finos.waltz.model.accesslog.AccessLog;
+import org.finos.waltz.model.accesslog.AccessTime;
+import org.finos.waltz.model.accesslog.ImmutableAccessLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 import spark.Response;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Service

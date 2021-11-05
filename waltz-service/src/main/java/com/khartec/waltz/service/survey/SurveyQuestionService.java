@@ -19,9 +19,9 @@
 package com.khartec.waltz.service.survey;
 
 
-import org.finos.waltz.data.survey.SurveyQuestionDao;
-import com.khartec.waltz.model.survey.SurveyQuestion;
 import com.khartec.waltz.service.survey.inclusion_evaluator.QuestionPredicateEvaluator;
+import org.finos.waltz.data.survey.SurveyQuestionDao;
+import org.finos.waltz.model.survey.SurveyQuestion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

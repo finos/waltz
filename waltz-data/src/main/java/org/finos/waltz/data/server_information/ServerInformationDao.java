@@ -18,14 +18,14 @@
 
 package org.finos.waltz.data.server_information;
 
-import org.finos.waltz.common.ListUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.LifecycleStatus;
-import com.khartec.waltz.model.server_information.*;
-import com.khartec.waltz.model.tally.ImmutableTally;
-import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.ServerInformationRecord;
+import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.data.JooqUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.LifecycleStatus;
+import org.finos.waltz.model.server_information.*;
+import org.finos.waltz.model.tally.ImmutableTally;
+import org.finos.waltz.model.tally.Tally;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
@@ -38,12 +38,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
 import static com.khartec.waltz.schema.tables.ServerUsage.SERVER_USAGE;
 import static java.util.Collections.emptyList;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
 import static org.jooq.impl.DSL.cast;
 import static org.jooq.impl.DSL.when;
 import static org.jooq.lambda.tuple.Tuple.tuple;

@@ -19,13 +19,13 @@
 package org.finos.waltz.data.scenario;
 
 
-import com.khartec.waltz.model.AxisOrientation;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.scenario.CloneScenarioCommand;
-import com.khartec.waltz.model.scenario.ImmutableScenarioAxisItem;
-import com.khartec.waltz.model.scenario.ScenarioAxisItem;
 import com.khartec.waltz.schema.tables.records.ScenarioAxisItemRecord;
+import org.finos.waltz.model.AxisOrientation;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.scenario.CloneScenarioCommand;
+import org.finos.waltz.model.scenario.ImmutableScenarioAxisItem;
+import org.finos.waltz.model.scenario.ScenarioAxisItem;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,11 +35,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import static com.khartec.waltz.schema.tables.ScenarioAxisItem.SCENARIO_AXIS_ITEM;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.data.InlineSelectFieldFactory.mkNameField;
 import static org.finos.waltz.data.JooqUtilities.readRef;
-import static com.khartec.waltz.schema.tables.ScenarioAxisItem.SCENARIO_AXIS_ITEM;
 
 @Repository
 public class ScenarioAxisItemDao {

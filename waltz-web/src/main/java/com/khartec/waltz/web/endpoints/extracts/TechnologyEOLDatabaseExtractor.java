@@ -20,8 +20,8 @@ package com.khartec.waltz.web.endpoints.extracts;
 
 import org.finos.waltz.data.EntityReferenceNameResolver;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
 import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,12 +29,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.web.WebUtilities.getEntityReference;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static spark.Spark.get;
 
 

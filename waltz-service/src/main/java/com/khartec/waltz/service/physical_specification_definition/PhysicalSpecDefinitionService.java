@@ -18,16 +18,16 @@
 
 package com.khartec.waltz.service.physical_specification_definition;
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.data.physical_specification_definition.PhysicalSpecDefinitionDao;
 import org.finos.waltz.data.physical_specification_definition.PhysicalSpecDefinitionFieldDao;
 import org.finos.waltz.data.physical_specification_definition.PhysicalSpecDefinitionSampleFileDao;
 import org.finos.waltz.data.physical_specification_definition.PhysicalSpecDefnIdSelectorFactory;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinition;
-import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinition;
-import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionChangeCommand;
-import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinition;
+import org.finos.waltz.model.physical_specification_definition.PhysicalSpecDefinition;
+import org.finos.waltz.model.physical_specification_definition.PhysicalSpecDefinitionChangeCommand;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,8 +39,8 @@ import java.util.Map;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.model.ReleaseLifecycleStatus.*;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.ReleaseLifecycleStatus.*;
 
 @Service
 public class PhysicalSpecDefinitionService {

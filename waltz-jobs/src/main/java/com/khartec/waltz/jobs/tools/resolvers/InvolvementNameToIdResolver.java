@@ -26,8 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.Tables.INVOLVEMENT_KIND;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 public class InvolvementNameToIdResolver implements Resolver<Long> {
 

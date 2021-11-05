@@ -18,19 +18,19 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.user.UserPreference;
 import com.khartec.waltz.service.user.UserPreferenceService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.user.UserPreference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Service

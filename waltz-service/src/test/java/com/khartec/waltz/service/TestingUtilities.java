@@ -25,9 +25,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.finos.waltz.common.StringUtilities.lower;
 import static junit.framework.TestCase.assertTrue;
 import static junit.framework.TestCase.fail;
+import static org.finos.waltz.common.StringUtilities.lower;
 
 public class TestingUtilities {
 

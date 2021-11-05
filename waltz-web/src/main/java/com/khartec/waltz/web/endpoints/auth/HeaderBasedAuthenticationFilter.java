@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.web.endpoints.auth;
 
-import com.khartec.waltz.model.settings.NamedSettings;
 import com.khartec.waltz.service.settings.SettingsService;
+import org.finos.waltz.model.settings.NamedSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;

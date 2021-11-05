@@ -1,14 +1,14 @@
 package com.khartec.waltz.jobs.tools.roadmaps;
 
-import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.common.LoggingUtilities;
-import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.model.AxisOrientation;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.schema.tables.*;
 import com.khartec.waltz.schema.tables.records.ScenarioRatingItemRecord;
 import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.LoggingUtilities;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.model.AxisOrientation;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -18,10 +18,10 @@ import java.sql.Timestamp;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.collectingAndThen;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 /**
  * This tool will take a roadmap with some predefined scenarios (with effective dates and

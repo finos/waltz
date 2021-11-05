@@ -18,18 +18,18 @@
 
 package com.khartec.waltz.jobs.tools;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.external_identifier.ExternalIdValue;
-import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.flow_diagram.FlowDiagramEntityService;
 import com.khartec.waltz.service.flow_diagram.FlowDiagramService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.HierarchyQueryScope;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.external_identifier.ExternalIdValue;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.io.IOException;
@@ -38,7 +38,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.finos.waltz.common.MapUtilities.indexBy;
-import static com.khartec.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 /**
  * Created by watkdav on 06/07/2018.

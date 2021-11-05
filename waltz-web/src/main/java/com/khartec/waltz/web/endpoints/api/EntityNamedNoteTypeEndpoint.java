@@ -18,21 +18,21 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.entity_named_note.EntityNamedNodeType;
-import com.khartec.waltz.model.entity_named_note.EntityNamedNoteTypeChangeCommand;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.entity_named_note.EntityNamedNoteTypeService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.entity_named_note.EntityNamedNodeType;
+import org.finos.waltz.model.entity_named_note.EntityNamedNoteTypeChangeCommand;
+import org.finos.waltz.model.user.SystemRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class EntityNamedNoteTypeEndpoint implements Endpoint {

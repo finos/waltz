@@ -1,9 +1,9 @@
 package com.khartec.waltz.service.permission;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.permission_group.ImmutablePermission;
-import com.khartec.waltz.model.permission_group.Permission;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.permission_group.ImmutablePermission;
+import org.finos.waltz.model.permission_group.Permission;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;

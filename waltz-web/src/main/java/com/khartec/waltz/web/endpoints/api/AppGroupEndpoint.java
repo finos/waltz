@@ -18,14 +18,14 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.app_group.*;
-import com.khartec.waltz.model.change_initiative.ChangeInitiative;
 import com.khartec.waltz.service.app_group.AppGroupService;
 import com.khartec.waltz.service.app_group.AppGroupSubscription;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.app_group.*;
+import org.finos.waltz.model.change_initiative.ChangeInitiative;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,9 +33,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.khartec.waltz.model.entity_search.EntitySearchOptions.mkForEntity;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.model.entity_search.EntitySearchOptions.mkForEntity;
 
 
 @Service

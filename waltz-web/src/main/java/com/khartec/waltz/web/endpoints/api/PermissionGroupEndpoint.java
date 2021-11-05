@@ -19,10 +19,10 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
-import com.khartec.waltz.model.permission_group.Permission;
 import com.khartec.waltz.service.permission.PermissionGroupService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.permission_group.Permission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -19,7 +19,7 @@
 package com.khartec.waltz.service.flow_diagram;
 
 import org.finos.waltz.data.flow_diagram.FlowDiagramAnnotationDao;
-import com.khartec.waltz.model.flow_diagram.FlowDiagramAnnotation;
+import org.finos.waltz.model.flow_diagram.FlowDiagramAnnotation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

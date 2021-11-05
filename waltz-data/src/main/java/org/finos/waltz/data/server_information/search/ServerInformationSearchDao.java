@@ -18,13 +18,10 @@
 
 package org.finos.waltz.data.server_information.search;
 
-import org.finos.waltz.data.FullTextSearch;
-import org.finos.waltz.data.SearchDao;
-import org.finos.waltz.data.UnsupportedSearcher;
-import org.finos.waltz.data.server_information.ServerInformationDao;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.model.server_information.ServerInformation;
 import org.finos.waltz.data.*;
+import org.finos.waltz.data.server_information.ServerInformationDao;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.server_information.ServerInformation;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
@@ -35,9 +32,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.khartec.waltz.schema.Tables.SERVER_INFORMATION;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.SetUtilities.orderedUnion;
-import static com.khartec.waltz.schema.Tables.SERVER_INFORMATION;
 
 
 @Repository

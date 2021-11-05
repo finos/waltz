@@ -18,14 +18,14 @@
 
 package org.finos.waltz.data.survey;
 
+import com.khartec.waltz.schema.tables.records.SurveyRunRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.StringUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.survey.*;
-import com.khartec.waltz.schema.tables.records.SurveyRunRecord;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.HierarchyQueryScope;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.survey.*;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -35,11 +35,11 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static com.khartec.waltz.schema.Tables.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
 import static org.finos.waltz.common.StringUtilities.join;
 import static org.finos.waltz.common.StringUtilities.splitThenMap;
-import static com.khartec.waltz.schema.Tables.*;
 
 @Repository
 public class SurveyRunDao {

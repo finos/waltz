@@ -19,9 +19,9 @@
 package org.finos.waltz.data.entity_workflow;
 
 
-import com.khartec.waltz.model.entity_workflow.EntityWorkflowDefinition;
-import com.khartec.waltz.model.entity_workflow.ImmutableEntityWorkflowDefinition;
 import com.khartec.waltz.schema.tables.records.EntityWorkflowDefinitionRecord;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
+import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowDefinition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;

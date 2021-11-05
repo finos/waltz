@@ -18,12 +18,12 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import org.finos.waltz.common.RandomUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.LifecycleStatus;
-import com.khartec.waltz.model.software_catalog.SoftwarePackage;
 import com.khartec.waltz.schema.tables.records.DatabaseInformationRecord;
 import com.khartec.waltz.schema.tables.records.DatabaseUsageRecord;
+import org.finos.waltz.common.RandomUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.LifecycleStatus;
+import org.finos.waltz.model.software_catalog.SoftwarePackage;
 import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
@@ -35,8 +35,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.DatabaseInformation.DATABASE_INFORMATION;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
 
 public class DatabaseGenerator implements SampleDataGenerator {
 

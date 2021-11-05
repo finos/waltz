@@ -19,11 +19,11 @@
 package com.khartec.waltz.service.notification;
 
 
-import org.finos.waltz.data.notification.NotificationDao;
-import com.khartec.waltz.model.notification.ImmutableNotificationResponse;
-import com.khartec.waltz.model.notification.NotificationResponse;
-import com.khartec.waltz.model.notification.NotificationSummary;
 import com.khartec.waltz.service.settings.SettingsService;
+import org.finos.waltz.data.notification.NotificationDao;
+import org.finos.waltz.model.notification.ImmutableNotificationResponse;
+import org.finos.waltz.model.notification.NotificationResponse;
+import org.finos.waltz.model.notification.NotificationSummary;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

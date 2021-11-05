@@ -18,8 +18,8 @@
 
 package org.finos.waltz.data.entity_hierarchy;
 
-import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.schema.tables.EntityHierarchy;
+import org.finos.waltz.model.EntityKind;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;

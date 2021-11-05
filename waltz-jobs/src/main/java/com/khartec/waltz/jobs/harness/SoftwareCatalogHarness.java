@@ -18,10 +18,10 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.software_catalog.SoftwareSummaryStatistics;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.software_catalog.SoftwareCatalogService;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.software_catalog.SoftwareSummaryStatistics;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

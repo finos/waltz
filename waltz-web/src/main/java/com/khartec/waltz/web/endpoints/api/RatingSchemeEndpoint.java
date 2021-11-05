@@ -18,14 +18,14 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.rating.RatingScheme;
-import com.khartec.waltz.model.rating.RatingSchemeItem;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.rating_scheme.RatingSchemeService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.rating.RatingScheme;
+import org.finos.waltz.model.rating.RatingSchemeItem;
+import org.finos.waltz.model.user.SystemRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
@@ -33,9 +33,9 @@ import spark.Response;
 
 import java.io.IOException;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Service

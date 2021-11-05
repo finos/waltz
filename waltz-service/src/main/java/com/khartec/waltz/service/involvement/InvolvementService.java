@@ -18,22 +18,22 @@
 
 package com.khartec.waltz.service.involvement;
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.involvement_kind.InvolvementKindService;
 import org.finos.waltz.data.EntityReferenceNameResolver;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.involvement.InvolvementDao;
 import org.finos.waltz.data.person.PersonDao;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.EntityReferenceUtilities;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.NameProvider;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.involvement.EntityInvolvementChangeCommand;
-import com.khartec.waltz.model.involvement.Involvement;
-import com.khartec.waltz.model.person.Person;
-import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.involvement_kind.InvolvementKindService;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.EntityReferenceUtilities;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.NameProvider;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.involvement.EntityInvolvementChangeCommand;
+import org.finos.waltz.model.involvement.Involvement;
+import org.finos.waltz.model.person.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

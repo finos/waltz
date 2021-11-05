@@ -18,6 +18,8 @@
 
 package com.khartec.waltz.service.physical_flow;
 
+import com.khartec.waltz.service.data_type.DataTypeDecoratorService;
+import com.khartec.waltz.service.enum_value.EnumValueAliasService;
 import org.finos.waltz.common.Aliases;
 import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.common.StringUtilities;
@@ -27,25 +29,23 @@ import org.finos.waltz.data.data_type.DataTypeDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
 import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
-import com.khartec.waltz.model.Criticality;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.UserTimestamp;
-import com.khartec.waltz.model.actor.Actor;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.command.CommandOutcome;
-import com.khartec.waltz.model.datatype.DataType;
-import com.khartec.waltz.model.datatype.DataTypeDecorator;
-import com.khartec.waltz.model.enum_value.EnumValueKind;
-import com.khartec.waltz.model.external_identifier.ExternalIdValue;
-import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
-import com.khartec.waltz.model.logical_flow.LogicalFlow;
-import com.khartec.waltz.model.physical_flow.*;
-import com.khartec.waltz.model.physical_specification.DataFormatKind;
-import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
-import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
-import com.khartec.waltz.service.data_type.DataTypeDecoratorService;
-import com.khartec.waltz.service.enum_value.EnumValueAliasService;
+import org.finos.waltz.model.Criticality;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.actor.Actor;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.command.CommandOutcome;
+import org.finos.waltz.model.datatype.DataType;
+import org.finos.waltz.model.datatype.DataTypeDecorator;
+import org.finos.waltz.model.enum_value.EnumValueKind;
+import org.finos.waltz.model.external_identifier.ExternalIdValue;
+import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
+import org.finos.waltz.model.physical_flow.*;
+import org.finos.waltz.model.physical_specification.DataFormatKind;
+import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
+import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -56,13 +56,13 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.SetUtilities.fromArray;
 import static org.finos.waltz.common.StringUtilities.isEmpty;
 import static org.finos.waltz.common.StringUtilities.lower;
-import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toList;
 
 
 @Service

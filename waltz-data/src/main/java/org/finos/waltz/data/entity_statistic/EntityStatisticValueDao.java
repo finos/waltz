@@ -18,14 +18,14 @@
 
 package org.finos.waltz.data.entity_statistic;
 
-import org.finos.waltz.data.application.ApplicationDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
-import com.khartec.waltz.model.entity_statistic.ImmutableEntityStatisticValue;
-import com.khartec.waltz.model.entity_statistic.StatisticValueState;
 import com.khartec.waltz.schema.tables.records.EntityStatisticValueRecord;
+import org.finos.waltz.data.application.ApplicationDao;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.entity_statistic.EntityStatisticValue;
+import org.finos.waltz.model.entity_statistic.ImmutableEntityStatisticValue;
+import org.finos.waltz.model.entity_statistic.StatisticValueState;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -34,9 +34,9 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository
 public class EntityStatisticValueDao {

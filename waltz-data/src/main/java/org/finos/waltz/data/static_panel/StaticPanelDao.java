@@ -18,10 +18,10 @@
 
 package org.finos.waltz.data.static_panel;
 
-import com.khartec.waltz.model.staticpanel.ContentKind;
-import com.khartec.waltz.model.staticpanel.ImmutableStaticPanel;
-import com.khartec.waltz.model.staticpanel.StaticPanel;
 import com.khartec.waltz.schema.tables.records.StaticPanelRecord;
+import org.finos.waltz.model.staticpanel.ContentKind;
+import org.finos.waltz.model.staticpanel.ImmutableStaticPanel;
+import org.finos.waltz.model.staticpanel.StaticPanel;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -30,8 +30,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.StaticPanel.STATIC_PANEL;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository
 public class StaticPanelDao {

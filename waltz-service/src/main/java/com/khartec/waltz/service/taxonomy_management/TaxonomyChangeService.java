@@ -18,21 +18,21 @@
 
 package com.khartec.waltz.service.taxonomy_management;
 
-import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.common.StringUtilities;
-import org.finos.waltz.data.taxonomy_management.TaxonomyChangeDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.exceptions.NotAuthorizedException;
-import com.khartec.waltz.model.measurable.Measurable;
-import com.khartec.waltz.model.measurable_category.MeasurableCategory;
-import com.khartec.waltz.model.taxonomy_management.*;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.client_cache_key.ClientCacheKeyService;
 import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import com.khartec.waltz.service.measurable.MeasurableService;
 import com.khartec.waltz.service.measurable_category.MeasurableCategoryService;
 import com.khartec.waltz.service.user.UserRoleService;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.data.taxonomy_management.TaxonomyChangeDao;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.exceptions.NotAuthorizedException;
+import org.finos.waltz.model.measurable.Measurable;
+import org.finos.waltz.model.measurable_category.MeasurableCategory;
+import org.finos.waltz.model.taxonomy_management.*;
+import org.finos.waltz.model.user.SystemRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -40,8 +40,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static org.finos.waltz.common.Checks.*;
 import static java.util.stream.Collectors.toMap;
+import static org.finos.waltz.common.Checks.*;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Service

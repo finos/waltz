@@ -18,20 +18,20 @@
 
 package com.khartec.waltz.service.physical_flow;
 
-import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
-import org.finos.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.command.CommandOutcome;
-import com.khartec.waltz.model.external_identifier.ExternalIdentifier;
-import com.khartec.waltz.model.logical_flow.LogicalFlow;
-import com.khartec.waltz.model.physical_flow.*;
-import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
-import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
-import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.external_identifier.ExternalIdentifierService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import com.khartec.waltz.service.physical_specification.PhysicalSpecificationService;
+import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
+import org.finos.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.command.CommandOutcome;
+import org.finos.waltz.model.external_identifier.ExternalIdentifier;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
+import org.finos.waltz.model.physical_flow.*;
+import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
+import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
+import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,13 +43,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.StringUtilities.isEmpty;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
-import static com.khartec.waltz.model.EntityKind.PHYSICAL_FLOW;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static java.lang.String.format;
+import static org.finos.waltz.model.EntityKind.PHYSICAL_FLOW;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 
 @Service

@@ -18,13 +18,13 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import org.finos.waltz.data.application.search.SqlServerAppSearch;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.model.entity_search.ImmutableEntitySearchOptions;
 import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.data.application.search.SqlServerAppSearch;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.entity_search.ImmutableEntitySearchOptions;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

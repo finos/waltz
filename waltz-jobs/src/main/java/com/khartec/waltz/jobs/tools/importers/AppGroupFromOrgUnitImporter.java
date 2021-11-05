@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.jobs.tools.importers;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.records.ApplicationGroupEntryRecord;
 import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Result;
@@ -36,10 +36,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.common.SetUtilities.minus;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroupOuEntry.APPLICATION_GROUP_OU_ENTRY;
+import static org.finos.waltz.common.SetUtilities.minus;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 

@@ -18,19 +18,19 @@
 
 package com.khartec.waltz.service.scenario;
 
-import org.finos.waltz.data.scenario.ScenarioAxisItemDao;
-import com.khartec.waltz.model.AxisOrientation;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.scenario.ScenarioAxisItem;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.data.scenario.ScenarioAxisItemDao;
+import org.finos.waltz.model.AxisOrientation;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.scenario.ScenarioAxisItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.service.scenario.ScenarioUtilities.mkBasicLogEntry;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class ScenarioAxisItemService {

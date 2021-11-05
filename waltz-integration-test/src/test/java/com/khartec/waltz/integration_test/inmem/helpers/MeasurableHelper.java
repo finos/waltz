@@ -2,7 +2,7 @@ package com.khartec.waltz.integration_test.inmem.helpers;
 
 import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.model.measurable_category.MeasurableCategory;
+import org.finos.waltz.model.measurable_category.MeasurableCategory;
 import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
 import com.khartec.waltz.schema.tables.records.MeasurableRecord;
 import com.khartec.waltz.service.measurable.MeasurableService;

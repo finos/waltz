@@ -18,12 +18,12 @@
 
 package com.khartec.waltz.jobs.generators;
 
+import com.khartec.waltz.schema.tables.records.BookmarkRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.RandomUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.schema.tables.records.BookmarkRecord;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
 
@@ -32,12 +32,12 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
 import static com.khartec.waltz.schema.tables.Bookmark.BOOKMARK;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
 
 
 public class BookmarkGenerator implements SampleDataGenerator {

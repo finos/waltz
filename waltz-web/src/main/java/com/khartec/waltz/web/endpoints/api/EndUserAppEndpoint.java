@@ -19,14 +19,14 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
-import com.khartec.waltz.model.application.AppRegistrationResponse;
-import com.khartec.waltz.model.enduserapp.EndUserApplication;
-import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.service.end_user_app.EndUserAppService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.application.AppRegistrationResponse;
+import org.finos.waltz.model.enduserapp.EndUserApplication;
+import org.finos.waltz.model.tally.Tally;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

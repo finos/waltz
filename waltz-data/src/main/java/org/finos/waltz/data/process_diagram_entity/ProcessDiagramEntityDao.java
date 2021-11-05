@@ -1,14 +1,14 @@
 package org.finos.waltz.data.process_diagram_entity;
 
-import org.finos.waltz.data.JooqUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.process_diagram.ImmutableProcessDiagramEntity;
-import com.khartec.waltz.model.process_diagram.ImmutableProcessDiagramEntityApplicationAlignment;
-import com.khartec.waltz.model.process_diagram.ProcessDiagramEntity;
-import com.khartec.waltz.model.process_diagram.ProcessDiagramEntityApplicationAlignment;
 import com.khartec.waltz.schema.tables.Measurable;
 import com.khartec.waltz.schema.tables.records.ProcessDiagramEntityRecord;
+import org.finos.waltz.data.JooqUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.process_diagram.ImmutableProcessDiagramEntity;
+import org.finos.waltz.model.process_diagram.ImmutableProcessDiagramEntityApplicationAlignment;
+import org.finos.waltz.model.process_diagram.ProcessDiagramEntity;
+import org.finos.waltz.model.process_diagram.ProcessDiagramEntityApplicationAlignment;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -17,8 +17,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Repository
 public class ProcessDiagramEntityDao {

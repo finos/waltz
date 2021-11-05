@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import org.finos.waltz.data.licence.LicenceDao;
 import com.khartec.waltz.jobs.tools.importers.licence.finos.FinosLicenceComplianceImporter;
 import com.khartec.waltz.jobs.tools.importers.licence.spdx.SpdxLicenceImporter;
+import org.finos.waltz.data.licence.LicenceDao;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
 

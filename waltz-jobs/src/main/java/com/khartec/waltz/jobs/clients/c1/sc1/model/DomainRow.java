@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.jobs.clients.c1.sc1.model;
 
+import com.khartec.waltz.jobs.Columns;
+import org.apache.poi.ss.usermodel.Row;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.common.hierarchy.FlatNode;
-import com.khartec.waltz.jobs.Columns;
-import com.khartec.waltz.model.Nullable;
-import org.apache.poi.ss.usermodel.Row;
+import org.finos.waltz.model.Nullable;
 import org.immutables.value.Value;
 
 import static com.khartec.waltz.jobs.XlsUtilities.strVal;

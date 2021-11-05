@@ -18,9 +18,9 @@
 
 package org.finos.waltz.data.entity_alias;
 
-import org.finos.waltz.common.SetUtilities;
-import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.schema.tables.records.EntityAliasRecord;
+import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.model.EntityReference;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.slf4j.Logger;

@@ -18,14 +18,14 @@
 
 package org.finos.waltz.data.involvement_kind;
 
-import org.finos.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.UserTimestamp;
-import com.khartec.waltz.model.involvement_kind.ImmutableInvolvementKind;
-import com.khartec.waltz.model.involvement_kind.InvolvementKind;
-import com.khartec.waltz.model.involvement_kind.InvolvementKindChangeCommand;
-import com.khartec.waltz.model.involvement_kind.InvolvementKindCreateCommand;
 import com.khartec.waltz.schema.tables.records.InvolvementKindRecord;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.involvement_kind.ImmutableInvolvementKind;
+import org.finos.waltz.model.involvement_kind.InvolvementKind;
+import org.finos.waltz.model.involvement_kind.InvolvementKindChangeCommand;
+import org.finos.waltz.model.involvement_kind.InvolvementKindCreateCommand;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -38,11 +38,11 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.function.Function;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.Checks.checkOptionalIsPresent;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
 import static com.khartec.waltz.schema.tables.KeyInvolvementKind.KEY_INVOLVEMENT_KIND;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkOptionalIsPresent;
 
 @Repository
 public class InvolvementKindDao {

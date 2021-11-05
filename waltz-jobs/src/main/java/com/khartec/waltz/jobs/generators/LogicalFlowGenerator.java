@@ -18,20 +18,20 @@
 
 package com.khartec.waltz.jobs.generators;
 
+import com.khartec.waltz.schema.tables.records.LogicalFlowRecord;
+import com.khartec.waltz.service.application.ApplicationService;
+import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.flow_classification_rule.FlowClassificationRuleDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRule;
-import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
-import com.khartec.waltz.model.logical_flow.LogicalFlow;
-import com.khartec.waltz.model.orgunit.OrganisationalUnit;
-import com.khartec.waltz.schema.tables.records.LogicalFlowRecord;
-import com.khartec.waltz.service.application.ApplicationService;
-import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.flow_classification_rule.FlowClassificationRule;
+import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
+import org.finos.waltz.model.orgunit.OrganisationalUnit;
 import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple;
 import org.springframework.context.ApplicationContext;
@@ -39,12 +39,12 @@ import org.springframework.context.ApplicationContext;
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static org.finos.waltz.common.RandomUtilities.randomPick;
-import static org.finos.waltz.common.RandomUtilities.randomlySizedIntStream;
-import static org.finos.waltz.common.SetUtilities.uniqBy;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
+import static org.finos.waltz.common.RandomUtilities.randomlySizedIntStream;
+import static org.finos.waltz.common.SetUtilities.uniqBy;
 
 
 public class LogicalFlowGenerator implements SampleDataGenerator {

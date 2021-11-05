@@ -31,16 +31,16 @@ import org.finos.waltz.data.measurable_rating_planned_decommission.MeasurableRat
 import org.finos.waltz.data.measurable_rating_replacement.MeasurableRatingReplacementDao;
 import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
 import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.changelog.ChangeLog;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.external_identifier.ExternalIdValue;
-import com.khartec.waltz.model.logical_flow.LogicalFlow;
-import com.khartec.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
-import com.khartec.waltz.model.measurable_rating_replacement.MeasurableRatingReplacement;
-import com.khartec.waltz.model.physical_flow.PhysicalFlow;
-import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
-import com.khartec.waltz.model.tally.DateTally;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.changelog.ChangeLog;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.external_identifier.ExternalIdValue;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
+import org.finos.waltz.model.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommission;
+import org.finos.waltz.model.measurable_rating_replacement.MeasurableRatingReplacement;
+import org.finos.waltz.model.physical_flow.PhysicalFlow;
+import org.finos.waltz.model.physical_specification.PhysicalSpecification;
+import org.finos.waltz.model.tally.DateTally;
 import org.jooq.lambda.Unchecked;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,12 +49,12 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.concurrent.Future;
 
+import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.*;
 import static org.finos.waltz.common.SetUtilities.*;
-import static com.khartec.waltz.model.EntityKind.*;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.model.EntityReferenceUtilities.safeName;
-import static java.lang.String.format;
+import static org.finos.waltz.model.EntityKind.*;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.EntityReferenceUtilities.safeName;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 

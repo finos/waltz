@@ -18,10 +18,10 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import org.finos.waltz.data.scenario.ScenarioAxisItemDao;
-import com.khartec.waltz.model.AxisOrientation;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.scenario.ScenarioService;
+import org.finos.waltz.data.scenario.ScenarioAxisItemDao;
+import org.finos.waltz.model.AxisOrientation;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.Arrays;

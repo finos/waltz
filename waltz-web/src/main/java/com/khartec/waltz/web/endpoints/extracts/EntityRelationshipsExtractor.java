@@ -1,7 +1,7 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +12,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.finos.waltz.common.ListUtilities.asList;
-import static org.finos.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.ChangeInitiative.CHANGE_INITIATIVE;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
+import static org.finos.waltz.common.ListUtilities.asList;
+import static org.finos.waltz.common.ListUtilities.map;
 import static spark.Spark.get;
 
 @Service

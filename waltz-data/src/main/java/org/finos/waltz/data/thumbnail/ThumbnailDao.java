@@ -18,11 +18,11 @@
 
 package org.finos.waltz.data.thumbnail;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.thumbnail.ImmutableThumbnail;
-import com.khartec.waltz.model.thumbnail.Thumbnail;
 import com.khartec.waltz.schema.tables.records.ThumbnailRecord;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.thumbnail.ImmutableThumbnail;
+import org.finos.waltz.model.thumbnail.Thumbnail;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -33,8 +33,8 @@ import java.sql.Timestamp;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Thumbnail.THUMBNAIL;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Repository

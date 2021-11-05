@@ -20,9 +20,9 @@ package com.khartec.waltz.service.shared_preference;
 
 
 import org.finos.waltz.data.shared_preference.SharedPreferenceDao;
-import com.khartec.waltz.model.shared_preference.ImmutableSharedPreference;
-import com.khartec.waltz.model.shared_preference.SharedPreference;
-import com.khartec.waltz.model.shared_preference.SharedPreferenceSaveCommand;
+import org.finos.waltz.model.shared_preference.ImmutableSharedPreference;
+import org.finos.waltz.model.shared_preference.SharedPreference;
+import org.finos.waltz.model.shared_preference.SharedPreferenceSaveCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

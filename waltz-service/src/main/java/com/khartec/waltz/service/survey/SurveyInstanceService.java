@@ -19,20 +19,20 @@
 package com.khartec.waltz.service.survey;
 
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.user.UserRoleService;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.person.PersonDao;
 import org.finos.waltz.data.survey.SurveyInstanceDao;
 import org.finos.waltz.data.survey.SurveyInstanceRecipientDao;
 import org.finos.waltz.data.survey.SurveyQuestionResponseDao;
 import org.finos.waltz.data.survey.SurveyRunDao;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.person.Person;
-import com.khartec.waltz.model.survey.*;
-import com.khartec.waltz.model.user.SystemRole;
-import com.khartec.waltz.model.utils.IdUtilities;
-import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.user.UserRoleService;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.person.Person;
+import org.finos.waltz.model.survey.*;
+import org.finos.waltz.model.user.SystemRole;
+import org.finos.waltz.model.utils.IdUtilities;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,7 +48,7 @@ import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.CollectionUtilities.find;
 import static org.finos.waltz.common.OptionalUtilities.contentsEqual;
-import static com.khartec.waltz.model.survey.SurveyInstanceStateMachineFactory.simple;
+import static org.finos.waltz.model.survey.SurveyInstanceStateMachineFactory.simple;
 
 @Service
 public class SurveyInstanceService {

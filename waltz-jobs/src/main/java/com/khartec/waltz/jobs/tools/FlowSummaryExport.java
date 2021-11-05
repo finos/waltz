@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.jobs.tools;
 
-import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.schema.tables.*;
 import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.model.EntityKind;
 import org.jooq.DSLContext;
 import org.jooq.lambda.Unchecked;
 import org.jooq.lambda.tuple.Tuple;
@@ -32,7 +32,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
+import static org.finos.waltz.model.EntityLifecycleStatus.REMOVED;
 
 /**
  * An example of a report showing logical flows,

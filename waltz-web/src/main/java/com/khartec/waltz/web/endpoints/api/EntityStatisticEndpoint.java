@@ -18,21 +18,21 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import org.finos.waltz.common.EnumUtilities;
-import com.khartec.waltz.model.Duration;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.entity_statistic.EntityStatistic;
-import com.khartec.waltz.model.entity_statistic.EntityStatisticDefinition;
-import com.khartec.waltz.model.entity_statistic.EntityStatisticValue;
-import com.khartec.waltz.model.entity_statistic.RollupKind;
-import com.khartec.waltz.model.immediate_hierarchy.ImmediateHierarchy;
-import com.khartec.waltz.model.tally.TallyPack;
 import com.khartec.waltz.service.entity_statistic.EntityStatisticService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.json.EntityStatisticQueryOptions;
+import org.finos.waltz.common.EnumUtilities;
+import org.finos.waltz.model.Duration;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.entity_statistic.EntityStatistic;
+import org.finos.waltz.model.entity_statistic.EntityStatisticDefinition;
+import org.finos.waltz.model.entity_statistic.EntityStatisticValue;
+import org.finos.waltz.model.entity_statistic.RollupKind;
+import org.finos.waltz.model.immediate_hierarchy.ImmediateHierarchy;
+import org.finos.waltz.model.tally.TallyPack;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +43,9 @@ import spark.Response;
 import java.io.IOException;
 import java.util.List;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Service

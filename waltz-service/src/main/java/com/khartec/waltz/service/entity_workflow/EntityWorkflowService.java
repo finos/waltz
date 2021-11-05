@@ -22,10 +22,10 @@ package com.khartec.waltz.service.entity_workflow;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowDefinitionDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
 import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.entity_workflow.EntityWorkflowDefinition;
-import com.khartec.waltz.model.entity_workflow.EntityWorkflowState;
-import com.khartec.waltz.model.entity_workflow.EntityWorkflowTransition;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

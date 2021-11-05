@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.model.software_catalog.ImmutableSoftwarePackage;
-import com.khartec.waltz.model.software_catalog.SoftwarePackage;
+import org.finos.waltz.model.software_catalog.ImmutableSoftwarePackage;
+import org.finos.waltz.model.software_catalog.SoftwarePackage;
 
 public interface DatabaseSoftwarePackages {
 

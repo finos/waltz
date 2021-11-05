@@ -18,9 +18,9 @@
 
 package org.finos.waltz.data.complexity;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.tally.ImmutableTally;
-import com.khartec.waltz.model.tally.Tally;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.tally.ImmutableTally;
+import org.finos.waltz.model.tally.Tally;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +29,9 @@ import org.springframework.stereotype.Repository;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 
 @Deprecated
 @Repository

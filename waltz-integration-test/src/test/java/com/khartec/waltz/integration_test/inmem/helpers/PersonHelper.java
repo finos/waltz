@@ -1,6 +1,6 @@
 package com.khartec.waltz.integration_test.inmem.helpers;
 
-import com.khartec.waltz.model.person.PersonKind;
+import org.finos.waltz.model.person.PersonKind;
 import com.khartec.waltz.schema.tables.records.PersonRecord;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;

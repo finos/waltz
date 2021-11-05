@@ -18,15 +18,15 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import org.finos.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
-import com.khartec.waltz.model.assessment_definition.ImmutableAssessmentDefinition;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.assessment_definition.AssessmentDefinitionService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
+import org.finos.waltz.model.assessment_definition.ImmutableAssessmentDefinition;
+import org.finos.waltz.model.user.SystemRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
@@ -34,9 +34,9 @@ import spark.Response;
 
 import java.io.IOException;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class AssessmentDefinitionEndpoint implements Endpoint {

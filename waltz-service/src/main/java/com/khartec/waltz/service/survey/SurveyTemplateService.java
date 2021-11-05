@@ -18,16 +18,16 @@
 
 package com.khartec.waltz.service.survey;
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.person.PersonDao;
 import org.finos.waltz.data.survey.SurveyQuestionDao;
 import org.finos.waltz.data.survey.SurveyQuestionDropdownEntryDao;
 import org.finos.waltz.data.survey.SurveyTemplateDao;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.person.Person;
-import com.khartec.waltz.model.survey.*;
-import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.person.Person;
+import org.finos.waltz.model.survey.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

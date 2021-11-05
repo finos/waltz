@@ -18,16 +18,16 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.UserTimestamp;
-import com.khartec.waltz.model.measurable_rating.*;
-import com.khartec.waltz.model.tally.MeasurableRatingTally;
-import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.measurable_rating.*;
+import org.finos.waltz.model.tally.MeasurableRatingTally;
+import org.finos.waltz.model.tally.Tally;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
@@ -39,11 +39,11 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.StringUtilities.firstChar;
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.StringUtilities.firstChar;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Service
 public class MeasurableRatingEndpoint implements Endpoint {

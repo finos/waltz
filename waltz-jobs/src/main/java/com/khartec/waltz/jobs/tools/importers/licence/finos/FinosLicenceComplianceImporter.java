@@ -22,14 +22,14 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.common.SetUtilities;
-import org.finos.waltz.data.licence.LicenceDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.licence.Licence;
 import com.khartec.waltz.schema.tables.records.EntityNamedNoteRecord;
 import com.khartec.waltz.schema.tables.records.EntityNamedNoteTypeRecord;
 import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.data.licence.LicenceDao;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.licence.Licence;
 import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -43,11 +43,11 @@ import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Stream;
 
-import static org.finos.waltz.common.Checks.checkNotEmpty;
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.EntityNamedNote.ENTITY_NAMED_NOTE;
 import static com.khartec.waltz.schema.tables.EntityNamedNoteType.ENTITY_NAMED_NOTE_TYPE;
 import static java.util.stream.Collectors.*;
+import static org.finos.waltz.common.Checks.checkNotEmpty;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 public class FinosLicenceComplianceImporter {
 

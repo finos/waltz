@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.service.user;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.user.SystemRole;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.user.SystemRole;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,7 +28,7 @@ import java.util.Optional;
 import java.util.function.BiFunction;
 
 import static org.finos.waltz.common.FunctionUtilities.alwaysBi;
-import static com.khartec.waltz.model.user.SystemRole.*;
+import static org.finos.waltz.model.user.SystemRole.*;
 
 public class RoleUtilities {
 

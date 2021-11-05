@@ -18,14 +18,14 @@
 
 package com.khartec.waltz.jobs.tools;
 
+import com.khartec.waltz.service.DIConfiguration;
 import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.external_identifier.ExternalIdValue;
-import com.khartec.waltz.model.logical_flow.LogicalFlow;
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.external_identifier.ExternalIdValue;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.interfaces.ShortestPathAlgorithm.SingleSourcePaths;

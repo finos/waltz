@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.service.entity_relationship;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.entity_relationship.EntityRelationshipKey;
-import com.khartec.waltz.model.entity_relationship.ImmutableEntityRelationshipKey;
-import com.khartec.waltz.model.entity_relationship.RelationshipKind;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.entity_relationship.EntityRelationshipKey;
+import org.finos.waltz.model.entity_relationship.ImmutableEntityRelationshipKey;
+import org.finos.waltz.model.entity_relationship.RelationshipKind;
 import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 

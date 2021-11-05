@@ -18,17 +18,17 @@
 
 package com.khartec.waltz.service.user;
 
+import com.khartec.waltz.service.settings.SettingsService;
 import org.finos.waltz.common.Checks;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.data.user.UserDao;
 import org.finos.waltz.data.user.UserRoleDao;
-import com.khartec.waltz.model.settings.Setting;
-import com.khartec.waltz.model.user.ImmutableLoginRequest;
-import com.khartec.waltz.model.user.LoginRequest;
-import com.khartec.waltz.model.user.PasswordResetRequest;
-import com.khartec.waltz.model.user.UserRegistrationRequest;
-import com.khartec.waltz.service.settings.SettingsService;
+import org.finos.waltz.model.settings.Setting;
+import org.finos.waltz.model.user.ImmutableLoginRequest;
+import org.finos.waltz.model.user.LoginRequest;
+import org.finos.waltz.model.user.PasswordResetRequest;
+import org.finos.waltz.model.user.UserRegistrationRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

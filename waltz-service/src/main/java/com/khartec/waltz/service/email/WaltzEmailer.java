@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.service.email;
 
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 import org.finos.waltz.common.Checks;
 import org.finos.waltz.common.IOUtilities;
 import org.finos.waltz.common.StringUtilities;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

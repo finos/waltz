@@ -18,12 +18,12 @@
 
 package org.finos.waltz.data.orgunit;
 
-import org.finos.waltz.data.FindEntityReferencesByIdSelector;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.orgunit.ImmutableOrganisationalUnit;
-import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.schema.tables.records.OrganisationalUnitRecord;
+import org.finos.waltz.data.FindEntityReferencesByIdSelector;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.orgunit.ImmutableOrganisationalUnit;
+import org.finos.waltz.model.orgunit.OrganisationalUnit;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +31,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static java.util.Optional.ofNullable;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.data.JooqUtilities.TO_ENTITY_REFERENCE;
 
 
 @Repository

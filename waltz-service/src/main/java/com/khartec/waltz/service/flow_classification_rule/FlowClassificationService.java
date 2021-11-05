@@ -19,7 +19,7 @@
 package com.khartec.waltz.service.flow_classification_rule;
 
 import org.finos.waltz.data.flow_classification_rule.FlowClassificationDao;
-import com.khartec.waltz.model.flow_classification.FlowClassification;
+import org.finos.waltz.model.flow_classification.FlowClassification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

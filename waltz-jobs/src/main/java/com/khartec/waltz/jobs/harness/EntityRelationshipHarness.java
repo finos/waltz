@@ -19,11 +19,11 @@
 package com.khartec.waltz.jobs.harness;
 
 
-import org.finos.waltz.data.entity_relationship.EntityRelationshipDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.entity_relationship.EntityRelationship;
 import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.data.entity_relationship.EntityRelationshipDao;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.entity_relationship.EntityRelationship;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

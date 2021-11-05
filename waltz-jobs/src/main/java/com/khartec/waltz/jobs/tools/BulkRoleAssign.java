@@ -18,12 +18,12 @@
 
 package com.khartec.waltz.jobs.tools;
 
-import org.finos.waltz.common.IOUtilities;
-import org.finos.waltz.common.SetUtilities;
-import com.khartec.waltz.model.user.ImmutableUpdateRolesCommand;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.user.UserRoleService;
+import org.finos.waltz.common.IOUtilities;
+import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.model.user.ImmutableUpdateRolesCommand;
+import org.finos.waltz.model.user.SystemRole;
 import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;

@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.web;
 
-import com.khartec.waltz.model.command.Command;
 import com.tngtech.archunit.lang.ArchRule;
+import org.finos.waltz.model.command.Command;
 import org.junit.Test;
 
 import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.classes;

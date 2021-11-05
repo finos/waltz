@@ -18,24 +18,24 @@
 
 package com.khartec.waltz.service.taxonomy_management;
 
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.Severity;
-import com.khartec.waltz.model.measurable.Measurable;
-import com.khartec.waltz.model.measurable_rating.MeasurableRating;
-import com.khartec.waltz.model.taxonomy_management.ImmutableTaxonomyChangeImpact;
-import com.khartec.waltz.model.taxonomy_management.ImmutableTaxonomyChangePreview;
-import com.khartec.waltz.model.taxonomy_management.TaxonomyChangeCommand;
 import com.khartec.waltz.service.measurable.MeasurableService;
 import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.HierarchyQueryScope;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.measurable.Measurable;
+import org.finos.waltz.model.measurable_rating.MeasurableRating;
+import org.finos.waltz.model.taxonomy_management.ImmutableTaxonomyChangeImpact;
+import org.finos.waltz.model.taxonomy_management.ImmutableTaxonomyChangePreview;
+import org.finos.waltz.model.taxonomy_management.TaxonomyChangeCommand;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
-import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
+import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
 public class TaxonomyManagementUtilities {
 

@@ -18,7 +18,7 @@
 
 package org.finos.waltz.data;
 
-import com.khartec.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
 

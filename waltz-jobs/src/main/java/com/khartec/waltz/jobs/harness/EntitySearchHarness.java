@@ -18,13 +18,13 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import org.finos.waltz.common.ListUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.model.entity_search.ImmutableEntitySearchOptions;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.entity_search.EntitySearchService;
+import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.entity_search.ImmutableEntitySearchOptions;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.Arrays;

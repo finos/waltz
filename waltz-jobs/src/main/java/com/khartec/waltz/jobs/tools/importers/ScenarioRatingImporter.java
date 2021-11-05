@@ -18,6 +18,8 @@
 
 package com.khartec.waltz.jobs.tools.importers;
 
+import com.khartec.waltz.schema.tables.records.ScenarioRatingItemRecord;
+import com.khartec.waltz.service.DIConfiguration;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.measurable.MeasurableDao;
@@ -25,18 +27,16 @@ import org.finos.waltz.data.rating_scheme.RatingSchemeDAO;
 import org.finos.waltz.data.roadmap.RoadmapDao;
 import org.finos.waltz.data.scenario.ScenarioAxisItemDao;
 import org.finos.waltz.data.scenario.ScenarioDao;
-import com.khartec.waltz.model.AxisOrientation;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.external_identifier.ExternalIdValue;
-import com.khartec.waltz.model.measurable.Measurable;
-import com.khartec.waltz.model.rating.RatingSchemeItem;
-import com.khartec.waltz.model.rating.RatingScheme;
-import com.khartec.waltz.model.roadmap.Roadmap;
-import com.khartec.waltz.model.scenario.Scenario;
-import com.khartec.waltz.model.scenario.ScenarioAxisItem;
-import com.khartec.waltz.schema.tables.records.ScenarioRatingItemRecord;
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.model.AxisOrientation;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.external_identifier.ExternalIdValue;
+import org.finos.waltz.model.measurable.Measurable;
+import org.finos.waltz.model.rating.RatingScheme;
+import org.finos.waltz.model.rating.RatingSchemeItem;
+import org.finos.waltz.model.roadmap.Roadmap;
+import org.finos.waltz.model.scenario.Scenario;
+import org.finos.waltz.model.scenario.ScenarioAxisItem;
 import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -51,13 +51,13 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static com.khartec.waltz.schema.tables.ScenarioRatingItem.SCENARIO_RATING_ITEM;
+import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.StringUtilities.lower;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.ScenarioRatingItem.SCENARIO_RATING_ITEM;
-import static java.util.stream.Collectors.*;
 
 //@Component
 public class ScenarioRatingImporter {

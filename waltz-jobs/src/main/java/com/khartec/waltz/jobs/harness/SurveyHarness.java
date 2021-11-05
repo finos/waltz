@@ -18,14 +18,14 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import org.finos.waltz.common.SetUtilities;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.survey.*;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.survey.SurveyInstanceService;
 import com.khartec.waltz.service.survey.SurveyQuestionService;
 import com.khartec.waltz.service.survey.SurveyRunService;
 import com.khartec.waltz.service.survey.SurveyTemplateService;
+import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.survey.*;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.Collections;

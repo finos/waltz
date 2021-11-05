@@ -18,13 +18,13 @@
 
 package org.finos.waltz.data.survey;
 
-import org.finos.waltz.common.StringUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.survey.ImmutableSurveyQuestion;
-import com.khartec.waltz.model.survey.SurveyQuestion;
-import com.khartec.waltz.model.survey.SurveyQuestionFieldType;
 import com.khartec.waltz.schema.tables.records.SurveyQuestionRecord;
+import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.survey.ImmutableSurveyQuestion;
+import org.finos.waltz.model.survey.SurveyQuestion;
+import org.finos.waltz.model.survey.SurveyQuestionFieldType;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,11 +34,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.Checks.checkTrue;
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Repository
 public class SurveyQuestionDao {

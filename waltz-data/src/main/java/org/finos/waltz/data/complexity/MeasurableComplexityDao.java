@@ -18,9 +18,9 @@
 
 package org.finos.waltz.data.complexity;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.tally.ImmutableTally;
-import com.khartec.waltz.model.tally.Tally;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.tally.ImmutableTally;
+import org.finos.waltz.model.tally.Tally;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;

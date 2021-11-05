@@ -19,15 +19,15 @@
 package com.khartec.waltz.jobs.harness;
 
 
-import org.finos.waltz.data.InlineSelectFieldFactory;
-import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.data.InlineSelectFieldFactory;
+import org.finos.waltz.model.EntityKind;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
 
 public class EntityNameUtilitiesHarness {
     public static void main(String[] args) {

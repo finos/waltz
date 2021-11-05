@@ -18,18 +18,18 @@
 
 package com.khartec.waltz.service.scenario;
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.roadmap.RoadmapUtilities;
 import org.finos.waltz.data.roadmap.RoadmapIdSelectorFactory;
 import org.finos.waltz.data.scenario.ScenarioAxisItemDao;
 import org.finos.waltz.data.scenario.ScenarioDao;
 import org.finos.waltz.data.scenario.ScenarioRatingItemDao;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.changelog.ChangeLog;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.scenario.CloneScenarioCommand;
-import com.khartec.waltz.model.scenario.Scenario;
-import com.khartec.waltz.model.scenario.ScenarioType;
-import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.roadmap.RoadmapUtilities;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.changelog.ChangeLog;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.scenario.CloneScenarioCommand;
+import org.finos.waltz.model.scenario.Scenario;
+import org.finos.waltz.model.scenario.ScenarioType;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +38,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.Collection;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.service.scenario.ScenarioUtilities.mkBasicLogEntry;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class ScenarioService {

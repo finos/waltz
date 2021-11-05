@@ -18,10 +18,10 @@
 
 package org.finos.waltz.data.settings;
 
-import org.finos.waltz.common.StringUtilities;
-import com.khartec.waltz.model.settings.ImmutableSetting;
-import com.khartec.waltz.model.settings.Setting;
 import com.khartec.waltz.schema.tables.records.SettingsRecord;
+import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.model.settings.ImmutableSetting;
+import org.finos.waltz.model.settings.Setting;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;

@@ -18,13 +18,13 @@
 
 package org.finos.waltz.data.changelog;
 
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.changelog.ChangeLog;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.tally.OrderedTally;
-import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.AttestationInstance;
 import com.khartec.waltz.schema.tables.records.ChangeLogRecord;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.changelog.ChangeLog;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.tally.OrderedTally;
+import org.finos.waltz.model.tally.Tally;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,12 +37,12 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import static com.khartec.waltz.schema.Tables.PERSON;
+import static com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG;
 import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.data.JooqUtilities.*;
-import static com.khartec.waltz.schema.Tables.PERSON;
-import static com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG;
 
 
 @Repository

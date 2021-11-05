@@ -20,16 +20,16 @@ package org.finos.waltz.data.change_set;
 
 import org.finos.waltz.data.IdSelectorFactory;
 import org.finos.waltz.data.change_unit.ChangeUnitIdSelectorFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.Tables.CHANGE_SET;
 import static com.khartec.waltz.schema.tables.ChangeUnit.CHANGE_UNIT;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 public class ChangeSetIdSelectorFactory implements IdSelectorFactory {
 

@@ -19,7 +19,7 @@
 package com.khartec.waltz.service.user;
 
 import org.finos.waltz.data.user.UserPreferenceDao;
-import com.khartec.waltz.model.user.UserPreference;
+import org.finos.waltz.model.user.UserPreference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

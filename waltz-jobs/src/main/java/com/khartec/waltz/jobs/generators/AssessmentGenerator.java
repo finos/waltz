@@ -18,16 +18,16 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import org.finos.waltz.common.ColorUtilities;
-import org.finos.waltz.common.ListUtilities;
-import org.finos.waltz.common.RandomUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.rating.RatingScheme;
 import com.khartec.waltz.schema.tables.records.AssessmentDefinitionRecord;
 import com.khartec.waltz.schema.tables.records.AssessmentRatingRecord;
 import com.khartec.waltz.schema.tables.records.RatingSchemeItemRecord;
 import com.khartec.waltz.schema.tables.records.RatingSchemeRecord;
 import com.khartec.waltz.service.rating_scheme.RatingSchemeService;
+import org.finos.waltz.common.ColorUtilities;
+import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.common.RandomUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.rating.RatingScheme;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple3;
@@ -37,9 +37,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.Tables.*;
 import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class AssessmentGenerator implements SampleDataGenerator {

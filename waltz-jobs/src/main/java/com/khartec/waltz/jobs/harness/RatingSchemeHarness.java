@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import org.finos.waltz.data.rating_scheme.RatingSchemeDAO;
-import com.khartec.waltz.model.rating.RatingSchemeItemUsageCount;
 import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.data.rating_scheme.RatingSchemeDAO;
+import org.finos.waltz.model.rating.RatingSchemeItemUsageCount;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

@@ -18,21 +18,21 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import org.finos.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.model.user_agent_info.ImmutableUserAgentInfo;
-import com.khartec.waltz.model.user_agent_info.UserAgentInfo;
 import com.khartec.waltz.service.user_agent_info.UserAgentInfoService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.json.BrowserInfo;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.model.user_agent_info.ImmutableUserAgentInfo;
+import org.finos.waltz.model.user_agent_info.UserAgentInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class UserAgentInfoEndpoint implements Endpoint {

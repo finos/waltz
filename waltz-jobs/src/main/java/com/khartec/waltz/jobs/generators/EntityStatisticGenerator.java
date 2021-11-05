@@ -18,19 +18,19 @@
 
 package com.khartec.waltz.jobs.generators;
 
+import com.khartec.waltz.service.DIConfiguration;
+import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.finos.waltz.common.RandomUtilities;
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.entity_statistic.EntityStatisticDefinitionDao;
 import org.finos.waltz.data.entity_statistic.EntityStatisticValueDao;
 import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.entity_statistic.*;
-import com.khartec.waltz.model.orgunit.OrganisationalUnit;
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.entity_statistic.*;
+import org.finos.waltz.model.orgunit.OrganisationalUnit;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -45,10 +45,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
 import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
 import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
 
 public class EntityStatisticGenerator implements SampleDataGenerator {
 

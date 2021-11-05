@@ -18,15 +18,15 @@
 
 package org.finos.waltz.data.flow_diagram;
 
+import com.khartec.waltz.schema.tables.records.FlowDiagramEntityRecord;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.flow_diagram.FlowDiagramEntity;
-import com.khartec.waltz.model.flow_diagram.ImmutableFlowDiagramEntity;
-import com.khartec.waltz.schema.tables.records.FlowDiagramEntityRecord;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.flow_diagram.FlowDiagramEntity;
+import org.finos.waltz.model.flow_diagram.ImmutableFlowDiagramEntity;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -36,13 +36,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.EnumUtilities.readEnum;
-import static org.finos.waltz.common.ListUtilities.*;
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static java.lang.String.format;
 import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.EnumUtilities.readEnum;
+import static org.finos.waltz.common.ListUtilities.*;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 
 @Repository

@@ -18,12 +18,12 @@
 
 package org.finos.waltz.data.rel;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.rel.ImmutableRelationshipKind;
-import com.khartec.waltz.model.rel.RelationshipKind;
-import com.khartec.waltz.model.rel.UpdateRelationshipKindCommand;
 import com.khartec.waltz.schema.tables.records.RelationshipKindRecord;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.rel.ImmutableRelationshipKind;
+import org.finos.waltz.model.rel.RelationshipKind;
+import org.finos.waltz.model.rel.UpdateRelationshipKindCommand;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;

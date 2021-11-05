@@ -18,6 +18,9 @@
 
 package com.khartec.waltz.service.logical_flow;
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.data_type.DataTypeService;
+import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.DBExecutorPoolInterface;
@@ -27,16 +30,13 @@ import org.finos.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import org.finos.waltz.data.logical_flow.LogicalFlowStatsDao;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.changelog.ChangeLog;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
-import com.khartec.waltz.model.logical_flow.*;
-import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
-import com.khartec.waltz.model.tally.TallyPack;
-import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.data_type.DataTypeService;
-import com.khartec.waltz.service.usage_info.DataTypeUsageService;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.changelog.ChangeLog;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.datatype.ImmutableDataTypeDecorator;
+import org.finos.waltz.model.logical_flow.*;
+import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
+import org.finos.waltz.model.tally.TallyPack;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.lambda.Unchecked;
@@ -56,17 +56,17 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.String.format;
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.SetUtilities.fromCollection;
-import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
-import static com.khartec.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static java.lang.String.format;
-import static java.util.Collections.emptyList;
-import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.model.EntityKind.DATA_TYPE;
+import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 

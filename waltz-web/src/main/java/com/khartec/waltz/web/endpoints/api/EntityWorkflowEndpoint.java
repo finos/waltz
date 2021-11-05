@@ -19,13 +19,13 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
-import com.khartec.waltz.model.entity_workflow.EntityWorkflowDefinition;
-import com.khartec.waltz.model.entity_workflow.EntityWorkflowState;
-import com.khartec.waltz.model.entity_workflow.EntityWorkflowTransition;
 import com.khartec.waltz.service.entity_workflow.EntityWorkflowService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowDefinition;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowTransition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

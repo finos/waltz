@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import org.finos.waltz.common.Checks;
-import com.khartec.waltz.model.source_data_rating.SourceDataRating;
 import com.khartec.waltz.service.source_data_rating.SourceDataRatingService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.common.Checks;
+import org.finos.waltz.model.source_data_rating.SourceDataRating;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

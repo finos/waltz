@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.model.app_group.AppGroupKind;
 import com.khartec.waltz.schema.tables.records.ApplicationGroupRecord;
+import org.finos.waltz.model.app_group.AppGroupKind;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.springframework.context.ApplicationContext;

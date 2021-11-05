@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import org.finos.waltz.data.process_diagram_entity.ProcessDiagramEntityDao;
-import com.khartec.waltz.model.process_diagram.ProcessDiagramEntityApplicationAlignment;
 import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.data.process_diagram_entity.ProcessDiagramEntityDao;
+import org.finos.waltz.model.process_diagram.ProcessDiagramEntityApplicationAlignment;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

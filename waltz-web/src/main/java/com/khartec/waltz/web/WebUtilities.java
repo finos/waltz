@@ -22,14 +22,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
-import org.finos.waltz.common.EnumUtilities;
-import org.finos.waltz.common.SetUtilities;
-import org.finos.waltz.common.StringUtilities;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.endpoints.auth.AuthenticationUtilities;
 import org.eclipse.jetty.http.MimeTypes;
+import org.finos.waltz.common.EnumUtilities;
+import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.user.SystemRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.Request;
@@ -43,12 +43,12 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.khartec.waltz.service.user.RoleUtilities.getRequiredRoleForEntityKind;
+import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ObjectUtilities.firstNotNull;
 import static org.finos.waltz.common.SetUtilities.asSet;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.service.user.RoleUtilities.getRequiredRoleForEntityKind;
-import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 public class WebUtilities {
 

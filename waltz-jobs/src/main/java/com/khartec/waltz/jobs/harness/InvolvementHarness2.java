@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.jobs.harness;
 
+import com.khartec.waltz.service.DIConfiguration;
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.involvement.InvolvementDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.application.Application;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -30,10 +30,10 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import javax.sql.DataSource;
 import java.util.Collection;
 
-import static org.finos.waltz.common.FunctionUtilities.time;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
+import static org.finos.waltz.common.FunctionUtilities.time;
 
 
 public class InvolvementHarness2 {

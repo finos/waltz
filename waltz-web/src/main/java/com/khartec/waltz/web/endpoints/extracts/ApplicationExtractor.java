@@ -18,10 +18,10 @@
 
 package com.khartec.waltz.web.endpoints.extracts;
 
+import com.khartec.waltz.schema.tables.Application;
 import org.finos.waltz.data.SelectorUtilities;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.schema.tables.Application;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.jooq.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

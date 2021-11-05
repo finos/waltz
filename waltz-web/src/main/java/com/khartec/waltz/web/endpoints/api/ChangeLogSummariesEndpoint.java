@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.tally.ChangeLogTally;
 import com.khartec.waltz.service.changelog.ChangeLogSummariesService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.tally.ChangeLogTally;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
@@ -32,10 +32,10 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Optional;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
 
 
 @Service

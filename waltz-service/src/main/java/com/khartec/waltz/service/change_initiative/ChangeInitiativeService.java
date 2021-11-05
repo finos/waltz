@@ -18,23 +18,23 @@
 
 package com.khartec.waltz.service.change_initiative;
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.entity_relationship.EntityRelationshipUtilities;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.data.change_initiative.ChangeInitiativeDao;
 import org.finos.waltz.data.change_initiative.ChangeInitiativeIdSelectorFactory;
 import org.finos.waltz.data.change_initiative.search.ChangeInitiativeSearchDao;
 import org.finos.waltz.data.entity_relationship.EntityRelationshipDao;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.Severity;
-import com.khartec.waltz.model.change_initiative.ChangeInitiative;
-import com.khartec.waltz.model.changelog.ChangeLog;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.entity_relationship.*;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.entity_relationship.EntityRelationshipUtilities;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.change_initiative.ChangeInitiative;
+import org.finos.waltz.model.changelog.ChangeLog;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.entity_relationship.*;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,8 +42,8 @@ import java.util.Collection;
 import java.util.Collections;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.EntityKind.CHANGE_INITIATIVE;
-import static com.khartec.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.EntityKind.CHANGE_INITIATIVE;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Service
 public class ChangeInitiativeService {

@@ -20,9 +20,9 @@ package com.khartec.waltz.jobs.clients.c1.sc1.model;
 
 import com.khartec.waltz.jobs.Columns;
 import com.khartec.waltz.jobs.clients.c1.sc1.parse.StatusToLifecyclePhase;
-import com.khartec.waltz.model.Nullable;
-import com.khartec.waltz.model.application.LifecyclePhase;
 import org.apache.poi.ss.usermodel.Row;
+import org.finos.waltz.model.Nullable;
+import org.finos.waltz.model.application.LifecyclePhase;
 import org.immutables.value.Value;
 
 import java.util.Date;

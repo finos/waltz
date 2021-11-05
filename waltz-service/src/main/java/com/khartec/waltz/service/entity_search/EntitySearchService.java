@@ -18,11 +18,6 @@
 
 package com.khartec.waltz.service.entity_search;
 
-import org.finos.waltz.common.StringUtilities;
-import org.finos.waltz.data.DBExecutorPoolInterface;
-import org.finos.waltz.data.SearchUtilities;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.service.actor.ActorService;
 import com.khartec.waltz.service.app_group.AppGroupService;
 import com.khartec.waltz.service.application.ApplicationService;
@@ -37,6 +32,13 @@ import com.khartec.waltz.service.physical_specification.PhysicalSpecificationSer
 import com.khartec.waltz.service.roadmap.RoadmapService;
 import com.khartec.waltz.service.server_information.ServerInformationService;
 import com.khartec.waltz.service.software_catalog.SoftwareCatalogService;
+import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.data.DBExecutorPoolInterface;
+import org.finos.waltz.data.SearchUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.WaltzEntity;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,8 +48,8 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.jooq.lambda.Unchecked.supplier;
 
 @Service

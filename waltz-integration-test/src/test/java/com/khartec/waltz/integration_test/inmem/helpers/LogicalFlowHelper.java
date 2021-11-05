@@ -2,13 +2,13 @@ package com.khartec.waltz.integration_test.inmem.helpers;
 
 import org.finos.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.datatype.DataTypeDecorator;
-import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
-import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
-import com.khartec.waltz.model.logical_flow.LogicalFlow;
-import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.datatype.DataTypeDecorator;
+import org.finos.waltz.model.datatype.ImmutableDataTypeDecorator;
+import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
+import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ import java.util.Set;
 
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.ListUtilities.map;
-import static com.khartec.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW;
 
 @Service

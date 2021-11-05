@@ -18,6 +18,8 @@
 
 package com.khartec.waltz.service.measurable_rating;
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.rating_scheme.RatingSchemeService;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.EntityReferenceNameResolver;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
@@ -25,19 +27,17 @@ import org.finos.waltz.data.measurable.MeasurableDao;
 import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
 import org.finos.waltz.data.measurable_category.MeasurableCategoryDao;
 import org.finos.waltz.data.measurable_rating.MeasurableRatingDao;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.measurable.Measurable;
-import com.khartec.waltz.model.measurable_category.MeasurableCategory;
-import com.khartec.waltz.model.measurable_rating.MeasurableRating;
-import com.khartec.waltz.model.measurable_rating.MeasurableRatingCommand;
-import com.khartec.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
-import com.khartec.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
-import com.khartec.waltz.model.rating.RatingSchemeItem;
-import com.khartec.waltz.model.tally.MeasurableRatingTally;
-import com.khartec.waltz.model.tally.Tally;
-import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.rating_scheme.RatingSchemeService;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.measurable.Measurable;
+import org.finos.waltz.model.measurable_category.MeasurableCategory;
+import org.finos.waltz.model.measurable_rating.MeasurableRating;
+import org.finos.waltz.model.measurable_rating.MeasurableRatingCommand;
+import org.finos.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
+import org.finos.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
+import org.finos.waltz.model.rating.RatingSchemeItem;
+import org.finos.waltz.model.tally.MeasurableRatingTally;
+import org.finos.waltz.model.tally.Tally;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,8 +46,8 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 
-import static org.finos.waltz.common.Checks.*;
 import static java.lang.String.format;
+import static org.finos.waltz.common.Checks.*;
 
 @Service
 public class MeasurableRatingService {

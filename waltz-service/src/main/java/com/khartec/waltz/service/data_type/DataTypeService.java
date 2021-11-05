@@ -20,9 +20,9 @@ package com.khartec.waltz.service.data_type;
 
 import org.finos.waltz.data.data_type.DataTypeDao;
 import org.finos.waltz.data.data_type.search.DataTypeSearchDao;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.datatype.DataType;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.datatype.DataType;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -20,10 +20,10 @@ package com.khartec.waltz.service.entity_enum;
 
 import org.finos.waltz.data.entity_enum.EntityEnumDefinitionDao;
 import org.finos.waltz.data.entity_enum.EntityEnumValueDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.entity_enum.EntityEnumDefinition;
-import com.khartec.waltz.model.entity_enum.EntityEnumValue;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.entity_enum.EntityEnumDefinition;
+import org.finos.waltz.model.entity_enum.EntityEnumValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

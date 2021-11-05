@@ -19,16 +19,16 @@
 package com.khartec.waltz.service.involvement_kind;
 
 import org.finos.waltz.data.involvement_kind.InvolvementKindDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.UserTimestamp;
-import com.khartec.waltz.model.command.CommandOutcome;
-import com.khartec.waltz.model.command.CommandResponse;
-import com.khartec.waltz.model.command.ImmutableCommandResponse;
-import com.khartec.waltz.model.involvement_kind.ImmutableInvolvementKindChangeCommand;
-import com.khartec.waltz.model.involvement_kind.InvolvementKind;
-import com.khartec.waltz.model.involvement_kind.InvolvementKindChangeCommand;
-import com.khartec.waltz.model.involvement_kind.InvolvementKindCreateCommand;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.command.CommandOutcome;
+import org.finos.waltz.model.command.CommandResponse;
+import org.finos.waltz.model.command.ImmutableCommandResponse;
+import org.finos.waltz.model.involvement_kind.ImmutableInvolvementKindChangeCommand;
+import org.finos.waltz.model.involvement_kind.InvolvementKind;
+import org.finos.waltz.model.involvement_kind.InvolvementKindChangeCommand;
+import org.finos.waltz.model.involvement_kind.InvolvementKindCreateCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

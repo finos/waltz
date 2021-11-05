@@ -19,15 +19,15 @@
 package org.finos.waltz.data.scheduled_job;
 
 
-import com.khartec.waltz.model.scheduled_job.JobKey;
-import com.khartec.waltz.model.scheduled_job.JobLifecycleStatus;
+import org.finos.waltz.model.scheduled_job.JobKey;
+import org.finos.waltz.model.scheduled_job.JobLifecycleStatus;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Settings.SETTINGS;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository
 public class ScheduledJobDao {

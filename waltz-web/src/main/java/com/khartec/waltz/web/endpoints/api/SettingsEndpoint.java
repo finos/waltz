@@ -18,25 +18,25 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.settings.ImmutableSetting;
-import com.khartec.waltz.model.settings.Setting;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.settings.SettingsService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.settings.ImmutableSetting;
+import org.finos.waltz.model.settings.Setting;
+import org.finos.waltz.model.user.SystemRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
 import java.util.Collection;
 
-import static org.finos.waltz.common.CollectionUtilities.map;
 import static com.khartec.waltz.web.WebUtilities.getUsername;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static org.finos.waltz.common.CollectionUtilities.map;
 
 @Service
 public class SettingsEndpoint implements Endpoint {

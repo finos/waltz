@@ -18,12 +18,12 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.role.Role;
-import com.khartec.waltz.model.user.*;
 import com.khartec.waltz.service.role.RoleService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.role.Role;
+import org.finos.waltz.model.user.SystemRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,7 +31,8 @@ import java.util.Map;
 import java.util.Set;
 
 import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
 
 
 @Service

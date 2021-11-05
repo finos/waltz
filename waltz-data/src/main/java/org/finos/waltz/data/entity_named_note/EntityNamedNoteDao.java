@@ -18,12 +18,12 @@
 
 package org.finos.waltz.data.entity_named_note;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.UserTimestamp;
-import com.khartec.waltz.model.entity_named_note.EntityNamedNote;
-import com.khartec.waltz.model.entity_named_note.ImmutableEntityNamedNote;
 import com.khartec.waltz.schema.tables.records.EntityNamedNoteRecord;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.entity_named_note.EntityNamedNote;
+import org.finos.waltz.model.entity_named_note.ImmutableEntityNamedNote;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -33,8 +33,8 @@ import org.springframework.stereotype.Repository;
 import java.sql.Timestamp;
 import java.util.List;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.EntityNamedNote.ENTITY_NAMED_NOTE;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository
 public class EntityNamedNoteDao {

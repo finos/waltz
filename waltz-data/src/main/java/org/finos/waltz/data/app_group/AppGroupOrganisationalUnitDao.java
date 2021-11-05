@@ -18,9 +18,9 @@
 
 package org.finos.waltz.data.app_group;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.app_group.AppGroupEntry;
-import com.khartec.waltz.model.app_group.ImmutableAppGroupEntry;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.app_group.AppGroupEntry;
+import org.finos.waltz.model.app_group.ImmutableAppGroupEntry;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;

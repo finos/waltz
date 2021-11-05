@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 public class SearchUtilities
 {

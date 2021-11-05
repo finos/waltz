@@ -18,9 +18,9 @@
 
 package org.finos.waltz.data.user;
 
-import com.khartec.waltz.model.user.ImmutableUserPreference;
-import com.khartec.waltz.model.user.UserPreference;
 import com.khartec.waltz.schema.tables.records.UserPreferenceRecord;
+import org.finos.waltz.model.user.ImmutableUserPreference;
+import org.finos.waltz.model.user.UserPreference;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -34,9 +34,9 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.khartec.waltz.schema.tables.UserPreference.USER_PREFERENCE;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.schema.tables.UserPreference.USER_PREFERENCE;
 
 @Repository
 public class UserPreferenceDao {

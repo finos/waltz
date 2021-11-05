@@ -19,16 +19,16 @@
 package com.khartec.waltz.service.attestation;
 
 
+import com.khartec.waltz.service.email.EmailService;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.attestation.AttestationInstanceDao;
 import org.finos.waltz.data.attestation.AttestationInstanceRecipientDao;
 import org.finos.waltz.data.attestation.AttestationRunDao;
 import org.finos.waltz.data.involvement.InvolvementDao;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.attestation.*;
-import com.khartec.waltz.model.person.Person;
-import com.khartec.waltz.service.email.EmailService;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.attestation.*;
+import org.finos.waltz.model.person.Person;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,17 +37,17 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.*;
 
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.common.ListUtilities.isEmpty;
 import static org.finos.waltz.common.SetUtilities.asSet;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
-import static com.khartec.waltz.model.attestation.AttestationStatus.ISSUED;
-import static com.khartec.waltz.model.attestation.AttestationStatus.ISSUING;
-import static com.khartec.waltz.model.utils.IdUtilities.toIds;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
+import static org.finos.waltz.model.attestation.AttestationStatus.ISSUED;
+import static org.finos.waltz.model.attestation.AttestationStatus.ISSUING;
+import static org.finos.waltz.model.utils.IdUtilities.toIds;
 
 @Service
 public class AttestationRunService {

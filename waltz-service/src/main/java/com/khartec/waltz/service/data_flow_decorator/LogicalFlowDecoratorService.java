@@ -19,6 +19,9 @@
 package com.khartec.waltz.service.data_flow_decorator;
 
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.logical_flow.LogicalFlowService;
+import com.khartec.waltz.service.usage_info.DataTypeUsageService;
 import org.finos.waltz.common.Checks;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.SetUtilities;
@@ -28,19 +31,16 @@ import org.finos.waltz.data.data_type.DataTypeDao;
 import org.finos.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowStatsDao;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.changelog.ChangeLog;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.data_flow_decorator.*;
-import com.khartec.waltz.model.datatype.DataType;
-import com.khartec.waltz.model.datatype.DataTypeDecorator;
-import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
-import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlowMeasures;
-import com.khartec.waltz.model.logical_flow.LogicalFlow;
-import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
-import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.logical_flow.LogicalFlowService;
-import com.khartec.waltz.service.usage_info.DataTypeUsageService;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.changelog.ChangeLog;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.data_flow_decorator.*;
+import org.finos.waltz.model.datatype.DataType;
+import org.finos.waltz.model.datatype.DataTypeDecorator;
+import org.finos.waltz.model.datatype.ImmutableDataTypeDecorator;
+import org.finos.waltz.model.logical_flow.ImmutableLogicalFlowMeasures;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
+import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +50,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.joining;
 import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.map;
@@ -58,12 +61,9 @@ import static org.finos.waltz.common.ListUtilities.asList;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.union;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.model.FlowDirection.*;
-import static com.khartec.waltz.model.utils.IdUtilities.indexById;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
-import static java.util.stream.Collectors.joining;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.FlowDirection.*;
+import static org.finos.waltz.model.utils.IdUtilities.indexById;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Service

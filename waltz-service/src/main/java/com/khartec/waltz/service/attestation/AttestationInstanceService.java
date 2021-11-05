@@ -18,20 +18,20 @@
 
 package com.khartec.waltz.service.attestation;
 
+import com.khartec.waltz.service.application.ApplicationService;
+import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.permission.PermissionGroupService;
 import org.finos.waltz.common.exception.UpdateFailedException;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.attestation.AttestationInstanceDao;
 import org.finos.waltz.data.person.PersonDao;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.attestation.*;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.external_identifier.ExternalIdValue;
-import com.khartec.waltz.model.person.Person;
-import com.khartec.waltz.service.application.ApplicationService;
-import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.permission.PermissionGroupService;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.attestation.*;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.external_identifier.ExternalIdValue;
+import org.finos.waltz.model.person.Person;
 import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -44,13 +44,13 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Set;
 
+import static com.khartec.waltz.schema.Tables.APPLICATION;
+import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.*;
 import static org.finos.waltz.common.CollectionUtilities.first;
 import static org.finos.waltz.common.CollectionUtilities.notEmpty;
 import static org.finos.waltz.common.DateTimeUtilities.*;
 import static org.finos.waltz.common.StringUtilities.join;
-import static com.khartec.waltz.schema.Tables.APPLICATION;
-import static java.lang.String.format;
 
 
 @Service

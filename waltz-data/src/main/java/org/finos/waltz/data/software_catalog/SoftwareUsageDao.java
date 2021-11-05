@@ -18,9 +18,12 @@
 
 package org.finos.waltz.data.software_catalog;
 
-import com.khartec.waltz.model.software_catalog.ImmutableSoftwareUsage;
-import com.khartec.waltz.model.software_catalog.SoftwareUsage;
-import org.jooq.*;
+import org.finos.waltz.model.software_catalog.ImmutableSoftwareUsage;
+import org.finos.waltz.model.software_catalog.SoftwareUsage;
+import org.jooq.Condition;
+import org.jooq.DSLContext;
+import org.jooq.Record;
+import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

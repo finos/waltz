@@ -18,18 +18,18 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.model.entity_search.ImmutableEntitySearchOptions;
 import com.khartec.waltz.service.entity_search.EntitySearchService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.entity_search.ImmutableEntitySearchOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class EntitySearchEndpoint implements Endpoint {

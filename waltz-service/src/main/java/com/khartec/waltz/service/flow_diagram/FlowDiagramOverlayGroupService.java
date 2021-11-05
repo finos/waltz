@@ -19,10 +19,10 @@
 package com.khartec.waltz.service.flow_diagram;
 
 import org.finos.waltz.data.flow_diagram.FlowDiagramOverlayGroupDao;
-import com.khartec.waltz.model.flow_diagram.FlowDiagramOverlayGroup;
-import com.khartec.waltz.model.flow_diagram.FlowDiagramOverlayGroupEntry;
-import com.khartec.waltz.model.flow_diagram.ImmutableFlowDiagramOverlayGroup;
-import com.khartec.waltz.model.flow_diagram.ImmutableFlowDiagramOverlayGroupEntry;
+import org.finos.waltz.model.flow_diagram.FlowDiagramOverlayGroup;
+import org.finos.waltz.model.flow_diagram.FlowDiagramOverlayGroupEntry;
+import org.finos.waltz.model.flow_diagram.ImmutableFlowDiagramOverlayGroup;
+import org.finos.waltz.model.flow_diagram.ImmutableFlowDiagramOverlayGroupEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

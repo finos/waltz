@@ -18,19 +18,19 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.flow_diagram.FlowDiagramOverlayGroup;
-import com.khartec.waltz.model.flow_diagram.FlowDiagramOverlayGroupEntry;
 import com.khartec.waltz.service.flow_diagram.FlowDiagramOverlayGroupService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.flow_diagram.FlowDiagramOverlayGroup;
+import org.finos.waltz.model.flow_diagram.FlowDiagramOverlayGroupEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Service

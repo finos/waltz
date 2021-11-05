@@ -21,10 +21,10 @@ package org.finos.waltz.data.change_initiative.search;
 import org.finos.waltz.data.DatabaseVendorSpecific;
 import org.finos.waltz.data.FullTextSearch;
 import org.finos.waltz.data.JooqUtilities;
-import org.finos.waltz.data.change_initiative.ChangeInitiativeDao;
-import com.khartec.waltz.model.change_initiative.ChangeInitiative;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import org.finos.waltz.data.SearchUtilities;
+import org.finos.waltz.data.change_initiative.ChangeInitiativeDao;
+import org.finos.waltz.model.change_initiative.ChangeInitiative;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.DSLContext;
 
 import java.util.List;

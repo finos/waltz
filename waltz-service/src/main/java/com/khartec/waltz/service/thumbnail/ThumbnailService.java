@@ -19,20 +19,20 @@
 package com.khartec.waltz.service.thumbnail;
 
 
-import org.finos.waltz.data.thumbnail.ThumbnailDao;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.Severity;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.thumbnail.ImmutableThumbnail;
-import com.khartec.waltz.model.thumbnail.Thumbnail;
-import com.khartec.waltz.model.thumbnail.ThumbnailSaveCommand;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.data.thumbnail.ThumbnailDao;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.thumbnail.ImmutableThumbnail;
+import org.finos.waltz.model.thumbnail.Thumbnail;
+import org.finos.waltz.model.thumbnail.ThumbnailSaveCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static java.lang.String.format;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Service

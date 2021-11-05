@@ -18,7 +18,6 @@
 
 package com.khartec.waltz.web;
 
-import org.finos.waltz.common.SetUtilities;
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaClasses;
 import com.tngtech.archunit.core.domain.JavaModifier;
@@ -26,6 +25,7 @@ import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.lang.ArchCondition;
 import com.tngtech.archunit.lang.ConditionEvents;
 import com.tngtech.archunit.lang.SimpleConditionEvent;
+import org.finos.waltz.common.SetUtilities;
 import org.junit.BeforeClass;
 
 import java.util.Collection;

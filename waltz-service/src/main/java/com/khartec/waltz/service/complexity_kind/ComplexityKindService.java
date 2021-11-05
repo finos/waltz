@@ -4,9 +4,9 @@ import org.finos.waltz.common.Checks;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.complexity.ComplexityKindDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.complexity.ComplexityKind;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.complexity.ComplexityKind;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

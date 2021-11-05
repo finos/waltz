@@ -20,19 +20,19 @@ package com.khartec.waltz.service.survey;
 
 import org.finos.waltz.data.IdSelectorFactory;
 import org.finos.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.ImmutableIdSelectionOptions;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.HierarchyQueryScope;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.ImmutableIdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.SelectConditionStep;
 import org.jooq.impl.DSL;
 
+import static com.khartec.waltz.schema.tables.SurveyInstance.SURVEY_INSTANCE;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
-import static com.khartec.waltz.model.HierarchyQueryScope.EXACT;
-import static com.khartec.waltz.schema.tables.SurveyInstance.SURVEY_INSTANCE;
+import static org.finos.waltz.model.HierarchyQueryScope.EXACT;
 
 public class SurveyInstanceIdSelectorFactory implements IdSelectorFactory {
 

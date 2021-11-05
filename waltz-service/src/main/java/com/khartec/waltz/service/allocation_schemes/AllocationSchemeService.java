@@ -19,7 +19,7 @@
 package com.khartec.waltz.service.allocation_schemes;
 
 import org.finos.waltz.data.allocation_scheme.AllocationSchemeDao;
-import com.khartec.waltz.model.allocation_scheme.AllocationScheme;
+import org.finos.waltz.model.allocation_scheme.AllocationScheme;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

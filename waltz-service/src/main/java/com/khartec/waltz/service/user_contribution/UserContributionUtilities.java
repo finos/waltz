@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.user_contribution;
 
-import com.khartec.waltz.model.tally.OrderedTally;
+import org.finos.waltz.model.tally.OrderedTally;
 
 import java.util.List;
 import java.util.Optional;

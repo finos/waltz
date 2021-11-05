@@ -18,14 +18,14 @@
 
 package org.finos.waltz.data.scenario;
 
-import org.finos.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.ReleaseLifecycleStatus;
-import com.khartec.waltz.model.scenario.CloneScenarioCommand;
-import com.khartec.waltz.model.scenario.ImmutableScenario;
-import com.khartec.waltz.model.scenario.Scenario;
-import com.khartec.waltz.model.scenario.ScenarioType;
 import com.khartec.waltz.schema.tables.records.ScenarioRecord;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.ReleaseLifecycleStatus;
+import org.finos.waltz.model.scenario.CloneScenarioCommand;
+import org.finos.waltz.model.scenario.ImmutableScenario;
+import org.finos.waltz.model.scenario.Scenario;
+import org.finos.waltz.model.scenario.ScenarioType;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -36,9 +36,9 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.function.BiFunction;
 
+import static com.khartec.waltz.schema.tables.Scenario.SCENARIO;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.*;
-import static com.khartec.waltz.schema.tables.Scenario.SCENARIO;
 
 @Repository
 public class ScenarioDao {

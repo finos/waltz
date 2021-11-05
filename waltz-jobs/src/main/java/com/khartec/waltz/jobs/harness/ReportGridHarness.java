@@ -18,13 +18,13 @@
 
 package com.khartec.waltz.jobs.harness;
 
+import com.khartec.waltz.service.DIBaseConfiguration;
 import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.report_grid.ReportGridDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.report_grid.ReportGridCell;
-import com.khartec.waltz.service.DIBaseConfiguration;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.report_grid.ReportGridCell;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -32,8 +32,8 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import java.util.Set;
 
 import static org.finos.waltz.common.CollectionUtilities.first;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
 
 public class ReportGridHarness {

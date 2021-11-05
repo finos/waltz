@@ -18,10 +18,10 @@
 
 package org.finos.waltz.data.app_group;
 
-import com.khartec.waltz.model.app_group.AppGroupMember;
-import com.khartec.waltz.model.app_group.AppGroupMemberRole;
-import com.khartec.waltz.model.app_group.ImmutableAppGroupMember;
 import com.khartec.waltz.schema.tables.records.ApplicationGroupMemberRecord;
+import org.finos.waltz.model.app_group.AppGroupMember;
+import org.finos.waltz.model.app_group.AppGroupMemberRole;
+import org.finos.waltz.model.app_group.ImmutableAppGroupMember;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;

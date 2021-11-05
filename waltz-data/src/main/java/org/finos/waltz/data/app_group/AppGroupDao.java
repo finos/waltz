@@ -18,15 +18,15 @@
 
 package org.finos.waltz.data.app_group;
 
-import org.finos.waltz.data.SearchDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.app_group.AppGroup;
-import com.khartec.waltz.model.app_group.AppGroupKind;
-import com.khartec.waltz.model.app_group.AppGroupMemberRole;
-import com.khartec.waltz.model.app_group.ImmutableAppGroup;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.schema.tables.records.ApplicationGroupRecord;
+import org.finos.waltz.data.SearchDao;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.app_group.AppGroup;
+import org.finos.waltz.model.app_group.AppGroupKind;
+import org.finos.waltz.model.app_group.AppGroupMemberRole;
+import org.finos.waltz.model.app_group.ImmutableAppGroup;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,13 +38,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.common.StringUtilities.mkSafe;
-import static org.finos.waltz.data.JooqUtilities.mkBasicTermSearch;
-import static org.finos.waltz.data.SearchUtilities.mkTerms;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.ApplicationGroup.APPLICATION_GROUP;
 import static com.khartec.waltz.schema.tables.ApplicationGroupMember.APPLICATION_GROUP_MEMBER;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
+import static org.finos.waltz.common.StringUtilities.mkSafe;
+import static org.finos.waltz.data.JooqUtilities.mkBasicTermSearch;
+import static org.finos.waltz.data.SearchUtilities.mkTerms;
 
 @Repository
 public class AppGroupDao implements SearchDao<AppGroup> {

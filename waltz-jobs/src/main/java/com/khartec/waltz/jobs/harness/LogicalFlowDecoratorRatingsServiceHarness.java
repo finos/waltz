@@ -18,18 +18,18 @@
 
 package com.khartec.waltz.jobs.harness;
 
+import com.khartec.waltz.service.DIConfiguration;
+import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
+import com.khartec.waltz.service.flow_classification_rule.FlowClassificationRuleService;
+import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.hierarchy.FlatNode;
 import org.finos.waltz.common.hierarchy.Forest;
 import org.finos.waltz.common.hierarchy.HierarchyUtilities;
 import org.finos.waltz.common.hierarchy.Node;
 import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
-import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRule;
-import com.khartec.waltz.model.orgunit.OrganisationalUnit;
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
-import com.khartec.waltz.service.flow_classification_rule.FlowClassificationRuleService;
-import com.khartec.waltz.service.orgunit.OrganisationalUnitService;
+import org.finos.waltz.model.flow_classification_rule.FlowClassificationRule;
+import org.finos.waltz.model.orgunit.OrganisationalUnit;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

@@ -18,9 +18,9 @@
 
 package org.finos.waltz.data.physical_specification_definition;
 
-import com.khartec.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinitionSampleFile;
-import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionSampleFile;
 import com.khartec.waltz.schema.tables.records.PhysicalSpecDefnSampleFileRecord;
+import org.finos.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinitionSampleFile;
+import org.finos.waltz.model.physical_specification_definition.PhysicalSpecDefinitionSampleFile;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -30,8 +30,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.PhysicalSpecDefnSampleFile.PHYSICAL_SPEC_DEFN_SAMPLE_FILE;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository
 public class PhysicalSpecDefinitionSampleFileDao {

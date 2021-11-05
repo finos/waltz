@@ -18,11 +18,11 @@
 
 package org.finos.waltz.data.logical_flow;
 
-import org.finos.waltz.data.InlineSelectFieldFactory;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.logical_flow.ImmutableLogicalFlow;
-import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.schema.tables.records.LogicalFlowRecord;
+import org.finos.waltz.data.InlineSelectFieldFactory;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.logical_flow.ImmutableLogicalFlow;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
@@ -36,6 +36,11 @@ import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
+import static com.khartec.waltz.schema.Tables.PHYSICAL_SPECIFICATION;
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.map;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
@@ -45,14 +50,8 @@ import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.data.application.ApplicationDao.IS_ACTIVE;
-import static com.khartec.waltz.model.EntityLifecycleStatus.ACTIVE;
-import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
-import static com.khartec.waltz.schema.Tables.PHYSICAL_FLOW;
-import static com.khartec.waltz.schema.Tables.PHYSICAL_SPECIFICATION;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.model.EntityLifecycleStatus.ACTIVE;
+import static org.finos.waltz.model.EntityLifecycleStatus.REMOVED;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 

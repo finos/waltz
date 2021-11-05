@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.service.role;
 
-import org.finos.waltz.data.role.RoleDao;
-import com.khartec.waltz.model.role.Role;
 import com.khartec.waltz.schema.tables.records.RoleRecord;
+import org.finos.waltz.data.role.RoleDao;
+import org.finos.waltz.model.role.Role;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

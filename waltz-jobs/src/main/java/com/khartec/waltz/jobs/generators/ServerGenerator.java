@@ -18,14 +18,14 @@
 
 package com.khartec.waltz.jobs.generators;
 
+import com.khartec.waltz.schema.tables.records.ServerUsageRecord;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.RandomUtilities;
 import org.finos.waltz.data.server_information.ServerInformationDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.LifecycleStatus;
-import com.khartec.waltz.model.server_information.ImmutableServerInformation;
-import com.khartec.waltz.model.server_information.ServerInformation;
-import com.khartec.waltz.schema.tables.records.ServerUsageRecord;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.LifecycleStatus;
+import org.finos.waltz.model.server_information.ImmutableServerInformation;
+import org.finos.waltz.model.server_information.ServerInformation;
 import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
@@ -37,9 +37,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.tables.ServerInformation.SERVER_INFORMATION;
 import static com.khartec.waltz.schema.tables.ServerUsage.SERVER_USAGE;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
 
 
 public class ServerGenerator implements SampleDataGenerator {

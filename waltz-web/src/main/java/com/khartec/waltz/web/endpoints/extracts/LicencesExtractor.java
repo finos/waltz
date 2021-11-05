@@ -19,16 +19,15 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 
-import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static com.khartec.waltz.schema.Tables.LICENCE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
@@ -36,6 +35,7 @@ import static com.khartec.waltz.schema.tables.SoftwareVersionLicence.SOFTWARE_VE
 import static com.khartec.waltz.web.WebUtilities.getEntityReference;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static java.lang.String.format;
+import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static spark.Spark.get;
 
 

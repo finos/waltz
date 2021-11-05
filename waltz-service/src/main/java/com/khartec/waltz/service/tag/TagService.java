@@ -18,15 +18,15 @@
 
 package com.khartec.waltz.service.tag;
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.tag.TagDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.tag.Tag;
-import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.tag.Tag;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.slf4j.Logger;

@@ -18,14 +18,14 @@
 
 package com.khartec.waltz.service.allocation;
 
+import com.khartec.waltz.service.allocation.AllocationUtilities.ValidationResult;
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.data.EntityReferenceNameResolver;
 import org.finos.waltz.data.allocation.AllocationDao;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.allocation.Allocation;
-import com.khartec.waltz.model.allocation.MeasurablePercentageChange;
-import com.khartec.waltz.service.allocation.AllocationUtilities.ValidationResult;
-import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.allocation.Allocation;
+import org.finos.waltz.model.allocation.MeasurablePercentageChange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,12 +37,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.EntityKind.ALLOCATION_SCHEME;
-import static com.khartec.waltz.model.EntityKind.MEASURABLE;
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.service.allocation.AllocationUtilities.mkBasicLogEntry;
 import static com.khartec.waltz.service.allocation.AllocationUtilities.validateAllocationChanges;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.model.EntityKind.ALLOCATION_SCHEME;
+import static org.finos.waltz.model.EntityKind.MEASURABLE;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Service
 public class AllocationService {

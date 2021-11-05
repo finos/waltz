@@ -18,6 +18,7 @@
 
 package com.khartec.waltz.service.assessment_rating;
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.data.GenericSelector;
@@ -25,22 +26,21 @@ import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.assessment_definition.AssessmentDefinitionDao;
 import org.finos.waltz.data.assessment_rating.AssessmentRatingDao;
 import org.finos.waltz.data.rating_scheme.RatingSchemeDAO;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
-import com.khartec.waltz.model.assessment_rating.*;
-import com.khartec.waltz.model.changelog.ChangeLog;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.rating.RatingSchemeItem;
-import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
+import org.finos.waltz.model.assessment_rating.*;
+import org.finos.waltz.model.changelog.ChangeLog;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static java.lang.String.format;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Service
 public class AssessmentRatingService {

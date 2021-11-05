@@ -18,17 +18,17 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
-import com.khartec.waltz.model.data_flow_decorator.LogicalFlowDecoratorStat;
-import com.khartec.waltz.model.data_flow_decorator.UpdateDataFlowDecoratorsAction;
-import com.khartec.waltz.model.datatype.DataTypeDecorator;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorService;
 import com.khartec.waltz.service.data_type.DataTypeDecoratorService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.data_flow_decorator.DecoratorRatingSummary;
+import org.finos.waltz.model.data_flow_decorator.LogicalFlowDecoratorStat;
+import org.finos.waltz.model.data_flow_decorator.UpdateDataFlowDecoratorsAction;
+import org.finos.waltz.model.datatype.DataTypeDecorator;
+import org.finos.waltz.model.user.SystemRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,12 +41,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.CollectionUtilities.map;
-import static com.khartec.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.CollectionUtilities.map;
+import static org.finos.waltz.model.EntityKind.LOGICAL_DATA_FLOW;
 
 
 @Service

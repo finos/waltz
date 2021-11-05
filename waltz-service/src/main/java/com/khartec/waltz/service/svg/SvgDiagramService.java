@@ -20,8 +20,8 @@ package com.khartec.waltz.service.svg;
 
 import org.finos.waltz.common.SvgUtilities;
 import org.finos.waltz.data.svg.SvgDiagramDao;
-import com.khartec.waltz.model.svg.ImmutableSvgDiagram;
-import com.khartec.waltz.model.svg.SvgDiagram;
+import org.finos.waltz.model.svg.ImmutableSvgDiagram;
+import org.finos.waltz.model.svg.SvgDiagram;
 import org.jooq.lambda.Unchecked;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import org.finos.waltz.common.StringUtilities;
-import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.schema.tables.records.MeasurableCategoryRecord;
 import com.khartec.waltz.schema.tables.records.MeasurableRecord;
 import com.khartec.waltz.service.entity_hierarchy.EntityHierarchyService;
+import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.model.EntityKind;
 import org.jooq.DSLContext;
 import org.jooq.SelectConditionStep;
 import org.jooq.lambda.Unchecked;
@@ -34,10 +34,10 @@ import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.common.Checks.checkNotEmpty;
-import static org.finos.waltz.common.IOUtilities.readLines;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
 import static com.khartec.waltz.schema.tables.MeasurableCategory.MEASURABLE_CATEGORY;
+import static org.finos.waltz.common.Checks.checkNotEmpty;
+import static org.finos.waltz.common.IOUtilities.readLines;
 
 /**
  * Created by dwatkins on 04/03/2017.

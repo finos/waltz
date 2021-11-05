@@ -20,12 +20,12 @@ package org.finos.waltz.data.changelog;
 
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.tally.ChangeLogTally;
-import com.khartec.waltz.model.tally.DateTally;
-import com.khartec.waltz.model.tally.ImmutableChangeLogTally;
-import com.khartec.waltz.model.tally.ImmutableDateTally;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.tally.ChangeLogTally;
+import org.finos.waltz.model.tally.DateTally;
+import org.finos.waltz.model.tally.ImmutableChangeLogTally;
+import org.finos.waltz.model.tally.ImmutableDateTally;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,11 +35,11 @@ import java.sql.Date;
 import java.util.List;
 import java.util.Optional;
 
+import static com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.data.JooqUtilities.mkDateRangeCondition;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 
 @Repository

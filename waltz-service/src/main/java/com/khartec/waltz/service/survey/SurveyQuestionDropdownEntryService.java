@@ -19,16 +19,16 @@
 package com.khartec.waltz.service.survey;
 
 import org.finos.waltz.data.survey.SurveyQuestionDropdownEntryDao;
-import com.khartec.waltz.model.survey.ImmutableSurveyQuestionDropdownEntry;
-import com.khartec.waltz.model.survey.SurveyQuestionDropdownEntry;
+import org.finos.waltz.model.survey.ImmutableSurveyQuestionDropdownEntry;
+import org.finos.waltz.model.survey.SurveyQuestionDropdownEntry;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class SurveyQuestionDropdownEntryService {

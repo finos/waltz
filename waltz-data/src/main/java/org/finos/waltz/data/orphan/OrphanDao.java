@@ -19,11 +19,11 @@
 package org.finos.waltz.data.orphan;
 
 import org.finos.waltz.common.ListUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.orphan.ImmutableOrphanRelationship;
-import com.khartec.waltz.model.orphan.OrphanRelationship;
-import com.khartec.waltz.model.orphan.OrphanSide;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.orphan.ImmutableOrphanRelationship;
+import org.finos.waltz.model.orphan.OrphanRelationship;
+import org.finos.waltz.model.orphan.OrphanSide;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,13 +32,13 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.function.BiFunction;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.data.application.ApplicationDao.IS_ACTIVE;
-import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.data.application.ApplicationDao.IS_ACTIVE;
+import static org.finos.waltz.model.EntityLifecycleStatus.REMOVED;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.jooq.impl.DSL.select;
 
 @Repository

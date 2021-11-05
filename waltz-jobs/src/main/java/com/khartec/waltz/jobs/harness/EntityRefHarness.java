@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.jobs.harness;
 
+import com.khartec.waltz.service.DIConfiguration;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.data.EntityReferenceNameResolver;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.List;

@@ -18,20 +18,20 @@
 
 package org.finos.waltz.data.involvement;
 
+import com.khartec.waltz.schema.tables.records.InvolvementRecord;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.end_user_app.EndUserAppDao;
 import org.finos.waltz.data.person.PersonDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.enduserapp.EndUserApplication;
-import com.khartec.waltz.model.involvement.ImmutableInvolvement;
-import com.khartec.waltz.model.involvement.Involvement;
-import com.khartec.waltz.model.person.Person;
-import com.khartec.waltz.schema.tables.records.InvolvementRecord;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.enduserapp.EndUserApplication;
+import org.finos.waltz.model.involvement.ImmutableInvolvement;
+import org.finos.waltz.model.involvement.Involvement;
+import org.finos.waltz.model.person.Person;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,15 +43,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static org.finos.waltz.data.application.ApplicationDao.IS_ACTIVE;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static com.khartec.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 import static java.util.stream.Collectors.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.data.application.ApplicationDao.IS_ACTIVE;
 
 
 @Repository

@@ -21,17 +21,17 @@ package org.finos.waltz.data.measurable.search;
 import org.finos.waltz.data.DatabaseVendorSpecific;
 import org.finos.waltz.data.FullTextSearch;
 import org.finos.waltz.data.JooqUtilities;
-import org.finos.waltz.data.measurable.MeasurableDao;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.model.measurable.Measurable;
 import org.finos.waltz.data.SearchUtilities;
+import org.finos.waltz.data.measurable.MeasurableDao;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.measurable.Measurable;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 
 import java.util.List;
 
-import static org.finos.waltz.common.StringUtilities.lower;
 import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
+import static org.finos.waltz.common.StringUtilities.lower;
 
 public class SqlServerMeasurableSearch implements FullTextSearch<Measurable>, DatabaseVendorSpecific {
 

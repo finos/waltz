@@ -18,13 +18,13 @@
 
 package org.finos.waltz.data.physical_flow;
 
-import org.finos.waltz.data.InlineSelectFieldFactory;
-import org.finos.waltz.data.enum_value.EnumValueDao;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.enum_value.EnumValueKind;
-import com.khartec.waltz.model.physical_flow.*;
 import com.khartec.waltz.schema.tables.PhysicalSpecDataType;
 import com.khartec.waltz.schema.tables.records.PhysicalFlowRecord;
+import org.finos.waltz.data.InlineSelectFieldFactory;
+import org.finos.waltz.data.enum_value.EnumValueDao;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.enum_value.EnumValueKind;
+import org.finos.waltz.model.physical_flow.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;
@@ -38,19 +38,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.khartec.waltz.schema.Tables.*;
+import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
+import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.Checks.checkFalse;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static org.finos.waltz.common.EnumUtilities.readEnum;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
-import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
-import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
-import static java.util.Collections.emptyList;
+import static org.finos.waltz.model.EntityLifecycleStatus.REMOVED;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 
 @Repository

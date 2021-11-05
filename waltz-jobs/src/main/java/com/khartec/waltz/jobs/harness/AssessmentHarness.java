@@ -18,16 +18,16 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.assessment_rating.AssessmentRatingDetail;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.assessment_rating.AssessmentRatingViewService;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.assessment_rating.AssessmentRatingDetail;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.Set;
 
-import static com.khartec.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 
 public class AssessmentHarness {

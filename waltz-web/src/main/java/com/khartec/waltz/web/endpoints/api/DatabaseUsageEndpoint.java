@@ -18,10 +18,10 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.database_usage.DatabaseUsage;
 import com.khartec.waltz.service.database_usage.DatabaseUsageService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.database_usage.DatabaseUsage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

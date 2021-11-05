@@ -18,8 +18,8 @@
 
 package org.finos.waltz.data.user;
 
-import com.khartec.waltz.model.user.ImmutableUser;
-import com.khartec.waltz.model.user.User;
+import org.finos.waltz.model.user.ImmutableUser;
+import org.finos.waltz.model.user.User;
 import org.jooq.DSLContext;
 import org.jooq.Query;
 import org.jooq.Record2;
@@ -33,12 +33,12 @@ import org.springframework.stereotype.Repository;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.SetUtilities.map;
 import static com.khartec.waltz.schema.tables.User.USER;
 import static com.khartec.waltz.schema.tables.UserRole.USER_ROLE;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.SetUtilities.map;
 
 
 @Repository

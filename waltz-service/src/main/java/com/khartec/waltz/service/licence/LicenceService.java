@@ -21,9 +21,9 @@ package com.khartec.waltz.service.licence;
 
 import org.finos.waltz.data.licence.LicenceDao;
 import org.finos.waltz.data.licence.LicenceIdSelectorFactory;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.licence.Licence;
-import com.khartec.waltz.model.tally.Tally;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.licence.Licence;
+import org.finos.waltz.model.tally.Tally;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;

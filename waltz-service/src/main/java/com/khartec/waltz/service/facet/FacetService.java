@@ -21,8 +21,8 @@ package com.khartec.waltz.service.facet;
 
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.tally.Tally;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.tally.Tally;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
+import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
 
 @Service

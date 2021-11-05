@@ -18,14 +18,14 @@
 
 package org.finos.waltz.data.entity_hierarchy;
 
-import org.finos.waltz.data.JooqUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.entity_hierarchy.EntityHierarchyItem;
-import com.khartec.waltz.model.entity_hierarchy.ImmutableEntityHierarchyItem;
-import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.EntityHierarchy;
 import com.khartec.waltz.schema.tables.records.EntityHierarchyRecord;
+import org.finos.waltz.data.JooqUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.entity_hierarchy.EntityHierarchyItem;
+import org.finos.waltz.model.entity_hierarchy.ImmutableEntityHierarchyItem;
+import org.finos.waltz.model.tally.Tally;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -39,9 +39,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.function.Function;
 
+import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.map;
-import static com.khartec.waltz.schema.tables.EntityHierarchy.ENTITY_HIERARCHY;
 
 @Repository
 public class EntityHierarchyDao {

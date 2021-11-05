@@ -18,14 +18,14 @@
 
 package org.finos.waltz.data.database_information;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.LifecycleStatus;
-import com.khartec.waltz.model.database_information.DatabaseInformation;
-import com.khartec.waltz.model.database_information.DatabaseSummaryStatistics;
-import com.khartec.waltz.model.database_information.ImmutableDatabaseInformation;
-import com.khartec.waltz.model.database_information.ImmutableDatabaseSummaryStatistics;
 import com.khartec.waltz.schema.tables.records.DatabaseInformationRecord;
 import org.finos.waltz.data.JooqUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.LifecycleStatus;
+import org.finos.waltz.model.database_information.DatabaseInformation;
+import org.finos.waltz.model.database_information.DatabaseSummaryStatistics;
+import org.finos.waltz.model.database_information.ImmutableDatabaseInformation;
+import org.finos.waltz.model.database_information.ImmutableDatabaseSummaryStatistics;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
@@ -37,7 +37,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.data.JooqUtilities.calculateStringTallies;
 import static com.khartec.waltz.schema.Tables.DATABASE_USAGE;
 import static com.khartec.waltz.schema.tables.DatabaseInformation.DATABASE_INFORMATION;
 import static com.khartec.waltz.schema.tables.EntityRelationship.ENTITY_RELATIONSHIP;

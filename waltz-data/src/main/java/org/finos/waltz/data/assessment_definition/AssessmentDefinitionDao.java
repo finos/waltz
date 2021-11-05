@@ -19,12 +19,12 @@
 package org.finos.waltz.data.assessment_definition;
 
 
-import org.finos.waltz.common.StringUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
-import com.khartec.waltz.model.assessment_definition.AssessmentVisibility;
-import com.khartec.waltz.model.assessment_definition.ImmutableAssessmentDefinition;
 import com.khartec.waltz.schema.tables.records.AssessmentDefinitionRecord;
+import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
+import org.finos.waltz.model.assessment_definition.AssessmentVisibility;
+import org.finos.waltz.model.assessment_definition.ImmutableAssessmentDefinition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -35,10 +35,10 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Optional;
 
+import static com.khartec.waltz.schema.tables.AssessmentDefinition.ASSESSMENT_DEFINITION;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
-import static com.khartec.waltz.schema.tables.AssessmentDefinition.ASSESSMENT_DEFINITION;
 
 
 @Repository

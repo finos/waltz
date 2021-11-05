@@ -18,21 +18,21 @@
 
 package org.finos.waltz.data.logical_flow;
 
-import org.finos.waltz.data.DBExecutorPoolInterface;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.FlowDirection;
-import com.khartec.waltz.model.logical_flow.*;
-import com.khartec.waltz.model.tally.ImmutableTally;
-import com.khartec.waltz.model.tally.ImmutableTallyPack;
-import com.khartec.waltz.model.tally.Tally;
-import com.khartec.waltz.model.tally.TallyPack;
 import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.DataType;
 import com.khartec.waltz.schema.tables.LogicalFlow;
 import com.khartec.waltz.schema.tables.*;
+import org.finos.waltz.data.DBExecutorPoolInterface;
 import org.finos.waltz.data.JooqUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.FlowDirection;
+import org.finos.waltz.model.logical_flow.*;
+import org.finos.waltz.model.tally.ImmutableTally;
+import org.finos.waltz.model.tally.ImmutableTallyPack;
+import org.finos.waltz.model.tally.Tally;
+import org.finos.waltz.model.tally.TallyPack;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.Unchecked;
@@ -46,16 +46,16 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.EntityKind.DATA_TYPE;
-import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.model.FlowDirection.INBOUND;
-import static com.khartec.waltz.model.FlowDirection.OUTBOUND;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static java.util.stream.Collectors.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.model.EntityKind.DATA_TYPE;
+import static org.finos.waltz.model.EntityLifecycleStatus.REMOVED;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.FlowDirection.INBOUND;
+import static org.finos.waltz.model.FlowDirection.OUTBOUND;
 import static org.jooq.impl.DSL.*;
 
 

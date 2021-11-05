@@ -20,11 +20,11 @@ package com.khartec.waltz.service.person;
 
 import org.finos.waltz.data.person.PersonDao;
 import org.finos.waltz.data.person.search.PersonSearchDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.model.person.ImmutablePerson;
-import com.khartec.waltz.model.person.Person;
-import com.khartec.waltz.model.person.PersonKind;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.person.ImmutablePerson;
+import org.finos.waltz.model.person.Person;
+import org.finos.waltz.model.person.PersonKind;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,11 +32,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.Checks.checkNotEmpty;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.FunctionUtilities.time;
 import static org.finos.waltz.common.StringUtilities.isEmpty;
-import static java.util.Collections.emptyList;
 
 @Service
 public class PersonService {

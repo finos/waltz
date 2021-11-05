@@ -18,17 +18,17 @@
 
 package org.finos.waltz.data;
 
-import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.application.ApplicationKind;
+import org.finos.waltz.model.HierarchyQueryScope;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.application.ApplicationKind;
 import org.jooq.Condition;
 
 import java.util.Set;
 
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.minus;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 
 public class SelectorUtilities {
 

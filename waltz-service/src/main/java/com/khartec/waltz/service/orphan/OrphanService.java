@@ -19,7 +19,7 @@
 package com.khartec.waltz.service.orphan;
 
 import org.finos.waltz.data.orphan.OrphanDao;
-import com.khartec.waltz.model.orphan.OrphanRelationship;
+import org.finos.waltz.model.orphan.OrphanRelationship;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

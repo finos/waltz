@@ -19,7 +19,7 @@
 package com.khartec.waltz.jobs.clients.c1.sc1.parse;
 
 import org.finos.waltz.common.Aliases;
-import com.khartec.waltz.model.application.LifecyclePhase;
+import org.finos.waltz.model.application.LifecyclePhase;
 
 public class StatusToLifecyclePhase {
 

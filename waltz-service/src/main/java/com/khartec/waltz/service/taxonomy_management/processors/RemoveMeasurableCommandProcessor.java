@@ -18,14 +18,6 @@
 
 package com.khartec.waltz.service.taxonomy_management.processors;
 
-import org.finos.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.bookmark.Bookmark;
-import com.khartec.waltz.model.flow_diagram.FlowDiagramEntity;
-import com.khartec.waltz.model.involvement.Involvement;
-import com.khartec.waltz.model.measurable.Measurable;
-import com.khartec.waltz.model.measurable_rating.MeasurableRating;
-import com.khartec.waltz.model.taxonomy_management.*;
 import com.khartec.waltz.service.bookmark.BookmarkService;
 import com.khartec.waltz.service.entity_relationship.EntityRelationshipService;
 import com.khartec.waltz.service.flow_diagram.FlowDiagramEntityService;
@@ -33,6 +25,14 @@ import com.khartec.waltz.service.involvement.InvolvementService;
 import com.khartec.waltz.service.measurable.MeasurableService;
 import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
 import com.khartec.waltz.service.taxonomy_management.TaxonomyCommandProcessor;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.bookmark.Bookmark;
+import org.finos.waltz.model.flow_diagram.FlowDiagramEntity;
+import org.finos.waltz.model.involvement.Involvement;
+import org.finos.waltz.model.measurable.Measurable;
+import org.finos.waltz.model.measurable_rating.MeasurableRating;
+import org.finos.waltz.model.taxonomy_management.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -42,11 +42,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.SetUtilities.*;
-import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUtilities.addToPreview;
 import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUtilities.validatePrimaryMeasurable;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.SetUtilities.*;
+import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
 @Service
 public class RemoveMeasurableCommandProcessor implements TaxonomyCommandProcessor {

@@ -18,16 +18,16 @@
 
 package com.khartec.waltz.service.app_group;
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.data.app_group.AppGroupDao;
 import org.finos.waltz.data.app_group.AppGroupEntryDao;
 import org.finos.waltz.data.app_group.AppGroupMemberDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.app_group.*;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.app_group.*;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,8 +35,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static java.lang.String.format;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class FavouritesService {

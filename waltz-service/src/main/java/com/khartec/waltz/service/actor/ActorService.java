@@ -20,26 +20,26 @@ package com.khartec.waltz.service.actor;
 
 import org.finos.waltz.data.actor.ActorDao;
 import org.finos.waltz.data.actor.ActorSearchDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.UserTimestamp;
-import com.khartec.waltz.model.actor.Actor;
-import com.khartec.waltz.model.actor.ActorChangeCommand;
-import com.khartec.waltz.model.actor.ActorCreateCommand;
-import com.khartec.waltz.model.actor.ImmutableActorChangeCommand;
-import com.khartec.waltz.model.command.CommandOutcome;
-import com.khartec.waltz.model.command.CommandResponse;
-import com.khartec.waltz.model.command.ImmutableCommandResponse;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.actor.Actor;
+import org.finos.waltz.model.actor.ActorChangeCommand;
+import org.finos.waltz.model.actor.ActorCreateCommand;
+import org.finos.waltz.model.actor.ImmutableActorChangeCommand;
+import org.finos.waltz.model.command.CommandOutcome;
+import org.finos.waltz.model.command.CommandResponse;
+import org.finos.waltz.model.command.ImmutableCommandResponse;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.StringUtilities.isEmpty;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.StringUtilities.isEmpty;
 
 @Service
 public class ActorService {

@@ -18,12 +18,12 @@
 
 package org.finos.waltz.data.software_catalog;
 
-import org.finos.waltz.data.JooqUtilities;
-import com.khartec.waltz.model.UserTimestamp;
-import com.khartec.waltz.model.software_catalog.ImmutableSoftwarePackageView;
-import com.khartec.waltz.model.software_catalog.SoftwarePackageView;
-import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.SoftwarePackageRecord;
+import org.finos.waltz.data.JooqUtilities;
+import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.software_catalog.ImmutableSoftwarePackageView;
+import org.finos.waltz.model.software_catalog.SoftwarePackageView;
+import org.finos.waltz.model.tally.Tally;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.slf4j.Logger;

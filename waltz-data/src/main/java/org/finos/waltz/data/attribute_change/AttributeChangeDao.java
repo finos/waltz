@@ -19,9 +19,9 @@
 package org.finos.waltz.data.attribute_change;
 
 
-import com.khartec.waltz.model.attribute_change.AttributeChange;
-import com.khartec.waltz.model.attribute_change.ImmutableAttributeChange;
 import com.khartec.waltz.schema.tables.records.AttributeChangeRecord;
+import org.finos.waltz.model.attribute_change.AttributeChange;
+import org.finos.waltz.model.attribute_change.ImmutableAttributeChange;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -32,9 +32,9 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.function.Function;
 
+import static com.khartec.waltz.schema.tables.AttributeChange.ATTRIBUTE_CHANGE;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
-import static com.khartec.waltz.schema.tables.AttributeChange.ATTRIBUTE_CHANGE;
 
 
 @Repository

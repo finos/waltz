@@ -18,16 +18,16 @@
 
 package com.khartec.waltz.service.external_identifier;
 
-import org.finos.waltz.data.external_identifier.ExternalIdentifierDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.Severity;
-import com.khartec.waltz.model.changelog.ChangeLog;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.external_identifier.ExternalIdentifier;
-import com.khartec.waltz.model.external_identifier.ImmutableExternalIdentifier;
 import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.data.external_identifier.ExternalIdentifierDao;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.changelog.ChangeLog;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.external_identifier.ExternalIdentifier;
+import org.finos.waltz.model.external_identifier.ImmutableExternalIdentifier;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -18,10 +18,10 @@
 
 package org.finos.waltz.data.entity_enum;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.entity_enum.EntityEnumDefinition;
-import com.khartec.waltz.model.entity_enum.ImmutableEntityEnumDefinition;
 import com.khartec.waltz.schema.tables.records.EntityEnumDefinitionRecord;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.entity_enum.EntityEnumDefinition;
+import org.finos.waltz.model.entity_enum.ImmutableEntityEnumDefinition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;

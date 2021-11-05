@@ -21,7 +21,7 @@ package com.khartec.waltz.jobs.tools.importers.licence.finos;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.Nullable;
+import org.finos.waltz.model.Nullable;
 import org.immutables.value.Value;
 
 

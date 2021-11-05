@@ -18,6 +18,8 @@
 
 package com.khartec.waltz.service.entity_hierarchy;
 
+import com.khartec.waltz.schema.Tables;
+import com.khartec.waltz.service.person_hierarchy.PersonHierarchyService;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.hierarchy.FlatNode;
 import org.finos.waltz.common.hierarchy.Forest;
@@ -30,14 +32,12 @@ import org.finos.waltz.data.entity_hierarchy.EntityRootsSelectorFactory;
 import org.finos.waltz.data.entity_statistic.EntityStatisticDao;
 import org.finos.waltz.data.measurable.MeasurableDao;
 import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.entity_hierarchy.EntityHierarchyItem;
-import com.khartec.waltz.model.entity_hierarchy.ImmutableEntityHierarchyItem;
-import com.khartec.waltz.model.tally.ImmutableTally;
-import com.khartec.waltz.model.tally.Tally;
-import com.khartec.waltz.schema.Tables;
-import com.khartec.waltz.service.person_hierarchy.PersonHierarchyService;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.entity_hierarchy.EntityHierarchyItem;
+import org.finos.waltz.model.entity_hierarchy.ImmutableEntityHierarchyItem;
+import org.finos.waltz.model.tally.ImmutableTally;
+import org.finos.waltz.model.tally.Tally;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,10 +48,10 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.EntityKind.PERSON;
 import static com.khartec.waltz.schema.Tables.ENTITY_HIERARCHY;
 import static com.khartec.waltz.schema.Tables.MEASURABLE;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.model.EntityKind.PERSON;
 import static org.jooq.impl.DSL.select;
 
 @Service

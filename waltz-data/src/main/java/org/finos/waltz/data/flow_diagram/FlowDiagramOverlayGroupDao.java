@@ -18,14 +18,14 @@
 
 package org.finos.waltz.data.flow_diagram;
 
-import org.finos.waltz.data.InlineSelectFieldFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.flow_diagram.FlowDiagramOverlayGroup;
-import com.khartec.waltz.model.flow_diagram.FlowDiagramOverlayGroupEntry;
-import com.khartec.waltz.model.flow_diagram.ImmutableFlowDiagramOverlayGroup;
-import com.khartec.waltz.model.flow_diagram.ImmutableFlowDiagramOverlayGroupEntry;
 import com.khartec.waltz.schema.tables.records.FlowDiagramOverlayGroupEntryRecord;
 import com.khartec.waltz.schema.tables.records.FlowDiagramOverlayGroupRecord;
+import org.finos.waltz.data.InlineSelectFieldFactory;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.flow_diagram.FlowDiagramOverlayGroup;
+import org.finos.waltz.model.flow_diagram.FlowDiagramOverlayGroupEntry;
+import org.finos.waltz.model.flow_diagram.ImmutableFlowDiagramOverlayGroup;
+import org.finos.waltz.model.flow_diagram.ImmutableFlowDiagramOverlayGroupEntry;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
@@ -38,12 +38,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.FLOW_DIAGRAM_OVERLAY_GROUP;
 import static com.khartec.waltz.schema.Tables.FLOW_DIAGRAM_OVERLAY_GROUP_ENTRY;
 import static java.util.stream.Collectors.collectingAndThen;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 
 @Repository

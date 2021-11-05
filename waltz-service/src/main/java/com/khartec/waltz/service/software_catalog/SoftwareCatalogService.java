@@ -23,10 +23,10 @@ import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.software_catalog.SoftwarePackageDao;
 import org.finos.waltz.data.software_catalog.SoftwareUsageDao;
 import org.finos.waltz.data.software_catalog.SoftwareVersionDao;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.model.software_catalog.*;
-import com.khartec.waltz.model.tally.Tally;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.software_catalog.*;
+import org.finos.waltz.model.tally.Tally;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +36,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.SoftwarePackage.SOFTWARE_PACKAGE;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class SoftwareCatalogService {

@@ -18,10 +18,10 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.complexity.ComplexityKind;
 import com.khartec.waltz.service.complexity_kind.ComplexityKindService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.complexity.ComplexityKind;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

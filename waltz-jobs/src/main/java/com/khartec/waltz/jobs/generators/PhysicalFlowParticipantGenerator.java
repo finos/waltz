@@ -18,13 +18,13 @@
 
 package com.khartec.waltz.jobs.generators;
 
+import com.khartec.waltz.schema.tables.records.PhysicalFlowParticipantRecord;
 import org.finos.waltz.common.RandomUtilities;
 import org.finos.waltz.common.SetUtilities;
-import com.khartec.waltz.model.Criticality;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.physical_flow_participant.ParticipationKind;
-import com.khartec.waltz.schema.tables.records.PhysicalFlowParticipantRecord;
+import org.finos.waltz.model.Criticality;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.physical_flow_participant.ParticipationKind;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
 
@@ -34,15 +34,15 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Stream;
 
-import static org.finos.waltz.common.RandomUtilities.randomPick;
-import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
-import static org.finos.waltz.common.MapUtilities.newHashMap;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_FLOW_PARTICIPANT;
 import static com.khartec.waltz.schema.tables.ServerUsage.SERVER_USAGE;
 import static java.util.Collections.emptyList;
 import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
+import static org.finos.waltz.common.MapUtilities.newHashMap;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class PhysicalFlowParticipantGenerator implements SampleDataGenerator {

@@ -20,9 +20,9 @@ package com.khartec.waltz.service.change_set;
 
 import org.finos.waltz.data.change_set.ChangeSetDao;
 import org.finos.waltz.data.change_set.ChangeSetIdSelectorFactory;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.change_set.ChangeSet;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.change_set.ChangeSet;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -19,15 +19,15 @@
 package com.khartec.waltz.web.endpoints.api;
 
 import com.fasterxml.jackson.databind.JsonMappingException;
-import com.khartec.waltz.model.SetAttributeCommand;
-import com.khartec.waltz.model.physical_flow.*;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowUploadService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.SetAttributeCommand;
+import org.finos.waltz.model.physical_flow.*;
+import org.finos.waltz.model.user.SystemRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +41,10 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 import static java.util.Arrays.asList;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class PhysicalFlowEndpoint implements Endpoint {

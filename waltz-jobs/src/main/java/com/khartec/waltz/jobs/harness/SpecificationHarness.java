@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
 import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

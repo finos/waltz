@@ -22,8 +22,8 @@ import org.finos.waltz.data.FullTextSearch;
 import org.finos.waltz.data.SearchDao;
 import org.finos.waltz.data.UnsupportedSearcher;
 import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.model.orgunit.OrganisationalUnit;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.orgunit.OrganisationalUnit;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
@@ -34,10 +34,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static org.finos.waltz.common.SetUtilities.orderedUnion;
 import static org.finos.waltz.data.JooqUtilities.*;
 import static org.finos.waltz.data.SearchUtilities.mkTerms;
-import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 
 @Repository
 public class OrganisationalUnitSearchDao implements SearchDao<OrganisationalUnit> {

@@ -24,8 +24,8 @@ import org.jooq.DSLContext;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import static com.khartec.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
-import static com.khartec.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 
 public class FlowDiagramHarness {

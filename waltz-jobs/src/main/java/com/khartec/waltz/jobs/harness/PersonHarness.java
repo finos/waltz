@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import org.finos.waltz.data.person.PersonDao;
-import com.khartec.waltz.model.person.PersonKind;
 import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.data.person.PersonDao;
+import org.finos.waltz.model.person.PersonKind;
 import org.jooq.DSLContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

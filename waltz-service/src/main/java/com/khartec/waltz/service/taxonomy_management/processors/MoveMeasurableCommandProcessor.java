@@ -18,20 +18,20 @@
 
 package com.khartec.waltz.service.taxonomy_management.processors;
 
-import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.common.SetUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.measurable.Measurable;
-import com.khartec.waltz.model.taxonomy_management.*;
 import com.khartec.waltz.service.measurable.MeasurableService;
 import com.khartec.waltz.service.taxonomy_management.TaxonomyCommandProcessor;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.measurable.Measurable;
+import org.finos.waltz.model.taxonomy_management.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
 
+import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUtilities.validateMeasurableInCategory;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.service.taxonomy_management.TaxonomyManagementUtilities.*;
 
 @Service
 public class MoveMeasurableCommandProcessor implements TaxonomyCommandProcessor {

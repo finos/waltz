@@ -18,6 +18,13 @@
 
 package com.khartec.waltz.jobs.clients.c1.sc1;
 
+import com.khartec.waltz.jobs.Columns;
+import com.khartec.waltz.jobs.WaltzUtilities;
+import com.khartec.waltz.jobs.clients.c1.sc1.model.*;
+import com.khartec.waltz.schema.tables.records.*;
+import com.khartec.waltz.service.DIConfiguration;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.ListUtilities;
@@ -27,19 +34,12 @@ import org.finos.waltz.common.hierarchy.FlatNode;
 import org.finos.waltz.common.hierarchy.Forest;
 import org.finos.waltz.common.hierarchy.HierarchyUtilities;
 import org.finos.waltz.common.hierarchy.Node;
-import com.khartec.waltz.jobs.Columns;
-import com.khartec.waltz.jobs.WaltzUtilities;
-import com.khartec.waltz.jobs.clients.c1.sc1.model.*;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.application.ApplicationKind;
-import com.khartec.waltz.model.application.LifecyclePhase;
-import com.khartec.waltz.model.change_initiative.ChangeInitiativeKind;
-import com.khartec.waltz.model.entity_relationship.RelationshipKind;
-import com.khartec.waltz.schema.tables.records.*;
-import com.khartec.waltz.service.DIConfiguration;
-import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.application.ApplicationKind;
+import org.finos.waltz.model.application.LifecyclePhase;
+import org.finos.waltz.model.change_initiative.ChangeInitiativeKind;
+import org.finos.waltz.model.entity_relationship.RelationshipKind;
 import org.jooq.DSLContext;
 import org.jooq.UpdateConditionStep;
 import org.jooq.impl.DSL;
@@ -63,12 +63,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
-import static org.finos.waltz.common.MapUtilities.indexBy;
-import static org.finos.waltz.common.StreamUtilities.mkSiphon;
-import static org.finos.waltz.common.StringUtilities.isEmpty;
-import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static com.khartec.waltz.jobs.WaltzUtilities.getOrCreateMeasurableCategory;
 import static com.khartec.waltz.jobs.WaltzUtilities.toId;
 import static com.khartec.waltz.jobs.XlsUtilities.strVal;
@@ -76,6 +70,12 @@ import static com.khartec.waltz.jobs.XlsUtilities.streamRows;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static java.util.stream.Collectors.toMap;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
+import static org.finos.waltz.common.MapUtilities.indexBy;
+import static org.finos.waltz.common.StreamUtilities.mkSiphon;
+import static org.finos.waltz.common.StringUtilities.isEmpty;
+import static org.finos.waltz.common.StringUtilities.mkSafe;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Component

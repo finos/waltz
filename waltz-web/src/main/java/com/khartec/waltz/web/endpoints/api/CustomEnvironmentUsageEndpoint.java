@@ -18,14 +18,14 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.custom_environment.CustomEnvironmentUsage;
-import com.khartec.waltz.model.custom_environment.CustomEnvironmentUsageInfo;
-import com.khartec.waltz.model.custom_environment.ImmutableCustomEnvironmentUsage;
 import com.khartec.waltz.service.custom_environment.CustomEnvironmentUsageService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.custom_environment.CustomEnvironmentUsage;
+import org.finos.waltz.model.custom_environment.CustomEnvironmentUsageInfo;
+import org.finos.waltz.model.custom_environment.ImmutableCustomEnvironmentUsage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

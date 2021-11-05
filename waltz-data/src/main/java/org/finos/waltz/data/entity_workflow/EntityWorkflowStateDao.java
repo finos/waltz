@@ -19,20 +19,20 @@
 package org.finos.waltz.data.entity_workflow;
 
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.entity_workflow.EntityWorkflowState;
-import com.khartec.waltz.model.entity_workflow.ImmutableEntityWorkflowState;
 import com.khartec.waltz.schema.tables.records.EntityWorkflowStateRecord;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.entity_workflow.EntityWorkflowState;
+import org.finos.waltz.model.entity_workflow.ImmutableEntityWorkflowState;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.EntityWorkflowState.ENTITY_WORKFLOW_STATE;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository
 public class EntityWorkflowStateDao {

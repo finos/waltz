@@ -19,20 +19,20 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
-import com.khartec.waltz.model.assessment_rating.AssessmentGroupedEntities;
-import com.khartec.waltz.model.assessment_rating.AssessmentRatingDetail;
 import com.khartec.waltz.service.assessment_rating.AssessmentRatingViewService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.assessment_rating.AssessmentGroupedEntities;
+import org.finos.waltz.model.assessment_rating.AssessmentRatingDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForList;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Service

@@ -18,12 +18,12 @@
 
 package org.finos.waltz.data.asset_cost;
 
-import org.finos.waltz.common.ListUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.cost.*;
 import com.khartec.waltz.schema.tables.records.AssetCostRecord;
+import org.finos.waltz.common.ListUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.cost.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple;
@@ -36,10 +36,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.AssetCost.ASSET_COST;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Repository

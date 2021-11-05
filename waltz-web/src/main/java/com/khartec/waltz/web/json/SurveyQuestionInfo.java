@@ -20,8 +20,8 @@ package com.khartec.waltz.web.json;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.khartec.waltz.model.survey.SurveyQuestion;
-import com.khartec.waltz.model.survey.SurveyQuestionDropdownEntry;
+import org.finos.waltz.model.survey.SurveyQuestion;
+import org.finos.waltz.model.survey.SurveyQuestionDropdownEntry;
 import org.immutables.value.Value;
 
 import java.util.List;

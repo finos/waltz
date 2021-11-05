@@ -18,16 +18,12 @@
 
 package org.finos.waltz.data.application.search;
 
-import org.finos.waltz.data.DBExecutorPoolInterface;
-import org.finos.waltz.data.FullTextSearch;
-import org.finos.waltz.data.SearchDao;
-import org.finos.waltz.data.UnsupportedSearcher;
-import org.finos.waltz.data.application.ApplicationDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.NameProvider;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import org.finos.waltz.data.*;
+import org.finos.waltz.data.application.ApplicationDao;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.NameProvider;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
@@ -41,12 +37,12 @@ import java.util.Set;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.CollectionUtilities.sort;
-import static org.finos.waltz.common.SetUtilities.orderedUnion;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;
 import static java.util.Collections.emptyList;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.CollectionUtilities.sort;
+import static org.finos.waltz.common.SetUtilities.orderedUnion;
 
 @Repository
 public class ApplicationSearchDao implements SearchDao<Application> {

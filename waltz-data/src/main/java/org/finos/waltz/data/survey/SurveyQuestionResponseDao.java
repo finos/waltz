@@ -19,17 +19,17 @@
 package org.finos.waltz.data.survey;
 
 
-import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.data.InlineSelectFieldFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.survey.ImmutableSurveyInstanceQuestionResponse;
-import com.khartec.waltz.model.survey.ImmutableSurveyQuestionResponse;
-import com.khartec.waltz.model.survey.SurveyInstanceQuestionResponse;
-import com.khartec.waltz.model.survey.SurveyQuestionResponse;
 import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.records.SurveyQuestionListResponseRecord;
 import com.khartec.waltz.schema.tables.records.SurveyQuestionResponseRecord;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.data.InlineSelectFieldFactory;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.survey.ImmutableSurveyInstanceQuestionResponse;
+import org.finos.waltz.model.survey.ImmutableSurveyQuestionResponse;
+import org.finos.waltz.model.survey.SurveyInstanceQuestionResponse;
+import org.finos.waltz.model.survey.SurveyQuestionResponse;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +45,11 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
+import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
+import static com.khartec.waltz.schema.Tables.SURVEY_QUESTION_LIST_RESPONSE;
+import static com.khartec.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.CollectionUtilities.first;
@@ -52,12 +57,7 @@ import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.common.StringUtilities.ifEmpty;
 import static org.finos.waltz.common.StringUtilities.join;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.schema.Tables.SURVEY_INSTANCE;
-import static com.khartec.waltz.schema.Tables.SURVEY_QUESTION_LIST_RESPONSE;
-import static com.khartec.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
-import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.*;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository

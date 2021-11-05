@@ -21,12 +21,12 @@ package com.khartec.waltz.service.entity_relationship;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.entity_relationship.EntityRelationshipDao;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.entity_relationship.Directionality;
-import com.khartec.waltz.model.entity_relationship.EntityRelationship;
-import com.khartec.waltz.model.entity_relationship.EntityRelationshipKey;
-import com.khartec.waltz.model.entity_relationship.RelationshipKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.entity_relationship.Directionality;
+import org.finos.waltz.model.entity_relationship.EntityRelationship;
+import org.finos.waltz.model.entity_relationship.EntityRelationshipKey;
+import org.finos.waltz.model.entity_relationship.RelationshipKind;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

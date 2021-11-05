@@ -18,9 +18,9 @@
 
 package org.finos.waltz.data.entity_svg_diagram;
 
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.entity_svg_diagram.EntitySvgDiagram;
-import com.khartec.waltz.model.entity_svg_diagram.ImmutableEntitySvgDiagram;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.entity_svg_diagram.EntitySvgDiagram;
+import org.finos.waltz.model.entity_svg_diagram.ImmutableEntitySvgDiagram;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -28,8 +28,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.EntitySvgDiagram.ENTITY_SVG_DIAGRAM;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Repository

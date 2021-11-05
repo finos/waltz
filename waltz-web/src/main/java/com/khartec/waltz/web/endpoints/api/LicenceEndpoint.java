@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.licence.Licence;
 import com.khartec.waltz.service.licence.LicenceService;
 import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.licence.Licence;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,10 +33,10 @@ import spark.Response;
 import java.io.IOException;
 import java.util.List;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.getId;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Service

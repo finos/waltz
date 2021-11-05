@@ -18,20 +18,20 @@
 
 package com.khartec.waltz.service.physical_specification;
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
 import org.finos.waltz.data.physical_specification.PhysicalSpecificationIdSelectorFactory;
 import org.finos.waltz.data.physical_specification.search.PhysicalSpecificationSearchDao;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.changelog.ChangeLog;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.command.CommandOutcome;
-import com.khartec.waltz.model.command.CommandResponse;
-import com.khartec.waltz.model.command.ImmutableCommandResponse;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
-import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
-import com.khartec.waltz.model.physical_specification.PhysicalSpecificationDeleteCommand;
-import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.changelog.ChangeLog;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.command.CommandOutcome;
+import org.finos.waltz.model.command.CommandResponse;
+import org.finos.waltz.model.command.ImmutableCommandResponse;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
+import org.finos.waltz.model.physical_specification.PhysicalSpecification;
+import org.finos.waltz.model.physical_specification.PhysicalSpecificationDeleteCommand;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,8 +43,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
-import static com.khartec.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 
 @Service

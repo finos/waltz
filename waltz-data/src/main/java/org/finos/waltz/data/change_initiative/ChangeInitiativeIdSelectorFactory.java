@@ -18,12 +18,12 @@
 
 package org.finos.waltz.data.change_initiative;
 
+import org.finos.waltz.data.SelectorUtilities;
 import org.finos.waltz.data.entity_hierarchy.AbstractIdSelectorFactory;
 import org.finos.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import org.finos.waltz.data.SelectorUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.SelectConditionStep;

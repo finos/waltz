@@ -18,15 +18,15 @@
 
 package org.finos.waltz.data.physical_specification;
 
-import org.finos.waltz.data.InlineSelectFieldFactory;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.physical_flow.PhysicalFlowParsed;
-import com.khartec.waltz.model.physical_specification.DataFormatKind;
-import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
-import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
-import com.khartec.waltz.schema.tables.*;
 import com.khartec.waltz.schema.tables.DataType;
+import com.khartec.waltz.schema.tables.*;
 import com.khartec.waltz.schema.tables.records.PhysicalSpecificationRecord;
+import org.finos.waltz.data.InlineSelectFieldFactory;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.physical_flow.PhysicalFlowParsed;
+import org.finos.waltz.model.physical_specification.DataFormatKind;
+import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
+import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,12 +37,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import static org.finos.waltz.common.Checks.checkFalse;
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static org.finos.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
-import static org.finos.waltz.data.physical_flow.PhysicalFlowDao.PHYSICAL_FLOW_NOT_REMOVED;
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.ChangeLog.CHANGE_LOG;
 import static com.khartec.waltz.schema.tables.DataType.DATA_TYPE;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
@@ -50,6 +44,12 @@ import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
+import static org.finos.waltz.common.Checks.checkFalse;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
+import static org.finos.waltz.data.physical_flow.PhysicalFlowDao.PHYSICAL_FLOW_NOT_REMOVED;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.jooq.impl.DSL.*;
 
 @Repository

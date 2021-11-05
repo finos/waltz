@@ -19,15 +19,15 @@
 package com.khartec.waltz.service.change_unit.processors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.finos.waltz.common.SetUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.attribute_change.AttributeChange;
-import com.khartec.waltz.model.change_unit.ChangeUnit;
-import com.khartec.waltz.model.physical_flow.PhysicalFlow;
 import com.khartec.waltz.service.change_unit.AttributeChangeCommandProcessor;
 import com.khartec.waltz.service.data_type.DataTypeDecoratorService;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
+import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.attribute_change.AttributeChange;
+import org.finos.waltz.model.change_unit.ChangeUnit;
+import org.finos.waltz.model.physical_flow.PhysicalFlow;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,10 +36,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
+import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.SetUtilities.minus;
-import static java.util.stream.Collectors.toSet;
 
 
 @Service

@@ -18,20 +18,20 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.notification.NotificationResponse;
 import com.khartec.waltz.service.notification.NotificationService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.notification.NotificationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.getUsername;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class NotificationEndpoint implements Endpoint {

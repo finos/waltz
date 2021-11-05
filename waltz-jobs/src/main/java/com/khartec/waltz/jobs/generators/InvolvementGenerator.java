@@ -18,12 +18,12 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import org.finos.waltz.common.RandomUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.application.ApplicationKind;
 import com.khartec.waltz.schema.tables.records.InvolvementRecord;
+import org.finos.waltz.common.RandomUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.application.ApplicationKind;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
 
@@ -34,8 +34,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static org.finos.waltz.common.ListUtilities.concat;
-import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static com.khartec.waltz.schema.Tables.MEASURABLE_CATEGORY;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
@@ -43,6 +41,8 @@ import static com.khartec.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
 import static com.khartec.waltz.schema.tables.OrganisationalUnit.ORGANISATIONAL_UNIT;
 import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static java.util.stream.Collectors.toMap;
+import static org.finos.waltz.common.ListUtilities.concat;
+import static org.finos.waltz.common.RandomUtilities.randomPick;
 
 
 public class InvolvementGenerator implements SampleDataGenerator {

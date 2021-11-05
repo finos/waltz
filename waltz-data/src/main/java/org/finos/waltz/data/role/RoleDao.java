@@ -18,9 +18,9 @@
 
 package org.finos.waltz.data.role;
 
-import com.khartec.waltz.model.role.ImmutableRole;
-import com.khartec.waltz.model.role.Role;
 import com.khartec.waltz.schema.tables.records.RoleRecord;
+import org.finos.waltz.model.role.ImmutableRole;
+import org.finos.waltz.model.role.Role;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -29,8 +29,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Role.ROLE;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Repository

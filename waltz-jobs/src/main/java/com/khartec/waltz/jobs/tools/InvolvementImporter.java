@@ -18,17 +18,17 @@
 
 package com.khartec.waltz.jobs.tools;
 
+import com.khartec.waltz.service.DIConfiguration;
+import com.khartec.waltz.service.application.ApplicationService;
+import com.khartec.waltz.service.person.PersonService;
 import org.finos.waltz.common.ArrayUtilities;
 import org.finos.waltz.common.DebugUtilities;
 import org.finos.waltz.common.IOUtilities;
 import org.finos.waltz.common.StreamUtilities.Siphon;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.application.LifecyclePhase;
-import com.khartec.waltz.model.external_identifier.ExternalIdValue;
-import com.khartec.waltz.model.person.Person;
-import com.khartec.waltz.service.DIConfiguration;
-import com.khartec.waltz.service.application.ApplicationService;
-import com.khartec.waltz.service.person.PersonService;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.application.LifecyclePhase;
+import org.finos.waltz.model.external_identifier.ExternalIdValue;
+import org.finos.waltz.model.person.Person;
 import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

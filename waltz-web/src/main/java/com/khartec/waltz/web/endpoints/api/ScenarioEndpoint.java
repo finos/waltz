@@ -18,15 +18,6 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.AxisOrientation;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ReleaseLifecycleStatus;
-import com.khartec.waltz.model.scenario.ImmutableChangeScenarioCommand;
-import com.khartec.waltz.model.scenario.ImmutableCloneScenarioCommand;
-import com.khartec.waltz.model.scenario.Scenario;
-import com.khartec.waltz.model.scenario.ScenarioType;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.roadmap.RoadmapService;
 import com.khartec.waltz.service.scenario.ScenarioAxisItemService;
 import com.khartec.waltz.service.scenario.ScenarioRatingItemService;
@@ -34,15 +25,24 @@ import com.khartec.waltz.service.scenario.ScenarioService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.json.ImmutableFullScenario;
+import org.finos.waltz.model.AxisOrientation;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ReleaseLifecycleStatus;
+import org.finos.waltz.model.scenario.ImmutableChangeScenarioCommand;
+import org.finos.waltz.model.scenario.ImmutableCloneScenarioCommand;
+import org.finos.waltz.model.scenario.Scenario;
+import org.finos.waltz.model.scenario.ScenarioType;
+import org.finos.waltz.model.user.SystemRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
 import java.time.LocalDate;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class ScenarioEndpoint implements Endpoint {

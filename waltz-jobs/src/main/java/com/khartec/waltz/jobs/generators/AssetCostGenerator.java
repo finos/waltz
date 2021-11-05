@@ -18,12 +18,12 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.common.RandomUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.schema.tables.records.CostRecord;
 import com.khartec.waltz.service.application.ApplicationService;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.RandomUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.application.Application;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
 
@@ -35,9 +35,9 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.common.RandomUtilities.randomPickSome;
 import static com.khartec.waltz.jobs.WaltzUtilities.getOrCreateCostKind;
 import static com.khartec.waltz.schema.Tables.COST;
+import static org.finos.waltz.common.RandomUtilities.randomPickSome;
 
 
 public class AssetCostGenerator implements SampleDataGenerator {

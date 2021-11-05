@@ -18,15 +18,15 @@
 
 package com.khartec.waltz.service.bookmark;
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.data.EntityReferenceNameResolver;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
 import org.finos.waltz.data.bookmark.BookmarkDao;
 import org.finos.waltz.data.bookmark.BookmarkIdSelectorFactory;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.bookmark.Bookmark;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.bookmark.Bookmark;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -18,14 +18,14 @@
 
 package com.khartec.waltz.service.person_hierarchy;
 
+import com.khartec.waltz.schema.tables.records.PersonHierarchyRecord;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.hierarchy.FlatNode;
 import org.finos.waltz.common.hierarchy.Forest;
 import org.finos.waltz.common.hierarchy.HierarchyUtilities;
 import org.finos.waltz.common.hierarchy.Node;
 import org.finos.waltz.data.person.PersonDao;
-import com.khartec.waltz.model.person.Person;
-import com.khartec.waltz.schema.tables.records.PersonHierarchyRecord;
+import org.finos.waltz.model.person.Person;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.SelectConditionStep;

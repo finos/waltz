@@ -1,22 +1,22 @@
 package org.finos.waltz.data.process_diagram;
 
+import com.khartec.waltz.schema.tables.records.ProcessDiagramEntityRecord;
+import com.khartec.waltz.schema.tables.records.ProcessDiagramRecord;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.JooqUtilities;
-import com.khartec.waltz.model.process_diagram.*;
-import com.khartec.waltz.schema.tables.records.ProcessDiagramEntityRecord;
-import com.khartec.waltz.schema.tables.records.ProcessDiagramRecord;
+import org.finos.waltz.model.process_diagram.*;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
-import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
-import static org.finos.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.schema.Tables.PROCESS_DIAGRAM;
 import static com.khartec.waltz.schema.Tables.PROCESS_DIAGRAM_ENTITY;
 import static java.util.Optional.ofNullable;
+import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static org.finos.waltz.common.EnumUtilities.readEnum;
 
 @Repository
 public class ProcessDiagramDao {

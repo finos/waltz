@@ -18,10 +18,10 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import org.finos.waltz.data.physical_specification.search.PhysicalSpecificationSearchDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.data.physical_specification.search.PhysicalSpecificationSearchDao;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.DSLContext;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

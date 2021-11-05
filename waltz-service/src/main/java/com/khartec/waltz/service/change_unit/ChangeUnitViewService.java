@@ -18,24 +18,24 @@
 
 package com.khartec.waltz.service.change_unit;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.assessment_rating.AssessmentRating;
-import com.khartec.waltz.model.assessment_rating.AssessmentRatingDetail;
-import com.khartec.waltz.model.assessment_rating.ImmutableAssessmentRatingDetail;
-import com.khartec.waltz.model.change_unit.ChangeUnit;
-import com.khartec.waltz.model.change_unit.ImmutablePhysicalFlowChangeUnitViewItem;
-import com.khartec.waltz.model.change_unit.PhysicalFlowChangeUnitViewItem;
-import com.khartec.waltz.model.logical_flow.LogicalFlow;
-import com.khartec.waltz.model.physical_flow.PhysicalFlow;
-import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
-import com.khartec.waltz.model.rating.RatingSchemeItem;
 import com.khartec.waltz.service.assessment_rating.AssessmentRatingService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
 import com.khartec.waltz.service.physical_specification.PhysicalSpecificationService;
 import com.khartec.waltz.service.rating_scheme.RatingSchemeService;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.HierarchyQueryScope;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.assessment_rating.AssessmentRating;
+import org.finos.waltz.model.assessment_rating.AssessmentRatingDetail;
+import org.finos.waltz.model.assessment_rating.ImmutableAssessmentRatingDetail;
+import org.finos.waltz.model.change_unit.ChangeUnit;
+import org.finos.waltz.model.change_unit.ImmutablePhysicalFlowChangeUnitViewItem;
+import org.finos.waltz.model.change_unit.PhysicalFlowChangeUnitViewItem;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
+import org.finos.waltz.model.physical_flow.PhysicalFlow;
+import org.finos.waltz.model.physical_specification.PhysicalSpecification;
+import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -44,14 +44,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.map;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.model.IdSelectionOptions.mkOptsForAllLifecycleStates;
-import static java.util.Collections.emptySet;
-import static java.util.stream.Collectors.toSet;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.IdSelectionOptions.mkOptsForAllLifecycleStates;
 
 
 @Service

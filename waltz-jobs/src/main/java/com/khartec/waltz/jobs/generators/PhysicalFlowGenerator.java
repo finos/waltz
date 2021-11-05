@@ -18,14 +18,14 @@
 
 package com.khartec.waltz.jobs.generators;
 
+import com.khartec.waltz.schema.tables.records.PhysicalFlowRecord;
 import org.finos.waltz.common.RandomUtilities;
 import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
-import com.khartec.waltz.model.Criticality;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.enum_value.EnumValueKind;
-import com.khartec.waltz.model.physical_flow.FrequencyKind;
-import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
-import com.khartec.waltz.schema.tables.records.PhysicalFlowRecord;
+import org.finos.waltz.model.Criticality;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.enum_value.EnumValueKind;
+import org.finos.waltz.model.physical_flow.FrequencyKind;
+import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.jooq.DSLContext;
 import org.jooq.lambda.tuple.Tuple;
 import org.jooq.lambda.tuple.Tuple3;
@@ -35,16 +35,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.khartec.waltz.schema.tables.EnumValue.ENUM_VALUE;
+import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
+import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static org.finos.waltz.data.physical_specification.PhysicalSpecificationDao.owningEntityNameField;
-import static com.khartec.waltz.schema.tables.EnumValue.ENUM_VALUE;
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
-import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 
 
 public class PhysicalFlowGenerator implements SampleDataGenerator {

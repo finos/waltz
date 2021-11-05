@@ -18,18 +18,18 @@
 
 package com.khartec.waltz.service.assessment_rating;
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
+import com.khartec.waltz.service.user.UserPreferenceService;
 import org.finos.waltz.data.assessment_definition.AssessmentDefinitionDao;
 import org.finos.waltz.data.assessment_rating.AssessmentRatingDao;
 import org.finos.waltz.data.rating_scheme.RatingSchemeDAO;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
-import com.khartec.waltz.model.assessment_definition.AssessmentVisibility;
-import com.khartec.waltz.model.assessment_rating.*;
-import com.khartec.waltz.model.rating.RatingSchemeItem;
-import com.khartec.waltz.model.user.UserPreference;
-import com.khartec.waltz.service.changelog.ChangeLogService;
-import com.khartec.waltz.service.user.UserPreferenceService;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
+import org.finos.waltz.model.assessment_definition.AssessmentVisibility;
+import org.finos.waltz.model.assessment_rating.*;
+import org.finos.waltz.model.rating.RatingSchemeItem;
+import org.finos.waltz.model.user.UserPreference;
 import org.jooq.Condition;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,14 +41,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.khartec.waltz.schema.Tables.ASSESSMENT_RATING;
+import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.CollectionUtilities.maybeFirst;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.common.StringUtilities.splitThenMap;
-import static com.khartec.waltz.schema.Tables.ASSESSMENT_RATING;
-import static java.lang.String.format;
 import static org.jooq.tools.StringUtils.toCamelCaseLC;
 
 @Service

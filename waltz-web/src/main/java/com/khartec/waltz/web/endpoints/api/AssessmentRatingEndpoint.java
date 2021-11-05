@@ -19,15 +19,15 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
-import org.finos.waltz.common.StringUtilities;
-import com.khartec.waltz.model.UserTimestamp;
-import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
-import com.khartec.waltz.model.assessment_rating.*;
 import com.khartec.waltz.service.assessment_definition.AssessmentDefinitionService;
 import com.khartec.waltz.service.assessment_rating.AssessmentRatingService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.NotAuthorizedException;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.common.StringUtilities;
+import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
+import org.finos.waltz.model.assessment_rating.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
@@ -37,9 +37,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Service

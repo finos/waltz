@@ -18,22 +18,22 @@
 
 package com.khartec.waltz.service.roadmap;
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.data.entity_relationship.EntityRelationshipDao;
 import org.finos.waltz.data.roadmap.RoadmapDao;
 import org.finos.waltz.data.roadmap.RoadmapIdSelectorFactory;
 import org.finos.waltz.data.roadmap.RoadmapSearchDao;
 import org.finos.waltz.data.scenario.ScenarioDao;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.entity_relationship.EntityRelationship;
-import com.khartec.waltz.model.entity_relationship.ImmutableEntityRelationship;
-import com.khartec.waltz.model.entity_relationship.RelationshipKind;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.model.roadmap.Roadmap;
-import com.khartec.waltz.model.roadmap.RoadmapAndScenarioOverview;
-import com.khartec.waltz.model.roadmap.RoadmapCreateCommand;
-import com.khartec.waltz.model.scenario.Scenario;
-import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.entity_relationship.EntityRelationship;
+import org.finos.waltz.model.entity_relationship.ImmutableEntityRelationship;
+import org.finos.waltz.model.entity_relationship.RelationshipKind;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.roadmap.Roadmap;
+import org.finos.waltz.model.roadmap.RoadmapAndScenarioOverview;
+import org.finos.waltz.model.roadmap.RoadmapCreateCommand;
+import org.finos.waltz.model.scenario.Scenario;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,10 +42,10 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.service.roadmap.RoadmapUtilities.mkBasicLogEntry;
 import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Service
 public class RoadmapService {

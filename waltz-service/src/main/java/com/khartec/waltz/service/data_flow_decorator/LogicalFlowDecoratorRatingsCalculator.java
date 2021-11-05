@@ -18,22 +18,22 @@
 
 package com.khartec.waltz.service.data_flow_decorator;
 
+import com.khartec.waltz.service.application.ApplicationService;
+import com.khartec.waltz.service.flow_classification_rule.FlowClassificationRuleResolver;
 import org.finos.waltz.data.data_type.DataTypeDao;
 import org.finos.waltz.data.flow_classification_rule.FlowClassificationDao;
 import org.finos.waltz.data.flow_classification_rule.FlowClassificationRuleDao;
 import org.finos.waltz.data.logical_flow.LogicalFlowDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.datatype.DataType;
-import com.khartec.waltz.model.datatype.DataTypeDecorator;
-import com.khartec.waltz.model.datatype.ImmutableDataTypeDecorator;
-import com.khartec.waltz.model.flow_classification.FlowClassification;
-import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
-import com.khartec.waltz.model.logical_flow.LogicalFlow;
-import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
-import com.khartec.waltz.service.application.ApplicationService;
-import com.khartec.waltz.service.flow_classification_rule.FlowClassificationRuleResolver;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.datatype.DataType;
+import org.finos.waltz.model.datatype.DataTypeDecorator;
+import org.finos.waltz.model.datatype.ImmutableDataTypeDecorator;
+import org.finos.waltz.model.flow_classification.FlowClassification;
+import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
+import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +47,7 @@ import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.filter;
 import static org.finos.waltz.common.ListUtilities.isEmpty;
 import static org.finos.waltz.common.SetUtilities.map;
-import static com.khartec.waltz.model.utils.IdUtilities.indexById;
+import static org.finos.waltz.model.utils.IdUtilities.indexById;
 
 @Service
 public class LogicalFlowDecoratorRatingsCalculator {

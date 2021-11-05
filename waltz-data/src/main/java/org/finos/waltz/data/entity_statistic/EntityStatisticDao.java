@@ -20,11 +20,11 @@ package org.finos.waltz.data.entity_statistic;
 
 import org.finos.waltz.common.Checks;
 import org.finos.waltz.data.FindEntityReferencesByIdSelector;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.entity_statistic.EntityStatistic;
-import com.khartec.waltz.model.entity_statistic.ImmutableEntityStatistic;
 import org.finos.waltz.data.JooqUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.entity_statistic.EntityStatistic;
+import org.finos.waltz.model.entity_statistic.ImmutableEntityStatistic;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,10 +32,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
 import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository
 public class EntityStatisticDao implements FindEntityReferencesByIdSelector {

@@ -18,10 +18,6 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.survey.SurveyQuestion;
-import com.khartec.waltz.model.survey.SurveyQuestionDropdownEntry;
-import com.khartec.waltz.model.survey.SurveyQuestionFieldType;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.survey.SurveyQuestionDropdownEntryService;
 import com.khartec.waltz.service.survey.SurveyQuestionService;
 import com.khartec.waltz.service.user.UserRoleService;
@@ -29,13 +25,17 @@ import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.json.SurveyQuestionInfo;
+import org.finos.waltz.model.survey.SurveyQuestion;
+import org.finos.waltz.model.survey.SurveyQuestionDropdownEntry;
+import org.finos.waltz.model.survey.SurveyQuestionFieldType;
+import org.finos.waltz.model.user.SystemRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Service

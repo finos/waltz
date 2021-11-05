@@ -19,12 +19,12 @@
 package org.finos.waltz.data.survey;
 
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.survey.ImmutableSurveyTemplate;
-import com.khartec.waltz.model.ReleaseLifecycleStatus;
-import com.khartec.waltz.model.survey.SurveyTemplate;
-import com.khartec.waltz.model.survey.SurveyTemplateChangeCommand;
 import com.khartec.waltz.schema.tables.records.SurveyTemplateRecord;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.ReleaseLifecycleStatus;
+import org.finos.waltz.model.survey.ImmutableSurveyTemplate;
+import org.finos.waltz.model.survey.SurveyTemplate;
+import org.finos.waltz.model.survey.SurveyTemplateChangeCommand;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -36,8 +36,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository
 public class SurveyTemplateDao {

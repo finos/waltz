@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.entity_enum.EntityEnumDefinition;
-import com.khartec.waltz.model.entity_enum.EntityEnumValue;
 import com.khartec.waltz.service.entity_enum.EntityEnumService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.entity_enum.EntityEnumDefinition;
+import org.finos.waltz.model.entity_enum.EntityEnumValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

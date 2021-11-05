@@ -18,6 +18,8 @@
 
 package com.khartec.waltz.jobs.generators;
 
+import com.khartec.waltz.schema.tables.records.ScenarioRatingItemRecord;
+import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.measurable.MeasurableDao;
 import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
@@ -25,17 +27,15 @@ import org.finos.waltz.data.measurable_rating.MeasurableRatingDao;
 import org.finos.waltz.data.roadmap.RoadmapDao;
 import org.finos.waltz.data.scenario.ScenarioAxisItemDao;
 import org.finos.waltz.data.scenario.ScenarioDao;
-import com.khartec.waltz.model.AxisOrientation;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.measurable.Measurable;
-import com.khartec.waltz.model.measurable_rating.MeasurableRating;
-import com.khartec.waltz.model.roadmap.Roadmap;
-import com.khartec.waltz.model.scenario.Scenario;
-import com.khartec.waltz.model.scenario.ScenarioAxisItem;
-import com.khartec.waltz.schema.tables.records.ScenarioRatingItemRecord;
-import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
+import org.finos.waltz.model.AxisOrientation;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.measurable.Measurable;
+import org.finos.waltz.model.measurable_rating.MeasurableRating;
+import org.finos.waltz.model.roadmap.Roadmap;
+import org.finos.waltz.model.scenario.Scenario;
+import org.finos.waltz.model.scenario.ScenarioAxisItem;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.SelectConditionStep;
@@ -46,16 +46,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static com.khartec.waltz.schema.Tables.*;
+import static com.khartec.waltz.schema.tables.Roadmap.ROADMAP;
 import static org.finos.waltz.common.ListUtilities.filter;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.ObjectUtilities.any;
 import static org.finos.waltz.common.RandomUtilities.randomIntBetween;
 import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static org.finos.waltz.common.SetUtilities.asSet;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
-import static com.khartec.waltz.schema.Tables.*;
-import static com.khartec.waltz.schema.tables.Roadmap.ROADMAP;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 public class RoadmapGenerator implements SampleDataGenerator {

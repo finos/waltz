@@ -18,13 +18,13 @@
 
 package org.finos.waltz.data.actor;
 
-import org.finos.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.actor.Actor;
-import com.khartec.waltz.model.actor.ActorChangeCommand;
-import com.khartec.waltz.model.actor.ActorCreateCommand;
-import com.khartec.waltz.model.actor.ImmutableActor;
 import com.khartec.waltz.schema.tables.records.ActorRecord;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.actor.Actor;
+import org.finos.waltz.model.actor.ActorChangeCommand;
+import org.finos.waltz.model.actor.ActorCreateCommand;
+import org.finos.waltz.model.actor.ImmutableActor;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -38,13 +38,13 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.function.Function;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.Checks.checkOptionalIsPresent;
-import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static com.khartec.waltz.schema.Tables.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.Actor.ACTOR;
 import static com.khartec.waltz.schema.tables.Involvement.INVOLVEMENT;
 import static java.util.Optional.ofNullable;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.Checks.checkOptionalIsPresent;
+import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 
 @Repository
 public class ActorDao {

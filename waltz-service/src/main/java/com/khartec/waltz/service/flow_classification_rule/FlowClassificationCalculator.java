@@ -18,17 +18,17 @@
 
 package com.khartec.waltz.service.flow_classification_rule;
 
+import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorRatingsCalculator;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.data_type.DataTypeDao;
 import org.finos.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import org.finos.waltz.data.entity_hierarchy.EntityHierarchyDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.datatype.DataType;
-import com.khartec.waltz.model.datatype.DataTypeDecorator;
-import com.khartec.waltz.service.data_flow_decorator.LogicalFlowDecoratorRatingsCalculator;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.datatype.DataType;
+import org.finos.waltz.model.datatype.DataTypeDecorator;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.slf4j.Logger;
@@ -41,10 +41,10 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.SetUtilities.fromCollection;
-import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
-import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
 
 @Service

@@ -18,29 +18,29 @@
 
 package com.khartec.waltz.service.physical_flow_participant;
 
-import org.finos.waltz.data.EntityReferenceNameResolver;
-import org.finos.waltz.data.physical_flow_participant.PhysicalFlowParticipantDao;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.Severity;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.logical_flow.LogicalFlow;
-import com.khartec.waltz.model.physical_flow.PhysicalFlow;
-import com.khartec.waltz.model.physical_flow_participant.ParticipationKind;
-import com.khartec.waltz.model.physical_flow_participant.PhysicalFlowParticipant;
-import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
 import com.khartec.waltz.service.physical_specification.PhysicalSpecificationService;
+import org.finos.waltz.data.EntityReferenceNameResolver;
+import org.finos.waltz.data.physical_flow_participant.PhysicalFlowParticipantDao;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
+import org.finos.waltz.model.physical_flow.PhysicalFlow;
+import org.finos.waltz.model.physical_flow_participant.ParticipationKind;
+import org.finos.waltz.model.physical_flow_participant.PhysicalFlowParticipant;
+import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.EntityKind.PHYSICAL_FLOW;
 import static java.lang.String.format;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.model.EntityKind.PHYSICAL_FLOW;
 
 
 @Service

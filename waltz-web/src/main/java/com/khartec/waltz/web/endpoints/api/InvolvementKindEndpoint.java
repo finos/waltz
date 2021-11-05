@@ -18,16 +18,16 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.command.CommandResponse;
-import com.khartec.waltz.model.involvement_kind.InvolvementKind;
-import com.khartec.waltz.model.involvement_kind.InvolvementKindChangeCommand;
-import com.khartec.waltz.model.involvement_kind.InvolvementKindCreateCommand;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.involvement_kind.InvolvementKindService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.WebUtilities;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.command.CommandResponse;
+import org.finos.waltz.model.involvement_kind.InvolvementKind;
+import org.finos.waltz.model.involvement_kind.InvolvementKindChangeCommand;
+import org.finos.waltz.model.involvement_kind.InvolvementKindCreateCommand;
+import org.finos.waltz.model.user.SystemRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +38,9 @@ import spark.Response;
 import java.io.IOException;
 import java.util.List;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class InvolvementKindEndpoint implements Endpoint {

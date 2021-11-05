@@ -1,10 +1,10 @@
 package com.khartec.waltz.integration_test.inmem.helpers;
 
 import org.finos.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.UserTimestamp;
-import com.khartec.waltz.model.physical_specification.DataFormatKind;
-import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecification;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.physical_specification.DataFormatKind;
+import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
 import com.khartec.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

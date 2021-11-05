@@ -20,17 +20,17 @@ package org.finos.waltz.data.actor;
 
 import org.finos.waltz.data.SearchDao;
 import org.finos.waltz.data.SearchUtilities;
-import com.khartec.waltz.model.actor.Actor;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.actor.Actor;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.PredicateUtilities.all;
-import static java.util.stream.Collectors.toList;
 
 
 @Repository

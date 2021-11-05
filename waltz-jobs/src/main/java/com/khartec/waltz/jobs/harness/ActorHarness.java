@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import org.finos.waltz.data.actor.ActorDao;
 import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.data.actor.ActorDao;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

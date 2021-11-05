@@ -18,17 +18,17 @@
 
 package org.finos.waltz.data;
 
+import com.khartec.waltz.schema.tables.records.ChangeLogRecord;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.StringUtilities;
-import com.khartec.waltz.model.EndOfLifeStatus;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.ImmutableEntityReference;
-import com.khartec.waltz.model.tally.ImmutableOrderedTally;
-import com.khartec.waltz.model.tally.ImmutableTally;
-import com.khartec.waltz.model.tally.OrderedTally;
-import com.khartec.waltz.model.tally.Tally;
-import com.khartec.waltz.schema.tables.records.ChangeLogRecord;
+import org.finos.waltz.model.EndOfLifeStatus;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.ImmutableEntityReference;
+import org.finos.waltz.model.tally.ImmutableOrderedTally;
+import org.finos.waltz.model.tally.ImmutableTally;
+import org.finos.waltz.model.tally.OrderedTally;
+import org.finos.waltz.model.tally.Tally;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 
@@ -40,11 +40,11 @@ import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static java.util.stream.Collectors.*;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.jooq.impl.DSL.currentDate;
 import static org.jooq.impl.DSL.inline;
 

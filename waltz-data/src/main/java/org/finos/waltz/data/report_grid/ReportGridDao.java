@@ -19,13 +19,13 @@
 package org.finos.waltz.data.report_grid;
 
 
-import org.finos.waltz.common.SetUtilities;
-import org.finos.waltz.data.InlineSelectFieldFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.report_grid.*;
 import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.records.ReportGridRecord;
+import org.finos.waltz.common.SetUtilities;
+import org.finos.waltz.data.InlineSelectFieldFactory;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.report_grid.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
@@ -39,21 +39,21 @@ import java.util.function.Function;
 import java.util.function.ToIntFunction;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
-import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static org.finos.waltz.common.MapUtilities.groupBy;
-import static org.finos.waltz.common.SetUtilities.map;
-import static org.finos.waltz.common.SetUtilities.union;
-import static org.finos.waltz.common.StringUtilities.join;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.model.survey.SurveyInstanceStatus.APPROVED;
-import static com.khartec.waltz.model.survey.SurveyInstanceStatus.COMPLETED;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toMap;
+import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
+import static org.finos.waltz.common.MapUtilities.groupBy;
+import static org.finos.waltz.common.SetUtilities.map;
+import static org.finos.waltz.common.SetUtilities.union;
+import static org.finos.waltz.common.StringUtilities.join;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.survey.SurveyInstanceStatus.APPROVED;
+import static org.finos.waltz.model.survey.SurveyInstanceStatus.COMPLETED;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository

@@ -1,9 +1,9 @@
 package com.khartec.waltz.service.attestation;
 
-import org.finos.waltz.data.attestation.AttestationPreCheckDao;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.attestation.LogicalFlowAttestationPreChecks;
 import com.khartec.waltz.service.settings.SettingsService;
+import org.finos.waltz.data.attestation.AttestationPreCheckDao;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.attestation.LogicalFlowAttestationPreChecks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static java.lang.String.format;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class AttestationPreCheckService {

@@ -19,25 +19,25 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.IdCommandResponse;
-import com.khartec.waltz.model.attestation.AttestationCreateSummary;
-import com.khartec.waltz.model.attestation.AttestationRun;
-import com.khartec.waltz.model.attestation.AttestationRunCreateCommand;
-import com.khartec.waltz.model.attestation.AttestationRunResponseSummary;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.attestation.AttestationRunService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.IdCommandResponse;
+import org.finos.waltz.model.attestation.AttestationCreateSummary;
+import org.finos.waltz.model.attestation.AttestationRun;
+import org.finos.waltz.model.attestation.AttestationRunCreateCommand;
+import org.finos.waltz.model.attestation.AttestationRunResponseSummary;
+import org.finos.waltz.model.user.SystemRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class AttestationRunEndpoint implements Endpoint {

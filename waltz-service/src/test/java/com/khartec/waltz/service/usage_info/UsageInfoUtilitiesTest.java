@@ -19,17 +19,16 @@
 package com.khartec.waltz.service.usage_info;
 
 import org.finos.waltz.common.SetUtilities;
-import com.khartec.waltz.model.system.SystemChangeSet;
-import com.khartec.waltz.model.usage_info.ImmutableUsageInfo;
-import com.khartec.waltz.model.usage_info.UsageInfo;
-import com.khartec.waltz.model.usage_info.UsageKind;
+import org.finos.waltz.model.system.SystemChangeSet;
+import org.finos.waltz.model.usage_info.ImmutableUsageInfo;
+import org.finos.waltz.model.usage_info.UsageInfo;
+import org.finos.waltz.model.usage_info.UsageKind;
 import org.jooq.tools.json.ParseException;
 import org.junit.Test;
 
 import java.util.Set;
 
-import static com.khartec.waltz.model.usage_info.UsageInfoUtilities.mkChangeSet;
-import static com.khartec.waltz.model.usage_info.UsageKind.*;
+import static org.finos.waltz.model.usage_info.UsageInfoUtilities.mkChangeSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 

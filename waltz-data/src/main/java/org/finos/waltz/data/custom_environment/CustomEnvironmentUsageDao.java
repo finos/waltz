@@ -18,18 +18,18 @@
 
 package org.finos.waltz.data.custom_environment;
 
+import com.khartec.waltz.schema.tables.Application;
+import com.khartec.waltz.schema.tables.records.CustomEnvironmentUsageRecord;
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.database_information.DatabaseInformationDao;
 import org.finos.waltz.data.server_information.ServerInformationDao;
-import com.khartec.waltz.model.CustomEnvironmentAsset;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.custom_environment.CustomEnvironmentUsage;
-import com.khartec.waltz.model.custom_environment.CustomEnvironmentUsageInfo;
-import com.khartec.waltz.model.custom_environment.ImmutableCustomEnvironmentUsage;
-import com.khartec.waltz.model.custom_environment.ImmutableCustomEnvironmentUsageInfo;
-import com.khartec.waltz.schema.tables.Application;
-import com.khartec.waltz.schema.tables.records.CustomEnvironmentUsageRecord;
+import org.finos.waltz.model.CustomEnvironmentAsset;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.custom_environment.CustomEnvironmentUsage;
+import org.finos.waltz.model.custom_environment.CustomEnvironmentUsageInfo;
+import org.finos.waltz.model.custom_environment.ImmutableCustomEnvironmentUsage;
+import org.finos.waltz.model.custom_environment.ImmutableCustomEnvironmentUsageInfo;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -39,11 +39,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
+import static com.khartec.waltz.schema.Tables.*;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
-import static com.khartec.waltz.model.EntityKind.valueOf;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.schema.Tables.*;
+import static org.finos.waltz.model.EntityKind.valueOf;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 
 @Repository

@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.model.change_unit.PhysicalFlowChangeUnitViewItem;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.change_unit.ChangeUnitViewService;
+import org.finos.waltz.model.change_unit.PhysicalFlowChangeUnitViewItem;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

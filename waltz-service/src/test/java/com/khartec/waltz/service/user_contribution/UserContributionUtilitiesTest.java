@@ -23,8 +23,8 @@ import org.junit.Test;
 
 import java.util.List;
 
-import static org.finos.waltz.common.ListUtilities.asList;
 import static com.khartec.waltz.service.user_contribution.UserContributionUtilities.findWindow;
+import static org.finos.waltz.common.ListUtilities.asList;
 
 public class UserContributionUtilitiesTest {
 

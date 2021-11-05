@@ -1,6 +1,6 @@
 package org.finos.waltz.data;
 
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
 
 import java.util.List;
 

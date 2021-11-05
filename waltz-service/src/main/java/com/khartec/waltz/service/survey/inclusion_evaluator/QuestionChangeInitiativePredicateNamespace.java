@@ -18,10 +18,10 @@
 
 package com.khartec.waltz.service.survey.inclusion_evaluator;
 
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.survey.SurveyQuestion;
-import com.khartec.waltz.model.survey.SurveyQuestionResponse;
 import com.khartec.waltz.schema.tables.ChangeInitiative;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.survey.SurveyQuestion;
+import org.finos.waltz.model.survey.SurveyQuestionResponse;
 import org.jooq.DSLContext;
 
 import java.util.List;

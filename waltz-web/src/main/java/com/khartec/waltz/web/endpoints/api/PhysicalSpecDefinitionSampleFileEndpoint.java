@@ -18,20 +18,20 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionSampleFile;
-import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionSampleFileCreateCommand;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.physical_specification_definition.PhysicalSpecDefinitionSampleFileService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.physical_specification_definition.PhysicalSpecDefinitionSampleFile;
+import org.finos.waltz.model.physical_specification_definition.PhysicalSpecDefinitionSampleFileCreateCommand;
+import org.finos.waltz.model.user.SystemRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class PhysicalSpecDefinitionSampleFileEndpoint implements Endpoint {

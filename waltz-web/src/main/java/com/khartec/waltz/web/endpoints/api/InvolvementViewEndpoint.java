@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.involvement.InvolvementDetail;
-import com.khartec.waltz.model.involvement.InvolvementViewItem;
 import com.khartec.waltz.service.involvement.InvolvementViewService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.involvement.InvolvementDetail;
+import org.finos.waltz.model.involvement.InvolvementViewItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

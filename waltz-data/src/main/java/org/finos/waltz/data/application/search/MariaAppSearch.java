@@ -20,20 +20,20 @@ package org.finos.waltz.data.application.search;
 
 import org.finos.waltz.data.DatabaseVendorSpecific;
 import org.finos.waltz.data.FullTextSearch;
-import org.finos.waltz.data.application.ApplicationDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import org.finos.waltz.data.SearchUtilities;
+import org.finos.waltz.data.application.ApplicationDao;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 
 import java.util.List;
 
-import static org.finos.waltz.common.ListUtilities.map;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.EntityAlias.ENTITY_ALIAS;
+import static org.finos.waltz.common.ListUtilities.map;
 
 public class MariaAppSearch implements FullTextSearch<Application>, DatabaseVendorSpecific {
 

@@ -18,14 +18,14 @@
 
 package com.khartec.waltz.service.email;
 
-import org.finos.waltz.data.attestation.AttestationInstanceRecipientDao;
-import org.finos.waltz.data.attestation.AttestationRunDao;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.NameProvider;
-import com.khartec.waltz.model.attestation.AttestationRun;
-import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.service.involvement_kind.InvolvementKindService;
 import com.khartec.waltz.service.person.PersonService;
+import org.finos.waltz.data.attestation.AttestationInstanceRecipientDao;
+import org.finos.waltz.data.attestation.AttestationRunDao;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.NameProvider;
+import org.finos.waltz.model.attestation.AttestationRun;
+import org.finos.waltz.model.person.Person;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,12 +38,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.SetUtilities.fromCollection;
 import static org.finos.waltz.common.StreamUtilities.batchProcessingCollector;
 import static org.finos.waltz.common.StringUtilities.mkSafe;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toSet;
 
 
 @Service

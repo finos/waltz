@@ -19,12 +19,12 @@
 package org.finos.waltz.data.licence;
 
 
-import org.finos.waltz.data.JooqUtilities;
-import com.khartec.waltz.model.UserTimestamp;
-import com.khartec.waltz.model.licence.ImmutableLicence;
-import com.khartec.waltz.model.licence.Licence;
-import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.LicenceRecord;
+import org.finos.waltz.data.JooqUtilities;
+import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.licence.ImmutableLicence;
+import org.finos.waltz.model.licence.Licence;
+import org.finos.waltz.model.tally.Tally;
 import org.jooq.*;
 import org.jooq.exception.NoDataFoundException;
 import org.jooq.impl.DSL;
@@ -33,10 +33,10 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.Licence.LICENCE;
 import static com.khartec.waltz.schema.tables.SoftwareUsage.SOFTWARE_USAGE;
 import static com.khartec.waltz.schema.tables.SoftwareVersionLicence.SOFTWARE_VERSION_LICENCE;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Repository

@@ -18,9 +18,9 @@
 
 package org.finos.waltz.data.survey;
 
-import com.khartec.waltz.model.survey.ImmutableSurveyQuestionDropdownEntry;
-import com.khartec.waltz.model.survey.SurveyQuestionDropdownEntry;
 import com.khartec.waltz.schema.tables.records.SurveyQuestionDropdownEntryRecord;
+import org.finos.waltz.model.survey.ImmutableSurveyQuestionDropdownEntry;
+import org.finos.waltz.model.survey.SurveyQuestionDropdownEntry;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,10 +29,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.function.Function;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.SurveyQuestionDropdownEntry.SURVEY_QUESTION_DROPDOWN_ENTRY;
 import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository
 public class SurveyQuestionDropdownEntryDao {

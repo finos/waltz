@@ -18,16 +18,16 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import org.finos.waltz.data.roadmap.RoadmapDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.roadmap.RoadmapAndScenarioOverview;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.roadmap.RoadmapService;
+import org.finos.waltz.data.roadmap.RoadmapDao;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.roadmap.RoadmapAndScenarioOverview;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.util.Collection;
 
-import static com.khartec.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 
 public class RoadmapHarness {

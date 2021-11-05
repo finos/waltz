@@ -18,9 +18,9 @@
 
 package org.finos.waltz.data.allocation_scheme;
 
-import com.khartec.waltz.model.allocation_scheme.AllocationScheme;
-import com.khartec.waltz.model.allocation_scheme.ImmutableAllocationScheme;
 import com.khartec.waltz.schema.tables.records.AllocationSchemeRecord;
+import org.finos.waltz.model.allocation_scheme.AllocationScheme;
+import org.finos.waltz.model.allocation_scheme.ImmutableAllocationScheme;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;

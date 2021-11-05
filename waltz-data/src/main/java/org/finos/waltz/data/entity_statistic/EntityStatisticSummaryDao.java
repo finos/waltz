@@ -19,13 +19,13 @@
 package org.finos.waltz.data.entity_statistic;
 
 import org.finos.waltz.data.DBExecutorPoolInterface;
-import com.khartec.waltz.model.Duration;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.tally.ImmutableTally;
-import com.khartec.waltz.model.tally.ImmutableTallyPack;
-import com.khartec.waltz.model.tally.Tally;
-import com.khartec.waltz.model.tally.TallyPack;
+import org.finos.waltz.model.Duration;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.tally.ImmutableTally;
+import org.finos.waltz.model.tally.ImmutableTallyPack;
+import org.finos.waltz.model.tally.Tally;
+import org.finos.waltz.model.tally.TallyPack;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.impl.SQLDataType;
@@ -44,11 +44,11 @@ import java.util.List;
 import java.util.concurrent.Future;
 import java.util.function.Function;
 
+import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
+import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
-import static java.util.stream.Collectors.*;
 import static org.jooq.impl.DSL.*;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 

@@ -18,25 +18,25 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.command.CommandResponse;
-import com.khartec.waltz.model.entity_search.ImmutableEntitySearchOptions;
-import com.khartec.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
-import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
-import com.khartec.waltz.model.physical_specification.PhysicalSpecificationDeleteCommand;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.physical_specification.PhysicalSpecificationService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.command.CommandResponse;
+import org.finos.waltz.model.entity_search.ImmutableEntitySearchOptions;
+import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
+import org.finos.waltz.model.physical_specification.PhysicalSpecification;
+import org.finos.waltz.model.physical_specification.PhysicalSpecificationDeleteCommand;
+import org.finos.waltz.model.user.SystemRole;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 import spark.Response;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class PhysicalSpecificationEndpoint implements Endpoint {

@@ -18,12 +18,12 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.process_diagram.ProcessDiagram;
-import com.khartec.waltz.model.process_diagram.ProcessDiagramAndEntities;
 import com.khartec.waltz.service.process_diagram.ProcessDiagramService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.process_diagram.ProcessDiagram;
+import org.finos.waltz.model.process_diagram.ProcessDiagramAndEntities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -20,8 +20,8 @@ package com.khartec.waltz.service.assessment_definition;
 
 
 import org.finos.waltz.data.assessment_definition.AssessmentDefinitionDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.assessment_definition.AssessmentDefinition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

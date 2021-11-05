@@ -1,8 +1,8 @@
 package com.khartec.waltz.integration_test.inmem.helpers;
 
-import com.khartec.waltz.model.Criticality;
-import com.khartec.waltz.model.physical_flow.*;
-import com.khartec.waltz.model.physical_specification.PhysicalSpecification;
+import org.finos.waltz.model.Criticality;
+import org.finos.waltz.model.physical_flow.*;
+import org.finos.waltz.model.physical_specification.PhysicalSpecification;
 import com.khartec.waltz.service.physical_flow.PhysicalFlowService;
 import com.khartec.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.jooq.DSLContext;

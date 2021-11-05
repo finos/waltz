@@ -21,9 +21,9 @@ package com.khartec.waltz.service.database_information;
 import org.finos.waltz.common.Checks;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.database_information.DatabaseInformationDao;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.database_information.DatabaseInformation;
-import com.khartec.waltz.model.database_information.DatabaseSummaryStatistics;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.database_information.DatabaseInformation;
+import org.finos.waltz.model.database_information.DatabaseSummaryStatistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

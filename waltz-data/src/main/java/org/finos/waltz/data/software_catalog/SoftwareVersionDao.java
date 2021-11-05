@@ -18,10 +18,10 @@
 
 package org.finos.waltz.data.software_catalog;
 
-import com.khartec.waltz.model.UserTimestamp;
-import com.khartec.waltz.model.software_catalog.ImmutableSoftwareVersion;
-import com.khartec.waltz.model.software_catalog.SoftwareVersion;
 import com.khartec.waltz.schema.tables.records.SoftwareVersionRecord;
+import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.software_catalog.ImmutableSoftwareVersion;
+import org.finos.waltz.model.software_catalog.SoftwareVersion;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -34,9 +34,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.tables.SoftwareVersion.SOFTWARE_VERSION;
 import static com.khartec.waltz.schema.tables.SoftwareVersionLicence.SOFTWARE_VERSION_LICENCE;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Repository

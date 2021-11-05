@@ -18,14 +18,14 @@
 
 package org.finos.waltz.data.change_unit;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.UserTimestamp;
-import com.khartec.waltz.model.change_set.ChangeSet;
-import com.khartec.waltz.model.change_unit.*;
 import com.khartec.waltz.schema.tables.records.ChangeSetRecord;
 import com.khartec.waltz.schema.tables.records.ChangeUnitRecord;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.change_set.ChangeSet;
+import org.finos.waltz.model.change_unit.*;
 import org.jooq.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -35,10 +35,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static com.khartec.waltz.schema.tables.ChangeUnit.CHANGE_UNIT;
 import static org.finos.waltz.common.Checks.*;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.schema.tables.ChangeUnit.CHANGE_UNIT;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 
 @Repository

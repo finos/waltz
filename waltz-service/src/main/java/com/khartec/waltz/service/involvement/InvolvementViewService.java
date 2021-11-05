@@ -1,12 +1,12 @@
 package com.khartec.waltz.service.involvement;
 
 
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.involvement.*;
-import com.khartec.waltz.model.involvement_kind.InvolvementKind;
-import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.service.involvement_kind.InvolvementKindService;
 import com.khartec.waltz.service.person.PersonService;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.involvement.*;
+import org.finos.waltz.model.involvement_kind.InvolvementKind;
+import org.finos.waltz.model.person.Person;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,9 +16,9 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toSet;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.map;
-import static java.util.stream.Collectors.toSet;
 
 @Service
 public class InvolvementViewService {

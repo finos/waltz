@@ -20,8 +20,8 @@ package com.khartec.waltz.service.measurable_category;
 
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.measurable_category.MeasurableCategoryAlignmentViewDao;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.measurable.MeasurableCategoryAlignment;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.measurable.MeasurableCategoryAlignment;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;

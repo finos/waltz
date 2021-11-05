@@ -18,23 +18,23 @@
 
 package org.finos.waltz.data.physical_flow;
 
-import org.finos.waltz.data.IdSelectorFactory;
-import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.schema.tables.PhysicalFlow;
+import org.finos.waltz.data.IdSelectorFactory;
 import org.finos.waltz.data.SelectorUtilities;
+import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.FlowDiagramEntity.FLOW_DIAGRAM_ENTITY;
 import static com.khartec.waltz.schema.tables.PhysicalFlow.PHYSICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalFlowParticipant.PHYSICAL_FLOW_PARTICIPANT;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 public class PhysicalFlowIdSelectorFactory implements IdSelectorFactory {

@@ -18,11 +18,11 @@
 
 package org.finos.waltz.data.access_log;
 
-import com.khartec.waltz.model.accesslog.AccessLog;
-import com.khartec.waltz.model.accesslog.AccessTime;
-import com.khartec.waltz.model.accesslog.ImmutableAccessLog;
-import com.khartec.waltz.model.accesslog.ImmutableAccessTime;
 import com.khartec.waltz.schema.tables.records.AccessLogRecord;
+import org.finos.waltz.model.accesslog.AccessLog;
+import org.finos.waltz.model.accesslog.AccessTime;
+import org.finos.waltz.model.accesslog.ImmutableAccessLog;
+import org.finos.waltz.model.accesslog.ImmutableAccessTime;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;

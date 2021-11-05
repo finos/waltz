@@ -1,10 +1,10 @@
 package com.khartec.waltz.service.survey.inclusion_evaluator;
 
-import com.khartec.waltz.model.ExternalIdProvider;
-import com.khartec.waltz.model.survey.SurveyQuestion;
-import com.khartec.waltz.model.survey.SurveyQuestionResponse;
 import org.apache.commons.jexl3.JexlEngine;
 import org.apache.commons.jexl3.MapContext;
+import org.finos.waltz.model.ExternalIdProvider;
+import org.finos.waltz.model.survey.SurveyQuestion;
+import org.finos.waltz.model.survey.SurveyQuestionResponse;
 
 import java.util.List;
 import java.util.Map;

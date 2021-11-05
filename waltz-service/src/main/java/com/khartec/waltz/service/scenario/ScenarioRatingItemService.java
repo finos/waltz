@@ -18,16 +18,16 @@
 
 package com.khartec.waltz.service.scenario;
 
-import org.finos.waltz.data.scenario.ScenarioRatingItemDao;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.external_identifier.ExternalIdValue;
-import com.khartec.waltz.model.rating.RatingSchemeItem;
-import com.khartec.waltz.model.scenario.ChangeScenarioCommand;
-import com.khartec.waltz.model.scenario.Scenario;
-import com.khartec.waltz.model.scenario.ScenarioRatingItem;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.changelog.ChangeLogService;
 import com.khartec.waltz.service.rating_scheme.RatingSchemeService;
+import org.finos.waltz.data.scenario.ScenarioRatingItemDao;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.external_identifier.ExternalIdValue;
+import org.finos.waltz.model.rating.RatingSchemeItem;
+import org.finos.waltz.model.scenario.ChangeScenarioCommand;
+import org.finos.waltz.model.scenario.Scenario;
+import org.finos.waltz.model.scenario.ScenarioRatingItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -35,8 +35,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.service.scenario.ScenarioUtilities.mkBasicLogEntry;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Service
 public class ScenarioRatingItemService {

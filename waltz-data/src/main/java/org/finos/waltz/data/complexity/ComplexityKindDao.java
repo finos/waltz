@@ -18,11 +18,11 @@
 
 package org.finos.waltz.data.complexity;
 
+import com.khartec.waltz.schema.tables.records.ComplexityKindRecord;
 import org.finos.waltz.common.Checks;
 import org.finos.waltz.data.GenericSelector;
-import com.khartec.waltz.model.complexity.ComplexityKind;
-import com.khartec.waltz.model.complexity.ImmutableComplexityKind;
-import com.khartec.waltz.schema.tables.records.ComplexityKindRecord;
+import org.finos.waltz.model.complexity.ComplexityKind;
+import org.finos.waltz.model.complexity.ImmutableComplexityKind;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;

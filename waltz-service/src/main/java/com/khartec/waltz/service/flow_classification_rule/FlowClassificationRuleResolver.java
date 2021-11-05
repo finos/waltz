@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.service.flow_classification_rule;
 
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
-import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleVantagePoint;
+import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 
 import java.util.*;
 

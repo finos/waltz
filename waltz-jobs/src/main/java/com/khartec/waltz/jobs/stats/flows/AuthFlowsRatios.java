@@ -1,13 +1,13 @@
 package com.khartec.waltz.jobs.stats.flows;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.DataType;
 import com.khartec.waltz.schema.tables.EnumValue;
 import com.khartec.waltz.schema.tables.LogicalFlow;
 import com.khartec.waltz.schema.tables.LogicalFlowDecorator;
 import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.Seq;
@@ -17,9 +17,9 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.util.Map;
 
+import static java.util.stream.Collectors.joining;
 import static org.finos.waltz.common.CollectionUtilities.sumInts;
 import static org.finos.waltz.common.StringUtilities.join;
-import static java.util.stream.Collectors.joining;
 import static org.jooq.lambda.Seq.seq;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 

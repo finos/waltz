@@ -21,7 +21,7 @@ package com.khartec.waltz.service.enum_value;
 
 import org.finos.waltz.common.Aliases;
 import org.finos.waltz.data.enum_value.EnumValueAliasDao;
-import com.khartec.waltz.model.enum_value.EnumValueKind;
+import org.finos.waltz.model.enum_value.EnumValueKind;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

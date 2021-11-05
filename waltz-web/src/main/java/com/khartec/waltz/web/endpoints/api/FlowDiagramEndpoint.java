@@ -18,23 +18,23 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.UpdateDescriptionCommand;
-import com.khartec.waltz.model.UpdateNameCommand;
-import com.khartec.waltz.model.flow_diagram.FlowDiagram;
-import com.khartec.waltz.model.flow_diagram.SaveDiagramCommand;
 import com.khartec.waltz.service.flow_diagram.FlowDiagramService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.UpdateDescriptionCommand;
+import org.finos.waltz.model.UpdateNameCommand;
+import org.finos.waltz.model.flow_diagram.FlowDiagram;
+import org.finos.waltz.model.flow_diagram.SaveDiagramCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.user.SystemRole.LINEAGE_EDITOR;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.model.user.SystemRole.LINEAGE_EDITOR;
 
 @Service
 public class FlowDiagramEndpoint implements Endpoint {

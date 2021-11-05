@@ -18,10 +18,10 @@
 
 package org.finos.waltz.data.custom_environment;
 
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.custom_environment.CustomEnvironment;
-import com.khartec.waltz.model.custom_environment.ImmutableCustomEnvironment;
 import com.khartec.waltz.schema.tables.records.CustomEnvironmentRecord;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.custom_environment.CustomEnvironment;
+import org.finos.waltz.model.custom_environment.ImmutableCustomEnvironment;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -32,9 +32,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
-import static com.khartec.waltz.model.EntityKind.valueOf;
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.Tables.CUSTOM_ENVIRONMENT;
+import static org.finos.waltz.model.EntityKind.valueOf;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 
 @Repository

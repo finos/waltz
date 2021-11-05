@@ -18,6 +18,8 @@
 
 package com.khartec.waltz.service.flow_classification_rule;
 
+import com.khartec.waltz.schema.Tables;
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.GenericSelectorFactory;
@@ -30,16 +32,14 @@ import org.finos.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import org.finos.waltz.data.flow_classification_rule.FlowClassificationDao;
 import org.finos.waltz.data.flow_classification_rule.FlowClassificationRuleDao;
 import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.application.Application;
-import com.khartec.waltz.model.changelog.ChangeLog;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.datatype.DataType;
-import com.khartec.waltz.model.flow_classification.FlowClassification;
-import com.khartec.waltz.model.flow_classification_rule.*;
-import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
-import com.khartec.waltz.schema.Tables;
-import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.application.Application;
+import org.finos.waltz.model.changelog.ChangeLog;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.datatype.DataType;
+import org.finos.waltz.model.flow_classification.FlowClassification;
+import org.finos.waltz.model.flow_classification_rule.*;
+import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.jooq.Condition;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -54,11 +54,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.EntityKind.*;
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static java.lang.String.format;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.model.EntityKind.ACTOR;
+import static org.finos.waltz.model.EntityKind.ORG_UNIT;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 
 @Service

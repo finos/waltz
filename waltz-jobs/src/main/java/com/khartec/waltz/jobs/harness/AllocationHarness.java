@@ -18,24 +18,24 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import org.finos.waltz.data.measurable_category.MeasurableCategoryDao;
-import com.khartec.waltz.model.Criticality;
-import com.khartec.waltz.model.UserTimestamp;
-import com.khartec.waltz.model.allocation_scheme.AllocationScheme;
-import com.khartec.waltz.model.allocation_scheme.ImmutableAllocationScheme;
-import com.khartec.waltz.model.application.*;
-import com.khartec.waltz.model.measurable.ImmutableMeasurable;
-import com.khartec.waltz.model.measurable.Measurable;
-import com.khartec.waltz.model.measurable_category.MeasurableCategory;
-import com.khartec.waltz.model.measurable_rating.ImmutableSaveMeasurableRatingCommand;
-import com.khartec.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
-import com.khartec.waltz.model.rating.RagRating;
 import com.khartec.waltz.schema.tables.records.AllocationRecord;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.allocation_schemes.AllocationSchemeService;
 import com.khartec.waltz.service.application.ApplicationService;
 import com.khartec.waltz.service.measurable.MeasurableService;
 import com.khartec.waltz.service.measurable_rating.MeasurableRatingService;
+import org.finos.waltz.data.measurable_category.MeasurableCategoryDao;
+import org.finos.waltz.model.Criticality;
+import org.finos.waltz.model.UserTimestamp;
+import org.finos.waltz.model.allocation_scheme.AllocationScheme;
+import org.finos.waltz.model.allocation_scheme.ImmutableAllocationScheme;
+import org.finos.waltz.model.application.*;
+import org.finos.waltz.model.measurable.ImmutableMeasurable;
+import org.finos.waltz.model.measurable.Measurable;
+import org.finos.waltz.model.measurable_category.MeasurableCategory;
+import org.finos.waltz.model.measurable_rating.ImmutableSaveMeasurableRatingCommand;
+import org.finos.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
+import org.finos.waltz.model.rating.RagRating;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple;

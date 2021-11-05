@@ -18,18 +18,18 @@
 
 package com.khartec.waltz.service.measurable_relationship;
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.data.EntityReferenceNameResolver;
 import org.finos.waltz.data.entity_relationship.EntityRelationshipDao;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.Operation;
-import com.khartec.waltz.model.Severity;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.entity_relationship.EntityRelationship;
-import com.khartec.waltz.model.entity_relationship.EntityRelationshipKey;
-import com.khartec.waltz.model.entity_relationship.ImmutableEntityRelationship;
-import com.khartec.waltz.model.entity_relationship.UpdateEntityRelationshipParams;
-import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Operation;
+import org.finos.waltz.model.Severity;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.entity_relationship.EntityRelationship;
+import org.finos.waltz.model.entity_relationship.EntityRelationshipKey;
+import org.finos.waltz.model.entity_relationship.ImmutableEntityRelationship;
+import org.finos.waltz.model.entity_relationship.UpdateEntityRelationshipParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -37,10 +37,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.map;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static java.lang.String.format;
 
 @Service
 public class MeasurableRelationshipService {

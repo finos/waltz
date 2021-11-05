@@ -1,6 +1,6 @@
 package org.finos.waltz.data.datatype_decorator;
 
-import com.khartec.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityKind;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

@@ -18,15 +18,15 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import org.finos.waltz.data.logical_flow.LogicalFlowDao;
-import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.HierarchyQueryScope;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.logical_flow.LogicalFlow;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.logical_flow.LogicalFlowService;
+import org.finos.waltz.data.logical_flow.LogicalFlowDao;
+import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.HierarchyQueryScope;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Select;

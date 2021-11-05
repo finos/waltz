@@ -18,14 +18,14 @@
 
 package org.finos.waltz.data.tag;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.tag.ImmutableTag;
-import com.khartec.waltz.model.tag.ImmutableTagUsage;
-import com.khartec.waltz.model.tag.Tag;
-import com.khartec.waltz.model.tag.TagUsage;
 import com.khartec.waltz.schema.tables.records.TagRecord;
 import com.khartec.waltz.schema.tables.records.TagUsageRecord;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.tag.ImmutableTag;
+import org.finos.waltz.model.tag.ImmutableTagUsage;
+import org.finos.waltz.model.tag.Tag;
+import org.finos.waltz.model.tag.TagUsage;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +35,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.schema.tables.Tag.TAG;
 import static com.khartec.waltz.schema.tables.TagUsage.TAG_USAGE;
 import static java.util.stream.Collectors.*;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 

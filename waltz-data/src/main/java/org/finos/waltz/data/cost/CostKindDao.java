@@ -18,10 +18,10 @@
 
 package org.finos.waltz.data.cost;
 
-import org.finos.waltz.data.GenericSelector;
-import com.khartec.waltz.model.cost.EntityCostKind;
-import com.khartec.waltz.model.cost.ImmutableEntityCostKind;
 import com.khartec.waltz.schema.tables.records.CostKindRecord;
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.model.cost.EntityCostKind;
+import org.finos.waltz.model.cost.ImmutableEntityCostKind;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;

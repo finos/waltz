@@ -18,15 +18,15 @@
 
 package com.khartec.waltz.service.change_unit;
 
+import com.khartec.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.data.change_unit.ChangeUnitDao;
 import org.finos.waltz.data.change_unit.ChangeUnitIdSelectorFactory;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.change_unit.*;
-import com.khartec.waltz.model.changelog.ImmutableChangeLog;
-import com.khartec.waltz.model.command.CommandOutcome;
-import com.khartec.waltz.model.command.CommandResponse;
-import com.khartec.waltz.model.command.ImmutableCommandResponse;
-import com.khartec.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.change_unit.*;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.command.CommandOutcome;
+import org.finos.waltz.model.command.CommandResponse;
+import org.finos.waltz.model.command.ImmutableCommandResponse;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +35,9 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Map;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.EntityReference.mkRef;
 import static java.util.stream.Collectors.toMap;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 
 @Service

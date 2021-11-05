@@ -18,10 +18,10 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import org.finos.waltz.data.user.UserPreferenceDao;
-import com.khartec.waltz.model.user.ImmutableUserPreference;
-import com.khartec.waltz.model.user.UserPreference;
 import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.data.user.UserPreferenceDao;
+import org.finos.waltz.model.user.ImmutableUserPreference;
+import org.finos.waltz.model.user.UserPreference;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

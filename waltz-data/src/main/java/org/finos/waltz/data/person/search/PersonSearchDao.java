@@ -21,9 +21,9 @@ package org.finos.waltz.data.person.search;
 import org.finos.waltz.data.DBExecutorPoolInterface;
 import org.finos.waltz.data.SearchDao;
 import org.finos.waltz.data.person.PersonDao;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.model.person.Person;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.person.Person;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
@@ -36,10 +36,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Future;
 
+import static com.khartec.waltz.schema.tables.Person.PERSON;
 import static org.finos.waltz.common.SetUtilities.orderedUnion;
 import static org.finos.waltz.data.JooqUtilities.mkBasicTermSearch;
 import static org.finos.waltz.data.SearchUtilities.mkTerms;
-import static com.khartec.waltz.schema.tables.Person.PERSON;
 
 @Repository
 public class PersonSearchDao implements SearchDao<Person> {

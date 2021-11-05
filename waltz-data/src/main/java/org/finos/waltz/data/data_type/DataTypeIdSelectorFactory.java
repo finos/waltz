@@ -20,15 +20,15 @@ package org.finos.waltz.data.data_type;
 
 
 import org.finos.waltz.data.entity_hierarchy.AbstractIdSelectorFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.IdSelectionOptions;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
 
-import static org.finos.waltz.data.SelectorUtilities.ensureScopeIsExact;
 import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static com.khartec.waltz.schema.tables.PhysicalSpecDataType.PHYSICAL_SPEC_DATA_TYPE;
+import static org.finos.waltz.data.SelectorUtilities.ensureScopeIsExact;
 
 public class DataTypeIdSelectorFactory extends AbstractIdSelectorFactory {
 

@@ -19,8 +19,8 @@
 package com.khartec.waltz.service.server_usage;
 
 import org.finos.waltz.data.server_usage.ServerUsageDao;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.server_usage.ServerUsage;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.server_usage.ServerUsage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

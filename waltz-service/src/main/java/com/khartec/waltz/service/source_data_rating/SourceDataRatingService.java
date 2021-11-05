@@ -20,7 +20,7 @@ package com.khartec.waltz.service.source_data_rating;
 
 import org.finos.waltz.common.Checks;
 import org.finos.waltz.data.source_data_rating.SourceDataRatingDao;
-import com.khartec.waltz.model.source_data_rating.SourceDataRating;
+import org.finos.waltz.model.source_data_rating.SourceDataRating;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

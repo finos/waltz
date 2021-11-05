@@ -38,10 +38,10 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.FunctionUtilities.time;
 import static com.khartec.waltz.web.endpoints.extracts.ExtractorUtilities.convertExcelToByteArray;
 import static com.khartec.waltz.web.endpoints.extracts.ExtractorUtilities.sanitizeSheetName;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.FunctionUtilities.time;
 
 
 public abstract class DirectQueryBasedDataExtractor implements DataExtractor {

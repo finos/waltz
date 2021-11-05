@@ -20,12 +20,12 @@ package org.finos.waltz.data.logical_data_element.search;
 
 
 import org.finos.waltz.common.EnumUtilities;
-import org.finos.waltz.data.SearchDao;
-import org.finos.waltz.data.logical_data_element.LogicalDataElementDao;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.model.logical_data_element.LogicalDataElement;
 import org.finos.waltz.data.JooqUtilities;
+import org.finos.waltz.data.SearchDao;
 import org.finos.waltz.data.SearchUtilities;
+import org.finos.waltz.data.logical_data_element.LogicalDataElementDao;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.logical_data_element.LogicalDataElement;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,9 +35,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
+import static com.khartec.waltz.schema.tables.LogicalDataElement.LOGICAL_DATA_ELEMENT;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.CollectionUtilities.sort;
-import static com.khartec.waltz.schema.tables.LogicalDataElement.LOGICAL_DATA_ELEMENT;
 
 @Repository
 public class LogicalDataElementSearchDao implements SearchDao<LogicalDataElement> {

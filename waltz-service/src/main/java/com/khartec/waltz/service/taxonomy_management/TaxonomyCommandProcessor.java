@@ -19,10 +19,10 @@
 package com.khartec.waltz.service.taxonomy_management;
 
 import org.finos.waltz.common.Checks;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.taxonomy_management.TaxonomyChangeCommand;
-import com.khartec.waltz.model.taxonomy_management.TaxonomyChangePreview;
-import com.khartec.waltz.model.taxonomy_management.TaxonomyChangeType;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.taxonomy_management.TaxonomyChangeCommand;
+import org.finos.waltz.model.taxonomy_management.TaxonomyChangePreview;
+import org.finos.waltz.model.taxonomy_management.TaxonomyChangeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

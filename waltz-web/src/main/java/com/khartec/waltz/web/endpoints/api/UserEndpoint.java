@@ -18,13 +18,13 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.user.*;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.service.user.UserService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.endpoints.auth.AuthenticationUtilities;
+import org.finos.waltz.model.user.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

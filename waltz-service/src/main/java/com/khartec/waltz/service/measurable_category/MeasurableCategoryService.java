@@ -19,7 +19,7 @@
 package com.khartec.waltz.service.measurable_category;
 
 import org.finos.waltz.data.measurable_category.MeasurableCategoryDao;
-import com.khartec.waltz.model.measurable_category.MeasurableCategory;
+import org.finos.waltz.model.measurable_category.MeasurableCategory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -20,10 +20,10 @@ package org.finos.waltz.data.server_information.search;
 
 import org.finos.waltz.data.FullTextSearch;
 import org.finos.waltz.data.JooqUtilities;
-import org.finos.waltz.data.server_information.ServerInformationDao;
-import com.khartec.waltz.model.entity_search.EntitySearchOptions;
-import com.khartec.waltz.model.server_information.ServerInformation;
 import org.finos.waltz.data.SearchUtilities;
+import org.finos.waltz.data.server_information.ServerInformationDao;
+import org.finos.waltz.model.entity_search.EntitySearchOptions;
+import org.finos.waltz.model.server_information.ServerInformation;
 import org.jooq.DSLContext;
 
 import java.util.List;

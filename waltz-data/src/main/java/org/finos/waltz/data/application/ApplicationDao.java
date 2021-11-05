@@ -19,15 +19,15 @@
 package org.finos.waltz.data.application;
 
 
-import org.finos.waltz.data.JooqUtilities;
-import com.khartec.waltz.model.Criticality;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.application.*;
-import com.khartec.waltz.model.external_identifier.ExternalIdValue;
-import com.khartec.waltz.model.rating.RagRating;
-import com.khartec.waltz.model.tally.Tally;
 import com.khartec.waltz.schema.tables.records.ApplicationRecord;
+import org.finos.waltz.data.JooqUtilities;
+import org.finos.waltz.model.Criticality;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.application.*;
+import org.finos.waltz.model.external_identifier.ExternalIdValue;
+import org.finos.waltz.model.rating.RagRating;
+import org.finos.waltz.model.tally.Tally;
 import org.jooq.*;
 import org.jooq.exception.DataAccessException;
 import org.slf4j.Logger;
@@ -40,12 +40,12 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 
-import static org.finos.waltz.common.Checks.checkNotEmpty;
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.EnumUtilities.readEnum;
 import static com.khartec.waltz.schema.Tables.EXTERNAL_IDENTIFIER;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static java.util.Optional.ofNullable;
+import static org.finos.waltz.common.Checks.checkNotEmpty;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.EnumUtilities.readEnum;
 
 
 @Repository

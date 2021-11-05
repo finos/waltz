@@ -18,10 +18,10 @@
 
 package com.khartec.waltz.jobs.tools;
 
-import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.service.DIConfiguration;
+import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.HierarchyQueryScope;
 import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Select;
@@ -32,9 +32,9 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.util.function.Supplier;
 
-import static com.khartec.waltz.model.EntityReference.mkRef;
-import static com.khartec.waltz.model.IdSelectionOptions.mkOpts;
 import static com.khartec.waltz.schema.Tables.*;
+import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
 /**
  * This application will remove a measurable and all associated data.

@@ -19,10 +19,10 @@
 package com.khartec.waltz.service;
 
 
-import org.finos.waltz.data.DBExecutorPool;
-import org.finos.waltz.data.DBExecutorPoolInterface;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import org.finos.waltz.data.DBExecutorPool;
+import org.finos.waltz.data.DBExecutorPoolInterface;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.conf.Settings;

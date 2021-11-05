@@ -19,19 +19,19 @@
 package com.khartec.waltz.web.endpoints.api;
 
 
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.Entry;
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.flow_classification_rule.DiscouragedSource;
-import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRule;
-import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRuleCreateCommand;
-import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRuleUpdateCommand;
-import com.khartec.waltz.model.user.SystemRole;
 import com.khartec.waltz.service.flow_classification_rule.FlowClassificationRuleService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.Entry;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.flow_classification_rule.DiscouragedSource;
+import org.finos.waltz.model.flow_classification_rule.FlowClassificationRule;
+import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleCreateCommand;
+import org.finos.waltz.model.flow_classification_rule.FlowClassificationRuleUpdateCommand;
+import org.finos.waltz.model.user.SystemRole;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +44,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
+import static org.finos.waltz.common.Checks.checkNotNull;
 
 
 @Service

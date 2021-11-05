@@ -1,8 +1,8 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
 
-import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.schema.tables.Application;
+import org.finos.waltz.model.EntityKind;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Record;

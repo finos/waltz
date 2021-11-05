@@ -18,6 +18,8 @@
 
 package com.khartec.waltz.jobs.generators;
 
+import com.khartec.waltz.schema.tables.records.AttributeChangeRecord;
+import com.khartec.waltz.schema.tables.records.ChangeUnitRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.MapUtilities;
@@ -25,17 +27,15 @@ import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.data.change_unit.ChangeUnitDao;
 import org.finos.waltz.data.data_type.DataTypeDao;
 import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
-import com.khartec.waltz.model.Criticality;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.change_unit.ChangeAction;
-import com.khartec.waltz.model.change_unit.ChangeUnit;
-import com.khartec.waltz.model.change_unit.ExecutionStatus;
-import com.khartec.waltz.model.datatype.DataType;
-import com.khartec.waltz.model.physical_flow.FrequencyKind;
-import com.khartec.waltz.model.physical_flow.PhysicalFlow;
-import com.khartec.waltz.schema.tables.records.AttributeChangeRecord;
-import com.khartec.waltz.schema.tables.records.ChangeUnitRecord;
+import org.finos.waltz.model.Criticality;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.change_unit.ChangeAction;
+import org.finos.waltz.model.change_unit.ChangeUnit;
+import org.finos.waltz.model.change_unit.ExecutionStatus;
+import org.finos.waltz.model.datatype.DataType;
+import org.finos.waltz.model.physical_flow.FrequencyKind;
+import org.finos.waltz.model.physical_flow.PhysicalFlow;
 import org.jooq.DSLContext;
 import org.springframework.context.ApplicationContext;
 
@@ -45,12 +45,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import static org.finos.waltz.common.RandomUtilities.*;
-import static org.finos.waltz.common.StringUtilities.joinUsing;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.ChangeSet.CHANGE_SET;
 import static com.khartec.waltz.schema.tables.ChangeUnit.CHANGE_UNIT;
 import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.common.RandomUtilities.*;
+import static org.finos.waltz.common.StringUtilities.joinUsing;
 
 public class ChangeUnitGenerator implements SampleDataGenerator {
 

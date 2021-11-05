@@ -19,14 +19,17 @@
 package com.khartec.waltz.jobs.harness;
 
 
-import com.khartec.waltz.model.FieldDataType;
-import com.khartec.waltz.model.ReleaseLifecycleStatus;
-import com.khartec.waltz.model.physical_specification_definition.*;
-import com.khartec.waltz.model.ImmutableReleaseLifecycleStatusChangeCommand;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.physical_specification_definition.PhysicalSpecDefinitionFieldService;
 import com.khartec.waltz.service.physical_specification_definition.PhysicalSpecDefinitionSampleFileService;
 import com.khartec.waltz.service.physical_specification_definition.PhysicalSpecDefinitionService;
+import org.finos.waltz.model.FieldDataType;
+import org.finos.waltz.model.ImmutableReleaseLifecycleStatusChangeCommand;
+import org.finos.waltz.model.ReleaseLifecycleStatus;
+import org.finos.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinitionChangeCommand;
+import org.finos.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinitionFieldChangeCommand;
+import org.finos.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinitionSampleFileCreateCommand;
+import org.finos.waltz.model.physical_specification_definition.PhysicalSpecDefinitionType;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class PhysicalSpecDefinitionHarness {

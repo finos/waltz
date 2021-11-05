@@ -18,13 +18,13 @@
 
 package com.khartec.waltz.service;
 
-import com.khartec.waltz.model.ImmutableWaltzVersionInfo;
-import com.khartec.waltz.model.WaltzVersionInfo;
-import com.khartec.waltz.model.settings.ImmutableSetting;
-import com.khartec.waltz.model.settings.Setting;
 import com.khartec.waltz.service.email.DummyJavaMailSender;
 import com.khartec.waltz.service.jmx.PersonMaintenance;
 import com.khartec.waltz.service.person_hierarchy.PersonHierarchyService;
+import org.finos.waltz.model.ImmutableWaltzVersionInfo;
+import org.finos.waltz.model.WaltzVersionInfo;
+import org.finos.waltz.model.settings.ImmutableSetting;
+import org.finos.waltz.model.settings.Setting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;

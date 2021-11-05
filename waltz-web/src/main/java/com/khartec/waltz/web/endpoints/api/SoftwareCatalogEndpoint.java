@@ -18,12 +18,12 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.software_catalog.SoftwareCatalog;
-import com.khartec.waltz.model.software_catalog.SoftwareSummaryStatistics;
 import com.khartec.waltz.service.software_catalog.SoftwareCatalogService;
 import com.khartec.waltz.web.DatumRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.software_catalog.SoftwareCatalog;
+import org.finos.waltz.model.software_catalog.SoftwareSummaryStatistics;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;

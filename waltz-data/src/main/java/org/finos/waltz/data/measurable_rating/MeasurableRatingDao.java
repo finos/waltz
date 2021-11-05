@@ -18,19 +18,19 @@
 
 package org.finos.waltz.data.measurable_rating;
 
+import com.khartec.waltz.schema.tables.records.MeasurableRatingRecord;
 import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.data.InlineSelectFieldFactory;
-import com.khartec.waltz.model.*;
-import com.khartec.waltz.model.measurable_rating.ImmutableMeasurableRating;
-import com.khartec.waltz.model.measurable_rating.MeasurableRating;
-import com.khartec.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
-import com.khartec.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
-import com.khartec.waltz.model.tally.ImmutableMeasurableRatingTally;
-import com.khartec.waltz.model.tally.MeasurableRatingTally;
-import com.khartec.waltz.model.tally.Tally;
-import com.khartec.waltz.schema.tables.records.MeasurableRatingRecord;
 import org.finos.waltz.data.JooqUtilities;
 import org.finos.waltz.data.SelectorUtilities;
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.measurable_rating.ImmutableMeasurableRating;
+import org.finos.waltz.model.measurable_rating.MeasurableRating;
+import org.finos.waltz.model.measurable_rating.RemoveMeasurableRatingCommand;
+import org.finos.waltz.model.measurable_rating.SaveMeasurableRatingCommand;
+import org.finos.waltz.model.tally.ImmutableMeasurableRatingTally;
+import org.finos.waltz.model.tally.MeasurableRatingTally;
+import org.finos.waltz.model.tally.Tally;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,15 +42,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import static com.khartec.waltz.schema.tables.Application.APPLICATION;
+import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
+import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
+import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.EnumUtilities.readEnum;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.StringUtilities.firstChar;
-import static com.khartec.waltz.schema.tables.Application.APPLICATION;
-import static com.khartec.waltz.schema.tables.Measurable.MEASURABLE;
-import static com.khartec.waltz.schema.tables.MeasurableRating.MEASURABLE_RATING;
-import static java.lang.String.format;
 
 @Repository
 public class MeasurableRatingDao {

@@ -18,12 +18,12 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.IdSelectionOptions;
-import com.khartec.waltz.model.cost.ApplicationCost;
-import com.khartec.waltz.model.cost.AssetCost;
-import com.khartec.waltz.model.cost.Cost;
 import com.khartec.waltz.service.asset_cost.AssetCostService;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.cost.ApplicationCost;
+import org.finos.waltz.model.cost.AssetCost;
+import org.finos.waltz.model.cost.Cost;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

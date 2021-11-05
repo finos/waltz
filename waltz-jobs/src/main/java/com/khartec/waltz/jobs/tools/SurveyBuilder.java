@@ -18,14 +18,14 @@
 
 package com.khartec.waltz.jobs.tools;
 
-import org.finos.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.ReleaseLifecycleStatus;
-import com.khartec.waltz.model.survey.*;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.survey.SurveyQuestionDropdownEntryService;
 import com.khartec.waltz.service.survey.SurveyQuestionService;
 import com.khartec.waltz.service.survey.SurveyTemplateService;
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.ReleaseLifecycleStatus;
+import org.finos.waltz.model.survey.*;
 import org.jooq.lambda.tuple.Tuple2;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -35,8 +35,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static java.util.Collections.emptyList;
+import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 

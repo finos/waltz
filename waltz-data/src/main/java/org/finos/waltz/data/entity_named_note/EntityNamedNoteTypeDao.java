@@ -18,12 +18,12 @@
 
 package org.finos.waltz.data.entity_named_note;
 
-import org.finos.waltz.common.Checks;
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.entity_named_note.EntityNamedNodeType;
-import com.khartec.waltz.model.entity_named_note.EntityNamedNoteTypeChangeCommand;
-import com.khartec.waltz.model.entity_named_note.ImmutableEntityNamedNodeType;
 import com.khartec.waltz.schema.tables.records.EntityNamedNoteTypeRecord;
+import org.finos.waltz.common.Checks;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.entity_named_note.EntityNamedNodeType;
+import org.finos.waltz.model.entity_named_note.EntityNamedNoteTypeChangeCommand;
+import org.finos.waltz.model.entity_named_note.ImmutableEntityNamedNodeType;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
@@ -36,11 +36,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.khartec.waltz.schema.tables.EntityNamedNote.ENTITY_NAMED_NOTE;
+import static com.khartec.waltz.schema.tables.EntityNamedNoteType.ENTITY_NAMED_NOTE_TYPE;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.StringUtilities.join;
 import static org.finos.waltz.common.StringUtilities.splitThenMap;
-import static com.khartec.waltz.schema.tables.EntityNamedNote.ENTITY_NAMED_NOTE;
-import static com.khartec.waltz.schema.tables.EntityNamedNoteType.ENTITY_NAMED_NOTE_TYPE;
 
 @Repository
 public class EntityNamedNoteTypeDao {

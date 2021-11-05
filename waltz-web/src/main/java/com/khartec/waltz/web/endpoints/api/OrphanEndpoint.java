@@ -18,21 +18,21 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.orphan.OrphanRelationship;
 import com.khartec.waltz.service.orphan.OrphanService;
 import com.khartec.waltz.service.user.UserRoleService;
 import com.khartec.waltz.web.ListRoute;
 import com.khartec.waltz.web.endpoints.Endpoint;
+import org.finos.waltz.model.orphan.OrphanRelationship;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static com.khartec.waltz.model.user.SystemRole.ADMIN;
 import static com.khartec.waltz.web.WebUtilities.mkPath;
 import static com.khartec.waltz.web.WebUtilities.requireRole;
 import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.model.user.SystemRole.ADMIN;
 
 @Service
 public class OrphanEndpoint implements Endpoint {

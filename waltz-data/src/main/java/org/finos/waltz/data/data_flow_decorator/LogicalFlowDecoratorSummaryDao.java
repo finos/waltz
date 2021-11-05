@@ -18,14 +18,14 @@
 
 package org.finos.waltz.data.data_flow_decorator;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.FlowDirection;
-import com.khartec.waltz.model.data_flow_decorator.DataTypeDirectionKey;
-import com.khartec.waltz.model.data_flow_decorator.DecoratorRatingSummary;
-import com.khartec.waltz.model.data_flow_decorator.ImmutableDecoratorRatingSummary;
-import com.khartec.waltz.model.rating.AuthoritativenessRatingValue;
 import com.khartec.waltz.schema.tables.LogicalFlow;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.FlowDirection;
+import org.finos.waltz.model.data_flow_decorator.DataTypeDirectionKey;
+import org.finos.waltz.model.data_flow_decorator.DecoratorRatingSummary;
+import org.finos.waltz.model.data_flow_decorator.ImmutableDecoratorRatingSummary;
+import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,12 +35,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
+import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
-import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
-import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
-import static com.khartec.waltz.schema.tables.LogicalFlowDecorator.LOGICAL_FLOW_DECORATOR;
+import static org.finos.waltz.model.EntityLifecycleStatus.REMOVED;
 import static org.jooq.impl.DSL.inline;
 import static org.jooq.impl.DSL.when;
 

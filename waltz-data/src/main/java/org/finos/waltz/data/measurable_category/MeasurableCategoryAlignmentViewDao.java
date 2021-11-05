@@ -18,14 +18,14 @@
 
 package org.finos.waltz.data.measurable_category;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityLifecycleStatus;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.measurable.*;
 import com.khartec.waltz.schema.Tables;
 import com.khartec.waltz.schema.tables.EntityHierarchy;
 import com.khartec.waltz.schema.tables.MeasurableCategory;
 import com.khartec.waltz.schema.tables.MeasurableRating;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityLifecycleStatus;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.measurable.*;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ import java.util.stream.Collectors;
 
 import static org.finos.waltz.common.MapUtilities.groupAndThen;
 import static org.finos.waltz.common.SetUtilities.map;
-import static com.khartec.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.jooq.impl.DSL.name;
 
 

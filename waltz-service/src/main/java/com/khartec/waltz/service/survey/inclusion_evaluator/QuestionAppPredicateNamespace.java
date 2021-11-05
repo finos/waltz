@@ -18,14 +18,14 @@
 
 package com.khartec.waltz.service.survey.inclusion_evaluator;
 
-import com.khartec.waltz.model.EntityKind;
-import com.khartec.waltz.model.EntityReference;
-import com.khartec.waltz.model.survey.SurveyQuestion;
-import com.khartec.waltz.model.survey.SurveyQuestionResponse;
 import com.khartec.waltz.schema.tables.Application;
 import com.khartec.waltz.schema.tables.DataType;
 import com.khartec.waltz.schema.tables.DataTypeUsage;
 import com.khartec.waltz.schema.tables.EntityHierarchy;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.survey.SurveyQuestion;
+import org.finos.waltz.model.survey.SurveyQuestionResponse;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;

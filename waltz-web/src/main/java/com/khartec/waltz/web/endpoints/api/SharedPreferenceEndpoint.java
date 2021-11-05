@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.web.endpoints.api;
 
-import com.khartec.waltz.model.shared_preference.SharedPreference;
-import com.khartec.waltz.model.shared_preference.SharedPreferenceSaveCommand;
 import com.khartec.waltz.service.shared_preference.SharedPreferenceService;
 import com.khartec.waltz.web.endpoints.Endpoint;
 import com.khartec.waltz.web.json.SharedPreferenceKeyAndCategory;
+import org.finos.waltz.model.shared_preference.SharedPreference;
+import org.finos.waltz.model.shared_preference.SharedPreferenceSaveCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
@@ -32,10 +32,11 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
+import static com.khartec.waltz.web.WebUtilities.*;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.getForList;
+import static com.khartec.waltz.web.endpoints.EndpointUtilities.postForDatum;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DigestUtilities.digest;
-import static com.khartec.waltz.web.WebUtilities.*;
-import static com.khartec.waltz.web.endpoints.EndpointUtilities.*;
 
 
 @Service
