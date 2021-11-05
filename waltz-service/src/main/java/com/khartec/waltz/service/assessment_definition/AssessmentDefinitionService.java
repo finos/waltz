@@ -19,7 +19,7 @@
 package com.khartec.waltz.service.assessment_definition;
 
 
-import com.khartec.waltz.data.assessment_definition.AssessmentDefinitionDao;
+import org.finos.waltz.data.assessment_definition.AssessmentDefinitionDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -19,10 +19,10 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
 
-import com.khartec.waltz.data.GenericSelector;
-import com.khartec.waltz.data.GenericSelectorFactory;
-import com.khartec.waltz.data.InlineSelectFieldFactory;
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.data.InlineSelectFieldFactory;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.DSLContext;

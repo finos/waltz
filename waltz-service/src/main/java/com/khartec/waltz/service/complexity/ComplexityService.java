@@ -1,9 +1,9 @@
 package com.khartec.waltz.service.complexity;
 
 import org.finos.waltz.common.Checks;
-import com.khartec.waltz.data.GenericSelector;
-import com.khartec.waltz.data.GenericSelectorFactory;
-import com.khartec.waltz.data.complexity.ComplexityDao;
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.data.complexity.ComplexityDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;

@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
-import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
+import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
+import org.finos.waltz.data.measurable_rating.MeasurableRatingDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.tally.MeasurableRatingTally;

@@ -19,8 +19,8 @@
 package com.khartec.waltz.jobs.tools;
 
 import org.finos.waltz.common.MapUtilities;
-import com.khartec.waltz.data.application.ApplicationDao;
-import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
+import org.finos.waltz.data.application.ApplicationDao;
+import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.external_identifier.ExternalIdValue;

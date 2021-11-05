@@ -20,11 +20,11 @@ package com.khartec.waltz.service.assessment_rating;
 
 import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.common.StringUtilities;
-import com.khartec.waltz.data.GenericSelector;
-import com.khartec.waltz.data.GenericSelectorFactory;
-import com.khartec.waltz.data.assessment_definition.AssessmentDefinitionDao;
-import com.khartec.waltz.data.assessment_rating.AssessmentRatingDao;
-import com.khartec.waltz.data.rating_scheme.RatingSchemeDAO;
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.data.assessment_definition.AssessmentDefinitionDao;
+import org.finos.waltz.data.assessment_rating.AssessmentRatingDao;
+import org.finos.waltz.data.rating_scheme.RatingSchemeDAO;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;
 import com.khartec.waltz.model.assessment_rating.*;

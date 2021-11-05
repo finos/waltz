@@ -19,8 +19,8 @@
 package com.khartec.waltz.jobs.generators.stress;
 
 import org.finos.waltz.common.RandomUtilities;
-import com.khartec.waltz.data.data_type.DataTypeDao;
-import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
+import org.finos.waltz.data.data_type.DataTypeDao;
+import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.datatype.DataType;

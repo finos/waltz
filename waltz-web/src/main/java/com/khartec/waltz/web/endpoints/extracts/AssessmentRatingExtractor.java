@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.web.endpoints.extracts;
 
-import com.khartec.waltz.data.InlineSelectFieldFactory;
-import com.khartec.waltz.data.assessment_definition.AssessmentDefinitionDao;
+import org.finos.waltz.data.InlineSelectFieldFactory;
+import org.finos.waltz.data.assessment_definition.AssessmentDefinitionDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.assessment_definition.AssessmentDefinition;

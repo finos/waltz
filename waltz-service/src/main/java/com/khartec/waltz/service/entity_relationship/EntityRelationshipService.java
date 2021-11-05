@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.service.entity_relationship;
 
-import com.khartec.waltz.data.GenericSelector;
-import com.khartec.waltz.data.GenericSelectorFactory;
-import com.khartec.waltz.data.entity_relationship.EntityRelationshipDao;
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.data.entity_relationship.EntityRelationshipDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.entity_relationship.Directionality;

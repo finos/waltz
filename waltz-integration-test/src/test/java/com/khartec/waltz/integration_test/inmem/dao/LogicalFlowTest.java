@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.integration_test.inmem.dao;
 
-import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
+import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.integration_test.inmem.helpers.AppHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.LogicalFlowHelper;

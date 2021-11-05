@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.person;
 
-import com.khartec.waltz.data.person.PersonDao;
-import com.khartec.waltz.data.person.search.PersonSearchDao;
+import org.finos.waltz.data.person.PersonDao;
+import org.finos.waltz.data.person.search.PersonSearchDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.person.ImmutablePerson;

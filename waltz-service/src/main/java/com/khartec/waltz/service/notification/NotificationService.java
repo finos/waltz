@@ -19,7 +19,7 @@
 package com.khartec.waltz.service.notification;
 
 
-import com.khartec.waltz.data.notification.NotificationDao;
+import org.finos.waltz.data.notification.NotificationDao;
 import com.khartec.waltz.model.notification.ImmutableNotificationResponse;
 import com.khartec.waltz.model.notification.NotificationResponse;
 import com.khartec.waltz.model.notification.NotificationSummary;

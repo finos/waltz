@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.physical_flow_participant;
 
-import com.khartec.waltz.data.EntityReferenceNameResolver;
-import com.khartec.waltz.data.physical_flow_participant.PhysicalFlowParticipantDao;
+import org.finos.waltz.data.EntityReferenceNameResolver;
+import org.finos.waltz.data.physical_flow_participant.PhysicalFlowParticipantDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.Severity;

@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.entity_statistic.EntityStatisticValueDao;
+import org.finos.waltz.data.entity_statistic.EntityStatisticValueDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;

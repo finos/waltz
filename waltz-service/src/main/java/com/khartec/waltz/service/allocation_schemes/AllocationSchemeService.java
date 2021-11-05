@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.allocation_schemes;
 
-import com.khartec.waltz.data.allocation_scheme.AllocationSchemeDao;
+import org.finos.waltz.data.allocation_scheme.AllocationSchemeDao;
 import com.khartec.waltz.model.allocation_scheme.AllocationScheme;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

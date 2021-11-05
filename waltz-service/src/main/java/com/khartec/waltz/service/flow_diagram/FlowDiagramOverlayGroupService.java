@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.flow_diagram;
 
-import com.khartec.waltz.data.flow_diagram.FlowDiagramOverlayGroupDao;
+import org.finos.waltz.data.flow_diagram.FlowDiagramOverlayGroupDao;
 import com.khartec.waltz.model.flow_diagram.FlowDiagramOverlayGroup;
 import com.khartec.waltz.model.flow_diagram.FlowDiagramOverlayGroupEntry;
 import com.khartec.waltz.model.flow_diagram.ImmutableFlowDiagramOverlayGroup;

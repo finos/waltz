@@ -19,12 +19,12 @@
 package com.khartec.waltz.jobs.tools;
 
 import org.finos.waltz.common.StringUtilities;
-import com.khartec.waltz.data.application.ApplicationDao;
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.data_type.DataTypeDao;
-import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
-import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
-import com.khartec.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
+import org.finos.waltz.data.application.ApplicationDao;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.data_type.DataTypeDao;
+import org.finos.waltz.data.logical_flow.LogicalFlowDao;
+import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
+import org.finos.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.EntityReference;
@@ -58,7 +58,7 @@ import java.util.stream.Collectors;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.SetUtilities.fromCollection;
-import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
+import static org.finos.waltz.data.logical_flow.LogicalFlowDao.LOGICAL_NOT_REMOVED;
 import static com.khartec.waltz.model.EntityReference.mkRef;
 import static com.khartec.waltz.model.utils.IdUtilities.indexByOptId;
 import static com.khartec.waltz.model.utils.IdUtilities.toIds;

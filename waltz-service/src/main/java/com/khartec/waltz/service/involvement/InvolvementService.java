@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.service.involvement;
 
-import com.khartec.waltz.data.EntityReferenceNameResolver;
-import com.khartec.waltz.data.GenericSelector;
-import com.khartec.waltz.data.GenericSelectorFactory;
-import com.khartec.waltz.data.involvement.InvolvementDao;
-import com.khartec.waltz.data.person.PersonDao;
+import org.finos.waltz.data.EntityReferenceNameResolver;
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.data.involvement.InvolvementDao;
+import org.finos.waltz.data.person.PersonDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.EntityReferenceUtilities;
 import com.khartec.waltz.model.IdSelectionOptions;

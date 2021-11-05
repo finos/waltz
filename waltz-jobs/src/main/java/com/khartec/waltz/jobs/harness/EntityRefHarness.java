@@ -19,7 +19,7 @@
 package com.khartec.waltz.jobs.harness;
 
 import org.finos.waltz.common.ListUtilities;
-import com.khartec.waltz.data.EntityReferenceNameResolver;
+import org.finos.waltz.data.EntityReferenceNameResolver;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.service.DIConfiguration;

@@ -19,12 +19,12 @@
 package com.khartec.waltz.jobs.tools.importers;
 
 import org.finos.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.data.application.ApplicationDao;
-import com.khartec.waltz.data.measurable.MeasurableDao;
-import com.khartec.waltz.data.rating_scheme.RatingSchemeDAO;
-import com.khartec.waltz.data.roadmap.RoadmapDao;
-import com.khartec.waltz.data.scenario.ScenarioAxisItemDao;
-import com.khartec.waltz.data.scenario.ScenarioDao;
+import org.finos.waltz.data.application.ApplicationDao;
+import org.finos.waltz.data.measurable.MeasurableDao;
+import org.finos.waltz.data.rating_scheme.RatingSchemeDAO;
+import org.finos.waltz.data.roadmap.RoadmapDao;
+import org.finos.waltz.data.scenario.ScenarioAxisItemDao;
+import org.finos.waltz.data.scenario.ScenarioDao;
 import com.khartec.waltz.model.AxisOrientation;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.application.Application;

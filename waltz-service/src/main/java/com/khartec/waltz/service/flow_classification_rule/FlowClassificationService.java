@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.flow_classification_rule;
 
-import com.khartec.waltz.data.flow_classification_rule.FlowClassificationDao;
+import org.finos.waltz.data.flow_classification_rule.FlowClassificationDao;
 import com.khartec.waltz.model.flow_classification.FlowClassification;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

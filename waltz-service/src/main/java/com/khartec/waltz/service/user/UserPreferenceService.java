@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.user;
 
-import com.khartec.waltz.data.user.UserPreferenceDao;
+import org.finos.waltz.data.user.UserPreferenceDao;
 import com.khartec.waltz.model.user.UserPreference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

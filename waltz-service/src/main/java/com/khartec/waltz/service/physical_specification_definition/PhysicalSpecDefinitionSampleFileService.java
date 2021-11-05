@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.physical_specification_definition;
 
-import com.khartec.waltz.data.physical_specification_definition.PhysicalSpecDefinitionSampleFileDao;
+import org.finos.waltz.data.physical_specification_definition.PhysicalSpecDefinitionSampleFileDao;
 import com.khartec.waltz.model.physical_specification_definition.ImmutablePhysicalSpecDefinitionSampleFile;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionSampleFile;
 import com.khartec.waltz.model.physical_specification_definition.PhysicalSpecDefinitionSampleFileCreateCommand;

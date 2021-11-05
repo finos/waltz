@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.process_diagram_entity.ProcessDiagramEntityDao;
+import org.finos.waltz.data.process_diagram_entity.ProcessDiagramEntityDao;
 import com.khartec.waltz.model.process_diagram.ProcessDiagramEntityApplicationAlignment;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.tools.json.ParseException;

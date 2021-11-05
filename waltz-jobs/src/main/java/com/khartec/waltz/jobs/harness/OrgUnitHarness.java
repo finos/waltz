@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
+import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.service.DIConfiguration;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

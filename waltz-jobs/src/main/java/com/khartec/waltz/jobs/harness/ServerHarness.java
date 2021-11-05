@@ -20,8 +20,8 @@ package com.khartec.waltz.jobs.harness;
 
 import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.common.ListUtilities;
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.server_information.ServerInformationDao;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.server_information.ServerInformationDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;

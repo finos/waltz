@@ -19,7 +19,7 @@
 package com.khartec.waltz.service.shared_preference;
 
 
-import com.khartec.waltz.data.shared_preference.SharedPreferenceDao;
+import org.finos.waltz.data.shared_preference.SharedPreferenceDao;
 import com.khartec.waltz.model.shared_preference.ImmutableSharedPreference;
 import com.khartec.waltz.model.shared_preference.SharedPreference;
 import com.khartec.waltz.model.shared_preference.SharedPreferenceSaveCommand;

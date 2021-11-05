@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.attestation.AttestationPreCheckDao;
+import org.finos.waltz.data.attestation.AttestationPreCheckDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.attestation.AttestationPreCheckService;

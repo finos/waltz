@@ -19,8 +19,8 @@
 package com.khartec.waltz.service.tag;
 
 import org.finos.waltz.common.SetUtilities;
-import com.khartec.waltz.data.GenericSelectorFactory;
-import com.khartec.waltz.data.tag.TagDao;
+import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.data.tag.TagDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;

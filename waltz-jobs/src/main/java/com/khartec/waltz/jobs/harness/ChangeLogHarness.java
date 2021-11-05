@@ -20,8 +20,8 @@ package com.khartec.waltz.jobs.harness;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.FunctionUtilities;
-import com.khartec.waltz.data.GenericSelectorFactory;
-import com.khartec.waltz.data.changelog.ChangeLogSummariesDao;
+import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.data.changelog.ChangeLogSummariesDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;

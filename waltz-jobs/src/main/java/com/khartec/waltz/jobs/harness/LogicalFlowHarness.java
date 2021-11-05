@@ -19,8 +19,8 @@
 package com.khartec.waltz.jobs.harness;
 
 import org.finos.waltz.common.FunctionUtilities;
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;

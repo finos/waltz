@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.integration_test.inmem.dao;
 
-import com.khartec.waltz.data.application.ApplicationDao;
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.application.ApplicationDao;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.integration_test.inmem.helpers.AppHelper;
 import com.khartec.waltz.model.EntityKind;

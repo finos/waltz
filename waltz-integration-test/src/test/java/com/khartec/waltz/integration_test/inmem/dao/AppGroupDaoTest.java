@@ -20,9 +20,9 @@ package com.khartec.waltz.integration_test.inmem.dao;
 
 import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
-import com.khartec.waltz.data.app_group.AppGroupOrganisationalUnitDao;
-import com.khartec.waltz.data.application.ApplicationDao;
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.app_group.AppGroupOrganisationalUnitDao;
+import org.finos.waltz.data.application.ApplicationDao;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.integration_test.inmem.helpers.AppGroupHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.AppHelper;

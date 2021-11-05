@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.service.changelog;
 
-import com.khartec.waltz.data.GenericSelector;
-import com.khartec.waltz.data.GenericSelectorFactory;
-import com.khartec.waltz.data.changelog.ChangeLogSummariesDao;
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.data.changelog.ChangeLogSummariesDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.tally.ChangeLogTally;

@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.generators;
 
-import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
+import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.application.LifecyclePhase;
 import com.khartec.waltz.model.utils.IdUtilities;

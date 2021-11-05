@@ -19,7 +19,7 @@
 package com.khartec.waltz.jobs.harness;
 
 
-import com.khartec.waltz.data.InlineSelectFieldFactory;
+import org.finos.waltz.data.InlineSelectFieldFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;

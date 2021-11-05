@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.scenario;
 
-import com.khartec.waltz.data.scenario.ScenarioAxisItemDao;
+import org.finos.waltz.data.scenario.ScenarioAxisItemDao;
 import com.khartec.waltz.model.AxisOrientation;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.scenario.ScenarioAxisItem;

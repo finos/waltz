@@ -21,10 +21,10 @@ package com.khartec.waltz.jobs.generators;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.RandomUtilities;
-import com.khartec.waltz.data.app_group.AppGroupDao;
-import com.khartec.waltz.data.involvement_kind.InvolvementKindDao;
-import com.khartec.waltz.data.person.PersonDao;
-import com.khartec.waltz.data.survey.SurveyTemplateDao;
+import org.finos.waltz.data.app_group.AppGroupDao;
+import org.finos.waltz.data.involvement_kind.InvolvementKindDao;
+import org.finos.waltz.data.person.PersonDao;
+import org.finos.waltz.data.survey.SurveyTemplateDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.app_group.AppGroup;

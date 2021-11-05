@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.change_initiative.ChangeInitiativeDao;
-import com.khartec.waltz.data.change_initiative.ChangeInitiativeIdSelectorFactory;
+import org.finos.waltz.data.change_initiative.ChangeInitiativeDao;
+import org.finos.waltz.data.change_initiative.ChangeInitiativeIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;

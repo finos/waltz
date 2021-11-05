@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.survey;
 
-import com.khartec.waltz.data.IdSelectorFactory;
-import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
+import org.finos.waltz.data.IdSelectorFactory;
+import org.finos.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;
 import com.khartec.waltz.model.IdSelectionOptions;

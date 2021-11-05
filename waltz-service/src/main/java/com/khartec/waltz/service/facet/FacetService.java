@@ -19,8 +19,8 @@
 package com.khartec.waltz.service.facet;
 
 
-import com.khartec.waltz.data.application.ApplicationDao;
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.application.ApplicationDao;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.tally.Tally;
 import org.jooq.Record1;

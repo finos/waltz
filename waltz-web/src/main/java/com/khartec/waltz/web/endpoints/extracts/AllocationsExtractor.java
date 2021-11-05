@@ -19,7 +19,7 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
 
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.*;

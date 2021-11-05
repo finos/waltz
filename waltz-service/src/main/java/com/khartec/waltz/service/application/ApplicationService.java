@@ -18,10 +18,10 @@
 
 package com.khartec.waltz.service.application;
 
-import com.khartec.waltz.data.application.ApplicationDao;
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.application.search.ApplicationSearchDao;
-import com.khartec.waltz.data.entity_alias.EntityAliasDao;
+import org.finos.waltz.data.application.ApplicationDao;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.application.search.ApplicationSearchDao;
+import org.finos.waltz.data.entity_alias.EntityAliasDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;

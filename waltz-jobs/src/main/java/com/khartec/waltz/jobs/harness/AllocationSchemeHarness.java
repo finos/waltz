@@ -18,17 +18,12 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.allocation.AllocationDao;
-import com.khartec.waltz.data.allocation_scheme.AllocationSchemeDao;
-import com.khartec.waltz.model.allocation.Allocation;
-import com.khartec.waltz.schema.tables.records.AllocationRecord;
+import org.finos.waltz.data.allocation.AllocationDao;
+import org.finos.waltz.data.allocation_scheme.AllocationSchemeDao;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
-import org.jooq.Record3;
 import org.jooq.impl.DSL;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import java.util.Collection;
 
 public class AllocationSchemeHarness {
 

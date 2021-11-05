@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.web.endpoints.extracts;
 
-import com.khartec.waltz.data.changelog.ChangeLogDao;
+import org.finos.waltz.data.changelog.ChangeLogDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.schema.tables.ChangeLog;

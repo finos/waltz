@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.service.orgunit;
 
-import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
-import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
-import com.khartec.waltz.data.orgunit.search.OrganisationalUnitSearchDao;
+import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
+import org.finos.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
+import org.finos.waltz.data.orgunit.search.OrganisationalUnitSearchDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;

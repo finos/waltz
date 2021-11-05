@@ -18,10 +18,10 @@
 
 package com.khartec.waltz.service.scenario;
 
-import com.khartec.waltz.data.roadmap.RoadmapIdSelectorFactory;
-import com.khartec.waltz.data.scenario.ScenarioAxisItemDao;
-import com.khartec.waltz.data.scenario.ScenarioDao;
-import com.khartec.waltz.data.scenario.ScenarioRatingItemDao;
+import org.finos.waltz.data.roadmap.RoadmapIdSelectorFactory;
+import org.finos.waltz.data.scenario.ScenarioAxisItemDao;
+import org.finos.waltz.data.scenario.ScenarioDao;
+import org.finos.waltz.data.scenario.ScenarioRatingItemDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;

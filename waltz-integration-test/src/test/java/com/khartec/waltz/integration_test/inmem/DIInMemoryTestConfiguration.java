@@ -1,8 +1,8 @@
 package com.khartec.waltz.integration_test.inmem;
 
 import org.finos.waltz.common.ExcludeFromIntegrationTesting;
-import com.khartec.waltz.data.DBExecutorPool;
-import com.khartec.waltz.data.DBExecutorPoolInterface;
+import org.finos.waltz.data.DBExecutorPool;
+import org.finos.waltz.data.DBExecutorPoolInterface;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import liquibase.integration.spring.SpringLiquibase;

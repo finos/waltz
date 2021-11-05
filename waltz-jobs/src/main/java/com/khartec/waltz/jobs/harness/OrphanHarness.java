@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.orphan.OrphanDao;
+import org.finos.waltz.data.orphan.OrphanDao;
 import com.khartec.waltz.model.orphan.OrphanRelationship;
 import com.khartec.waltz.service.DIConfiguration;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

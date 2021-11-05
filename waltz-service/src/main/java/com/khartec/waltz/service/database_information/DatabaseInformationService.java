@@ -19,8 +19,8 @@
 package com.khartec.waltz.service.database_information;
 
 import org.finos.waltz.common.Checks;
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.database_information.DatabaseInformationDao;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.database_information.DatabaseInformationDao;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.database_information.DatabaseInformation;
 import com.khartec.waltz.model.database_information.DatabaseSummaryStatistics;

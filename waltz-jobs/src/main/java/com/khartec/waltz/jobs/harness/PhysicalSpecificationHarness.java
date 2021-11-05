@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.physical_specification.search.PhysicalSpecificationSearchDao;
+import org.finos.waltz.data.physical_specification.search.PhysicalSpecificationSearchDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.service.DIConfiguration;

@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.physical_flow;
 
-import com.khartec.waltz.data.physical_flow.PhysicalFlowDao;
-import com.khartec.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
+import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
+import org.finos.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.command.CommandOutcome;
 import com.khartec.waltz.model.external_identifier.ExternalIdentifier;

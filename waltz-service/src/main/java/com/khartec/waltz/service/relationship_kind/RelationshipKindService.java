@@ -1,6 +1,6 @@
 package com.khartec.waltz.service.relationship_kind;
 
-import com.khartec.waltz.data.rel.RelationshipKindDao;
+import org.finos.waltz.data.rel.RelationshipKindDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.rel.RelationshipKind;
 import com.khartec.waltz.model.rel.UpdateRelationshipKindCommand;

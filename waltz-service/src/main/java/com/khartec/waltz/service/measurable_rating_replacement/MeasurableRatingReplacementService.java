@@ -20,9 +20,9 @@ package com.khartec.waltz.service.measurable_rating_replacement;
 
 
 import org.finos.waltz.common.exception.UpdateFailedException;
-import com.khartec.waltz.data.EntityReferenceNameResolver;
-import com.khartec.waltz.data.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionDao;
-import com.khartec.waltz.data.measurable_rating_replacement.MeasurableRatingReplacementDao;
+import org.finos.waltz.data.EntityReferenceNameResolver;
+import org.finos.waltz.data.measurable_rating_planned_decommission.MeasurableRatingPlannedDecommissionDao;
+import org.finos.waltz.data.measurable_rating_replacement.MeasurableRatingReplacementDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Operation;

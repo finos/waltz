@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.attestation.AttestationInstanceDao;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.attestation.AttestationInstanceDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.attestation.*;

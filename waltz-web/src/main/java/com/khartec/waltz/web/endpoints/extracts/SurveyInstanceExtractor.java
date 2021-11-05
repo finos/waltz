@@ -19,8 +19,8 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
 import org.finos.waltz.common.SetUtilities;
-import com.khartec.waltz.data.InlineSelectFieldFactory;
-import com.khartec.waltz.data.survey.SurveyQuestionDao;
+import org.finos.waltz.data.InlineSelectFieldFactory;
+import org.finos.waltz.data.survey.SurveyQuestionDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.survey.SurveyInstanceStatus;
 import com.khartec.waltz.model.survey.SurveyQuestion;

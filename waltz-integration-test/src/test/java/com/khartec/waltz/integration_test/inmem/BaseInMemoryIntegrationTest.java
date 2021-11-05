@@ -2,9 +2,9 @@ package com.khartec.waltz.integration_test.inmem;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.LoggingUtilities;
-import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
-import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
-import com.khartec.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
+import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
+import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
+import org.finos.waltz.data.orgunit.OrganisationalUnitIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.schema.tables.records.OrganisationalUnitRecord;

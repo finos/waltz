@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.access_log.AccessLogDao;
+import org.finos.waltz.data.access_log.AccessLogDao;
 import com.khartec.waltz.model.accesslog.ImmutableAccessLog;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.tools.json.ParseException;

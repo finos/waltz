@@ -19,8 +19,8 @@
 package com.khartec.waltz.service.user_contribution;
 
 import org.finos.waltz.common.ListUtilities;
-import com.khartec.waltz.data.changelog.ChangeLogDao;
-import com.khartec.waltz.data.person.PersonDao;
+import org.finos.waltz.data.changelog.ChangeLogDao;
+import org.finos.waltz.data.person.PersonDao;
 import com.khartec.waltz.model.person.Person;
 import com.khartec.waltz.model.tally.OrderedTally;
 import com.khartec.waltz.model.tally.Tally;

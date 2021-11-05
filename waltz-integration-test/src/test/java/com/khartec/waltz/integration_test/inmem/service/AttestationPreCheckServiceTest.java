@@ -19,7 +19,7 @@
 package com.khartec.waltz.integration_test.inmem.service;
 
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
-import com.khartec.waltz.data.attestation.AttestationPreCheckDao;
+import org.finos.waltz.data.attestation.AttestationPreCheckDao;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.integration_test.inmem.helpers.AppGroupHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.DataTypeHelper;

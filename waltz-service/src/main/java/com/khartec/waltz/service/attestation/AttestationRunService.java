@@ -19,12 +19,12 @@
 package com.khartec.waltz.service.attestation;
 
 
-import com.khartec.waltz.data.GenericSelector;
-import com.khartec.waltz.data.GenericSelectorFactory;
-import com.khartec.waltz.data.attestation.AttestationInstanceDao;
-import com.khartec.waltz.data.attestation.AttestationInstanceRecipientDao;
-import com.khartec.waltz.data.attestation.AttestationRunDao;
-import com.khartec.waltz.data.involvement.InvolvementDao;
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.data.attestation.AttestationInstanceDao;
+import org.finos.waltz.data.attestation.AttestationInstanceRecipientDao;
+import org.finos.waltz.data.attestation.AttestationRunDao;
+import org.finos.waltz.data.involvement.InvolvementDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.attestation.*;
 import com.khartec.waltz.model.person.Person;

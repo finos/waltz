@@ -24,7 +24,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.SetUtilities;
-import com.khartec.waltz.data.licence.LicenceDao;
+import org.finos.waltz.data.licence.LicenceDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.licence.Licence;
 import com.khartec.waltz.schema.tables.records.EntityNamedNoteRecord;

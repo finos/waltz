@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.data_type;
 
-import com.khartec.waltz.data.data_type.DataTypeDao;
-import com.khartec.waltz.data.data_type.search.DataTypeSearchDao;
+import org.finos.waltz.data.data_type.DataTypeDao;
+import org.finos.waltz.data.data_type.search.DataTypeSearchDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.datatype.DataType;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;

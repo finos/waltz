@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.attestation.AttestationInstanceRecipientDao;
+import org.finos.waltz.data.attestation.AttestationInstanceRecipientDao;
 import com.khartec.waltz.service.DIConfiguration;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 

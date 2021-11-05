@@ -19,11 +19,11 @@
 package com.khartec.waltz.service.attestation;
 
 import org.finos.waltz.common.exception.UpdateFailedException;
-import com.khartec.waltz.data.GenericSelector;
-import com.khartec.waltz.data.GenericSelectorFactory;
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.attestation.AttestationInstanceDao;
-import com.khartec.waltz.data.person.PersonDao;
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.attestation.AttestationInstanceDao;
+import org.finos.waltz.data.person.PersonDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.attestation.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;

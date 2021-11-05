@@ -19,7 +19,7 @@
 package com.khartec.waltz.service.survey;
 
 
-import com.khartec.waltz.data.survey.SurveyQuestionDao;
+import org.finos.waltz.data.survey.SurveyQuestionDao;
 import com.khartec.waltz.model.survey.SurveyQuestion;
 import com.khartec.waltz.service.survey.inclusion_evaluator.QuestionPredicateEvaluator;
 import org.springframework.beans.factory.annotation.Autowired;

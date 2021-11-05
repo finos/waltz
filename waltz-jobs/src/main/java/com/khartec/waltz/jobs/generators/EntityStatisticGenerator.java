@@ -19,10 +19,10 @@
 package com.khartec.waltz.jobs.generators;
 
 import org.finos.waltz.common.RandomUtilities;
-import com.khartec.waltz.data.application.ApplicationDao;
-import com.khartec.waltz.data.entity_statistic.EntityStatisticDefinitionDao;
-import com.khartec.waltz.data.entity_statistic.EntityStatisticValueDao;
-import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
+import org.finos.waltz.data.application.ApplicationDao;
+import org.finos.waltz.data.entity_statistic.EntityStatisticDefinitionDao;
+import org.finos.waltz.data.entity_statistic.EntityStatisticValueDao;
+import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.ImmutableEntityReference;

@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.service.server_information;
 
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.server_information.ServerInformationDao;
-import com.khartec.waltz.data.server_information.search.ServerInformationSearchDao;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.server_information.ServerInformationDao;
+import org.finos.waltz.data.server_information.search.ServerInformationSearchDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;

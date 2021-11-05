@@ -18,10 +18,10 @@
 
 package com.khartec.waltz.service.usage_info;
 
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.data_type.DataTypeDao;
-import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
-import com.khartec.waltz.data.data_type_usage.DataTypeUsageDao;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.data_type.DataTypeDao;
+import org.finos.waltz.data.data_type.DataTypeIdSelectorFactory;
+import org.finos.waltz.data.data_type_usage.DataTypeUsageDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;

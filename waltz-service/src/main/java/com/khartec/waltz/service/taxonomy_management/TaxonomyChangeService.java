@@ -20,7 +20,7 @@ package com.khartec.waltz.service.taxonomy_management;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.StringUtilities;
-import com.khartec.waltz.data.taxonomy_management.TaxonomyChangeDao;
+import org.finos.waltz.data.taxonomy_management.TaxonomyChangeDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.exceptions.NotAuthorizedException;

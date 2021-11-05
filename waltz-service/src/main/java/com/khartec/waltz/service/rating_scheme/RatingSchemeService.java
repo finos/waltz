@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.rating_scheme;
 
-import com.khartec.waltz.data.rating_scheme.RatingSchemeDAO;
+import org.finos.waltz.data.rating_scheme.RatingSchemeDAO;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.rating.RatingSchemeItem;
 import com.khartec.waltz.model.rating.RatingScheme;

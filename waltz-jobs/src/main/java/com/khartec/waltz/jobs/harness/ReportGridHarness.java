@@ -19,8 +19,8 @@
 package com.khartec.waltz.jobs.harness;
 
 import org.finos.waltz.common.FunctionUtilities;
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.report_grid.ReportGridDao;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.report_grid.ReportGridDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.report_grid.ReportGridCell;

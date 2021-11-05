@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.scenario;
 
-import com.khartec.waltz.data.scenario.ScenarioRatingItemDao;
+import org.finos.waltz.data.scenario.ScenarioRatingItemDao;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.external_identifier.ExternalIdValue;
 import com.khartec.waltz.model.rating.RatingSchemeItem;

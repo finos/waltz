@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.measurable_relationship;
 
-import com.khartec.waltz.data.EntityReferenceNameResolver;
-import com.khartec.waltz.data.entity_relationship.EntityRelationshipDao;
+import org.finos.waltz.data.EntityReferenceNameResolver;
+import org.finos.waltz.data.entity_relationship.EntityRelationshipDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Operation;

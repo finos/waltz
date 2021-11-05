@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.involvement_kind;
 
-import com.khartec.waltz.data.involvement_kind.InvolvementKindDao;
+import org.finos.waltz.data.involvement_kind.InvolvementKindDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.UserTimestamp;

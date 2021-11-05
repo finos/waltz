@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.service.asset_cost;
 
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.asset_cost.AssetCostDao;
-import com.khartec.waltz.data.asset_cost.AssetCostStatsDao;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.asset_cost.AssetCostDao;
+import org.finos.waltz.data.asset_cost.AssetCostStatsDao;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.cost.ApplicationCost;
 import com.khartec.waltz.model.cost.AssetCost;

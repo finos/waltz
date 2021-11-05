@@ -19,7 +19,7 @@
 package com.khartec.waltz.jobs.tools;
 
 import org.finos.waltz.common.StringUtilities;
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;

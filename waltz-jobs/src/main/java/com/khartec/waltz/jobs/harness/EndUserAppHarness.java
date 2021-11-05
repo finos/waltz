@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.end_user_app.EndUserAppDao;
+import org.finos.waltz.data.end_user_app.EndUserAppDao;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

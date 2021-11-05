@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.entity_enum;
 
-import com.khartec.waltz.data.entity_enum.EntityEnumDefinitionDao;
-import com.khartec.waltz.data.entity_enum.EntityEnumValueDao;
+import org.finos.waltz.data.entity_enum.EntityEnumDefinitionDao;
+import org.finos.waltz.data.entity_enum.EntityEnumValueDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.entity_enum.EntityEnumDefinition;

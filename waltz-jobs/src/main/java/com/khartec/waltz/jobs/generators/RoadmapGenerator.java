@@ -19,12 +19,12 @@
 package com.khartec.waltz.jobs.generators;
 
 import org.finos.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.data.measurable.MeasurableDao;
-import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
-import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
-import com.khartec.waltz.data.roadmap.RoadmapDao;
-import com.khartec.waltz.data.scenario.ScenarioAxisItemDao;
-import com.khartec.waltz.data.scenario.ScenarioDao;
+import org.finos.waltz.data.measurable.MeasurableDao;
+import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
+import org.finos.waltz.data.measurable_rating.MeasurableRatingDao;
+import org.finos.waltz.data.roadmap.RoadmapDao;
+import org.finos.waltz.data.scenario.ScenarioAxisItemDao;
+import org.finos.waltz.data.scenario.ScenarioDao;
 import com.khartec.waltz.model.AxisOrientation;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;

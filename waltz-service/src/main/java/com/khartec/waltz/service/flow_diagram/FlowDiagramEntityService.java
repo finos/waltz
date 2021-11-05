@@ -18,10 +18,10 @@
 
 package com.khartec.waltz.service.flow_diagram;
 
-import com.khartec.waltz.data.GenericSelector;
-import com.khartec.waltz.data.GenericSelectorFactory;
-import com.khartec.waltz.data.flow_diagram.FlowDiagramEntityDao;
-import com.khartec.waltz.data.flow_diagram.FlowDiagramIdSelectorFactory;
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.data.flow_diagram.FlowDiagramEntityDao;
+import org.finos.waltz.data.flow_diagram.FlowDiagramIdSelectorFactory;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.flow_diagram.FlowDiagramEntity;

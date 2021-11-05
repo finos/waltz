@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.entity_named_note;
 
-import com.khartec.waltz.data.entity_named_note.EntityNamedNoteDao;
-import com.khartec.waltz.data.entity_named_note.EntityNamedNoteTypeDao;
+import org.finos.waltz.data.entity_named_note.EntityNamedNoteDao;
+import org.finos.waltz.data.entity_named_note.EntityNamedNoteTypeDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.Severity;

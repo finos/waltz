@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static org.finos.waltz.common.StreamUtilities.mkSiphon;
-import static com.khartec.waltz.data.JooqUtilities.readRef;
+import static org.finos.waltz.data.JooqUtilities.readRef;
 import static com.khartec.waltz.jobs.XlsUtilities.strVal;
 import static com.khartec.waltz.jobs.XlsUtilities.streamRows;
 import static com.khartec.waltz.jobs.tools.importers.DiffResult.mkDiff;

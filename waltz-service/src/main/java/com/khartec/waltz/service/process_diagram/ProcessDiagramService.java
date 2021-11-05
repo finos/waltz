@@ -1,9 +1,9 @@
 package com.khartec.waltz.service.process_diagram;
 
-import com.khartec.waltz.data.GenericSelector;
-import com.khartec.waltz.data.GenericSelectorFactory;
-import com.khartec.waltz.data.process_diagram.ProcessDiagramDao;
-import com.khartec.waltz.data.process_diagram.ProcessDiagramIdSelectorFactory;
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.data.process_diagram.ProcessDiagramDao;
+import org.finos.waltz.data.process_diagram.ProcessDiagramIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.process_diagram.ImmutableProcessDiagramAndEntities;

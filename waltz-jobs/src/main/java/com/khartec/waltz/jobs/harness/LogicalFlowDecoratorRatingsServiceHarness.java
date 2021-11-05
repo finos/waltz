@@ -23,7 +23,7 @@ import org.finos.waltz.common.hierarchy.FlatNode;
 import org.finos.waltz.common.hierarchy.Forest;
 import org.finos.waltz.common.hierarchy.HierarchyUtilities;
 import org.finos.waltz.common.hierarchy.Node;
-import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
+import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.model.flow_classification_rule.FlowClassificationRule;
 import com.khartec.waltz.model.orgunit.OrganisationalUnit;
 import com.khartec.waltz.service.DIConfiguration;

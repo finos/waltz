@@ -18,10 +18,10 @@
 
 package com.khartec.waltz.service.cost;
 
-import com.khartec.waltz.data.GenericSelector;
-import com.khartec.waltz.data.GenericSelectorFactory;
-import com.khartec.waltz.data.cost.CostDao;
-import com.khartec.waltz.data.cost.CostKindDao;
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.data.cost.CostDao;
+import org.finos.waltz.data.cost.CostKindDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;

@@ -1,6 +1,6 @@
 package com.khartec.waltz.jobs.tools.diagrams;
 
-import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
+import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityLifecycleStatus;
 import com.khartec.waltz.model.IdSelectionOptions;

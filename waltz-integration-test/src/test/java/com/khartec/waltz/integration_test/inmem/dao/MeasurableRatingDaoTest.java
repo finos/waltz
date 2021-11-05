@@ -19,7 +19,7 @@
 package com.khartec.waltz.integration_test.inmem.dao;
 
 import org.finos.waltz.common.exception.NotFoundException;
-import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
+import org.finos.waltz.data.measurable_rating.MeasurableRatingDao;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.integration_test.inmem.helpers.AppHelper;
 import com.khartec.waltz.integration_test.inmem.helpers.MeasurableHelper;

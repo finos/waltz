@@ -19,7 +19,7 @@
 package com.khartec.waltz.service.user_agent_info;
 
 import org.finos.waltz.common.Checks;
-import com.khartec.waltz.data.user_agent_info.UserAgentInfoDao;
+import org.finos.waltz.data.user_agent_info.UserAgentInfoDao;
 import com.khartec.waltz.model.user_agent_info.UserAgentInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -19,7 +19,7 @@
 package com.khartec.waltz.integration_test.inmem.dao;
 
 import org.finos.waltz.common.SetUtilities;
-import com.khartec.waltz.data.orgunit.OrganisationalUnitDao;
+import org.finos.waltz.data.orgunit.OrganisationalUnitDao;
 import com.khartec.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;

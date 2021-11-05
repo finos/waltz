@@ -1,6 +1,6 @@
 package com.khartec.waltz.service.attestation;
 
-import com.khartec.waltz.data.attestation.AttestationPreCheckDao;
+import org.finos.waltz.data.attestation.AttestationPreCheckDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.attestation.LogicalFlowAttestationPreChecks;
 import com.khartec.waltz.service.settings.SettingsService;

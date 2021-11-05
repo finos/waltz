@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.change_set;
 
-import com.khartec.waltz.data.change_set.ChangeSetDao;
-import com.khartec.waltz.data.change_set.ChangeSetIdSelectorFactory;
+import org.finos.waltz.data.change_set.ChangeSetDao;
+import org.finos.waltz.data.change_set.ChangeSetIdSelectorFactory;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.change_set.ChangeSet;

@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.survey;
 
-import com.khartec.waltz.data.survey.SurveyQuestionDropdownEntryDao;
+import org.finos.waltz.data.survey.SurveyQuestionDropdownEntryDao;
 import com.khartec.waltz.model.survey.ImmutableSurveyQuestionDropdownEntry;
 import com.khartec.waltz.model.survey.SurveyQuestionDropdownEntry;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -19,11 +19,11 @@
 package com.khartec.waltz.service.entity_statistic;
 
 import org.finos.waltz.common.Checks;
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.entity_statistic.EntityStatisticDao;
-import com.khartec.waltz.data.entity_statistic.EntityStatisticDefinitionDao;
-import com.khartec.waltz.data.entity_statistic.EntityStatisticSummaryDao;
-import com.khartec.waltz.data.entity_statistic.EntityStatisticValueDao;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.entity_statistic.EntityStatisticDao;
+import org.finos.waltz.data.entity_statistic.EntityStatisticDefinitionDao;
+import org.finos.waltz.data.entity_statistic.EntityStatisticSummaryDao;
+import org.finos.waltz.data.entity_statistic.EntityStatisticValueDao;
 import com.khartec.waltz.model.Duration;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;

@@ -19,8 +19,8 @@
 package com.khartec.waltz.service.licence;
 
 
-import com.khartec.waltz.data.licence.LicenceDao;
-import com.khartec.waltz.data.licence.LicenceIdSelectorFactory;
+import org.finos.waltz.data.licence.LicenceDao;
+import org.finos.waltz.data.licence.LicenceIdSelectorFactory;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.licence.Licence;
 import com.khartec.waltz.model.tally.Tally;

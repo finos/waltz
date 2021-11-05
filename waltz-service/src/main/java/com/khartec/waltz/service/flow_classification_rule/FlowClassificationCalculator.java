@@ -19,10 +19,10 @@
 package com.khartec.waltz.service.flow_classification_rule;
 
 import org.finos.waltz.common.SetUtilities;
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.data_type.DataTypeDao;
-import com.khartec.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
-import com.khartec.waltz.data.entity_hierarchy.EntityHierarchyDao;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.data_type.DataTypeDao;
+import org.finos.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
+import org.finos.waltz.data.entity_hierarchy.EntityHierarchyDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;

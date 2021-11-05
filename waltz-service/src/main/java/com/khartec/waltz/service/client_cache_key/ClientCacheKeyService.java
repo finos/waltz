@@ -19,7 +19,7 @@
 package com.khartec.waltz.service.client_cache_key;
 
 
-import com.khartec.waltz.data.client_cache_key.ClientCacheKeyDao;
+import org.finos.waltz.data.client_cache_key.ClientCacheKeyDao;
 import com.khartec.waltz.model.client_cache_key.ClientCacheKey;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -20,9 +20,9 @@ package com.khartec.waltz.jobs.generators;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.LoggingUtilities;
-import com.khartec.waltz.data.application.ApplicationDao;
-import com.khartec.waltz.data.measurable_category.MeasurableCategoryDao;
-import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
+import org.finos.waltz.data.application.ApplicationDao;
+import org.finos.waltz.data.measurable_category.MeasurableCategoryDao;
+import org.finos.waltz.data.measurable_rating.MeasurableRatingDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.application.Application;
 import com.khartec.waltz.model.measurable_rating.MeasurableRating;

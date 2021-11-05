@@ -19,7 +19,7 @@
 package com.khartec.waltz.service.thumbnail;
 
 
-import com.khartec.waltz.data.thumbnail.ThumbnailDao;
+import org.finos.waltz.data.thumbnail.ThumbnailDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.Severity;

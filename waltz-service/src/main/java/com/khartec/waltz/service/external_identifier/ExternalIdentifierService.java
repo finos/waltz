@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.service.external_identifier;
 
-import com.khartec.waltz.data.external_identifier.ExternalIdentifierDao;
+import org.finos.waltz.data.external_identifier.ExternalIdentifierDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Operation;

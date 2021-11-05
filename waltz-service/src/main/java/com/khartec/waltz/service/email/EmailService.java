@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.email;
 
-import com.khartec.waltz.data.attestation.AttestationInstanceRecipientDao;
-import com.khartec.waltz.data.attestation.AttestationRunDao;
+import org.finos.waltz.data.attestation.AttestationInstanceRecipientDao;
+import org.finos.waltz.data.attestation.AttestationRunDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.NameProvider;
 import com.khartec.waltz.model.attestation.AttestationRun;

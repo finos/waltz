@@ -18,19 +18,19 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.EntityReferenceNameResolver;
-import com.khartec.waltz.data.app_group.AppGroupDao;
-import com.khartec.waltz.data.application.ApplicationDao;
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.complexity.ConnectionComplexityDao;
-import com.khartec.waltz.data.data_type_usage.DataTypeUsageDao;
-import com.khartec.waltz.data.entity_relationship.EntityRelationshipDao;
-import com.khartec.waltz.data.involvement.InvolvementDao;
-import com.khartec.waltz.data.licence.LicenceDao;
-import com.khartec.waltz.data.logical_data_element.search.LogicalDataElementSearchDao;
-import com.khartec.waltz.data.measurable.MeasurableDao;
-import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
-import com.khartec.waltz.data.physical_flow.PhysicalFlowDao;
+import org.finos.waltz.data.EntityReferenceNameResolver;
+import org.finos.waltz.data.app_group.AppGroupDao;
+import org.finos.waltz.data.application.ApplicationDao;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.complexity.ConnectionComplexityDao;
+import org.finos.waltz.data.data_type_usage.DataTypeUsageDao;
+import org.finos.waltz.data.entity_relationship.EntityRelationshipDao;
+import org.finos.waltz.data.involvement.InvolvementDao;
+import org.finos.waltz.data.licence.LicenceDao;
+import org.finos.waltz.data.logical_data_element.search.LogicalDataElementSearchDao;
+import org.finos.waltz.data.measurable.MeasurableDao;
+import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
+import org.finos.waltz.data.physical_flow.PhysicalFlowDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.app_group.AppGroup;

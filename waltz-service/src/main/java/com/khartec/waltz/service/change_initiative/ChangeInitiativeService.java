@@ -20,10 +20,10 @@ package com.khartec.waltz.service.change_initiative;
 
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.StringUtilities;
-import com.khartec.waltz.data.change_initiative.ChangeInitiativeDao;
-import com.khartec.waltz.data.change_initiative.ChangeInitiativeIdSelectorFactory;
-import com.khartec.waltz.data.change_initiative.search.ChangeInitiativeSearchDao;
-import com.khartec.waltz.data.entity_relationship.EntityRelationshipDao;
+import org.finos.waltz.data.change_initiative.ChangeInitiativeDao;
+import org.finos.waltz.data.change_initiative.ChangeInitiativeIdSelectorFactory;
+import org.finos.waltz.data.change_initiative.search.ChangeInitiativeSearchDao;
+import org.finos.waltz.data.entity_relationship.EntityRelationshipDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.Operation;

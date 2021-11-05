@@ -19,12 +19,12 @@
 package com.khartec.waltz.service.measurable_rating;
 
 import org.finos.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.data.EntityReferenceNameResolver;
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.measurable.MeasurableDao;
-import com.khartec.waltz.data.measurable.MeasurableIdSelectorFactory;
-import com.khartec.waltz.data.measurable_category.MeasurableCategoryDao;
-import com.khartec.waltz.data.measurable_rating.MeasurableRatingDao;
+import org.finos.waltz.data.EntityReferenceNameResolver;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.measurable.MeasurableDao;
+import org.finos.waltz.data.measurable.MeasurableIdSelectorFactory;
+import org.finos.waltz.data.measurable_category.MeasurableCategoryDao;
+import org.finos.waltz.data.measurable_rating.MeasurableRatingDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.measurable.Measurable;

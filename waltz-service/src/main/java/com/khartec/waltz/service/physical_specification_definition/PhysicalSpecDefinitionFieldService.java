@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.physical_specification_definition;
 
-import com.khartec.waltz.data.physical_specification_definition.PhysicalSpecDefinitionFieldDao;
-import com.khartec.waltz.data.physical_specification_definition.PhysicalSpecDefnFieldIdSelectorFactory;
+import org.finos.waltz.data.physical_specification_definition.PhysicalSpecDefinitionFieldDao;
+import org.finos.waltz.data.physical_specification_definition.PhysicalSpecDefnFieldIdSelectorFactory;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.logical_data_element.LogicalDataElementChangeCommand;

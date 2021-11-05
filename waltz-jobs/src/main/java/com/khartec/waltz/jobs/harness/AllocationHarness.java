@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.measurable_category.MeasurableCategoryDao;
+import org.finos.waltz.data.measurable_category.MeasurableCategoryDao;
 import com.khartec.waltz.model.Criticality;
 import com.khartec.waltz.model.UserTimestamp;
 import com.khartec.waltz.model.allocation_scheme.AllocationScheme;

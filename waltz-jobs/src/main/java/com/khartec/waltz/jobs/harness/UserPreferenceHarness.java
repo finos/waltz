@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.user.UserPreferenceDao;
+import org.finos.waltz.data.user.UserPreferenceDao;
 import com.khartec.waltz.model.user.ImmutableUserPreference;
 import com.khartec.waltz.model.user.UserPreference;
 import com.khartec.waltz.service.DIConfiguration;

@@ -19,10 +19,10 @@
 package com.khartec.waltz.service.survey;
 
 import org.finos.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.data.person.PersonDao;
-import com.khartec.waltz.data.survey.SurveyQuestionDao;
-import com.khartec.waltz.data.survey.SurveyQuestionDropdownEntryDao;
-import com.khartec.waltz.data.survey.SurveyTemplateDao;
+import org.finos.waltz.data.person.PersonDao;
+import org.finos.waltz.data.survey.SurveyQuestionDao;
+import org.finos.waltz.data.survey.SurveyQuestionDropdownEntryDao;
+import org.finos.waltz.data.survey.SurveyTemplateDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.person.Person;

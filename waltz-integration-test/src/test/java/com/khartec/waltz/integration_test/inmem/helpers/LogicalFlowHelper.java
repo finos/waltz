@@ -1,7 +1,7 @@
 package com.khartec.waltz.integration_test.inmem.helpers;
 
-import com.khartec.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
-import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
+import org.finos.waltz.data.datatype_decorator.LogicalFlowDecoratorDao;
+import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.datatype.DataTypeDecorator;

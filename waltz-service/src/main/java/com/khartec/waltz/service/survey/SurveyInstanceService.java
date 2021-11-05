@@ -20,11 +20,11 @@ package com.khartec.waltz.service.survey;
 
 
 import org.finos.waltz.common.DateTimeUtilities;
-import com.khartec.waltz.data.person.PersonDao;
-import com.khartec.waltz.data.survey.SurveyInstanceDao;
-import com.khartec.waltz.data.survey.SurveyInstanceRecipientDao;
-import com.khartec.waltz.data.survey.SurveyQuestionResponseDao;
-import com.khartec.waltz.data.survey.SurveyRunDao;
+import org.finos.waltz.data.person.PersonDao;
+import org.finos.waltz.data.survey.SurveyInstanceDao;
+import org.finos.waltz.data.survey.SurveyInstanceRecipientDao;
+import org.finos.waltz.data.survey.SurveyQuestionResponseDao;
+import org.finos.waltz.data.survey.SurveyRunDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.person.Person;

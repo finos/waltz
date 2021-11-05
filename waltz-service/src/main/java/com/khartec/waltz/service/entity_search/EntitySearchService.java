@@ -19,8 +19,8 @@
 package com.khartec.waltz.service.entity_search;
 
 import org.finos.waltz.common.StringUtilities;
-import com.khartec.waltz.data.DBExecutorPoolInterface;
-import com.khartec.waltz.data.SearchUtilities;
+import org.finos.waltz.data.DBExecutorPoolInterface;
+import org.finos.waltz.data.SearchUtilities;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.service.actor.ActorService;

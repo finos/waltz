@@ -19,7 +19,7 @@
 package com.khartec.waltz.service.entity_alias;
 
 import org.finos.waltz.common.Checks;
-import com.khartec.waltz.data.entity_alias.EntityAliasDao;
+import org.finos.waltz.data.entity_alias.EntityAliasDao;
 import com.khartec.waltz.model.EntityReference;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

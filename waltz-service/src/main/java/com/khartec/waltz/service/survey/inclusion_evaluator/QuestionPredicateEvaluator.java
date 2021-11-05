@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.service.survey.inclusion_evaluator;
 
-import com.khartec.waltz.data.survey.SurveyInstanceDao;
-import com.khartec.waltz.data.survey.SurveyQuestionDao;
-import com.khartec.waltz.data.survey.SurveyQuestionResponseDao;
+import org.finos.waltz.data.survey.SurveyInstanceDao;
+import org.finos.waltz.data.survey.SurveyQuestionDao;
+import org.finos.waltz.data.survey.SurveyQuestionResponseDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.survey.SurveyInstance;
 import com.khartec.waltz.model.survey.SurveyInstanceQuestionResponse;

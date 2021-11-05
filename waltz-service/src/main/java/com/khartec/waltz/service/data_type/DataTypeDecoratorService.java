@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.service.data_type;
 
-import com.khartec.waltz.data.GenericSelectorFactory;
-import com.khartec.waltz.data.datatype_decorator.DataTypeDecoratorDao;
-import com.khartec.waltz.data.datatype_decorator.DataTypeDecoratorDaoSelectorFactory;
-import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
-import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
+import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.data.datatype_decorator.DataTypeDecoratorDao;
+import org.finos.waltz.data.datatype_decorator.DataTypeDecoratorDaoSelectorFactory;
+import org.finos.waltz.data.logical_flow.LogicalFlowDao;
+import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.datatype.DataType;

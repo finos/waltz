@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.attestation.AttestationRunDao;
+import org.finos.waltz.data.attestation.AttestationRunDao;
 import com.khartec.waltz.model.attestation.AttestationRunResponseSummary;
 import com.khartec.waltz.service.DIConfiguration;
 import org.jooq.tools.json.ParseException;

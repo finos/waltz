@@ -20,8 +20,8 @@ package com.khartec.waltz.jobs.generators;
 
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.SetUtilities;
-import com.khartec.waltz.data.flow_classification_rule.FlowClassificationRuleDao;
-import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
+import org.finos.waltz.data.flow_classification_rule.FlowClassificationRuleDao;
+import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.application.Application;

@@ -18,11 +18,11 @@
 
 package com.khartec.waltz.service.roadmap;
 
-import com.khartec.waltz.data.entity_relationship.EntityRelationshipDao;
-import com.khartec.waltz.data.roadmap.RoadmapDao;
-import com.khartec.waltz.data.roadmap.RoadmapIdSelectorFactory;
-import com.khartec.waltz.data.roadmap.RoadmapSearchDao;
-import com.khartec.waltz.data.scenario.ScenarioDao;
+import org.finos.waltz.data.entity_relationship.EntityRelationshipDao;
+import org.finos.waltz.data.roadmap.RoadmapDao;
+import org.finos.waltz.data.roadmap.RoadmapIdSelectorFactory;
+import org.finos.waltz.data.roadmap.RoadmapSearchDao;
+import org.finos.waltz.data.scenario.ScenarioDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;
 import com.khartec.waltz.model.entity_relationship.EntityRelationship;

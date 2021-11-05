@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.service.logical_data_element;
 
-import com.khartec.waltz.data.logical_data_element.LogicalDataElementDao;
-import com.khartec.waltz.data.logical_data_element.LogicalDataElementIdSelectorFactory;
-import com.khartec.waltz.data.logical_data_element.search.LogicalDataElementSearchDao;
+import org.finos.waltz.data.logical_data_element.LogicalDataElementDao;
+import org.finos.waltz.data.logical_data_element.LogicalDataElementIdSelectorFactory;
+import org.finos.waltz.data.logical_data_element.search.LogicalDataElementSearchDao;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.logical_data_element.LogicalDataElement;

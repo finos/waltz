@@ -20,7 +20,7 @@ package com.khartec.waltz.service.user;
 
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.common.StringUtilities;
-import com.khartec.waltz.data.user.UserRoleDao;
+import org.finos.waltz.data.user.UserRoleDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.Operation;
 import com.khartec.waltz.model.Severity;

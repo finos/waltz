@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
-import com.khartec.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
+import org.finos.waltz.data.logical_flow.LogicalFlowDao;
+import org.finos.waltz.data.logical_flow.LogicalFlowIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.HierarchyQueryScope;

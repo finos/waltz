@@ -19,7 +19,7 @@
 package com.khartec.waltz.jobs.harness;
 
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import com.khartec.waltz.model.app_group.AppGroupEntry;
 import com.khartec.waltz.service.DIConfiguration;
 import com.khartec.waltz.service.app_group.FavouritesService;

@@ -19,7 +19,7 @@
 package com.khartec.waltz.service.enum_value;
 
 
-import com.khartec.waltz.data.enum_value.EnumValueDao;
+import org.finos.waltz.data.enum_value.EnumValueDao;
 import com.khartec.waltz.model.EnumValue;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

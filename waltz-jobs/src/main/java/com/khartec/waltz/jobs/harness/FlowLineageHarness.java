@@ -19,8 +19,8 @@
 package com.khartec.waltz.jobs.harness;
 
 import org.finos.waltz.common.SetUtilities;
-import com.khartec.waltz.data.InlineSelectFieldFactory;
-import com.khartec.waltz.data.logical_flow.LogicalFlowDao;
+import org.finos.waltz.data.InlineSelectFieldFactory;
+import org.finos.waltz.data.logical_flow.LogicalFlowDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.service.DIConfiguration;

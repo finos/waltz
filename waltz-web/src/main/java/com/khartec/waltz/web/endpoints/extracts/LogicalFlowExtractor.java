@@ -19,8 +19,8 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
 import org.finos.waltz.common.ListUtilities;
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.data_type.DataTypeIdSelectorFactory;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.data_type.DataTypeIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
 import org.jooq.*;
@@ -36,7 +36,7 @@ import java.util.Map;
 
 import static org.finos.waltz.common.ListUtilities.isEmpty;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.data.InlineSelectFieldFactory.mkNameField;
+import static org.finos.waltz.data.InlineSelectFieldFactory.mkNameField;
 import static com.khartec.waltz.model.EntityLifecycleStatus.REMOVED;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;

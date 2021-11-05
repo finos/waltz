@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.measurable_category;
 
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.measurable_category.MeasurableCategoryAlignmentViewDao;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.measurable_category.MeasurableCategoryAlignmentViewDao;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.measurable.MeasurableCategoryAlignment;
 import org.jooq.Record1;

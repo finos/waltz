@@ -19,8 +19,8 @@
 package com.khartec.waltz.web.endpoints.extracts;
 
 import org.finos.waltz.common.ListUtilities;
-import com.khartec.waltz.data.InlineSelectFieldFactory;
-import com.khartec.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
+import org.finos.waltz.data.InlineSelectFieldFactory;
+import org.finos.waltz.data.physical_flow.PhysicalFlowIdSelectorFactory;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.IdSelectionOptions;
@@ -38,13 +38,14 @@ import java.util.Map;
 
 import static org.finos.waltz.common.ListUtilities.isEmpty;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
-import static com.khartec.waltz.data.logical_flow.LogicalFlowDao.*;
 import static com.khartec.waltz.schema.Tables.*;
 import static com.khartec.waltz.schema.tables.Application.APPLICATION;
 import static com.khartec.waltz.schema.tables.LogicalFlow.LOGICAL_FLOW;
 import static com.khartec.waltz.schema.tables.PhysicalSpecification.PHYSICAL_SPECIFICATION;
 import static com.khartec.waltz.web.WebUtilities.*;
 import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.data.logical_flow.LogicalFlowDao.*;
+import static org.finos.waltz.data.physical_flow.PhysicalFlowDao.PHYSICAL_FLOW_NOT_REMOVED;
 import static spark.Spark.post;
 
 

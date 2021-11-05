@@ -19,10 +19,10 @@
 package com.khartec.waltz.service.software_catalog;
 
 import org.finos.waltz.common.ListUtilities;
-import com.khartec.waltz.data.application.ApplicationIdSelectorFactory;
-import com.khartec.waltz.data.software_catalog.SoftwarePackageDao;
-import com.khartec.waltz.data.software_catalog.SoftwareUsageDao;
-import com.khartec.waltz.data.software_catalog.SoftwareVersionDao;
+import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
+import org.finos.waltz.data.software_catalog.SoftwarePackageDao;
+import org.finos.waltz.data.software_catalog.SoftwareUsageDao;
+import org.finos.waltz.data.software_catalog.SoftwareVersionDao;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.entity_search.EntitySearchOptions;
 import com.khartec.waltz.model.software_catalog.*;

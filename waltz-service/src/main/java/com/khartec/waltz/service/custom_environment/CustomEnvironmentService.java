@@ -1,7 +1,7 @@
 package com.khartec.waltz.service.custom_environment;
 
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
-import com.khartec.waltz.data.custom_environment.CustomEnvironmentDao;
+import org.finos.waltz.data.custom_environment.CustomEnvironmentDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.Operation;

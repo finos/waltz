@@ -18,7 +18,7 @@
 
 package com.khartec.waltz.jobs.harness;
 
-import com.khartec.waltz.data.logical_flow.LogicalFlowStatsDao;
+import org.finos.waltz.data.logical_flow.LogicalFlowStatsDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.logical_flow.LogicalFlowGraphSummary;
 import com.khartec.waltz.service.DIConfiguration;

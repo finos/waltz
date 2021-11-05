@@ -18,9 +18,9 @@
 
 package com.khartec.waltz.service.physical_specification;
 
-import com.khartec.waltz.data.physical_specification.PhysicalSpecificationDao;
-import com.khartec.waltz.data.physical_specification.PhysicalSpecificationIdSelectorFactory;
-import com.khartec.waltz.data.physical_specification.search.PhysicalSpecificationSearchDao;
+import org.finos.waltz.data.physical_specification.PhysicalSpecificationDao;
+import org.finos.waltz.data.physical_specification.PhysicalSpecificationIdSelectorFactory;
+import org.finos.waltz.data.physical_specification.search.PhysicalSpecificationSearchDao;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.changelog.ChangeLog;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;

@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.change_unit;
 
-import com.khartec.waltz.data.change_unit.ChangeUnitDao;
-import com.khartec.waltz.data.change_unit.ChangeUnitIdSelectorFactory;
+import org.finos.waltz.data.change_unit.ChangeUnitDao;
+import org.finos.waltz.data.change_unit.ChangeUnitIdSelectorFactory;
 import com.khartec.waltz.model.*;
 import com.khartec.waltz.model.change_unit.*;
 import com.khartec.waltz.model.changelog.ImmutableChangeLog;

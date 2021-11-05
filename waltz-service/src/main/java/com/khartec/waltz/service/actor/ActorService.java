@@ -18,8 +18,8 @@
 
 package com.khartec.waltz.service.actor;
 
-import com.khartec.waltz.data.actor.ActorDao;
-import com.khartec.waltz.data.actor.ActorSearchDao;
+import org.finos.waltz.data.actor.ActorDao;
+import org.finos.waltz.data.actor.ActorSearchDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.UserTimestamp;

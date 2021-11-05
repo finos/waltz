@@ -19,9 +19,9 @@
 package com.khartec.waltz.service.app_group;
 
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
-import com.khartec.waltz.data.app_group.AppGroupDao;
-import com.khartec.waltz.data.app_group.AppGroupEntryDao;
-import com.khartec.waltz.data.app_group.AppGroupMemberDao;
+import org.finos.waltz.data.app_group.AppGroupDao;
+import org.finos.waltz.data.app_group.AppGroupEntryDao;
+import org.finos.waltz.data.app_group.AppGroupMemberDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.ImmutableEntityReference;
 import com.khartec.waltz.model.Operation;

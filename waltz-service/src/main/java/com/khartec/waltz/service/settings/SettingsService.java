@@ -20,7 +20,7 @@ package com.khartec.waltz.service.settings;
 
 import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.common.MapUtilities;
-import com.khartec.waltz.data.settings.SettingsDao;
+import org.finos.waltz.data.settings.SettingsDao;
 import com.khartec.waltz.model.settings.Setting;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

@@ -19,9 +19,9 @@
 package com.khartec.waltz.service.entity_workflow;
 
 
-import com.khartec.waltz.data.entity_workflow.EntityWorkflowDefinitionDao;
-import com.khartec.waltz.data.entity_workflow.EntityWorkflowStateDao;
-import com.khartec.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
+import org.finos.waltz.data.entity_workflow.EntityWorkflowDefinitionDao;
+import org.finos.waltz.data.entity_workflow.EntityWorkflowStateDao;
+import org.finos.waltz.data.entity_workflow.EntityWorkflowTransitionDao;
 import com.khartec.waltz.model.EntityReference;
 import com.khartec.waltz.model.entity_workflow.EntityWorkflowDefinition;
 import com.khartec.waltz.model.entity_workflow.EntityWorkflowState;

@@ -20,7 +20,7 @@ package com.khartec.waltz.jobs.generators;
 
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.RandomUtilities;
-import com.khartec.waltz.data.server_information.ServerInformationDao;
+import org.finos.waltz.data.server_information.ServerInformationDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.LifecycleStatus;
 import com.khartec.waltz.model.server_information.ImmutableServerInformation;

@@ -1,9 +1,9 @@
 package com.khartec.waltz.service.cost_kind;
 
 import org.finos.waltz.common.Checks;
-import com.khartec.waltz.data.GenericSelector;
-import com.khartec.waltz.data.GenericSelectorFactory;
-import com.khartec.waltz.data.cost.CostKindDao;
+import org.finos.waltz.data.GenericSelector;
+import org.finos.waltz.data.GenericSelectorFactory;
+import org.finos.waltz.data.cost.CostKindDao;
 import com.khartec.waltz.model.EntityKind;
 import com.khartec.waltz.model.IdSelectionOptions;
 import com.khartec.waltz.model.cost.EntityCostKind;
