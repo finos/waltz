@@ -57,6 +57,7 @@ public class SurveyRunService {
     private final PersonDao personDao;
     private final SurveyInstanceDao surveyInstanceDao;
     private final SurveyInstanceRecipientDao surveyInstanceRecipientDao;
+    private final SurveyInstanceOwnerDao surveyInstanceOwnerDao;
     private final SurveyRunDao surveyRunDao;
     private final SurveyTemplateDao surveyTemplateDao;
     private final SurveyQuestionResponseDao surveyQuestionResponseDao;
@@ -71,6 +72,7 @@ public class SurveyRunService {
                             PersonDao personDao,
                             SurveyInstanceDao surveyInstanceDao,
                             SurveyInstanceRecipientDao surveyInstanceRecipientDao,
+                            SurveyInstanceOwnerDao surveyInstanceOwnerDao,
                             SurveyRunDao surveyRunDao,
                             SurveyTemplateDao surveyTemplateDao,
                             SurveyQuestionResponseDao surveyQuestionResponseDao) {
@@ -79,6 +81,7 @@ public class SurveyRunService {
         checkNotNull(personDao, "personDao cannot be null");
         checkNotNull(surveyInstanceDao, "surveyInstanceDao cannot be null");
         checkNotNull(surveyInstanceRecipientDao, "surveyInstanceRecipientDao cannot be null");
+        checkNotNull(surveyInstanceOwnerDao, "surveyInstanceOwnerDao cannot be null");
         checkNotNull(surveyRunDao, "surveyRunDao cannot be null");
         checkNotNull(surveyTemplateDao, "surveyTemplateDao cannot be null");
         checkNotNull(surveyQuestionResponseDao, "surveyQuestionResponseDao cannot be null");
@@ -88,6 +91,7 @@ public class SurveyRunService {
         this.personDao = personDao;
         this.surveyInstanceDao = surveyInstanceDao;
         this.surveyInstanceRecipientDao = surveyInstanceRecipientDao;
+        this.surveyInstanceOwnerDao = surveyInstanceOwnerDao;
         this.surveyRunDao = surveyRunDao;
         this.surveyTemplateDao = surveyTemplateDao;
         this.surveyQuestionResponseDao = surveyQuestionResponseDao;
@@ -301,11 +305,13 @@ public class SurveyRunService {
                     if (surveyRun.issuanceKind() == SurveyIssuanceKind.GROUP) {
                         // one instance per group
                         long instanceId = createSurveyInstance(k);
+                        createSurveyInstanceOwner(instanceId, surveyRun.ownerId());
                         v.forEach(r -> createSurveyInstanceRecipient(instanceId, r));
                     } else {
                         // one instance for each individual
                         v.forEach(r -> {
                             long instanceId = createSurveyInstance(k);
+                            createSurveyInstanceOwner(instanceId, surveyRun.ownerId());
                             createSurveyInstanceRecipient(instanceId, r);
                         });
                     }
@@ -336,6 +342,13 @@ public class SurveyRunService {
         return surveyInstanceRecipientDao.create(ImmutableSurveyInstanceRecipientCreateCommand.builder()
                 .surveyInstanceId(surveyInstanceId)
                 .personId(surveyInstanceRecipient.person().id().get())
+                .build());
+    }
+
+    private long createSurveyInstanceOwner(long surveyInstanceId, Long ownerId) {
+        return surveyInstanceOwnerDao.create(ImmutableSurveyInstanceOwnerCreateCommand.builder()
+                .surveyInstanceId(surveyInstanceId)
+                .personId(ownerId)
                 .build());
     }
 
@@ -448,9 +461,12 @@ public class SurveyRunService {
                 .surveyRunId(run.id().get())
                 .status(SurveyInstanceStatus.NOT_STARTED)
                 .owningRole(owningRole)
-                .ownerId(run.ownerId())
                 .build();
         long instanceId = surveyInstanceDao.create(instanceCreateCommand);
+        surveyInstanceOwnerDao.create(ImmutableSurveyInstanceOwnerCreateCommand.builder()
+                .surveyInstanceId(instanceId)
+                .personId(run.ownerId())
+                .build());
         return surveyInstanceDao.createInstanceRecipients(
                 instanceId,
                 personIds);
