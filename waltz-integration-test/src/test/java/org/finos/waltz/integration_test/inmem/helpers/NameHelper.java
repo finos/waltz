@@ -21,4 +21,8 @@ public class NameHelper {
         return stem + "_" + counter.incrementAndGet();
     }
 
+    public static String mkName(String stem, String qualifier) {
+        return mkName(stem + "_" + qualifier);
+    }
+
 }

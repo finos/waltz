@@ -115,10 +115,10 @@ public class SurveyRunDao {
         record.setSelectorEntityId(command.selectionOptions().entityReference().id());
         record.setSelectorHierarchyScope(command.selectionOptions().scope().name());
         record.setInvolvementKindIds(join(command.involvementKindIds(), ID_SEPARATOR));
-        record.setDueDate(command.dueDate().map(Date::valueOf).orElse(null));
+        record.setDueDate(DateTimeUtilities.toSqlDate(command.dueDate()));
         record.setIssuanceKind(command.issuanceKind().name());
         record.setOwnerId(ownerId);
-        record.setContactEmail(command.contactEmail().orElse(null));
+        record.setContactEmail(command.contactEmail());
         record.setStatus(SurveyRunStatus.DRAFT.name());
 
         record.store();

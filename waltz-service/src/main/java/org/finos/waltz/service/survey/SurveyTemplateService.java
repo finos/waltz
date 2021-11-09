@@ -34,6 +34,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 
+import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
@@ -105,12 +106,12 @@ public class SurveyTemplateService {
                 .build());
 
         changeLogService.write(
-                ImmutableChangeLog.builder()
-                        .operation(Operation.ADD)
-                        .userId(userName)
-                        .parentReference(EntityReference.mkRef(EntityKind.SURVEY_TEMPLATE, surveyTemplateId))
-                        .message("Survey Template: '" + command.name() + "' added")
-                        .build());
+            ImmutableChangeLog.builder()
+                .operation(Operation.ADD)
+                .userId(userName)
+                .parentReference(EntityReference.mkRef(EntityKind.SURVEY_TEMPLATE, surveyTemplateId))
+                .message(format("Survey Template: '%s' added", command.name()))
+                .build());
 
         return surveyTemplateId;
     }

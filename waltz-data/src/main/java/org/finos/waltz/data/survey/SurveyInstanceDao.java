@@ -111,7 +111,7 @@ public class SurveyInstanceDao {
     }
 
 
-    public List<SurveyInstance> findForRecipient(long personId) {
+    public Set<SurveyInstance> findForRecipient(long personId) {
         return dsl.select(SURVEY_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
                 .select(EXTERNAL_ID_FIELD)
@@ -120,18 +120,18 @@ public class SurveyInstanceDao {
                 .on(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
                 .where(SURVEY_INSTANCE_RECIPIENT.PERSON_ID.eq(personId))
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
-                .fetch(TO_DOMAIN_MAPPER);
+                .fetchSet(TO_DOMAIN_MAPPER);
     }
 
 
-    public List<SurveyInstance> findForSurveyRun(long surveyRunId) {
+    public Set<SurveyInstance> findForSurveyRun(long surveyRunId) {
         return dsl.select(SURVEY_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
                 .select(EXTERNAL_ID_FIELD)
                 .from(SURVEY_INSTANCE)
                 .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
-                .fetch(TO_DOMAIN_MAPPER);
+                .fetchSet(TO_DOMAIN_MAPPER);
     }
 
 
