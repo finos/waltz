@@ -22,6 +22,7 @@ public class PersonHelper {
         this.dsl = dsl;
     }
 
+
     public Long createPerson(String name) {
         PersonRecord p = dsl.newRecord(PERSON);
         p.setDepartmentName("dept");
@@ -32,5 +33,15 @@ public class PersonHelper {
         p.insert();
 
         return p.getId();
+    }
+
+
+    public boolean updateIsRemoved(Long pId, boolean isRemoved) {
+        int execute = dsl.update(PERSON)
+                .set(PERSON.IS_REMOVED, isRemoved)
+                .where(PERSON.ID.eq(pId))
+                .execute();
+
+        return execute == 1;
     }
 }

@@ -227,9 +227,10 @@ public class InvolvementDao {
                 .from(PERSON)
                 .innerJoin(INVOLVEMENT)
                 .on(INVOLVEMENT.EMPLOYEE_ID.eq(PERSON.EMPLOYEE_ID))
-                .where(INVOLVEMENT.ENTITY_KIND.eq(entityKind.name())
-                        .and(INVOLVEMENT.ENTITY_ID.in(entityIdSelector)
-                                .and(INVOLVEMENT.KIND_ID.in(involvementKindIds))))
+                .where(PERSON.IS_REMOVED.isFalse()
+                        .and(INVOLVEMENT.ENTITY_KIND.eq(entityKind.name())
+                            .and(INVOLVEMENT.ENTITY_ID.in(entityIdSelector)
+                                .and(INVOLVEMENT.KIND_ID.in(involvementKindIds)))))
                 .fetch()
                 .stream()
                 .collect(groupingBy(

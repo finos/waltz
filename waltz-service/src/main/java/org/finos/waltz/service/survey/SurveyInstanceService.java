@@ -99,7 +99,7 @@ public class SurveyInstanceService {
     }
 
 
-    public List<SurveyInstance> findForRecipient(String userName) {
+    public Set<SurveyInstance> findForRecipient(String userName) {
         checkNotNull(userName, "userName cannot be null");
 
         Person person = getPersonByUsername(userName);
@@ -108,14 +108,14 @@ public class SurveyInstanceService {
     }
 
 
-    public List<SurveyInstance> findForRecipient(Long personId) {
+    public Set<SurveyInstance> findForRecipient(Long personId) {
         checkNotNull(personId, "personId cannot be null");
 
         return surveyInstanceDao.findForRecipient(personId);
     }
 
 
-    public List<SurveyInstance> findForSurveyRun(long surveyRunId) {
+    public Set<SurveyInstance> findForSurveyRun(long surveyRunId) {
         return surveyInstanceDao.findForSurveyRun(surveyRunId);
     }
 

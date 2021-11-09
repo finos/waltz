@@ -30,9 +30,11 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.LongStream;
 
 import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.common.CollectionUtilities.first;
 
 
 public class SurveyHarness {
@@ -141,12 +143,12 @@ public class SurveyHarness {
         SurveyQuestionService surveyQuestionService = ctx.getBean(SurveyQuestionService.class);
         SurveyInstanceService surveyInstanceService = ctx.getBean(SurveyInstanceService.class);
 
-        List<SurveyInstance> instances = surveyInstanceService.findForRecipient(userName);
+        Set<SurveyInstance> instances = surveyInstanceService.findForRecipient(userName);
 
         System.out.println("===========Instances==========");
         System.out.println(instances);
 
-        SurveyInstance instance = instances.get(0);
+        SurveyInstance instance = first(instances);
         List<SurveyQuestion> questions = surveyQuestionService.findForSurveyInstance(instance.id().get());
 
         System.out.println("===========Questions==========");
