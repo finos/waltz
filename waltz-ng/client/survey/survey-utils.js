@@ -148,14 +148,6 @@ export function loadSurveyInfo($q,
             .loadViewData(CORE_API.PersonStore.getById, [run.ownerId]))
         .then(r => r.data);
 
-    // NEED TO CHANGE
-    // const instanceOwnerPromise = instancePromise
-    //     .then(instance => instance.ownerId
-    //         ? serviceBroker
-    //             .loadViewData(CORE_API.PersonStore.getById, [instance.ownerId])
-    //             .then(r => r.data)
-    //         : Promise.resolve(null));
-
     const owningRolePromise = instancePromise
         .then(instance => serviceBroker
             .loadAppData(CORE_API.RoleStore.findAllRoles)
