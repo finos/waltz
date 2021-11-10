@@ -29,12 +29,94 @@
 
     <!-- moving from `com.khartec` to `org.finos` -->
     <changeSet id="20211105-5755-1"
-               author="davidwatkins73">
+               author="woodjes">
         <update tableName="settings">
             <column name="value"
                     value="org.finos.waltz.web.endpoints.auth.JWTAuthenticationFilter"/>
             <where>value='com.khartec.waltz.web.endpoints.auth.JWTAuthenticationFilter'</where>
         </update>
+    </changeSet>
+
+    <changeSet id="20211108-5755-2"
+               author="davidwatkins73">
+        <update tableName="settings">
+            <column name="value"
+                    value="org.finos.waltz.web.endpoints.auth.HeaderBasedAuthenticationFilter"/>
+            <where>value='com.khartec.waltz.web.endpoints.auth.HeaderBasedAuthenticationFilter'</where>
+        </update>
+    </changeSet>
+
+    <!-- 5678: Move owner_id to new survey_instance_owner table   -->
+    <changeSet author="woodjes"
+               id="20211108-5678-1">
+        <createTable tableName="survey_instance_owner">
+            <column name="id"
+                    autoIncrement="true"
+                    type="${id.type}">
+                <constraints nullable="false"
+                             primaryKey="true"
+                             primaryKeyName="survey_instance_owner_pkey"/>
+            </column>
+            <column name="survey_instance_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="person_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet id="20211108-5678-2"
+               author="woodjes">
+        <addForeignKeyConstraint baseColumnNames="person_id"
+                                 baseTableName="survey_instance_owner"
+                                 constraintName="survey_instance_owner_person_id_fkey"
+                                 onDelete="CASCADE"
+                                 referencedColumnNames="id"
+                                 referencedTableName="person"/>
+    </changeSet>
+
+    <changeSet id="20211108-5678-3"
+               author="woodjes">
+        <addForeignKeyConstraint baseColumnNames="survey_instance_id"
+                                 baseTableName="survey_instance_owner"
+                                 constraintName="survey_instance_owner_instance_id_fkey"
+                                 onDelete="CASCADE"
+                                 referencedColumnNames="id"
+                                 referencedTableName="survey_instance"/>
+    </changeSet>
+
+    <changeSet  id="20211108-5678-4"
+                author="woodjes">
+        <addUniqueConstraint columnNames="survey_instance_id, person_id"
+                             constraintName="unique_survey_instance_owner_id"
+                             tableName="survey_instance_owner"/>
+    </changeSet>
+
+    <changeSet id="20211108-5678-5"
+               author="woodjes">
+        <sql>
+            INSERT INTO survey_instance_owner (survey_instance_id, person_id)
+            SELECT DISTINCT survey_instance.id, survey_instance.owner_id
+            FROM survey_instance
+            INNER JOIN person on survey_instance.owner_id = person.id
+            WHERE owner_id IS NOT null
+            UNION (
+            SELECT DISTINCT survey_instance.id, survey_run.owner_id
+            FROM survey_instance
+            INNER JOIN survey_run ON survey_instance.survey_run_id = survey_run.id
+            INNER JOIN person on survey_run.owner_id = person.id
+            WHERE survey_run.owner_id IS NOT null );
+        </sql>
+    </changeSet>
+
+    <changeSet id="20211108-5678-6"
+               author="woodjes">
+        <comment>5678: drop survey_owner from survey_instance</comment>
+        <dropColumn tableName="survey_instance"
+                    columnName="owner_id"/>
     </changeSet>
 
 </databaseChangeLog>

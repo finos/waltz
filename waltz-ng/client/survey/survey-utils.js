@@ -115,6 +115,10 @@ export function loadSurveyInfo($q,
         .loadViewData(CORE_API.SurveyInstanceStore.findRecipients, [surveyInstanceId], {force})
         .then(r => r.data);
 
+    const instanceOwnersPromise = serviceBroker
+        .loadViewData(CORE_API.SurveyInstanceStore.findOwners, [surveyInstanceId], {force})
+        .then(r => r.data);
+
     const instancePromise = serviceBroker
         .loadViewData(CORE_API.SurveyInstanceStore.getById, [surveyInstanceId], {force})
         .then(r => r.data);
@@ -144,13 +148,6 @@ export function loadSurveyInfo($q,
             .loadViewData(CORE_API.PersonStore.getById, [run.ownerId]))
         .then(r => r.data);
 
-    const instanceOwnerPromise = instancePromise
-        .then(instance => instance.ownerId
-            ? serviceBroker
-                .loadViewData(CORE_API.PersonStore.getById, [instance.ownerId])
-                .then(r => r.data)
-            : Promise.resolve(null));
-
     const owningRolePromise = instancePromise
         .then(instance => serviceBroker
             .loadAppData(CORE_API.RoleStore.findAllRoles)
@@ -178,14 +175,14 @@ export function loadSurveyInfo($q,
         subjectPromise,
         ownerPromise,
         owningRolePromise,
-        instanceOwnerPromise,
+        instanceOwnersPromise,
         possibleActionsPromise,
         permissionsPromise
     ];
 
     return $q
         .all(promises)
-        .then(([u, instance, dropdownEntries, run, template, recipients,  versions, subject, owner, ownerRole, instanceOwner, possibleActions, permissions]) => {
+        .then(([u, instance, dropdownEntries, run, template, recipients,  versions, subject, owner, ownerRole, instanceOwners, possibleActions, permissions]) => {
 
             const latestInstanceId = instance.originalInstanceId || instance.id;
             const isLatest = latestInstanceId === instance.id;
@@ -202,7 +199,7 @@ export function loadSurveyInfo($q,
                 subject,
                 owner,
                 ownerRole,
-                instanceOwner,
+                instanceOwners,
                 possibleActions,
                 permissions
             };

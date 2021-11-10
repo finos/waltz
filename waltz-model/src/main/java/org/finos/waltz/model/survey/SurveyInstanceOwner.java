@@ -20,28 +20,16 @@ package org.finos.waltz.model.survey;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.Nullable;
-import org.finos.waltz.model.command.Command;
+import org.finos.waltz.model.IdProvider;
+import org.finos.waltz.model.person.Person;
 import org.immutables.value.Value;
 
-import java.time.LocalDate;
-import java.util.Optional;
-
 @Value.Immutable
-@JsonSerialize(as = ImmutableSurveyInstanceCreateCommand.class)
-@JsonDeserialize(as = ImmutableSurveyInstanceCreateCommand.class)
-public abstract class SurveyInstanceCreateCommand implements Command {
+@JsonSerialize(as = ImmutableSurveyInstanceOwner.class)
+@JsonDeserialize(as = ImmutableSurveyInstanceOwner.class)
+public abstract class SurveyInstanceOwner implements IdProvider {
 
-    public abstract Long surveyRunId();
-    public abstract EntityReference entityReference();
-    public abstract Optional<LocalDate> dueDate();
-    @Value.Default
-    public SurveyInstanceStatus status() {
-        return SurveyInstanceStatus.NOT_STARTED;
-    }
-
-    @Nullable
-    public abstract String owningRole();
+    public abstract SurveyInstance surveyInstance();
+    public abstract Person person();
 
 }

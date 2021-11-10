@@ -19,20 +19,17 @@
 package org.finos.waltz.service.survey;
 
 
-import org.finos.waltz.service.changelog.ChangeLogService;
-import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.person.PersonDao;
-import org.finos.waltz.data.survey.SurveyInstanceDao;
-import org.finos.waltz.data.survey.SurveyInstanceRecipientDao;
-import org.finos.waltz.data.survey.SurveyQuestionResponseDao;
-import org.finos.waltz.data.survey.SurveyRunDao;
+import org.finos.waltz.data.survey.*;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.survey.*;
 import org.finos.waltz.model.user.SystemRole;
 import org.finos.waltz.model.utils.IdUtilities;
+import org.finos.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.service.user.UserRoleService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,7 +44,6 @@ import java.util.Set;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.CollectionUtilities.find;
-import static org.finos.waltz.common.OptionalUtilities.contentsEqual;
 import static org.finos.waltz.model.survey.SurveyInstanceStateMachineFactory.simple;
 
 @Service
@@ -57,6 +53,7 @@ public class SurveyInstanceService {
     private final PersonDao personDao;
     private final SurveyInstanceDao surveyInstanceDao;
     private final SurveyInstanceRecipientDao surveyInstanceRecipientDao;
+    private final SurveyInstanceOwnerDao surveyInstanceOwnerDao;
     private final SurveyQuestionResponseDao surveyQuestionResponseDao;
     private final SurveyInstanceIdSelectorFactory surveyInstanceIdSelectorFactory = new SurveyInstanceIdSelectorFactory();
     private final SurveyRunDao surveyRunDao;
@@ -69,6 +66,7 @@ public class SurveyInstanceService {
                                  PersonDao personDao,
                                  SurveyInstanceDao surveyInstanceDao,
                                  SurveyInstanceRecipientDao surveyInstanceRecipientDao,
+                                 SurveyInstanceOwnerDao surveyInstanceOwnerDao,
                                  SurveyQuestionResponseDao surveyQuestionResponseDao,
                                  SurveyRunDao surveyRunDao,
                                  UserRoleService userRoleService,
@@ -78,6 +76,7 @@ public class SurveyInstanceService {
         checkNotNull(personDao, "personDao cannot be null");
         checkNotNull(surveyInstanceDao, "surveyInstanceDao cannot be null");
         checkNotNull(surveyInstanceRecipientDao, "surveyInstanceRecipientDao cannot be null");
+        checkNotNull(surveyInstanceOwnerDao, "surveyInstanceOwnerDao cannot be null");
         checkNotNull(surveyQuestionResponseDao, "surveyQuestionResponseDao cannot be null");
         checkNotNull(surveyRunDao, "surveyRunDao cannot be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
@@ -87,6 +86,7 @@ public class SurveyInstanceService {
         this.personDao = personDao;
         this.surveyInstanceDao = surveyInstanceDao;
         this.surveyInstanceRecipientDao = surveyInstanceRecipientDao;
+        this.surveyInstanceOwnerDao = surveyInstanceOwnerDao;
         this.surveyQuestionResponseDao = surveyQuestionResponseDao;
         this.surveyRunDao = surveyRunDao;
         this.userRoleService = userRoleService;
@@ -127,6 +127,11 @@ public class SurveyInstanceService {
 
     public List<SurveyInstanceRecipient> findRecipients(long instanceId) {
         return surveyInstanceRecipientDao.findForSurveyInstance(instanceId);
+    }
+
+
+    public List<SurveyInstanceOwner> findOwners(long instanceId) {
+        return surveyInstanceOwnerDao.findForSurveyInstance(instanceId);
     }
 
 
@@ -347,10 +352,9 @@ public class SurveyInstanceService {
 
 
     private boolean isOwner(long instanceId, Person person) {
-        SurveyInstance instance = surveyInstanceDao.getById(instanceId);
-        SurveyRun run = surveyRunDao.getById(instance.surveyRunId());
-
-        return contentsEqual(person.id(), run.ownerId());
+        return person.id()
+                .map(pId -> surveyInstanceOwnerDao.isPersonInstanceOwner(pId, instanceId))
+                .orElse(false);
     }
 
 
@@ -395,7 +399,7 @@ public class SurveyInstanceService {
         boolean isAdmin = userRoleService.hasRole(userName, SystemRole.SURVEY_ADMIN);
         boolean isParticipant = surveyInstanceRecipientDao.isPersonInstanceRecipient(person.id().get(), instanceId);
         boolean isOwner = person.id()
-                .map(pid -> Objects.equals(instance.ownerId(), pid) || Objects.equals(run.ownerId(), pid))
+                .map(pid -> surveyInstanceOwnerDao.isPersonInstanceOwner(instanceId, pid) || Objects.equals(run.ownerId(), pid))
                 .orElse(false);
         boolean hasOwningRole = userRoleService.hasRole(person.email(), instance.owningRole());
         boolean isLatest = instance.originalInstanceId() == null;

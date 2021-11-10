@@ -79,7 +79,6 @@ public class SurveyInstanceDao {
                 .approvedAt(ofNullable(record.getApprovedAt()).map(Timestamp::toLocalDateTime).orElse(null))
                 .approvedBy(record.getApprovedBy())
                 .originalInstanceId(record.getOriginalInstanceId())
-                .ownerId(record.getOwnerId())
                 .owningRole(record.getOwningRole())
                 .name(record.getName())
                 .qualifierEntity(maybeReadRef(
@@ -144,7 +143,6 @@ public class SurveyInstanceDao {
         record.setEntityId(command.entityReference().id());
         record.setStatus(command.status().name());
         record.setDueDate(command.dueDate().map(Date::valueOf).orElse(null));
-        record.setOwnerId(command.ownerId());
         record.setOwningRole(command.owningRole());
 
         record.store();
@@ -168,7 +166,6 @@ public class SurveyInstanceDao {
                 .map(dt -> Timestamp.valueOf(currentInstance.approvedAt()))
                 .orElse(null));
         record.setApprovedBy(currentInstance.approvedBy());
-        record.setOwnerId(currentInstance.ownerId());
         record.setOwningRole(currentInstance.owningRole());
         record.setName(currentInstance.name());
         Optional
