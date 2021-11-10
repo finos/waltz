@@ -9,7 +9,6 @@
     import EntityLink from "../../../common/svelte/EntityLink.svelte";
 
     export let parentEntity;
-    export let flowInfo;
 
     let selectedTab = "context";
     let dispatch = createEventDispatcher();
