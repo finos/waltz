@@ -20,7 +20,7 @@ batchUpdate(toUpdate); // update attrs
 writeChangeLogs(toAdd, toRemove, toUpdate); // user visible log
 ```
 
-A good example is: [HigherEducationTaxonomyImport.java](https://github.com/finos/waltz/blob/master/waltz-jobs/src/main/java/com/khartec/waltz/jobs/example/HigherEducationTaxonomyImport.java).
+A good example is: [HigherEducationTaxonomyImport.java](https://github.com/finos/waltz/blob/master/waltz-jobs/src/main/java/org/finos/waltz/jobs/example/HigherEducationTaxonomyImport.java).
 
 
 

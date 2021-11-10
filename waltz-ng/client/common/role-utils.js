@@ -23,7 +23,7 @@ import systemRoles from "../user/system-roles";
  * Given an entity kind, returns the user roles required for editing
  *
  * Note this file should correspond to the Java impl:
- * `com.khartec.waltz.service.user.RoleUtilities.getRequiredRoleForEntityKind(...)`
+ * `org.finos.waltz.service.user.RoleUtilities.getRequiredRoleForEntityKind(...)`
  *
  * @param kind
  * @param secondaryKind  (Optional) secondary kind

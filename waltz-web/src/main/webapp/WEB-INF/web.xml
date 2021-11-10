@@ -32,7 +32,7 @@
         <filter-class>spark.servlet.SparkFilter</filter-class>
         <init-param>
             <param-name>applicationClass</param-name>
-            <param-value>com.khartec.waltz.web.WaltzApplication</param-value>
+            <param-value>org.finos.waltz.web.WaltzApplication</param-value>
         </init-param>
     </filter>
 
