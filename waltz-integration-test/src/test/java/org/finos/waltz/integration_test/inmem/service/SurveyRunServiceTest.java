@@ -119,9 +119,9 @@ public class SurveyRunServiceTest extends BaseInMemoryIntegrationTest {
         assertEquals("instances for u1 should be just an instance for appA", asSet(instanceA), instancesForU1);
         assertEquals("should be no instances for user 2A", Collections.emptySet(), instancesForU2a);
 
-        assertEquals("can find by name or id (1)", instanceService.findForRecipient(u1Id), instanceService.findForRecipient(u1));
-        assertEquals("can find by name or id (2a)", instanceService.findForRecipient(u2bId), instanceService.findForRecipient(u2b));
-        assertThrows("finding by removed user throws an exception", IllegalArgumentException.class, () -> instanceService.findForRecipient(u2a));
+        assertEquals("can find by name or id (1)", instanceService.findForRecipient(u1Id), instanceService.findForUser(u1));
+        assertEquals("can find by name or id (2a)", instanceService.findForRecipient(u2bId), instanceService.findForUser(u2b));
+        assertThrows("finding by removed user throws an exception", IllegalArgumentException.class, () -> instanceService.findForUser(u2a));
 
         List<SurveyInstanceRecipient> aRecips = instanceService.findRecipients(instanceAId);
         List<SurveyInstanceRecipient> bRecips = instanceService.findRecipients(instanceBId);

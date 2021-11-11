@@ -30,15 +30,10 @@
     <waltz-section>
         <div class="row">
             <div class="col-md-4">
-                <waltz-svelte-component component="$ctrl.EntityInfoPanel"
+                <waltz-svelte-component component="$ctrl.Grid"
+                                        column-defs="$ctrl.columnDefs"
+                                        row-data="$ctrl.rowData"
                                         primary-entity-ref="$ctrl.parentEntityRef">
-                </waltz-svelte-component>
-            </div>
-            <div class="col-md-4">
-            </div>
-            <div class="col-md-4">
-                <waltz-svelte-component component="$ctrl.EntityInfoPanel"
-                                        primary-entity-ref="$ctrl.measurableEntityRef">
                 </waltz-svelte-component>
             </div>
         </div>

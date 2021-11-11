@@ -18,7 +18,7 @@
 import _ from "lodash";
 import {initialiseData} from "../common/index";
 import {mkEntityLinkGridCell, mkLinkGridCell} from "../common/grid-utils";
-
+import UserSurveyListPanel from "./components/svelte/UserSurveyListPanel.svelte"
 import template from "./survey-instance-list-user-view.html";
 import roles from "../user/system-roles";
 
@@ -27,7 +27,8 @@ const initialState = {
     incompleteColumnDefs: [],
     completeColumnDefs: [],
     surveyInstancesAndRuns: [],
-    showSurveyTemplateButton: false
+    showSurveyTemplateButton: false,
+    UserSurveyListPanel
 };
 
 
@@ -53,11 +54,11 @@ function mkSurveyData(surveyRuns = [], surveyInstances = []) {
     };
 }
 
-const subjectField = mkEntityLinkGridCell("Subject", 
-                                          "surveyInstance.surveyEntity", 
-                                          "left", 
-                                          "top", 
-                                          {}, 
+const subjectField = mkEntityLinkGridCell("Subject",
+                                          "surveyInstance.surveyEntity",
+                                          "left",
+                                          "top",
+                                          {},
                                           true);
 
 const subjectExtIdField = {
@@ -156,21 +157,10 @@ function controller($q,
 
     const vm = initialiseData(this, initialState);
 
-    vm.incompleteColumnDefs = mkIncompleteColumnDefs();
-    vm.completeColumnDefs = mkCompleteColumnDefs();
-
     userService.whoami()
         .then(user => vm.user = user)
         .then(() => vm.showSurveyTemplateButton = userService.hasRole(vm.user, roles.SURVEY_ADMIN)
             || userService.hasRole(vm.user, roles.SURVEY_TEMPLATE_ADMIN));
-
-    const surveyRunsPromise = surveyRunStore.findForUser();
-    const surveyInstancesPromise = surveyInstanceStore.findForUser();
-
-    $q.all([surveyRunsPromise, surveyInstancesPromise])
-        .then(([surveyRuns, surveyInstances]) => {
-            vm.surveys = mkSurveyData(surveyRuns, surveyInstances);
-        });
 }
 
 
