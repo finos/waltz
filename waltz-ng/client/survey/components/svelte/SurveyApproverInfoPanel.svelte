@@ -173,7 +173,7 @@
     {#if _.isEmpty(gridData)}
         <NoData>There are no surveys for the current selection</NoData>
     {:else }
-        <h4>{$selectedSurveyStatusCell.header.description}:</h4>
+        <h4>{$selectedSurveyStatusCell?.header.description}:</h4>
         <SurveyInstanceGrid {columnDefs}
                             rowData={gridData}
                             onSelectRow={selectRow}/>
