@@ -187,7 +187,7 @@
         background-color: $waltz-amber-background;
 
         &.selected {
-            border: solid 1px $waltz-amber;
+            outline: solid 1px $waltz-amber;
         }
     }
 
@@ -195,7 +195,7 @@
         background-color: $waltz-blue-background;
 
         &.selected {
-            border: solid 1px $waltz-blue;
+            outline: solid 1px $waltz-blue;
         }
     }
 
@@ -203,7 +203,7 @@
         background-color: $waltz-maroon-background;
 
         &.selected {
-            border: solid 1px $waltz-dark-red;
+            outline: solid 1px $waltz-dark-red;
         }
     }
 
@@ -211,7 +211,7 @@
         background-color: $waltz-green-background;
 
         &.selected {
-            border: solid 1px $waltz-green;
+            outline: solid 1px $waltz-green;
         }
     }
 
