@@ -359,4 +359,16 @@ public class SurveyInstanceDao {
 
         return dsl.batchInsert(records).execute();
     }
+
+    public Set<SurveyInstance> findForOwner(Long personId) {
+        return dsl.select(SURVEY_INSTANCE.fields())
+                .select(ENTITY_NAME_FIELD)
+                .select(EXTERNAL_ID_FIELD)
+                .from(SURVEY_INSTANCE)
+                .innerJoin(SURVEY_INSTANCE_OWNER)
+                .on(SURVEY_INSTANCE_OWNER.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
+                .where(SURVEY_INSTANCE_OWNER.PERSON_ID.eq(personId))
+                .and(IS_ORIGINAL_INSTANCE_CONDITION)
+                .fetchSet(TO_DOMAIN_MAPPER);
+    }
 }

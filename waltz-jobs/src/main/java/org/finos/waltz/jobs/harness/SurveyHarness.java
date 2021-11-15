@@ -143,45 +143,10 @@ public class SurveyHarness {
         SurveyQuestionService surveyQuestionService = ctx.getBean(SurveyQuestionService.class);
         SurveyInstanceService surveyInstanceService = ctx.getBean(SurveyInstanceService.class);
 
-        Set<SurveyInstance> instances = surveyInstanceService.findForRecipient(userName);
+        Set<SurveyInstanceUserInvolvement> instances = surveyInstanceService.findForUser(userName);
 
         System.out.println("===========Instances==========");
         System.out.println(instances);
-
-        SurveyInstance instance = first(instances);
-        List<SurveyQuestion> questions = surveyQuestionService.findForSurveyInstance(instance.id().get());
-
-        System.out.println("===========Questions==========");
-        System.out.println(questions);
-
-        List<SurveyInstanceQuestionResponse> responses = surveyInstanceService.findResponses(instance.id().get());
-
-        System.out.println("===========Responses==========");
-        System.out.println(responses);
-
-        ImmutableSurveyQuestionResponse insertResponse = ImmutableSurveyQuestionResponse.builder()
-                .questionId(1L)
-                .comment("some comment")
-                .stringResponse("some response")
-                .build();
-
-        surveyInstanceService.saveResponse(userName, instance.id().get(), insertResponse);
-        System.out.println("===========Inserted Responses==========");
-        System.out.println(surveyInstanceService.findResponses(instance.id().get()));
-
-        ImmutableSurveyQuestionResponse updateResponse = insertResponse
-                .withStringResponse("updated string response");
-
-        surveyInstanceService.saveResponse(userName, instance.id().get(), updateResponse);
-        System.out.println("===========Updated Responses==========");
-        System.out.println(surveyInstanceService.findResponses(instance.id().get()));
-
-        surveyInstanceService.updateStatus(
-                userName,
-                instance.id().get(),
-                ImmutableSurveyInstanceStatusChangeCommand.builder()
-                        .action(SurveyInstanceAction.SAVING)
-                        .build());
     }
 
 
