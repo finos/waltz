@@ -191,7 +191,7 @@
         }
     }
 
-    .awaiting-approval{
+    .awaiting-approval {
         background-color: $waltz-blue-background;
 
         &.selected {
@@ -207,7 +207,7 @@
         }
     }
 
-    .approved{
+    .approved {
         background-color: $waltz-green-background;
 
         &.selected {

@@ -107,6 +107,15 @@ public class SurveyInstanceService {
     }
 
 
+    public Set<SurveyInstance> findForRecipient(String userName) {
+        checkNotNull(userName, "userName cannot be null");
+
+        Person person = getPersonByUsername(userName);
+
+        return surveyInstanceDao.findForRecipient(person.id().get());
+    }
+
+
     public Set<SurveyInstance> findForSurveyRun(long surveyRunId) {
         return surveyInstanceDao.findForSurveyRun(surveyRunId);
     }
