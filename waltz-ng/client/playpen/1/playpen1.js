@@ -18,11 +18,13 @@
 
 
 import template from "./playpen1.html";
-import {initialiseData} from "../../common";
-import EntityInfoPanel from "../../common/svelte/info-panels/EntityInfoPanel.svelte";
+import {initialiseData, randomPick} from "../../common";
+import Grid from "./Grid.svelte";
+import _ from "lodash";
+import {characters} from "./data";
 
 const initData = {
-    EntityInfoPanel,
+    Grid,
     // parentEntityRef: {id: 20768, kind: "APPLICATION"}
     parentEntityRef: {id: 6538029, kind: "CHANGE_INITIATIVE"},
     measurableEntityRef: {id: 54566, kind: "MEASURABLE"}
@@ -34,6 +36,17 @@ function controller($element, $q, serviceBroker) {
     const vm = initialiseData(this, initData);
 
 
+
+    vm.rowData = _
+        .chain(_.range(0, 4000))
+        .map(d => ({c1: d, c2: d + " name", c3: randomPick(characters)}))
+        .value();
+
+    vm.columnDefs = [
+        { field: "c1", name: "c1" },
+        { field: "c2", name: "c2" },
+        { field: "c3", name: "c3" }
+    ]
 }
 
 controller.$inject = ["$element", "$q", "ServiceBroker"];

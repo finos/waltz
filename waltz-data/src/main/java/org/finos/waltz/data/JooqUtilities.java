@@ -59,8 +59,20 @@ public class JooqUtilities {
         return Optional
                 .ofNullable(record.getValue(kindField))
                 .map(kindStr -> mkRef(
-                    EntityKind.valueOf(kindStr),
-                    record.getValue(idField)));
+                        EntityKind.valueOf(kindStr),
+                        record.getValue(idField)));
+    }
+
+    public static Optional<EntityReference> maybeReadRef(Record record,
+                                                         Field<String> kindField,
+                                                         Field<Long> idField,
+                                                         Field<String> nameField) {
+        return Optional
+                .ofNullable(record.getValue(kindField))
+                .map(kindStr -> mkRef(
+                        EntityKind.valueOf(kindStr),
+                        record.getValue(idField),
+                        record.getValue(nameField)));
     }
 
     public static EntityReference readRef(Record record, Field<String> kindField, Field<Long> idField) {
