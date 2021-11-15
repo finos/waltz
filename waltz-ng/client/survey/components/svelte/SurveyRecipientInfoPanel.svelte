@@ -5,6 +5,7 @@
     import NoData from "../../../common/svelte/NoData.svelte";
     import {surveyInstanceStatus} from "../../../common/services/enums/survey-instance-status";
     import {selectSurveyRow} from "./user-survey-store";
+    import Icon from "../../../common/svelte/Icon.svelte";
 
     export let surveys = [];
 
@@ -54,7 +55,7 @@
         },{
             class: "incomplete",
             name: "Total Outstanding",
-            description: "Total incomplete surveys",
+            description: "All incomplete surveys",
             width: "10%",
             data: d => d.incomplete
         },{
@@ -131,48 +132,55 @@
 
 </script>
 
-
-<table class="table table-condensed">
-    <thead>
-    <tr>
-        <th width="30%">Survey Name</th>
-        {#each tableHeaders as header}
-            <th width={`${60 / tableHeaders.length}%`}>{header.name}</th>
-        {/each}
-        <th with="10%">Total</th>
-    </tr>
-    </thead>
-    <tbody>
-    {#each templateSummaries as templateInfo}
+<div class="help-block">
+    <Icon name="info-circle"/>The table below details the surveys for which you are an assigned recipient. Recipients are responsible for
+    completing a survey. Select a filter to see the survey details and use the table to navigate to them.
+</div>
+{#if _.isEmpty(templateSummaries)}
+    <NoData>There are no surveys where you are an assigned recipient</NoData>
+{:else}
+    <table class="table table-condensed">
+        <thead>
         <tr>
-            <td>{templateInfo.template.name}</td>
+            <th width="30%">Survey Name</th>
             {#each tableHeaders as header}
-                <td class={_.isEmpty(header.data(templateInfo)) ? "" : header.class}>
-                    {#if _.isEmpty(header.data(templateInfo))}
-                        <div class="text-muted">0</div>
-                    {:else}
-                        <button class="btn btn-skinny"
-                                on:click={() => selectSurveyFilter(header, templateInfo)}>
-                            {_.size(header.data(templateInfo))}
-                        </button>
-                    {/if}
-                </td>
+                <th width={`${60 / tableHeaders.length}%`}>{header.name}</th>
             {/each}
-            <td><div>{_.size(byTemplateId[templateInfo.template.id])}</div></td>
+            <th with="10%">Total</th>
         </tr>
-    {/each}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+        {#each templateSummaries as templateInfo}
+            <tr>
+                <td>{templateInfo.template.name}</td>
+                {#each tableHeaders as header}
+                    <td class={_.isEmpty(header.data(templateInfo)) ? "" : header.class}>
+                        {#if _.isEmpty(header.data(templateInfo))}
+                            <div class="text-muted">0</div>
+                        {:else}
+                            <button class="btn btn-skinny"
+                                    on:click={() => selectSurveyFilter(header, templateInfo)}>
+                                {_.size(header.data(templateInfo))}
+                            </button>
+                        {/if}
+                    </td>
+                {/each}
+                <td><div>{_.size(byTemplateId[templateInfo.template.id])}</div></td>
+            </tr>
+        {/each}
+        </tbody>
+    </table>
 
-<hr>
+    <hr>
 
-{#if _.isEmpty(gridData)}
-    <NoData>There are no surveys for the current selection</NoData>
-{:else }
-    <h4>{selectedFilterName}:</h4>
-    <SurveyInstanceGrid {columnDefs}
-                        rowData={gridData}
-                        onSelectRow={selectRow}/>
+    {#if _.isEmpty(gridData)}
+        <NoData>There are no surveys for the current selection</NoData>
+    {:else }
+        <h4>{selectedFilterName}:</h4>
+        <SurveyInstanceGrid {columnDefs}
+                            rowData={gridData}
+                            onSelectRow={selectRow}/>
+    {/if}
 {/if}
 
 <style type="text/scss">

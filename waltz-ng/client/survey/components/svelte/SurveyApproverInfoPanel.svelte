@@ -6,6 +6,7 @@
     import {surveyInstanceStatus} from "../../../common/services/enums/survey-instance-status";
     import {selectSurveyRow} from "./user-survey-store";
     import {timeFormat} from "d3-time-format";
+    import Icon from "../../../common/svelte/Icon.svelte";
 
     export let surveys = [];
 
@@ -49,7 +50,7 @@
         },{
             class: "overdue",
             name: "Overdue",
-            description: "Overdue surveys",
+            description: "Overdue surveys - awaiting completion",
             width: "25%",
             data: d => d.overdue
         },{
@@ -126,61 +127,68 @@
 
 </script>
 
-
-<table class="table table-condensed">
-    <thead>
-    <tr>
-        <th width="30%">Survey Name</th>
-        {#each tableHeaders as header}
-            <th width={`${60 / tableHeaders.length}%`}>{header.name}</th>
-        {/each}
-    </tr>
-    </thead>
-    <tbody>
-    {#each templateSummaries as templateInfo}
+<div class="help-block">
+    <Icon name="info-circle"/>The table below details the surveys for which you are an assigned owner. Owners are responsible
+    for approving, rejecting and reopening surveys. Select a filter to see the individual survey details and navigate to them.
+</div>
+{#if _.isEmpty(templateSummaries)}
+    <NoData>There are no surveys where you are an assigned owner</NoData>
+{:else}
+    <table class="table table-condensed">
+        <thead>
         <tr>
-            <td>{templateInfo.template.name}</td>
+            <th width="30%">Survey Name</th>
             {#each tableHeaders as header}
-                <td class={_.isEmpty(header.data(templateInfo)) ? "" : header.class}>
-                    {#if _.isEmpty(header.data(templateInfo))}
-                        <div class="text-muted">0</div>
-                    {:else}
-                        <button class="btn btn-skinny"
-                                on:click={() => selectSurveyFilter(header, templateInfo)}>
-                            {_.size(header.data(templateInfo))}
-                        </button>
-                    {/if}
-                </td>
+                <th width={`${60 / tableHeaders.length}%`}>{header.name}</th>
             {/each}
         </tr>
-    {/each}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+        {#each templateSummaries as templateInfo}
+            <tr>
+                <td>{templateInfo.template.name}</td>
+                {#each tableHeaders as header}
+                    <td class={_.isEmpty(header.data(templateInfo)) ? "" : header.class}>
+                        {#if _.isEmpty(header.data(templateInfo))}
+                            <div class="text-muted">0</div>
+                        {:else}
+                            <button class="btn btn-skinny"
+                                    on:click={() => selectSurveyFilter(header, templateInfo)}>
+                                {_.size(header.data(templateInfo))}
+                            </button>
+                        {/if}
+                    </td>
+                {/each}
+            </tr>
+        {/each}
+        </tbody>
+    </table>
 
-<hr>
+    <hr>
 
-{#if _.isEmpty(gridData)}
-    <NoData>There are no surveys for the current selection</NoData>
-{:else }
-    <h4>{selectedFilterName}:</h4>
-    <SurveyInstanceGrid {columnDefs}
-                        rowData={gridData}
-                        onSelectRow={selectRow}/>
+    {#if _.isEmpty(gridData)}
+        <NoData>There are no surveys for the current selection</NoData>
+    {:else }
+        <h4>{selectedFilterName}:</h4>
+        <SurveyInstanceGrid {columnDefs}
+                            rowData={gridData}
+                            onSelectRow={selectRow}/>
+    {/if}
 {/if}
 
 <style type="text/scss">
     @import '../../../../style/variables';
 
     .overdue {
-        background-color: $waltz-lime-background;
+        background-color: $waltz-amber-background;
+    }
+
+    .awaiting-approval{
+        background-color: $waltz-blue-background;
     }
 
     .rejected {
         background-color: $waltz-maroon-background;
-    }
-
-    .awaiting-approval{
-        background-color: $waltz-orange-background;
     }
 
     .approved{
