@@ -1,17 +1,27 @@
 <script>
 
     import _ from "lodash";
-    import {termSearch} from "../../common";
-    import Icon from "../../common/svelte/Icon.svelte";
+    import {termSearch} from "../../../common";
+    import Icon from "../../../common/svelte/Icon.svelte";
 
     export let columnDefs = [];
     export let rowData = [];
+    export let onSelectRow = () => console.log("selecting row in survey grid");
 
     let qry = null;
 
     $: filteredRows = _.isEmpty(qry)
         ? rowData
         : termSearch(rowData, qry, _.map(columnDefs, d => d.field));
+
+    $: totalAllocatedWidth = _.sumBy(columnDefs, d => _.get(d, "width", 0));
+
+    $: unallocatedColumns = _.filter(columnDefs, d => _.isEmpty(d.width));
+
+    $: unallocatedWidth = _.isEmpty(unallocatedColumns)
+        ? 0
+        : (100 - totalAllocatedWidth) / unallocatedColumns.length;
+
 </script>
 
 <div class="row">
@@ -31,7 +41,14 @@
 <div class="row">
     <div class="col-sm-12">
         <div class={_.size(rowData) > 10 ? "waltz-scroll-region-300" : ""}>
-            <table class="table table-condensed">
+            <table class="table table-condensed table-hover small fixed-table">
+
+                <colgroup>
+                    {#each columnDefs as col}
+                        <col width={_.get(col, ["width"],  `${unallocatedWidth}%`)}>
+                    {/each}
+                </colgroup>
+
                 <thead>
                     <tr>
                         {#each columnDefs as col}
@@ -42,9 +59,10 @@
 
                 <tbody>
                 {#each filteredRows as row}
-                    <tr>
+                    <tr class="clickable"
+                        on:click={() => onSelectRow(row)}>
                     {#each columnDefs as col}
-                        <td>{_.get(row, col.field.split("."))}</td>
+                        <td>{_.get(row, col.field.split("."), "-") || "-"}</td>
                     {/each}
                     </tr>
                 {/each}

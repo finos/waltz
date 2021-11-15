@@ -18,31 +18,23 @@
 
 package org.finos.waltz.data.survey;
 
-import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.HierarchyQueryScope;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.survey.*;
-import org.finos.waltz.schema.tables.records.SurveyInstanceRecipientRecord;
 import org.finos.waltz.schema.tables.records.SurveyInstanceRecord;
 import org.finos.waltz.schema.tables.records.SurveyRunRecord;
 import org.jooq.*;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Set;
 
 import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
-import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.StringUtilities.splitThenMap;
 import static org.finos.waltz.data.JooqUtilities.maybeReadRef;
@@ -55,13 +47,19 @@ public class SurveyViewDao {
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
                 SURVEY_INSTANCE.ENTITY_ID,
                 SURVEY_INSTANCE.ENTITY_KIND,
-                newArrayList(EntityKind.values()))
+                newArrayList(EntityKind.APPLICATION, EntityKind.CHANGE_INITIATIVE))
             .as("entity_name");
+
+    private static final Field<String> QUALIFIER_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+                SURVEY_INSTANCE.ENTITY_QUALIFIER_ID,
+                SURVEY_INSTANCE.ENTITY_QUALIFIER_KIND,
+                newArrayList(EntityKind.MEASURABLE))
+            .as("qualifier_entity_name");
 
     private static final Field<String> EXTERNAL_ID_FIELD = InlineSelectFieldFactory.mkExternalIdField(
             SURVEY_INSTANCE.ENTITY_ID,
             SURVEY_INSTANCE.ENTITY_KIND,
-            newArrayList(EntityKind.values()))
+            newArrayList(EntityKind.APPLICATION, EntityKind.CHANGE_INITIATIVE))
             .as("external_id");
 
     private static final String ID_SEPARATOR = ";";
@@ -88,9 +86,10 @@ public class SurveyViewDao {
                 .owningRole(instanceRecord.getOwningRole())
                 .name(instanceRecord.getName())
                 .qualifierEntity(maybeReadRef(
-                        instanceRecord,
+                        r,
                         SURVEY_INSTANCE.ENTITY_QUALIFIER_KIND,
-                        SURVEY_INSTANCE.ENTITY_QUALIFIER_ID)
+                        SURVEY_INSTANCE.ENTITY_QUALIFIER_ID,
+                        QUALIFIER_NAME_FIELD)
                         .orElse(null))
                 .build();
 
@@ -148,6 +147,7 @@ public class SurveyViewDao {
                         SURVEY_TEMPLATE.ID,
                         SURVEY_TEMPLATE.DESCRIPTION)
                 .select(ENTITY_NAME_FIELD)
+                .select(QUALIFIER_NAME_FIELD)
                 .select(EXTERNAL_ID_FIELD)
                 .from(SURVEY_INSTANCE)
                 .innerJoin(SURVEY_INSTANCE_RECIPIENT)
@@ -156,6 +156,7 @@ public class SurveyViewDao {
                 .innerJoin(SURVEY_TEMPLATE).on(SURVEY_RUN.SURVEY_TEMPLATE_ID.eq(SURVEY_TEMPLATE.ID))
                 .where(SURVEY_INSTANCE_RECIPIENT.PERSON_ID.eq(personId))
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
+                .and(SURVEY_INSTANCE.STATUS.ne(SurveyInstanceStatus.WITHDRAWN.name()))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 
@@ -168,6 +169,7 @@ public class SurveyViewDao {
                         SURVEY_TEMPLATE.ID,
                         SURVEY_TEMPLATE.DESCRIPTION)
                 .select(ENTITY_NAME_FIELD)
+                .select(QUALIFIER_NAME_FIELD)
                 .select(EXTERNAL_ID_FIELD)
                 .from(SURVEY_INSTANCE)
                 .innerJoin(SURVEY_INSTANCE_OWNER)
@@ -176,6 +178,7 @@ public class SurveyViewDao {
                 .innerJoin(SURVEY_TEMPLATE).on(SURVEY_RUN.SURVEY_TEMPLATE_ID.eq(SURVEY_TEMPLATE.ID))
                 .where(SURVEY_INSTANCE_OWNER.PERSON_ID.eq(personId))
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
+                .and(SURVEY_INSTANCE.STATUS.ne(SurveyInstanceStatus.WITHDRAWN.name()))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 }

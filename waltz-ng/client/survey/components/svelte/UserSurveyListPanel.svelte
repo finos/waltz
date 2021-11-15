@@ -1,8 +1,9 @@
 <script>
 
     import {surveyInstanceViewStore} from "../../../svelte-stores/survey-instance-view-store";
-    import SurveyRecipientInfoPanel, {surveys} from "./SurveyRecipientInfoPanel.svelte";
+    import SurveyRecipientInfoPanel from "./SurveyRecipientInfoPanel.svelte";
     import _ from "lodash";
+    import SurveyApproverInfoPanel from "./SurveyApproverInfoPanel.svelte";
 
     let selectedTab = 'completions';
 
@@ -17,12 +18,7 @@
     $: incompleteSurveys = _.filter(recipientSurveys, c => c.surveyInstance.status === 'IN_PROGRESS' || c.surveyInstance.status === 'NOT_STARTED');
     $: completedSurveys = _.filter(approverSurveys, c => c.surveyInstance.status === 'COMPLETED');
 
-    $: console.log({recipientSurveys, approverSurveys, incompleteSurveys});
-
 </script>
-
-<h4>Hello new svelte panel here!</h4>
-
 
 <div class="waltz-tabs" style="padding-top: 1em">
     <!-- TAB HEADERS -->
@@ -48,7 +44,7 @@
         {#if selectedTab === 'completions'}
             <SurveyRecipientInfoPanel surveys={_.get(surveysByInvolvementKind, 'RECIPIENT', []).surveyInstances}/>
         {:else if selectedTab === 'approvals'}
-            <h4>Stuff to be approved</h4>
+            <SurveyApproverInfoPanel surveys={_.get(surveysByInvolvementKind, 'OWNER', []).surveyInstances}/>
         {/if}
     </div>
 </div>

@@ -21,6 +21,7 @@ import {mkEntityLinkGridCell, mkLinkGridCell} from "../common/grid-utils";
 import UserSurveyListPanel from "./components/svelte/UserSurveyListPanel.svelte"
 import template from "./survey-instance-list-user-view.html";
 import roles from "../user/system-roles";
+import {selectSurveyRow} from "./components/svelte/user-survey-store";
 
 
 const initialState = {
@@ -150,12 +151,20 @@ function mkCompleteColumnDefs() {
 }
 
 
-function controller($q,
-                    surveyInstanceStore,
-                    surveyRunStore,
+function controller($state,
                     userService) {
 
     const vm = initialiseData(this, initialState);
+
+    vm.goToSurvey = (surveyInstance) => {
+        $state.go(
+            "main.survey.instance.response.view",
+            { id: surveyInstance.id });
+    }
+
+    vm.$onInit = () => {
+        selectSurveyRow.set(vm.goToSurvey);
+    }
 
     userService.whoami()
         .then(user => vm.user = user)
@@ -165,9 +174,7 @@ function controller($q,
 
 
 controller.$inject = [
-    "$q",
-    "SurveyInstanceStore",
-    "SurveyRunStore",
+    "$state",
     "UserService"
 ];
 

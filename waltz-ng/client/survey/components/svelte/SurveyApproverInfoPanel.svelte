@@ -5,6 +5,7 @@
     import NoData from "../../../common/svelte/NoData.svelte";
     import {surveyInstanceStatus} from "../../../common/services/enums/survey-instance-status";
     import {selectSurveyRow} from "./user-survey-store";
+    import {timeFormat} from "d3-time-format";
 
     export let surveys = [];
 
@@ -12,62 +13,56 @@
     let selectedFilterName;
 
     let columnDefs = [
-        { field: "surveyInstance.surveyEntity.name", name: "Subject Name", width: "30%"},
+        { field: "surveyInstance.surveyEntity.name", name: "Subject Name", width: "20%"},
         { field: "surveyInstance.surveyEntityExternalId", name: "Subject Ext Id"},
-        { field: "surveyInstance.qualifierEntity.name", name: "Qualifier"},
+        { field: "surveyInstance.qualifierEntity.name", name: "Qualifier", width: "15%"},
         { field: "displayStatus", name: "Status"},
-        { field: "surveyRun.dueDate", name: "Due Date"}
+        { field: "surveyInstance.submittedBy", name: "Submitter", width: "15%"},
+        { field: "displaySubmittedAt", name: "Submitted"},
+        { field: "surveyInstance.approvedBy", name: "Approver", width: "15%"},
+        { field: "displayApprovedAt", name: "Approved"},
     ]
+
+    const dateFormat = timeFormat("%Y-%m-%d");
 
     $: byTemplateId = _
         .chain(surveys)
-        .map(d => Object.assign({}, d, { displayStatus: _.get(surveyInstanceStatus[d.surveyInstance.status], "name", d.surveyInstance.status)}))
+        .map(d => Object.assign(
+            {},
+            d,
+            {
+                displayApprovedAt: _.isEmpty(d.surveyInstance.approvedAt) ? null : dateFormat(new Date(d.surveyInstance.approvedAt)),
+                displaySubmittedAt: _.isEmpty(d.surveyInstance.submittedAt) ? null : dateFormat(new Date(d.surveyInstance.submittedAt)),
+                displayStatus: _.get(surveyInstanceStatus[d.surveyInstance.status], "name", d.surveyInstance.status)
+            }))
         .orderBy(d => _.toLower(d.surveyInstance.surveyEntity.name))
         .groupBy(d => d.surveyTemplateRef.id)
         .value();
 
     const tableHeaders = [
         {
-            class: "rejected",
-            name: "Rejected",
-            description: "Rejected surveys",
-            width: "10%",
-            data: d => d.rejected
+            class: "awaiting-approval",
+            name: "Awaiting Approval",
+            description: "Completed surveys - awaiting approval",
+            width: "25%",
+            data: d => d.completed
         },{
             class: "overdue",
             name: "Overdue",
             description: "Overdue surveys",
-            width: "10%",
+            width: "25%",
             data: d => d.overdue
         },{
-            class: "due-week",
-            name: "Due Week",
-            description: "Incomplete surveys - due within 7 days",
-            width: "10%",
-            data: d => d.dueWeek
-        },{
-            class: "due-month",
-            name: "Due Month",
-            description: "Incomplete surveys - due within 30 days",
-            width: "10%",
-            data: d => d.dueMonth
-        },{
-            class: "incomplete",
-            name: "Total Outstanding",
-            description: "Total incomplete surveys",
-            width: "10%",
-            data: d => d.incomplete
-        },{
-            class: "awaiting-approval",
-            name: "Awaiting Approval",
-            description: "Completed surveys - awaiting approval",
-            width: "10%",
-            data: d => d.completed
+            class: "rejected",
+            name: "Rejected",
+            description: "Rejected surveys",
+            width: "25%",
+            data: d => d.rejected
         },{
             class: "approved",
             description: "Approved surveys",
             name: "Approved",
-            width: "10%",
+            width: "25%",
             data: d => d.approved
         }
     ]
@@ -139,7 +134,6 @@
         {#each tableHeaders as header}
             <th width={`${60 / tableHeaders.length}%`}>{header.name}</th>
         {/each}
-        <th with="10%">Total</th>
     </tr>
     </thead>
     <tbody>
@@ -158,7 +152,6 @@
                     {/if}
                 </td>
             {/each}
-            <td><div>{_.size(byTemplateId[templateInfo.template.id])}</div></td>
         </tr>
     {/each}
     </tbody>
@@ -179,27 +172,15 @@
     @import '../../../../style/variables';
 
     .overdue {
-        background-color: $waltz-red-background;
+        background-color: $waltz-lime-background;
     }
 
     .rejected {
         background-color: $waltz-maroon-background;
     }
 
-    .due-week {
-        background-color: $waltz-orange-background;
-    }
-
-    .due-month {
-        background-color: $waltz-amber-background;
-    }
-
-    .incomplete {
-        background-color: $waltz-blue-background;
-    }
-
     .awaiting-approval{
-        background-color: $waltz-lime-background;
+        background-color: $waltz-orange-background;
     }
 
     .approved{
