@@ -4,14 +4,21 @@
     import _ from "lodash";
     import NoData from "../../../common/svelte/NoData.svelte";
     import {surveyInstanceStatus} from "../../../common/services/enums/survey-instance-status";
-    import {selectSurveyRow} from "./user-survey-store";
+    import {selectedSurveyStatusCell, selectSurveyRow} from "./user-survey-store";
     import {timeFormat} from "d3-time-format";
     import Icon from "../../../common/svelte/Icon.svelte";
+    import {onMount} from "svelte";
 
     export let surveys = [];
 
     let gridData = [];
-    let selectedFilterName;
+
+    let currentDate = new Date();
+    let weekFromNow = new Date();
+    let monthFromNow = new Date();
+
+    weekFromNow.setDate(weekFromNow.getDate() + 7);
+    monthFromNow.setDate(currentDate.getDate() + 30);
 
     let columnDefs = [
         { field: "surveyInstance.surveyEntity.name", name: "Subject Name", width: "20%"},
@@ -25,20 +32,6 @@
     ]
 
     const dateFormat = timeFormat("%Y-%m-%d");
-
-    $: byTemplateId = _
-        .chain(surveys)
-        .map(d => Object.assign(
-            {},
-            d,
-            {
-                displayApprovedAt: _.isEmpty(d.surveyInstance.approvedAt) ? null : dateFormat(new Date(d.surveyInstance.approvedAt)),
-                displaySubmittedAt: _.isEmpty(d.surveyInstance.submittedAt) ? null : dateFormat(new Date(d.surveyInstance.submittedAt)),
-                displayStatus: _.get(surveyInstanceStatus[d.surveyInstance.status], "name", d.surveyInstance.status)
-            }))
-        .orderBy(d => _.toLower(d.surveyInstance.surveyEntity.name))
-        .groupBy(d => d.surveyTemplateRef.id)
-        .value();
 
     const tableHeaders = [
         {
@@ -67,6 +60,32 @@
             data: d => d.approved
         }
     ]
+
+    onMount(() => $selectedSurveyStatusCell = null);
+
+    function selectSurveyFilter(header, templateInfo) {
+        $selectedSurveyStatusCell = {header, templateInfo};
+        gridData = header.data(templateInfo)
+    }
+
+    function selectRow(d) {
+        $selectSurveyRow(d.surveyInstance);
+    }
+
+
+    $: byTemplateId = _
+        .chain(surveys)
+        .map(d => Object.assign(
+            {},
+            d,
+            {
+                displayApprovedAt: _.isEmpty(d.surveyInstance.approvedAt) ? null : dateFormat(new Date(d.surveyInstance.approvedAt)),
+                displaySubmittedAt: _.isEmpty(d.surveyInstance.submittedAt) ? null : dateFormat(new Date(d.surveyInstance.submittedAt)),
+                displayStatus: _.get(surveyInstanceStatus[d.surveyInstance.status], "name", d.surveyInstance.status)
+            }))
+        .orderBy(d => _.toLower(d.surveyInstance.surveyEntity.name))
+        .groupBy(d => d.surveyTemplateRef.id)
+        .value();
 
     $: templateSummaries = _
         .chain(byTemplateId)
@@ -99,15 +118,6 @@
             }})
         .value();
 
-    function selectSurveyFilter(header, templateInfo) {
-        selectedFilterName = header.description;
-        gridData = header.data(templateInfo)
-    }
-
-    function selectRow(d) {
-        $selectSurveyRow(d.surveyInstance);
-    }
-
     $: templatesById = _
         .chain(surveys)
         .map(d => d.surveyTemplateRef)
@@ -117,13 +127,6 @@
 
     $: surveysByStatus = _.keyBy(surveys, d => d.surveyInstance.status);
     $: incompleteSurveys = _.concat(_.get(surveysByStatus, "IN_PROGRESS", []) , _.get(surveysByStatus, "NOT_STARTED", []));
-
-    let currentDate = new Date();
-    let weekFromNow = new Date();
-    let monthFromNow = new Date();
-
-    weekFromNow.setDate(weekFromNow.getDate() + 7);
-    monthFromNow.setDate(currentDate.getDate() + 30);
 
 </script>
 
@@ -148,7 +151,8 @@
             <tr>
                 <td>{templateInfo.template.name}</td>
                 {#each tableHeaders as header}
-                    <td class={_.isEmpty(header.data(templateInfo)) ? "" : header.class}>
+                    <td class={_.isEmpty(header.data(templateInfo)) ? "" : header.class}
+                        class:selected={$selectedSurveyStatusCell?.header === header && $selectedSurveyStatusCell?.templateInfo === templateInfo}>
                         {#if _.isEmpty(header.data(templateInfo))}
                             <div class="text-muted">0</div>
                         {:else}
@@ -169,7 +173,7 @@
     {#if _.isEmpty(gridData)}
         <NoData>There are no surveys for the current selection</NoData>
     {:else }
-        <h4>{selectedFilterName}:</h4>
+        <h4>{$selectedSurveyStatusCell.header.description}:</h4>
         <SurveyInstanceGrid {columnDefs}
                             rowData={gridData}
                             onSelectRow={selectRow}/>
@@ -181,18 +185,34 @@
 
     .overdue {
         background-color: $waltz-amber-background;
+
+        &.selected {
+            border: solid 1px $waltz-amber;
+        }
     }
 
     .awaiting-approval{
         background-color: $waltz-blue-background;
+
+        &.selected {
+            border: solid 1px $waltz-blue;
+        }
     }
 
     .rejected {
         background-color: $waltz-maroon-background;
+
+        &.selected {
+            border: solid 1px $waltz-dark-red;
+        }
     }
 
     .approved{
         background-color: $waltz-green-background;
+
+        &.selected {
+            border: solid 1px $waltz-green;
+        }
     }
 
     td * {

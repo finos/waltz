@@ -28,7 +28,7 @@
            id="completions">
     <label class="wt-label"
            for="completions">
-        <span>My Surveys - {_.size(incompleteSurveys)}</span>
+        <span>Surveys to Complete- {_.size(incompleteSurveys)}</span>
     </label>
 
     <input type="radio"
@@ -37,7 +37,7 @@
            id="approvals">
     <label class="wt-label"
            for="approvals">
-        <span>Approvals - {_.size(completedSurveys)}</span>
+        <span>Surveys to Approve - {_.size(completedSurveys)}</span>
     </label>
 
     <div class="wt-tab wt-active">

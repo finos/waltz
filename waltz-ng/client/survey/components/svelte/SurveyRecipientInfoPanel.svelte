@@ -4,13 +4,13 @@
     import _ from "lodash";
     import NoData from "../../../common/svelte/NoData.svelte";
     import {surveyInstanceStatus} from "../../../common/services/enums/survey-instance-status";
-    import {selectSurveyRow} from "./user-survey-store";
+    import {selectedSurveyStatusCell, selectSurveyRow} from "./user-survey-store";
     import Icon from "../../../common/svelte/Icon.svelte";
+    import {onMount} from "svelte";
 
     export let surveys = [];
 
     let gridData = [];
-    let selectedFilterName;
 
     let columnDefs = [
         { field: "surveyInstance.surveyEntity.name", name: "Subject Name", width: "30%"},
@@ -18,14 +18,14 @@
         { field: "surveyInstance.qualifierEntity.name", name: "Qualifier"},
         { field: "displayStatus", name: "Status"},
         { field: "surveyRun.dueDate", name: "Due Date"}
-    ]
+    ];
 
-    $: byTemplateId = _
-        .chain(surveys)
-        .map(d => Object.assign({}, d, { displayStatus: _.get(surveyInstanceStatus[d.surveyInstance.status], "name", d.surveyInstance.status)}))
-        .orderBy(d => _.toLower(d.surveyInstance.surveyEntity.name))
-        .groupBy(d => d.surveyTemplateRef.id)
-        .value();
+    let currentDate = new Date();
+    let weekFromNow = new Date();
+    let monthFromNow = new Date();
+
+    weekFromNow.setDate(weekFromNow.getDate() + 7);
+    monthFromNow.setDate(currentDate.getDate() + 30);
 
     const tableHeaders = [
         {
@@ -55,7 +55,7 @@
         },{
             class: "incomplete",
             name: "Total Outstanding",
-            description: "All incomplete surveys",
+            description: "Total outstanding - all incomplete surveys",
             width: "10%",
             data: d => d.incomplete
         },{
@@ -72,6 +72,30 @@
             data: d => d.approved
         }
     ]
+
+    function selectSurveyFilter(header, templateInfo) {
+        $selectedSurveyStatusCell = {header, templateInfo};
+        gridData = header.data(templateInfo)
+    }
+
+    function selectRow(d) {
+        $selectSurveyRow(d.surveyInstance);
+    }
+
+    function determineClass(selectedHeader, header, templateInfo){
+        return !_.isEmpty(header.data(templateInfo))
+            ? header.class
+            : "";
+    }
+
+    onMount(() => $selectedSurveyStatusCell = null);
+
+    $: byTemplateId = _
+        .chain(surveys)
+        .map(d => Object.assign({}, d, { displayStatus: _.get(surveyInstanceStatus[d.surveyInstance.status], "name", d.surveyInstance.status)}))
+        .orderBy(d => _.toLower(d.surveyInstance.surveyEntity.name))
+        .groupBy(d => d.surveyTemplateRef.id)
+        .value();
 
     $: templateSummaries = _
         .chain(byTemplateId)
@@ -104,15 +128,6 @@
             }})
         .value();
 
-    function selectSurveyFilter(header, templateInfo) {
-        selectedFilterName = header.description;
-        gridData = header.data(templateInfo)
-    }
-
-    function selectRow(d) {
-        $selectSurveyRow(d.surveyInstance);
-    }
-
     $: templatesById = _
         .chain(surveys)
         .map(d => d.surveyTemplateRef)
@@ -122,13 +137,6 @@
 
     $: surveysByStatus = _.keyBy(surveys, d => d.surveyInstance.status);
     $: incompleteSurveys = _.concat(_.get(surveysByStatus, "IN_PROGRESS", []) , _.get(surveysByStatus, "NOT_STARTED", []));
-
-    let currentDate = new Date();
-    let weekFromNow = new Date();
-    let monthFromNow = new Date();
-
-    weekFromNow.setDate(weekFromNow.getDate() + 7);
-    monthFromNow.setDate(currentDate.getDate() + 30);
 
 </script>
 
@@ -146,7 +154,7 @@
             {#each tableHeaders as header}
                 <th width={`${60 / tableHeaders.length}%`}>{header.name}</th>
             {/each}
-            <th with="10%">Total</th>
+            <th width="10%">Total</th>
         </tr>
         </thead>
         <tbody>
@@ -154,7 +162,9 @@
             <tr>
                 <td>{templateInfo.template.name}</td>
                 {#each tableHeaders as header}
-                    <td class={_.isEmpty(header.data(templateInfo)) ? "" : header.class}>
+                    <td on:click|stopPropagation={() => selectSurveyFilter(header, templateInfo)}
+                        class={determineClass($selectedSurveyStatusCell, header, templateInfo)}
+                        class:selected={$selectedSurveyStatusCell?.header === header && $selectedSurveyStatusCell?.templateInfo === templateInfo}>
                         {#if _.isEmpty(header.data(templateInfo))}
                             <div class="text-muted">0</div>
                         {:else}
@@ -176,7 +186,7 @@
     {#if _.isEmpty(gridData)}
         <NoData>There are no surveys for the current selection</NoData>
     {:else }
-        <h4>{selectedFilterName}:</h4>
+        <h4>{$selectedSurveyStatusCell?.header.description}</h4>
         <SurveyInstanceGrid {columnDefs}
                             rowData={gridData}
                             onSelectRow={selectRow}/>
@@ -188,34 +198,61 @@
 
     .overdue {
         background-color: $waltz-red-background;
+
+        &.selected {
+            border: solid 1px $waltz-red;
+        }
     }
 
     .rejected {
         background-color: $waltz-maroon-background;
+        &.selected {
+            border: solid 1px $waltz-dark-red;
+        }
     }
 
     .due-week {
         background-color: $waltz-orange-background;
+
+        &.selected {
+            border: solid 1px $waltz-orange;
+        }
     }
 
     .due-month {
         background-color: $waltz-amber-background;
+        &.selected {
+            border: solid 1px $waltz-amber;
+        }
     }
 
     .incomplete {
         background-color: $waltz-blue-background;
+
+        &.selected {
+            border: solid 1px $waltz-blue;
+        }
     }
 
-    .awaiting-approval{
+    .awaiting-approval {
         background-color: $waltz-lime-background;
+
+        &.selected {
+            border: solid 1px $waltz-lime;
+        }
     }
 
-    .approved{
+    .approved {
         background-color: $waltz-green-background;
+
+        &.selected {
+            border: solid 1px $waltz-green;
+        }
     }
 
     td * {
         width: 100%;
+        height: 100%;
         display: block;
         text-align: center;
     }
