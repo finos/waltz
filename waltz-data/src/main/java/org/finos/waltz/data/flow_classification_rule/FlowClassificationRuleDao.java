@@ -77,7 +77,6 @@ public class FlowClassificationRuleDao {
     private final static Field<Integer> declaredOrgUnitLevel = ehOrgUnit.LEVEL.as("declaredOrgUnitLevel");
     private final static Field<Long> declaredDataTypeId = ehDataType.ID.as("declaredDataTypeId");
     private final static Field<Integer> declaredDataTypeLevel = ehDataType.LEVEL.as("declaredDataTypeLevel");
-    private final static Field<String> targetDataTypeCode = impliedDataType.CODE.as("targetDataTypeCode");
 
     private static final Field<String> PARENT_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             FLOW_CLASSIFICATION_RULE.PARENT_ID,
@@ -129,18 +128,17 @@ public class FlowClassificationRuleDao {
     };
 
 
-    private static final RecordMapper<Record, FlowClassificationRuleVantagePoint> TO_VANTAGE_MAPPER = r -> {
+    private static final RecordMapper<Record, FlowClassificationRuleVantagePoint> TO_VANTAGE_MAPPER = r -> ImmutableFlowClassificationRuleVantagePoint
+            .builder()
+            .vantagePoint(mkRef(EntityKind.ORG_UNIT, r.get(targetOrgUnitId)))
+            .vantagePointRank(r.get(declaredOrgUnitLevel))
+            .applicationId(r.get(FLOW_CLASSIFICATION_RULE.APPLICATION_ID))
+            .classificationCode(r.get(FLOW_CLASSIFICATION.CODE))
+            .dataType(mkRef(EntityKind.DATA_TYPE, r.get(declaredDataTypeId)))
+            .dataTypeRank(r.get(declaredDataTypeLevel))
+            .ruleId(r.get(FLOW_CLASSIFICATION_RULE.ID))
+            .build();
 
-        return ImmutableFlowClassificationRuleVantagePoint.builder()
-                .vantagePoint(mkRef(EntityKind.ORG_UNIT, r.get(targetOrgUnitId)))
-                .vantagePointRank(r.get(declaredOrgUnitLevel))
-                .applicationId(r.get(FLOW_CLASSIFICATION_RULE.APPLICATION_ID))
-                .classificationCode(r.get(FLOW_CLASSIFICATION.CODE))
-                .dataType(mkRef(EntityKind.DATA_TYPE, r.get(declaredDataTypeId)))
-                .dataTypeRank(r.get(declaredDataTypeLevel))
-                .ruleId(r.get(FLOW_CLASSIFICATION_RULE.ID))
-                .build();
-    };
 
 
     @Autowired

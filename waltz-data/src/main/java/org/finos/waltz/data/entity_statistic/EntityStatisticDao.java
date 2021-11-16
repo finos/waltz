@@ -32,17 +32,15 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.schema.tables.EntityStatisticDefinition.ENTITY_STATISTIC_DEFINITION;
 import static org.finos.waltz.schema.tables.EntityStatisticValue.ENTITY_STATISTIC_VALUE;
-import static org.finos.waltz.common.Checks.checkNotNull;
 
 @Repository
 public class EntityStatisticDao implements FindEntityReferencesByIdSelector {
 
     private static final org.finos.waltz.schema.tables.EntityStatisticDefinition es = ENTITY_STATISTIC_DEFINITION.as("es");
     private static final org.finos.waltz.schema.tables.EntityStatisticValue esv = ENTITY_STATISTIC_VALUE.as("esv");
-    private static final org.finos.waltz.schema.tables.Application app = APPLICATION.as("app");
 
     private final DSLContext dsl;
 

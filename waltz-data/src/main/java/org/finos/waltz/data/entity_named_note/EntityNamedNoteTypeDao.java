@@ -24,10 +24,7 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.entity_named_note.EntityNamedNodeType;
 import org.finos.waltz.model.entity_named_note.EntityNamedNoteTypeChangeCommand;
 import org.finos.waltz.model.entity_named_note.ImmutableEntityNamedNodeType;
-import org.jooq.DSLContext;
-import org.jooq.Record;
-import org.jooq.RecordMapper;
-import org.jooq.Select;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -93,12 +90,12 @@ public class EntityNamedNoteTypeDao {
      * given id.  The removal will only take place if no
      * entity named notes refer to this id.
      *
-     * @param id
+     * @param id - identifier of the named note type to remove
      * @return boolean - whether the note was removed.
      */
     public boolean removeById(Long id) {
 
-        Select anyUsageOfType = DSL
+        SelectConditionStep<Record1<Long>> anyUsageOfType = DSL
                 .select(ENTITY_NAMED_NOTE.ENTITY_ID)
                 .from(ENTITY_NAMED_NOTE)
                 .where(ENTITY_NAMED_NOTE.NAMED_NOTE_TYPE_ID.eq(id));
@@ -114,8 +111,8 @@ public class EntityNamedNoteTypeDao {
     /**
      * Creates a new record and returns the generated id.  All fields in the command must be
      * provided.
-     * @param command
-     * @return
+     * @param command an EntityNameNoteTypeChangeCommand object
+     * @return the id of the note type created.
      */
     public long create(EntityNamedNoteTypeChangeCommand command) {
         String name = Checks.checkOptionalIsPresent(command.name(), "Name must be provided");

@@ -18,18 +18,16 @@
 
 package org.finos.waltz.data.access_log;
 
-import org.finos.waltz.schema.tables.records.AccessLogRecord;
 import org.finos.waltz.model.accesslog.AccessLog;
 import org.finos.waltz.model.accesslog.AccessTime;
 import org.finos.waltz.model.accesslog.ImmutableAccessLog;
 import org.finos.waltz.model.accesslog.ImmutableAccessTime;
+import org.finos.waltz.schema.tables.records.AccessLogRecord;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
 import org.jooq.impl.DSL;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -43,8 +41,6 @@ import static org.finos.waltz.schema.tables.AccessLog.ACCESS_LOG;
 
 @Repository
 public class AccessLogDao {
-
-    private static final Logger LOG = LoggerFactory.getLogger(AccessLogDao.class);
 
     private final DSLContext dsl;
 
@@ -96,8 +92,9 @@ public class AccessLogDao {
 
 
     public List<AccessTime> findActiveUsersSince(LocalDateTime dateTime) {
-        Field maxCreatedAt = DSL.max(ACCESS_LOG.CREATED_AT).as(ACCESS_LOG.CREATED_AT);
-        return dsl.select(ACCESS_LOG.USER_ID, maxCreatedAt)
+        Field<Timestamp> maxCreatedAt = DSL.max(ACCESS_LOG.CREATED_AT).as(ACCESS_LOG.CREATED_AT);
+        return dsl
+                .select(ACCESS_LOG.USER_ID, maxCreatedAt)
                 .from(ACCESS_LOG)
                 .where(ACCESS_LOG.CREATED_AT.greaterOrEqual(Timestamp.valueOf(dateTime)))
                 .groupBy(ACCESS_LOG.USER_ID)
