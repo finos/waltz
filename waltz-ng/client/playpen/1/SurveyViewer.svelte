@@ -11,8 +11,6 @@
     $: groupedQuestions = groupQuestions($questions);
     $: responsesByQuestionId = indexResponses($responses);
 
-    $: console.log({groupedQuestions, responsesByQuestionId});
-
     $: sectionsToShow = $selectedSection ? [$selectedSection] : groupedQuestions;
 
     function selectSection(section) {
@@ -118,6 +116,7 @@
     }
 
     .section {
+        margin-top: 3em;
         outline: 1px solid #ddd;
         margin-bottom: 1em;
         padding-bottom: 0.5em;
