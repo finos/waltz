@@ -28,6 +28,9 @@
     <name>waltz-web</name>
     <url>http://maven.apache.org</url>
 
+    <properties>
+        <skip.npm>false</skip.npm>
+    </properties>
 
     <dependencies>
 
@@ -135,6 +138,7 @@
                         <BUILD_ENV>prod</BUILD_ENV>
                     </environmentVariables>
                     <workingDirectory>../waltz-ng</workingDirectory>
+                    <skip>${skip.npm}</skip>
                 </configuration>
             </plugin>
             <plugin>

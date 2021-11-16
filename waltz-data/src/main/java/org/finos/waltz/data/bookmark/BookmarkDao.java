@@ -144,7 +144,8 @@ public class BookmarkDao {
         checkOptionalIsPresent(bookmark.id(), "bookmark id is required for an update");
         checkNotEmpty(username, "username cannot be empty");
 
-        int rc = dsl.update(BOOKMARK)
+        int rc = dsl
+                .update(BOOKMARK)
                 .set(BOOKMARK.KIND, bookmark.bookmarkKind().value())
                 .set(BOOKMARK.DESCRIPTION, bookmark.description().orElse(null))
                 .set(BOOKMARK.URL, bookmark.url().orElse(""))

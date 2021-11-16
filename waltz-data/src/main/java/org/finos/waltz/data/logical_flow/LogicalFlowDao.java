@@ -91,7 +91,7 @@ public class LogicalFlowDao {
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .lastUpdatedAt(record.getLastUpdatedAt().toLocalDateTime())
                 .lastAttestedBy(Optional.ofNullable(record.getLastAttestedBy()))
-                .lastAttestedAt(Optional.ofNullable(record.getLastAttestedAt()).map(ts -> ts.toLocalDateTime()))
+                .lastAttestedAt(Optional.ofNullable(record.getLastAttestedAt()).map(Timestamp::toLocalDateTime))
                 .created(UserTimestamp.mkForUser(record.getCreatedBy(), record.getCreatedAt()))
                 .provenance(record.getProvenance())
                 .isReadOnly(record.getIsReadonly())
@@ -109,11 +109,11 @@ public class LogicalFlowDao {
         record.setLastUpdatedBy(flow.lastUpdatedBy());
         record.setLastUpdatedAt(Timestamp.valueOf(flow.lastUpdatedAt()));
         record.setLastAttestedBy(flow.lastAttestedBy().orElse(null));
-        record.setLastAttestedAt(flow.lastAttestedAt().map(ldt -> Timestamp.valueOf(ldt)).orElse(null));
+        record.setLastAttestedAt(flow.lastAttestedAt().map(Timestamp::valueOf).orElse(null));
         record.setProvenance(flow.provenance());
         record.setEntityLifecycleStatus(flow.entityLifecycleStatus().name());
-        record.setCreatedAt(flow.created().map(c -> c.atTimestamp()).orElse(Timestamp.valueOf(flow.lastUpdatedAt())));
-        record.setCreatedBy(flow.created().map(c -> c.by()).orElse(flow.lastUpdatedBy()));
+        record.setCreatedAt(flow.created().map(UserTimestamp::atTimestamp).orElse(Timestamp.valueOf(flow.lastUpdatedAt())));
+        record.setCreatedBy(flow.created().map(UserTimestamp::by).orElse(flow.lastUpdatedBy()));
         record.setIsReadonly(flow.isReadOnly());
         record.setIsRemoved(flow.isRemoved());
         return record;
@@ -162,14 +162,12 @@ public class LogicalFlowDao {
                 .map(t -> isSourceCondition(t.v1)
                         .and(isTargetCondition(t.v2))
                         .and(LOGICAL_NOT_REMOVED))
-                .reduce((a, b) -> a.or(b))
+                .reduce(Condition::or)
                 .get();
 
-        List<LogicalFlow> fetch = baseQuery()
+        return baseQuery()
                 .where(condition)
                 .fetch(TO_DOMAIN_MAPPER);
-
-        return fetch;
     }
 
 
@@ -183,8 +181,8 @@ public class LogicalFlowDao {
                 .entrySet()
                 .stream()
                 .map(entry -> LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(entry.getKey().name())
-                        .and(LOGICAL_FLOW.TARGET_ENTITY_ID.in(map(entry.getValue(), ref -> ref.id()))))
-                .collect(Collectors.reducing(DSL.falseCondition(), (acc, c) -> acc.or(c)));
+                        .and(LOGICAL_FLOW.TARGET_ENTITY_ID.in(map(entry.getValue(), EntityReference::id))))
+                .collect(Collectors.reducing(DSL.falseCondition(), Condition::or));
 
         return baseQuery()
                 .where(anyTargetMatches)
@@ -224,7 +222,7 @@ public class LogicalFlowDao {
                 .stream()
                 .map(t -> isSourceCondition(t.source())
                         .and(isTargetCondition(t.target())))
-                .reduce((a, b) -> a.or(b))
+                .reduce(Condition::or)
                 .orElse(DSL.falseCondition());
 
         List<LogicalFlow> existingFlows = baseQuery()
@@ -266,8 +264,9 @@ public class LogicalFlowDao {
      * Attempt to restore a flow.  The id is ignored and only source and target
      * are used. Return's true if the flow has been successfully restored or
      * false if no matching (removed) flow was found.
-     * @param flow
-     * @return
+     *
+     * @param flow logical flow to restore, based on the source and target
+     * @return true if the flow was restored
      */
     private boolean restoreFlow(LogicalFlow flow, String username) {
         UpdateConditionStep<LogicalFlowRecord> upd = dsl
@@ -431,7 +430,7 @@ public class LogicalFlowDao {
                 .stream()
                 .map(t -> isSourceCondition(t.source())
                         .and(isTargetCondition(t.target())))
-                .reduce((a, b) -> a.or(b))
+                .reduce(Condition::or)
                 .get();
 
         return dsl.update(LOGICAL_FLOW)

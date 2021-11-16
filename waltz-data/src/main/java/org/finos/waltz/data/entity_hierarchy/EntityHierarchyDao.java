@@ -51,22 +51,23 @@ public class EntityHierarchyDao {
     private static final EntityHierarchy eh = ENTITY_HIERARCHY;
 
     private static final Function<EntityHierarchyItem, EntityHierarchyRecord> ITEM_TO_RECORD_MAPPER =
-            item -> new EntityHierarchyRecord(
-                    item.kind().name(),
-                    item.id().get(),
-                    item.parentId().orElse(null),
-                    item.level());
+            item -> item
+                    .id()
+                    .map(id -> new EntityHierarchyRecord(
+                        item.kind().name(),
+                        id,
+                        item.parentId().orElse(null),
+                        item.level()))
+                    .orElseThrow(() -> new IllegalArgumentException("Cannot convert an item without an id to a hierarchy record"));
 
     public static final RecordMapper<Record, EntityHierarchyItem> TO_DOMAIN_MAPPER = record -> {
         EntityHierarchyRecord ehRecord = record.into(ENTITY_HIERARCHY);
-        EntityHierarchyItem item = ImmutableEntityHierarchyItem.builder()
+        return ImmutableEntityHierarchyItem.builder()
                 .id(ehRecord.getId())
                 .kind(Enum.valueOf(EntityKind.class, ehRecord.getKind()))
                 .parentId(ehRecord.getAncestorId())
                 .level(ehRecord.getLevel())
                 .build();
-
-        return item;
     };
 
     private final DSLContext dsl;

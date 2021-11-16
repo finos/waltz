@@ -22,7 +22,6 @@ import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.survey.*;
 import org.finos.waltz.service.DIConfiguration;
-import org.finos.waltz.service.survey.SurveyInstanceService;
 import org.finos.waltz.service.survey.SurveyQuestionService;
 import org.finos.waltz.service.survey.SurveyRunService;
 import org.finos.waltz.service.survey.SurveyTemplateService;
@@ -30,11 +29,9 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.LongStream;
 
 import static java.util.stream.Collectors.toList;
-import static org.finos.waltz.common.CollectionUtilities.first;
 
 
 public class SurveyHarness {
@@ -43,8 +40,6 @@ public class SurveyHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
         surveyTempateHarness(ctx);
-//        surveyRunHarness(ctx);
-//        surveyResponseHarness(ctx);
     }
 
     private static void surveyTempateHarness(AnnotationConfigApplicationContext ctx) {
@@ -137,17 +132,6 @@ public class SurveyHarness {
     }
 
 
-    private static void surveyResponseHarness(AnnotationConfigApplicationContext ctx) {
-        String userName = "1258battle@gmail.com";
-
-        SurveyQuestionService surveyQuestionService = ctx.getBean(SurveyQuestionService.class);
-        SurveyInstanceService surveyInstanceService = ctx.getBean(SurveyInstanceService.class);
-
-        Set<SurveyInstanceUserInvolvement> instances = surveyInstanceService.findForUser(userName);
-
-        System.out.println("===========Instances==========");
-        System.out.println(instances);
-    }
 
 
 }
