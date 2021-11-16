@@ -3,6 +3,10 @@
     import StringResponseRenderer from "./StringResponseRenderer.svelte";
     import NumberResponseRenderer from "./NumberResponseRenderer.svelte";
     import DateResponseRenderer from "./DateResponseRenderer.svelte";
+    import EntityResponseRenderer from "./EntityResponseRenderer.svelte";
+    import BooleanResponseRenderer from "./BooleanResponseRenderer.svelte";
+    import DropdownMultiResponseRenderer from "./DropdownMultiResponseRenderer.svelte";
+    import MeasurableMultiResponseRenderer from "./MeasurableMultiResponseRenderer.svelte";
 
     export let response;
     export let question;
@@ -11,17 +15,21 @@
         switch (question.fieldType) {
             case "NUMBER":
                 return NumberResponseRenderer;
-            case "APPLICATION":
-            case "BOOLEAN":
             case "DATE":
                 return DateResponseRenderer;
-            case "DROPDOWN":
-            case "DROPDOWN_MULTI_SELECT":
-            case "MEASURABLE_MULTI_SELECT":
             case "PERSON":
+            case "APPLICATION":
+                return EntityResponseRenderer;
+            case "BOOLEAN":
+                return BooleanResponseRenderer;
+            case "DROPDOWN_MULTI_SELECT":
+                return DropdownMultiResponseRenderer;
+            case "MEASURABLE_MULTI_SELECT":
+                return MeasurableMultiResponseRenderer;
+            case "DROPDOWN":
+            case "TEXTAREA":
             case "TEXT":
                 return StringResponseRenderer;
-            case "TEXTAREA":
             default:
                 return StringResponseRenderer;
         }
@@ -32,7 +40,7 @@
 </script>
 
 
-<svelte:component {response} this={comp}/>
+<svelte:component {response} {question} this={comp}/>
 {#if response?.comment}
     <div class="small">Comment: {response?.comment}</div>
 {/if}

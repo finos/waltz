@@ -27,7 +27,7 @@ import * as SurveyUtils from "../../survey/survey-utils";
 
 const initData = {
     // parentEntityRef: {id: 20768, kind: "APPLICATION"}
-    parentEntityRef: {id: 71944, kind: "SURVEY_INSTANCE"},
+    parentEntityRef: {id: 76814, kind: "SURVEY_INSTANCE"},
     measurableEntityRef: {id: 54566, kind: "MEASURABLE"},
     SurveyViewer
 };
@@ -41,7 +41,7 @@ function controller($q,
 
    vm.$onInit = () => {
        loadSurveyInfo($q, serviceBroker, userService, vm.parentEntityRef.id)
-           .then(details => console.log(details) || surveyDetails.set(details));
+           .then(details => surveyDetails.set(details));
 
        serviceBroker
            .loadViewData(
