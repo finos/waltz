@@ -44,6 +44,7 @@ import java.util.Set;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.CollectionUtilities.find;
+import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.model.survey.SurveyInstanceStateMachineFactory.simple;
 
 @Service
@@ -99,19 +100,19 @@ public class SurveyInstanceService {
     }
 
 
+    public Set<SurveyInstance> findForRecipient(Long personId) {
+        checkNotNull(personId, "personId cannot be null");
+
+        return surveyInstanceDao.findForRecipient(personId);
+    }
+
+
     public Set<SurveyInstance> findForRecipient(String userName) {
         checkNotNull(userName, "userName cannot be null");
 
         Person person = getPersonByUsername(userName);
 
         return surveyInstanceDao.findForRecipient(person.id().get());
-    }
-
-
-    public Set<SurveyInstance> findForRecipient(Long personId) {
-        checkNotNull(personId, "personId cannot be null");
-
-        return surveyInstanceDao.findForRecipient(personId);
     }
 
 
