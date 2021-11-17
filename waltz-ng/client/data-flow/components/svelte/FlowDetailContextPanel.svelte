@@ -4,12 +4,11 @@
     import PhysicalFlowDetailTable from "./PhysicalFlowDetailTable.svelte";
     import {createEventDispatcher} from "svelte";
     import DataTypeDetailTable from "./DataTypeDetailTable.svelte";
-
-    import _ from "lodash";
     import EntityLink from "../../../common/svelte/EntityLink.svelte";
+    import _ from "lodash";
+
 
     export let parentEntity;
-    export let flowInfo;
 
     let selectedTab = "context";
     let dispatch = createEventDispatcher();

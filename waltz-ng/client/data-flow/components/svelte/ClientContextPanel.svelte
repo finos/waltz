@@ -12,8 +12,8 @@
     import EntityInfoPanel from "../../../common/svelte/info-panels/EntityInfoPanel.svelte";
     import {entity} from "../../../common/services/enums/entity";
     import NoData from "../../../common/svelte/NoData.svelte";
+    import _ from "lodash";
 
-    export let flowInfo;
 
     let selectedTab = "context";
     let dispatch = createEventDispatcher();

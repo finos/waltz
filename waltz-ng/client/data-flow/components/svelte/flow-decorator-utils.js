@@ -1,3 +1,5 @@
+import _ from "lodash";
+
 export const dimensions = {
     client: {
         height: 25,
@@ -119,6 +121,59 @@ export function mkArcs(summarisedFlows){
         .value();
 }
 
+
 function mkTipRatings(ratingCounts){
     return _.map(ratingCounts, (v, k) => ({ ratingId: k, count: v }));
 }
+
+
+export function summariseFlows(flowInfo, noOpinionRating) {
+
+    return _
+        .chain(flowInfo)
+        .map(d => Object.assign({}, d, {key: `cat_${d.rollupDataType.id}_cli_${d.counterpart.id}`}))
+        .groupBy(d => d.key)
+        .mapValues((v, k) => {
+            const flow = _.head(v);
+
+            const ratingCounts = _
+                .chain(v)
+                .filter(v => v.actualDataType.id !== v.rollupDataType.id)
+                .countBy(v => v.classificationId)
+                .value();
+
+            const exactFlow = _.find(v, d => d.actualDataType.id === d.rollupDataType.id);
+
+            const lineRating = _.get(exactFlow, "classificationId", noOpinionRating?.id); //TODO: make this the no opinion id
+
+            const lineLifecycleStatus = _.get(exactFlow, "flowEntityLifecycleStatus", "ACTIVE");
+
+            const actualDataTypeIds = _
+                .chain(v)
+                .map(f => f.actualDataType?.id)
+                .uniq()
+                .value();
+
+            const rollupDataTypeIds = _
+                .chain(v)
+                .map(f => f.rollupDataType?.id)
+                .uniq()
+                .value();
+
+            return {
+                key: k,
+                ratings: v,
+                hasChildren: !_.isEmpty(ratingCounts),
+                ratingCounts,
+                lineRating,
+                lineLifecycleStatus,
+                actualDataTypeIds,
+                rollupDataTypeIds,
+                flowId: flow.flowId,
+                category: flow.rollupDataType,
+                client: flow.counterpart
+            };
+        })
+        .value();
+}
+
