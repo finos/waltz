@@ -7,6 +7,8 @@
     export let fixedWidth = true;
     export let inverse;
     export let spin;
+    export let pullLeft = false;
+    export let pullRight = false;
 
     let classNames = [];
 
@@ -19,7 +21,9 @@
         stack ? `fa-stack-${stack}` : "",
         fixedWidth ? "fa-fw" : "",
         inverse ? "fa-inverse" : "",
-        spin ? "fa-spin" : ""
+        spin ? "fa-spin" : "",
+        pullLeft ? "fa-pull-left" : "",
+        pullRight ? "fa-pull-right" : ""
     ].join(" ");
 
 </script>

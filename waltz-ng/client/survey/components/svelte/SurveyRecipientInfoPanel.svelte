@@ -140,9 +140,11 @@
 
 </script>
 
-<div class="help-block">
-    <Icon name="info-circle"/>The table below details the surveys for which you are an assigned recipient. Recipients are responsible for
-    completing a survey. Select a filter to see the survey details and use the table to navigate to them.
+<div class="help-block small">
+    <Icon name="pencil-square-o" size="4x" pullLeft={true}/>
+    The table below details the surveys for which you are an assigned recipient.
+    Recipients are responsible for completing a survey.
+    Select a filter to see the survey details and use the table to navigate to them.
 </div>
 {#if _.isEmpty(templateSummaries)}
     <NoData>There are no surveys where you are an assigned recipient</NoData>
@@ -181,12 +183,14 @@
         </tbody>
     </table>
 
+    <br>
     <hr>
 
     {#if _.isEmpty(gridData)}
         <NoData>There are no surveys for the current selection</NoData>
     {:else }
         <h4>{$selectedSurveyStatusCell?.header.description}</h4>
+        <br>
         <SurveyInstanceGrid {columnDefs}
                             rowData={gridData}
                             onSelectRow={selectRow}/>
