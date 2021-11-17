@@ -9,6 +9,18 @@
     $: groupedQuestions = groupQuestions($questions);
     $: responsesByQuestionId = indexResponses($responses);
 
+    $: questionsWithResponse = _
+        .chain(_.values(responsesByQuestionId))
+        .filter(d => !_.isEmpty(d.stringResponse)
+            || !_.isEmpty(d.entityResponse)
+            || !_.isEmpty(d.numberResponse)
+            || d.booleanResponse !== "null"
+            || d.dateResponse
+            || !_.isEmpty(d.listResponse)
+            || !_.isEmpty(d.entityListResponse))
+        .map(d => Number(d.questionId))
+        .value();
+
     $: sectionsToShow = $selectedSection ? [$selectedSection] : groupedQuestions;
 
     function selectSection(section) {
@@ -17,6 +29,13 @@
         } else {
             $selectedSection = section;
         }
+    }
+
+    function getResponsesCount(section) {
+        return _
+            .chain(section.questions)
+            .filter(q => _.includes(questionsWithResponse, q.id))
+            .size();
     }
 
 </script>
@@ -36,6 +55,10 @@
                     class:selected={section === $selectedSection}
                     on:click={() => selectSection(section)}>
                         {section.sectionName}
+                    <span title={`${getResponsesCount(section)} questions with a response out of a total ${_.size(section.questions)} questions`}
+                          class="small pull-right text-muted">
+                        {`(${getResponsesCount(section)} / ${_.size(section.questions)})`}
+                    </span>
                 </li>
         {/each}
     </ul>
@@ -49,7 +72,13 @@
 
             {#each section.questions as question}
                 <div class="row section-question">
-                    <div class="col-md-3 help-block">{question.questionText}</div>
+                    <div class="col-md-3 help-block">
+                        {question.questionText}
+                        {#if question.isMandatory}
+                            <span class="mandatory"
+                                  title="This question is mandatory">*</span>
+                        {/if}
+                    </div>
                     <div class:col-md-9={_.isEmpty(question.subQuestions)}
                          class:col-md-3={!_.isEmpty(question.subQuestions)}>
                         {#if question.label}
@@ -133,6 +162,10 @@
 
     .question-list {
         padding-top: 2.5em;
+    }
+
+    .mandatory {
+        color: #a94442;
     }
 
 </style>
