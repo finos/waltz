@@ -4,6 +4,7 @@
     import SurveyRecipientInfoPanel from "./SurveyRecipientInfoPanel.svelte";
     import _ from "lodash";
     import SurveyApproverInfoPanel from "./SurveyApproverInfoPanel.svelte";
+    import Icon from "../../../common/svelte/Icon.svelte";
 
     let selectedTab = 'completions';
 
@@ -28,7 +29,7 @@
            id="completions">
     <label class="wt-label"
            for="completions">
-        <span>Surveys to Complete- {_.size(incompleteSurveys)}</span>
+        <span><Icon name="pencil-square-o"/>Surveys to Complete - {_.size(incompleteSurveys)}</span>
     </label>
 
     <input type="radio"
@@ -37,7 +38,7 @@
            id="approvals">
     <label class="wt-label"
            for="approvals">
-        <span>Surveys to Approve - {_.size(completedSurveys)}</span>
+        <span><Icon name="check-square-o"/>Surveys to Approve - {_.size(completedSurveys)}</span>
     </label>
 
     <div class="wt-tab wt-active">
