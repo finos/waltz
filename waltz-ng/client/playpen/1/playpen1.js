@@ -18,38 +18,49 @@
 
 
 import template from "./playpen1.html";
-import {initialiseData, randomPick} from "../../common";
-import Grid from "./Grid.svelte";
-import _ from "lodash";
-import {characters} from "./data";
+import {initialiseData} from "../../common";
+import SurveyViewer from "../../survey/components/svelte/inline-panel/SurveyViewer.svelte";
+import {loadSurveyInfo} from "../../survey/survey-utils";
+import {questions, responses, surveyDetails} from "./survey-detail-store";
+import {CORE_API} from "../../common/services/core-api-utils";
 
 const initData = {
-    Grid,
     // parentEntityRef: {id: 20768, kind: "APPLICATION"}
-    parentEntityRef: {id: 6538029, kind: "CHANGE_INITIATIVE"},
-    measurableEntityRef: {id: 54566, kind: "MEASURABLE"}
+    parentEntityRef: {id: 76823, kind: "SURVEY_INSTANCE"},
+    measurableEntityRef: {id: 54566, kind: "MEASURABLE"},
+    SurveyViewer
 };
 
 
-function controller($element, $q, serviceBroker) {
+function controller($q,
+                    serviceBroker,
+                    userService) {
 
     const vm = initialiseData(this, initData);
 
+   vm.$onInit = () => {
+       loadSurveyInfo($q, serviceBroker, userService, vm.parentEntityRef.id)
+           .then(details => surveyDetails.set(details));
 
+       serviceBroker
+           .loadViewData(
+               CORE_API.SurveyQuestionStore.findQuestionsForInstance,
+               [ vm.parentEntityRef.id ])
+           .then(r => questions.set(r.data));
 
-    vm.rowData = _
-        .chain(_.range(0, 4000))
-        .map(d => ({c1: d, c2: d + " name", c3: randomPick(characters)}))
-        .value();
+        serviceBroker
+           .loadViewData(
+               CORE_API.SurveyInstanceStore.findResponses,
+               [ vm.parentEntityRef.id ])
+           .then(r => {
+               return responses.set(r.data);
+           });
 
-    vm.columnDefs = [
-        { field: "c1", name: "c1" },
-        { field: "c2", name: "c2" },
-        { field: "c3", name: "c3" }
-    ]
+   }
+
 }
 
-controller.$inject = ["$element", "$q", "ServiceBroker"];
+controller.$inject = ["$q", "ServiceBroker", "UserService"];
 
 const view = {
     template,

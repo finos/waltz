@@ -80,8 +80,12 @@ public class SurveyInstanceOwnerDao {
         record.setSurveyInstanceId(command.surveyInstanceId());
         record.setPersonId(command.personId());
 
-        record.store();
-        return record.getId();
+        return dsl
+                .insertInto(SURVEY_INSTANCE_OWNER)
+                .set(record)
+                .onDuplicateKeyIgnore()
+                .returning(SURVEY_INSTANCE_OWNER.ID)
+                .execute();
     }
 
 

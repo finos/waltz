@@ -300,25 +300,41 @@ public class SurveyInstanceService {
     }
 
 
-    public boolean updateRecipient(String username, SurveyInstanceRecipientUpdateCommand command) {
+    public long addOwner(String username, SurveyInstanceOwnerCreateCommand command) {
         checkNotNull(command, "command cannot be null");
         checkPersonIsOwnerOrAdmin(username, command.surveyInstanceId());
-
-        boolean delete = surveyInstanceRecipientDao.delete(command.instanceRecipientId());
-        long id = surveyInstanceRecipientDao.create(ImmutableSurveyInstanceRecipientCreateCommand
-                .builder()
-                .personId(command.personId())
-                .surveyInstanceId(command.surveyInstanceId())
-                .build());
+        long rc = surveyInstanceOwnerDao.create(command);
 
         logRecipientChange(
                 username,
                 command.surveyInstanceId(),
                 command.personId(),
-                Operation.UPDATE,
-                "Survey Instance: Set %s as a recipient");
+                Operation.ADD,
+                "Survey Instance: Added %s as an owner");
 
-        return delete && id > 0;
+        return rc;
+    }
+
+
+        public boolean updateRecipient(String username, SurveyInstanceRecipientUpdateCommand command) {
+            checkNotNull(command, "command cannot be null");
+            checkPersonIsOwnerOrAdmin(username, command.surveyInstanceId());
+
+            boolean delete = surveyInstanceRecipientDao.delete(command.instanceRecipientId());
+            long id = surveyInstanceRecipientDao.create(ImmutableSurveyInstanceRecipientCreateCommand
+                    .builder()
+                    .personId(command.personId())
+                    .surveyInstanceId(command.surveyInstanceId())
+                    .build());
+
+            logRecipientChange(
+                    username,
+                    command.surveyInstanceId(),
+                    command.personId(),
+                    Operation.UPDATE,
+                    "Survey Instance: Set %s as a recipient");
+
+            return delete && id > 0;
     }
 
 
