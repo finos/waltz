@@ -119,4 +119,16 @@
                     columnName="owner_id"/>
     </changeSet>
 
+    <!-- 5786: Add owner_kind_ids column to survey run -->
+    <changeSet id="20211117-5768-1"
+               author="woodjes">
+        <comment>5678: drop survey_owner from survey_instance</comment>
+        <addColumn tableName="survey_run">
+            <column name="owner_kind_ids"
+                    type="VARCHAR(255)">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
