@@ -1,12 +1,10 @@
 <script>
 
-    import {questions, responses, selectedSection, surveyDetails} from "./survey-detail-store";
+    import {questions, responses, selectedSection} from "./survey-detail-store";
     import {groupQuestions, indexResponses} from "../../survey/survey-utils";
-    import NoData from "../../common/svelte/NoData.svelte";
     import _ from "lodash";
     import SurveyQuestionResponse from "./SurveyQuestionResponse.svelte";
-
-    $: console.log({surveyDetails: $surveyDetails, questions: $questions, responses: $responses});
+    import Icon from "../../common/svelte/Icon.svelte";
 
     $: groupedQuestions = groupQuestions($questions);
     $: responsesByQuestionId = indexResponses($responses);
@@ -26,17 +24,23 @@
 
 <div class="col-sm-3">
     <h4>Sections</h4>
-    <ul class="section-list small">
+    <div class="help-block small">
+        <Icon name="info-circle"/>Select a section below to focus on its questions
+    </div>
+    <ul class="section-list">
         {#each groupedQuestions as section}
-            <li class="clickable"
-                class:selected={section === $selectedSection}
-                on:click={() => selectSection(section)}>
-                {section.sectionName}
-            </li>
+                <li class="clickable section-list-item"
+                    on:mouseenter={() => section.hovering = true}
+                    on:mouseleave={() => section.hovering = false}
+                    class:highlighted={section.hovering}
+                    class:selected={section === $selectedSection}
+                    on:click={() => selectSection(section)}>
+                        {section.sectionName}
+                </li>
         {/each}
     </ul>
 </div>
-<div class="col-sm-9">
+<div class="col-sm-9 question-list">
     {#each sectionsToShow as section}
         <div class="section col-md-12">
             <div class="row section-question-header">
@@ -102,9 +106,11 @@
     }
 
     .section-question-header {
+        color: $text-muted;
         font-weight: bold;
         border-bottom: 1px solid #ddd;
         background-color: #fafafa;
+        background: linear-gradient(90deg, #fafafa 0%, rgba(255,255,255,1) 100%);
     }
 
     .sub-question-label {
@@ -116,10 +122,17 @@
     }
 
     .section {
-        margin-top: 3em;
         outline: 1px solid #ddd;
         margin-bottom: 1em;
         padding-bottom: 0.5em;
+    }
+
+    .highlighted {
+        background-color: #f3f9ff;
+    }
+
+    .question-list {
+        padding-top: 2.5em;
     }
 
 </style>

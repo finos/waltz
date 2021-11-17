@@ -27,7 +27,7 @@ import * as SurveyUtils from "../../survey/survey-utils";
 
 const initData = {
     // parentEntityRef: {id: 20768, kind: "APPLICATION"}
-    parentEntityRef: {id: 76814, kind: "SURVEY_INSTANCE"},
+    parentEntityRef: {id: 76823, kind: "SURVEY_INSTANCE"},
     measurableEntityRef: {id: 54566, kind: "MEASURABLE"},
     SurveyViewer
 };

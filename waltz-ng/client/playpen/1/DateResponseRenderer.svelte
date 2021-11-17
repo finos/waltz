@@ -8,4 +8,8 @@
 
 </script>
 
-<span>{dateFormat(new Date(response?.dateResponse))}</span>
+{#if response?.dateResponse}
+    <span>{dateFormat(new Date(response?.dateResponse))}</span>
+{:else}
+    <span class="text-muted">-</span>
+{/if}

@@ -30,15 +30,19 @@
 
 </script>
 
-<MeasurableTree tree={hierarchy}/>
+{#if !_.isEmpty(items)}
+    <MeasurableTree tree={hierarchy}/>
 
-{#if !_.isEmpty(notFoundResults)}
-    <div class="help-block small">
-        The following items were associated but a match can no longer be found:
-        <ul>
-            {#each notFoundResults as notFoundItem}
-                <li>{notFoundItem.name}</li>
-            {/each}
-        </ul>
-    </div>
+    {#if !_.isEmpty(notFoundResults)}
+        <div class="help-block small">
+            The following items were associated but a match can no longer be found:
+            <ul>
+                {#each notFoundResults as notFoundItem}
+                    <li>{notFoundItem.name}</li>
+                {/each}
+            </ul>
+        </div>
+    {/if}
+{:else}
+    <span class="text-muted">-</span>
 {/if}

@@ -7,12 +7,15 @@
 
 </script>
 
-
-<ul>
-    {#each items as item}
-        <li>{item}</li>
-    {/each}
-</ul>
+{#if !_.isEmpty(items)}
+    <ul>
+        {#each items as item}
+            <li>{item}</li>
+        {/each}
+    </ul>
+{:else}
+    <span class="text-muted">-</span>
+{/if}
 
 
 <style>
