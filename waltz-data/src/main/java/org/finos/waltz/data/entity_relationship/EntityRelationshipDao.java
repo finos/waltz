@@ -48,7 +48,7 @@ import static org.finos.waltz.model.EntityReference.mkRef;
 public class EntityRelationshipDao {
 
 
-    private static List<EntityKind> POSSIBLE_ENTITIES = newArrayList(
+    private static final List<EntityKind> POSSIBLE_ENTITIES = newArrayList(
             EntityKind.APPLICATION,
             EntityKind.APP_GROUP,
             EntityKind.ACTOR,
@@ -56,13 +56,13 @@ public class EntityRelationshipDao {
             EntityKind.CHANGE_INITIATIVE);
 
 
-    private static Field<String> NAME_A = InlineSelectFieldFactory.mkNameField(
+    private static final Field<String> NAME_A = InlineSelectFieldFactory.mkNameField(
             ENTITY_RELATIONSHIP.ID_A,
             ENTITY_RELATIONSHIP.KIND_A,
             POSSIBLE_ENTITIES);
 
 
-    private static Field<String> NAME_B = InlineSelectFieldFactory.mkNameField(
+    private static final Field<String> NAME_B = InlineSelectFieldFactory.mkNameField(
             ENTITY_RELATIONSHIP.ID_B,
             ENTITY_RELATIONSHIP.KIND_B,
             POSSIBLE_ENTITIES);
@@ -145,7 +145,7 @@ public class EntityRelationshipDao {
                 .collect(Collectors.toMap(
                         r -> EntityKind.valueOf(r.get(0, String.class)),
                         r -> r.get(1, Integer.class),
-                        (a, b) -> a + b));
+                        Integer::sum));
     }
 
 

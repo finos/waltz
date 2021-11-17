@@ -113,7 +113,7 @@ public class LicenceDao {
 
     public List<Tally<Long>> countApplications() {
 
-        Field licenceId = DSL.field("licence_id", Long.class);
+        Field<Long> licenceId = DSL.field("licence_id", Long.class);
 
         Table<Record2<Long, Long>> appLicences = DSL.selectDistinct(SOFTWARE_USAGE.APPLICATION_ID, SOFTWARE_VERSION_LICENCE.LICENCE_ID)
                 .from(SOFTWARE_VERSION_LICENCE)

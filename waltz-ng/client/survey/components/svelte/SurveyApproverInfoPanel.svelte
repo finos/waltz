@@ -132,8 +132,9 @@
 
 </script>
 
-<div class="help-block">
-    <Icon name="info-circle"/>The table below details the surveys for which you are an assigned owner. Owners are responsible
+<div class="help-block small">
+    <Icon name="check-square-o" size="4x" pullLeft={true}/>
+    The table below details the surveys for which you are an assigned owner. Owners are responsible
     for approving, rejecting and reopening surveys. Select a filter to see the individual survey details and navigate to them.
 </div>
 {#if _.isEmpty(templateSummaries)}
@@ -170,12 +171,14 @@
         </tbody>
     </table>
 
+    <br>
     <hr>
 
     {#if _.isEmpty(gridData)}
         <NoData>There are no surveys for the current selection</NoData>
     {:else }
         <h4>{$selectedSurveyStatusCell?.header.description}:</h4>
+        <br>
         <SurveyInstanceGrid {columnDefs}
                             rowData={gridData}
                             onSelectRow={selectRow}/>
