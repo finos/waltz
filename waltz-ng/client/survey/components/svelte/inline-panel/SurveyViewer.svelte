@@ -1,10 +1,10 @@
 <script>
 
-    import {questions, responses, selectedSection} from "./survey-detail-store";
-    import {groupQuestions, indexResponses} from "../../survey/survey-utils";
+    import {questions, responses, selectedSection} from "../../../../playpen/1/survey-detail-store";
+    import {groupQuestions, indexResponses} from "../../../survey-utils";
     import _ from "lodash";
     import SurveyQuestionResponse from "./SurveyQuestionResponse.svelte";
-    import Icon from "../../common/svelte/Icon.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
 
     $: groupedQuestions = groupQuestions($questions);
     $: responsesByQuestionId = indexResponses($responses);

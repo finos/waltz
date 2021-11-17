@@ -1,7 +1,7 @@
 <script>
     import _ from "lodash";
-    import Icon from "../../common/svelte/Icon.svelte";
-    import {stringToBoolean} from "../../common/string-utils";
+    import Icon from "../../../../common/svelte/Icon.svelte";
+    import {stringToBoolean} from "../../../../common/string-utils";
 
     export let response;
 

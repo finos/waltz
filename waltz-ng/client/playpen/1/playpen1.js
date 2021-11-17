@@ -19,11 +19,10 @@
 
 import template from "./playpen1.html";
 import {initialiseData} from "../../common";
-import SurveyViewer from "./SurveyViewer.svelte";
+import SurveyViewer from "../../survey/components/svelte/inline-panel/SurveyViewer.svelte";
 import {loadSurveyInfo} from "../../survey/survey-utils";
 import {questions, responses, surveyDetails} from "./survey-detail-store";
 import {CORE_API} from "../../common/services/core-api-utils";
-import * as SurveyUtils from "../../survey/survey-utils";
 
 const initData = {
     // parentEntityRef: {id: 20768, kind: "APPLICATION"}

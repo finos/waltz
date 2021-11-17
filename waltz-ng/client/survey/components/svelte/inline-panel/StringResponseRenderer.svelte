@@ -1,5 +1,5 @@
 <script>
-    import Markdown from "../../common/svelte/Markdown.svelte";
+    import Markdown from "../../../../common/svelte/Markdown.svelte";
     import _ from "lodash";
 
     export let response;

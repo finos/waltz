@@ -1,13 +1,13 @@
 <script>
 
 
-    import {measurableStore} from "../../svelte-stores/measurables";
+    import {measurableStore} from "../../../../svelte-stores/measurables";
     import _ from "lodash";
-    import {mkSelectionOptions} from "../../common/selector-utils";
-    import {mkRef} from "../../common/entity-utils";
-    import {entity} from "../../common/services/enums/entity";
-    import {parseMeasurableListResponse} from "../../survey/survey-utils";
-    import {buildHierarchies, reduceToSelectedNodesOnly} from "../../common/hierarchy-utils";
+    import {mkSelectionOptions} from "../../../../common/selector-utils";
+    import {mkRef} from "../../../../common/entity-utils";
+    import {entity} from "../../../../common/services/enums/entity";
+    import {parseMeasurableListResponse} from "../../../survey-utils";
+    import {buildHierarchies, reduceToSelectedNodesOnly} from "../../../../common/hierarchy-utils";
     import MeasurableTree from "./MeasurableTree.svelte";
 
     export let response;

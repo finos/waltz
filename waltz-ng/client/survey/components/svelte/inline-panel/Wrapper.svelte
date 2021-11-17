@@ -1,5 +1,5 @@
 <script>
-    import DataTypeTreeSelector from "../../common/svelte/DataTypeTreeSelector.svelte";
+    import DataTypeTreeSelector from "../../../../common/svelte/DataTypeTreeSelector.svelte";
 </script>
 
 
