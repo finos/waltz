@@ -38,25 +38,31 @@
             class: "awaiting-approval",
             name: "Awaiting Approval",
             description: "Completed surveys - awaiting approval",
-            width: "25%",
+            width: "20%",
             data: d => d.completed
         },{
             class: "overdue",
             name: "Overdue",
             description: "Overdue surveys - awaiting completion",
-            width: "25%",
+            width: "20%",
             data: d => d.overdue
+        },{
+            class: "awaiting-completion",
+            name: "Awaiting Completion",
+            description: "Incomplete surveys - awaiting completion",
+            width: "20%",
+            data: d => d.incomplete
         },{
             class: "rejected",
             name: "Rejected",
             description: "Rejected surveys",
-            width: "25%",
+            width: "20%",
             data: d => d.rejected
         },{
             class: "approved",
             description: "Approved surveys",
             name: "Approved",
-            width: "25%",
+            width: "20%",
             data: d => d.approved
         }
     ]
@@ -103,8 +109,6 @@
             const rejected = _.get(surveysByStatus, ["REJECTED"], [])
 
             const [overdue, outstanding] = _.partition(incomplete, d => new Date(d.surveyRun.dueDate) < currentDate);
-            const [dueWeek, moreThanWeek] = _.partition(outstanding, d => new Date(d.surveyRun.dueDate) < weekFromNow);
-            const [dueMonth, future] = _.partition(moreThanWeek, d => new Date(d.surveyRun.dueDate) < monthFromNow);
 
             return {
                 template: templatesById[k],
@@ -113,8 +117,6 @@
                 rejected,
                 completed,
                 overdue,
-                dueWeek,
-                dueMonth
             }})
         .value();
 
@@ -184,10 +186,10 @@
     @import '../../../../style/variables';
 
     .overdue {
-        background-color: $waltz-amber-background;
+        background-color: $waltz-red-background;
 
         &.selected {
-            outline: solid 1px $waltz-amber;
+            outline: solid 1px $waltz-red;
         }
     }
 
@@ -212,6 +214,14 @@
 
         &.selected {
             outline: solid 1px $waltz-green;
+        }
+    }
+
+    .awaiting-completion {
+        background-color: $waltz-lime-background;
+
+        &.selected {
+            outline: solid 1px $waltz-lime;
         }
     }
 
