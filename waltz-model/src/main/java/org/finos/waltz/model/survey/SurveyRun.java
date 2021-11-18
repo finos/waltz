@@ -45,4 +45,5 @@ public abstract class SurveyRun implements IdProvider, NameProvider, Description
     public abstract Long ownerId();
     public abstract String contactEmail();
     public abstract SurveyRunStatus status();
+    public abstract Set<Long> ownerInvKindIds();
 }
