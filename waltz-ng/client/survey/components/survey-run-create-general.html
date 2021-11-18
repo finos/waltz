@@ -96,7 +96,7 @@
                                               required="true"
                                               place-holder="yyyy-MM-dd"
                                               format="yyyy-MM-dd"
-                                              model="$ctrl.dueDate">
+                                              model="$ctrl.surveyInstance.dueDate">
                 </waltz-date-picker-form-input>
             </div>
         </div>
@@ -111,7 +111,7 @@
                                               required="true"
                                               place-holder="yyyy-MM-dd"
                                               format="yyyy-MM-dd"
-                                              model="$ctrl.approvalDueDate">
+                                              model="$ctrl.surveyInstance.approvalDueDate">
                 </waltz-date-picker-form-input>
             </div>
         </div>
@@ -172,7 +172,7 @@
             </div>
             <div class="col-sm-10">
                 <div>
-                    <select ng-model="$ctrl.surveyRun.owningRole"
+                    <select ng-model="$ctrl.surveyInstance.owningRole"
                             id="owningRole"
                             class="form-control">
                         <option ng-repeat="role in $ctrl.customRoles"

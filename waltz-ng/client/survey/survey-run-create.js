@@ -91,7 +91,7 @@ function controller($document,
         $interval(() => document.body.removeChild(iframeHack), 100, 1);
     };
 
-    vm.onSaveGeneral = (surveyRun, dueDate, approvalDueDate) => {
+    vm.onSaveGeneral = (surveyRun, surveyInstance) => {
         const command = {
             name: surveyRun.name,
             description: surveyRun.description,
@@ -106,8 +106,7 @@ function controller($document,
             involvementKindIds: _.map(surveyRun.involvementKinds, kind => kind.id),
             ownerInvKindIds: _.map(surveyRun.ownerInvolvementKinds, kind => kind.id),
             issuanceKind: surveyRun.issuanceKind,
-            dueDate: dueDate ? timeFormat("%Y-%m-%d")(dueDate) : null,
-            approvalDueDate: approvalDueDate ? timeFormat("%Y-%m-%d")(approvalDueDate) : null,
+            dueDate: surveyInstance.dueDate ? timeFormat("%Y-%m-%d")(surveyInstance.dueDate) : null,
             contactEmail: surveyRun.contactEmail
         };
 
@@ -117,10 +116,10 @@ function controller($document,
                     vm.step = "RECIPIENT";
                     const instancesRecipientsCreateCommand = {
                         surveyRunId: surveyRun.id,
-                        dueDate: dueDate,
-                        approvalDueDate: approvalDueDate,
+                        dueDate: surveyInstance.dueDate,
+                        approvalDueDate: surveyInstance.approvalDueDate,
                         excludedRecipients: [],
-                        owningRole: null
+                        owningRole: surveyInstance.owningRole
                     };
                     instanceCreateCommand.set(instancesRecipientsCreateCommand);
                 });
@@ -131,10 +130,10 @@ function controller($document,
                     vm.step = "RECIPIENT";
                     const instancesRecipientsCreateCommand = {
                         surveyRunId: r.id,
-                        dueDate: dueDate,
-                        approvalDueDate: approvalDueDate,
+                        dueDate: surveyInstance.dueDate,
+                        approvalDueDate: surveyInstance.approvalDueDate,
                         excludedRecipients: [],
-                        owningRole: null
+                        owningRole: surveyInstance.owningRole
                     };
                     instanceCreateCommand.set(instancesRecipientsCreateCommand);
                 });

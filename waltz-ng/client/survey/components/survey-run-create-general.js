@@ -59,10 +59,12 @@ const initialState = {
     },
     surveyRun: {
         selectorEntity: null,
-        owningRole: null
     },
-    dueDate: null,
-    approvalDueDate: null
+    surveyInstance: {
+        dueDate: null,
+        approvalDueDate: null,
+        owningRole: null
+    }
 };
 
 
@@ -123,7 +125,7 @@ function controller(appGroupStore, involvementKindStore, serviceBroker) {
     };
 
     vm.onSubmit = () => {
-        vm.onSave(this.surveyRun, vm.dueDate, vm.approvalDueDate);
+        vm.onSave(this.surveyRun, vm.surveyInstance);
     };
 
     vm.isLastInList = (item, list) => {

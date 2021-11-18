@@ -377,6 +377,7 @@ public class SurveyRunService {
                 .status(surveyInstance.status())
                 .dueDate(surveyInstance.dueDate())
                 .approvalDueDate(surveyInstance.approvalDueDate())
+                .owningRole(surveyInstance.owningRole())
                 .build());
     }
 
