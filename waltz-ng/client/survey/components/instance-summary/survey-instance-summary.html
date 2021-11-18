@@ -59,7 +59,7 @@
     <!-- ISSUED / APPROVED -->
     <div class="row waltz-survey-summary-row">
         <div ng-include="'wsis-issued-by'"></div>
-        <div ng-include="'wsis-owner'"></div>
+        <div ng-include="'wsis-approval-due-date'"></div>
     </div>
 
     <!-- SUBJECT / DUE -->
@@ -74,22 +74,25 @@
     </div>
 
     <!-- RECIPIENTS -->
-    <div class="row">
-        <div class="col-sm-2 waltz-display-field-label">
-            <span ng-bind="$ctrl.surveyDetails.run.issuanceKind | toDisplayName:'issuance'"></span>
-            Recipient/s
-        </div>
-        <div class="col-sm-4">
-            <!-- For groups -->
-            <div ng-if="$ctrl.surveyDetails.run.issuanceKind === 'GROUP'"
-                 ng-include="'wsis-group-recipients'">
+    <div class="row waltz-survey-summary-row">
+        <div>
+            <div class="col-sm-2 waltz-display-field-label">
+                <span ng-bind="$ctrl.surveyDetails.run.issuanceKind | toDisplayName:'issuance'"></span>
+                Recipient/s
             </div>
+            <div class="col-sm-4">
+                <!-- For groups -->
+                <div ng-if="$ctrl.surveyDetails.run.issuanceKind === 'GROUP'"
+                     ng-include="'wsis-group-recipients'">
+                </div>
 
-            <!-- For individuals -->
-            <div ng-if="$ctrl.surveyDetails.run.issuanceKind === 'INDIVIDUAL'"
-                 ng-include="'wsis-indiv-recipients'">
+                <!-- For individuals -->
+                <div ng-if="$ctrl.surveyDetails.run.issuanceKind === 'INDIVIDUAL'"
+                     ng-include="'wsis-indiv-recipients'">
+                </div>
             </div>
         </div>
+        <div ng-include="'wsis-owner'"></div>
     </div>
 </div>
 
@@ -158,7 +161,7 @@
 <script type="text/ng-template"
         id="wsis-due-date">
     <div class="col-sm-2 waltz-display-field-label">
-        Due
+        Submission Due
     </div>
     <div class="col-sm-4">
         <span ng-if="$ctrl.surveyDetails.permissions.isMetaEdit">
@@ -171,6 +174,30 @@
         </span>
         <span ng-if="!$ctrl.surveyDetails.permissions.isMetaEdit">
             <waltz-from-now timestamp="$ctrl.surveyDetails.instance.dueDate"
+                            days-only="true">
+            </waltz-from-now>
+        </span>
+    </div>
+</script>
+
+
+<!-- APPROVAL DUE DATE -->
+<script type="text/ng-template"
+        id="wsis-approval-due-date">
+    <div class="col-sm-2 waltz-display-field-label">
+        Approval Due
+    </div>
+    <div class="col-sm-4">
+        <span ng-if="$ctrl.surveyDetails.permissions.isMetaEdit">
+            <waltz-editable-field on-save="$ctrl.updateApprovalDueDate"
+                                  field-type="date"
+                                  date-format="yyyy-MM-dd"
+                                  initial-val="$ctrl.surveyDetails.instance.approvalDueDate"
+                                  ctx="$ctrl.surveyDetails.instance.id">
+            </waltz-editable-field>
+        </span>
+        <span ng-if="!$ctrl.surveyDetails.permissions.isMetaEdit">
+            <waltz-from-now timestamp="$ctrl.surveyDetails.instance.approvalDueDate"
                             days-only="true">
             </waltz-from-now>
         </span>

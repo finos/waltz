@@ -20,6 +20,7 @@ import {initialiseData} from "../common/index";
 import {timeFormat} from "d3-time-format";
 import template from "./survey-run-create.html";
 import {CORE_API} from "../common/services/core-api-utils";
+import {instanceCreateCommand} from "./components/survey-run-create-store";
 
 
 const initialState = {
@@ -29,6 +30,8 @@ const initialState = {
         selectorScope: "EXACT",
         issuanceKind: "GROUP"
     },
+    dueDate: null,
+    approvalDueDate: null,
     onSaveGeneral: (s) => {},
     onSaveRecipient: (r) => {}
 };
@@ -88,7 +91,7 @@ function controller($document,
         $interval(() => document.body.removeChild(iframeHack), 100, 1);
     };
 
-    vm.onSaveGeneral = (surveyRun) => {
+    vm.onSaveGeneral = (surveyRun, dueDate, approvalDueDate) => {
         const command = {
             name: surveyRun.name,
             description: surveyRun.description,
@@ -103,7 +106,8 @@ function controller($document,
             involvementKindIds: _.map(surveyRun.involvementKinds, kind => kind.id),
             ownerInvKindIds: _.map(surveyRun.ownerInvolvementKinds, kind => kind.id),
             issuanceKind: surveyRun.issuanceKind,
-            dueDate: surveyRun.dueDate ? timeFormat("%Y-%m-%d")(surveyRun.dueDate) : null,
+            dueDate: dueDate ? timeFormat("%Y-%m-%d")(dueDate) : null,
+            approvalDueDate: approvalDueDate ? timeFormat("%Y-%m-%d")(approvalDueDate) : null,
             contactEmail: surveyRun.contactEmail
         };
 
@@ -111,23 +115,41 @@ function controller($document,
             surveyRunStore.update(surveyRun.id, command)
                 .then(() => {
                     vm.step = "RECIPIENT";
+                    const instancesRecipientsCreateCommand = {
+                        surveyRunId: surveyRun.id,
+                        dueDate: dueDate,
+                        approvalDueDate: approvalDueDate,
+                        excludedRecipients: [],
+                        owningRole: null
+                    };
+                    instanceCreateCommand.set(instancesRecipientsCreateCommand);
                 });
         } else {
             surveyRunStore.create(command)
                 .then(r => {
                     vm.surveyRun.id = r.id;
                     vm.step = "RECIPIENT";
+                    const instancesRecipientsCreateCommand = {
+                        surveyRunId: r.id,
+                        dueDate: dueDate,
+                        approvalDueDate: approvalDueDate,
+                        excludedRecipients: [],
+                        owningRole: null
+                    };
+                    instanceCreateCommand.set(instancesRecipientsCreateCommand);
                 });
         }
+
+
     };
 
-    vm.onSaveRecipient = (surveyRun, includedRecipients, excludedRecipients) => {
-        surveyRunStore.createSurveyRunInstancesAndRecipients(surveyRun.id, excludedRecipients)
-            .then(() => serviceBroker.execute(CORE_API.SurveyRunStore.updateOwningRole, [surveyRun.id, {owningRole: surveyRun.owningRole}]))
-            .then(() => surveyRunStore.updateStatus(surveyRun.id, {newStatus: "ISSUED"})
+    vm.onSaveRecipient = (createInstancesAndRecipientsCommand, includedRecipients) => {
+        surveyRunStore
+            .createSurveyRunInstancesAndRecipients(createInstancesAndRecipientsCommand)
+            .then(() => surveyRunStore.updateStatus(createInstancesAndRecipientsCommand.surveyRunId, {newStatus: "ISSUED"})
                 .then(() => {
                     vm.step = "COMPLETED";
-                    generateEmailLink(surveyRun, includedRecipients);
+                    generateEmailLink(vm.surveyRun, includedRecipients);
                 })
             );
     };

@@ -247,9 +247,9 @@ public class SurveyRunService {
     }
 
 
-    public List<SurveyInstanceRecipient> generateSurveyInstanceRecipients(long surveyRunId) {
-        SurveyRun surveyRun = surveyRunDao.getById(surveyRunId);
-        checkNotNull(surveyRun, "surveyRun " + surveyRunId + " not found");
+    public List<SurveyInstanceRecipient> generateSurveyInstanceRecipients(InstancesAndRecipientsCreateCommand command) {
+        SurveyRun surveyRun = surveyRunDao.getById(command.surveyRunId());
+        checkNotNull(surveyRun, "surveyRun " + command.surveyRunId() + " not found");
 
         SurveyTemplate surveyTemplate = surveyTemplateDao.getById(surveyRun.surveyTemplateId());
         checkNotNull(surveyTemplate, "surveyTemplate " + surveyRun.surveyTemplateId() + " not found");
@@ -268,7 +268,9 @@ public class SurveyRunService {
                                         .surveyEntity(e.getKey())
                                         .surveyRunId(surveyRun.id().get())
                                         .status(SurveyInstanceStatus.NOT_STARTED)
-                                        .dueDate(surveyRun.dueDate())
+                                        .dueDate(command.dueDate())
+                                        .approvalDueDate(command.approvalDueDate())
+                                        .owningRole(command.owningRole())
                                         .build())
                                 .person(p)
                                 .build()))
@@ -277,9 +279,9 @@ public class SurveyRunService {
     }
 
 
-    public List<SurveyInstanceOwner> generateSurveyInstanceOwners(long surveyRunId) {
-        SurveyRun surveyRun = surveyRunDao.getById(surveyRunId);
-        checkNotNull(surveyRun, "surveyRun " + surveyRunId + " not found");
+    public List<SurveyInstanceOwner> generateSurveyInstanceOwners(InstancesAndRecipientsCreateCommand command) {
+        SurveyRun surveyRun = surveyRunDao.getById(command.surveyRunId());
+        checkNotNull(surveyRun, "surveyRun " + command.surveyRunId() + " not found");
 
         SurveyTemplate surveyTemplate = surveyTemplateDao.getById(surveyRun.surveyTemplateId());
         checkNotNull(surveyTemplate, "surveyTemplate " + surveyRun.surveyTemplateId() + " not found");
@@ -296,9 +298,11 @@ public class SurveyRunService {
                         .map(p -> ImmutableSurveyInstanceOwner.builder()
                                 .surveyInstance(ImmutableSurveyInstance.builder()
                                         .surveyEntity(e.getKey())
-                                        .surveyRunId(surveyRun.id().get())
+                                        .surveyRunId(command.surveyRunId())
                                         .status(SurveyInstanceStatus.NOT_STARTED)
-                                        .dueDate(surveyRun.dueDate())
+                                        .dueDate(command.dueDate())
+                                        .approvalDueDate(command.approvalDueDate())
+                                        .owningRole(command.owningRole())
                                         .build())
                                 .person(p)
                                 .build()))
@@ -309,21 +313,20 @@ public class SurveyRunService {
     }
 
 
-    public boolean createSurveyInstancesAndRecipients(long surveyRunId,
-                                                      Collection<SurveyInstanceRecipient> excludedRecipients) {
+    public boolean createSurveyInstancesAndRecipients(InstancesAndRecipientsCreateCommand command) {
 
-        SurveyRun surveyRun = surveyRunDao.getById(surveyRunId);
-        checkNotNull(surveyRun, "surveyRun " + surveyRunId + " not found");
+        SurveyRun surveyRun = surveyRunDao.getById(command.surveyRunId());
+        checkNotNull(surveyRun, "surveyRun " + command.surveyRunId() + " not found");
 
-        Set<SurveyInstanceRecipient> excludedRecipientSet = fromCollection(excludedRecipients);
-        List<SurveyInstanceRecipient> surveyInstanceRecipients = generateSurveyInstanceRecipients(surveyRunId)
+        Set<SurveyInstanceRecipient> excludedRecipientSet = fromCollection(command.excludedRecipients());
+        List<SurveyInstanceRecipient> surveyInstanceRecipients = generateSurveyInstanceRecipients(command)
                 .stream()
                 .filter(r -> !excludedRecipientSet.contains(r))
                 .collect(toList());
 
-        List<SurveyInstanceOwner> surveyInstanceOwners = generateSurveyInstanceOwners(surveyRunId);
+        List<SurveyInstanceOwner> surveyInstanceOwners = generateSurveyInstanceOwners(command);
 
-        Map<SurveyInstance, Collection<SurveyInstanceOwner>> surveyOwnersByInstance = groupBy(surveyInstanceOwners, k -> k.surveyInstance());
+        Map<SurveyInstance, Collection<SurveyInstanceOwner>> surveyOwnersByInstance = groupBy(surveyInstanceOwners, SurveyInstanceOwner::surveyInstance);
 
         Map<SurveyInstance, List<SurveyInstanceRecipient>> instancesAndRecipientsToSave = surveyInstanceRecipients.stream()
                 .collect(groupingBy(
@@ -332,7 +335,7 @@ public class SurveyRunService {
                 ));
 
         // delete existing instances and recipients
-        deleteSurveyInstancesAndRecipients(surveyRunId);
+        deleteSurveyInstancesAndRecipients(command.surveyRunId());
 
         // insert new instances and recipients
         instancesAndRecipientsToSave.forEach(
@@ -373,6 +376,7 @@ public class SurveyRunService {
                 .entityReference(surveyInstance.surveyEntity())
                 .status(surveyInstance.status())
                 .dueDate(surveyInstance.dueDate())
+                .approvalDueDate(surveyInstance.approvalDueDate())
                 .build());
     }
 
@@ -496,6 +500,7 @@ public class SurveyRunService {
         SurveyInstanceCreateCommand instanceCreateCommand = ImmutableSurveyInstanceCreateCommand
                 .builder()
                 .dueDate(run.dueDate())
+                .approvalDueDate(run.dueDate())
                 .entityReference(entityRef)
                 .surveyRunId(run.id().get())
                 .status(SurveyInstanceStatus.NOT_STARTED)

@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.DescriptionProvider;
 import org.finos.waltz.model.IdSelectionOptions;
 import org.finos.waltz.model.NameProvider;
+import org.finos.waltz.model.Nullable;
 import org.finos.waltz.model.command.Command;
 import org.immutables.value.Value;
 
@@ -39,6 +40,7 @@ public abstract class SurveyRunCreateCommand implements Command, NameProvider, D
     public abstract IdSelectionOptions selectionOptions();
     public abstract Set<Long> involvementKindIds();
     public abstract LocalDate dueDate();
+    public abstract LocalDate approvalDueDate();
     public abstract SurveyIssuanceKind issuanceKind();
     public abstract String contactEmail();
     public abstract Set<Long> ownerInvKindIds();

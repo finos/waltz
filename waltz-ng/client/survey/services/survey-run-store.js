@@ -107,14 +107,14 @@ function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
-    const generateSurveyRunRecipients = (id) => {
+    const generateSurveyRunRecipients = (command) => {
         return $http
-            .get(`${base}/${id}/recipients`)
+            .post(`${base}/recipients`, command)
     };
 
-    const createSurveyRunInstancesAndRecipients = (id, excludedRecipients) => {
+    const createSurveyRunInstancesAndRecipients = (instancesAndRecipientsCreateCommand) => {
         return $http
-            .post(`${base}/${id}/recipients`, excludedRecipients);
+            .post(`${base}/create-instance-recipients`, instancesAndRecipientsCreateCommand);
     };
 
     const getCompletionRate = (id) => {

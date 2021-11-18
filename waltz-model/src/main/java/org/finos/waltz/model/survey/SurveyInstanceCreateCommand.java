@@ -36,6 +36,8 @@ public abstract class SurveyInstanceCreateCommand implements Command {
     public abstract Long surveyRunId();
     public abstract EntityReference entityReference();
     public abstract Optional<LocalDate> dueDate();
+    public abstract LocalDate approvalDueDate();
+
     @Value.Default
     public SurveyInstanceStatus status() {
         return SurveyInstanceStatus.NOT_STARTED;

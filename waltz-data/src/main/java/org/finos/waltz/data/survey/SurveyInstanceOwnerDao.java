@@ -46,6 +46,7 @@ public class SurveyInstanceOwnerDao {
                                     record.getValue(SURVEY_INSTANCE.ENTITY_ID)))
                             .status(SurveyInstanceStatus.valueOf(record.getValue(SURVEY_INSTANCE.STATUS)))
                             .dueDate(record.getValue(SURVEY_INSTANCE.DUE_DATE).toLocalDate())
+                            .approvalDueDate(record.getValue(SURVEY_INSTANCE.APPROVAL_DUE_DATE).toLocalDate())
                             .build())
                     .person(PersonDao.personMapper.map(record))
                     .build();
