@@ -119,10 +119,13 @@
 
     function loadForCategory(evt) {
 
-        const category = evt.detail
-        const parentEntity = $focusClient || entity
+        const category = evt.detail;
+        const parentEntity = $focusClient || entity;
 
-        flowGraphSummaryCall = logicalFlowStore.getFlowGraphSummary(parentEntity, category.id, true);
+        flowGraphSummaryCall = logicalFlowStore.getFlowGraphSummary(
+            parentEntity,
+            category.id,
+            true /* force */);
 
         additionalBreadcrumbs = _.concat(
             additionalBreadcrumbs,

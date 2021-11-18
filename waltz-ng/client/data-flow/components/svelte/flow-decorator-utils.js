@@ -21,19 +21,22 @@ export const dimensions = {
     }
 };
 
+
 const catLayout = {
     id: a => a.categoryId,
     scale: (catYPos, cliYPos) => catYPos,
     dimensions: dimensions.category,
     offset: () => 0
-}
+};
+
 
 const cliLayout = {
     id: a => a.clientId,
     scale: (catYPos, cliYPos) => cliYPos,
     dimensions: dimensions.client,
     offset: (x) => x
-}
+};
+
 
 export const layout = {
     categoryToClient: {
@@ -91,17 +94,23 @@ export function mkClients(summarisedFlows, physicalFlows = []){
         .value()
 }
 
+
 export function mkCategories(summarisedFlows){
     return _
         .chain(summarisedFlows)
-        .map(d => ({
-            name: d.category.name,
-            id: d.category.id,
-            hasChildren: d.hasChildren
-        }))
-        .uniq()
+        .groupBy(d => d.category.id)
+        .reduce((acc, xs, k) => {
+            const category = {
+                id: xs[0].category.id,
+                name: xs[0].category.name,
+                hasChildren: _.some(xs, x => x.hasChildren)
+            };
+
+            return [...acc, category];
+        }, [])
         .value();
 }
+
 
 export function mkArcs(summarisedFlows){
     return _
@@ -141,7 +150,9 @@ export function summariseFlows(flowInfo, noOpinionRating) {
                 .countBy(decorator => decorator.classificationId)
                 .value();
 
-            const exactFlow = _.find(decoratorsForKey, decorator => decorator.actualDataType.id === decorator.rollupDataType.id);
+            const exactFlow = _.find(
+                decoratorsForKey,
+                decorator => decorator.actualDataType.id === decorator.rollupDataType.id);
 
             const lineRating = _.get(exactFlow, ["classificationId"], noOpinionRating?.id); //TODO: make this the no opinion id
 
@@ -175,4 +186,3 @@ export function summariseFlows(flowInfo, noOpinionRating) {
         })
         .value();
 }
-

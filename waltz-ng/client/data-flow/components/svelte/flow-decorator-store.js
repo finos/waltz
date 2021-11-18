@@ -46,16 +46,17 @@ export const focusClient = writable(null);
 
 export const flowDirection = derived(layoutDirection, (direction) => {
     return direction === layoutDirections.categoryToClient ? flowDirections.OUTBOUND : flowDirections.INBOUND
-})
+});
+
 
 export const filteredCategories = derived([categoryQuery, categories], ([catQry, cats]) => {
-
     const filteredCats = _.isEmpty(catQry)
         ? cats
         : termSearch(cats, catQry, ["name"]);
 
     return _.sortBy(filteredCats, d => d.name)
-})
+});
+
 
 export const filteredClients = derived([clientQuery, entityKindFilter, assessmentRatingFilter, clients], ([clientQry, entityKindFilter, assessmentRatingFilter, cs]) => {
 
@@ -72,6 +73,7 @@ export const filteredClients = derived([clientQuery, entityKindFilter, assessmen
             .value();
 });
 
+
 export const filteredArcs = derived([arcs, filteredClients, filteredCategories], ([acs, fcs, fcats]) => {
 
     clientScrollOffset.set(0);
@@ -85,7 +87,7 @@ export const filteredArcs = derived([arcs, filteredClients, filteredCategories],
 
 export const filterApplied = derived([clients, filteredClients, categories, filteredCategories], ([cs, fcs, cats, fcats]) => {
     return !containsAll(fcs, cs) || !containsAll(fcats, cats);
-})
+});
 
 
 export const clientScale = derived(filteredClients, (c) => scaleBand()

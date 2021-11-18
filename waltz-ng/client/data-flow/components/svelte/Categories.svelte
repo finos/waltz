@@ -25,9 +25,8 @@
 
 {#each $filteredCategories as category}
     <g transform={`translate(0, ${$categoryScale(category.id)})`}
-       class="no-text-select">
-        <rect fill="#f4fff0"
-              stroke="#ccc"
+       class="no-text-select category">
+        <rect class="pill"
               on:mouseenter={() => onMouseEnter(category)}
               on:mouseleave={() => onMouseLeave()}
               rx={dimensions.category.height / 2}
@@ -40,18 +39,15 @@
              {truncateMiddle(category.name, 22)}
         </text>
         {#if category.hasChildren}
-            <g transform={`translate(${$layoutDirection === layoutDirections.categoryToClient ? dimensions.category.width - 20 : 20 }, ${$categoryScale.bandwidth() / 2})`}>
+            <g transform={`translate(${$layoutDirection === layoutDirections.categoryToClient ? dimensions.category.width - 20 : 20 }, ${$categoryScale.bandwidth() / 2})`}
+               class="children-indicator">
                 <path d={symbol().type(symbolCircle).size(500)()}
                       on:click|stopPropagation={() => drillDownCategory(category)}
-                      class="clickable drilldown"
-                      fill="#f4fff0"
-                      style="stroke: #bbb; stroke-dasharray: 2,2"
-                      stroke-opacity="0">
+                      class="clickable drilldown-circle">
                 </path>
                 <path d={symbol().type(symbolCross).size(40)()}
-                      pointer-events="none"
-                      fill="#AFDE96"
-                      stroke="#aaa">
+                      class="drilldown-cross"
+                      pointer-events="none">
                 </path>
             </g>
         {/if}
@@ -60,11 +56,33 @@
 
 
 <style>
-
-    .drilldown:hover {
-        stroke-opacity: 1;
-        fill: #f9fff7;
-        transition: stroke-opacity 300ms linear;
+    .pill {
+        stroke: #ccc;
+        fill: #f4fff0;
     }
 
+    .drilldown-circle {
+        fill: #f4fff0;
+        stroke: #bbb;
+        stroke-dasharray: 2,2;
+        stroke-opacity: 0.5;
+    }
+
+    .drilldown-cross {
+        fill: #AFDE96;
+        stroke: #aaa;
+    }
+
+    .category:hover .drilldown-circle {
+        stroke-opacity: 1;
+        fill: #f9fff7;
+    }
+
+    .category:hover .drilldown-cross {
+        fill: #1abc1a;
+    }
+
+    .category:hover .pill {
+        fill: #e6fcdd;
+    }
 </style>
