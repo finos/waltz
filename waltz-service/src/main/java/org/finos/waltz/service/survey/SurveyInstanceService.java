@@ -270,6 +270,29 @@ public class SurveyInstanceService {
     }
 
 
+    public int updateApprovalDueDate(String userName, long instanceId, DateChangeCommand command) {
+        checkNotNull(userName, "userName cannot be null");
+        checkNotNull(command, "command cannot be null");
+
+        checkPersonIsOwnerOrAdmin(userName, instanceId);
+        LocalDate newDueDate = command.newDateVal().orElse(null);
+
+        checkNotNull(newDueDate, "newDueDate cannot be null");
+
+        int result = surveyInstanceDao.updateApprovalDueDate(instanceId, newDueDate);
+
+        changeLogService.write(
+                ImmutableChangeLog.builder()
+                        .operation(Operation.UPDATE)
+                        .userId(userName)
+                        .parentReference(EntityReference.mkRef(EntityKind.SURVEY_INSTANCE, instanceId))
+                        .message("Survey Instance: approval due date changed to " + newDueDate)
+                        .build());
+
+        return result;
+    }
+
+
     public List<SurveyInstance> findBySurveyInstanceIdSelector(IdSelectionOptions idSelectionOptions) {
         checkNotNull(idSelectionOptions, "idSelectionOptions cannot be null");
 

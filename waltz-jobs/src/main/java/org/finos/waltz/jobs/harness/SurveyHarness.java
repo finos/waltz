@@ -18,6 +18,8 @@
 
 package org.finos.waltz.jobs.harness;
 
+import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.survey.*;
@@ -27,19 +29,21 @@ import org.finos.waltz.service.survey.SurveyRunService;
 import org.finos.waltz.service.survey.SurveyTemplateService;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.LongStream;
 
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.toList;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
+import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 
 
 public class SurveyHarness {
 
     public static void main(String[] args) {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-
-        surveyTempateHarness(ctx);
+        surveyRunHarness(ctx);
+//        surveyTempateHarness(ctx);
     }
 
     private static void surveyTempateHarness(AnnotationConfigApplicationContext ctx) {
@@ -96,7 +100,14 @@ public class SurveyHarness {
         String userName = "livingston@mail.com";
         long surveyRunId = surveyRunService.createSurveyRun(userName, surveyRunCreateCommand).id().get();
 
-        List<SurveyInstanceRecipient> surveyInstanceRecipients = surveyRunService.generateSurveyInstanceRecipients(surveyRunId);
+        ImmutableInstancesAndRecipientsCreateCommand createCmd = ImmutableInstancesAndRecipientsCreateCommand.builder()
+                .surveyRunId(surveyRunId)
+                .dueDate(toLocalDate(nowUtcTimestamp()))
+                .approvalDueDate(toLocalDate(nowUtcTimestamp()))
+                .excludedRecipients(emptySet())
+                .build();
+
+        List<SurveyInstanceRecipient> surveyInstanceRecipients = surveyRunService.generateSurveyInstanceRecipients(createCmd);
 
         surveyInstanceRecipients.forEach(r -> System.out.println(
                 r.surveyInstance().surveyEntity().name().get()
@@ -105,30 +116,8 @@ public class SurveyHarness {
 
         System.out.println("Generated recipients count: " + surveyInstanceRecipients.size());
 
-        surveyRunService.createSurveyInstancesAndRecipients(surveyRunId, surveyInstanceRecipients.subList(0, 5));
+        surveyRunService.createSurveyInstancesAndRecipients(createCmd);
 
-        ImmutableSurveyRunChangeCommand surveyRunChangeCommand = ImmutableSurveyRunChangeCommand.builder()
-                .surveyTemplateId(1L)
-                .name("Q2 Quality Survey")
-                .selectionOptions(idSelectionOptions)
-                .issuanceKind(SurveyIssuanceKind.GROUP)
-                .involvementKindIds(SetUtilities.fromCollection(
-                        LongStream.range(3, 7).mapToObj(Long::valueOf)
-                                .collect(toList())))
-                .contactEmail("jack.livingston12@gmail.com")
-                .build();
-
-        // update survey run
-        surveyRunService.updateSurveyRun(userName, surveyRunId, surveyRunChangeCommand);
-
-        List<SurveyInstanceRecipient> updatedSurveyInstanceRecipients = surveyRunService.generateSurveyInstanceRecipients(surveyRunId);
-        System.out.println("Updated Generated recipients count: " + updatedSurveyInstanceRecipients.size());
-
-        // generate the instances and recipients again
-        surveyRunService.createSurveyInstancesAndRecipients(surveyRunId, Collections.emptyList());
-
-        // finally publish
-        surveyRunService.updateSurveyRunStatus(userName, surveyRunId, SurveyRunStatus.ISSUED);
     }
 
 

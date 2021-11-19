@@ -34,7 +34,6 @@ import spark.Request;
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.model.HierarchyQueryScope.EXACT;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
@@ -68,8 +67,8 @@ public class SurveyRunEndpoint implements Endpoint {
         String surveyRunListForUserPath = mkPath(BASE_URL, "user");
         String surveyRunUpdatePath = mkPath(BASE_URL, ":id");
         String surveyRunDeletePath = mkPath(BASE_URL, ":id");
-        String generateSurveyRunRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
-        String createSurveyRunInstancesAndRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
+        String generateSurveyRunRecipientsPath = mkPath(BASE_URL, "recipients");
+        String createSurveyRunInstancesAndRecipientsPath = mkPath(BASE_URL, "create-instance-recipients");
         String createSurveyInstancesPath = mkPath(BASE_URL, ":id", "create-instances");
         String updateSurveyRunStatusPath = mkPath(BASE_URL, ":id", "status");
         String updateSurveyRunDueDatePath = mkPath(BASE_URL, ":id", "due-date");
@@ -143,15 +142,15 @@ public class SurveyRunEndpoint implements Endpoint {
         ListRoute<SurveyInstanceRecipient> generateSurveyRunRecipientsRoute = (request, response) -> {
             ensureUserHasAdminRights(request);
 
-            return surveyRunService.generateSurveyInstanceRecipients(getId(request));
+            InstancesAndRecipientsCreateCommand command = readBody(request, InstancesAndRecipientsCreateCommand.class);
+
+            return surveyRunService.generateSurveyInstanceRecipients(command);
         };
 
         DatumRoute<Boolean> createSurveyRunInstancesAndRecipientsRoute = (request, response) -> {
             ensureUserHasAdminRights(request);
 
-            return surveyRunService.createSurveyInstancesAndRecipients(
-                    getId(request),
-                    newArrayList(readBody(request, SurveyInstanceRecipient[].class)));
+            return surveyRunService.createSurveyInstancesAndRecipients(readBody(request, InstancesAndRecipientsCreateCommand.class));
         };
 
         DatumRoute<Boolean> createSurveyInstancesRoute = (request, response) -> {
@@ -172,7 +171,7 @@ public class SurveyRunEndpoint implements Endpoint {
         getForList(findByTemplateIdPath, findByTemplateIdRoute);
         getForList(findByEntityRefPath, findByEntityRoute);
         getForList(findForRecipientIdPath, findForRecipientIdRoute);
-        getForList(generateSurveyRunRecipientsPath, generateSurveyRunRecipientsRoute);
+        postForList(generateSurveyRunRecipientsPath, generateSurveyRunRecipientsRoute);
         getForList(surveyRunListForUserPath, surveyRunListForUserRoute);
         postForDatum(BASE_URL, surveyRunCreateRoute);
         deleteForDatum(surveyRunDeletePath, surveyRunDeleteRoute);

@@ -22,6 +22,8 @@ import java.util.Set;
 
 import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.CollectionUtilities.find;
+import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
+import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
@@ -95,7 +97,14 @@ public class SurveyRunServiceTest extends BaseInMemoryIntegrationTest {
 
         IdCommandResponse runResp = runService.createSurveyRun(admin, cmd);
         Long surveyRunId = runResp.id().orElseThrow(() -> new AssertionFailedError("Failed to create run"));
-        runService.createSurveyInstancesAndRecipients(surveyRunId, emptySet());
+
+        ImmutableInstancesAndRecipientsCreateCommand createCmd = ImmutableInstancesAndRecipientsCreateCommand.builder()
+                .surveyRunId(surveyRunId)
+                .dueDate(toLocalDate(nowUtcTimestamp()))
+                .approvalDueDate(toLocalDate(nowUtcTimestamp()))
+                .excludedRecipients(emptySet())
+                .build();
+        runService.createSurveyInstancesAndRecipients(createCmd);
 
         Set<SurveyInstance> instances = instanceService.findForSurveyRun(surveyRunId);
 

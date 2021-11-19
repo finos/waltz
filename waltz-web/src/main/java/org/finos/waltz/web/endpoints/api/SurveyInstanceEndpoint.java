@@ -69,6 +69,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
         String saveResponsePath = mkPath(BASE_URL, ":id", "response");
         String updateStatusPath = mkPath(BASE_URL, ":id", "status");
         String updateDueDatePath = mkPath(BASE_URL, ":id", "due-date");
+        String updateApprovalDueDatePath = mkPath(BASE_URL, ":id", "approval-due-date");
         String recipientPath = mkPath(BASE_URL, ":id", "recipient");
         String deleteRecipientPath = mkPath(BASE_URL, ":id", "recipient", ":instanceRecipientId");
         String reportProblemWithQuestionResponsePath = mkPath(BASE_URL, ":id", "response", ":questionId", "problem");
@@ -160,6 +161,16 @@ public class SurveyInstanceEndpoint implements Endpoint {
                     command);
         };
 
+
+        DatumRoute<Integer> updateApprovalDueDateRoute = (req, res) -> {
+            DateChangeCommand command = readBody(req, DateChangeCommand.class);
+
+            return surveyInstanceService.updateApprovalDueDate(
+                    getUsername(req),
+                    getId(req),
+                    command);
+        };
+
         DatumRoute<Boolean> updateRecipientRoute =
                 (req, res) -> {
                     SurveyInstanceRecipientUpdateCommand command = readBody(req, SurveyInstanceRecipientUpdateCommand.class);
@@ -192,6 +203,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
         putForDatum(saveResponsePath, saveResponseRoute);
         putForDatum(updateStatusPath, updateStatusRoute);
         putForDatum(updateDueDatePath, updateDueDateRoute);
+        putForDatum(updateApprovalDueDatePath, updateApprovalDueDateRoute);
         putForDatum(recipientPath, updateRecipientRoute);
         postForDatum(recipientPath, addRecipientRoute);
         deleteForDatum(deleteRecipientPath, deleteRecipientRoute);

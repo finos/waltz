@@ -52,10 +52,11 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
+import static java.util.Collections.emptySet;
 import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkFalse;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
-import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
+import static org.finos.waltz.common.DateTimeUtilities.*;
 import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static org.finos.waltz.schema.Tables.SURVEY_INSTANCE;
 import static org.finos.waltz.schema.Tables.SURVEY_RUN;
@@ -218,8 +219,13 @@ public class SurveyRunGenerator implements SampleDataGenerator {
             long surveyRunId = surveyRunRecord.getId();
             LOG.debug("Survey Run: {} / {} / {}", surveyRunRecord.getStatus(), surveyRunId, surveyRunRecord.getName());
 
-            surveyRunService.createSurveyInstancesAndRecipients(surveyRunId, Collections.emptyList());
-
+            ImmutableInstancesAndRecipientsCreateCommand createCmd = ImmutableInstancesAndRecipientsCreateCommand.builder()
+                    .surveyRunId(surveyRunId)
+                    .dueDate(toLocalDate(nowUtcTimestamp()))
+                    .approvalDueDate(toLocalDate(nowUtcTimestamp()))
+                    .excludedRecipients(emptySet())
+                    .build();
+            surveyRunService.createSurveyInstancesAndRecipients(createCmd);
 
             List<SurveyInstanceQuestionResponse> surveyInstanceQuestionResponses = mkRandomSurveyRunResponses(
                     surveyRunId, surveyInstanceService, surveyQuestionService);

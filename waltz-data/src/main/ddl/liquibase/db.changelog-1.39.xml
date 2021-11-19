@@ -122,13 +122,78 @@
     <!-- 5786: Add owner_kind_ids column to survey run -->
     <changeSet id="20211117-5768-1"
                author="woodjes">
-        <comment>5678: drop survey_owner from survey_instance</comment>
+        <comment>5678: add owner_inv_kind_ids to survey_run</comment>
         <addColumn tableName="survey_run">
             <column name="owner_inv_kind_ids"
-                    type="VARCHAR(255)">
+                    type="${id-list.type}">
                 <constraints nullable="true"/>
             </column>
         </addColumn>
     </changeSet>
+
+    <!-- 5776: Add due date for submission and approval to survey instance -->
+    <changeSet id="20211118-5776-1"
+               author="woodjes">
+        <comment>5776: add approval due date to survey_instance</comment>
+        <addColumn tableName="survey_instance">
+            <column name="approval_due_date"
+                    type="DATE">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20211118-5776-2"
+               author="woodjes">
+        <comment>5776: add approval due date to survey_instance</comment>
+        <sql>
+            UPDATE survey_instance
+            SET approval_due_date = (SELECT due_date FROM survey_run WHERE id = survey_instance.survey_run_id)
+        </sql>
+    </changeSet>
+
+    <changeSet id="20211118-5776-3"
+               author="woodjes">
+        <comment>5776: add approval due date to survey_instance</comment>
+        <addNotNullConstraint tableName="survey_instance"
+                              columnName="approval_due_date"
+                              columnDataType="DATE"/>
+    </changeSet>
+
+
+    <!-- 5778: Add due date for submission and approval to survey instance -->
+    <changeSet id="20211119-5778-1"
+               author="davidwatkins73">
+        <comment>5778: Survey Runs: add submission and approval date offsets. Add an is_default column</comment>
+        <addColumn tableName="survey_run">
+            <column name="is_default"
+                    defaultValueBoolean="false"
+                    type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="survey_run">
+            <column name="approval_due_date"
+                    type="DATE">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20211119-5778-2"
+               author="davidwatkins73">
+        <sql>
+            UPDATE survey_run
+            SET approval_due_date = due_date
+        </sql>
+    </changeSet>
+
+    <changeSet id="20211119-5778-3"
+               author="davidwatkins73">
+        <addNotNullConstraint tableName="survey_run"
+                              columnName="approval_due_date"
+                              columnDataType="DATE"/>
+    </changeSet>
+
 
 </databaseChangeLog>
