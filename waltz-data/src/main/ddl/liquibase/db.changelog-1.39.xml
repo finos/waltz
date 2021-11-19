@@ -160,4 +160,40 @@
                               columnDataType="DATE"/>
     </changeSet>
 
+
+    <!-- 5778: Add due date for submission and approval to survey instance -->
+    <changeSet id="20211119-5778-1"
+               author="davidwatkins73">
+        <comment>5778: Survey Runs: add submission and approval date offsets. Add an is_default column</comment>
+        <addColumn tableName="survey_run">
+            <column name="is_default"
+                    defaultValueBoolean="false"
+                    type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <addColumn tableName="survey_run">
+            <column name="approval_due_date"
+                    type="DATE">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20211119-5778-2"
+               author="davidwatkins73">
+        <sql>
+            UPDATE survey_run
+            SET approval_due_date = due_date
+        </sql>
+    </changeSet>
+
+    <changeSet id="20211119-5778-3"
+               author="davidwatkins73">
+        <addNotNullConstraint tableName="survey_run"
+                              columnName="approval_due_date"
+                              columnDataType="DATE"/>
+    </changeSet>
+
+
 </databaseChangeLog>

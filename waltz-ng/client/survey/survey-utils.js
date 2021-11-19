@@ -76,7 +76,14 @@ export function mkDescription(descriptions = []) {
 }
 
 
-
+/**
+ * Indexes the given survey responses by question id.
+ * Also ensures that booleans and dates are properly
+ * represented as strings.
+ *
+ * @param responses
+ * @returns {qid -> surveyResponse}
+ */
 export function indexResponses(responses = []) {
     return _
         .chain(responses)
