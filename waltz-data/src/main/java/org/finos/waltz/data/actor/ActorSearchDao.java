@@ -22,7 +22,6 @@ import org.finos.waltz.data.SearchDao;
 import org.finos.waltz.data.SearchUtilities;
 import org.finos.waltz.model.actor.Actor;
 import org.finos.waltz.model.entity_search.EntitySearchOptions;
-import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -40,7 +39,7 @@ public class ActorSearchDao implements SearchDao<Actor> {
 
 
     @Autowired
-    public ActorSearchDao(DSLContext dsl, ActorDao actorDao) {
+    public ActorSearchDao(ActorDao actorDao) {
         checkNotNull(actorDao, "actorDao cannot be null");
         this.actorDao = actorDao;
     }

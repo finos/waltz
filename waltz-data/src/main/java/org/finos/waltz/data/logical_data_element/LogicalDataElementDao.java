@@ -18,31 +18,27 @@
 
 package org.finos.waltz.data.logical_data_element;
 
-import org.finos.waltz.schema.tables.records.LogicalDataElementRecord;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.FieldDataType;
 import org.finos.waltz.model.logical_data_element.ImmutableLogicalDataElement;
 import org.finos.waltz.model.logical_data_element.LogicalDataElement;
+import org.finos.waltz.schema.tables.records.LogicalDataElementRecord;
 import org.jooq.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static org.finos.waltz.schema.Tables.LOGICAL_DATA_ELEMENT;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.schema.Tables.LOGICAL_DATA_ELEMENT;
 
 
 @Repository
 public class LogicalDataElementDao {
 
-    private static final Logger LOG = LoggerFactory.getLogger(LogicalDataElementDao.class);
-
     public static final RecordMapper<Record, LogicalDataElement> TO_DOMAIN_MAPPER = r -> {
         LogicalDataElementRecord record = r.into(LOGICAL_DATA_ELEMENT);
-        LogicalDataElement element = ImmutableLogicalDataElement.builder()
+        return ImmutableLogicalDataElement.builder()
                 .id(record.getId())
                 .externalId(record.getExternalId())
                 .name(record.getName())
@@ -52,8 +48,6 @@ public class LogicalDataElementDao {
                 .entityLifecycleStatus(EntityLifecycleStatus.valueOf(record.getEntityLifecycleStatus()))
                 .provenance(record.getProvenance())
                 .build();
-
-        return element;
     };
 
     private final DSLContext dsl;

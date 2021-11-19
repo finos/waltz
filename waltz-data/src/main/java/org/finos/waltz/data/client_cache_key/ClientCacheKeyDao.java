@@ -18,27 +18,23 @@
 
 package org.finos.waltz.data.client_cache_key;
 
-import org.finos.waltz.schema.tables.records.ClientCacheKeyRecord;
 import org.finos.waltz.model.client_cache_key.ClientCacheKey;
 import org.finos.waltz.model.client_cache_key.ImmutableClientCacheKey;
+import org.finos.waltz.schema.tables.records.ClientCacheKeyRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static org.finos.waltz.schema.tables.ClientCacheKey.CLIENT_CACHE_KEY;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.nowUtcTimestamp;
+import static org.finos.waltz.schema.tables.ClientCacheKey.CLIENT_CACHE_KEY;
 
 
 @Repository
 public class ClientCacheKeyDao {
-
-    private static final Logger LOG = LoggerFactory.getLogger(ClientCacheKeyDao.class);
 
     public static final RecordMapper<Record, ClientCacheKey> TO_DOMAIN_MAPPER = (r) -> {
         ClientCacheKeyRecord record = r.into(CLIENT_CACHE_KEY);
@@ -76,7 +72,8 @@ public class ClientCacheKeyDao {
 
 
     public boolean createOrUpdate(String key, String guid) {
-        return dsl.insertInto(
+        return dsl
+                .insertInto(
                     CLIENT_CACHE_KEY,
                     CLIENT_CACHE_KEY.KEY,
                     CLIENT_CACHE_KEY.GUID,

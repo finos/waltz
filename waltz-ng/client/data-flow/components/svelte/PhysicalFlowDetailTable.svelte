@@ -1,11 +1,5 @@
 <script>
-    import {
-        selectedClient,
-        layoutDirection,
-        layoutDirections,
-        selectedCategory,
-        selectedDecorator
-    } from "./flow-decorator-store";
+    import {selectedCategory} from "./flow-decorator-store";
     import _ from "lodash";
     import {truncate} from "../../../common/string-utils";
     import EntityLink from "../../../common/svelte/EntityLink.svelte";

@@ -197,24 +197,32 @@
         id="wsis-owner">
 
     <div class="col-sm-2 waltz-display-field-label">
-        Owner
+        Owner/s
     </div>
     <div class="col-sm-4">
-        <waltz-entity-link entity-ref="$ctrl.surveyDetails.instanceOwner"
-                           tooltip-placement="right">
-        </waltz-entity-link>
-        <span ng-if="$ctrl.surveyDetails.ownerRole">
-            /
-            <span ng-bind="$ctrl.surveyDetails.ownerRole.name"
-                  uib-popover="Admin group for this survey"
-                  popover-trigger="mouseenter"
-                  popover-append-to-body="true">
-            </span>
-        </span>
+        <ul class="list-unstyled list-inline">
+            <li ng-repeat="owner in $ctrl.surveyDetails.instanceOwners | orderBy:'person.name'">
+                <span>
+                    <waltz-entity-link entity-ref="owner.person"
+                                       tooltip-placement="right">
+                    </waltz-entity-link>
+                    <span ng-if="!$last">, </span>
+                </span>
+            </li>
+            <li ng-if="$ctrl.surveyDetails.ownerRole">
+                <span>
+                    /
+                </span>
+                <span ng-bind="$ctrl.surveyDetails.ownerRole.name"
+                      uib-popover="Admin group for this survey"
+                      popover-trigger="mouseenter"
+                      popover-append-to-body="true">
 
+                </span>
+            </li>
+        </ul>
     </div>
 </script>
-
 
 
 <!-- SUBMITTED DATE -->

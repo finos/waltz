@@ -41,5 +41,5 @@ public abstract class SurveyRunChangeCommand implements Command, NameProvider, D
     public abstract Optional<LocalDate> dueDate();
     public abstract SurveyIssuanceKind issuanceKind();
     public abstract Optional<String> contactEmail();
-
+    public abstract Set<Long> ownerInvKindIds();
 }

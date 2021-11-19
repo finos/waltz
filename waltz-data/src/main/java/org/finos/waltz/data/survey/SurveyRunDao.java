@@ -68,6 +68,10 @@ public class SurveyRunDao {
                 .ownerId(record.getOwnerId())
                 .contactEmail(record.getContactEmail())
                 .status(SurveyRunStatus.valueOf(record.getStatus()))
+                .ownerInvKindIds(splitThenMap(
+                        record.getOwnerInvKindIds(),
+                        ID_SEPARATOR,
+                        Long::valueOf))
                 .build();
     };
 
@@ -115,11 +119,12 @@ public class SurveyRunDao {
         record.setSelectorEntityId(command.selectionOptions().entityReference().id());
         record.setSelectorHierarchyScope(command.selectionOptions().scope().name());
         record.setInvolvementKindIds(join(command.involvementKindIds(), ID_SEPARATOR));
-        record.setDueDate(command.dueDate().map(Date::valueOf).orElse(null));
+        record.setDueDate(DateTimeUtilities.toSqlDate(command.dueDate()));
         record.setIssuanceKind(command.issuanceKind().name());
         record.setOwnerId(ownerId);
-        record.setContactEmail(command.contactEmail().orElse(null));
+        record.setContactEmail(command.contactEmail());
         record.setStatus(SurveyRunStatus.DRAFT.name());
+        record.setOwnerInvKindIds(join(command.ownerInvKindIds(), ID_SEPARATOR));
 
         record.store();
         return record.getId();
@@ -148,6 +153,7 @@ public class SurveyRunDao {
                 .set(SURVEY_RUN.DUE_DATE, command.dueDate().map(Date::valueOf).orElse(null))
                 .set(SURVEY_RUN.ISSUANCE_KIND, command.issuanceKind().name())
                 .set(SURVEY_RUN.CONTACT_EMAIL, command.contactEmail().orElse(null))
+                .set(SURVEY_RUN.OWNER_INV_KIND_IDS, join(command.ownerInvKindIds(), ID_SEPARATOR))
                 .where(SURVEY_RUN.ID.eq(surveyRunId))
                 .execute();
     }

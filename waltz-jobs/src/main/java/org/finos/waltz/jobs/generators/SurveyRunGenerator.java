@@ -132,7 +132,7 @@ public class SurveyRunGenerator implements SampleDataGenerator {
                                                                                    SurveyQuestionService surveyQuestionService) {
 
         List<SurveyQuestion> surveyQuestions = surveyQuestionService.findForSurveyRun(surveyRunId);
-        List<SurveyInstance> surveyInstances = surveyInstanceService.findForSurveyRun(surveyRunId);
+        Set<SurveyInstance> surveyInstances = surveyInstanceService.findForSurveyRun(surveyRunId);
         List<SurveyInstanceRecipient> surveyInstanceRecipients = surveyInstances.stream()
                 .flatMap(surveyInstance -> surveyInstanceService.findRecipients(surveyInstance.id().get()).stream())
                 .collect(toList());

@@ -18,6 +18,7 @@
 import {initialiseData} from "../../common/index";
 import template from './survey-run-create-general.html';
 import {CORE_API} from "../../common/services/core-api-utils";
+import _ from "lodash";
 
 
 const bindings = {
@@ -123,6 +124,10 @@ function controller(appGroupStore, involvementKindStore, serviceBroker) {
     vm.onSubmit = () => {
         vm.onSave(this.surveyRun);
     };
+
+    vm.isLastInList = (item, list) => {
+        return _.indexOf(list, item) + 1 !== list.length;
+    }
 }
 
 

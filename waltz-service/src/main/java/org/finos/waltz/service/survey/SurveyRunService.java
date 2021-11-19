@@ -18,7 +18,6 @@
 
 package org.finos.waltz.service.survey;
 
-import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.GenericSelector;
@@ -30,22 +29,21 @@ import org.finos.waltz.model.*;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.survey.*;
+import org.finos.waltz.service.changelog.ChangeLogService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.ListUtilities.map;
+import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.SetUtilities.fromCollection;
 
@@ -57,6 +55,7 @@ public class SurveyRunService {
     private final PersonDao personDao;
     private final SurveyInstanceDao surveyInstanceDao;
     private final SurveyInstanceRecipientDao surveyInstanceRecipientDao;
+    private final SurveyInstanceOwnerDao surveyInstanceOwnerDao;
     private final SurveyRunDao surveyRunDao;
     private final SurveyTemplateDao surveyTemplateDao;
     private final SurveyQuestionResponseDao surveyQuestionResponseDao;
@@ -71,6 +70,7 @@ public class SurveyRunService {
                             PersonDao personDao,
                             SurveyInstanceDao surveyInstanceDao,
                             SurveyInstanceRecipientDao surveyInstanceRecipientDao,
+                            SurveyInstanceOwnerDao surveyInstanceOwnerDao,
                             SurveyRunDao surveyRunDao,
                             SurveyTemplateDao surveyTemplateDao,
                             SurveyQuestionResponseDao surveyQuestionResponseDao) {
@@ -79,6 +79,7 @@ public class SurveyRunService {
         checkNotNull(personDao, "personDao cannot be null");
         checkNotNull(surveyInstanceDao, "surveyInstanceDao cannot be null");
         checkNotNull(surveyInstanceRecipientDao, "surveyInstanceRecipientDao cannot be null");
+        checkNotNull(surveyInstanceOwnerDao, "surveyInstanceOwnerDao cannot be null");
         checkNotNull(surveyRunDao, "surveyRunDao cannot be null");
         checkNotNull(surveyTemplateDao, "surveyTemplateDao cannot be null");
         checkNotNull(surveyQuestionResponseDao, "surveyQuestionResponseDao cannot be null");
@@ -88,6 +89,7 @@ public class SurveyRunService {
         this.personDao = personDao;
         this.surveyInstanceDao = surveyInstanceDao;
         this.surveyInstanceRecipientDao = surveyInstanceRecipientDao;
+        this.surveyInstanceOwnerDao = surveyInstanceOwnerDao;
         this.surveyRunDao = surveyRunDao;
         this.surveyTemplateDao = surveyTemplateDao;
         this.surveyQuestionResponseDao = surveyQuestionResponseDao;
@@ -275,16 +277,53 @@ public class SurveyRunService {
     }
 
 
+    public List<SurveyInstanceOwner> generateSurveyInstanceOwners(long surveyRunId) {
+        SurveyRun surveyRun = surveyRunDao.getById(surveyRunId);
+        checkNotNull(surveyRun, "surveyRun " + surveyRunId + " not found");
+
+        SurveyTemplate surveyTemplate = surveyTemplateDao.getById(surveyRun.surveyTemplateId());
+        checkNotNull(surveyTemplate, "surveyTemplate " + surveyRun.surveyTemplateId() + " not found");
+
+        GenericSelector genericSelector = genericSelectorFactory.applyForKind(surveyTemplate.targetEntityKind(), surveyRun.selectionOptions());
+        Map<EntityReference, List<Person>> entityRefToPeople = involvementDao.findPeopleByEntitySelectorAndInvolvement(
+                surveyTemplate.targetEntityKind(),
+                genericSelector.selector(),
+                surveyRun.ownerInvKindIds());
+
+        return entityRefToPeople.entrySet()
+                .stream()
+                .flatMap(e -> e.getValue().stream()
+                        .map(p -> ImmutableSurveyInstanceOwner.builder()
+                                .surveyInstance(ImmutableSurveyInstance.builder()
+                                        .surveyEntity(e.getKey())
+                                        .surveyRunId(surveyRun.id().get())
+                                        .status(SurveyInstanceStatus.NOT_STARTED)
+                                        .dueDate(surveyRun.dueDate())
+                                        .build())
+                                .person(p)
+                                .build()))
+                .distinct()
+                .collect(toList());
+
+
+    }
+
+
     public boolean createSurveyInstancesAndRecipients(long surveyRunId,
-                                                      List<SurveyInstanceRecipient> excludedRecipients) {
+                                                      Collection<SurveyInstanceRecipient> excludedRecipients) {
 
         SurveyRun surveyRun = surveyRunDao.getById(surveyRunId);
         checkNotNull(surveyRun, "surveyRun " + surveyRunId + " not found");
 
         Set<SurveyInstanceRecipient> excludedRecipientSet = fromCollection(excludedRecipients);
-        List<SurveyInstanceRecipient> surveyInstanceRecipients = generateSurveyInstanceRecipients(surveyRunId).stream()
+        List<SurveyInstanceRecipient> surveyInstanceRecipients = generateSurveyInstanceRecipients(surveyRunId)
+                .stream()
                 .filter(r -> !excludedRecipientSet.contains(r))
                 .collect(toList());
+
+        List<SurveyInstanceOwner> surveyInstanceOwners = generateSurveyInstanceOwners(surveyRunId);
+
+        Map<SurveyInstance, Collection<SurveyInstanceOwner>> surveyOwnersByInstance = groupBy(surveyInstanceOwners, k -> k.surveyInstance());
 
         Map<SurveyInstance, List<SurveyInstanceRecipient>> instancesAndRecipientsToSave = surveyInstanceRecipients.stream()
                 .collect(groupingBy(
@@ -301,11 +340,17 @@ public class SurveyRunService {
                     if (surveyRun.issuanceKind() == SurveyIssuanceKind.GROUP) {
                         // one instance per group
                         long instanceId = createSurveyInstance(k);
+                        createSurveyInstanceOwner(instanceId, surveyRun.ownerId());
+                        Collection<SurveyInstanceOwner> owners = surveyOwnersByInstance.get(k);
+                        fromCollection(owners).forEach(o -> createSurveyInstanceOwner(instanceId, o.person().id().get()));
                         v.forEach(r -> createSurveyInstanceRecipient(instanceId, r));
                     } else {
                         // one instance for each individual
                         v.forEach(r -> {
                             long instanceId = createSurveyInstance(k);
+                            createSurveyInstanceOwner(instanceId, surveyRun.ownerId());
+                            Collection<SurveyInstanceOwner> owners = surveyOwnersByInstance.get(k);
+                            fromCollection(owners).forEach(o -> createSurveyInstanceOwner(instanceId, o.person().id().get()));
                             createSurveyInstanceRecipient(instanceId, r);
                         });
                     }
@@ -336,6 +381,13 @@ public class SurveyRunService {
         return surveyInstanceRecipientDao.create(ImmutableSurveyInstanceRecipientCreateCommand.builder()
                 .surveyInstanceId(surveyInstanceId)
                 .personId(surveyInstanceRecipient.person().id().get())
+                .build());
+    }
+
+    private long createSurveyInstanceOwner(long surveyInstanceId, Long ownerId) {
+        return surveyInstanceOwnerDao.create(ImmutableSurveyInstanceOwnerCreateCommand.builder()
+                .surveyInstanceId(surveyInstanceId)
+                .personId(ownerId)
                 .build());
     }
 
@@ -448,9 +500,12 @@ public class SurveyRunService {
                 .surveyRunId(run.id().get())
                 .status(SurveyInstanceStatus.NOT_STARTED)
                 .owningRole(owningRole)
-                .ownerId(run.ownerId())
                 .build();
         long instanceId = surveyInstanceDao.create(instanceCreateCommand);
+        surveyInstanceOwnerDao.create(ImmutableSurveyInstanceOwnerCreateCommand.builder()
+                .surveyInstanceId(instanceId)
+                .personId(run.ownerId())
+                .build());
         return surveyInstanceDao.createInstanceRecipients(
                 instanceId,
                 personIds);
