@@ -44,7 +44,8 @@
         {#each sortedNodes as childNode}
             <li>
                 {#if childNode.children.length > 0}
-                    <svelte:self on:select node={childNode}
+                    <svelte:self on:select
+                                 node={childNode}
                                  childNodes={childNode.children}/>
                 {:else}
                     <Icon size="lg"

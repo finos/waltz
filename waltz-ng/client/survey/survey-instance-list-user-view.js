@@ -18,16 +18,18 @@
 import _ from "lodash";
 import {initialiseData} from "../common/index";
 import {mkEntityLinkGridCell, mkLinkGridCell} from "../common/grid-utils";
-
+import UserSurveyListPanel from "./components/svelte/UserSurveyListPanel.svelte"
 import template from "./survey-instance-list-user-view.html";
 import roles from "../user/system-roles";
+import {selectSurveyRow} from "./components/svelte/user-survey-store";
 
 
 const initialState = {
     incompleteColumnDefs: [],
     completeColumnDefs: [],
     surveyInstancesAndRuns: [],
-    showSurveyTemplateButton: false
+    showSurveyTemplateButton: false,
+    UserSurveyListPanel
 };
 
 
@@ -53,11 +55,11 @@ function mkSurveyData(surveyRuns = [], surveyInstances = []) {
     };
 }
 
-const subjectField = mkEntityLinkGridCell("Subject", 
-                                          "surveyInstance.surveyEntity", 
-                                          "left", 
-                                          "top", 
-                                          {}, 
+const subjectField = mkEntityLinkGridCell("Subject",
+                                          "surveyInstance.surveyEntity",
+                                          "left",
+                                          "top",
+                                          {},
                                           true);
 
 const subjectExtIdField = {
@@ -149,35 +151,30 @@ function mkCompleteColumnDefs() {
 }
 
 
-function controller($q,
-                    surveyInstanceStore,
-                    surveyRunStore,
+function controller($state,
                     userService) {
 
     const vm = initialiseData(this, initialState);
 
-    vm.incompleteColumnDefs = mkIncompleteColumnDefs();
-    vm.completeColumnDefs = mkCompleteColumnDefs();
+    vm.goToSurvey = (surveyInstance) => {
+        $state.go(
+            "main.survey.instance.response.view",
+            { id: surveyInstance.id });
+    }
+
+    vm.$onInit = () => {
+        selectSurveyRow.set(vm.goToSurvey);
+    }
 
     userService.whoami()
         .then(user => vm.user = user)
         .then(() => vm.showSurveyTemplateButton = userService.hasRole(vm.user, roles.SURVEY_ADMIN)
             || userService.hasRole(vm.user, roles.SURVEY_TEMPLATE_ADMIN));
-
-    const surveyRunsPromise = surveyRunStore.findForUser();
-    const surveyInstancesPromise = surveyInstanceStore.findForUser();
-
-    $q.all([surveyRunsPromise, surveyInstancesPromise])
-        .then(([surveyRuns, surveyInstances]) => {
-            vm.surveys = mkSurveyData(surveyRuns, surveyInstances);
-        });
 }
 
 
 controller.$inject = [
-    "$q",
-    "SurveyInstanceStore",
-    "SurveyRunStore",
+    "$state",
     "UserService"
 ];
 

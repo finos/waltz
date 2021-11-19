@@ -1,19 +1,11 @@
 <script>
     import Icon from "../../../common/svelte/Icon.svelte";
-    import {
-        clearSelections,
-        contextPanelMode,
-        filteredArcs,
-        Modes,
-        selectedClient,
-        selectedClientArcs
-    } from "./flow-decorator-store";
+    import {clearSelections, contextPanelMode, Modes, selectedClient, selectedClientArcs} from "./flow-decorator-store";
     import {createEventDispatcher} from "svelte";
     import EntityInfoPanel from "../../../common/svelte/info-panels/EntityInfoPanel.svelte";
     import {entity} from "../../../common/services/enums/entity";
     import NoData from "../../../common/svelte/NoData.svelte";
-
-    export let flowInfo;
+    import _ from "lodash";
 
     let selectedTab = "context";
     let dispatch = createEventDispatcher();

@@ -19,24 +19,48 @@
 
 import template from "./playpen1.html";
 import {initialiseData} from "../../common";
-import EntityInfoPanel from "../../common/svelte/info-panels/EntityInfoPanel.svelte";
+import SurveyViewer from "../../survey/components/svelte/inline-panel/SurveyViewer.svelte";
+import {loadSurveyInfo} from "../../survey/survey-utils";
+import {questions, responses, surveyDetails} from "./survey-detail-store";
+import {CORE_API} from "../../common/services/core-api-utils";
 
 const initData = {
-    EntityInfoPanel,
     // parentEntityRef: {id: 20768, kind: "APPLICATION"}
-    parentEntityRef: {id: 6538029, kind: "CHANGE_INITIATIVE"},
-    measurableEntityRef: {id: 54566, kind: "MEASURABLE"}
+    parentEntityRef: {id: 76823, kind: "SURVEY_INSTANCE"},
+    measurableEntityRef: {id: 54566, kind: "MEASURABLE"},
+    SurveyViewer
 };
 
 
-function controller($element, $q, serviceBroker) {
+function controller($q,
+                    serviceBroker,
+                    userService) {
 
     const vm = initialiseData(this, initData);
 
+   vm.$onInit = () => {
+       loadSurveyInfo($q, serviceBroker, userService, vm.parentEntityRef.id)
+           .then(details => surveyDetails.set(details));
+
+       serviceBroker
+           .loadViewData(
+               CORE_API.SurveyQuestionStore.findQuestionsForInstance,
+               [ vm.parentEntityRef.id ])
+           .then(r => questions.set(r.data));
+
+        serviceBroker
+           .loadViewData(
+               CORE_API.SurveyInstanceStore.findResponses,
+               [ vm.parentEntityRef.id ])
+           .then(r => {
+               return responses.set(r.data);
+           });
+
+   }
 
 }
 
-controller.$inject = ["$element", "$q", "ServiceBroker"];
+controller.$inject = ["$q", "ServiceBroker", "UserService"];
 
 const view = {
     template,

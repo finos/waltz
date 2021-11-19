@@ -47,7 +47,7 @@ public class AssetCostDao {
 
     private final DSLContext dsl;
 
-    private RecordMapper<Record, Cost> costMapper = r -> {
+    private final RecordMapper<Record, Cost> costMapper = r -> {
         AssetCostRecord record = r.into(ASSET_COST);
         return ImmutableCost.builder()
                 .amount(record.getAmount())
@@ -56,7 +56,7 @@ public class AssetCostDao {
                 .build();
     };
 
-    private RecordMapper<Record, AssetCost> assetCostMapper = r -> {
+    private final RecordMapper<Record, AssetCost> assetCostMapper = r -> {
         AssetCostRecord record = r.into(ASSET_COST);
         return ImmutableAssetCost.builder()
                 .assetCode(record.getAssetCode())
@@ -66,8 +66,7 @@ public class AssetCostDao {
     };
 
 
-
-    private RecordMapper<Record, ApplicationCost> appCostMapper = r -> {
+    private final RecordMapper<Record, ApplicationCost> appCostMapper = r -> {
         EntityReference appRef = ImmutableEntityReference.builder()
                 .kind(EntityKind.APPLICATION)
                 .id(r.getValue(APPLICATION.ID))

@@ -93,7 +93,7 @@ public class EndUserAppIdSelectorFactory implements Function<IdSelectionOptions,
                 return mkForPersonReportees(options);
             default:
                 throw new UnsupportedOperationException(
-                        "Querying for appIds of person using (scope: '"
+                        "Querying for endUserAppIds of person using (scope: '"
                                 + options.scope()
                                 + "') not supported");
         }

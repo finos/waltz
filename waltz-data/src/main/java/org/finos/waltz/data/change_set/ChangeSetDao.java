@@ -81,7 +81,7 @@ public class ChangeSetDao {
         changeSet.id().ifPresent(record::setId);
         changeSet.parentEntity().ifPresent(ref -> record.setParentEntityKind(ref.kind().name()));
         changeSet.parentEntity().ifPresent(ref -> record.setParentEntityId(ref.id()));
-        record.setPlannedDate(changeSet.plannedDate().map(t -> Timestamp.valueOf(t)).orElse(null));
+        record.setPlannedDate(changeSet.plannedDate().map(Timestamp::valueOf).orElse(null));
         record.setEntityLifecycleStatus(changeSet.entityLifecycleStatus().name());
         record.setName(changeSet.name());
         record.setDescription(changeSet.description());

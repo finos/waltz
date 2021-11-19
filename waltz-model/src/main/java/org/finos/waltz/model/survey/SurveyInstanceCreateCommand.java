@@ -44,6 +44,4 @@ public abstract class SurveyInstanceCreateCommand implements Command {
     @Nullable
     public abstract String owningRole();
 
-    @Nullable
-    public abstract Long ownerId();
 }

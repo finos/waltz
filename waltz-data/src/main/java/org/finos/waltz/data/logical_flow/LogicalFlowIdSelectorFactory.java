@@ -219,19 +219,6 @@ public class LogicalFlowIdSelectorFactory implements IdSelectorFactory {
     }
 
 
-    private Select<Record1<Long>> mkForApplication(IdSelectionOptions options) {
-        SelectorUtilities.ensureScopeIsExact(options);
-        long appId = options.entityReference().id();
-        return DSL.select(LOGICAL_FLOW.ID)
-                .from(LOGICAL_FLOW)
-                .where(LOGICAL_FLOW.SOURCE_ENTITY_ID.eq(appId)
-                        .and(LOGICAL_FLOW.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
-                .or(LOGICAL_FLOW.TARGET_ENTITY_ID.eq(appId)
-                        .and(LOGICAL_FLOW.TARGET_ENTITY_KIND.eq(EntityKind.APPLICATION.name())))
-                .and(LOGICAL_NOT_REMOVED);
-    }
-
-
     private Select<Record1<Long>> mkForDataType(IdSelectionOptions options) {
         Select<Record1<Long>> dataTypeSelector = dataTypeIdSelectorFactory.apply(options);
 

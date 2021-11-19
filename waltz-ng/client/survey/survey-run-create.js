@@ -101,6 +101,7 @@ function controller($document,
                 scope: surveyRun.selectorScope,
             },
             involvementKindIds: _.map(surveyRun.involvementKinds, kind => kind.id),
+            ownerInvKindIds: _.map(surveyRun.ownerInvolvementKinds, kind => kind.id),
             issuanceKind: surveyRun.issuanceKind,
             dueDate: surveyRun.dueDate ? timeFormat("%Y-%m-%d")(surveyRun.dueDate) : null,
             contactEmail: surveyRun.contactEmail

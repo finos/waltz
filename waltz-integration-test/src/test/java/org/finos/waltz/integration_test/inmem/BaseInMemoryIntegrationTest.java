@@ -74,6 +74,7 @@ public abstract class BaseInMemoryIntegrationTest {
 
     @Before
     public void baseSetup() {
+        LoggingUtilities.configureLogging();
         ouIds = setupOuTree();
     }
 

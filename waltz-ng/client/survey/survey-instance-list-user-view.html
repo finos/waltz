@@ -37,33 +37,9 @@
             </a>
         </waltz-section-actions>
 
-        <h4>Incomplete</h4>
-        <br>
-        <div ng-if="ctrl.surveys.incomplete.length > 0">
-            <waltz-grid-with-search column-defs="ctrl.incompleteColumnDefs"
-                                    local-storage-key="waltz-survey-user-instance.incomplete"
-                                    entries="ctrl.surveys.incomplete">
-            </waltz-grid-with-search>
-        </div>
-        <div ng-if="ctrl.surveys.incomplete.length == 0">
-            <span class="text-muted">
-                No incomplete surveys found
-            </span>
-        </div>
 
-        <hr>
-        <h4>Completed/Withdrawn</h4>
-        <br>
-        <div ng-if="ctrl.surveys.complete.length > 0">
-            <waltz-grid-with-search column-defs="ctrl.completeColumnDefs"
-                                    local-storage-key="waltz-survey-user-instance.complete"
-                                    entries="ctrl.surveys.complete">
-            </waltz-grid-with-search>
-        </div>
-        <div ng-if="ctrl.surveys.complete.length == 0">
-            <span class="text-muted">
-                No completed/withdrawn surveys found
-            </span>
-        </div>
+        <waltz-svelte-component component="ctrl.UserSurveyListPanel"
+                                primary-entity-ref="ctrl.parentEntityRef">
+        </waltz-svelte-component>
     </div>
 </div>

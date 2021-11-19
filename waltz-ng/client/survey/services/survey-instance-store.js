@@ -65,6 +65,12 @@ function store($http, baseApiUrl) {
             .then(result => result.data);
     };
 
+    const findOwners = (id) => {
+        return $http
+            .get(`${base}/${id}/owners`)
+            .then(result => result.data);
+    };
+
     const findResponses = (id) => {
         return $http
             .get(`${base}/${id}/responses`)
@@ -140,6 +146,7 @@ function store($http, baseApiUrl) {
         findForSurveyRun,
         findPreviousVersions,
         findRecipients,
+        findOwners,
         findResponses,
         findPossibleActions,
         saveResponse,
@@ -193,6 +200,11 @@ export const SurveyInstanceStore_API = {
         serviceName,
         serviceFnName: "findRecipients",
         description: "finds recipients for a given survey instance id"
+    },
+    findOwners: {
+        serviceName,
+        serviceFnName: "findOwners",
+        description: "finds owners for a given survey instance id"
     },
     findResponses: {
         serviceName,
