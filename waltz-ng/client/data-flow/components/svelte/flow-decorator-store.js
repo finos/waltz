@@ -10,13 +10,13 @@ import {containsAll} from "../../../common/list-utils";
 export const layoutDirections = {
     categoryToClient: "categoryToClient",
     clientToCategory: "clientToCategory"
-}
+};
 
 
 export const flowDirections = {
     OUTBOUND: "OUTBOUND",
     INBOUND: "INBOUND"
-}
+};
 
 
 export const Modes = {
@@ -24,7 +24,8 @@ export const Modes = {
     DECORATOR: "DECORATOR",
     FLOW_SUMMARY: "FLOW_SUMMARY",
     FLOW_DETAIL: "FLOW_DETAIL"
-}
+};
+
 
 export const categories = writable([]);
 export const clients = writable([]);
@@ -43,6 +44,7 @@ export const selectedDecorator = writable(null);
 export const selectedClient = writable(null);
 export const selectedFlow = writable(null);
 export const focusClient = writable(null);
+
 
 export const flowDirection = derived(layoutDirection, (direction) => {
     return direction === layoutDirections.categoryToClient ? flowDirections.OUTBOUND : flowDirections.INBOUND
@@ -95,10 +97,12 @@ export const clientScale = derived(filteredClients, (c) => scaleBand()
     .domain(_.map(c, "id"))
     .range([0, _.max([(c.length - 1) * (dimensions.client.height * 1.2), dimensions.diagram.height])]));
 
+
 export const categoryScale = derived(filteredCategories, c => scaleBand()
     .padding(0.2)
     .range([0, dimensions.diagram.height])
     .domain(_.map(c, "id")));
+
 
 export const clientScrollOffset = tweened(0, {duration: 200});
 
@@ -111,14 +115,14 @@ export const layout = derived(
             scale: catScale,
             dimensions: dimensions.category,
             offset: () => 0
-        }
+        };
 
         const cliLayout = {
             id: a => a.clientId,
             scale: cliScale,
             dimensions: dimensions.client,
             offset: (x) => x
-        }
+        };
 
         if (layoutDir === layoutDirections.categoryToClient) {
             return {
@@ -126,22 +130,21 @@ export const layout = derived(
                 right: cliLayout,
                 clientTranslateX: dimensions.diagram.width - dimensions.client.width,
                 categoryTranslateX: 0
-            }
+            };
         } else if (layoutDir === layoutDirections.clientToCategory) {
             return {
                 left: cliLayout,
                 right: catLayout,
                 clientTranslateX: 0,
                 categoryTranslateX: dimensions.diagram.width - dimensions.category.width
-            }
+            };
         } else {
-            throw "layout direction: '" + layoutDir + "' not recognised!!"
+            throw `layout direction: '${layoutDir}' not recognised`;
         }
     });
 
 
 export const selectedClientArcs = derived([filteredArcs, selectedClient], ([$filteredArcs, $selectedClient]) => {
-
     if($selectedClient == null){
         return [];
     } else{
@@ -151,6 +154,7 @@ export const selectedClientArcs = derived([filteredArcs, selectedClient], ([$fil
             .value();
     }
 });
+
 
 export function clearSelections() {
     contextPanelMode.set(Modes.DEFAULT);
