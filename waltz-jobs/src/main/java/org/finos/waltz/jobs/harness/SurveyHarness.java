@@ -22,7 +22,6 @@ import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.survey.*;
 import org.finos.waltz.service.DIConfiguration;
-import org.finos.waltz.service.survey.SurveyInstanceService;
 import org.finos.waltz.service.survey.SurveyQuestionService;
 import org.finos.waltz.service.survey.SurveyRunService;
 import org.finos.waltz.service.survey.SurveyTemplateService;
@@ -41,8 +40,6 @@ public class SurveyHarness {
         AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
 
         surveyTempateHarness(ctx);
-//        surveyRunHarness(ctx);
-//        surveyResponseHarness(ctx);
     }
 
     private static void surveyTempateHarness(AnnotationConfigApplicationContext ctx) {
@@ -135,52 +132,6 @@ public class SurveyHarness {
     }
 
 
-    private static void surveyResponseHarness(AnnotationConfigApplicationContext ctx) {
-        String userName = "1258battle@gmail.com";
-
-        SurveyQuestionService surveyQuestionService = ctx.getBean(SurveyQuestionService.class);
-        SurveyInstanceService surveyInstanceService = ctx.getBean(SurveyInstanceService.class);
-
-        List<SurveyInstance> instances = surveyInstanceService.findForRecipient(userName);
-
-        System.out.println("===========Instances==========");
-        System.out.println(instances);
-
-        SurveyInstance instance = instances.get(0);
-        List<SurveyQuestion> questions = surveyQuestionService.findForSurveyInstance(instance.id().get());
-
-        System.out.println("===========Questions==========");
-        System.out.println(questions);
-
-        List<SurveyInstanceQuestionResponse> responses = surveyInstanceService.findResponses(instance.id().get());
-
-        System.out.println("===========Responses==========");
-        System.out.println(responses);
-
-        ImmutableSurveyQuestionResponse insertResponse = ImmutableSurveyQuestionResponse.builder()
-                .questionId(1L)
-                .comment("some comment")
-                .stringResponse("some response")
-                .build();
-
-        surveyInstanceService.saveResponse(userName, instance.id().get(), insertResponse);
-        System.out.println("===========Inserted Responses==========");
-        System.out.println(surveyInstanceService.findResponses(instance.id().get()));
-
-        ImmutableSurveyQuestionResponse updateResponse = insertResponse
-                .withStringResponse("updated string response");
-
-        surveyInstanceService.saveResponse(userName, instance.id().get(), updateResponse);
-        System.out.println("===========Updated Responses==========");
-        System.out.println(surveyInstanceService.findResponses(instance.id().get()));
-
-        surveyInstanceService.updateStatus(
-                userName,
-                instance.id().get(),
-                ImmutableSurveyInstanceStatusChangeCommand.builder()
-                        .action(SurveyInstanceAction.SAVING)
-                        .build());
-    }
 
 
 }

@@ -38,8 +38,9 @@ public abstract class SurveyRunCreateCommand implements Command, NameProvider, D
     public abstract Long surveyTemplateId();
     public abstract IdSelectionOptions selectionOptions();
     public abstract Set<Long> involvementKindIds();
-    public abstract Optional<LocalDate> dueDate();
+    public abstract LocalDate dueDate();
     public abstract SurveyIssuanceKind issuanceKind();
-    public abstract Optional<String> contactEmail();
+    public abstract String contactEmail();
+    public abstract Set<Long> ownerInvKindIds();
 
 }

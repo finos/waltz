@@ -60,10 +60,10 @@ public class SurveyInstanceEndpoint implements Endpoint {
         String getPermissionsPath = mkPath(BASE_URL, ":id", "permissions");
         String findByEntityRefPath = mkPath(BASE_URL, "entity", ":kind", ":id");
         String findForRecipientIdPath = mkPath(BASE_URL, "recipient", "id", ":id");
-        String findForUserPath = mkPath(BASE_URL, "user");
         String findForSurveyRunPath = mkPath(BASE_URL, "run", ":id");
         String findPreviousVersionsPath = mkPath(BASE_URL, "id", ":id", "previous-versions");
         String findRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
+        String findOwnersPath = mkPath(BASE_URL, ":id", "owners");
         String findResponsesPath = mkPath(BASE_URL, ":id", "responses");
         String findPossibleActionsPath = mkPath(BASE_URL, ":id", "actions");
         String saveResponsePath = mkPath(BASE_URL, ":id", "response");
@@ -88,14 +88,14 @@ public class SurveyInstanceEndpoint implements Endpoint {
         ListRoute<SurveyInstance> findForRecipientIdRoute = (req, res)
                 -> surveyInstanceService.findForRecipient(getId(req));
 
-        ListRoute<SurveyInstance> findForUserRoute =
-                (req, res) -> surveyInstanceService.findForRecipient(getUsername(req));
-
         ListRoute<SurveyInstanceQuestionResponse> findResponsesRoute =
                 (req, res) -> surveyInstanceService.findResponses(getId(req));
 
         ListRoute<SurveyInstanceRecipient> findRecipientsRoute =
                 (req, res) -> surveyInstanceService.findRecipients(getId(req));
+
+        ListRoute<SurveyInstanceOwner> findOwnersRoute =
+                (req, res) -> surveyInstanceService.findOwners(getId(req));
 
         ListRoute<SurveyInstance> findForSurveyRunRoute =
                 (req, res) -> surveyInstanceService.findForSurveyRun(getId(req));
@@ -183,10 +183,10 @@ public class SurveyInstanceEndpoint implements Endpoint {
         getForDatum(getPermissionsPath, getPermissionsRoute);
         getForList(findByEntityRefPath, findByEntityRefRoute);
         getForList(findForRecipientIdPath, findForRecipientIdRoute);
-        getForList(findForUserPath, findForUserRoute);
         getForList(findForSurveyRunPath, findForSurveyRunRoute);
         getForList(findPreviousVersionsPath, findPreviousVersionsRoute);
         getForList(findRecipientsPath, findRecipientsRoute);
+        getForList(findOwnersPath, findOwnersRoute);
         getForList(findResponsesPath, findResponsesRoute);
         getForList(findPossibleActionsPath, findPossibleActionsRoute);
         putForDatum(saveResponsePath, saveResponseRoute);

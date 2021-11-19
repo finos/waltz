@@ -18,20 +18,18 @@
 
 package org.finos.waltz.data.involvement;
 
-import org.finos.waltz.schema.tables.records.InvolvementRecord;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.data.application.ApplicationDao;
-import org.finos.waltz.data.end_user_app.EndUserAppDao;
 import org.finos.waltz.data.person.PersonDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ImmutableEntityReference;
 import org.finos.waltz.model.application.Application;
-import org.finos.waltz.model.enduserapp.EndUserApplication;
 import org.finos.waltz.model.involvement.ImmutableInvolvement;
 import org.finos.waltz.model.involvement.Involvement;
 import org.finos.waltz.model.person.Person;
+import org.finos.waltz.schema.tables.records.InvolvementRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,15 +41,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import static org.finos.waltz.schema.tables.Application.APPLICATION;
-import static org.finos.waltz.schema.tables.EndUserApplication.END_USER_APPLICATION;
-import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
-import static org.finos.waltz.schema.tables.Person.PERSON;
-import static org.finos.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.data.application.ApplicationDao.IS_ACTIVE;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
+import static org.finos.waltz.schema.tables.Person.PERSON;
+import static org.finos.waltz.schema.tables.PersonHierarchy.PERSON_HIERARCHY;
 
 
 @Repository
@@ -179,14 +176,6 @@ public class InvolvementDao {
     }
 
 
-    public List<EndUserApplication> findAllEndUserApplicationsByEmployeeId(Select<Record1<Long>> endUserAppIdSelector) {
-        return dsl.select(END_USER_APPLICATION.fields())
-                .from(END_USER_APPLICATION)
-                .where(END_USER_APPLICATION.ID.in(endUserAppIdSelector))
-                .fetch(EndUserAppDao.TO_DOMAIN_MAPPER);
-    }
-
-
     public List<Person> findPeopleByEntityReference(EntityReference ref) {
         return dsl.selectDistinct(PERSON.fields())
                 .from(PERSON)
@@ -227,9 +216,10 @@ public class InvolvementDao {
                 .from(PERSON)
                 .innerJoin(INVOLVEMENT)
                 .on(INVOLVEMENT.EMPLOYEE_ID.eq(PERSON.EMPLOYEE_ID))
-                .where(INVOLVEMENT.ENTITY_KIND.eq(entityKind.name())
-                        .and(INVOLVEMENT.ENTITY_ID.in(entityIdSelector)
-                                .and(INVOLVEMENT.KIND_ID.in(involvementKindIds))))
+                .where(PERSON.IS_REMOVED.isFalse()
+                        .and(INVOLVEMENT.ENTITY_KIND.eq(entityKind.name())
+                            .and(INVOLVEMENT.ENTITY_ID.in(entityIdSelector)
+                                .and(INVOLVEMENT.KIND_ID.in(involvementKindIds)))))
                 .fetch()
                 .stream()
                 .collect(groupingBy(

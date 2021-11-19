@@ -50,7 +50,7 @@ import static org.finos.waltz.model.EntityReference.mkRef;
 public class FlowDiagramOverlayGroupDao {
 
 
-    private static Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
+    private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             FLOW_DIAGRAM_OVERLAY_GROUP_ENTRY.ENTITY_ID,
             FLOW_DIAGRAM_OVERLAY_GROUP_ENTRY.ENTITY_KIND,
             newArrayList(EntityKind.MEASURABLE, EntityKind.APP_GROUP));

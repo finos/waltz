@@ -3,8 +3,8 @@ package org.finos.waltz.integration_test.inmem.service;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.integration_test.inmem.helpers.ChangeLogHelper;
 import org.finos.waltz.integration_test.inmem.helpers.PersonHelper;
+import org.finos.waltz.integration_test.inmem.helpers.SurveyTemplateHelper;
 import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.ImmutableReleaseLifecycleStatusChangeCommand;
 import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.ReleaseLifecycleStatus;
 import org.finos.waltz.model.survey.*;
@@ -36,6 +36,9 @@ public class SurveyTemplateServiceTest extends BaseInMemoryIntegrationTest {
 
     @Autowired
     private SurveyQuestionService surveyQuestionService;
+
+    @Autowired
+    private SurveyTemplateHelper templateHelper;
 
     @Autowired
     private PersonHelper personHelper;
@@ -73,7 +76,7 @@ public class SurveyTemplateServiceTest extends BaseInMemoryIntegrationTest {
 
         personHelper.createPerson(userId);
 
-        long id = createTemplate(userId, templateName);
+        long id = templateHelper.createTemplate(userId, templateName);
         List<SurveyTemplate> all = surveyTemplateService.findAll(userId);
 
         assertNotNull(all);
@@ -101,11 +104,11 @@ public class SurveyTemplateServiceTest extends BaseInMemoryIntegrationTest {
 
         personHelper.createPerson(userId);
 
-        long id = createTemplate(userId, templateName);
+        long id =  templateHelper.createTemplate(userId, templateName);
 
         assertEquals(ReleaseLifecycleStatus.DRAFT, surveyTemplateService.getById(id).status());
 
-        updateStatus(userId, id, ReleaseLifecycleStatus.ACTIVE);
+        templateHelper.updateStatus(userId, id, ReleaseLifecycleStatus.ACTIVE);
 
         assertEquals(ReleaseLifecycleStatus.ACTIVE, surveyTemplateService.getById(id).status());
 
@@ -121,7 +124,7 @@ public class SurveyTemplateServiceTest extends BaseInMemoryIntegrationTest {
         String templateName = mkName("canUpdateLifecycleStatusOfTemplates");
         personHelper.createPerson(userId);
 
-        long id = createTemplate(userId, templateName);
+        long id =  templateHelper.createTemplate(userId, templateName);
 
         SurveyTemplate preTemplate = surveyTemplateService.getById(id);
         assertEquals(templateName, preTemplate.name());
@@ -155,7 +158,7 @@ public class SurveyTemplateServiceTest extends BaseInMemoryIntegrationTest {
         String templateName = mkName("canUpdateLifecycleStatusOfTemplates");
 
         personHelper.createPerson(userId);
-        long id = createTemplate(userId, templateName);
+        long id =  templateHelper.createTemplate(userId, templateName);
 
         assertEquals(ReleaseLifecycleStatus.DRAFT, surveyTemplateService.getById(id).status());
         Boolean rc = surveyTemplateService.delete(id);
@@ -170,23 +173,14 @@ public class SurveyTemplateServiceTest extends BaseInMemoryIntegrationTest {
         String templateName = mkName("template");
 
         personHelper.createPerson(userId);
-        long id = createTemplate(userId, templateName);
+        long templateId = templateHelper.createTemplate(userId, templateName);
+        templateHelper.addQuestion(templateId);
 
-        updateStatus(userId, id, ReleaseLifecycleStatus.ACTIVE);
+        templateHelper.updateStatus(userId, templateId, ReleaseLifecycleStatus.ACTIVE);
 
-        SurveyQuestion question = ImmutableSurveyQuestion
-                .builder()
-                .fieldType(SurveyQuestionFieldType.TEXT)
-                .sectionName("section")
-                .questionText("question")
-                .surveyTemplateId(id)
-                .build();
+        long cloneId = surveyTemplateService.clone(userId, templateId);
 
-        surveyQuestionService.create(question);
-
-        long cloneId = surveyTemplateService.clone(userId, id);
-
-        assertTrue("clone id should be different", cloneId != id);
+        assertTrue("clone id should be different", cloneId != templateId);
 
         SurveyTemplate cloned = surveyTemplateService.getById(cloneId);
 
@@ -204,25 +198,4 @@ public class SurveyTemplateServiceTest extends BaseInMemoryIntegrationTest {
         dsl.deleteFrom(SURVEY_TEMPLATE).execute();
     }
 
-
-    private long createTemplate(String userId, String templateName) {
-        SurveyTemplateChangeCommand cmd = ImmutableSurveyTemplateChangeCommand.builder()
-                .name(templateName)
-                .externalId("extId")
-                .description("desc")
-                .targetEntityKind(EntityKind.APPLICATION)
-                .build();
-
-        return surveyTemplateService.create(userId, cmd);
-    }
-
-
-    private void updateStatus(String userId, long id, ReleaseLifecycleStatus newStatus) {
-        surveyTemplateService.updateStatus(
-                userId,
-                id,
-                ImmutableReleaseLifecycleStatusChangeCommand.builder()
-                        .newStatus(newStatus)
-                        .build());
-    }
 }

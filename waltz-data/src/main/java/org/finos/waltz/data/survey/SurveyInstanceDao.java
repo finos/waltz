@@ -79,7 +79,6 @@ public class SurveyInstanceDao {
                 .approvedAt(ofNullable(record.getApprovedAt()).map(Timestamp::toLocalDateTime).orElse(null))
                 .approvedBy(record.getApprovedBy())
                 .originalInstanceId(record.getOriginalInstanceId())
-                .ownerId(record.getOwnerId())
                 .owningRole(record.getOwningRole())
                 .name(record.getName())
                 .qualifierEntity(maybeReadRef(
@@ -111,7 +110,7 @@ public class SurveyInstanceDao {
     }
 
 
-    public List<SurveyInstance> findForRecipient(long personId) {
+    public Set<SurveyInstance> findForRecipient(long personId) {
         return dsl.select(SURVEY_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
                 .select(EXTERNAL_ID_FIELD)
@@ -120,18 +119,18 @@ public class SurveyInstanceDao {
                 .on(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
                 .where(SURVEY_INSTANCE_RECIPIENT.PERSON_ID.eq(personId))
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
-                .fetch(TO_DOMAIN_MAPPER);
+                .fetchSet(TO_DOMAIN_MAPPER);
     }
 
 
-    public List<SurveyInstance> findForSurveyRun(long surveyRunId) {
+    public Set<SurveyInstance> findForSurveyRun(long surveyRunId) {
         return dsl.select(SURVEY_INSTANCE.fields())
                 .select(ENTITY_NAME_FIELD)
                 .select(EXTERNAL_ID_FIELD)
                 .from(SURVEY_INSTANCE)
                 .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
-                .fetch(TO_DOMAIN_MAPPER);
+                .fetchSet(TO_DOMAIN_MAPPER);
     }
 
 
@@ -144,7 +143,6 @@ public class SurveyInstanceDao {
         record.setEntityId(command.entityReference().id());
         record.setStatus(command.status().name());
         record.setDueDate(command.dueDate().map(Date::valueOf).orElse(null));
-        record.setOwnerId(command.ownerId());
         record.setOwningRole(command.owningRole());
 
         record.store();
@@ -168,7 +166,6 @@ public class SurveyInstanceDao {
                 .map(dt -> Timestamp.valueOf(currentInstance.approvedAt()))
                 .orElse(null));
         record.setApprovedBy(currentInstance.approvedBy());
-        record.setOwnerId(currentInstance.ownerId());
         record.setOwningRole(currentInstance.owningRole());
         record.setName(currentInstance.name());
         Optional
@@ -361,5 +358,17 @@ public class SurveyInstanceDao {
                 });
 
         return dsl.batchInsert(records).execute();
+    }
+
+    public Set<SurveyInstance> findForOwner(Long personId) {
+        return dsl.select(SURVEY_INSTANCE.fields())
+                .select(ENTITY_NAME_FIELD)
+                .select(EXTERNAL_ID_FIELD)
+                .from(SURVEY_INSTANCE)
+                .innerJoin(SURVEY_INSTANCE_OWNER)
+                .on(SURVEY_INSTANCE_OWNER.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
+                .where(SURVEY_INSTANCE_OWNER.PERSON_ID.eq(personId))
+                .and(IS_ORIGINAL_INSTANCE_CONDITION)
+                .fetchSet(TO_DOMAIN_MAPPER);
     }
 }
