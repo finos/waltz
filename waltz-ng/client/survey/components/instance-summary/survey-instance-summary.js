@@ -195,6 +195,23 @@ function controller($q,
         }
     };
 
+
+    vm.updateApprovalDueDate = (change, instanceId) => {
+        if (!change.newVal) {
+            toasts.error("Due date cannot be blank");
+        } else {
+            serviceBroker
+                .execute(
+                    CORE_API.SurveyInstanceStore.updateApprovalDueDate,
+                    [ instanceId, {newDateVal: timeFormat("%Y-%m-%d")(change.newVal)}])
+                .then(() => {
+                    toasts.success("Survey instance approval due date updated successfully");
+                    reload(true);
+                })
+                .catch(e => displayError("Failed to update survey instance approval due date", e));
+        }
+    };
+
     vm.invokeStatusAction = actions.invokeStatusAction(serviceBroker, toasts, reload, $timeout, $state)
 
     // -- LIFECYCLE

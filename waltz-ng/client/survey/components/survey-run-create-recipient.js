@@ -18,11 +18,13 @@
 import {initialiseData} from "../../common/index";
 import _ from "lodash";
 import template from "./survey-run-create-recipient.html";
+import {instanceCreateCommand} from "./survey-run-create-store";
 
 
 const bindings = {
     surveyTemplate: "<",
     surveyRun: "<",
+    instanceCreate: "<",
     onSave: "<",
     onGoBack: "<"
 };
@@ -31,21 +33,24 @@ const bindings = {
 const initialState = {
     surveyRunRecipients: [],
     includedRecipients: [],
-    excludedRecipients: []
+    excludedRecipients: [],
 };
 
 
-function controller(surveyRunStore) {
+function controller(surveyRunStore, $scope) {
     const vm = initialiseData(this, initialState);
 
     vm.$onInit = () => {
-        surveyRunStore
-            .generateSurveyRunRecipients(vm.surveyRun.id)
-            .then(r => {
-                vm.surveyRunRecipients = r.data;
-                vm.includedRecipients = [].concat(vm.surveyRunRecipients);
-                vm.excludedRecipients = [];
-            });
+        instanceCreateCommand.subscribe(d => $scope.$applyAsync(() => {
+            vm.instanceCreate = d;
+            surveyRunStore
+                .generateSurveyRunRecipients(vm.instanceCreate)
+                .then(r => {
+                    vm.surveyRunRecipients = r.data;
+                    vm.includedRecipients = [].concat(vm.surveyRunRecipients);
+                    vm.excludedRecipients = [];
+                });
+        }));
     };
 
     vm.excludeRecipient = (recipient) => {
@@ -61,8 +66,10 @@ function controller(surveyRunStore) {
     vm.isRecipientIncluded = (recipient) =>
         vm.includedRecipients.indexOf(recipient) >= 0;
 
-    vm.onSubmit = () =>
-        vm.onSave(vm.surveyRun, vm.includedRecipients, vm.excludedRecipients);
+    vm.onSubmit = () =>{
+        vm.instanceCreate.excludedRecipients = vm.excludedRecipients;
+        vm.onSave(vm.instanceCreate, vm.includedRecipients);
+    }
 
     vm.goBack = () => {
         vm.onGoBack();
@@ -71,7 +78,8 @@ function controller(surveyRunStore) {
 
 
 controller.$inject = [
-    "SurveyRunStore"
+    "SurveyRunStore",
+    "$scope"
 ];
 
 

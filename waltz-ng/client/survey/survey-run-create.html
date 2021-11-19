@@ -40,6 +40,7 @@
         <waltz-survey-run-create-recipient ng-if="ctrl.step === 'RECIPIENT'"
                                            survey-template="ctrl.surveyTemplate"
                                            survey-run="ctrl.surveyRun"
+                                           instance-create="$ctrl.instancesRecipientsCreateCommand"
                                            on-save="ctrl.onSaveRecipient"
                                            on-go-back="ctrl.goBack">
         </waltz-survey-run-create-recipient>

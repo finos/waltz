@@ -657,7 +657,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="involvement_kind_ids"
-                    type="VARCHAR(255)">
+                    type="${id-list.type}">
                 <constraints nullable="true"/>
             </column>
             <column name="issued_on"

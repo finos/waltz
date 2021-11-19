@@ -91,20 +91,21 @@
     <property name="description.type" value="${longvarchar.type}"></property>
     <property name="email.type" value="VARCHAR(255)"></property>
     <property name="enum.type" value="VARCHAR(64)"></property>
+    <property name="expression.type" value="VARCHAR(500)"></property>
     <property name="external-id.type" value="VARCHAR(200)"></property>
     <property name="group.type" value="VARCHAR(128)"></property>
     <property name="guid.type" value="VARCHAR(64)"></property>
     <property name="id.type" value="${long.type}"></property>
+    <property name="id-list.type" value="VARCHAR(255)"></property>
     <property name="key.type" value="VARCHAR(120)"></property>
     <property name="name.type" value="VARCHAR(255)"></property>
-    <property name="tag.type" value="VARCHAR(255)"></property>
     <property name="provenance.type" value="VARCHAR(64)"></property>
     <property name="rag.type" value="CHAR(1)"></property>
     <property name="role.type" value="VARCHAR(255)"></property>
-    <property name="version.type" value="VARCHAR(64)"></property>
-    <property name="weight.type" value="${int.type}"></property>
+    <property name="tag.type" value="VARCHAR(255)"></property>
     <property name="url.type" value="VARCHAR(500)"></property>
     <property name="user-agent.type" value="VARCHAR(500)"></property>
-    <property name="expression.type" value="VARCHAR(500)"></property>
+    <property name="version.type" value="VARCHAR(64)"></property>
+    <property name="weight.type" value="${int.type}"></property>
 
 </databaseChangeLog>

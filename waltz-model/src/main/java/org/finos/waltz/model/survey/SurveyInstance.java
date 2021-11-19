@@ -44,6 +44,7 @@ public abstract class SurveyInstance implements IdProvider {
     public abstract String surveyEntityExternalId();
     public abstract SurveyInstanceStatus status();
     public abstract LocalDate dueDate();
+    public abstract LocalDate approvalDueDate();
 
     @Nullable
     public abstract LocalDateTime submittedAt();

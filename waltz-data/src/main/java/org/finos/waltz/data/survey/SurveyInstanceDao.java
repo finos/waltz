@@ -18,6 +18,7 @@
 
 package org.finos.waltz.data.survey;
 
+import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.schema.tables.records.SurveyInstanceRecipientRecord;
 import org.finos.waltz.schema.tables.records.SurveyInstanceRecord;
 import org.finos.waltz.common.CollectionUtilities;
@@ -35,11 +36,10 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static org.finos.waltz.common.DateTimeUtilities.*;
 import static org.finos.waltz.schema.Tables.*;
 import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.DateTimeUtilities.nowUtc;
-import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.data.JooqUtilities.maybeReadRef;
 import static org.finos.waltz.model.EntityReference.mkRef;
@@ -73,7 +73,8 @@ public class SurveyInstanceDao {
                         r.getValue(ENTITY_NAME_FIELD)))
                 .surveyEntityExternalId(r.getValue(EXTERNAL_ID_FIELD))
                 .status(SurveyInstanceStatus.valueOf(record.getStatus()))
-                .dueDate(record.getDueDate().toLocalDate())
+                .dueDate(toLocalDate(record.getDueDate()))
+                .approvalDueDate(toLocalDate(record.getApprovalDueDate()))
                 .submittedAt(ofNullable(record.getSubmittedAt()).map(Timestamp::toLocalDateTime).orElse(null))
                 .submittedBy(record.getSubmittedBy())
                 .approvedAt(ofNullable(record.getApprovedAt()).map(Timestamp::toLocalDateTime).orElse(null))
@@ -143,6 +144,7 @@ public class SurveyInstanceDao {
         record.setEntityId(command.entityReference().id());
         record.setStatus(command.status().name());
         record.setDueDate(command.dueDate().map(Date::valueOf).orElse(null));
+        record.setApprovalDueDate(toSqlDate(command.approvalDueDate()));
         record.setOwningRole(command.owningRole());
 
         record.store();
@@ -159,6 +161,7 @@ public class SurveyInstanceDao {
         record.setEntityId(currentInstance.surveyEntity().id());
         record.setStatus(currentInstance.status().name());
         record.setDueDate(toSqlDate(currentInstance.dueDate()));
+        record.setApprovalDueDate(toSqlDate(currentInstance.approvalDueDate()));
         record.setOriginalInstanceId(currentInstance.id().get());
         record.setSubmittedAt((currentInstance.submittedAt() != null) ? Timestamp.valueOf(currentInstance.submittedAt()) : null);
         record.setSubmittedBy(currentInstance.submittedBy());
@@ -201,6 +204,14 @@ public class SurveyInstanceDao {
     public int updateDueDate(long instanceId, LocalDate newDueDate) {
         return dsl.update(SURVEY_INSTANCE)
                 .set(SURVEY_INSTANCE.DUE_DATE, toSqlDate(newDueDate))
+                .where(SURVEY_INSTANCE.ID.eq(instanceId))
+                .execute();
+    }
+
+
+    public int updateApprovalDueDate(long instanceId, LocalDate newDueDate) {
+        return dsl.update(SURVEY_INSTANCE)
+                .set(SURVEY_INSTANCE.APPROVAL_DUE_DATE, toSqlDate(newDueDate))
                 .where(SURVEY_INSTANCE.ID.eq(instanceId))
                 .execute();
     }
