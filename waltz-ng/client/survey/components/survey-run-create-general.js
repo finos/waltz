@@ -16,49 +16,53 @@
  *
  */
 import {initialiseData} from "../../common/index";
-import template from './survey-run-create-general.html';
+import template from "./survey-run-create-general.html";
 import {CORE_API} from "../../common/services/core-api-utils";
 import _ from "lodash";
 
 
 const bindings = {
-    surveyTemplate: '<',
-    surveyRun: '<',
-    onSave: '<'
+    surveyTemplate: "<",
+    surveyRun: "<",
+    onSave: "<"
 };
 
 
 const exactScope = {
-    value: 'EXACT',
-    name: 'Exact'
+    value: "EXACT",
+    name: "Exact"
 };
 
 
 const childrenScope = {
-    value: 'CHILDREN',
-    name: 'Children'
+    value: "CHILDREN",
+    name: "Children"
 };
 
 
 const initialState = {
     allowedEntityKinds: [{
-        value: 'APP_GROUP',
-        name: 'Application Group'
+        value: "APP_GROUP",
+        name: "Application Group"
     },{
-        value: 'ORG_UNIT',
-        name: 'Org Unit'
+        value: "ORG_UNIT",
+        name: "Org Unit"
     },{
-        value: 'MEASURABLE',
-        name: 'Measurable'
+        value: "MEASURABLE",
+        name: "Measurable"
     }],
     allowedScopes: {
-        'APP_GROUP': [exactScope],
-        'CHANGE_INITIATIVE': [exactScope],
-        'ORG_UNIT': [exactScope, childrenScope],
-        'MEASURABLE': [exactScope, childrenScope]
+        "APP_GROUP": [exactScope],
+        "CHANGE_INITIATIVE": [exactScope],
+        "ORG_UNIT": [exactScope, childrenScope],
+        "MEASURABLE": [exactScope, childrenScope]
     },
     surveyRun: {
         selectorEntity: null,
+    },
+    surveyInstance: {
+        dueDate: null,
+        approvalDueDate: null,
         owningRole: null
     }
 };
@@ -66,20 +70,20 @@ const initialState = {
 
 function mkAllowedEntityKinds(entityKind) {
     const selectors = [{
-        value: 'APP_GROUP',
-        name: 'Application Group'
+        value: "APP_GROUP",
+        name: "Application Group"
     },{
-        value: 'ORG_UNIT',
-        name: 'Org Unit'
+        value: "ORG_UNIT",
+        name: "Org Unit"
     },{
-        value: 'MEASURABLE',
-        name: 'Measurable'
+        value: "MEASURABLE",
+        name: "Measurable"
     }];
 
-    if (entityKind === 'CHANGE_INITIATIVE') {
+    if (entityKind === "CHANGE_INITIATIVE") {
         selectors.push({
-            value: 'CHANGE_INITIATIVE',
-            name: 'Change Initiative'
+            value: "CHANGE_INITIATIVE",
+            name: "Change Initiative"
         });
     }
     return selectors;
@@ -99,8 +103,7 @@ function controller(appGroupStore, involvementKindStore, serviceBroker) {
         .all([appGroupStore.findPublicGroups(), appGroupStore.findPrivateGroups()])
         .then(([publicGroups = [], privateGroups = []]) => {
             vm.availableAppGroups = [].concat(publicGroups, privateGroups);
-        }
-    );
+        });
 
     involvementKindStore.findAll().then(
         involvementKinds => {
@@ -122,7 +125,7 @@ function controller(appGroupStore, involvementKindStore, serviceBroker) {
     };
 
     vm.onSubmit = () => {
-        vm.onSave(this.surveyRun);
+        vm.onSave(this.surveyRun, vm.surveyInstance);
     };
 
     vm.isLastInList = (item, list) => {
@@ -132,9 +135,9 @@ function controller(appGroupStore, involvementKindStore, serviceBroker) {
 
 
 controller.$inject = [
-    'AppGroupStore',
-    'InvolvementKindStore',
-    'ServiceBroker'
+    "AppGroupStore",
+    "InvolvementKindStore",
+    "ServiceBroker"
 ];
 
 

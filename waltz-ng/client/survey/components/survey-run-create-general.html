@@ -89,14 +89,29 @@
         <div class="form-group">
             <label for="dueDate"
                    class="col-sm-2 control-label">
-                Due Date
+                Due Date <span class="text-danger">*</span>
             </label>
             <div class="col-sm-10 col-md-3">
                 <waltz-date-picker-form-input id="dueDate"
                                               required="true"
                                               place-holder="yyyy-MM-dd"
                                               format="yyyy-MM-dd"
-                                              model="$ctrl.surveyRun.dueDate">
+                                              model="$ctrl.surveyInstance.dueDate">
+                </waltz-date-picker-form-input>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="approvalDueDate"
+                   class="col-sm-2 control-label">
+                Approval Due Date <span class="text-danger">*</span>
+            </label>
+            <div class="col-sm-10 col-md-3">
+                <waltz-date-picker-form-input id="approvalDueDate"
+                                              required="true"
+                                              place-holder="yyyy-MM-dd"
+                                              format="yyyy-MM-dd"
+                                              model="$ctrl.surveyInstance.approvalDueDate">
                 </waltz-date-picker-form-input>
             </div>
         </div>
@@ -124,6 +139,7 @@
             </label>
             <div class="col-sm-10">
                 <waltz-entity-selector current-selection="$ctrl.surveyRun.selectorEntity"
+                                       id="selectorEntity"
                                        required="true"
                                        on-select="$ctrl.onSelectorEntitySelect"
                                        entity-lifecycle-statuses="['ACTIVE', 'PENDING']"
@@ -156,7 +172,7 @@
             </div>
             <div class="col-sm-10">
                 <div>
-                    <select ng-model="$ctrl.surveyRun.owningRole"
+                    <select ng-model="$ctrl.surveyInstance.owningRole"
                             id="owningRole"
                             class="form-control">
                         <option ng-repeat="role in $ctrl.customRoles"

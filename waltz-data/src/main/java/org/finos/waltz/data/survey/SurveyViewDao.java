@@ -78,6 +78,7 @@ public class SurveyViewDao {
                 .surveyEntityExternalId(r.getValue(EXTERNAL_ID_FIELD))
                 .status(SurveyInstanceStatus.valueOf(instanceRecord.getStatus()))
                 .dueDate(instanceRecord.getDueDate().toLocalDate())
+                .approvalDueDate(instanceRecord.getApprovalDueDate().toLocalDate())
                 .submittedAt(ofNullable(instanceRecord.getSubmittedAt()).map(Timestamp::toLocalDateTime).orElse(null))
                 .submittedBy(instanceRecord.getSubmittedBy())
                 .approvedAt(ofNullable(instanceRecord.getApprovedAt()).map(Timestamp::toLocalDateTime).orElse(null))
