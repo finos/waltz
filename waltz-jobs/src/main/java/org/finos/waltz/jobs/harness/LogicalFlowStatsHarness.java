@@ -20,11 +20,15 @@ package org.finos.waltz.jobs.harness;
 
 import org.finos.waltz.data.logical_flow.LogicalFlowStatsDao;
 import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.logical_flow.LogicalFlowGraphSummary;
+import org.finos.waltz.model.FlowDirection;
+import org.finos.waltz.model.logical_flow.FlowInfo;
 import org.finos.waltz.service.DIConfiguration;
 import org.jooq.DSLContext;
 import org.jooq.tools.json.ParseException;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
+import java.util.Map;
+import java.util.Set;
 
 import static org.finos.waltz.model.EntityReference.mkRef;
 
@@ -35,7 +39,7 @@ public class LogicalFlowStatsHarness {
         DSLContext dsl = ctx.getBean(DSLContext.class);
         LogicalFlowStatsDao dao = ctx.getBean(LogicalFlowStatsDao.class);
 
-        LogicalFlowGraphSummary flowInfoByDirection = dao.getFlowInfoByDirection(mkRef(EntityKind.APPLICATION, 20506L), null);
+        Map<FlowDirection, Set<FlowInfo>> flowInfoByDirection = dao.getFlowInfoByDirection(mkRef(EntityKind.APPLICATION, 20506L), null);
 
         System.out.println("--done");
 

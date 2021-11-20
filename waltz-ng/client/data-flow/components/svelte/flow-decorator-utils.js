@@ -1,5 +1,17 @@
 import _ from "lodash";
 
+export const colors = {
+    APPLICATION: {
+        fill: "#eef8ff",
+        stroke: "#6fbdff"
+    },
+    ACTOR: {
+        fill: "#f0e9ff",
+        stroke: "#9f75fd"
+    }
+};
+
+
 export const dimensions = {
     client: {
         height: 25,
@@ -103,6 +115,7 @@ export function mkCategories(summarisedFlows){
             const category = {
                 id: xs[0].category.id,
                 name: xs[0].category.name,
+                category: xs[0].category,
                 hasChildren: _.some(xs, x => x.hasChildren)
             };
 

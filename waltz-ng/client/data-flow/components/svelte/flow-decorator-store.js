@@ -26,6 +26,8 @@ export const Modes = {
     FLOW_DETAIL: "FLOW_DETAIL"
 };
 
+export const parentCategory = writable(null);
+export const startingCategory = writable(null);
 
 export const categories = writable([]);
 export const clients = writable([]);

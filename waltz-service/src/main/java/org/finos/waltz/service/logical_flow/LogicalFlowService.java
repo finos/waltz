@@ -18,9 +18,6 @@
 
 package org.finos.waltz.service.logical_flow;
 
-import org.finos.waltz.service.changelog.ChangeLogService;
-import org.finos.waltz.service.data_type.DataTypeService;
-import org.finos.waltz.service.usage_info.DataTypeUsageService;
 import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.DBExecutorPoolInterface;
@@ -33,10 +30,14 @@ import org.finos.waltz.data.logical_flow.LogicalFlowStatsDao;
 import org.finos.waltz.model.*;
 import org.finos.waltz.model.changelog.ChangeLog;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.model.datatype.DataType;
 import org.finos.waltz.model.datatype.ImmutableDataTypeDecorator;
 import org.finos.waltz.model.logical_flow.*;
 import org.finos.waltz.model.rating.AuthoritativenessRatingValue;
 import org.finos.waltz.model.tally.TallyPack;
+import org.finos.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.service.data_type.DataTypeService;
+import org.finos.waltz.service.usage_info.DataTypeUsageService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.lambda.Unchecked;
@@ -47,10 +48,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.Future;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -352,8 +350,27 @@ public class LogicalFlowService {
     }
 
 
-    public LogicalFlowGraphSummary getFlowInfoByDirection(EntityReference ref, Long datatypeId) {
-        return logicalFlowStatsDao.getFlowInfoByDirection(ref, datatypeId);
+    /**
+     *
+     * @param ref  app or actor ref
+     * @param startingDataTypeId  optional id of the data type to use (i.e. restrict to flows below that data type)
+     * @return
+     */
+    public LogicalFlowGraphSummary getFlowInfoByDirection(EntityReference ref, Long startingDataTypeId) {
+        ImmutableLogicalFlowGraphSummary.Builder result = ImmutableLogicalFlowGraphSummary
+                .builder()
+                .flowInfoByDirection(logicalFlowStatsDao.getFlowInfoByDirection(ref, startingDataTypeId));
+
+        if (startingDataTypeId != null) {
+            DataType startingDataType = dataTypeService.getDataTypeById(startingDataTypeId);
+            result.startingDataType(startingDataType);
+            result.parentDataType(startingDataType
+                    .parentId()
+                    .map(dataTypeService::getDataTypeById)
+                    .orElse(null));
+        }
+
+        return result.build();
     }
 
 

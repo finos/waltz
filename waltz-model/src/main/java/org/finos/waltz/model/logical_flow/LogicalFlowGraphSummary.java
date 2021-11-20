@@ -21,6 +21,8 @@ package org.finos.waltz.model.logical_flow;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.FlowDirection;
+import org.finos.waltz.model.Nullable;
+import org.finos.waltz.model.datatype.DataType;
 import org.immutables.value.Value;
 
 import java.util.Map;
@@ -30,6 +32,12 @@ import java.util.Set;
 @JsonSerialize(as = ImmutableLogicalFlowGraphSummary.class)
 @JsonDeserialize(as = ImmutableLogicalFlowGraphSummary.class)
 public abstract class LogicalFlowGraphSummary {
+
+    @Nullable
+    public abstract DataType startingDataType();
+
+    @Nullable
+    public abstract DataType parentDataType();
 
     public abstract Map<FlowDirection, Set<FlowInfo>> flowInfoByDirection();
 }

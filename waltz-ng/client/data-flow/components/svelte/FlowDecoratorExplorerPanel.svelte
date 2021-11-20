@@ -10,7 +10,9 @@
         flowDirections,
         focusClient,
         layout,
-        selectedClient
+        selectedClient,
+        parentCategory,
+        startingCategory
     } from "./flow-decorator-store";
     import Categories from "./Categories.svelte";
     import Clients from "./Clients.svelte";
@@ -28,6 +30,7 @@
     import Icon from "../../../common/svelte/Icon.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
     import {flowClassificationStore} from "../../../svelte-stores/flow-classification-store";
+    import {sameRef} from "../../../common/entity-utils";
 
     export let primaryEntityRef;
 
@@ -49,6 +52,8 @@
     $: entity = $entityCall.data;
 
     $: flowInfo = _.get(flowGraphSummary?.flowInfoByDirection, [$flowDirection], []);
+    $: $startingCategory = flowGraphSummary?.startingDataType;
+    $: $parentCategory = flowGraphSummary?.parentDataType;
 
     $: summarisedFlows = summariseFlows(flowInfo, noOpinionRating);
     $: $categories = mkCategories(summarisedFlows);
@@ -64,7 +69,6 @@
         name: $flowDirection === flowDirections.INBOUND
             ? `${$focusClient?.name || entity.name} Inbound flows`
             : `${$focusClient?.name || entity.name} Outbound flows`,
-        active: true,
         classes: "breadcrumb-root",
         onClick: () => {
             const parent = $focusClient || entity
@@ -76,7 +80,6 @@
     $: homeBreadcrumb = {
         id: -2,
         name: `Home (${entity.name})`,
-        active: true,
         classes: "breadcrumb-home",
         onClick: () => {
             $focusClient = null;
@@ -124,22 +127,36 @@
 
         flowGraphSummaryCall = logicalFlowStore.getFlowGraphSummary(
             parentEntity,
-            category.id,
-            true /* force */);
+            category?.id,
+            false /* no force */);
 
-        additionalBreadcrumbs = _.concat(
-            additionalBreadcrumbs,
-            {
-                id: category.id,
-                name: category.name,
-                active: true,
-                onClick: () => {
-                    const parent = $focusClient || entity
-                    additionalBreadcrumbs = _.dropRightWhile(additionalBreadcrumbs, d => d.id !== category.id);
-                    flowGraphSummaryCall = logicalFlowStore.getFlowGraphSummary(parent, category.id, true);
-                }
-            })
+        if (category == null) {
+            additionalBreadcrumbs = [];
+        } else {
+            const matchingBreadcrumbFn = b => b.id === category?.id && sameRef(parentEntity, b.parentEntity);
+
+            const dropBreadcrumbs = () => {
+                return _.dropRightWhile(additionalBreadcrumbs, d => !matchingBreadcrumbFn(d))
+            }
+
+            const addBreadcrumb = () => {
+                return [
+                    ...additionalBreadcrumbs,
+                    {
+                        parentEntity,
+                        id: category.id,
+                        name: category.name,
+                        onClick: () => loadForCategory({detail: category})
+                    }
+                ];
+            };
+
+            additionalBreadcrumbs = _.find(additionalBreadcrumbs, matchingBreadcrumbFn)
+                ? dropBreadcrumbs()
+                : addBreadcrumb();
+        }
     }
+
 
     function selectClient(evt) {
 
@@ -215,7 +232,8 @@
 
                 <g id="categories"
                    transform={`translate(${$layout.categoryTranslateX}, 0)`}>
-                    <Categories on:select={loadForCategory}/>
+                    <Categories kind={$focusClient?.kind || primaryEntityRef.kind}
+                                on:select={loadForCategory}/>
                 </g>
 
                 <g id="clients"
@@ -262,4 +280,6 @@
     .breadcrumb-home button {
         font-weight: bold !important;
     }
+
+
 </style>
