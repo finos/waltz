@@ -42,9 +42,9 @@
         : actorStore.getById(primaryEntityRef.id);
 
     let breadcrumbs = [];
-    let svgElem;
     let additionalBreadcrumbs = [];
     let entitiesVisited = [];
+    let svgElem;
 
     $: flowGraphSummary = $flowGraphSummaryCall.data;
     $: physicalFlows = $physicalFlowCall.data;
