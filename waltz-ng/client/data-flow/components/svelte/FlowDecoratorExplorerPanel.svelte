@@ -1,21 +1,22 @@
-
 <script>
     import {
         arcs,
         categories,
+        clearSelections,
         clients,
         clientScale,
         clientScrollOffset,
         flowDirection,
-        flowDirections, focusClient,
+        flowDirections,
+        focusClient,
         layout,
         selectedClient,
-        clearSelections
+        parentCategory,
+        startingCategory
     } from "./flow-decorator-store";
     import Categories from "./Categories.svelte";
     import Clients from "./Clients.svelte";
-    import {dimensions} from "./flow-decorator-utils";
-    import {mkArcs, mkCategories, mkClients} from "./flow-decorator-utils";
+    import {dimensions, mkArcs, mkCategories, mkClients, summariseFlows} from "./flow-decorator-utils";
     import _ from "lodash";
     import Arcs from "./Arcs.svelte";
     import {event, select} from "d3-selection";
@@ -29,6 +30,79 @@
     import Icon from "../../../common/svelte/Icon.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
     import {flowClassificationStore} from "../../../svelte-stores/flow-classification-store";
+    import {sameRef} from "../../../common/entity-utils";
+
+    export let primaryEntityRef;
+
+    let flowGraphSummaryCall = logicalFlowStore.getFlowGraphSummary(primaryEntityRef, null);
+    let flowClassificationCall = flowClassificationStore.findAll()
+    let physicalFlowCall = physicalFlowStore.findBySelector(mkSelectionOptions(primaryEntityRef, "EXACT"));
+    let entityCall = primaryEntityRef.kind === 'APPLICATION'
+        ? applicationStore.getById(primaryEntityRef.id)
+        : actorStore.getById(primaryEntityRef.id);
+
+    let breadcrumbs = [];
+    let additionalBreadcrumbs = [];
+    let entitiesVisited = [];
+    let svgElem;
+
+    $: flowGraphSummary = $flowGraphSummaryCall.data;
+    $: physicalFlows = $physicalFlowCall.data;
+    $: noOpinionRating = _.find($flowClassificationCall.data, d => d.code === 'NO_OPINION');
+    $: entity = $entityCall.data;
+
+    $: flowInfo = _.get(flowGraphSummary?.flowInfoByDirection, [$flowDirection], []);
+    $: $startingCategory = flowGraphSummary?.startingDataType;
+    $: $parentCategory = flowGraphSummary?.parentDataType;
+
+    $: summarisedFlows = summariseFlows(flowInfo, noOpinionRating);
+    $: $categories = mkCategories(summarisedFlows);
+    $: $clients = mkClients(summarisedFlows, physicalFlows);
+    $: $arcs = mkArcs(summarisedFlows);
+
+    $: select(svgElem)
+        .call(zoom()
+            .on("zoom", onScroll));
+
+    $: baseBreadcrumb = {
+        id: -1,
+        name: $flowDirection === flowDirections.INBOUND
+            ? `${$focusClient?.name || entity.name} Inbound flows`
+            : `${$focusClient?.name || entity.name} Outbound flows`,
+        classes: "breadcrumb-root",
+        onClick: () => {
+            const parent = $focusClient || entity
+            flowGraphSummaryCall = logicalFlowStore.getFlowGraphSummary(parent, null, true);
+            additionalBreadcrumbs = []
+        }
+    };
+
+    $: homeBreadcrumb = {
+        id: -2,
+        name: `Home (${entity.name})`,
+        classes: "breadcrumb-home",
+        onClick: () => {
+            $focusClient = null;
+            flowGraphSummaryCall = logicalFlowStore.getFlowGraphSummary(primaryEntityRef, null, true);
+            entitiesVisited = [];
+            additionalBreadcrumbs = [];
+        }
+    };
+
+
+    $: {
+        let baseAndDrilldowns = _.concat([baseBreadcrumb], additionalBreadcrumbs);
+
+        breadcrumbs = _
+            .chain(baseAndDrilldowns)
+            .map(d => Object.assign({}, d, {active: false}))
+            .value();
+
+        const lastBreadcrumb = _.last(breadcrumbs);
+
+        lastBreadcrumb.active = true;
+        lastBreadcrumb.classes = lastBreadcrumb.classes + " text-muted";
+    }
 
     function onScroll() {
         clientScrollOffset.update(origValue => {
@@ -45,153 +119,44 @@
         });
     }
 
-    export let primaryEntityRef;
-
-    let breadcrumbs = [];
-    let flowGraphSummaryCall = logicalFlowStore.getFlowGraphSummary(primaryEntityRef, null);
-
-    $: flowGraphSummary = $flowGraphSummaryCall.data;
-
-    $: physicalFlowCall = physicalFlowStore.findBySelector(mkSelectionOptions(primaryEntityRef, "EXACT"));
-    $: physicalFlows = $physicalFlowCall.data;
-
-    let entityCall = primaryEntityRef.kind === 'APPLICATION'
-        ? applicationStore.getById(primaryEntityRef.id)
-        : actorStore.getById(primaryEntityRef.id);
-
-    $: entity = $entityCall.data;
-
-    let svgElem;
-
-    $: $categories = mkCategories(summarisedFlows);
-    $: $clients = mkClients(summarisedFlows, physicalFlows);
-    $: $arcs = mkArcs(summarisedFlows);
-
-    $: select(svgElem)
-        .call(zoom()
-            .on("zoom", onScroll));
-
-    $: flowInfo = _.get(flowGraphSummary?.flowInfoByDirection, [$flowDirection], []);
-
-    $: groupedFlowInfo = _
-        .chain(flowInfo)
-        .map(d => Object.assign({}, d, {key: `cat_${d.rollupDataType.id}_cli_${d.counterpart.id}`}))
-        .groupBy(d => d.key)
-        .value();
-
-    $: flowClassificationCall = flowClassificationStore.findAll()
-    $: noOpinionRating = _.find($flowClassificationCall.data, d => d.code === 'NO_OPINION');
-
-    $: summarisedFlows = _
-        .chain(groupedFlowInfo)
-        .mapValues((v, k) => {
-
-            const flow = _.head(v);
-
-            const ratingCounts = _
-                .chain(v)
-                .filter(v => v.actualDataType.id !== v.rollupDataType.id)
-                .countBy(v => v.classificationId)
-                .value();
-
-            const exactFlow = _.find(v, d => d.actualDataType.id === d.rollupDataType.id);
-
-            const lineRating = _.get(exactFlow, "classificationId", noOpinionRating?.id); //TODO: make this the no opinion id
-
-            const lineLifecycleStatus = _.get(exactFlow, "flowEntityLifecycleStatus", "ACTIVE");
-
-            const actualDataTypeIds = _
-                .chain(v)
-                .map(f => f.actualDataType?.id)
-                .uniq()
-                .value();
-
-            const rollupDataTypeIds = _
-                .chain(v)
-                .map(f => f.rollupDataType?.id)
-                .uniq()
-                .value();
-
-            return {
-                key: k,
-                ratings: v,
-                hasChildren: !_.isEmpty(ratingCounts),
-                ratingCounts,
-                lineRating,
-                lineLifecycleStatus,
-                actualDataTypeIds,
-                rollupDataTypeIds,
-                flowId: flow.flowId,
-                category: flow.rollupDataType,
-                client: flow.counterpart
-            };
-        })
-        .value()
 
     function loadForCategory(evt) {
 
-        const category = evt.detail
-        const parentEntity = $focusClient || entity
+        const category = evt.detail;
+        const parentEntity = $focusClient || entity;
 
-        flowGraphSummaryCall = logicalFlowStore.getFlowGraphSummary(parentEntity, category.id, true);
+        flowGraphSummaryCall = logicalFlowStore.getFlowGraphSummary(
+            parentEntity,
+            category?.id,
+            false /* no force */);
 
-        additionalBreadcrumbs = _.concat(
-            additionalBreadcrumbs,
-            {
-                id: category.id,
-                name: category.name,
-                active: true,
-                onClick: () => {
-                    const parent = $focusClient || entity
-                    additionalBreadcrumbs = _.dropRightWhile(additionalBreadcrumbs, d => d.id !== category.id);
-                    flowGraphSummaryCall = logicalFlowStore.getFlowGraphSummary(parent, category.id, true);
-                }
-            })
-    }
-
-    $: baseBreadcrumb = {
-        id: -1,
-        name: $flowDirection === flowDirections.INBOUND
-            ? `${$focusClient?.name || entity.name} Inbound flows`
-            : `${$focusClient?.name || entity.name} Outbound flows`,
-        active: true,
-        classes: "breadcrumb-root",
-        onClick: () => {
-            const parent = $focusClient || entity
-            flowGraphSummaryCall = logicalFlowStore.getFlowGraphSummary(parent, null, true);
-            additionalBreadcrumbs = []
-        }
-    }
-
-    $: homeBreadcrumb = {
-        id: -2,
-        name: `Home (${entity.name})`,
-        active: true,
-        classes: "breadcrumb-home",
-        onClick: () => {
-            $focusClient = null;
-            flowGraphSummaryCall = logicalFlowStore.getFlowGraphSummary(primaryEntityRef, null, true);
-            entitiesVisited = [];
+        if (category == null) {
             additionalBreadcrumbs = [];
+        } else {
+            const matchingBreadcrumbFn = b => b.id === category?.id && sameRef(parentEntity, b.parentEntity);
+
+            const dropBreadcrumbs = () => {
+                return _.dropRightWhile(additionalBreadcrumbs, d => !matchingBreadcrumbFn(d))
+            }
+
+            const addBreadcrumb = () => {
+                return [
+                    ...additionalBreadcrumbs,
+                    {
+                        parentEntity,
+                        id: category.id,
+                        name: category.name,
+                        onClick: () => loadForCategory({detail: category})
+                    }
+                ];
+            };
+
+            additionalBreadcrumbs = _.find(additionalBreadcrumbs, matchingBreadcrumbFn)
+                ? dropBreadcrumbs()
+                : addBreadcrumb();
         }
     }
 
-    $: additionalBreadcrumbs = [];
-    $: entitiesVisited = [];
-
-    $: {
-        let baseAndDrilldowns = _.concat([baseBreadcrumb], additionalBreadcrumbs);
-
-        breadcrumbs = _
-            .chain(baseAndDrilldowns)
-            .map(d => Object.assign({}, d, {active: false}))
-            .value();
-
-        const lastBreadcrumb = _.last(breadcrumbs);
-
-        lastBreadcrumb.active = true;
-        lastBreadcrumb.classes = lastBreadcrumb.classes + " text-muted";
-    }
 
     function selectClient(evt) {
 
@@ -267,7 +232,8 @@
 
                 <g id="categories"
                    transform={`translate(${$layout.categoryTranslateX}, 0)`}>
-                    <Categories on:select={loadForCategory}/>
+                    <Categories kind={$focusClient?.kind || primaryEntityRef.kind}
+                                on:select={loadForCategory}/>
                 </g>
 
                 <g id="clients"
@@ -306,6 +272,7 @@
         margin-bottom: 0.4em;
     }
 
+    /* this is used */
     .breadcrumb-root {
         font-weight: bold;
     }
@@ -313,7 +280,6 @@
     .breadcrumb-home button {
         font-weight: bold !important;
     }
-
 
 
 </style>

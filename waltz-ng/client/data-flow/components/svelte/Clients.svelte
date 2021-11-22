@@ -10,7 +10,7 @@
         contextPanelMode,
         Modes, clearSelections
     } from "./flow-decorator-store";
-    import {dimensions} from "./flow-decorator-utils"
+    import {dimensions, colors} from "./flow-decorator-utils"
     import {truncateMiddle} from "../../../common/string-utils";
 
     import _ from "lodash";
@@ -33,14 +33,16 @@
         $selectedClient = client;
         $contextPanelMode = Modes.FLOW_SUMMARY;
     }
-
 </script>
+
 
 <g transform={`translate(0, ${$clientScrollOffset})`}>
     {#each $filteredClients as client}
-        <g transform={`translate(0, ${$clientScale(client.id)})`} class={mkClasses(client)}
+        <g transform={`translate(0, ${$clientScale(client.id)})`}
+           class={mkClasses(client)}
            on:click|stopPropagation={() => selectClient(client)}>
-            <rect stroke="#999"
+            <rect stroke={colors[client.kind].stroke}
+                  fill={colors[client.kind].fill}
                   on:mouseenter={() => onMouseEnter(client)}
                   on:mouseleave={() => onMouseLeave()}
                   rx={dimensions.client.height / 2}
@@ -75,18 +77,6 @@
 
 
 <style>
-
-
-    .ACTOR rect {
-        fill: #f0e9ff;
-    }
-
-
-    .APPLICATION rect {
-        fill: #eef8ff;
-    }
-
-
     .svg-fa-icon text {
         font-family: FontAwesome;
     }

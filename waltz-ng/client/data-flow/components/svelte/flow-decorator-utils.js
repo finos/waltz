@@ -1,3 +1,17 @@
+import _ from "lodash";
+
+export const colors = {
+    APPLICATION: {
+        fill: "#eef8ff",
+        stroke: "#6fbdff"
+    },
+    ACTOR: {
+        fill: "#f0e9ff",
+        stroke: "#9f75fd"
+    }
+};
+
+
 export const dimensions = {
     client: {
         height: 25,
@@ -19,19 +33,22 @@ export const dimensions = {
     }
 };
 
+
 const catLayout = {
     id: a => a.categoryId,
     scale: (catYPos, cliYPos) => catYPos,
     dimensions: dimensions.category,
     offset: () => 0
-}
+};
+
 
 const cliLayout = {
     id: a => a.clientId,
     scale: (catYPos, cliYPos) => cliYPos,
     dimensions: dimensions.client,
     offset: (x) => x
-}
+};
+
 
 export const layout = {
     categoryToClient: {
@@ -89,17 +106,24 @@ export function mkClients(summarisedFlows, physicalFlows = []){
         .value()
 }
 
+
 export function mkCategories(summarisedFlows){
     return _
         .chain(summarisedFlows)
-        .map(d => ({
-            name: d.category.name,
-            id: d.category.id,
-            hasChildren: d.hasChildren
-        }))
-        .uniq()
+        .groupBy(d => d.category.id)
+        .reduce((acc, xs, k) => {
+            const category = {
+                id: xs[0].category.id,
+                name: xs[0].category.name,
+                category: xs[0].category,
+                hasChildren: _.some(xs, x => x.hasChildren)
+            };
+
+            return [...acc, category];
+        }, [])
         .value();
 }
+
 
 export function mkArcs(summarisedFlows){
     return _
@@ -119,6 +143,59 @@ export function mkArcs(summarisedFlows){
         .value();
 }
 
+
 function mkTipRatings(ratingCounts){
     return _.map(ratingCounts, (v, k) => ({ ratingId: k, count: v }));
+}
+
+
+export function summariseFlows(flowInfo, noOpinionRating) {
+    return _
+        .chain(flowInfo)
+        .map(d => Object.assign({}, d, {key: `cat_${d.rollupDataType.id}_cli_${d.counterpart.id}`}))
+        .groupBy(d => d.key)
+        .mapValues((decoratorsForKey, key) => {
+            const flow = _.head(decoratorsForKey);
+
+            const ratingCounts = _
+                .chain(decoratorsForKey)
+                .filter(decorator => decorator.actualDataType.id !== decorator.rollupDataType.id)
+                .countBy(decorator => decorator.classificationId)
+                .value();
+
+            const exactFlow = _.find(
+                decoratorsForKey,
+                decorator => decorator.actualDataType.id === decorator.rollupDataType.id);
+
+            const lineRating = _.get(exactFlow, ["classificationId"], noOpinionRating?.id); //TODO: make this the no opinion id
+
+            const lineLifecycleStatus = _.get(exactFlow, ["flowEntityLifecycleStatus"], "ACTIVE");
+
+            const actualDataTypeIds = _
+                .chain(decoratorsForKey)
+                .map(decorator => decorator.actualDataType?.id)
+                .uniq()
+                .value();
+
+            const rollupDataTypeIds = _
+                .chain(decoratorsForKey)
+                .map(decorators => decorators.rollupDataType?.id)
+                .uniq()
+                .value();
+
+            return {
+                key,
+                ratings: decoratorsForKey,
+                hasChildren: !_.isEmpty(ratingCounts),
+                ratingCounts,
+                lineRating,
+                lineLifecycleStatus,
+                actualDataTypeIds,
+                rollupDataTypeIds,
+                flowId: flow.flowId,
+                category: flow.rollupDataType,
+                client: flow.counterpart
+            };
+        })
+        .value();
 }
