@@ -173,6 +173,13 @@ public class SurveyInstanceService {
     }
 
 
+    private void checkApprovalDueDateIsLaterThanSubmissionDueDate(LocalDate approvalDue, LocalDate submissionDue) {
+        checkTrue(
+                approvalDue.compareTo(submissionDue) >= 0,
+                "Approval due date cannot be earlier than the submission due date");
+    }
+
+
     public Person checkPersonIsRecipient(String userName, long instanceId) {
         Person person = getPersonByUsername(userName);
         boolean isPersonInstanceRecipient = surveyInstanceRecipientDao.isPersonInstanceRecipient(
@@ -255,6 +262,7 @@ public class SurveyInstanceService {
         LocalDate newDueDate = command.newDateVal().orElse(null);
 
         checkNotNull(newDueDate, "newDueDate cannot be null");
+        checkApprovalDueDateIsLaterThanSubmissionDueDate(surveyInstanceDao.getById(instanceId).approvalDueDate(), newDueDate);
 
         int result = surveyInstanceDao.updateDueDate(instanceId, newDueDate);
 
@@ -275,9 +283,11 @@ public class SurveyInstanceService {
         checkNotNull(command, "command cannot be null");
 
         checkPersonIsOwnerOrAdmin(userName, instanceId);
-        LocalDate newDueDate = command.newDateVal().orElse(null);
 
+        LocalDate newDueDate = command.newDateVal().orElse(null);
         checkNotNull(newDueDate, "newDueDate cannot be null");
+        checkApprovalDueDateIsLaterThanSubmissionDueDate(newDueDate, surveyInstanceDao.getById(instanceId).dueDate());
+
 
         int result = surveyInstanceDao.updateApprovalDueDate(instanceId, newDueDate);
 

@@ -235,12 +235,37 @@ public class SurveyRunService {
         int surveyRunResult = surveyRunDao.updateDueDate(surveyRunId, newDueDate);
         int surveyInstanceResult = surveyInstanceDao.updateDueDateForSurveyRun(surveyRunId, newDueDate);
 
+        checkApprovalDueDateIsLaterThanSubmissionDueDate(surveyRunDao.getById(surveyRunId).approvalDueDate(), newDueDate);
+
         changeLogService.write(
                 ImmutableChangeLog.builder()
                         .operation(Operation.UPDATE)
                         .userId(userName)
                         .parentReference(EntityReference.mkRef(EntityKind.SURVEY_RUN, surveyRunId))
                         .message("Survey Run: due date changed to " + newDueDate)
+                        .build());
+
+        return surveyRunResult + surveyInstanceResult;
+    }
+
+
+    public int updateSurveyRunApprovalDueDate(String userName, long surveyRunId, DateChangeCommand command) {
+        checkNotNull(userName, "userName cannot be null");
+        checkNotNull(command, "command cannot be null");
+
+        LocalDate newDueDate = command.newDateVal().orElse(null);
+        checkNotNull(newDueDate, "newDueDate cannot be null");
+        checkApprovalDueDateIsLaterThanSubmissionDueDate(newDueDate, surveyRunDao.getById(surveyRunId).dueDate());
+
+        int surveyRunResult = surveyRunDao.updateApprovalDueDate(surveyRunId, newDueDate);
+        int surveyInstanceResult = surveyInstanceDao.updateApprovalDueDateForSurveyRun(surveyRunId, newDueDate);
+
+        changeLogService.write(
+                ImmutableChangeLog.builder()
+                        .operation(Operation.UPDATE)
+                        .userId(userName)
+                        .parentReference(EntityReference.mkRef(EntityKind.SURVEY_RUN, surveyRunId))
+                        .message("Survey Run: approval due date changed to " + newDueDate)
                         .build());
 
         return surveyRunResult + surveyInstanceResult;
@@ -524,5 +549,13 @@ public class SurveyRunService {
 
         return surveyInstanceDao.updateOwningRoleForSurveyRun(id, owningRoleSaveCommand.owningRole());
     }
+
+
+    private void checkApprovalDueDateIsLaterThanSubmissionDueDate(LocalDate approvalDue, LocalDate submissionDue) {
+        checkTrue(
+                approvalDue.compareTo(submissionDue) >= 0,
+                "Approval due date cannot be earlier than the submission due date");
+    }
+
 }
 

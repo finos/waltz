@@ -24,13 +24,14 @@
  */
 
 import {initialiseData, invokeFunction} from "../../common";
-import template from './survey-run-overview.html';
+import template from "./survey-run-overview.html";
 
 
 const bindings = {
-    template: '<',
-    run: '<',
-    onUpdateDueDate: '<'
+    template: "<",
+    run: "<",
+    onUpdateDueDate: "<",
+    onUpdateApprovalDueDate: "<"
 };
 
 
@@ -44,6 +45,10 @@ function controller() {
 
     vm.updateDueDate = (data) => {
         invokeFunction(vm.onUpdateDueDate, data.newVal);
+    };
+
+    vm.updateApprovalDueDate = (data) => {
+        invokeFunction(vm.onUpdateApprovalDueDate, data.newVal);
     };
 }
 
