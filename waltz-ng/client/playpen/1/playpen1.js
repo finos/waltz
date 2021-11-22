@@ -20,15 +20,18 @@
 import template from "./playpen1.html";
 import {initialiseData} from "../../common";
 import SurveyViewer from "../../survey/components/svelte/inline-panel/SurveyViewer.svelte";
+import SurveyContextPanel from "./SurveyContextPanel.svelte";
 import {loadSurveyInfo} from "../../survey/survey-utils";
-import {questions, responses, surveyDetails} from "./survey-detail-store";
+import {questions, responses, surveyDetails} from "../../survey/components/svelte/inline-panel/survey-detail-store";
 import {CORE_API} from "../../common/services/core-api-utils";
 
 const initData = {
     // parentEntityRef: {id: 20768, kind: "APPLICATION"}
-    parentEntityRef: {id: 76823, kind: "SURVEY_INSTANCE"},
+    parentEntityRef: {id: 39855, kind: "SURVEY_INSTANCE"},
+    // parentEntityRef: {id: 76823, kind: "SURVEY_INSTANCE"},
     measurableEntityRef: {id: 54566, kind: "MEASURABLE"},
-    SurveyViewer
+    SurveyViewer,
+    SurveyContextPanel
 };
 
 
