@@ -101,6 +101,12 @@ function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
+    const updateApprovalDueDate = (id, command) => {
+        return $http
+            .put(`${base}/${id}/approval-due-date`, command)
+            .then(r => r.data);
+    };
+
     const updateOwningRole = (id, command) => {
         return $http
             .put(`${base}/${id}/role`, command)
@@ -145,95 +151,101 @@ function store($http, baseApiUrl) {
         createSurveyRunInstancesAndRecipients,
         getCompletionRate,
         createSurveyInstances,
-        updateOwningRole
+        updateOwningRole,
+        updateApprovalDueDate
     };
 }
 
 
 store.$inject = [
-    '$http',
-    'BaseApiUrl'
+    "$http",
+    "BaseApiUrl"
 ];
 
 
-const serviceName = 'SurveyRunStore';
+const serviceName = "SurveyRunStore";
 
 
 export const SurveyRunStore_API = {
     create: {
         serviceName,
-        serviceFnName: 'create',
-        description: 'create survey run'
+        serviceFnName: "create",
+        description: "create survey run"
     },
     deleteById: {
         serviceName,
-        serviceFnName: 'deleteById',
-        description: 'delete survey run for a given id'
+        serviceFnName: "deleteById",
+        description: "delete survey run for a given id"
     },
     getById: {
         serviceName,
-        serviceFnName: 'getById',
-        description: 'get survey run for a given id'
+        serviceFnName: "getById",
+        description: "get survey run for a given id"
     },
     findByTemplateId: {
         serviceName,
-        serviceFnName: 'findByTemplateId',
-        description: 'find survey runs for a given template id'
+        serviceFnName: "findByTemplateId",
+        description: "find survey runs for a given template id"
     },
     findByEntityReference: {
         serviceName,
-        serviceFnName: 'findByEntityReference',
-        description: 'find survey runs for a given entity'
+        serviceFnName: "findByEntityReference",
+        description: "find survey runs for a given entity"
     },
     findForRecipientId: {
         serviceName,
-        serviceFnName: 'findForRecipientId',
-        description: 'find survey runs for a given recipient person id'
+        serviceFnName: "findForRecipientId",
+        description: "find survey runs for a given recipient person id"
     },
     findForUser: {
         serviceName,
-        serviceFnName: 'findForUser',
-        description: 'find survey runs for the current logged in user'
+        serviceFnName: "findForUser",
+        description: "find survey runs for the current logged in user"
     },
     update: {
         serviceName,
-        serviceFnName: 'update',
-        description: 'update a survey run'
+        serviceFnName: "update",
+        description: "update a survey run"
     },
     updateStatus: {
         serviceName,
-        serviceFnName: 'updateStatus',
-        description: `update a survey run's status`
+        serviceFnName: "updateStatus",
+        description: "update a survey run's status"
     },
     updateDueDate: {
         serviceName,
-        serviceFnName: 'updateDueDate',
-        description: `update a survey run's due date`
+        serviceFnName: "updateDueDate",
+        description: "update a survey run's due date"
+    },
+    updateApprovalDueDate: {
+        serviceName,
+        serviceFnName: "updateApprovalDueDate",
+        description: "update a survey run's due date for approval"
     },
     updateOwningRole: {
         serviceName,
-        serviceFnName: 'updateOwningRole',
-        description: `update the owning role for all instances in a run`
+        serviceFnName: "updateOwningRole",
+        description: "update the owning role for all instances in a run"
     },
     generateSurveyRunRecipients: {
         serviceName,
-        serviceFnName: 'generateSurveyRunRecipients',
-        description: 'generate recipient for a given survey run id'
+        serviceFnName: "generateSurveyRunRecipients",
+        description: "generate recipient for a given survey run id"
     },
     createSurveyRunInstancesAndRecipients: {
         serviceName,
-        serviceFnName: 'createSurveyRunInstancesAndRecipients',
-        description: 'create a survey run, instances and recipients'
+        serviceFnName: "createSurveyRunInstancesAndRecipients",
+        description: "create a survey run, instances and recipients"
     },
     getCompletionRate: {
         serviceName,
-        serviceFnName: 'getCompletionRate',
-        description: 'get completion rate for a given survey run id'
+        serviceFnName: "getCompletionRate",
+        description: "get completion rate for a given survey run id"
     },
     createSurveyInstances: {
         serviceName,
-        serviceFnName: 'createSurveyInstances',
-        description: 'create a survey instance for a given survey run and list of person ids'
+        serviceFnName: "createSurveyInstances",
+        description: "create a survey instance for a given survey run and list of person ids"
     }
 };
 

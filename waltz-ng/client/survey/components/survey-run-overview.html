@@ -21,16 +21,13 @@
         <div class="col-sm-2 waltz-display-field-label">
             Run Name
         </div>
-        <div class="col-sm-10">
+        <div class="col-sm-4">
             <span ng-bind="$ctrl.run.name"></span>
         </div>
-    </div>
-    <br>
-    <div class="row">
         <div class="col-sm-2 waltz-display-field-label">
             Template Name
         </div>
-        <div class="col-sm-10">
+        <div class="col-sm-4">
             <span ng-bind="$ctrl.template.name"></span>
         </div>
     </div>
@@ -48,13 +45,24 @@
         <br>
         <div class="row">
             <div class="col-sm-2 waltz-display-field-label">
-                Due
+                Submission Due
             </div>
             <div class="col-sm-4">
                 <waltz-editable-field on-save="$ctrl.updateDueDate"
                                       field-type="date"
                                       date-format="yyyy-MM-dd"
                                       initial-val="$ctrl.run.dueDate">
+                </waltz-editable-field>
+            </div>
+            <div class="col-sm-2 waltz-display-field-label">
+                Approval Due
+            </div>
+            <div class="col-sm-4">
+                <waltz-editable-field on-save="$ctrl.updateApprovalDueDate"
+                                      field-type="date"
+                                      date-format="yyyy-MM-dd"
+                                      initial-val="$ctrl.run.approvalDueDate"
+                                      min-date="$ctrl.run.dueDate">
                 </waltz-editable-field>
             </div>
         </div>

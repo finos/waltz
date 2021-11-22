@@ -120,4 +120,12 @@ public class SurveyInstanceOwnerDao {
                 .where(SURVEY_INSTANCE_OWNER.SURVEY_INSTANCE_ID.eq(surveyInstanceId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
+
+    public Long getPersonIdForOwnerId(long ownerId) {
+        return dsl
+                .select(SURVEY_INSTANCE_OWNER.PERSON_ID)
+                .from(SURVEY_INSTANCE_OWNER)
+                .where(SURVEY_INSTANCE_OWNER.ID.eq(ownerId))
+                .fetchOne(SURVEY_INSTANCE_OWNER.PERSON_ID);
+    }
 }

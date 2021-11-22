@@ -29,7 +29,8 @@ const bindings = {
     model: "=",
     itemId: "<?",
     onChange: "<?",
-    maxDate: "<?"
+    maxDate: "<?",
+    minDate: "<?"
 };
 
 
@@ -51,11 +52,19 @@ function controller() {
     const vm = initialiseData(this, initialState);
 
     vm.$onChanges = () => {
-        if (!vm.allowPastDates) {
+
+        if (vm.minDate) {
+            vm.dateOptions.minDate = new Date(vm.minDate)
+        } else if (!vm.allowPastDates) {
             vm.dateOptions.minDate = new Date();
+        } else {
+            vm.dateOptions.min = null;
         }
+
         if (vm.maxDate) {
             vm.dateOptions.maxDate = new Date(vm.maxDate);
+        } else {
+            vm.dateOptions.maxDate = null;
         }
     };
 

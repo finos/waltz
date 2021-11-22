@@ -72,6 +72,7 @@ public class SurveyRunEndpoint implements Endpoint {
         String createSurveyInstancesPath = mkPath(BASE_URL, ":id", "create-instances");
         String updateSurveyRunStatusPath = mkPath(BASE_URL, ":id", "status");
         String updateSurveyRunDueDatePath = mkPath(BASE_URL, ":id", "due-date");
+        String updateSurveyRunApprovalDueDatePath = mkPath(BASE_URL, ":id", "approval-due-date");
         String updateOwningRolePath = mkPath(BASE_URL, ":id", "role");
         String getSurveyRunCompletionRate = mkPath(BASE_URL, ":id", "completion-rate");
 
@@ -129,6 +130,16 @@ public class SurveyRunEndpoint implements Endpoint {
                     command);
         };
 
+
+        DatumRoute<Integer> surveyRunUpdateApprovalDueDateRoute = (req, res) -> {
+            DateChangeCommand command = readBody(req, DateChangeCommand.class);
+
+            return surveyRunService.updateSurveyRunApprovalDueDate(
+                    getUsername(req),
+                    getId(req),
+                    command);
+        };
+
         DatumRoute<Integer> surveyRunUpdateOwningRolesRoute = (req, res) -> {
 
             SurveyInstanceOwningRoleSaveCommand owningRole = readBody(req, SurveyInstanceOwningRoleSaveCommand.class);
@@ -180,6 +191,7 @@ public class SurveyRunEndpoint implements Endpoint {
         postForDatum(createSurveyInstancesPath, createSurveyInstancesRoute);
         putForDatum(updateSurveyRunStatusPath, surveyRunUpdateStatusRoute);
         putForDatum(updateSurveyRunDueDatePath, surveyRunUpdateDueDateRoute);
+        putForDatum(updateSurveyRunApprovalDueDatePath, surveyRunUpdateApprovalDueDateRoute);
         putForDatum(updateOwningRolePath, surveyRunUpdateOwningRolesRoute);
         getForDatum(getSurveyRunCompletionRate, getSurveyRunCompletionRateRoute);
     }

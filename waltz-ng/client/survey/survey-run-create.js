@@ -106,7 +106,8 @@ function controller($document,
             involvementKindIds: _.map(surveyRun.involvementKinds, kind => kind.id),
             ownerInvKindIds: _.map(surveyRun.ownerInvolvementKinds, kind => kind.id),
             issuanceKind: surveyRun.issuanceKind,
-            dueDate: surveyInstance.dueDate ? timeFormat("%Y-%m-%d")(surveyInstance.dueDate) : null,
+            dueDate: surveyRun.dueDate ? timeFormat("%Y-%m-%d")(surveyRun.dueDate) : null,
+            approvalDueDate: surveyRun.approvalDueDate ? timeFormat("%Y-%m-%d")(surveyRun.dueDate) : null,
             contactEmail: surveyRun.contactEmail
         };
 
@@ -116,8 +117,8 @@ function controller($document,
                     vm.step = "RECIPIENT";
                     const instancesRecipientsCreateCommand = {
                         surveyRunId: surveyRun.id,
-                        dueDate: surveyInstance.dueDate,
-                        approvalDueDate: surveyInstance.approvalDueDate,
+                        dueDate: surveyRun.dueDate,
+                        approvalDueDate: surveyRun.approvalDueDate,
                         excludedRecipients: [],
                         owningRole: surveyInstance.owningRole
                     };
@@ -130,8 +131,8 @@ function controller($document,
                     vm.step = "RECIPIENT";
                     const instancesRecipientsCreateCommand = {
                         surveyRunId: r.id,
-                        dueDate: surveyInstance.dueDate,
-                        approvalDueDate: surveyInstance.approvalDueDate,
+                        dueDate: surveyRun.dueDate,
+                        approvalDueDate: surveyRun.approvalDueDate,
                         excludedRecipients: [],
                         owningRole: surveyInstance.owningRole
                     };

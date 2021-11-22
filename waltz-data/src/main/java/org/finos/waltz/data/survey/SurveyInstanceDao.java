@@ -226,6 +226,15 @@ public class SurveyInstanceDao {
     }
 
 
+    public int updateApprovalDueDateForSurveyRun(long surveyRunId, LocalDate newDueDate) {
+        return dsl.update(SURVEY_INSTANCE)
+                .set(SURVEY_INSTANCE.APPROVAL_DUE_DATE, toSqlDate(newDueDate))
+                .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
+                .and(IS_ORIGINAL_INSTANCE_CONDITION)
+                .execute();
+    }
+
+
     public int updateOwningRoleForSurveyRun(long surveyRunId, String role) {
         return dsl.update(SURVEY_INSTANCE)
                 .set(SURVEY_INSTANCE.OWNING_ROLE, role)

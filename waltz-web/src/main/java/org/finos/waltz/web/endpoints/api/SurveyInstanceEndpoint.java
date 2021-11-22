@@ -72,6 +72,8 @@ public class SurveyInstanceEndpoint implements Endpoint {
         String updateApprovalDueDatePath = mkPath(BASE_URL, ":id", "approval-due-date");
         String recipientPath = mkPath(BASE_URL, ":id", "recipient");
         String deleteRecipientPath = mkPath(BASE_URL, ":id", "recipient", ":instanceRecipientId");
+        String ownerPath = mkPath(BASE_URL, ":id", "owner");
+        String deleteOwnerPath = mkPath(BASE_URL, ":id", "owner", ":instanceOwnerId");
         String reportProblemWithQuestionResponsePath = mkPath(BASE_URL, ":id", "response", ":questionId", "problem");
 
         DatumRoute<SurveyInstance> getByIdRoute =
@@ -189,6 +191,18 @@ public class SurveyInstanceEndpoint implements Endpoint {
                         getId(req),
                         getLong(req, "instanceRecipientId"));
 
+        DatumRoute<Long> addOwnerRoute =
+                (req, res) -> {
+                    SurveyInstanceOwnerCreateCommand command = readBody(req, SurveyInstanceOwnerCreateCommand.class);
+                    return surveyInstanceService.addOwner(getUsername(req), command);
+                };
+
+        DatumRoute<Boolean> deleteOwnerRoute =
+                (req, res) -> surveyInstanceService.deleteOwner(
+                        getUsername(req),
+                        getId(req),
+                        getLong(req, "instanceOwnerId"));
+
 
         getForDatum(getByIdPath, getByIdRoute);
         getForDatum(getPermissionsPath, getPermissionsRoute);
@@ -206,7 +220,9 @@ public class SurveyInstanceEndpoint implements Endpoint {
         putForDatum(updateApprovalDueDatePath, updateApprovalDueDateRoute);
         putForDatum(recipientPath, updateRecipientRoute);
         postForDatum(recipientPath, addRecipientRoute);
+        postForDatum(ownerPath, addOwnerRoute);
         deleteForDatum(deleteRecipientPath, deleteRecipientRoute);
+        deleteForDatum(deleteOwnerPath, deleteOwnerRoute);
         postForDatum(reportProblemWithQuestionResponsePath, reportProblemWithQuestionResponseRoute);
     }
 

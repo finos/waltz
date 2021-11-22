@@ -118,6 +118,7 @@
                 completed,
                 overdue,
             }})
+        .orderBy(d => d.template.name)
         .value();
 
     $: templatesById = _
@@ -138,6 +139,7 @@
     for approving, rejecting and reopening surveys. Select a filter to see the individual survey details and navigate to them.
 </div>
 {#if _.isEmpty(templateSummaries)}
+    <br>
     <NoData>There are no surveys where you are an assigned owner</NoData>
 {:else}
     <table class="table table-condensed">
@@ -145,7 +147,7 @@
         <tr>
             <th width="30%">Survey Name</th>
             {#each tableHeaders as header}
-                <th width={`${60 / tableHeaders.length}%`}>{header.name}</th>
+                <th width={`${70 / tableHeaders.length}%`}>{header.name}</th>
             {/each}
         </tr>
         </thead>

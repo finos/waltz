@@ -59,6 +59,8 @@ const initialState = {
     },
     surveyRun: {
         selectorEntity: null,
+        dueDate: null,
+        approvalDueDate: null
     },
     surveyInstance: {
         dueDate: null,

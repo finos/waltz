@@ -96,7 +96,8 @@
                                               required="true"
                                               place-holder="yyyy-MM-dd"
                                               format="yyyy-MM-dd"
-                                              model="$ctrl.surveyInstance.dueDate">
+                                              max-date="$ctrl.surveyRun.approvalDueDate"
+                                              model="$ctrl.surveyRun.dueDate">
                 </waltz-date-picker-form-input>
             </div>
         </div>
@@ -111,7 +112,8 @@
                                               required="true"
                                               place-holder="yyyy-MM-dd"
                                               format="yyyy-MM-dd"
-                                              model="$ctrl.surveyInstance.approvalDueDate">
+                                              min-date="$ctrl.surveyRun.dueDate"
+                                              model="$ctrl.surveyRun.approvalDueDate">
                 </waltz-date-picker-form-input>
             </div>
         </div>

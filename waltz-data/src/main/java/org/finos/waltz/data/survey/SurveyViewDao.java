@@ -111,6 +111,7 @@ public class SurveyViewDao {
                         Long::valueOf))
                 .issuedOn(ofNullable(runRecord.getIssuedOn()).map(Date::toLocalDate))
                 .dueDate(runRecord.getDueDate().toLocalDate())
+                .approvalDueDate(runRecord.getApprovalDueDate().toLocalDate())
                 .issuanceKind(SurveyIssuanceKind.valueOf(runRecord.getIssuanceKind()))
                 .ownerId(runRecord.getOwnerId())
                 .contactEmail(runRecord.getContactEmail())
