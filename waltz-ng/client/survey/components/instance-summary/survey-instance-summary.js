@@ -47,7 +47,7 @@ function mkUpdateRecipientCommand(instanceRecipientId, person, surveyInstanceId)
 }
 
 
-function mkCreateRecipientCommand(instanceId, person) {
+function mkCreateInstanceInvolvementCommand(instanceId, person) {
     return {
         surveyInstanceId: instanceId,
         personId: person.id
@@ -55,8 +55,8 @@ function mkCreateRecipientCommand(instanceId, person) {
 }
 
 
-function findMatchingRecipient(recipients = [], person) {
-    return _.find(recipients, r => sameRef(r.person, person))
+function findMatchingInvolvement(involvements = [], person) {
+    return _.find(involvements, r => sameRef(r.person, person))
 }
 
 const statusToIcon = {
@@ -86,7 +86,8 @@ function controller($q,
                 vm.statusIcon = statusToIcon[vm.surveyDetails.instance.status] || "fw";
 
                 vm.description = surveyUtils.mkDescription([details.template.description, details.run.description]);
-                vm.people = _.map(details.recipients, d => d.person);
+                vm.recipients = _.map(details.recipients, d => d.person);
+                vm.owners = _.map(details.instanceOwners, d => d.person);
                 vm.availableStatusActions = actions.determineAvailableStatusActions(
                     details.isLatest,
                     details.possibleActions);
@@ -128,7 +129,7 @@ function controller($q,
     };
 
     vm.onAddRecipient = p => {
-        const cmd = mkCreateRecipientCommand(vm.instanceId, p);
+        const cmd = mkCreateInstanceInvolvementCommand(vm.instanceId, p);
         toasts.info(`Adding ${p.name} as a recipient`);
         return serviceBroker
             .execute(CORE_API.SurveyInstanceStore.addRecipient, [ vm.instanceId, cmd ])
@@ -140,13 +141,11 @@ function controller($q,
                     toasts.error(`${p.name} not added as a recipient`)
                 }
             })
-            .catch(e => displayError(
-                `Could not add ${p.name} as a recipient`,
-                e));
+            .catch(e => displayError(`Could not add ${p.name} as a recipient`, e));
     };
 
-    vm.onRemoveRecipient = p => {
-        const recipient = findMatchingRecipient(vm.surveyDetails.recipients, p);
+    vm.onRemoveRecipient = (p) => {
+        const recipient = findMatchingInvolvement(vm.surveyDetails.recipients, p);
         toasts.info(`Removing ${p.name} as a recipient`);
         if (recipient) {
             return serviceBroker
@@ -164,6 +163,45 @@ function controller($q,
                 .catch(e => displayError(`${p.name} not removed from recipients`, e));
         } else {
             // we couldn't find the recipient so lets reload in case something happened elsewhere
+            return reload();
+        }
+    };
+
+    vm.onAddOwner = (p) => {
+        const cmd = mkCreateInstanceInvolvementCommand(vm.instanceId, p);
+        toasts.info(`Adding ${p.name} as an owner`);
+        return serviceBroker
+            .execute(CORE_API.SurveyInstanceStore.addOwner, [ vm.instanceId, cmd ])
+            .then(r => {
+                if(r.data) {
+                    reload(true);
+                    toasts.success(`${p.name} added as an owner`);
+                } else {
+                    toasts.error(`${p.name} not added as an owner`)
+                }
+            })
+            .catch(e => displayError(`Could not add ${p.name} as an owner`, e));
+    };
+
+    vm.onRemoveOwner = p => {
+        const owner = findMatchingInvolvement(vm.surveyDetails.instanceOwners, p);
+        toasts.info(`Removing ${p.name} as an owner`);
+        if (owner) {
+            return serviceBroker
+                .execute(
+                    CORE_API.SurveyInstanceStore.deleteOwner,
+                    [vm.surveyDetails.instance.id, owner.id])
+                .then(r => {
+                    if(r.data) {
+                        reload(true);
+                        toasts.success(`Removed ${p.name} from owners`);
+                    } else {
+                        toasts.error(`Failed to remove ${p.name} from owners`);
+                    }
+                })
+                .catch(e => displayError(`${p.name} not removed from owners`, e));
+        } else {
+            // we couldn't find the owner so lets reload in case something happened elsewhere
             return reload();
         }
     };

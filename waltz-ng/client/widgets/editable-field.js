@@ -34,6 +34,7 @@ const bindings = {
     startInEditMode: "<?",
     onCancel: "<?",
     maxDate: "<?",  // only for date fields
+    minDate: "<?",  // only for date fields
     inlineHelp: "@?"
 };
 

@@ -126,6 +126,7 @@
                 dueWeek,
                 dueMonth
             }})
+        .orderBy(d => d.template.name)
         .value();
 
     $: templatesById = _
@@ -147,6 +148,7 @@
     Select a filter to see the survey details and use the table to navigate to them.
 </div>
 {#if _.isEmpty(templateSummaries)}
+    <br>
     <NoData>There are no surveys where you are an assigned recipient</NoData>
 {:else}
     <table class="table table-condensed">

@@ -21,6 +21,7 @@ import {timeFormat} from "d3-time-format";
 import {initialiseData} from "../common";
 import {mkEntityLabelGridCell} from "../common/grid-utils";
 import toasts from "../svelte-stores/toast-store";
+import {displayError} from "../common/error-utils";
 
 const columnDefs = [
     mkEntityLabelGridCell("Entity", "surveyEntity", "left", "right"),
@@ -103,7 +104,26 @@ function controller($stateParams,
                         toasts.success("Survey run due date updated successfully");
                         loadSurveyRun();
                         loadInstances();
-                    }, r => toasts.error("Failed to update survey run due date"));
+                    })
+                    .catch(e => displayError("Failed to update survey run due date", e));
+            }
+        }
+    };
+
+    vm.updateApprovalDueDate = (newVal) => {
+        if (!newVal) {
+            toasts.error("Approval due date cannot be blank");
+        } else {
+            if (confirm("This will update the approval due date of all the instances under this run. " +
+                    "Are you sure you want to continue?")) {
+                surveyRunStore
+                    .updateApprovalDueDate(id, {newDateVal: timeFormat("%Y-%m-%d")(newVal)})
+                    .then(r => {
+                        toasts.success("Survey run approval due date updated successfully");
+                        loadSurveyRun();
+                        loadInstances();
+                    })
+                    .catch(e => displayError("Failed to update survey run approval due date", e));
             }
         }
     };

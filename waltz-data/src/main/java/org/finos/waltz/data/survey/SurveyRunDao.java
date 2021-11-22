@@ -35,6 +35,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 import static org.finos.waltz.schema.Tables.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.DateTimeUtilities.toSqlDate;
@@ -64,6 +65,7 @@ public class SurveyRunDao {
                         Long::valueOf))
                 .issuedOn(Optional.ofNullable(record.getIssuedOn()).map(Date::toLocalDate))
                 .dueDate(record.getDueDate().toLocalDate())
+                .approvalDueDate(toLocalDate(record.getApprovalDueDate()))
                 .issuanceKind(SurveyIssuanceKind.valueOf(record.getIssuanceKind()))
                 .ownerId(record.getOwnerId())
                 .contactEmail(record.getContactEmail())
@@ -72,6 +74,7 @@ public class SurveyRunDao {
                         record.getOwnerInvKindIds(),
                         ID_SEPARATOR,
                         Long::valueOf))
+                .isDefault(record.getIsDefault())
                 .build();
     };
 
@@ -119,7 +122,8 @@ public class SurveyRunDao {
         record.setSelectorEntityId(command.selectionOptions().entityReference().id());
         record.setSelectorHierarchyScope(command.selectionOptions().scope().name());
         record.setInvolvementKindIds(join(command.involvementKindIds(), ID_SEPARATOR));
-        record.setDueDate(DateTimeUtilities.toSqlDate(command.dueDate()));
+        record.setDueDate(toSqlDate(command.dueDate()));
+        record.setApprovalDueDate(toSqlDate(command.approvalDueDate()));
         record.setIssuanceKind(command.issuanceKind().name());
         record.setOwnerId(ownerId);
         record.setContactEmail(command.contactEmail());
@@ -151,6 +155,7 @@ public class SurveyRunDao {
                 .set(SURVEY_RUN.SELECTOR_HIERARCHY_SCOPE, command.selectionOptions().scope().name())
                 .set(SURVEY_RUN.INVOLVEMENT_KIND_IDS, StringUtilities.join(command.involvementKindIds(), ID_SEPARATOR))
                 .set(SURVEY_RUN.DUE_DATE, command.dueDate().map(Date::valueOf).orElse(null))
+                .set(SURVEY_RUN.APPROVAL_DUE_DATE, command.approvalDueDate().map(Date::valueOf).orElse(null))
                 .set(SURVEY_RUN.ISSUANCE_KIND, command.issuanceKind().name())
                 .set(SURVEY_RUN.CONTACT_EMAIL, command.contactEmail().orElse(null))
                 .set(SURVEY_RUN.OWNER_INV_KIND_IDS, join(command.ownerInvKindIds(), ID_SEPARATOR))
@@ -174,6 +179,15 @@ public class SurveyRunDao {
         return dsl
                 .update(SURVEY_RUN)
                 .set(SURVEY_RUN.DUE_DATE, toSqlDate(newDueDate))
+                .where(SURVEY_RUN.ID.eq(surveyRunId))
+                .execute();
+    }
+
+
+    public int updateApprovalDueDate(long surveyRunId, LocalDate newDueDate) {
+        return dsl
+                .update(SURVEY_RUN)
+                .set(SURVEY_RUN.APPROVAL_DUE_DATE, toSqlDate(newDueDate))
                 .where(SURVEY_RUN.ID.eq(surveyRunId))
                 .execute();
     }

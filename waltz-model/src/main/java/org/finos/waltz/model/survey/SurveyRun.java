@@ -41,9 +41,15 @@ public abstract class SurveyRun implements IdProvider, NameProvider, Description
     public abstract Set<Long> involvementKindIds();
     public abstract Optional<LocalDate> issuedOn();
     public abstract LocalDate dueDate();
+    public abstract LocalDate approvalDueDate();
     public abstract SurveyIssuanceKind issuanceKind();
     public abstract Long ownerId();
     public abstract String contactEmail();
     public abstract SurveyRunStatus status();
     public abstract Set<Long> ownerInvKindIds();
+
+    @Value.Default
+    public boolean isDefault() {
+        return false;
+    }
 }
