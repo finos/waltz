@@ -243,7 +243,7 @@ public class LogicalFlowStatsDao {
     }
 
 
-    public LogicalFlowGraphSummary getFlowInfoByDirection(EntityReference ref, Long datatypeId){
+    public Map<FlowDirection, Set<FlowInfo>> getFlowInfoByDirection(EntityReference ref, Long datatypeId){
 
         Condition sourceAppCondition = lf.SOURCE_ENTITY_ID.eq(counterpart_app.ID).and(lf.SOURCE_ENTITY_KIND.eq(EntityKind.APPLICATION.name()));
         Condition sourceActorCondition = lf.SOURCE_ENTITY_ID.eq(counterpart_actor.ID).and(lf.SOURCE_ENTITY_KIND.eq(EntityKind.ACTOR.name()));
@@ -273,7 +273,7 @@ public class LogicalFlowStatsDao {
                 sourceQry
                         .union(targetQry);
 
-        Map<FlowDirection, Set<FlowInfo>> data = unionedData
+        return unionedData
                 .fetch()
                 .stream()
                 .collect(groupingBy(
@@ -301,11 +301,6 @@ public class LogicalFlowStatsDao {
                                     .build();
 
                         }, toSet())));
-
-        return ImmutableLogicalFlowGraphSummary
-                .builder()
-                .flowInfoByDirection(data)
-                .build();
     }
 
 
