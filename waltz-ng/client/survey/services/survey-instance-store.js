@@ -131,9 +131,21 @@ function store($http, baseApiUrl) {
             .then(result => result.data);
     };
 
+    const addOwner = (surveyInstanceId, command) => {
+        return $http
+            .post(`${base}/${surveyInstanceId}/owner`, command)
+            .then(result => result.data);
+    };
+
     const deleteRecipient = (id, instanceRecipientId) => {
         return $http
             .delete(`${base}/${id}/recipient/${instanceRecipientId}`)
+            .then(result => result.data);
+    };
+
+    const deleteOwner = (id, instanceOwnerId) => {
+        return $http
+            .delete(`${base}/${id}/owner/${instanceOwnerId}`)
             .then(result => result.data);
     };
 
@@ -162,6 +174,8 @@ function store($http, baseApiUrl) {
         updateRecipient,
         addRecipient,
         deleteRecipient,
+        addOwner,
+        deleteOwner,
         markApproved,
         reportProblemWithQuestionResponse
     };
@@ -272,6 +286,16 @@ export const SurveyInstanceStore_API = {
         serviceName,
         serviceFnName: "deleteRecipient",
         description: "delete recipient from a given survey instance id"
+    },
+    addOwner: {
+        serviceName,
+        serviceFnName: "addOwner",
+        description: "add owner to a given survey instance id"
+    },
+    deleteOwner: {
+        serviceName,
+        serviceFnName: "deleteOwner",
+        description: "delete owner from a given survey instance id"
     },
     reportProblemWithQuestionResponse: {
         serviceName,
