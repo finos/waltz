@@ -26,8 +26,7 @@
             <a class="btn btn-xs"
                 ng-if="action.type.includes('instance')"
                 ng-class="'btn-{{action.severity}}'"
-                ng-click="$ctrl.invokeStatusAction(action, $ctrl.surveyDetails.instance.id)"
-                >
+                ng-click="$ctrl.invokeStatusAction(action, $ctrl.surveyDetails.instance.id)">
                 <span ng-bind="action.name"></span>
             </a>
         </span>
