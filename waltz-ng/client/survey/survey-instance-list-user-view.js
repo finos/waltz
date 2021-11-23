@@ -15,16 +15,10 @@
  * See the License for the specific
  *
  */
-import _ from "lodash";
 import {initialiseData} from "../common/index";
-import {mkEntityLinkGridCell, mkLinkGridCell} from "../common/grid-utils";
 import UserSurveyListPanel from "./components/svelte/UserSurveyListPanel.svelte"
 import template from "./survey-instance-list-user-view.html";
 import roles from "../user/system-roles";
-import {selectSurveyRow} from "./components/svelte/user-survey-store";
-import {loadSurveyInfo} from "./survey-utils";
-import {questions, responses, surveyDetails} from "./components/svelte/inline-panel/survey-detail-store";
-import {CORE_API} from "../common/services/core-api-utils";
 
 
 const initialState = {
@@ -39,33 +33,6 @@ function controller($state,
                     userService) {
 
     const vm = initialiseData(this, initialState);
-
-    vm.goToSurvey = (surveyInstance) => {
-        $state.go(
-            "main.survey.instance.response.view",
-            { id: surveyInstance.id });
-    }
-
-    vm.$onInit = () => {
-        selectSurveyRow.set(vm.goToSurvey);
-
-        // loadSurveyInfo($q, serviceBroker, userService, vm.parentEntityRef.id)
-        //     .then(details => surveyDetails.set(details));
-        //
-        // serviceBroker
-        //     .loadViewData(
-        //         CORE_API.SurveyQuestionStore.findQuestionsForInstance,
-        //         [ vm.parentEntityRef.id ])
-        //     .then(r => questions.set(r.data));
-        //
-        // serviceBroker
-        //     .loadViewData(
-        //         CORE_API.SurveyInstanceStore.findResponses,
-        //         [ vm.parentEntityRef.id ])
-        //     .then(r => {
-        //         return responses.set(r.data);
-        //     });
-    }
 
     userService.whoami()
         .then(user => vm.user = user)

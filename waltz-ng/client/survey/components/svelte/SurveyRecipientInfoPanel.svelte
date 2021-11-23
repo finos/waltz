@@ -4,7 +4,7 @@
     import _ from "lodash";
     import NoData from "../../../common/svelte/NoData.svelte";
     import {surveyInstanceStatus} from "../../../common/services/enums/survey-instance-status";
-    import {selectedSurvey, selectedSurveyStatusCell, selectSurveyRow} from "./user-survey-store";
+    import {selectedSurvey, selectedSurveyStatusCell} from "./user-survey-store";
     import Icon from "../../../common/svelte/Icon.svelte";
     import {onMount} from "svelte";
     import SurveyViewer from "./inline-panel/SurveyViewer.svelte";
