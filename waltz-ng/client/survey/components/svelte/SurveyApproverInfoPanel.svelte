@@ -211,7 +211,7 @@
             <a class="clickable"
                on:click={() => selectSurveyFilter($selectedSurveyStatusCell?.header, $selectedSurveyStatusCell?.templateInfo)}>
                 {$selectedSurveyStatusCell?.header.description}
-            </a> / {$selectedSurvey?.surveyEntity?.name}
+            </a> / {$selectedSurvey?.surveyEntity?.name || "Unknown"}
         </h4>
         <div class="help-block small">
             <Icon name="info-circle"/>To navigate back to the filtered survey list click on the link above or select a different filter.
