@@ -57,8 +57,8 @@ public class SurveyInstanceViewService {
     }
 
 
-    public SurveyInstance getById(long instanceId) {
-        return surveyInstanceDao.getById(instanceId);
+    public SurveyInstanceInfo getById(long instanceId) {
+        return surveyViewDao.getById(instanceId);
     }
 
 

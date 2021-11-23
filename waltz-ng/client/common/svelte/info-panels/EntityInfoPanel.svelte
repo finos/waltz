@@ -6,6 +6,7 @@
     import ActorInfoPanel from "./ActorInfoPanel.svelte";
     import DataTypeInfoPanel from "./DataTypeInfoPanel.svelte";
     import LogicalDataFlowPanel from "./LogicalDataFlowInfoPanel.svelte"
+    import SurveyInstanceInfoPanel from "./SurveyInstanceInfoPanel.svelte";
 
     export let primaryEntityRef;
 
@@ -23,6 +24,8 @@
                 return LogicalDataFlowPanel;
             case "MEASURABLE":
                 return MeasurableInfoPanel;
+            case "SURVEY_INSTANCE":
+                return SurveyInstanceInfoPanel;
             default:
                 throw `No info panel for kind: ${entityKind}`;
         }

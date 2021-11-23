@@ -19,16 +19,18 @@
 package org.finos.waltz.web.endpoints.api;
 
 
+import org.finos.waltz.model.survey.SurveyInstanceInfo;
 import org.finos.waltz.model.survey.SurveyInstanceUserInvolvement;
 import org.finos.waltz.service.survey.SurveyInstanceViewService;
+import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.web.WebUtilities.getUsername;
-import static org.finos.waltz.web.WebUtilities.mkPath;
+import static org.finos.waltz.web.WebUtilities.*;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
 
 @Service
@@ -49,11 +51,15 @@ public class SurveyInstanceViewEndpoint implements Endpoint {
     @Override
     public void register() {
         String findForUserPath = mkPath(BASE_URL, "user");
+        String getByIdPath = mkPath(BASE_URL, "id", ":id");
+
+        DatumRoute<SurveyInstanceInfo> getByIdRoute = (req, resp) -> surveyInstanceViewService.getById(getId(req));
 
         ListRoute<SurveyInstanceUserInvolvement> findForUserRoute =
                 (req, res) -> surveyInstanceViewService.findForUser(getUsername(req));
 
         getForList(findForUserPath, findForUserRoute);
+        getForDatum(getByIdPath, getByIdRoute);
     }
 
 }

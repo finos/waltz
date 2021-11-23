@@ -140,6 +140,23 @@ public class SurveyViewDao {
     }
 
 
+    public SurveyInstanceInfo getById(long instanceId) {
+        return dsl
+                .select(SURVEY_INSTANCE.fields())
+                .select(SURVEY_RUN.fields())
+                .select(SURVEY_TEMPLATE.NAME,
+                        SURVEY_TEMPLATE.ID,
+                        SURVEY_TEMPLATE.DESCRIPTION)
+                .select(ENTITY_NAME_FIELD)
+                .select(QUALIFIER_NAME_FIELD)
+                .select(EXTERNAL_ID_FIELD)
+                .from(SURVEY_INSTANCE)
+                .innerJoin(SURVEY_RUN).on(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(SURVEY_RUN.ID))
+                .innerJoin(SURVEY_TEMPLATE).on(SURVEY_RUN.SURVEY_TEMPLATE_ID.eq(SURVEY_TEMPLATE.ID))
+                .where(SURVEY_INSTANCE.ID.eq(instanceId))
+                .fetchOne(TO_DOMAIN_MAPPER);
+    }
+
 
     public Set<SurveyInstanceInfo> findForRecipient(long personId) {
         return dsl

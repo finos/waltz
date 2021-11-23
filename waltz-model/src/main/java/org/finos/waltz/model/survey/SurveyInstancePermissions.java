@@ -31,6 +31,7 @@ public abstract class SurveyInstancePermissions {
     public boolean isParticipant() {
         return false;
     }
+
     @Value.Default
     public boolean isMetaEdit() {
         return false;

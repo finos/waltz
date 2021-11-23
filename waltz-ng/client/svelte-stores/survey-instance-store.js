@@ -18,22 +18,18 @@
 
 import {remote} from "./remote";
 
-export function mkSurveyInstanceViewStore() {
+export function mkSurveyInstanceStore() {
 
-    const getById = (id) => remote
-        .fetchViewDatum("GET", `api/survey-instance-view/id/${id}`);
+    const getPermissions = (id) => remote
+        .fetchViewDatum("GET", `api/survey-instance/${id}/permissions`);
 
-    const findForUser = (force = false) => remote
-        .fetchViewList(
-            "GET",
-            "api/survey-instance-view/user",
-            null,
-            {force});
+    const findPossibleActions = (id) => remote
+        .fetchViewDatum("GET", `api/survey-instance/${id}/actions`);
 
     return {
-        findForUser,
-        getById
+        getPermissions,
+        findPossibleActions
     };
 }
 
-export const surveyInstanceViewStore = mkSurveyInstanceViewStore();
+export const surveyInstanceStore = mkSurveyInstanceStore();
