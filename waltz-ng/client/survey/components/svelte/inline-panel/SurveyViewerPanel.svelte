@@ -1,7 +1,7 @@
 <script>
 
     import Icon from "../../../../common/svelte/Icon.svelte";
-    import {groupedQuestions, responsesByQuestionId, selectedSection} from "./survey-detail-store";
+    import {groupedQuestions, questions, responsesByQuestionId, selectedSection} from "./survey-detail-store";
     import _ from "lodash";
     import SurveyContextPanel from "../../../../playpen/1/SurveyContextPanel.svelte";
     import {surveyInstanceStore} from "../../../../svelte-stores/survey-instance-store";
@@ -11,6 +11,7 @@
     import {determineAvailableStatusActions} from "../../../survey-actions";
     import toasts from "../../../../svelte-stores/toast-store";
     import {displayError} from "../../../../common/error-utils";
+    import NoData from "../../../../common/svelte/NoData.svelte";
 
     export let primaryEntityRef;
     let selectedTab = 'sections';
@@ -81,6 +82,8 @@
 
     $: sectionList = $groupedQuestions;
 
+    $: hasMandatoryQuestionsWithoutResponse = _.some($questions, q => console.log({q, m:q.isMandatory, ninc: !_.includes(questionsWithResponse, q.id)}) || q.isMandatory && !_.includes(questionsWithResponse, q.id));
+
 </script>
 
 <div class="waltz-sub-section show-border">
@@ -110,12 +113,21 @@
                     {#each actionList as action}
                         <li>
                             <button class={`btn btn-xs ${actionToIcon[action?.actionName].class}`}
+                                    disabled={action.actionName === 'SUBMITTING' && hasMandatoryQuestionsWithoutResponse}
                                     on:click={() => invokeAction(action, primaryEntityRef?.id)}>
                                 <Icon name={actionToIcon[action?.actionName].icon}/>{action?.actionDisplay}
                             </button>
                         </li>
                     {/each}
                 </ul>
+                {#if hasMandatoryQuestionsWithoutResponse}
+                    <div style="padding-top: 0.5em"
+                         class="small">
+                        <NoData type="warning">
+                            <Icon name="exclamation-triangle"/>There are mandatory questions that have not been completed for this survey
+                        </NoData>
+                    </div>
+                {/if}
             {/if}
         </div>
     </div>
