@@ -82,7 +82,7 @@
 
     $: sectionList = $groupedQuestions;
 
-    $: hasMandatoryQuestionsWithoutResponse = _.some($questions, q => console.log({q, m:q.isMandatory, ninc: !_.includes(questionsWithResponse, q.id)}) || q.isMandatory && !_.includes(questionsWithResponse, q.id));
+    $: hasMandatoryQuestionsWithoutResponse = _.some($questions, q => q.isMandatory && !_.includes(questionsWithResponse, q.id));
 
 </script>
 
@@ -166,7 +166,7 @@
                     on:mouseenter={() => section.hovering = true}
                     on:mouseleave={() => section.hovering = false}
                     class:highlighted={section.hovering}
-                    class:selected={section === $selectedSection}
+                    class:selected={section?.sectionName === $selectedSection?.sectionName}
                     on:click={() => selectSection(section)}>
                     {section.sectionName}
                     <span title={`${getResponsesCount(section)} questions with a response out of a total ${_.size(section.questions)} questions`}

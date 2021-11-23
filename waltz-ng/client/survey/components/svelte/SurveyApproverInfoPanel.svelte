@@ -90,6 +90,9 @@
         activeMode = Modes.SURVEY;
     }
 
+    function goToNext(d){
+        $selectedSurvey = Object.assign({}, d, {kind: "SURVEY_INSTANCE"});
+    }
 
     $: byTemplateId = _
         .chain(surveys)
@@ -142,6 +145,10 @@
 
     $: surveysByStatus = _.keyBy(surveys, d => d.surveyInstance.status);
     $: incompleteSurveys = _.concat(_.get(surveysByStatus, "IN_PROGRESS", []) , _.get(surveysByStatus, "NOT_STARTED", []));
+
+    $: currentSurvey = _.findIndex(gridData, d => d?.surveyInstance?.id === $selectedSurvey?.id);
+    $: previousSurvey =  _.get(gridData[currentSurvey -1], 'surveyInstance', null);
+    $: nextSurvey =  _.get(gridData[currentSurvey +1], 'surveyInstance', null);
 
 </script>
 
@@ -208,6 +215,30 @@
         </h4>
         <div class="help-block small">
             <Icon name="info-circle"/>To navigate back to the filtered survey list click on the link above or select a different filter.
+        </div>
+        <div style="padding: 0.5em">
+            <div class="col-md-6"
+                 style="border-right: solid 1px #cccccc; padding-right: 0.5em">
+                {#if previousSurvey}
+                    <button class="btn btn-skinny pull-right"
+                            on:click={() => goToNext(previousSurvey)}>
+                        <Icon name="arrow-circle-left"/> Previous survey ({previousSurvey?.surveyEntity?.name  || "Unknown"})
+                    </button>
+                {:else}
+                    <span class="text-muted pull-right">No previous surveys</span>
+                {/if}
+            </div>
+            <div class="col-md-6"
+                 style="border-left: solid 1px #cccccc; padding-left: 0.5em">
+                {#if nextSurvey}
+                    <button class="btn btn-skinny"
+                            on:click={() => goToNext(nextSurvey)}>
+                        Next survey ({nextSurvey?.surveyEntity?.name || "Unknown"}) <Icon name="arrow-circle-right"/>
+                    </button>
+                {:else}
+                    <span class="text-muted">No further surveys</span>
+                {/if}
+            </div>
         </div>
         <br>
         <SurveyViewer primaryEntityRef={$selectedSurvey}/>

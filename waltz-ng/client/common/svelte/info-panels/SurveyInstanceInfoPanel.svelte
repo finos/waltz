@@ -28,7 +28,7 @@
             </tr>
             <tr>
                 <td width="50%">Subject</td>
-                <td width="50%"><EntityLink ref={survey.surveyInstance?.surveyEntity}/></td>
+                <td width="50%"><EntityLink ref={survey.surveyInstance?.surveyEntity || "Unknown"}/></td>
             </tr>
             <tr>
                 <td width="50%">Status</td>
