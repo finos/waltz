@@ -22,6 +22,9 @@ import UserSurveyListPanel from "./components/svelte/UserSurveyListPanel.svelte"
 import template from "./survey-instance-list-user-view.html";
 import roles from "../user/system-roles";
 import {selectSurveyRow} from "./components/svelte/user-survey-store";
+import {loadSurveyInfo} from "./survey-utils";
+import {questions, responses, surveyDetails} from "./components/svelte/inline-panel/survey-detail-store";
+import {CORE_API} from "../common/services/core-api-utils";
 
 
 const initialState = {
@@ -31,125 +34,6 @@ const initialState = {
     showSurveyTemplateButton: false,
     UserSurveyListPanel
 };
-
-
-function mkSurveyData(surveyRuns = [], surveyInstances = []) {
-    const runsById = _.keyBy(surveyRuns, "id");
-
-    const mappedData = _.map(surveyInstances, instance => {
-        return {
-            "surveyInstance": instance,
-            "surveyRun": runsById[instance.surveyRunId]
-        }
-    });
-
-    const [incomplete = [], complete = []] = _.partition(
-        mappedData,
-        data => data.surveyInstance.status === "NOT_STARTED"
-            || data.surveyInstance.status === "IN_PROGRESS"
-            || data.surveyInstance.status === "REJECTED");
-
-    return {
-        "incomplete": incomplete,
-        "complete": complete
-    };
-}
-
-const subjectField = mkEntityLinkGridCell("Subject",
-                                          "surveyInstance.surveyEntity",
-                                          "left",
-                                          "top",
-                                          {},
-                                          true);
-
-const subjectExtIdField = {
-    field: "surveyInstance.surveyEntityExternalId",
-    name: "Subject External Id",
-    width: "10%"
-};
-const statusField = {
-    field: "surveyInstance.status",
-    name: "Status",
-    cellFilter: "toDisplayName:'surveyInstanceStatus'",
-    width: "10%"
-};
-const issuedOnField = {
-    field: "surveyRun.issuedOn",
-    name: "Issued",
-    cellTemplate: "<div class=\"ui-grid-cell-contents\"><waltz-from-now timestamp=\"COL_FIELD\" days-only=\"true\"></waltz-from-now></div>",
-    width: "10%"
-};
-const dueDateField = {
-    field: "surveyInstance.dueDate",
-    name: "Due",
-    cellTemplate: "<div class=\"ui-grid-cell-contents\"><waltz-from-now timestamp=\"COL_FIELD\" days-only=\"true\"></waltz-from-now></div>",
-    width: "10%"
-};
-
-const  surveyRunEditLinkField  = Object.assign(
-    {},
-    mkLinkGridCell("Survey Run", "surveyRun.name", "surveyInstance.id", "main.survey.instance.response.edit"),
-    { width: "25%"});
-
-const  surveyRunViewLinkField  = Object.assign(
-    {},
-    mkLinkGridCell("Survey Run", "surveyRun.name", "surveyInstance.id", "main.survey.instance.response.edit"),
-    { width: "25%"});
-
-const surveyInstanceNameField = mkLinkGridCell("Survey Name", "surveyInstance.name", "surveyInstance.id", "main.survey.instance.response.edit");
-
-
-const approvedField = {
-    field: "surveyInstance.approvedBy",
-    name: "Approved By",
-    cellTemplate: `
-        <div class="ui-grid-cell-contents">
-           <span ng-if="row.entity.surveyInstance.approvedBy">
-                <span ng-bind="row.entity.surveyInstance.approvedBy">
-                </span>,
-            </span>
-            <waltz-from-now class='text-muted'
-                        ng-if="row.entity.surveyInstance.approvedAt"
-                        timestamp="row.entity.surveyInstance.approvedAt">
-            </waltz-from-now>
-            <span ng-if="! row.entity.surveyInstance.approvedAt">
-                -
-            </span>
-       </div>`,
-    width: "15%"
-};
-
-
-
-
-function mkIncompleteColumnDefs() {
-    return [
-        subjectField,
-        subjectExtIdField,
-        surveyRunEditLinkField,
-        surveyInstanceNameField,
-        statusField,
-        issuedOnField,
-        dueDateField
-    ];
-}
-
-
-
-function mkCompleteColumnDefs() {
-
-    return [
-        subjectField,
-        subjectExtIdField,
-        surveyRunEditLinkField,
-        surveyInstanceNameField,
-        statusField,
-        issuedOnField,
-        dueDateField,
-        approvedField,
-    ];
-}
-
 
 function controller($state,
                     userService) {
@@ -164,6 +48,23 @@ function controller($state,
 
     vm.$onInit = () => {
         selectSurveyRow.set(vm.goToSurvey);
+
+        // loadSurveyInfo($q, serviceBroker, userService, vm.parentEntityRef.id)
+        //     .then(details => surveyDetails.set(details));
+        //
+        // serviceBroker
+        //     .loadViewData(
+        //         CORE_API.SurveyQuestionStore.findQuestionsForInstance,
+        //         [ vm.parentEntityRef.id ])
+        //     .then(r => questions.set(r.data));
+        //
+        // serviceBroker
+        //     .loadViewData(
+        //         CORE_API.SurveyInstanceStore.findResponses,
+        //         [ vm.parentEntityRef.id ])
+        //     .then(r => {
+        //         return responses.set(r.data);
+        //     });
     }
 
     userService.whoami()

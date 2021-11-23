@@ -4,10 +4,11 @@
     import _ from "lodash";
     import NoData from "../../../common/svelte/NoData.svelte";
     import {surveyInstanceStatus} from "../../../common/services/enums/survey-instance-status";
-    import {selectedSurveyStatusCell, selectSurveyRow} from "./user-survey-store";
+    import {selectedSurveyStatusCell, selectSurveyRow, selectedSurvey} from "./user-survey-store";
     import {timeFormat} from "d3-time-format";
     import Icon from "../../../common/svelte/Icon.svelte";
     import {onMount} from "svelte";
+    import SurveyViewer from "./inline-panel/SurveyViewer.svelte";
 
     export let surveys = [];
 
@@ -19,6 +20,14 @@
 
     weekFromNow.setDate(weekFromNow.getDate() + 7);
     monthFromNow.setDate(currentDate.getDate() + 30);
+
+    const Modes = {
+        INFO: "INFO",
+        GRID: "GRID",
+        SURVEY: "SURVEY",
+    }
+
+    let activeMode = Modes.INFO;
 
     let columnDefs = [
         { field: "surveyInstance.surveyEntity.name", name: "Subject Name", width: "20%"},
@@ -71,11 +80,14 @@
 
     function selectSurveyFilter(header, templateInfo) {
         $selectedSurveyStatusCell = {header, templateInfo};
-        gridData = header.data(templateInfo)
+        $selectedSurvey = null;
+        gridData = header.data(templateInfo);
+        activeMode = Modes.GRID;
     }
 
     function selectRow(d) {
-        $selectSurveyRow(d.surveyInstance);
+        $selectedSurvey = Object.assign({}, d.surveyInstance, {kind: "SURVEY_INSTANCE"});
+        activeMode = Modes.SURVEY;
     }
 
 
@@ -176,14 +188,29 @@
     <br>
     <hr>
 
-    {#if _.isEmpty(gridData)}
+    {#if activeMode === Modes.INFO}
         <NoData>There are no surveys for the current selection</NoData>
-    {:else }
+    {:else if activeMode === Modes.GRID}
         <h4>{$selectedSurveyStatusCell?.header.description}:</h4>
+        <div class="help-block small">
+            <Icon name="info-circle"/>Select a survey from the list below for detail and responses, or to execute any available actions.
+        </div>
         <br>
         <SurveyInstanceGrid {columnDefs}
                             rowData={gridData}
                             onSelectRow={selectRow}/>
+    {:else if activeMode === Modes.SURVEY}
+        <h4>
+            <a class="clickable"
+               on:click={() => selectSurveyFilter($selectedSurveyStatusCell?.header, $selectedSurveyStatusCell?.templateInfo)}>
+                {$selectedSurveyStatusCell?.header.description}
+            </a> / {$selectedSurvey?.surveyEntity?.name}
+        </h4>
+        <div class="help-block small">
+            <Icon name="info-circle"/>To navigate back to the filtered survey list click on the link above or select a different filter.
+        </div>
+        <br>
+        <SurveyViewer primaryEntityRef={$selectedSurvey}/>
     {/if}
 {/if}
 
