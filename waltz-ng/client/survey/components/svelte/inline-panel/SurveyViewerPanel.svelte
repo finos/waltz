@@ -8,17 +8,49 @@
     import {actionToIcon} from "./survey-viewer-utils";
     import {surveyInstanceViewStore} from "../../../../svelte-stores/survey-instance-view-store";
     import EntityLink from "../../../../common/svelte/EntityLink.svelte";
+    import {determineAvailableStatusActions} from "../../../survey-actions";
+    import toasts from "../../../../svelte-stores/toast-store";
+    import {displayError} from "../../../../common/error-utils";
 
     export let primaryEntityRef;
     let selectedTab = 'sections';
 
     $: findPossibleActionsCall = surveyInstanceStore.findPossibleActions(primaryEntityRef?.id);
-    $: possibleActions = $findPossibleActionsCall.data;
+    $: possibleActions = $findPossibleActionsCall?.data;
+
+    $: actionList = determineAvailableStatusActions(
+        _.isNull(survey?.surveyInstance?.originalInstanceId),
+        possibleActions || [])
 
     $: surveyCall = surveyInstanceViewStore.getById(primaryEntityRef?.id);
-    $: survey = $surveyCall.data;
+    $: survey = $surveyCall?.data;
 
     $: surveyName = survey?.surveyInstance?.name || survey?.surveyRun?.name || survey?.surveyTemplateRef?.name
+
+    function invokeAction(action, surveyInstanceId) {
+        const display = action.actionDisplay
+        const verb = action.verb
+        const name = action.actionName
+
+        // SHOW MESSAGE
+        const msg = `Are you sure you want to ${_.toLower(display)} this survey?`;
+        const reason = action.isCommentMandatory
+            ? prompt(msg + " Please enter a reason below (mandatory):", verb)
+            : confirm(msg);
+
+        const updateCmd = {action: name, reason: reason};
+
+        const prom = reason
+            ? Promise.resolve(surveyInstanceStore.updateStatus(surveyInstanceId, updateCmd))
+                .then(() => {
+                    toasts.success("Survey response " + verb + " successfully")
+                    surveyCall = surveyInstanceViewStore.getById(surveyInstanceId, true);
+                    findPossibleActionsCall = surveyInstanceStore.findPossibleActions(surveyInstanceId, true);
+                })
+                .catch(e => displayError("Unable to update status of survey. " + e.error, e))
+            : Promise.reject(display + " cancelled")
+                .catch(e => toasts.info(e))
+    }
 
     function selectSection(section) {
         if ($selectedSection === section) {
@@ -73,13 +105,13 @@
                     </tr>
                 </tbody>
             </table>
-            {#if !_.isEmpty(possibleActions)}
+            {#if !_.isEmpty(actionList)}
                 <ul class="list-inline">
-                    {#each possibleActions as action}
+                    {#each actionList as action}
                         <li>
-                            <button class={`btn btn-xs ${actionToIcon[action?.name].class}`}
-                                    on:click={() => console.log("hi")}>
-                                <Icon name={actionToIcon[action?.name].icon}/>{action?.display}
+                            <button class={`btn btn-xs ${actionToIcon[action?.actionName].class}`}
+                                    on:click={() => invokeAction(action, primaryEntityRef?.id)}>
+                                <Icon name={actionToIcon[action?.actionName].icon}/>{action?.actionDisplay}
                             </button>
                         </li>
                     {/each}

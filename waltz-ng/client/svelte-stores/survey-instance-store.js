@@ -23,8 +23,8 @@ export function mkSurveyInstanceStore() {
     const getPermissions = (id) => remote
         .fetchViewDatum("GET", `api/survey-instance/${id}/permissions`);
 
-    const findPossibleActions = (id) => remote
-        .fetchViewDatum("GET", `api/survey-instance/${id}/actions`);
+    const findPossibleActions = (id, force = false) => remote
+        .fetchViewDatum("GET", `api/survey-instance/${id}/actions`, [], {force});
 
     const findRecipients = (id) => remote
         .fetchViewList("GET",`api/survey-instance/${id}/recipients`);
@@ -35,12 +35,16 @@ export function mkSurveyInstanceStore() {
     const findResponses = (id) => remote
         .fetchViewList("GET",`api/survey-instance/${id}/responses`);
 
+    const updateStatus = (id, command) => remote
+        .execute("PUT",`api/survey-instance/${id}/status`, command);
+
     return {
         getPermissions,
         findPossibleActions,
         findRecipients,
         findOwners,
-        findResponses
+        findResponses,
+        updateStatus
     };
 }
 

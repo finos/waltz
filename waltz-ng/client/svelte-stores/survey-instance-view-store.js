@@ -20,8 +20,8 @@ import {remote} from "./remote";
 
 export function mkSurveyInstanceViewStore() {
 
-    const getById = (id) => remote
-        .fetchViewDatum("GET", `api/survey-instance-view/id/${id}`);
+    const getById = (id, force = false) => remote
+        .fetchViewDatum("GET", `api/survey-instance-view/id/${id}`, null, {force});
 
     const findForUser = (force = false) => remote
         .fetchViewList(
