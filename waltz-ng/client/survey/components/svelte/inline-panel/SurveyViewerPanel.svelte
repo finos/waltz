@@ -3,7 +3,6 @@
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {groupedQuestions, questions, responsesByQuestionId, selectedSection} from "./survey-detail-store";
     import _ from "lodash";
-    import SurveyContextPanel from "../../../../playpen/1/SurveyContextPanel.svelte";
     import {surveyInstanceStore} from "../../../../svelte-stores/survey-instance-store";
     import {actionToIcon} from "./survey-viewer-utils";
     import {surveyInstanceViewStore} from "../../../../svelte-stores/survey-instance-view-store";
@@ -12,6 +11,7 @@
     import toasts from "../../../../svelte-stores/toast-store";
     import {displayError} from "../../../../common/error-utils";
     import NoData from "../../../../common/svelte/NoData.svelte";
+    import EntityInfoPanel from "../../../../common/svelte/info-panels/EntityInfoPanel.svelte";
 
     export let primaryEntityRef;
     let selectedTab = 'sections';
@@ -177,7 +177,8 @@
             {/each}
         </ul>
     {:else if selectedTab === 'detail'}
-        <SurveyContextPanel {primaryEntityRef}/>
+        <EntityInfoPanel {primaryEntityRef}>
+        </EntityInfoPanel>
     {/if}
     </div>
 </div>
