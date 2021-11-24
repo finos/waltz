@@ -17,23 +17,16 @@
  */
 
 import {remote} from "./remote";
+import {CORE_API} from "../common/services/core-api-utils";
 
-export function mkSurveyInstanceViewStore() {
+export function mkSurveyQuestionStore() {
 
-    const getById = (id, force = false) => remote
-        .fetchViewDatum("GET", `api/survey-instance-view/id/${id}`, null, {force});
-
-    const findForUser = (force = false) => remote
-        .fetchViewList(
-            "GET",
-            "api/survey-instance-view/user",
-            null,
-            {force});
+    const findQuestionsForInstance = (id) => remote
+        .fetchViewList("GET", `api/survey-question/questions/instance/${id}`);
 
     return {
-        findForUser,
-        getById
+        findQuestionsForInstance
     };
 }
 
-export const surveyInstanceViewStore = mkSurveyInstanceViewStore();
+export const surveyQuestionStore = mkSurveyQuestionStore();

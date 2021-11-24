@@ -1,138 +1,89 @@
 <script>
 
-    import {questions, responses, selectedSection} from "../../../../playpen/1/survey-detail-store";
-    import {groupQuestions, indexResponses} from "../../../survey-utils";
+    import {
+        groupedQuestions,
+        responses,
+        questions,
+        responsesByQuestionId,
+        selectedSection,
+        surveyDetails
+    } from "./survey-detail-store";
     import _ from "lodash";
     import SurveyQuestionResponse from "./SurveyQuestionResponse.svelte";
-    import Icon from "../../../../common/svelte/Icon.svelte";
+    import SurveyViewerPanel from "./SurveyViewerPanel.svelte";
+    import {surveyInstanceViewStore} from "../../../../svelte-stores/survey-instance-view-store";
+    import {surveyQuestionStore} from "../../../../svelte-stores/survey-question-store";
+    import {surveyInstanceStore} from "../../../../svelte-stores/survey-instance-store";
 
-    $: groupedQuestions = groupQuestions($questions);
-    $: responsesByQuestionId = indexResponses($responses);
+    export let primaryEntityRef;
 
-    $: questionsWithResponse = _
-        .chain(_.values(responsesByQuestionId))
-        .filter(d => !_.isEmpty(d.stringResponse)
-            || !_.isEmpty(d.entityResponse)
-            || !_.isEmpty(d.numberResponse)
-            || d.booleanResponse !== "null"
-            || d.dateResponse
-            || !_.isEmpty(d.listResponse)
-            || !_.isEmpty(d.entityListResponse))
-        .map(d => Number(d.questionId))
-        .value();
+    $: instanceCall = surveyInstanceViewStore.getById(primaryEntityRef?.id);
+    $: $surveyDetails = $instanceCall.data;
 
-    $: sectionsToShow = $selectedSection ? [$selectedSection] : groupedQuestions;
+    $: questionsCall = surveyQuestionStore.findQuestionsForInstance(primaryEntityRef?.id);
+    $: $questions = $questionsCall?.data;
 
-    function selectSection(section) {
-        if ($selectedSection === section) {
-            $selectedSection = null;
-        } else {
-            $selectedSection = section;
-        }
-    }
+    $: responsesCall = surveyInstanceStore.findResponses(primaryEntityRef?.id);
+    $: $responses = $responsesCall?.data;
 
-    function getResponsesCount(section) {
-        return _
-            .chain(section.questions)
-            .filter(q => _.includes(questionsWithResponse, q.id))
-            .size();
-    }
+    $: sectionsToShow = $selectedSection ? [$selectedSection] : $groupedQuestions;
 
 </script>
 
+<div class="row">
+    <div class="col-sm-8 question-list">
+        {#each sectionsToShow as section}
+            <div class="section col-md-12">
+                <div class="row section-question-header">
+                    <div class="col-md-12">{section?.sectionName}</div>
+                </div>
 
-<div class="col-sm-3">
-    <h4>Sections</h4>
-    <div class="help-block small">
-        <Icon name="info-circle"/>Select a section below to focus on its questions
-    </div>
-    <ul class="section-list">
-        {#each groupedQuestions as section}
-                <li class="clickable section-list-item"
-                    on:mouseenter={() => section.hovering = true}
-                    on:mouseleave={() => section.hovering = false}
-                    class:highlighted={section.hovering}
-                    class:selected={section === $selectedSection}
-                    on:click={() => selectSection(section)}>
-                        {section.sectionName}
-                    <span title={`${getResponsesCount(section)} questions with a response out of a total ${_.size(section.questions)} questions`}
-                          class="small pull-right text-muted">
-                        {`(${getResponsesCount(section)} / ${_.size(section.questions)})`}
-                    </span>
-                </li>
-        {/each}
-    </ul>
-</div>
-<div class="col-sm-9 question-list">
-    {#each sectionsToShow as section}
-        <div class="section col-md-12">
-            <div class="row section-question-header">
-                <div class="col-md-12">{section.sectionName}</div>
-            </div>
-
-            {#each section.questions as question}
-                <div class="row section-question">
-                    <div class="col-md-3 help-block">
-                        {question.questionText}
-                        {#if question.isMandatory}
+                {#each section?.questions as question}
+                    <div class="row section-question">
+                        <div class="col-md-6 help-block">
+                            {question?.questionText}
+                            {#if question?.isMandatory}
                             <span class="mandatory"
                                   title="This question is mandatory">*</span>
+                            {/if}
+                        </div>
+                        <div class:col-md-6={_.isEmpty(question?.subQuestions)}
+                             class:col-md-2={!_.isEmpty(question?.subQuestions)}
+                             class="force-wrap">
+                            {#if question?.label}
+                                <div class="help-block sub-question-label">{question.label}</div>
+                            {/if}
+                            <SurveyQuestionResponse {question}
+                                                    response={_.get($responsesByQuestionId, question.id, null)}/>
+                        </div>
+                        {#if question.subQuestions}
+                            {#each question?.subQuestions as subQuestion}
+                                <div class="col-md-2">
+                                    {#if question?.label}
+                                        <div class="help-block sub-question-label">{subQuestion?.label}</div>
+                                    {/if}
+                                    <SurveyQuestionResponse question={subQuestion}
+                                                            response={_.get($responsesByQuestionId, subQuestion.id, null)}/>
+                                </div>
+                            {/each}
                         {/if}
                     </div>
-                    <div class:col-md-9={_.isEmpty(question.subQuestions)}
-                         class:col-md-3={!_.isEmpty(question.subQuestions)}>
-                        {#if question.label}
-                            <div class="help-block sub-question-label">{question.label}</div>
-                        {/if}
-                        <SurveyQuestionResponse {question}
-                                                response={_.get(responsesByQuestionId, question.id, null)}/>
-                    </div>
-                    {#if question.subQuestions}
-                        {#each question.subQuestions as subQuestion}
-                            <div class="col-md-3">
-                                {#if question.label}
-                                    <div class="help-block sub-question-label">{subQuestion.label}</div>
-                                {/if}
-                                <SurveyQuestionResponse question={subQuestion}
-                                                        response={_.get(responsesByQuestionId, subQuestion.id, null)}/>
-                            </div>
-                        {/each}
-                    {/if}
-                </div>
-            {/each}
-        </div>
-    {/each}
+                {/each}
+            </div>
+        {/each}
+    </div>
+
+
+    <div class="col-sm-4"
+         style="padding-left: 0">
+        <SurveyViewerPanel {primaryEntityRef}/>
+    </div>
 </div>
 
 
 <style type="text/scss">
 
     @import "style/variables";
-
-    ul {
-        padding: 0;
-        margin: 0;
-        list-style: none;
-    }
-
-    li {
-        padding-top: 0;
-    }
-
-    .section-list {
-
-        li:not(:last-child)  {
-            border-bottom: 1px solid #EEEEEE ;
-        }
-
-        li {
-            padding: 0.25em;
-        }
-
-        .selected {
-            background-color: $waltz-yellow-background;
-        }
-    }
 
     .section-question-header {
         color: $text-muted;
@@ -156,12 +107,7 @@
         padding-bottom: 0.5em;
     }
 
-    .highlighted {
-        background-color: #f3f9ff;
-    }
-
     .question-list {
-        padding-top: 2.5em;
     }
 
     .mandatory {

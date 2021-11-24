@@ -95,4 +95,4 @@ export function invokeStatusAction(serviceBroker, notification, reloader, $timeo
             })
             .catch(err => notification.warning(err))
     }
-};
+}
