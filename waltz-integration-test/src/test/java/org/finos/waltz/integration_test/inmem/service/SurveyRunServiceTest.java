@@ -92,6 +92,7 @@ public class SurveyRunServiceTest extends BaseInMemoryIntegrationTest {
                 .surveyTemplateId(tId)
                 .addInvolvementKindIds(invKind)
                 .dueDate(DateTimeUtilities.today().plusMonths(1))
+                .approvalDueDate(DateTimeUtilities.today().plusMonths(1))
                 .contactEmail("someone@somewhere.com")
                 .build();
 

@@ -37,6 +37,7 @@ public class SurveyInstanceStateMachineTest {
                     .build())
             .status(APPROVED)
             .dueDate(LocalDate.now())
+            .approvalDueDate(LocalDate.now())
             .build();
 
     private final SurveyInstance surveyWithApprovedDate = ImmutableSurveyInstance

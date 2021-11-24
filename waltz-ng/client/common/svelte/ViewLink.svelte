@@ -76,6 +76,10 @@
         "main.server.view": {
             path: ctx => `server/${ctx.id}`,
             title: "Server View"
+        },
+        "main.survey.instance.view": {
+            path: ctx => `survey/instance/${ctx.id}/response/view`,
+            title: "Server View"
         }
     };
 
