@@ -19,18 +19,17 @@
 import {remote} from "./remote";
 import {CORE_API} from "../common/services/core-api-utils";
 
-export function mkSurveyQuestionStore() {
+export function mkSurveyTemplateStore() {
 
-    const findQuestionsForInstance = (id) => remote
-        .fetchViewList("GET", `api/survey-question/questions/instance/${id}`);
-
-    const findQuestionsForTemplate = (id, force = false) => remote
-        .fetchViewList("GET", `api/survey-question/questions/template/${id}`, [], {force});
+    const findAll  = (force = false) => remote.fetchViewList(
+        "GET",
+        "api/survey-template",
+        [],
+        {force});
 
     return {
-        findQuestionsForInstance,
-        findQuestionsForTemplate
+        findAll
     };
 }
 
-export const surveyQuestionStore = mkSurveyQuestionStore();
+export const surveyTemplateStore = mkSurveyTemplateStore();
