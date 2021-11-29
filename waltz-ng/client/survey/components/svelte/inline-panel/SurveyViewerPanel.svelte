@@ -6,6 +6,7 @@
     import {surveyInstanceViewStore} from "../../../../svelte-stores/survey-instance-view-store";
     import EntityInfoPanel from "../../../../common/svelte/info-panels/EntityInfoPanel.svelte";
     import SurveyOverviewSubPanel from "./SurveyOverviewSubPanel.svelte";
+    import SurveyInstanceInfoPanel from "../../../../common/svelte/info-panels/SurveyInstanceInfoPanel.svelte";
 
     export let primaryEntityRef;
 
@@ -100,8 +101,8 @@
         </ul>
     {:else if selectedTab === 'detail'}
         <!-- SURVEY INSTANCE DETAILS -->
-        <EntityInfoPanel {primaryEntityRef}>
-        </EntityInfoPanel>
+        <SurveyInstanceInfoPanel {primaryEntityRef}>
+        </SurveyInstanceInfoPanel>
     {/if}
     </div>
 </div>
