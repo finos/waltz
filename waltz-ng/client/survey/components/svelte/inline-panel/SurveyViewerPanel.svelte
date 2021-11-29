@@ -1,57 +1,13 @@
 <script>
 
     import Icon from "../../../../common/svelte/Icon.svelte";
-    import {groupedQuestions, questions, responsesByQuestionId, selectedSection} from "./survey-detail-store";
+    import {groupedQuestions, responsesByQuestionId, selectedSection} from "./survey-detail-store";
     import _ from "lodash";
-    import {surveyInstanceStore} from "../../../../svelte-stores/survey-instance-store";
-    import {actionToIcon} from "./survey-viewer-utils";
     import {surveyInstanceViewStore} from "../../../../svelte-stores/survey-instance-view-store";
-    import EntityLink from "../../../../common/svelte/EntityLink.svelte";
-    import {determineAvailableStatusActions} from "../../../survey-actions";
-    import toasts from "../../../../svelte-stores/toast-store";
-    import {displayError} from "../../../../common/error-utils";
-    import NoData from "../../../../common/svelte/NoData.svelte";
     import EntityInfoPanel from "../../../../common/svelte/info-panels/EntityInfoPanel.svelte";
+    import SurveyOverviewSubPanel from "./SurveyOverviewSubPanel.svelte";
 
     export let primaryEntityRef;
-    let selectedTab = 'sections';
-
-    $: findPossibleActionsCall = surveyInstanceStore.findPossibleActions(primaryEntityRef?.id);
-    $: possibleActions = $findPossibleActionsCall?.data;
-
-    $: actionList = determineAvailableStatusActions(
-        _.isNull(survey?.surveyInstance?.originalInstanceId),
-        possibleActions || [])
-
-    $: surveyCall = surveyInstanceViewStore.getById(primaryEntityRef?.id);
-    $: survey = $surveyCall?.data;
-
-    $: surveyName = survey?.surveyInstance?.name || survey?.surveyRun?.name || survey?.surveyTemplateRef?.name
-
-    function invokeAction(action, surveyInstanceId) {
-        const display = action.actionDisplay
-        const verb = action.verb
-        const name = action.actionName
-
-        // SHOW MESSAGE
-        const msg = `Are you sure you want to ${_.toLower(display)} this survey?`;
-        const reason = action.isCommentMandatory
-            ? prompt(msg + " Please enter a reason below (mandatory):", verb)
-            : confirm(msg);
-
-        const updateCmd = {action: name, reason: reason};
-
-        const prom = reason
-            ? Promise.resolve(surveyInstanceStore.updateStatus(surveyInstanceId, updateCmd))
-                .then(() => {
-                    toasts.success("Survey response " + verb + " successfully")
-                    surveyCall = surveyInstanceViewStore.getById(surveyInstanceId, true);
-                    findPossibleActionsCall = surveyInstanceStore.findPossibleActions(surveyInstanceId, true);
-                })
-                .catch(e => displayError("Unable to update status of survey. " + e.error, e))
-            : Promise.reject(display + " cancelled")
-                .catch(e => toasts.info(e))
-    }
 
     function selectSection(section) {
         if ($selectedSection === section) {
@@ -68,6 +24,16 @@
             .size();
     }
 
+    function onAction(evt) {
+        const surveyInstanceId = evt.detail;
+        surveyCall = surveyInstanceViewStore.getById(surveyInstanceId, true);
+    }
+
+    let selectedTab = 'sections';
+
+    $: surveyCall = surveyInstanceViewStore.getById(primaryEntityRef?.id);
+    $: survey = $surveyCall?.data;
+
     $: questionsWithResponse = _
         .chain(_.values($responsesByQuestionId))
         .filter(d => !_.isEmpty(d.stringResponse)
@@ -82,56 +48,12 @@
 
     $: sectionList = $groupedQuestions;
 
-    $: hasMandatoryQuestionsWithoutResponse = _.some($questions, q => q.isMandatory && !_.includes(questionsWithResponse, q.id));
-
 </script>
 
-<div class="waltz-sub-section show-border">
-    <div class="wss-name">
-        Overview
-    </div>
-    <div class="wss-content">
-        <div style="padding: 0.5em">
-            <table class="table table-condensed small">
-                <tbody>
-                    <tr>
-                        <td>Survey</td>
-                        <td>
-                            <EntityLink ref={Object.assign({}, survey?.surveyInstance, {name: surveyName})}/>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>Subject</td>
-                        <td>
-                            <EntityLink ref={survey?.surveyInstance?.surveyEntity}/>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            {#if !_.isEmpty(actionList)}
-                <ul class="list-inline">
-                    {#each actionList as action}
-                        <li>
-                            <button class={`btn btn-xs ${actionToIcon[action?.actionName].class}`}
-                                    disabled={action.actionName === 'SUBMITTING' && hasMandatoryQuestionsWithoutResponse}
-                                    on:click={() => invokeAction(action, primaryEntityRef?.id)}>
-                                <Icon name={actionToIcon[action?.actionName].icon}/>{action?.actionDisplay}
-                            </button>
-                        </li>
-                    {/each}
-                </ul>
-                {#if hasMandatoryQuestionsWithoutResponse}
-                    <div style="padding-top: 0.5em"
-                         class="small">
-                        <NoData type="warning">
-                            <Icon name="exclamation-triangle"/>There are mandatory questions that have not been completed for this survey
-                        </NoData>
-                    </div>
-                {/if}
-            {/if}
-        </div>
-    </div>
-</div>
+<SurveyOverviewSubPanel on:action={onAction}
+                        {questionsWithResponse}
+                        {survey}/>
+
 
 <div class="waltz-tabs" style="padding-top: 1em">
     <!-- TAB HEADERS -->
@@ -155,8 +77,8 @@
     </label>
 
     <div class="wt-tab wt-active">
-    <!-- SERVERS -->
     {#if selectedTab === 'sections'}
+        <!-- SECTIONS -->
         <div class="help-block small">
             <Icon name="info-circle"/>Select a section below to focus on its questions
         </div>
@@ -177,6 +99,7 @@
             {/each}
         </ul>
     {:else if selectedTab === 'detail'}
+        <!-- SURVEY INSTANCE DETAILS -->
         <EntityInfoPanel {primaryEntityRef}>
         </EntityInfoPanel>
     {/if}

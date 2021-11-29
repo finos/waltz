@@ -24,7 +24,7 @@ export function mkSurveyInstanceStore() {
         .fetchViewDatum("GET", `api/survey-instance/${id}/permissions`);
 
     const findPossibleActions = (id, force = false) => remote
-        .fetchViewDatum("GET", `api/survey-instance/${id}/actions`, [], {force});
+        .fetchViewList("GET", `api/survey-instance/${id}/actions`, [], {force});
 
     const findRecipients = (id) => remote
         .fetchViewList("GET",`api/survey-instance/${id}/recipients`);

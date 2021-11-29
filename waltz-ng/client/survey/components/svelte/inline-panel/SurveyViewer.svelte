@@ -26,7 +26,9 @@
     $: responsesCall = surveyInstanceStore.findResponses(primaryEntityRef?.id);
     $: $responses = $responsesCall?.data;
 
-    $: sectionsToShow = $selectedSection ? [$selectedSection] : $groupedQuestions;
+    $: sectionsToShow = $selectedSection
+        ? [$selectedSection]
+        : $groupedQuestions;
 
 </script>
 

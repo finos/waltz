@@ -3,6 +3,7 @@
     import _ from "lodash";
 
     export let text = "";
+    export let context = {};
 
     let expanded = false;
 
@@ -12,17 +13,24 @@
 
 <div class={hasLongDescription && !expanded ? "wdf-description" : ""}>
     <div class={hasLongDescription && !expanded ? "wdf-description-fade" : ""}></div>
-    <Markdown text={text}/>
+    <Markdown {text} {context}/>
 </div>
 {#if hasLongDescription}
-    <button class="btn btn-skinny small pull-right"
-            on:click={() => expanded = !expanded}>
-        {expanded ? "Show less" : "Show more"}
-    </button>
+    <div class="expander">
+        <button class="btn btn-skinny small"
+                on:click={() => expanded = !expanded}>
+            {expanded ? "Show less" : "Show more"}
+        </button>
+    </div>
 {/if}
 
 
 <style>
+
+    .expander {
+        text-align: right;
+        width: 100%;
+    }
 
     .wdf-description {
         position:relative;
@@ -32,9 +40,9 @@
 
     .wdf-description-fade {
         position:absolute;
-        top:2em;
+        top:1em;
         width:100%;
-        height:4em;
+        height:5em;
         background: -webkit-linear-gradient(transparent, white);
         background: -o-linear-gradient(transparent, white);
         background: -moz-linear-gradient(transparent, white);
