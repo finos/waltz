@@ -29,19 +29,18 @@
 
     <waltz-section>
         <div class="row">
-            <div class="col-sm-4">
-                <waltz-svelte-component component="$ctrl.TestPage">
+            <div class="col-sm-6">
+                <waltz-svelte-component ng-if="$ctrl.gridId"
+                                        component="$ctrl.TestPage"
+                                        grid-id="$ctrl.gridId"
+                                        column-defs="$ctrl.columnDefs">
 
                 </waltz-svelte-component>
             </div>
-            <div class="col-sm-4">
-                <waltz-svelte-component component="$ctrl.TestPage">
-
-                </waltz-svelte-component>
-            </div>
-             <div class="col-sm-4">
-                <waltz-svelte-component component="$ctrl.TestPage">
-
+            <div class="col-sm-6">
+                <waltz-svelte-component component="$ctrl.TestPage"
+                                        grid-id="$ctrl.gridId"
+                                        column-defs="$ctrl.columnDefs">
                 </waltz-svelte-component>
             </div>
         </div>

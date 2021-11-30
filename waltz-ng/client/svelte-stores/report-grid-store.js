@@ -16,24 +16,19 @@
  *
  */
 
-package org.finos.waltz.model.involvement_kind;
+import {remote} from "./remote";
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.finos.waltz.model.*;
-import org.immutables.value.Value;
+export function mkReportGridStore() {
 
-@Value.Immutable
-@JsonSerialize(as = ImmutableInvolvementKind.class)
-@JsonDeserialize(as = ImmutableInvolvementKind.class)
-public abstract class InvolvementKind implements
-        IdProvider,
-        NameProvider,
-        DescriptionProvider,
-        LastUpdatedProvider {
+    const updateColumnDefinitions = (id, updatecommand) => remote
+        .execute(
+            "POST",
+            `api/report-grid/id/${id}/column-definitions/update`,
+            updatecommand);
 
-    @Value.Default
-    public EntityKind kind() {
-        return EntityKind.INVOLVEMENT_KIND;
-    }
+    return {
+        updateColumnDefinitions
+    };
 }
+
+export const reportGridStore = mkReportGridStore();

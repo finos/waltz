@@ -18,14 +18,13 @@
 
 package org.finos.waltz.service.report_grid;
 
+import org.finos.waltz.model.*;
+import org.finos.waltz.model.changelog.ImmutableChangeLog;
+import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.rating_scheme.RatingSchemeService;
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.report_grid.ReportGridDao;
-import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.HierarchyQueryScope;
-import org.finos.waltz.model.IdSelectionOptions;
-import org.finos.waltz.model.ImmutableIdSelectionOptions;
 import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.model.report_grid.*;
@@ -35,8 +34,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
+import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.SetUtilities.map;
 
@@ -46,6 +47,7 @@ public class ReportGridService {
     private final RatingSchemeService ratingSchemeService;
     private final ApplicationDao applicationDao;
     private final ReportGridDao reportGridDao;
+    private final ChangeLogService changeLogService;
 
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
 
@@ -53,14 +55,17 @@ public class ReportGridService {
     @Autowired
     public ReportGridService(ReportGridDao reportGridDao,
                              ApplicationDao applicationDao,
-                             RatingSchemeService ratingSchemeService) {
+                             RatingSchemeService ratingSchemeService,
+                             ChangeLogService changeLogService) {
         checkNotNull(reportGridDao, "reportGridDao cannot be null");
         checkNotNull(applicationDao, "applicationDao cannot be null");
         checkNotNull(ratingSchemeService, "ratingSchemeService cannot be null");
+        checkNotNull(changeLogService, "changeLogService cannot be null");
 
         this.reportGridDao = reportGridDao;
         this.applicationDao = applicationDao;
         this.ratingSchemeService = ratingSchemeService;
+        this.changeLogService = changeLogService;
     }
 
 
@@ -112,5 +117,10 @@ public class ReportGridService {
         return instance;
     }
 
+    public ReportGridDefinition updateColumnDefinitions(long reportGridId,
+                                                        ReportGridColumnDefinitionsUpdateCommand updateCommand) {
 
+        int newColumnCount = reportGridDao.updateColumnDefinitions(reportGridId, updateCommand.columnDefinitions());
+        return reportGridDao.getGridDefinitionById(reportGridId);
+    }
 }

@@ -2,39 +2,48 @@
 
     import EntitySelector from "./EntitySelector.svelte";
     import _ from "lodash";
+    import {mkRef, sameRef} from "../../common/entity-utils";
+    import ReportGridColumnSummary from "./ReportGridColumnSummary.svelte";
+    import {columnUsageKind, ratingRollupRule} from "./report-grid-utils";
 
-    let selectedEntities = [];
+    export let gridId;
+    export let columnDefs = [];
+
+    $: columnDefinitions = columnDefs;
 
     function onSelect(d) {
-        selectedEntities = _.concat(selectedEntities, d);
+        const column = {
+            columnEntityReference: mkRef(d.kind, d.id, d.name || d.questionText, d.description),
+            usageKind: columnUsageKind.NONE.key,
+            ratingRollupRule: ratingRollupRule.NONE.key,
+            position: 0,
+        }
+        columnDefs = _.concat(columnDefs, column);
     }
 
-    function clearSelectedEntity(d) {
-        selectedEntities = _.without(selectedEntities, d);
+    function removeColumn(d) {
+        columnDefs = _.reject(
+            columnDefs,
+            r => sameRef(r.columnEntityReference, d.columnEntityReference));
     }
 
-    let alreadyExists;
-
-    $: alreadyExists = (d) => {
-        console.log({selectedEntities, d});
-        return !_.includes(selectedEntities, d)
+    $: canBeAdded = (d) => {
+        console.log({columnDefs, d})
+        return !_.some(
+            columnDefs,
+            r => sameRef(r.columnEntityReference, d));
     }
-
-    console.log({selectedEntities});
 
 </script>
-<p>Selected:</p>
-<ul>
-    {#each selectedEntities as entity}
-        <li>{entity.name}
-            <button class="btn btn-skinny small"
-                    on:click={() => clearSelectedEntity(entity)}>
-                Clear
-            </button></li>
-    {/each}
-</ul>
+
+{#if gridId}
+<ReportGridColumnSummary {columnDefs}
+                         {gridId}
+                         onRemove={removeColumn}/>
+{/if}
 
 <hr>
 
 <EntitySelector onSelect={onSelect}
-                selectionFilter={alreadyExists}/>
+                onDeselect={removeColumn}
+                selectionFilter={canBeAdded}/>

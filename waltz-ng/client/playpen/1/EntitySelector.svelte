@@ -6,6 +6,7 @@
     import EntityPicker from "./EntityPicker.svelte";
 
     export let onSelect = (d) => console.log("Selecting entity", d);
+    export let onDeselect = (d) => console.log("Deselecting entity", d);
     export let selectionFilter = () => true;
 
     let selectedEntityKind = null;
@@ -30,11 +31,7 @@
 
     function onSelectEntity(d) {
         onSelect(d);
-        selectedEntityKind = null;
-        showDropdown = false;
     }
-
-    $: console.log({entityKinds, selectedEntityKind, showDropdown});
 
 </script>
 
@@ -95,6 +92,7 @@
     <div class="col-sm-12">
         {#if selectedEntityKind}
             <EntityPicker onSelect={onSelectEntity}
+                          {onDeselect}
                           {selectionFilter}
                           entityKind={selectedEntityKind?.key}/>
         {:else}

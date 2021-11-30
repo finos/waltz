@@ -23,10 +23,14 @@ import InvolvementPicker from "./InvolvementPicker.svelte";
 import EntityPicker from "./EntityPicker.svelte";
 import EntitySelector from "./EntitySelector.svelte";
 import TestPage from "./TestPage.svelte";
+import {mkSelectionOptions} from "../../common/selector-utils";
+import {CORE_API} from "../../common/services/core-api-utils";
+import _ from "lodash";
 
 const initData = {
     // parentEntityRef: {id: 20768, kind: "APPLICATION"}
     parentEntityRef: {id: 39855, kind: "SURVEY_INSTANCE"},
+    orgEntityRef: {id: 95, kind: "ORG_UNIT"},
     // parentEntityRef: {id: 76823, kind: "SURVEY_INSTANCE"},
     measurableEntityRef: {id: 54566, kind: "MEASURABLE"},
     InvolvementPicker,
@@ -44,6 +48,14 @@ function controller($q,
 
     vm.$onInit = () => {
 
+        serviceBroker.loadViewData(
+            CORE_API.ReportGridStore.getViewById,
+            [3, mkSelectionOptions(vm.orgEntityRef)])
+            .then(d => {
+                const report = d.data;
+                vm.columnDefs = _.orderBy(report.definition.columnDefinitions, d => d.position) || []
+                vm.gridId = report.definition.id;
+            });
 
     }
 

@@ -18,6 +18,8 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.model.report_grid.ReportGridColumnDefinitionsUpdateCommand;
+import org.finos.waltz.model.report_grid.ReportGridDefinition;
 import org.finos.waltz.service.report_grid.ReportGridService;
 import org.finos.waltz.web.endpoints.Endpoint;
 import org.finos.waltz.model.report_grid.ReportGrid;
@@ -29,8 +31,7 @@ import spark.Response;
 import java.io.IOException;
 
 import static org.finos.waltz.web.WebUtilities.*;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.postForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class ReportGridEndpoint implements Endpoint {
@@ -50,12 +51,12 @@ public class ReportGridEndpoint implements Endpoint {
     public void register() {
         String findAllPath = mkPath(BASE_URL, "all");
         String getViewByIdPath = mkPath(BASE_URL, "view", "id", ":id");
-//        String findByExtIdPath = mkPath(BASE_URL, "view", "external-id", ":externalId");
+        String updateColumnDefsPath = mkPath(BASE_URL, "id", ":id", "column-definitions", "update");
 
 
         getForDatum(findAllPath, (req, resp) -> reportGridService.findAll());
         postForDatum(getViewByIdPath, this::getViewByIdRoute);
-//        postForDatum(findByExtIdPath, this::getByExtIdRoute);
+        postForDatum(updateColumnDefsPath, this::updateColumnDefsRoute);
     }
 
 
@@ -63,6 +64,10 @@ public class ReportGridEndpoint implements Endpoint {
         return reportGridService.getByIdAndSelectionOptions(
                 getId(req),
                 readIdSelectionOptionsFromBody(req));
+    }
+
+    public ReportGridDefinition updateColumnDefsRoute(Request req, Response resp) throws IOException {
+        return reportGridService.updateColumnDefinitions(getId(req), readBody(req, ReportGridColumnDefinitionsUpdateCommand.class));
     }
 
 

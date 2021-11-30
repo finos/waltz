@@ -7,6 +7,7 @@
     import MeasurablePicker from "./MeasurablePicker.svelte";
 
     export let onSelect = (d) => console.log("Selecting an entity", d);
+    export let onDeselect = (d) => console.log("Deselecting an entity", d);
     export let entityKind;
     export let selectionFilter = () => true
 
@@ -31,4 +32,7 @@
 
 </script>
 
-<svelte:component {onSelect} {selectionFilter} this={comp}/>
+<svelte:component {onSelect}
+                  {onDeselect}
+                  {selectionFilter}
+                  this={comp}/>

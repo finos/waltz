@@ -34,16 +34,28 @@
         selectedTemplate = template;
     }
 
+    function clearSelectedTemplate() {
+        selectedTemplate = null;
+    }
+
 </script>
 
 {#if selectedTemplate}
     <p>Questions for template: {selectedTemplate.name}</p>
-    <div class="help-block small"><Icon name="info-circle"/>Select a question from the list below, you can filter the list using the search bar.</div>
+    <div class="help-block small">
+        <Icon name="info-circle"/>Select a question from the list below, you can filter the list using the search bar or
+        <button on:click={clearSelectedTemplate}
+                class="btn-skinny">
+            choose a different template
+        </button>.
+    </div>
     <Grid {columnDefs}
           {rowData}
           onSelectRow={onSelect}/>
 {:else}
-    <div class="help-block small"><Icon name="info-circle"/>Select a template from the list below, you can filter the list using the search bar.</div>
+    <div class="help-block small">
+        <Icon name="info-circle"/>Select a template from the list below, you can filter the list using the search bar.
+    </div>
     <Grid columnDefs={templateColumnDefs}
           rowData={templates}
           onSelectRow={selectTemplate}/>

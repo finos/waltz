@@ -19,13 +19,14 @@
 package org.finos.waltz.data.report_grid;
 
 
-import org.finos.waltz.schema.Tables;
-import org.finos.waltz.schema.tables.records.ReportGridRecord;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.report_grid.*;
+import org.finos.waltz.schema.Tables;
+import org.finos.waltz.schema.tables.records.ReportGridColumnDefinitionRecord;
+import org.finos.waltz.schema.tables.records.ReportGridRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
@@ -37,14 +38,12 @@ import java.util.Comparator;
 import java.util.*;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
-import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-import static org.finos.waltz.schema.Tables.*;
-import static org.finos.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.function.Function.identity;
-import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.DateTimeUtilities.toLocalDateTime;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.MapUtilities.groupBy;
@@ -54,6 +53,8 @@ import static org.finos.waltz.common.StringUtilities.join;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.survey.SurveyInstanceStatus.APPROVED;
 import static org.finos.waltz.model.survey.SurveyInstanceStatus.COMPLETED;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.InvolvementKind.INVOLVEMENT_KIND;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
@@ -117,6 +118,32 @@ public class ReportGridDao {
     public ReportGridDefinition getGridDefinitionByExternalId(String externalId) {
         return getGridDefinitionByCondition(rg.EXTERNAL_ID.eq(externalId));
     }
+
+
+    public int updateColumnDefinitions(long gridId, List<ReportGridColumnDefinition> columnDefinitions) {
+
+        int clearedColumns = dsl
+                .deleteFrom(rgcd)
+                .where(rgcd.REPORT_GRID_ID.eq(gridId))
+                .execute();
+
+        int[] columnsUpdated = columnDefinitions
+                .stream()
+                .map(d -> {
+                    ReportGridColumnDefinitionRecord record = dsl.newRecord(rgcd);
+                    record.setReportGridId(gridId);
+                    record.setColumnEntityId(d.columnEntityReference().id());
+                    record.setColumnEntityKind(d.columnEntityReference().kind().name());
+                    record.setColumnUsageKind(d.usageKind().name());
+                    record.setRatingRollupRule(d.ratingRollupRule().name());
+                    record.setPosition(Long.valueOf(d.position()).intValue());
+                    return record;
+                })
+                .collect(collectingAndThen(toSet(), d -> dsl.batchInsert(d).execute()));
+
+        return IntStream.of(columnsUpdated).sum();
+    }
+
 
 
     // --- Helpers ---
@@ -417,7 +444,7 @@ public class ReportGridDao {
                             .orElse(null);
                 })
                 .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
+                .collect(toSet());
     }
 
 

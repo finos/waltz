@@ -71,6 +71,7 @@ public enum EntityKind {
     PHYSICAL_FLOW("Physical flow"),
     PROCESS_DIAGRAM("Process Diagram"),
     RELATIONSHIP_KIND("Relationship Kind"),
+    REPORT_GRID("Report Grid"),
     ROADMAP("Roadmap"),
     SCENARIO("Scenario"),
     SERVER("Server"),

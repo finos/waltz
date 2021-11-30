@@ -1,16 +1,16 @@
 <script>
 
-    import {involvementKindStore} from "../../svelte-stores/involvement-kind-store";
     import Grid from "./Grid.svelte";
     import Icon from "../../common/svelte/Icon.svelte";
     import _ from "lodash";
-    import {assessmentDefinitionStore} from "../../svelte-stores/assessment-definition";
     import {measurableCategoryStore} from "../../svelte-stores/measurable-category-store";
     import {measurableStore} from "../../svelte-stores/measurables";
     import {mkSelectionOptions} from "../../common/selector-utils";
-    import {mkRef} from "../../common/entity-utils";
+    import {buildHierarchies} from "../../common/hierarchy-utils";
+    import MeasurableTreeSelector from "./MeasurableTreeSelector.svelte";
 
-    export let onSelect = () => console.log("Selecting involvement kind");
+    export let onSelect = () => console.log("Selecting measurable");
+    export let onDeselect = () => console.log("Deselecting measurable");
     export let selectionFilter = () => true;
 
     $: measurableCategoriesCall = measurableCategoryStore.findAll();
@@ -20,8 +20,11 @@
     $: measurables = $measurablesCall?.data || [];
 
     let selectedCategory = null;
+    let rowData;
+    let selected = [];
 
-    $: rowData = _.filter(measurables, selectionFilter)
+    $: [rowData, selected] = _.partition(measurables, selectionFilter);
+    $: selectedIds = _.map(selected, d => d.id);
 
     const categoryColumnDefs = [
         { field: "name", name: "Measurable Category", width: "30%"},
@@ -37,18 +40,37 @@
         selectedCategory = d;
     }
 
-    $: console.log({categories, measurables})
+    function clearSelectedCategory(){
+        selectedCategory = null;
+    }
+
+    $: hierarchy = { name:"root", hideNode: true, children: buildHierarchies(measurables, false)};
 
 </script>
 
 
 {#if selectedCategory}
-    <div class="help-block small"><Icon name="info-circle"/>Select a measurable from the list below, you can filter the list using the search bar.</div>
-    <Grid {columnDefs}
-          {rowData}
-          onSelectRow={onSelect}/>
+    <h4>
+        {selectedCategory.name}
+    </h4>
+
+    <div class="help-block small">
+        <span>
+            <Icon name="info-circle"/>Select a measurable from the list below, you can filter the list using the search bar or
+            <button on:click={clearSelectedCategory}
+                    class="btn-skinny">
+                choose a different category
+            </button>.
+        </span>
+    </div>
+    <MeasurableTreeSelector measurables={measurables}
+                            selected={selected}
+                            {onSelect}
+                            {onDeselect}/>
 {:else}
-    <div class="help-block small"><Icon name="info-circle"/>Select a measurable from the list below, you can filter the list using the search bar.</div>
+    <div class="help-block small">
+        <Icon name="info-circle"/>Select a category from the list below, you can filter the list using the search bar.
+    </div>
     <Grid columnDefs={categoryColumnDefs}
           rowData={categories}
           onSelectRow={selectCategory}/>
