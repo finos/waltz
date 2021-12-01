@@ -1,14 +1,14 @@
 <script>
 
-    import NoData from "../../common/svelte/NoData.svelte";
-    import Icon from "../../common/svelte/Icon.svelte";
+    import NoData from "../../../../common/svelte/NoData.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
     import DropdownPicker from "./DropdownPicker.svelte";
-    import {columnUsageKind, ratingRollupRule} from "./report-grid-utils";
+    import {columnUsageKind, ratingRollupRule} from "../../../../playpen/1/report-grid-utils";
     import _ from "lodash"
-    import {entity} from "../../common/services/enums/entity";
-    import {move} from "../../common/list-utils";
-    import {reportGridStore} from "../../svelte-stores/report-grid-store";
-    import toasts from "../../svelte-stores/toast-store";
+    import {entity} from "../../../../common/services/enums/entity";
+    import {move} from "../../../../common/list-utils";
+    import {reportGridStore} from "../../../../svelte-stores/report-grid-store";
+    import toasts from "../../../../svelte-stores/toast-store";
 
     export let onRemove = () => console.log("Removing entity")
     export let columnDefs = [];

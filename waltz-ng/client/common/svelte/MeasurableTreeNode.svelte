@@ -1,7 +1,6 @@
 <script>
 
-    import Icon from "../../common/svelte/Icon.svelte";
-    import {createEventDispatcher} from "svelte";
+    import Icon from "./Icon.svelte";
     import _ from "lodash";
 
     export let tree;
@@ -9,8 +8,6 @@
     export let expanded = false;
     export let onSelect = () => console.log("selecting")
     export let onDeselect = () => console.log("deselecting")
-
-    let dispatch = createEventDispatcher();
 
     function toggleExpanded() {
         expanded = !expanded;
@@ -28,13 +25,13 @@
     {/if}
     {#if tree.isSelected}
         <button class="btn btn-skinny"
-                on:click|stopPropagation={() => console.log({tree}) || onDeselect(tree)}>
+                on:click|stopPropagation={() => onDeselect(tree)}>
             <Icon name="check-square-o"/>
             {tree.name}
         </button>
     {:else}
         <button class="btn btn-skinny"
-                on:click|stopPropagation={() => console.log({tree}) || onSelect(tree)}>
+                on:click|stopPropagation={() => onSelect(tree)}>
             <Icon name="square-o"/>
             {tree.name}
         </button>

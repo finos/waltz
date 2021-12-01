@@ -1,13 +1,13 @@
 <script>
 
-    import Grid from "./Grid.svelte";
-    import Icon from "../../common/svelte/Icon.svelte";
+    import Grid from "../../../../playpen/1/Grid.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
     import _ from "lodash";
-    import {measurableCategoryStore} from "../../svelte-stores/measurable-category-store";
-    import {measurableStore} from "../../svelte-stores/measurables";
-    import {mkSelectionOptions} from "../../common/selector-utils";
-    import {buildHierarchies} from "../../common/hierarchy-utils";
-    import MeasurableTreeSelector from "./MeasurableTreeSelector.svelte";
+    import {measurableCategoryStore} from "../../../../svelte-stores/measurable-category-store";
+    import {measurableStore} from "../../../../svelte-stores/measurables";
+    import {mkSelectionOptions} from "../../../../common/selector-utils";
+    import {buildHierarchies} from "../../../../common/hierarchy-utils";
+    import MeasurableTreeSelector from "../../../../common/svelte/MeasurableTreeSelector.svelte";
 
     export let onSelect = () => console.log("Selecting measurable");
     export let onDeselect = () => console.log("Deselecting measurable");

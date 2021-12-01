@@ -2,10 +2,9 @@
 
     import MeasurableTreeNode from "./MeasurableTreeNode.svelte";
     import _ from "lodash";
-    import {buildHierarchies, doSearch, prepareSearchNodes} from "../../common/hierarchy-utils";
-    import {createEventDispatcher} from "svelte";
-    import {sameRef} from "../../common/entity-utils";
-    import SearchInput from "../../common/svelte/SearchInput.svelte";
+    import {buildHierarchies, doSearch, prepareSearchNodes} from "../hierarchy-utils";
+    import {sameRef} from "../entity-utils";
+    import SearchInput from "./SearchInput.svelte";
 
     export let measurables;
     export let depth = 0;
@@ -16,8 +15,6 @@
     let expanded = true;
     let qry = "";
     let searchNodes = [];
-
-    let dispatch = createEventDispatcher();
 
     function calcDisplayHierarchy(nodes, query, selected) {
 

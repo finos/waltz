@@ -20,14 +20,24 @@ import {remote} from "./remote";
 
 export function mkReportGridStore() {
 
+    const findAll = (force = false) => remote
+        .fetchAppList("GET", "api/report-grid/all", [], {force});
+
     const updateColumnDefinitions = (id, updatecommand) => remote
         .execute(
             "POST",
             `api/report-grid/id/${id}/column-definitions/update`,
             updatecommand);
 
+    const create = (createCommand) => {
+        return remote.execute("POST", "api/report-grid/create", createCommand);
+    }
+
+
     return {
-        updateColumnDefinitions
+        findAll,
+        updateColumnDefinitions,
+        create
     };
 }
 

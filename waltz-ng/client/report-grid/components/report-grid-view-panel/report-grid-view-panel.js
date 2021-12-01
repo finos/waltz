@@ -27,18 +27,22 @@ import {determineForegroundColor} from "../../../common/colors";
 import {rgb} from "d3-color";
 import {scaleLinear} from "d3-scale";
 import extent from "d3-array/src/extent";
+import ReportGridControlPanel from "../svelte/ReportGridControlPanel.svelte";
+import {selectedGrid} from "../svelte/report-grid-store";
 
 const bindings = {
     parentEntityRef: "<",
-    gridId: "<"
+    // gridId: "<"
 };
 
 const initData = {
     categoryExtId: "CLOUD_READINESS",
     selectedCounterId: null,
     activeSummaryColRefs: [],
-    filters: []
+    filters: [],
+    ReportGridControlPanel
 };
+const localStorageKey = "waltz-report-grid-view-section-last-id";
 
 const nameCol = mkEntityLinkGridCell(
     "Name",
@@ -331,7 +335,7 @@ function mkRowFilter(filters = []) {
 }
 
 
-function controller(serviceBroker) {
+function controller($scope, serviceBroker, localStorageService) {
 
     const vm = initialiseData(this, initData);
 
@@ -374,20 +378,17 @@ function controller(serviceBroker) {
 
     }
 
-    vm.$onChanges = () => {
-        if (! vm.parentEntityRef) return;
-
-        vm.selectionOptions = mkSelectionOptions(vm.parentEntityRef);
-
-        vm.loading = true;
+    function loadGridData() {
         serviceBroker
             .loadViewData(
                 CORE_API.ReportGridStore.getViewById,
-                [vm.gridId, mkSelectionOptions(vm.parentEntityRef)])
+                [vm.gridId, mkSelectionOptions(vm.parentEntityRef)], {force: true})
             .then(r => {
+                console.log(r.data);
                 vm.filters = [];
                 vm.loading = false;
                 vm.rawGridData = r.data;
+                selectedGrid.set(r.data.definition);
                 vm.allTableData = prepareTableData(vm.rawGridData);
                 vm.allColumnDefs = prepareColumnDefs(vm.rawGridData);
                 vm.activeSummaryColRefs = _
@@ -397,6 +398,26 @@ function controller(serviceBroker) {
                     .value();
                 refresh();
             });
+    }
+
+    vm.$onChanges = () => {
+        if (! vm.parentEntityRef) return;
+
+        if (vm.gridId) {
+
+            vm.selectionOptions = mkSelectionOptions(vm.parentEntityRef);
+
+            vm.loading = true;
+            loadGridData();
+        }
+    };
+
+    vm.onGridSelect = (grid) => {
+        $scope.$applyAsync(() => {
+            localStorageService.set(localStorageKey, grid.id);
+            vm.gridId = grid.id;
+            loadGridData();
+        });
     };
 
     vm.onToggleFilter = (counter) => {
@@ -433,7 +454,7 @@ function controller(serviceBroker) {
     };
 }
 
-controller.$inject = ["ServiceBroker"];
+controller.$inject = ["$scope", "ServiceBroker", "localStorageService"];
 
 const component = {
     controller,

@@ -2,9 +2,9 @@
 
     import EntitySelector from "./EntitySelector.svelte";
     import _ from "lodash";
-    import {mkRef, sameRef} from "../../common/entity-utils";
+    import {mkRef, sameRef} from "../../../../common/entity-utils";
     import ReportGridColumnSummary from "./ReportGridColumnSummary.svelte";
-    import {columnUsageKind, ratingRollupRule} from "./report-grid-utils";
+    import {columnUsageKind, ratingRollupRule} from "../../../../playpen/1/report-grid-utils";
 
     export let gridId;
     export let columnDefs = [];

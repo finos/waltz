@@ -1,9 +1,9 @@
 <script>
 
-    import Grid from "./Grid.svelte";
-    import Icon from "../../common/svelte/Icon.svelte";
-    import {surveyTemplateStore} from "../../svelte-stores/survey-template-store";
-    import {surveyQuestionStore} from "../../svelte-stores/survey-question-store";
+    import Grid from "../../../../playpen/1/Grid.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
+    import {surveyTemplateStore} from "../../../../svelte-stores/survey-template-store";
+    import {surveyQuestionStore} from "../../../../svelte-stores/survey-question-store";
     import _ from "lodash";
 
     export let onSelect = () => console.log("Selecting involvement kind");

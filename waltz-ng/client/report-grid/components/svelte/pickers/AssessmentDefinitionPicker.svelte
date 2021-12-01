@@ -1,10 +1,9 @@
 <script>
 
-    import {involvementKindStore} from "../../svelte-stores/involvement-kind-store";
-    import Grid from "./Grid.svelte";
-    import Icon from "../../common/svelte/Icon.svelte";
+    import Grid from "../../../../playpen/1/Grid.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
     import _ from "lodash";
-    import {assessmentDefinitionStore} from "../../svelte-stores/assessment-definition";
+    import {assessmentDefinitionStore} from "../../../../svelte-stores/assessment-definition";
 
     export let onSelect = () => console.log("Selecting involvement kind");
     export let selectionFilter = () => true;

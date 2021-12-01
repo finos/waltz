@@ -19,10 +19,10 @@
 
 import template from "./playpen1.html";
 import {initialiseData} from "../../common";
-import InvolvementPicker from "./InvolvementPicker.svelte";
-import EntityPicker from "./EntityPicker.svelte";
-import EntitySelector from "./EntitySelector.svelte";
-import TestPage from "./TestPage.svelte";
+import InvolvementPicker from "../../report-grid/components/svelte/pickers/InvolvementPicker.svelte";
+import EntityPicker from "../../report-grid/components/svelte/pickers/EntityPicker.svelte";
+import EntitySelector from "../../report-grid/components/svelte/column-definition-edit-panel/EntitySelector.svelte";
+import TestPage from "../../report-grid/components/svelte/column-definition-edit-panel/ColumnDefinitionEditPanel.svelte";
 import {mkSelectionOptions} from "../../common/selector-utils";
 import {CORE_API} from "../../common/services/core-api-utils";
 import _ from "lodash";
@@ -50,7 +50,7 @@ function controller($q,
 
         serviceBroker.loadViewData(
             CORE_API.ReportGridStore.getViewById,
-            [3, mkSelectionOptions(vm.orgEntityRef)])
+            [2, mkSelectionOptions(vm.orgEntityRef)])
             .then(d => {
                 const report = d.data;
                 vm.columnDefs = _.orderBy(report.definition.columnDefinitions, d => d.position) || []

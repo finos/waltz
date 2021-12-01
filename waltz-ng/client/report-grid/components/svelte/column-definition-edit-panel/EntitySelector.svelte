@@ -1,9 +1,9 @@
 <script>
 
-    import {entity} from "../../common/services/enums/entity";
+    import {entity} from "../../../../common/services/enums/entity";
     import _ from "lodash";
-    import Icon from "../../common/svelte/Icon.svelte";
-    import EntityPicker from "./EntityPicker.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
+    import EntityPicker from "../pickers/EntityPicker.svelte";
 
     export let onSelect = (d) => console.log("Selecting entity", d);
     export let onDeselect = (d) => console.log("Deselecting entity", d);

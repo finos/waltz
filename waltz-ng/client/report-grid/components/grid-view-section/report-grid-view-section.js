@@ -2,18 +2,20 @@ import template from "./report-grid-view-section.html";
 import {initialiseData} from "../../../common";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import * as _ from "lodash";
+import ReportGridPicker from "../svelte/ReportGridPicker.svelte";
 
 const bindings = {
     parentEntityRef: "<"
 };
 
 const initData = {
-    showPicker: false
+    showPicker: false,
+    ReportGridPicker
 };
 
 const localStorageKey = "waltz-report-grid-view-section-last-id";
 
-function controller(serviceBroker, localStorageService) {
+function controller($scope, serviceBroker, localStorageService) {
 
     const vm = initialiseData(this, initData);
 
@@ -24,7 +26,7 @@ function controller(serviceBroker, localStorageService) {
             vm.showPicker = true;
         } else {
             serviceBroker
-                .loadViewData(CORE_API.ReportGridStore.findAll)
+                .loadViewData(CORE_API.ReportGridStore.findAll, [], { force: true })
                 .then(r => {
                     vm.selectedGrid = _.find(r.data, d => d.id === lastUsedGridId);
                     if (!vm.selectedGrid){
@@ -35,13 +37,18 @@ function controller(serviceBroker, localStorageService) {
     };
 
     vm.onGridSelect = (grid) => {
-        localStorageService.set(localStorageKey, grid.id);
-        vm.selectedGrid = grid;
-        vm.showPicker = false;
+        $scope.$applyAsync(() => {
+            console.log({grid})
+            localStorageService.set(localStorageKey, grid.id);
+            vm.selectedGrid = grid;
+            console.log({selectedGrid})
+            vm.showPicker = false;
+        });
     };
 }
 
 controller.$inject = [
+    "$scope",
     "ServiceBroker",
     "localStorageService"
 ];

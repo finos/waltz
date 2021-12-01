@@ -117,10 +117,17 @@ public class ReportGridService {
         return instance;
     }
 
+
     public ReportGridDefinition updateColumnDefinitions(long reportGridId,
                                                         ReportGridColumnDefinitionsUpdateCommand updateCommand) {
 
         int newColumnCount = reportGridDao.updateColumnDefinitions(reportGridId, updateCommand.columnDefinitions());
         return reportGridDao.getGridDefinitionById(reportGridId);
+    }
+
+
+    public ReportGridDefinition create(ReportGridCreateCommand createCommand, String username){
+        long gridId = reportGridDao.create(createCommand, username);
+        return reportGridDao.getGridDefinitionById(gridId);
     }
 }

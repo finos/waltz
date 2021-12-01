@@ -18,6 +18,12 @@
 
     <div ng-if="!$ctrl.loading">
         <!-- SUMMARIES -->
+
+        <waltz-svelte-component component="$ctrl.ReportGridControlPanel"
+                                selected-grid="$ctrl.selectedGrid"
+                                on-grid-select="$ctrl.onGridSelect">
+        </waltz-svelte-component>
+
         <div ng-include="'wrgvp-filters'"
              style="margin-bottom: 0.7em">
             <!-- summaries go here -->
@@ -149,7 +155,6 @@
                     </div>
                 </div>
             </div>
-
 
         </content>
     </waltz-sub-section>

@@ -1,46 +1,8 @@
 <div>
-
-    <div ng-if="$ctrl.selectedGrid">
-        <h4>
-            <span ng-bind="$ctrl.selectedGrid.name"></span>
-            <span class="small">
-                <a class="clickable"
-                   ng-click="$ctrl.showPicker = !$ctrl.showPicker"
-                   ng-bind="$ctrl.showPicker ? 'View current report' : 'Change report'">
-                </a>
-            </span>
-        </h4>
-        <waltz-markdown text="$ctrl.selectedGrid.description"></waltz-markdown>
-    </div>
-
-    <!-- PICKER -->
-    <div class="row"
-         ng-if="$ctrl.showPicker"
-         style="margin-bottom: 1em">
-        <div class="col-md-6">
-            <waltz-sub-section name="Report picker">
-                <content>
-                    <div class="waltz-sub-section-content">
-                        <waltz-report-grid-picker on-grid-select="$ctrl.onGridSelect">
-                        </waltz-report-grid-picker>
-                    </div>
-                    <div class="waltz-sub-section-controls"
-                         ng-if="$ctrl.selectedGrid">
-                        <a ng-click="$ctrl.showPicker = false"
-                           class="clickable">
-                            Close
-                        </a>
-                     </div>
-                </content>
-            </waltz-sub-section>
-        </div>
-    </div>
-
     <!-- GRID & FILTERS -->
     <div ng-if="$ctrl.selectedGrid"
          style="padding-top: 0.5em;">
-        <waltz-report-grid-view-panel parent-entity-ref="$ctrl.parentEntityRef"
-                                      grid-id="$ctrl.selectedGrid.id">
+        <waltz-report-grid-view-panel parent-entity-ref="$ctrl.parentEntityRef">
         </waltz-report-grid-view-panel>
     </div>
 </div>

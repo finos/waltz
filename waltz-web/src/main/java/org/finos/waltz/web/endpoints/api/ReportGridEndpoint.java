@@ -19,6 +19,7 @@
 package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.model.report_grid.ReportGridColumnDefinitionsUpdateCommand;
+import org.finos.waltz.model.report_grid.ReportGridCreateCommand;
 import org.finos.waltz.model.report_grid.ReportGridDefinition;
 import org.finos.waltz.service.report_grid.ReportGridService;
 import org.finos.waltz.web.endpoints.Endpoint;
@@ -50,6 +51,7 @@ public class ReportGridEndpoint implements Endpoint {
     @Override
     public void register() {
         String findAllPath = mkPath(BASE_URL, "all");
+        String createPath = mkPath(BASE_URL, "create");
         String getViewByIdPath = mkPath(BASE_URL, "view", "id", ":id");
         String updateColumnDefsPath = mkPath(BASE_URL, "id", ":id", "column-definitions", "update");
 
@@ -57,6 +59,7 @@ public class ReportGridEndpoint implements Endpoint {
         getForDatum(findAllPath, (req, resp) -> reportGridService.findAll());
         postForDatum(getViewByIdPath, this::getViewByIdRoute);
         postForDatum(updateColumnDefsPath, this::updateColumnDefsRoute);
+        postForDatum(createPath, this::createRoute);
     }
 
 
@@ -68,6 +71,10 @@ public class ReportGridEndpoint implements Endpoint {
 
     public ReportGridDefinition updateColumnDefsRoute(Request req, Response resp) throws IOException {
         return reportGridService.updateColumnDefinitions(getId(req), readBody(req, ReportGridColumnDefinitionsUpdateCommand.class));
+    }
+
+    public ReportGridDefinition createRoute(Request req, Response resp) throws IOException {
+        return reportGridService.create(readBody(req, ReportGridCreateCommand.class), getUsername(req));
     }
 
 

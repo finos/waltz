@@ -19,6 +19,7 @@
 package org.finos.waltz.data.report_grid;
 
 
+import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
@@ -145,6 +146,19 @@ public class ReportGridDao {
     }
 
 
+    public long create(ReportGridCreateCommand createCommand, String username) {
+        ReportGridRecord record = dsl.newRecord(rg);
+        record.setName(createCommand.name());
+        record.setExternalId(createCommand.externalId());
+        record.setDescription(createCommand.description());
+        record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
+        record.setLastUpdatedBy(username);
+        record.setProvenance("waltz");
+
+        int insert = record.insert();
+
+        return record.getId();
+    }
 
     // --- Helpers ---
 
