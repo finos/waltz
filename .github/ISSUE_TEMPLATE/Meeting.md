@@ -1,5 +1,5 @@
 ---
-name: 🤝 Waltz Meeting Agenda
+name: Waltz Meeting Agenda
 about: To track Waltz meeting agenda and attendance
 ---
 
