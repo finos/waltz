@@ -19,21 +19,22 @@
 package org.finos.waltz.web.endpoints.api;
 
 
+import org.finos.waltz.model.DateChangeCommand;
+import org.finos.waltz.model.person.Person;
+import org.finos.waltz.model.survey.*;
 import org.finos.waltz.service.survey.SurveyInstanceService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
-import org.finos.waltz.model.DateChangeCommand;
-import org.finos.waltz.model.survey.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static org.finos.waltz.web.WebUtilities.*;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.model.HierarchyQueryScope.EXACT;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
+import static org.finos.waltz.web.WebUtilities.*;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class SurveyInstanceEndpoint implements Endpoint {
@@ -71,9 +72,9 @@ public class SurveyInstanceEndpoint implements Endpoint {
         String updateDueDatePath = mkPath(BASE_URL, ":id", "due-date");
         String updateApprovalDueDatePath = mkPath(BASE_URL, ":id", "approval-due-date");
         String recipientPath = mkPath(BASE_URL, ":id", "recipient");
-        String deleteRecipientPath = mkPath(BASE_URL, ":id", "recipient", ":instanceRecipientId");
+        String deleteRecipientPath = mkPath(BASE_URL, ":id", "recipient", ":personId");
         String ownerPath = mkPath(BASE_URL, ":id", "owner");
-        String deleteOwnerPath = mkPath(BASE_URL, ":id", "owner", ":instanceOwnerId");
+        String deleteOwnerPath = mkPath(BASE_URL, ":id", "owner", ":personId");
         String reportProblemWithQuestionResponsePath = mkPath(BASE_URL, ":id", "response", ":questionId", "problem");
 
         DatumRoute<SurveyInstance> getByIdRoute =
@@ -94,10 +95,10 @@ public class SurveyInstanceEndpoint implements Endpoint {
         ListRoute<SurveyInstanceQuestionResponse> findResponsesRoute =
                 (req, res) -> surveyInstanceService.findResponses(getId(req));
 
-        ListRoute<SurveyInstanceRecipient> findRecipientsRoute =
+        ListRoute<Person> findRecipientsRoute =
                 (req, res) -> surveyInstanceService.findRecipients(getId(req));
 
-        ListRoute<SurveyInstanceOwner> findOwnersRoute =
+        ListRoute<Person> findOwnersRoute =
                 (req, res) -> surveyInstanceService.findOwners(getId(req));
 
         ListRoute<SurveyInstance> findForSurveyRunRoute =
@@ -173,15 +174,14 @@ public class SurveyInstanceEndpoint implements Endpoint {
                     command);
         };
 
-        DatumRoute<Boolean> updateRecipientRoute =
-                (req, res) -> {
-                    SurveyInstanceRecipientUpdateCommand command = readBody(req, SurveyInstanceRecipientUpdateCommand.class);
-                    return surveyInstanceService.updateRecipient(getUsername(req), command);
-                };
-
         DatumRoute<Long> addRecipientRoute =
                 (req, res) -> {
-                    SurveyInstanceRecipientCreateCommand command = readBody(req, SurveyInstanceRecipientCreateCommand.class);
+                    SurveyInstanceRecipientCreateCommand command = ImmutableSurveyInstanceRecipientCreateCommand
+                            .builder()
+                            .surveyInstanceId(getId(req))
+                            .personId(readBody(req, Long.class))
+                            .build();
+
                     return surveyInstanceService.addRecipient(getUsername(req), command);
                 };
 
@@ -189,11 +189,15 @@ public class SurveyInstanceEndpoint implements Endpoint {
                 (req, res) -> surveyInstanceService.deleteRecipient(
                         getUsername(req),
                         getId(req),
-                        getLong(req, "instanceRecipientId"));
+                        getLong(req, "personId"));
 
         DatumRoute<Long> addOwnerRoute =
                 (req, res) -> {
-                    SurveyInstanceOwnerCreateCommand command = readBody(req, SurveyInstanceOwnerCreateCommand.class);
+                    SurveyInstanceOwnerCreateCommand command = ImmutableSurveyInstanceOwnerCreateCommand
+                            .builder()
+                            .surveyInstanceId(getId(req))
+                            .personId(readBody(req, Long.class))
+                            .build();
                     return surveyInstanceService.addOwner(getUsername(req), command);
                 };
 
@@ -201,7 +205,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
                 (req, res) -> surveyInstanceService.deleteOwner(
                         getUsername(req),
                         getId(req),
-                        getLong(req, "instanceOwnerId"));
+                        getLong(req, "personId"));
 
 
         getForDatum(getByIdPath, getByIdRoute);
@@ -218,7 +222,6 @@ public class SurveyInstanceEndpoint implements Endpoint {
         putForDatum(updateStatusPath, updateStatusRoute);
         putForDatum(updateDueDatePath, updateDueDateRoute);
         putForDatum(updateApprovalDueDatePath, updateApprovalDueDateRoute);
-        putForDatum(recipientPath, updateRecipientRoute);
         postForDatum(recipientPath, addRecipientRoute);
         postForDatum(ownerPath, addOwnerRoute);
         deleteForDatum(deleteRecipientPath, deleteRecipientRoute);

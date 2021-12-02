@@ -1,6 +1,7 @@
 <script>
     import Markdown from "./Markdown.svelte";
     import _ from "lodash";
+    import Icon from "./Icon.svelte";
 
     export let text = "";
     export let context = {};
@@ -20,6 +21,7 @@
         <button class="btn btn-skinny small"
                 on:click={() => expanded = !expanded}>
             {expanded ? "Show less" : "Show more"}
+            <Icon name={expanded ? "chevron-up" : "chevron-down"}/>
         </button>
     </div>
 {/if}
@@ -28,7 +30,7 @@
 <style>
 
     .expander {
-        text-align: right;
+        text-align: center;
         width: 100%;
     }
 

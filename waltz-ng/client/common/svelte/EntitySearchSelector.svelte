@@ -7,14 +7,14 @@
     export let placeholder = "Search...";
     export let showClear = true;
 
-    let selectedItem;
-
     const dispatch = createEventDispatcher();
 
     async function search(qry){
         const response = await entitySearchStore.search(qry, entityKinds);
         return response.data;
     }
+
+    let selectedItem = null;
 
     $: dispatch("select", selectedItem);
 

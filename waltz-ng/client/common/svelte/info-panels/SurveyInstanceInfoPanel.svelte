@@ -74,6 +74,8 @@
         </tbody>
     </table>
 
+    <slot name="post-header"/>
+
 
     <div class="help-block small">
         <DescriptionFade text={survey.surveyRun?.description}
@@ -81,7 +83,6 @@
     </div>
 
 
-    <slot name="post-header"/>
 
     <slot name="footer"/>
 {/if}

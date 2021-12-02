@@ -4,9 +4,9 @@
     import {groupedQuestions, responsesByQuestionId, selectedSection} from "./survey-detail-store";
     import _ from "lodash";
     import {surveyInstanceViewStore} from "../../../../svelte-stores/survey-instance-view-store";
-    import EntityInfoPanel from "../../../../common/svelte/info-panels/EntityInfoPanel.svelte";
     import SurveyOverviewSubPanel from "./SurveyOverviewSubPanel.svelte";
     import SurveyInstanceInfoPanel from "../../../../common/svelte/info-panels/SurveyInstanceInfoPanel.svelte";
+    import SurveyPeople from "./SurveyPeople.svelte";
 
     export let primaryEntityRef;
 
@@ -35,6 +35,7 @@
     $: surveyCall = surveyInstanceViewStore.getById(primaryEntityRef?.id);
     $: survey = $surveyCall?.data;
 
+
     $: questionsWithResponse = _
         .chain(_.values($responsesByQuestionId))
         .filter(d => !_.isEmpty(d.stringResponse)
@@ -49,6 +50,7 @@
 
     $: sectionList = $groupedQuestions;
 
+    $: console.log(survey);
 </script>
 
 <SurveyOverviewSubPanel on:action={onAction}
@@ -102,6 +104,13 @@
     {:else if selectedTab === 'detail'}
         <!-- SURVEY INSTANCE DETAILS -->
         <SurveyInstanceInfoPanel {primaryEntityRef}>
+            <div slot="post-header">
+                <h5>
+                    <Icon name="users"/>
+                    People
+                </h5>
+                <SurveyPeople id={primaryEntityRef?.id}/>
+            </div>
         </SurveyInstanceInfoPanel>
     {/if}
     </div>

@@ -79,15 +79,15 @@ function controller($q,
 
     function reload(force = false) {
         return surveyUtils
-            .loadSurveyInfo($q,  serviceBroker, userService, vm.instanceId, true)
+            .loadSurveyInfo($q, serviceBroker, userService, vm.instanceId, true)
             .then(details => {
                 vm.surveyDetails = details;
 
                 vm.statusIcon = statusToIcon[vm.surveyDetails.instance.status] || "fw";
 
                 vm.description = surveyUtils.mkDescription([details.template.description, details.run.description]);
-                vm.recipients = _.map(details.recipients, d => d.person);
-                vm.owners = _.map(details.instanceOwners, d => d.person);
+                vm.recipients = details.recipients;
+                vm.owners = details.instanceOwners;
                 vm.availableStatusActions = actions.determineAvailableStatusActions(
                     details.isLatest,
                     details.possibleActions);
@@ -132,9 +132,9 @@ function controller($q,
         const cmd = mkCreateInstanceInvolvementCommand(vm.instanceId, p);
         toasts.info(`Adding ${p.name} as a recipient`);
         return serviceBroker
-            .execute(CORE_API.SurveyInstanceStore.addRecipient, [ vm.instanceId, cmd ])
+            .execute(CORE_API.SurveyInstanceStore.addRecipient, [vm.instanceId, cmd])
             .then(r => {
-                if(r.data) {
+                if (r.data) {
                     reload(true);
                     toasts.success(`${p.name} added as a recipient`);
                 } else {
@@ -153,7 +153,7 @@ function controller($q,
                     CORE_API.SurveyInstanceStore.deleteRecipient,
                     [vm.surveyDetails.instance.id, recipient.id])
                 .then(r => {
-                    if(r.data) {
+                    if (r.data) {
                         reload(true);
                         toasts.success(`Removed ${p.name} from recipients`);
                     } else {
@@ -171,9 +171,9 @@ function controller($q,
         const cmd = mkCreateInstanceInvolvementCommand(vm.instanceId, p);
         toasts.info(`Adding ${p.name} as an owner`);
         return serviceBroker
-            .execute(CORE_API.SurveyInstanceStore.addOwner, [ vm.instanceId, cmd ])
+            .execute(CORE_API.SurveyInstanceStore.addOwner, [vm.instanceId, cmd])
             .then(r => {
-                if(r.data) {
+                if (r.data) {
                     reload(true);
                     toasts.success(`${p.name} added as an owner`);
                 } else {
@@ -192,7 +192,7 @@ function controller($q,
                     CORE_API.SurveyInstanceStore.deleteOwner,
                     [vm.surveyDetails.instance.id, owner.id])
                 .then(r => {
-                    if(r.data) {
+                    if (r.data) {
                         reload(true);
                         toasts.success(`Removed ${p.name} from owners`);
                     } else {
@@ -207,6 +207,7 @@ function controller($q,
     };
 
     vm.editRecipient = (data, instanceRecipientId) => {
+        throw "No longer supported";
         const cmd = mkUpdateRecipientCommand(instanceRecipientId, data.newVal, vm.surveyInstance.id);
         serviceBroker
             .execute(
@@ -224,7 +225,7 @@ function controller($q,
             serviceBroker
                 .execute(
                     CORE_API.SurveyInstanceStore.updateDueDate,
-                    [ instanceId, {newDateVal: timeFormat("%Y-%m-%d")(change.newVal)}])
+                    [instanceId, {newDateVal: timeFormat("%Y-%m-%d")(change.newVal)}])
                 .then(() => {
                     toasts.success("Survey instance due date updated successfully");
                     reload(true);
@@ -241,7 +242,7 @@ function controller($q,
             serviceBroker
                 .execute(
                     CORE_API.SurveyInstanceStore.updateApprovalDueDate,
-                    [ instanceId, {newDateVal: timeFormat("%Y-%m-%d")(change.newVal)}])
+                    [instanceId, {newDateVal: timeFormat("%Y-%m-%d")(change.newVal)}])
                 .then(() => {
                     toasts.success("Survey instance approval due date updated successfully");
                     reload(true);

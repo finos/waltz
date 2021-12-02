@@ -21,6 +21,7 @@ package org.finos.waltz.data.survey;
 import org.finos.waltz.data.person.PersonDao;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.survey.*;
 import org.finos.waltz.schema.tables.records.SurveyInstanceOwnerRecord;
 import org.jooq.*;
@@ -108,7 +109,7 @@ public class SurveyInstanceOwnerDao {
                 .execute();
     }
 
-
+    @Deprecated
     public List<SurveyInstanceOwner> findForSurveyInstance(long surveyInstanceId) {
         return dsl
                 .select(SURVEY_INSTANCE_OWNER.fields())
@@ -120,6 +121,19 @@ public class SurveyInstanceOwnerDao {
                 .where(SURVEY_INSTANCE_OWNER.SURVEY_INSTANCE_ID.eq(surveyInstanceId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
+
+
+    public List<Person> findPeopleForSurveyInstance(long surveyInstanceId) {
+        return dsl
+                .select(PERSON.fields())
+                .from(SURVEY_INSTANCE_OWNER)
+                .innerJoin(SURVEY_INSTANCE).on(SURVEY_INSTANCE.ID.eq(SURVEY_INSTANCE_OWNER.SURVEY_INSTANCE_ID))
+                .innerJoin(PERSON).on(PERSON.ID.eq(SURVEY_INSTANCE_OWNER.PERSON_ID))
+                .where(SURVEY_INSTANCE_OWNER.SURVEY_INSTANCE_ID.eq(surveyInstanceId))
+                .fetch(PersonDao.personMapper);
+    }
+
+
 
     public Long getPersonIdForOwnerId(long ownerId) {
         return dsl
