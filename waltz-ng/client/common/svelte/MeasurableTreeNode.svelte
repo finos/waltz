@@ -24,26 +24,25 @@
         </button>
     {/if}
     {#if tree.isSelected}
-        <button class="btn btn-skinny"
+        <button class="btn-skinny"
                 on:click|stopPropagation={() => onDeselect(tree)}>
             <Icon name="check-square-o"/>
             {tree.name}
         </button>
     {:else}
-        <button class="btn btn-skinny"
+        <button class="btn-skinny"
                 on:click|stopPropagation={() => onSelect(tree)}>
             <Icon name="square-o"/>
             {tree.name}
         </button>
     {/if}
-
 {/if}
 
 {#if expanded || tree.isExpanded}
     {#if tree.children}
         <ul class:root={depth === 0}>
             {#each tree.children as child}
-                <li>
+                <li style="xxwhite-space: nowrap">
                     <svelte:self tree={child}
                                  depth={++depth}
                                  {onSelect}
@@ -55,7 +54,7 @@
 {/if}
 
 
-<style>
+<style type="text/scss">
     ul.root {
         padding-left: 1em;
     }
@@ -66,5 +65,11 @@
 
     li {
         padding-top: 0;
+
+        button {
+            display: flex;
+            flex-wrap: wrap;
+        }
     }
+
 </style>

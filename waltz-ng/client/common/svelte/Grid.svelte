@@ -1,8 +1,8 @@
 <script>
 
     import _ from "lodash";
-    import {termSearch} from "../../common";
-    import Icon from "../../common/svelte/Icon.svelte";
+    import {termSearch} from "../index";
+    import Icon from "./Icon.svelte";
 
     export let columnDefs = [];
     export let rowData = [];

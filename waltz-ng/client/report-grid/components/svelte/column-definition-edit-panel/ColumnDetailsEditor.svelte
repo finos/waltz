@@ -1,10 +1,11 @@
 <script>
     import DropdownPicker from "./DropdownPicker.svelte";
     import _ from "lodash";
-    import {columnUsageKind, ratingRollupRule} from "../../../../playpen/1/report-grid-utils";
+    import {columnUsageKind, ratingRollupRule} from "../report-grid-utils";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {columnDefs, selectedGrid} from "../report-grid-store";
     import {sameRef} from "../../../../common/entity-utils";
+    import DescriptionFade from "../../../../common/svelte/DescriptionFade.svelte";
 
     export let column;
     export let onCancel = () => console.log("Close");
@@ -50,7 +51,7 @@
 
 <h4>{column.columnEntityReference.name}</h4>
 <div class="help-block small">
-    {column.columnEntityReference.description}
+    <DescriptionFade text={column.columnEntityReference.description}/>
 </div>
 
 <table class="table table-condensed small">

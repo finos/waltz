@@ -8,7 +8,7 @@
 
 
 <p>
-    Are you sure you want to remove <strong>{column.columnEntityReference.name}</strong> from this report grid?
+    Are you sure you want to remove <strong>{column?.columnEntityReference?.name}</strong> from this report grid?
 </p>
 
 <button class="btn btn-danger" on:click={() => onRemove(column)}>Remove</button>

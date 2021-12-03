@@ -1,6 +1,6 @@
 <script>
 
-    import Grid from "../../../../playpen/1/Grid.svelte";
+    import Grid from "../../../../common/svelte/Grid.svelte";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import _ from "lodash";
     import {assessmentDefinitionStore} from "../../../../svelte-stores/assessment-definition";
@@ -23,6 +23,7 @@
 <div class="help-block small">
     <Icon name="info-circle"/>Select an assessment definition from the list below, you can filter the list using the search bar.
 </div>
+<br>
 <Grid {columnDefs}
       {rowData}
       onSelectRow={onSelect}/>

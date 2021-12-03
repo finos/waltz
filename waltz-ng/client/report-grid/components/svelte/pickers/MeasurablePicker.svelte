@@ -1,6 +1,6 @@
 <script>
 
-    import Grid from "../../../../playpen/1/Grid.svelte";
+    import Grid from "../../../../common/svelte/Grid.svelte";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import _ from "lodash";
     import {measurableCategoryStore} from "../../../../svelte-stores/measurable-category-store";
@@ -50,8 +50,6 @@
 
 
 {#if selectedCategory}
-    <p>Measurables for category: {selectedCategory.name}</p>
-
     <div class="help-block small">
         <span>
             <Icon name="info-circle"/>Select a measurable from the list below, you can filter the list using the search bar or
@@ -61,6 +59,7 @@
             </button>.
         </span>
     </div>
+    <p>Measurables for category: <strong>{selectedCategory.name}</strong></p>
     <MeasurableTreeSelector measurables={measurables}
                             selected={selected}
                             {onSelect}
@@ -69,6 +68,7 @@
     <div class="help-block small">
         <Icon name="info-circle"/>Select a category from the list below, you can filter the list using the search bar.
     </div>
+    <br>
     <Grid columnDefs={categoryColumnDefs}
           rowData={categories}
           onSelectRow={selectCategory}/>

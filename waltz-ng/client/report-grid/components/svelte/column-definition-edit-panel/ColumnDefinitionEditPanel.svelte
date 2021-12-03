@@ -4,13 +4,13 @@
     import _ from "lodash";
     import {mkRef, sameRef} from "../../../../common/entity-utils";
     import ReportGridColumnSummary from "./ReportGridColumnSummary.svelte";
-    import {columnUsageKind, ratingRollupRule} from "../../../../playpen/1/report-grid-utils";
+    import {columnUsageKind, ratingRollupRule} from "../report-grid-utils";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {reportGridStore} from "../../../../svelte-stores/report-grid-store";
     import toasts from "../../../../svelte-stores/toast-store";
     import ColumnDetailsEditor from "./ColumnDetailsEditor.svelte";
     import NoData from "../../../../common/svelte/NoData.svelte";
-    import {columnDefs, hasChanged} from "../report-grid-store";
+    import {columnDefs, hasChanged, selectedColumn} from "../report-grid-store";
     import ColumnRemovalConfirmation from "./ColumnRemovalConfirmation.svelte";
 
     export let gridId;
@@ -26,7 +26,6 @@
     let activeMode = Modes.VIEW;
 
     let canBeAdded;
-    let selectedColumn = null;
 
     function onSelect(d) {
         const column = {
@@ -35,13 +34,28 @@
             ratingRollupRule: ratingRollupRule.NONE.key,
             position: 0,
         }
-        $columnDefs = _.concat($columnDefs, column);
+
+        const newList = _.concat(column, $columnDefs);
+
+        $columnDefs = _.map(
+            newList,
+            d => Object.assign(
+                {},
+                d,
+                { position: _.indexOf(newList, d) }));
     }
 
     function deleteColumn(d) {
         $columnDefs = _.reject(
            $columnDefs,
             r => sameRef(r.columnEntityReference, d.columnEntityReference));
+        cancel();
+    }
+
+    function deleteEntity(d) {
+        $columnDefs = _.reject(
+           $columnDefs,
+            r => sameRef(r.columnEntityReference, d));
         cancel();
     }
 
@@ -61,7 +75,7 @@
             .then(() => {
                 onSave();
                 toasts.success("Report grid columns updated successfully");
-                selectedColumn = null
+                $selectedColumn = null
             })
             .catch(() => toasts.error("Unable to update report grid"));
     }
@@ -73,17 +87,17 @@
     }
 
     function editColumn(column){
-        selectedColumn = column;
+        $selectedColumn = column;
         activeMode = Modes.EDIT;
     }
 
     function removeColumn(column){
-        selectedColumn = column;
+        $selectedColumn = column;
         activeMode = Modes.DELETE;
     }
 
     function cancel() {
-        selectedColumn = null;
+        $selectedColumn = null;
         activeMode = Modes.VIEW
     }
 
@@ -107,8 +121,10 @@
 
 <div class="row">
     <div class="col-sm-4">
+        <h5><Icon name="plus"/>Add a Column:</h5>
+        <br>
         <EntitySelector onSelect={onSelect}
-                        onDeselect={removeColumn}
+                        onDeselect={deleteEntity}
                         selectionFilter={canBeAdded}/>
     </div>
 
@@ -122,11 +138,11 @@
 
     <div class="col-sm-4">
         {#if activeMode === Modes.EDIT}
-            <ColumnDetailsEditor column={selectedColumn}
+            <ColumnDetailsEditor column={$selectedColumn}
                                  onCancel={cancel}
                                  onRemove={removeColumn}/>
         {:else if activeMode === Modes.DELETE}
-            <ColumnRemovalConfirmation column={selectedColumn}
+            <ColumnRemovalConfirmation column={$selectedColumn}
                                        onCancel={cancel}
                                        onRemove={deleteColumn}/>
         {:else if activeMode === Modes.VIEW}

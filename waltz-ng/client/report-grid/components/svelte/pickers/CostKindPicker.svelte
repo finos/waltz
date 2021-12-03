@@ -1,6 +1,6 @@
 <script>
 
-    import Grid from "../../../../playpen/1/Grid.svelte";
+    import Grid from "../../../../common/svelte/Grid.svelte";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {costKindStore} from "../../../../svelte-stores/cost-kind-store";
     import _ from "lodash";
@@ -23,6 +23,7 @@
 <div class="help-block small">
     <Icon name="info-circle"/>Select a cost kind from the list below, you can filter the list using the search bar.
 </div>
+<br>
 <Grid {columnDefs}
       {rowData}
       onSelectRow={onSelect}/>

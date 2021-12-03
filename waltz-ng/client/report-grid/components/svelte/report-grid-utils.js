@@ -5,6 +5,38 @@ import {determineForegroundColor} from "../../../common/colors";
 import {scaleLinear} from "d3-scale";
 import extent from "d3-array/src/extent";
 
+export const ratingRollupRule = {
+    NONE: {
+        key: "NONE",
+        name: "None",
+
+    },
+    PICK_HIGHEST: {
+        key: "PICK_HIGHEST",
+        name: "Pick Highest",
+
+    },
+    PICK_LOWEST: {
+        key: "PICK_LOWEST",
+        name: "Pick Lowest",
+
+    }
+};
+
+
+export const columnUsageKind = {
+    NONE: {
+        key: "NONE",
+        name: "None",
+
+    },
+    SUMMARY: {
+        key: "SUMMARY",
+        name: "Summary",
+
+    }
+};
+
 const nameCol = mkEntityLinkGridCell(
     "Name",
     "application",

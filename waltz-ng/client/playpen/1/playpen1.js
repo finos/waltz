@@ -22,7 +22,8 @@ import {initialiseData} from "../../common";
 import InvolvementPicker from "../../report-grid/components/svelte/pickers/InvolvementPicker.svelte";
 import EntityPicker from "../../report-grid/components/svelte/pickers/EntityPicker.svelte";
 import EntitySelector from "../../report-grid/components/svelte/column-definition-edit-panel/EntitySelector.svelte";
-import TestPage from "../../report-grid/components/svelte/column-definition-edit-panel/ColumnDefinitionEditPanel.svelte";
+import TestPage
+    from "../../report-grid/components/svelte/column-definition-edit-panel/ColumnDefinitionEditPanel.svelte";
 import {mkSelectionOptions} from "../../common/selector-utils";
 import {CORE_API} from "../../common/services/core-api-utils";
 import _ from "lodash";

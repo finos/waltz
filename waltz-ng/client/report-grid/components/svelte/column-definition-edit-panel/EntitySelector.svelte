@@ -29,10 +29,6 @@
         showDropdown = false;
     }
 
-    function onSelectEntity(d) {
-        onSelect(d);
-    }
-
     function cancel() {
         selectedEntityKind = null;
         showDropdown = false
@@ -92,11 +88,10 @@
     </div>
 </div>
 
-<!--<br>-->
 <div class="row">
     <div class="col-sm-12">
         {#if selectedEntityKind}
-            <EntityPicker onSelect={onSelectEntity}
+            <EntityPicker {onSelect}
                           {onDeselect}
                           {selectionFilter}
                           entityKind={selectedEntityKind?.key}/>
@@ -111,7 +106,7 @@
 {#if selectedEntityKind}
     <button class="btn btn-skinny"
         on:click={() => cancel()}>
-        <Icon name="ban"/>Cancel
+        <Icon name="times"/>Close
     </button>
 {/if}
 

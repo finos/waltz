@@ -1,6 +1,6 @@
 <script>
 
-    import Grid from "../../../../playpen/1/Grid.svelte";
+    import Grid from "../../../../common/svelte/Grid.svelte";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import {surveyTemplateStore} from "../../../../svelte-stores/survey-template-store";
     import {surveyQuestionStore} from "../../../../svelte-stores/survey-question-store";
@@ -41,7 +41,6 @@
 </script>
 
 {#if selectedTemplate}
-    <p>Questions for template: {selectedTemplate.name}</p>
     <div class="help-block small">
         <Icon name="info-circle"/>Select a question from the list below, you can filter the list using the search bar or
         <button on:click={clearSelectedTemplate}
@@ -49,6 +48,7 @@
             choose a different template
         </button>.
     </div>
+    <p>Questions for template: <strong>{selectedTemplate.name}</strong></p>
     <Grid {columnDefs}
           {rowData}
           onSelectRow={onSelect}/>
@@ -56,6 +56,7 @@
     <div class="help-block small">
         <Icon name="info-circle"/>Select a template from the list below, you can filter the list using the search bar.
     </div>
+    <br>
     <Grid columnDefs={templateColumnDefs}
           rowData={templates}
           onSelectRow={selectTemplate}/>
