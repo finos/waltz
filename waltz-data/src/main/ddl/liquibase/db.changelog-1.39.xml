@@ -195,5 +195,31 @@
                               columnDataType="DATE"/>
     </changeSet>
 
+    <!-- 5682: Create report grid member table   -->
+    <changeSet author="woodjes"
+               id="20211203-5682-1">
+        <createTable tableName="report_grid_member">
+            <column name="grid_id"
+                    type="${id.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id"
+                    type="${email.type}">
+                <constraints nullable="false"/>
+            </column>
+            <column name="role"
+                    type="${enum.type}"
+                    defaultValue="VIEWER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="woodjes"
+               id="20211203-5682-2">
+        <addPrimaryKey columnNames="grid_id, user_id"
+                       constraintName="report_grid_member_pkey"
+                       tableName="report_grid_member"/>
+    </changeSet>
 
 </databaseChangeLog>

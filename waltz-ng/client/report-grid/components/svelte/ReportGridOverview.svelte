@@ -22,8 +22,6 @@ function cancel() {
     activeMode = Modes.VIEW
 }
 
-$: console.log({selectedGrid: $selectedGrid})
-
 </script>
 
 {#if activeMode === Modes.VIEW}

@@ -99,6 +99,16 @@ public class ReportGridDao {
     }
 
 
+    public Set<ReportGridDefinition> findForUser(String username){
+        return dsl
+                .select(rg.fields())
+                .from(rg)
+                .innerJoin(REPORT_GRID_MEMBER).on(rg.ID.eq(REPORT_GRID_MEMBER.GRID_ID))
+                .where(REPORT_GRID_MEMBER.USER_ID.eq(username))
+                .fetchSet(r -> mkReportGridDefinition(rgcd.REPORT_GRID_ID.eq(r.get(rg.ID)), r.into(REPORT_GRID)));
+    }
+
+
     public Set<ReportGridCell> findCellDataByGridId(long id,
                                                     Select<Record1<Long>> appSelector) {
         return findCellDataByGridCondition(rg.ID.eq(id), appSelector);
