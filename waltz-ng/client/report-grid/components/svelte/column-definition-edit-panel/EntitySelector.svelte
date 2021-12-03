@@ -33,6 +33,11 @@
         onSelect(d);
     }
 
+    function cancel() {
+        selectedEntityKind = null;
+        showDropdown = false
+    }
+
 </script>
 
 
@@ -87,7 +92,7 @@
     </div>
 </div>
 
-<br>
+<!--<br>-->
 <div class="row">
     <div class="col-sm-12">
         {#if selectedEntityKind}
@@ -96,10 +101,19 @@
                           {selectionFilter}
                           entityKind={selectedEntityKind?.key}/>
         {:else}
-            Select an entity kind from the list
+            <div class="help-block small">
+                <Icon name="info-circle"/>Use the picker to select an entity kind
+            </div>
         {/if}
     </div>
 </div>
+
+{#if selectedEntityKind}
+    <button class="btn btn-skinny"
+        on:click={() => cancel()}>
+        <Icon name="ban"/>Cancel
+    </button>
+{/if}
 
 <style type="text/scss">
     ul {

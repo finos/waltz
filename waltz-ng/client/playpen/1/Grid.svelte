@@ -40,7 +40,7 @@
 
 <div class="row">
     <div class="col-sm-12">
-        <div class={_.size(rowData) > 10 ? "waltz-scroll-region-300" : ""}>
+        <div class={_.size(rowData) > 6 ? "waltz-scroll-region-300" : ""}>
             <table class="table table-condensed table-hover small fixed-table">
                 <colgroup>
                     {#each columnDefs as col}

@@ -10,13 +10,11 @@
     PICKER: "PICKER",
 }
 
-// export let selectedGrid = null;
 export let onGridSelect = () => console.log("selecting grid");
 let activeMode = Modes.VIEW;
 
 function selectGrid(grid) {
     onGridSelect(grid);
-    // $selectedGrid = grid;
     activeMode = Modes.VIEW;
 }
 
@@ -30,8 +28,8 @@ $: console.log({selectedGrid: $selectedGrid})
 
 {#if activeMode === Modes.VIEW}
     {#if $selectedGrid}
-        <h4>{$selectedGrid.name}</h4>
-        <p>{$selectedGrid.description}</p>
+        <h4>{$selectedGrid.definition.name}</h4>
+        <p>{$selectedGrid.definition.description}</p>
     {:else}
         <NoData>No grid selected</NoData>
     {/if}

@@ -138,6 +138,7 @@ public class ReportGridDao {
                     record.setColumnUsageKind(d.usageKind().name());
                     record.setRatingRollupRule(d.ratingRollupRule().name());
                     record.setPosition(Long.valueOf(d.position()).intValue());
+                    record.setDisplayName(d.displayName());
                     return record;
                 })
                 .collect(collectingAndThen(toSet(), d -> dsl.batchInsert(d).execute()));
@@ -173,7 +174,7 @@ public class ReportGridDao {
 
     private List<ReportGridColumnDefinition> getColumnDefinitions(Condition condition) {
 
-        SelectConditionStep<Record7<String, Long, String, String, Integer, String, String>> measurableColumns = mkColumnDefinitionQuery(
+        SelectConditionStep<Record8<String, String, Long, String, String, Integer, String, String>> measurableColumns = mkColumnDefinitionQuery(
                 EntityKind.MEASURABLE,
                 m,
                 m.ID,
@@ -181,7 +182,7 @@ public class ReportGridDao {
                 m.DESCRIPTION,
                 condition);
 
-        SelectConditionStep<Record7<String, Long, String, String, Integer, String, String>> assessmentDefinitionColumns = mkColumnDefinitionQuery(
+        SelectConditionStep<Record8<String, String, Long, String, String, Integer, String, String>> assessmentDefinitionColumns = mkColumnDefinitionQuery(
                 EntityKind.ASSESSMENT_DEFINITION,
                 ad,
                 ad.ID,
@@ -189,7 +190,7 @@ public class ReportGridDao {
                 ad.DESCRIPTION,
                 condition);
 
-        SelectConditionStep<Record7<String, Long, String, String, Integer, String, String>> costKindColumns = mkColumnDefinitionQuery(
+        SelectConditionStep<Record8<String, String, Long, String, String, Integer, String, String>> costKindColumns = mkColumnDefinitionQuery(
                 EntityKind.COST_KIND,
                 ck,
                 ck.ID,
@@ -197,7 +198,7 @@ public class ReportGridDao {
                 ck.DESCRIPTION,
                 condition);
 
-        SelectConditionStep<Record7<String, Long, String, String, Integer, String, String>> involvementKindColumns = mkColumnDefinitionQuery(
+        SelectConditionStep<Record8<String, String, Long, String, String, Integer, String, String>> involvementKindColumns = mkColumnDefinitionQuery(
                 EntityKind.INVOLVEMENT_KIND,
                 ik,
                 ik.ID,
@@ -205,7 +206,7 @@ public class ReportGridDao {
                 ik.DESCRIPTION,
                 condition);
 
-        SelectConditionStep<Record7<String, Long, String, String, Integer, String, String>> surveyQuestionColumns = mkColumnDefinitionQuery(
+        SelectConditionStep<Record8<String, String, Long, String, String, Integer, String, String>> surveyQuestionColumns = mkColumnDefinitionQuery(
                 EntityKind.SURVEY_QUESTION,
                 sq,
                 sq.ID,
@@ -225,20 +226,22 @@ public class ReportGridDao {
                                 r.get(rgcd.COLUMN_ENTITY_ID),
                                 r.get("name", String.class),
                                 r.get("desc", String.class)))
+                        .displayName(r.get(rgcd.DISPLAY_NAME))
                         .position(r.get(rgcd.POSITION))
                         .usageKind(ColumnUsageKind.valueOf(r.get(rgcd.COLUMN_USAGE_KIND)))
                         .ratingRollupRule(RatingRollupRule.valueOf(r.get(rgcd.RATING_ROLLUP_RULE)))
                         .build());
     }
 
-    private SelectConditionStep<Record7<String, Long, String, String, Integer, String, String>> mkColumnDefinitionQuery(EntityKind entityKind,
-                                                                                                                        Table<?> t,
-                                                                                                                        TableField<? extends Record, Long> ID,
-                                                                                                                        TableField<? extends Record, String> NAME,
-                                                                                                                        TableField<? extends Record, String> DESCRIPTION,
-                                                                                                                        Condition reportCondition) {
+    private SelectConditionStep<Record8<String, String, Long, String, String, Integer, String, String>> mkColumnDefinitionQuery(EntityKind entityKind,
+                                                                                                                                Table<?> t,
+                                                                                                                                TableField<? extends Record, Long> ID,
+                                                                                                                                TableField<? extends Record, String> NAME,
+                                                                                                                                TableField<? extends Record, String> DESCRIPTION,
+                                                                                                                                Condition reportCondition) {
         return dsl
-                    .select(DSL.coalesce(rgcd.DISPLAY_NAME, NAME).as("name"),
+                    .select(NAME.as("name"),
+                            rgcd.DISPLAY_NAME,
                             rgcd.COLUMN_ENTITY_ID,
                             rgcd.COLUMN_ENTITY_KIND,
                             DESCRIPTION.as("desc"),

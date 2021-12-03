@@ -27,7 +27,7 @@
      style="width: 100%; outline: 1px solid #cccccc;">
     <div class:expanded={showDropdown}>
         <button on:click={() => toggleDropdown()}
-                class="btn btn-skinny">
+                class="btn-skinny">
             {#if _.isNull(selectedItem)}
                 <span class="force-wrap">
                     {defaultMessage}
@@ -59,7 +59,7 @@
                 {/if}
                 {#each items as item}
                     <li>
-                        <button class="btn btn-skinny"
+                        <button class="btn-skinny"
                                 on:click={() => selectItem(item)}>
                             <span class="force-wrap">{item?.name}</span>
                         </button>

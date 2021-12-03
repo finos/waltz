@@ -20,7 +20,9 @@
 
 </script>
 
-<div class="help-block small"><Icon name="info-circle"/>Select an involvement from the list below, you can filter the list using the search bar.</div>
+<div class="help-block small">
+    <Icon name="info-circle"/>Select an involvement from the list below, you can filter the list using the search bar.
+</div>
 <Grid {columnDefs}
       {rowData}
       onSelectRow={onSelect}/>

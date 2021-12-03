@@ -50,9 +50,7 @@
 
 
 {#if selectedCategory}
-    <h4>
-        {selectedCategory.name}
-    </h4>
+    <p>Measurables for category: {selectedCategory.name}</p>
 
     <div class="help-block small">
         <span>

@@ -2,12 +2,12 @@
 
     import ReportGridOverview from "./ReportGridOverview.svelte";
     import ReportGridFilters from "./ReportGridFilters.svelte";
+    import ColumnDefinitionEditPanel from "./column-definition-edit-panel/ColumnDefinitionEditPanel.svelte";
+    import {selectedGrid} from "./report-grid-store";
 
-    export let selectedGrid;
     export let onGridSelect = () => console.log("selecting grid");
+    export let onSave = () => console.log("Saved report grid");
     let selectedTab = "context"
-
-    $: console.log({selectedGrid});
 
 </script>
 
@@ -25,6 +25,7 @@
     <input type="radio"
            bind:group={selectedTab}
            value="filters"
+           disabled={!$selectedGrid}
            id="filters">
     <label class="wt-label"
            for="filters">
@@ -33,6 +34,7 @@
 
     <input type="radio"
            bind:group={selectedTab}
+           disabled={!$selectedGrid}
            value="columns"
            id="columns">
     <label class="wt-label"
@@ -43,11 +45,13 @@
     <div class="wt-tab wt-active">
         <!-- SERVERS -->
         {#if selectedTab === 'context'}
-            <ReportGridOverview {selectedGrid} {onGridSelect}/>
+            <ReportGridOverview {onGridSelect}/>
         {:else if selectedTab === 'filters'}
             <ReportGridFilters/>
         {:else if selectedTab === 'columns'}
-            <h4>Columns</h4>
+            <ColumnDefinitionEditPanel gridId={$selectedGrid?.definition.id}
+                                       columnDefs={$selectedGrid?.definition.columnDefinitions}
+                                       onSave={onSave}/>
         {/if}
     </div>
 </div>
