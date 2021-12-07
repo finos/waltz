@@ -10,7 +10,7 @@
     import toasts from "../../../../svelte-stores/toast-store";
     import ColumnDetailsEditor from "./ColumnDetailsEditor.svelte";
     import NoData from "../../../../common/svelte/NoData.svelte";
-    import {columnDefs, hasChanged, selectedColumn} from "../report-grid-store";
+    import {columnDefs, hasChanged, selectedColumn, lastMovedColumn} from "../report-grid-store";
     import ColumnRemovalConfirmation from "./ColumnRemovalConfirmation.svelte";
 
     export let gridId;
@@ -64,18 +64,21 @@
         const columnDefs = _.map(
             columns,
             d => ({
-                    columnEntityReference: d.columnEntityReference,position: d.position,
-                    usageKind: d.usageKind,
-                    ratingRollupRule: d.ratingRollupRule,
-                    displayName: d.displayName
-                }));
+                columnEntityReference: d.columnEntityReference,
+                position: d.position,
+                usageKind: d.usageKind,
+                ratingRollupRule: d.ratingRollupRule,
+                displayName: d.displayName
+            }));
 
         return reportGridStore
             .updateColumnDefinitions(gridId, {columnDefinitions: columnDefs})
             .then(() => {
                 onSave();
                 toasts.success("Report grid columns updated successfully");
-                $selectedColumn = null
+                $selectedColumn = null;
+                $lastMovedColumn = null;
+                activeMode = Modes.VIEW;
             })
             .catch(() => toasts.error("Unable to update report grid"));
     }
@@ -122,7 +125,6 @@
 <div class="row">
     <div class="col-sm-4">
         <h5><Icon name="plus"/>Add a Column:</h5>
-        <br>
         <EntitySelector onSelect={onSelect}
                         onDeselect={deleteEntity}
                         selectionFilter={canBeAdded}/>

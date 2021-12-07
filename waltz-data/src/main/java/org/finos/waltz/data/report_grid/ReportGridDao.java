@@ -103,8 +103,9 @@ public class ReportGridDao {
         return dsl
                 .select(rg.fields())
                 .from(rg)
-                .innerJoin(REPORT_GRID_MEMBER).on(rg.ID.eq(REPORT_GRID_MEMBER.GRID_ID))
-                .where(REPORT_GRID_MEMBER.USER_ID.eq(username))
+                .leftJoin(REPORT_GRID_MEMBER)
+                .on(rg.ID.eq(REPORT_GRID_MEMBER.GRID_ID))
+                .where(rg.KIND.eq(ReportGridKind.PUBLIC.name()).or(REPORT_GRID_MEMBER.USER_ID.eq(username)))
                 .fetchSet(r -> mkReportGridDefinition(rgcd.REPORT_GRID_ID.eq(r.get(rg.ID)), r.into(REPORT_GRID)));
     }
 
@@ -165,10 +166,23 @@ public class ReportGridDao {
         record.setLastUpdatedAt(DateTimeUtilities.nowUtcTimestamp());
         record.setLastUpdatedBy(username);
         record.setProvenance("waltz");
+        record.setKind(createCommand.kind().name());
 
         int insert = record.insert();
 
         return record.getId();
+    }
+
+    public long update(long id, ReportGridUpdateCommand updateCommand, String username) {
+        return dsl
+                .update(rg)
+                .set(rg.NAME, updateCommand.name())
+                .set(rg.DESCRIPTION, updateCommand.description())
+                .set(rg.KIND, updateCommand.kind().name())
+                .set(rg.LAST_UPDATED_AT, DateTimeUtilities.nowUtcTimestamp())
+                .set(rg.LAST_UPDATED_BY, username)
+                .where(rg.ID.eq(id))
+                .execute();
     }
 
     // --- Helpers ---
@@ -271,50 +285,56 @@ public class ReportGridDao {
 
         ReportGridDefinition gridDefn = getGridDefinitionByCondition(gridCondition);
 
-        Map<EntityKind, Collection<ReportGridColumnDefinition>> colsByKind = groupBy(
-                gridDefn.columnDefinitions(),
-                cd -> cd.columnEntityReference().kind());
+        if(gridDefn == null ){
+            return emptySet();
 
-        Set<Long> requiredAssessmentDefinitions = map(
-                colsByKind.getOrDefault(EntityKind.ASSESSMENT_DEFINITION, emptySet()),
-                cd -> cd.columnEntityReference().id());
+        } else {
 
-        Map<RatingRollupRule, Collection<ReportGridColumnDefinition>> measurableColumnsByRollupKind = groupBy(
-                colsByKind.getOrDefault(EntityKind.MEASURABLE, emptySet()),
-                ReportGridColumnDefinition::ratingRollupRule);
+            Map<EntityKind, Collection<ReportGridColumnDefinition>> colsByKind = groupBy(
+                    gridDefn.columnDefinitions(),
+                    cd -> cd.columnEntityReference().kind());
 
-        Set<Long> exactMeasurableIds = map(
-                measurableColumnsByRollupKind.get(RatingRollupRule.NONE),
-                cd -> cd.columnEntityReference().id());
+            Set<Long> requiredAssessmentDefinitions = map(
+                    colsByKind.getOrDefault(EntityKind.ASSESSMENT_DEFINITION, emptySet()),
+                    cd -> cd.columnEntityReference().id());
 
-        Set<Long> summaryMeasurableIdsUsingHighest = map(
-                measurableColumnsByRollupKind.get(RatingRollupRule.PICK_HIGHEST),
-                cd -> cd.columnEntityReference().id());
+            Map<RatingRollupRule, Collection<ReportGridColumnDefinition>> measurableColumnsByRollupKind = groupBy(
+                    colsByKind.getOrDefault(EntityKind.MEASURABLE, emptySet()),
+                    ReportGridColumnDefinition::ratingRollupRule);
 
-        Set<Long> summaryMeasurableIdsUsingLowest = map(
-                measurableColumnsByRollupKind.get(RatingRollupRule.PICK_LOWEST),
-                cd -> cd.columnEntityReference().id());
+            Set<Long> exactMeasurableIds = map(
+                    measurableColumnsByRollupKind.get(RatingRollupRule.NONE),
+                    cd -> cd.columnEntityReference().id());
 
-        Set<Long> requiredCostKinds = map(
-                colsByKind.getOrDefault(EntityKind.COST_KIND, emptySet()),
-                cd -> cd.columnEntityReference().id());
+            Set<Long> summaryMeasurableIdsUsingHighest = map(
+                    measurableColumnsByRollupKind.get(RatingRollupRule.PICK_HIGHEST),
+                    cd -> cd.columnEntityReference().id());
 
-        Set<Long> requiredInvolvementKinds = map(
-                colsByKind.getOrDefault(EntityKind.INVOLVEMENT_KIND, emptySet()),
-                cd -> cd.columnEntityReference().id());
+            Set<Long> summaryMeasurableIdsUsingLowest = map(
+                    measurableColumnsByRollupKind.get(RatingRollupRule.PICK_LOWEST),
+                    cd -> cd.columnEntityReference().id());
 
-        Set<Long> requiredSurveyQuestionIds = map(
-                colsByKind.getOrDefault(EntityKind.SURVEY_QUESTION, emptySet()),
-                cd -> cd.columnEntityReference().id());
+            Set<Long> requiredCostKinds = map(
+                    colsByKind.getOrDefault(EntityKind.COST_KIND, emptySet()),
+                    cd -> cd.columnEntityReference().id());
+
+            Set<Long> requiredInvolvementKinds = map(
+                    colsByKind.getOrDefault(EntityKind.INVOLVEMENT_KIND, emptySet()),
+                    cd -> cd.columnEntityReference().id());
+
+            Set<Long> requiredSurveyQuestionIds = map(
+                    colsByKind.getOrDefault(EntityKind.SURVEY_QUESTION, emptySet()),
+                    cd -> cd.columnEntityReference().id());
 
 
-        return union(
-                fetchSummaryMeasurableData(appSelector, summaryMeasurableIdsUsingHighest, summaryMeasurableIdsUsingLowest),
-                fetchAssessmentData(appSelector, requiredAssessmentDefinitions),
-                fetchExactMeasurableData(appSelector, exactMeasurableIds),
-                fetchCostData(appSelector, requiredCostKinds),
-                fetchInvolvementData(appSelector, requiredInvolvementKinds),
-                fetchSurveyQuestionResponseData(appSelector, requiredSurveyQuestionIds));
+            return union(
+                    fetchSummaryMeasurableData(appSelector, summaryMeasurableIdsUsingHighest, summaryMeasurableIdsUsingLowest),
+                    fetchAssessmentData(appSelector, requiredAssessmentDefinitions),
+                    fetchExactMeasurableData(appSelector, exactMeasurableIds),
+                    fetchCostData(appSelector, requiredCostKinds),
+                    fetchInvolvementData(appSelector, requiredInvolvementKinds),
+                    fetchSurveyQuestionResponseData(appSelector, requiredSurveyQuestionIds));
+        }
     }
 
 
@@ -642,7 +662,22 @@ public class ReportGridDao {
                 .lastUpdatedAt(toLocalDateTime(r.get(rg.LAST_UPDATED_AT)))
                 .lastUpdatedBy(r.get(rg.LAST_UPDATED_BY))
                 .columnDefinitions(getColumnDefinitions(condition))
+                .kind(ReportGridKind.valueOf(r.get(rg.KIND)))
                 .build();
+    }
+
+
+    public Set<ReportGridDefinition> findForOwner(String username) {
+        Condition isOwner = REPORT_GRID_MEMBER.USER_ID.eq(username)
+                .and(REPORT_GRID_MEMBER.ROLE.eq(ReportGridMemberRole.OWNER.name()));
+
+        return dsl
+                .select(rg.fields())
+                .from(rg)
+                .innerJoin(REPORT_GRID_MEMBER)
+                .on(rg.ID.eq(REPORT_GRID_MEMBER.GRID_ID))
+                .where(isOwner)
+                .fetchSet(r -> mkReportGridDefinition(rgcd.REPORT_GRID_ID.eq(r.get(rg.ID)), r.into(REPORT_GRID)));
     }
 }
 

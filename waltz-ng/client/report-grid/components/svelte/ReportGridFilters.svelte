@@ -43,8 +43,6 @@
         $filters = _.reject($filters, f => f.propName === refToRemove);
     }
 
-    $: console.log({chunkedSummaryData, fs: $filters, acS: $activeSummaryColRefs, ss: $summaries})
-
 </script>
 
 <div>

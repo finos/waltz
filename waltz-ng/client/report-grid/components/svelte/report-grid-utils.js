@@ -5,6 +5,17 @@ import {determineForegroundColor} from "../../../common/colors";
 import {scaleLinear} from "d3-scale";
 import extent from "d3-array/src/extent";
 
+export const reportGridKinds = {
+    PUBLIC: {
+        key: "PUBLIC",
+        name: "Public"
+    },
+    PRIVATE: {
+        key: "PRIVATE",
+        name: "Private"
+    }
+}
+
 export const ratingRollupRule = {
     NONE: {
         key: "NONE",

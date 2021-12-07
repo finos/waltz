@@ -18,18 +18,17 @@
 
 package org.finos.waltz.web.endpoints.api;
 
-import org.finos.waltz.model.report_grid.ReportGridColumnDefinitionsUpdateCommand;
-import org.finos.waltz.model.report_grid.ReportGridCreateCommand;
-import org.finos.waltz.model.report_grid.ReportGridDefinition;
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.model.report_grid.*;
 import org.finos.waltz.service.report_grid.ReportGridService;
 import org.finos.waltz.web.endpoints.Endpoint;
-import org.finos.waltz.model.report_grid.ReportGrid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import spark.Request;
 import spark.Response;
 
 import java.io.IOException;
+import java.util.Set;
 
 import static org.finos.waltz.web.WebUtilities.*;
 import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
@@ -51,15 +50,21 @@ public class ReportGridEndpoint implements Endpoint {
     @Override
     public void register() {
         String findAllPath = mkPath(BASE_URL, "all");
+        String findForUserPath = mkPath(BASE_URL, "user");
         String createPath = mkPath(BASE_URL, "create");
+        String updatePath = mkPath(BASE_URL, "id", ":id", "update");
+        String findForOwnerPath = mkPath(BASE_URL, "owner");
         String getViewByIdPath = mkPath(BASE_URL, "view", "id", ":id");
         String updateColumnDefsPath = mkPath(BASE_URL, "id", ":id", "column-definitions", "update");
 
 
         getForDatum(findAllPath, (req, resp) -> reportGridService.findAll());
+        getForList(findForUserPath, (req, resp) -> reportGridService.findForUser(getUsername(req)));
+        getForList(findForOwnerPath, this::findForOwnerRoute);
         postForDatum(getViewByIdPath, this::getViewByIdRoute);
         postForDatum(updateColumnDefsPath, this::updateColumnDefsRoute);
         postForDatum(createPath, this::createRoute);
+        postForDatum(updatePath, this::updateRoute);
     }
 
 
@@ -69,13 +74,24 @@ public class ReportGridEndpoint implements Endpoint {
                 readIdSelectionOptionsFromBody(req));
     }
 
-    public ReportGridDefinition updateColumnDefsRoute(Request req, Response resp) throws IOException {
-        return reportGridService.updateColumnDefinitions(getId(req), readBody(req, ReportGridColumnDefinitionsUpdateCommand.class));
+    public ReportGridDefinition updateColumnDefsRoute(Request req, Response resp) throws IOException, InsufficientPrivelegeException {
+        return reportGridService.updateColumnDefinitions(
+                getId(req),
+                readBody(req, ReportGridColumnDefinitionsUpdateCommand.class),
+                getUsername(req));
     }
 
     public ReportGridDefinition createRoute(Request req, Response resp) throws IOException {
-        return reportGridService.create(readBody(req, ReportGridCreateCommand.class), getUsername(req));
+        return reportGridService.
+                create(readBody(req, ReportGridCreateCommand.class), getUsername(req));
     }
 
+    public ReportGridDefinition updateRoute(Request req, Response resp) throws IOException, InsufficientPrivelegeException {
+        return reportGridService.
+                update(getId(req), readBody(req, ReportGridUpdateCommand.class), getUsername(req));
+    }
 
+    public Set<ReportGridDefinition> findForOwnerRoute(Request req, Response resp) {
+        return reportGridService.findForOwner(getUsername(req));
+    }
 }

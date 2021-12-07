@@ -26,6 +26,7 @@ import org.finos.waltz.schema.tables.records.ReportGridMemberRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
 import org.jooq.RecordMapper;
+import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -61,5 +62,23 @@ public class ReportGridMemberDao {
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 
+    public int register(long gridId, String username, ReportGridMemberRole role) {
+        return dsl
+                .insertInto(REPORT_GRID_MEMBER)
+                .set(REPORT_GRID_MEMBER.GRID_ID, gridId)
+                .set(REPORT_GRID_MEMBER.USER_ID, username)
+                .set(REPORT_GRID_MEMBER.ROLE, role.name())
+                .execute();
+    }
+
+    public boolean canUpdate(long gridId, String userId) {
+        return dsl
+                .fetchExists(DSL
+                .select(REPORT_GRID_MEMBER.GRID_ID)
+                .from(REPORT_GRID_MEMBER)
+                .where(REPORT_GRID_MEMBER.GRID_ID.eq(gridId)
+                        .and(REPORT_GRID_MEMBER.USER_ID.eq(userId)
+                                .and(REPORT_GRID_MEMBER.ROLE.eq(ReportGridMemberRole.OWNER.name())))));
+    }
 }
 

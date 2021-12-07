@@ -23,6 +23,12 @@ export function mkReportGridStore() {
     const findAll = (force = false) => remote
         .fetchAppList("GET", "api/report-grid/all", [], {force});
 
+    const findForUser = (force = false) => remote
+        .fetchAppList("GET", "api/report-grid/user", [], {force});
+
+    const findForOwner = (force = false) => remote
+        .fetchAppList("GET", "api/report-grid/owner", [], {force});
+
     const updateColumnDefinitions = (id, updatecommand) => remote
         .execute(
             "POST",
@@ -33,11 +39,18 @@ export function mkReportGridStore() {
         return remote.execute("POST", "api/report-grid/create", createCommand);
     }
 
+    const update = (id, updateCmd) => {
+        return remote.execute("POST", `api/report-grid/id/${id}/update`, updateCmd);
+    }
+
 
     return {
         findAll,
+        findForUser,
+        findForOwner,
         updateColumnDefinitions,
-        create
+        create,
+        update
     };
 }
 

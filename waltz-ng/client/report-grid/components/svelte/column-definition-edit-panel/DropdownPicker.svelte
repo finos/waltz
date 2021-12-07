@@ -6,7 +6,7 @@
  export let items = [];
  export let defaultMessage = "Select an option";
  export let onSelect = () => console.log("Selecting");
- export  let selectedItem = null;
+ export let selectedItem = null;
 
  let showDropdown = false;
 

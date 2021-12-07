@@ -49,9 +49,9 @@
 
 </script>
 
-<h4>{column.columnEntityReference.name}</h4>
+<h4>{column?.columnEntityReference?.name}</h4>
 <div class="help-block small">
-    <DescriptionFade text={column.columnEntityReference.description}/>
+    <DescriptionFade text={column?.columnEntityReference?.description}/>
 </div>
 
 <table class="table table-condensed small">
@@ -82,7 +82,7 @@
                 </div>
             </td>
             <td>
-                {#if column.columnEntityReference.kind === 'MEASURABLE'}
+                {#if column?.columnEntityReference?.kind === 'MEASURABLE'}
                     <DropdownPicker items={rollupKinds}
                                     onSelect={(d) => selectRollupKind(d, column)}
                                     defaultMessage="Select rollup kind"

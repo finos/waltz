@@ -222,4 +222,15 @@
                        tableName="report_grid_member"/>
     </changeSet>
 
+    <changeSet author="woodjes"
+               id="20211203-5682-3">
+        <addColumn tableName="report_grid">
+            <column name="kind"
+                    type="${enum.type}"
+                    defaultValue="PUBLIC">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

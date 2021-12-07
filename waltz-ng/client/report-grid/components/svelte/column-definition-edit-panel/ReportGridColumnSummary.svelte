@@ -4,12 +4,14 @@
     import Icon from "../../../../common/svelte/Icon.svelte";
     import _ from "lodash"
     import {entity} from "../../../../common/services/enums/entity";
-    import {columnDefs, selectedColumn, selectedGrid} from "../report-grid-store";
+    import {columnDefs, selectedColumn, selectedGrid, lastMovedColumn} from "../report-grid-store";
     import {move} from "../../../../common/list-utils";
     import {sameRef} from "../../../../common/entity-utils";
 
     export let onRemove = () => console.log("Removing entity")
     export let onEdit = () => console.log("Editing entity")
+
+    let lastMoved = null;
 
     function getIcon(entityKind) {
         return _.get(entity[entityKind], 'icon', "fw");
@@ -17,6 +19,7 @@
 
     function moveColumn(positionCount, column) {
         const reorderedList = move($columnDefs, _.indexOf($columnDefs, column), positionCount);
+        $lastMovedColumn = column;
         $columnDefs = _.map(reorderedList,
             d => Object.assign(
                 {},
@@ -51,36 +54,27 @@
                 </thead>
                 <tbody>
                     {#each _.orderBy($columnDefs, d => d.position) as column}
-                        <tr class:selected={$selectedColumn && sameRef(column.columnEntityReference, $selectedColumn?.columnEntityReference)}>
+                        <tr class:selected={$selectedColumn && sameRef(column.columnEntityReference, $selectedColumn?.columnEntityReference)}
+                            class:last-moved={$lastMovedColumn && sameRef(column.columnEntityReference, $lastMovedColumn?.columnEntityReference)}>
                             <td>
                                 <Icon name={getIcon(column?.columnEntityReference?.kind)}/>{column?.columnEntityReference?.name || column?.columnEntityReference?.questionText}
                             </td>
                             <td>
                                 <span style="text-align: center">
-                                    {#if column.position === 0}
-                                        <span class="text-muted">
-                                            <Icon name="arrow-up"/>
-                                        </span>
-                                    {:else}
-                                        <button class="btn btn-skinny"
-                                                on:click={() => moveColumn(-1, column)}>
-                                            <Icon name="arrow-up"/>
-                                        </button>
-                                    {/if}
+                                    <button class="btn btn-skinny"
+                                            disabled={column.position === 0}
+                                            on:click={() => moveColumn(-1, column)}>
+                                        <Icon name="arrow-up"/>
+                                    </button>
                                 </span>
                             </td>
                             <td>
                                 <span style="text-align: center">
-                                    {#if column.position === _.maxBy($columnDefs, d => d.position)?.position}
-                                        <span class="text-muted">
-                                            <Icon name="arrow-down"/>
-                                        </span>
-                                    {:else}
-                                        <button class="btn btn-skinny"
-                                                on:click={() => moveColumn(1, column)}>
-                                            <Icon name="arrow-down"/>
-                                        </button>
-                                    {/if}
+                                    <button class="btn btn-skinny"
+                                            disabled={column.position === _.maxBy($columnDefs, d => d.position)?.position}
+                                            on:click={() => moveColumn(1, column)}>
+                                        <Icon name="arrow-down"/>
+                                    </button>
                                 </span>
                             </td>
                             <td>
@@ -111,6 +105,11 @@
 
 <style>
     .selected{
+        font-weight: bold;
+        background: #f3f9ff;
+    }
+
+    .last-moved{
         background: #f3f9ff;
     }
 </style>

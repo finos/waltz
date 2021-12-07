@@ -24,6 +24,7 @@ import _ from "lodash";
 import ReportGridControlPanel from "../svelte/ReportGridControlPanel.svelte";
 import {activeSummaryColRefs, filters, selectedGrid, columnDefs} from "../svelte/report-grid-store";
 import {mkPropNameForRef, mkRowFilter, prepareColumnDefs, prepareTableData} from "../svelte/report-grid-utils";
+import {displayError} from "../../../common/error-utils";
 
 const bindings = {
     parentEntityRef: "<",
@@ -72,7 +73,6 @@ function controller($scope, serviceBroker, localStorageService) {
                 CORE_API.ReportGridStore.getViewById,
                 [vm.gridId, mkSelectionOptions(vm.parentEntityRef)], {force: true})
             .then(r => {
-                // vm.filters = [];
                 vm.loading = false;
                 vm.rawGridData = r.data;
 
@@ -82,6 +82,9 @@ function controller($scope, serviceBroker, localStorageService) {
                 vm.allTableData = prepareTableData(vm.rawGridData);
                 vm.allColumnDefs = prepareColumnDefs(vm.rawGridData);
                 refresh();
+            })
+            .catch(e => {
+                displayError("Could not load grid data for id: " + vm.gridId, e)
             });
     }
 

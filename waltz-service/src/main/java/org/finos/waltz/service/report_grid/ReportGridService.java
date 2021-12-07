@@ -18,8 +18,8 @@
 
 package org.finos.waltz.service.report_grid;
 
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.model.*;
-import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.service.changelog.ChangeLogService;
 import org.finos.waltz.service.rating_scheme.RatingSchemeService;
 import org.finos.waltz.data.application.ApplicationDao;
@@ -34,7 +34,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import static java.lang.String.format;
@@ -47,6 +46,7 @@ public class ReportGridService {
     private final RatingSchemeService ratingSchemeService;
     private final ApplicationDao applicationDao;
     private final ReportGridDao reportGridDao;
+    private final ReportGridMemberService reportGridMemberService;
     private final ChangeLogService changeLogService;
 
     private final ApplicationIdSelectorFactory applicationIdSelectorFactory = new ApplicationIdSelectorFactory();
@@ -56,13 +56,16 @@ public class ReportGridService {
     public ReportGridService(ReportGridDao reportGridDao,
                              ApplicationDao applicationDao,
                              RatingSchemeService ratingSchemeService,
+                             ReportGridMemberService reportGridMemberService,
                              ChangeLogService changeLogService) {
         checkNotNull(reportGridDao, "reportGridDao cannot be null");
+        checkNotNull(reportGridMemberService, "reportGridMemberService cannot be null");
         checkNotNull(applicationDao, "applicationDao cannot be null");
         checkNotNull(ratingSchemeService, "ratingSchemeService cannot be null");
         checkNotNull(changeLogService, "changeLogService cannot be null");
 
         this.reportGridDao = reportGridDao;
+        this.reportGridMemberService = reportGridMemberService;
         this.applicationDao = applicationDao;
         this.ratingSchemeService = ratingSchemeService;
         this.changeLogService = changeLogService;
@@ -71,6 +74,11 @@ public class ReportGridService {
 
     public Set<ReportGridDefinition> findAll(){
         return reportGridDao.findAll();
+    }
+
+
+    public Set<ReportGridDefinition> findForUser(String username){
+        return reportGridDao.findForUser(username);
     }
 
 
@@ -88,8 +96,13 @@ public class ReportGridService {
                     .withScope(HierarchyQueryScope.EXACT)
                 : idSelectionOptions;
 
-        ReportGridInstance instance = mkInstance(id, opts);
         ReportGridDefinition definition = reportGridDao.getGridDefinitionById(id);
+
+        if(definition == null){
+            return null;
+        }
+
+        ReportGridInstance instance = mkInstance(id, opts);
 
         return ImmutableReportGrid
                 .builder()
@@ -119,8 +132,9 @@ public class ReportGridService {
 
 
     public ReportGridDefinition updateColumnDefinitions(long reportGridId,
-                                                        ReportGridColumnDefinitionsUpdateCommand updateCommand) {
-
+                                                        ReportGridColumnDefinitionsUpdateCommand updateCommand,
+                                                        String username) throws InsufficientPrivelegeException {
+        checkIsOwner(reportGridId, username);
         int newColumnCount = reportGridDao.updateColumnDefinitions(reportGridId, updateCommand.columnDefinitions());
         return reportGridDao.getGridDefinitionById(reportGridId);
     }
@@ -128,6 +142,23 @@ public class ReportGridService {
 
     public ReportGridDefinition create(ReportGridCreateCommand createCommand, String username){
         long gridId = reportGridDao.create(createCommand, username);
+        reportGridMemberService.register(gridId, username, ReportGridMemberRole.OWNER);
         return reportGridDao.getGridDefinitionById(gridId);
+    }
+
+
+    public ReportGridDefinition update(long id, ReportGridUpdateCommand updateCommand, String username) throws InsufficientPrivelegeException {
+        checkIsOwner(id, username);
+        long gridId = reportGridDao.update(id, updateCommand, username);
+        return reportGridDao.getGridDefinitionById(id);
+    }
+
+
+    private void checkIsOwner(long reportGridId, String username) throws InsufficientPrivelegeException {
+        reportGridMemberService.checkIsOwner(reportGridId, username);
+    }
+
+    public Set<ReportGridDefinition> findForOwner(String username) {
+        return reportGridDao.findForOwner(username);
     }
 }

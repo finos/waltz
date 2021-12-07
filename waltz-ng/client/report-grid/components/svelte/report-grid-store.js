@@ -8,6 +8,8 @@ export let filters = writable([]);
 export let activeSummaryColRefs = writable([]);
 export let columnDefs = writable([]);
 export let selectedColumn = writable(null);
+export let lastMovedColumn = writable(null);
+export let ownedReportIds = writable([]);
 
 export let columnsChanged = derived([columnDefs, selectedGrid], ([$columnDefs, $selectedGrid]) => {
 
@@ -44,7 +46,6 @@ export let positionChanged = derived(columnDefs, ($columnDefs) => {
 export let hasChanged = derived(
     [columnsChanged, usageKindChanged, ratingRollupRuleChanged, positionChanged],
     ([$columnsChanged, $usageKindChanged, $ratingRollupRuleChanged, $positionChanged]) => {
-        console.log({$usageKindChanged});
         return $columnsChanged || $usageKindChanged || $ratingRollupRuleChanged || $positionChanged;
     })
 
