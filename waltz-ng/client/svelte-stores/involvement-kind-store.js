@@ -20,6 +20,15 @@ import {remote} from "./remote";
 
 export function mkInvolvementKindStore() {
 
+    const findAll = (force = false) => {
+        return remote
+            .fetchViewList(
+                "GET",
+                "api/involvement-kind",
+                [],
+                {force: force});
+    }
+
     const getById = (id, force = false) => {
         return remote
             .fetchViewData(
@@ -41,6 +50,7 @@ export function mkInvolvementKindStore() {
     };
 
     return {
+        findAll,
         getById,
         findKeyInvolvementKindsByEntityKind
     };

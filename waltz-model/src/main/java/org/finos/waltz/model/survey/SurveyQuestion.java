@@ -21,6 +21,7 @@ package org.finos.waltz.model.survey;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.ExternalIdProvider;
 import org.finos.waltz.model.IdProvider;
@@ -62,5 +63,10 @@ public abstract class SurveyQuestion implements
     public abstract Optional<String> label();
 
     public abstract Optional<String> parentExternalId();
+
+    @Value.Default
+    public EntityKind kind(){
+        return EntityKind.SURVEY_QUESTION;
+    }
 
 }

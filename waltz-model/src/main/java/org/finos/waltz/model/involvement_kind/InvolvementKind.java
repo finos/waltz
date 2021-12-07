@@ -20,10 +20,7 @@ package org.finos.waltz.model.involvement_kind;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.finos.waltz.model.DescriptionProvider;
-import org.finos.waltz.model.IdProvider;
-import org.finos.waltz.model.LastUpdatedProvider;
-import org.finos.waltz.model.NameProvider;
+import org.finos.waltz.model.*;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -34,4 +31,9 @@ public abstract class InvolvementKind implements
         NameProvider,
         DescriptionProvider,
         LastUpdatedProvider {
+
+    @Value.Default
+    public EntityKind kind() {
+        return EntityKind.INVOLVEMENT_KIND;
+    }
 }

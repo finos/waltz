@@ -17,20 +17,15 @@
  */
 
 import {remote} from "./remote";
-import {CORE_API} from "../common/services/core-api-utils";
 
-export function mkSurveyQuestionStore() {
+export function mkReportGridMemberStore() {
 
-    const findQuestionsForInstance = (id) => remote
-        .fetchViewList("GET", `api/survey-question/questions/instance/${id}`);
-
-    const findQuestionsForTemplate = (id, force = false) => remote
-        .fetchViewList("GET", `api/survey-question/questions/template/${id}`, [], {force});
+    const findByGridId = (id, force = false) => remote
+        .fetchViewList("GET", `api/report-grid-member/grid-id/${id}`, [], {force});
 
     return {
-        findQuestionsForInstance,
-        findQuestionsForTemplate
+        findByGridId,
     };
 }
 
-export const surveyQuestionStore = mkSurveyQuestionStore();
+export const reportGridMemberStore = mkReportGridMemberStore();
