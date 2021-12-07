@@ -4,9 +4,9 @@
     import {groupedQuestions, responsesByQuestionId, selectedSection} from "./survey-detail-store";
     import _ from "lodash";
     import {surveyInstanceViewStore} from "../../../../svelte-stores/survey-instance-view-store";
-    import SurveyOverviewSubPanel from "./SurveyOverviewSubPanel.svelte";
     import SurveyInstanceInfoPanel from "../../../../common/svelte/info-panels/SurveyInstanceInfoPanel.svelte";
     import SurveyPeople from "./SurveyPeople.svelte";
+    import SurveyActions from "./SurveyActions.svelte";
 
     export let primaryEntityRef;
 
@@ -30,11 +30,8 @@
         surveyCall = surveyInstanceViewStore.getById(surveyInstanceId, true);
     }
 
-    let selectedTab = 'sections';
-
     $: surveyCall = surveyInstanceViewStore.getById(primaryEntityRef?.id);
     $: survey = $surveyCall?.data;
-
 
     $: questionsWithResponse = _
         .chain(_.values($responsesByQuestionId))
@@ -50,42 +47,26 @@
 
     $: sectionList = $groupedQuestions;
 
-    $: console.log(survey);
 </script>
 
-<SurveyOverviewSubPanel on:action={onAction}
-                        {questionsWithResponse}
-                        {survey}/>
 
+<!-- SURVEY INSTANCE DETAILS -->
+<SurveyInstanceInfoPanel {primaryEntityRef}>
+    <div slot="post-title">
+        <SurveyActions on:action={onAction}
+                       {survey}
+                       {questionsWithResponse}/>
 
-<div class="waltz-tabs" style="padding-top: 1em">
-    <!-- TAB HEADERS -->
+        <br>
 
-    <input type="radio"
-           bind:group={selectedTab}
-           value="sections"
-           id="sections">
-    <label class="wt-label"
-           for="sections">
-        <span>Sections</span>
-    </label>
-
-    <input type="radio"
-           bind:group={selectedTab}
-           value="detail"
-           id="detail">
-    <label class="wt-label"
-           for="detail">
-        <span>Detail</span>
-    </label>
-
-    <div class="wt-tab wt-active">
-    {#if selectedTab === 'sections'}
-        <!-- SECTIONS -->
+        <h5>
+            <Icon name="columns"/>
+            Sections
+        </h5>
         <div class="help-block small">
             <Icon name="info-circle"/>Select a section below to focus on its questions
         </div>
-        <ul class="section-list">
+        <ul class="section-list small">
             {#each sectionList as section}
                 <li class="clickable section-list-item"
                     on:mouseenter={() => section.hovering = true}
@@ -96,36 +77,34 @@
                     {section.sectionName}
                     <span title={`${getResponsesCount(section)} questions with a response out of a total ${_.size(section.questions)} questions`}
                           class="small pull-right text-muted">
-                        {`(${getResponsesCount(section)} / ${_.size(section.questions)})`}
-                    </span>
+                {`(${getResponsesCount(section)} / ${_.size(section.questions)})`}
+            </span>
                 </li>
             {/each}
         </ul>
-    {:else if selectedTab === 'detail'}
-        <!-- SURVEY INSTANCE DETAILS -->
-        <SurveyInstanceInfoPanel {primaryEntityRef}>
-            <div slot="post-header">
-                <h5>
-                    <Icon name="users"/>
-                    People
-                </h5>
-                <SurveyPeople id={primaryEntityRef?.id}/>
-            </div>
-        </SurveyInstanceInfoPanel>
-    {/if}
+
+        <br>
+
+        <h5>
+            <Icon name="table"/>
+            Detail
+        </h5>
     </div>
-</div>
+    <div slot="post-header">
+        <h5>
+            <Icon name="users"/>
+            People
+        </h5>
+        <SurveyPeople id={primaryEntityRef?.id}
+                      groupApprovers={survey.surveyInstance?.owningRole}/>
+    </div>
+</SurveyInstanceInfoPanel>
 
 
 <style type="text/scss">
 
     @import "style/variables";
 
-    ul {
-        padding: 0;
-        margin: 0;
-        list-style: none;
-    }
 
     li {
         padding-top: 0;
@@ -136,6 +115,8 @@
     }
 
     .section-list {
+
+        padding-left: 1.7em;
 
         li:not(:last-child)  {
             border-bottom: 1px solid #EEEEEE ;

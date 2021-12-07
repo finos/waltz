@@ -253,17 +253,15 @@ public class SurveyInstanceService {
     }
 
 
-    public int updateDueDate(String userName, long instanceId, DateChangeCommand command) {
+    public int updateSubmissionDueDate(String userName, long instanceId, LocalDate newDueDate) {
         checkNotNull(userName, "userName cannot be null");
-        checkNotNull(command, "command cannot be null");
+        checkNotNull(newDueDate, "newDueDate cannot be null");
 
         checkPersonIsOwnerOrAdmin(userName, instanceId);
-        LocalDate newDueDate = command.newDateVal().orElse(null);
 
-        checkNotNull(newDueDate, "newDueDate cannot be null");
         checkApprovalDueDateIsLaterThanSubmissionDueDate(surveyInstanceDao.getById(instanceId).approvalDueDate(), newDueDate);
 
-        int result = surveyInstanceDao.updateDueDate(instanceId, newDueDate);
+        int result = surveyInstanceDao.updateSubmissionDueDate(instanceId, newDueDate);
 
         changeLogService.write(
                 ImmutableChangeLog.builder()
@@ -277,14 +275,12 @@ public class SurveyInstanceService {
     }
 
 
-    public int updateApprovalDueDate(String userName, long instanceId, DateChangeCommand command) {
+    public int updateApprovalDueDate(String userName, long instanceId, LocalDate newDueDate) {
         checkNotNull(userName, "userName cannot be null");
-        checkNotNull(command, "command cannot be null");
+        checkNotNull(newDueDate, "newDueDate cannot be null");
 
         checkPersonIsOwnerOrAdmin(userName, instanceId);
 
-        LocalDate newDueDate = command.newDateVal().orElse(null);
-        checkNotNull(newDueDate, "newDueDate cannot be null");
         checkApprovalDueDateIsLaterThanSubmissionDueDate(newDueDate, surveyInstanceDao.getById(instanceId).dueDate());
 
 

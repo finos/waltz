@@ -12,8 +12,8 @@
 
 </script>
 
-<div class={hasLongDescription && !expanded ? "wdf-description" : ""}>
-    <div class={hasLongDescription && !expanded ? "wdf-description-fade" : ""}></div>
+<div class:wdf-description={hasLongDescription && !expanded}> <!-- wdf-description limits the size of the box -->
+    <div class:wdf-description-fade={hasLongDescription && !expanded}></div>  <!-- wdf-description-fade overlays the fade effect -->
     <Markdown {text} {context}/>
 </div>
 {#if hasLongDescription}

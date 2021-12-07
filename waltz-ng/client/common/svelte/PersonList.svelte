@@ -43,8 +43,6 @@
             isRemovable: mayRemove(p, self, { canRemove, canRemoveSelf})
         }));
 
-    $: console.log({peopleList, self})
-
 </script>
 
 {#if mode === Modes.LIST}
@@ -88,6 +86,7 @@
     </ul>
 
 {:else if mode === Modes.ADD}
+
     <!-- ADD -->
     <strong>Add additional person</strong>
 
@@ -97,6 +96,7 @@
             on:click={() => mode = Modes.LIST}>
         Cancel
     </button>
+
 {/if}
 
 

@@ -93,18 +93,24 @@
 {#if mode === Modes.LIST}
     <!-- ACTION LIST -->
     {#if !_.isEmpty(actionList)}
-        <ul class="list-inline">
-            {#each actionList as action}
-                <li>
-                    <button class={mkButtonClasses(action)}
-                            disabled={action.actionName === 'SUBMITTING' && hasMandatoryQuestionsWithoutResponse}
-                            on:click={() => initiateAction(action, instanceId)}>
-                        <Icon name={action.icon}/>
-                        {action.display}
-                    </button>
-                </li>
-            {/each}
-        </ul>
+        <h5>
+            <Icon name="cogs"/>
+            Actions
+        </h5>
+        <div class="actions">
+            <ul class="list-inline">
+                {#each actionList as action}
+                    <li>
+                        <button class={mkButtonClasses(action)}
+                                disabled={action.actionName === 'SUBMITTING' && hasMandatoryQuestionsWithoutResponse}
+                                on:click={() => initiateAction(action, instanceId)}>
+                            <Icon name={action.icon}/>
+                            {action.display}
+                        </button>
+                    </li>
+                {/each}
+            </ul>
+        </div>
         {#if hasMandatoryQuestionsWithoutResponse}
             <div style="padding-top: 0.5em"
                  class="small">
@@ -148,3 +154,17 @@
 {:else}
     <h4>Unknown Mode: {mode}</h4>
 {/if}
+
+<style>
+    .actions {
+        padding: 0.4em;
+        border-color: #ddd;
+        border-width: 1px;
+        border-style: solid;
+        background: #fafafa;
+    }
+
+    .actions ul {
+        margin-bottom: 0;
+    }
+</style>

@@ -8,21 +8,51 @@
     import {surveyInstanceStatus} from "../../services/enums/survey-instance-status";
     import _ from "lodash";
     import {toSurveyName} from "../../../survey/components/svelte/inline-panel/survey-viewer-utils";
-    import Markdown from "../Markdown.svelte";
     import DescriptionFade from "../DescriptionFade.svelte";
+    import DatePicker from "../DatePicker.svelte";
+    import {surveyInstanceStore} from "../../../svelte-stores/survey-instance-store";
+    import ToastStore from "../../../svelte-stores/toast-store";
+    import {displayError} from "../../error-utils";
 
     export let primaryEntityRef;
 
-    $: surveyCall = surveyInstanceViewStore.getById(primaryEntityRef?.id);
+    function reload() {
+        surveyCall = surveyInstanceViewStore.getById(primaryEntityRef?.id, true);
+    }
+
+    function updateSubmissionDueDate(d) {
+        const updDate = d.detail;
+        surveyInstanceStore
+            .updateSubmissionDueDate(primaryEntityRef.id, updDate)
+            .then(() => ToastStore.success("Updated submission due date"))
+            .then(() => reload())
+            .catch(e => displayError("Failed to update submission due date", e));
+    }
+
+    function updateApprovalDueDate(d) {
+        const updDate = d.detail;
+        surveyInstanceStore
+            .updateApprovalDueDate(primaryEntityRef.id, updDate)
+            .then(() => ToastStore.success("Updated approval due date"))
+            .then(() => reload())
+            .catch(e => displayError("Failed to update approval due date", e));
+    }
+
+    $: id = primaryEntityRef?.id;
+
+    $: surveyCall = id && surveyInstanceViewStore.getById(id);
     $: survey = $surveyCall.data;
+
+    $: permissionsCall = id && surveyInstanceStore.getPermissions(id);
+    $: permissions = $permissionsCall.data;
 
     $: surveyName = toSurveyName(survey);
 
     $: descContext = survey
-        ? {entity: survey.surveyInstance.surveyEntity, instance: survey.surveyInstance }
+        ? {entity: survey.surveyInstance.surveyEntity, instance: survey.surveyInstance}
         : null;
-
 </script>
+
 
 {#if survey}
     <h4><EntityLink ref={Object.assign(survey.surveyInstance, {name: surveyName})}/></h4>
@@ -43,7 +73,14 @@
             </tr>
             <tr>
                 <td width="50%">Submission Due Date</td>
-                <td width="50%">{survey.surveyInstance?.dueDate}</td>
+                <td width="50%">
+                    {#key survey.surveyInstance?.dueDate}
+                        <DatePicker canEdit={permissions?.isMetaEdit}
+                                    origDate={survey.surveyInstance.dueDate}
+                                    options={{maxDate: survey.surveyInstance.approvalDueDate}}
+                                    on:change={updateSubmissionDueDate}/>
+                    {/key}
+                </td>
             </tr>
             {#if survey.surveyInstance?.submittedAt}
                 <tr>
@@ -58,7 +95,14 @@
             {/if}
             <tr>
                 <td width="50%">Approval Due Date</td>
-                <td width="50%">{survey.surveyInstance?.approvalDueDate}</td>
+                <td width="50%">
+                    {#key survey.approvalInstance?.dueDate}
+                        <DatePicker canEdit={permissions?.isMetaEdit}
+                                    origDate={survey.surveyInstance.approvalDueDate}
+                                    options={{minDate: survey.surveyInstance.dueDate}}
+                                    on:change={updateApprovalDueDate}/>
+                    {/key}
+                </td>
             </tr>
             {#if survey.surveyInstance?.approvedAt}
                 <tr>

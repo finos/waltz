@@ -17,6 +17,7 @@
  */
 
 import {remote} from "./remote";
+import {toLocalDate} from "../common/date-utils";
 
 export function mkSurveyInstanceStore() {
 
@@ -50,6 +51,13 @@ export function mkSurveyInstanceStore() {
     const addOwner = (surveyInstanceId, personId) => remote
         .execute("POST", `api/survey-instance/${surveyInstanceId}/owner`, personId);
 
+    const updateSubmissionDueDate = (id, updDate) => remote
+        .execute("PUT",`api/survey-instance/${id}/submission-due-date`, toLocalDate(updDate));
+
+    const updateApprovalDueDate = (id, updDate) => remote
+        .execute("PUT",`api/survey-instance/${id}/approval-due-date`, toLocalDate(updDate));
+
+
     return {
         addOwner,
         addRecipient,
@@ -60,7 +68,10 @@ export function mkSurveyInstanceStore() {
         findRecipients,
         findResponses,
         getPermissions,
-        updateStatus
+        updateStatus,
+        updateSubmissionDueDate,
+        updateApprovalDueDate
+
     };
 }
 

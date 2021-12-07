@@ -5,17 +5,19 @@
     import {surveyInstanceStore} from "../../../../svelte-stores/survey-instance-store";
     import {displayError} from "../../../../common/error-utils";
     import PersonList from "../../../../common/svelte/PersonList.svelte";
+    import Icon from "../../../../common/svelte/Icon.svelte";
 
 
     export let id;
+    export let groupApprovers = null;
 
     let ownersCall = null;
     let recipientsCall = null;
 
 
     function reload() {
-        ownersCall = surveyInstanceStore.findOwners(id, true)
-        recipientsCall = surveyInstanceStore.findRecipients(id, true)
+        ownersCall = surveyInstanceStore.findOwners(id, true);
+        recipientsCall = surveyInstanceStore.findRecipients(id, true);
     }
 
 
@@ -25,8 +27,8 @@
             .then(() => Toasts.success(`Added recipient: ${person.name}`))
             .then(reload)
             .catch(e => displayError("Failed to add recipient", e));
-
     }
+
 
     function onAddOwner(person) {
         return surveyInstanceStore
@@ -60,6 +62,8 @@
     $: permissions = $permissionsCall.data;
 
     $: id && reload();
+
+    $: console.log("peeps", {groupApprovers})
 </script>
 
 
@@ -81,8 +85,9 @@
         </td>
     </tr>
     <tr style="vertical-align: top">
-        <td>Approvers</td>
+        <td>Individual Approvers</td>
         <td>
+
             <PersonList people={owners}
                         onAdd={onAddOwner}
                         onRemove={onRemoveOwner}
@@ -91,6 +96,15 @@
                         canRemoveSelf={false}/>
         </td>
     </tr>
+    {#if !_.isNil(groupApprovers)}
+        <tr style="vertical-align: top">
+            <td>Group Approvers</td>
+            <td>
+                <Icon name="group"/>
+                {groupApprovers}
+            </td>
+        </tr>
+    {/if}
     </tbody>
 </table>
 

@@ -19,7 +19,6 @@
 package org.finos.waltz.web.endpoints.api;
 
 
-import org.finos.waltz.model.DateChangeCommand;
 import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.survey.*;
 import org.finos.waltz.service.survey.SurveyInstanceService;
@@ -29,6 +28,8 @@ import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.model.HierarchyQueryScope.EXACT;
@@ -69,7 +70,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
         String findPossibleActionsPath = mkPath(BASE_URL, ":id", "actions");
         String saveResponsePath = mkPath(BASE_URL, ":id", "response");
         String updateStatusPath = mkPath(BASE_URL, ":id", "status");
-        String updateDueDatePath = mkPath(BASE_URL, ":id", "due-date");
+        String updateSubmissionDueDatePath = mkPath(BASE_URL, ":id", "submission-due-date");
         String updateApprovalDueDatePath = mkPath(BASE_URL, ":id", "approval-due-date");
         String recipientPath = mkPath(BASE_URL, ":id", "recipient");
         String deleteRecipientPath = mkPath(BASE_URL, ":id", "recipient", ":personId");
@@ -155,23 +156,23 @@ public class SurveyInstanceEndpoint implements Endpoint {
                     );
                 };
 
-        DatumRoute<Integer> updateDueDateRoute = (req, res) -> {
-            DateChangeCommand command = readBody(req, DateChangeCommand.class);
+        DatumRoute<Integer> updateSubmissionDueDateRoute = (req, res) -> {
+            LocalDate newDate = readBody(req, LocalDate.class);
 
-            return surveyInstanceService.updateDueDate(
+            return surveyInstanceService.updateSubmissionDueDate(
                     getUsername(req),
                     getId(req),
-                    command);
+                    newDate);
         };
 
 
         DatumRoute<Integer> updateApprovalDueDateRoute = (req, res) -> {
-            DateChangeCommand command = readBody(req, DateChangeCommand.class);
+            LocalDate newDate = readBody(req, LocalDate.class);
 
             return surveyInstanceService.updateApprovalDueDate(
                     getUsername(req),
                     getId(req),
-                    command);
+                    newDate);
         };
 
         DatumRoute<Long> addRecipientRoute =
@@ -220,7 +221,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
         getForList(findPossibleActionsPath, findPossibleActionsRoute);
         putForDatum(saveResponsePath, saveResponseRoute);
         putForDatum(updateStatusPath, updateStatusRoute);
-        putForDatum(updateDueDatePath, updateDueDateRoute);
+        putForDatum(updateSubmissionDueDatePath, updateSubmissionDueDateRoute);
         putForDatum(updateApprovalDueDatePath, updateApprovalDueDateRoute);
         postForDatum(recipientPath, addRecipientRoute);
         postForDatum(ownerPath, addOwnerRoute);

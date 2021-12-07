@@ -10,10 +10,11 @@
     } from "./survey-detail-store";
     import _ from "lodash";
     import SurveyQuestionResponse from "./SurveyQuestionResponse.svelte";
-    import SurveyViewerPanel from "./SurveyViewerPanel.svelte";
+    import SurveyViewerContextPanel from "./SurveyViewerContextPanel.svelte";
     import {surveyInstanceViewStore} from "../../../../svelte-stores/survey-instance-view-store";
     import {surveyQuestionStore} from "../../../../svelte-stores/survey-question-store";
     import {surveyInstanceStore} from "../../../../svelte-stores/survey-instance-store";
+
 
     export let primaryEntityRef;
 
@@ -31,6 +32,7 @@
         : $groupedQuestions;
 
 </script>
+
 
 <div class="row">
     <div class="col-sm-8 question-list">
@@ -78,7 +80,7 @@
 
     <div class="col-sm-4"
          style="padding-left: 0">
-        <SurveyViewerPanel {primaryEntityRef}/>
+        <SurveyViewerContextPanel {primaryEntityRef}/>
     </div>
 </div>
 

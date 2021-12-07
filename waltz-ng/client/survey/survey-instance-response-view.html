@@ -16,6 +16,12 @@
   ~
   -->
 <div>
+    <waltz-section name="Survey">
+        <waltz-svelte-component component="ctrl.SurveyViewer"
+                                primary-entity-ref="ctrl.entityReference">
+        </waltz-svelte-component>
+    </waltz-section>
+
     <waltz-page-header icon="wpforms"
                        name="{{ ctrl.surveyDetails.run.name }}"
                        small="{{ctrl.surveyDetails.instance.name || ctrl.surveyDetails.subject.name }}">
