@@ -59,7 +59,7 @@
                 <td class="waltz-visibility-child-30">
                     <small>
                         <ul class="list-unstyled list-inline">
-                            <li  ng-if="subscription.role == 'OWNER'">
+                            <li  ng-if="subscription.role == 'OWNER' && !subscription.appGroup.isFavouriteGroup">
                                 <a class="clickable" ng-click="$ctrl.deleteGroup(subscription)">
                                     Delete
                                     <waltz-icon name="trash"></waltz-icon>
