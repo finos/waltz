@@ -46,4 +46,9 @@ public abstract class AssessmentDefinition implements
     public abstract boolean isReadOnly();
 
     public abstract AssessmentVisibility visibility();
+
+    @Value.Default
+    public EntityKind kind() {
+        return EntityKind.ASSESSMENT_DEFINITION;
+    }
 }

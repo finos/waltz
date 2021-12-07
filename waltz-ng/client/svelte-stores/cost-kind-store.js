@@ -17,20 +17,19 @@
  */
 
 import {remote} from "./remote";
-import {CORE_API} from "../common/services/core-api-utils";
+import {checkIsCustomEnvironment} from "../common/checks";
 
-export function mkSurveyQuestionStore() {
-
-    const findQuestionsForInstance = (id) => remote
-        .fetchViewList("GET", `api/survey-question/questions/instance/${id}`);
-
-    const findQuestionsForTemplate = (id, force = false) => remote
-        .fetchViewList("GET", `api/survey-question/questions/template/${id}`, [], {force});
+export function mkCostKindStore() {
+    const findAll = (force = false) => remote
+        .fetchViewList(
+            "GET",
+            "api/cost-kind",
+            null,
+            {force});
 
     return {
-        findQuestionsForInstance,
-        findQuestionsForTemplate
+        findAll
     };
 }
 
-export const surveyQuestionStore = mkSurveyQuestionStore();
+export const costKindStore = mkCostKindStore();

@@ -16,7 +16,7 @@
         return response.data;
     }
 
-    $: dispatch("select", selectedItem);
+    $: dispatch("select");
 
 </script>
 

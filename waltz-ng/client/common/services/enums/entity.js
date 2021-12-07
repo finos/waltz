@@ -66,6 +66,13 @@ export const entity = {
         description: null,
         position: 60
     },
+    ASSESSMENT_DEFINITION: {
+        key: "ASSESSMENT_DEFINITION",
+        name: "Assessment Definition",
+        icon: "puzzle-piece",
+        description: null,
+        position: 62
+    },
     ATTESTATION: {
         key: "ATTESTATION",
         name: "Attestation",
@@ -107,6 +114,13 @@ export const entity = {
         icon: "hourglass-2",
         description: null,
         position: 96
+    },
+    COST_KIND: {
+        key: "COST_KIND",
+        name: "Cost Kind",
+        icon: "money",
+        description: null,
+        position: 97
     },
     DATABASE: {
         key: "DATABASE",
@@ -160,6 +174,13 @@ export const entity = {
     INVOLVEMENT: {
         key: "INVOLVEMENT",
         name: "Involvement",
+        icon: "share-alt-square",
+        description: null,
+        position: 150
+    },
+    INVOLVEMENT_KIND: {
+        key: "INVOLVEMENT_KIND",
+        name: "Involvement Kind",
         icon: "share-alt-square",
         description: null,
         position: 150
@@ -303,6 +324,13 @@ export const entity = {
         icon: "wpforms",
         description: null,
         position: 257
+    },
+    SURVEY_QUESTION: {
+        key: "SURVEY_QUESTION",
+        name: "Survey Question",
+        icon: "question-circle-o",
+        description: null,
+        position: 258
     },
     SYSTEM: {
         key: "SYSTEM",
