@@ -158,12 +158,18 @@ public class AppGroupService {
 
 
     public void subscribe(String userId, long groupId) {
-        audit(groupId,
-                userId,
-                "Subscribed to group " + appGroupDao.getGroup(groupId).name(),
-                EntityKind.PERSON,
-                Operation.ADD);
-        appGroupMemberDao.register(groupId, userId);
+        AppGroup group = appGroupDao.getGroup(groupId);
+
+        if (group.isFavouriteGroup()){
+            throw new IllegalArgumentException("Cannot subscribe to someone else's favourites group");
+        } else {
+            audit(groupId,
+                    userId,
+                    "Subscribed to group " + group.name(),
+                    EntityKind.PERSON,
+                    Operation.ADD);
+            appGroupMemberDao.register(groupId, userId);
+        }
     }
 
 

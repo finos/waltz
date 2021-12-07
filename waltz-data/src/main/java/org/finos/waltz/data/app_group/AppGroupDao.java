@@ -94,7 +94,7 @@ public class AppGroupDao implements SearchDao<AppGroup> {
 
 
     public List<AppGroup> findPrivateGroupsByOwner(String userId) {
-        SelectConditionStep<Record1<Long>> groupIds = getPrivateGroupIdByOwner(userId);
+        SelectConditionStep<Record1<Long>> groupIds = findGroupsOwnedByUser(userId);
 
         return dsl
                 .select(APPLICATION_GROUP.fields())
@@ -107,7 +107,7 @@ public class AppGroupDao implements SearchDao<AppGroup> {
 
 
     public AppGroup getFavouritesGroupForOwner(String userId) {
-        SelectConditionStep<Record1<Long>> groupIds = getPrivateGroupIdByOwner(userId);
+        SelectConditionStep<Record1<Long>> groupIds = findGroupsOwnedByUser(userId);
 
         return dsl
                 .select(APPLICATION_GROUP.fields())
@@ -147,7 +147,7 @@ public class AppGroupDao implements SearchDao<AppGroup> {
                 .from(APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.ID.in(appGroups))
                 .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name())
-                        .or(APPLICATION_GROUP.ID.in(getPrivateGroupIdByOwner(username))))
+                        .or(APPLICATION_GROUP.ID.in(findGroupsOwnedByUser(username))))
                 .and(notRemoved)
                 .fetch(TO_DOMAIN);
     }
@@ -172,7 +172,7 @@ public class AppGroupDao implements SearchDao<AppGroup> {
                 .on(joinOnA.or(joinOnB))
                 .where((aMatchesEntity.or(bMatchesEntity)))
                 .and(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name())
-                        .or(APPLICATION_GROUP.ID.in(getPrivateGroupIdByOwner(username))))
+                        .or(APPLICATION_GROUP.ID.in(findGroupsOwnedByUser(username))))
                 .and(notRemoved);
 
         return dsl
@@ -196,6 +196,7 @@ public class AppGroupDao implements SearchDao<AppGroup> {
         return dsl.select(APPLICATION_GROUP.fields())
                 .from(APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.KIND.eq(AppGroupKind.PUBLIC.name()))
+                .and(APPLICATION_GROUP.IS_FAVOURITE_GROUP.isFalse())
                 .and(notRemoved)
                 .fetch(TO_DOMAIN);
     }
@@ -217,7 +218,7 @@ public class AppGroupDao implements SearchDao<AppGroup> {
                     .and(nameCondition))
                     .and(notRemoved);
 
-        Select<Record1<Long>> userGroupIds = getPrivateGroupIdByOwner(options.userId());
+        Select<Record1<Long>> userGroupIds = findGroupsOwnedByUser(options.userId());
 
         Select<Record> privateGroups = dsl
                 .select(APPLICATION_GROUP.fields())
@@ -250,10 +251,12 @@ public class AppGroupDao implements SearchDao<AppGroup> {
 
 
     public Long insert(AppGroup appGroup) {
-        return dsl.insertInto(APPLICATION_GROUP)
+        return dsl
+                .insertInto(APPLICATION_GROUP)
                 .set(APPLICATION_GROUP.DESCRIPTION, appGroup.description())
                 .set(APPLICATION_GROUP.NAME, appGroup.name())
                 .set(APPLICATION_GROUP.KIND, appGroup.appGroupKind().name())
+                .set(APPLICATION_GROUP.EXTERNAL_ID, appGroup.externalId().orElse(null))
                 .set(APPLICATION_GROUP.IS_REMOVED, appGroup.isRemoved())
                 .set(APPLICATION_GROUP.IS_FAVOURITE_GROUP, appGroup.isFavouriteGroup())
                 .returning(APPLICATION_GROUP.ID)
@@ -266,6 +269,7 @@ public class AppGroupDao implements SearchDao<AppGroup> {
         return dsl.update(APPLICATION_GROUP)
                 .set(APPLICATION_GROUP.IS_REMOVED, true)
                 .where(APPLICATION_GROUP.ID.eq(groupId))
+                .and(APPLICATION_GROUP.IS_FAVOURITE_GROUP.isFalse())
                 .execute();
 
     }
@@ -287,9 +291,12 @@ public class AppGroupDao implements SearchDao<AppGroup> {
     }
 
 
-    private SelectConditionStep<Record1<Long>> getPrivateGroupIdByOwner(String userId) {
-        return DSL.select(APPLICATION_GROUP_MEMBER.GROUP_ID)
+    private SelectConditionStep<Record1<Long>> findGroupsOwnedByUser(String userId) {
+        return DSL
+                .select(APPLICATION_GROUP_MEMBER.GROUP_ID)
                 .from(APPLICATION_GROUP_MEMBER)
+                .innerJoin(APPLICATION_GROUP)
+                .on(APPLICATION_GROUP_MEMBER.GROUP_ID.eq(APPLICATION_GROUP.ID))
                 .where(APPLICATION_GROUP_MEMBER.USER_ID.eq(userId)
                         .and(APPLICATION_GROUP_MEMBER.ROLE.eq(AppGroupMemberRole.OWNER.name())));
     }

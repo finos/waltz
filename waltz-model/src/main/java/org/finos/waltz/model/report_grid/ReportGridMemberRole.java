@@ -16,21 +16,9 @@
  *
  */
 
-import {remote} from "./remote";
-import {CORE_API} from "../common/services/core-api-utils";
+package org.finos.waltz.model.report_grid;
 
-export function mkSurveyQuestionStore() {
-
-    const findQuestionsForInstance = (id) => remote
-        .fetchViewList("GET", `api/survey-question/questions/instance/${id}`);
-
-    const findQuestionsForTemplate = (id, force = false) => remote
-        .fetchViewList("GET", `api/survey-question/questions/template/${id}`, [], {force});
-
-    return {
-        findQuestionsForInstance,
-        findQuestionsForTemplate
-    };
+public enum ReportGridMemberRole {
+    VIEWER,
+    OWNER
 }
-
-export const surveyQuestionStore = mkSurveyQuestionStore();
