@@ -62,8 +62,6 @@
     $: permissions = $permissionsCall.data;
 
     $: id && reload();
-
-    $: console.log("peeps", {groupApprovers})
 </script>
 
 
