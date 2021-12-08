@@ -23,8 +23,20 @@ export function mkReportGridMemberStore() {
     const findByGridId = (id, force = false) => remote
         .fetchViewList("GET", `api/report-grid-member/grid-id/${id}`, [], {force});
 
+    const updateRole = (gridId, updateRoleCommand) => remote
+        .execute("POST", `api/report-grid-member/grid-id/${gridId}/update-role`, updateRoleCommand);
+
+    const deleteRole = (member) => remote
+        .execute("POST", "api/report-grid-member/delete", member);
+
+    const create = (member) => remote
+        .execute("POST", "api/report-grid-member/create", member);
+
     return {
         findByGridId,
+        updateRole,
+        deleteRole,
+        create
     };
 }
 

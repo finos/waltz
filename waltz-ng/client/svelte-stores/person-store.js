@@ -16,9 +16,15 @@ export function mkPersonStore() {
             "GET",
             `api/person/employee-id/${empId}`, null, null);
 
+    const findByUserId = (userId) => remote
+        .fetchViewData(
+            "GET",
+            `api/person/user-id/${userId}`, null, null);
+
     return {
         getByEmployeeId,
-        getById
+        getById,
+        findByUserId
     };
 }
 
