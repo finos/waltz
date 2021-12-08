@@ -24,10 +24,17 @@
     $: membersCall = $selectedGrid?.definition?.id && reportGridMemberStore.findByGridId($selectedGrid?.definition.id, true);
     $: members = $membersCall?.data || [];
 
+    $: peopleCall = $selectedGrid?.definition?.id && reportGridMemberStore.findPeopleByGridId($selectedGrid?.definition.id, true);
+    $: people = $peopleCall?.data || [];
+
     $: membersList = _.isEmpty(qry)
         ? members
         : termSearch(members, qry, ["userId", "role"]);
 
+
+    $: encrichedMembersList = _.map(
+        membersList,
+        d => Object.assign({}, d, {person: _.find(people, p => p.email === d.userId)}));
 
     function selectMember(member) {
         selectedMember = member;
@@ -39,18 +46,32 @@
             role
         }
 
-        reportGridMemberStore.updateRole($selectedGrid?.definition?.id, updateCmd);
-        reloadMembers();
-        activeMode = Modes.VIEW;
-        selectedMember = null;
+        let updatePromise = reportGridMemberStore.updateRole($selectedGrid?.definition?.id, updateCmd);
+
+        Promise.resolve(updatePromise)
+            .then(r => {
+                toasts.success("Updated user role to:" + role)
+                reloadMembers();
+                activeMode = Modes.VIEW;
+                selectedMember = null;
+            })
+            .catch(e => toasts.error("Could not update role: " + e))
     }
 
     function reloadMembers(){
         membersCall = reportGridMemberStore.findByGridId($selectedGrid?.definition.id, true);
+        peopleCall = reportGridMemberStore.findPeopleByGridId($selectedGrid?.definition.id, true);
     }
 
     function deleteMember(member) {
-        reportGridMemberStore.deleteRole(member);
+
+        const reportGridMember = {
+            gridId: member.gridId,
+            userId: member.userId,
+            role: member.role
+        }
+
+        reportGridMemberStore.deleteRole(reportGridMember);
         reloadMembers();
         selectedMember = null;
     }
@@ -89,7 +110,7 @@
             <SearchInput bind:value={qry}
                          placeholder="Search people"/>
         {/if}
-        <table class="table table-condensed table-hover">
+        <table class="table table-condensed table-hover small">
             <colgroup>
                 <col width="70%">
                 <col width="30%">
@@ -101,10 +122,11 @@
                 </tr>
             </thead>
             <tbody>
-            {#each membersList as member}
+            {#each encrichedMembersList as member}
                 <tr class="clickable"
+                    class:selected={selectedMember?.userId === member?.userId}
                     on:click={() => selectMember(member)}>
-                    <td>{member.userId}</td>
+                    <td>{member?.person?.displayName}</td>
                     <td>{reportGridMember[member.role].name}</td>
                 </tr>
             {/each}
@@ -132,3 +154,10 @@
         {/if}
     </div>
 </div>
+
+
+<style>
+    .selected{
+        background: #f3f9ff;
+    }
+</style>

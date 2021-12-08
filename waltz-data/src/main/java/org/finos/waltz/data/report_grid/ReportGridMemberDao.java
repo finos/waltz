@@ -19,6 +19,8 @@
 package org.finos.waltz.data.report_grid;
 
 
+import org.finos.waltz.data.person.PersonDao;
+import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.report_grid.*;
 import org.finos.waltz.schema.tables.records.ReportGridMemberRecord;
 import org.jooq.DSLContext;
@@ -30,6 +32,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
+import static org.finos.waltz.schema.Tables.PERSON;
 import static org.finos.waltz.schema.Tables.REPORT_GRID_MEMBER;
 
 @Repository
@@ -107,6 +110,16 @@ public class ReportGridMemberDao {
         record.setUserId(member.userId());
         record.setRole(member.role().name());
         return record.insert();
+    }
+
+    public Set<Person> findPeopleByGridId(Long gridId) {
+        return dsl
+                .select(PERSON.fields())
+                .from(REPORT_GRID_MEMBER)
+                .innerJoin(PERSON).on(PERSON.EMAIL.eq(REPORT_GRID_MEMBER.USER_ID)
+                        .and(PERSON.IS_REMOVED.isFalse()))
+                .where(REPORT_GRID_MEMBER.GRID_ID.eq(gridId))
+                .fetchSet(PersonDao.personMapper);
     }
 }
 

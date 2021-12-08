@@ -20,6 +20,7 @@ package org.finos.waltz.service.report_grid;
 
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
 import org.finos.waltz.data.report_grid.ReportGridMemberDao;
+import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.report_grid.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,11 @@ public class ReportGridMemberService {
 
     public Set<ReportGridMember> findByGridId(Long gridId){
         return reportGridMemberDao.findByGridId(gridId);
+    }
+
+
+    public Set<Person> findPeopleByGridId(Long gridId) {
+        return reportGridMemberDao.findPeopleByGridId(gridId);
     }
 
 

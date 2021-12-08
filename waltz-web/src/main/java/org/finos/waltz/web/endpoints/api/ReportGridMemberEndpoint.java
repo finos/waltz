@@ -19,6 +19,7 @@
 package org.finos.waltz.web.endpoints.api;
 
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.report_grid.ReportGridMember;
 import org.finos.waltz.model.report_grid.ReportGridMemberUpdateRoleCommand;
 import org.finos.waltz.service.report_grid.ReportGridMemberService;
@@ -52,11 +53,13 @@ public class ReportGridMemberEndpoint implements Endpoint {
     @Override
     public void register() {
         String findForGridIdPath = mkPath(BASE_URL, "grid-id", ":id");
+        String findPeopleForGridIdPath = mkPath(BASE_URL, "grid-id", ":id", "people");
         String updateUserRolePath = mkPath(BASE_URL, "grid-id", ":id", "update-role");
         String createPath = mkPath(BASE_URL, "create");
         String deletePath = mkPath(BASE_URL, "delete");
 
         getForList(findForGridIdPath, this::findForGridIdRoute);
+        getForList(findPeopleForGridIdPath, this::findPeopleForGridIdRoute);
         postForList(updateUserRolePath, this::updateUserRoleRoute);
         postForDatum(createPath, this::createRoute);
         postForDatum(deletePath, this::delete);
@@ -65,6 +68,11 @@ public class ReportGridMemberEndpoint implements Endpoint {
 
     public Set<ReportGridMember> findForGridIdRoute(Request req, Response resp) throws IOException {
         return reportGridMemberService.findByGridId(getId(req));
+    }
+
+
+    public Set<Person> findPeopleForGridIdRoute(Request req, Response resp) throws IOException {
+        return reportGridMemberService.findPeopleByGridId(getId(req));
     }
 
 

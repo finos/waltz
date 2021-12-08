@@ -27,9 +27,9 @@
 </p>
 
 {#if selectedPerson}
-    <button class="btn btn-success"
+    <button class="btn btn-xs btn-success"
             on:click={() => onSelect(person)}>
-        <Icon name="save"/>Add
+        <Icon name="save"/> Add
     </button>
 {/if}
 <button class="btn btn-skinny"

@@ -4,6 +4,7 @@
     import EntityLink from "../EntityLink.svelte";
     import {personStore} from "../../../svelte-stores/person-store";
     import {orgUnitStore} from "../../../svelte-stores/org-unit-store";
+    import Icon from "../Icon.svelte";
 
     export let primaryEntityRef;
 
@@ -16,6 +17,8 @@
     $: orgUnitCall = person?.organisationalUnitId && orgUnitStore.getById(person?.organisationalUnitId);
     $: orgUnit = $orgUnitCall?.data;
 
+    $: phone = person?.officePhone || person?.mobilePhone;
+
 </script>
 
 {#if person}
@@ -25,8 +28,24 @@
         <tbody>
             <tr>
                 <td width="50%">Email</td>
-                <td width="50%">{person.email}</td>
+                <td width="50%">
+                    {person.email}
+                    <a href="mailto:{person.email}">
+                        <Icon name="envelope-o"/>
+                    </a>
+                </td>
             </tr>
+            {#if phone}
+                <tr>
+                    <td width="50%">Phone</td>
+                    <td width="50%">
+                        {phone}
+                        <a href="sip:{person.email}">
+                            <Icon name="phone"/>
+                        </a>
+                    </td>
+                </tr>
+            {/if}
             <tr>
                 <td width="50%">Org unit</td>
                 <td width="50%">{orgUnit?.name || "Unknown"}</td>
