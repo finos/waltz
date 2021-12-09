@@ -27,7 +27,7 @@
     $: grids = $reportGridCall.data;
 
 
-    $: gridOwnersCall = $selectedGrid?.definition?.id && reportGridMemberStore.findByGridId($selectedGrid?.definition.id);
+    $: gridOwnersCall = $selectedGrid?.definition?.id && reportGridMemberStore.findByGridId($selectedGrid?.definition?.id);
     $: gridOwners = $gridOwnersCall?.data || [];
 
     function selectGrid(grid) {
@@ -93,6 +93,7 @@
 
     function cancel(){
         activeMode = Modes.VIEW;
+        $selectedGrid = $selectedGrid.definition.id ? $selectedGrid : null;
     }
 
     $: gridOwnerNames = _.map(gridOwners, d => d.userId);
@@ -108,14 +109,14 @@
     <div class="col-sm-7">
         {#if activeMode === Modes.EDIT}
             <h4>Editing report grid:</h4>
-            <ReportGridEditor grid={$selectedGrid.definition}
+            <ReportGridEditor grid={$selectedGrid?.definition}
                               doSave={saveReportGrid}
                               doCancel={cancel}/>
         {:else if activeMode === Modes.VIEW}
-            {#if $selectedGrid.definition.id}
+            {#if $selectedGrid?.definition?.id}
                 <h4>{$selectedGrid?.definition?.name}</h4>
-                <div class:text-muted={$selectedGrid.definition?.description}>
-                    {$selectedGrid.definition?.description || "No description provided"}
+                <div class:text-muted={$selectedGrid?.definition?.description}>
+                    {$selectedGrid?.definition?.description || "No description provided"}
                 </div>
                 <br>
                 <div>
@@ -149,12 +150,3 @@
         {/if}
     </div>
 </div>
-
-
-<style>
-
-    li {
-        display: inline;
-    }
-
-</style>

@@ -19,9 +19,9 @@
 package org.finos.waltz.data.report_grid;
 
 
-import org.finos.waltz.model.report_grid.ImmutableReportGridMember;
-import org.finos.waltz.model.report_grid.ReportGridMember;
-import org.finos.waltz.model.report_grid.ReportGridMemberRole;
+import org.finos.waltz.data.person.PersonDao;
+import org.finos.waltz.model.person.Person;
+import org.finos.waltz.model.report_grid.*;
 import org.finos.waltz.schema.tables.records.ReportGridMemberRecord;
 import org.jooq.DSLContext;
 import org.jooq.Record;
@@ -32,6 +32,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Set;
 
+import static org.finos.waltz.schema.Tables.PERSON;
 import static org.finos.waltz.schema.Tables.REPORT_GRID_MEMBER;
 
 @Repository
@@ -48,9 +49,9 @@ public class ReportGridMemberDao {
         ReportGridMemberRecord record = r.into(ReportGridMemberRecord.class);
 
         return ImmutableReportGridMember.builder()
-                .groupId(record.getGridId())
+                .gridId(record.getGridId())
                 .userId(record.getUserId())
-                .reportGridMemberRole(ReportGridMemberRole.valueOf(record.getRole()))
+                .role(ReportGridMemberRole.valueOf(record.getRole()))
                 .build();
     };
 
@@ -79,6 +80,46 @@ public class ReportGridMemberDao {
                 .where(REPORT_GRID_MEMBER.GRID_ID.eq(gridId)
                         .and(REPORT_GRID_MEMBER.USER_ID.eq(userId)
                                 .and(REPORT_GRID_MEMBER.ROLE.eq(ReportGridMemberRole.OWNER.name())))));
+    }
+
+
+    public int updateUserRole(long gridId, ReportGridMemberUpdateRoleCommand updateCommand) {
+        return dsl
+                .update(REPORT_GRID_MEMBER)
+                .set(REPORT_GRID_MEMBER.ROLE, updateCommand.role().name())
+                .where(REPORT_GRID_MEMBER.GRID_ID.eq(gridId)
+                        .and(REPORT_GRID_MEMBER.USER_ID.eq(updateCommand.userId())))
+                .execute();
+    }
+
+
+    public boolean delete(ReportGridMember member){
+        return dsl
+                .deleteFrom(REPORT_GRID_MEMBER)
+                .where(REPORT_GRID_MEMBER.GRID_ID.eq(member.gridId())
+                        .and(REPORT_GRID_MEMBER.USER_ID.eq(member.userId())
+                                .and(REPORT_GRID_MEMBER.ROLE.eq(member.role().name()))))
+                .execute() == 1;
+
+    }
+
+
+    public int create(ReportGridMember member) {
+        ReportGridMemberRecord record = dsl.newRecord(REPORT_GRID_MEMBER);
+        record.setGridId(member.gridId());
+        record.setUserId(member.userId());
+        record.setRole(member.role().name());
+        return record.insert();
+    }
+
+    public Set<Person> findPeopleByGridId(Long gridId) {
+        return dsl
+                .select(PERSON.fields())
+                .from(REPORT_GRID_MEMBER)
+                .innerJoin(PERSON).on(PERSON.EMAIL.eq(REPORT_GRID_MEMBER.USER_ID)
+                        .and(PERSON.IS_REMOVED.isFalse()))
+                .where(REPORT_GRID_MEMBER.GRID_ID.eq(gridId))
+                .fetchSet(PersonDao.personMapper);
     }
 }
 

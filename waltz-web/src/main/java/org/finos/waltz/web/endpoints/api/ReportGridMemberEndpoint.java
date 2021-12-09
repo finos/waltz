@@ -18,7 +18,10 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.common.exception.InsufficientPrivelegeException;
+import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.report_grid.ReportGridMember;
+import org.finos.waltz.model.report_grid.ReportGridMemberUpdateRoleCommand;
 import org.finos.waltz.service.report_grid.ReportGridMemberService;
 import org.finos.waltz.web.endpoints.Endpoint;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,9 +32,8 @@ import spark.Response;
 import java.io.IOException;
 import java.util.Set;
 
-import static org.finos.waltz.web.WebUtilities.getId;
-import static org.finos.waltz.web.WebUtilities.mkPath;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
+import static org.finos.waltz.web.WebUtilities.*;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class ReportGridMemberEndpoint implements Endpoint {
@@ -51,12 +53,48 @@ public class ReportGridMemberEndpoint implements Endpoint {
     @Override
     public void register() {
         String findForGridIdPath = mkPath(BASE_URL, "grid-id", ":id");
+        String findPeopleForGridIdPath = mkPath(BASE_URL, "grid-id", ":id", "people");
+        String updateUserRolePath = mkPath(BASE_URL, "grid-id", ":id", "update-role");
+        String createPath = mkPath(BASE_URL, "create");
+        String deletePath = mkPath(BASE_URL, "delete");
 
         getForList(findForGridIdPath, this::findForGridIdRoute);
+        getForList(findPeopleForGridIdPath, this::findPeopleForGridIdRoute);
+        postForList(updateUserRolePath, this::updateUserRoleRoute);
+        postForDatum(createPath, this::createRoute);
+        postForDatum(deletePath, this::delete);
     }
 
 
     public Set<ReportGridMember> findForGridIdRoute(Request req, Response resp) throws IOException {
         return reportGridMemberService.findByGridId(getId(req));
+    }
+
+
+    public Set<Person> findPeopleForGridIdRoute(Request req, Response resp) throws IOException {
+        return reportGridMemberService.findPeopleByGridId(getId(req));
+    }
+
+
+    public Set<ReportGridMember> updateUserRoleRoute(Request req, Response resp) throws IOException, InsufficientPrivelegeException {
+        return reportGridMemberService.updateUserRole(
+                getId(req),
+                readBody(req, ReportGridMemberUpdateRoleCommand.class),
+                getUsername(req));
+    }
+
+
+    public int createRoute(Request req, Response resp) throws IOException, InsufficientPrivelegeException {
+        return reportGridMemberService.create(
+                readBody(req, ReportGridMember.class),
+                getUsername(req));
+    }
+
+
+    public boolean delete(Request req, Response resp) throws IOException, InsufficientPrivelegeException {
+        System.out.println(req);
+        return reportGridMemberService.delete(
+                readBody(req, ReportGridMember.class),
+                getUsername(req));
     }
 }
