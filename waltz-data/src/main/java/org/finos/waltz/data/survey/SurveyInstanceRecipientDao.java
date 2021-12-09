@@ -18,6 +18,7 @@
 
 package org.finos.waltz.data.survey;
 
+import org.finos.waltz.model.person.Person;
 import org.finos.waltz.schema.tables.records.SurveyInstanceRecipientRecord;
 import org.finos.waltz.data.person.PersonDao;
 import org.finos.waltz.model.EntityKind;
@@ -86,10 +87,11 @@ public class SurveyInstanceRecipientDao {
     }
 
 
-    public boolean delete(long surveyInstanceRecipientId) {
-
-        return dsl.deleteFrom(SURVEY_INSTANCE_RECIPIENT)
-                .where(SURVEY_INSTANCE_RECIPIENT.ID.eq(surveyInstanceRecipientId))
+    public boolean deleteByInstanceAndPerson(long surveyInstanceId, long personId) {
+        return dsl
+                .deleteFrom(SURVEY_INSTANCE_RECIPIENT)
+                .where(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.eq(surveyInstanceId))
+                .and(SURVEY_INSTANCE_RECIPIENT.PERSON_ID.eq(personId))
                 .execute() == 1;
     }
 
@@ -105,6 +107,7 @@ public class SurveyInstanceRecipientDao {
     }
 
 
+    @Deprecated
     public List<SurveyInstanceRecipient> findForSurveyInstance(long surveyInstanceId) {
         return dsl
                 .select(SURVEY_INSTANCE_RECIPIENT.fields())
@@ -115,6 +118,17 @@ public class SurveyInstanceRecipientDao {
                 .innerJoin(PERSON).on(PERSON.ID.eq(SURVEY_INSTANCE_RECIPIENT.PERSON_ID))
                 .where(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.eq(surveyInstanceId))
                 .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<Person> findPeopleForSurveyInstance(long surveyInstanceId) {
+        return dsl
+                .select(PERSON.fields())
+                .from(SURVEY_INSTANCE_RECIPIENT)
+                .innerJoin(SURVEY_INSTANCE).on(SURVEY_INSTANCE.ID.eq(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID))
+                .innerJoin(PERSON).on(PERSON.ID.eq(SURVEY_INSTANCE_RECIPIENT.PERSON_ID))
+                .where(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.eq(surveyInstanceId))
+                .fetch(PersonDao.personMapper);
     }
 
 

@@ -201,7 +201,7 @@ public class SurveyInstanceDao {
     }
 
 
-    public int updateDueDate(long instanceId, LocalDate newDueDate) {
+    public int updateSubmissionDueDate(long instanceId, LocalDate newDueDate) {
         return dsl.update(SURVEY_INSTANCE)
                 .set(SURVEY_INSTANCE.DUE_DATE, toSqlDate(newDueDate))
                 .where(SURVEY_INSTANCE.ID.eq(instanceId))

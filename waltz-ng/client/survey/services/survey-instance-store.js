@@ -113,12 +113,6 @@ function store($http, baseApiUrl) {
             .then(r => r.data);
     };
 
-    const updateRecipient = (id, command) => {
-        return $http
-            .put(`${base}/${id}/recipient`, command)
-            .then(result => result.data);
-    };
-
     const markApproved = (id, reasonCommand) => {
         return $http
             .put(`${base}/${id}/approval`, reasonCommand)
@@ -171,7 +165,6 @@ function store($http, baseApiUrl) {
         updateStatus,
         updateDueDate,
         updateApprovalDueDate,
-        updateRecipient,
         addRecipient,
         deleteRecipient,
         addOwner,

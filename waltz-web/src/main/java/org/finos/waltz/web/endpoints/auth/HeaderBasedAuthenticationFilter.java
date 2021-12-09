@@ -30,8 +30,8 @@ import static org.finos.waltz.common.StringUtilities.notEmpty;
 
 /**
  * Simple filter which works by reading a username from the
- * http headers of a request.  The header name is either 'remote-user'
- * or is specified by a settings: 'server.authentication.filter.headerbased.param'
+ * http headers of a request.  The header name is either `remote-user`
+ * or is specified by a settings: `server.authentication.filter.headerbased.param`
  */
 public class HeaderBasedAuthenticationFilter extends WaltzFilter {
 
@@ -45,7 +45,7 @@ public class HeaderBasedAuthenticationFilter extends WaltzFilter {
 
         paramName = getSettingValue(NamedSettings.headerBasedAuthenticationFilterParam)
                 .orElseGet(() -> {
-                    LOG.warn("HeaderBasedAuthenticationFilter is configured but no header parameter give, therefore defaulting.");
+                    LOG.warn("HeaderBasedAuthenticationFilter is configured but no header parameter has been provided in the settings table (key is: 'server.authentication.filter.headerbased.param').  Defaulting to 'remote-user'.");
                     return "remote-user";
                 });
 
@@ -57,7 +57,7 @@ public class HeaderBasedAuthenticationFilter extends WaltzFilter {
     public void handle(Request request,
                        Response response) throws Exception {
         String userParam = request.headers(paramName);
-        LOG.debug("User according to header: "+userParam);
+        LOG.trace("User according to header: {}", userParam);
         if (notEmpty(userParam)) {
             AuthenticationUtilities.setUser(request, userParam);
         } else {

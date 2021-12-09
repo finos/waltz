@@ -75,3 +75,26 @@ export function ifPresent(obj, fn, dflt) {
         ? fn(obj)
         : dflt;
 }
+
+
+/**
+ * Iterates over a set of functions (`fns`), invoking each in turn on the
+ * object (`obj`) provided by the first parameter.
+ *
+ * - if the result of calling the function on the object is _null_ (or _undefined_) the next
+ * function is tried
+ * - if the result is _non null_ then that result is returned and no other functions are tried
+ * - if _none_ of the functions produce a result then `null` is returned
+ *
+ * @param obj
+ * @param fns
+ * @returns {null}
+ */
+export function firstToReturn(obj, fns = []) {
+    let result = null;
+    for (const fn of fns) {
+        result = invokeFunction(fn, obj);
+        if (! _.isNil(result)) break;
+    }
+    return result;
+}

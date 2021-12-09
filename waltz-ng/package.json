@@ -60,6 +60,7 @@
     "ng-tags-input": "3.2.0",
     "patch-package": "6.4.7",
     "satellizer": "0.15.5",
+    "svelte-flatpickr": "3.2.4",
     "ui-select": "0.19.8",
     "whatwg-fetch": "3.6.2",
     "xlsx": "0.17.3"

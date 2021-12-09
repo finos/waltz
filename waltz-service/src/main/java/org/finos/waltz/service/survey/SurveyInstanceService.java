@@ -125,13 +125,13 @@ public class SurveyInstanceService {
     }
 
 
-    public List<SurveyInstanceRecipient> findRecipients(long instanceId) {
-        return surveyInstanceRecipientDao.findForSurveyInstance(instanceId);
+    public List<Person> findRecipients(long instanceId) {
+        return surveyInstanceRecipientDao.findPeopleForSurveyInstance(instanceId);
     }
 
 
-    public List<SurveyInstanceOwner> findOwners(long instanceId) {
-        return surveyInstanceOwnerDao.findForSurveyInstance(instanceId);
+    public List<Person> findOwners(long instanceId) {
+        return surveyInstanceOwnerDao.findPeopleForSurveyInstance(instanceId);
     }
 
 
@@ -253,17 +253,15 @@ public class SurveyInstanceService {
     }
 
 
-    public int updateDueDate(String userName, long instanceId, DateChangeCommand command) {
+    public int updateSubmissionDueDate(String userName, long instanceId, LocalDate newDueDate) {
         checkNotNull(userName, "userName cannot be null");
-        checkNotNull(command, "command cannot be null");
+        checkNotNull(newDueDate, "newDueDate cannot be null");
 
         checkPersonIsOwnerOrAdmin(userName, instanceId);
-        LocalDate newDueDate = command.newDateVal().orElse(null);
 
-        checkNotNull(newDueDate, "newDueDate cannot be null");
         checkApprovalDueDateIsLaterThanSubmissionDueDate(surveyInstanceDao.getById(instanceId).approvalDueDate(), newDueDate);
 
-        int result = surveyInstanceDao.updateDueDate(instanceId, newDueDate);
+        int result = surveyInstanceDao.updateSubmissionDueDate(instanceId, newDueDate);
 
         changeLogService.write(
                 ImmutableChangeLog.builder()
@@ -277,14 +275,12 @@ public class SurveyInstanceService {
     }
 
 
-    public int updateApprovalDueDate(String userName, long instanceId, DateChangeCommand command) {
+    public int updateApprovalDueDate(String userName, long instanceId, LocalDate newDueDate) {
         checkNotNull(userName, "userName cannot be null");
-        checkNotNull(command, "command cannot be null");
+        checkNotNull(newDueDate, "newDueDate cannot be null");
 
         checkPersonIsOwnerOrAdmin(userName, instanceId);
 
-        LocalDate newDueDate = command.newDateVal().orElse(null);
-        checkNotNull(newDueDate, "newDueDate cannot be null");
         checkApprovalDueDateIsLaterThanSubmissionDueDate(newDueDate, surveyInstanceDao.getById(instanceId).dueDate());
 
 
@@ -348,32 +344,9 @@ public class SurveyInstanceService {
     }
 
 
-        public boolean updateRecipient(String username, SurveyInstanceRecipientUpdateCommand command) {
-            checkNotNull(command, "command cannot be null");
-            checkPersonIsOwnerOrAdmin(username, command.surveyInstanceId());
-
-            boolean delete = surveyInstanceRecipientDao.delete(command.instanceRecipientId());
-            long id = surveyInstanceRecipientDao.create(ImmutableSurveyInstanceRecipientCreateCommand
-                    .builder()
-                    .personId(command.personId())
-                    .surveyInstanceId(command.surveyInstanceId())
-                    .build());
-
-            logPersonChange(
-                    username,
-                    command.surveyInstanceId(),
-                    command.personId(),
-                    Operation.UPDATE,
-                    "Survey Instance: Set %s as a recipient");
-
-            return delete && id > 0;
-    }
-
-
-    public boolean deleteRecipient(String username, long surveyInstanceId, long recipientId) {
+    public boolean deleteRecipient(String username, long surveyInstanceId, long personId) {
         checkPersonIsOwnerOrAdmin(username, surveyInstanceId);
-        Long personId = surveyInstanceRecipientDao.getPersonIdForRecipientId(recipientId);
-        boolean rc = surveyInstanceRecipientDao.delete(recipientId);
+        boolean rc = surveyInstanceRecipientDao.deleteByInstanceAndPerson(surveyInstanceId, personId);
 
         logPersonChange(
                 username,
