@@ -46,6 +46,7 @@ Looking back at notable changes over the year:
 
 |===
 
+<<<
 
 == Looking ahead to 2022
 In Q1/Q2 we are intending to focus on two main development areas:
@@ -65,6 +66,7 @@ In addition, we are looking to add some workflow facilities to allow surveys to 
 An internally developed component to track and report on data quality issues will be folded back into the main code base.
 This uses metadata to highlight discrepancies between data points (i.e. apps which claim they do payments but have no related payment data classes).
 
+<<<
 
 == Bigger Topics
 
