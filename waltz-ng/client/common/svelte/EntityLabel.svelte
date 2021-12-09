@@ -16,4 +16,15 @@
 {#if showIcon}
     <EntityIcon kind={ref?.kind}/>
 {/if}
-{name}
+<span class:removed={ref?.entityLifecycleStatus === 'REMOVED' || ref?.isRemoved}>
+    {name}
+</span>
+
+<style>
+
+    .removed {
+        color: #999;
+        text-decoration: line-through;
+    }
+
+</style>

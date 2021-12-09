@@ -44,6 +44,7 @@ public class PersonEndpoint implements Endpoint {
     private static final String MANAGERS_PATH = mkPath(BASE_URL, "employee-id", ":empId", "managers");
     private static final String BY_EMPLOYEE_PATH = mkPath(BASE_URL, "employee-id", ":empId");
     private static final String GET_BY_USERID_PATH = mkPath(BASE_URL, "user-id", ":userId");
+    private static final String GET_SELF_PATH = mkPath(BASE_URL, "self");
     private static final String GET_BY_ID = mkPath(BASE_URL, "id", ":id");
     private static final String REBUILD_HIERARCHY_PATH = mkPath(BASE_URL, "rebuild-hierarchy");
 
@@ -89,6 +90,9 @@ public class PersonEndpoint implements Endpoint {
 
         getForDatum(GET_BY_USERID_PATH, ((request, response) ->
                 personService.getPersonByUserId(request.params("userId"))));
+
+        getForDatum(GET_SELF_PATH, ((request, response) ->
+                personService.getPersonByUserId(getUsername(request))));
 
         getForDatum(REBUILD_HIERARCHY_PATH, this::rebuildHierarchyRoute);
 

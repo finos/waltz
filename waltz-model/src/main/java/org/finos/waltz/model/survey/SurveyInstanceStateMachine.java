@@ -24,15 +24,16 @@ public class SurveyInstanceStateMachine {
         return transitions.getOrDefault(current, emptyList())
                 .stream()
                 .filter(t -> t.getPredicate().apply(permissions, instance))
-                .map(t -> t.getFutureStatus())
+                .map(SurveyInstanceStateTransition::getFutureStatus)
                 .collect(toList());
     }
 
     public List<SurveyInstanceAction> nextPossibleActions(SurveyInstancePermissions permissions, SurveyInstance instance) {
-        return transitions.getOrDefault(current, emptyList())
+        return transitions
+                .getOrDefault(current, emptyList())
                 .stream()
                 .filter(t -> t.getPredicate().apply(permissions, instance))
-                .map(t -> t.getAction())
+                .map(SurveyInstanceStateTransition::getAction)
                 .collect(toList());
     }
 
