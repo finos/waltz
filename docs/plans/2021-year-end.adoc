@@ -1,0 +1,87 @@
+= 2021 - End of Year Review
+
+== Stats
+
+|===
+| Stat | Value
+
+| Major releases
+| 8  (approx 6 week cadence)
+
+| Commits
+| 1407
+
+| Issues Closed
+| 236
+
+| Blogs / Screens casts
+| 11
+
+|===
+
+== Notable Changes
+
+Looking back at notable changes over the year:
+
+|===
+| Feature | Description
+
+| **Flow Classification Rules**
+| Authoritative source rules have been generalised to allow for a more nuanced view of strategic data flows.
+
+| **Survey Improvements**
+| Survey questions can now reference taxonomy items.  Sub questions allow for simpler presentation of time based questions.
+
+| **Report Grids**
+| Added support for columns which reference people, costs and survey question responses.
+
+| **Diagrams**
+| Overhauled the flow diagrams and added new process diagrams.
+
+| **Cost kinds**
+| Different types of costs can be recorded against applications and graphed.
+
+| **Tech Debt (WIP)**
+| Moving from legacy AngularJS to Svelte.  Automated integration tests and builds via GitHub Actions (moving away from Travis).
+
+|===
+
+
+== Looking ahead to 2022
+In Q1/Q2 we are intending to focus on two main development areas:
+
+* Surveys
+* Data Quality
+
+In addition, we will be continuing to expand the automated test suite and accelerate the migration from AngularJS to Svelte.
+We will also be looking to move to a newer version of Java (currently Waltz is developed against Java 8) and we are **considering dropping support for IE 11**.
+
+=== Surveys
+Surveys continue to be a popular feature of Waltz and have found usage in a wide variety of situations.
+We are currently reworking the survey UI to streamline teh user experience for users who have a large number of surveys to complete and/or approve.
+In addition, we are looking to add some workflow facilities to allow surveys to support larger processes in the bank.
+
+=== Data Quality
+An internally developed component to track and report on data quality issues will be folded back into the main code base.
+This uses metadata to highlight discrepancies between data points (i.e. apps which claim they do payments but have no related payment data classes).
+
+
+== Bigger Topics
+
+=== Components
+A key deliverable for next year (probably in the second half) will be support for registering and documenting application components.
+We are still discussing what shape this will take and what (if any) differences there will be between apps and components withing Waltz.
+
+We would be delighted to open this up for wider discussion/contribution as this work takes shape.
+
+=== Community Participation
+
+* Integration
+** Standardized API's
+** Resuable assets to help with customer integration
+* More case studies
+* Onboarding tools
+
+
+
+
