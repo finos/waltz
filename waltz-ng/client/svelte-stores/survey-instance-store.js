@@ -36,6 +36,15 @@ export function mkSurveyInstanceStore() {
     const findResponses = (id) => remote
         .fetchViewList("GET",`api/survey-instance/${id}/responses`);
 
+    const findPreviousVersions = (originalId) => remote
+        .fetchViewList("GET", `api/survey-instance/id/${originalId}/previous-versions`);
+
+
+    const findVersions = (originalId, force = false) => remote
+        .fetchViewList("GET", `api/survey-instance/id/${originalId}/versions`, null, {force});
+
+
+
     const updateStatus = (id, command) => remote
         .execute("PUT",`api/survey-instance/${id}/status`, command);
 
@@ -67,6 +76,8 @@ export function mkSurveyInstanceStore() {
         findPossibleActions,
         findRecipients,
         findResponses,
+        findPreviousVersions,
+        findVersions,
         getPermissions,
         updateStatus,
         updateSubmissionDueDate,

@@ -7,8 +7,6 @@
     export let placeholder = "Search...";
     export let showClear = true;
 
-    let selectedItem;
-
     const dispatch = createEventDispatcher();
 
     async function search(qry){

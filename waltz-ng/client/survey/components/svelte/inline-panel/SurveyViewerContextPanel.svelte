@@ -7,8 +7,9 @@
     import SurveyInstanceInfoPanel from "../../../../common/svelte/info-panels/SurveyInstanceInfoPanel.svelte";
     import SurveyPeople from "./SurveyPeople.svelte";
     import SurveyActions from "./SurveyActions.svelte";
+    import SurveyInstanceVersionPicker from "./SurveyInstanceVersionPicker.svelte";
 
-    export let primaryEntityRef;
+    export let instanceId;
 
     function selectSection(section) {
         if ($selectedSection === section) {
@@ -26,11 +27,10 @@
     }
 
     function onAction(evt) {
-        const surveyInstanceId = evt.detail;
-        surveyCall = surveyInstanceViewStore.getById(surveyInstanceId, true);
+        surveyCall = surveyInstanceViewStore.getById(instanceId, true);
     }
 
-    $: surveyCall = surveyInstanceViewStore.getById(primaryEntityRef?.id);
+    $: surveyCall = instanceId && surveyInstanceViewStore.getById(instanceId);
     $: survey = $surveyCall?.data;
 
     $: questionsWithResponse = _
@@ -51,11 +51,15 @@
 
 
 <!-- SURVEY INSTANCE DETAILS -->
-<SurveyInstanceInfoPanel {primaryEntityRef}>
+{#if survey}
+<SurveyInstanceInfoPanel {instanceId}>
     <div slot="post-title">
         <SurveyActions on:action={onAction}
                        {survey}
                        {questionsWithResponse}/>
+
+        <SurveyInstanceVersionPicker on:select
+                                     instance={survey?.surveyInstance}/>
 
         <br>
 
@@ -95,11 +99,11 @@
             <Icon name="users"/>
             People
         </h5>
-        <SurveyPeople id={primaryEntityRef?.id}
+        <SurveyPeople id={instanceId}
                       groupApprovers={survey.surveyInstance?.owningRole}/>
     </div>
 </SurveyInstanceInfoPanel>
-
+{/if}
 
 <style type="text/scss">
 
