@@ -56,7 +56,7 @@
 </script>
 
 
-{#if !_.isEmpty(versions)}
+{#if _.size(versions) > 1}
     <h5>
         <Icon name="history"/>
         Versions
