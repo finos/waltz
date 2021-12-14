@@ -5,6 +5,18 @@ import {determineForegroundColor} from "../../../common/colors";
 import {scaleLinear} from "d3-scale";
 import extent from "d3-array/src/extent";
 
+export const reportGridMember = {
+    OWNER: {
+        key: "OWNER",
+        name: "Owner"
+    },
+    VIEWER: {
+        key: "VIEWER",
+        name: "Viewer"
+    }
+}
+
+
 export const reportGridKinds = {
     PUBLIC: {
         key: "PUBLIC",

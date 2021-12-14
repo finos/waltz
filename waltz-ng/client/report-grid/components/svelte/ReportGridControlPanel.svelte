@@ -7,15 +7,16 @@
     import {reportGridStore} from "../../../svelte-stores/report-grid-store";
     import _ from "lodash";
     import Icon from "../../../common/svelte/Icon.svelte";
+    import ReportGridPersonEditPanel from "./person-edit-panel/ReportGridPersonEditPanel.svelte";
 
     export let onGridSelect = () => console.log("selecting grid");
     export let onSave = () => console.log("Saved report grid");
     let selectedTab = "overview"
 
 
-    $: isOwned = $selectedGrid && _.includes($ownedReportIds, $selectedGrid.definition?.id);
+    $: isOwned = $selectedGrid && _.includes($ownedReportIds, $selectedGrid?.definition?.id);
 
-    $: ownedGridsCall = $selectedGrid.definition.id && reportGridStore.findForOwner(true);
+    $: ownedGridsCall = $selectedGrid?.definition?.id && reportGridStore.findForOwner(true);
     $: $ownedReportIds = _.map($ownedGridsCall?.data, d => d.id);
 
 
@@ -59,6 +60,19 @@
         </span>
     </label>
 
+    <input type="radio"
+           bind:group={selectedTab}
+           disabled={!isOwned}
+           value="people"
+           id="people">
+    <label class="wt-label"
+           for="people">
+        <span title={isOwned ? "" : "You are not an owner for this report grid"}>
+            People Editor
+            <Icon name={isOwned ? "unlock" : "lock"}/>
+        </span>
+    </label>
+
     <div class="wt-tab wt-active">
         <!-- SERVERS -->
         {#if selectedTab === 'overview'}
@@ -66,9 +80,11 @@
         {:else if selectedTab === 'filters'}
             <ReportGridFilters/>
         {:else if selectedTab === 'columns'}
-            <ColumnDefinitionEditPanel gridId={$selectedGrid?.definition.id}
-                                       columnDefs={$selectedGrid?.definition.columnDefinitions}
+            <ColumnDefinitionEditPanel gridId={$selectedGrid?.definition?.id}
+                                       columnDefs={$selectedGrid?.definition?.columnDefinitions}
                                        onSave={onSave}/>
+        {:else if selectedTab === 'people'}
+            <ReportGridPersonEditPanel/>
         {/if}
     </div>
 </div>
