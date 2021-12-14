@@ -61,7 +61,7 @@
                        bind:group={workingCopy.kind}
                        value={reportGridKinds.PUBLIC.key}>
                 {reportGridKinds.PUBLIC.name}
-                <div class="help-block small">PUBLIC - These grids can be viewed by everyone</div>
+                <div class="help-block small">Public - These grids can be viewed by everyone</div>
             </label>
         </div>
     </div>

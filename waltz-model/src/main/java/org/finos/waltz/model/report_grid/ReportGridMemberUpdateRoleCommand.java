@@ -3,14 +3,14 @@ package org.finos.waltz.model.report_grid;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.finos.waltz.model.command.Command;
 import org.immutables.value.Value;
 
 @Value.Immutable
-@JsonSerialize(as = ImmutableReportGridMember.class)
-@JsonDeserialize(as = ImmutableReportGridMember.class)
-public abstract class ReportGridMember {
+@JsonSerialize(as = ImmutableReportGridMemberUpdateRoleCommand.class)
+@JsonDeserialize(as = ImmutableReportGridMemberUpdateRoleCommand.class)
+public abstract class ReportGridMemberUpdateRoleCommand implements Command {
 
-    public abstract Long gridId();
     public abstract String userId();
 
     @Value.Default

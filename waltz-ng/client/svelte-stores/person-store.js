@@ -16,7 +16,12 @@ export function mkPersonStore() {
             "GET",
             `api/person/employee-id/${empId}`, null, null);
 
-    const getSelf = () => remote
+    const findByUserId = (userId) => remote
+        .fetchViewData(
+            "GET",
+            `api/person/user-id/${userId}`, null, null);
+
+  const getSelf = () => remote
         .fetchViewDatum(
             "GET",
             "api/person/self", null, null);
@@ -24,6 +29,7 @@ export function mkPersonStore() {
     return {
         getByEmployeeId,
         getById,
+        findByUserId,
         getSelf
     };
 }
