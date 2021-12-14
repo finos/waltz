@@ -57,7 +57,7 @@
                         <tr class:selected={$selectedColumn && sameRef(column.columnEntityReference, $selectedColumn?.columnEntityReference)}
                             class:last-moved={$lastMovedColumn && sameRef(column.columnEntityReference, $lastMovedColumn?.columnEntityReference)}>
                             <td>
-                                <Icon name={getIcon(column?.columnEntityReference?.kind)}/>{column?.columnEntityReference?.name || column?.columnEntityReference?.questionText}
+                                <Icon name={getIcon(column?.columnEntityReference?.kind)}/> {column?.columnEntityReference?.name || column?.columnEntityReference?.questionText}
                             </td>
                             <td>
                                 <span style="text-align: center">
@@ -93,7 +93,7 @@
                     {:else}
                         <tr>
                             <td colspan="5">
-                                <NoData>You have no entities selected</NoData>
+                                <NoData>This grid has no columns.</NoData>
                             </td>
                         </tr>
                     {/each}
@@ -111,5 +111,10 @@
 
     .last-moved{
         background: #f3f9ff;
+    }
+
+    thead tr {
+        background-color: #fafafa;
+        background: linear-gradient(90deg, #fafafa 0%, rgba(255,255,255,1) 100%);
     }
 </style>

@@ -73,7 +73,8 @@
                             </td>
                         </tr>
                     {/each}
-                    <tr>
+                    <tr class="clickable"
+                        on:click={onCreate}>
                         <td colspan="2">
                             <button class="btn btn-skinny"
                                     on:click={onCreate}>
