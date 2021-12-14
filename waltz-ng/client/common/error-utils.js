@@ -17,6 +17,7 @@
  */
 
 import ToastStore from "../svelte-stores/toast-store"
+import {firstToReturn} from "./function-utils";
 
 const fallbackReasons = {
     404: "Not found",
@@ -30,8 +31,15 @@ export function mkErrorMessage(message, e) {
         ? fallbackReasons[e.status] || `Status Code: ${e.status}`
         : "Unknown reason";
 
+    const possiblePaths = [
+        d => _.get(d,["data", "message"]),
+        d => _.get(d, ["error"])
+    ];
+
+
+
     const reason = e
-        ? ": " + _.get(e, ["data", "message"], fallbackReason)
+        ? ": " + firstToReturn(e, possiblePaths)
         : "";
 
     return `${message}${reason}`;

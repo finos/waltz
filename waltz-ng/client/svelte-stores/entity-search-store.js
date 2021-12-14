@@ -23,7 +23,7 @@ export function mkEntitySearchStore() {
     const search = (query,
                     entityKinds = [],
                     limit= 5,
-                    entityLifecycleStatuses=["ACTIVE", "PENDING", "REMOVED"],
+                    entityLifecycleStatuses=["ACTIVE", "PENDING"],
                     force = false) => {
 
         let options = {

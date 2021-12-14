@@ -79,7 +79,7 @@
         },
         "main.survey.instance.view": {
             path: ctx => `survey/instance/${ctx.id}/response/view`,
-            title: "Server View"
+            title: "Survey View"
         }
     };
 

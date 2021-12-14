@@ -22,12 +22,7 @@ package org.finos.waltz.model.survey;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.IdProvider;
-import org.finos.waltz.model.Nullable;
 import org.immutables.value.Value;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Value.Immutable
 @JsonSerialize(as = ImmutableSurveyInstanceInfo.class)
@@ -37,4 +32,5 @@ public abstract class SurveyInstanceInfo {
     public abstract SurveyInstance surveyInstance();
     public abstract SurveyRun surveyRun();
     public abstract EntityReference surveyTemplateRef();
+
 }

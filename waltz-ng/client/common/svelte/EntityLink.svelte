@@ -14,7 +14,7 @@
      * @type {{id: number}}
      */
 
-    export let ref = {};
+    export let ref = null;
     export let isSecondaryLink = false;
     export let showIcon = true;
 
@@ -22,9 +22,11 @@
 
     $: {
         try {
-            state = kindToViewState(ref.kind);
+            state = ref
+                ? kindToViewState(ref.kind)
+                : null;
         } catch(e){
-            console.log(e);
+            console.error(e);
         }
     }
 

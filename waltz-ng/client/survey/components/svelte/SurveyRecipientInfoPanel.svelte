@@ -211,7 +211,7 @@
     {#if activeMode === Modes.INFO}
         <NoData>There are no surveys for the current selection</NoData>
     {:else if activeMode === Modes.GRID}
-        <h4>{$selectedSurveyStatusCell?.header.description}:</h4>
+        <h4>{$selectedSurveyStatusCell?.header.description}</h4>
         <div class="help-block small">
             <Icon name="info-circle"/>Select a survey from the list below for detail and responses, or to execute any available actions.
         </div>
@@ -221,10 +221,11 @@
                             onSelectRow={selectRow}/>
     {:else if activeMode === Modes.SURVEY}
         <h4>
-            <a class="clickable"
-               on:click={() => selectSurveyFilter($selectedSurveyStatusCell?.header, $selectedSurveyStatusCell?.templateInfo)}>
+            <button class="breadcrumb btn-skinny"
+                    on:click={() => selectSurveyFilter($selectedSurveyStatusCell?.header, $selectedSurveyStatusCell?.templateInfo)}>
                 {$selectedSurveyStatusCell?.header.description}
-            </a> / {$selectedSurvey?.surveyEntity?.name || "Unknown"}
+            </button>
+            / {$selectedSurvey?.surveyEntity?.name || "Unknown"}
         </h4>
         <div class="help-block small">
             <Icon name="info-circle"/>To navigate back to the filtered survey list click on the link above or select a different filter.
@@ -260,6 +261,10 @@
 
 <style type="text/scss">
     @import '../../../../style/variables';
+
+    .breadcrumb {
+        padding: 0;
+    }
 
     .overdue {
         background-color: $waltz-red-background;

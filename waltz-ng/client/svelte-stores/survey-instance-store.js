@@ -17,6 +17,7 @@
  */
 
 import {remote} from "./remote";
+import {toLocalDate} from "../common/date-utils";
 
 export function mkSurveyInstanceStore() {
 
@@ -24,13 +25,13 @@ export function mkSurveyInstanceStore() {
         .fetchViewDatum("GET", `api/survey-instance/${id}/permissions`);
 
     const findPossibleActions = (id, force = false) => remote
-        .fetchViewDatum("GET", `api/survey-instance/${id}/actions`, [], {force});
+        .fetchViewList("GET", `api/survey-instance/${id}/actions`, [], {force});
 
-    const findRecipients = (id) => remote
-        .fetchViewList("GET",`api/survey-instance/${id}/recipients`);
+    const findRecipients = (id, force = false) => remote
+        .fetchViewList("GET",`api/survey-instance/${id}/recipients`, null, {force});
 
-    const findOwners = (id) => remote
-        .fetchViewList("GET",`api/survey-instance/${id}/owners`);
+    const findOwners = (id, force = false) => remote
+        .fetchViewList("GET",`api/survey-instance/${id}/owners`, null, {force});
 
     const findResponses = (id) => remote
         .fetchViewList("GET",`api/survey-instance/${id}/responses`);
@@ -38,13 +39,39 @@ export function mkSurveyInstanceStore() {
     const updateStatus = (id, command) => remote
         .execute("PUT",`api/survey-instance/${id}/status`, command);
 
+    const deleteRecipient = (id, personId) => remote
+        .execute("DELETE", `api/survey-instance/${id}/recipient/${personId}`)
+
+    const deleteOwner = (id, personId) => remote
+        .execute("DELETE", `api/survey-instance/${id}/owner/${personId}`)
+
+    const addRecipient = (surveyInstanceId, personId) => remote
+        .execute("POST",`api/survey-instance/${surveyInstanceId}/recipient`, personId);
+
+    const addOwner = (surveyInstanceId, personId) => remote
+        .execute("POST", `api/survey-instance/${surveyInstanceId}/owner`, personId);
+
+    const updateSubmissionDueDate = (id, updDate) => remote
+        .execute("PUT",`api/survey-instance/${id}/submission-due-date`, toLocalDate(updDate));
+
+    const updateApprovalDueDate = (id, updDate) => remote
+        .execute("PUT",`api/survey-instance/${id}/approval-due-date`, toLocalDate(updDate));
+
+
     return {
-        getPermissions,
+        addOwner,
+        addRecipient,
+        deleteOwner,
+        deleteRecipient,
+        findOwners,
         findPossibleActions,
         findRecipients,
-        findOwners,
         findResponses,
-        updateStatus
+        getPermissions,
+        updateStatus,
+        updateSubmissionDueDate,
+        updateApprovalDueDate
+
     };
 }
 
