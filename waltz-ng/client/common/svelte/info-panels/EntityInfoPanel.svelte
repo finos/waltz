@@ -7,6 +7,7 @@
     import DataTypeInfoPanel from "./DataTypeInfoPanel.svelte";
     import LogicalDataFlowPanel from "./LogicalDataFlowInfoPanel.svelte"
     import SurveyInstanceInfoPanel from "./SurveyInstanceInfoPanel.svelte";
+    import PersonInfoPanel from "./PersonInfoPanel.svelte";
 
     export let primaryEntityRef;
 
@@ -24,6 +25,8 @@
                 return LogicalDataFlowPanel;
             case "MEASURABLE":
                 return MeasurableInfoPanel;
+            case "PERSON":
+                return PersonInfoPanel;
             case "SURVEY_INSTANCE":
                 return SurveyInstanceInfoPanel;
             default:

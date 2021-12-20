@@ -59,7 +59,7 @@
                     </thead>
                     <tbody>
                     {#each gridList as grid}
-                        <tr class:waltz-highlighted-row={$selectedGrid?.definition.id === grid?.id}
+                        <tr class:selected={$selectedGrid?.definition.id === grid?.id}
                             class="clickable"
                             on:click={() => onSelect(grid)}>
                             <td>
@@ -73,7 +73,8 @@
                             </td>
                         </tr>
                     {/each}
-                    <tr>
+                    <tr class="clickable"
+                        on:click={onCreate}>
                         <td colspan="2">
                             <button class="btn btn-skinny"
                                     on:click={onCreate}>
@@ -87,3 +88,10 @@
         </div>
     </div>
 </div>
+
+
+<style type="text/scss">
+    .selected{
+        background: #f3f9ff;
+    }
+</style>

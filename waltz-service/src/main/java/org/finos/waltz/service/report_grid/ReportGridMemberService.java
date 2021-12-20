@@ -19,10 +19,9 @@
 package org.finos.waltz.service.report_grid;
 
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
-import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.report_grid.ReportGridMemberDao;
+import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.report_grid.*;
-import org.finos.waltz.service.changelog.ChangeLogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,19 +48,45 @@ public class ReportGridMemberService {
     }
 
 
+    public Set<Person> findPeopleByGridId(Long gridId) {
+        return reportGridMemberDao.findPeopleByGridId(gridId);
+    }
+
+
     public int register(long gridId, String username, ReportGridMemberRole role) {
         return reportGridMemberDao.register(gridId, username, role);
     }
 
 
-    public void checkIsOwner(long groupId, String userId) throws InsufficientPrivelegeException {
-        if (!reportGridMemberDao.canUpdate(groupId, userId)) {
-            throw new InsufficientPrivelegeException(userId + " cannot update group: " + groupId);
+    public void checkIsOwner(long gridId, String userId) throws InsufficientPrivelegeException {
+        if (!reportGridMemberDao.canUpdate(gridId, userId)) {
+            throw new InsufficientPrivelegeException(userId + " cannot update grid: " + gridId);
         }
     }
 
 
     public boolean canUpdate(long groupId, String userId){
         return reportGridMemberDao.canUpdate(groupId, userId);
+    }
+
+
+    public Set<ReportGridMember> updateUserRole(long gridId,
+                                                ReportGridMemberUpdateRoleCommand updateCommand,
+                                                String username) throws InsufficientPrivelegeException {
+        checkIsOwner(gridId, username);
+        int updatedRoles = reportGridMemberDao.updateUserRole(gridId, updateCommand);
+        return findByGridId(gridId);
+    }
+
+
+    public boolean delete(ReportGridMember member, String username) throws InsufficientPrivelegeException {
+        checkIsOwner(member.gridId(), username);
+        return reportGridMemberDao.delete(member);
+    }
+
+
+    public int create(ReportGridMember member, String username) throws InsufficientPrivelegeException {
+        checkIsOwner(member.gridId(), username);
+        return reportGridMemberDao.create(member);
     }
 }

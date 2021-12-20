@@ -124,7 +124,9 @@
 
 <div class="row">
     <div class="col-sm-4">
-        <h5><Icon name="plus"/>Add a Column:</h5>
+        <div style="padding-bottom: 1em">
+            <strong>Add a column</strong> to the report grid, you can construct a grid from a combination of entities. e.g. viewpoints, assessments, survey question responses etc.
+        </div>
         <EntitySelector onSelect={onSelect}
                         onDeselect={deleteEntity}
                         selectionFilter={canBeAdded}/>

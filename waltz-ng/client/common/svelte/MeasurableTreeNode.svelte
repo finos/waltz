@@ -42,7 +42,7 @@
     {#if tree.children}
         <ul class:root={depth === 0}>
             {#each tree.children as child}
-                <li style="xxwhite-space: nowrap">
+                <li style="white-space: nowrap">
                     <svelte:self tree={child}
                                  depth={++depth}
                                  {onSelect}
@@ -66,5 +66,4 @@
     li {
         padding-top: 0;
     }
-
 </style>

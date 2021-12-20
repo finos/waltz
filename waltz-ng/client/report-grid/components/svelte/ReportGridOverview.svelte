@@ -2,7 +2,7 @@
 
     import ReportGridPicker from "./ReportGridPicker.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
-    import {selectedGrid, ownedReportIds} from "./report-grid-store";
+    import {ownedReportIds, selectedGrid} from "./report-grid-store";
     import {reportGridKinds} from "./report-grid-utils";
     import ReportGridEditor from "./ReportGridEditor.svelte";
     import {toUpperSnakeCase} from "../../../common/string-utils";
@@ -27,7 +27,7 @@
     $: grids = $reportGridCall.data;
 
 
-    $: gridOwnersCall = $selectedGrid?.definition?.id && reportGridMemberStore.findByGridId($selectedGrid?.definition.id);
+    $: gridOwnersCall = $selectedGrid?.definition?.id && reportGridMemberStore.findByGridId($selectedGrid?.definition?.id);
     $: gridOwners = $gridOwnersCall?.data || [];
 
     function selectGrid(grid) {
@@ -83,7 +83,8 @@
         const workingGrid = {
             name: null,
             description: null,
-            externalId: null
+            externalId: null,
+            kind: reportGridKinds.PRIVATE.key,
         }
 
         $selectedGrid = { definition: workingGrid };
@@ -93,6 +94,7 @@
 
     function cancel(){
         activeMode = Modes.VIEW;
+        $selectedGrid = $selectedGrid.definition.id ? $selectedGrid : null;
     }
 
     $: gridOwnerNames = _.map(gridOwners, d => d.userId);
@@ -108,28 +110,39 @@
     <div class="col-sm-7">
         {#if activeMode === Modes.EDIT}
             <h4>Editing report grid:</h4>
-            <ReportGridEditor grid={$selectedGrid.definition}
+            <ReportGridEditor grid={$selectedGrid?.definition}
                               doSave={saveReportGrid}
                               doCancel={cancel}/>
         {:else if activeMode === Modes.VIEW}
-            {#if $selectedGrid.definition.id}
+            {#if $selectedGrid?.definition?.id}
                 <h4>{$selectedGrid?.definition?.name}</h4>
-                <div class:text-muted={$selectedGrid.definition?.description}>
-                    {$selectedGrid.definition?.description || "No description provided"}
+                <div class:text-muted={!$selectedGrid?.definition?.description}>
+                    {$selectedGrid?.definition?.description || "No description provided"}
                 </div>
-                <br>
-                <div>
-                    Kind: {_.get(reportGridKinds[$selectedGrid?.definition?.kind], 'name', 'Unknown Kind')}
-                </div>
-                <div>
-                    Owners:
-                    {#if !_.isEmpty(gridOwners)}
-                        {_.join(gridOwnerNames, '; ')}
-                    {:else}
-                        <span class="text-muted">None defined</span>
-                    {/if}
-                </div>
-                <br>
+                <table class="table table-condensed small">
+                    <tbody>
+                    <tr>
+                        <td>Kind</td>
+                        <td>{_.get(reportGridKinds[$selectedGrid?.definition?.kind], 'name', 'Unknown Kind')}</td>
+                    </tr>
+                    <tr>
+                        <td>Owners</td>
+                        <td>
+                            {#if !_.isEmpty(gridOwners)}
+                                <ul>
+                                    {#each _.orderBy(gridOwners, d => d.userId) as owner}
+                                    <li>
+                                        {owner.userId}
+                                    </li>
+                                    {/each}
+                                </ul>
+                            {:else}
+                                <span class="text-muted">None defined</span>
+                            {/if}
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
                 {#if _.includes($ownedReportIds, $selectedGrid.definition?.id)}
                     <button class="btn btn-skinny"
                             on:click={() => activeMode = Modes.EDIT}>
@@ -150,11 +163,8 @@
     </div>
 </div>
 
-
 <style>
-
-    li {
-        display: inline;
-    }
-
+     ul {
+         padding-left: 1em
+     }
 </style>
