@@ -36,10 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
@@ -307,10 +304,14 @@ public class SurveyInstanceService {
     }
 
 
+    @Deprecated
     public List<SurveyInstance> findPreviousVersionsForInstance(long instanceId) {
         return surveyInstanceDao.findPreviousVersionsForInstance(instanceId);
     }
 
+    public List<SurveyInstance> findVersionsForInstance(long instanceId) {
+        return surveyInstanceDao.findVersionsForInstance(instanceId);
+    }
 
     public long addRecipient(String username, SurveyInstanceRecipientCreateCommand command) {
         checkNotNull(command, "command cannot be null");
@@ -474,4 +475,5 @@ public class SurveyInstanceService {
                 })
                 .orElse(false);
     }
+
 }

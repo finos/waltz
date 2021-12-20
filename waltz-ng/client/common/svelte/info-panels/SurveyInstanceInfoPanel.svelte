@@ -14,16 +14,16 @@
     import ToastStore from "../../../svelte-stores/toast-store";
     import {displayError} from "../../error-utils";
 
-    export let primaryEntityRef;
+    export let instanceId;
 
     function reload() {
-        surveyCall = surveyInstanceViewStore.getById(primaryEntityRef?.id, true);
+        surveyCall = surveyInstanceViewStore.getById(instanceId, true);
     }
 
     function updateSubmissionDueDate(d) {
         const updDate = d.detail;
         surveyInstanceStore
-            .updateSubmissionDueDate(primaryEntityRef.id, updDate)
+            .updateSubmissionDueDate(instanceId, updDate)
             .then(() => ToastStore.success("Updated submission due date"))
             .then(() => reload())
             .catch(e => displayError("Failed to update submission due date", e));
@@ -32,18 +32,16 @@
     function updateApprovalDueDate(d) {
         const updDate = d.detail;
         surveyInstanceStore
-            .updateApprovalDueDate(primaryEntityRef.id, updDate)
+            .updateApprovalDueDate(instanceId, updDate)
             .then(() => ToastStore.success("Updated approval due date"))
             .then(() => reload())
             .catch(e => displayError("Failed to update approval due date", e));
     }
 
-    $: id = primaryEntityRef?.id;
-
-    $: surveyCall = id && surveyInstanceViewStore.getById(id);
+    $: surveyCall = instanceId && surveyInstanceViewStore.getById(instanceId);
     $: survey = $surveyCall.data;
 
-    $: permissionsCall = id && surveyInstanceStore.getPermissions(id);
+    $: permissionsCall = instanceId && surveyInstanceStore.getPermissions(instanceId);
     $: permissions = $permissionsCall.data;
 
     $: surveyName = toSurveyName(survey);

@@ -64,6 +64,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
         String findForRecipientIdPath = mkPath(BASE_URL, "recipient", "id", ":id");
         String findForSurveyRunPath = mkPath(BASE_URL, "run", ":id");
         String findPreviousVersionsPath = mkPath(BASE_URL, "id", ":id", "previous-versions");
+        String findVersionsPath = mkPath(BASE_URL, "id", ":id", "versions");
         String findRecipientsPath = mkPath(BASE_URL, ":id", "recipients");
         String findOwnersPath = mkPath(BASE_URL, ":id", "owners");
         String findResponsesPath = mkPath(BASE_URL, ":id", "responses");
@@ -107,6 +108,9 @@ public class SurveyInstanceEndpoint implements Endpoint {
 
         ListRoute<SurveyInstance> findPreviousVersionsRoute =
                 (req, res) -> surveyInstanceService.findPreviousVersionsForInstance(getId(req));
+
+        ListRoute<SurveyInstance> findVersionsRoute =
+                (req, res) -> surveyInstanceService.findVersionsForInstance(getId(req));
 
         ListRoute<SurveyInstanceAction> findPossibleActionsRoute =
                 (req, res) -> surveyInstanceService.findPossibleActionsForInstance(getUsername(req), getId(req));
@@ -215,6 +219,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
         getForList(findForRecipientIdPath, findForRecipientIdRoute);
         getForList(findForSurveyRunPath, findForSurveyRunRoute);
         getForList(findPreviousVersionsPath, findPreviousVersionsRoute);
+        getForList(findVersionsPath, findVersionsRoute);
         getForList(findRecipientsPath, findRecipientsRoute);
         getForList(findOwnersPath, findOwnersRoute);
         getForList(findResponsesPath, findResponsesRoute);
