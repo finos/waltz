@@ -36,14 +36,13 @@ import spark.Request;
 import java.util.Collection;
 
 import static org.finos.waltz.common.CollectionUtilities.map;
-import static org.finos.waltz.web.WebUtilities.readBody;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
-import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
+import static org.finos.waltz.web.WebUtilities.*;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class SettingsEndpoint implements Endpoint {
 
-    private static final String BASE_URL = WebUtilities.mkPath("api", "settings");
+    private static final String BASE_URL = mkPath("api", "settings");
 
     private final SettingsService settingsService;
     private final UserRoleService userRoleService;
@@ -59,9 +58,9 @@ public class SettingsEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        String findAllPath = WebUtilities.mkPath(BASE_URL);
-        String getByNamePath = WebUtilities.mkPath(BASE_URL, "name", ":name");
-        String updateValuePath = WebUtilities.mkPath(BASE_URL, "update");
+        String findAllPath = mkPath(BASE_URL);
+        String getByNamePath = mkPath(BASE_URL, "name", ":name");
+        String updateValuePath = mkPath(BASE_URL, "update");
 
 
         ListRoute<Setting> findAllRoute = (request, response) -> {
@@ -77,6 +76,7 @@ public class SettingsEndpoint implements Endpoint {
         };
 
         DatumRoute<Integer> updateValueRoute = (request, response) -> {
+            requireRole(userRoleService, request, SystemRole.ADMIN);
             UpdateSettingsCommand updateCommand = readBody(request, UpdateSettingsCommand.class);
             return settingsService.update(updateCommand);
         };
@@ -84,7 +84,7 @@ public class SettingsEndpoint implements Endpoint {
 
         getForList(findAllPath, findAllRoute);
         getForDatum(getByNamePath, getByNameRoute);
-        getForDatum(updateValuePath, updateValueRoute);
+        postForDatum(updateValuePath, updateValueRoute);
     }
 
 

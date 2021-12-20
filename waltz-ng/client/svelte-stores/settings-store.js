@@ -27,8 +27,14 @@ export function mkSettingsStore() {
             null,
             {force});
 
+
+    const update = (updateCmd) => remote
+        .execute("POST", "api/settings/update", updateCmd)
+
+
     return {
-        loadAll
+        loadAll,
+        update
     };
 }
 

@@ -23,32 +23,16 @@ const initialState = {
     SettingsPanel
 }
 
-function controller(settingsService) {
+function controller() {
 
     const vm = initialiseData(this, initialState);
 
-    vm.settings = [];
-
-    const load = (force = false) => settingsService
-        .findAll(force)
-        .then(settings => vm.settings = settings);
-
-    vm.forceRefresh = () => {
-        load(true);
-    };
-
-    load();
-
 }
-
-controller.$inject = [ 'SettingsService' ];
-
-
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: "$ctrl",
     bindToController: true,
     scope: {}
 };
