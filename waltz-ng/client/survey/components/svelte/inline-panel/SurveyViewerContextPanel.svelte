@@ -7,8 +7,10 @@
     import SurveyInstanceInfoPanel from "../../../../common/svelte/info-panels/SurveyInstanceInfoPanel.svelte";
     import SurveyPeople from "./SurveyPeople.svelte";
     import SurveyActions from "./SurveyActions.svelte";
+    import SurveyInstanceVersionPicker from "./SurveyInstanceVersionPicker.svelte";
+    import DataExtractLink from "../../../../common/svelte/DataExtractLink.svelte";
 
-    export let primaryEntityRef;
+    export let instanceId;
 
     function selectSection(section) {
         if ($selectedSection === section) {
@@ -26,11 +28,10 @@
     }
 
     function onAction(evt) {
-        const surveyInstanceId = evt.detail;
-        surveyCall = surveyInstanceViewStore.getById(surveyInstanceId, true);
+        surveyCall = surveyInstanceViewStore.getById(instanceId, true);
     }
 
-    $: surveyCall = surveyInstanceViewStore.getById(primaryEntityRef?.id);
+    $: surveyCall = instanceId && surveyInstanceViewStore.getById(instanceId);
     $: survey = $surveyCall?.data;
 
     $: questionsWithResponse = _
@@ -47,43 +48,53 @@
 
     $: sectionList = $groupedQuestions;
 
+    $: extractFilename = survey
+        ? `survey-instance-${survey.surveyRun.name}-${survey.surveyInstance.surveyEntity.name}`
+        : "survey-instance";
+
 </script>
 
 
 <!-- SURVEY INSTANCE DETAILS -->
-<SurveyInstanceInfoPanel {primaryEntityRef}>
+{#if survey}
+<SurveyInstanceInfoPanel {instanceId}>
     <div slot="post-title">
-        <SurveyActions on:action={onAction}
-                       {survey}
-                       {questionsWithResponse}/>
-
-        <br>
-
-        <h5>
-            <Icon name="columns"/>
-            Sections
-        </h5>
-        <div class="help-block small">
-            <Icon name="info-circle"/>Select a section below to focus on its questions
+        <div class="mini-section">
+            <SurveyActions on:action={onAction}
+                           {survey}
+                           {questionsWithResponse}/>
         </div>
-        <ul class="section-list small">
-            {#each sectionList as section}
-                <li class="clickable section-list-item"
-                    on:mouseenter={() => section.hovering = true}
-                    on:mouseleave={() => section.hovering = false}
-                    class:highlighted={section.hovering}
-                    class:selected={section?.sectionName === $selectedSection?.sectionName}
-                    on:click={() => selectSection(section)}>
-                    {section.sectionName}
-                    <span title={`${getResponsesCount(section)} questions with a response out of a total ${_.size(section.questions)} questions`}
-                          class="small pull-right text-muted">
-                {`(${getResponsesCount(section)} / ${_.size(section.questions)})`}
-            </span>
-                </li>
-            {/each}
-        </ul>
 
-        <br>
+        <div class="mini-section">
+            <SurveyInstanceVersionPicker on:select
+                                         instance={survey?.surveyInstance}/>
+        </div>
+
+        <div class="mini-section">
+            <h5>
+                <Icon name="columns"/>
+                Sections
+            </h5>
+            <div class="help-block small">
+                <Icon name="info-circle"/>Select a section below to focus on its questions
+            </div>
+            <ul class="section-list small">
+                {#each sectionList as section}
+                    <li class="clickable section-list-item"
+                        on:mouseenter={() => section.hovering = true}
+                        on:mouseleave={() => section.hovering = false}
+                        class:highlighted={section.hovering}
+                        class:selected={section?.sectionName === $selectedSection?.sectionName}
+                        on:click={() => selectSection(section)}>
+                        {section.sectionName}
+                        <span title={`${getResponsesCount(section)} questions with a response out of a total ${_.size(section.questions)} questions`}
+                              class="small pull-right text-muted">
+                    {`(${getResponsesCount(section)} / ${_.size(section.questions)})`}
+                </span>
+                    </li>
+                {/each}
+            </ul>
+        </div>
 
         <h5>
             <Icon name="table"/>
@@ -91,27 +102,43 @@
         </h5>
     </div>
     <div slot="post-header">
-        <h5>
-            <Icon name="users"/>
-            People
-        </h5>
-        <SurveyPeople id={primaryEntityRef?.id}
-                      groupApprovers={survey.surveyInstance?.owningRole}/>
+        <div class="mini-section">
+            <h5>
+                <Icon name="users"/>
+                People
+            </h5>
+            <SurveyPeople id={instanceId}
+                          groupApprovers={survey.surveyInstance?.owningRole}/>
+        </div>
+        <div class="mini-section">
+            <div class="small">
+                <DataExtractLink name="Export Survey"
+                                 filename={extractFilename}
+                                 extractUrl="survey-run-response/instance/{survey?.surveyInstance.id}"
+                                 styling="button"/>
+            </div>
+
+        </div>
+
     </div>
 </SurveyInstanceInfoPanel>
+{/if}
 
 
 <style type="text/scss">
 
     @import "style/variables";
 
+    .mini-section {
+        padding-bottom: 1em;
+    }
 
     li {
         padding-top: 0;
     }
 
     .highlighted {
-        background-color: #f3f9ff;
+        background-color: #e2ffd9;
     }
 
     .section-list {
@@ -127,7 +154,7 @@
         }
 
         .selected {
-            background-color: $waltz-yellow-background;
+            background-color: #e2ffd9;
         }
     }
 </style>

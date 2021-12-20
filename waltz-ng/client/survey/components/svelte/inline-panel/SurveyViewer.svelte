@@ -31,6 +31,10 @@
         ? [$selectedSection]
         : $groupedQuestions;
 
+    function onChangeInstance(d) {
+        primaryEntityRef = Object.assign({}, primaryEntityRef, {id: d.detail});
+    }
+
 </script>
 
 
@@ -80,7 +84,8 @@
 
     <div class="col-sm-4"
          style="padding-left: 0">
-        <SurveyViewerContextPanel {primaryEntityRef}/>
+        <SurveyViewerContextPanel on:select={onChangeInstance}
+                                  instanceId={primaryEntityRef.id}/>
     </div>
 </div>
 

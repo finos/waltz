@@ -64,7 +64,7 @@
             <td>
                 <div>Usage Kind</div>
                 <div class="small help-text">
-                    Select summary for columns to appear in the filter list
+                    Select summary for columns to appear in the filter list.
                 </div>
             </td>
             <td>
@@ -78,7 +78,7 @@
             <td>
                 <div>Rating rollup rule</div>
                 <div class="small help-text">
-                    Describes the rating value to be displayed when aggregating for a hierarchy
+                    Describes the rating value to be displayed when aggregating for a hierarchy.
                 </div>
             </td>
             <td>

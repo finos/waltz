@@ -17,5 +17,7 @@ export function alignDateToUTC(inputDate) {
 const dateFormat = timeFormat("%Y-%m-%d");
 
 export function toLocalDate(inputDate) {
-    return dateFormat(inputDate);
+    return dateFormat(_.isString(inputDate)
+        ? new Date(inputDate)
+        : inputDate);
 }

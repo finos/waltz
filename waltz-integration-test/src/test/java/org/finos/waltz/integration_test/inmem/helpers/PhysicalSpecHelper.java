@@ -5,9 +5,12 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.UserTimestamp;
 import org.finos.waltz.model.physical_specification.DataFormatKind;
 import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecification;
+import org.finos.waltz.model.physical_specification.ImmutablePhysicalSpecificationDeleteCommand;
 import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 
 @Service
 public class PhysicalSpecHelper {
@@ -20,7 +23,7 @@ public class PhysicalSpecHelper {
     }
 
     public Long createPhysicalSpec(EntityReference owningEntity, String name) {
-        String specName = NameHelper.mkName(name);
+        String specName = mkName(name);
         String user = NameHelper.mkUserId(name);
         return physicalSpecificationService.create(ImmutablePhysicalSpecification.builder()
                 .externalId(specName)
@@ -33,5 +36,16 @@ public class PhysicalSpecHelper {
                 .created(UserTimestamp.mkForUser(user, DateTimeUtilities.nowUtcTimestamp()))
                 .build());
     }
+
+
+    public void removeSpec(Long specId) {
+        physicalSpecificationService.markRemovedIfUnused(
+                ImmutablePhysicalSpecificationDeleteCommand
+                        .builder()
+                        .specificationId(specId)
+                        .build(),
+                mkName("deletingSpec"));
+    }
+
 
 }

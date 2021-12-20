@@ -20,7 +20,8 @@ export const $http = {
     get,
     post,
     put,
-    delete: _delete
+    delete: _delete,
+    doFetch
 };
 
 
@@ -39,6 +40,12 @@ if (typeof window !== 'undefined') {
 }
 
 
+function doFetch(url, requestOptions) {
+    const options = Object.assign({}, {headers}, requestOptions);
+    return fetch(url, options)
+}
+
+
 function get(url) {
     const requestOptions = {
         method: "GET",
@@ -47,6 +54,7 @@ function get(url) {
     return fetch(url, requestOptions)
         .then(handleResponse);
 }
+
 
 function post(url, body) {
     const requestOptions = {

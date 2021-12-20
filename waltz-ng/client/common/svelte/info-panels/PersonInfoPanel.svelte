@@ -47,7 +47,7 @@
                 </tr>
             {/if}
             <tr>
-                <td width="50%">Org unit</td>
+                <td width="50%">Organisational unit</td>
                 <td width="50%">{orgUnit?.name || "Unknown"}</td>
             </tr>
             <tr>
