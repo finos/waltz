@@ -15,35 +15,24 @@
  * See the License for the specific
  *
  */
-import template from './settings-view.html';
+import template from "./settings-view.html";
+import SettingsPanel from "./svelte/settings/SettingsPanel.svelte";
+import {initialiseData} from "../common";
 
-
-function controller(settingsService) {
-
-    const vm = this;
-
-    vm.settings = [];
-
-    const load = (force = false) => settingsService
-        .findAll(force)
-        .then(settings => vm.settings = settings);
-
-    vm.forceRefresh = () => {
-        load(true);
-    };
-
-    load();
-
+const initialState = {
+    SettingsPanel
 }
 
-controller.$inject = [ 'SettingsService' ];
+function controller() {
 
+    const vm = initialiseData(this, initialState);
 
+}
 
 export default {
     template,
     controller,
-    controllerAs: 'ctrl',
+    controllerAs: "$ctrl",
     bindToController: true,
     scope: {}
 };

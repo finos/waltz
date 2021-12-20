@@ -18,6 +18,7 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.model.settings.UpdateSettingsCommand;
 import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
@@ -35,11 +36,13 @@ import spark.Request;
 import java.util.Collection;
 
 import static org.finos.waltz.common.CollectionUtilities.map;
+import static org.finos.waltz.web.WebUtilities.*;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.*;
 
 @Service
 public class SettingsEndpoint implements Endpoint {
 
-    private static final String BASE_URL = WebUtilities.mkPath("api", "settings");
+    private static final String BASE_URL = mkPath("api", "settings");
 
     private final SettingsService settingsService;
     private final UserRoleService userRoleService;
@@ -55,8 +58,9 @@ public class SettingsEndpoint implements Endpoint {
 
     @Override
     public void register() {
-        String findAllPath = WebUtilities.mkPath(BASE_URL);
-        String getByNamePath = WebUtilities.mkPath(BASE_URL, "name", ":name");
+        String findAllPath = mkPath(BASE_URL);
+        String getByNamePath = mkPath(BASE_URL, "name", ":name");
+        String updateValuePath = mkPath(BASE_URL, "update");
 
 
         ListRoute<Setting> findAllRoute = (request, response) -> {
@@ -71,9 +75,16 @@ public class SettingsEndpoint implements Endpoint {
             return isAdmin(request) ? setting : sanitize(setting);
         };
 
+        DatumRoute<Integer> updateValueRoute = (request, response) -> {
+            requireRole(userRoleService, request, SystemRole.ADMIN);
+            UpdateSettingsCommand updateCommand = readBody(request, UpdateSettingsCommand.class);
+            return settingsService.update(updateCommand);
+        };
 
-        EndpointUtilities.getForList(findAllPath, findAllRoute);
-        EndpointUtilities.getForDatum(getByNamePath, getByNameRoute);
+
+        getForList(findAllPath, findAllRoute);
+        getForDatum(getByNamePath, getByNameRoute);
+        postForDatum(updateValuePath, updateValueRoute);
     }
 
 
