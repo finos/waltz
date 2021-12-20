@@ -7,7 +7,7 @@
     export let doCancel = () => console.log("Cancel");
     export let doSave = () => console.log("Saving");
 
-    let workingCopy = Object.assign({}, grid);
+    let workingCopy = Object.assign({}, grid, {kind: grid?.kind || reportGridKinds.PRIVATE.key});
 
     function noChange(workingCopy) {
         return workingCopy?.name === grid?.name
@@ -16,7 +16,9 @@
     }
 
     function notSubmittable(){
-        return _.isNull(workingCopy?.name) || _.isNull(workingCopy?.kind);
+        return _.isEmpty(workingCopy?.name)
+            || _.isEmpty(workingCopy?.name.trim())
+            || _.isNull(workingCopy?.kind);
     }
 
 </script>
