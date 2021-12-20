@@ -18,13 +18,12 @@
 
 package org.finos.waltz.data.survey;
 
-import org.finos.waltz.common.DateTimeUtilities;
-import org.finos.waltz.schema.tables.records.SurveyInstanceRecipientRecord;
-import org.finos.waltz.schema.tables.records.SurveyInstanceRecord;
 import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.survey.*;
+import org.finos.waltz.schema.tables.records.SurveyInstanceRecipientRecord;
+import org.finos.waltz.schema.tables.records.SurveyInstanceRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,34 +35,38 @@ import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.common.DateTimeUtilities.*;
-import static org.finos.waltz.schema.Tables.*;
 import static java.util.Optional.ofNullable;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.DateTimeUtilities.*;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.data.JooqUtilities.maybeReadRef;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.schema.Tables.*;
 
 @Repository
 public class SurveyInstanceDao {
 
-    private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
-                SURVEY_INSTANCE.ENTITY_ID,
-                SURVEY_INSTANCE.ENTITY_KIND,
+    private static final org.finos.waltz.schema.tables.SurveyInstance si = SURVEY_INSTANCE;
+
+    private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory
+            .mkNameField(
+                si.ENTITY_ID,
+                si.ENTITY_KIND,
                 newArrayList(EntityKind.values()))
             .as("entity_name");
 
-    private static final Field<String> EXTERNAL_ID_FIELD = InlineSelectFieldFactory.mkExternalIdField(
-            SURVEY_INSTANCE.ENTITY_ID,
-            SURVEY_INSTANCE.ENTITY_KIND,
-            newArrayList(EntityKind.values()))
+    private static final Field<String> EXTERNAL_ID_FIELD = InlineSelectFieldFactory
+            .mkExternalIdField(
+                si.ENTITY_ID,
+                si.ENTITY_KIND,
+                newArrayList(EntityKind.values()))
             .as("external_id");
 
 
-    private static final Condition IS_ORIGINAL_INSTANCE_CONDITION = SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.isNull();
+    private static final Condition IS_ORIGINAL_INSTANCE_CONDITION = si.ORIGINAL_INSTANCE_ID.isNull();
 
     private static final RecordMapper<Record, SurveyInstance> TO_DOMAIN_MAPPER = r -> {
-        SurveyInstanceRecord record = r.into(SURVEY_INSTANCE);
+        SurveyInstanceRecord record = r.into(si);
         return ImmutableSurveyInstance.builder()
                 .id(record.getId())
                 .surveyRunId(record.getSurveyRunId())
@@ -84,8 +87,8 @@ public class SurveyInstanceDao {
                 .name(record.getName())
                 .qualifierEntity(maybeReadRef(
                             record,
-                            SURVEY_INSTANCE.ENTITY_QUALIFIER_KIND,
-                            SURVEY_INSTANCE.ENTITY_QUALIFIER_ID)
+                            si.ENTITY_QUALIFIER_KIND,
+                            si.ENTITY_QUALIFIER_ID)
                         .orElse(null))
                 .build();
     };
@@ -102,22 +105,22 @@ public class SurveyInstanceDao {
 
 
     public SurveyInstance getById(long id) {
-        return dsl.select(SURVEY_INSTANCE.fields())
+        return dsl.select(si.fields())
                 .select(ENTITY_NAME_FIELD)
                 .select(EXTERNAL_ID_FIELD)
-                .from(SURVEY_INSTANCE)
-                .where(SURVEY_INSTANCE.ID.eq(id))
+                .from(si)
+                .where(si.ID.eq(id))
                 .fetchOne(TO_DOMAIN_MAPPER);
     }
 
 
     public Set<SurveyInstance> findForRecipient(long personId) {
-        return dsl.select(SURVEY_INSTANCE.fields())
+        return dsl.select(si.fields())
                 .select(ENTITY_NAME_FIELD)
                 .select(EXTERNAL_ID_FIELD)
-                .from(SURVEY_INSTANCE)
+                .from(si)
                 .innerJoin(SURVEY_INSTANCE_RECIPIENT)
-                .on(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
+                .on(SURVEY_INSTANCE_RECIPIENT.SURVEY_INSTANCE_ID.eq(si.ID))
                 .where(SURVEY_INSTANCE_RECIPIENT.PERSON_ID.eq(personId))
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
                 .fetchSet(TO_DOMAIN_MAPPER);
@@ -125,11 +128,11 @@ public class SurveyInstanceDao {
 
 
     public Set<SurveyInstance> findForSurveyRun(long surveyRunId) {
-        return dsl.select(SURVEY_INSTANCE.fields())
+        return dsl.select(si.fields())
                 .select(ENTITY_NAME_FIELD)
                 .select(EXTERNAL_ID_FIELD)
-                .from(SURVEY_INSTANCE)
-                .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
+                .from(si)
+                .where(si.SURVEY_RUN_ID.eq(surveyRunId))
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
@@ -138,7 +141,7 @@ public class SurveyInstanceDao {
     public long create(SurveyInstanceCreateCommand command) {
         checkNotNull(command, "command cannot be null");
 
-        SurveyInstanceRecord record = dsl.newRecord(SURVEY_INSTANCE);
+        SurveyInstanceRecord record = dsl.newRecord(si);
         record.setSurveyRunId(command.surveyRunId());
         record.setEntityKind(command.entityReference().kind().name());
         record.setEntityId(command.entityReference().id());
@@ -155,7 +158,7 @@ public class SurveyInstanceDao {
     public long createPreviousVersion(SurveyInstance currentInstance) {
         checkNotNull(currentInstance, "currentInstance cannot be null");
 
-        SurveyInstanceRecord record = dsl.newRecord(SURVEY_INSTANCE);
+        SurveyInstanceRecord record = dsl.newRecord(si);
         record.setSurveyRunId(currentInstance.surveyRunId());
         record.setEntityKind(currentInstance.surveyEntity().kind().name());
         record.setEntityId(currentInstance.surveyEntity().id());
@@ -184,8 +187,8 @@ public class SurveyInstanceDao {
 
 
     public int deleteForSurveyRun(long surveyRunId) {
-        return dsl.delete(SURVEY_INSTANCE)
-                .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
+        return dsl.delete(si)
+                .where(si.SURVEY_RUN_ID.eq(surveyRunId))
                 .execute();
     }
 
@@ -193,52 +196,52 @@ public class SurveyInstanceDao {
     public int updateStatus(long instanceId, SurveyInstanceStatus newStatus) {
         checkNotNull(newStatus, "newStatus cannot be null");
 
-        return dsl.update(SURVEY_INSTANCE)
-                .set(SURVEY_INSTANCE.STATUS, newStatus.name())
-                .where(SURVEY_INSTANCE.STATUS.notEqual(newStatus.name())
-                        .and(SURVEY_INSTANCE.ID.eq(instanceId)))
+        return dsl.update(si)
+                .set(si.STATUS, newStatus.name())
+                .where(si.STATUS.notEqual(newStatus.name())
+                        .and(si.ID.eq(instanceId)))
                 .execute();
     }
 
 
     public int updateSubmissionDueDate(long instanceId, LocalDate newDueDate) {
-        return dsl.update(SURVEY_INSTANCE)
-                .set(SURVEY_INSTANCE.DUE_DATE, toSqlDate(newDueDate))
-                .where(SURVEY_INSTANCE.ID.eq(instanceId))
+        return dsl.update(si)
+                .set(si.DUE_DATE, toSqlDate(newDueDate))
+                .where(si.ID.eq(instanceId))
                 .execute();
     }
 
 
     public int updateApprovalDueDate(long instanceId, LocalDate newDueDate) {
-        return dsl.update(SURVEY_INSTANCE)
-                .set(SURVEY_INSTANCE.APPROVAL_DUE_DATE, toSqlDate(newDueDate))
-                .where(SURVEY_INSTANCE.ID.eq(instanceId))
+        return dsl.update(si)
+                .set(si.APPROVAL_DUE_DATE, toSqlDate(newDueDate))
+                .where(si.ID.eq(instanceId))
                 .execute();
     }
 
 
     public int updateDueDateForSurveyRun(long surveyRunId, LocalDate newDueDate) {
-        return dsl.update(SURVEY_INSTANCE)
-                .set(SURVEY_INSTANCE.DUE_DATE, toSqlDate(newDueDate))
-                .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
+        return dsl.update(si)
+                .set(si.DUE_DATE, toSqlDate(newDueDate))
+                .where(si.SURVEY_RUN_ID.eq(surveyRunId))
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
                 .execute();
     }
 
 
     public int updateApprovalDueDateForSurveyRun(long surveyRunId, LocalDate newDueDate) {
-        return dsl.update(SURVEY_INSTANCE)
-                .set(SURVEY_INSTANCE.APPROVAL_DUE_DATE, toSqlDate(newDueDate))
-                .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
+        return dsl.update(si)
+                .set(si.APPROVAL_DUE_DATE, toSqlDate(newDueDate))
+                .where(si.SURVEY_RUN_ID.eq(surveyRunId))
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
                 .execute();
     }
 
 
     public int updateOwningRoleForSurveyRun(long surveyRunId, String role) {
-        return dsl.update(SURVEY_INSTANCE)
-                .set(SURVEY_INSTANCE.OWNING_ROLE, role)
-                .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId))
+        return dsl.update(si)
+                .set(si.OWNING_ROLE, role)
+                .where(si.SURVEY_RUN_ID.eq(surveyRunId))
                 .execute();
     }
 
@@ -246,10 +249,10 @@ public class SurveyInstanceDao {
     public int updateSubmitted(long instanceId, String userName) {
         checkNotNull(userName, "userName cannot be null");
 
-        return dsl.update(SURVEY_INSTANCE)
-                .set(SURVEY_INSTANCE.SUBMITTED_AT, Timestamp.valueOf(nowUtc()))
-                .set(SURVEY_INSTANCE.SUBMITTED_BY, userName)
-                .where(SURVEY_INSTANCE.ID.eq(instanceId))
+        return dsl.update(si)
+                .set(si.SUBMITTED_AT, Timestamp.valueOf(nowUtc()))
+                .set(si.SUBMITTED_BY, userName)
+                .where(si.ID.eq(instanceId))
                 .execute();
     }
 
@@ -257,54 +260,73 @@ public class SurveyInstanceDao {
     public int markApproved(long instanceId, String userName) {
         checkNotNull(userName, "userName cannot be null");
 
-        return dsl.update(SURVEY_INSTANCE)
-                .set(SURVEY_INSTANCE.APPROVED_AT, Timestamp.valueOf(nowUtc()))
-                .set(SURVEY_INSTANCE.APPROVED_BY, userName)
-                .set(SURVEY_INSTANCE.STATUS, SurveyInstanceStatus.APPROVED.name())
-                .where(SURVEY_INSTANCE.ID.eq(instanceId))
+        return dsl.update(si)
+                .set(si.APPROVED_AT, Timestamp.valueOf(nowUtc()))
+                .set(si.APPROVED_BY, userName)
+                .set(si.STATUS, SurveyInstanceStatus.APPROVED.name())
+                .where(si.ID.eq(instanceId))
                 .execute();
     }
 
 
     public void clearApproved(long instanceId) {
-        dsl.update(SURVEY_INSTANCE)
-                .set(SURVEY_INSTANCE.APPROVED_AT, (Timestamp) null)
-                .set(SURVEY_INSTANCE.APPROVED_BY, (String) null)
-                .where(SURVEY_INSTANCE.ID.eq(instanceId))
+        dsl.update(si)
+                .set(si.APPROVED_AT, (Timestamp) null)
+                .set(si.APPROVED_BY, (String) null)
+                .where(si.ID.eq(instanceId))
                 .execute();
     }
 
 
     public List<SurveyInstance> findBySurveyInstanceIdSelector(Select<Record1<Long>> selector) {
-        return dsl.select(SURVEY_INSTANCE.fields())
+        return dsl.select(si.fields())
                 .select(ENTITY_NAME_FIELD)
                 .select(EXTERNAL_ID_FIELD)
-                .from(SURVEY_INSTANCE)
-                .where(SURVEY_INSTANCE.ID.in(selector))
+                .from(si)
+                .where(si.ID.in(selector))
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
+    @Deprecated
     public List<SurveyInstance> findPreviousVersionsForInstance(long instanceId) {
-        return dsl.select(SURVEY_INSTANCE.fields())
+        return dsl.select(si.fields())
                 .select(ENTITY_NAME_FIELD)
                 .select(EXTERNAL_ID_FIELD)
-                .from(SURVEY_INSTANCE)
-                .where(SURVEY_INSTANCE.ORIGINAL_INSTANCE_ID.eq(instanceId))
+                .from(si)
+                .where(si.ORIGINAL_INSTANCE_ID.eq(instanceId))
+                .fetch(TO_DOMAIN_MAPPER);
+    }
+
+
+    public List<SurveyInstance> findVersionsForInstance(long instanceId) {
+
+        SelectConditionStep<Record1<Long>> origId = DSL
+                .select(DSL.coalesce(si.ORIGINAL_INSTANCE_ID, si.ID))
+                .from(si)
+                .where(si.ID.eq(instanceId));
+
+        return dsl
+                .select(si.fields())
+                .select(ENTITY_NAME_FIELD)
+                .select(EXTERNAL_ID_FIELD)
+                .from(si)
+                .where(si.ID.eq(origId))
+                .or(si.ORIGINAL_INSTANCE_ID.eq(origId))
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
 
     public SurveyRunCompletionRate getCompletionRateForSurveyRun(Long surveyRunId) {
-        Condition condition = SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId);
+        Condition condition = si.SURVEY_RUN_ID.eq(surveyRunId);
         return CollectionUtilities
                 .maybeFirst(calcCompletionRateForSurveyRuns(condition))
                 .orElse(null);
     }
 
     public List<SurveyRunCompletionRate> findCompletionRateForSurveyTemplate(Long surveyTemplateId) {
-        Condition condition = SURVEY_INSTANCE.SURVEY_RUN_ID.in(DSL
+        Condition condition = si.SURVEY_RUN_ID.in(DSL
                 .select(SURVEY_RUN.ID)
                 .from(SURVEY_RUN)
                 .where(SURVEY_RUN.SURVEY_TEMPLATE_ID.eq(surveyTemplateId)));
@@ -314,21 +336,21 @@ public class SurveyInstanceDao {
 
 
     private List<SurveyRunCompletionRate> calcCompletionRateForSurveyRuns(Condition surveyRunSelectionCondition) {
-        Field<Integer> statCount = DSL.count(SURVEY_INSTANCE.ID).as("statCount");
+        Field<Integer> statCount = DSL.count(si.ID).as("statCount");
 
         final Result<Record3<Long, String, Integer>> countsByRunAndStatus = dsl
-                .select(SURVEY_INSTANCE.SURVEY_RUN_ID,
-                        SURVEY_INSTANCE.STATUS,
+                .select(si.SURVEY_RUN_ID,
+                        si.STATUS,
                         statCount)
-                .from(SURVEY_INSTANCE)
+                .from(si)
                 .where(surveyRunSelectionCondition)
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
-                .groupBy(SURVEY_INSTANCE.SURVEY_RUN_ID, SURVEY_INSTANCE.STATUS)
+                .groupBy(si.SURVEY_RUN_ID, si.STATUS)
                 .fetch();
 
         Map<Long, ImmutableSurveyRunCompletionRate.Builder> buildersByRunId = new HashMap<>();
         countsByRunAndStatus.forEach(r -> {
-            Long runId = r.get(SURVEY_INSTANCE.SURVEY_RUN_ID);
+            Long runId = r.get(si.SURVEY_RUN_ID);
             ImmutableSurveyRunCompletionRate.Builder inProgressBuilder = buildersByRunId.getOrDefault(
                     runId,
                     ImmutableSurveyRunCompletionRate.builder().surveyRunId(runId));
@@ -354,7 +376,7 @@ public class SurveyInstanceDao {
 
 
     private boolean isStatTypeOf(Record3<Long, String, Integer> r, SurveyInstanceStatus status) {
-        return r.get(SURVEY_INSTANCE.STATUS).equals(status.name());
+        return r.get(si.STATUS).equals(status.name());
     }
 
 
@@ -381,12 +403,12 @@ public class SurveyInstanceDao {
     }
 
     public Set<SurveyInstance> findForOwner(Long personId) {
-        return dsl.select(SURVEY_INSTANCE.fields())
+        return dsl.select(si.fields())
                 .select(ENTITY_NAME_FIELD)
                 .select(EXTERNAL_ID_FIELD)
-                .from(SURVEY_INSTANCE)
+                .from(si)
                 .innerJoin(SURVEY_INSTANCE_OWNER)
-                .on(SURVEY_INSTANCE_OWNER.SURVEY_INSTANCE_ID.eq(SURVEY_INSTANCE.ID))
+                .on(SURVEY_INSTANCE_OWNER.SURVEY_INSTANCE_ID.eq(si.ID))
                 .where(SURVEY_INSTANCE_OWNER.PERSON_ID.eq(personId))
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
                 .fetchSet(TO_DOMAIN_MAPPER);

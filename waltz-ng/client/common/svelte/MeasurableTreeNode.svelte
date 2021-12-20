@@ -54,7 +54,7 @@
 {/if}
 
 
-<style type="text/scss">
+<style>
     ul.root {
         padding-left: 1em;
     }
@@ -65,6 +65,5 @@
 
     li {
         padding-top: 0;
-
     }
 </style>

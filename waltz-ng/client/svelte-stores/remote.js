@@ -57,16 +57,16 @@ class Cache {
 }
 
 
-function mkPromise(method, url, data) {
+function mkPromise(method, url, data, options) {
     switch (method) {
         case "GET":
-            return $http.get(url);
+            return $http.get(url, options);
         case "POST":
-            return $http.post(url, data);
+            return $http.post(url, data, options);
         case "PUT":
-            return $http.put(url, data);
+            return $http.put(url, data, options);
         case "DELETE":
-            return $http.delete(url);
+            return $http.delete(url, options);
         default:
             Promise.reject(`Unknown verb: ${method}`);
     }
