@@ -58,6 +58,10 @@ public class LogicalFlowHelper {
         logicalFlowDecoratorDao.addDecorators(decorators);
     }
 
+    public List<DataTypeDecorator> fetchDecoratorsForFlow(Long flowId) {
+        return logicalFlowDecoratorDao.findByEntityId(flowId);
+    }
+
 
     public void clearAllFlows(){
         dsl.deleteFrom(LOGICAL_FLOW).execute();
