@@ -19,7 +19,7 @@
     let activeMode = Modes.VIEW;
     let selectedMember = null;
 
-    let qry = null;
+    let qry = "";
 
     $: membersCall = $selectedGrid?.definition?.id && reportGridMemberStore.findByGridId($selectedGrid?.definition.id, true);
     $: members = $membersCall?.data || [];
@@ -30,7 +30,6 @@
     $: membersList = _.isEmpty(qry)
         ? members
         : termSearch(members, qry, ["userId", "role"]);
-
 
     $: encrichedMembersList = _.map(
         membersList,
@@ -105,10 +104,14 @@
 </script>
 
 <div class="row">
-    <div class="col-sm-6">
-        {#if _.size(membersList) > 10}
+    <div class="col-sm-5">
+        <div class="help-block small">
+            Listed below are the owners and viewers of this report grid.
+        </div>
+        {#if _.size(members) > 10}
             <SearchInput bind:value={qry}
                          placeholder="Search people"/>
+            <br>
         {/if}
         <table class="table table-condensed table-hover small">
             <colgroup>
@@ -142,7 +145,7 @@
             </tbody>
         </table>
     </div>
-    <div class="col-sm-6">
+    <div class="col-sm-7">
         {#if activeMode === Modes.VIEW}
             <ReportGridPersonOverview members={members}
                                       selectedMember={selectedMember}
