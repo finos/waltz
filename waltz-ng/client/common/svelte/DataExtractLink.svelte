@@ -16,7 +16,6 @@
     const base = "data-extract/";
 
     function getFileNameFromHttpResponse(httpResponse) {
-        console.log({httpResponse})
         const contentDispositionHeader = httpResponse.headers["Content-Disposition"];
         if(!contentDispositionHeader) {
             return null;
