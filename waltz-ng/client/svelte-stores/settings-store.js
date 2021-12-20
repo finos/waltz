@@ -19,6 +19,7 @@
 import {remote} from "./remote";
 
 export function mkSettingsStore() {
+
     const loadAll = (force = false) => remote
         .fetchAppList(
             "GET",

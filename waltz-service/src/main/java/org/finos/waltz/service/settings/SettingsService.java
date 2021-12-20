@@ -22,6 +22,7 @@ import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.data.settings.SettingsDao;
 import org.finos.waltz.model.settings.Setting;
+import org.finos.waltz.model.settings.UpdateSettingsCommand;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -87,5 +88,10 @@ public class SettingsService {
 
     public Map<String, String> indexByPrefix(String prefix) {
         return settingsDao.indexByPrefix(prefix);
+    }
+
+
+    public int update(UpdateSettingsCommand cmd) {
+        return settingsDao.update(cmd);
     }
 }

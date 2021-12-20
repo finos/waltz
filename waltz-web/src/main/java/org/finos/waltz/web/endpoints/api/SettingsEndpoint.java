@@ -18,6 +18,7 @@
 
 package org.finos.waltz.web.endpoints.api;
 
+import org.finos.waltz.model.settings.UpdateSettingsCommand;
 import org.finos.waltz.service.settings.SettingsService;
 import org.finos.waltz.service.user.UserRoleService;
 import org.finos.waltz.web.DatumRoute;
@@ -35,6 +36,9 @@ import spark.Request;
 import java.util.Collection;
 
 import static org.finos.waltz.common.CollectionUtilities.map;
+import static org.finos.waltz.web.WebUtilities.readBody;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForDatum;
+import static org.finos.waltz.web.endpoints.EndpointUtilities.getForList;
 
 @Service
 public class SettingsEndpoint implements Endpoint {
@@ -57,6 +61,7 @@ public class SettingsEndpoint implements Endpoint {
     public void register() {
         String findAllPath = WebUtilities.mkPath(BASE_URL);
         String getByNamePath = WebUtilities.mkPath(BASE_URL, "name", ":name");
+        String updateValuePath = WebUtilities.mkPath(BASE_URL, "update");
 
 
         ListRoute<Setting> findAllRoute = (request, response) -> {
@@ -71,9 +76,15 @@ public class SettingsEndpoint implements Endpoint {
             return isAdmin(request) ? setting : sanitize(setting);
         };
 
+        DatumRoute<Integer> updateValueRoute = (request, response) -> {
+            UpdateSettingsCommand updateCommand = readBody(request, UpdateSettingsCommand.class);
+            return settingsService.update(updateCommand);
+        };
 
-        EndpointUtilities.getForList(findAllPath, findAllRoute);
-        EndpointUtilities.getForDatum(getByNamePath, getByNameRoute);
+
+        getForList(findAllPath, findAllRoute);
+        getForDatum(getByNamePath, getByNameRoute);
+        getForDatum(updateValuePath, updateValueRoute);
     }
 
 

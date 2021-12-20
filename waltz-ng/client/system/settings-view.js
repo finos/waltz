@@ -15,12 +15,17 @@
  * See the License for the specific
  *
  */
-import template from './settings-view.html';
+import template from "./settings-view.html";
+import SettingsPanel from "./svelte/settings/SettingsPanel.svelte";
+import {initialiseData} from "../common";
 
+const initialState = {
+    SettingsPanel
+}
 
 function controller(settingsService) {
 
-    const vm = this;
+    const vm = initialiseData(this, initialState);
 
     vm.settings = [];
 
