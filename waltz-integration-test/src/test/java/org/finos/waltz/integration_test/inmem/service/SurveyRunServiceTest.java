@@ -9,6 +9,7 @@ import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.IdCommandResponse;
 import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.survey.*;
 import org.finos.waltz.service.survey.SurveyInstanceService;
 import org.finos.waltz.service.survey.SurveyRunService;
@@ -133,15 +134,15 @@ public class SurveyRunServiceTest extends BaseInMemoryIntegrationTest {
         assertEquals("can find by name or id (2a)", instanceService.findForRecipient(u2bId), instanceService.findForRecipient(u2b));
         assertThrows("finding by removed user throws an exception", IllegalArgumentException.class, () -> instanceService.findForRecipient(u2a));
 
-        List<SurveyInstanceRecipient> aRecips = instanceService.findRecipients(instanceAId);
-        List<SurveyInstanceRecipient> bRecips = instanceService.findRecipients(instanceBId);
+        List<Person> aRecips = instanceService.findRecipients(instanceAId);
+        List<Person> bRecips = instanceService.findRecipients(instanceBId);
         assertEquals("Expect user1 to be the recipient", asSet(u1), recipsToUserIds(aRecips));
         assertEquals("app B has only one recipient (u2a) as the other involved person (u2a) has been removed", asSet(u2b), recipsToUserIds(bRecips));
     }
 
 
-    private Set<String> recipsToUserIds(List<SurveyInstanceRecipient> aRecips) {
-        return map(aRecips, r -> r.person().userId());
+    private Set<String> recipsToUserIds(List<Person> aRecips) {
+        return map(aRecips, Person::userId);
     }
 
 

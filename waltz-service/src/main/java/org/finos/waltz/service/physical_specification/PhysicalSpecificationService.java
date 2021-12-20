@@ -42,7 +42,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.Checks.checkNotNull;
+import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.model.EntityKind.PHYSICAL_SPECIFICATION;
 import static org.finos.waltz.model.EntityReference.mkRef;
 
@@ -72,6 +74,7 @@ public class PhysicalSpecificationService {
 
 
     public Set<PhysicalSpecification> findByEntityReference(EntityReference ref) {
+        checkNotNull(ref, "Entity reference cannot be null");
         return specificationDao.findByEntityReference(ref);
     }
 
@@ -125,6 +128,7 @@ public class PhysicalSpecificationService {
 
 
     public List<PhysicalSpecification> search(EntitySearchOptions options) {
+        checkNotNull(options, "Search options cannot be null");
         return specificationSearchDao.search(options);
     }
 
@@ -149,14 +153,21 @@ public class PhysicalSpecificationService {
 
 
     public Collection<PhysicalSpecification> findByIds(Collection<Long> ids) {
-        return specificationDao.findByIds(ids);
+        if(isEmpty(ids)) {
+            return emptyList();
+        } else{
+            return specificationDao.findByIds(ids);
+        }
     }
 
     public int updateExternalId(Long id, String sourceExtId) {
+        checkNotNull(id, "Specification id cannot be null");
+        checkNotNull(sourceExtId, "External id cannot be null");
         return specificationDao.updateExternalId(id, sourceExtId);
     }
 
     public boolean isUsed(Long specificationId) {
+        checkNotNull(specificationId, "Specification id cannot be null");
         return specificationDao.isUsed(specificationId);
     }
 
@@ -165,6 +176,8 @@ public class PhysicalSpecificationService {
     }
 
     public int makeActive(Long specificationId, String username) {
+        checkNotNull(specificationId, "Specification id cannot be null");
+        checkNotNull(username, "Username cannot be null");
         int result = specificationDao.makeActive(specificationId);
         if(result > 0) {
             logChange(username,
@@ -176,6 +189,8 @@ public class PhysicalSpecificationService {
     }
 
     public int propagateDataTypesToLogicalFlows(String userName, long id) {
+        checkNotNull(userName, "Username cannot be null");
+
         return specificationDao.propagateDataTypesToLogicalFlows(userName, id);
     }
 }

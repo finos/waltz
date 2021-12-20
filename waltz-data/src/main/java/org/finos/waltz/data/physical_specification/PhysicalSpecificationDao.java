@@ -118,8 +118,8 @@ public class PhysicalSpecificationDao {
                 .select(PHYSICAL_SPECIFICATION.fields())
                 .select(owningEntityNameField)
                 .from(PHYSICAL_SPECIFICATION)
-                .innerJoin(PHYSICAL_FLOW).on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
-                .innerJoin(LOGICAL_FLOW).on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
+                .leftJoin(PHYSICAL_FLOW).on(PHYSICAL_FLOW.SPECIFICATION_ID.eq(PHYSICAL_SPECIFICATION.ID))
+                .leftJoin(LOGICAL_FLOW).on(LOGICAL_FLOW.ID.eq(PHYSICAL_FLOW.LOGICAL_FLOW_ID))
                 .where(isOwnerCondition)
                 .or(isTargetCondition)
                 .or(isSourceCondition)
@@ -213,7 +213,8 @@ public class PhysicalSpecificationDao {
     }
 
     public int updateExternalId(long specificationId, String externalId) {
-        return dsl.update(PHYSICAL_SPECIFICATION)
+        return dsl
+                .update(PHYSICAL_SPECIFICATION)
                 .set(PHYSICAL_SPECIFICATION.EXTERNAL_ID, externalId)
                 .where(PHYSICAL_SPECIFICATION.ID.eq(specificationId))
                 .execute();
@@ -229,7 +230,8 @@ public class PhysicalSpecificationDao {
     }
 
     public int makeActive(Long specificationId) {
-        return dsl.update(PHYSICAL_SPECIFICATION)
+        return dsl
+                .update(PHYSICAL_SPECIFICATION)
                 .set(PHYSICAL_SPECIFICATION.IS_REMOVED, false)
                 .where(PHYSICAL_SPECIFICATION.ID.eq(specificationId))
                 .execute();

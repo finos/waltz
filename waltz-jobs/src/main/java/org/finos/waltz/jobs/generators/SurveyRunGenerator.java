@@ -41,7 +41,7 @@ import org.jooq.DSLContext;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
-import org.jooq.lambda.tuple.Tuple;
+import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -57,12 +57,14 @@ import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkFalse;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.DateTimeUtilities.*;
+import static org.finos.waltz.common.ListUtilities.map;
 import static org.finos.waltz.common.RandomUtilities.randomPick;
 import static org.finos.waltz.schema.Tables.SURVEY_INSTANCE;
 import static org.finos.waltz.schema.Tables.SURVEY_RUN;
 import static org.finos.waltz.schema.tables.Person.PERSON;
 import static org.finos.waltz.schema.tables.SurveyInstanceRecipient.SURVEY_INSTANCE_RECIPIENT;
 import static org.finos.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
+import static org.jooq.lambda.tuple.Tuple.tuple;
 
 /**
  * Generates random survey runs and associated instances and recipients
@@ -134,24 +136,23 @@ public class SurveyRunGenerator implements SampleDataGenerator {
 
         List<SurveyQuestion> surveyQuestions = surveyQuestionService.findForSurveyRun(surveyRunId);
         Set<SurveyInstance> surveyInstances = surveyInstanceService.findForSurveyRun(surveyRunId);
-        List<SurveyInstanceRecipient> surveyInstanceRecipients = surveyInstances.stream()
-                .flatMap(surveyInstance -> surveyInstanceService.findRecipients(surveyInstance.id().get()).stream())
-                .collect(toList());
 
-        Map<SurveyInstance, List<SurveyInstanceRecipient>> surveyInstanceRecipientsMap = surveyInstanceRecipients
+        Map<Long, List<Tuple2<Long, Person>>> surveyInstanceRecipientsMap = surveyInstances
                 .stream()
-                .collect(groupingBy(r -> r.surveyInstance()));
-
+                .flatMap(surveyInstance -> surveyInstanceService.findRecipients(surveyInstance.id().get())
+                        .stream()
+                        .map(p -> tuple(surveyInstance.id().get(), p)))
+                .collect(groupingBy(t -> t.v1));
 
         return surveyInstanceRecipientsMap.entrySet()
                 .stream()
                 .flatMap(entry -> {
-                    SurveyInstance surveyInstance = entry.getKey();
-                    List<SurveyInstanceRecipient> instanceRecipients = entry.getValue();
+                    Long surveyInstanceId = entry.getKey();
+                    List<Person> instanceRecipients = map(entry.getValue(), t -> t.v2);
 
                     return surveyQuestions.stream()
                             .map(q -> ImmutableSurveyInstanceQuestionResponse.builder()
-                                    .surveyInstanceId(surveyInstance.id().get())
+                                    .surveyInstanceId(surveyInstanceId)
                                     .personId(randomPick(instanceRecipients).id().get())
                                     .questionResponse(mkRandomSurveyQuestionResponse(q, random))
                                     .lastUpdatedAt(nowUtc())
@@ -233,7 +234,7 @@ public class SurveyRunGenerator implements SampleDataGenerator {
             Map<SurveyInstanceStatus, Set<Long>> surveyInstanceStatusMap = surveyInstanceQuestionResponses.stream()
                     .mapToLong(response -> response.surveyInstanceId())
                     .distinct()
-                    .mapToObj(id -> Tuple.tuple(randomPick(
+                    .mapToObj(id -> tuple(randomPick(
                             SurveyInstanceStatus.NOT_STARTED, SurveyInstanceStatus.IN_PROGRESS, SurveyInstanceStatus.COMPLETED), id))
                     .collect(groupingBy(t -> t.v1, mapping(t -> t.v2, toSet())));
 
