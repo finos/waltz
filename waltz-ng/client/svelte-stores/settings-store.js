@@ -19,6 +19,7 @@
 import {remote} from "./remote";
 
 export function mkSettingsStore() {
+
     const loadAll = (force = false) => remote
         .fetchAppList(
             "GET",
@@ -26,8 +27,14 @@ export function mkSettingsStore() {
             null,
             {force});
 
+
+    const update = (updateCmd) => remote
+        .execute("POST", "api/settings/update", updateCmd)
+
+
     return {
-        loadAll
+        loadAll,
+        update
     };
 }
 

@@ -18,6 +18,7 @@
 
 package org.finos.waltz.data.settings;
 
+import org.finos.waltz.model.settings.UpdateSettingsCommand;
 import org.finos.waltz.schema.tables.records.SettingsRecord;
 import org.finos.waltz.common.StringUtilities;
 import org.finos.waltz.model.settings.ImmutableSetting;
@@ -83,5 +84,16 @@ public class SettingsDao {
                 .fetchMap(
                         SETTINGS.NAME,
                         r -> StringUtilities.mkSafe(r.get(SETTINGS.VALUE)).trim());
+    }
+
+
+    public int update(UpdateSettingsCommand cmd) {
+        return dsl
+                .update(SETTINGS)
+                .set(SETTINGS.VALUE, cmd.value())
+                .where(SETTINGS.NAME.eq(cmd.name()))
+                .and(SETTINGS.RESTRICTED.isFalse())
+                .execute();
+
     }
 }

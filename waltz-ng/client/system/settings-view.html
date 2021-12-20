@@ -28,39 +28,7 @@
     </waltz-page-header>
 
     <div class="waltz-page-summary waltz-page-summary-attach">
-        <p class="waltz-paragraph">
-            Settings are used to configure and tune waltz.  The table below shows the currently configured
-            settings.
-        </p>
-        <table class="table table-striped">
-            <thead>
-            <tr>
-                <th class="col-md-2">Name</th>
-                <th class="col-md-4">Value</th>
-                <th class="col-md-6">Description</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr ng-repeat="setting in ctrl.settings | orderBy:'name'">
-                <td><span ng-bind="setting.name"></span></td>
-                <td><span ng-bind="setting.value"></span></td>
-                <td><span ng-bind="setting.description"></span></td>
-            </tr>
-            <tr ng-if="ctrl.settings.length == 0">
-                <td colspan="2">
-                    No settings
-                </td>
-            </tr>
-            </tbody>
-        </table>
-
-        <div class="pull-right text-muted small">
-            Note that settings are cached in the browser,
-            <a ng-click="ctrl.forceRefresh()"
-               class="clickable">
-                refresh now
-                <waltz-icon name="refresh"></waltz-icon>
-            </a>
-        </div>
+        <waltz-svelte-component component="$ctrl.SettingsPanel">
+        </waltz-svelte-component>
     </div>
 </div>
