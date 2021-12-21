@@ -21,11 +21,13 @@ import {initialiseData} from "../common";
 import {CORE_API} from "../common/services/core-api-utils";
 import template from "./user-management.html";
 import roles from "./system-roles";
+import UserManagementPanel from "./svelte/UserManagementPanel.svelte"
 
 
 const initialState = {
     numAllowedWithoutFilter: 100,
-    roles
+    roles,
+    UserManagementPanel
 };
 
 

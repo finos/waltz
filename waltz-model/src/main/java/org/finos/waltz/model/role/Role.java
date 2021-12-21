@@ -30,4 +30,9 @@ public abstract class Role {
     public abstract String name();
     public abstract String description();
     public abstract boolean isCustom();
+
+    @Value.Default
+    public boolean userSelectable() {
+        return true;
+    };
 }

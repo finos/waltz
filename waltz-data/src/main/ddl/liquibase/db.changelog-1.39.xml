@@ -233,4 +233,15 @@
         </addColumn>
     </changeSet>
 
+    <changeSet author="woodjes"
+               id="20211220-5800-1">
+        <addColumn tableName="role">
+            <column name="user_selectable"
+                    type="boolean"
+                    defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>
