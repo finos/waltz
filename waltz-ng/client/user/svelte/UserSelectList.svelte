@@ -34,7 +34,9 @@
              placeholder="Search for a user..."/>
 <br>
 {#if _.size(displayedUsers) > 100}
-    <NoData type="info">There are too may results to show, please use the search to filter the list</NoData>
+    <NoData type="info">
+        <Icon name="exclamation-triangle"/> There are too many results to show, please use the search to filter the list
+    </NoData>
 {:else}
     <div class:waltz-scroll-region-350={_.size(displayedUsers) > 10}>
         <table class="table table-condensed small table-hover">
