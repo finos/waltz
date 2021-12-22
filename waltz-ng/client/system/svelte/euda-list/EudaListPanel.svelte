@@ -25,13 +25,14 @@
     let qry = "";
     let selectedEuda = null;
     let recentlyPromoted = [];
+    let comment = null;
 
     $: eudaList = _.isEmpty(qry)
         ? eudas
         : termSearch(eudas, qry, ["id", "name", "description", "lifecyclePhase", "kind"])
 
     function promote() {
-        const promotePromise = endUserApplicationStore.promoteToApplication(selectedEuda.id);
+        const promotePromise = endUserApplicationStore.promoteToApplication(selectedEuda.id, {comment});
         Promise.resolve(promotePromise)
             .then(r => {
                 toasts.success("Successfully promoted " + selectedEuda.name + " to an application")
@@ -116,9 +117,18 @@
                 {:else if activeMode === Modes.CONFIRM}
                     <h4 class="force-wrap">
                         Are you sure you want to promote:
-                        <strong>{selectedEuda.name}</strong>
+                        {selectedEuda.name}
                         to a full application in Waltz?
                     </h4>
+                    <div>
+                        <input class="form-control"
+                               id="comment"
+                               placeholder="Comment"
+                               bind:value={comment}>
+                    </div>
+                    <div class="help-block small"><Icon name="info-circle"/>
+                        Add a comment to the change log entry for this application
+                    </div>
                     <br>
                     <span>
                         <button class="btn btn-success"

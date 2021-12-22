@@ -16,8 +16,6 @@
     $: orgUnitCall = euda?.organisationalUnitId && orgUnitStore.getById(euda?.organisationalUnitId);
     $: orgUnit = $orgUnitCall?.data;
 
-    $: console.log({euda});
-
 </script>
 
 {#if euda}

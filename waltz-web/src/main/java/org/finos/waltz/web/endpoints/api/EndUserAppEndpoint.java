@@ -19,14 +19,15 @@
 package org.finos.waltz.web.endpoints.api;
 
 
+import org.finos.waltz.model.application.AppRegistrationResponse;
+import org.finos.waltz.model.changelog.ChangeLogComment;
+import org.finos.waltz.model.enduserapp.EndUserApplication;
+import org.finos.waltz.model.tally.Tally;
 import org.finos.waltz.service.end_user_app.EndUserAppService;
 import org.finos.waltz.web.DatumRoute;
 import org.finos.waltz.web.ListRoute;
 import org.finos.waltz.web.WebUtilities;
 import org.finos.waltz.web.endpoints.Endpoint;
-import org.finos.waltz.model.application.AppRegistrationResponse;
-import org.finos.waltz.model.enduserapp.EndUserApplication;
-import org.finos.waltz.model.tally.Tally;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -68,7 +69,9 @@ public class EndUserAppEndpoint implements Endpoint {
 
             res.type(WebUtilities.TYPE_JSON);
 
-            return endUserAppService.promoteToApplication(getId(req), getUsername(req));
+            ChangeLogComment comment = readBody(req, ChangeLogComment.class);
+
+            return endUserAppService.promoteToApplication(getId(req), comment, getUsername(req));
         };
 
         DatumRoute<EndUserApplication> getByIdRoute = (req, res) -> endUserAppService.getById(getId(req));
