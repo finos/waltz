@@ -50,6 +50,7 @@ public class EndUserAppEndpoint implements Endpoint {
     @Override
     public void register() {
         String findBySelectorPath = mkPath(BASE_URL, "selector");
+        String getByIdPath = mkPath(BASE_URL, "id", ":id");
         String countByOrgUnitPath = mkPath(BASE_URL, "count-by", "org-unit");
         String promoteToApplicationPath = mkPath(BASE_URL, "promote", ":id");
 
@@ -70,12 +71,12 @@ public class EndUserAppEndpoint implements Endpoint {
             return endUserAppService.promoteToApplication(getId(req), getUsername(req));
         };
 
+        DatumRoute<EndUserApplication> getByIdRoute = (req, res) -> endUserAppService.getById(getId(req));
+
         getForList(countByOrgUnitPath, countByOrgUnitRoute);
-
+        getForDatum(getByIdPath, getByIdRoute);
         postForList(findBySelectorPath, findBySelectorRoute);
-
         postForDatum(promoteToApplicationPath, promoteToApplicationRoute);
-
         getForList(findAllPath, findAllRoute);
 
     }

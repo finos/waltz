@@ -20,89 +20,22 @@ import {CORE_API} from "../common/services/core-api-utils";
 import {initialiseData} from "../common";
 import * as _ from "lodash";
 import toasts from "../svelte-stores/toast-store";
+import EudaListPanel from "./svelte/euda-list/EudaListPanel.svelte"
 
 const initialState = {
     selectedEuda: null,
-    recentlyPromoted: []
+    recentlyPromoted: [],
+    EudaListPanel
 };
 
 
-function controller(serviceBroker) {
+function controller() {
 
     const vm = initialiseData(this, initialState);
-
-    function loadData() {
-        return serviceBroker
-            .loadViewData(CORE_API.EndUserAppStore.findAll, [], {force: true})
-            .then(r => vm.eudas = r.data);
-    }
-
-    vm.$onInit = () => {
-        vm.columnDefs = mkColumnDefs();
-
-        serviceBroker
-            .loadViewData(CORE_API.OrgUnitStore.findAll)
-            .then(r => vm.orgUnitsById = _.keyBy(r.data, d => d.id));
-
-        loadData();
-    };
-
-    vm.selectEuda = (euda) => {
-        vm.selectedEuda = euda;
-    };
-
-    vm.promoteToApplication = (id) => {
-        if (confirm("Are you sure you want to promote this End User Application to a Application in Waltz?")){
-            return serviceBroker
-                .loadViewData(
-                    CORE_API.EndUserAppStore.promoteToApplication,
-                    [id] )
-                .then(r => {
-                    vm.recentlyPromoted = _.concat(vm.recentlyPromoted, Object.assign({}, vm.selectedEuda, {appId: r.data.id}));
-                    vm.selectedEuda = null;
-                })
-                .then(() => toasts.success("EUDA successfully promoted"))
-                .catch(e => toasts.error(`Could not promote EUDA: ${e.data.message}`))
-                .then(() => loadData());
-        }
-    }
-}
-
-
-function mkColumnDefs() {
-    return [
-        {
-            field: "id",
-            name: "ID",
-            width: "10%"
-        },
-        {
-            field: "name",
-            name: "Name",
-            width: "30%"
-        },
-        {
-            field: "description",
-            name: "Description",
-            width: "30%"
-        },
-        {
-            field: "applicationKind",
-            name: "Kind",
-            width: "15%"
-        },
-        {
-            field: "lifecyclePhase",
-            name: "Lifecycle Phase",
-            cellFilter: "toDisplayName:'lifecyclePhase'",
-            width: "15%"
-        }
-    ];
 }
 
 
 controller.$inject = [
-    "ServiceBroker"
 ];
 
 

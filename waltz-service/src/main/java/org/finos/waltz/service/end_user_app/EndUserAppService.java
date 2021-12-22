@@ -100,6 +100,10 @@ public class EndUserAppService {
         return time("EUAS.findBySelector", () -> endUserAppDao.findBySelector(selector));
     }
 
+    public EndUserApplication getById(Long id) {
+        return endUserAppDao.getById(id);
+    }
+
 
     public List<EndUserApplication> findAll() {
         return endUserAppDao.findAll();
