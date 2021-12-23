@@ -14,7 +14,6 @@
     $: $categoryQuery = categoryQryValue;
     $: $clientQuery = clientQryValue;
 
-    let counterpartKinds = ["ACTOR", "APPLICATION"];
     let filteredKinds = [];
 
     function addOrRemoveKindFromFilter(kind) {
