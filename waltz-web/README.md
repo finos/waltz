@@ -42,7 +42,7 @@ are available (typically on the classpath).
 ## Both
 
 When the server starts you will see messages about registering
-enpoints and CORS services, similar to:
+endpoints and CORS services, similar to:
 
 ````
 ....
