@@ -26,7 +26,7 @@ body:
       placeholder: Be as precise as you can. Feel free to share screenshots, videos, or data from the devtools of your browser.
     validations:
       required: true
-  - type: text
+  - type: input
     attributes:
       label: Waltz Version
       description: Please provide the Waltz version number
