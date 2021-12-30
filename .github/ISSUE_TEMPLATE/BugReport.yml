@@ -17,7 +17,7 @@ body:
       options:
         - label: "This issue is not a duplicate. Before opening a new issue, please search existing issues: https://github.com/finos/waltz/issues"
           required: true
-        - label: "This issue is not a question, feature request, RFC, or anything other than a bug report directly related to Waltz. 
+        - label: "This issue is not a question, feature request, RFC, or anything other than a bug report directly related to Waltz."
           required: true
   - type: textarea
     attributes:
