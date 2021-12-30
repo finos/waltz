@@ -10,15 +10,6 @@ body:
         Thanks for taking the time to fill out this bug report.
         Please fill out each section below. This info allows Waltz maintainers to diagnose (and fix!) your issue as quickly as possible. 
 
-  - type: checkboxes
-    attributes:
-      label: Preliminary Checks
-      description: Please make sure that you verify each checkbox and follow the instructions for them.
-      options:
-        - label: "This issue is not a duplicate. Before opening a new issue, please search existing issues: https://github.com/finos/waltz/issues"
-          required: true
-        - label: "This issue is not a question, feature request, RFC, or anything other than a bug report directly related to Waltz."
-          required: true
   - type: textarea
     attributes:
       label: Description
