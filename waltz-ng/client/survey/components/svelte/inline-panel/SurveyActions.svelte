@@ -9,7 +9,6 @@
     import {createEventDispatcher} from "svelte";
 
     export let survey;
-    export let questionsWithResponse;
 
     const Modes = {
         LIST: "LIST",

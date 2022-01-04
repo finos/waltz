@@ -20,9 +20,13 @@ package org.finos.waltz.service.survey;
 
 
 import org.finos.waltz.common.DateTimeUtilities;
+import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.person.PersonDao;
 import org.finos.waltz.data.survey.*;
-import org.finos.waltz.model.*;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.Operation;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.survey.*;
@@ -38,10 +42,11 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.*;
 
-import static org.finos.waltz.common.Checks.checkNotNull;
-import static org.finos.waltz.common.Checks.checkTrue;
+import static org.finos.waltz.common.Checks.*;
 import static org.finos.waltz.common.CollectionUtilities.find;
+import static org.finos.waltz.common.StringUtilities.joinUsing;
 import static org.finos.waltz.model.survey.SurveyInstanceStateMachineFactory.simple;
+import static org.finos.waltz.model.utils.IdUtilities.indexByOptionalId;
 
 @Service
 public class SurveyInstanceService {
@@ -56,6 +61,7 @@ public class SurveyInstanceService {
     private final SurveyRunDao surveyRunDao;
     private final UserRoleService userRoleService;
     private final SurveyQuestionService surveyQuestionService;
+    private final SurveyInstanceViewService instanceViewService;
 
 
     @Autowired
@@ -67,6 +73,7 @@ public class SurveyInstanceService {
                                  SurveyQuestionResponseDao surveyQuestionResponseDao,
                                  SurveyRunDao surveyRunDao,
                                  UserRoleService userRoleService,
+                                 SurveyInstanceViewService instanceViewService,
                                  SurveyQuestionService surveyQuestionService) {
 
         checkNotNull(changeLogService, "changeLogService cannot be null");
@@ -77,6 +84,7 @@ public class SurveyInstanceService {
         checkNotNull(surveyQuestionResponseDao, "surveyQuestionResponseDao cannot be null");
         checkNotNull(surveyRunDao, "surveyRunDao cannot be null");
         checkNotNull(userRoleService, "userRoleService cannot be null");
+        checkNotNull(instanceViewService, "instanceViewService cannot be null");
         checkNotNull(surveyQuestionService, "surveyQuestionService cannot be null");
 
         this.changeLogService = changeLogService;
@@ -87,6 +95,7 @@ public class SurveyInstanceService {
         this.surveyQuestionResponseDao = surveyQuestionResponseDao;
         this.surveyRunDao = surveyRunDao;
         this.userRoleService = userRoleService;
+        this.instanceViewService = instanceViewService;
         this.surveyQuestionService = surveyQuestionService;
     }
 
@@ -194,6 +203,19 @@ public class SurveyInstanceService {
 
         SurveyInstancePermissions permissions = getPermissions(userName, instanceId);
         SurveyInstanceStatus newStatus = simple(surveyInstance.status()).process(command.action(), permissions, surveyInstance);
+
+        if (command.action().getCompletionRequirement() == SurveyInstanceActionCompletionRequirement.REQUIRE_FULL_COMPLETION) {
+            // abort if missing any mandatory questions
+            SurveyInstanceFormDetails formDetails = instanceViewService.getFormDetailsById(instanceId);
+            if (! formDetails.missingMandatoryQuestionIds().isEmpty()) {
+                Map<Long, SurveyQuestion> questionsById = indexByOptionalId(formDetails.activeQuestions());
+                Set<SurveyQuestion> missingMandatoryQuestions = SetUtilities.map(formDetails.missingMandatoryQuestionIds(), questionsById::get);
+                fail("Some questions are missing, namely: %s", joinUsing(
+                        missingMandatoryQuestions,
+                        SurveyQuestion::questionText,
+                        ", "));
+            }
+        }
 
         int nbupdates = 0;
         switch (command.action()) {
