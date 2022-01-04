@@ -38,7 +38,7 @@
             .catch(e => displayError("Failed to update approval due date", e));
     }
 
-    $: surveyCall = instanceId && surveyInstanceViewStore.getById(instanceId);
+    $: surveyCall = instanceId && surveyInstanceViewStore.getInfoById(instanceId);
     $: survey = $surveyCall.data;
 
     $: permissionsCall = instanceId && surveyInstanceStore.getPermissions(instanceId);

@@ -59,7 +59,7 @@ public class SurveyInstanceViewService {
     }
 
 
-    public SurveyInstanceFormDetails getFormById(long instanceId) {
+    public SurveyInstanceFormDetails getFormDetailsById(long instanceId) {
         return instanceEvaluator.eval(instanceId);
     }
 

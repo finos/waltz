@@ -1,9 +1,9 @@
 <script>
 
     import {
+        formDetails,
         groupedQuestions,
         responses,
-        questions,
         responsesByQuestionId,
         selectedSection,
         surveyDetails
@@ -12,17 +12,16 @@
     import SurveyQuestionResponse from "./SurveyQuestionResponse.svelte";
     import SurveyViewerContextPanel from "./SurveyViewerContextPanel.svelte";
     import {surveyInstanceViewStore} from "../../../../svelte-stores/survey-instance-view-store";
-    import {surveyQuestionStore} from "../../../../svelte-stores/survey-question-store";
     import {surveyInstanceStore} from "../../../../svelte-stores/survey-instance-store";
 
 
     export let primaryEntityRef;
 
-    $: instanceCall = surveyInstanceViewStore.getById(primaryEntityRef?.id);
+    $: instanceCall = surveyInstanceViewStore.getInfoById(primaryEntityRef?.id);
     $: $surveyDetails = $instanceCall.data;
 
-    $: questionsCall = surveyQuestionStore.findQuestionsForInstance(primaryEntityRef?.id);
-    $: $questions = $questionsCall?.data;
+    $: formDetailsCall = surveyInstanceViewStore.getFormDetailsById(primaryEntityRef?.id);
+    $: $formDetails = $formDetailsCall?.data;
 
     $: responsesCall = surveyInstanceStore.findResponses(primaryEntityRef?.id);
     $: $responses = $responsesCall?.data;

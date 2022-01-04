@@ -12,8 +12,8 @@ import java.util.Set;
 @JsonDeserialize(as = ImmutableSurveyInstanceFormDetails.class)
 public abstract class SurveyInstanceFormDetails {
 
-    public abstract List<SurveyQuestion> activeQs();
+    public abstract List<SurveyQuestion> activeQuestions();
 
-    public abstract Set<Long> missingMandatoryQuestions();
+    public abstract Set<Long> missingMandatoryQuestionIds();
 
 }

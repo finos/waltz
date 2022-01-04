@@ -18,7 +18,7 @@ public class SurveyInstanceHarness {
 
 
         System.out.println("-------------");
-        formDetails.activeQs().forEach(q -> System.out.printf("Q:%d / %s\n", q.id().get(), q.questionText()));
-        System.out.println("Missing: " + formDetails.missingMandatoryQuestions());
+        formDetails.activeQuestions().forEach(q -> System.out.printf("Q:%d / %s\n", q.id().get(), q.questionText()));
+        System.out.println("Missing: " + formDetails.missingMandatoryQuestionIds());
     }
 }

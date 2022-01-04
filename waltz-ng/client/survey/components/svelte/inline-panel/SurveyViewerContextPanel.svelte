@@ -28,10 +28,10 @@
     }
 
     function onAction(evt) {
-        surveyCall = surveyInstanceViewStore.getById(instanceId, true);
+        surveyCall = surveyInstanceViewStore.getInfoById(instanceId, true);
     }
 
-    $: surveyCall = instanceId && surveyInstanceViewStore.getById(instanceId);
+    $: surveyCall = instanceId && surveyInstanceViewStore.getInfoById(instanceId);
     $: survey = $surveyCall?.data;
 
     $: questionsWithResponse = _

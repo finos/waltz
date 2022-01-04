@@ -57,7 +57,7 @@ public class SurveyQuestionService {
 
 
     public List<SurveyQuestion> findForSurveyInstance(long surveyInstanceId) {
-        return evaluator.eval(surveyInstanceId).activeQs();
+        return evaluator.eval(surveyInstanceId).activeQuestions();
     }
 
 

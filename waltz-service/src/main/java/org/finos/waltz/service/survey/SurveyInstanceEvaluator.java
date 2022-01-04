@@ -51,8 +51,8 @@ public class SurveyInstanceEvaluator {
         Set<Long> missingMandatoryQuestions = determineMissingMandatoryQuestions(activeQs, responsesByQuestionId);
 
         return ImmutableSurveyInstanceFormDetails.builder()
-                .activeQs(activeQs)
-                .missingMandatoryQuestions(missingMandatoryQuestions)
+                .activeQuestions(activeQs)
+                .missingMandatoryQuestionIds(missingMandatoryQuestions)
                 .build();
     }
 

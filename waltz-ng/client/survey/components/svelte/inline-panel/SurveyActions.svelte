@@ -3,7 +3,7 @@
     import _ from "lodash";
     import toasts from "../../../../svelte-stores/toast-store";
     import {displayError} from "../../../../common/error-utils";
-    import {questions} from "./survey-detail-store";
+    import {missingMandatoryQuestionIds, questions} from "./survey-detail-store";
     import Icon from "../../../../common/svelte/Icon.svelte";
     import NoData from "../../../../common/svelte/NoData.svelte";
     import {createEventDispatcher} from "svelte";
@@ -83,10 +83,7 @@
                 || pa.availability === "EDIT_AND_VIEW")
         : [];
 
-    $: hasMandatoryQuestionsWithoutResponse = _.some(
-        $questions,
-        q => q.isMandatory && !_.includes(questionsWithResponse, q.id));
-
+    $: hasMandatoryQuestionsWithoutResponse = ! _.isEmpty($missingMandatoryQuestionIds);
 </script>
 
 
@@ -102,7 +99,7 @@
                 {#each actionList as action}
                     <li>
                         <button class={mkButtonClasses(action)}
-                                disabled={action.actionName === 'SUBMITTING' && hasMandatoryQuestionsWithoutResponse}
+                                disabled={action.completionRequirement === "REQUIRE_FULL_COMPLETION" && hasMandatoryQuestionsWithoutResponse}
                                 on:click={() => initiateAction(action, instanceId)}>
                             <Icon name={action.icon}/>
                             {action.display}
