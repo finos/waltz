@@ -28,7 +28,9 @@ public class SurveyInstanceStateTransition {
         return predicate;
     }
 
-    public static SurveyInstanceStateTransition transition(SurveyInstanceAction action, SurveyInstanceStatus futureStatus, BiFunction<SurveyInstancePermissions, SurveyInstance, Boolean> predicate) {
+    public static SurveyInstanceStateTransition transition(SurveyInstanceAction action,
+                                                           SurveyInstanceStatus futureStatus,
+                                                           BiFunction<SurveyInstancePermissions, SurveyInstance, Boolean> predicate) {
         return new SurveyInstanceStateTransition(action, futureStatus, predicate);
     }
 

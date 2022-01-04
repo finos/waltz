@@ -19,7 +19,6 @@
 package org.finos.waltz.service.survey;
 
 
-import org.finos.waltz.service.survey.inclusion_evaluator.QuestionPredicateEvaluator;
 import org.finos.waltz.data.survey.SurveyQuestionDao;
 import org.finos.waltz.model.survey.SurveyQuestion;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,12 +33,12 @@ import static org.finos.waltz.common.Checks.checkTrue;
 public class SurveyQuestionService {
 
     private final SurveyQuestionDao surveyQuestionDao;
-    private final QuestionPredicateEvaluator evaluator;
+    private final SurveyInstanceEvaluator evaluator;
 
 
     @Autowired
     public SurveyQuestionService(SurveyQuestionDao surveyQuestionDao,
-                                 QuestionPredicateEvaluator evaluator) {
+                                 SurveyInstanceEvaluator evaluator) {
         checkNotNull(surveyQuestionDao, "surveyQuestionDao cannot be null");
 
         this.surveyQuestionDao = surveyQuestionDao;
@@ -58,7 +57,7 @@ public class SurveyQuestionService {
 
 
     public List<SurveyQuestion> findForSurveyInstance(long surveyInstanceId) {
-        return evaluator.determineActiveQuestions(surveyInstanceId);
+        return evaluator.eval(surveyInstanceId).activeQs();
     }
 
 

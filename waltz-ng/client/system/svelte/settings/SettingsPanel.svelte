@@ -91,7 +91,7 @@
         </tr>
     </thead>
     <tbody>
-    {#each displayedSettings as setting}
+    {#each _.orderBy(displayedSettings, d => d.name) as setting}
         <tr class:editing={editing && workingSetting?.name === setting?.name}>
             <td class="text-muted">
                 {setting.name}

@@ -5,6 +5,7 @@ import org.apache.commons.jexl3.MapContext;
 import org.finos.waltz.model.ExternalIdProvider;
 import org.finos.waltz.model.survey.SurveyQuestion;
 import org.finos.waltz.model.survey.SurveyQuestionResponse;
+import org.finos.waltz.service.survey.SurveyInstanceUtilities;
 
 import java.util.List;
 import java.util.Map;
@@ -88,32 +89,10 @@ public class QuestionBasePredicateNamespace {
         return ((Optional<T>) referencedQuestion
                 .id()
                 .map(responsesByQuestionId::get)
-                .flatMap(resp -> getVal(referencedQuestion, resp)))
+                .flatMap(resp -> SurveyInstanceUtilities.getVal(referencedQuestion, resp)))
                 .orElse(defaultValue);
     }
 
-
-    private Optional<? extends Object> getVal(SurveyQuestion referencedQuestion, SurveyQuestionResponse resp) {
-        switch (referencedQuestion.fieldType()) {
-            case TEXT:
-            case TEXTAREA:
-            case DROPDOWN:
-                return resp.stringResponse();
-            case NUMBER:
-                return resp.numberResponse();
-            case DATE:
-                return resp.dateResponse();
-            case BOOLEAN:
-                return resp.booleanResponse();
-            case DROPDOWN_MULTI_SELECT:
-                return resp.listResponse();
-            case APPLICATION:
-            case PERSON:
-                return resp.entityResponse();
-            default:
-                return Optional.empty();
-        }
-    }
 
     /**
      * Need to pass in the evaluator so that 'recursive' functions can be computed (e.g. 'DITTO')

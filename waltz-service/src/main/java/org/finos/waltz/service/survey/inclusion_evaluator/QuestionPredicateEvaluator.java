@@ -18,65 +18,27 @@
 
 package org.finos.waltz.service.survey.inclusion_evaluator;
 
-import org.finos.waltz.service.DIConfiguration;
 import org.apache.commons.jexl3.*;
-import org.finos.waltz.data.survey.SurveyInstanceDao;
-import org.finos.waltz.data.survey.SurveyQuestionDao;
-import org.finos.waltz.data.survey.SurveyQuestionResponseDao;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.survey.SurveyInstance;
-import org.finos.waltz.model.survey.SurveyInstanceQuestionResponse;
 import org.finos.waltz.model.survey.SurveyQuestion;
 import org.finos.waltz.model.survey.SurveyQuestionResponse;
 import org.jooq.DSLContext;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.finos.waltz.common.MapUtilities.indexBy;
 import static org.finos.waltz.common.MapUtilities.newHashMap;
 import static org.finos.waltz.common.StringUtilities.isEmpty;
 
-@Service
 public class QuestionPredicateEvaluator {
 
-    private final DSLContext dsl;
-    private final SurveyQuestionDao questionDao;
-    private final SurveyInstanceDao instanceDao;
-    private final SurveyQuestionResponseDao responseDao;
+    public static List<SurveyQuestion> eval(DSLContext dsl,
+                                     List<SurveyQuestion> qs,
+                                     EntityReference subjectRef,
+                                     Map<Long, SurveyQuestionResponse> responsesByQuestionId) {
 
-
-    @Autowired
-    public QuestionPredicateEvaluator(DSLContext dsl,
-                                      SurveyQuestionDao questionDao,
-                                      SurveyInstanceDao instanceDao,
-                                      SurveyQuestionResponseDao responseDao) {
-        this.dsl = dsl;
-        this.questionDao = questionDao;
-        this.instanceDao = instanceDao;
-        this.responseDao = responseDao;
-    }
-
-
-    public List<SurveyQuestion> determineActiveQuestions(long surveyInstanceId) {
-        List<SurveyQuestion> qs = loadQuestions(surveyInstanceId);
-        Map<Long, SurveyQuestionResponse> responsesByQuestionId = loadResponses(surveyInstanceId);
-
-        SurveyInstance instance = instanceDao.getById(surveyInstanceId);
-        EntityReference subjectRef = instance.surveyEntity();
-        return eval(qs, subjectRef, responsesByQuestionId);
-    }
-
-
-    private List<SurveyQuestion> eval(List<SurveyQuestion> qs,
-                                      EntityReference subjectRef,
-                                      Map<Long, SurveyQuestionResponse> responsesByQuestionId) {
-
-        QuestionBasePredicateNamespace namespace = mkPredicateNameSpace(qs, subjectRef, responsesByQuestionId);
+        QuestionBasePredicateNamespace namespace = mkPredicateNameSpace(dsl, qs, subjectRef, responsesByQuestionId);
 
         JexlBuilder builder = new JexlBuilder();
         JexlEngine jexl = builder
@@ -85,11 +47,15 @@ public class QuestionPredicateEvaluator {
 
         namespace.usingEvaluator(jexl);
 
-        return determineActiveQs(qs, jexl);
+        List<SurveyQuestion> activeQs = determineActiveQs(qs, jexl);
+
+        return activeQs;
     }
 
 
-    private QuestionBasePredicateNamespace mkPredicateNameSpace(List<SurveyQuestion> qs, EntityReference subjectRef, Map<Long, SurveyQuestionResponse> responsesByQuestionId) {
+
+
+    private static QuestionBasePredicateNamespace mkPredicateNameSpace(DSLContext dsl, List<SurveyQuestion> qs, EntityReference subjectRef, Map<Long, SurveyQuestionResponse> responsesByQuestionId) {
         switch (subjectRef.kind()) {
             case APPLICATION:
                 return new QuestionAppPredicateNamespace(
@@ -120,8 +86,7 @@ public class QuestionPredicateEvaluator {
                             } else {
                                 JexlExpression expr = jexl.createExpression(p);
                                 JexlContext jexlCtx = new MapContext();
-                                Boolean result = Boolean.valueOf(expr.evaluate(jexlCtx).toString());
-                                return result;
+                                return Boolean.valueOf(expr.evaluate(jexlCtx).toString());
                             }
                         })
                         .orElse(true))
@@ -130,28 +95,5 @@ public class QuestionPredicateEvaluator {
     }
 
 
-    private Map<Long, SurveyQuestionResponse> loadResponses(long surveyInstanceId) {
-        return indexBy(
-                responseDao.findForInstance(surveyInstanceId),
-                r -> r.questionResponse().questionId(),
-                SurveyInstanceQuestionResponse::questionResponse);
-    }
 
-
-    private List<SurveyQuestion> loadQuestions(long surveyInstanceId) {
-        return questionDao.findForSurveyInstance(surveyInstanceId);
-    }
-
-
-    // --- TEST ---
-
-    public static void main(String[] args) {
-        AnnotationConfigApplicationContext ctx = new AnnotationConfigApplicationContext(DIConfiguration.class);
-        QuestionPredicateEvaluator evaluator = ctx.getBean(QuestionPredicateEvaluator.class);
-
-        long surveyInstanceId = 147L; // 95L;
-        List<SurveyQuestion> activeQs = evaluator.determineActiveQuestions(surveyInstanceId);
-        System.out.println("-------------");
-        activeQs.forEach(System.out::println);
-    }
 }

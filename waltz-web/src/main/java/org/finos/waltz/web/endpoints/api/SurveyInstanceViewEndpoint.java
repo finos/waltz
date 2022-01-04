@@ -19,6 +19,7 @@
 package org.finos.waltz.web.endpoints.api;
 
 
+import org.finos.waltz.model.survey.SurveyInstanceFormDetails;
 import org.finos.waltz.model.survey.SurveyInstanceInfo;
 import org.finos.waltz.model.survey.SurveyInstanceUserInvolvement;
 import org.finos.waltz.service.survey.SurveyInstanceViewService;
@@ -51,15 +52,18 @@ public class SurveyInstanceViewEndpoint implements Endpoint {
     @Override
     public void register() {
         String findForUserPath = mkPath(BASE_URL, "user");
-        String getByIdPath = mkPath(BASE_URL, "id", ":id");
+        String getInfoByIdPath = mkPath(BASE_URL, "id", ":id");
+        String getFormByIdPath = mkPath(BASE_URL, "form-details", ":id");
 
-        DatumRoute<SurveyInstanceInfo> getByIdRoute = (req, resp) -> surveyInstanceViewService.getById(getId(req));
+        DatumRoute<SurveyInstanceInfo> getInfoByIdRoute = (req, resp) -> surveyInstanceViewService.getInfoById(getId(req));
+        DatumRoute<SurveyInstanceFormDetails> getFormByIdRoute = (req, resp) -> surveyInstanceViewService.getFormById(getId(req));
 
         ListRoute<SurveyInstanceUserInvolvement> findForUserRoute =
                 (req, res) -> surveyInstanceViewService.findForUser(getUsername(req));
 
         getForList(findForUserPath, findForUserRoute);
-        getForDatum(getByIdPath, getByIdRoute);
+        getForDatum(getInfoByIdPath, getInfoByIdRoute);
+        getForDatum(getFormByIdPath, getFormByIdRoute);
     }
 
 }
