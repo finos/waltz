@@ -89,32 +89,43 @@
         <div class="form-group">
             <label for="dueDate"
                    class="col-sm-2 control-label">
-                Due Date <span class="text-danger">*</span>
+                Submission Due Date <span class="text-danger">*</span>
             </label>
-            <div class="col-sm-10 col-md-3">
-                <waltz-date-picker-form-input id="dueDate"
-                                              required="true"
-                                              place-holder="yyyy-MM-dd"
-                                              format="yyyy-MM-dd"
-                                              max-date="$ctrl.surveyRun.approvalDueDate"
-                                              model="$ctrl.surveyRun.dueDate">
-                </waltz-date-picker-form-input>
+            <div class="col-sm-10">
+                <div style="width: 30%">
+                    <waltz-date-picker-form-input id="dueDate"
+                                                  required="true"
+                                                  place-holder="yyyy-MM-dd"
+                                                  format="yyyy-MM-dd"
+                                                  max-date="$ctrl.surveyRun.approvalDueDate"
+                                                  model="$ctrl.surveyRun.dueDate">
+                    </waltz-date-picker-form-input>
+                </div>
+                <div class="small help-block">
+                    The survey must be completed and submitted by a 'survey recipient' by this date.
+                </div>
             </div>
         </div>
 
         <div class="form-group">
             <label for="approvalDueDate"
-                   class="col-sm-2 control-label">
+                   class="col-sm-2 control-label"
+                   title="This is the date the survey must be approved by. This date must be later than the submission due date.">
                 Approval Due Date <span class="text-danger">*</span>
             </label>
-            <div class="col-sm-10 col-md-3">
-                <waltz-date-picker-form-input id="approvalDueDate"
-                                              required="true"
-                                              place-holder="yyyy-MM-dd"
-                                              format="yyyy-MM-dd"
-                                              min-date="$ctrl.surveyRun.dueDate"
-                                              model="$ctrl.surveyRun.approvalDueDate">
-                </waltz-date-picker-form-input>
+            <div class="col-sm-10">
+                <div style="width: 30%">
+                    <waltz-date-picker-form-input id="approvalDueDate"
+                                                  required="true"
+                                                  place-holder="yyyy-MM-dd"
+                                                  format="yyyy-MM-dd"
+                                                  min-date="$ctrl.surveyRun.dueDate"
+                                                  model="$ctrl.surveyRun.approvalDueDate">
+                    </waltz-date-picker-form-input>
+                </div>
+                <div class="small help-block">
+                    The survey must be approved or rejected by a 'survey owner' by this date.
+                </div>
             </div>
         </div>
 
@@ -131,6 +142,12 @@
                         ng-change="$ctrl.onSelectorEntityKindChange()"
                         ng-model="$ctrl.surveyRun.selectorEntityKind">
                 </select>
+                <div class="small help-block">
+                    Surveys are issued in bulk to subject entities that fall under the selector entity.
+                    The selector entity kind describes the type of entity used for this issuance
+                    e.g. to issue a survey to all applications under an organisational unit, the selector entity would be 'Org Unit'.
+                    Once chosen, the specific selector entity can be searched for in the next field.
+                </div>
             </div>
         </div>
 
@@ -147,13 +164,17 @@
                                        entity-lifecycle-statuses="['ACTIVE', 'PENDING']"
                                        entity-kinds="[$ctrl.surveyRun.selectorEntityKind]">
                 </waltz-entity-selector>
+                <div class="small help-block">
+                    Surveys are issued in bulk to subject entities that fall under the selector entity.
+                    Specify the selector entity that will be used to issue these surveys.
+                </div>
             </div>
         </div>
 
         <div class="form-group">
             <label for="selectorScope"
                    class="col-sm-2 control-label">
-                Scope <span class="text-danger">*</span>
+                Selector Scope <span class="text-danger">*</span>
             </label>
             <div class="col-sm-10">
                 <select id="selectorScope"
@@ -162,13 +183,19 @@
                         ng-options="scope.value as scope.name for scope in $ctrl.allowedScopes[$ctrl.surveyRun.selectorEntityKind]"
                         ng-model="$ctrl.surveyRun.selectorScope">
                 </select>
+                <div class="small help-block">
+                    Surveys are issued in bulk to subject entities that fall under the selector entity.
+                    Some entity types are hierarchical, e.g. organisational units, this field can be used to specify how
+                    to traverse the hierarchy when finding associated subject entities.
+                    e.g. for applications belonging only to this 'exact' org unit, or belonging to this org unit or any of its 'children'
+                </div>
             </div>
         </div>
 
         <div class="form-group">
             <div>
                 <label for="owningRole"
-                class="col-sm-2 control-label">
+                       class="col-sm-2 control-label">
                     Survey admin role/s
                 </label>
             </div>
@@ -187,7 +214,10 @@
                             Survey Owner only
                         </option>
                     </select>
-                    <br>
+                </div>
+                <div class="small help-block">
+                    Can submit, approve, reject, withdraw and re-open surveys.
+                    This is role-based and will give permission across all surveys in this run.
                 </div>
             </div>
         </div>
@@ -222,6 +252,10 @@
                         </li>
                     </ul>
                 </div>
+                <div class="small help-block">
+                    This is involvement-based and will give 'survey owner' permissions specific
+                    to the person with that involvement as listed in the 'people' section on the surveyed entity
+                </div>
             </div>
         </div>
 
@@ -255,6 +289,11 @@
                             </button>
                         </li>
                     </ul>
+                </div>
+                <div class="small help-block">
+                    Recipients can complete, submit and reopen surveys they have been assigned.
+                    This is involvement-based and will give permissions specific
+                    to the person with that involvement as listed in the 'people' section on the surveyed entity.
                 </div>
             </div>
         </div>
