@@ -17,13 +17,18 @@
 
     export let primaryEntityRef;
 
-    $: instanceCall = surveyInstanceViewStore.getInfoById(primaryEntityRef?.id);
-    $: $surveyDetails = $instanceCall.data;
+    let instanceCall, formDetailsCall, responsesCall;
 
-    $: formDetailsCall = surveyInstanceViewStore.getFormDetailsById(primaryEntityRef?.id);
+    $: {
+        if (primaryEntityRef) {
+            instanceCall = surveyInstanceViewStore.getInfoById(primaryEntityRef.id);
+            formDetailsCall = surveyInstanceViewStore.getFormDetailsById(primaryEntityRef.id);
+            responsesCall = surveyInstanceStore.findResponses(primaryEntityRef.id);
+        }
+    }
+
+    $: $surveyDetails = $instanceCall?.data;
     $: $formDetails = $formDetailsCall?.data;
-
-    $: responsesCall = surveyInstanceStore.findResponses(primaryEntityRef?.id);
     $: $responses = $responsesCall?.data;
 
     $: sectionsToShow = $selectedSection
@@ -80,12 +85,13 @@
         {/each}
     </div>
 
-
+    {#if primaryEntityRef}
     <div class="col-sm-4"
          style="padding-left: 0">
         <SurveyViewerContextPanel on:select={onChangeInstance}
                                   instanceId={primaryEntityRef.id}/>
     </div>
+    {/if}
 </div>
 
 
