@@ -20,11 +20,9 @@ package org.finos.waltz.service.survey;
 
 
 import org.finos.waltz.data.person.PersonDao;
-import org.finos.waltz.data.survey.*;
+import org.finos.waltz.data.survey.SurveyViewDao;
 import org.finos.waltz.model.person.Person;
 import org.finos.waltz.model.survey.*;
-import org.finos.waltz.service.changelog.ChangeLogService;
-import org.finos.waltz.service.user.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,33 +30,37 @@ import java.util.Set;
 
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.SetUtilities.asSet;
-import static org.finos.waltz.model.survey.SurveyInstanceStateMachineFactory.simple;
 
 @Service
 public class SurveyInstanceViewService {
 
     private final PersonDao personDao;
-    private final SurveyInstanceDao surveyInstanceDao;
     private final SurveyViewDao surveyViewDao;
+    private final SurveyInstanceEvaluator instanceEvaluator;
 
 
     @Autowired
     public SurveyInstanceViewService(PersonDao personDao,
-                                     SurveyInstanceDao surveyInstanceDao,
+                                     SurveyInstanceEvaluator instanceEvaluator,
                                      SurveyViewDao surveyViewDao) {
 
         checkNotNull(personDao, "personDao cannot be null");
-        checkNotNull(surveyInstanceDao, "surveyInstanceDao cannot be null");
-        checkNotNull(surveyInstanceDao, "surveyInstanceDao cannot be null");
+        checkNotNull(instanceEvaluator, "instanceEvaluator cannot be null");
+        checkNotNull(surveyViewDao, "surveyViewDao cannot be null");
 
         this.personDao = personDao;
-        this.surveyInstanceDao = surveyInstanceDao;
+        this.instanceEvaluator = instanceEvaluator;
         this.surveyViewDao = surveyViewDao;
     }
 
 
-    public SurveyInstanceInfo getById(long instanceId) {
+    public SurveyInstanceInfo getInfoById(long instanceId) {
         return surveyViewDao.getById(instanceId);
+    }
+
+
+    public SurveyInstanceFormDetails getFormDetailsById(long instanceId) {
+        return instanceEvaluator.eval(instanceId);
     }
 
 

@@ -76,8 +76,14 @@ public class IdUtilities {
     }
 
 
+    @Deprecated
     public static <T extends IdProvider> Map<Optional<Long>, T> indexByOptId(Collection<T> ts) {
         return indexBy(IdProvider::id, ts);
+    }
+
+
+    public static <T extends IdProvider> Map<Long, T> indexByOptionalId(Collection<T> ts) {
+        return indexBy(ts, t -> t.id().orElse(null));
     }
 
 

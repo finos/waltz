@@ -20,8 +20,11 @@ import {remote} from "./remote";
 
 export function mkSurveyInstanceViewStore() {
 
-    const getById = (id, force = false) => remote
+    const getInfoById = (id, force = false) => remote
         .fetchViewDatum("GET", `api/survey-instance-view/id/${id}`, null, {force});
+
+    const getFormDetailsById = (id, force = false) => remote
+        .fetchViewDatum("GET", `api/survey-instance-view/form-details/${id}`, null, {force});
 
     const findForUser = (force = false) => remote
         .fetchViewList(
@@ -32,7 +35,8 @@ export function mkSurveyInstanceViewStore() {
 
     return {
         findForUser,
-        getById
+        getFormDetailsById,
+        getInfoById
     };
 }
 

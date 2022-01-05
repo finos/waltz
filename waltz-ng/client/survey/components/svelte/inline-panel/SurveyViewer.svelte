@@ -1,9 +1,9 @@
 <script>
 
     import {
+        formDetails,
         groupedQuestions,
         responses,
-        questions,
         responsesByQuestionId,
         selectedSection,
         surveyDetails
@@ -12,19 +12,23 @@
     import SurveyQuestionResponse from "./SurveyQuestionResponse.svelte";
     import SurveyViewerContextPanel from "./SurveyViewerContextPanel.svelte";
     import {surveyInstanceViewStore} from "../../../../svelte-stores/survey-instance-view-store";
-    import {surveyQuestionStore} from "../../../../svelte-stores/survey-question-store";
     import {surveyInstanceStore} from "../../../../svelte-stores/survey-instance-store";
 
 
     export let primaryEntityRef;
 
-    $: instanceCall = surveyInstanceViewStore.getById(primaryEntityRef?.id);
-    $: $surveyDetails = $instanceCall.data;
+    let instanceCall, formDetailsCall, responsesCall;
 
-    $: questionsCall = surveyQuestionStore.findQuestionsForInstance(primaryEntityRef?.id);
-    $: $questions = $questionsCall?.data;
+    $: {
+        if (primaryEntityRef) {
+            instanceCall = surveyInstanceViewStore.getInfoById(primaryEntityRef.id);
+            formDetailsCall = surveyInstanceViewStore.getFormDetailsById(primaryEntityRef.id);
+            responsesCall = surveyInstanceStore.findResponses(primaryEntityRef.id);
+        }
+    }
 
-    $: responsesCall = surveyInstanceStore.findResponses(primaryEntityRef?.id);
+    $: $surveyDetails = $instanceCall?.data;
+    $: $formDetails = $formDetailsCall?.data;
     $: $responses = $responsesCall?.data;
 
     $: sectionsToShow = $selectedSection
@@ -81,12 +85,13 @@
         {/each}
     </div>
 
-
+    {#if primaryEntityRef}
     <div class="col-sm-4"
          style="padding-left: 0">
         <SurveyViewerContextPanel on:select={onChangeInstance}
                                   instanceId={primaryEntityRef.id}/>
     </div>
+    {/if}
 </div>
 
 

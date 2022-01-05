@@ -32,8 +32,21 @@ public abstract class SurveyInstancePermissions {
         return false;
     }
 
+    /**
+     * Indicates if the user can edit meta data associated with this survey instance
+     * (e.g. recipients, due dates etc)
+     *
+     * Derived via a rule similar to: `isLatest && (isAdmin || isOwner || hasOwningRole)`
+     *
+     * @return true if user can edit associated metadata
+     */
     @Value.Default
     public boolean isMetaEdit() {
+        return false;
+    }
+
+    @Value.Default
+    public boolean canEdit() {
         return false;
     }
 }

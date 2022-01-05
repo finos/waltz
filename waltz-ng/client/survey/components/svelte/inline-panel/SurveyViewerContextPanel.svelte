@@ -28,10 +28,10 @@
     }
 
     function onAction(evt) {
-        surveyCall = surveyInstanceViewStore.getById(instanceId, true);
+        surveyCall = surveyInstanceViewStore.getInfoById(instanceId, true);
     }
 
-    $: surveyCall = instanceId && surveyInstanceViewStore.getById(instanceId);
+    $: surveyCall = instanceId && surveyInstanceViewStore.getInfoById(instanceId);
     $: survey = $surveyCall?.data;
 
     $: questionsWithResponse = _
@@ -95,12 +95,15 @@
                 {/each}
             </ul>
         </div>
+    </div>
 
+    <div slot="pre-header">
         <h5>
             <Icon name="table"/>
             Detail
         </h5>
     </div>
+
     <div slot="post-header">
         <div class="mini-section">
             <h5>

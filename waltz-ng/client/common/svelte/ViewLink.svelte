@@ -80,6 +80,10 @@
         "main.survey.instance.view": {
             path: ctx => `survey/instance/${ctx.id}/response/view`,
             title: "Survey View"
+        },
+        "main.survey.instance.edit": {
+            path: ctx => `survey/instance/${ctx.id}/response/edit`,
+            title: "Survey Edit"
         }
     };
 

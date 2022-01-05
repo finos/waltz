@@ -13,6 +13,7 @@
     import {surveyInstanceStore} from "../../../svelte-stores/survey-instance-store";
     import ToastStore from "../../../svelte-stores/toast-store";
     import {displayError} from "../../error-utils";
+    import ViewLink from "../ViewLink.svelte";
 
     export let instanceId;
 
@@ -38,7 +39,7 @@
             .catch(e => displayError("Failed to update approval due date", e));
     }
 
-    $: surveyCall = instanceId && surveyInstanceViewStore.getById(instanceId);
+    $: surveyCall = instanceId && surveyInstanceViewStore.getInfoById(instanceId);
     $: survey = $surveyCall.data;
 
     $: permissionsCall = instanceId && surveyInstanceStore.getPermissions(instanceId);
@@ -55,6 +56,8 @@
 {#if survey}
     <h4><EntityLink ref={Object.assign(survey.surveyInstance, {name: surveyName})}/></h4>
     <slot name="post-title"/>
+
+    <slot name="pre-header"/>
     <table class="table table-condensed small">
         <tbody>
             <tr>
@@ -115,7 +118,6 @@
             {/if}
         </tbody>
     </table>
-
     <slot name="post-header"/>
 
 
