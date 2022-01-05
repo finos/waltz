@@ -7,6 +7,7 @@
     import Icon from "../../../../common/svelte/Icon.svelte";
     import NoData from "../../../../common/svelte/NoData.svelte";
     import {createEventDispatcher} from "svelte";
+    import ViewLink from "../../../../common/svelte/ViewLink.svelte";
 
     export let survey;
 
@@ -71,9 +72,18 @@
     let reason = "";
     let activeAction = null;
 
+    let findPossibleActionsCall, permissionsCall;
+
+    $: {
+        if (instanceId) {
+            findPossibleActionsCall = surveyInstanceStore.findPossibleActions(instanceId, true);
+            permissionsCall = surveyInstanceStore.getPermissions(instanceId);
+        }
+    }
+
     $: instanceId = survey?.surveyInstance?.id;
-    $: findPossibleActionsCall = instanceId && surveyInstanceStore.findPossibleActions(instanceId, true);
     $: possibleActions = $findPossibleActionsCall?.data;
+    $: permissions = $permissionsCall?.data;
 
     $: actionList = _.isNull(survey?.surveyInstance?.originalInstanceId)
         ? _.filter(
@@ -95,6 +105,17 @@
         </h5>
         <div class="actions">
             <ul class="list-inline">
+                {#if permissions?.canEdit}
+                    <li>
+                        <ViewLink state="main.survey.instance.edit"
+                                  ctx={{id: instanceId}}>
+                            <button class="btn btn-xs btn-primary">
+                                <Icon name="pencil"/>
+                                Edit
+                            </button>
+                        </ViewLink>
+                    </li>
+                {/if}
                 {#each actionList as action}
                     <li>
                         <button class={mkButtonClasses(action)}

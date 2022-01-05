@@ -13,6 +13,7 @@
     import {surveyInstanceStore} from "../../../svelte-stores/survey-instance-store";
     import ToastStore from "../../../svelte-stores/toast-store";
     import {displayError} from "../../error-utils";
+    import ViewLink from "../ViewLink.svelte";
 
     export let instanceId;
 

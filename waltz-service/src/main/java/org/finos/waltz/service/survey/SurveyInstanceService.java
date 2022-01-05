@@ -464,6 +464,7 @@ public class SurveyInstanceService {
                 .orElse(false);
         boolean hasOwningRole = userRoleService.hasRole(person.email(), instance.owningRole());
         boolean isLatest = instance.originalInstanceId() == null;
+        boolean editableStatus = instance.status() == SurveyInstanceStatus.NOT_STARTED || instance.status() == SurveyInstanceStatus.IN_PROGRESS;
 
         return ImmutableSurveyInstancePermissions.builder()
                 .isAdmin(isAdmin)
@@ -471,6 +472,7 @@ public class SurveyInstanceService {
                 .isOwner(isOwner)
                 .hasOwnerRole(hasOwningRole)
                 .isMetaEdit(isLatest && (isAdmin || isOwner || hasOwningRole))
+                .canEdit(isLatest && isParticipant && editableStatus)
                 .build();
     }
 
