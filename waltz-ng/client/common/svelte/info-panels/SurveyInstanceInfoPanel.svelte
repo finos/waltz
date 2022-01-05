@@ -56,6 +56,8 @@
 {#if survey}
     <h4><EntityLink ref={Object.assign(survey.surveyInstance, {name: surveyName})}/></h4>
     <slot name="post-title"/>
+
+    <slot name="pre-header"/>
     <table class="table table-condensed small">
         <tbody>
             <tr>
@@ -116,7 +118,6 @@
             {/if}
         </tbody>
     </table>
-
     <slot name="post-header"/>
 
 

@@ -95,12 +95,15 @@
                 {/each}
             </ul>
         </div>
+    </div>
 
+    <div slot="pre-header">
         <h5>
             <Icon name="table"/>
             Detail
         </h5>
     </div>
+
     <div slot="post-header">
         <div class="mini-section">
             <h5>
