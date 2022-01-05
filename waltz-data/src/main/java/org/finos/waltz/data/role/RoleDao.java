@@ -65,6 +65,7 @@ public class RoleDao {
                 .name(record.getName())
                 .description(record.getDescription())
                 .isCustom(record.getIsCustom())
+                .userSelectable(record.getUserSelectable())
                 .build();
     };
 }

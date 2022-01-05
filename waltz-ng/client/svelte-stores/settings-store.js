@@ -24,7 +24,7 @@ export function mkSettingsStore() {
         .fetchAppList(
             "GET",
             "api/settings",
-            null,
+            [],
             {force});
 
 
