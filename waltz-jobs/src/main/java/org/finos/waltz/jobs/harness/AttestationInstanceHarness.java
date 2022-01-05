@@ -19,12 +19,9 @@
 package org.finos.waltz.jobs.harness;
 
 import org.finos.waltz.data.attestation.AttestationInstanceDao;
+import org.finos.waltz.model.attestation.AttestationSyncRecipientsResponse;
 import org.finos.waltz.service.DIConfiguration;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
-
-import static org.finos.waltz.common.FunctionUtilities.time;
-import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 
 
 public class AttestationInstanceHarness {
@@ -35,8 +32,7 @@ public class AttestationInstanceHarness {
 
         AttestationInstanceDao dao = ctx.getBean(AttestationInstanceDao.class);
 
-
-        int records = dao.reassignRecipients();
+        AttestationSyncRecipientsResponse records = dao.reassignRecipients();
 
         System.out.println(records);
 

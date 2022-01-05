@@ -18,7 +18,6 @@
 
 package org.finos.waltz.data.attestation;
 
-import org.finos.waltz.schema.tables.records.AttestationInstanceRecord;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.Criticality;
 import org.finos.waltz.model.EntityKind;
@@ -27,6 +26,7 @@ import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.model.application.ApplicationKind;
 import org.finos.waltz.model.application.LifecyclePhase;
 import org.finos.waltz.model.attestation.*;
+import org.finos.waltz.schema.tables.records.AttestationInstanceRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
@@ -42,13 +42,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.finos.waltz.schema.Tables.*;
-import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.model.EntityReference.mkRef;
-import static org.jooq.impl.SQLDataType.VARCHAR;
+import static org.finos.waltz.schema.Tables.*;
+import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 
@@ -232,86 +231,44 @@ public class AttestationInstanceDao {
     }
 
 
-    public int reassignRecipients() {
+    public AttestationSyncRecipientsResponse reassignRecipients() {
 
-//        ;with tmp(a, b, c, position, single) as (
-//                select id, involvement_kind_ids,
-//                STUFF(involvement_kind_ids, 1, CHARINDEX(';', attestation_run.involvement_kind_ids), ''),
-//                1,
-//                convert(nvarchar(max),left(involvement_kind_ids, CHARINDEX(';', attestation_run.involvement_kind_ids + ';') -1))
-//                from attestation_run
-//                union all
-//                select a, b,
-//                STUFF(c, 1, CHARINDEX(';', c + ';'), ''),
-//                position+1,
-//                convert(nvarchar(max),left(c, CHARINDEX(';', c + ';') -1))
-//                from tmp
-//                where c > ''),
-//                ar_id_and_inv_kinds as (
-//                select a run_id, cast(single as int) inv_kind_id
-//        from tmp
-//        where single != ' '),
-//        ar_with_req_people as (
-//                select distinct ar_id_and_inv_kinds.*, ai.id instance_id, ai.parent_entity_id entity_id, ai.parent_entity_kind entity_kind, p.email person
-//        from ar_id_and_inv_kinds
-//        inner join attestation_instance ai on ar_id_and_inv_kinds.run_id = ai.attestation_run_id
-//        and ai.attested_at is null
-//        inner join involvement i on ai.parent_entity_id = i.entity_id
-//        and ai.parent_entity_kind = i.entity_kind
-//        and i.kind_id = ar_id_and_inv_kinds.inv_kind_id
-//        inner join person p on i.employee_id = p.employee_id
-//        where p.id is not null and p.is_removed = 0
-//      ),
-//        req_recipients as (
-//                select instance_id, entity_id, entity_kind, person from ar_with_req_people
-//      ),
-//        recipients_to_add as (
-//                select instance_id, person from req_recipients
-//        except
-//                (
-//                        select ai.id, air.user_id
-//                        from attestation_instance ai
-//                        inner join attestation_instance_recipient air on ai.id = air.attestation_instance_id
-//                ))
-//        insert into attestation_instance_recipient
-//        select * from recipients_to_add;
+        Field<Object> firstInv = DSL.field("STUFF(involvement_kind_ids, 1, CHARINDEX(';', attestation_run.involvement_kind_ids), '')");
+        Field<Object> invKindId = DSL.field("convert(nvarchar(max),left(involvement_kind_ids, CHARINDEX(';', attestation_run.involvement_kind_ids + ';') -1))");
 
-        Field<Object> stuff = DSL.field("STUFF(involvement_kind_ids, 1, CHARINDEX(';', attestation_run.involvement_kind_ids), '')");
-        Field<Object> inv = DSL.field("convert(nvarchar(max),left(involvement_kind_ids, CHARINDEX(';', attestation_run.involvement_kind_ids + ';') -1))");
-
-        Field<Object> stuffC = DSL.field("STUFF(c, 1, CHARINDEX(';', c + ';'), '')");
+        Field<Object> remainingKindIds = DSL.field("STUFF(remaining_kind_string, 1, CHARINDEX(';', remaining_kind_string + ';'), '')");
         Field<Object> positionInc = DSL.field("position+1");
-        Field<Object> inv2 = DSL.field("convert(nvarchar(max),left(c, CHARINDEX(';', c + ';') -1))");
+        Field<Object> invKindIdVal = DSL.field("convert(nvarchar(max),left(remaining_kind_string, CHARINDEX(';', remaining_kind_string + ';') -1))");
 
-        CommonTableExpression<Record> temp = DSL
-                .name("temp")
+        CommonTableExpression<Record> attestationInvolvements = DSL
+                .name("attestationInvolvements")
                 .as(DSL
                         .select(ATTESTATION_RUN.ID.as("run_id"),
                                 ATTESTATION_RUN.INVOLVEMENT_KIND_IDS.as("inv_kind_ids"))
-                        .select(stuff.as("c"))
+                        .select(firstInv.as("remaining_kind_string"))
                         .select(DSL.val(1).as("position"))
-                        .select(inv.as("single"))
+                        .select(invKindId.as("inv_kind_id"))
                         .from(ATTESTATION_RUN));
 
         CommonTableExpression<Record5<Long, String, Object, Object, Object>> attestationRunsWithInvKind = DSL
                 .name("attestationRunsWithInvKind")
-                .fields("run_id", "inv_kind_ids", "c", "position", "single")
+                .fields("run_id", "inv_kind_ids", "remaining_kind_string", "position", "inv_kind_id")
                 .as(dsl
-                        .select(temp.field("run_id", Long.class),
-                                temp.field("inv_kind_ids", String.class),
-                                temp.field("c", Object.class),
-                                temp.field("position", Object.class),
-                                temp.field("single", Object.class))
-                        .from(temp)
+                        .select(attestationInvolvements.field("run_id", Long.class),
+                                attestationInvolvements.field("inv_kind_ids", String.class),
+                                attestationInvolvements.field("remaining_kind_string", Object.class),
+                                attestationInvolvements.field("position", Object.class),
+                                attestationInvolvements.field("inv_kind_id", Object.class))
+                        .from(attestationInvolvements)
                         .unionAll(DSL
                                 .select(DSL.field("run_id", Long.class),
                                         DSL.field("inv_kind_ids", String.class),
-                                        stuffC,
+                                        remainingKindIds,
                                         positionInc,
-                                        inv2)
-                                .from(temp)
-                                .where(temp.field("c").isNotNull())
-                                .and(temp.field("single").isNotNull())));
+                                        invKindIdVal)
+                                .from(attestationInvolvements)
+                                .where(attestationInvolvements.field("remaining_kind_string").isNotNull())
+                                .and(attestationInvolvements.field("inv_kind_id").isNotNull())));
 
         CommonTableExpression<Record2<Long, String>> runWithRequiredPeople = DSL
                 .name("runWithRequiredPeople")
@@ -325,7 +282,7 @@ public class AttestationInstanceDao {
                         .innerJoin(INVOLVEMENT)
                         .on(ATTESTATION_INSTANCE.PARENT_ENTITY_ID.eq(INVOLVEMENT.ENTITY_ID)
                                 .and(ATTESTATION_INSTANCE.PARENT_ENTITY_KIND.eq(INVOLVEMENT.ENTITY_KIND)
-                                        .and(DSL.cast(attestationRunsWithInvKind.field("single"), Long.class).eq(INVOLVEMENT.KIND_ID))))
+                                        .and(DSL.cast(attestationRunsWithInvKind.field("inv_kind_id"), Long.class).eq(INVOLVEMENT.KIND_ID))))
                         .innerJoin(PERSON).on(INVOLVEMENT.EMPLOYEE_ID.eq(PERSON.EMPLOYEE_ID)
                                 .and(PERSON.IS_REMOVED.isFalse())));
 
@@ -341,8 +298,8 @@ public class AttestationInstanceDao {
                                         ATTESTATION_INSTANCE_RECIPIENT.USER_ID)
                                 .from(ATTESTATION_INSTANCE_RECIPIENT)));
 
-        return dsl
-                .with(temp)
+        int addedRecipients = dsl
+                .with(attestationInvolvements)
                 .with(attestationRunsWithInvKind)
                 .with(runWithRequiredPeople)
                 .with(missingRecipients)
@@ -353,6 +310,49 @@ public class AttestationInstanceDao {
                                 missingRecipients.field(missingRecipients.field("user_id", String.class)))
                         .from(missingRecipients))
                 .execute();
+
+        CommonTableExpression<Record2<Long, String>> recipientsToRemove = DSL
+                .name("recipientsToRemove")
+                .fields("instance_id", "user_id")
+                .as(DSL
+                        .select(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID,
+                                ATTESTATION_INSTANCE_RECIPIENT.USER_ID)
+                        .from(ATTESTATION_INSTANCE_RECIPIENT)
+                        .innerJoin(ATTESTATION_INSTANCE)
+                        .on(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(ATTESTATION_INSTANCE.ID))
+                        .where(ATTESTATION_INSTANCE.ATTESTED_AT.isNull())
+                        .except(
+                                dsl
+                                        .select(runWithRequiredPeople.field("instance_id", Long.class),
+                                                runWithRequiredPeople.field("user_id", String.class))
+                                        .from(runWithRequiredPeople)));
+
+        CommonTableExpression<Record1<Long>> attestationRecipientIds = DSL
+                .name("attestationRecipientIds")
+                .fields("id")
+                .as(DSL
+                        .select(ATTESTATION_INSTANCE_RECIPIENT.ID)
+                        .from(ATTESTATION_INSTANCE_RECIPIENT)
+                        .innerJoin(recipientsToRemove)
+                        .on(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(recipientsToRemove.field("instance_id", Long.class))
+                                .and(ATTESTATION_INSTANCE_RECIPIENT.USER_ID.eq(recipientsToRemove.field("user_id", String.class)))));
+
+        int removedRecipients = dsl
+                .with(attestationInvolvements)
+                .with(attestationRunsWithInvKind)
+                .with(runWithRequiredPeople)
+                .with(recipientsToRemove)
+                .with(attestationRecipientIds)
+                .delete(ATTESTATION_INSTANCE_RECIPIENT)
+                .where(ATTESTATION_INSTANCE_RECIPIENT.ID.in(dsl
+                                .select(attestationRecipientIds.field("id", Long.class))
+                                .from(attestationRecipientIds)))
+                .execute();
+
+        return ImmutableAttestationSyncRecipientsResponse.builder()
+                .recipientsCreatedCount(Long.valueOf(addedRecipients))
+                .recipientsRemovedCount(Long.valueOf(removedRecipients))
+                .build();
     }
 
 
