@@ -8,6 +8,7 @@
     import NoData from "../../../../common/svelte/NoData.svelte";
     import {createEventDispatcher} from "svelte";
     import ViewLink from "../../../../common/svelte/ViewLink.svelte";
+    import StaticPanels from "../../../../common/svelte/StaticPanels.svelte";
 
     export let survey;
 
@@ -93,6 +94,13 @@
         : [];
 
     $: hasMandatoryQuestionsWithoutResponse = ! _.isEmpty($missingMandatoryQuestionIds);
+
+    function mkConfirmationKey(templateExtId, surveyAction) {
+        return `CONFIRMATION.SURVEY_ACTION.${templateExtId}.${surveyAction}`;
+    }
+
+    $: confirmationGroupKey = mkConfirmationKey(survey?.surveyTemplateRef?.externalId, activeAction?.name);
+
 </script>
 
 
@@ -140,14 +148,19 @@
     {/if}
 {:else if mode === Modes.CONFIRMATION }
     <!-- ACTION CONFIRMATION -->
-    <h4>Are you sure you want to {_.toLower(activeAction.display)} this survey?</h4>
+    <StaticPanels key={confirmationGroupKey}
+                  showTitle={false}/>
+
+    <div>
+        Are you sure you want to {_.toLower(activeAction.display)} this survey?
+    </div>
 
     <form autocomplete="off"
           on:submit|preventDefault={() => invokeAction(activeAction, instanceId)}>
 
         <!-- CONFIRMATION REASON ? -->
         {#if activeAction.confirmationRequirement === "CONFIRM_AND_COMMENT_REQUIRED"}
-            Please enter a reason below (mandatory):
+            <span class="small">Please enter a reason below (mandatory):</span>
             <textarea class="form-control"
                       bind:value={reason}/>
         {/if}
