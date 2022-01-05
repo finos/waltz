@@ -19,11 +19,47 @@
 import {remote} from "./remote";
 
 export function mkUserStore() {
+
+    const findAll = (force = false) => remote
+        .fetchAppList("GET", "api/user", [], {force});
+
     const load = (force = false) => remote
         .fetchAppDatum("GET", "api/user/whoami", null, {force});
 
+    const getByUserId = (userId, force = false) => remote
+        .fetchViewDatum("GET", `api/user/user-id/${userId}`, null, {force});
+
+    const updateRoles = (userName, roles, comment) => remote.execute(
+        "POST",
+        `api/user/${userName}/roles`, {roles, comment});
+
+    const register = (newUserCmd) => remote.execute(
+        "POST",
+        "api/user/new-user",
+        newUserCmd);
+
+    const resetPassword = (userName, newPassword, currentPassword) => {
+        const cmd = {
+            userName,
+            newPassword,
+            currentPassword
+        };
+        return remote.execute(
+            "POST",
+            "api/user/reset-password",
+            cmd);
+    }
+
+    const deleteUser = (username) => remote.execute("DELETE", `api/user/${username}`, null);
+
     return {
-        load
+        findAll,
+        load,
+        getByUserId,
+        updateRoles,
+        register,
+        resetPassword,
+        deleteUser
     };
 }
 
