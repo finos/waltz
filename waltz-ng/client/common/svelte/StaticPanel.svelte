@@ -22,7 +22,7 @@
     {#if showIcon && !showTitle}
         <Icon name={panel.icon}/>
     {/if}
-        <span>
+    <span>
         <Markdown inline="true"
                   text={panel.content}/>
     </span>
