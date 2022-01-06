@@ -31,9 +31,17 @@ export function mkStaticPanelStore() {
         .execute("POST","api/static-panel", panel)
         .then(() => load(true))
 
+    const findByGroupKey = (groupKey, force=false) => remote
+        .fetchViewList(
+            "GET",
+            `api/static-panel/group?group=${groupKey}`,
+            [],
+            {force})
+
     return {
         load,
-        save
+        save,
+        findByGroupKey
     };
 }
 

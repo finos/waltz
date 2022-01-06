@@ -125,7 +125,8 @@ public class SurveyViewDao {
                         EntityKind.SURVEY_TEMPLATE,
                         r.get(SURVEY_TEMPLATE.ID),
                         r.get(SURVEY_TEMPLATE.NAME),
-                        r.get(SURVEY_TEMPLATE.DESCRIPTION)))
+                        r.get(SURVEY_TEMPLATE.DESCRIPTION),
+                        r.get(SURVEY_TEMPLATE.EXTERNAL_ID)))
                 .build();
     };
 
@@ -146,7 +147,8 @@ public class SurveyViewDao {
                 .select(SURVEY_RUN.fields())
                 .select(SURVEY_TEMPLATE.NAME,
                         SURVEY_TEMPLATE.ID,
-                        SURVEY_TEMPLATE.DESCRIPTION)
+                        SURVEY_TEMPLATE.DESCRIPTION,
+                        SURVEY_TEMPLATE.EXTERNAL_ID)
                 .select(ENTITY_NAME_FIELD)
                 .select(QUALIFIER_NAME_FIELD)
                 .select(EXTERNAL_ID_FIELD)
@@ -164,7 +166,8 @@ public class SurveyViewDao {
                 .select(SURVEY_RUN.fields())
                 .select(SURVEY_TEMPLATE.NAME,
                         SURVEY_TEMPLATE.ID,
-                        SURVEY_TEMPLATE.DESCRIPTION)
+                        SURVEY_TEMPLATE.DESCRIPTION,
+                        SURVEY_TEMPLATE.EXTERNAL_ID)
                 .select(ENTITY_NAME_FIELD)
                 .select(QUALIFIER_NAME_FIELD)
                 .select(EXTERNAL_ID_FIELD)
@@ -186,7 +189,8 @@ public class SurveyViewDao {
                 .select(SURVEY_RUN.fields())
                 .select(SURVEY_TEMPLATE.NAME,
                         SURVEY_TEMPLATE.ID,
-                        SURVEY_TEMPLATE.DESCRIPTION)
+                        SURVEY_TEMPLATE.DESCRIPTION,
+                        SURVEY_TEMPLATE.EXTERNAL_ID)
                 .select(ENTITY_NAME_FIELD)
                 .select(QUALIFIER_NAME_FIELD)
                 .select(EXTERNAL_ID_FIELD)

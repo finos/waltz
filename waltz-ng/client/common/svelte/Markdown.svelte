@@ -4,6 +4,7 @@
 
     export let text = "";
     export let context = {};
+    export let inline = false;
 
     const converter = new showdown.Converter();
     converter.setFlavor("github");
@@ -24,4 +25,15 @@
 
 </script>
 
-{@html html}
+<span class:inline-markdown={inline}>
+    {@html html}
+</span>
+
+
+<style>
+
+    :global(.inline-markdown > p) {
+        display: inline;
+    }
+
+</style>
