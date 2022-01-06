@@ -40,42 +40,49 @@
         {
             class: "rejected",
             name: "Rejected",
-            description: "Rejected surveys",
+            longName: "Rejected surveys",
+            description: "Survey owner has rejected survey. Survey must be reopened then recipients are required to update and resubmit",
             width: "10%",
             data: d => d.rejected
         },{
             class: "overdue",
             name: "Overdue",
-            description: "Overdue surveys",
+            longName: "Overdue surveys",
+            description: "Survey is past its submission due date within Waltz",
             width: "10%",
             data: d => d.overdue
         },{
             class: "due-week",
             name: "Due Week",
-            description: "Incomplete surveys - due within 7 days",
+            longName: "Incomplete surveys - due within 7 days",
+            description: "Survey is due to be submitted within 7 days",
             width: "10%",
             data: d => d.dueWeek
         },{
             class: "due-month",
             name: "Due Month",
-            description: "Incomplete surveys - due within 30 days",
+            longName: "Incomplete surveys - due within 30 days",
+            description: "Survey is due to be submitted within 30 days",
             width: "10%",
             data: d => d.dueMonth
         },{
             class: "incomplete",
             name: "Total Outstanding",
-            description: "Total outstanding - all incomplete surveys",
+            longName: "Total outstanding - all incomplete surveys",
+            description: "All surveys requiring completion (sum of overdue, due week, due month and anything with a submission due date over a month)",
             width: "10%",
             data: d => d.incomplete
         },{
             class: "awaiting-approval",
             name: "Awaiting Approval",
-            description: "Completed surveys - awaiting approval",
+            longName: "Completed surveys - awaiting approval",
+            description: "Completed and submitted surveys waiting approval by a survey owner",
             width: "10%",
             data: d => d.completed
         },{
             class: "approved",
-            description: "Approved surveys",
+            longName: "Approved surveys",
+            description: "Survey has been approved by the survey owner, no further action required",
             name: "Approved",
             width: "10%",
             data: d => d.approved
@@ -176,7 +183,10 @@
         <tr>
             <th width="30%">Survey Name</th>
             {#each tableHeaders as header}
-                <th width={`${60 / tableHeaders.length}%`}>{header.name}</th>
+                <th width={`${60 / tableHeaders.length}%`}
+                    title={header.description}>
+                    {header.name}
+                </th>
             {/each}
             <th width="10%">Total</th>
         </tr>
@@ -211,7 +221,11 @@
     {#if activeMode === Modes.INFO}
         <NoData>There are no surveys for the current selection</NoData>
     {:else if activeMode === Modes.GRID}
-        <h4>{$selectedSurveyStatusCell?.header.description}</h4>
+        <h4>{$selectedSurveyStatusCell?.header.longName}</h4>
+
+        <div class="help-block small">
+            {$selectedSurveyStatusCell?.header.description}
+        </div>
         <div class="help-block small">
             <Icon name="info-circle"/>Select a survey from the list below for detail and responses, or to execute any available actions.
         </div>

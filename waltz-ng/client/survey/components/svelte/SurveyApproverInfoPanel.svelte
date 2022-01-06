@@ -46,30 +46,35 @@
         {
             class: "awaiting-approval",
             name: "Awaiting Approval",
-            description: "Completed surveys - awaiting approval",
+            longName: "Completed surveys - awaiting approval",
+            description: "Completed and submitted surveys waiting approval by a survey owner",
             width: "20%",
             data: d => d.completed
         },{
             class: "overdue",
             name: "Overdue",
-            description: "Overdue surveys - awaiting completion",
+            longName: "Overdue surveys",
+            description: "Survey is past its submission due date within Waltz", // check approval or submission due date
             width: "20%",
             data: d => d.overdue
         },{
             class: "awaiting-completion",
             name: "Awaiting Completion",
-            description: "Incomplete surveys - awaiting completion",
+            longName: "Incomplete surveys - awaiting completion",
+            description: "Surveys that will need approval once they have been submitted, this includes overdue surveys and those that have not passed their due date",
             width: "20%",
             data: d => d.incomplete
         },{
             class: "rejected",
             name: "Rejected",
-            description: "Rejected surveys",
+            longName: "Rejected surveys",
+            description: "Survey owner has rejected survey. Survey must be reopened then recipients are required to update and resubmit",
             width: "20%",
             data: d => d.rejected
         },{
             class: "approved",
-            description: "Approved surveys",
+            longName: "Approved surveys",
+            description: "Survey has been approved by the survey owner, no further action required",
             name: "Approved",
             width: "20%",
             data: d => d.approved
@@ -166,7 +171,10 @@
         <tr>
             <th width="30%">Survey Name</th>
             {#each tableHeaders as header}
-                <th width={`${70 / tableHeaders.length}%`}>{header.name}</th>
+                <th width={`${70 / tableHeaders.length}%`}
+                    title={header.description}>
+                    {header.name}
+                </th>
             {/each}
         </tr>
         </thead>
@@ -198,7 +206,10 @@
     {#if activeMode === Modes.INFO}
         <NoData>There are no surveys for the current selection</NoData>
     {:else if activeMode === Modes.GRID}
-        <h4>{$selectedSurveyStatusCell?.header.description}</h4>
+        <h4>{$selectedSurveyStatusCell?.header.longName}</h4>
+        <div class="help-block small">
+            {$selectedSurveyStatusCell?.header.description}
+        </div>
         <div class="help-block small">
             <Icon name="info-circle"/>Select a survey from the list below for detail and responses, or to execute any available actions.
         </div>
