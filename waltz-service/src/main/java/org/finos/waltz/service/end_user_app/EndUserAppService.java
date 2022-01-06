@@ -34,6 +34,7 @@ import org.finos.waltz.model.application.AppRegistrationResponse;
 import org.finos.waltz.model.application.ApplicationKind;
 import org.finos.waltz.model.application.ImmutableAppRegistrationRequest;
 import org.finos.waltz.model.changelog.ChangeLog;
+import org.finos.waltz.model.changelog.ChangeLogComment;
 import org.finos.waltz.model.changelog.ImmutableChangeLog;
 import org.finos.waltz.model.enduserapp.EndUserApplication;
 import org.finos.waltz.model.involvement.ImmutableInvolvement;
@@ -48,6 +49,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collection;
 import java.util.List;
 
+import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.FunctionUtilities.time;
 import static org.finos.waltz.common.ListUtilities.map;
@@ -100,13 +102,17 @@ public class EndUserAppService {
         return time("EUAS.findBySelector", () -> endUserAppDao.findBySelector(selector));
     }
 
+    public EndUserApplication getById(Long id) {
+        return endUserAppDao.getById(id);
+    }
+
 
     public List<EndUserApplication> findAll() {
         return endUserAppDao.findAll();
     }
 
 
-    public AppRegistrationResponse promoteToApplication(Long id, String username){
+    public AppRegistrationResponse promoteToApplication(Long id, ChangeLogComment comment, String username){
 
         AppRegistrationRequest appRegistrationRequest = mkAppRegistrationRequestForEuda(id);
 
@@ -118,7 +124,7 @@ public class EndUserAppService {
 
         migrateEudaInvolvements(id, appRegistrationResponse);
 
-        changeLogDao.write(mkChangeLog(appRegistrationResponse, username));
+        changeLogDao.write(mkChangeLog(appRegistrationResponse, comment, username));
 
         return appRegistrationResponse;
     }
@@ -141,9 +147,14 @@ public class EndUserAppService {
     }
 
 
-    private ChangeLog mkChangeLog(AppRegistrationResponse appRegistrationResponse, String username) {
+    private ChangeLog mkChangeLog(AppRegistrationResponse appRegistrationResponse, ChangeLogComment comment, String username) {
+        String messagePrefix = format("Promoted application '%s' from an end user application.", appRegistrationResponse.originalRequest().name());
+        String message = comment == null
+                ? messagePrefix
+                : format("%s Comment: %s", messagePrefix, comment.comment());
+
         return ImmutableChangeLog.builder()
-                .message(String.format("Promoted application '%s' from an end user application", appRegistrationResponse.originalRequest().name()))
+                .message(message)
                 .operation(Operation.ADD)
                 .parentReference(mkRef(APPLICATION, appRegistrationResponse.id().get()))
                 .userId(username)
