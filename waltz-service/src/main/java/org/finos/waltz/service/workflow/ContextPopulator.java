@@ -1,72 +1,98 @@
 package org.finos.waltz.service.workflow;
 
-import org.finos.waltz.common.CollectionUtilities;
+import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.schema.tables.AssessmentDefinition;
 import org.finos.waltz.schema.tables.AssessmentRating;
 import org.finos.waltz.schema.tables.RatingSchemeItem;
+import org.jooq.DSLContext;
 import org.jooq.Record5;
 import org.jooq.Select;
 import org.jooq.impl.DSL;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.util.Collections.emptySet;
+import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.SetUtilities.map;
 
+@Service
 public class ContextPopulator {
 
     private static final AssessmentRating ar = AssessmentRating.ASSESSMENT_RATING;
     private static final RatingSchemeItem rsi = RatingSchemeItem.RATING_SCHEME_ITEM;
     private static final AssessmentDefinition ad = AssessmentDefinition.ASSESSMENT_DEFINITION;
 
-    public void populateContext(Set<WorkflowContextVariableDeclaration> declarations, GenericSelector selector) {
+    private final DSLContext dsl;
 
-        Map<EntityKind, Collection<WorkflowContextVariableDeclaration>> declarationsByRefKind = groupBy(declarations, d -> d.ref().kind());
+    @Autowired
+    public ContextPopulator(DSLContext dsl) {
+        this.dsl = dsl;
+    }
 
-        Select<Record5<String, String, String, String, Long>> assessmentCall = prepareAssessmentQuery(declarationsByRefKind.get(EntityKind.ASSESSMENT_DEFINITION), selector);
+    public void populateContext(Set<ContextVariableDeclaration> declarations, GenericSelector selector) {
 
-//        if (assessmentCall != null) {
-//            assessmentCall
-//                    .fetch()
-//                    .stream()
-//                    .map(r -> {
-//
-//                    })
-//                    .collect(Collectors.toSet());
-//        }
+        Map<EntityKind, Collection<ContextVariableDeclaration>> declarationsByRefKind = groupBy(declarations, d -> d.ref().kind());
 
-        Select<Record5<String, String, String, String, Long>> surveyCall = prepareAssessmentQuery(declarationsByRefKind.get(EntityKind.SURVEY_QUESTION), selector);
+        Set<ContextVariable<String>> assessmentVariables = fetchAssessmentVariables(
+                declarationsByRefKind.get(EntityKind.ASSESSMENT_DEFINITION),
+                selector);
+
+        System.out.println(assessmentVariables);
 
     }
 
+    private Set<ContextVariable<String>> fetchAssessmentVariables(Collection<ContextVariableDeclaration> declarations,
+                                                                  GenericSelector selector) {
+        if (isEmpty(declarations)) {
+            return emptySet();
+        } else {
+            Map<String, String> extIdsToVarName = MapUtilities.indexBy(
+                    declarations,
+                    d -> d.ref().externalId(),
+                    ContextVariableDeclaration::name);
+
+            return dsl
+                .fetch(prepareAssessmentQuery(declarations, selector))
+                .stream()
+                .map(r -> ImmutableContextVariable
+                        .<String>builder()
+                        .name(extIdsToVarName.get(r.get(ad.EXTERNAL_ID)))
+                        .value(r.get(rsi.CODE))
+                        .entityRef(EntityReference.mkRef(selector.kind(), r.get(ar.ENTITY_ID)))
+                        .build())
+                .collect(Collectors.toSet());
+        }
+    }
+
+
     private Select<Record5<String, String, String, String, Long>> prepareAssessmentQuery(
-            Collection<WorkflowContextVariableDeclaration> declarations,
+            Collection<ContextVariableDeclaration> declarations,
             GenericSelector genericSelector)
     {
-        if (CollectionUtilities.isEmpty(declarations)) {
-            return null;
-        } else {
-            Set<String> defExtIds = map(
-                    declarations,
-                    d -> d.ref().externalId());
-            return DSL
-                    .select(rsi.EXTERNAL_ID,
-                            rsi.NAME,
-                            rsi.CODE,
-                            ad.EXTERNAL_ID,
-                            ar.ENTITY_ID)
-                    .from(ar)
-                    .innerJoin(rsi).on(rsi.ID.eq(ar.RATING_ID))
-                    .innerJoin(ad).on(ad.ID.eq(ar.ASSESSMENT_DEFINITION_ID))
-                    .where(ad.EXTERNAL_ID.in(defExtIds))
-                    .and(ar.ENTITY_KIND.eq(genericSelector.kind().name()))
-                    .and(ar.ENTITY_ID.in(genericSelector.selector()));
-        }
+        Set<String> defExtIds = map(
+                declarations,
+                d -> d.ref().externalId());
+        return DSL
+                .select(rsi.EXTERNAL_ID,
+                        rsi.NAME,
+                        rsi.CODE,
+                        ad.EXTERNAL_ID,
+                        ar.ENTITY_ID)
+                .from(ar)
+                .innerJoin(rsi).on(rsi.ID.eq(ar.RATING_ID))
+                .innerJoin(ad).on(ad.ID.eq(ar.ASSESSMENT_DEFINITION_ID))
+                .where(ad.EXTERNAL_ID.in(defExtIds))
+                .and(ar.ENTITY_KIND.eq(genericSelector.kind().name()))
+                .and(ar.ENTITY_ID.in(genericSelector.selector()));
     }
 
 }

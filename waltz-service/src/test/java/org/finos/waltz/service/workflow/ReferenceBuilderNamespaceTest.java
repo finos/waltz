@@ -15,7 +15,7 @@ import static org.finos.waltz.common.CollectionUtilities.find;
 import static org.finos.waltz.common.IOUtilities.getFileResource;
 import static org.finos.waltz.common.IOUtilities.readAsString;
 import static org.finos.waltz.common.MapUtilities.newHashMap;
-import static org.finos.waltz.service.workflow.WorkflowContextVariableReference.mkVarRef;
+import static org.finos.waltz.service.workflow.ContextVariableReference.mkVarRef;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -64,13 +64,13 @@ public class ReferenceBuilderNamespaceTest {
         JexlExpression expr = jexl.createExpression(declarationExpressions);
         expr.evaluate(jexlCtx);
 
-        Set<WorkflowContextVariableDeclaration> declarations = jexlCtx.declarations();
+        Set<ContextVariableDeclaration> declarations = jexlCtx.declarations();
 
         assertEquals(3, declarations.size());
 
-        Optional<WorkflowContextVariableDeclaration> x = find(declarations, t -> t.name().equals("x"));
-        Optional<WorkflowContextVariableDeclaration> y = find(declarations, t -> t.name().equals("y"));
-        Optional<WorkflowContextVariableDeclaration> longName = find(declarations, t -> t.name().equals("longName"));
+        Optional<ContextVariableDeclaration> x = find(declarations, t -> t.name().equals("x"));
+        Optional<ContextVariableDeclaration> y = find(declarations, t -> t.name().equals("y"));
+        Optional<ContextVariableDeclaration> longName = find(declarations, t -> t.name().equals("longName"));
 
         assertTrue(x.isPresent());
         assertTrue(y.isPresent());

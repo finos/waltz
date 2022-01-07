@@ -4,13 +4,13 @@ import org.finos.waltz.model.EntityKind;
 import org.immutables.value.Value;
 
 @Value.Immutable
-public abstract class WorkflowContextSurveyResponseVariableReference extends WorkflowContextVariableReference {
+public abstract class SurveyResponseContextVariableReference extends ContextVariableReference {
 
     public abstract String surveyExternalId();
 
 
-    public static WorkflowContextSurveyResponseVariableReference mkVarRef(String surveyExternalId, String externalId) {
-        return ImmutableWorkflowContextSurveyResponseVariableReference
+    public static SurveyResponseContextVariableReference mkVarRef(String surveyExternalId, String externalId) {
+        return ImmutableSurveyResponseContextVariableReference
                 .builder()
                 .kind(EntityKind.SURVEY_QUESTION)
                 .surveyExternalId(surveyExternalId)
