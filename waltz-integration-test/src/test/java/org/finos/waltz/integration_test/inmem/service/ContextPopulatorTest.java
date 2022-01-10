@@ -28,6 +28,7 @@ import static java.lang.String.format;
 import static org.finos.waltz.common.CollectionUtilities.find;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.finos.waltz.service.workflow.ContextVariableReference.mkVarRef;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -67,70 +68,88 @@ public class ContextPopulatorTest extends BaseInMemoryIntegrationTest {
         scheme.setDescription("desc");
         scheme.store();
 
-        RatingSchemeItemRecord ratingItem1 = dsl.newRecord(rsi);
-        ratingItem1.setName(mkName("ratingItem1"));
-        ratingItem1.setSchemeId(scheme.getId());
-        ratingItem1.setCode("X");
-        ratingItem1.setDescription("X Desc");
-        ratingItem1.setColor("red");
-        ratingItem1.store();
+        RatingSchemeItemRecord ratingItem1 = mkRatingItem(scheme, "ratingItem1", "X");
+        RatingSchemeItemRecord ratingItem2 = mkRatingItem(scheme, "ratingItem2", "Y");
 
-        RatingSchemeItemRecord ratingItem2 = dsl.newRecord(rsi);
-        ratingItem2.setName(mkName("ratingItem2"));
-        ratingItem2.setSchemeId(scheme.getId());
-        ratingItem2.setCode("Y");
-        ratingItem2.setDescription("Y Desc");
-        ratingItem2.setColor("red");
-        ratingItem2.store();
+        AssessmentDefinitionRecord def1 = mkAssessmentDef("def1", scheme);
+        AssessmentDefinitionRecord def2 = mkAssessmentDef("anotherDef", scheme);
 
-        String defExtId = mkName("defExtId");
-
-        AssessmentDefinitionRecord def = dsl.newRecord(ad);
-        def.setName(mkName("def"));
-        def.setRatingSchemeId(scheme.getId());
-        def.setEntityKind(EntityKind.APPLICATION.name());
-        def.setLastUpdatedBy("admin");
-        def.setProvenance("waltz");
-        def.setExternalId(defExtId);
-        def.store();
-
-        AssessmentRatingRecord r1 = dsl.newRecord(ar);
-        r1.setEntityKind(a1.kind().name());
-        r1.setEntityId(a1.id());
-        r1.setAssessmentDefinitionId(def.getId());
-        r1.setRatingId(ratingItem1.getId());
-        r1.setLastUpdatedBy("admin");
-        r1.setProvenance("prov");
-        r1.store();
-
-        AssessmentRatingRecord r2 = dsl.newRecord(ar);
-        r2.setEntityKind(a2.kind().name());
-        r2.setEntityId(a2.id());
-        r2.setAssessmentDefinitionId(def.getId());
-        r2.setRatingId(ratingItem2.getId());
-        r2.setLastUpdatedBy("admin");
-        r2.setProvenance("prov");
-        r2.store();
+        mkRating(a1, def1, ratingItem1);
+        mkRating(a2, def1, ratingItem2);
+        mkRating(a1, def2, ratingItem2);
 
         Set<ContextVariableDeclaration> declarations = SetUtilities.asSet(
                 ImmutableContextVariableDeclaration
                         .builder()
-                        .name("foo")
-                        .ref(ContextVariableReference.mkVarRef(EntityKind.ASSESSMENT_DEFINITION, defExtId))
+                        .name("def1Var")
+                        .ref(mkVarRef(EntityKind.ASSESSMENT_DEFINITION, def1.getExternalId()))
                         .build(),
                 ImmutableContextVariableDeclaration
                         .builder()
-                        .name("fooDupe")
-                        .ref(ContextVariableReference.mkVarRef(EntityKind.ASSESSMENT_DEFINITION, defExtId))
+                        .name("def1VarDupe")
+                        .ref(mkVarRef(EntityKind.ASSESSMENT_DEFINITION, def1.getExternalId()))
+                        .build(),
+                ImmutableContextVariableDeclaration
+                        .builder()
+                        .name("def2Var")
+                        .ref(mkVarRef(EntityKind.ASSESSMENT_DEFINITION, def2.getExternalId()))
                         .build());
 
         Set<ContextVariable<String>> vars = populator.populateContext(declarations, selector);
 
-        assertVar(vars, a1, "foo", "X", "A1");
-        assertVar(vars, a2, "foo", "Y", "A2");
-        assertVar(vars, a1, "fooDupe", "X", "A1");
-        assertVar(vars, a2, "fooDupe", "Y", "A2");
+        assertVar(vars, a1, "def1Var", "X", "A1");
+        assertVar(vars, a1, "def2Var", "Y", "A1");
+        assertVar(vars, a1, "def1VarDupe", "X", "A1");
+
+        assertVar(vars, a2, "def1Var", "Y", "A2");
+        assertVar(vars, a2, "def1VarDupe", "Y", "A2");
     }
+
+
+    private RatingSchemeItemRecord mkRatingItem(RatingSchemeRecord scheme,
+                                                String name,
+                                                String code) {
+        RatingSchemeItemRecord rating = dsl.newRecord(rsi);
+        rating.setName(mkName(name));
+        rating.setSchemeId(scheme.getId());
+        rating.setCode(code);
+        rating.setDescription("Desc: " + name + " / " + code);
+        rating.setColor("red");
+        rating.store();
+        return rating;
+    }
+
+
+    private AssessmentDefinitionRecord mkAssessmentDef(String defName,
+                                                       RatingSchemeRecord scheme) {
+        AssessmentDefinitionRecord def = dsl.newRecord(ad);
+        String name = mkName(defName);
+        String extId = mkName(defName, "extId");
+        def.setName(name);
+        def.setRatingSchemeId(scheme.getId());
+        def.setEntityKind(EntityKind.APPLICATION.name());
+        def.setLastUpdatedBy("admin");
+        def.setProvenance("waltz");
+        def.setExternalId(extId);
+        def.store();
+        return def;
+    }
+
+
+    private AssessmentRatingRecord mkRating(EntityReference appRef,
+                                            AssessmentDefinitionRecord defRecord,
+                                            RatingSchemeItemRecord ratingRecord) {
+        AssessmentRatingRecord record = dsl.newRecord(ar);
+        record.setEntityKind(appRef.kind().name());
+        record.setEntityId(appRef.id());
+        record.setAssessmentDefinitionId(defRecord.getId());
+        record.setRatingId(ratingRecord.getId());
+        record.setLastUpdatedBy("admin");
+        record.setProvenance("prov");
+        record.store();
+        return record;
+    }
+
 
     private void assertVar(Set<ContextVariable<String>> vars,
                            EntityReference appRef,
