@@ -180,6 +180,14 @@ public class MapUtilities {
     }
 
 
+    public static <K, R, V> Map<K, R> indexBy(Collection<V> xs,
+                                              Function<V, K> keyFn,
+                                              Function<V, R> valueFn,
+                                              BinaryOperator<R> mergeFunction) {
+        return indexBy(keyFn, valueFn, xs, mergeFunction);
+    }
+
+
     public static <K, V> Map<K, Long> countBy(Function<V, K> keyFn,
                                               Collection<V> xs) {
         if (xs == null) {

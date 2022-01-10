@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,15 +39,17 @@ public class ContextPopulator {
         this.dsl = dsl;
     }
 
-    public void populateContext(Set<ContextVariableDeclaration> declarations, GenericSelector selector) {
 
+    public Set<ContextVariable<String>> populateContext(Set<ContextVariableDeclaration> declarations,
+                                                        GenericSelector selector)
+    {
         Map<EntityKind, Collection<ContextVariableDeclaration>> declarationsByRefKind = groupBy(declarations, d -> d.ref().kind());
 
         Set<ContextVariable<String>> assessmentVariables = fetchAssessmentVariables(
                 declarationsByRefKind.get(EntityKind.ASSESSMENT_DEFINITION),
                 selector);
 
-        System.out.println(assessmentVariables);
+        return assessmentVariables;
 
     }
 
@@ -55,7 +58,7 @@ public class ContextPopulator {
         if (isEmpty(declarations)) {
             return emptySet();
         } else {
-            Map<String, String> extIdsToVarName = MapUtilities.indexBy(
+            Map<String, Collection<String>> extIdsToVarNames = MapUtilities.groupBy(
                     declarations,
                     d -> d.ref().externalId(),
                     ContextVariableDeclaration::name);
@@ -63,12 +66,15 @@ public class ContextPopulator {
             return dsl
                 .fetch(prepareAssessmentQuery(declarations, selector))
                 .stream()
-                .map(r -> ImmutableContextVariable
-                        .<String>builder()
-                        .name(extIdsToVarName.get(r.get(ad.EXTERNAL_ID)))
-                        .value(r.get(rsi.CODE))
-                        .entityRef(EntityReference.mkRef(selector.kind(), r.get(ar.ENTITY_ID)))
-                        .build())
+                .flatMap(r -> extIdsToVarNames
+                        .getOrDefault(r.get(ad.EXTERNAL_ID), Collections.emptySet())
+                        .stream()
+                        .map(varName -> ImmutableContextVariable
+                            .<String>builder()
+                            .name(varName)
+                            .value(r.get(rsi.CODE))
+                            .entityRef(EntityReference.mkRef(selector.kind(), r.get(ar.ENTITY_ID)))
+                            .build()))
                 .collect(Collectors.toSet());
         }
     }

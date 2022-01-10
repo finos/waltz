@@ -14,10 +14,7 @@ import org.finos.waltz.schema.tables.records.AssessmentDefinitionRecord;
 import org.finos.waltz.schema.tables.records.AssessmentRatingRecord;
 import org.finos.waltz.schema.tables.records.RatingSchemeItemRecord;
 import org.finos.waltz.schema.tables.records.RatingSchemeRecord;
-import org.finos.waltz.service.workflow.ContextPopulator;
-import org.finos.waltz.service.workflow.ContextVariableDeclaration;
-import org.finos.waltz.service.workflow.ContextVariableReference;
-import org.finos.waltz.service.workflow.ImmutableContextVariableDeclaration;
+import org.finos.waltz.service.workflow.*;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
 import org.junit.Test;
@@ -57,6 +54,7 @@ public class ContextPopulatorTest extends BaseInMemoryIntegrationTest {
 
         EntityReference a1 = appHelper.createNewApp(mkName("a1"), ouIds.a);
         EntityReference a2 = appHelper.createNewApp(mkName("a2"), ouIds.a);
+        EntityReference a3 = appHelper.createNewApp(mkName("a3"), ouIds.a);
 
         RatingSchemeRecord scheme = dsl.newRecord(rs);
         scheme.setName(mkName("scheme"));
@@ -113,9 +111,15 @@ public class ContextPopulatorTest extends BaseInMemoryIntegrationTest {
                         .builder()
                         .name("foo")
                         .ref(ContextVariableReference.mkVarRef(EntityKind.ASSESSMENT_DEFINITION, defExtId))
+                        .build(),
+                ImmutableContextVariableDeclaration
+                        .builder()
+                        .name("fooDupe")
+                        .ref(ContextVariableReference.mkVarRef(EntityKind.ASSESSMENT_DEFINITION, defExtId))
                         .build());
 
-        populator.populateContext(declarations, selector);
+        Set<ContextVariable<String>> vars = populator.populateContext(declarations, selector);
+        System.out.println(vars);
     }
 
 }
