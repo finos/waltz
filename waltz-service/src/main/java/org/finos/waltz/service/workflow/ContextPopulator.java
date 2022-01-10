@@ -24,6 +24,7 @@ import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.SetUtilities.map;
+import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Service
 public class ContextPopulator {
@@ -73,7 +74,9 @@ public class ContextPopulator {
                             .<String>builder()
                             .name(varName)
                             .value(r.get(rsi.CODE))
-                            .entityRef(EntityReference.mkRef(selector.kind(), r.get(ar.ENTITY_ID)))
+                            .entityRef(mkRef(
+                                    selector.kind(),
+                                    r.get(ar.ENTITY_ID)))
                             .build()))
                 .collect(Collectors.toSet());
         }

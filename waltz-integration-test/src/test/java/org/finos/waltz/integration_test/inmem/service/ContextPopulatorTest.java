@@ -1,5 +1,6 @@
 package org.finos.waltz.integration_test.inmem.service;
 
+import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.ImmutableGenericSelector;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
@@ -20,10 +21,15 @@ import org.jooq.impl.DSL;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Optional;
 import java.util.Set;
 
+import static java.lang.String.format;
+import static org.finos.waltz.common.CollectionUtilities.find;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class ContextPopulatorTest extends BaseInMemoryIntegrationTest {
 
@@ -119,7 +125,26 @@ public class ContextPopulatorTest extends BaseInMemoryIntegrationTest {
                         .build());
 
         Set<ContextVariable<String>> vars = populator.populateContext(declarations, selector);
-        System.out.println(vars);
+
+        assertVar(vars, a1, "foo", "X", "A1");
+        assertVar(vars, a2, "foo", "Y", "A2");
+        assertVar(vars, a1, "fooDupe", "X", "A1");
+        assertVar(vars, a2, "fooDupe", "Y", "A2");
+    }
+
+    private void assertVar(Set<ContextVariable<String>> vars,
+                           EntityReference appRef,
+                           String varName,
+                           String expectedVal,
+                           String refDesc) {
+        Optional<ContextVariable<String>> maybeVar = find(vars, v -> v.entityRef().equals(appRef) && v.name().equals(varName));
+        assertTrue(
+                format("Could not find var with name: %s for app: %s", varName, refDesc),
+                maybeVar.isPresent());
+        maybeVar.ifPresent(v -> assertEquals(
+                format("Var: %s should be: %s for app: %s", varName, expectedVal, refDesc),
+                expectedVal,
+                v.value()));
     }
 
 }
