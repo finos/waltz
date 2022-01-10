@@ -140,7 +140,7 @@ public class AttestationInstanceEndpoint implements Endpoint {
         postForList(findApplicationAttestationInstancesForKindAndSelectorPath, findApplicationAttestationInstancesForKindAndSelectorRoute);
         postForList(findApplicationAttestationSummaryForSelectorPath, findApplicationAttestationSummaryForSelectorRoute);
         getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
-        getForDatum(reassignRecipientsPath, this::reassignRecipientsRoute);
+        postForDatum(reassignRecipientsPath, this::reassignRecipientsRoute);
     }
 
 

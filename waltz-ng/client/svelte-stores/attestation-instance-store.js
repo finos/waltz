@@ -26,6 +26,11 @@ export function mkAttestationInstanceStore() {
                 {force});
     };
 
+
+    const reassignRecipients = () => {
+        return remote.execute()
+    }
+
     return {
         findByEntityRef,
         findLatestMeasurableAttestations
