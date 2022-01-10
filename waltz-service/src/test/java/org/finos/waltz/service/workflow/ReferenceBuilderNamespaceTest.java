@@ -77,7 +77,7 @@ public class ReferenceBuilderNamespaceTest {
         assertTrue(longName.isPresent());
 
         x.ifPresent(t -> assertEquals(t.ref(), ReferenceBuilderNamespace.assessment("wibble")));
-        y.ifPresent(t -> assertEquals(t.ref(), ReferenceBuilderNamespace.surveyResponse("surv", "q1")));
-        longName.ifPresent(t -> assertEquals(t.ref(), ReferenceBuilderNamespace.surveyResponse("surv", "q2")));
+        y.ifPresent(t -> assertEquals(t.ref(), ReferenceBuilderNamespace.surveyQuestionResponse("surv", "q1")));
+        longName.ifPresent(t -> assertEquals(t.ref(), ReferenceBuilderNamespace.surveyQuestionResponse("surv", "q2")));
     }
 }

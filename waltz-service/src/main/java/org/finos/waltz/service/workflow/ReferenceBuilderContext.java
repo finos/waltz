@@ -7,8 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import static org.jooq.lambda.tuple.Tuple.tuple;
-
 public class ReferenceBuilderContext implements JexlContext {
 
     private Map<String, ContextVariableReference> referenceMap = new HashMap<>();

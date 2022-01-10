@@ -2,18 +2,10 @@ package org.finos.waltz.service.workflow;
 
 import org.finos.waltz.model.EntityKind;
 
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 import static org.finos.waltz.service.workflow.ContextVariableReference.mkVarRef;
+import static org.finos.waltz.service.workflow.SurveyQuestionResponseContextVariableReference.mkVarRef;
 
 public class ReferenceBuilderNamespace {
-
-    public static String helloWorld(int count, String name) {
-        return IntStream.range(0, count)
-                .mapToObj(x -> name + "!")
-                .collect(Collectors.joining());
-    }
 
 
     public static ContextVariableReference assessment(String extId) {
@@ -21,8 +13,10 @@ public class ReferenceBuilderNamespace {
     }
 
 
-    public static SurveyQuestionResponseContextVariableReference surveyResponse(String surveyTemplateExtId, String questionExtId) {
-        return SurveyQuestionResponseContextVariableReference.mkVarRef(
+    public static SurveyQuestionResponseContextVariableReference surveyQuestionResponse(String surveyTemplateExtId,
+                                                                                        String questionExtId)
+    {
+        return mkVarRef(
                 surveyTemplateExtId,
                 questionExtId);
     }
