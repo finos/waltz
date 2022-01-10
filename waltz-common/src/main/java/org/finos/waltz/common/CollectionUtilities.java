@@ -48,6 +48,10 @@ public class CollectionUtilities {
                 .findFirst();
     }
 
+    public static <T> Optional<T> find(Collection<T> ts, Predicate<T> pred) {
+        return find(pred, ts);
+    }
+
 
     /**
      * given a collection and a predicate will (eagerly) evaluate the items in the
