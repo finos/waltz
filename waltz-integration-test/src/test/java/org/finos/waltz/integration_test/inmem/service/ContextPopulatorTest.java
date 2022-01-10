@@ -1,6 +1,5 @@
 package org.finos.waltz.integration_test.inmem.service;
 
-import org.finos.waltz.common.CollectionUtilities;
 import org.finos.waltz.common.SetUtilities;
 import org.finos.waltz.data.ImmutableGenericSelector;
 import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
@@ -23,17 +22,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import static java.lang.String.format;
 import static org.finos.waltz.common.CollectionUtilities.find;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.service.workflow.ContextVariableReference.mkVarRef;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class ContextPopulatorTest extends BaseInMemoryIntegrationTest {
-
 
     private static final AssessmentRating ar = AssessmentRating.ASSESSMENT_RATING;
     private static final RatingScheme rs = RatingScheme.RATING_SCHEME;
@@ -95,14 +93,19 @@ public class ContextPopulatorTest extends BaseInMemoryIntegrationTest {
                         .ref(mkVarRef(EntityKind.ASSESSMENT_DEFINITION, def2.getExternalId()))
                         .build());
 
-        Set<ContextVariable<String>> vars = populator.populateContext(declarations, selector);
+        Set<ContextVariable<? extends ContextValue>> vars = populator.populateContext(declarations, selector);
 
-        assertVar(vars, a1, "def1Var", "X", "A1");
-        assertVar(vars, a1, "def2Var", "Y", "A1");
-        assertVar(vars, a1, "def1VarDupe", "X", "A1");
+        assertVar(vars, a1, "def1Var", mkAssessmentCodeCheck("X"), "A1");
+        assertVar(vars, a1, "def2Var", mkAssessmentCodeCheck("Y"), "A1");
+        assertVar(vars, a1, "def1VarDupe", mkAssessmentCodeCheck("X"), "A1");
 
-        assertVar(vars, a2, "def1Var", "Y", "A2");
-        assertVar(vars, a2, "def1VarDupe", "Y", "A2");
+        assertVar(vars, a2, "def1Var", mkAssessmentCodeCheck("Y"), "A2");
+        assertVar(vars, a2, "def1VarDupe", mkAssessmentCodeCheck("Y"), "A2");
+    }
+
+
+    private Predicate<ContextValue> mkAssessmentCodeCheck(String code) {
+        return v -> ((AssessmentContextValue) v).ratingCode().equals(code);
     }
 
 
@@ -151,19 +154,18 @@ public class ContextPopulatorTest extends BaseInMemoryIntegrationTest {
     }
 
 
-    private void assertVar(Set<ContextVariable<String>> vars,
+    private void assertVar(Set<ContextVariable<? extends ContextValue>> vars,
                            EntityReference appRef,
                            String varName,
-                           String expectedVal,
+                           Predicate<ContextValue> valueChecker,
                            String refDesc) {
-        Optional<ContextVariable<String>> maybeVar = find(vars, v -> v.entityRef().equals(appRef) && v.name().equals(varName));
+        Optional<ContextVariable<? extends ContextValue>> maybeVar = find(vars, v -> v.entityRef().equals(appRef) && v.name().equals(varName));
         assertTrue(
                 format("Could not find var with name: %s for app: %s", varName, refDesc),
                 maybeVar.isPresent());
-        maybeVar.ifPresent(v -> assertEquals(
-                format("Var: %s should be: %s for app: %s", varName, expectedVal, refDesc),
-                expectedVal,
-                v.value()));
+        maybeVar.ifPresent(v -> assertTrue(
+                format("Var: %s should be: %s for app: %s", varName, valueChecker, refDesc),
+                valueChecker.test(v.value())));
     }
 
 }

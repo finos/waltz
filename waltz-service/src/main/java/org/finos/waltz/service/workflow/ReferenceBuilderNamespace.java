@@ -21,8 +21,8 @@ public class ReferenceBuilderNamespace {
     }
 
 
-    public static SurveyResponseContextVariableReference surveyResponse(String surveyTemplateExtId, String questionExtId) {
-        return SurveyResponseContextVariableReference.mkVarRef(
+    public static SurveyQuestionResponseContextVariableReference surveyResponse(String surveyTemplateExtId, String questionExtId) {
+        return SurveyQuestionResponseContextVariableReference.mkVarRef(
                 surveyTemplateExtId,
                 questionExtId);
     }

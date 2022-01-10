@@ -1,15 +1,12 @@
 package org.finos.waltz.service.workflow;
 
-import org.finos.waltz.common.MapUtilities;
 import org.finos.waltz.data.GenericSelector;
 import org.finos.waltz.model.EntityKind;
-import org.finos.waltz.model.EntityReference;
 import org.finos.waltz.schema.tables.AssessmentDefinition;
 import org.finos.waltz.schema.tables.AssessmentRating;
 import org.finos.waltz.schema.tables.RatingSchemeItem;
-import org.jooq.DSLContext;
-import org.jooq.Record5;
-import org.jooq.Select;
+import org.finos.waltz.schema.tables.SurveyQuestionResponse;
+import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,12 +15,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.emptySet;
 import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.MapUtilities.groupBy;
 import static org.finos.waltz.common.SetUtilities.map;
+import static org.finos.waltz.common.SetUtilities.union;
 import static org.finos.waltz.model.EntityReference.mkRef;
 
 @Service
@@ -32,6 +31,21 @@ public class ContextPopulator {
     private static final AssessmentRating ar = AssessmentRating.ASSESSMENT_RATING;
     private static final RatingSchemeItem rsi = RatingSchemeItem.RATING_SCHEME_ITEM;
     private static final AssessmentDefinition ad = AssessmentDefinition.ASSESSMENT_DEFINITION;
+    private static final SurveyQuestionResponse sqr = SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
+
+    private static final Function<Record, AssessmentContextValue> ASSESSMENT_MAPPER = r -> ImmutableAssessmentContextValue
+            .builder()
+            .ratingName(r.get(rsi.NAME))
+            .ratingCode(r.get(rsi.CODE))
+            .ratingExternalId(r.get(rsi.EXTERNAL_ID))
+            .ratingComment(r.get(ar.DESCRIPTION))
+            .build();
+
+    private static final Function<Record, SurveyQuestionResponseContextValue> QUESTION_MAPPER = r -> ImmutableSurveyQuestionResponseContextValue
+            .builder()
+            .value(r.get(sqr.STRING_RESPONSE))
+            .comment(r.get(sqr.COMMENT))
+            .build();
 
     private final DSLContext dsl;
 
@@ -41,25 +55,41 @@ public class ContextPopulator {
     }
 
 
-    public Set<ContextVariable<String>> populateContext(Set<ContextVariableDeclaration> declarations,
+    public Set<ContextVariable<? extends ContextValue>> populateContext(Set<ContextVariableDeclaration> declarations,
                                                         GenericSelector selector)
     {
         Map<EntityKind, Collection<ContextVariableDeclaration>> declarationsByRefKind = groupBy(declarations, d -> d.ref().kind());
 
-        Set<ContextVariable<String>> assessmentVariables = fetchAssessmentVariables(
+        Set<ContextVariable<AssessmentContextValue>> assessmentVariables = fetchAssessmentVariables(
                 declarationsByRefKind.get(EntityKind.ASSESSMENT_DEFINITION),
                 selector);
 
-        return assessmentVariables;
+        Set<ContextVariable<SurveyQuestionResponseContextValue>> surveyResponseVariables = fetchSurveyResponseVariables(
+                declarationsByRefKind.get(EntityKind.SURVEY_QUESTION),
+                selector);
 
+        return union(
+                assessmentVariables,
+                surveyResponseVariables);
     }
 
-    private Set<ContextVariable<String>> fetchAssessmentVariables(Collection<ContextVariableDeclaration> declarations,
+
+    private Set<ContextVariable<SurveyQuestionResponseContextValue>> fetchSurveyResponseVariables(Collection<ContextVariableDeclaration> declarations,
+                                                                                                  GenericSelector selector) {
+        if (isEmpty(declarations)) {
+            return emptySet();
+        } else {
+            return emptySet();
+        }
+    }
+
+
+    private Set<ContextVariable<AssessmentContextValue>> fetchAssessmentVariables(Collection<ContextVariableDeclaration> declarations,
                                                                   GenericSelector selector) {
         if (isEmpty(declarations)) {
             return emptySet();
         } else {
-            Map<String, Collection<String>> extIdsToVarNames = MapUtilities.groupBy(
+            Map<String, Collection<String>> extIdsToVarNames = groupBy(
                     declarations,
                     d -> d.ref().externalId(),
                     ContextVariableDeclaration::name);
@@ -71,9 +101,9 @@ public class ContextPopulator {
                         .getOrDefault(r.get(ad.EXTERNAL_ID), Collections.emptySet())
                         .stream()
                         .map(varName -> ImmutableContextVariable
-                            .<String>builder()
+                            .<AssessmentContextValue>builder()
                             .name(varName)
-                            .value(r.get(rsi.CODE))
+                            .value(ASSESSMENT_MAPPER.apply(r))
                             .entityRef(mkRef(
                                     selector.kind(),
                                     r.get(ar.ENTITY_ID)))
@@ -83,7 +113,7 @@ public class ContextPopulator {
     }
 
 
-    private Select<Record5<String, String, String, String, Long>> prepareAssessmentQuery(
+    private SelectConditionStep<Record6<String, String, String, String, String, Long>> prepareAssessmentQuery(
             Collection<ContextVariableDeclaration> declarations,
             GenericSelector genericSelector)
     {
@@ -94,6 +124,7 @@ public class ContextPopulator {
                 .select(rsi.EXTERNAL_ID,
                         rsi.NAME,
                         rsi.CODE,
+                        ar.DESCRIPTION,
                         ad.EXTERNAL_ID,
                         ar.ENTITY_ID)
                 .from(ar)

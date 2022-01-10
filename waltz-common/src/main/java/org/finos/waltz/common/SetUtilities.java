@@ -54,9 +54,9 @@ public class SetUtilities {
     }
 
     @SafeVarargs
-    public static <T> Set<T> union(Collection<T>... xss) {
+    public static <T> Set<T> union(Collection<? extends T>... xss) {
         Set<T> result = new HashSet<>();
-        for (Collection<T> xs : xss) {
+        for (Collection<? extends T> xs : xss) {
             result.addAll(xs);
         }
         return result;
