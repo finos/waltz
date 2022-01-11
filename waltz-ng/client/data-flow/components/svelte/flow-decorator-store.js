@@ -56,9 +56,9 @@ export const flowDirection = derived(layoutDirection, (direction) => {
 export const filteredCategories = derived([categoryQuery, categories], ([catQry, cats]) => {
     const filteredCats = _.isEmpty(catQry)
         ? cats
-        : termSearch(cats, catQry, ["name"]);
+        : termSearch(cats, catQry, ["searchableDataTypeNames"]);
 
-    return _.sortBy(filteredCats, d => d.name)
+    return _.orderBy(filteredCats, d => _.upperCase(d.name))
 });
 
 
@@ -73,7 +73,7 @@ export const filteredClients = derived([clientQuery, entityKindFilter, assessmen
         : _.chain(filtered)
             .filter(entityKindFilter)
             .filter(assessmentRatingFilter)
-            .sortBy(c => c.name)
+            .orderBy(c => _.upperCase(c.name))
             .value();
 });
 
