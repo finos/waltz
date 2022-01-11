@@ -28,12 +28,16 @@ export function mkAttestationInstanceStore() {
 
 
     const reassignRecipients = () => {
-        return remote.execute()
+        return remote.execute(
+            "POST",
+            "api/attestation-instance/reassign-recipients",
+            null)
     }
 
     return {
         findByEntityRef,
-        findLatestMeasurableAttestations
+        findLatestMeasurableAttestations,
+        reassignRecipients
     };
 }
 

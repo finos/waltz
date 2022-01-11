@@ -18,6 +18,7 @@
 
 package org.finos.waltz.data.attestation;
 
+import org.finos.waltz.common.FunctionUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.Criticality;
 import org.finos.waltz.model.EntityKind;
@@ -32,6 +33,8 @@ import org.jooq.impl.DSL;
 import org.jooq.lambda.tuple.Tuple2;
 import org.jooq.lambda.tuple.Tuple3;
 import org.jooq.lambda.tuple.Tuple4;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -41,7 +44,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
+import static java.lang.String.format;
 import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
@@ -53,6 +58,8 @@ import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
 public class AttestationInstanceDao {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AttestationInstanceDao.class);
 
     private static final Field<String> ENTITY_NAME_FIELD = InlineSelectFieldFactory.mkNameField(
             ATTESTATION_INSTANCE.PARENT_ENTITY_ID,
@@ -298,19 +305,6 @@ public class AttestationInstanceDao {
                                         ATTESTATION_INSTANCE_RECIPIENT.USER_ID)
                                 .from(ATTESTATION_INSTANCE_RECIPIENT)));
 
-        int addedRecipients = dsl
-                .with(attestationInvolvements)
-                .with(attestationRunsWithInvKind)
-                .with(runWithRequiredPeople)
-                .with(missingRecipients)
-                .insertInto(ATTESTATION_INSTANCE_RECIPIENT)
-                .columns(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID, ATTESTATION_INSTANCE_RECIPIENT.USER_ID)
-                .select(dsl
-                        .select(missingRecipients.field("instance_id", Long.class),
-                                missingRecipients.field(missingRecipients.field("user_id", String.class)))
-                        .from(missingRecipients))
-                .execute();
-
         CommonTableExpression<Record2<Long, String>> recipientsToRemove = DSL
                 .name("recipientsToRemove")
                 .fields("instance_id", "user_id")
@@ -337,22 +331,44 @@ public class AttestationInstanceDao {
                         .on(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID.eq(recipientsToRemove.field("instance_id", Long.class))
                                 .and(ATTESTATION_INSTANCE_RECIPIENT.USER_ID.eq(recipientsToRemove.field("user_id", String.class)))));
 
-        int removedRecipients = dsl
-                .with(attestationInvolvements)
-                .with(attestationRunsWithInvKind)
-                .with(runWithRequiredPeople)
-                .with(recipientsToRemove)
-                .with(attestationRecipientIds)
-                .delete(ATTESTATION_INSTANCE_RECIPIENT)
-                .where(ATTESTATION_INSTANCE_RECIPIENT.ID.in(dsl
+        return dsl
+                .transactionResult(ctx -> {
+                    DSLContext tx = ctx.dsl();
+
+                    int addedRecipients = tx
+                        .with(attestationInvolvements)
+                        .with(attestationRunsWithInvKind)
+                        .with(runWithRequiredPeople)
+                        .with(missingRecipients)
+                        .insertInto(ATTESTATION_INSTANCE_RECIPIENT)
+                        .columns(ATTESTATION_INSTANCE_RECIPIENT.ATTESTATION_INSTANCE_ID, ATTESTATION_INSTANCE_RECIPIENT.USER_ID)
+                        .select(dsl
+                                .select(missingRecipients.field("instance_id", Long.class),
+                                        missingRecipients.field(missingRecipients.field("user_id", String.class)))
+                                .from(missingRecipients))
+                        .execute();
+
+                int removedRecipients = tx
+                        .with(attestationInvolvements)
+                        .with(attestationRunsWithInvKind)
+                        .with(runWithRequiredPeople)
+                        .with(recipientsToRemove)
+                        .with(attestationRecipientIds)
+                        .delete(ATTESTATION_INSTANCE_RECIPIENT)
+                        .where(ATTESTATION_INSTANCE_RECIPIENT.ID.in(dsl
                                 .select(attestationRecipientIds.field("id", Long.class))
                                 .from(attestationRecipientIds)))
-                .execute();
+                        .execute();
 
-        return ImmutableAttestationSyncRecipientsResponse.builder()
-                .recipientsCreatedCount(Long.valueOf(addedRecipients))
-                .recipientsRemovedCount(Long.valueOf(removedRecipients))
-                .build();
+                LOG.info(format("Reassigning recipients for attestations: %d recipients added, %d recipients removed",
+                        addedRecipients,
+                        removedRecipients));
+
+                return ImmutableAttestationSyncRecipientsResponse.builder()
+                        .recipientsRemovedCount(Long.valueOf(removedRecipients))
+                        .recipientsCreatedCount(Long.valueOf(addedRecipients))
+                        .build();
+        });
     }
 
 

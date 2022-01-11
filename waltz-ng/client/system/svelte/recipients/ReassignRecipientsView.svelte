@@ -5,7 +5,7 @@ import PageHeader from "../../../common/svelte/PageHeader.svelte";
 import {attestationInstanceStore} from "../../../svelte-stores/attestation-instance-store";
 
 function reassignRecipients() {
-    attestationInstanceStore
+    attestationInstanceStore.reassignRecipients()
 }
 
 </script>
