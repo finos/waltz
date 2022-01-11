@@ -6,9 +6,9 @@ import org.immutables.value.Value;
 @Value.Immutable
 public abstract class SurveyQuestionResponseContextValue implements ContextValue {
 
-    public abstract String value();
+    public abstract String getValue();
 
     @Nullable
-    public abstract String comment();
+    public abstract String getComment();
 
 }
