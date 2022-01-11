@@ -105,7 +105,7 @@ public class ContextPopulatorTest extends BaseInMemoryIntegrationTest {
 
 
     private Predicate<ContextValue> mkAssessmentCodeCheck(String code) {
-        return v -> ((AssessmentContextValue) v).ratingCode().equals(code);
+        return v -> ((AssessmentContextValue) v).getRatingCode().equals(code);
     }
 
 

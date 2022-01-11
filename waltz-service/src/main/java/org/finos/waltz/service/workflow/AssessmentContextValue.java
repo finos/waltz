@@ -6,13 +6,13 @@ import org.immutables.value.Value;
 @Value.Immutable
 public abstract class AssessmentContextValue implements ContextValue {
 
-    public abstract String ratingCode();
-    public abstract String ratingName();
+    public abstract String getRatingCode();
+    public abstract String getRatingName();
 
     @Nullable
-    public abstract String ratingExternalId();
+    public abstract String getRatingExternalId();
 
     @Nullable
-    public abstract String ratingComment();
+    public abstract String getRatingComment();
 
 }
