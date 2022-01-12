@@ -12,7 +12,15 @@
         layout,
         selectedClient,
         parentCategory,
-        startingCategory
+        startingCategory,
+        layoutDirection,
+        layoutDirections,
+        filterApplied,
+        clientQuery,
+        categoryQuery,
+        entityKindFilter,
+        assessmentRatingFilter,
+        selectedRating
     } from "./flow-decorator-store";
     import Categories from "./Categories.svelte";
     import Clients from "./Clients.svelte";
@@ -174,11 +182,41 @@
         console.log({entitiesVisited});
     }
 
+    function toggleDirection() {
+        $layoutDirection = ($layoutDirection === layoutDirections.categoryToClient)
+            ? layoutDirections.clientToCategory
+            : layoutDirections.categoryToClient
+    }
+
+    function clearFilters() {
+        $clientQuery = null;
+        $categoryQuery = null;
+        $entityKindFilter = () => true;
+        $assessmentRatingFilter = () => true;
+        $selectedRating = null;
+    }
+
 </script>
 
 <div class="row">
     <div class="col-md-12">
         <ol class="breadcrumb">
+            <li>
+                <button title={$filterApplied ? "Click to clear filters" : "You can filter using the 'Filters' tab"}
+                        class="btn btn-skinny"
+                        class:filters-active={$filterApplied}
+                        class:filters-disabled={!$filterApplied}
+                        disabled={!$filterApplied}
+                        on:click={() => clearFilters()}>
+                    <Icon size="lg"
+                          name="filter"/>
+                </button>
+                <button title="toggle flow direction"
+                        class="btn btn-skinny"
+                        on:click={toggleDirection}>
+                    <Icon size="lg" name="exchange"/>
+                </button>
+            </li>
             {#if $focusClient}
                 <li class={homeBreadcrumb.classes}>
                     <button class="btn btn-skinny"
@@ -279,6 +317,14 @@
 
     .breadcrumb-home button {
         font-weight: bold !important;
+    }
+
+    .filters-active {
+        color: red;
+    }
+
+    .filters-disabled {
+        color: darkgrey;
     }
 
 

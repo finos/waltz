@@ -29,7 +29,10 @@ export function mkSettingsStore() {
 
 
     const update = (updateCmd) => remote
-        .execute("POST", "api/settings/update", updateCmd)
+        .execute(
+            "POST",
+            "api/settings/update",
+            updateCmd)
 
 
     return {

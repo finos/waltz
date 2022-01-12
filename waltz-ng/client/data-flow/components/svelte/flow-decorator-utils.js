@@ -102,7 +102,7 @@ export function mkClients(summarisedFlows, physicalFlows = []){
                 physicalFlows: physFlows,
             }
         })
-        .uniq()
+        .uniqBy(d => d.id)
         .value()
 }
 
@@ -116,7 +116,13 @@ export function mkCategories(summarisedFlows){
                 id: xs[0].category.id,
                 name: xs[0].category.name,
                 category: xs[0].category,
-                hasChildren: _.some(xs, x => x.hasChildren)
+                hasChildren: _.some(xs, x => x.hasChildren),
+                searchableDataTypeNames: _
+                    .chain(xs)
+                    .flatMap(x => x.searchableDataTypeNames)
+                    .uniq()
+                    .join(" ")
+                    .value()
             };
 
             return [...acc, category];
@@ -177,6 +183,13 @@ export function summariseFlows(flowInfo, noOpinionRating) {
                 .uniq()
                 .value();
 
+            const searchableDataTypeNames = _
+                .chain(decoratorsForKey)
+                .map(decorator => decorator.actualDataType?.name)
+                .uniq()
+                .concat([flow.rollupDataType?.name])
+                .value();
+
             const rollupDataTypeIds = _
                 .chain(decoratorsForKey)
                 .map(decorators => decorators.rollupDataType?.id)
@@ -191,6 +204,7 @@ export function summariseFlows(flowInfo, noOpinionRating) {
                 lineRating,
                 lineLifecycleStatus,
                 actualDataTypeIds,
+                searchableDataTypeNames,
                 rollupDataTypeIds,
                 flowId: flow.flowId,
                 category: flow.rollupDataType,

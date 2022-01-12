@@ -2,19 +2,11 @@
 
     import _ from "lodash";
     import {categoryQuery, clientQuery, entityKindFilter} from "./flow-decorator-store";
-    import AssessmentFilters from "./AssessmentFilters.svelte";
     import {createEventDispatcher} from "svelte";
     import Icon from "../../../common/svelte/Icon.svelte";
 
-    let categoryQryValue = "";
-    let clientQryValue = "";
-
     const dispatch = createEventDispatcher();
 
-    $: $categoryQuery = categoryQryValue;
-    $: $clientQuery = clientQryValue;
-
-    let counterpartKinds = ["ACTOR", "APPLICATION"];
     let filteredKinds = [];
 
     function addOrRemoveKindFromFilter(kind) {
@@ -48,7 +40,7 @@
                id="category-filter"
                type="text"
                placeholder="Search by name..."
-               bind:value={categoryQryValue}/>
+               bind:value={$categoryQuery}/>
     </div>
 </div>
 
@@ -63,7 +55,7 @@
                id="client-filter"
                type="text"
                placeholder="Search by name..."
-               bind:value={clientQryValue}/>
+               bind:value={$clientQuery}/>
     </div>
 </div>
 
