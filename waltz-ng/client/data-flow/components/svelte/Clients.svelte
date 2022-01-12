@@ -1,16 +1,17 @@
 <script>
     import {
+        clearSelections,
         clientScale,
         clientScrollOffset,
-        filteredClients,
+        contextPanelMode,
+        displayedClients,
         highlightClass,
-        selectedClient,
         layoutDirection,
         layoutDirections,
-        contextPanelMode,
-        Modes, clearSelections
+        Modes,
+        selectedClient
     } from "./flow-decorator-store";
-    import {dimensions, colors} from "./flow-decorator-utils"
+    import {colors, dimensions} from "./flow-decorator-utils"
     import {truncateMiddle} from "../../../common/string-utils";
 
     import _ from "lodash";
@@ -27,17 +28,17 @@
         return client.kind + " clickable no-text-select";
     }
 
-
     function selectClient(client) {
         clearSelections();
         $selectedClient = client;
         $contextPanelMode = Modes.FLOW_SUMMARY;
     }
+
 </script>
 
 
 <g transform={`translate(0, ${$clientScrollOffset})`}>
-    {#each $filteredClients as client}
+    {#each $displayedClients as client}
         <g transform={`translate(0, ${$clientScale(client.id)})`}
            class={mkClasses(client)}
            on:click|stopPropagation={() => selectClient(client)}>

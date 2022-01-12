@@ -102,7 +102,7 @@ export function mkClients(summarisedFlows, physicalFlows = []){
                 physicalFlows: physFlows,
             }
         })
-        .uniq()
+        .uniqBy(d => d.id)
         .value()
 }
 

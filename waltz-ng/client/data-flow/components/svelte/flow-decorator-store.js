@@ -94,13 +94,25 @@ export const filterApplied = derived([clients, filteredClients, categories, filt
 });
 
 
-export const clientScale = derived(filteredClients, (c) => scaleBand()
+export const displayedClients = derived([filteredArcs, filteredClients], ([$filteredArcs, $filteredClients]) => {
+    const clientsInArcs = _.map($filteredArcs, d => d.clientId);
+    return _.filter($filteredClients, c => _.includes(clientsInArcs, c.id));
+})
+
+
+export const displayedCategories = derived([filteredArcs, filteredCategories], ([$filteredArcs, $filteredCategories]) => {
+    const categoriesInArcs = _.map($filteredArcs, d => d.categoryId);
+    return _.filter($filteredCategories, c => _.includes(categoriesInArcs, c.id));
+})
+
+
+export const clientScale = derived(displayedClients, (c) => scaleBand()
     .padding(0.2)
     .domain(_.map(c, "id"))
     .range([0, _.max([(c.length - 1) * (dimensions.client.height * 1.2), dimensions.diagram.height])]));
 
 
-export const categoryScale = derived(filteredCategories, c => scaleBand()
+export const categoryScale = derived(displayedCategories, c => scaleBand()
     .padding(0.2)
     .range([0, dimensions.diagram.height])
     .domain(_.map(c, "id")));
