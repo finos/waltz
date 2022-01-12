@@ -1,7 +1,7 @@
 <script>
 
     import _ from "lodash";
-    import {assessmentRatingFilter, filteredClients} from "./flow-decorator-store";
+    import {assessmentRatingFilter, filteredClients, selectedRating} from "./flow-decorator-store";
     import {assessmentRatingViewStore} from "../../../svelte-stores/assessment-rating-view-service";
     import Icon from "../../../common/svelte/Icon.svelte";
     import NoData from "../../../common/svelte/NoData.svelte";
@@ -17,7 +17,6 @@
 
     let assessmentKind = 'APPLICATION';
     let selectedDefinition = null;
-    let selectedRating = null;
     let activeMode = Modes.DEFINITION;
 
     $: entityIds = _
@@ -40,11 +39,11 @@
     }
 
     function selectRating(rating) {
-        if(selectedRating === rating){
-            selectedRating = null;
+        if($selectedRating === rating){
+            $selectedRating = null;
             $assessmentRatingFilter = () => true;
         } else {
-            selectedRating = rating;
+            $selectedRating = rating;
             const entityIds = _.map(rating.entityReferences, d => d.id);
             $assessmentRatingFilter = d => assessmentKind === d.kind && _.includes(entityIds, d.id);
         }
@@ -52,7 +51,7 @@
 
     function back() {
         selectedDefinition = null;
-        selectedRating = null;
+        $selectedRating = null;
         $assessmentRatingFilter = null;
         activeMode = Modes.DEFINITION
     }
@@ -124,7 +123,8 @@
                 <tbody>
                 {#each selectedDefinition.ratingEntityLists as rating}
                     <tr on:click={() => selectRating(rating)}
-                        class="clickable" class:selected={selectedRating === rating}>
+                        class="clickable"
+                        class:selected={$selectedRating === rating}>
                         <td>{rating.rating}</td>
                         <td>{_.size(rating.entityReferences)}</td>
                     </tr>

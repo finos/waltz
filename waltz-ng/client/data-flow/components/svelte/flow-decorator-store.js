@@ -35,6 +35,7 @@ export const arcs = writable([]);
 export const clientQuery = writable(null);
 export const categoryQuery = writable(null);
 export const entityKindFilter = writable(() => true);
+export const selectedRating = writable(null);
 export const assessmentRatingFilter = writable(() => true);
 export const layoutDirection = writable(layoutDirections.clientToCategory)
 export const highlightClass = writable(null);
@@ -56,9 +57,9 @@ export const flowDirection = derived(layoutDirection, (direction) => {
 export const filteredCategories = derived([categoryQuery, categories], ([catQry, cats]) => {
     const filteredCats = _.isEmpty(catQry)
         ? cats
-        : termSearch(cats, catQry, ["name"]);
+        : termSearch(cats, catQry, ["searchableDataTypeNames"]);
 
-    return _.sortBy(filteredCats, d => d.name)
+    return _.orderBy(filteredCats, d => _.upperCase(d.name))
 });
 
 
@@ -73,7 +74,7 @@ export const filteredClients = derived([clientQuery, entityKindFilter, assessmen
         : _.chain(filtered)
             .filter(entityKindFilter)
             .filter(assessmentRatingFilter)
-            .sortBy(c => c.name)
+            .orderBy(c => _.upperCase(c.name))
             .value();
 });
 
@@ -94,13 +95,25 @@ export const filterApplied = derived([clients, filteredClients, categories, filt
 });
 
 
-export const clientScale = derived(filteredClients, (c) => scaleBand()
+export const displayedClients = derived([filteredArcs, filteredClients], ([$filteredArcs, $filteredClients]) => {
+    const clientsInArcs = _.map($filteredArcs, d => d.clientId);
+    return _.filter($filteredClients, c => _.includes(clientsInArcs, c.id));
+})
+
+
+export const displayedCategories = derived([filteredArcs, filteredCategories], ([$filteredArcs, $filteredCategories]) => {
+    const categoriesInArcs = _.map($filteredArcs, d => d.categoryId);
+    return _.filter($filteredCategories, c => _.includes(categoriesInArcs, c.id));
+})
+
+
+export const clientScale = derived(displayedClients, (c) => scaleBand()
     .padding(0.2)
     .domain(_.map(c, "id"))
     .range([0, _.max([(c.length - 1) * (dimensions.client.height * 1.2), dimensions.diagram.height])]));
 
 
-export const categoryScale = derived(filteredCategories, c => scaleBand()
+export const categoryScale = derived(displayedCategories, c => scaleBand()
     .padding(0.2)
     .range([0, dimensions.diagram.height])
     .domain(_.map(c, "id")));

@@ -1,10 +1,17 @@
 <script>
-    import {categoryScale, filteredCategories, focusClient, highlightClass, parentCategory, startingCategory} from "./flow-decorator-store";
-    import {dimensions, colors} from "./flow-decorator-utils"
+    import {
+        categoryScale,
+        displayedCategories,
+        highlightClass,
+        layoutDirection,
+        layoutDirections,
+        parentCategory,
+        startingCategory
+    } from "./flow-decorator-store";
+    import {colors, dimensions} from "./flow-decorator-utils"
     import {truncateMiddle} from "../../../common/string-utils";
     import {symbol, symbolCircle, symbolTriangle} from "d3-shape";
     import {createEventDispatcher} from "svelte";
-    import {layoutDirection, layoutDirections} from "./flow-decorator-store";
 
     const navigationIndentation= 30;
 
@@ -59,7 +66,7 @@
 </rect>
 
 
-{#each $filteredCategories as category}
+{#each $displayedCategories as category}
     <g transform={`translate(0, ${$categoryScale(category.id)})`}
        class="no-text-select category">
         <rect class="pill"
