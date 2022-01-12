@@ -35,6 +35,7 @@ export const arcs = writable([]);
 export const clientQuery = writable(null);
 export const categoryQuery = writable(null);
 export const entityKindFilter = writable(() => true);
+export const selectedRating = writable(null);
 export const assessmentRatingFilter = writable(() => true);
 export const layoutDirection = writable(layoutDirections.clientToCategory)
 export const highlightClass = writable(null);
