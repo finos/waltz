@@ -243,5 +243,17 @@
             </column>
         </addColumn>
     </changeSet>
+  
+   <changeSet author="leprben"
+               id="20220101-2375-1" >
+        <addColumn tableName="application_group_entry" >
+            <column name="created_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
 
 </databaseChangeLog>
