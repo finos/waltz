@@ -80,7 +80,7 @@
         <jgrapht.version>1.5.1</jgrapht.version>
         <jool.version>0.9.14</jool.version>
         <jooq.version>3.13.2</jooq.version> <!--If this changes see issue #4553 -->
-        <junit.version>4.13</junit.version>
+        <junit.version>5.7.2</junit.version>
         <jwt.version>3.14.0</jwt.version>
         <liquibase.maven.version>3.5.1</liquibase.maven.version>
         <logback.version>1.2.3</logback.version>
@@ -262,8 +262,13 @@
 
             <!-- test -->
             <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-api</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter-engine</artifactId>
                 <version>${junit.version}</version>
                 <scope>test</scope>
             </dependency>
@@ -477,7 +482,7 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <optimize>true</optimize>
-                    <showDeprecation>true</showDeprecation>
+                    <showDeprecation>false</showDeprecation>
                     <showWarnings>true</showWarnings>
                     <useIncrementalCompilation>false</useIncrementalCompilation>
                 </configuration>
