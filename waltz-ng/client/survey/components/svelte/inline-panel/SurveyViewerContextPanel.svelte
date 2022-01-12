@@ -70,31 +70,35 @@
                                          instance={survey?.surveyInstance}/>
         </div>
 
-        <div class="mini-section">
-            <h5>
-                <Icon name="columns"/>
-                Sections
-            </h5>
-            <div class="help-block small">
-                <Icon name="info-circle"/>Select a section below to focus on its questions
+        {#if _.size(sectionList) > 1}
+            <div class="mini-section">
+                <h5>
+                    <Icon name="columns"/>
+                    Sections
+                </h5>
+                <div class="help-block small">
+                    <Icon name="info-circle"/>Select a section below to focus on its questions, click the section again to view all questions for this survey.
+                </div>
+                <div class:waltz-scroll-region-250={_.size(sectionList) > 10}>
+                    <ul class="section-list small">
+                        {#each sectionList as section}
+                            <li class="clickable section-list-item"
+                                on:mouseenter={() => section.hovering = true}
+                                on:mouseleave={() => section.hovering = false}
+                                class:highlighted={section.hovering}
+                                class:selected={section?.sectionName === $selectedSection?.sectionName}
+                                on:click={() => selectSection(section)}>
+                                {section.sectionName}
+                                <span title={`${getResponsesCount(section)} questions with a response out of a total ${_.size(section.questions)} questions`}
+                                      class="small pull-right text-muted">
+                        {`(${getResponsesCount(section)} / ${_.size(section.questions)})`}
+                    </span>
+                            </li>
+                        {/each}
+                    </ul>
+                </div>
             </div>
-            <ul class="section-list small">
-                {#each sectionList as section}
-                    <li class="clickable section-list-item"
-                        on:mouseenter={() => section.hovering = true}
-                        on:mouseleave={() => section.hovering = false}
-                        class:highlighted={section.hovering}
-                        class:selected={section?.sectionName === $selectedSection?.sectionName}
-                        on:click={() => selectSection(section)}>
-                        {section.sectionName}
-                        <span title={`${getResponsesCount(section)} questions with a response out of a total ${_.size(section.questions)} questions`}
-                              class="small pull-right text-muted">
-                    {`(${getResponsesCount(section)} / ${_.size(section.questions)})`}
-                </span>
-                    </li>
-                {/each}
-            </ul>
-        </div>
+        {/if}
     </div>
 
     <div slot="pre-header">
