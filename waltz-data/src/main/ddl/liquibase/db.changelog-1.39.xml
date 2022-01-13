@@ -257,12 +257,12 @@
   
    <changeSet author="leprben"
                id="20220113-5821-2" >
-        <addColumn tableName="application_group_ou_entry" >
-            <column name="created_at"
-                    type="TIMESTAMP"
-                    defaultValueComputed="${now.value}">
-                <constraints nullable="false"/>
-            </column>
+             <addColumn tableName="application_group_ou_entry">
+            <column name="created_at"
+                    type="TIMESTAMP"
+                    defaultValueComputed="${now.value}">
+                <constraints nullable="false"/>
+            </column>
         </addColumn> 
     </changeSet>
 
