@@ -52,6 +52,10 @@
         ? `survey-instance-${survey.surveyRun.name}-${survey.surveyInstance.surveyEntity.name}`
         : "survey-instance";
 
+    function cloneResponses() {
+        console.log("cloning");
+    }
+
 </script>
 
 
@@ -123,6 +127,12 @@
                                  filename={extractFilename}
                                  extractUrl="survey-run-response/instance/{survey?.surveyInstance.id}"
                                  styling="button"/>
+            </div>
+            <div class="small">
+                <button class="btn btn-info"
+                        on:click={() => cloneResponses()}>
+                    Clone responses
+                </button>
             </div>
 
         </div>

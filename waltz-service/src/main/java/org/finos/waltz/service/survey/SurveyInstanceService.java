@@ -500,4 +500,11 @@ public class SurveyInstanceService {
                 .orElse(false);
     }
 
+
+    public int copyResponses(long sourceSurveyId, CopySurveyResponsesCommand copyCommand, String username) {
+
+        Person person = personDao.getByUserEmail(username);
+
+        return surveyQuestionResponseDao.copyResponses(sourceSurveyId, copyCommand, person.id().get());
+    }
 }
