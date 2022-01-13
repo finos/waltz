@@ -18,9 +18,9 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ArrayUtilities_lastTest {
 
@@ -35,19 +35,22 @@ public class ArrayUtilities_lastTest {
     public void lastOnMultiElementGivesTheLastElement() {
         String[] xs = {"A", "B", "C"};
         assertEquals("C", ArrayUtilities.last(xs));
+
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void lastOnEmptyArrayExplodes() {
         String[] xs = {};
-        assertEquals("C", ArrayUtilities.last(xs));
+        assertThrows(IllegalArgumentException.class, ()
+                -> ArrayUtilities.last(xs));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void lastOnNullArrayExplodes() {
-        assertEquals("C", ArrayUtilities.last(null));
+        assertThrows(IllegalArgumentException.class, ()
+                -> ArrayUtilities.last(null));
     }
 
 }

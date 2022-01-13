@@ -1,8 +1,8 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ObjectUtilities_anyTest {
 
@@ -32,6 +32,11 @@ public class ObjectUtilities_anyTest {
         String[] ele = null;
         boolean result = ObjectUtilities.any(x->x.length()==1, ele);
         assertEquals(false, result);
+        /*
+
+        assertThrows(NullPointerException.class,
+                ()->  StringUtilities.join(coll,","));
+         */
     }
 
     @Test(expected = NullPointerException.class)
@@ -39,6 +44,11 @@ public class ObjectUtilities_anyTest {
         String[] ele = {"aa", "bb"};
         boolean result = ObjectUtilities.any(null, ele);
         assertEquals(false, result);
+        /*
+
+        assertThrows(NullPointerException.class,
+                ()->  StringUtilities.join(coll,","));
+         */
     }
 
     @Test(expected = NullPointerException.class)
@@ -46,5 +56,10 @@ public class ObjectUtilities_anyTest {
         String[] ele = null;
         boolean result = ObjectUtilities.any(null, ele);
         assertEquals(false, result);
+        /*
+
+        assertThrows(NullPointerException.class,
+                ()->  StringUtilities.join(coll,","));
+         */
     }
 }

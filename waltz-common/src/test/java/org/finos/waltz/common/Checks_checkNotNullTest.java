@@ -18,15 +18,18 @@
 
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class Checks_checkNotNullTest {
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void throwsExceptionIfGivenNull() {
-        Checks.checkNotNull(null, "test message");
+        assertThrows(IllegalArgumentException.class, ()
+                -> Checks.checkNotNull(null, "test message"));
+
     }
 
     @Test

@@ -1,23 +1,30 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.finos.waltz.common.CollectionUtilities.any;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class Checks_checkNotEmptyTest {
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void sendNull(){
         String element = null;
-        Checks.checkNotEmpty(element, "Test");
+        assertThrows(IllegalArgumentException.class, ()
+                -> Checks.checkNotEmpty(element, "Test"));
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void sendEmpty(){
         String element = "";
         Checks.checkNotEmpty(element, "Test");
+        assertThrows(IllegalArgumentException.class, ()
+                -> Checks.checkNotEmpty(element, "Test"));
+
     }
 
+    @Test
     public void sendElement(){
         String element = "a";
         String result = Checks.checkNotEmpty(element, "Test");

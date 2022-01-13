@@ -1,10 +1,10 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class OptionalUtilities_contentsEqualTest {
     @Test
@@ -31,5 +31,10 @@ public class OptionalUtilities_contentsEqualTest {
     @Test(expected = IllegalArgumentException.class)
     public void simpleContentsEqualWhenAllNull(){
         OptionalUtilities.contentsEqual(null,null);
+        /*
+
+        assertThrows(NullPointerException.class,
+                ()->  StringUtilities.join(coll,","));
+         */
     }
 }

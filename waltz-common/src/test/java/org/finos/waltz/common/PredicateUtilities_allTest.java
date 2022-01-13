@@ -1,10 +1,10 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class PredicateUtilities_allTest {
     @Test
@@ -32,6 +32,11 @@ public class PredicateUtilities_allTest {
     public void simpleAllNullList1(){
         List<Integer> ele = null;
         PredicateUtilities.all(ele, x->(Integer.parseInt(x.toString())%2)==0);
+        /*
+
+        assertThrows(NullPointerException.class,
+                ()->  StringUtilities.join(coll,","));
+         */
     }
 
     @Test(expected = NullPointerException.class)
@@ -71,17 +76,32 @@ public class PredicateUtilities_allTest {
     public void simpleAllNullList2(){
         Integer[] ele = null;
         PredicateUtilities.all(ele, x->(Integer.parseInt(x.toString())%2)==0);
+        /*
+
+        assertThrows(NullPointerException.class,
+                ()->  StringUtilities.join(coll,","));
+         */
     }
 
     @Test(expected = NullPointerException.class)
     public void simpleAllNullPredicate2(){
         Integer[] ele = new Integer[]{1,2,3};
         PredicateUtilities.all(ele, null);
+        /*
+
+        assertThrows(NullPointerException.class,
+                ()->  StringUtilities.join(coll,","));
+         */
     }
 
     @Test(expected = NullPointerException.class)
     public void simpleAllNull2(){
         Integer[] ele = null;
         PredicateUtilities.all(ele, null);
+        /*
+
+        assertThrows(NullPointerException.class,
+                ()->  StringUtilities.join(coll,","));
+         */
     }
 }

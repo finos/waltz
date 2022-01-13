@@ -1,11 +1,11 @@
 package org.finos.waltz.common;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class OptionalUtilities_toListTest {
     @Test
@@ -37,5 +37,6 @@ public class OptionalUtilities_toListTest {
         Optional<String> ele1 = Optional.of("a");
         Optional<String> ele2 = null;
         OptionalUtilities.toList(ele1, ele2);
+
     }
 }
