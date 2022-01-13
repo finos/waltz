@@ -245,8 +245,8 @@
     </changeSet>
   
    <changeSet author="leprben"
-               id="20220101-5821-1" >
-        <addColumn tableName="application_group_entry" >
+              id="20220101-5821-1" >
+        <addColumn tableName="application_group_entry">
             <column name="created_at"
                     type="TIMESTAMP"
                     defaultValueComputed="${now.value}">
@@ -256,7 +256,7 @@
    </changeSet>
   
    <changeSet author="leprben"
-               id="20220113-5821-2" >
+              id="20220113-5821-2" >
         <addColumn tableName="application_group_ou_entry">
             <column name="created_at"
                     type="TIMESTAMP"
