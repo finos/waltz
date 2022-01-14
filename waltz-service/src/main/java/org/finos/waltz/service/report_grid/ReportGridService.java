@@ -19,15 +19,19 @@
 package org.finos.waltz.service.report_grid;
 
 import org.finos.waltz.common.exception.InsufficientPrivelegeException;
-import org.finos.waltz.model.*;
-import org.finos.waltz.service.changelog.ChangeLogService;
-import org.finos.waltz.service.rating_scheme.RatingSchemeService;
+import org.finos.waltz.common.exception.NotFoundException;
 import org.finos.waltz.data.application.ApplicationDao;
 import org.finos.waltz.data.application.ApplicationIdSelectorFactory;
 import org.finos.waltz.data.report_grid.ReportGridDao;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.HierarchyQueryScope;
+import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.ImmutableIdSelectionOptions;
 import org.finos.waltz.model.application.Application;
 import org.finos.waltz.model.rating.RatingSchemeItem;
 import org.finos.waltz.model.report_grid.*;
+import org.finos.waltz.service.changelog.ChangeLogService;
+import org.finos.waltz.service.rating_scheme.RatingSchemeService;
 import org.jooq.Record1;
 import org.jooq.Select;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -160,5 +164,24 @@ public class ReportGridService {
 
     public Set<ReportGridDefinition> findForOwner(String username) {
         return reportGridDao.findForOwner(username);
+    }
+
+
+    public boolean remove(long gridId,
+                          String username) throws InsufficientPrivelegeException {
+        ReportGridDefinition gridDef = reportGridDao.getGridDefinitionById(gridId);
+        if (gridDef == null) {
+            throw new NotFoundException(
+                    "REPORT_GRID_NOT_FOUND",
+                    format("Grid def: %d not found", gridId));
+        }
+        reportGridMemberService.checkIsOwner(gridId, username);
+
+        return reportGridDao.remove(gridId);
+    }
+
+
+    public ReportGridDefinition getGridDefinitionById(long gridId) {
+        return reportGridDao.getGridDefinitionById(gridId);
     }
 }

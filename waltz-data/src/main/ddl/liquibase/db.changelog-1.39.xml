@@ -244,7 +244,7 @@
         </addColumn>
     </changeSet>
   
-   <changeSet author="leprben"
+    <changeSet author="leprben"
               id="20220101-5821-1" >
         <addColumn tableName="application_group_entry">
             <column name="created_at"
@@ -253,9 +253,9 @@
                 <constraints nullable="false"/>
             </column>
         </addColumn>
-   </changeSet>
+    </changeSet>
   
-   <changeSet author="leprben"
+    <changeSet author="leprben"
               id="20220113-5821-2" >
         <addColumn tableName="application_group_ou_entry">
             <column name="created_at"
@@ -264,7 +264,18 @@
                 <constraints nullable="false"/>
             </column>
         </addColumn> 
-   </changeSet>
+    </changeSet>
+
+    <changeSet id="20220114-5829-1"
+               author="davidwatkins73">
+        <addForeignKeyConstraint baseColumnNames="grid_id"
+                                 baseTableName="report_grid_member"
+                                 constraintName="report_grid_to_grid_member_fk"
+                                 onDelete="CASCADE"
+                                 referencedColumnNames="id"
+                                 referencedTableName="report_grid"/>
+    </changeSet>
+
 
 
 </databaseChangeLog>
