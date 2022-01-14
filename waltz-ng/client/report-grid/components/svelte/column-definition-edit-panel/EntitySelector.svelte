@@ -77,7 +77,7 @@
                             <li>
                                 <button class="btn btn-skinny"
                                         on:click={() => selectEntityKind(entityKind)}>
-                                    <Icon name={entityKind.icon}/>{entityKind.name}
+                                    <Icon name={entityKind.icon}/> {entityKind.name}
                                 </button>
                             </li>
                         {/each}
