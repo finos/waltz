@@ -74,7 +74,7 @@
                 selectedSurveys = [];
                 selectedQuestions = [];
             })
-            .catch(e => toasts.error("Failed to copy responses: "+ e));
+            .catch(e => toasts.error("Failed to copy responses: "+ e.error));
 
     }
 
@@ -103,7 +103,7 @@
 
     <!--select questions-->
     <div class="small help-block" style="padding-top: 1em">
-        Select the questions you would like to copy.
+        <strong>Select the questions</strong> you would like to copy.
         To copy all of the question responses for this survey you can leave this blank.
     </div>
 
@@ -139,10 +139,9 @@
         </div>
     {/if}
 
-
     <!--select survey-->
     <div class="small help-block" style="padding-top: 1em">
-        Select the surveys you would like to copy these responses to. You can only copy responses to a survey sharing the
+        <strong>Select the surveys</strong> you would like to copy these responses to. You can only copy responses to a survey sharing the
         same template, and that you are a recipient of or that you own.
     </div>
     {#if isEmpty(incompleteSurveys)}
@@ -180,7 +179,7 @@
 
     <!--select questions-->
     <div class="small help-block" style="padding-top: 1em">
-        Do you want to override any existing responses on the selected surveys
+        Do you want to <strong>override any existing responses</strong> on the selected surveys?
     </div>
 
     <div>
@@ -210,7 +209,7 @@
 
             <NoData type="info">
                 <div class="help-block">
-                    You have {_.size(recentlyAlteredSurveys)} recently altered surveys.
+                    You have {_.size(recentlyAlteredSurveys)} recently altered survey/s.
                     {#if !showRecentlyAltered}
                         <button class="btn btn-skinny"
                                 on:click={() => showRecentlyAltered = true}>
