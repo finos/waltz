@@ -4,8 +4,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class RandomUtilities_randomlySizedIntStreamTest {
     @Test
@@ -20,33 +19,23 @@ public class RandomUtilities_randomlySizedIntStreamTest {
         assertEquals(1, val.count());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void toggleRandomlySizedIntStream(){
-        RandomUtilities.randomlySizedIntStream(1,0);
-        /*
-
-        assertThrows(NullPointerException.class,
-                ()->  StringUtilities.join(coll,","));
-         */
+        assertThrows(IllegalArgumentException.class,
+                ()-> RandomUtilities.randomlySizedIntStream(1,0));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void randomlySizedIntStreamAllZero(){
-        RandomUtilities.randomlySizedIntStream(0,0);
-        /*
 
-        assertThrows(NullPointerException.class,
-                ()->  StringUtilities.join(coll,","));
-         */
+        assertThrows(IllegalArgumentException.class,
+                ()-> RandomUtilities.randomlySizedIntStream(0,0));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void randomlySizedIntStreamAllOne(){
-        RandomUtilities.randomlySizedIntStream(1,1);
-        /*
 
-        assertThrows(NullPointerException.class,
-                ()->  StringUtilities.join(coll,","));
-         */
+        assertThrows(IllegalArgumentException.class,
+                ()-> RandomUtilities.randomlySizedIntStream(1,1));
     }
 }

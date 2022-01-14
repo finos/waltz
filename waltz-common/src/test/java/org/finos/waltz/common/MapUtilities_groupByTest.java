@@ -107,15 +107,11 @@ public class MapUtilities_groupByTest {
                 () -> MapUtilities.groupBy(x -> x.length(), null, xs));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void cannotTransformWithAllNullParams() {
         List<String> xs = null;
-        Map<Integer, Collection<String>> result = MapUtilities.groupBy(null, null, xs);
-        /*
-
-        assertThrows(NullPointerException.class,
-                ()->  StringUtilities.join(coll,","));
-         */
+        assertThrows(IllegalArgumentException.class,
+                () -> MapUtilities.groupBy(null, null, xs));
     }
 
     //toggled params
@@ -133,15 +129,11 @@ public class MapUtilities_groupByTest {
         assertEquals(1, result.get(3).size());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void toggledSimpleGroupNullList() {
         List<String> xs = null;
-        Map<Integer, Collection<String>> result = MapUtilities.groupBy(xs, x -> x.length());
-        /*
-
-        assertThrows(NullPointerException.class,
-                ()->  StringUtilities.join(coll,","));
-         */
+        assertThrows(IllegalArgumentException.class,
+                () -> MapUtilities.groupBy(xs, x -> x.length()));
     }
 
     @Test
@@ -152,15 +144,11 @@ public class MapUtilities_groupByTest {
         assertTrue(result.isEmpty());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void toggledSimpleGroupNullFunc() {
         List<String> xs = new ArrayList();
-        Map<Integer, Collection<String>> result = MapUtilities.groupBy(xs, null);
-        /*
-
-        assertThrows(NullPointerException.class,
-                ()->  StringUtilities.join(coll,","));
-         */
+        assertThrows(IllegalArgumentException.class,
+                () -> MapUtilities.groupBy(xs, null));
     }
 
     @Test
@@ -180,47 +168,34 @@ public class MapUtilities_groupByTest {
         assertTrue(result.isEmpty());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void toggledCannotTransformNullList() {
         List<String> xs = null;
-        Map<Integer, Collection<String>> result = MapUtilities.groupBy(xs, x -> x.length(), x -> x.toUpperCase());
-        /*
 
-        assertThrows(NullPointerException.class,
-                ()->  StringUtilities.join(coll,","));
-         */
+        assertThrows(IllegalArgumentException.class,
+                () -> MapUtilities.groupBy(xs, x -> x.length(), x -> x.toUpperCase()));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void toggledCannotTransformWithNullFirstFunc() {
         List<String> xs = ListUtilities.newArrayList("aa", "bb", "b", "ccc");
-        Map<Integer, Collection<String>> result = MapUtilities.groupBy(xs, null, x -> x.toUpperCase());
-        /*
 
-        assertThrows(NullPointerException.class,
-                ()->  StringUtilities.join(coll,","));
-         */
+        assertThrows(IllegalArgumentException.class,
+                () -> MapUtilities.groupBy(xs, null, x -> x.toUpperCase()));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void toggledCannotTransformWithNullSecondFunc() {
         List<String> xs = ListUtilities.newArrayList("aa", "bb", "b", "ccc");
-        Map<Integer, Collection<String>> result = MapUtilities.groupBy(xs, x -> x.length(), null);
-        /*
-
-        assertThrows(NullPointerException.class,
-                ()->  StringUtilities.join(coll,","));
-         */
+        assertThrows(IllegalArgumentException.class,
+                () -> MapUtilities.groupBy(xs, x -> x.length(), null));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void toggledCannotTransformWithAllNullParams() {
         List<String> xs = null;
-        Map<Integer, Collection<String>> result = MapUtilities.groupBy(xs, null, null);
-        /*
 
-        assertThrows(NullPointerException.class,
-                ()->  StringUtilities.join(coll,","));
-         */
+        assertThrows(IllegalArgumentException.class,
+                () -> MapUtilities.groupBy(xs, null, null));
     }
 }

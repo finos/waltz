@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class StringUtilities_tokeniseTest {
 
@@ -22,14 +23,11 @@ public class StringUtilities_tokeniseTest {
         assertEquals(expectedList, StringUtilities.tokenise(str));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void simpleTokeniseWithNullStr(){
         String str = null;
-        StringUtilities.tokenise(str);
-        /*
 
-        assertThrows(NullPointerException.class,
-                ()->  StringUtilities.join(coll,","));
-         */
+        assertThrows(IllegalArgumentException.class,
+                ()-> StringUtilities.tokenise(str));
     }
 }
