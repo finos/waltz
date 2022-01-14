@@ -9,8 +9,11 @@
     import SurveyActions from "./SurveyActions.svelte";
     import SurveyInstanceVersionPicker from "./SurveyInstanceVersionPicker.svelte";
     import DataExtractLink from "../../../../common/svelte/DataExtractLink.svelte";
+    import {createEventDispatcher} from "svelte";
 
     export let instanceId;
+
+    let dispatch = createEventDispatcher();
 
     function selectSection(section) {
         if ($selectedSection === section) {
@@ -52,8 +55,8 @@
         ? `survey-instance-${survey.surveyRun.name}-${survey.surveyInstance.surveyEntity.name}`
         : "survey-instance";
 
-    function cloneResponses() {
-        console.log("cloning");
+    function copyResponses() {
+        dispatch("showCloneWidget");
     }
 
 </script>
@@ -122,16 +125,16 @@
                           groupApprovers={survey.surveyInstance?.owningRole}/>
         </div>
         <div class="mini-section">
-            <div class="small">
+            <div class="small" style="display: inline-block">
                 <DataExtractLink name="Export Survey"
                                  filename={extractFilename}
                                  extractUrl="survey-run-response/instance/{survey?.surveyInstance.id}"
                                  styling="button"/>
             </div>
-            <div class="small">
-                <button class="btn btn-info"
-                        on:click={() => cloneResponses()}>
-                    Clone responses
+            <div class="small" style="display: inline-block">
+                <button class="btn btn-info btn-xs"
+                        on:click={() => copyResponses()}>
+                    <Icon name="clone"/> Copy responses
                 </button>
             </div>
 

@@ -19,14 +19,14 @@
 package org.finos.waltz.data.survey;
 
 
-import org.finos.waltz.model.survey.*;
-import org.finos.waltz.schema.Tables;
-import org.finos.waltz.schema.tables.records.SurveyQuestionListResponseRecord;
-import org.finos.waltz.schema.tables.records.SurveyQuestionResponseRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.survey.*;
+import org.finos.waltz.schema.Tables;
+import org.finos.waltz.schema.tables.records.SurveyQuestionListResponseRecord;
+import org.finos.waltz.schema.tables.records.SurveyQuestionResponseRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,20 +42,21 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
-import static org.finos.waltz.common.ListUtilities.isEmpty;
-import static org.finos.waltz.schema.Tables.*;
-import static org.finos.waltz.schema.tables.SurveyInstance.SURVEY_INSTANCE;
-import static org.finos.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.CollectionUtilities.first;
+import static org.finos.waltz.common.ListUtilities.isEmpty;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.common.StringUtilities.ifEmpty;
 import static org.finos.waltz.common.StringUtilities.join;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.schema.Tables.SURVEY_QUESTION_LIST_RESPONSE;
+import static org.finos.waltz.schema.Tables.SURVEY_RUN;
+import static org.finos.waltz.schema.tables.SurveyInstance.SURVEY_INSTANCE;
+import static org.finos.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
@@ -404,6 +405,7 @@ public class SurveyQuestionResponseDao {
                     .innerJoin(sr).on(si.SURVEY_RUN_ID.eq(sr.ID)
                             .and(sr.SURVEY_TEMPLATE_ID.eq(sourceTemplateId)))
                     .where(si.ID.in(copyCommand.targetSurveyInstanceIds()))
+                    .and(si.STATUS.in(SurveyInstanceStatus.NOT_STARTED.name(), SurveyInstanceStatus.IN_PROGRESS.name()))
                     .asTable();
 
             int questionResponsesCopiedCount = copySurveyQuestionResponses(

@@ -42,8 +42,10 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.*;
 
+import static java.lang.String.format;
 import static org.finos.waltz.common.Checks.*;
 import static org.finos.waltz.common.CollectionUtilities.find;
+import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.StringUtilities.joinUsing;
 import static org.finos.waltz.model.survey.SurveyInstanceStateMachineFactory.simple;
 import static org.finos.waltz.model.utils.IdUtilities.indexByOptionalId;
@@ -166,6 +168,21 @@ public class SurveyInstanceService {
         surveyQuestionResponseDao.saveResponse(instanceQuestionResponse);
 
         return true;
+    }
+
+
+    public Person checkPersonIsRecipientOrOwnerOrAdmin(String userName, long instanceId) {
+        Person person = getPersonByUsername(userName);
+        boolean isPersonInstanceRecipient = surveyInstanceRecipientDao.isPersonInstanceRecipient(
+                person.id().get(),
+                instanceId);
+        checkTrue(
+                isPersonInstanceRecipient
+                        || isAdmin(userName)
+                        || isOwner(instanceId, person)
+                        || hasOwningRole(instanceId, person),
+                "Permission denied");
+        return person;
     }
 
 
@@ -439,7 +456,7 @@ public class SurveyInstanceService {
                         .userId(username)
                         .parentReference(EntityReference.mkRef(EntityKind.SURVEY_INSTANCE, instanceId))
                         .childKind(EntityKind.PERSON)
-                        .message(String.format(msg, recipient.name()))
+                        .message(format(msg, recipient.name()))
                         .build());
     }
 
@@ -493,7 +510,7 @@ public class SurveyInstanceService {
                                     .userId(username)
                                     .parentReference(EntityReference.mkRef(EntityKind.SURVEY_INSTANCE, instanceId))
                                     .childKind(EntityKind.SURVEY_QUESTION)
-                                    .message(String.format("Question [%s]: %s", q.questionText(), message))
+                                    .message(format("Question [%s]: %s", q.questionText(), message))
                                     .build());
                     return true;
                 })
@@ -503,8 +520,44 @@ public class SurveyInstanceService {
 
     public int copyResponses(long sourceSurveyId, CopySurveyResponsesCommand copyCommand, String username) {
 
+        copyCommand.targetSurveyInstanceIds()
+                .forEach(trgInstanceId -> checkPersonIsRecipientOrOwnerOrAdmin(username, trgInstanceId));
+
         Person person = personDao.getByUserEmail(username);
 
-        return surveyQuestionResponseDao.copyResponses(sourceSurveyId, copyCommand, person.id().get());
+        int updated = surveyQuestionResponseDao.copyResponses(sourceSurveyId, copyCommand, person.id().get());
+
+        String willBeOverwrittenMessage = copyCommand.overrideExistingResponses()
+                ? "existing responses were overwritten"
+                : "existing responses were unchanged";
+
+        String questionMessage = isEmpty(copyCommand.questionIds())
+                ? "All questions"
+                : format("Questions: %s", copyCommand.questionIds().toString());
+
+        copyCommand.targetSurveyInstanceIds()
+                .forEach(trgInstanceId -> {
+
+                    updateStatus(
+                            username,
+                            trgInstanceId,
+                            ImmutableSurveyInstanceStatusChangeCommand.builder()
+                                    .action(SurveyInstanceAction.SAVING)
+                                    .reason(format("Questions copied from survey instance: %d, %s", sourceSurveyId, willBeOverwrittenMessage))
+                                    .build());
+
+                    changeLogService.write(
+                            ImmutableChangeLog.builder()
+                                    .operation(Operation.UPDATE)
+                                    .userId(username)
+                                    .parentReference(EntityReference.mkRef(EntityKind.SURVEY_INSTANCE, trgInstanceId))
+                                    .message(format("%s copied from survey instance: %d, %s",
+                                            questionMessage,
+                                            sourceSurveyId,
+                                            willBeOverwrittenMessage))
+                                    .build());
+                });
+
+        return updated;
     }
 }
