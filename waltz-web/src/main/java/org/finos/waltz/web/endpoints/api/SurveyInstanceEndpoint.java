@@ -117,7 +117,6 @@ public class SurveyInstanceEndpoint implements Endpoint {
                 (req, res) -> surveyInstanceService.findPossibleActionsForInstance(getUsername(req), getId(req));
 
         DatumRoute<Integer> copyResponsesRoute = (req, res) -> {
-            //check is survey recipient on target
             CopySurveyResponsesCommand cloneCommand = readBody(req, CopySurveyResponsesCommand.class);
             return surveyInstanceService.copyResponses(getId(req), cloneCommand, getUsername(req));
         };
