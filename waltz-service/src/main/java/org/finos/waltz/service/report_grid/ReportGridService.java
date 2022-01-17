@@ -144,23 +144,28 @@ public class ReportGridService {
     }
 
 
-    public ReportGridDefinition create(ReportGridCreateCommand createCommand, String username){
+    public ReportGridDefinition create(ReportGridCreateCommand createCommand,
+                                       String username){
         long gridId = reportGridDao.create(createCommand, username);
         reportGridMemberService.register(gridId, username, ReportGridMemberRole.OWNER);
         return reportGridDao.getGridDefinitionById(gridId);
     }
 
 
-    public ReportGridDefinition update(long id, ReportGridUpdateCommand updateCommand, String username) throws InsufficientPrivelegeException {
+    public ReportGridDefinition update(long id,
+                                       ReportGridUpdateCommand updateCommand,
+                                       String username) throws InsufficientPrivelegeException {
         checkIsOwner(id, username);
         long gridId = reportGridDao.update(id, updateCommand, username);
         return reportGridDao.getGridDefinitionById(id);
     }
 
 
-    private void checkIsOwner(long reportGridId, String username) throws InsufficientPrivelegeException {
+    private void checkIsOwner(long reportGridId,
+                              String username) throws InsufficientPrivelegeException {
         reportGridMemberService.checkIsOwner(reportGridId, username);
     }
+
 
     public Set<ReportGridDefinition> findForOwner(String username) {
         return reportGridDao.findForOwner(username);

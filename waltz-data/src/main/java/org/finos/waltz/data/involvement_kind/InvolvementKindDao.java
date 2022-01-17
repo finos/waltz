@@ -56,6 +56,7 @@ public class InvolvementKindDao {
                 .id(record.getId())
                 .name(record.getName())
                 .description(record.getDescription())
+                .externalId(record.getExternalId())
                 .lastUpdatedAt(DateTimeUtilities.toLocalDateTime(record.getLastUpdatedAt()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .build();
@@ -70,6 +71,7 @@ public class InvolvementKindDao {
         record.setLastUpdatedAt(Timestamp.valueOf(ik.lastUpdatedAt()));
         record.setLastUpdatedBy(ik.lastUpdatedBy());
 
+        ik.externalId().ifPresent(record::setExternalId);
         ik.id().ifPresent(record::setId);
 
         return record;
@@ -116,6 +118,9 @@ public class InvolvementKindDao {
         record.setDescription(command.description());
         record.setLastUpdatedBy(username);
         record.setLastUpdatedAt(Timestamp.valueOf(DateTimeUtilities.nowUtc()));
+
+        command.externalId().ifPresent(record::setExternalId);
+
         record.store();
 
         return record.getId();
