@@ -42,8 +42,9 @@ import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
 
 public class BookmarkServiceTest extends BaseInMemoryIntegrationTest {
 
@@ -155,9 +156,9 @@ public class BookmarkServiceTest extends BaseInMemoryIntegrationTest {
         createBookmark(appRef2, "c");
 
         int numRemoved = svc.deleteByBookmarkIdSelector(a1_opts);
-        assertEquals("both app1 bookmarks should have been removed", 2, numRemoved);
-        assertEquals("no app1 bookmarks should be left", emptySet(), svc.findByBookmarkIdSelector(a1_opts));
-        assertEquals("the app2 bookmark should remain", 1, svc.findByBookmarkIdSelector(a2_opts).size());
+        assertEquals(2, numRemoved,"both app1 bookmarks should have been removed");
+        assertEquals(emptySet(), svc.findByBookmarkIdSelector(a1_opts),"no app1 bookmarks should be left");
+        assertEquals(1, svc.findByBookmarkIdSelector(a2_opts).size(),"the app2 bookmark should remain");
     }
 
 

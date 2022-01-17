@@ -29,7 +29,8 @@ import static org.finos.waltz.common.CollectionUtilities.find;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.schema.tables.Application.APPLICATION;
 import static org.finos.waltz.service.workflow.ContextVariableReference.mkVarRef;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 public class ContextPopulatorTest extends BaseInMemoryIntegrationTest {
 
@@ -161,11 +162,10 @@ public class ContextPopulatorTest extends BaseInMemoryIntegrationTest {
                            String refDesc) {
         Optional<ContextVariable<? extends ContextValue>> maybeVar = find(vars, v -> v.entityRef().equals(appRef) && v.name().equals(varName));
         assertTrue(
-                format("Could not find var with name: %s for app: %s", varName, refDesc),
                 maybeVar.isPresent());
-        maybeVar.ifPresent(v -> assertTrue(
-                format("Var: %s should be: %s for app: %s", varName, valueChecker, refDesc),
-                valueChecker.test(v.value())));
+        maybeVar.ifPresent(v ->
+                assertTrue(valueChecker.test(v.value()),
+                format("Could not find var with name: %s for app: %s", varName, refDesc)));
     }
 
 }

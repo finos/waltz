@@ -28,8 +28,7 @@ import static org.finos.waltz.common.DateTimeUtilities.toLocalDate;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Service
 public class SurveyRunServiceTest extends BaseInMemoryIntegrationTest {
@@ -111,34 +110,34 @@ public class SurveyRunServiceTest extends BaseInMemoryIntegrationTest {
 
         Set<SurveyInstance> instances = instanceService.findForSurveyRun(surveyRunId);
 
-        assertEquals("should be 2 instances", 2, instances.size());
+        assertEquals(2, instances.size(), "should be 2 instances");
 
         SurveyInstance instanceA = findInstanceForApp(instances, appA);
         SurveyInstance instanceB = findInstanceForApp(instances, appB);
         assertNotNull(instanceA);
         assertNotNull(instanceB);
-        assertEquals("instance won't have been started yet", SurveyInstanceStatus.NOT_STARTED, instanceA.status());
-        assertEquals("instance won't have been started yet", SurveyInstanceStatus.NOT_STARTED, instanceB.status());
+        assertEquals(SurveyInstanceStatus.NOT_STARTED, instanceA.status(), "instance won't have been started yet");
+        assertEquals(SurveyInstanceStatus.NOT_STARTED, instanceB.status(), "instance won't have been started yet");
 
         Long instanceAId = instanceA.id().orElseThrow(() -> new AssertionFailedError("Failed to find instance for app A"));
         Long instanceBId = instanceB.id().orElseThrow(() -> new AssertionFailedError("Failed to find instance for app B"));
-        assertNotNull("check user 1 via api", instanceService.checkPersonIsRecipient(u1, instanceAId));
-        assertNotNull("admin is owner of instance A", instanceService.checkPersonIsOwnerOrAdmin(admin, instanceAId));
-        assertNotNull("admin is owner of instance B", instanceService.checkPersonIsOwnerOrAdmin(admin, instanceBId));
+        assertNotNull(instanceService.checkPersonIsRecipient(u1, instanceAId), "check user 1 via api");
+        assertNotNull(instanceService.checkPersonIsOwnerOrAdmin(admin, instanceAId), "admin is owner of instance A");
+        assertNotNull(instanceService.checkPersonIsOwnerOrAdmin(admin, instanceBId), "admin is owner of instance B");
 
         Set<SurveyInstance> instancesForU1 = instanceService.findForRecipient(u1Id);
         Set<SurveyInstance> instancesForU2a = instanceService.findForRecipient(u2aId);
-        assertEquals("instances for u1 should be just an instance for appA", asSet(instanceA), instancesForU1);
-        assertEquals("should be no instances for user 2A", Collections.emptySet(), instancesForU2a);
+        assertEquals(asSet(instanceA), instancesForU1, "instances for u1 should be just an instance for appA");
+        assertEquals(Collections.emptySet(), instancesForU2a, "should be no instances for user 2A");
 
-        assertEquals("can find by name or id (1)", instanceService.findForRecipient(u1Id), instanceService.findForRecipient(u1));
-        assertEquals("can find by name or id (2a)", instanceService.findForRecipient(u2bId), instanceService.findForRecipient(u2b));
-        assertThrows("finding by removed user throws an exception", IllegalArgumentException.class, () -> instanceService.findForRecipient(u2a));
+        assertEquals(instanceService.findForRecipient(u1Id), instanceService.findForRecipient(u1), "can find by name or id (1)");
+        assertEquals(instanceService.findForRecipient(u2bId), instanceService.findForRecipient(u2b), "can find by name or id (2a)");
+        assertThrows(IllegalArgumentException.class, () -> instanceService.findForRecipient(u2a), "finding by removed user throws an exception");
 
         List<Person> aRecips = instanceService.findRecipients(instanceAId);
         List<Person> bRecips = instanceService.findRecipients(instanceBId);
-        assertEquals("Expect user1 to be the recipient", asSet(u1), recipsToUserIds(aRecips));
-        assertEquals("app B has only one recipient (u2a) as the other involved person (u2a) has been removed", asSet(u2b), recipsToUserIds(bRecips));
+        assertEquals(asSet(u1), recipsToUserIds(aRecips), "Expect user1 to be the recipient");
+        assertEquals(asSet(u2b), recipsToUserIds(bRecips), "app B has only one recipient (u2a) as the other involved person (u2a) has been removed");
     }
 
 

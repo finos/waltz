@@ -27,8 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.finos.waltz.common.CollectionUtilities.find;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AssessmentsTest extends BaseInMemoryIntegrationTest {
 
