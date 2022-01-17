@@ -66,9 +66,12 @@
                 </div>
             </content>
         </waltz-sub-section>
-        <br>
-        <waltz-roadmap-references parent-entity-ref="$ctrl.parentEntityRef">
-        </waltz-roadmap-references>
+
+        <div ng-if="$ctrl.roadmapsEnabled">
+            <br>
+            <waltz-roadmap-references parent-entity-ref="$ctrl.parentEntityRef">
+            </waltz-roadmap-references>
+        </div>
     </div>
 
 </div>

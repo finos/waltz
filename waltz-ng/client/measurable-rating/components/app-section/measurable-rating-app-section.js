@@ -21,6 +21,7 @@ import {initialiseData} from "../../../common";
 
 import template from "./measurable-rating-app-section.html";
 import {determineStartingTab, loadAllData, mkTabs} from "../../measurable-rating-utils";
+import namedSettings from "../../../system/named-settings";
 
 
 /**
@@ -48,12 +49,21 @@ const initialState = {
         tab: null
     },
     byCategory: {},
-    activeAllocationScheme: null
+    activeAllocationScheme: null,
+    roadmapsEnabled: false
 };
 
 
-function controller($q, serviceBroker) {
+function controller($q, serviceBroker, settingsService) {
     const vm = initialiseData(this, initialState);
+
+    function determineIfRoadmapsAreEnabled() {
+        settingsService
+            .findOrDefault(namedSettings.measurableRatingRoadmapsEnabled, true)
+            .then(isEnabled => {
+                vm.roadmapsEnabled = !(isEnabled === 'false');
+            });
+    }
 
     const loadData = (force = false) => {
         return loadAllData($q, serviceBroker, vm.parentEntityRef, false, force)
@@ -68,9 +78,12 @@ function controller($q, serviceBroker) {
             });
     };
 
-    vm.$onInit = () => loadData()
-        .then(() => serviceBroker.loadViewData(CORE_API.ApplicationStore.getById, [vm.parentEntityRef.id])
-            .then(r => vm.application = r.data));
+    vm.$onInit = () => {
+        determineIfRoadmapsAreEnabled();
+        loadData()
+            .then(() => serviceBroker.loadViewData(CORE_API.ApplicationStore.getById, [vm.parentEntityRef.id])
+                .then(r => vm.application = r.data));
+    };
 
 
     // -- INTERACT ---
@@ -128,7 +141,8 @@ function controller($q, serviceBroker) {
 
 controller.$inject = [
     "$q",
-    "ServiceBroker"
+    "ServiceBroker",
+    "SettingsService"
 ];
 
 
