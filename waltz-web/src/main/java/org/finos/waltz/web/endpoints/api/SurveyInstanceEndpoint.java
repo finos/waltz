@@ -78,6 +78,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
         String ownerPath = mkPath(BASE_URL, ":id", "owner");
         String deleteOwnerPath = mkPath(BASE_URL, ":id", "owner", ":personId");
         String reportProblemWithQuestionResponsePath = mkPath(BASE_URL, ":id", "response", ":questionId", "problem");
+        String copyResponsesPath = mkPath(BASE_URL, ":id", "copy-responses");
 
         DatumRoute<SurveyInstance> getByIdRoute =
                 (req, res) -> surveyInstanceService.getById(getId(req));
@@ -114,6 +115,11 @@ public class SurveyInstanceEndpoint implements Endpoint {
 
         ListRoute<SurveyInstanceAction> findPossibleActionsRoute =
                 (req, res) -> surveyInstanceService.findPossibleActionsForInstance(getUsername(req), getId(req));
+
+        DatumRoute<Integer> copyResponsesRoute = (req, res) -> {
+            CopySurveyResponsesCommand cloneCommand = readBody(req, CopySurveyResponsesCommand.class);
+            return surveyInstanceService.copyResponses(getId(req), cloneCommand, getUsername(req));
+        };
 
         DatumRoute<Boolean> saveResponseRoute = (req, res) -> {
             String userName = getUsername(req);
@@ -233,6 +239,7 @@ public class SurveyInstanceEndpoint implements Endpoint {
         deleteForDatum(deleteRecipientPath, deleteRecipientRoute);
         deleteForDatum(deleteOwnerPath, deleteOwnerRoute);
         postForDatum(reportProblemWithQuestionResponsePath, reportProblemWithQuestionResponseRoute);
+        postForDatum(copyResponsesPath, copyResponsesRoute);
     }
 
 }

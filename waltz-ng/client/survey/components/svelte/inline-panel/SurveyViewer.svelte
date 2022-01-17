@@ -13,17 +13,24 @@
     import SurveyViewerContextPanel from "./SurveyViewerContextPanel.svelte";
     import {surveyInstanceViewStore} from "../../../../svelte-stores/survey-instance-view-store";
     import {surveyInstanceStore} from "../../../../svelte-stores/survey-instance-store";
-
+    import CopySurveyResponsesPanel from "./CopySurveyResponsesPanel.svelte";
 
     export let primaryEntityRef;
+
+    const Modes = {
+        CONTEXT: "CONTEXT",
+        COPY_RESPONSES: "COPY_RESPONSES"
+    }
+
+    let activeMode = Modes.CONTEXT
 
     let instanceCall, formDetailsCall, responsesCall;
 
     $: {
         if (primaryEntityRef) {
-            instanceCall = surveyInstanceViewStore.getInfoById(primaryEntityRef.id);
-            formDetailsCall = surveyInstanceViewStore.getFormDetailsById(primaryEntityRef.id);
-            responsesCall = surveyInstanceStore.findResponses(primaryEntityRef.id);
+            instanceCall = surveyInstanceViewStore.getInfoById(primaryEntityRef.id, true);
+            formDetailsCall = surveyInstanceViewStore.getFormDetailsById(primaryEntityRef.id, true);
+            responsesCall = surveyInstanceStore.findResponses(primaryEntityRef.id, true);
         }
     }
 
@@ -36,6 +43,7 @@
         : $groupedQuestions;
 
     function onChangeInstance(d) {
+        activeMode = Modes.CONTEXT;
         primaryEntityRef = Object.assign({}, primaryEntityRef, {id: d.detail});
     }
 
@@ -88,8 +96,13 @@
     {#if primaryEntityRef}
     <div class="col-sm-4"
          style="padding-left: 0">
-        <SurveyViewerContextPanel on:select={onChangeInstance}
-                                  instanceId={primaryEntityRef.id}/>
+        {#if activeMode === Modes.CONTEXT}
+            <SurveyViewerContextPanel on:select={onChangeInstance}
+                                      on:showCloneWidget={() => activeMode = Modes.COPY_RESPONSES}
+                                      instanceId={primaryEntityRef.id}/>
+        {:else if activeMode === Modes.COPY_RESPONSES}
+            <CopySurveyResponsesPanel on:cancel={() => activeMode = Modes.CONTEXT}/>
+        {/if}
     </div>
     {/if}
 </div>

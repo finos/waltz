@@ -117,7 +117,8 @@
                     <li>
                         <ViewLink state="main.survey.instance.edit"
                                   ctx={{id: instanceId}}>
-                            <button class="btn btn-xs btn-primary">
+                            <button class="btn btn-xs btn-primary"
+                                    title="Edit survey responses">
                                 <Icon name="pencil"/>
                                 Edit
                             </button>
@@ -127,6 +128,7 @@
                 {#each actionList as action}
                     <li>
                         <button class={mkButtonClasses(action)}
+                                title={action.description}
                                 disabled={action.completionRequirement === "REQUIRE_FULL_COMPLETION" && hasMandatoryQuestionsWithoutResponse}
                                 on:click={() => initiateAction(action, instanceId)}>
                             <Icon name={action.icon}/>

@@ -19,17 +19,14 @@
 package org.finos.waltz.data.survey;
 
 
-import org.finos.waltz.schema.Tables;
-import org.finos.waltz.schema.tables.records.SurveyQuestionListResponseRecord;
-import org.finos.waltz.schema.tables.records.SurveyQuestionResponseRecord;
 import org.finos.waltz.common.DateTimeUtilities;
 import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityReference;
-import org.finos.waltz.model.survey.ImmutableSurveyInstanceQuestionResponse;
-import org.finos.waltz.model.survey.ImmutableSurveyQuestionResponse;
-import org.finos.waltz.model.survey.SurveyInstanceQuestionResponse;
-import org.finos.waltz.model.survey.SurveyQuestionResponse;
+import org.finos.waltz.model.survey.*;
+import org.finos.waltz.schema.Tables;
+import org.finos.waltz.schema.tables.records.SurveyQuestionListResponseRecord;
+import org.finos.waltz.schema.tables.records.SurveyQuestionResponseRecord;
 import org.jooq.*;
 import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,23 +42,30 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 
-import static org.finos.waltz.schema.Tables.SURVEY_INSTANCE;
-import static org.finos.waltz.schema.Tables.SURVEY_QUESTION_LIST_RESPONSE;
-import static org.finos.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.*;
 import static org.finos.waltz.common.Checks.checkNotNull;
 import static org.finos.waltz.common.Checks.checkTrue;
 import static org.finos.waltz.common.CollectionUtilities.first;
+import static org.finos.waltz.common.ListUtilities.isEmpty;
 import static org.finos.waltz.common.ListUtilities.newArrayList;
 import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.common.StringUtilities.ifEmpty;
 import static org.finos.waltz.common.StringUtilities.join;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.schema.Tables.SURVEY_QUESTION_LIST_RESPONSE;
+import static org.finos.waltz.schema.Tables.SURVEY_RUN;
+import static org.finos.waltz.schema.tables.SurveyInstance.SURVEY_INSTANCE;
+import static org.finos.waltz.schema.tables.SurveyQuestionResponse.SURVEY_QUESTION_RESPONSE;
 import static org.jooq.lambda.tuple.Tuple.tuple;
 
 @Repository
 public class SurveyQuestionResponseDao {
+
+    private static final org.finos.waltz.schema.tables.SurveyQuestionResponse sqr = SURVEY_QUESTION_RESPONSE.as("sqr");
+    private static final org.finos.waltz.schema.tables.SurveyQuestionListResponse sqlr = SURVEY_QUESTION_LIST_RESPONSE.as("sqlr");
+    private static final org.finos.waltz.schema.tables.SurveyRun sr = SURVEY_RUN.as("sr");
+    private static final org.finos.waltz.schema.tables.SurveyInstance si = SURVEY_INSTANCE.as("si");
 
     private static final Field<String> entityNameField = InlineSelectFieldFactory.mkNameField(
             SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_ID,
@@ -338,9 +342,9 @@ public class SurveyQuestionResponseDao {
 
     public int deleteForSurveyRun(long surveyRunId) {
         Select<Record1<Long>> surveyInstanceIdSelector = dsl
-                .select(SURVEY_INSTANCE.ID)
-                .from(SURVEY_INSTANCE)
-                .where(SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId));
+                .select(Tables.SURVEY_INSTANCE.ID)
+                .from(Tables.SURVEY_INSTANCE)
+                .where(Tables.SURVEY_INSTANCE.SURVEY_RUN_ID.eq(surveyRunId));
 
         // this will also auto delete any survey_question_list_response records (fk delete cascade)
         return dsl
@@ -380,5 +384,162 @@ public class SurveyQuestionResponseDao {
                                         .orElse(null));
 
         return record;
+    }
+
+    public int copyResponses(Long sourceSurveyInstanceId,
+                                 CopySurveyResponsesCommand copyCommand,
+                                 Long personId) {
+
+        return dsl.transactionResult(configuration -> {
+            DSLContext tx = DSL.using(configuration);
+
+            SelectConditionStep<Record1<Long>> sourceTemplateId = tx
+                    .select(sr.SURVEY_TEMPLATE_ID)
+                    .from(si)
+                    .innerJoin(sr).on(si.SURVEY_RUN_ID.eq(sr.ID))
+                    .where(si.ID.eq(sourceSurveyInstanceId));
+
+            Table<Record1<Long>> targetInstanceIds = tx
+                    .select(si.ID)
+                    .from(si)
+                    .innerJoin(sr).on(si.SURVEY_RUN_ID.eq(sr.ID)
+                            .and(sr.SURVEY_TEMPLATE_ID.eq(sourceTemplateId)))
+                    .where(si.ID.in(copyCommand.targetSurveyInstanceIds()))
+                    .and(si.STATUS.in(SurveyInstanceStatus.NOT_STARTED.name(), SurveyInstanceStatus.IN_PROGRESS.name()))
+                    .asTable();
+
+            int questionResponsesCopiedCount = copySurveyQuestionResponses(
+                    tx,
+                    sourceSurveyInstanceId,
+                    targetInstanceIds,
+                    copyCommand,
+                    personId);
+
+            int questionListResponsesCopiedCount = copySurveyQuestionListResponses(
+                    tx,
+                    sourceSurveyInstanceId,
+                    targetInstanceIds,
+                    copyCommand,
+                    personId);
+
+            return questionResponsesCopiedCount;
+        });
+
+    }
+
+
+    private int copySurveyQuestionResponses(DSLContext tx,
+                                            Long sourceSurveyInstanceId,
+                                            Table<Record1<Long>> targetInstanceIds,
+                                            CopySurveyResponsesCommand copyCommand,
+                                            Long personId) {
+
+        Condition questionCondition = isEmpty(copyCommand.questionIds())
+                ? DSL.trueCondition()
+                : sqr.QUESTION_ID.in(copyCommand.questionIds());
+
+
+        if(copyCommand.overrideExistingResponses()){
+            tx
+                    .deleteFrom(sqr)
+                    .where(sqr.SURVEY_INSTANCE_ID.in(copyCommand.targetSurveyInstanceIds())
+                            .and(questionCondition))
+                    .execute();
+        }
+
+        org.finos.waltz.schema.tables.SurveyQuestionResponse existing_target_sqr = SURVEY_QUESTION_RESPONSE.as("existing_target_sqr");
+
+        SelectConditionStep<Record12<Long, Long, String, Boolean, BigDecimal, Date, Long, String, String, Timestamp, Long, String>> responsesToInsert = tx
+                .select(
+                        targetInstanceIds.field(si.ID).as("siId"),
+                        sqr.QUESTION_ID,
+                        sqr.STRING_RESPONSE,
+                        sqr.BOOLEAN_RESPONSE,
+                        sqr.NUMBER_RESPONSE,
+                        sqr.DATE_RESPONSE,
+                        sqr.ENTITY_RESPONSE_ID,
+                        sqr.ENTITY_RESPONSE_KIND,
+                        sqr.LIST_RESPONSE_CONCAT,
+                        DSL.val(DateTimeUtilities.nowUtcTimestamp()),
+                        DSL.val(personId).as("person_id"),
+                        sqr.COMMENT)
+                .from(sqr)
+                .crossJoin(targetInstanceIds)
+                .leftJoin(existing_target_sqr)
+                .on(sqr.QUESTION_ID.eq(existing_target_sqr.QUESTION_ID))
+                .and(targetInstanceIds.field(si.ID).eq(existing_target_sqr.SURVEY_INSTANCE_ID))
+                .where(sqr.SURVEY_INSTANCE_ID.eq(sourceSurveyInstanceId))
+                .and(questionCondition)
+                .and(existing_target_sqr.SURVEY_INSTANCE_ID.isNull());
+
+        return tx
+                .insertInto(SURVEY_QUESTION_RESPONSE)
+                .columns(
+                        SURVEY_QUESTION_RESPONSE.SURVEY_INSTANCE_ID,
+                        SURVEY_QUESTION_RESPONSE.QUESTION_ID,
+                        SURVEY_QUESTION_RESPONSE.STRING_RESPONSE,
+                        SURVEY_QUESTION_RESPONSE.BOOLEAN_RESPONSE,
+                        SURVEY_QUESTION_RESPONSE.NUMBER_RESPONSE,
+                        SURVEY_QUESTION_RESPONSE.DATE_RESPONSE,
+                        SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_ID,
+                        SURVEY_QUESTION_RESPONSE.ENTITY_RESPONSE_KIND,
+                        SURVEY_QUESTION_RESPONSE.LIST_RESPONSE_CONCAT,
+                        SURVEY_QUESTION_RESPONSE.LAST_UPDATED_AT,
+                        SURVEY_QUESTION_RESPONSE.PERSON_ID,
+                        SURVEY_QUESTION_RESPONSE.COMMENT)
+                .select(responsesToInsert)
+                .execute();
+    }
+
+
+    private int copySurveyQuestionListResponses(DSLContext tx,
+                                                Long sourceSurveyInstanceId,
+                                                Table<Record1<Long>> targetInstanceIds,
+                                                CopySurveyResponsesCommand copyCommand,
+                                                Long personId) {
+
+        Condition questionCondition = isEmpty(copyCommand.questionIds())
+                ? DSL.trueCondition()
+                : sqlr.QUESTION_ID.in(copyCommand.questionIds());
+
+
+        if(copyCommand.overrideExistingResponses()){
+            tx
+                    .deleteFrom(sqlr)
+                    .where(sqlr.SURVEY_INSTANCE_ID.in(copyCommand.targetSurveyInstanceIds())
+                            .and(questionCondition))
+                    .execute();
+        }
+
+        org.finos.waltz.schema.tables.SurveyQuestionListResponse existing_target_sqlr = SURVEY_QUESTION_LIST_RESPONSE.as("existing_target_sqlr");
+
+        SelectConditionStep<Record6<Long, Long, String, Integer, Long, String>> responsesToInsert = tx
+                .select(
+                        targetInstanceIds.field(si.ID).as("siId"),
+                        sqlr.QUESTION_ID,
+                        sqlr.RESPONSE,
+                        sqlr.POSITION,
+                        sqlr.ENTITY_ID,
+                        sqlr.ENTITY_KIND)
+                .from(sqlr)
+                .crossJoin(targetInstanceIds)
+                .leftJoin(existing_target_sqlr)
+                .on(sqlr.QUESTION_ID.eq(existing_target_sqlr.QUESTION_ID))
+                .and(targetInstanceIds.field(si.ID).eq(existing_target_sqlr.SURVEY_INSTANCE_ID))
+                .where(sqlr.SURVEY_INSTANCE_ID.eq(sourceSurveyInstanceId))
+                .and(questionCondition)
+                .and(existing_target_sqlr.SURVEY_INSTANCE_ID.isNull());
+
+        return tx
+                .insertInto(SURVEY_QUESTION_LIST_RESPONSE)
+                .columns(
+                        SURVEY_QUESTION_LIST_RESPONSE.SURVEY_INSTANCE_ID,
+                        SURVEY_QUESTION_LIST_RESPONSE.QUESTION_ID,
+                        SURVEY_QUESTION_LIST_RESPONSE.RESPONSE,
+                        SURVEY_QUESTION_LIST_RESPONSE.POSITION,
+                        SURVEY_QUESTION_LIST_RESPONSE.ENTITY_ID,
+                        SURVEY_QUESTION_LIST_RESPONSE.ENTITY_KIND)
+                .select(responsesToInsert)
+                .execute();
     }
 }

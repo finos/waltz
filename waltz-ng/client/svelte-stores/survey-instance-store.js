@@ -66,6 +66,9 @@ export function mkSurveyInstanceStore() {
     const updateApprovalDueDate = (id, updDate) => remote
         .execute("PUT",`api/survey-instance/${id}/approval-due-date`, toLocalDate(updDate));
 
+    const copyResponses = (id, copyCmd) => remote
+        .execute("POST",`api/survey-instance/${id}/copy-responses`, copyCmd);
+
 
     return {
         addOwner,
@@ -81,7 +84,8 @@ export function mkSurveyInstanceStore() {
         getPermissions,
         updateStatus,
         updateSubmissionDueDate,
-        updateApprovalDueDate
+        updateApprovalDueDate,
+        copyResponses
 
     };
 }
