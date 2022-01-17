@@ -47,6 +47,11 @@
         .filter(d => d.surveyInstance.status === 'NOT_STARTED' ||  d.surveyInstance.status === 'IN_PROGRESS')
         .filter(d => d.surveyTemplateRef?.id === templateId)
         .filter(d => d.surveyInstance?.id !== $surveyDetails?.surveyInstance?.id)
+        .groupBy(d => d.surveyInstance.id)
+        .map((v, k) => {
+            let roles = _.map(v, d => d.role);
+            return Object.assign({}, _.first(v), {roles});
+        })
         .value()
 
     $: completedQuestions = _.filter($formDetails?.activeQuestions, q => _.includes(questionsWithResponse, q.id));
@@ -91,6 +96,19 @@
             selectedQuestions = _.without(selectedQuestions, question)
         } else {
             selectedQuestions = _.concat(selectedQuestions, question);
+        }
+    }
+
+    function mkRoleTitle(survey) {
+        const isRecipient = _.includes(survey?.roles, "RECIPIENT");
+        const isOwner = _.includes(survey?.roles, "OWNER");
+
+        if (isRecipient && isOwner) {
+            return "You are both a recipient and owner of this survey";
+        } else if (isRecipient) {
+            return "You are a recipient of this survey";
+        } else if (isOwner) {
+            return "You are an owner of this survey";
         }
     }
 
@@ -167,7 +185,8 @@
                     {#each incompleteSurveys as survey}
                         <tr class="clickable"
                             class:selected={_.includes(selectedSurveys, survey)}
-                            on:click={() => selectSurvey(survey)}>
+                            on:click={() => selectSurvey(survey)}
+                            title={mkRoleTitle(survey)}>
                             <td>{survey.surveyRun.name}</td>
                             <td>{survey.surveyInstance.surveyEntity.name || '-'}</td>
                         </tr>
