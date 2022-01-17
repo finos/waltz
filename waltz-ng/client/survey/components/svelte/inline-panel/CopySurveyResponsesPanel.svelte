@@ -17,7 +17,7 @@
     let selectedSurveys = [];
     let selectedQuestions = [];
     let overrideExistingResponses = false;
-    let recentlyAlteredSurveys = [];
+    let surveysWithCopiedAnswers = [];
     let showRecentlyAltered = false;
 
     function cancel() {
@@ -71,7 +71,7 @@
 
         Promise.resolve(copyPromise)
             .then(r => {
-                recentlyAlteredSurveys = selectedSurveys;
+                surveysWithCopiedAnswers = selectedSurveys;
                 toasts.success("Successfully copied responses");
             })
             .then(r => {
@@ -223,12 +223,12 @@
         </span>
     </div>
 
-    {#if _.size(recentlyAlteredSurveys) > 0}
+    {#if _.size(surveysWithCopiedAnswers) > 0}
         <div style="padding-top: 1em">
 
             <NoData type="info">
                 <div class="help-block">
-                    You have {_.size(recentlyAlteredSurveys)} recently altered survey/s.
+                    You have copied responses to {_.size(surveysWithCopiedAnswers)} survey/s.
                     {#if !showRecentlyAltered}
                         <button class="btn btn-skinny"
                                 on:click={() => showRecentlyAltered = true}>
@@ -242,7 +242,7 @@
                     {/if}
                     {#if showRecentlyAltered}
                         <ul>
-                            {#each recentlyAlteredSurveys as survey}
+                            {#each surveysWithCopiedAnswers as survey}
                                 <li>
                                     <EntityLink ref={Object.assign({}, survey.surveyInstance, {name: survey.surveyInstance.surveyEntity.name})}/>
                                 </li>
