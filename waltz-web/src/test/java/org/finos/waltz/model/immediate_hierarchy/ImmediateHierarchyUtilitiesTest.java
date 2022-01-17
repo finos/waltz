@@ -21,7 +21,8 @@ package org.finos.waltz.model.immediate_hierarchy;
 import org.finos.waltz.common.ListUtilities;
 import org.finos.waltz.model.IdProvider;
 import org.finos.waltz.model.ParentIdProvider;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,8 +30,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static java.util.Optional.empty;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class ImmediateHierarchyUtilitiesTest {
 
@@ -126,14 +126,16 @@ public class ImmediateHierarchyUtilitiesTest {
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void selfMustBePresent() {
-        ImmediateHierarchyUtilities.build(-1, all);
+        assertThrows(IllegalArgumentException.class,
+                () -> ImmediateHierarchyUtilities.build(-1, all));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void mustHaveSomeUnits() {
-        ImmediateHierarchyUtilities.build(1, Collections.emptyList());
+        assertThrows(IllegalArgumentException.class,
+                () -> ImmediateHierarchyUtilities.build(1, Collections.emptyList()));
     }
 
 
