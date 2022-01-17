@@ -30,10 +30,7 @@ const initialState = {
 };
 
 
-function controller($q,
-                    $stateParams,
-                    serviceBroker,
-                    userService) {
+function controller($stateParams) {
 
     const vm = initialiseData(this, initialState);
     const id = $stateParams.id;
@@ -42,39 +39,11 @@ function controller($q,
         id,
         kind: "SURVEY_INSTANCE"
     };
-
-    SurveyUtils
-        .loadSurveyInfo($q, serviceBroker, userService, id)
-        .then(details => vm.surveyDetails = details);
-
-    const questionPromise = serviceBroker
-        .loadViewData(
-            CORE_API.SurveyQuestionStore.findQuestionsForInstance,
-            [ id ])
-        .then(r => r.data);
-
-    const responsePromise= serviceBroker
-        .loadViewData(
-            CORE_API.SurveyInstanceStore.findResponses,
-            [ id ])
-        .then(r => {
-            return r.data;
-        });
-
-    $q.all([questionPromise, responsePromise])
-        .then(([allQuestions, surveyResponses]) => {
-            vm.answersById = SurveyUtils.indexResponses(surveyResponses);
-            vm.groupedQuestions = SurveyUtils.groupQuestions(allQuestions);
-        });
-
 }
 
 
 controller.$inject = [
-    "$q",
     "$stateParams",
-    "ServiceBroker",
-    "UserService"
 ];
 
 

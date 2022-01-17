@@ -122,11 +122,13 @@ public abstract class BaseInMemoryIntegrationTest {
      *
      * The url to connect to is:
      *    jdbc:h2:tcp://localhost/mem:waltz
+     *    username: sa
+     *    password: sa
      */
 //    @After
     public void stickAround() {
         try {
-            System.err.println("Starting tcp server, connect with: jdbc:h2:tcp://localhost/mem:waltz");
+            System.err.println("Starting tcp server, connect with: jdbc:h2:tcp://localhost/mem:waltz, username: sa, password: sa");
             Server.createTcpServer().start();
             System.err.println("Sticking around for 2 hrs");
             Thread.sleep(TimeUnit.HOURS.toMillis(2));
