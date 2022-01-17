@@ -34,10 +34,22 @@ export function mkAttestationInstanceStore() {
             null)
     }
 
+
+    const getCountsOfRecipientsToReassign = (force = false) => {
+        return remote
+            .fetchViewData(
+                "GET",
+                "api/attestation-instance/reassign-counts",
+                null,
+                null,
+                {force})
+    }
+
     return {
         findByEntityRef,
         findLatestMeasurableAttestations,
-        reassignRecipients
+        reassignRecipients,
+        getCountsOfRecipientsToReassign
     };
 }
 

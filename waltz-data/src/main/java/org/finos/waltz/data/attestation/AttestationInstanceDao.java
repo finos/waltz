@@ -285,7 +285,7 @@ public class AttestationInstanceDao {
     }
 
 
-    public AttestationSyncRecipientsResponse findCountsOfRecipientsToReassign() {
+    public AttestationSyncRecipientsResponse getCountsOfRecipientsToReassign() {
 
         CommonTableExpression<?> attestationRunsWithInvKind = getAttestationRunsWithInvKindCTE();
         CommonTableExpression<Record2<Long, String>> runWithRequiredPeople = getRunsWithRequiredPeopleCTE(attestationRunsWithInvKind);
@@ -297,27 +297,24 @@ public class AttestationInstanceDao {
                 .transactionResult(ctx -> {
                     DSLContext tx = ctx.dsl();
 
-                    int toAdd = tx
-                            .fetchCount(DSL
-                                    .withRecursive(attestationRunsWithInvKind)
-                                    .with(runWithRequiredPeople)
-                                    .with(missingRecipients)
-                                    .select(missingRecipients.field("instance_id", Long.class),
-                                            missingRecipients.field(missingRecipients.field("user_id", String.class)))
-                                    .from(missingRecipients));
+                    Result<Record2<Long, String>> toAdd = tx
+                            .withRecursive(attestationRunsWithInvKind)
+                            .with(runWithRequiredPeople)
+                            .with(missingRecipients)
+                            .selectFrom(missingRecipients)
+                            .fetch();
 
-                    int toRemove = tx
-                            .fetchCount(DSL
-                                    .withRecursive(attestationRunsWithInvKind)
-                                    .with(runWithRequiredPeople)
-                                    .with(recipientsToRemove)
-                                    .with(attestationRecipientIds)
-                                    .select(attestationRecipientIds.field("id", Long.class))
-                                    .from(attestationRecipientIds));
+                    Result<Record1<Long>> toRemove = tx
+                            .withRecursive(attestationRunsWithInvKind)
+                            .with(runWithRequiredPeople)
+                            .with(recipientsToRemove)
+                            .with(attestationRecipientIds)
+                            .selectFrom(attestationRecipientIds)
+                            .fetch();
 
                     return ImmutableAttestationSyncRecipientsResponse.builder()
-                            .recipientsRemovedCount(Long.valueOf(toRemove))
-                            .recipientsCreatedCount(Long.valueOf(toAdd))
+                            .recipientsRemovedCount(Long.valueOf(toRemove.size()))
+                            .recipientsCreatedCount(Long.valueOf(toAdd.size()))
                             .build();
         });
     }

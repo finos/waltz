@@ -151,6 +151,11 @@ public class AttestationInstanceService {
     }
 
 
+    public AttestationSyncRecipientsResponse getCountsOfRecipientsToReassign() {
+        return attestationInstanceDao.getCountsOfRecipientsToReassign();
+    }
+
+
     private Select<Record1<Long>> mkIdSelector(IdSelectionOptions selectionOptions) {
         GenericSelector genericSelector = genericSelectorFactory.applyForKind(EntityKind.ATTESTATION, selectionOptions);
         return genericSelector.selector();

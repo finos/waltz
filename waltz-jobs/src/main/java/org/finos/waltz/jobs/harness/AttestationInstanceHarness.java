@@ -32,7 +32,7 @@ public class AttestationInstanceHarness {
 
         AttestationInstanceDao dao = ctx.getBean(AttestationInstanceDao.class);
 
-        AttestationSyncRecipientsResponse records = dao.reassignRecipients();
+        AttestationSyncRecipientsResponse records = dao.getCountsOfRecipientsToReassign();
 
         System.out.println(records);
 

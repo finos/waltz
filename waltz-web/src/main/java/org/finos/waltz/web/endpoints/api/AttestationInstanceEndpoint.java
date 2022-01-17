@@ -78,6 +78,7 @@ public class AttestationInstanceEndpoint implements Endpoint {
         String findApplicationAttestationSummaryForSelectorPath = mkPath(BASE_URL, "app-summary");
         String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
         String reassignRecipientsPath = mkPath(BASE_URL, "reassign-recipients");
+        String getCountsOfRecipientsToReassignPath = mkPath(BASE_URL, "reassign-counts");
 
         DatumRoute<Boolean> attestInstanceRoute =
                 (req, res) -> attestationInstanceService.attestInstance(
@@ -141,6 +142,7 @@ public class AttestationInstanceEndpoint implements Endpoint {
         postForList(findApplicationAttestationSummaryForSelectorPath, findApplicationAttestationSummaryForSelectorRoute);
         getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
         postForDatum(reassignRecipientsPath, this::reassignRecipientsRoute);
+        getForDatum(getCountsOfRecipientsToReassignPath, this::getCountsOfRecipientsToReassign);
     }
 
 
@@ -161,6 +163,11 @@ public class AttestationInstanceEndpoint implements Endpoint {
 
         LOG.info("User: {}, requested reassign recipients for attestations", username);
         return attestationInstanceService.reassignRecipients();
+    }
+
+
+    private AttestationSyncRecipientsResponse getCountsOfRecipientsToReassign(Request request, Response response) {
+        return attestationInstanceService.getCountsOfRecipientsToReassign();
     }
 
 

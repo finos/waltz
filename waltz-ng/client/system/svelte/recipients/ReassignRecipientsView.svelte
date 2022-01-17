@@ -1,21 +1,24 @@
 <script>
 
-import ViewLink from "../../../common/svelte/ViewLink.svelte";
-import PageHeader from "../../../common/svelte/PageHeader.svelte";
-import {attestationInstanceStore} from "../../../svelte-stores/attestation-instance-store";
-import toasts from "../../../svelte-stores/toast-store";
+    import ViewLink from "../../../common/svelte/ViewLink.svelte";
+    import PageHeader from "../../../common/svelte/PageHeader.svelte";
+    import {attestationInstanceStore} from "../../../svelte-stores/attestation-instance-store";
+    import toasts from "../../../svelte-stores/toast-store";
 
+    let attestationReassignmentsCall = attestationInstanceStore.getCountsOfRecipientsToReassign();
+    $: attestationReassignmentCounts = $attestationReassignmentsCall.data;
 
-function reassignRecipients() {
-    let reassignPromise = attestationInstanceStore.reassignRecipients();
+    function reassignRecipients() {
+        let reassignPromise = attestationInstanceStore.reassignRecipients();
 
-    Promise.resolve(reassignPromise)
-        .then(r => {
-            const counts = r.data;
-            toasts.success(`Successfully reassigned recipients. Recipients created: ${counts.recipientsCreatedCount}, Recipients removed: ${counts.recipientsRemovedCount}`);
-        })
-        .catch(e => toasts.error("Could not reassign recipients: " + e.error));
-}
+        Promise.resolve(reassignPromise)
+            .then(r => {
+                const counts = r.data;
+                toasts.success(`Successfully reassigned recipients. Recipients created: ${counts?.recipientsCreatedCount}, Recipients removed: ${counts?.recipientsRemovedCount}`);
+            })
+            .then(r => attestationReassignmentsCall = attestationInstanceStore.getCountsOfRecipientsToReassign(true))
+            .catch(e => toasts.error("Could not reassign recipients: " + e.error));
+    }
 
 </script>
 
@@ -33,6 +36,30 @@ function reassignRecipients() {
 
 
 <div class="waltz-page-summary waltz-page-summary-attach">
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-condensed">
+                <thead>
+                    <tr>
+                        <th>Entity</th>
+                        <th title="People who have an involvement for an entity with an open attestation but who are not assigned to the attestation">
+                            Missing Recipients
+                        </th>
+                        <th title="Attestation recipients who have since lost the involvement for that entity or are no longer active">
+                            Invalid Recipients
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Attestations</td>
+                        <td>{attestationReassignmentCounts?.recipientsCreatedCount}</td>
+                        <td>{attestationReassignmentCounts?.recipientsRemovedCount}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-12">
             <h4>Attestations</h4>
