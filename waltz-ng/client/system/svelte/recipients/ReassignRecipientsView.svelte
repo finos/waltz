@@ -3,9 +3,18 @@
 import ViewLink from "../../../common/svelte/ViewLink.svelte";
 import PageHeader from "../../../common/svelte/PageHeader.svelte";
 import {attestationInstanceStore} from "../../../svelte-stores/attestation-instance-store";
+import toasts from "../../../svelte-stores/toast-store";
+
 
 function reassignRecipients() {
-    attestationInstanceStore.reassignRecipients()
+    let reassignPromise = attestationInstanceStore.reassignRecipients();
+
+    Promise.resolve(reassignPromise)
+        .then(r => {
+            const counts = r.data;
+            toasts.success(`Successfully reassigned recipients. Recipients created: ${counts.recipientsCreatedCount}, Recipients removed: ${counts.recipientsRemovedCount}`);
+        })
+        .catch(e => toasts.error("Could not reassign recipients: " + e.error));
 }
 
 </script>
