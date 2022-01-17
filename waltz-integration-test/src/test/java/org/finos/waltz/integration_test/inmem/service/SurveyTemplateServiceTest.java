@@ -11,8 +11,8 @@ import org.finos.waltz.model.survey.*;
 import org.finos.waltz.service.survey.SurveyQuestionService;
 import org.finos.waltz.service.survey.SurveyTemplateService;
 import org.jooq.DSLContext;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +26,8 @@ import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkUserId
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
 import static org.finos.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Service
 public class SurveyTemplateServiceTest extends BaseInMemoryIntegrationTest {

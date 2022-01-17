@@ -40,7 +40,7 @@ public class EnumUtilities_parseEnumWithAliasesTest {
 
     @Test
     public void parseWithNullEnumClass(){
-        assertThrows(NullPointerException.class,
+        assertThrows(IllegalArgumentException.class,
                 ()->parseEnumWithAliases("a", null, null, al));
     }
 

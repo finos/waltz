@@ -18,7 +18,6 @@ public class Checks_checkNotEmptyTest {
     @Test
     public void sendEmpty(){
         String element = "";
-        Checks.checkNotEmpty(element, "Test");
         assertThrows(IllegalArgumentException.class, ()
                 -> Checks.checkNotEmpty(element, "Test"));
 

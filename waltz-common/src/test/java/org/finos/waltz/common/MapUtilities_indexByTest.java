@@ -57,7 +57,7 @@ public class MapUtilities_indexByTest {
     public void indexByToggledParamsWithNullList() {
         List<String> xs = null;
         assertThrows(IllegalArgumentException.class,
-                ()-> MapUtilities.indexBy(xs::indexOf, identity(), xs));
+                ()->MapUtilities.indexBy(x ->  xs.indexOf(x), identity(), xs));
     }
 
     @Test
@@ -104,7 +104,7 @@ public class MapUtilities_indexByTest {
     public void indexByDifferentParamsWithNullList() {
         List<String> xs = null;
         assertThrows(IllegalArgumentException.class,
-                ()-> MapUtilities.indexBy(xs::indexOf, identity(), xs, BinaryOperator.maxBy(Comparator.naturalOrder())));
+                ()-> MapUtilities.indexBy(x ->  xs.indexOf(x), identity(), xs, BinaryOperator.maxBy(Comparator.naturalOrder())));
     }
 
     @Test
@@ -117,7 +117,7 @@ public class MapUtilities_indexByTest {
    @Test
     public void indexByDifferentParamsWithNullBinFn() {
         List<String> xs = ListUtilities.newArrayList("bb", "aa", "b" );
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(NullPointerException.class,
                ()-> MapUtilities.indexBy(x ->  xs.indexOf(x), identity(), xs, null));
     }
 

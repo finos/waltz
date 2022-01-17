@@ -28,7 +28,7 @@ import org.finos.waltz.model.datatype.DataTypeDecorator;
 import org.finos.waltz.model.datatype.DataTypeUsageCharacteristics;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.service.data_type.DataTypeDecoratorService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
@@ -43,7 +43,8 @@ import static org.finos.waltz.common.SetUtilities.map;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DataTypeDecoratorServiceTest extends BaseInMemoryIntegrationTest {
 

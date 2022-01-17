@@ -25,7 +25,7 @@ import org.finos.waltz.integration_test.inmem.BaseInMemoryIntegrationTest;
 import org.finos.waltz.model.app_group.*;
 import org.finos.waltz.service.app_group.AppGroupService;
 import org.finos.waltz.service.app_group.AppGroupSubscription;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;
@@ -33,7 +33,7 @@ import java.util.Set;
 
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class AppGroupServiceTest extends BaseInMemoryIntegrationTest {
 
@@ -44,7 +44,7 @@ public class AppGroupServiceTest extends BaseInMemoryIntegrationTest {
     @Test
     public void getGroupDetailByIdReturnsNullIfNotFound() {
         AppGroupDetail grp = appGroupSvc.getGroupDetailById(-1);
-        assertNull("expect null if group does not exist", grp);
+        assertNull(grp, "expect null if group does not exist");
     }
 
 
@@ -52,10 +52,10 @@ public class AppGroupServiceTest extends BaseInMemoryIntegrationTest {
     public void checkingDefaultsInNewlyCreatedGroup() {
         String userId = mkUserId("agtest");
         Long gid = appGroupSvc.createNewGroup(userId);
-        assertNotNull("Creating a new group gives it an id", gid);
+        assertNotNull(gid,"Creating a new group gives it an id");
 
         AppGroupDetail grp = appGroupSvc.getGroupDetailById(gid);
-        assertTrue("Newly created group has no applications", grp.applications().isEmpty());
+        assertTrue(grp.applications().isEmpty(),"Newly created group has no applications");
         assertTrue("Newly created group has no ou's", grp.organisationalUnits().isEmpty());
         assertEquals("Groups are private by default", AppGroupKind.PRIVATE, grp.appGroup().appGroupKind());
         assertEquals("Newly created group has one member", 1, grp.members().size());

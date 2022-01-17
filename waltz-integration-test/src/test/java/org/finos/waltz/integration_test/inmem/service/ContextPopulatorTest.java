@@ -17,7 +17,7 @@ import org.finos.waltz.schema.tables.records.RatingSchemeRecord;
 import org.finos.waltz.service.workflow.*;
 import org.jooq.DSLContext;
 import org.jooq.impl.DSL;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Optional;

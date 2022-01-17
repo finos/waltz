@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MapUtilities_composeTest {
 
@@ -38,12 +37,12 @@ public class MapUtilities_composeTest {
         assertEquals(0, result.size());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void simpleComposeWithNullMap1() {
         Map map1 = null;
         Map map2 = MapUtilities.newHashMap(1,'a',2,'b');
-        Map<Integer, Character> result = MapUtilities.compose(map1, map2);
-        assertEquals(0, result.size());
+        assertThrows(NullPointerException.class,
+                ()-> MapUtilities.compose(map1, map2));
     }
 
     @Test
@@ -56,11 +55,12 @@ public class MapUtilities_composeTest {
         assertEquals(Optional.empty(), java.util.Optional.ofNullable(result.get(2)));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void simpleComposeWithNullMap2() {
         Map map1 = MapUtilities.newHashMap(1,1,2,2);
         Map map2 = null;
-        MapUtilities.compose(map1, map2);
+        assertThrows(NullPointerException.class,
+                ()-> MapUtilities.compose(map1, map2));
     }
 
     @Test
@@ -71,10 +71,11 @@ public class MapUtilities_composeTest {
         assertEquals(0, result.size());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void simpleComposeWithAllNullMaps() {
         Map map1 = null;
         Map map2 = null;
-        MapUtilities.compose(map1, map2);
+        assertThrows(NullPointerException.class,
+                ()-> MapUtilities.compose(map1, map2));
     }
 }

@@ -166,7 +166,7 @@ public class RandomUtilities_randomPickTest {
     @Test
     public void randomPickWithListNull() {
         List<String> str = null;
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(NullPointerException.class,
                 ()->  randomPick(str));
     }
 }

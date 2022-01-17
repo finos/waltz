@@ -36,7 +36,7 @@ import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.finos.waltz.service.physical_flow.PhysicalFlowService;
 import org.finos.waltz.service.physical_specification.PhysicalSpecificationService;
 import org.finos.waltz.service.physical_specification_definition.PhysicalSpecDefinitionService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
@@ -53,7 +53,8 @@ import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.model.entity_search.EntitySearchOptions.mkForEntity;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PhysicalSpecificationServiceTest extends BaseInMemoryIntegrationTest {
 

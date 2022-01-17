@@ -30,8 +30,8 @@ import org.finos.waltz.schema.Tables;
 import org.finos.waltz.service.attestation.AttestationPreCheckService;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.jooq.DSLContext;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -178,7 +178,7 @@ public class AttestationPreCheckServiceTest extends BaseInMemoryIntegrationTest 
     }
 
 
-    @After
+    @AfterEach
     public void removeExemptionGroups() {
         dsl.deleteFrom(Tables.APPLICATION_GROUP)
                 .where(APPLICATION_GROUP.EXTERNAL_ID.eq(AttestationPreCheckDao.GROUP_LOGICAL_FLOW_ATTESTATION_EXEMPT_FROM_FLOW_COUNT_CHECK))

@@ -21,8 +21,7 @@ public class PredicateUtilities_notTest {
 
     @Test
     public void simpleNotNullPredicate(){
-
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(NullPointerException.class,
                 ()-> PredicateUtilities.not(null));
     }
 }

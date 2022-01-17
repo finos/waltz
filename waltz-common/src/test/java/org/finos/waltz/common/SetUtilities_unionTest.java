@@ -34,7 +34,7 @@ public class SetUtilities_unionTest {
     public void simpleUnionWithOneNullColl(){
         Collection<String> coll1 = ListUtilities.newArrayList("a");
         Collection<String> coll2 = null;
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(NullPointerException.class,
                 ()->  SetUtilities.union(coll1,coll2));
     }
 
@@ -50,7 +50,6 @@ public class SetUtilities_unionTest {
     public void simpleUnionWithTwoNullColl(){
         Collection<String> coll1 = null;
         Collection<String> coll2 = null;
-        SetUtilities.union(coll1,coll2);
         assertThrows(NullPointerException.class,
                 ()->  SetUtilities.union(coll1,coll2));
     }

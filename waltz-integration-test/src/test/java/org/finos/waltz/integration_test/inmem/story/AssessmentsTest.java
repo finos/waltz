@@ -19,7 +19,7 @@ import org.finos.waltz.model.rating.ImmutableRatingSchemeItem;
 import org.finos.waltz.service.assessment_definition.AssessmentDefinitionService;
 import org.finos.waltz.service.assessment_rating.AssessmentRatingService;
 import org.finos.waltz.service.rating_scheme.RatingSchemeService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
@@ -27,7 +27,8 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.finos.waltz.common.CollectionUtilities.find;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AssessmentsTest extends BaseInMemoryIntegrationTest {
 

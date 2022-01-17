@@ -33,7 +33,7 @@ import org.finos.waltz.service.attestation.AttestationInstanceService;
 import org.finos.waltz.service.attestation.AttestationRunService;
 import org.jooq.DSLContext;
 import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
@@ -46,7 +46,8 @@ import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkUserId
 import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.finos.waltz.schema.tables.AttestationInstance.ATTESTATION_INSTANCE;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
 

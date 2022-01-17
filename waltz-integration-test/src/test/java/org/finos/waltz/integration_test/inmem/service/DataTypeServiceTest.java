@@ -29,7 +29,7 @@ import org.finos.waltz.model.entity_search.EntitySearchOptions;
 import org.finos.waltz.model.entity_search.ImmutableEntitySearchOptions;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.service.data_type.DataTypeService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
@@ -39,7 +39,8 @@ import java.util.Set;
 import static java.util.Collections.emptyList;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.common.SetUtilities.map;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DataTypeServiceTest extends BaseInMemoryIntegrationTest {
 

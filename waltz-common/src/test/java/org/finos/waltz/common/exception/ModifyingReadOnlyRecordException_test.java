@@ -12,7 +12,7 @@ public class ModifyingReadOnlyRecordException_test {
 
     @Test
     public void modifyingReadOnlyRecordExceptionMessage() throws Exception {
-        Throwable exception = assertThrows(InsufficientPrivelegeException.class, () -> {
+        Throwable exception = assertThrows(ModifyingReadOnlyRecordException.class, () -> {
             System.out.println("=======Starting Exception process=======");
             throw new ModifyingReadOnlyRecordException("503","Modifying Read Only Record");
         });

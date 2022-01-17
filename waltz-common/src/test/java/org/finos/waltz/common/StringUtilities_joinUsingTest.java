@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class StringUtilities_joinUsingTest {
 
@@ -32,47 +33,30 @@ public class StringUtilities_joinUsingTest {
         assertEquals("", StringUtilities.joinUsing(coll, x->x.toString()+x.toString(),","));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void simpleJoinUsingWithNullColl(){
         Collection coll = null;
-        StringUtilities.joinUsing(coll, x->x.toString()+x.toString(),",");
-        /*
-
         assertThrows(NullPointerException.class,
-                ()->  StringUtilities.join(coll,","));
-         */
+                ()-> StringUtilities.joinUsing(coll, x->x.toString()+x.toString(),","));
     }
 
     @Test
     public void simpleJoinUsingWithTwoEmpty(){
         Collection coll = ListUtilities.newArrayList();
         assertEquals("", StringUtilities.joinUsing(coll, x->x.toString()+x.toString(),""));
-        /*
-
-        assertThrows(NullPointerException.class,
-                ()->  StringUtilities.join(coll,","));
-         */
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void simpleJoinUsingWithTwoNull(){
         Collection coll = null;
-       StringUtilities.joinUsing(coll, x->x.toString()+x.toString(),null);
-       /*
-
         assertThrows(NullPointerException.class,
-                ()->  StringUtilities.join(coll,","));
-         */
+                ()-> StringUtilities.joinUsing(coll, x->x.toString()+x.toString(),null));
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void simpleJoinUsingWithAllNull(){
         Collection coll = null;
-        StringUtilities.joinUsing(coll, null,null);
-        /*
-
         assertThrows(NullPointerException.class,
-                ()->  StringUtilities.join(coll,","));
-         */
+                ()->  StringUtilities.joinUsing(coll, null,null));
     }
 }

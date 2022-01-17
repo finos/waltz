@@ -6,8 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MapUtilities_countByTest {
 
@@ -37,15 +36,11 @@ public class MapUtilities_countByTest {
         assertTrue(result.isEmpty());
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void simpleCountByWithNullFunc() {
         List<String> xs = ListUtilities.newArrayList("aa", "bb", "b" , "ccc");
-        Map<Object, Long> result = MapUtilities.countBy(null, xs);
-        /*
-
         assertThrows(NullPointerException.class,
-                ()->  StringUtilities.join(coll,","));
-         */
+                ()-> MapUtilities.countBy(null, xs));
     }
 
     @Test

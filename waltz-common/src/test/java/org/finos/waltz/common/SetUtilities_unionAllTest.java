@@ -24,8 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SetUtilities_unionAllTest {
 
@@ -35,14 +34,10 @@ public class SetUtilities_unionAllTest {
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void cannotUnionAllNull() {
-        SetUtilities.unionAll(null);
-        /*
-
-        assertThrows(NullPointerException.class,
-                ()->  StringUtilities.join(coll,","));
-         */
+        assertThrows(IllegalArgumentException.class,
+                ()-> SetUtilities.unionAll(null));
     }
 
 

@@ -29,7 +29,7 @@ import org.finos.waltz.model.bookmark.Bookmark;
 import org.finos.waltz.model.bookmark.BookmarkKindValue;
 import org.finos.waltz.model.bookmark.ImmutableBookmark;
 import org.finos.waltz.service.bookmark.BookmarkService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;

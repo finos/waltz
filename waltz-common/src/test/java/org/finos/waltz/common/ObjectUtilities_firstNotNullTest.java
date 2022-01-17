@@ -3,6 +3,7 @@ package org.finos.waltz.common;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class ObjectUtilities_firstNotNullTest {
 
@@ -34,10 +35,10 @@ public class ObjectUtilities_firstNotNullTest {
         assertEquals(null, result);
     }
 
-    @Test(expected = NullPointerException.class)
+    @Test
     public void firstNotNullWithNullArray() {
         String[] ele = null;
-        String result = ObjectUtilities.firstNotNull(ele);
-        assertEquals(null, result);
+        assertThrows(NullPointerException.class,
+                ()-> ObjectUtilities.firstNotNull(ele));
     }
 }

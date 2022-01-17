@@ -30,7 +30,7 @@ import org.finos.waltz.model.logical_flow.ImmutableAddLogicalFlowCommand;
 import org.finos.waltz.model.logical_flow.LogicalFlow;
 import org.finos.waltz.service.logical_flow.LogicalFlowService;
 import org.jooq.lambda.tuple.Tuple2;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collection;
@@ -46,7 +46,8 @@ import static org.finos.waltz.model.EntityReference.mkRef;
 import static org.finos.waltz.model.HierarchyQueryScope.CHILDREN;
 import static org.finos.waltz.model.IdSelectionOptions.mkOpts;
 import static org.jooq.lambda.tuple.Tuple.tuple;
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class LogicalFlowServiceTest extends BaseInMemoryIntegrationTest {
 
