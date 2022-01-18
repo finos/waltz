@@ -32,6 +32,7 @@ import AssessmentDefinitionsView from "./assessment-defintions-view";
 import RatingSchemesView from "./rating-schemes-view";
 import EudaListView from "./euda-list-view";
 import RelationshipKindsView from "./relationship-kinds-view";
+import ReassignRecipientsView from "./reassign-recipients-view";
 
 
 const baseState = {
@@ -66,6 +67,12 @@ const orphansState = {
 const recalculateState = {
     url: "/recalculate",
     views: { "content@": RecalculateView }
+};
+
+
+const reassignRecipientsState = {
+    url: "/reassign-recipients",
+    views: { "content@": ReassignRecipientsView }
 };
 
 
@@ -131,7 +138,8 @@ function setupRoutes($stateProvider) {
         .state("main.system.rating-schemes", ratingSchemesState)
         .state("main.system.euda-list", eudaListState)
         .state("main.system.relationship-kinds", relationshipKindsState)
-        .state("main.system.recalculate", recalculateState);
+        .state("main.system.recalculate", recalculateState)
+        .state("main.system.reassign-recipients", reassignRecipientsState);
 }
 
 
