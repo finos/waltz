@@ -580,8 +580,6 @@ public class ReportGridDao {
                             DSL.cast(SURVEY_QUESTION_RESPONSE.NUMBER_RESPONSE, String.class),
                             DSL.cast(SURVEY_QUESTION_RESPONSE.DATE_RESPONSE, String.class),
                             DSL.cast(SURVEY_QUESTION_RESPONSE.LIST_RESPONSE_CONCAT, String.class)).as("response")) // for entity responses need to join entity name field
-                    // this is missing measurable multi select responses, can use the
-                    // response field from survey_question_list_response to avoid entity name selects...
                     .from(SURVEY_QUESTION)
                     .innerJoin(SURVEY_QUESTION_RESPONSE)
                     .on(SURVEY_QUESTION.ID.eq(SURVEY_QUESTION_RESPONSE.QUESTION_ID))
