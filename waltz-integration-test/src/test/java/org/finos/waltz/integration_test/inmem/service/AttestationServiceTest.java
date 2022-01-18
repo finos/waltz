@@ -104,7 +104,6 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-//    @Ignore
     public void basicRetrieval() {
 
         long invId = involvementHelper.mkInvolvementKind(mkName("basicRetrieval"));
