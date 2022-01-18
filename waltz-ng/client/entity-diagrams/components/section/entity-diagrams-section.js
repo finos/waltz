@@ -47,10 +47,14 @@ function combineDiagrams(flowDiagrams = [],
                          processDiagrams = [],
                          flowActions = []) {
 
+    const flowDiagramUiState = kindToViewState("FLOW_DIAGRAM");
+    const processDiagramUiState = kindToViewState("PROCESS_DIAGRAM");
+
     const convertFlowDiagramFn = d => {
         return {
             id: refToString(d),
             ref: toEntityRef(d),
+            uiState: flowDiagramUiState,
             type: "Flow",
             name: d.name,
             icon: "random",
@@ -65,6 +69,7 @@ function combineDiagrams(flowDiagrams = [],
         return {
             id: refToString(d),
             ref: toEntityRef(d),
+            uiState: processDiagramUiState,
             type: "Process",
             name: d.name,
             icon: "cogs",
@@ -121,9 +126,6 @@ function controller($q,
             [ vm.parentEntityRef ],
             { force  })
         .then(r => r.data);
-
-
-
 
     const flowActions = [
         {

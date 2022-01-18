@@ -69,7 +69,21 @@
                     class="waltz-animate-repeat">
                     <td>
                         <!-- NAME -->
-                        <a ng-click="$ctrl.onDiagramSelect(diagram)"
+                        <!-- if the diagram has a corresponding ui state go to it -->
+                        <a ng-if="diagram.uiState"
+                           ui-sref="{{diagram.uiState}} ({id: diagram.ref.id })">
+                            <waltz-icon name="{{ diagram.icon }}"></waltz-icon>
+                            <span uib-popover-template="'weds-popover'"
+                                  popover-trigger="mouseenter"
+                                  popover-append-to-body="true"
+                                  popover-enable="diagram.description"
+                                  popover-placement="right"
+                                  ng-bind="diagram.name">
+                            </span>
+                        </a>
+                        <!-- if the diagram does not have a corresponding ui state assume the JS will handle it -->
+                        <a ng-if="!diagram.uiState"
+                           ng-click="$ctrl.onDiagramSelect(diagram)"
                            class="clickable">
                             <waltz-icon name="{{ diagram.icon }}"></waltz-icon>
                             <span uib-popover-template="'weds-popover'"
