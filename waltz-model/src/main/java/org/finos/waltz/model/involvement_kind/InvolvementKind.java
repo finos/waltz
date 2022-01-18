@@ -29,6 +29,7 @@ import org.immutables.value.Value;
 public abstract class InvolvementKind implements
         IdProvider,
         NameProvider,
+        ExternalIdProvider,
         DescriptionProvider,
         LastUpdatedProvider {
 
