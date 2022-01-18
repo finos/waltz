@@ -24,6 +24,7 @@ import static org.finos.waltz.common.StringUtilities.lower;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.schema.Tables.SURVEY_QUESTION_RESPONSE;
 import static org.finos.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
 import static org.finos.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
 import static org.junit.Assert.*;
@@ -194,6 +195,7 @@ public class SurveyTemplateServiceTest extends BaseInMemoryIntegrationTest {
 
     @After
     public void teardown() {
+        dsl.deleteFrom(SURVEY_QUESTION_RESPONSE).execute();
         dsl.deleteFrom(SURVEY_QUESTION).execute();
         dsl.deleteFrom(SURVEY_TEMPLATE).execute();
     }

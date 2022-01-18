@@ -32,6 +32,7 @@ public class InvolvementHelper {
         InvolvementKindCreateCommand cmd = ImmutableInvolvementKindCreateCommand.builder()
                 .description(name)
                 .name(name)
+                .externalId(name)
                 .build();
         return involvementKindService.create(cmd, NameHelper.mkUserId("involvementHelper"));
     }
