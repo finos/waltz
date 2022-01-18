@@ -57,7 +57,7 @@
 
 
 {#if _.size(versions) > 1}
-    <h5>
+    <h5 style="padding-top: 1em;">
         <Icon name="history"/>
         Versions
     </h5>
