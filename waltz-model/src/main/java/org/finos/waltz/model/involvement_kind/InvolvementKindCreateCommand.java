@@ -21,6 +21,7 @@ package org.finos.waltz.model.involvement_kind;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.finos.waltz.model.DescriptionProvider;
+import org.finos.waltz.model.ExternalIdProvider;
 import org.finos.waltz.model.NameProvider;
 import org.finos.waltz.model.command.Command;
 import org.immutables.value.Value;
@@ -29,6 +30,10 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableInvolvementKindCreateCommand.class)
 @JsonDeserialize(as = ImmutableInvolvementKindCreateCommand.class)
-public abstract class InvolvementKindCreateCommand implements Command, NameProvider, DescriptionProvider {
+public abstract class InvolvementKindCreateCommand implements
+        Command,
+        NameProvider,
+        DescriptionProvider,
+        ExternalIdProvider {
 
 }

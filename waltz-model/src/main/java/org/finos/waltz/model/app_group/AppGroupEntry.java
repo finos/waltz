@@ -10,5 +10,7 @@ import org.immutables.value.Value;
 @Value.Immutable
 @JsonSerialize(as = ImmutableAppGroupEntry.class)
 @JsonDeserialize(as = ImmutableAppGroupEntry.class)
-public abstract class AppGroupEntry extends EntityReference implements ProvenanceProvider, IsReadOnlyProvider {
+public abstract class AppGroupEntry extends EntityReference implements
+        ProvenanceProvider,
+        IsReadOnlyProvider {
 }
