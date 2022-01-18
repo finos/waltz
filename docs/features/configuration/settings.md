@@ -61,10 +61,13 @@ Development options can be used by developers to aid in writing code for Waltz
 
 ## Features (```feature.*```)
 
-Features can be enabled/disabled and configured via settings.  Currently available options are:
+Features can be enabled/disabled and configured via settings.  Available options are:
 
-* ```feature.software-catalog.enabled```
-    * (```true|false```) display software-catalog (technology sections)
+* ```feature.data-extractor.entity-cost.enabled```
+    * (**`true`**|`false`) allow users to export asset costs (defaults to true)
+* ```feature.measurable-rating-roadmaps.enabled```
+    * (**`true`**|`false`) display links to roadmap pages (defaults to true)
+   
 
 
 ## General Settings (```settings.*```)

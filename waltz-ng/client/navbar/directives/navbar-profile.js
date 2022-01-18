@@ -21,6 +21,7 @@ import {CORE_API, getApiReference} from "../../common/services/core-api-utils";
 import template from "./navbar-profile.html";
 import roles from "../../user/system-roles";
 import ToastStore from "../../svelte-stores/toast-store"
+import namedSettings from "../../system/named-settings";
 
 const bindings = {
     logoOverlayText: "<"
@@ -32,7 +33,8 @@ const initialState = {
     user: null,
     showSysAdminMenuItem: false,
     notificationCountTotal: null,
-    notificationsCountsByKind: {}
+    notificationsCountsByKind: {},
+    roadmapsEnabled: true
 };
 
 
@@ -68,6 +70,12 @@ function controller($interval,
                     settingsService,
                     userService) {
     const vm = _.defaultsDeep(this, initialState);
+
+    settingsService
+        .findOrDefault(namedSettings.measurableRatingRoadmapsEnabled, true)
+        .then(isEnabled => {
+            vm.roadmapsEnabled = !(isEnabled === 'false');
+        });
 
     settingsService
         .findOrDefault("web.authentication", "")

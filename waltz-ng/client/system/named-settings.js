@@ -26,5 +26,6 @@ export default {
     defaultCurrency: "settings.asset-cost.default-currency",
     currentYearText: "settings.asset-cost.current-year-text",
     avatarTemplateUrl: "ui.avatar.template.url",
-    costExportEnabled: "feature.data-extractor.entity-cost.enabled"
+    costExportEnabled: "feature.data-extractor.entity-cost.enabled",
+    measurableRatingRoadmapsEnabled: "feature.measurable-rating-roadmaps.enabled"
 };
