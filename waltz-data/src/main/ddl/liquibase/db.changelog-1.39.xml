@@ -294,15 +294,4 @@
         </addColumn>
     </changeSet>
 
-    <changeSet id="20220117-5803-2"
-               author="davidwatkins73">
-        <update tableName="involvement_kind">
-            <column name="external_id"
-                    valueComputed="id">
-                <constraints nullable="false"
-                             unique="true"/>
-            </column>
-        </update>
-    </changeSet>
-
 </databaseChangeLog>
