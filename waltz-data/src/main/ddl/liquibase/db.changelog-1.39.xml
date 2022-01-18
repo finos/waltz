@@ -288,10 +288,8 @@
                author="davidwatkins73">
         <addColumn tableName="involvement_kind">
             <column name="external_id"
-                    type="${external-id.type}"
-                    defaultValue="TEMP">
-                <constraints nullable="false"
-                             unique="true"/>
+                    type="${external-id.type}">
+                <constraints nullable="true"/>
             </column>
         </addColumn>
     </changeSet>
@@ -300,7 +298,10 @@
                author="davidwatkins73">
         <update tableName="involvement_kind">
             <column name="external_id"
-                    valueComputed="id"/>
+                    valueComputed="id">
+                <constraints nullable="false"
+                             unique="true"/>
+            </column>
         </update>
     </changeSet>
 
