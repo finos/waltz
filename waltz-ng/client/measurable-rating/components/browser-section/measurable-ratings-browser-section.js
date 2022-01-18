@@ -21,6 +21,7 @@ import template from "./measurable-ratings-browser-section.html";
 import {CORE_API} from "../../../common/services/core-api-utils";
 import {mkSelectionOptions} from "../../../common/selector-utils";
 import * as _ from "lodash";
+import namedSettings from "../../../system/named-settings";
 
 /**
  * @name waltz-measurable-ratings-browser
@@ -37,16 +38,25 @@ const bindings = {
 
 
 const initialState = {
-    hasAllocations: false
+    hasAllocations: false,
+    roadmapsEnabled: true
 };
 
 
 
-function controller(serviceBroker) {
+function controller(serviceBroker, settingsService) {
     const vm = initialiseData(this, initialState);
 
-    vm.$onInit = () => {
+    function determineIfRoadmapsAreEnabled() {
+        settingsService
+            .findOrDefault(namedSettings.measurableRatingRoadmapsEnabled, true)
+            .then(isEnabled => {
+                vm.roadmapsEnabled = !(isEnabled === 'false');
+            });
+    }
 
+    vm.$onInit = () => {
+        determineIfRoadmapsAreEnabled();
         vm.selector = mkSelectionOptions(vm.parentEntityRef,
             undefined,
             undefined,
@@ -69,7 +79,8 @@ function controller(serviceBroker) {
 
 
 controller.$inject = [
-    "ServiceBroker"
+    "ServiceBroker",
+    "SettingsService"
 ];
 
 
