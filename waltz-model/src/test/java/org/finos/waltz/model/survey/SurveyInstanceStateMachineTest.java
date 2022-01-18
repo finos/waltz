@@ -3,15 +3,16 @@ package org.finos.waltz.model.survey;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.EntityLifecycleStatus;
 import org.finos.waltz.model.ImmutableEntityReference;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static org.finos.waltz.model.survey.SurveyInstanceAction.*;
 import static org.finos.waltz.model.survey.SurveyInstanceStatus.*;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
+
 
 public class SurveyInstanceStateMachineTest {
     private final SurveyInstancePermissions admin = ImmutableSurveyInstancePermissions.builder()
@@ -82,11 +83,12 @@ public class SurveyInstanceStateMachineTest {
         assertEquals(COMPLETED, state.process(SUBMITTING, participant, survey));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void permissionCheckRejects() {
         SurveyInstanceStateMachine state = SurveyInstanceStateMachineFactory.simple("APPROVED");
         assertEquals(IN_PROGRESS, state.process(REOPENING, participant, survey));
-        state.process(WITHDRAWING, participant, survey); // fails as only admin
+        assertThrows(IllegalArgumentException.class,
+                () -> state.process(WITHDRAWING, participant, survey)); // fails as only admin
     }
 
 }

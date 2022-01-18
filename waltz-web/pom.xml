@@ -30,7 +30,6 @@
 
     <properties>
         <skip.npm>false</skip.npm>
-        <archunit.version>0.22.0</archunit.version>
     </properties>
 
     <dependencies>
@@ -95,7 +94,6 @@
         <dependency>
             <groupId>com.tngtech.archunit</groupId>
             <artifactId>archunit</artifactId>
-            <version>${archunit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>

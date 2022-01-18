@@ -18,21 +18,26 @@
 
 package org.finos.waltz.model;
 
-import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class EntityLinkUtilitiesTest {
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void mkIdLink_kindCannotBeNull() {
-        EntityLinkUtilities.mkIdLink("test", null, 23L);
+
+        assertThrows(IllegalArgumentException.class,
+                () -> EntityLinkUtilities.mkIdLink("test", null, 23L));
     }
 
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void mkIdLink_idCannotBeNull() {
-        EntityLinkUtilities.mkIdLink("test", EntityKind.APPLICATION, null);
+        assertThrows(IllegalArgumentException.class,
+                () -> EntityLinkUtilities.mkIdLink("test", EntityKind.APPLICATION, null));
     }
 
 
