@@ -62,6 +62,7 @@ public class SurveyTemplateServiceTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void findAllReturnsEmptyListIfNoTemplates() {
+        templateHelper.deleteAllSurveyTemplate();
         String userId = mkUserId("findAllReturnsEmptyListIfNoTemplates");
         personHelper.createPerson(userId);
         List<SurveyTemplate> templates = surveyTemplateService.findAll(userId);
@@ -191,13 +192,4 @@ public class SurveyTemplateServiceTest extends BaseInMemoryIntegrationTest {
 
         assertEquals("Should have copied the question", 1, surveyQuestionService.findForSurveyTemplate(cloneId).size());
     }
-
-
-    @After
-    public void teardown() {
-        dsl.deleteFrom(SURVEY_QUESTION_RESPONSE).execute();
-        dsl.deleteFrom(SURVEY_QUESTION).execute();
-        dsl.deleteFrom(SURVEY_TEMPLATE).execute();
-    }
-
 }

@@ -6,8 +6,13 @@ import org.finos.waltz.model.ReleaseLifecycleStatus;
 import org.finos.waltz.model.survey.*;
 import org.finos.waltz.service.survey.SurveyQuestionService;
 import org.finos.waltz.service.survey.SurveyTemplateService;
+import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import static org.finos.waltz.schema.Tables.SURVEY_QUESTION_RESPONSE;
+import static org.finos.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
+import static org.finos.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
 
 @Service
 public class SurveyTemplateHelper {
@@ -18,6 +23,9 @@ public class SurveyTemplateHelper {
 
     @Autowired
     private SurveyQuestionService surveyQuestionService;
+
+    @Autowired
+    private DSLContext dsl;
 
 
     public long createTemplate(String userId, String templateName) {
@@ -52,5 +60,11 @@ public class SurveyTemplateHelper {
                 .build();
 
         return surveyQuestionService.create(question);
+    }
+
+    public void deleteAllSurveyTemplate() {
+        dsl.deleteFrom(SURVEY_QUESTION_RESPONSE).execute();
+        dsl.deleteFrom(SURVEY_QUESTION).execute();
+        dsl.deleteFrom(SURVEY_TEMPLATE).execute();
     }
 }
