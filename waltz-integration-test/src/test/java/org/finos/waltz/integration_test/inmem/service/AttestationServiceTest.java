@@ -40,6 +40,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.finos.waltz.common.CollectionUtilities.first;
+import static org.finos.waltz.common.CollectionUtilities.isEmpty;
 import static org.finos.waltz.common.SetUtilities.asSet;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
@@ -103,7 +104,6 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
     }
 
     @Test
-    @Ignore
     public void basicRetrieval() {
 
         long invId = involvementHelper.mkInvolvementKind(mkName("basicRetrieval"));
@@ -132,7 +132,7 @@ public class AttestationServiceTest extends BaseInMemoryIntegrationTest {
         System.out.println("-------------");
 
         List<AttestationInstance> instances = aiSvc.findByIdSelector(mkOpts(mkRef(EntityKind.ORG_UNIT, ouIds.a)));
-        assertFalse(instances.isEmpty());
+        assertFalse(isEmpty(instances));
     }
 
 
