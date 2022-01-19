@@ -12,7 +12,7 @@
     let selectedTemplate = null;
 
     $: templatesCall = surveyTemplateStore.findAll();
-    $: templates = $templatesCall.data;
+    $: templates = _.orderBy($templatesCall.data, d => d.name);
 
     $: questionsCall = selectedTemplate && surveyQuestionStore.findQuestionsForTemplate(selectedTemplate?.id)
     $: questions = $questionsCall?.data || [];
@@ -27,7 +27,7 @@
 
     const templateColumnDefs = [
         { field: "name", name: "Name", width: "40%"},
-        { field: "description", name: "Description", width: "60%"},
+        { field: "description", name: "Description", width: "60%", maxLength: 300},
     ];
 
     function selectTemplate(template) {
