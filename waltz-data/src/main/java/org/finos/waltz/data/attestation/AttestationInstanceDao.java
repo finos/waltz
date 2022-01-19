@@ -268,7 +268,6 @@ public class AttestationInstanceDao {
                 .innerJoin(ATTESTATION_RUN)
                 .on(ATTESTATION_RUN.ID.eq(ATTESTATION_INSTANCE.ATTESTATION_RUN_ID))
                 .where(ATTESTATION_INSTANCE.ID.in(selector))
-                .and(ATTESTATION_INSTANCE.ATTESTED_AT.isNotNull())
                 .fetch(TO_DOMAIN_MAPPER);
     }
 
