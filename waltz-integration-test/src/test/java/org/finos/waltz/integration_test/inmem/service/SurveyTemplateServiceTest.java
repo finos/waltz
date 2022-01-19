@@ -24,6 +24,7 @@ import static org.finos.waltz.common.StringUtilities.lower;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkName;
 import static org.finos.waltz.integration_test.inmem.helpers.NameHelper.mkUserId;
 import static org.finos.waltz.model.EntityReference.mkRef;
+import static org.finos.waltz.schema.Tables.SURVEY_QUESTION_RESPONSE;
 import static org.finos.waltz.schema.tables.SurveyQuestion.SURVEY_QUESTION;
 import static org.finos.waltz.schema.tables.SurveyTemplate.SURVEY_TEMPLATE;
 import static org.junit.Assert.*;
@@ -61,6 +62,7 @@ public class SurveyTemplateServiceTest extends BaseInMemoryIntegrationTest {
 
     @Test
     public void findAllReturnsEmptyListIfNoTemplates() {
+        templateHelper.deleteAllSurveyTemplate();
         String userId = mkUserId("findAllReturnsEmptyListIfNoTemplates");
         personHelper.createPerson(userId);
         List<SurveyTemplate> templates = surveyTemplateService.findAll(userId);
@@ -190,12 +192,4 @@ public class SurveyTemplateServiceTest extends BaseInMemoryIntegrationTest {
 
         assertEquals("Should have copied the question", 1, surveyQuestionService.findForSurveyTemplate(cloneId).size());
     }
-
-
-    @After
-    public void teardown() {
-        dsl.deleteFrom(SURVEY_QUESTION).execute();
-        dsl.deleteFrom(SURVEY_TEMPLATE).execute();
-    }
-
 }

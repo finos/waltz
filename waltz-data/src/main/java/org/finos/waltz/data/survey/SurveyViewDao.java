@@ -22,6 +22,7 @@ import org.finos.waltz.data.InlineSelectFieldFactory;
 import org.finos.waltz.model.EntityKind;
 import org.finos.waltz.model.HierarchyQueryScope;
 import org.finos.waltz.model.IdSelectionOptions;
+import org.finos.waltz.model.ReleaseLifecycleStatus;
 import org.finos.waltz.model.survey.*;
 import org.finos.waltz.schema.tables.records.SurveyInstanceRecord;
 import org.finos.waltz.schema.tables.records.SurveyRunRecord;
@@ -179,6 +180,7 @@ public class SurveyViewDao {
                 .where(SURVEY_INSTANCE_RECIPIENT.PERSON_ID.eq(personId))
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
                 .and(SURVEY_INSTANCE.STATUS.ne(SurveyInstanceStatus.WITHDRAWN.name()))
+                .and(SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name()))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 
@@ -202,6 +204,7 @@ public class SurveyViewDao {
                 .where(SURVEY_INSTANCE_OWNER.PERSON_ID.eq(personId))
                 .and(IS_ORIGINAL_INSTANCE_CONDITION)
                 .and(SURVEY_INSTANCE.STATUS.ne(SurveyInstanceStatus.WITHDRAWN.name()))
+                .and(SURVEY_TEMPLATE.STATUS.eq(ReleaseLifecycleStatus.ACTIVE.name()))
                 .fetchSet(TO_DOMAIN_MAPPER);
     }
 }

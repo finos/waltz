@@ -11,6 +11,7 @@ import org.finos.waltz.schema.tables.records.OrganisationalUnitRecord;
 import org.finos.waltz.service.entity_hierarchy.EntityHierarchyService;
 import org.h2.tools.Server;
 import org.jooq.DSLContext;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;

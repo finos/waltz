@@ -36,6 +36,7 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static org.finos.waltz.schema.tables.Involvement.INVOLVEMENT;
@@ -56,7 +57,7 @@ public class InvolvementKindDao {
                 .id(record.getId())
                 .name(record.getName())
                 .description(record.getDescription())
-                .externalId(record.getExternalId())
+                .externalId(Optional.ofNullable(record.getExternalId()))
                 .lastUpdatedAt(DateTimeUtilities.toLocalDateTime(record.getLastUpdatedAt()))
                 .lastUpdatedBy(record.getLastUpdatedBy())
                 .build();
