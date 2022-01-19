@@ -60,7 +60,8 @@ export function toEntityRef(obj, kind = obj.kind) {
         id: obj.id,
         kind,
         name: obj.name,
-        description: obj.description
+        description: obj.description,
+        entityLifecycleStatus: obj.entityLifecycleStatus
     };
 
     checkIsEntityRef(ref);

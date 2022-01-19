@@ -41,28 +41,43 @@
         <!-- Summary -->
         <div>
             <h4>Summary</h4>
-            <span ng-if="!$ctrl.searchSummary.notFound"
+            <div ng-if="!$ctrl.searchSummary.notFound"
                   class="text-success">
-                All identifers found, ready to save selection
-            </span>
+                <waltz-icon name="check"></waltz-icon>
+                All identifiers found, ready to save selection
+            </div>
 
-            <span ng-if="$ctrl.searchSummary.notFound > 0"
+            <div ng-if="$ctrl.searchSummary.notFound > 0"
                   class="text-danger">
+                <waltz-icon name="exclamation-triangle"></waltz-icon>
                 <span ng-bind="$ctrl.searchSummary.notFound" ></span>
-                identifer<span ng-if="$ctrl.searchSummary.notFound > 1">s</span>
+                identifier<span ng-if="$ctrl.searchSummary.notFound > 1">s</span>
                 <a class="clickable wbas-inline-link"
-                   ng-click="$ctrl.toggleNotFound()">not found</a>.
+                   ng-click="$ctrl.toggleNotFound()">
+                    not found
+                </a>.
 
                 Please review below and
                 <a class="clickable wbas-inline-link"
-                   ng-click="$ctrl.visibility.editor = true">correct</a>.
+                   ng-click="$ctrl.visibility.editor = true">
+                    correct
+                </a>.
 
                 <a class="clickable"
                    ng-if="$ctrl.showNotFoundOnly"
                    ng-click="$ctrl.toggleNotFound()">
                     show all
                 </a>
-            </span>
+            </div>
+
+            <div ng-if="$ctrl.searchSummary.removedEntityCount > 0"
+                  class="text-warning">
+                <waltz-icon name="exclamation-triangle"></waltz-icon>
+                Note, this list contains:
+                <span ng-bind="$ctrl.searchSummary.removedEntityCount"></span>
+                entities which are no longer active.
+            </div>
+
         </div>
 
         <br>
