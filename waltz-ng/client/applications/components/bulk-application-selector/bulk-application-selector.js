@@ -54,9 +54,25 @@ const initialState = {
 
 
 function mkSummary(searchResults = []) {
+    const basicStats = {
+        total: searchResults.length,
+        removedEntityCount: _
+            .chain(searchResults)
+            .filter(r => _.get(r, ["entityRef", "entityLifecycleStatus"]) === 'REMOVED')
+            .size()
+            .value()
+    };
+
+    const countsByFoundStatus = _.countBy(
+        searchResults,
+        r => r.entityRef == null || r.rating === undefined
+            ? "notFound"
+            : "found");
+
     return Object.assign(
-        { total: searchResults.length },
-        _.countBy(searchResults, r => r.entityRef == null ? 'notFound' : 'found'));
+        {},
+        basicStats,
+        countsByFoundStatus);
 }
 
 
@@ -75,7 +91,8 @@ function findMatchedApps(apps = [], identifiers = [], existingRefs = []) {
     const appsByAssetCode = _.keyBy(apps, 'assetCode');
     const existingRefsById = _.keyBy(existingRefs, 'id');
 
-    const newAndExistingApps = _.chain(identifiers)
+    return _
+        .chain(identifiers)
         .map(identifier => {
             const app = appsByAssetCode[identifier];
             const entityRef = app ? toEntityRef(app, 'APPLICATION') : null;
@@ -87,8 +104,6 @@ function findMatchedApps(apps = [], identifiers = [], existingRefs = []) {
             };
         })
         .value();
-
-    return newAndExistingApps;
 }
 
 
