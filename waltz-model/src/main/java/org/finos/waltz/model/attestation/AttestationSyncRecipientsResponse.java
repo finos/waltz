@@ -16,25 +16,26 @@
  *
  */
 
-package org.finos.waltz.model.involvement_kind;
+package org.finos.waltz.model.attestation;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.finos.waltz.model.*;
+import org.finos.waltz.model.EntityKind;
+import org.finos.waltz.model.EntityReference;
+import org.finos.waltz.model.IdProvider;
+import org.finos.waltz.model.Nullable;
 import org.immutables.value.Value;
 
-@Value.Immutable
-@JsonSerialize(as = ImmutableInvolvementKind.class)
-@JsonDeserialize(as = ImmutableInvolvementKind.class)
-public abstract class InvolvementKind implements
-        IdProvider,
-        NameProvider,
-        ExternalIdProvider,
-        DescriptionProvider,
-        LastUpdatedProvider {
+import java.time.LocalDateTime;
+import java.util.Optional;
 
-    @Value.Default
-    public EntityKind kind() {
-        return EntityKind.INVOLVEMENT_KIND;
-    }
+@Value.Immutable
+@JsonSerialize(as = ImmutableAttestationSyncRecipientsResponse.class)
+@JsonDeserialize(as = ImmutableAttestationSyncRecipientsResponse.class)
+public abstract class AttestationSyncRecipientsResponse {
+
+    public abstract Long recipientsCreatedCount();
+    public abstract Long recipientsRemovedCount();
+
 }
+

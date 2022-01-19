@@ -679,5 +679,13 @@ public class ReportGridDao {
                 .where(isOwner)
                 .fetchSet(r -> mkReportGridDefinition(rgcd.REPORT_GRID_ID.eq(r.get(rg.ID)), r.into(REPORT_GRID)));
     }
+
+
+    public boolean remove(long gridId) {
+        return dsl
+                .deleteFrom(REPORT_GRID)
+                .where(REPORT_GRID.ID.eq(gridId))
+                .execute() == 1;
+    }
 }
 

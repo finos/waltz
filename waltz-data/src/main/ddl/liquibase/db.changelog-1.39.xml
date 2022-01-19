@@ -46,6 +46,7 @@
         </update>
     </changeSet>
 
+
     <!-- 5678: Move owner_id to new survey_instance_owner table   -->
     <changeSet author="woodjes"
                id="20211108-5678-1">
@@ -119,6 +120,7 @@
                     columnName="owner_id"/>
     </changeSet>
 
+
     <!-- 5786: Add owner_kind_ids column to survey run -->
     <changeSet id="20211117-5768-1"
                author="woodjes">
@@ -130,6 +132,7 @@
             </column>
         </addColumn>
     </changeSet>
+
 
     <!-- 5776: Add due date for submission and approval to survey instance -->
     <changeSet id="20211118-5776-1"
@@ -195,6 +198,7 @@
                               columnDataType="DATE"/>
     </changeSet>
 
+
     <!-- 5682: Create report grid member table   -->
     <changeSet author="woodjes"
                id="20211203-5682-1">
@@ -233,6 +237,7 @@
         </addColumn>
     </changeSet>
 
+
     <changeSet author="woodjes"
                id="20211220-5800-1">
         <addColumn tableName="role">
@@ -243,8 +248,9 @@
             </column>
         </addColumn>
     </changeSet>
-  
-   <changeSet author="leprben"
+
+
+    <changeSet author="leprben"
               id="20220101-5821-1" >
         <addColumn tableName="application_group_entry">
             <column name="created_at"
@@ -253,9 +259,9 @@
                 <constraints nullable="false"/>
             </column>
         </addColumn>
-   </changeSet>
-  
-   <changeSet author="leprben"
+    </changeSet>
+
+    <changeSet author="leprben"
               id="20220113-5821-2" >
         <addColumn tableName="application_group_ou_entry">
             <column name="created_at"
@@ -263,8 +269,40 @@
                     defaultValueComputed="${now.value}">
                 <constraints nullable="false"/>
             </column>
-        </addColumn> 
-   </changeSet>
+        </addColumn>
+    </changeSet>
 
+
+    <changeSet id="20220114-5829-1"
+               author="davidwatkins73">
+        <addForeignKeyConstraint baseColumnNames="grid_id"
+                                 baseTableName="report_grid_member"
+                                 constraintName="report_grid_to_grid_member_fk"
+                                 onDelete="CASCADE"
+                                 referencedColumnNames="id"
+                                 referencedTableName="report_grid"/>
+    </changeSet>
+
+
+    <changeSet id="20220117-5803-1"
+               author="davidwatkins73">
+        <addColumn tableName="involvement_kind">
+            <column name="external_id"
+                    type="${external-id.type}">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20220117-5803-2"
+               author="davidwatkins73">
+        <update tableName="involvement_kind">
+            <column name="external_id"
+                    valueComputed="id">
+                <constraints nullable="false"
+                             unique="true"/>
+            </column>
+        </update>
+    </changeSet>
 
 </databaseChangeLog>

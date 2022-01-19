@@ -53,10 +53,10 @@ public class ReportGridEndpoint implements Endpoint {
         String findForUserPath = mkPath(BASE_URL, "user");
         String createPath = mkPath(BASE_URL, "create");
         String updatePath = mkPath(BASE_URL, "id", ":id", "update");
+        String removalPath = mkPath(BASE_URL, "id", ":id");
         String findForOwnerPath = mkPath(BASE_URL, "owner");
         String getViewByIdPath = mkPath(BASE_URL, "view", "id", ":id");
         String updateColumnDefsPath = mkPath(BASE_URL, "id", ":id", "column-definitions", "update");
-
 
         getForDatum(findAllPath, (req, resp) -> reportGridService.findAll());
         getForList(findForUserPath, (req, resp) -> reportGridService.findForUser(getUsername(req)));
@@ -65,33 +65,51 @@ public class ReportGridEndpoint implements Endpoint {
         postForDatum(updateColumnDefsPath, this::updateColumnDefsRoute);
         postForDatum(createPath, this::createRoute);
         postForDatum(updatePath, this::updateRoute);
+        deleteForDatum(removalPath, this::removalRoute);
     }
 
 
-    public ReportGrid getViewByIdRoute(Request req, Response resp) throws IOException {
+    private boolean removalRoute(Request request,
+                                 Response response) throws InsufficientPrivelegeException {
+        return reportGridService.remove(
+                getId(request),
+                getUsername(request));
+    }
+
+
+    public ReportGrid getViewByIdRoute(Request req,
+                                       Response resp) throws IOException {
         return reportGridService.getByIdAndSelectionOptions(
                 getId(req),
                 readIdSelectionOptionsFromBody(req));
     }
 
-    public ReportGridDefinition updateColumnDefsRoute(Request req, Response resp) throws IOException, InsufficientPrivelegeException {
+
+    public ReportGridDefinition updateColumnDefsRoute(Request req,
+                                                      Response resp) throws IOException, InsufficientPrivelegeException {
         return reportGridService.updateColumnDefinitions(
                 getId(req),
                 readBody(req, ReportGridColumnDefinitionsUpdateCommand.class),
                 getUsername(req));
     }
 
-    public ReportGridDefinition createRoute(Request req, Response resp) throws IOException {
+
+    public ReportGridDefinition createRoute(Request req,
+                                            Response resp) throws IOException {
         return reportGridService.
                 create(readBody(req, ReportGridCreateCommand.class), getUsername(req));
     }
 
-    public ReportGridDefinition updateRoute(Request req, Response resp) throws IOException, InsufficientPrivelegeException {
+
+    public ReportGridDefinition updateRoute(Request req,
+                                            Response resp) throws IOException, InsufficientPrivelegeException {
         return reportGridService.
                 update(getId(req), readBody(req, ReportGridUpdateCommand.class), getUsername(req));
     }
 
-    public Set<ReportGridDefinition> findForOwnerRoute(Request req, Response resp) {
+
+    public Set<ReportGridDefinition> findForOwnerRoute(Request req,
+                                                       Response resp) {
         return reportGridService.findForOwner(getUsername(req));
     }
 }

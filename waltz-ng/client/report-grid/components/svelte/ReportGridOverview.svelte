@@ -17,7 +17,7 @@
     const Modes = {
         VIEW: "VIEW",
         EDIT: "EDIT"
-    }
+    };
 
     let activeMode = Modes.VIEW;
 
@@ -30,8 +30,8 @@
     $: gridOwnersCall = $selectedGrid?.definition?.id && reportGridMemberStore.findByGridId($selectedGrid?.definition?.id);
     $: gridOwners = $gridOwnersCall?.data || [];
 
-    function selectGrid(grid) {
-        onGridSelect(grid);
+    function selectGrid(grid, isNew = false) {
+        onGridSelect(grid, isNew);
     }
 
     function create(grid){
@@ -46,7 +46,7 @@
         Promise.resolve(savePromise)
             .then(r => {
                 toasts.success("Grid created successfully")
-                selectGrid(r.data);
+                selectGrid(r.data, true);
                 activeMode = Modes.VIEW;
                 reportGridCall = reportGridStore.findForUser(true);
             })

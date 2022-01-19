@@ -77,6 +77,8 @@ public class AttestationInstanceEndpoint implements Endpoint {
         String findApplicationAttestationInstancesForKindAndSelectorPath = mkPath(BASE_URL, "applications", "attested-entity", ":kind", ":id");
         String findApplicationAttestationSummaryForSelectorPath = mkPath(BASE_URL, "app-summary");
         String cleanupOrphansPath = mkPath(BASE_URL, "cleanup-orphans");
+        String reassignRecipientsPath = mkPath(BASE_URL, "reassign-recipients");
+        String getCountsOfRecipientsToReassignPath = mkPath(BASE_URL, "reassign-counts");
 
         DatumRoute<Boolean> attestInstanceRoute =
                 (req, res) -> attestationInstanceService.attestInstance(
@@ -139,6 +141,8 @@ public class AttestationInstanceEndpoint implements Endpoint {
         postForList(findApplicationAttestationInstancesForKindAndSelectorPath, findApplicationAttestationInstancesForKindAndSelectorRoute);
         postForList(findApplicationAttestationSummaryForSelectorPath, findApplicationAttestationSummaryForSelectorRoute);
         getForDatum(cleanupOrphansPath, this::cleanupOrphansRoute);
+        postForDatum(reassignRecipientsPath, this::reassignRecipientsRoute);
+        getForDatum(getCountsOfRecipientsToReassignPath, this::getCountsOfRecipientsToReassign);
     }
 
 
@@ -149,6 +153,21 @@ public class AttestationInstanceEndpoint implements Endpoint {
 
         LOG.info("User: {}, requested orphan attestation cleanup", username);
         return attestationInstanceService.cleanupOrphans();
+    }
+
+
+    private AttestationSyncRecipientsResponse reassignRecipientsRoute(Request request, Response response) {
+        requireRole(userRoleService, request, SystemRole.ADMIN);
+
+        String username = getUsername(request);
+
+        LOG.info("User: {}, requested reassign recipients for attestations", username);
+        return attestationInstanceService.reassignRecipients();
+    }
+
+
+    private AttestationSyncRecipientsResponse getCountsOfRecipientsToReassign(Request request, Response response) {
+        return attestationInstanceService.getCountsOfRecipientsToReassign();
     }
 
 

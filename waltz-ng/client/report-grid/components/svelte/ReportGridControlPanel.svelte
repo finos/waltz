@@ -11,14 +11,27 @@
 
     export let onGridSelect = () => console.log("selecting grid");
     export let onSave = () => console.log("Saved report grid");
-    let selectedTab = "overview"
 
+    const tabs = {
+        OVERVIEW: 'overview',
+        FILTERS: 'filters',
+        COLUMNS: 'columns',
+        PEOPLE: 'people'
+    };
+
+    let selectedTab = tabs.OVERVIEW;
+
+    function handleGridSelect(selectedGrid, isNew) {
+        if (isNew) {
+            selectedTab = tabs.COLUMNS;
+        }
+        onGridSelect(selectedGrid);
+    }
 
     $: isOwned = $selectedGrid && _.includes($ownedReportIds, $selectedGrid?.definition?.id);
 
     $: ownedGridsCall = $selectedGrid?.definition?.id && reportGridStore.findForOwner(true);
     $: $ownedReportIds = _.map($ownedGridsCall?.data, d => d.id);
-
 
 </script>
 
@@ -26,7 +39,7 @@
     <!-- TAB HEADERS -->
     <input type="radio"
            bind:group={selectedTab}
-           value="overview"
+           value={tabs.OVERVIEW}
            id="overview">
     <label class="wt-label"
            for="overview">
@@ -37,7 +50,7 @@
 
     <input type="radio"
            bind:group={selectedTab}
-           value="filters"
+           value={tabs.FILTERS}
            disabled={!$selectedGrid}
            id="filters">
     <label class="wt-label"
@@ -50,7 +63,7 @@
     <input type="radio"
            bind:group={selectedTab}
            disabled={!isOwned}
-           value="columns"
+           value={tabs.COLUMNS}
            id="columns">
     <label class="wt-label"
            for="columns">
@@ -63,7 +76,7 @@
     <input type="radio"
            bind:group={selectedTab}
            disabled={!isOwned}
-           value="people"
+           value={tabs.PEOPLE}
            id="people">
     <label class="wt-label"
            for="people">
@@ -76,7 +89,7 @@
     <div class="wt-tab wt-active">
         <!-- SERVERS -->
         {#if selectedTab === 'overview'}
-            <ReportGridOverview {onGridSelect}/>
+            <ReportGridOverview onGridSelect={handleGridSelect}/>
         {:else if selectedTab === 'filters'}
             <ReportGridFilters/>
         {:else if selectedTab === 'columns'}

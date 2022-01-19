@@ -1,4 +1,3 @@
-
 /*
  * Waltz - Enterprise Architecture
  * Copyright (C) 2016, 2017, 2018, 2019 Waltz open source project
@@ -16,16 +15,26 @@
  * See the License for the specific
  *
  */
+import template from "./reassign-recipients-view.html";
 
-export default {
-    authentication: "web.authentication",
-    devExtEnabled: "web.devext.enabled",
-    httpHeaderPrefix: "web.devext.http.header.",
-    betaEnvironment: "web.beta",
-    betaNagMessage: "web.beta.nag-message",
-    defaultCurrency: "settings.asset-cost.default-currency",
-    currentYearText: "settings.asset-cost.current-year-text",
-    avatarTemplateUrl: "ui.avatar.template.url",
-    costExportEnabled: "feature.data-extractor.entity-cost.enabled",
-    measurableRatingRoadmapsEnabled: "feature.measurable-rating-roadmaps.enabled"
+import ReassignRecipientsView from "./svelte/recipients/ReassignRecipientsView.svelte"
+import {initialiseData} from "../common";
+
+
+const initialState = {
+    ReassignRecipientsView
 };
+
+
+function controller() {
+    initialiseData(this, initialState);
+}
+
+const page = {
+    controller,
+    template,
+    controllerAs: "$ctrl"
+};
+
+
+export default page;
