@@ -11,7 +11,11 @@
     $: costKindCall = costKindStore.findAll();
     $: costKinds = $costKindCall.data;
 
-    $: rowData = _.filter(costKinds, selectionFilter)
+    $: rowData = _
+        .chain(costKinds)
+        .filter(selectionFilter)
+        .orderBy(d => d.name)
+        .value();
 
     const columnDefs = [
         { field: "name", name: "Cost Kind", width: "30%"},

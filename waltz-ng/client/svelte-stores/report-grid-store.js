@@ -37,11 +37,15 @@ export function mkReportGridStore() {
 
     const create = (createCommand) => {
         return remote.execute("POST", "api/report-grid/create", createCommand);
-    }
+    };
 
     const update = (id, updateCmd) => {
         return remote.execute("POST", `api/report-grid/id/${id}/update`, updateCmd);
-    }
+    };
+
+    const remove = (id, updateCmd) => {
+        return remote.execute("DELETE", `api/report-grid/id/${id}`);
+    };
 
 
     return {
@@ -50,7 +54,8 @@ export function mkReportGridStore() {
         findForOwner,
         updateColumnDefinitions,
         create,
-        update
+        update,
+        remove
     };
 }
 

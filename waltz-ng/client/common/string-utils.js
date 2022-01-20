@@ -64,7 +64,7 @@ export function truncate(origStr = "",
 export function truncateMiddle(origStr = "",
                          maxLength = 16,
                          separator = " ... ") {
-    if (origStr.length <= maxLength) {
+    if (_.size(origStr) <= maxLength) {
         return origStr;
     }
 

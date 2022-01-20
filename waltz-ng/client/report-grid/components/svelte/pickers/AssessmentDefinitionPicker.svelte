@@ -11,11 +11,15 @@
     $: assessmentDefinitionsCall = assessmentDefinitionStore.loadAll();
     $: assessmentDefintions = $assessmentDefinitionsCall.data;
 
-    $: rowData = _.filter(assessmentDefintions, selectionFilter)
+    $: rowData = _
+        .chain(assessmentDefintions)
+        .filter(selectionFilter)
+        .orderBy(d => d.name)
+        .value()
 
     const columnDefs = [
         { field: "name", name: "Involvement Kind", width: "30%"},
-        { field: "description", name: "Description", width: "70%"},
+        { field: "description", name: "Description", width: "70%", maxLength: 300},
     ];
 
 </script>
