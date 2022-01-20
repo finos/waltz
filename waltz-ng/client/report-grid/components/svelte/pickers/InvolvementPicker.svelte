@@ -11,11 +11,15 @@
     $: involvementKindCall = involvementKindStore.findAll();
     $: involvementKinds = $involvementKindCall.data;
 
-    $: rowData = _.filter(involvementKinds, selectionFilter)
+    $: rowData = _
+        .chain(involvementKinds)
+        .filter(selectionFilter)
+        .orderBy(d => d.name)
+        .value();
 
     const columnDefs = [
         { field: "name", name: "Involvement Kind", width: "30%"},
-        { field: "description", name: "Description", width: "70%"},
+        { field: "description", name: "Description", width: "70%", maxLength: 300},
     ];
 
 </script>

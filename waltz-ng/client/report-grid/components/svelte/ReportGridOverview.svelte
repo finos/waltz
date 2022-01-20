@@ -16,7 +16,8 @@
 
     const Modes = {
         VIEW: "VIEW",
-        EDIT: "EDIT"
+        EDIT: "EDIT",
+        REMOVE: "REMOVE"
     };
 
     let activeMode = Modes.VIEW;
@@ -31,6 +32,8 @@
     $: gridOwners = $gridOwnersCall?.data || [];
 
     function selectGrid(grid, isNew = false) {
+        $selectedGrid = null;
+        activeMode = Modes.VIEW;
         onGridSelect(grid, isNew);
     }
 
@@ -47,7 +50,6 @@
             .then(r => {
                 toasts.success("Grid created successfully")
                 selectGrid(r.data, true);
-                activeMode = Modes.VIEW;
                 reportGridCall = reportGridStore.findForUser(true);
             })
             .catch(e => toasts.error("Could not create grid"));
@@ -65,9 +67,20 @@
             .then(r => {
                 toasts.success("Grid updated successfully")
                 selectGrid(r.data);
-                activeMode = Modes.VIEW;
             })
             .catch(e => toasts.error("Could not update grid"));
+    }
+
+    function remove(grid){
+
+        let rmPromise = reportGridStore.remove(grid.id);
+        Promise.resolve(rmPromise)
+            .then(r => {
+                toasts.success("Grid removed successfully")
+                selectGrid(null);
+                reportGridCall = reportGridStore.findForUser(true);
+            })
+            .catch(e => toasts.error("Could not remove grid"));
     }
 
     function saveReportGrid(grid) {
@@ -108,17 +121,15 @@
                           onGridSelect={selectGrid}/>
     </div>
     <div class="col-sm-7">
+
         {#if activeMode === Modes.EDIT}
             <h4>Editing report grid:</h4>
             <ReportGridEditor grid={$selectedGrid?.definition}
                               doSave={saveReportGrid}
                               doCancel={cancel}/>
-        {:else if activeMode === Modes.VIEW}
+        {:else if activeMode === Modes.VIEW || activeMode === Modes.REMOVE}
             {#if $selectedGrid?.definition?.id}
                 <h4>{$selectedGrid?.definition?.name}</h4>
-                <div class:text-muted={!$selectedGrid?.definition?.description}>
-                    {$selectedGrid?.definition?.description || "No description provided"}
-                </div>
                 <table class="table table-condensed small">
                     <tbody>
                     <tr>
@@ -143,21 +154,47 @@
                     </tr>
                     </tbody>
                 </table>
+                <div class:text-muted={!$selectedGrid?.definition?.description}
+                     style="padding-bottom: 2em;">
+                    {$selectedGrid?.definition?.description || "No description provided"}
+                </div>
                 {#if _.includes($ownedReportIds, $selectedGrid.definition?.id)}
-                    <button class="btn btn-skinny"
-                            on:click={() => activeMode = Modes.EDIT}>
-                        <Icon name="pencil"/>Edit Grid
-                    </button>
-                    <div class="help-block small">
-                        <Icon name="info-circle"/>To edit the columns for the grid use the 'Column Editor' tab above.
-                    </div>
+                    {#if activeMode === Modes.REMOVE}
+                        <h4>Please confirm you would like to delete this grid?</h4>
+                        <ul>
+                            <li>It cannot be restored</li>
+                            <li>It will be deleted for all users</li>
+                            <li>It will be deleted across all views in Waltz (Org Units, App Groups, People etc.)</li>
+                        </ul>
+                        <button class="btn-danger btn btn-sm"
+                                on:click={() => remove($selectedGrid.definition)}>
+                            Yes, delete this grid
+                        </button>
+                        <button class="btn-primary btn btn-sm"
+                                on:click={() => activeMode = Modes.VIEW}>
+                            Cancel
+                        </button>
+                    {/if}
+                    {#if activeMode === Modes.VIEW}
+                        <button class="btn btn-sm btn-primary"
+                                on:click={() => activeMode = Modes.EDIT}>
+                            <Icon name="pencil"/>Edit Grid
+                        </button>
+                        <button class="btn btn-sm btn-danger"
+                                on:click={() => activeMode = Modes.REMOVE}>
+                            <Icon name="trash"/>Delete Grid
+                        </button>
+                        <div class="help-block small">
+                            <Icon name="info-circle"/>To edit the columns for the grid use the 'Column Editor' tab above.
+                        </div>
+                    {/if}
                 {:else}
                     <div class="help-block small">
                         <Icon name="info-circle"/>You cannot edit this grid as you are not an owner.
                     </div>
                 {/if}
             {:else}
-                <NoData>No grid selected</NoData>
+                <NoData>Waiting for grid selection</NoData>
             {/if}
         {/if}
     </div>
